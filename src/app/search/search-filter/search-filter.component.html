@@ -1,0 +1,20 @@
+<div class="col-12 col-md-3 form-group">
+    <label for="requestOrPlan">Search For</label>
+    <br>
+    <div class="btn-group btn-group-toggle" 
+        ngbRadioGroup name="radioBasic" 
+        [(ngModel)]="searchFilter.requestOrPlan"
+        id="requestOrPlan">
+        <label ngbButtonLabel class="btn-primary">
+            <input ngbButton type="radio" value="Request"> Request
+        </label>
+        <label ngbButtonLabel class="btn-primary">
+            <input ngbButton type="radio" value="Plan"> Plan
+        </label>
+    </div>
+    <br>
+</div>
+<app-search-pool></app-search-pool>
+<app-funding-request-type></app-funding-request-type>
+<hr>
+{{searchFilter|json}}
