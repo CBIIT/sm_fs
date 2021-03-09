@@ -1,0 +1,70 @@
+<header th:fragment="header">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark" id="firstNav" arial-label="Primary Navigation">
+        <div class="container d-flex">
+            <a class="navbar-brand" href="{{nciHome}}" title="National Cancer Institute IMPAC II Extension Suite (I2E)"
+                target="_blank"></a>
+            <div class="appName">
+                Funding Selections
+            </div>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#firstNavCollapse"
+                aria-controls="firstNavCollapse" aria-expanded="false" aria-label="Toggle navigation"
+                title="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="firstNavCollapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <span class="navbar-text">{{ loggedOnUser?.fullName }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-book mr-1" aria-hidden="true"></i>Docs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-question-circle mr-1"
+                                aria-hidden="true"></i>Help</a>
+                    </li>
+                    <li class="nav-item dropdown change-user" *ngIf="canChangeUser">
+                        <lib-change-user></lib-change-user>
+                     </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="secondNav" role="navigation" aria-label="I2E Applications Navigation">
+        <div class="container">
+            <div class="scrtabs-tab-container scrtabs-bootstrap4" style="visibility: visible;">
+
+                <div class="scrtabs-tabs-fixed-container" style="width: 1263.33px;">
+                    <div class="scrtabs-tabs-movable-container" style="width: 1263.33px;">
+                        <ul class="nav nav-pills scrolling-tabs">
+                            <li id="i2eHome" class="nav-item">
+                                <a class="nav-link" href="#" title="Switch to Horizontal Navigation"
+                                    aria-label="I2E Home" target="_self"><i class="fas fa-home"
+                                        aria-hidden="true"></i></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ workBenchUrl }}">Workbench</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#">EM<span class="sr-only">&nbsp;(current)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ nearUrl }}">NEAR</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#">Other Modules</a>
+                            </li>
+                            <li id="impac2" class="nav-item">
+                                <a class="nav-link" target="_blank" href="https://inside.era.nih.gov/index.htm">IMPAC
+                                    II</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</header>

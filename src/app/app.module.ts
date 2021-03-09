@@ -9,16 +9,24 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgSelect2Module } from 'ng-select2';
 import { I2ecuiLibModule } from 'i2ecui-lib';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { HeaderComponent } from './header/header.component';
 import { SearchFilterComponent } from './search/search-filter/search-filter.component';
 import { FundingRequestTypeComponent } from './search/search-filter/funding-request-type/funding-request-type.component';
 import { SearchPoolComponent } from './search/search-filter/search-pool/search-pool.component';
+import { SearchComponent } from './search/search.component';
+import { NewRequestComponent } from './new-request/new-request.component';
+import { FsMenuComponent } from './fs-menu/fs-menu.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SearchFilterComponent,
     FundingRequestTypeComponent,
-    SearchPoolComponent
+    SearchPoolComponent,
+    HeaderComponent,
+    SearchComponent,
+    NewRequestComponent,
+    FsMenuComponent
   ],
   imports: [
     BrowserModule,

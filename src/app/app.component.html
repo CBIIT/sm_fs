@@ -1,7 +1,15 @@
+<div class="container">
+    <div class="row">
+        <app-header></app-header>
+    </div>
+    <div class="row">
+        <div class="col-lg-2">
+            <app-fs-menu></app-fs-menu>
+        </div>
+        <div class="col-lg-10">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
 
-<!--<lib-cancer-activities-dropdown  (selectedCasValues)="receiveCasValue($event)">
-</lib-cancer-activities-dropdown>
-<lib-pdname-dropdown  apiCallName = "activePds" (selectedPdIdValue)="receivePdIdValue($event)"></lib-pdname-dropdown>
-<lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
--->
-<app-search-filter></app-search-filter>
+</div>
+
