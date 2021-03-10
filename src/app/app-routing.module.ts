@@ -5,9 +5,10 @@ import { SearchComponent } from './search/search.component';
 
 
 const routes: Routes = [
-  {path: '', component: SearchComponent},
+  {path: '', redirectTo: '/search', pathMatch: 'full'},
   {path: 'search', component: SearchComponent},
-  {path: 'newrequest', component: NewRequestComponent}
+  {path: 'newrequest', component: NewRequestComponent},
+  {path: 'newplan', component: NewRequestComponent}
 ]
 
 @NgModule({
