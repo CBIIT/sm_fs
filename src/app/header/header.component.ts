@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewChecked } from '@angular/core';
 import { NciPerson } from 'i2ecws-lib';
 import { UserService } from 'i2ecui-lib';
 import { environment } from '../../environments/environment';
-
+import { AppPropertiesService } from '../service/app-properties.service';
 
 @Component({
   selector: 'app-header',
@@ -17,22 +17,25 @@ export class HeaderComponent implements OnInit {
   nearUrl: string ;
   canChangeUser: boolean ;
 
+  constructor(private userService: UserService, 
+              private AppPropertiesService: AppPropertiesService) { }
 
-  constructor(private userService: UserService) { }
-
-  ngOnInit(): void {
-
-    this.userService.getSecurityCredentials().subscribe(
+  async ngOnInit() {
+      this.userService.getSecurityCredentials().subscribe(
       result => {
         if (result ) {
           this.loggedOnUser = result.nciPerson;
           this.canChangeUser = this.userService.isTechSupportAuth(result.authorities);
         }
-      }
-    );
+      });
 
-    this.nciHome = environment.nciHome;
-    this.workBenchUrl = environment.workBenchUrl;
-    this.nearUrl = environment.nearUrl;
+      await this.AppPropertiesService.initialize2();
+      this.workBenchUrl=this.AppPropertiesService.getProperty('workBenchUrl');
+      this.nciHome = this.AppPropertiesService.getProperty('nciHome');
+      this.nearUrl = this.AppPropertiesService.getProperty('nearUrl');
+    
   }
+    // this.nciHome = environment.nciHome;
+    // this.workBenchUrl = environment.workBenchUrl;
+    // this.nearUrl = environment.nearUrl;
 }
