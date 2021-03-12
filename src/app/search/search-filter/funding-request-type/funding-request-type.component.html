@@ -2,6 +2,6 @@
     <label for="request-type-select">Request Type</label>
     <ng-select2  id="request-type-select" [width]="'610'"  [(ngModel)]="searchFilter.requestType" [allowClear]="true">
         <option></option>
-        <option *ngFor="let requestType of requestTypes" [value]="requestType.key" > {{requestType.value}}</option> 
+        <option *ngFor="let requestType of requestTypes" [value]="requestType.id" > {{requestType.requestName}}</option> 
    </ng-select2>
 </div>

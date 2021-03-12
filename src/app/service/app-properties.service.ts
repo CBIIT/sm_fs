@@ -17,7 +17,7 @@ export class AppPropertiesService {
       return;
 
     console.log("AppPropertiesService initialize STARTS");
-    let result= await this.lookupService.getAppPropertiesByAppNameUsingGET('FUNDING_SELECTIONS').toPromise();
+    let result= await this.lookupService.getAppPropertiesByAppNameUsingGET('GREENSHEETS').toPromise();
   
     this.appProperties={};
     result.forEach((element) => {
