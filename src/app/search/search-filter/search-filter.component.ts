@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { GrantnumberSearchCriteriaComponent } from 'i2ecui-lib';
 import { SearchFilterService } from '../search-filter.service';
 
 @Component({
@@ -8,10 +9,19 @@ import { SearchFilterService } from '../search-filter.service';
   providers: [SearchFilterService]
 })
 export class SearchFilterComponent implements OnInit {
-
+  @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
+  
   public searchFilter: 
-  { requestOrPlan: string; searchPool: string; requestType: string; } 
-  = { requestOrPlan: '', searchPool: '', requestType: '' };
+  { requestOrPlan: string; searchPool: string; requestType: string; 
+    rfaPa:string; fyRange:any, grantNumber:string} 
+  = { requestOrPlan: '', 
+      searchPool: '', 
+      requestType: '', 
+      rfaPa:'', 
+      fyRange: {},
+      grantNumber:''
+     };
+
 
   constructor(private searchFilterService:SearchFilterService) {}
 
@@ -19,5 +29,16 @@ export class SearchFilterComponent implements OnInit {
     console.log("search-filter component ngOnInit()");
     this.searchFilter=this.searchFilterService.searchFilter;
   }
+
+  rfaPaSelected(event:string) {
+    this.searchFilter.rfaPa=event;
+  }
+
+  fyRangeChanged(event:{}) {
+    this.searchFilter.fyRange=event;
+  }
+
+
+
 
 }
