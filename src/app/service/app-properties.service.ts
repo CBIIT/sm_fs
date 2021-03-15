@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Inject, Injectable, InjectionToken, OnInit } from '@angular/core';
 import { LookupsControllerService } from 'i2ecws-lib';
 import { ObjectUnsubscribedError, Observable, of } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -9,15 +9,19 @@ import { environment } from '../../environments/environment';
 export class AppPropertiesService {
 
   private appProperties:{}={}; 
+  private appName:string='';
 
-  constructor(private lookupService:LookupsControllerService) { }
+  constructor(private lookupService:LookupsControllerService,
+    @Inject(APP_NAME) appName: string) { 
+      this.appName=appName;
+  }
 
    async initialize() {
     if (Object.keys(this.appProperties).length>0)
       return;
 
-    console.log("AppPropertiesService initialize STARTS");
-    let result= await this.lookupService.getAppPropertiesByAppNameUsingGET('GREENSHEETS').toPromise();
+    console.log("getAppProperties for appName="+this.appName);
+    let result= await this.lookupService.getAppPropertiesByAppNameUsingGET(this.appName).toPromise();
   
     this.appProperties={};
     result.forEach((element) => {
@@ -38,3 +42,5 @@ export class AppPropertiesService {
   }
 
 }
+
+export const APP_NAME = new InjectionToken<string>('appName');

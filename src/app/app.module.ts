@@ -16,6 +16,7 @@ import { SearchPoolComponent } from './search/search-filter/search-pool/search-p
 import { SearchComponent } from './search/search.component';
 import { NewRequestComponent } from './new-request/new-request.component';
 import { FsMenuComponent } from './fs-menu/fs-menu.component';
+import { APP_NAME } from './service/app-properties.service';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { FsMenuComponent } from './fs-menu/fs-menu.component';
     NgbModule,
     FormsModule
   ],
-  providers: [{provide: BASE_PATH, useValue: '/i2ecws'}],
+  providers: [{provide: BASE_PATH, useValue: '/i2ecws'},
+              {provide: APP_NAME, useValue: 'FUNDING-SELECTIONS'}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
