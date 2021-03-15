@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -16,7 +16,16 @@ import { SearchPoolComponent } from './search/search-filter/search-pool/search-p
 import { SearchComponent } from './search/search.component';
 import { NewRequestComponent } from './new-request/new-request.component';
 import { FsMenuComponent } from './fs-menu/fs-menu.component';
-import { APP_NAME } from './service/app-properties.service';
+import { AppPropertiesService, PROPERTIES_APP_NAME, PROPERTIES_OVERRIDE } from './service/app-properties.service';
+import { environment } from 'src/environments/environment';
+
+export function initializeAppProperties(appPropertiesService: AppPropertiesService) {
+  return (): Promise<any> => { 
+    //add async loading proerties and other initialization functions below.
+    //calling rest api to load application properties and override properties
+    return appPropertiesService.initialize();
+  }
+}
 
 @NgModule({
   declarations: [
@@ -40,7 +49,11 @@ import { APP_NAME } from './service/app-properties.service';
     FormsModule
   ],
   providers: [{provide: BASE_PATH, useValue: '/i2ecws'},
-              {provide: APP_NAME, useValue: 'FUNDING-SELECTIONS'}],
+              {provide: PROPERTIES_APP_NAME, useValue: 'GREENSHEETS'},
+              {provide: PROPERTIES_OVERRIDE, useValue: environment},
+              {provide: APP_INITIALIZER, useFactory: initializeAppProperties, 
+                deps: [AppPropertiesService], multi: true}
+              ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

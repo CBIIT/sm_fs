@@ -31,11 +31,11 @@ export class HeaderComponent implements OnInit {
 
      // await this.AppPropertiesService.initialize2();
       console.log("before workbench");
-      this.workBenchUrl=await this.AppPropertiesService.getProperty('workBenchUrl');
+      this.workBenchUrl= this.AppPropertiesService.getProperty('workBenchUrl');
       console.log("before nciHome");
-      this.nciHome = await this.AppPropertiesService.getProperty('nciHome');
+      this.nciHome = this.AppPropertiesService.getProperty('nciHome');
       console.log("before nearUrl");
-      this.nearUrl = await this.AppPropertiesService.getProperty('nearUrl');
+      this.nearUrl = this.AppPropertiesService.getProperty('nearUrl');
     
   }
     // this.nciHome = environment.nciHome;
