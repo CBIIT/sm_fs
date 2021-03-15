@@ -1,18 +1,15 @@
+import { SearchCriteria } from "./search-criteria";
+
 export class SearchFilterService {
 
-    public searchFilter: 
-    { requestOrPlan: string; searchPool: string; requestType: string; 
-      rfaPa:string; fyRange:any, grantNumber:string} 
-    = { requestOrPlan: '', 
+    public searchFilter: SearchCriteria=
+    { requestOrPlan: 'Request', 
         searchPool: '', 
         requestType: '', 
         rfaPa:'', 
         fyRange: {},
         grantNumber:''
-       };
+    };
 
-    init() {
-        
-    }
 
 }
