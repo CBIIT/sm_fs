@@ -19,8 +19,8 @@ export class SearchComponent implements OnInit {
   doSearch(event:SearchCriteria) {
     console.log("search.component doSearch Called");
     let fsCritera:FundSelectSearchCriteria={};
-    fsCritera.fyFrom=event.fyRange["fromFy"];
-    fsCritera.fyTo=event.fyRange["toFy"];
+    fsCritera.fyFrom=event.fyRange.fromFy;
+    fsCritera.fyTo=event.fyRange.toFy;
     fsCritera.requestType=[event.requestType];
     fsCritera.rfaPaNumber=[event.rfaPa];
     

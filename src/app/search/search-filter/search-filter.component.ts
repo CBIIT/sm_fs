@@ -26,7 +26,7 @@ export class SearchFilterComponent implements OnInit {
     this.searchFilter.rfaPa=event;
   }
 
-  fyRangeChanged(event:{}) {
+  fyRangeChanged(event:{fromFy:number,toFy:number}) {
     this.searchFilter.fyRange=event;
   }
 
