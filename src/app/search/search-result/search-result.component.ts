@@ -17,7 +17,7 @@ export class SearchResultComponent implements OnInit {
 
   doSearch(criteria:FundSelectSearchCriteria) {
     console.log("search-result.component doSearch Called");
-    this.pfrControllerService.searchPaylinePaylistGrantsUsingPOST1(criteria).subscribe(
+    this.pfrControllerService.searchFundingRequestsUsingPOST(criteria).subscribe(
       result => {
         console.log('searchPaylinePaylistGrantsUsingPOST1 returned ', result);
         this.searchResult = result;
