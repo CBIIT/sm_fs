@@ -1,6 +1,5 @@
-import { Inject, Injectable, InjectionToken, OnInit } from '@angular/core';
+import { Inject, Injectable, InjectionToken } from '@angular/core';
 import { LookupsControllerService } from 'i2ecws-lib';
-import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

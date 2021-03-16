@@ -18,6 +18,7 @@ import { NewRequestComponent } from './new-request/new-request.component';
 import { FsMenuComponent } from './fs-menu/fs-menu.component';
 import { AppPropertiesService, PROPERTIES_APP_NAME, PROPERTIES_OVERRIDE } from './service/app-properties.service';
 import { environment } from 'src/environments/environment';
+import { SearchResultComponent } from './search/search-result/search-result.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService) {
   return (): Promise<any> => { 
@@ -36,7 +37,8 @@ export function initializeAppProperties(appPropertiesService: AppPropertiesServi
     HeaderComponent,
     SearchComponent,
     NewRequestComponent,
-    FsMenuComponent
+    FsMenuComponent,
+    SearchResultComponent
   ],
   imports: [
     BrowserModule,

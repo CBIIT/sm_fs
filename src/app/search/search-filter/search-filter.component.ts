@@ -1,5 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
 import { GrantnumberSearchCriteriaComponent } from 'i2ecui-lib';
+import { FundSelectSearchCriteria } from 'i2ecws-lib';
 import { SearchCriteria } from '../search-criteria';
 import { SearchFilterService } from '../search-filter.service';
 
@@ -11,7 +12,7 @@ import { SearchFilterService } from '../search-filter.service';
 })
 export class SearchFilterComponent implements OnInit {
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
-  
+  @Output() callSearch=new EventEmitter<SearchCriteria>();
   public searchFilter: SearchCriteria;
 
   constructor(private searchFilterService:SearchFilterService) {}
@@ -33,7 +34,9 @@ export class SearchFilterComponent implements OnInit {
     return this.searchFilter.requestOrPlan==='Request';
   }
 
-
-
+  doSearch() {
+    console.log("search-filter.component doSearch Called");
+    this.callSearch.emit(this.searchFilter);
+  }
 
 }
