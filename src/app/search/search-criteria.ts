@@ -3,6 +3,6 @@ export interface SearchCriteria {
     searchPool: string; 
     requestType: string; 
     rfaPa:string; 
-    fyRange:{}, 
+    fyRange:{fromFy:number,toFy:number}, 
     grantNumber:string
 }
