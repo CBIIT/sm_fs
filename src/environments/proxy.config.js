@@ -1,6 +1,6 @@
 module.exports = {
   '/i2ecws': {
-    target: 'http://localhost:8080/',
+    target: 'http://localhost/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
