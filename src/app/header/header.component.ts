@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewChecked } from '@angular/core';
-import { NciPerson } from 'i2ecws-lib';
+import { AppNavigationTControllerService, NciPerson } from 'i2ecws-lib';
 import { UserService } from 'i2ecui-lib';
 import { environment } from '../../environments/environment';
 import { AppPropertiesService } from '../service/app-properties.service';
@@ -16,25 +16,50 @@ export class HeaderComponent implements OnInit {
   workBenchUrl: string;
   nearUrl: string ;
   canChangeUser: boolean ;
+  
+  mainMenus=[];
+  otherMenus=[];
 
   constructor(private userService: UserService, 
+              private appNavService: AppNavigationTControllerService,
               private AppPropertiesService: AppPropertiesService) { }
 
-  async ngOnInit() {
+  ngOnInit() {
       this.userService.getSecurityCredentials().subscribe(
       result => {
         if (result ) {
+          console.log(result);
           this.loggedOnUser = result.nciPerson;
           this.canChangeUser = this.userService.isTechSupportAuth(result.authorities);
+          let roles=[];
+          result.authorities.forEach(authority=>{ roles.push(authority.authority)});
+          let linked=[];
+          this.appNavService.getNavLinksUsingGET(roles).subscribe(
+            result2 => {
+              if (result2 ) {
+                result2.forEach(appNav=>{
+                  if (linked.indexOf(appNav.gwbLinksTDto.displayName)>-1)
+                    return;
+                  linked.push(appNav.gwbLinksTDto.displayName);
+                  let nav:{name:string, url:string}={name:'',url:''};
+                  nav.url=appNav.gwbLinksTDto.composedUrl;
+                  nav.name=appNav.gwbLinksTDto.displayName;
+                  if (appNav.mainDisplayFlag==='Y')
+                    this.mainMenus.push(nav);
+                  else 
+                    this.otherMenus.push(nav);
+                  
+                });
+                this.mainMenus.push({name:'FS',url:'/',target:''})
+                console.log("main nav menus",this.mainMenus);
+                console.log("other nav menus",this.otherMenus);
+              }
+            });
         }
       });
 
-     // await this.AppPropertiesService.initialize2();
-      console.log("before workbench");
       this.workBenchUrl= this.AppPropertiesService.getProperty('workBenchUrl');
-      console.log("before nciHome");
       this.nciHome = this.AppPropertiesService.getProperty('nciHome');
-      console.log("before nearUrl");
       this.nearUrl = this.AppPropertiesService.getProperty('nearUrl');
     
   }
