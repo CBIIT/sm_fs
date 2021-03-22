@@ -39,21 +39,20 @@
                     <div class="scrtabs-tabs-movable-container" style="width: 1263.33px;">
                         <ul class="nav nav-pills scrolling-tabs">
                             <li id="i2eHome" class="nav-item">
-                                <a class="nav-link" href="#" title="Switch to Horizontal Navigation"
+                                <a class="nav-link" href="{{nciHome}}" title="Switch to Horizontal Navigation"
                                     aria-label="I2E Home" target="_self"><i class="fas fa-home"
                                         aria-hidden="true"></i></a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ workBenchUrl }}">Workbench</a>
+                            <li class="nav-item" *ngFor="let nav of mainMenus">
+                                <a class="nav-link" [ngClass]="{active:nav.name==='FS'}" href="{{ nav.url }}" target="{{nav.name.toUpperCase()==='WORKBENCH'?'_blank':''}}">{{nav.name}}</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#">EM<span class="sr-only">&nbsp;(current)</span></a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ nearUrl }}">NEAR</a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#">Other Modules</a>
+                            <li class="nav-item dropdown" id="other_modules">
+                                <a class="nav-link dropdown-toggle" href="#" id="other-modules-link" data-toggle="dropdown"
+                                         aria-haspopup="true" aria-expanded="false">Other Modules</a>
+                                <div class="dropdown-menu dropdown-menu-left" aria-labelledby="other-modules-link">
+                                    <a class="dropdown-item" *ngFor="let nav of otherMenus" 
+                                        href="{{nav.url}}">{{nav.name}}</a>
+                                </div>
                             </li>
                             <li id="impac2" class="nav-item">
                                 <a class="nav-link" target="_blank" href="https://inside.era.nih.gov/index.htm">IMPAC

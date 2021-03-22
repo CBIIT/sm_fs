@@ -20,7 +20,7 @@
 <lib-rfa-pa-dropdown (selectedRfaPaValue)="rfaPaSelected($event)" *ngIf="!isSearchingRequest()"></lib-rfa-pa-dropdown>
 <lib-fy-range [minYear]="2001" [maxYear]="2025" (rangeChanged)="fyRangeChanged($event)"></lib-fy-range>
 <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
-<button class="btn-primary" (click)="doSearch()">Search</button>
+<button class="btn btn-primary" (click)="doSearch()">Search</button>
 </div>
 <hr>
 {{searchFilter|json}}
