@@ -26,7 +26,7 @@
     "@types/select2": "^4.0.53",
     "bootstrap": "^4.6.0",
     "i2ecui-lib": "file:i2ecui-lib-0.0.1.tgz",
-    "i2ecws-lib": "github:CBIIT/i2ecws-lib.git#v2.1.0-rc1",
+    "i2ecws-lib": "file:i2ecws-lib-2.1.0.tgz",
     "jquery": "^3.5.1",
     "ng-select2": "^1.2.5",
     "rxjs": "~6.6.0",

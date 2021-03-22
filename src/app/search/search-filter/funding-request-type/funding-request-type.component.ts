@@ -1,5 +1,5 @@
 import { Component, OnInit , Input , Output , EventEmitter } from '@angular/core';
-import { PfrLookupControllerService } from 'i2ecws-lib';
+import { FsLookupControllerService } from 'i2ecws-lib';
 import 'select2';
 import { SearchFilterService } from '../../search-filter.service';
 
@@ -15,7 +15,7 @@ export class FundingRequestTypeComponent implements OnInit {
   { requestOrPlan: string; searchPool: string; requestType: string; } 
   = { requestOrPlan: '', searchPool: '', requestType: '' };
 
-  constructor(private pfrLookupControllerService : PfrLookupControllerService,
+  constructor(private fsLookupControllerService : FsLookupControllerService,
     private searchFilterService:SearchFilterService) { }
  
   // set selectedRequestType(selectedValue: string) {
@@ -24,7 +24,7 @@ export class FundingRequestTypeComponent implements OnInit {
   //   this.requestTypeSelected.emit(this._selectRequestType);
   // }
   ngOnInit(): void {
-    this.pfrLookupControllerService.getRequestTypesUsingGET().subscribe(
+    this.fsLookupControllerService.getRequestTypesUsingGET().subscribe(
       result => {
         console.log('getRequestTypes returned ', result);
         this.requestTypes = result;
