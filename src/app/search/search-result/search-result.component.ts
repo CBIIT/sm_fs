@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FundSelectSearchCriteria, PfrControllerService } from 'i2ecws-lib';
+import { FundSelectSearchCriteria, FsControllerService } from 'i2ecws-lib';
 
 @Component({
   selector: 'app-search-result',
@@ -10,14 +10,14 @@ export class SearchResultComponent implements OnInit {
 
   searchResult;
 
-  constructor(private pfrControllerService: PfrControllerService ) { }
+  constructor(private fsControllerService: FsControllerService ) { }
 
   ngOnInit(): void {
   }
 
   doSearch(criteria:FundSelectSearchCriteria) {
     console.log("search-result.component doSearch Called");
-    this.pfrControllerService.searchFundingRequestsUsingPOST(criteria).subscribe(
+    this.fsControllerService.searchFundingRequestsUsingPOST(criteria).subscribe(
       result => {
         console.log('searchPaylinePaylistGrantsUsingPOST1 returned ', result);
         this.searchResult = result;
