@@ -65,7 +65,7 @@ export function initializeAppProperties(appPropertiesService: AppPropertiesServi
     FormsModule
   ],
   providers: [{provide: BASE_PATH, useValue: '/i2ecws'},
-              {provide: PROPERTIES_APP_NAME, useValue: 'GREENSHEETS'},
+              {provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTION'},
               {provide: PROPERTIES_OVERRIDE, useValue: environment},
               {provide: APP_INITIALIZER, useFactory: initializeAppProperties, 
                 deps: [AppPropertiesService], multi: true}
