@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AppPropertiesService } from '../service/app-properties.service';
 
 @Component({
   selector: 'app-fs-menu',
@@ -7,9 +8,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FsMenuComponent implements OnInit {
 
-  constructor() { }
+  paylistDashboardUrl;
+  paylistPendingGrantsUrl;
+  paylistSearchUrl;
+
+
+  constructor(private appPropertiesService:AppPropertiesService) { }
 
   ngOnInit(): void {
+    this.paylistDashboardUrl=this.appPropertiesService.getProperty('paylistUrl')+'#side-nav-paylists';
+    this.paylistPendingGrantsUrl=this.appPropertiesService.getProperty('paylistUrl')+'#side-nav-grants';
+    this.paylistSearchUrl=this.appPropertiesService.getProperty('paylistUrl')+'#side-nav-find-paylists';
   }
 
 }
