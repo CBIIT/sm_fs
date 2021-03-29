@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Router, CanActivate, CanActivateChild, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { UserService } from 'i2ecui-lib';
-import { I2ERoles, SecurityCredentials, GrantedAuthority } from 'i2ecws-lib';
+import { SecurityCredentials, GrantedAuthority } from 'i2ecws-lib';
 
 @Injectable({
   providedIn: 'root'

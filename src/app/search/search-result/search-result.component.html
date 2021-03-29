@@ -5,5 +5,32 @@
     <div class="row">
         <p *ngIf="!searchResult">No results to display. Try applying a filter above and clicking "Search."</p>
         <p>{{searchResult|json}}</p>
+
+
+         <table datatable [dtOptions]="dtOptions" class="row-border hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>First name</th>
+                <th>Last name</th>
+              </tr>
+            </thead>
+            <tbody *ngIf="persons?.length != 0">
+              <tr *ngFor="let person of persons">
+                <td>{{ person.fullGrantNum }}</td>
+                <td>{{ person.piFullName }}</td>
+                <td>{{ person.orgName }}</td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="persons?.length == 0">
+              <tr>
+                <td colspan="3" class="no-data-available">No data!</td>
+              </tr>
+            </tbody>
+          </table>
+
+
+
+
     </div>
 </div>

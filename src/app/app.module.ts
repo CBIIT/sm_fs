@@ -26,6 +26,7 @@ import { Step1Component } from './funding-request/step1/step1.component';
 import { Step3Component } from './funding-request/step3/step3.component';
 import { Step2Component } from './funding-request/step2/step2.component';
 import { Step4Component } from './funding-request/step4/step4.component';
+import { DataTablesModule } from "angular-datatables";
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService) {
   return (): Promise<any> => { 
@@ -62,7 +63,8 @@ export function initializeAppProperties(appPropertiesService: AppPropertiesServi
     HttpClientModule,
     NgSelect2Module,
     NgbModule,
-    FormsModule
+    FormsModule,
+    DataTablesModule 
   ],
   providers: [{provide: BASE_PATH, useValue: '/i2ecws'},
               {provide: PROPERTIES_APP_NAME, useValue: 'GREENSHEETS'},
