@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SearchCriteria } from './search-criteria';
 import { SearchResultComponent } from './search-result/search-result.component';
-import { FundSelectSearchCriteria } from 'i2ecws-lib';
+import { FundSelectSearchCriteria } from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-search',
@@ -23,7 +23,7 @@ export class SearchComponent implements OnInit {
     fsCritera.fyTo=event.fyRange.toFy;
     fsCritera.requestType=[event.requestType];
     fsCritera.rfaPaNumber=[event.rfaPa];
-    
+
     this.searchResultComponent.doSearch(fsCritera);
 
   }

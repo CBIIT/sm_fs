@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewChecked } from '@angular/core';
-import { AppNavigationTControllerService, NciPerson } from 'i2ecws-lib';
-import { UserService } from 'i2ecui-lib';
+import { AppNavigationTControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
+import { UserService } from '@nci-cbiit/i2ecui-lib';
 import { environment } from '../../environments/environment';
 import { AppPropertiesService } from '../service/app-properties.service';
 
@@ -16,11 +16,11 @@ export class HeaderComponent implements OnInit {
   workBenchUrl: string;
   nearUrl: string ;
   canChangeUser: boolean ;
-  
+
   mainMenus=[];
   otherMenus=[];
 
-  constructor(private userService: UserService, 
+  constructor(private userService: UserService,
               private appNavService: AppNavigationTControllerService,
               private AppPropertiesService: AppPropertiesService) { }
 
@@ -46,9 +46,9 @@ export class HeaderComponent implements OnInit {
                   nav.name=appNav.gwbLinksTDto.displayName;
                   if (appNav.mainDisplayFlag==='Y')
                     this.mainMenus.push(nav);
-                  else 
+                  else
                     this.otherMenus.push(nav);
-                  
+
                 });
                 this.mainMenus.push({name:'FS',url:'/',target:''})
                 console.log("main nav menus",this.mainMenus);
@@ -61,7 +61,7 @@ export class HeaderComponent implements OnInit {
       this.workBenchUrl= this.AppPropertiesService.getProperty('workBenchUrl');
       this.nciHome = this.AppPropertiesService.getProperty('nciHome');
       this.nearUrl = this.AppPropertiesService.getProperty('nearUrl');
-    
+
   }
     // this.nciHome = environment.nciHome;
     // this.workBenchUrl = environment.workBenchUrl;

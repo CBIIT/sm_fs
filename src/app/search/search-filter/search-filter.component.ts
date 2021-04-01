@@ -1,6 +1,6 @@
 import { Component, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
-import { GrantnumberSearchCriteriaComponent } from 'i2ecui-lib';
-import { FundSelectSearchCriteria } from 'i2ecws-lib';
+import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
+import { FundSelectSearchCriteria } from '@nci-cbiit/i2ecws-lib';
 import { SearchCriteria } from '../search-criteria';
 import { SearchFilterService } from '../search-filter.service';
 

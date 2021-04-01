@@ -1,5 +1,5 @@
 import { Component, OnInit , Input , Output , EventEmitter } from '@angular/core';
-import { LookupsControllerService } from 'i2ecws-lib';
+import { LookupsControllerService } from '@nci-cbiit/i2ecws-lib';
 import 'select2';
 import { SearchFilterService } from '../../search-filter.service';
 
@@ -11,14 +11,14 @@ import { SearchFilterService } from '../../search-filter.service';
 export class SearchPoolComponent implements OnInit {
 
     public searchPools: {key:string, value:string}[]=[];
-    public searchFilter: 
-    { requestOrPlan: string; searchPool: string; requestType: string; } 
+    public searchFilter:
+    { requestOrPlan: string; searchPool: string; requestType: string; }
     = { requestOrPlan: '', searchPool: '', requestType: '' };
-  
-  
+
+
     constructor(private lookupsControllerService : LookupsControllerService,
       private searchFilterService:SearchFilterService) { }
-   
+
     // set selectedSearchPool(selectedValue: string) {
     //   this._select = selectedValue;
     //   console.log(selectedValue);
@@ -56,8 +56,8 @@ export class SearchPoolComponent implements OnInit {
         "key":'rqawme',
         "value":"Requests Awaiting My Response"
       });
-  
+
     }
-  
+
     }
-  
+

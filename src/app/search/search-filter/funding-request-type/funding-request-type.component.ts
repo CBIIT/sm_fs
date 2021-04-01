@@ -1,5 +1,5 @@
 import { Component, OnInit , Input , Output , EventEmitter } from '@angular/core';
-import { FsLookupControllerService } from 'i2ecws-lib';
+import { FsLookupControllerService } from '@nci-cbiit/i2ecws-lib';
 import 'select2';
 import { SearchFilterService } from '../../search-filter.service';
 
@@ -11,13 +11,13 @@ import { SearchFilterService } from '../../search-filter.service';
 })
 export class FundingRequestTypeComponent implements OnInit {
   public requestTypes: {id:number, requestName:string}[]=[];
-  public searchFilter: 
-  { requestOrPlan: string; searchPool: string; requestType: string; } 
+  public searchFilter:
+  { requestOrPlan: string; searchPool: string; requestType: string; }
   = { requestOrPlan: '', searchPool: '', requestType: '' };
 
   constructor(private fsLookupControllerService : FsLookupControllerService,
     private searchFilterService:SearchFilterService) { }
- 
+
   // set selectedRequestType(selectedValue: string) {
   //   this._selectRequestType = selectedValue;
   //   console.log(selectedValue);
@@ -34,7 +34,7 @@ export class FundingRequestTypeComponent implements OnInit {
     console.log("funding-request-type component ngOnInit()");
 
     this.searchFilter=this.searchFilterService.searchFilter;
-    
+
     // this.requestTypes.push({
     //   "key":1018,
     //   "value":"Co-Fund a Non-NCI Non-Competing Grant"

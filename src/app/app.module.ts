@@ -4,10 +4,10 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ApiModule, BASE_PATH } from 'i2ecws-lib';
+import { ApiModule, BASE_PATH } from '@nci-cbiit/i2ecws-lib';
 import { HttpClientModule } from '@angular/common/http';
 import { NgSelect2Module } from 'ng-select2';
-import { I2ecuiLibModule } from 'i2ecui-lib';
+import { I2ecuiLibModule } from '@nci-cbiit/i2ecui-lib';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HeaderComponent } from './header/header.component';
 import { SearchFilterComponent } from './search/search-filter/search-filter.component';
@@ -29,7 +29,7 @@ import { Step4Component } from './funding-request/step4/step4.component';
 import { DataTablesModule } from "angular-datatables";
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService) {
-  return (): Promise<any> => { 
+  return (): Promise<any> => {
     //add async loading proerties and other initialization functions below.
     //calling rest api to load application properties and override properties
     return appPropertiesService.initialize();
@@ -64,12 +64,12 @@ export function initializeAppProperties(appPropertiesService: AppPropertiesServi
     NgSelect2Module,
     NgbModule,
     FormsModule,
-    DataTablesModule 
+    DataTablesModule
   ],
   providers: [{provide: BASE_PATH, useValue: '/i2ecws'},
               {provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTION'},
               {provide: PROPERTIES_OVERRIDE, useValue: environment},
-              {provide: APP_INITIALIZER, useFactory: initializeAppProperties, 
+              {provide: APP_INITIALIZER, useFactory: initializeAppProperties,
                 deps: [AppPropertiesService], multi: true}
               ],
   bootstrap: [AppComponent]

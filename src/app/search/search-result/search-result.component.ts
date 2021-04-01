@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FundSelectSearchCriteria, FsControllerService, FundingRequestQueryDto, BASE_PATH } from 'i2ecws-lib';
+import { FundSelectSearchCriteria, FsControllerService, FundingRequestQueryDto, BASE_PATH } from '@nci-cbiit/i2ecws-lib';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 
 class DataTablesResponse {
@@ -28,7 +28,7 @@ export class SearchResultComponent implements OnInit {
   ngOnInit(): void {
 
 
-    
+
 
     this.userData = { fyFrom : '2019' };
         this.dtOptions = {
@@ -61,7 +61,7 @@ export class SearchResultComponent implements OnInit {
     this.userData = { fyFrom : criteria.fyFrom };
 
 
-    
+
 
     // this.fsControllerService.searchFundingRequestsUsingPOST(criteria).subscribe(
     //   result => {
