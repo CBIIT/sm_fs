@@ -10,23 +10,23 @@
          <table datatable [dtOptions]="dtOptions" class="row-border hover">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>First name</th>
-                <th>Last name</th>
+                <th>Grant Number</th>
+                <th>PI Full Name</th>
+                <th>Org Name</th>
               </tr>
             </thead>
-            <tbody *ngIf="persons?.length != 0">
-              <tr *ngFor="let person of persons">
-                <td>{{ person.fullGrantNum }}</td>
-                <td>{{ person.piFullName }}</td>
-                <td>{{ person.orgName }}</td>
+            <tbody *ngIf="fundingRequests?.length != 0">
+              <tr *ngFor="let fundingRequest of fundingRequests">
+                <td>{{ fundingRequest.fullGrantNum }}</td>
+                <td>{{ fundingRequest.piFullName }}</td>
+                <td>{{ fundingRequest.orgName }}</td>
               </tr>
             </tbody>
-            <tbody *ngIf="persons?.length == 0">
+            <!-- <tbody *ngIf="fundingRequests?.length == 0">
               <tr>
                 <td colspan="3" class="no-data-available">No data!</td>
               </tr>
-            </tbody>
+            </tbody> -->
           </table>
 
 

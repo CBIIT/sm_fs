@@ -17,14 +17,13 @@ class DataTablesResponse {
 export class SearchResultComponent implements OnInit {
 
   dtOptions: DataTables.Settings = {};
-  persons: FundingRequestQueryDto[];
+  fundingRequests: FundingRequestQueryDto[];
   userData: any;
   params: any;
 
   searchResult;
 
-  constructor(private fsControllerService: FsControllerService,
-    private http: HttpClient) { }
+  constructor(private fsControllerService: FsControllerService) { }
 
   ngOnInit(): void {
 
@@ -40,7 +39,7 @@ export class SearchResultComponent implements OnInit {
         this.fsControllerService.searchFundingRequestsUsingPOST(Object.assign(dataTablesParameters, this.userData)).subscribe(
           result => {
             console.log('searchPaylinePaylistGrantsUsingPOST1 returned ', result);
-            this.persons = result.data;
+            this.fundingRequests = result.data;
             callback({
               recordsTotal: result.recordsTotal,
               recordsFiltered: result.recordsFiltered,
