@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FundSelectSearchCriteriaRes, FsControllerService, FundingRequestQueryDatatableDto, FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { FundSelectSearchCriteriaRes, FsSearchControllerService , FundingRequestQueryDatatableDto, FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 
 class DataTablesResponse {
@@ -23,7 +23,7 @@ export class SearchResultComponent implements OnInit {
 
   searchResult;
 
-  constructor(private fsControllerService: FsControllerService) { }
+  constructor(private fsSearchControllerService: FsSearchControllerService) { }
 
   ngOnInit(): void {
 
@@ -36,7 +36,7 @@ export class SearchResultComponent implements OnInit {
 
       ajax: (dataTablesParameters: any, callback) => {
 
-        this.fsControllerService.searchFundingRequestsUsingPOST(Object.assign(dataTablesParameters, this.userData)).subscribe(
+        this.fsSearchControllerService.searchFundingRequestsUsingPOST(Object.assign(dataTablesParameters, this.userData)).subscribe(
           result => {
             console.log('searchPaylinePaylistGrantsUsingPOST1 returned ', result);
             this.fundingRequests = result.data;
