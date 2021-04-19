@@ -5,7 +5,49 @@
     <div class="flex">
         <app-search-pool></app-search-pool>
         <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
+        <lib-fy-range [minYear]="2001" [maxYear]="2025" (rangeChanged)="fyRangeChanged($event)"></lib-fy-range>
+        <lib-i2status-dropdown (selectedI2statusValue)="i2StatusChanged($event)"></lib-i2status-dropdown>
+        <button class="btn btn-info float-right" (click)="clear()">Clear</button>
+        <button class="btn btn-primary float-right" (click)="search()">Search</button>
     </div>
+    <hr/>
+    <div class="row">
+        <h2>Results</h2>
+    </div>
+    <div class="row">
+        <p *ngIf="!grantList">No results to display. Try applying a filter above and clicking "Search."</p>
+        <table #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+            <thead>
+              <tr>
+                <th>Grant Number</th>
+                <th>Project Title</th>
+                <th>I2 Status</th>
+                <th>PI</th>
+                <th>Institution</th>
+                <th>FY</th>
+                <th>NCAB Date</th>
+                <th>Pctl</th>
+                <th>PriScr</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let grant of grantList">
+                <td>{{grant.fullGrantNum}}</td>
+                <td>{{grant.projectTitle}}</td>
+                <td>{{grant.applStatusCode}}</td>
+                <td>{{grant.piFullName}}</td>
+                <td>{{grant.orgName}}</td>
+                <td>{{grant.fy}}</td>
+                <td>{{grant.councilMeetingDate}}</td>
+                <td>{{grant.irgPercentileNum}}</td>
+                <td>{{grant.priorityScoreNum}}</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+    </div>
+
     <div class="flex">
         <button class="btn btn-primary float-right" (click)="nextStep()">Next</button>
     </div>
