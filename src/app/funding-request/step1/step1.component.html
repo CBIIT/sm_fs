@@ -1,14 +1,30 @@
 <div class="container">
-    <div class="row">
+    <div class="row flex">
         <h2>Filters</h2>
+        <a [routerLink]="" (click)="showHideAdvanced()" class="float-right">Show Advanced Filters</a>
     </div>
     <div class="flex">
         <app-search-pool></app-search-pool>
         <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
         <lib-fy-range [minYear]="2001" [maxYear]="2025" (rangeChanged)="fyRangeChanged($event)"></lib-fy-range>
         <lib-i2status-dropdown (selectedI2statusValue)="i2StatusChanged($event)"></lib-i2status-dropdown>
-        <button class="btn btn-info float-right" (click)="clear()">Clear</button>
-        <button class="btn btn-primary float-right" (click)="search()">Search</button>
+        <div class="col-12 col-md-6 form-group" *ngIf="showAdvancedFilters">
+            <label>PI</label>
+            <input type="text" [(ngModel)]="piName"/>
+        </div>
+        <lib-institute-dropdown *ngIf="showAdvancedFilters"></lib-institute-dropdown>
+        <lib-pdname-dropdown  (selectedPdIdValue)="pdSelected($event)" 
+        [showInactiveToggle]="true" *ngIf="showAdvancedFilters"></lib-pdname-dropdown>
+        <lib-rfa-pa-dropdown *ngIf="showAdvancedFilters"></lib-rfa-pa-dropdown>
+        <lib-ncab-daterange *ngIf="showAdvancedFilters"></lib-ncab-daterange>
+        <lib-cancer-activities-dropdown  (selectedCasValues)="cayCodeSelected($event)" 
+        *ngIf="showAdvancedFilters"> 
+        </lib-cancer-activities-dropdown>
+    </div>
+
+    <div class="float-right">
+            <button class="btn btn-info" (click)="clear()">Clear</button>
+            <button class="btn btn-primary" (click)="search()">Search</button>
     </div>
     <hr/>
     <div class="row">
@@ -42,13 +58,9 @@
                 <td>{{grant.councilMeetingDate}}</td>
                 <td>{{grant.irgPercentileNum}}</td>
                 <td>{{grant.priorityScoreNum}}</td>
-                <td></td>
+                <td><button class="btn btn-primary"  (click)="nextStep()">Select</button></td>
               </tr>
             </tbody>
           </table>
-    </div>
-
-    <div class="flex">
-        <button class="btn btn-primary float-right" (click)="nextStep()">Next</button>
     </div>
 </div>

@@ -18,6 +18,8 @@ export class Step1Component implements OnInit, AfterViewInit {
 
   dtOptions: DataTables.Settings = {};
   dtTrigger: Subject<any> = new Subject();
+  showAdvancedFilters:boolean=false;
+  piName:string;
 
   constructor(private router:Router,
               private gsfs: GrantsSearchFilterService,
@@ -86,6 +88,14 @@ export class Step1Component implements OnInit, AfterViewInit {
     this.gsfs.setI2Status(event);
   }
 
+  pdSelected(event:string) {
+    console.log("PD Selected",event);
+  }
+
+  cayCodeSelected(event) {
+    console.log("CayCode selected",event);
+  }
+
   search() {
     console.log("grant search criteria", this.gsfs.getGrantsSearchCriteria());
     this.fsRequestControllerService.searchGrantsUsingPOST(this.gsfs.getGrantsSearchCriteria()).subscribe(
@@ -107,6 +117,10 @@ export class Step1Component implements OnInit, AfterViewInit {
 
   clear() {
 
+  }
+
+  showHideAdvanced() {
+    this.showAdvancedFilters=!this.showAdvancedFilters;
   }
 
 
