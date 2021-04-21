@@ -27,6 +27,7 @@ import { Step3Component } from './funding-request/step3/step3.component';
 import { Step2Component } from './funding-request/step2/step2.component';
 import { Step4Component } from './funding-request/step4/step4.component';
 import { DataTablesModule } from "angular-datatables";
+import { FsRequestTypeComponent } from './fs-request-type/fs-request-type.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService) {
   return (): Promise<any> => {
@@ -53,7 +54,8 @@ export function initializeAppProperties(appPropertiesService: AppPropertiesServi
     Step1Component,
     Step3Component,
     Step2Component,
-    Step4Component
+    Step4Component,
+    FsRequestTypeComponent
   ],
   imports: [
     BrowserModule,
