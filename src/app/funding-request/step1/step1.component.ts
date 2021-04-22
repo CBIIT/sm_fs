@@ -36,6 +36,7 @@ export class Step1Component implements OnInit, AfterViewInit {
 
 
   ngOnInit(): void {
+    //this.grantList[0].piEmail
     this.dtOptions = {
       pageLength: 10
     //   data: this.grantList,

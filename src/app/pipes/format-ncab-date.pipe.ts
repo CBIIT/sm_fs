@@ -5,8 +5,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class FormatNcabDatePipe implements PipeTransform {
 
-  transform(value: unknown, ...args: unknown[]): unknown {
-    return null;
+  transform(value: string): string {
+    return value.substr(4,2)+'/'+value.substr(0,4);
   }
 
 }
