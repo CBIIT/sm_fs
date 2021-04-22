@@ -45,13 +45,17 @@
                 <th>Pctl</th>
                 <th>PriScr</th>
                 <th>Action</th>
+                <th>CA</th>
+                <th>PD</th>
+                <th>Budget Start Date</th>
+                <th>Existing Requests</th>
               </tr>
             </thead>
             <tbody>
             <tr *ngFor="let grant of grantList">
                 <td><a href="{{grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a></td>
                 <td>{{grant.projectTitle}}</td>
-                <td>{{grant.applStatusCode}}</td>
+                <td>{{grant.applStatusGroupDescrip}}</td>
                 <td><a href="mailto:{{grant.piEmail}}">{{grant.piFullName}}</a></td>
                 <td>{{grant.orgName}}</td>
                 <td>{{grant.fy}}</td>
@@ -59,6 +63,10 @@
                 <td>{{grant.irgPercentileNum}}</td>
                 <td>{{grant.priorityScoreNum}}</td>
                 <td><button class="btn btn-primary"  (click)="nextStep()">Select</button></td>
+                <td>{{grant.cayCode}}</td>
+                <td><a href="mailto:{{grant.pdEmailAddress}}">{{grant.roleUsageCode}}</a></td>
+                <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>
+                <td>{{grant.requestCount}}</td>
               </tr>
             </tbody>
           </table>
