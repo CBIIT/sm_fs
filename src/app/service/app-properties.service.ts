@@ -20,7 +20,7 @@ export class AppPropertiesService {
 
   delay = ms => new Promise(res => setTimeout(res, ms));
 
-   async initialize() {
+  async initialize() {
     //await this.delay(5000);
     console.log("AppPropertiesService initialize Starts, appName="+this.appName);
     let result= await this.lookupService.getAppPropertiesByAppNameUsingGET(this.appName).toPromise();

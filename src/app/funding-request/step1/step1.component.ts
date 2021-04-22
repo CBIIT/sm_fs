@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FsRequestControllerService, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { DataTableDirective } from 'angular-datatables';
 import { Subject } from 'rxjs';
+import { AppPropertiesService } from 'src/app/service/app-properties.service';
 import { GrantsSearchFilterService } from '../grants-search/grants-search-filter.service';
 
 @Component({
@@ -16,14 +17,17 @@ export class Step1Component implements OnInit, AfterViewInit {
   
   grantList: NciPfrGrantQueryDto[];
 
+  
   dtOptions: DataTables.Settings = {};
   dtTrigger: Subject<any> = new Subject();
   showAdvancedFilters:boolean=false;
   piName:string;
+  grantViewerUrl:string=this.propertiesService.getProperty('GRANT_VIEWER_URL');
 
   constructor(private router:Router,
               private gsfs: GrantsSearchFilterService,
-              private fsRequestControllerService: FsRequestControllerService) { }
+              private fsRequestControllerService: FsRequestControllerService,
+              private propertiesService: AppPropertiesService) { }
 
   ngAfterViewInit(): void {
     console.log("mytable is",this.myTable);

@@ -28,6 +28,7 @@ import { Step2Component } from './funding-request/step2/step2.component';
 import { Step4Component } from './funding-request/step4/step4.component';
 import { DataTablesModule } from "angular-datatables";
 import { FsRequestTypeComponent } from './fs-request-type/fs-request-type.component';
+import { FormatNcabDatePipe } from '.pipes/format-ncab-date.pipe';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService) {
   return (): Promise<any> => {
@@ -55,7 +56,8 @@ export function initializeAppProperties(appPropertiesService: AppPropertiesServi
     Step3Component,
     Step2Component,
     Step4Component,
-    FsRequestTypeComponent
+    FsRequestTypeComponent,
+    FormatNcabDatePipe
   ],
   imports: [
     BrowserModule,
@@ -69,7 +71,7 @@ export function initializeAppProperties(appPropertiesService: AppPropertiesServi
     DataTablesModule
   ],
   providers: [{provide: BASE_PATH, useValue: '/i2ecws'},
-              {provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTION'},
+              {provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS'},
               {provide: PROPERTIES_OVERRIDE, useValue: environment},
               {provide: APP_INITIALIZER, useFactory: initializeAppProperties,
                 deps: [AppPropertiesService], multi: true}

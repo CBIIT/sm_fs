@@ -14,7 +14,7 @@
         </div>
         <lib-institute-dropdown *ngIf="showAdvancedFilters"></lib-institute-dropdown>
         <lib-pdname-dropdown  (selectedPdIdValue)="pdSelected($event)" 
-        [showInactiveToggle]="true" *ngIf="showAdvancedFilters"></lib-pdname-dropdown>
+        *ngIf="showAdvancedFilters"></lib-pdname-dropdown>
         <lib-rfa-pa-dropdown *ngIf="showAdvancedFilters"></lib-rfa-pa-dropdown>
         <lib-ncab-daterange *ngIf="showAdvancedFilters"></lib-ncab-daterange>
         <lib-cancer-activities-dropdown  (selectedCasValues)="cayCodeSelected($event)" 
@@ -49,13 +49,13 @@
             </thead>
             <tbody>
             <tr *ngFor="let grant of grantList">
-                <td>{{grant.fullGrantNum}}</td>
+                <td><a href="{{grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a></td>
                 <td>{{grant.projectTitle}}</td>
                 <td>{{grant.applStatusCode}}</td>
-                <td>{{grant.piFullName}}</td>
+                <td><a href="mailto:{{grant.piEmail}}">{{grant.piFullName}}</a></td>
                 <td>{{grant.orgName}}</td>
                 <td>{{grant.fy}}</td>
-                <td>{{grant.councilMeetingDate}}</td>
+                <td>{{grant.councilMeetingDate|formatNcabDate}}</td>
                 <td>{{grant.irgPercentileNum}}</td>
                 <td>{{grant.priorityScoreNum}}</td>
                 <td><button class="btn btn-primary"  (click)="nextStep()">Select</button></td>
