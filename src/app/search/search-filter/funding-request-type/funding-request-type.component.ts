@@ -1,7 +1,9 @@
-import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, Input, Output, EventEmitter, Inject} from '@angular/core';
 import {FsLookupControllerService} from '@nci-cbiit/i2ecws-lib';
 import 'select2';
 import {SearchFilterService} from '../../search-filter.service';
+import {UserService} from '@nci-cbiit/i2ecui-lib';
+import {RequestModel} from '../../../model/request-model';
 
 
 @Component({
@@ -16,11 +18,15 @@ export class FundingRequestTypeComponent implements OnInit {
     = {requestOrPlan: '', searchPool: '', requestType: '', grantNumber: '', npnId: undefined};
 
   constructor(private fsLookupControllerService: FsLookupControllerService,
-              private searchFilterService: SearchFilterService) {
+              private searchFilterService: SearchFilterService,
+              private userService: UserService,
+              private requestModel: RequestModel) {
   }
 
   ngOnInit(): void {
-    this.fsLookupControllerService.getRequestTypesWithFlagUsingGET(this.searchFilter.grantNumber, this.searchFilter.npnId).subscribe(
+    this.requestModel.title = 'Title in FundingRequestTypeComponent';
+    this.fsLookupControllerService.getRequestTypesWithFlagUsingGET(this.requestModel.grant.fullGrantNum,
+      this.userService.currentUserValue.npnId).subscribe(
       result => {
         console.log('getRequestTypes returned ', result);
         this.requestTypes = result.fundingRequestTypeRulesDtoList;

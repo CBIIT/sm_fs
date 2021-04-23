@@ -62,7 +62,7 @@
                 <td>{{grant.councilMeetingDate|formatNcabDate}}</td>
                 <td>{{grant.irgPercentileNum}}</td>
                 <td>{{grant.priorityScoreNum}}</td>
-                <td><button class="btn btn-primary"  (click)="nextStep($event)">Select</button></td>
+                <td><button class="btn btn-primary"  (click)="nextStep($event, grant)">Select</button></td>
                 <td>{{grant.cayCode}}</td>
                 <td><a href="mailto:{{grant.pdEmailAddress}}">{{grant.roleUsageCode}}</a></td>
                 <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>

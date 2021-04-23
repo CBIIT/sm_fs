@@ -1,10 +1,11 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {DataTableDirective} from 'angular-datatables';
 import {Subject} from 'rxjs';
 import {AppPropertiesService} from 'src/app/service/app-properties.service';
 import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.service';
+import {RequestModel} from '../../model/request-model';
 
 @Component({
   selector: 'app-step1',
@@ -13,6 +14,7 @@ import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.s
   providers: [GrantsSearchFilterService]
 })
 export class Step1Component implements OnInit, AfterViewInit {
+
   @ViewChild(DataTableDirective, {static: false}) myTable: DataTableDirective;
 
   grantList: NciPfrGrantQueryDto[];
@@ -27,7 +29,8 @@ export class Step1Component implements OnInit, AfterViewInit {
   constructor(private router: Router,
               private gsfs: GrantsSearchFilterService,
               private fsRequestControllerService: FsRequestControllerService,
-              private propertiesService: AppPropertiesService) {
+              private propertiesService: AppPropertiesService,
+              private requestModel: RequestModel) {
   }
 
   ngAfterViewInit(): void {
@@ -37,14 +40,16 @@ export class Step1Component implements OnInit, AfterViewInit {
 
 
   ngOnInit(): void {
-    //this.grantList[0].piEmail
     this.dtOptions = {
       pageLength: 10
     };
   }
 
-  nextStep(event): void {
-    console.log(event);
+  nextStep(event, grant): void {
+    console.log(this.requestModel.title);
+    console.log("", this.requestModel.grant);
+    this.requestModel.title = 'Please work';
+    this.requestModel.grant = grant;
     this.router.navigate(['/request/step2']);
     // TODO: identify and emit the selected grant
     // TODO: identify and emit the npnId of the current user

@@ -1,4 +1,7 @@
-import { Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
+import {RequestModel} from './model/request-model';
+import {PlanModel} from './model/plan-model';
+
 
 @Component({
   selector: 'app-root',
@@ -7,5 +10,4 @@ import { Component} from '@angular/core';
 })
 export class AppComponent {
   title = 'Funding Selections';
-
 }
