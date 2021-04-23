@@ -26,33 +26,35 @@ import { Step1Component } from './funding-request/step1/step1.component';
 import { Step3Component } from './funding-request/step3/step3.component';
 import { Step2Component } from './funding-request/step2/step2.component';
 import { Step4Component } from './funding-request/step4/step4.component';
-import { DataTablesModule } from "angular-datatables";
+import { DataTablesModule } from 'angular-datatables';
 import { FsRequestTypeComponent } from './fs-request-type/fs-request-type.component';
 import { FormatNcabDatePipe } from './pipes/format-ncab-date.pipe';
 import { AppLookupsService } from './service/app-lookups.service';
 import { CodeDescriptionPipe } from './pipes/code-description.pipe';
+import {RequestModel} from './model/request-model';
+import {PlanModel} from './model/plan-model';
 
-// export function initializeAppProperties(appPropertiesService: AppPropertiesService) {
-//   return (): Promise<any> => {
-//     //add async loading proerties and other initialization functions below.
-//     //calling rest api to load application properties and override properties
-//     return appPropertiesService.initialize();
-//   }
-// }
+
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
-  appLookupsService:AppLookupsService) {
+                                        appLookupsService: AppLookupsService,
+                                        requestModel: RequestModel,
+                                        planModel: PlanModel) {
   return (): Promise<any> => {
-    //add async loading proerties and other initialization functions below.
-    //calling rest api to load application properties and override properties
+    // add async loading proerties and other initialization functions below.
+    // calling rest api to load application properties and override properties
     return appInitialization(appPropertiesService,
-      appLookupsService);
-  }
+      appLookupsService, requestModel, planModel);
+  };
 }
-async function appInitialization(
+async function appInitialization (
   appPropertiesService: AppPropertiesService,
-  appLookupsService:AppLookupsService ) {
+  appLookupsService: AppLookupsService,
+  requestModel: RequestModel,
+  planModel: PlanModel) {
     appPropertiesService.initialize();
     appLookupsService.initialize();
+    requestModel = new RequestModel();
+    planModel = new PlanModel();
 }
 
 @NgModule({
@@ -92,7 +94,7 @@ async function appInitialization(
               {provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS'},
               {provide: PROPERTIES_OVERRIDE, useValue: environment},
               {provide: APP_INITIALIZER, useFactory: initializeAppProperties,
-                deps: [AppPropertiesService, AppLookupsService], multi: true}
+                deps: [AppPropertiesService, AppLookupsService, RequestModel, PlanModel], multi: true}
               ],
   bootstrap: [AppComponent]
 })

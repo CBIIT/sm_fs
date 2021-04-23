@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, Inject, Input, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {RequestModel} from '../../model/request-model';
 
 @Component({
   selector: 'app-step2',
@@ -8,16 +9,19 @@ import { Router } from '@angular/router';
 })
 export class Step2Component implements OnInit {
 
-  constructor(private router:Router) { }
-
-  ngOnInit(): void {
+  constructor(private router: Router, private requestModel: RequestModel) {
   }
 
-  nextStep() {
+  ngOnInit(): void {
+    console.log(this.requestModel.title);
+    console.log(this.requestModel.grant);
+  }
+
+  nextStep(): void {
     this.router.navigate(['/request/step3']);
   }
 
-  prevStep() {
+  prevStep(): void {
     this.router.navigate(['/request/step1']);
   }
 

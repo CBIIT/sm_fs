@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SearchFilterService } from '../search/search-filter.service';
+import {RequestModel} from '../model/request-model';
 
 @Component({
   selector: 'app-funding-request',
@@ -21,8 +22,11 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
   private routerSub:Subscription;
 
   constructor(private route:ActivatedRoute,
-              private router:Router) { }
-  
+              private router:Router,
+              private requestModel: RequestModel) {
+    this.requestModel.title = 'funding request component title';
+  }
+
   ngOnDestroy(): void {
     if (this.routerSub && !this.routerSub.closed)
         this.routerSub.unsubscribe();
@@ -38,19 +42,19 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
             this.activeStep=step;
             break;
           }
-        }   
+        }
       }
     });
-    
+
     //when direct access using url
     for (var step of this.steps) {
       if (step.route===this.router.url) {
         console.log("oninit matched url");
         this.activeStep=step;
       }
-    }   
+    }
   }
 
-  
+
 
 }
