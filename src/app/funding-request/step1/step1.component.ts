@@ -41,7 +41,18 @@ export class Step1Component implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.dtOptions = {
-      pageLength: 10
+      pageLength: 10,
+      responsive: {
+        details: {
+            type: 'column',
+            target: -1
+        }
+    },
+    columnDefs: [ {
+        className: 'control',
+        orderable: false,
+        targets:   -1
+    } ]
     };
   }
 
@@ -81,7 +92,7 @@ export class Step1Component implements OnInit, AfterViewInit {
     console.log('grant search criteria', this.gsfs.getGrantsSearchCriteria());
     this.fsRequestControllerService.searchGrantsUsingPOST(this.gsfs.getGrantsSearchCriteria()).subscribe(
       result => {
-        console.log('searchPaylinePaylistGrantsUsingPOST1 returned ', result);
+        console.log('searchGrantsUsingPOST returned ', result);
         this.grantList = result;
         // this.dtTrigger.next();
         this.myTable.dtInstance.then((dtInstance: DataTables.Api) => {

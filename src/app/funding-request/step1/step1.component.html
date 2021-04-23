@@ -76,11 +76,11 @@
                 <th>NCAB Date</th>
                 <th>Pctl</th>
                 <th>PriScr</th>
-                <th>Action</th>
                 <th>CA</th>
                 <th>PD</th>
                 <th>Budget Start Date</th>
                 <th>Existing Requests</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -94,11 +94,11 @@
                 <td>{{grant.councilMeetingDate|formatNcabDate}}</td>
                 <td>{{grant.irgPercentileNum}}</td>
                 <td>{{grant.priorityScoreNum}}</td>
-                <td><button class="btn btn-primary"  (click)="nextStep($event, grant)">Select</button></td>
-                <td>{{grant.cayCode}}</td>
+                <td><a routerlink="" ngbPopover="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="mouseenter:mouseleave" placement="top">{{grant.cayCode}}</a></td>
                 <td><a href="mailto:{{grant.pdEmailAddress}}">{{grant.roleUsageCode}}</a></td>
                 <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>
                 <td>{{grant.requestCount}}</td>
+                <td><button class="btn btn-primary"  (click)="nextStep($event, grant)">Select</button></td>
               </tr>
             </tbody>
           </table>
