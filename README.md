@@ -1,13 +1,13 @@
 # Funding Selection
 
 ## Action Items
-- [ ] Document standards and usage
+[ ] Document standards and usage
 
 ## Create new UI components
 **NOTE:** FS-specific components should go here.  Shared components go into sm_i2e_common_ui.  If you're not sure, put it here and we'll
 worry about it later.
 
-``` ng generate component <component_name>```
+``` ng generate component <optional_path>\<component_name>```
 
 # fs
 
