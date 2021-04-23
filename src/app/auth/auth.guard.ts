@@ -35,12 +35,12 @@ export class AuthGuard implements CanActivate {
             this.router.navigate(['/unauthorize']);
             resolve(false);
           });
-      })
+      });
   }
 
   hasValidAuthority(authorities: GrantedAuthority[]): boolean {
-    for (let a in authorities) {
-      if (authorities[a].authority == "I2E_USER") {
+    for (const a in authorities) {
+      if (authorities[a].authority === 'I2E_USER') {
         return true;
       }
     }

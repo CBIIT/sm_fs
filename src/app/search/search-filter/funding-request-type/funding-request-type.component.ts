@@ -1,7 +1,7 @@
-import { Component, OnInit , Input , Output , EventEmitter } from '@angular/core';
-import { FsLookupControllerService } from '@nci-cbiit/i2ecws-lib';
+import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import {FsLookupControllerService} from '@nci-cbiit/i2ecws-lib';
 import 'select2';
-import { SearchFilterService } from '../../search-filter.service';
+import {SearchFilterService} from '../../search-filter.service';
 
 
 @Component({
@@ -10,52 +10,27 @@ import { SearchFilterService } from '../../search-filter.service';
   styleUrls: ['./funding-request-type.component.css']
 })
 export class FundingRequestTypeComponent implements OnInit {
-  public requestTypes: {id:number, requestName:string}[]=[];
+  public requestTypes: { id?: number, requestName?: string }[] = [];
   public searchFilter:
-  { requestOrPlan: string; searchPool: string; requestType: string; }
-  = { requestOrPlan: '', searchPool: '', requestType: '' };
+    { requestOrPlan: string; searchPool: string; requestType: string; grantNumber: string; npnId: number }
+    = {requestOrPlan: '', searchPool: '', requestType: '', grantNumber: '', npnId: undefined};
 
-  constructor(private fsLookupControllerService : FsLookupControllerService,
-    private searchFilterService:SearchFilterService) { }
+  constructor(private fsLookupControllerService: FsLookupControllerService,
+              private searchFilterService: SearchFilterService) {
+  }
 
-  // set selectedRequestType(selectedValue: string) {
-  //   this._selectRequestType = selectedValue;
-  //   console.log(selectedValue);
-  //   this.requestTypeSelected.emit(this._selectRequestType);
-  // }
   ngOnInit(): void {
-    this.fsLookupControllerService.getRequestTypesUsingGET().subscribe(
+    this.fsLookupControllerService.getRequestTypesWithFlagUsingGET(this.searchFilter.grantNumber, this.searchFilter.npnId).subscribe(
       result => {
         console.log('getRequestTypes returned ', result);
-        this.requestTypes = result;
-      },error => {
-        console.log( 'HttpClient get request error for----- '+ error.message);
+        this.requestTypes = result.fundingRequestTypeRulesDtoList;
+      }, error => {
+        console.log('HttpClient get request error for----- ' + error.message);
       });
-    console.log("funding-request-type component ngOnInit()");
+    console.log('funding-request-type component ngOnInit()');
 
-    this.searchFilter=this.searchFilterService.searchFilter;
-
-    // this.requestTypes.push({
-    //   "key":1018,
-    //   "value":"Co-Fund a Non-NCI Non-Competing Grant"
-    // });
-    // this.requestTypes.push({
-    //   "key":27,
-    //   "value":"Co-fund a Non-NCI Competing Application"
-    // });
-    // this.requestTypes.push({
-    //   "key":1000,
-    //   "value":"Diversity Supplement (includes CURE Supplements)"
-    // });
-    // this.requestTypes.push({
-    //   "key":25,
-    //   "value":"Early Pay"
-    // });
-    // this.requestTypes.push({
-    //   "key":9,
-    //   "value":"General Administrative Supplements/Adjustment (Post-Award)"
-    // });
+    this.searchFilter = this.searchFilterService.searchFilter;
 
   }
 
-  }
+}

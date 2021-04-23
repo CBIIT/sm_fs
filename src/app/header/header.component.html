@@ -1,4 +1,4 @@
-<header th:fragment="header">
+<header>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark" id="firstNav" arial-label="Primary Navigation">
         <div class="container d-flex">
             <a class="navbar-brand" href="{{nciHome}}" title="National Cancer Institute IMPAC II Extension Suite (I2E)"
@@ -50,7 +50,7 @@
                                 <a class="nav-link dropdown-toggle" href="#" id="other-modules-link" data-toggle="dropdown"
                                          aria-haspopup="true" aria-expanded="false">Other Modules</a>
                                 <div class="dropdown-menu dropdown-menu-left" aria-labelledby="other-modules-link">
-                                    <a class="dropdown-item" *ngFor="let nav of otherMenus" 
+                                    <a class="dropdown-item" *ngFor="let nav of otherMenus"
                                         href="{{nav.url}}">{{nav.name}}</a>
                                 </div>
                             </li>

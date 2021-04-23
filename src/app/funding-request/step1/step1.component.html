@@ -13,12 +13,12 @@
             <input type="text" [(ngModel)]="piName"/>
         </div>
         <lib-institute-dropdown *ngIf="showAdvancedFilters"></lib-institute-dropdown>
-        <lib-pdname-dropdown  (selectedPdIdValue)="pdSelected($event)" 
+        <lib-pdname-dropdown  (selectedPdIdValue)="pdSelected($event)"
         *ngIf="showAdvancedFilters"></lib-pdname-dropdown>
         <lib-rfa-pa-dropdown *ngIf="showAdvancedFilters"></lib-rfa-pa-dropdown>
         <lib-ncab-daterange *ngIf="showAdvancedFilters"></lib-ncab-daterange>
-        <lib-cancer-activities-dropdown  (selectedCasValues)="cayCodeSelected($event)" 
-        *ngIf="showAdvancedFilters"> 
+        <lib-cancer-activities-dropdown  (selectedCasValues)="cayCodeSelected($event)"
+        *ngIf="showAdvancedFilters">
         </lib-cancer-activities-dropdown>
     </div>
 
@@ -62,7 +62,7 @@
                 <td>{{grant.councilMeetingDate|formatNcabDate}}</td>
                 <td>{{grant.irgPercentileNum}}</td>
                 <td>{{grant.priorityScoreNum}}</td>
-                <td><button class="btn btn-primary"  (click)="nextStep()">Select</button></td>
+                <td><button class="btn btn-primary"  (click)="nextStep($event)">Select</button></td>
                 <td>{{grant.cayCode}}</td>
                 <td><a href="mailto:{{grant.pdEmailAddress}}">{{grant.roleUsageCode}}</a></td>
                 <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>
