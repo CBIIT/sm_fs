@@ -1,15 +1,14 @@
+<app-header></app-header>
 <div class="container">
-    <div class="row">
-        <app-header></app-header>
-    </div>
     <div class="row">
         <div class="col-lg-2">
             <app-fs-menu></app-fs-menu>
         </div>
         <div class="col-lg-10">
-            <router-outlet></router-outlet>
+            <main id="main">
+                <router-outlet></router-outlet>
+            </main>
         </div>
     </div>
-
 </div>
 
