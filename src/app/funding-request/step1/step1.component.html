@@ -1,36 +1,68 @@
-<div class="container">
-    <div class="row flex">
-        <h2>Filters</h2>
-        <a [routerLink]="" (click)="showHideAdvanced()" class="float-right">Show Advanced Filters</a>
+<div class="row">
+    <div class="col-12 d-flex">
+        <h2 class="d-inline-block" id="filters-label">Filters</h2>
+        <a [routerLink]="" (click)="showHideAdvanced()" class="ml-auto">Show Advanced Filters</a>
     </div>
-    <div class="flex">
+</div>
+<div class="row" role="group" aria-labelledby="filters-label">
+
+    <div class="col-lg-4">
         <app-search-pool></app-search-pool>
-        <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
-        <lib-fy-range [minYear]="2001" [maxYear]="2025" (rangeChanged)="fyRangeChanged($event)"></lib-fy-range>
-        <lib-i2status-dropdown (selectedI2statusValue)="i2StatusChanged($event)"></lib-i2status-dropdown>
-        <div class="col-12 col-md-6 form-group" *ngIf="showAdvancedFilters">
-            <label>PI</label>
-            <input type="text" [(ngModel)]="piName"/>
-        </div>
-        <lib-institute-dropdown *ngIf="showAdvancedFilters"></lib-institute-dropdown>
-        <lib-pdname-dropdown  (selectedPdIdValue)="pdSelected($event)"
-        *ngIf="showAdvancedFilters"></lib-pdname-dropdown>
-        <lib-rfa-pa-dropdown *ngIf="showAdvancedFilters"></lib-rfa-pa-dropdown>
-        <lib-ncab-daterange *ngIf="showAdvancedFilters"></lib-ncab-daterange>
-        <lib-cancer-activities-dropdown  (selectedCasValues)="cayCodeSelected($event)"
-        *ngIf="showAdvancedFilters">
-        </lib-cancer-activities-dropdown>
     </div>
 
-    <div class="float-right">
-            <button class="btn btn-info" (click)="clear()">Clear</button>
-            <button class="btn btn-primary" (click)="search()">Search</button>
+    <div class="col-lg-8">
+        <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
     </div>
-    <hr/>
-    <div class="row">
+
+    <div class="col-lg-3">
+        <lib-fy-range [minYear]="2001" [maxYear]="2025" (rangeChanged)="fyRangeChanged($event)"></lib-fy-range>
+    </div>
+    
+    <div class="col-lg-3">
+        <lib-i2status-dropdown (selectedI2statusValue)="i2StatusChanged($event)"></lib-i2status-dropdown>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="form-group">
+            <label for="piName">PI</label>
+            <input id="piName" type="text" class="form-control" [(ngModel)]="piName"/>
+        </div>
+    </div>
+
+    <!-- START Advanced Filters -->
+
+    <div class="col-lg-6" *ngIf="showAdvancedFilters">
+        <lib-pdname-dropdown  (selectedPdIdValue)="pdSelected($event)"></lib-pdname-dropdown>
+    </div>
+
+    <div class="col-lg-3" *ngIf="showAdvancedFilters">
+        <lib-rfa-pa-dropdown></lib-rfa-pa-dropdown>
+    </div>
+
+    <div class="col-lg-3" *ngIf="showAdvancedFilters">
+        <lib-ncab-daterange></lib-ncab-daterange>
+    </div>
+
+    <div class="col-lg-8" *ngIf="showAdvancedFilters">
+        <lib-cancer-activities-dropdown  (selectedCasValues)="cayCodeSelected($event)"></lib-cancer-activities-dropdown>
+    </div>
+
+    <!-- END Advanced Filters -->
+
+    <div class="col-lg-2 d-flex align-items-end justify-content-end ml-auto">
+        <button class="btn btn-outline-secondary mr-2" (click)="clear()">Clear</button>
+        <button class="btn btn-primary" (click)="search()">Search</button>
+    </div>
+
+    <div class="col-12">
+        <hr/>
+    </div>
+
+</div> <!-- END Row -->
+
+<div class="row">
+    <div class="col-12">
         <h2>Results</h2>
-    </div>
-    <div class="row">
         <p *ngIf="!grantList">No results to display. Try applying a filter above and clicking "Search."</p>
         <table #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
             <thead>
