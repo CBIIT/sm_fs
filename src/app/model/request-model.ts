@@ -7,14 +7,17 @@ import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
   providedIn: 'root'
 })
 export class RequestModel {
+  // Stores the grant selected in Step 1
   private _grant: NciPfrGrantQueryDto;
+
+  // Holds the request title
   private _title = 'RequestModel';
 
-  get grant(): any {
+  get grant(): NciPfrGrantQueryDto {
     return this._grant;
   }
 
-  set grant(value: any) {
+  set grant(value: NciPfrGrantQueryDto) {
     this._grant = value;
   }
 

@@ -1,6 +1,7 @@
 import {Component, Inject, Input, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
+import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-step2',
@@ -9,7 +10,10 @@ import {RequestModel} from '../../model/request-model';
 })
 export class Step2Component implements OnInit {
 
-  constructor(private router: Router, private requestModel: RequestModel) {
+  private requestModel: RequestModel;
+
+  constructor(private router: Router, requestModel: RequestModel) {
+    this.requestModel = requestModel;
   }
 
   ngOnInit(): void {
@@ -23,6 +27,10 @@ export class Step2Component implements OnInit {
 
   prevStep(): void {
     this.router.navigate(['/request/step1']);
+  }
+
+  get grant(): NciPfrGrantQueryDto {
+    return this.requestModel.grant;
   }
 
 }
