@@ -98,7 +98,7 @@
                 <td><a href="mailto:{{grant.pdEmailAddress}}">{{grant.roleUsageCode}}</a></td>
                 <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>
                 <td>{{grant.requestCount}}</td>
-                <td><button class="btn btn-primary"  (click)="nextStep($event)">Select</button></td>
+                <td><button class="btn btn-primary"  (click)="nextStep($event, grant)">Select</button></td>
               </tr>
             </tbody>
           </table>
