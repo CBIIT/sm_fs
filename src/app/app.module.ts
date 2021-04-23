@@ -29,13 +29,30 @@ import { Step4Component } from './funding-request/step4/step4.component';
 import { DataTablesModule } from "angular-datatables";
 import { FsRequestTypeComponent } from './fs-request-type/fs-request-type.component';
 import { FormatNcabDatePipe } from './pipes/format-ncab-date.pipe';
+import { AppLookupsService } from './service/app-lookups.service';
+import { CodeDescriptionPipe } from './pipes/code-description.pipe';
 
-export function initializeAppProperties(appPropertiesService: AppPropertiesService) {
+// export function initializeAppProperties(appPropertiesService: AppPropertiesService) {
+//   return (): Promise<any> => {
+//     //add async loading proerties and other initialization functions below.
+//     //calling rest api to load application properties and override properties
+//     return appPropertiesService.initialize();
+//   }
+// }
+export function initializeAppProperties(appPropertiesService: AppPropertiesService,
+  appLookupsService:AppLookupsService) {
   return (): Promise<any> => {
     //add async loading proerties and other initialization functions below.
     //calling rest api to load application properties and override properties
-    return appPropertiesService.initialize();
+    return appInitialization(appPropertiesService,
+      appLookupsService);
   }
+}
+async function appInitialization(
+  appPropertiesService: AppPropertiesService,
+  appLookupsService:AppLookupsService ) {
+    appPropertiesService.initialize();
+    appLookupsService.initialize();
 }
 
 @NgModule({
@@ -57,7 +74,8 @@ export function initializeAppProperties(appPropertiesService: AppPropertiesServi
     Step2Component,
     Step4Component,
     FsRequestTypeComponent,
-    FormatNcabDatePipe
+    FormatNcabDatePipe,
+    CodeDescriptionPipe
   ],
   imports: [
     BrowserModule,
@@ -74,7 +92,7 @@ export function initializeAppProperties(appPropertiesService: AppPropertiesServi
               {provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS'},
               {provide: PROPERTIES_OVERRIDE, useValue: environment},
               {provide: APP_INITIALIZER, useFactory: initializeAppProperties,
-                deps: [AppPropertiesService], multi: true}
+                deps: [AppPropertiesService, AppLookupsService], multi: true}
               ],
   bootstrap: [AppComponent]
 })
