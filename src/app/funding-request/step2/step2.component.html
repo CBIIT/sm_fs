@@ -13,7 +13,7 @@
     </div>
     <div class="col-md-3">
       <h4>PI</h4>
-      <br><div [innerHTML]="grant|emailFormatter: 'piFullName':'piEmail':'Grant related stuff'"></div>
+      <br><div [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail':'Grant related stuff'"></div>
     </div>
     <div class="col-md-3">
       <h4>Institution</h4>
@@ -24,7 +24,7 @@
   <div class="row">
     <div class="col-md-3">
       <h4>PD</h4>
-      <br><div [innerHTML]="grant|emailFormatter: 'pdFullName':'pdEmailAddress':'Grant related stuff'"></div>
+      <br><div [innerHTML]="grant|mailtoFormatter: 'pdFullName':'pdEmailAddress':'Grant related stuff'"></div>
     </div>
     <div class="col-md-3">
       <h4>I2 Status</h4>

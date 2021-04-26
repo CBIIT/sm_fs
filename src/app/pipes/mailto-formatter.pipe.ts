@@ -1,13 +1,13 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({
-  name: 'emailFormatter'
+  name: 'mailtoFormatter'
 })
-export class EmailFormatterPipe implements PipeTransform {
+export class MailtoFormatterPipe implements PipeTransform {
 
   transform(value: any, ...args: string[]): unknown {
     if (!args || args.length < 2) {
-      throw new Error('Email formatter requires at least two parameters');
+      throw new Error('Mailto formatter requires at least two parameters');
     }
 
     const nameField = args[0];

@@ -32,7 +32,7 @@ import {CodeDescriptionPipe} from './pipes/code-description.pipe';
 import {RequestModel} from './model/request-model';
 import {PlanModel} from './model/plan-model';
 import {AppUserSessionService} from './service/app-user-session.service';
-import { EmailFormatterPipe } from './pipes/email-formatter.pipe';
+import { MailtoFormatterPipe } from './pipes/mailto-formatter.pipe';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
@@ -75,7 +75,7 @@ async function appInitialization(
     Step4Component,
     FormatNcabDatePipe,
     CodeDescriptionPipe,
-    EmailFormatterPipe
+    MailtoFormatterPipe
   ],
   imports: [
     BrowserModule,
