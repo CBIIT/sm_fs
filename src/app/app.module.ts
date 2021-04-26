@@ -11,7 +11,7 @@ import { I2ecuiLibModule } from '@nci-cbiit/i2ecui-lib';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HeaderComponent } from './header/header.component';
 import { SearchFilterComponent } from './search/search-filter/search-filter.component';
-import { FundingRequestTypeComponent } from './search/search-filter/funding-request-type/funding-request-type.component';
+import { FundingRequestTypeComponent } from './funding-request-type/funding-request-type.component';
 import { SearchPoolComponent } from './search/search-filter/search-pool/search-pool.component';
 import { SearchComponent } from './search/search.component';
 import { NewRequestComponent } from './new-request/new-request.component';

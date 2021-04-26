@@ -1,9 +1,9 @@
 import {Component, OnInit, Input, Output, EventEmitter, Inject} from '@angular/core';
 import {FsLookupControllerService} from '@nci-cbiit/i2ecws-lib';
 import 'select2';
-import {SearchFilterService} from '../../search-filter.service';
+import {SearchFilterService} from '../search/search-filter.service';
 import {UserService} from '@nci-cbiit/i2ecui-lib';
-import {RequestModel} from '../../../model/request-model';
+import {RequestModel} from '../model/request-model';
 
 
 @Component({
