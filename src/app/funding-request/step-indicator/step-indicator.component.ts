@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-step-indicator',
@@ -7,9 +7,10 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class StepIndicatorComponent implements OnInit {
   @Input() activeStep;
-  @Input() steps:{step:number,name:string,route:string}[];
+  @Input() steps: { step: number, name: string, route: string }[];
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit(): void {
   }

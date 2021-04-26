@@ -4,6 +4,4 @@ export interface SearchCriteria {
   requestType: string;
   rfaPa: string;
   fyRange: { fromFy: number, toFy: number };
-  grantNumber: string;
-  npnId: number;
 }

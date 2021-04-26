@@ -24,7 +24,7 @@
     <div class="row">
         <h2>Request Information</h2>
     </div>
-        <app-funding-request-type></app-funding-request-type>
+        <app-funding-request-type [filter]="true"></app-funding-request-type>
     <div class="flex">
             <button class="btn btn-outline-dark float-left" (click)="prevStep()">Previous</button>
             <button class="btn btn-primary float-right" (click)="nextStep()">Next</button>

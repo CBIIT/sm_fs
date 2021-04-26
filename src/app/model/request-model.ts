@@ -1,6 +1,4 @@
 import {Injectable} from '@angular/core';
-import {Router} from '@angular/router';
-import {UserService} from '@nci-cbiit/i2ecui-lib';
 import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 
 @Injectable({
@@ -30,7 +28,6 @@ export class RequestModel {
   }
 
   constructor() {
-    this._grant = {};
   }
 
 }

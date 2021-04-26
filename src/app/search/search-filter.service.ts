@@ -8,9 +8,7 @@ export class SearchFilterService {
       searchPool: '',
       requestType: '',
       rfaPa: '',
-      fyRange: {fromFy: undefined, toFy: undefined},
-      grantNumber: '',
-      npnId: undefined
+      fyRange: {fromFy: undefined, toFy: undefined}
     };
 
 
