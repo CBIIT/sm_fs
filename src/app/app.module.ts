@@ -27,7 +27,6 @@ import { Step3Component } from './funding-request/step3/step3.component';
 import { Step2Component } from './funding-request/step2/step2.component';
 import { Step4Component } from './funding-request/step4/step4.component';
 import { DataTablesModule } from 'angular-datatables';
-import { FsRequestTypeComponent } from './fs-request-type/fs-request-type.component';
 import { FormatNcabDatePipe } from './pipes/format-ncab-date.pipe';
 import { AppLookupsService } from './service/app-lookups.service';
 import { CodeDescriptionPipe } from './pipes/code-description.pipe';
@@ -75,7 +74,6 @@ async function appInitialization (
     Step3Component,
     Step2Component,
     Step4Component,
-    FsRequestTypeComponent,
     FormatNcabDatePipe,
     CodeDescriptionPipe
   ],
