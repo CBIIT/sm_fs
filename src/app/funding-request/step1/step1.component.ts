@@ -6,6 +6,7 @@ import {Subject} from 'rxjs';
 import {AppPropertiesService} from 'src/app/service/app-properties.service';
 import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.service';
 import {RequestModel} from '../../model/request-model';
+import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
 @Component({
   selector: 'app-step1',
@@ -20,7 +21,7 @@ export class Step1Component implements OnInit, AfterViewInit {
   grantList: NciPfrGrantQueryDto[];
 
 
-  dtOptions: DataTables.Settings = {};
+  dtOptions: any;
   dtTrigger: Subject<any> = new Subject();
   showAdvancedFilters: boolean = false;
   piName: string;
@@ -47,14 +48,20 @@ export class Step1Component implements OnInit, AfterViewInit {
             type: 'column',
             target: -1
         }
-    },
-    columnDefs: [ {
+      },
+      columnDefs: [ {
         className: 'control',
         orderable: false,
         targets:   -1
-    } ]
+      } ,
+      {
+        responsivePriority: 1,
+        targets:   -2
+      } ]
     };
   }
+
+
 
   nextStep(event, grant): void {
     console.log(this.requestModel.title);
