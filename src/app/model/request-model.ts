@@ -9,7 +9,7 @@ export class RequestModel {
   private _grant: NciPfrGrantQueryDto;
 
   // Holds the request title
-  private _title = 'RequestModel';
+  private _requestName = 'RequestModel';
 
   get grant(): NciPfrGrantQueryDto {
     return this._grant;
@@ -19,12 +19,12 @@ export class RequestModel {
     this._grant = value;
   }
 
-  get title(): string {
-    return this._title;
+  get requestName(): string {
+    return this._requestName;
   }
 
-  set title(value: string) {
-    this._title = value;
+  set requestName(value: string) {
+    this._requestName = value;
   }
 
   constructor() {

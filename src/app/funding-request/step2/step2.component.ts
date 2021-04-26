@@ -1,7 +1,8 @@
 import {Component, Inject, Input, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
-import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {AppPropertiesService} from '../../service/app-properties.service';
 
 @Component({
   selector: 'app-step2',
@@ -10,15 +11,18 @@ import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 })
 export class Step2Component implements OnInit {
 
-  private requestModel: RequestModel;
+  private _requestModel: RequestModel;
 
-  constructor(private router: Router, requestModel: RequestModel) {
-    this.requestModel = requestModel;
+  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+
+  constructor(private router: Router, requestModel: RequestModel,
+              private propertiesService: AppPropertiesService) {
+    this._requestModel = requestModel;
   }
 
   ngOnInit(): void {
-    console.log(this.requestModel.title);
-    console.log(this.requestModel.grant);
+    console.log(this._requestModel.requestName);
+    console.log(this._requestModel.grant);
   }
 
   nextStep(): void {
@@ -30,7 +34,11 @@ export class Step2Component implements OnInit {
   }
 
   get grant(): NciPfrGrantQueryDto {
-    return this.requestModel.grant;
+    return this._requestModel.grant;
+  }
+
+  get requestModel(): RequestModel {
+    return this._requestModel;
   }
 
 }

@@ -10,8 +10,9 @@ export class CodeDescriptionPipe implements PipeTransform {
   }
 
   transform(value: string, ...args: string[]): string {
-    if (!args[0])
-      throw new Error("codeDescription pipe requires type parameter, such as CancerActivities.");
+    if (!args[0]) {
+      throw new Error('codeDescription pipe requires type parameter, such as CancerActivities.');
+    }
     return this.appLookupsService.getDescription(args[0],value);
   }
 

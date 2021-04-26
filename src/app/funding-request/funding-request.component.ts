@@ -24,7 +24,7 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
   constructor(private route:ActivatedRoute,
               private router:Router,
               private requestModel: RequestModel) {
-    this.requestModel.title = 'funding request component title';
+    this.requestModel.requestName = 'funding request component title';
   }
 
   ngOnDestroy(): void {

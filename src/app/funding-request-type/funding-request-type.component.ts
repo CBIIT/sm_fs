@@ -26,7 +26,7 @@ export class FundingRequestTypeComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('filter =', this.filter);
-    this.requestModel.title = 'Title in FundingRequestTypeComponent';
+    this.requestModel.requestName = 'Title in FundingRequestTypeComponent';
 
     this.evoke(this.filter).subscribe(
       result => {

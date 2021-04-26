@@ -24,6 +24,7 @@ export class Step1Component implements OnInit, AfterViewInit {
   dtTrigger: Subject<any> = new Subject();
   showAdvancedFilters: boolean = false;
   piName: string;
+  // TODO: let's figure out how to make some of these global properties
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
 
   constructor(private router: Router,
@@ -57,9 +58,9 @@ export class Step1Component implements OnInit, AfterViewInit {
   }
 
   nextStep(event, grant): void {
-    console.log(this.requestModel.title);
+    console.log(this.requestModel.requestName);
     console.log("", this.requestModel.grant);
-    this.requestModel.title = 'Please work';
+    this.requestModel.requestName = 'Please work';
     this.requestModel.grant = grant;
     this.router.navigate(['/request/step2']);
     // TODO: identify and emit the selected grant
