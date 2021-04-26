@@ -6,11 +6,11 @@
 </div>
 <div class="row" role="group" aria-labelledby="filters-label">
 
-    <div class="col-lg-4">
+    <div class="col-lg-6">
         <app-search-pool></app-search-pool>
     </div>
-
-    <div class="col-lg-8">
+    
+    <div class="col-lg-6">
         <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
     </div>
 
@@ -22,7 +22,7 @@
         <lib-i2status-dropdown (selectedI2statusValue)="i2StatusChanged($event)"></lib-i2status-dropdown>
     </div>
 
-    <div class="col-lg-4">
+    <div class="col-lg-3">
         <div class="form-group">
             <label for="piName">PI</label>
             <input id="piName" type="text" class="form-control" [(ngModel)]="piName"/>
@@ -43,7 +43,7 @@
         <lib-ncab-daterange></lib-ncab-daterange>
     </div>
 
-    <div class="col-lg-8" *ngIf="showAdvancedFilters">
+    <div class="col-lg-6" *ngIf="showAdvancedFilters">
         <lib-cancer-activities-dropdown  (selectedCasValues)="cayCodeSelected($event)"></lib-cancer-activities-dropdown>
     </div>
 
@@ -94,7 +94,7 @@
                 <td>{{grant.councilMeetingDate|formatNcabDate}}</td>
                 <td>{{grant.irgPercentileNum}}</td>
                 <td>{{grant.priorityScoreNum}}</td>
-                <td><a routerlink="" ngbPopover="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="mouseenter:mouseleave" placement="top">{{grant.cayCode}}</a></td>
+                <td><a [routerLink]="" ngbPopover="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="mouseenter:mouseleave" placement="top">{{grant.cayCode}}</a></td>
                 <td><a href="mailto:{{grant.pdEmailAddress}}">{{grant.roleUsageCode}}</a></td>
                 <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>
                 <td>{{grant.requestCount}}</td>

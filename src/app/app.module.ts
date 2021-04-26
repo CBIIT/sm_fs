@@ -32,26 +32,31 @@ import { AppLookupsService } from './service/app-lookups.service';
 import { CodeDescriptionPipe } from './pipes/code-description.pipe';
 import {RequestModel} from './model/request-model';
 import {PlanModel} from './model/plan-model';
+import { AppUserSessionService } from './service/app-user-session.service';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
                                         appLookupsService: AppLookupsService,
+                                        appUserSessionService:AppUserSessionService,
                                         requestModel: RequestModel,
                                         planModel: PlanModel) {
   return (): Promise<any> => {
     // add async loading proerties and other initialization functions below.
     // calling rest api to load application properties and override properties
     return appInitialization(appPropertiesService,
-      appLookupsService, requestModel, planModel);
+      appLookupsService, appUserSessionService,
+      requestModel, planModel);
   };
 }
 async function appInitialization (
   appPropertiesService: AppPropertiesService,
   appLookupsService: AppLookupsService,
+  appUserSessionService:AppUserSessionService,
   requestModel: RequestModel,
   planModel: PlanModel) {
     appPropertiesService.initialize();
     appLookupsService.initialize();
+    appUserSessionService.initialize();
     requestModel = new RequestModel();
     planModel = new PlanModel();
 }
@@ -92,7 +97,8 @@ async function appInitialization (
               {provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS'},
               {provide: PROPERTIES_OVERRIDE, useValue: environment},
               {provide: APP_INITIALIZER, useFactory: initializeAppProperties,
-                deps: [AppPropertiesService, AppLookupsService, RequestModel, PlanModel], multi: true}
+                deps: [AppPropertiesService, AppLookupsService, 
+                  AppUserSessionService, RequestModel, PlanModel], multi: true}
               ],
   bootstrap: [AppComponent]
 })
