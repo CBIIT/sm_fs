@@ -30,6 +30,10 @@ export class AppUserSessionService {
       });
   }
 
-  
+  isPD():boolean{
+    //to-do: need to check roles to determine if PD
+    return true;
+  }
+
 
 }

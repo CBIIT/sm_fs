@@ -9,7 +9,7 @@
     <div class="col-lg-6">
         <app-search-pool></app-search-pool>
     </div>
-    
+
     <div class="col-lg-6">
         <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
     </div>
@@ -76,11 +76,12 @@
                 <th>NCAB Date</th>
                 <th>Pctl</th>
                 <th>PriScr</th>
+                <th>Action</th>
                 <th>CA</th>
                 <th>PD</th>
                 <th>Budget Start Date</th>
                 <th>Existing Requests</th>
-                <th>Action</th>
+                <th>&nbsp;</th>
               </tr>
             </thead>
             <tbody>
@@ -94,11 +95,12 @@
                 <td>{{grant.councilMeetingDate|formatNcabDate}}</td>
                 <td>{{grant.irgPercentileNum}}</td>
                 <td>{{grant.priorityScoreNum}}</td>
+                <td><button class="btn btn-primary"  (click)="nextStep($event, grant)">Select</button></td>
                 <td><a [routerLink]="" ngbPopover="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="mouseenter:mouseleave" placement="top">{{grant.cayCode}}</a></td>
                 <td><a href="mailto:{{grant.pdEmailAddress}}">{{grant.roleUsageCode}}</a></td>
                 <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>
                 <td>{{grant.requestCount}}</td>
-                <td><button class="btn btn-primary"  (click)="nextStep($event, grant)">Select</button></td>
+                <td></td>
               </tr>
             </tbody>
           </table>
