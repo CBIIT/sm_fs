@@ -1,0 +1,12 @@
+<div class="row">
+  <h2>Request Information</h2>
+</div>
+<div class="row">
+  <div class="col-md-4">
+    <app-funding-request-type [filter]="true"></app-funding-request-type>
+    </div>
+  <div class="col-md-4">
+    <label for="request-name-text">Request Name</label><br>
+    <input id="request-name-text" type="text" [width]='610' [(ngModel)]="model.requestName">
+  </div>
+</div>

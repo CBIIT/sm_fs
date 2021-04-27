@@ -15,6 +15,17 @@ export class RequestModel {
   // Grant viewer URL for use in links
   private _grantViewerUrl: string;
 
+  // Request type
+  private _requestType: string;
+
+  get requestType(): string {
+    return this._requestType;
+  }
+
+  set requestType(value: string) {
+    this._requestType = value;
+  }
+
   get grant(): NciPfrGrantQueryDto {
     return this._grant;
   }

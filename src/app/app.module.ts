@@ -35,6 +35,7 @@ import {AppUserSessionService} from './service/app-user-session.service';
 import { MailtoFormatterPipe } from './pipes/mailto-formatter.pipe';
 import { GrantInformationComponent } from './grant-information/grant-information.component';
 import { ProgramRecommendedCostsComponent } from './program-recommended-costs/program-recommended-costs.component';
+import { RequestInformationComponent } from './request-information/request-information.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
@@ -79,7 +80,8 @@ async function appInitialization(
     CodeDescriptionPipe,
     MailtoFormatterPipe,
     GrantInformationComponent,
-    ProgramRecommendedCostsComponent
+    ProgramRecommendedCostsComponent,
+    RequestInformationComponent
   ],
   imports: [
     BrowserModule,

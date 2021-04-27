@@ -1,14 +1,7 @@
 <div class="container">
   <app-grant-information></app-grant-information>
   <hr>
-  <div class="row">
-    <h2>Request Information</h2>
-  </div>
-  <app-funding-request-type [filter]="true"></app-funding-request-type>
-  <div class="row">
-    <h2>Request Name</h2>
-  </div>
-  <input type="text" [value]="model.requestName">
+  <app-request-information></app-request-information>
   <hr>
   <app-program-recommended-costs></app-program-recommended-costs>
 

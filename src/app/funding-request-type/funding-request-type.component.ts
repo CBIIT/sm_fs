@@ -21,7 +21,7 @@ export class FundingRequestTypeComponent implements OnInit {
   constructor(private fsLookupControllerService: FsLookupControllerService,
               private searchFilterService: SearchFilterService,
               private userService: UserService,
-              private requestModel: RequestModel) {
+              private model: RequestModel) {
   }
 
   ngOnInit(): void {
@@ -46,7 +46,7 @@ export class FundingRequestTypeComponent implements OnInit {
 
   evoke(filter): any {
     if (filter) {
-      return this.fsLookupControllerService.getRequestTypesWithFlagUsingGET(this.requestModel.grant.fullGrantNum,
+      return this.fsLookupControllerService.getRequestTypesWithFlagUsingGET(this.model.grant.fullGrantNum,
         this.userService.currentUserValue.npnId);
     } else {
       return this.fsLookupControllerService.getRequestTypesUsingGET();
