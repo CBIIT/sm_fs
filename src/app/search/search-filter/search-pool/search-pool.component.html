@@ -1,6 +1,6 @@
 <div class="col-12 col-md-6 form-group">
     <label for="search-pool-select">Search Within</label>
-    <ng-select2  id="search-pool-select" [width]="'610'"  [allowClear]="true">
+    <ng-select2  id="search-pool-select" [width]="'610'"  [allowClear]="true" [(ngModel)]="value">
         <option></option>
         <option *ngFor="let searchPool of searchPools" [value]="searchPool.key" > {{searchPool.value}}</option> 
    </ng-select2>

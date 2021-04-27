@@ -19,6 +19,10 @@ export class GrantsSearchFilterService {
         return this.grantsSearchCriteria;
     }
 
+    getGrantSearchCriteria():GrantsSearchCriteriaDto {
+        return this.grantsSearchCriteria;
+    }
+
     doSearch() {
         
     }

@@ -7,7 +7,7 @@
 <div class="row" role="group" aria-labelledby="filters-label">
 
     <div class="col-lg-6">
-        <app-search-pool></app-search-pool>
+        <app-search-pool (valueChanged)="searchPoolChanged($event)" [grantSearch]="true"></app-search-pool>
     </div>
 
     <div class="col-lg-6">

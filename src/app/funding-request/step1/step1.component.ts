@@ -11,8 +11,7 @@ import { AppUserSessionService } from 'src/app/service/app-user-session.service'
 @Component({
   selector: 'app-step1',
   templateUrl: './step1.component.html',
-  styleUrls: ['./step1.component.css'],
-  providers: [GrantsSearchFilterService]
+  styleUrls: ['./step1.component.css']
 })
 export class Step1Component implements OnInit, AfterViewInit {
 
@@ -25,6 +24,7 @@ export class Step1Component implements OnInit, AfterViewInit {
   dtTrigger: Subject<any> = new Subject();
   showAdvancedFilters: boolean = false;
   piName: string;
+  searchWithin:string;
   // TODO: let's figure out how to make some of these global properties
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
 
@@ -76,6 +76,11 @@ export class Step1Component implements OnInit, AfterViewInit {
 
   onSearch(): void {
 
+  }
+
+  searchPoolChanged(event:string):void {
+    console.log("search pool changed: "+event);
+    this.searchWithin=event;
   }
 
   fyRangeChanged(event): void {
