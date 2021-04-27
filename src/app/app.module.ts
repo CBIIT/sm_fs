@@ -34,6 +34,7 @@ import {PlanModel} from './model/plan-model';
 import {AppUserSessionService} from './service/app-user-session.service';
 import { MailtoFormatterPipe } from './pipes/mailto-formatter.pipe';
 import { GrantInformationComponent } from './grant-information/grant-information.component';
+import { ProgramRecommendedCostsComponent } from './program-recommended-costs/program-recommended-costs.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
@@ -77,7 +78,8 @@ async function appInitialization(
     FormatNcabDatePipe,
     CodeDescriptionPipe,
     MailtoFormatterPipe,
-    GrantInformationComponent
+    GrantInformationComponent,
+    ProgramRecommendedCostsComponent
   ],
   imports: [
     BrowserModule,

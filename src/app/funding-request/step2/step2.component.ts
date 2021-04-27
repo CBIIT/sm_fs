@@ -13,7 +13,7 @@ export class Step2Component implements OnInit {
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
 
-  constructor(private router: Router, private _requestModel: RequestModel,
+  constructor(private router: Router, private requestModel: RequestModel,
               private propertiesService: AppPropertiesService) {
   }
 
@@ -29,11 +29,11 @@ export class Step2Component implements OnInit {
   }
 
   get grant(): NciPfrGrantQueryDto {
-    return this._requestModel.grant;
+    return this.model.grant;
   }
 
-  get requestModel(): RequestModel {
-    return this._requestModel;
+  get model(): RequestModel {
+    return this.requestModel;
   }
 
 }
