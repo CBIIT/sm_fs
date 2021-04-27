@@ -2,13 +2,14 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {RequestModel} from '../model/request-model';
+import { SearchFilterService } from '../search/search-filter.service';
 import { GrantsSearchFilterService } from './grants-search/grants-search-filter.service';
 
 @Component({
   selector: 'app-funding-request',
   templateUrl: './funding-request.component.html',
   styleUrls: ['./funding-request.component.css'],
-  providers: [GrantsSearchFilterService]
+  providers: [GrantsSearchFilterService, SearchFilterService]
 })
 export class FundingRequestComponent implements OnInit, OnDestroy {
   activeStep={step:0,name:'',route:''};

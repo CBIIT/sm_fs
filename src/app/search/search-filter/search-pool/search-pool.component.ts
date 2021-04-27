@@ -1,8 +1,6 @@
 import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
-import {LookupsControllerService} from '@nci-cbiit/i2ecws-lib';
 import 'select2';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
-import {SearchFilterService} from '../../search-filter.service';
 
 @Component({
   selector: 'app-search-pool',
