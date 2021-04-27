@@ -2,11 +2,23 @@
   <h2>Request Information</h2>
 </div>
 <div class="row">
-  <div class="col-md-4">
+  <div class="col-md-6">
     <app-funding-request-type [filter]="true"></app-funding-request-type>
-    </div>
+  </div>
   <div class="col-md-4">
     <label for="request-name-text">Request Name</label><br>
     <input id="request-name-text" type="text" [width]='610' [(ngModel)]="model.requestName">
+  </div>
+  <div class="col-md-2">
+    <label for="fy-span">FY</label><br>
+    <span id="fy-span">{{ grant.fy }}</span>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <label>Requesting PD</label>
+  </div>
+  <div class="col-md-6">
+    <label>Requesting PD's CA</label>
   </div>
 </div>

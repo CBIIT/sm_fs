@@ -1,9 +1,9 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import {Subscription} from 'rxjs';
 import {RequestModel} from '../model/request-model';
-import { SearchFilterService } from '../search/search-filter.service';
-import { GrantsSearchFilterService } from './grants-search/grants-search-filter.service';
+import {SearchFilterService} from '../search/search-filter.service';
+import {GrantsSearchFilterService} from './grants-search/grants-search-filter.service';
 
 @Component({
   selector: 'app-funding-request',
@@ -12,35 +12,35 @@ import { GrantsSearchFilterService } from './grants-search/grants-search-filter.
   providers: [GrantsSearchFilterService, SearchFilterService]
 })
 export class FundingRequestComponent implements OnInit, OnDestroy {
-  activeStep={step:0,name:'',route:''};
-  steps=[
-    {step:1, name:'Select Grant', route:'/request/step1'},
-    {step:2, name:'Request Info', route:'/request/step2'},
-    {step:3, name:'Supporting Docs', route:'/request/step3'},
-    {step:4, name:'Review', route:'/request/step4'},
+  activeStep = {step: 0, name: '', route: ''};
+  steps = [
+    {step: 1, name: 'Select Grant', route: '/request/step1'},
+    {step: 2, name: 'Request Info', route: '/request/step2'},
+    {step: 3, name: 'Supporting Docs', route: '/request/step3'},
+    {step: 4, name: 'Review', route: '/request/step4'},
   ];
 
-  private routerSub:Subscription;
+  private routerSub: Subscription;
 
-  constructor(private route:ActivatedRoute,
-              private router:Router,
+  constructor(private route: ActivatedRoute,
+              private router: Router,
               private requestModel: RequestModel) {
-    this.requestModel.requestName = 'funding request component title';
   }
 
   ngOnDestroy(): void {
-    if (this.routerSub && !this.routerSub.closed)
-        this.routerSub.unsubscribe();
+    if (this.routerSub && !this.routerSub.closed) {
+      this.routerSub.unsubscribe();
+    }
   }
 
   ngOnInit(): void {
-    this.routerSub=this.router.events.subscribe((val)=>{
-      console.log("Router event", val)
+    this.routerSub = this.router.events.subscribe((val) => {
+      console.log('Router event', val);
       if (val instanceof NavigationEnd) {
         for (var step of this.steps) {
-          if (step.route===val.urlAfterRedirects) {
-            console.log("matched URL");
-            this.activeStep=step;
+          if (step.route === val.urlAfterRedirects) {
+            console.log('matched URL');
+            this.activeStep = step;
             break;
           }
         }
@@ -49,13 +49,12 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
 
     //when direct access using url
     for (var step of this.steps) {
-      if (step.route===this.router.url) {
-        console.log("oninit matched url");
-        this.activeStep=step;
+      if (step.route === this.router.url) {
+        console.log('oninit matched url');
+        this.activeStep = step;
       }
     }
   }
-
 
 
 }

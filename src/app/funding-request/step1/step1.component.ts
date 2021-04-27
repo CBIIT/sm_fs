@@ -6,7 +6,7 @@ import {Subject} from 'rxjs';
 import {AppPropertiesService} from 'src/app/service/app-properties.service';
 import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.service';
 import {RequestModel} from '../../model/request-model';
-import { AppUserSessionService } from 'src/app/service/app-user-session.service';
+import {AppUserSessionService} from 'src/app/service/app-user-session.service';
 
 @Component({
   selector: 'app-step1',
@@ -24,7 +24,7 @@ export class Step1Component implements OnInit, AfterViewInit {
   dtTrigger: Subject<any> = new Subject();
   showAdvancedFilters: boolean = false;
   piName: string;
-  searchWithin:string;
+  searchWithin: string;
   // TODO: let's figure out how to make some of these global properties
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
 
@@ -46,28 +46,24 @@ export class Step1Component implements OnInit, AfterViewInit {
       pageLength: 10,
       responsive: {
         details: {
-            type: 'column',
-            target: -1
+          type: 'column',
+          target: -1
         }
       },
-      columnDefs: [ {
+      columnDefs: [{
         className: 'control',
         orderable: false,
-        targets:   -1
-      } ,
-      {
-        responsivePriority: 1,
-        targets:   -2
-      } ]
+        targets: -1
+      },
+        {
+          responsivePriority: 1,
+          targets: -2
+        }]
     };
   }
 
 
-
   nextStep(event, grant): void {
-    console.log(this.requestModel.requestName);
-    console.log("", this.requestModel.grant);
-    this.requestModel.requestName = 'Please work';
     this.requestModel.grant = grant;
     this.router.navigate(['/request/step2']);
     // TODO: identify and emit the selected grant
@@ -78,9 +74,9 @@ export class Step1Component implements OnInit, AfterViewInit {
 
   }
 
-  searchPoolChanged(event:string):void {
-    console.log("search pool changed: "+event);
-    this.searchWithin=event;
+  searchPoolChanged(event: string): void {
+    console.log('search pool changed: ' + event);
+    this.searchWithin = event;
   }
 
   fyRangeChanged(event): void {
