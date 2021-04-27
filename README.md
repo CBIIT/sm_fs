@@ -1,7 +1,8 @@
 # Funding Selection
 
 ## Action Items
-[ ] Document standards and usage
+- [ ] Document standards and usage
+- [ ] Document best practices
 
 ## Create new UI components
 **NOTE:** FS-specific components should go here.  Shared components go into sm_i2e_common_ui.  If you're not sure, put it here and we'll
@@ -36,3 +37,9 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+# Best Practices
+
+- Create a shared Model object that can be injected into components.
+- The model should contain all the data a component might need
+- Keep reusability in mind
