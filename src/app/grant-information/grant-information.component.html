@@ -4,7 +4,7 @@
 <div class="row">
   <div class="col-md-3">
     <h4>Grant Number</h4>
-    <br><a href="{{grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
+    <br><a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
   </div>
   <div class="col-md-3">
     <h4>Project Title</h4>
@@ -27,7 +27,7 @@
   </div>
   <div class="col-md-3">
     <h4>I2 Status</h4>
-    <br>{{ grant.ipf }}
+    <br>{{ grant.applStatusGroupCode }}
   </div>
   <div class="col-md-3">
     <h4>CA</h4>
@@ -48,15 +48,15 @@
     <h4>Budget Start Date</h4>
     <br>{{ grant.budgetStartDate }}
   </div>
-  <div class="col-md-3">
+  <div class="col-md-2">
     <h4>NCAB</h4>
     <br>{{ grant.councilMeetingDate|formatNcabDate }}
   </div>
-  <div class="col-md-3">
+  <div class="col-md-2">
     <h4>Score</h4>
     <br>{{ grant.priorityScoreNum }}
   </div>
-  <div class="col-md-3">
+  <div class="col-md-2">
     <h4>Percentile</h4>
     <br>{{ grant.irgPercentileNum }}
   </div>

@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {AppPropertiesService} from '../service/app-properties.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,9 @@ export class RequestModel {
 
   // Holds the request title
   private _requestName = 'RequestModel';
+
+  // Grant viewer URL for use in links
+  private _grantViewerUrl: string;
 
   get grant(): NciPfrGrantQueryDto {
     return this._grant;
@@ -27,7 +31,12 @@ export class RequestModel {
     this._requestName = value;
   }
 
-  constructor() {
+  get grantViewerUrl(): string {
+    return this._grantViewerUrl;
+  }
+
+  constructor(private propertiesService: AppPropertiesService) {
+    this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
   }
 
 }

@@ -26,7 +26,6 @@ export class FundingRequestTypeComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('filter =', this.filter);
-    this.requestModel.requestName = 'Title in FundingRequestTypeComponent';
 
     this.evoke(this.filter).subscribe(
       result => {
@@ -52,6 +51,10 @@ export class FundingRequestTypeComponent implements OnInit {
     } else {
       return this.fsLookupControllerService.getRequestTypesUsingGET();
     }
+  }
+
+  onChange(event): any {
+    console.log('change');
   }
 
 }

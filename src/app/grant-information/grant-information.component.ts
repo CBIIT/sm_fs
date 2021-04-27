@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../service/app-properties.service';
@@ -20,6 +20,10 @@ export class GrantInformationComponent implements OnInit {
 
   get grant(): NciPfrGrantQueryDto {
     return this.requestModel.grant;
+  }
+
+  get model(): RequestModel {
+    return this.requestModel;
   }
 
 }
