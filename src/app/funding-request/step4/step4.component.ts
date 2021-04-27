@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {RequestModel} from '../../model/request-model';
+import {AppPropertiesService} from '../../service/app-properties.service';
+import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-step4',
@@ -8,13 +11,20 @@ import { Router } from '@angular/router';
 })
 export class Step4Component implements OnInit {
 
-  constructor(private router:Router) { }
+  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+
+  constructor(private router: Router, private requestModel: RequestModel, private propertiesService: AppPropertiesService) {
+  }
 
   ngOnInit(): void {
   }
 
-  prevStep() {
+  prevStep(): void {
     this.router.navigate(['/request/step3']);
+  }
+
+  get grant(): NciPfrGrantQueryDto {
+    return this.requestModel.grant;
   }
 
 }

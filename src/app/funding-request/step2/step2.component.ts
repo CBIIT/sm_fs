@@ -11,18 +11,13 @@ import {AppPropertiesService} from '../../service/app-properties.service';
 })
 export class Step2Component implements OnInit {
 
-  private _requestModel: RequestModel;
-
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
 
-  constructor(private router: Router, requestModel: RequestModel,
+  constructor(private router: Router, private _requestModel: RequestModel,
               private propertiesService: AppPropertiesService) {
-    this._requestModel = requestModel;
   }
 
   ngOnInit(): void {
-    console.log(this._requestModel.requestName);
-    console.log(this._requestModel.grant);
   }
 
   nextStep(): void {
