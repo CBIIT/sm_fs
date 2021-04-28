@@ -36,11 +36,11 @@ import { MailtoFormatterPipe } from './pipes/mailto-formatter.pipe';
 import { GrantInformationComponent } from './grant-information/grant-information.component';
 import { ProgramRecommendedCostsComponent } from './program-recommended-costs/program-recommended-costs.component';
 import { RequestInformationComponent } from './request-information/request-information.component';
-import { FundingRequestReadonlyComponent } from './funding-request-readonly/funding-request-readonly.component';
+import { RequestInformationReadonlyComponent } from './request-information-readonly/request-information-readonly.component';
 import { RequestHistoryComponent } from './request-history/request-history.component';
-import { NextScheduledApproversReadonlyComponent } from './next-scheduled-approvers-readonly/next-scheduled-approvers-readonly.component';
+import { NextScheduledApproversRequestReadonlyComponent } from './next-scheduled-approvers-request-readonly/next-scheduled-approvers-request-readonly.component';
 import { ProgramRecommendedCostsReadonlyComponent } from './program-recommended-costs-readonly/program-recommended-costs-readonly.component';
-import { ManageScheduledApproversRequestComponent } from './manage-scheduled-approvers-request/manage-scheduled-approvers-request.component';
+import { NextScheduledApproversRequestComponent } from './next-scheduled-approvers-request/next-scheduled-approvers-request.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
@@ -87,11 +87,11 @@ async function appInitialization(
     GrantInformationComponent,
     ProgramRecommendedCostsComponent,
     RequestInformationComponent,
-    FundingRequestReadonlyComponent,
+    RequestInformationReadonlyComponent,
     RequestHistoryComponent,
-    NextScheduledApproversReadonlyComponent,
+    NextScheduledApproversRequestReadonlyComponent,
     ProgramRecommendedCostsReadonlyComponent,
-    ManageScheduledApproversRequestComponent
+    NextScheduledApproversRequestComponent
   ],
   imports: [
     BrowserModule,

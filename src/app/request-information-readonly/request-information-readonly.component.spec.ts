@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FundingRequestReadonlyComponent } from './funding-request-readonly.component';
+import { RequestInformationReadonlyComponent } from './request-information-readonly.component';
 
 describe('FundingRequestReadonlyComponent', () => {
-  let component: FundingRequestReadonlyComponent;
-  let fixture: ComponentFixture<FundingRequestReadonlyComponent>;
+  let component: RequestInformationReadonlyComponent;
+  let fixture: ComponentFixture<RequestInformationReadonlyComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FundingRequestReadonlyComponent ]
+      declarations: [ RequestInformationReadonlyComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FundingRequestReadonlyComponent);
+    fixture = TestBed.createComponent(RequestInformationReadonlyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

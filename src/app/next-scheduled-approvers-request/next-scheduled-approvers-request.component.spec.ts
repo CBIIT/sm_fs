@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ManageScheduledApproversRequestComponent } from './manage-scheduled-approvers-request.component';
+import { NextScheduledApproversRequestComponent } from './next-scheduled-approvers-request.component';
 
 describe('ManageScheduledApproversRequestComponent', () => {
-  let component: ManageScheduledApproversRequestComponent;
-  let fixture: ComponentFixture<ManageScheduledApproversRequestComponent>;
+  let component: NextScheduledApproversRequestComponent;
+  let fixture: ComponentFixture<NextScheduledApproversRequestComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ManageScheduledApproversRequestComponent ]
+      declarations: [ NextScheduledApproversRequestComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ManageScheduledApproversRequestComponent);
+    fixture = TestBed.createComponent(NextScheduledApproversRequestComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
