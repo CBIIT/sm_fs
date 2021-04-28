@@ -1,10 +1,34 @@
 <div class="container" style="width: 100%;">
     <div class="row">
         <div class="col-lg-5">
-            <h3>Add Docs</h3>
+            <h2>Add Docs</h2>
+            <h4>You may upload Microsoft Word, Microsoft Excel, (OR) Adobe Acrobat document(s) only. 
+                Note: if you upload MS Excel, make sure to upload only one worksheet per file in order to have it included in the submission package. 
+                Maximum file upload is 10 megabytes. </h4>
+
+                <div class="form-group">
+                    <label for="Type">Type</label>
+                    <ng-select2  id="Type" [(ngModel)]="selectedDocType" [allowClear]="true">
+                        <option></option>
+                      <option *ngFor="let DocType of DocTypes" [value]="DocType.rvLowValue" > {{DocType.rvLowValue}}</option> 
+                   </ng-select2>
+                </div>
+
+                <label class="btn btn-default">
+                    <input type="file" multiple (change)="selectFiles($event)" />
+                  </label>
+                  
+                  <button
+                    class="btn btn-success"
+                    [disabled]="!selectedFiles"
+                    (click)="uploadFiles()"
+                  >
+                    Upload
+                  </button>
+
         </div>
         <div class="col-lg-7">
-            <h3>Submission Package</h3>
+            <h2>Submission Package</h2>
             <br><h4>Included Content</h4>
         </div>
     </div>
