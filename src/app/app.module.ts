@@ -37,6 +37,10 @@ import { GrantInformationComponent } from './grant-information/grant-information
 import { ProgramRecommendedCostsComponent } from './program-recommended-costs/program-recommended-costs.component';
 import { RequestInformationComponent } from './request-information/request-information.component';
 import { FundingRequestReadonlyComponent } from './funding-request-readonly/funding-request-readonly.component';
+import { RequestHistoryComponent } from './request-history/request-history.component';
+import { NextScheduledApproversReadonlyComponent } from './next-scheduled-approvers-readonly/next-scheduled-approvers-readonly.component';
+import { ProgramRecommendedCostsReadonlyComponent } from './program-recommended-costs-readonly/program-recommended-costs-readonly.component';
+import { ManageScheduledApproversRequestComponent } from './manage-scheduled-approvers-request/manage-scheduled-approvers-request.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
@@ -83,7 +87,11 @@ async function appInitialization(
     GrantInformationComponent,
     ProgramRecommendedCostsComponent,
     RequestInformationComponent,
-    FundingRequestReadonlyComponent
+    FundingRequestReadonlyComponent,
+    RequestHistoryComponent,
+    NextScheduledApproversReadonlyComponent,
+    ProgramRecommendedCostsReadonlyComponent,
+    ManageScheduledApproversRequestComponent
   ],
   imports: [
     BrowserModule,
