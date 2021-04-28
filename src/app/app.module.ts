@@ -41,6 +41,7 @@ import { RequestHistoryComponent } from './request-history/request-history.compo
 import { NextScheduledApproversRequestReadonlyComponent } from './next-scheduled-approvers-request-readonly/next-scheduled-approvers-request-readonly.component';
 import { ProgramRecommendedCostsReadonlyComponent } from './program-recommended-costs-readonly/program-recommended-costs-readonly.component';
 import { NextScheduledApproversRequestComponent } from './next-scheduled-approvers-request/next-scheduled-approvers-request.component';
+import { FundingSourceComponent } from './funding-source/funding-source.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
@@ -91,7 +92,8 @@ async function appInitialization(
     RequestHistoryComponent,
     NextScheduledApproversRequestReadonlyComponent,
     ProgramRecommendedCostsReadonlyComponent,
-    NextScheduledApproversRequestComponent
+    NextScheduledApproversRequestComponent,
+    FundingSourceComponent
   ],
   imports: [
     BrowserModule,
