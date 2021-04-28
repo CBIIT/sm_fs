@@ -18,6 +18,9 @@ export class Step2Component implements OnInit {
   }
 
   ngOnInit(): void {
+    if(!this.requestModel.grant) {
+      this.router.navigate(['/request']);
+    }
   }
 
   nextStep(): void {
@@ -35,5 +38,6 @@ export class Step2Component implements OnInit {
   get model(): RequestModel {
     return this.requestModel;
   }
+
 
 }

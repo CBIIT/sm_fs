@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
@@ -24,6 +24,14 @@ export class RequestInformationComponent implements OnInit {
 
   get model(): RequestModel {
     return this.requestModel;
+  }
+
+  receiveCasValue(e): void {
+
+  }
+
+  receivePdIdValue(e): void {
+
   }
 
 }

@@ -15,10 +15,11 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-md-6">
-    <label>Requesting PD</label>
+  <div class="col-lg-6">
+    <lib-pdname-dropdown label="PD Name" apiCallName="activePds" (selectedPdIdValue)="receivePdIdValue($event)" [showInactiveToggle]="true"></lib-pdname-dropdown>
   </div>
-  <div class="col-md-6">
-    <label>Requesting PD's CA</label>
+  <div class="col-lg-6">
+    <lib-cancer-activities-dropdown label="PD's Cancer Activities"  (selectedCasValues)="receiveCasValue($event)"></lib-cancer-activities-dropdown>
   </div>
+
 </div>

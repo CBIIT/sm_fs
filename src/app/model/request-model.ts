@@ -10,7 +10,7 @@ export class RequestModel {
   private _grant: NciPfrGrantQueryDto;
 
   // Holds the request title
-  private _requestName = 'RequestModel';
+  private _requestName: string;
 
   // Grant viewer URL for use in links
   private _grantViewerUrl: string;

@@ -36,6 +36,7 @@ import { MailtoFormatterPipe } from './pipes/mailto-formatter.pipe';
 import { GrantInformationComponent } from './grant-information/grant-information.component';
 import { ProgramRecommendedCostsComponent } from './program-recommended-costs/program-recommended-costs.component';
 import { RequestInformationComponent } from './request-information/request-information.component';
+import { FundingRequestReadonlyComponent } from './funding-request-readonly/funding-request-readonly.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
@@ -81,7 +82,8 @@ async function appInitialization(
     MailtoFormatterPipe,
     GrantInformationComponent,
     ProgramRecommendedCostsComponent,
-    RequestInformationComponent
+    RequestInformationComponent,
+    FundingRequestReadonlyComponent
   ],
   imports: [
     BrowserModule,
