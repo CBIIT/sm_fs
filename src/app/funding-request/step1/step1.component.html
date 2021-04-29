@@ -36,11 +36,11 @@
     </div>
 
     <div class="col-lg-3" *ngIf="showAdvancedFilters">
-        <lib-rfa-pa-dropdown></lib-rfa-pa-dropdown>
+        <lib-rfa-pa-dropdown (selectedRfaPaValue)="rfaRaSelected($event)"></lib-rfa-pa-dropdown>
     </div>
 
     <div class="col-lg-3" *ngIf="showAdvancedFilters">
-        <lib-ncab-daterange></lib-ncab-daterange>
+        <lib-ncab-daterange (selectedNcabToValue)="ncabToSelected($event)" (selectedNcabFromValue)="ncabFromSelected($event)"></lib-ncab-daterange>
     </div>
 
     <div class="col-lg-6" *ngIf="showAdvancedFilters">

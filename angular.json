@@ -82,7 +82,9 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "fs:build",
-            "proxyConfig": "src/environments/proxy.config.js"
+            "proxyConfig": "src/environments/proxy.config.js",
+            "baseHref": "/fs/",
+            "deployUrl": "/fs/"
           },
           "configurations": {
             "production": {

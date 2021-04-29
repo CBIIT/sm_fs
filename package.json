@@ -21,7 +21,7 @@
     "@angular/platform-browser": "~11.1.0",
     "@angular/platform-browser-dynamic": "~11.1.0",
     "@angular/router": "^11.2.12",
-    "@nci-cbiit/i2ecui-lib": "~1.0.0-SNAPSHOT",
+    "@nci-cbiit/i2ecui-lib": "file:nci-cbiit-i2ecui-lib-1.0.0-SNAPSHOT.6.tgz",
     "@nci-cbiit/i2ecws-lib": "^2.1.0-SNAPSHOT.202104281545",
     "@ng-bootstrap/ng-bootstrap": "^9.0.2",
     "@types/jquery": "^3.5.5",
