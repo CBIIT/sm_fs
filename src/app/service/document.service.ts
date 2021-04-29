@@ -13,8 +13,8 @@ export class DocumentService {
   private response: String;
   fileString:string = "";
  // fileString: string;
-  
-  
+
+
   constructor(private http: HttpClient,
     private documentsControllerService: DocumentsControllerService) { }
 
@@ -28,7 +28,7 @@ export class DocumentService {
     //   responseType: 'json'
     // });
 
-    
+
     var reader = new FileReader();
 
   reader.onload = function () {
@@ -36,7 +36,7 @@ export class DocumentService {
   }
 
 
-  
+
 
   reader.readAsBinaryString(file);
 
@@ -46,7 +46,7 @@ export class DocumentService {
     console.log(reader.result);
 
     // By lines
-    
+
 
     this.fileString = reader.result as string;
  };
@@ -60,7 +60,7 @@ export class DocumentService {
           return result;
         })
 
-      
+
 
       );
     }
