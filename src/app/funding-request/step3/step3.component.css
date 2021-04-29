@@ -1,0 +1,9 @@
+@media (min-width: 992px) { 
+    #submission-package {
+        border-left:1px solid #c1c2c9;
+        padding-left:30px;
+    }
+    #add-docs {
+        padding-right:30px;
+    }
+}

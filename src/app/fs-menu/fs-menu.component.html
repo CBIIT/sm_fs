@@ -1,33 +1,21 @@
-<div class="panel-group">
-    <div class="panel panel-default">
-      <div class="list-group">
-          <a class="list-group-item list-group-item-action" data-toggle="collapse" 
-          href="#collapse1" >Paylist</a>
-      </div>
-      <div id="collapse1" class="panel-collapse collapse">
-        <div class="list-group" id="side-nav">
-            <a class="list-group-item list-group-item-action" id="side-nav-paylists" href="{{paylistDashboardUrl}}">Dashboard</a>
-            <a class="list-group-item list-group-item-action" id="side-nav-grants"  href="{{paylistPendingGrantsUrl}}">Pending Grants&nbsp;<span class="badge badge-danger ml-1" id="PendingGrantsLength">0</span></a>
-            <a class="list-group-item list-group-item-action" id="side-nav-find-paylists"  href="{{paylistSearchUrl}}">Find Paylists</a>
-        </div>
-      </div>
-      <div class="panel-heading">
-        <div class="list-group">
-          <a class="list-group-item list-group-item-action collapsed" data-toggle="collapse" 
-          href="#collapse2" >Funding Requests/Plans</a>
-        </div>
-      </div>
-      <div id="collapse2" class="collapse show">
-        <div class="list-group" id="side-nav" role="tablist">
-            <a class="list-group-item list-group-item-action" 
-                routerLink="/request" routerLinkActive="active">New Request</a>
-            <a class="list-group-item list-group-item-action" 
-                routerLink="/newplan" routerLinkActive="active">New Plan</a>
-            <a class="list-group-item list-group-item-action" 
-                routerLink="/search"  routerLinkActive="active">Search</a>
-            <a class="list-group-item list-group-item-action" 
-                routerLink="/manage"  routerLinkActive="active">Manage Destinations</a>
-        </div>
-      </div>
-    </div>
-  </div>
+<nav id="side-nav" aria-label="application navigation">
+    <ul class="list-group">
+        <li class="list-group-item"><a routerLink="/search"  routerLinkActive="active">Search</a></li>
+        <li class="list-group-item">
+            <a href="#paylist" class="parent" data-toggle="collapse" href="#nav-collapse-paylist" role="button" aria-expanded="false" aria-controls="nav-collapse-paylist">Paylist</a>
+            <ul class="collapse" id="nav-collapse-paylist">
+                <li class="list-group-item"><a href="{{paylistDashboardUrl}}">Dashboard</a></li>
+                <li class="list-group-item"><a href="{{paylistPendingGrantsUrl}}">Pending Grants</a></li>
+                <li class="list-group-item"><a href="{{paylistSearchUrl}}">Find Paylists</a></li>
+            </ul>
+        </li>
+        <li class="list-group-item">
+            <a href="#PFR" class="parent" data-toggle="collapse" href="#nav-collapse-pfr" role="button" aria-expanded="true" aria-controls="nav-collapse-pfr">Program Funding Requests</a>
+            <ul class="collapse show" id="nav-collapse-pfr">
+                <li class="list-group-item"><a routerLink="/request" routerLinkActive="active">New Funding Request</a></li>
+                <li class="list-group-item"><a routerLink="/newplan" routerLinkActive="active">New Funding Plan</a></li>
+                <li class="list-group-item"><a routerLink="/manage" routerLinkActive="active">Manage Designation</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>

@@ -1,40 +1,50 @@
-<div class="container" style="width: 100%;">
-    <div class="row">
-        <div class="col-lg-5">
-            <h2>Add Docs</h2>
-            <h4>You may upload Microsoft Word, Microsoft Excel, (OR) Adobe Acrobat document(s) only. 
-                Note: if you upload MS Excel, make sure to upload only one worksheet per file in order to have it included in the submission package. 
-                Maximum file upload is 10 megabytes. </h4>
+<div class="row">
 
-                <div class="form-group">
-                    <label for="Type">Type</label>
-                    <ng-select2  id="Type" [(ngModel)]="selectedDocType" [allowClear]="true">
-                        <option></option>
-                      <option *ngFor="let DocType of DocTypes" [value]="DocType.rvLowValue" > {{DocType.rvLowValue}}</option> 
-                   </ng-select2>
+    <div class="col-lg-4" id="add-docs">
+        <h2>Add Docs</h2>
+        <p><small class="text-muted">You may upload Microsoft Word, Microsoft Excel, (OR) Adobe Acrobat document(s) only. Note: if you upload MS Excel, make sure to upload only one worksheet per file in order to have it included in the submission packaged. Maximum file upload is 10 megabytes.</small></p>
+        
+        <div class="form-group">
+            <label for="type">Type</label>
+            <ng-select2  id="type" [(ngModel)]="selectedDocType" [allowClear]="true">
+                <option></option>
+              <option *ngFor="let DocType of DocTypes" [value]="DocType.rvLowValue" > {{DocType.rvLowValue}}</option> 
+           </ng-select2>
+        </div>
+
+        <div class="form-group">
+            <div class="input-group">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="file-browse" (change)="selectFiles($event)">
+                    <label class="custom-file-label" for="file-browse">Choose file</label>
                 </div>
-
-                <label class="btn btn-default">
-                    <input type="file" multiple (change)="selectFiles($event)" />
-                  </label>
-                  
-                  <button
-                    class="btn btn-success"
-                    [disabled]="!selectedFiles"
-                    (click)="uploadFiles()"
-                  >
-                    Upload
-                  </button>
-
+                <div class="input-group-append">
+                    <button class="btn btn-primary" [disabled]="!selectedFiles" (click)="uploadFiles()">Upload</button>
+                </div>
+            </div>
         </div>
-        <div class="col-lg-7">
-            <h2>Submission Package</h2>
-            <br><h4>Included Content</h4>
+
+        <div class="form-group">
+            <label for="file-description">Description</label>
+            <textarea class="form-control" id="file-description" rows="1"></textarea>
         </div>
+    </div><!-- END left col -->
+
+    <div class="col-lg-8" id="submission-package">
+        <h2>Submission Package</h2>
+        <h3>Included Content</h3>
+        <p>That goes here...</p>
+        <h3>Excluded Content</h3>
+        <p>That goes here...</p>
     </div>
-    <hr>
-    <div class="flex">
-            <button class="btn btn-outline-dark float-left" (click)="prevStep()">Previous</button>
-            <button class="btn btn-primary float-right" (click)="nextStep()">Next</button>
-    </div>        
+</div>
+
+<hr>
+<div class="row">
+    <div class="col-12 d-flex">
+        <button class="btn btn-outline-secondary mr-auto" (click)="prevStep()">Previous</button>
+        <button class="btn btn-outline-primary mr-2"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i> View Package</button>
+        <button class="btn btn-outline-primary mr-2">Save as Draft</button>
+        <button class="btn btn-primary" (click)="nextStep()">Save and Continue</button>
+    </div>
 </div>

@@ -1,16 +1,13 @@
-<div class="container">
-  <app-grant-information></app-grant-information>
-  <hr>
-  <app-request-information></app-request-information>
-  <hr>
-  <app-program-recommended-costs></app-program-recommended-costs>
-
-  <hr>
-  <div>
-    <div class="flex">
-      <button class="btn btn-outline-dark float-left" (click)="prevStep()">Previous</button>
-      <button class="btn btn-outline-secondary float-right" (click)="nextStep()">Save as Draft</button>
-      <button class="btn btn-primary float-right" (click)="nextStep()">Save and Continue</button>
+<app-grant-information></app-grant-information>
+<hr>
+<app-request-information></app-request-information>
+<hr>
+<app-program-recommended-costs></app-program-recommended-costs>
+<hr>
+<div class="row">
+    <div class="col-12 d-flex">
+        <button class="btn btn-outline-secondary mr-auto" (click)="prevStep()">Previous</button>
+        <button class="btn btn-outline-primary mr-2">Save as Draft</button>
+        <button class="btn btn-primary" (click)="nextStep()">Save and Continue</button>
     </div>
-
-  </div>
+</div>

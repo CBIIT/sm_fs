@@ -6,11 +6,11 @@
 </div>
 <div class="row" role="group" aria-labelledby="filters-label">
 
-    <div class="col-lg-6">
+    <div class="col-lg-4">
         <app-search-pool (valueChanged)="searchPoolChanged($event)" [grantSearch]="true"></app-search-pool>
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-lg-8">
         <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
     </div>
 
@@ -64,7 +64,7 @@
     <div class="col-12">
         <h2>Results</h2>
         <p *ngIf="!grantList">No results to display. Try applying a filter above and clicking "Search."</p>
-        <table #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+        <table #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border">
             <thead>
               <tr>
                 <th>Grant Number</th>
