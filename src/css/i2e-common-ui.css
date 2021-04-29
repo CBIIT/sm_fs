@@ -11862,6 +11862,25 @@ readers do not read off random characters that represent icons */
 }
 
 /*!
+ * Font Awesome Pro 5.15.3 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license (Commercial License)
+ */
+@font-face {
+  font-family: 'Font Awesome 5 Pro';
+  font-style: normal;
+  font-weight: 300;
+  font-display: block;
+  src: url("../fonts/fa-light-300.eot");
+  src: url("../fonts/fa-light-300.eot?#iefix") format("embedded-opentype"), url("../fonts/fa-light-300.woff2") format("woff2"), url("../fonts/fa-light-300.woff") format("woff"), url("../fonts/fa-light-300.ttf") format("truetype"), url("../fonts/fa-light-300.svg#fontawesome") format("svg");
+}
+
+/* line 20, ../Github/sm_i2e_common_ui/src/scss/fontawesome/light.scss */
+.fal {
+  font-family: 'Font Awesome 5 Pro';
+  font-weight: 300;
+}
+
+/*!
  * Bootstrap v4.3.1 (https://getbootstrap.com/)
  * Copyright 2011-2019 The Bootstrap Authors
  * Copyright 2011-2019 Twitter, Inc.
@@ -12290,27 +12309,27 @@ h1, h2, h3, h4, h5, h6,
 
 /* line 16, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
 h1, .h1 {
-  font-size: 2.25rem;
+  font-size: 1.62rem;
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
 h2, .h2 {
-  font-size: 1.8rem;
+  font-size: 1.44rem;
 }
 
 /* line 18, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
 h3, .h3 {
-  font-size: 1.575rem;
+  font-size: 1.26rem;
 }
 
 /* line 19, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
 h4, .h4 {
-  font-size: 1.35rem;
+  font-size: 1.17rem;
 }
 
 /* line 20, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
 h5, .h5 {
-  font-size: 1.125rem;
+  font-size: 1.08rem;
 }
 
 /* line 21, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
@@ -23661,17 +23680,24 @@ a.text-dark:hover, a.text-dark:focus {
 }
 
 /* line 3, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+.form-group .character-counter {
+  color: #63666a;
+  text-align: right;
+  display: block;
+}
+
+/* line 9, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-control {
   color: #272a2b;
 }
 
-/* line 5, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 11, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-control:disabled, .form-control[readonly] {
   background-color: #eee;
   color: #4b4e52;
 }
 
-/* line 11, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 17, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 label, .like-label {
   display: block;
   font-weight: bold;
@@ -23679,25 +23705,61 @@ label, .like-label {
   margin-bottom: .3rem;
 }
 
-/* line 21, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 22, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+label .optional, .like-label .optional {
+  font-weight: normal;
+  color: #63666a;
+  font-style: italic;
+}
+
+/* line 29, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+.custom-file-label {
+  padding-left: 5.5rem;
+}
+
+/* line 31, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+.custom-file-label:before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+  display: block;
+  height: calc(1.3em + 0.75rem);
+  padding: 0.375rem 0.75rem;
+  line-height: 1.3;
+  color: #272a2b;
+  content: "Browse";
+  background-color: #f4f5f6;
+  border-right: inherit;
+  border-radius: 0.25rem 0 0 0.25rem;
+}
+
+/* line 47, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+.custom-file-label:after {
+  content: "";
+  display: none;
+}
+
+/* line 56, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container {
   width: 100% !important;
 }
 
-/* line 24, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 59, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection {
   min-height: calc(1.3em + 0.75rem + 2px);
   border: 1px solid #a3a6ad;
 }
 
-/* line 27, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 62, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection .select2-selection__rendered {
   color: #272a2b;
   line-height: 1.3;
   padding: 0.375rem 0.75rem;
 }
 
-/* line 31, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 66, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection .select2-selection__rendered .select2-selection__clear {
   width: calc( calc(1.3em + 0.75rem) - ( 0.375rem * 2 ));
   height: calc( calc(1.3em + 0.75rem) - ( 0.375rem * 2 ));
@@ -23709,25 +23771,25 @@ label, .like-label {
   color: #272a2b;
 }
 
-/* line 40, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 75, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection .select2-selection__rendered .select2-selection__clear:hover {
   color: #272a2b;
   background-color: #dbdde0;
 }
 
-/* line 46, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 81, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection.select2-selection--multiple {
   display: flex;
   flex-wrap: wrap;
 }
 
-/* line 49, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 84, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered {
   padding: 0.25rem 0.75rem 0rem 0.75rem;
   height: 100%;
 }
 
-/* line 52, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 87, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
   margin-top: 0rem;
   margin-bottom: .25rem;
@@ -23736,24 +23798,24 @@ label, .like-label {
   padding: 1px 5px 1px 2px;
 }
 
-/* line 58, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 93, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered .select2-selection__choice .select2-selection__choice__remove {
   color: #0076a8;
   padding: 0 .25rem;
   margin-right: 0px;
 }
 
-/* line 62, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 97, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered .select2-selection__choice .select2-selection__choice__remove:hover {
   color: #003e51;
 }
 
-/* line 67, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 102, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered .select2-search .select2-search__field {
   margin-top: 2px;
 }
 
-/* line 70, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 105, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered .select2-selection__clear {
   right: .5rem;
   cursor: pointer;
@@ -23764,13 +23826,13 @@ label, .like-label {
   padding: unset;
 }
 
-/* line 82, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 117, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection__arrow {
   height: calc(1.3em + 0.75rem);
   width: 1rem;
 }
 
-/* line 85, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 120, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection__arrow b {
   border-color: transparent;
   border-style: unset;
@@ -23785,7 +23847,7 @@ label, .like-label {
   transform: translate(0, -50%);
 }
 
-/* line 97, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 132, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection__arrow b:before {
   content: '\f0d7';
   font-family: 'Font Awesome 5 Pro';
@@ -23793,18 +23855,18 @@ label, .like-label {
   color: #63666a;
 }
 
-/* line 106, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 141, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container.select2-container--focus .select2-selection {
   border-color: #29bfff;
   box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
 }
 
-/* line 111, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 146, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-search--dropdown .select2-search__field {
   width: 98%;
 }
 
-/* line 117, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 152, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .input-group ng-select2 {
   position: relative;
   -ms-flex: 1 1 auto;
@@ -23813,33 +23875,33 @@ label, .like-label {
   margin-bottom: 0;
 }
 
-/* line 124, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 159, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .input-group ng-select2:not(:first-of-type) .select2-container--default .select2-selection--single {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   margin-left: -1px;
 }
 
-/* line 131, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 166, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .input-group ng-select2:not(:last-of-type) .select2-container--default .select2-selection--single {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-/* line 138, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 173, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .input-group .input-group-text:not(:first-child) {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   margin-left: -1px;
 }
 
-/* line 143, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 178, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .input-group .input-group-text:not(:last-child) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-/* line 155, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 190, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input {
   position: absolute;
   margin-top: .3rem;
@@ -23848,17 +23910,17 @@ label, .like-label {
   opacity: 0;
 }
 
-/* line 161, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 196, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input:hover {
   cursor: pointer;
 }
 
-/* line 165, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 200, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input ~ label:hover {
   cursor: pointer;
 }
 
-/* line 170, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 205, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input ~ label:before {
   font-family: 'Font Awesome 5 Pro';
   font-weight: 400;
@@ -23875,45 +23937,45 @@ label, .like-label {
   transition: box-shadow 0.15s ease-in-out;
 }
 
-/* line 185, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 220, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input:checked ~ label:before {
   font-weight: 900;
   color: #0076a8;
 }
 
-/* line 189, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 224, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input:focus ~ label:before {
   box-shadow: 0 0 0 0.1rem rgba(0, 118, 168, 0.25), inset 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
 }
 
-/* line 192, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 227, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input:disabled ~ label:before {
   color: #63666a;
 }
 
-/* line 196, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 231, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="radio"] ~ label:before {
   content: '\f111';
   border-radius: 1rem;
   width: 1.1rem;
 }
 
-/* line 201, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 236, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="radio"]:checked ~ label:before {
   content: '\f192';
 }
 
-/* line 206, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 241, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="checkbox"] ~ label:before {
   content: '\f0c8';
 }
 
-/* line 209, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 244, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="checkbox"]:checked ~ label:before {
   content: '\f14a';
 }
 
-/* line 217, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 252, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check-inline input, .form-inline .form-check input {
   position: static;
   margin-top: 0;
@@ -23921,7 +23983,7 @@ label, .like-label {
   margin-left: 0;
 }
 
-/* line 230, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 265, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container {
   display: flex;
   flex-direction: row;
@@ -23934,7 +23996,7 @@ label, .like-label {
 }
 
 @media (min-width: 768px) {
-  /* line 230, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+  /* line 265, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
   .grant-number-container {
     padding-top: 0rem;
     border-color: transparent;
@@ -23943,22 +24005,22 @@ label, .like-label {
   }
 }
 
-/* line 245, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 280, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container .form-group {
   margin-right: 10px;
 }
 
-/* line 247, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 282, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container .form-group label {
   font-weight: normal;
 }
 
-/* line 250, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 285, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container .form-group input {
   text-align: center;
 }
 
-/* line 254, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 289, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grant-number-legend {
   max-width: none;
   display: block;
@@ -23971,7 +24033,7 @@ label, .like-label {
 }
 
 @media (min-width: 768px) {
-  /* line 265, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+  /* line 300, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
   .grant-number-container #grant-number-legend {
     width: auto;
     max-width: 4rem;
@@ -23981,32 +24043,32 @@ label, .like-label {
   }
 }
 
-/* line 273, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 308, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grantNumberType {
   width: calc(1.5rem + 0.9rem);
 }
 
-/* line 276, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 311, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grantNumberIC, .grant-number-container #grantNumberYear {
   width: calc(1.5rem + (0.9rem * 2));
 }
 
-/* line 279, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 314, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grantNumberMech {
   width: calc(1.5rem + (0.9rem * 3));
 }
 
-/* line 282, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 317, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grantNumberSuffix {
   width: calc(1.5rem + (0.9rem * 4));
 }
 
-/* line 285, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 320, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grantNumberSerial {
   width: calc(1.5rem + (0.55rem * 6));
 }
 
-/* line 288, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 323, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container .btn-clear-fields {
   mask: url("../images/times-tag.svg");
   background: #63666a;
@@ -24019,7 +24081,7 @@ label, .like-label {
   margin-bottom: 0.1rem;
 }
 
-/* line 298, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 333, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container .btn-clear-fields:hover, .grant-number-container .btn-clear-fields:focus {
   background: #383d40;
 }
@@ -24475,82 +24537,40 @@ main {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-h1, h2, h3, h4, h5, h6,
-.h1, .h2, .h3, .h4, .h5, .h6 {
-  font-family: "Montserrat", sans-serif;
-  font-weight: 700 !important;
-  line-height: 1.1;
-}
-
-/* line 22, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-h1, .h1 {
-  font-size: 1.7rem;
-}
-
-/* line 23, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-h2, .h2 {
-  font-size: 1.5rem;
-}
-
-/* line 24, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-h3, .h3 {
-  font-size: 1.3rem;
-  margin-bottom: .4rem;
-}
-
-/* line 25, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-h4, .h4 {
-  font-size: 1.2rem;
-  margin-bottom: .3rem;
-}
-
-/* line 26, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-h5, .h5 {
-  font-size: 1.1rem;
-  margin-bottom: .1rem;
-}
-
-/* line 27, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-h6, .h6 {
-  font-size: 1rem;
-  margin-bottom: 0rem;
-}
-
-/* line 30, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 a:focus, a:hover {
   text-decoration: none !important;
 }
 
-/* line 35, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 22, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 hr {
   width: 100%;
   display: block;
   border-top-color: #c1c2c9;
 }
 
-/* line 41, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 28, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 blockquote {
   padding: 0rem 1rem;
   border-left: 0.5rem solid #f4f5f6;
 }
 
-/* line 44, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 31, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 blockquote > cite {
   display: block;
   text-align: right;
 }
 
-/* line 50, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 37, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 cite {
   font-size: 90%;
 }
 
-/* line 54, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 41, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 pre {
   margin-bottom: 0rem;
 }
 
-/* line 58, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 45, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 code {
   font-size: 0.7875rem;
   color: #0a7b85;
@@ -24558,13 +24578,23 @@ code {
   background-color: #e3fcf8;
 }
 
-/* line 68, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 52, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.external-link:after {
+  content: '\f35d';
+  font-family: 'Font Awesome 5 Pro';
+  display: inline-block;
+  margin-left: .15rem;
+  font-size: 55%;
+  transform: translate(0%, -50%);
+}
+
+/* line 64, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .card .card-title {
   font-size: 1.3rem;
   margin-bottom: 0rem;
 }
 
-/* line 74, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 70, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .popover {
   font-size: 0.9rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -24572,62 +24602,62 @@ code {
   margin: 1rem;
 }
 
-/* line 81, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 77, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .dropdown-menu {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-/* line 87, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 83, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .list-group.list-group-flush .list-group-item {
   padding: 0.3rem .2rem;
   border: none;
 }
 
-/* line 90, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 86, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .list-group.list-group-flush .list-group-item.lvl2 {
   padding-left: .9rem;
 }
 
-/* line 93, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 89, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .list-group.list-group-flush .list-group-item.lvl3 {
   padding-left: 1.8rem;
 }
 
-/* line 96, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 92, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .list-group.list-group-flush .list-group-item.active {
   background: #fff;
   color: #0076a8;
   font-weight: bold;
 }
 
-/* line 106, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 102, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .list-inline li {
   display: inline-block;
 }
 
-/* line 108, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 104, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .list-inline li:not(:last-child) {
   margin-right: .5rem;
 }
 
-/* line 117, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 113, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .modal .modal-dialog .modal-content .modal-header {
   font-size: 1.1rem;
   font-family: "Montserrat", sans-serif;
   font-weight: 700 !important;
 }
 
-/* line 124, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 120, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .modal.modal-xl {
   max-width: calc(100% - 30px);
 }
 
-/* line 129, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 125, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .badge {
   vertical-align: 10%;
 }
 
-/* line 134, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 130, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .alert .alert-heading {
   font-size: 1.1rem;
   font-family: "Montserrat", sans-serif;
@@ -24636,22 +24666,22 @@ code {
   display: inline-block;
 }
 
-/* line 141, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 137, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .alert p {
   margin-bottom: .5rem;
 }
 
-/* line 144, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 140, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .alert a:hover, .alert a:focus {
   text-decoration: underline !important;
 }
 
-/* line 151, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 147, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 ul.no-bullets {
   list-style: none;
 }
 
-/* line 156, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 152, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #back-to-top {
   display: none;
   position: fixed;
@@ -24665,28 +24695,56 @@ ul.no-bullets {
   line-height: 0.7rem;
 }
 
-/* line 167, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 163, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #back-to-top i {
   margin-bottom: .1rem;
 }
 
-/* line 173, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-.toggle-icons.collapsed:before {
-  font-family: "Font Awesome 5 Pro";
-  font-weight: 400;
-  content: '\f0fe';
-  margin-right: .3rem;
+/* line 170, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.collapse-toggle:hover {
+  text-decoration: none;
+}
+
+/* line 172, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.collapse-toggle:hover:before {
+  color: #165c7d;
+}
+
+/* line 175, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.collapse-toggle:hover:after {
+  color: #165c7d;
 }
 
 /* line 179, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-.toggle-icons:before {
-  font-family: "Font Awesome 5 Pro";
-  font-weight: 400;
-  content: '\f146';
-  margin-right: .3rem;
+.collapse-toggle:before, .collapse-toggle[aria-expanded=false]:before {
+  content: '\f055';
+  font-family: 'Font Awesome 5 Pro';
+  display: inline-block;
+  font-weight: 300;
+  color: #0076a8;
 }
 
-/* line 187, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 186, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.collapse-toggle[aria-expanded=true]:before {
+  content: '\f056';
+}
+
+/* line 189, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.collapse-toggle:after, .collapse-toggle[aria-expanded=false]:after {
+  content: 'Show';
+  font-family: "Noto Sans", sans-serif;
+  display: inline-block;
+  font-weight: regular;
+  color: #0076a8;
+  margin-left: .2rem;
+}
+
+/* line 197, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.collapse-toggle[aria-expanded=true]:after {
+  content: 'Hide';
+}
+
+/* line 204, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .info-card-deck .card {
   border-radius: 0rem;
   border-color: transparent;
@@ -24694,12 +24752,12 @@ ul.no-bullets {
   padding-right: 1rem;
 }
 
-/* line 192, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 209, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .info-card-deck .card:last-child {
   border-right-color: transparent;
 }
 
-/* line 195, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 212, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .info-card-deck .card .info-label {
   font-family: "Montserrat", sans-serif;
   line-height: 1.1;
@@ -24707,12 +24765,12 @@ ul.no-bullets {
   margin-bottom: .2rem;
 }
 
-/* line 201, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 218, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .info-card-deck .card label.info-label {
   font-weight: normal;
 }
 
-/* line 207, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 224, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .tag {
   display: inline-block;
   padding: .35em .5em;
@@ -24726,49 +24784,49 @@ ul.no-bullets {
   border: 1px solid;
 }
 
-/* line 218, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 235, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .tag.tag-primary {
   background-color: #e5f6ff;
   color: #003e51;
   border-color: #94dbff;
 }
 
-/* line 223, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 240, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .tag.tag-secondary {
   background-color: #f4f5f6;
   color: #272a2b;
   border-color: #c1c2c9;
 }
 
-/* line 228, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 245, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .tag.tag-success {
   background-color: #e1f7eb;
   color: #063d20;
   border-color: #97dbb2;
 }
 
-/* line 233, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 250, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .tag.tag-danger {
   background-color: #ffe8ea;
   color: #5e0020;
   border-color: #fca4ad;
 }
 
-/* line 238, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 255, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .tag.tag-warning {
   background-color: #fff0cf;
   color: #5d2d00;
   border-color: #ffcc59;
 }
 
-/* line 243, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 260, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .tag.tag-info {
   background-color: #e3fcf8;
   color: #00454d;
   border-color: #91e6d5;
 }
 
-/* line 253, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 270, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .dimmer {
   background: rgba(0, 0, 0, 0.6);
   position: fixed;
@@ -24788,12 +24846,12 @@ ul.no-bullets {
   }
 }
 
-/* line 265, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 282, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .dimmer .loading {
   text-align: center;
 }
 
-/* line 268, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 285, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .dimmer .spinner {
   width: 50px;
   height: 50px;
@@ -24805,14 +24863,14 @@ ul.no-bullets {
   animation: rotate 800ms infinite linear;
 }
 
-/* line 278, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 295, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .dimmer .loadMsg {
   font-size: 1.3rem;
   color: #fff;
   font-weight: bold;
 }
 
-/* line 285, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 302, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav {
   position: sticky;
   top: 1rem;
@@ -24820,7 +24878,7 @@ ul.no-bullets {
   margin-bottom: 2rem;
 }
 
-/* line 291, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 308, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul li {
   padding: 0rem;
   border: none;
@@ -24828,7 +24886,7 @@ ul.no-bullets {
   background-color: transparent;
 }
 
-/* line 297, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 314, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul li a {
   display: block;
   padding: .75rem .5rem;
@@ -24837,12 +24895,12 @@ ul.no-bullets {
   border-bottom: 1px solid #c1c2c9;
 }
 
-/* line 303, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 320, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul li a.parent {
   padding-right: 1.75rem;
 }
 
-/* line 306, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 323, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul li a.parent[aria-expanded=false]:after {
   font-family: "Font Awesome 5 Pro";
   font-weight: 400;
@@ -24852,7 +24910,7 @@ ul.no-bullets {
   top: .75rem;
 }
 
-/* line 315, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 332, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul li a.parent[aria-expanded=true]:after {
   font-family: "Font Awesome 5 Pro";
   font-weight: 400;
@@ -24862,42 +24920,42 @@ ul.no-bullets {
   top: .75rem;
 }
 
-/* line 326, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 343, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul li.active a {
   border-left: 0.3rem solid #40c1ac;
   padding-left: calc(.5rem - .3rem);
   font-weight: bold;
 }
 
-/* line 334, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 351, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul ul {
   padding: 0rem !important;
 }
 
-/* line 337, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 354, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul ul li a {
   padding-left: 1.5rem;
 }
 
-/* line 340, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 357, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul ul li.active a {
   padding-left: calc(1.5rem - .3rem);
 }
 
-/* line 348, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 365, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .infoTooltip {
   padding: .2rem;
   margin-left: -.2rem;
 }
 
-/* line 352, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 369, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .infoTooltip > i {
   line-height: inherit;
   vertical-align: top;
   font-size: 90%;
 }
 
-/* line 358, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 375, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   font-size: 85%;
 }
@@ -24908,11 +24966,12 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
 }
 
 /* line 2, ../Github/sm_i2e_common_ui/src/scss/custom/_utilities.scss */
-.text-sm {
+.text-sm, small {
   font-size: 0.7875rem;
+  line-height: 1.1375;
 }
 
-/* line 4, ../Github/sm_i2e_common_ui/src/scss/custom/_utilities.scss */
+/* line 7, ../Github/sm_i2e_common_ui/src/scss/custom/_utilities.scss */
 .nowrap {
   white-space: nowrap;
 }
