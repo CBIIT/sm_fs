@@ -21,8 +21,7 @@ const routes: Routes = [
         {path: 'step1', component: Step1Component},
         {path: 'step2', component: Step2Component},
         {path: 'step3', component: Step3Component},
-        {path: 'step4', component: Step4Component},
-		{path: '**', component: SearchComponent, canActivate: [AuthGuard]}
+        {path: 'step4', component: Step4Component}
       ]}
     ]
   },
