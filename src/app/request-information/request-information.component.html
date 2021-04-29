@@ -1,25 +1,33 @@
 <div class="row">
-  <h2>Request Information</h2>
-</div>
-<div class="row">
-  <div class="col-md-6">
-    <app-funding-request-type [filter]="true"></app-funding-request-type>
-  </div>
-  <div class="col-md-4">
-    <label for="request-name-text">Request Name</label><br>
-    <input id="request-name-text" type="text" [width]='610' [(ngModel)]="model.requestName">
-  </div>
-  <div class="col-md-2">
-    <label for="fy-span">FY</label><br>
-    <span id="fy-span">{{ grant.fy }}</span>
-  </div>
-</div>
-<div class="row">
-  <div class="col-lg-6">
-    <lib-pdname-dropdown label="Requesting PD" apiCallName="activePds" (selectedPdIdValue)="receivePdIdValue($event)" [showInactiveToggle]="true"></lib-pdname-dropdown>
-  </div>
-  <div class="col-lg-6">
-    <lib-cancer-activities-dropdown label="Requesting PD's CA"  (selectedCasValues)="receiveCasValue($event)"></lib-cancer-activities-dropdown>
-  </div>
 
-</div>
+    <div class="col-12">
+        <h2 class="mb-3">Request Information</h2>
+    </div>
+
+    <div class="col-lg-4">
+        <app-funding-request-type [filter]="true"></app-funding-request-type>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="request-name-text">Request Name <a href="#"><i class="fas fa-question-circle"></i></a></label>
+            <input id="request-name-text" class="form-control" type="text" [(ngModel)]="model.requestName">
+        </div>
+    </div>
+
+    <div class="col-lg-2">
+        <div class="form-group">
+            <label for="grant-fy">FY</label>
+            <input id="grant-fy" type="text" readonly class="form-control-plaintext" value="{{ grant.fy }}">
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <lib-pdname-dropdown label="Requesting PD" apiCallName="activePds" (selectedPdIdValue)="receivePdIdValue($event)" [showInactiveToggle]="true"></lib-pdname-dropdown>
+    </div>
+
+    <div class="col-md-6 col-lg-2">
+        <lib-cancer-activities-dropdown label="Requesting PD's CA"  (selectedCasValues)="receiveCasValue($event)"></lib-cancer-activities-dropdown>
+    </div>
+
+</div><!-- END Row -->

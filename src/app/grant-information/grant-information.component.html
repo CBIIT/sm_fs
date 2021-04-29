@@ -1,61 +1,102 @@
 <div class="row">
-  <h2>Grant Information</h2>
+    <div class="col-12 d-flex">
+        <h2>Grant Information</h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#grant-info-collapse" role="button" aria-expanded="true" aria-controls="grant-info-collapse"></a>
+    </div>
 </div>
-<div class="row">
-  <div class="col-md-3">
-    <h4>Grant Number</h4>
-    <br><a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
-  </div>
-  <div class="col-md-3">
-    <h4>Project Title</h4>
-    <br>{{ grant.projectTitle }}
-  </div>
-  <div class="col-md-3">
-    <h4>PI</h4>
-    <br><div [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail':'Grant related stuff'"></div>
-  </div>
-  <div class="col-md-3">
-    <h4>Institution</h4>
-    <br>{{ grant.orgName }}
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-3">
-    <h4>PD</h4>
-    <br><div [innerHTML]="grant|mailtoFormatter: 'pdFullName':'pdEmailAddress':'Grant related stuff'"></div>
-  </div>
-  <div class="col-md-3">
-    <h4>I2 Status</h4>
-    <br>{{ grant.applStatusGroupCode }}
-  </div>
-  <div class="col-md-3">
-    <h4>CA</h4>
-    <br>{{ grant.cayCode }}
-  </div>
-  <div class="col-md-3">
-    <h4>DOC</h4>
-    <br>{{ grant.doc }}
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-3">
-    <h4>Thrust Information</h4>
-    <br>{{ grant.thtCode }}
-  </div>
-  <div class="col-md-3">
-    <h4>Budget Start Date</h4>
-    <br>{{ grant.budgetStartDate }}
-  </div>
-  <div class="col-md-3">
-    <h4>NCAB</h4>
-    <br>{{ grant.councilMeetingDate|formatNcabDate }}
-  </div>
-  <div class="col-md-2">
-    <h4>Score</h4>
-    <br>{{ grant.priorityScoreNum }}
-  </div>
-  <div class="col-md-1">
-    <h4>Percentile</h4>
-    <br>{{ grant.irgPercentileNum }}
-  </div>
-</div>
+
+<div class="row collapse show mt-2" id="grant-info-collapse">
+
+    <div class="col-lg-3">
+        <div class="form-group">
+            <p class="like-label">Grant Number</p>
+            <p><a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a></p>
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="form-group">
+            <p class="like-label">Project Title</p>
+            <p>{{ grant.projectTitle }}</p>
+        </div>
+    </div>
+
+    <div class="col-lg-2">
+        <div class="form-group">
+            <p class="like-label">PI</p>
+            <p><span [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail':'Grant related stuff'"></span></p>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="form-group">
+            <p class="like-label">Institution</p>
+            <p>{{ grant.orgName }}</p>
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="form-group">
+            <p class="like-label">PD</p>
+            <p><span [innerHTML]="grant|mailtoFormatter: 'pdFullName':'pdEmailAddress':'Grant related stuff'"></span></p>
+        </div>
+    </div>
+    
+    <div class="col-lg-3">
+        <div class="form-group">
+            <p class="like-label">I2 Status</p>
+            <p>{{ grant.applStatusGroupCode }}</p>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-2">
+        <div class="form-group">
+            <p class="like-label">CA</p>
+            <p>{{ grant.cayCode }}</p>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-2">
+        <div class="form-group">
+            <p class="like-label">DOC</p>
+            <p>{{ grant.doc }}</p>
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="form-group">
+            <p class="like-label">Thrust Information</p>
+            <p>{{ grant.thtCode }}</p>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <div class="form-group">
+            <p class="like-label">Budget Start Date</p>
+            <p>{{ grant.budgetStartDate }}</p>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-2">
+        <div class="form-group">
+            <p class="like-label">NCAB</p>
+            <p>{{ grant.councilMeetingDate|formatNcabDate }}</p>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-2">
+        <div class="form-group">
+            <p class="like-label">Score</p>
+            <p>{{ grant.priorityScoreNum }}</p>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-2">
+        <div class="form-group">
+            <p class="like-label">Percentile</p>
+            <p>{{ grant.irgPercentileNum }}</p>
+        </div>
+    </div>
+
+
+</div><!-- END Row -->
