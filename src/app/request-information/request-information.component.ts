@@ -27,11 +27,11 @@ export class RequestInformationComponent implements OnInit {
   }
 
   receiveCasValue(e): void {
-
+    console.log('CA', e);
   }
 
   receivePdIdValue(e): void {
-
+    console.log('PD', e);
   }
 
 }
