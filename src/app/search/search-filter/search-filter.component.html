@@ -17,8 +17,8 @@
 <div class="col-12 col-md-3 form-group">
 <app-search-pool></app-search-pool>
 <app-funding-request-type [filter]="false" *ngIf="isSearchingRequest()"></app-funding-request-type>
-<lib-rfa-pa-dropdown (selectedRfaPaValue)="rfaPaSelected($event)" *ngIf="!isSearchingRequest()"></lib-rfa-pa-dropdown>
-<lib-fy-range [minYear]="2001" [maxYear]="2025" (rangeChanged)="fyRangeChanged($event)"></lib-fy-range>
+<lib-rfa-pa-dropdown *ngIf="!isSearchingRequest()"></lib-rfa-pa-dropdown>
+<lib-fy-range [minYear]="2001" [maxYear]="2025"></lib-fy-range>
 <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
 <button class="btn btn-primary" (click)="doSearch()">Search</button>
 </div>

@@ -7,7 +7,7 @@
 <div class="row" role="group" aria-labelledby="filters-label">
 
     <div class="col-lg-4">
-        <app-search-pool (valueChanged)="searchPoolChanged($event)" [grantSearch]="true"></app-search-pool>
+        <app-search-pool [(searchWithin)]="searchWithin" [grantSearch]="true"></app-search-pool>
     </div>
 
     <div class="col-lg-8">
@@ -15,11 +15,11 @@
     </div>
 
     <div class="col-lg-3">
-        <lib-fy-range [minYear]="2001" [maxYear]="2025" (rangeChanged)="fyRangeChanged($event)"></lib-fy-range>
+        <lib-fy-range [minYear]="2001" [maxYear]="2025" [(selectedValue)]="fyRange"></lib-fy-range>
     </div>
     
     <div class="col-lg-3">
-        <lib-i2status-dropdown (selectedI2statusValue)="i2StatusChanged($event)"></lib-i2status-dropdown>
+        <lib-i2status-dropdown [(selectedValue)]="i2Status"></lib-i2status-dropdown>
     </div>
 
     <div class="col-lg-3">
@@ -32,19 +32,19 @@
     <!-- START Advanced Filters -->
 
     <div class="col-lg-6" *ngIf="showAdvancedFilters">
-        <lib-pdname-dropdown  (selectedPdIdValue)="pdSelected($event)"></lib-pdname-dropdown>
+        <lib-pdname-dropdown [(selectedValue)]="selectedPd" ></lib-pdname-dropdown>
     </div>
 
     <div class="col-lg-3" *ngIf="showAdvancedFilters">
-        <lib-rfa-pa-dropdown (selectedRfaPaValue)="rfaRaSelected($event)"></lib-rfa-pa-dropdown>
+        <lib-rfa-pa-dropdown [(selectedValue)]="selectRfaPa"></lib-rfa-pa-dropdown>
     </div>
 
     <div class="col-lg-3" *ngIf="showAdvancedFilters">
-        <lib-ncab-daterange (selectedNcabToValue)="ncabToSelected($event)" (selectedNcabFromValue)="ncabFromSelected($event)"></lib-ncab-daterange>
+        <lib-ncab-daterange [(selectedValue)]="ncabRange"></lib-ncab-daterange>
     </div>
 
     <div class="col-lg-6" *ngIf="showAdvancedFilters">
-        <lib-cancer-activities-dropdown  (selectedCasValues)="cayCodeSelected($event)"></lib-cancer-activities-dropdown>
+        <lib-cancer-activities-dropdown  [(selectedValue)]="selectedCas"></lib-cancer-activities-dropdown>
     </div>
 
     <!-- END Advanced Filters -->

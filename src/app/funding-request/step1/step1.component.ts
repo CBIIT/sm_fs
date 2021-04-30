@@ -27,10 +27,17 @@ export class Step1Component implements OnInit, AfterViewInit {
   dtOptions: any;
   dtTrigger: Subject<any> = new Subject();
   showAdvancedFilters: boolean = false;
+  //search criteria values
   piName: string;
   searchWithin: string;
-  selectedCays:string; //unfortunately the component is returing comma separated array.
-  // TODO: let's figure out how to make some of these global properties
+  fyRange:any={};
+  ncabRange:any={};
+  selectedPd:string;
+  selectRfaPa:string;
+  i2Status:string;
+  selectedCas:string[]=[];
+
+ 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
 
   constructor(private router: Router,
@@ -86,9 +93,12 @@ export class Step1Component implements OnInit, AfterViewInit {
     // TODO: identify and emit the npnId of the current user
   }
 
-  searchPoolChanged(event: string): void {
+  searchPoolChanged(event: string): string {
     console.log('search pool changed: ' + event);
-    this.searchWithin = event;
+    if (event)
+      this.searchWithin = event;
+
+    return this.searchWithin;
   }
 
   fyRangeChanged(event): void {
@@ -106,10 +116,10 @@ export class Step1Component implements OnInit, AfterViewInit {
     this.gsfs.setPdId(event);
   }
 
-  cayCodeSelected(event): void {
-    console.log('CayCode selected', event);
-    this.selectedCays=event;
-  }
+  // cayCodeSelected(event): void {
+  //   console.log('CayCode selected', event);
+  //   this.selectedCays=event;
+  // }
 
   rfaRaSelected(event):void {
     console.log('RFA/PA selected', event);
@@ -134,6 +144,7 @@ export class Step1Component implements OnInit, AfterViewInit {
   }
 
   search(): void {
+    console.log("searchWithin="+this.searchWithin);
     this.gsfs.getGrantsSearchCriteria().grantType = this.toString(this.grantNumberComponent.grantNumberType);
     this.gsfs.getGrantsSearchCriteria().grantMech = this.toString(this.grantNumberComponent.grantNumberMech);
     this.gsfs.getGrantsSearchCriteria().grantIc = this.toString(this.grantNumberComponent.grantNumberIC);
@@ -141,7 +152,7 @@ export class Step1Component implements OnInit, AfterViewInit {
     this.gsfs.getGrantsSearchCriteria().grantYear= this.toString(this.grantNumberComponent.grantNumberYear);
     this.gsfs.getGrantsSearchCriteria().grantSuffix= this.toString(this.grantNumberComponent.grantNumberSuffix);
     
-    this.gsfs.getGrantsSearchCriteria().cayCodes=(this.selectedCays)?this.selectedCays.split(','):[];
+    // this.gsfs.getGrantsSearchCriteria().cayCodes=(this.selectedCays)?this.selectedCays.split(','):[];
     console.log('grant search criteria', this.gsfs.getGrantsSearchCriteria());
     this.fsRequestControllerService.searchGrantsUsingPOST(this.gsfs.getGrantsSearchCriteria()).subscribe(
       result => {
@@ -161,7 +172,7 @@ export class Step1Component implements OnInit, AfterViewInit {
   }
 
   clear(): void {
-
+    this.searchWithin='';
   }
 
   showHideAdvanced(): void {
