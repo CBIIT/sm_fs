@@ -12,14 +12,14 @@
     <div class="col-lg-4">
         <div class="form-group">
             <label for="other-docs">Other NCI DOCs Contributing Funds</label>
-            <p>ng-select goes here...</p>
+          <p><app-other-docs-contributing-funds id="other-docs"></app-other-docs-contributing-funds></p>
         </div>
     </div>
 
     <div class="col-lg-8">
         <div class="form-group">
             <label for="cost-comments">Comments <span class="optional">(optional)</span></label>
-            <textarea class="form-control" id="cost-comments" rows="2" maxlength="1000"></textarea>
+            <textarea class="form-control" id="cost-comments" [(ngModel)]="requestModel.requestComments" rows="2" maxlength="1000"></textarea>
             <span class="character-counter">#/1000</span>
         </div>
     </div>

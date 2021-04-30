@@ -23,11 +23,11 @@
     </div>
 
     <div class="col-md-6 col-lg-4">
-        <lib-pdname-dropdown label="Requesting PD" apiCallName="activePds" (selectedPdIdValue)="receivePdIdValue($event)" [showInactiveToggle]="true"></lib-pdname-dropdown>
+        <lib-pdname-dropdown label="Requesting PD" [showInactiveToggle]="false" (selectedPdIdValue)="receivePdIdValue($event)"></lib-pdname-dropdown>
     </div>
 
     <div class="col-md-6 col-lg-2">
-        <lib-cancer-activities-dropdown label="Requesting PD's CA"  (selectedCasValues)="receiveCasValue($event)"></lib-cancer-activities-dropdown>
+        <lib-cancer-activities-dropdown maxSelection="1" label="Requesting PD's CA"  (selectedCasValues)="receiveCasValue($event)"></lib-cancer-activities-dropdown>
     </div>
 
 </div><!-- END Row -->

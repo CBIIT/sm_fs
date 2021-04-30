@@ -18,6 +18,18 @@ export class RequestModel {
   // Request type
   private _requestType: string;
 
+  // Request comments
+  private _requestComments: string;
+
+
+  get requestComments(): string {
+    return this._requestComments;
+  }
+
+  set requestComments(value: string) {
+    this._requestComments = value;
+  }
+
   get requestType(): string {
     return this._requestType;
   }
