@@ -1,7 +1,6 @@
 import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
 import 'select2';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
-import { __values } from 'tslib';
 
 @Component({
   selector: 'app-search-pool',
@@ -12,26 +11,22 @@ export class SearchPoolComponent implements OnInit {
 
   public searchPools: { key: string, value: string }[];
 
+  @Output() valueChanged=new EventEmitter<string>();
+  @Input("initValue") _value:string;
   @Input() grantSearch:boolean=false;
-  
-  @Input() 
-  get searchWithin():string {
-    return this._value;
-  }
-
-  @Output() searchWithinChange=new EventEmitter<string>();
-
-  set searchWithin(value:string) {
-    this._value=value;
-    this.searchWithinChange.emit(value);
-  }
-
-
-
-  _value:string;
 
   constructor(private appUserSessionService:AppUserSessionService) {
   }
+
+  get value(): string {
+    return this._value;
+  }
+  set value(value: string) {
+    console.log('search-pool set value: ' + value);
+    this._value = value;
+    this.valueChanged.emit(value);
+  }
+
 
   ngOnInit(): void {
     console.log('search-pool component ngOnInit()');
@@ -44,9 +39,9 @@ export class SearchPoolComponent implements OnInit {
                         {key: 'mypf',   value: 'My Portfolio' },
                         {key: 'myrq',   value: 'My Requests' },
                         {key: 'myrqur', value: 'My Requests Under Review' },
-                        {key: 'rqwme', value: 'Requests Awaiting My Response' }];
+                        {key: 'rqawme', value: 'Requests Awaiting My Response' }];
     else 
-      this.searchPools=[{key: 'rqwme', value: 'Requests Awaiting My Response' }];
+      this.searchPools=[{key: 'rqawme', value: 'Requests Awaiting My Response' }];
   }
 
 
