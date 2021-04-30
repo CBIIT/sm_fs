@@ -27,10 +27,15 @@ export class Step1Component implements OnInit, AfterViewInit {
   dtOptions: any;
   dtTrigger: Subject<any> = new Subject();
   showAdvancedFilters: boolean = false;
+  //search criteria
   piName: string;
   searchWithin: string;
-  selectedCays:string; //unfortunately the component is returing comma separated array.
-  // TODO: let's figure out how to make some of these global properties
+  fyRange:any={};
+  ncabRange:any={};
+  selectedPd:string;
+  selectedRfaPa:string;
+  selectedCas:string[]=[];
+  i2Status:string;
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
 
   constructor(private router: Router,
@@ -108,7 +113,7 @@ export class Step1Component implements OnInit, AfterViewInit {
 
   cayCodeSelected(event): void {
     console.log('CayCode selected', event);
-    this.selectedCays=event;
+  //  this.selectedCays=event;
   }
 
   rfaRaSelected(event):void {
@@ -141,7 +146,7 @@ export class Step1Component implements OnInit, AfterViewInit {
     this.gsfs.getGrantsSearchCriteria().grantYear= this.toString(this.grantNumberComponent.grantNumberYear);
     this.gsfs.getGrantsSearchCriteria().grantSuffix= this.toString(this.grantNumberComponent.grantNumberSuffix);
     
-    this.gsfs.getGrantsSearchCriteria().cayCodes=(this.selectedCays)?this.selectedCays.split(','):[];
+  //  this.gsfs.getGrantsSearchCriteria().cayCodes=(this.selectedCays)?this.selectedCays.split(','):[];
     console.log('grant search criteria', this.gsfs.getGrantsSearchCriteria());
     this.fsRequestControllerService.searchGrantsUsingPOST(this.gsfs.getGrantsSearchCriteria()).subscribe(
       result => {
