@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
-import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {DataTableDirective} from 'angular-datatables';
 import {Subject} from 'rxjs';
 import {AppPropertiesService} from 'src/app/service/app-properties.service';
@@ -37,6 +37,7 @@ export class Step1Component implements OnInit, AfterViewInit {
   selectedCas:string[]=[];
   i2Status:string;
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+  searchCriteria:GrantsSearchCriteriaDto=this.gsfs.getGrantsSearchCriteria();
 
   constructor(private router: Router,
               private gsfs: GrantsSearchFilterService,
@@ -96,41 +97,6 @@ export class Step1Component implements OnInit, AfterViewInit {
     this.searchWithin = event;
   }
 
-  fyRangeChanged(event): void {
-    console.log('fyRangeChanged', event);
-    this.gsfs.setFyRange(event);
-  }
-
-  i2StatusChanged(event): void {
-    console.log('i2StatusChanged', event);
-    this.gsfs.setI2Status(event);
-  }
-
-  pdSelected(event: string): void {
-    console.log('PD Selected', event);
-    this.gsfs.setPdId(event);
-  }
-
-  cayCodeSelected(event): void {
-    console.log('CayCode selected', event);
-  //  this.selectedCays=event;
-  }
-
-  rfaRaSelected(event):void {
-    console.log('RFA/PA selected', event);
-    this.gsfs.setRfaPa(event);
-  }
-
-  ncabToSelected(event):void{
-    console.log("NCAB to ", event);
-    this.gsfs.getGrantsSearchCriteria().toCouncileMeetingDate=event;
-  }
-
-  ncabFromSelected(event):void{
-    console.log("NCAB from ", event);
-    this.gsfs.getGrantsSearchCriteria().fromCouncilMeetingDate=event;
-  }
-
   toString(aString:String):string{
     if (!aString)
       return null;
@@ -139,16 +105,26 @@ export class Step1Component implements OnInit, AfterViewInit {
   }
 
   search(): void {
-    this.gsfs.getGrantsSearchCriteria().grantType = this.toString(this.grantNumberComponent.grantNumberType);
-    this.gsfs.getGrantsSearchCriteria().grantMech = this.toString(this.grantNumberComponent.grantNumberMech);
-    this.gsfs.getGrantsSearchCriteria().grantIc = this.toString(this.grantNumberComponent.grantNumberIC);
-    this.gsfs.getGrantsSearchCriteria().grantSerial = this.toString(this.grantNumberComponent.grantNumberSerial);
-    this.gsfs.getGrantsSearchCriteria().grantYear= this.toString(this.grantNumberComponent.grantNumberYear);
-    this.gsfs.getGrantsSearchCriteria().grantSuffix= this.toString(this.grantNumberComponent.grantNumberSuffix);
+    this.searchCriteria.cayCodes=this.selectedCas;
+    this.searchCriteria.fromFy=this.fyRange.fromFy;
+    this.searchCriteria.toFy=this.fyRange.toFy;
+    this.searchCriteria.fromCouncilMeetingDate=this.ncabRange.fromNcab;
+    this.searchCriteria.toCouncileMeetingDate=this.ncabRange.toNcab;
+    this.searchCriteria.applStatusGroupCode=this.i2Status;
+    this.searchCriteria.piName=this.piName;
+    this.searchCriteria.pdNpnId=this.selectedPd;
+    this.searchCriteria.rfaPa=this.selectedRfaPa;
     
-  //  this.gsfs.getGrantsSearchCriteria().cayCodes=(this.selectedCays)?this.selectedCays.split(','):[];
-    console.log('grant search criteria', this.gsfs.getGrantsSearchCriteria());
-    this.fsRequestControllerService.searchGrantsUsingPOST(this.gsfs.getGrantsSearchCriteria()).subscribe(
+    this.searchCriteria.grantType=this.toString(this.grantNumberComponent.grantNumberType);
+    this.searchCriteria.grantMech = this.toString(this.grantNumberComponent.grantNumberMech);
+    this.searchCriteria.grantIc = this.toString(this.grantNumberComponent.grantNumberIC);
+    this.searchCriteria.grantSerial = this.toString(this.grantNumberComponent.grantNumberSerial);
+    this.searchCriteria.grantYear= this.toString(this.grantNumberComponent.grantNumberYear);
+    this.searchCriteria.grantSuffix= this.toString(this.grantNumberComponent.grantNumberSuffix);
+    
+  //  this.searchCriteria.cayCodes=(this.selectedCays)?this.selectedCays.split(','):[];
+    console.log('grant search criteria', this.searchCriteria);
+    this.fsRequestControllerService.searchGrantsUsingPOST(this.searchCriteria).subscribe(
       result => {
         console.log('searchGrantsUsingPOST returned ', result);
         this.grantList = result;
@@ -166,6 +142,21 @@ export class Step1Component implements OnInit, AfterViewInit {
   }
 
   clear(): void {
+    this.searchWithin='';
+    this.piName='';
+    this.fyRange={};
+    this.ncabRange={};
+    this.selectedPd='';
+    this.selectedRfaPa='';
+    this.selectedCas=[];
+    this.i2Status='';
+
+    this.grantNumberComponent.grantNumberType='';
+    this.grantNumberComponent.grantNumberMech='';
+    this.grantNumberComponent.grantNumberIC='';
+    this.grantNumberComponent.grantNumberSerial='';
+    this.grantNumberComponent.grantNumberYear='';
+    this.grantNumberComponent.grantNumberSuffix='';
 
   }
 
