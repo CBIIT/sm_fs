@@ -21,7 +21,7 @@ export class SearchPoolComponent implements OnInit {
   @Output() selectedValueChange=new EventEmitter<string>();
 
   set selectedValue(value:string) {
-    console.log("DOC selectedValue setter called ",value);
+    console.log("search pool selectedValue setter called ",value);
     this._selectedValue=value;
     this.selectedValueChange.emit(value);
   }

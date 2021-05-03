@@ -144,8 +144,8 @@ export class Step1Component implements OnInit, AfterViewInit {
   clear(): void {
     this.searchWithin='';
     this.piName='';
-    this.fyRange={};
-    this.ncabRange={};
+    this.fyRange={'fromFy':'','toFy':''};
+    this.ncabRange={'fromNcab':'','toNcab':''};
     this.selectedPd='';
     this.selectedRfaPa='';
     this.selectedCas=[];
