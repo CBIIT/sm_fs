@@ -27,68 +27,6 @@ export class DocumentService {
 
   }
 
-
-
-
-  reader.readAsBinaryString(file);
-
-  reader.onloadend = (e) => {
-    //console.log(myReader.result);
-    // Entire file
-    console.log(reader.result);
-
-    // By lines
-
-
-    this.fileString = reader.result as string;
- };
-
-
-    // return this.documentsControllerService.addDocumentUsingPOST(this.fileString, 1, "abc", "test").pipe(
-    //
-    //   map(
-    //     result => {
-    //       this.response = result;
-    //       return result;
-    //     })
-    //
-    //
-    //
-    //   );
-    return null;
-    }
-
-||||||| 4e1db75
-
-
-
-  reader.readAsBinaryString(file);
-
-  reader.onloadend = (e) => {
-    //console.log(myReader.result);
-    // Entire file
-    console.log(reader.result);
-
-    // By lines
-
-
-    this.fileString = reader.result as string;
- };
-
-
-    return this.documentsControllerService.addDocumentUsingPOST(this.fileString, 1, "abc", "test").pipe(
-
-      map(
-        result => {
-          this.response = result;
-          return result;
-        })
-
-
-
-      );
-    }
-
   getFiles(): Observable<any> {
     return this.http.get(`${this.docUrl}/files`);
   }
