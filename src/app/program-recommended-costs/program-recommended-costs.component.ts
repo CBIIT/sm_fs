@@ -22,4 +22,8 @@ export class ProgramRecommendedCostsComponent implements OnInit {
     return this.requestModel.grant;
   }
 
+  get model(): RequestModel {
+    return this.requestModel;
+  }
+
 }

@@ -43,6 +43,7 @@ import { ProgramRecommendedCostsReadonlyComponent } from './program-recommended-
 import { NextScheduledApproversRequestComponent } from './next-scheduled-approvers-request/next-scheduled-approvers-request.component';
 import { FundingSourceComponent } from './funding-source/funding-source.component';
 import { OtherDocsContributingFundsComponent } from './other-docs-contributing-funds/other-docs-contributing-funds.component';
+import { PdCaIntegratedComponent } from './pd-ca-integrated/pd-ca-integrated.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
@@ -95,7 +96,8 @@ async function appInitialization(
     ProgramRecommendedCostsReadonlyComponent,
     NextScheduledApproversRequestComponent,
     FundingSourceComponent,
-    OtherDocsContributingFundsComponent
+    OtherDocsContributingFundsComponent,
+    PdCaIntegratedComponent
   ],
   imports: [
     BrowserModule,

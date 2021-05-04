@@ -52,17 +52,18 @@ export class DocumentService {
  };
 
 
-    return this.documentsControllerService.addDocumentUsingPOST(this.fileString, 1, "abc", "test").pipe(
-
-      map(
-        result => {
-          this.response = result;
-          return result;
-        })
-
-
-
-      );
+    // return this.documentsControllerService.addDocumentUsingPOST(this.fileString, 1, "abc", "test").pipe(
+    //
+    //   map(
+    //     result => {
+    //       this.response = result;
+    //       return result;
+    //     })
+    //
+    //
+    //
+    //   );
+    return null;
     }
 
   getFiles(): Observable<any> {

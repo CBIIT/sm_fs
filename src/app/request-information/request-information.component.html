@@ -1,33 +1,35 @@
 <div class="row">
 
-    <div class="col-12">
-        <h2 class="mb-3">Request Information</h2>
-    </div>
+  <div class="col-12">
+    <h2 class="mb-3">Request Information</h2>
+  </div>
 
-    <div class="col-lg-4">
-        <app-funding-request-type [filter]="true"></app-funding-request-type>
-    </div>
+  <div class="col-lg-4">
+    <app-funding-request-type [filter]="true"></app-funding-request-type>
+  </div>
 
-    <div class="col-lg-6">
-        <div class="form-group">
-            <label for="request-name-text">Request Name <a href="#"><i class="fas fa-question-circle"></i></a></label>
-            <input id="request-name-text" class="form-control" type="text" [(ngModel)]="model.requestName">
-        </div>
+  <div class="col-lg-6">
+    <div class="form-group">
+      <label for="request-name-text">Request Name <a href="#"><i class="fas fa-question-circle"></i></a></label>
+      <input id="request-name-text" class="form-control" type="text" [(ngModel)]="model.requestName">
     </div>
+  </div>
 
-    <div class="col-lg-2">
-        <div class="form-group">
-            <label for="grant-fy">FY</label>
-            <input id="grant-fy" type="text" readonly class="form-control-plaintext" value="{{ grant.fy }}">
-        </div>
+  <div class="col-lg-2">
+    <div class="form-group">
+      <label for="grant-fy">FY</label>
+      <input id="grant-fy" type="text" readonly class="form-control-plaintext" value="{{ grant.fy }}">
     </div>
+  </div>
 
-    <div class="col-md-6 col-lg-4">
-        <lib-pdname-dropdown label="Requesting PD" [showInactiveToggle]="false" (selectedPdIdValue)="receivePdIdValue($event)"></lib-pdname-dropdown>
-    </div>
+  <div class="col-md-6 col-lg-4">
+    <lib-pdname-dropdown label="Requesting PD" [showInactiveToggle]="false"></lib-pdname-dropdown>
+  </div>
 
-    <div class="col-md-6 col-lg-2">
-        <lib-cancer-activities-dropdown maxSelection="1" label="Requesting PD's CA"  (selectedCasValues)="receiveCasValue($event)"></lib-cancer-activities-dropdown>
-    </div>
+  <div class="col-md-6 col-lg-2">
+    <lib-cancer-activities-dropdown [maxSelection]="1" label="Requesting PD's CA"></lib-cancer-activities-dropdown>
+  </div>
+
+  <app-pd-ca-integrated></app-pd-ca-integrated>
 
 </div><!-- END Row -->
