@@ -34,7 +34,9 @@ export class Step1Component implements OnInit, AfterViewInit {
   selectedRfaPa:string;
   selectedCas:string[]=[];
   i2Status:string;
+
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+  eGrantsUrl:string=this.propertiesService.getProperty('EGRANTS_URL');
   searchCriteria:GrantsSearchCriteriaDto=this.gsfs.getGrantsSearchCriteria();
 
   constructor(private router: Router,
@@ -175,7 +177,8 @@ export class Step1Component implements OnInit, AfterViewInit {
     if (grant.applTypeCode==='3') 
       return 'Select the parent grant to request supplements';
     else 
-      return 'Grant Application is in the '+grant.applStatusGroupDescrip+ ' IMPAC II status and cannot be selected for requesting funds';
+      return 'Grant Application is in the ' + grant.applStatusGroupDescrip + 
+      ' IMPAC II status and cannot be selected for requesting funds.';
   }
 
 

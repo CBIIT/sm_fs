@@ -86,7 +86,9 @@
             </thead>
             <tbody>
             <tr *ngFor="let grant of grantList">
-                <td><a href="{{grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a></td>
+                <td><a href="{{grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
+                    <a href="{{eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants" class="hint--right" style="float:right"><img src="/images/egrants_icon.svg" height="18" style="padding:3px;margin:0px 2px;border: 0px;"> </a>
+                </td>
                 <td>{{grant.projectTitle}}</td>
                 <td>{{grant.applStatusGroupDescrip}}</td>
                 <td><a href="mailto:{{grant.piEmail}}">{{grant.piFullName}}</a></td>
