@@ -11,20 +11,24 @@ export class SearchPoolComponent implements OnInit {
 
   public searchPools: { key: string, value: string }[];
 
-  @Output() valueChanged=new EventEmitter<string>();
-  @Input("initValue") _value:string;
   @Input() grantSearch:boolean=false;
 
-  constructor(private appUserSessionService:AppUserSessionService) {
+  @Input() 
+  get selectedValue():string {
+    return this._selectedValue;
   }
 
-  get value(): string {
-    return this._value;
+  @Output() selectedValueChange=new EventEmitter<string>();
+
+  set selectedValue(value:string) {
+    console.log("search pool selectedValue setter called ",value);
+    this._selectedValue=value;
+    this.selectedValueChange.emit(value);
   }
-  set value(value: string) {
-    console.log('search-pool set value: ' + value);
-    this._value = value;
-    this.valueChanged.emit(value);
+
+  private _selectedValue: string = '';
+
+  constructor(private appUserSessionService:AppUserSessionService) {
   }
 
 
