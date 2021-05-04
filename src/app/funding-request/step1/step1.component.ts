@@ -18,10 +18,8 @@ export class Step1Component implements OnInit, AfterViewInit {
 
   @ViewChild(DataTableDirective, {static: false}) myTable: DataTableDirective;
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
- 
 
   grantList: NciPfrGrantQueryDto[];
-
 
 //  dtOptions:  DataTables.Settings;
   dtOptions: any;
@@ -162,6 +160,22 @@ export class Step1Component implements OnInit, AfterViewInit {
 
   showHideAdvanced(): void {
     this.showAdvancedFilters = !this.showAdvancedFilters;
+  }
+
+  disabledStatuses:string[] = ['W', 'T', 'C', 'U', 'N', 'RR'];
+
+  actionDisabled(grant:NciPfrGrantQueryDto):boolean {
+    if (grant.applTypeCode==='3' || this.disabledStatuses.indexOf(grant.applStatusGroupCode)!==-1)
+      return true;
+    else 
+      return false;
+  }
+
+  disabledTooltip(grant:NciPfrGrantQueryDto):string {
+    if (grant.applTypeCode==='3') 
+      return 'Select the parent grant to request supplements';
+    else 
+      return 'Grant Application is in the '+grant.applStatusGroupDescrip+ ' IMPAC II status and cannot be selected for requesting funds';
   }
 
 
