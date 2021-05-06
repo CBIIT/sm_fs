@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-12 d-flex">
         <h2 class="d-inline-block" id="filters-label">Filters</h2>
-        <a [routerLink]="" (click)="showHideAdvanced()" class="ml-auto">Show Advanced Filters</a>
+        <a [routerLink]="" (click)="showHideAdvanced()" class="ml-auto">{{showAdvancedFilters?'Hide':'Show'}} Advanced Filters</a>
     </div>
 </div>
 <div class="row" role="group" aria-labelledby="filters-label">
@@ -51,7 +51,12 @@
 
     <div class="col-lg-2 d-flex align-items-end justify-content-end ml-auto">
         <button class="btn btn-outline-secondary mr-2" (click)="clear()">Clear</button>
-        <button class="btn btn-primary" (click)="search()">Search</button>
+        <button class="btn btn-primary" (click)="search()" *ngIf="validFilter(); else searchDisabled">Search</button>
+        <ng-template #searchDisabled>
+            <span ngbTooltip="Missing required search criteria">
+                <button class="btn btn-primary" disabled>Search</button>
+            </span>
+        </ng-template>
     </div>
 
     <div class="col-12">
@@ -64,7 +69,7 @@
     <div class="col-12">
         <h2>Results</h2>
         <p *ngIf="!grantList">No results to display. Try applying a filter above and clicking "Search."</p>
-        <table #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border">
+        <table id="grantDt" #grantDt class="table no-footer dtr-column dataTable row-border" role="grid">
             <thead>
               <tr>
                 <th>Grant Number</th>
@@ -87,7 +92,9 @@
             <tbody>
             <tr *ngFor="let grant of grantList">
                 <td><a href="{{grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
-                    <a href="{{eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants" class="hint--right" style="float:right"><img src="/images/egrants_icon.svg" height="18" style="padding:3px;margin:0px 2px;border: 0px;"> </a>
+                    <a href="{{eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants" class="hint--right" style="float:right">
+                        <img src="images/egrants_icon.svg" height="18" style="padding:3px;margin:0px 2px;border: 0px;">
+                    </a>
                 </td>
                 <td>{{grant.projectTitle}}</td>
                 <td>{{grant.applStatusGroupDescrip}}</td>

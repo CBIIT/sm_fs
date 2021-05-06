@@ -8,6 +8,7 @@ import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.s
 import {RequestModel} from '../../model/request-model';
 import {AppUserSessionService} from 'src/app/service/app-user-session.service';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
+import {getCurrentFiscalYear} from 'src/app/utils/utils';
 
 @Component({
   selector: 'app-step1',
@@ -16,8 +17,10 @@ import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
 })
 export class Step1Component implements OnInit, AfterViewInit {
 
-  @ViewChild(DataTableDirective, {static: false}) myTable: DataTableDirective;
+ // @ViewChild('grantDt') myTable;
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
+
+  dataTable: any;
 
   grantList: NciPfrGrantQueryDto[];
 
@@ -47,12 +50,18 @@ export class Step1Component implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    console.log('mytable is', this.myTable);
-    this.dtTrigger.next();
-  }
+    console.log("step1 afterViewInit() is called");
+    this.initDatatable();
+  }  
 
 
   ngOnInit(): void {
+
+    let curFy=getCurrentFiscalYear();
+    this.fyRange={'fromFy':curFy-1,'toFy':curFy};
+    
+    this.searchWithin='mypf';
+
     this.dtOptions = {
       pageLength: 10,
       responsive: {
@@ -104,6 +113,12 @@ export class Step1Component implements OnInit, AfterViewInit {
       return aString.toString();
   }
 
+  validFilter():boolean {
+    return !((!this.fyRange.fromFy ||!this.fyRange.toFy)
+        && (!this.searchWithin)
+        && (!this.grantNumberComponent.grantNumberIC || ! this.grantNumberComponent.grantNumberSerial));
+  }
+
   search(): void {
     this.searchCriteria.cayCodes=this.selectedCas;
     this.searchCriteria.fromFy=this.fyRange.fromFy;
@@ -127,18 +142,22 @@ export class Step1Component implements OnInit, AfterViewInit {
     this.fsRequestControllerService.searchGrantsUsingPOST(this.searchCriteria).subscribe(
       result => {
         console.log('searchGrantsUsingPOST returned ', result);
+        if (this.dataTable) {
+          console.log("destroy datatable");
+          this.dataTable.destroy()
+          this.dataTable=null
+        }
         this.grantList = result;
-        // this.dtTrigger.next();
-        this.myTable.dtInstance.then((dtInstance: DataTables.Api) => {
-          // Destroy the table first
-        dtInstance.destroy();
-          // Call the dtTrigger to rerender again
-        this.dtTrigger.next();
-        });
+        setTimeout(() => this.initDatatable(),0);
 
       }, error => {
         console.log('HttpClient get request error for----- ' + error.message);
       });
+  }
+
+  private initDatatable(): void {
+    this.dataTable = $('table#grantDt').DataTable(this.dtOptions);
+    this.dataTable.columns.adjust().responsive.recalc();
   }
 
   clear(): void {
@@ -157,7 +176,6 @@ export class Step1Component implements OnInit, AfterViewInit {
     this.grantNumberComponent.grantNumberSerial='';
     this.grantNumberComponent.grantNumberYear='';
     this.grantNumberComponent.grantNumberSuffix='';
-
   }
 
   showHideAdvanced(): void {
@@ -183,3 +201,5 @@ export class Step1Component implements OnInit, AfterViewInit {
 
 
 }
+
+
