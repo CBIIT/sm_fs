@@ -2,14 +2,16 @@
 
     <div class="col-lg-4" id="add-docs">
         <h2>Add Docs</h2>
-        <p><small class="text-muted">You may upload Microsoft Word, Microsoft Excel, (OR) Adobe Acrobat document(s) only. Note: if you upload MS Excel, make sure to upload only one worksheet per file in order to have it included in the submission packaged. Maximum file upload is 10 megabytes.</small></p>
-        
+        <p><small class="text-muted">You may upload Microsoft Word, Microsoft Excel, (OR) Adobe Acrobat document(s)
+                only. Note: if you upload MS Excel, make sure to upload only one worksheet per file in order to have it
+                included in the submission packaged. Maximum file upload is 10 megabytes.</small></p>
+
         <div class="form-group">
             <label for="type">Type</label>
-            <ng-select2  id="type" [(ngModel)]="selectedDocType" [allowClear]="true">
+            <ng-select2 id="type" [(ngModel)]="selectedDocType" [allowClear]="true">
                 <option></option>
-              <option *ngFor="let DocType of DocTypes" [value]="DocType.rvLowValue" > {{DocType.rvLowValue}}</option> 
-           </ng-select2>
+                <option *ngFor="let DocType of DocTypes" [value]="DocType.rvLowValue"> {{DocType.rvLowValue}}</option>
+            </ng-select2>
         </div>
 
         <div class="form-group">
@@ -28,6 +30,16 @@
             <label for="file-description">Description</label>
             <textarea class="form-control" id="file-description" rows="5"></textarea>
         </div>
+
+        <!-- <div class="card">
+            <div class="card-header">List of Files</div>
+            <ul class="list-group list-group-flush" *ngFor="let file of fileInfos">
+                <li class="list-group-item">
+                    <a href="{{ file.docFilename }}">{{ file.docFilename }}</a>
+                </li>
+            </ul>
+        </div> -->
+
     </div><!-- END left col -->
 
     <div class="col-lg-8" id="submission-package">
@@ -36,14 +48,27 @@
         <p>That goes here...</p>
         <h3>Excluded Content</h3>
         <p>That goes here...</p>
+
+        <div class='wrapper'>
+            <div [dragula]='"first-bag"' [dragulaModel]="items" (dragulaModelChange)="items = $event">
+                <div *ngFor="let item of items">{{item.docFilename}}</div>
+            </div>
+        </div>
+
     </div>
+
+
+
+
+
 </div>
 
 <hr>
 <div class="row">
     <div class="col-12 d-flex">
         <button class="btn btn-outline-secondary mr-auto" (click)="prevStep()">Previous</button>
-        <button class="btn btn-outline-primary mr-2"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i> View Package</button>
+        <button class="btn btn-outline-primary mr-2"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i> View
+            Package</button>
         <button class="btn btn-outline-primary mr-2">Save as Draft</button>
         <button class="btn btn-primary" (click)="nextStep()">Save and Continue</button>
     </div>
