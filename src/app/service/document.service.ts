@@ -13,13 +13,14 @@ export class DocumentService {
   constructor(private http: HttpClient,
     private documentsControllerService: DocumentsControllerService) { }
 
-  upload(file: File): Observable<HttpEvent<any>> {
+  upload(file: File, docDto: DocumentsDto): Observable<HttpEvent<any>> {
     const formData: FormData = new FormData();
 
     formData.append('file', file);
-    formData.append('keyId', '1');
-    formData.append('keyType', 'PFR');
-    formData.append('docType', 'Doc Type');
+    formData.append('keyId', docDto.keyId.toString());
+    formData.append('keyType', docDto.keyType);
+    formData.append('docType', docDto.docType);
+    formData.append('docDescription', docDto.docDescription);
 
     const req = new HttpRequest('POST', `${this.docUrl}/add`, formData, {
       reportProgress: true,
