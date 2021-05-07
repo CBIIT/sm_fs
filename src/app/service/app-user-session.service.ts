@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { UserService } from '@nci-cbiit/i2ecui-lib';
 import { CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
+import { map } from 'rxjs/Operators'
 
 @Injectable({
   providedIn: 'root'
@@ -56,6 +57,24 @@ export class AppUserSessionService {
 
   getUserCancerActivities():any[] {
     return this.userCancerActivities;
+  }
+
+  getUserCaAsString():string {
+    let cas=this.getUserCaCodes();
+    if (cas)
+      return cas.join(', ');
+    else
+      return null;
+  }
+
+  getUserCaCodes():string[] {
+    if (this.userCancerActivities && this.userCancerActivities.length>0) {
+      var cas=this.userCancerActivities.map(item=>{
+        return item['code'];
+      });
+      return cas;
+    }
+    return null;
   }
 
   getLoggedOnUser():NciPerson{

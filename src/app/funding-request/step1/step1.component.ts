@@ -117,13 +117,12 @@ export class Step1Component implements OnInit, AfterViewInit {
   search(): void {
     
     if (this.searchWithin ==='mypf') 
-      this.searchCriteria.pdNpnId=
-        (this.userSessionService.getLoggedOnUser())?this.userSessionService.getLoggedOnUser().npnId+'':null;
+      this.searchCriteria.pdNpnId=<string><any>(this.userSessionService.getLoggedOnUser().npnId);
     else
-      this.searchCriteria.pdNpnId= (this.selectedPd)?this.selectedPd+'':null;;
+      this.searchCriteria.pdNpnId= <string><any>this.selectedPd;
     
     if (this.searchWithin ==='myca')  
-      this.searchCriteria.cayCodes=this.userSessionService.getUserCancerActivities();
+      this.searchCriteria.cayCodes=this.userSessionService.getUserCaCodes();
     else 
       this.searchCriteria.cayCodes=this.selectedCas;
     this.searchCriteria.fromFy=this.fyRange.fromFy;

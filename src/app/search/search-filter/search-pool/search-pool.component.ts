@@ -35,10 +35,9 @@ export class SearchPoolComponent implements OnInit {
   ngOnInit(): void {
     console.log('search-pool component ngOnInit()');
 
-    let myCA='My Cancer Activities';
-    if (this.appUserSessionService.getUserCancerActivities() 
-        && this.appUserSessionService.getUserCancerActivities().length>0)
-        myCA=myCA+' '+this.appUserSessionService.getUserCancerActivities().join(', ');
+    let myCA =this.appUserSessionService.getUserCaAsString();
+
+    myCA=(myCA)?'My Cancer Activities'+' ('+myCA+')':'My Cancer Activities';
 
     if (this.grantSearch)
       this.searchPools=[{key: 'myca',   value: myCA },
