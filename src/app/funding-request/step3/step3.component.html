@@ -28,18 +28,10 @@
 
         <div class="form-group">
             <label for="file-description">Description</label>
-            <textarea class="form-control" id="file-description" rows="5"></textarea>
+            <textarea class="form-control" id="file-description" rows="5" [(ngModel)]="docDescription"></textarea>
         </div>
 
-        <!-- <div class="card">
-            <div class="card-header">List of Files</div>
-            <ul class="list-group list-group-flush" *ngFor="let file of fileInfos">
-                <li class="list-group-item">
-                    <a href="{{ file.docFilename }}">{{ file.docFilename }}</a>
-                </li>
-            </ul>
-        </div> -->
-
+        
     </div><!-- END left col -->
 
     <div class="col-lg-8" id="submission-package">

@@ -7,7 +7,7 @@ import {AppPropertiesService} from 'src/app/service/app-properties.service';
 import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.service';
 import {RequestModel} from '../../model/request-model';
 import {AppUserSessionService} from 'src/app/service/app-user-session.service';
-import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
+import {GrantnumberSearchCriteriaComponent} from '@nci-cbiit/i2ecui-lib';
 import {getCurrentFiscalYear} from 'src/app/utils/utils';
 
 @Component({
@@ -17,7 +17,15 @@ import {getCurrentFiscalYear} from 'src/app/utils/utils';
 })
 export class Step1Component implements OnInit, AfterViewInit {
 
- // @ViewChild('grantDt') myTable;
+  constructor(private router: Router,
+              private gsfs: GrantsSearchFilterService,
+              private fsRequestControllerService: FsRequestControllerService,
+              private propertiesService: AppPropertiesService,
+              private userSessionService: AppUserSessionService,
+              private requestModel: RequestModel) {
+  }
+
+  // @ViewChild('grantDt') myTable;
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
 
   dataTable: any;
@@ -27,40 +35,35 @@ export class Step1Component implements OnInit, AfterViewInit {
 //  dtOptions:  DataTables.Settings;
   dtOptions: any;
   dtTrigger: Subject<any> = new Subject();
-  showAdvancedFilters: boolean = false;
-  //search criteria
+  showAdvancedFilters = false;
+  // search criteria
   piName: string;
   searchWithin: string;
-  fyRange:any={};
-  ncabRange:any={};
-  selectedPd:string;
-  selectedRfaPa:string;
-  selectedCas:string[]=[];
-  i2Status:string;
+  fyRange: any = {};
+  ncabRange: any = {};
+  selectedPd: number;
+  selectedRfaPa: string;
+  selectedCas: string[] = [];
+  i2Status: string;
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
-  eGrantsUrl:string=this.propertiesService.getProperty('EGRANTS_URL');
-  searchCriteria:GrantsSearchCriteriaDto=this.gsfs.getGrantsSearchCriteria();
+  eGrantsUrl: string = this.propertiesService.getProperty('EGRANTS_URL');
+  searchCriteria: GrantsSearchCriteriaDto = this.gsfs.getGrantsSearchCriteria();
 
-  constructor(private router: Router,
-              private gsfs: GrantsSearchFilterService,
-              private fsRequestControllerService: FsRequestControllerService,
-              private propertiesService: AppPropertiesService,
-              private requestModel: RequestModel) {
-  }
+  disabledStatuses: string[] = ['W', 'T', 'C', 'U', 'N', 'RR'];
 
   ngAfterViewInit(): void {
-    console.log("step1 afterViewInit() is called");
+    console.log('step1 afterViewInit() is called');
     this.initDatatable();
-  }  
+  }
 
 
   ngOnInit(): void {
 
-    let curFy=getCurrentFiscalYear();
-    this.fyRange={'fromFy':curFy-1,'toFy':curFy};
-    
-    this.searchWithin='mypf';
+    const curFy = getCurrentFiscalYear();
+    this.fyRange = {fromFy: curFy - 1, toFy: curFy};
+
+    this.searchWithin = 'mypf';
 
     this.dtOptions = {
       pageLength: 10,
@@ -75,80 +78,84 @@ export class Step1Component implements OnInit, AfterViewInit {
         orderable: false,
         targets: -1
       },
-        {responsivePriority: 1,targets: 0 }, //grant_num
-        {responsivePriority: 2,targets: 13 }, //action
-        {responsivePriority: 3,targets: 3 }, //pi
-        {responsivePriority: 4,targets: 6 }, //ncab
-        {responsivePriority: 5,targets: 5 }, //fy
-        {responsivePriority: 6,targets: 10 }, //pd
-        {responsivePriority: 7,targets: 9 }, //ca
-        {responsivePriority: 8,targets: 7 }, //pctl
-        {responsivePriority: 9,targets: 8 },//priscr
-        {responsivePriority: 10,targets: 12 }, //existing requests
-        {responsivePriority: 11,targets: 2 }, // i2 status
-        {responsivePriority: 12,targets: 1 }, // project title
-        {responsivePriority: 13,targets: 11 }, //budget start date
-        {responsivePriority: 14,targets: 4 }  // institute
+        {responsivePriority: 1, targets: 0}, // grant_num
+        {responsivePriority: 2, targets: 13}, // action
+        {responsivePriority: 3, targets: 3}, // pi
+        {responsivePriority: 4, targets: 6}, // ncab
+        {responsivePriority: 5, targets: 5}, // fy
+        {responsivePriority: 6, targets: 10}, // pd
+        {responsivePriority: 7, targets: 9}, // ca
+        {responsivePriority: 8, targets: 7}, // pctl
+        {responsivePriority: 9, targets: 8}, // priscr
+        {responsivePriority: 10, targets: 12}, // existing requests
+        {responsivePriority: 11, targets: 2}, // i2 status
+        {responsivePriority: 12, targets: 1}, // project title
+        {responsivePriority: 13, targets: 11}, // budget start date
+        {responsivePriority: 14, targets: 4}  // institute
       ]
     };
   }
 
-
   nextStep(event, grant): void {
     this.requestModel.grant = grant;
     this.router.navigate(['/request/step2']);
-    // TODO: identify and emit the selected grant
-    // TODO: identify and emit the npnId of the current user
   }
 
-  searchPoolChanged(event: string): void {
-    console.log('search pool changed: ' + event);
-    this.searchWithin = event;
-  }
-
-  toString(aString:String):string{
-    if (!aString)
+  toString(aString: String): string {
+    if (!aString) {
       return null;
-    else
+    } else {
       return aString.toString();
+    }
   }
 
-  validFilter():boolean {
-    return !((!this.fyRange.fromFy ||!this.fyRange.toFy)
-        && (!this.searchWithin)
-        && (!this.grantNumberComponent.grantNumberIC || ! this.grantNumberComponent.grantNumberSerial));
+  validFilter(): boolean {
+    return !((!this.fyRange.fromFy || !this.fyRange.toFy)
+      && (!this.searchWithin)
+      && (!this.grantNumberComponent.grantNumberIC || !this.grantNumberComponent.grantNumberSerial));
   }
 
   search(): void {
-    this.searchCriteria.cayCodes=this.selectedCas;
-    this.searchCriteria.fromFy=this.fyRange.fromFy;
-    this.searchCriteria.toFy=this.fyRange.toFy;
-    this.searchCriteria.fromCouncilMeetingDate=this.ncabRange.fromNcab;
-    this.searchCriteria.toCouncileMeetingDate=this.ncabRange.toNcab;
-    this.searchCriteria.applStatusGroupCode=this.i2Status;
-    this.searchCriteria.piName=this.piName;
-    this.searchCriteria.pdNpnId=this.selectedPd;
-    this.searchCriteria.rfaPa=this.selectedRfaPa;
-    
-    this.searchCriteria.grantType=this.toString(this.grantNumberComponent.grantNumberType);
+
+    if (this.searchWithin === 'mypf') {
+      this.searchCriteria.pdNpnId = ((this.userSessionService.getLoggedOnUser().npnId) as any as string);
+    } else {
+      this.searchCriteria.pdNpnId = (this.selectedPd as any as string);
+    }
+
+    if (this.searchWithin === 'myca') {
+      this.searchCriteria.cayCodes = this.userSessionService.getUserCaCodes();
+    } else {
+      this.searchCriteria.cayCodes = this.selectedCas;
+    }
+    this.searchCriteria.fromFy = this.fyRange.fromFy;
+    this.searchCriteria.toFy = this.fyRange.toFy;
+    this.searchCriteria.fromCouncilMeetingDate = this.ncabRange.fromNcab;
+    this.searchCriteria.toCouncileMeetingDate = this.ncabRange.toNcab;
+    this.searchCriteria.applStatusGroupCode = this.i2Status;
+    this.searchCriteria.piName = this.piName;
+
+    this.searchCriteria.rfaPa = this.selectedRfaPa;
+
+    this.searchCriteria.grantType = this.toString(this.grantNumberComponent.grantNumberType);
     this.searchCriteria.grantMech = this.toString(this.grantNumberComponent.grantNumberMech);
     this.searchCriteria.grantIc = this.toString(this.grantNumberComponent.grantNumberIC);
     this.searchCriteria.grantSerial = this.toString(this.grantNumberComponent.grantNumberSerial);
-    this.searchCriteria.grantYear= this.toString(this.grantNumberComponent.grantNumberYear);
-    this.searchCriteria.grantSuffix= this.toString(this.grantNumberComponent.grantNumberSuffix);
-    
-  //  this.searchCriteria.cayCodes=(this.selectedCays)?this.selectedCays.split(','):[];
+    this.searchCriteria.grantYear = this.toString(this.grantNumberComponent.grantNumberYear);
+    this.searchCriteria.grantSuffix = this.toString(this.grantNumberComponent.grantNumberSuffix);
+
+    //  this.searchCriteria.cayCodes=(this.selectedCays)?this.selectedCays.split(','):[];
     console.log('grant search criteria', this.searchCriteria);
     this.fsRequestControllerService.searchGrantsUsingPOST(this.searchCriteria).subscribe(
       result => {
         console.log('searchGrantsUsingPOST returned ', result);
         if (this.dataTable) {
-          console.log("destroy datatable");
-          this.dataTable.destroy()
-          this.dataTable=null
+          console.log('destroy datatable');
+          this.dataTable.destroy();
+          this.dataTable = null;
         }
         this.grantList = result;
-        setTimeout(() => this.initDatatable(),0);
+        setTimeout(() => this.initDatatable(), 0);
 
       }, error => {
         console.log('HttpClient get request error for----- ' + error.message);
@@ -161,42 +168,42 @@ export class Step1Component implements OnInit, AfterViewInit {
   }
 
   clear(): void {
-    this.searchWithin='';
-    this.piName='';
-    this.fyRange={'fromFy':'','toFy':''};
-    this.ncabRange={'fromNcab':'','toNcab':''};
-    this.selectedPd='';
-    this.selectedRfaPa='';
-    this.selectedCas=[];
-    this.i2Status='';
+    this.searchWithin = '';
+    this.piName = '';
+    this.fyRange = {fromFy: '', toFy: ''};
+    this.ncabRange = {fromNcab: '', toNcab: ''};
+    this.selectedPd = undefined;
+    this.selectedRfaPa = '';
+    this.selectedCas = [];
+    this.i2Status = '';
 
-    this.grantNumberComponent.grantNumberType='';
-    this.grantNumberComponent.grantNumberMech='';
-    this.grantNumberComponent.grantNumberIC='';
-    this.grantNumberComponent.grantNumberSerial='';
-    this.grantNumberComponent.grantNumberYear='';
-    this.grantNumberComponent.grantNumberSuffix='';
+    this.grantNumberComponent.grantNumberType = '';
+    this.grantNumberComponent.grantNumberMech = '';
+    this.grantNumberComponent.grantNumberIC = '';
+    this.grantNumberComponent.grantNumberSerial = '';
+    this.grantNumberComponent.grantNumberYear = '';
+    this.grantNumberComponent.grantNumberSuffix = '';
   }
 
   showHideAdvanced(): void {
     this.showAdvancedFilters = !this.showAdvancedFilters;
   }
 
-  disabledStatuses:string[] = ['W', 'T', 'C', 'U', 'N', 'RR'];
-
-  actionDisabled(grant:NciPfrGrantQueryDto):boolean {
-    if (grant.applTypeCode==='3' || this.disabledStatuses.indexOf(grant.applStatusGroupCode)!==-1)
+  actionDisabled(grant: NciPfrGrantQueryDto): boolean {
+    if (grant.applTypeCode === '3' || this.disabledStatuses.indexOf(grant.applStatusGroupCode) !== -1) {
       return true;
-    else 
+    } else {
       return false;
+    }
   }
 
-  disabledTooltip(grant:NciPfrGrantQueryDto):string {
-    if (grant.applTypeCode==='3') 
+  disabledTooltip(grant: NciPfrGrantQueryDto): string {
+    if (grant.applTypeCode === '3') {
       return 'Select the parent grant to request supplements';
-    else 
-      return 'Grant Application is in the ' + grant.applStatusGroupDescrip + 
-      ' IMPAC II status and cannot be selected for requesting funds.';
+    } else {
+      return 'Grant Application is in the ' + grant.applStatusGroupDescrip +
+        ' IMPAC II status and cannot be selected for requesting funds.';
+    }
   }
 
 

@@ -3,6 +3,7 @@ import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../../service/app-properties.service';
+import {errorObject} from 'rxjs/internal-compatibility';
 
 @Component({
   selector: 'app-step2',
@@ -14,20 +15,28 @@ export class Step2Component implements OnInit {
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
 
   constructor(private router: Router, private requestModel: RequestModel,
-              private propertiesService: AppPropertiesService) {
+              private propertiesService: AppPropertiesService,
+              private fsRequestControllerService: FsRequestControllerService) {
   }
 
   ngOnInit(): void {
-    if(!this.requestModel.grant) {
+    if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
   }
 
-  nextStep(): void {
+  saveAndContinue(): void {
+    this.saveFundingRequest();
     this.router.navigate(['/request/step3']);
   }
 
+  saveAsDraft(): void {
+    this.saveFundingRequest();
+    this.router.navigate(['/request/step2']);
+  }
+
   prevStep(): void {
+    // TODO - alert for unsaved changes?
     this.router.navigate(['/request/step1']);
   }
 
@@ -37,6 +46,18 @@ export class Step2Component implements OnInit {
 
   get model(): RequestModel {
     return this.requestModel;
+  }
+
+  saveFundingRequest(): void {
+    // TODO: make sure model is properly constructed
+    this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
+      result => {
+        this.requestModel.requestDto = result;
+      }, error => {
+        // TODO: properly handle errors here
+        console.log('HttpClient get request error for----- ' + error.message);
+      }
+    );
   }
 
 

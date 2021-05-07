@@ -18,6 +18,21 @@ export class FundingRequestTypeComponent implements OnInit {
     { requestOrPlan: string; searchPool: string; requestType: string; }
     = {requestOrPlan: '', searchPool: '', requestType: ''};
 
+  @Input()
+  get selectedValue(): number {
+    return this._selectedValue;
+  }
+
+  @Output() selectedValueChange = new EventEmitter<number>();
+
+  set selectedValue(value: number) {
+    console.log('Funding Request Type selectedValue setter called ', value);
+    this._selectedValue = value;
+    this.selectedValueChange.emit(value);
+  }
+
+  private _selectedValue: number;
+
   constructor(private fsLookupControllerService: FsLookupControllerService,
               private searchFilterService: SearchFilterService,
               private userService: UserService,

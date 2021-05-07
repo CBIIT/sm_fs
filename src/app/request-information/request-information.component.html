@@ -5,13 +5,13 @@
   </div>
 
   <div class="col-lg-4">
-    <app-funding-request-type [filter]="true"></app-funding-request-type>
+    <app-funding-request-type [(selectedValue)]="selectedRequestType" [filter]="true"></app-funding-request-type>
   </div>
 
   <div class="col-lg-6">
     <div class="form-group">
       <label for="request-name-text">Request Name <a href="#"><i class="fas fa-question-circle"></i></a></label>
-      <input id="request-name-text" class="form-control" type="text" [(ngModel)]="model.requestName">
+      <input id="request-name-text" class="form-control" type="text" [(ngModel)]="requestName">
     </div>
   </div>
 
@@ -23,11 +23,11 @@
   </div>
 
   <div class="col-md-6 col-lg-4">
-    <lib-pdname-dropdown label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
+    <lib-pdname-dropdown [(selectedValue)]="selectedPd" label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
   </div>
 
   <div class="col-md-6 col-lg-2">
-    <lib-cancer-activities-dropdown [maxSelection]="1" [syncWithPd]="true" label="Requesting PD's CA"></lib-cancer-activities-dropdown>
+    <lib-cancer-activities-dropdown [(selectedValue)]="selectedCayCode" [maxSelection]="1" [syncWithPd]="true" label="Requesting PD's CA"></lib-cancer-activities-dropdown>
   </div>
 
 </div><!-- END Row -->
