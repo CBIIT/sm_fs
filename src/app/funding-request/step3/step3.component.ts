@@ -1,14 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import 'select2';
-import { Select2OptionData } from 'ng-select2';
 import { Options } from 'select2';
 import { CgRefCodControllerService, CgRefCodesDto, DocumentsDto } from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
-import { Observable } from 'rxjs';
-import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { DragulaService } from 'ng2-dragula';
-
+import { RequestModel } from '../../model/request-model';
 
 @Component({
   selector: 'app-step3',
@@ -19,25 +16,69 @@ export class Step3Component implements OnInit {
 
 
   public items: DocumentsDto[];
-  private GREEK_ALPHABET: string[] = ["alpha", "beta", "gamma"];
 
 
-  @Input() apiMethodName: string;
-  @Output() selectedDocTypeValue = new EventEmitter<string>();
   public DocTypes: Array<CgRefCodesDto>;
   public options: Options;
+  public _selectedDocType: string = '';
+  public _docDescription: string = '';
 
   selectedFiles: FileList;
-  progressInfos = [];
-  message = '';
-
   fileInfos: Array<DocumentsDto>;
+
+
+  get model(): RequestModel {
+    return this.requestModel;
+  }
+
+
+  get selectedDocType(): string {
+    return this._selectedDocType;
+  }
+
+  set selectedDocType(selectedDocType: string) {
+    this._selectedDocType = selectedDocType;
+  }
+
+  get docDescription(): string {
+    return this._docDescription;
+  }
+
+  set docDescription(docDescription: string) {
+    this._docDescription = docDescription;
+  }
+
+
+  selectFiles(event) {
+    this.selectedFiles = event.target.files;
+  }
+
+  public _docDto: DocumentsDto = {};
+
+  uploadFiles() {
+    for (let i = 0; i < this.selectedFiles.length; i++) {
+      this._docDto.docDescription = this.docDescription;
+      this._docDto.docType = this.selectedDocType;
+      this._docDto.keyId = 1; //TODO: Get this ID from step 2 once implemented
+      this._docDto.keyType = 'PFR';
+      this.upload(this.selectedFiles[i], this._docDto);
+    }
+  }
+
+  upload(file, DocumentsDto) {
+    this.documentService.upload(file, this._docDto).subscribe(
+      event => { },
+      err => {
+        console.log("error occured while uploading a document")
+      });
+  }
 
 
   constructor(private router: Router,
     private cgRefCodControllerService: CgRefCodControllerService,
     private documentService: DocumentService,
-    private dragulaService: DragulaService) {
+    private dragulaService: DragulaService,
+    private requestModel: RequestModel) {
 
     dragulaService.dropModel().subscribe((value) => {
       console.log(`dropModel: ${value.item}, ${value.name}, ${value.sourceIndex}, ${value.targetIndex}, ${value.sourceModel}, ${value.targetModel}`);
@@ -49,47 +90,10 @@ export class Step3Component implements OnInit {
 
   }
 
-  
-
-
-  // For getting the I2 status selected value and emitting the value..
-  public _selectedDocType: string = '';
-
-  set selectedDocType(selectedDocType: string) {
-    this._selectedDocType = selectedDocType;
-    console.log(selectedDocType);
-    this.selectedDocTypeValue.emit(this._selectedDocType);
-  }
-
-  selectFiles(event) {
-    this.progressInfos = [];
-    this.selectedFiles = event.target.files;
-  }
-
-  uploadFiles() {
-    this.message = '';
-
-    for (let i = 0; i < this.selectedFiles.length; i++) {
-      this.upload(i, this.selectedFiles[i]);
-    }
-  }
-
-  upload(idx, file) {
-    this.progressInfos[idx] = { value: 0, fileName: file.name };
-
-    this.documentService.upload(file).subscribe(
-      event => {
-        
-      },
-      err => {
-        this.message = 'Could not upload the file:' + file.name;
-      });
-  }
 
   ngOnInit(): void {
 
-     this.documentService.getFiles().subscribe(
-
+    this.documentService.getFiles().subscribe(
       result => {
         this.fileInfos = result;
         this.items = result;
@@ -98,7 +102,7 @@ export class Step3Component implements OnInit {
 
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
-        console.log('Getting the Doc Dropdown results');
+        console.log('Getting the Doc type Dropdown results');
         this.DocTypes = result;
       }, error => {
         console.log('HttpClient get request error for----- ' + error.message);
