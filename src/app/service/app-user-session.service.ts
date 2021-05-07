@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { UserService } from '@nci-cbiit/i2ecui-lib';
-import { CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
-import { map } from 'rxjs/Operators'
+import { CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib'
 
 @Injectable({
   providedIn: 'root'
