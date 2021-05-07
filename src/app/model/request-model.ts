@@ -1,13 +1,17 @@
 import {Injectable} from '@angular/core';
-import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../service/app-properties.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RequestModel {
+
   // Stores the grant selected in Step 1
   private _grant: NciPfrGrantQueryDto;
+
+  // Note that swagger generated two versions of the DTO, one for the request and one for the response.  But they are identical.
+  private _requestDto: FundingRequestDtoReq;
 
   // Holds the request title
   private _requestName: string;
@@ -36,6 +40,14 @@ export class RequestModel {
 
   set requestType(value: string) {
     this._requestType = value;
+  }
+
+  get requestDto(): FundingRequestDtoReq {
+    return this._requestDto;
+  }
+
+  set requestDto(value: FundingRequestDtoReq) {
+    this._requestDto = value;
   }
 
   get grant(): NciPfrGrantQueryDto {

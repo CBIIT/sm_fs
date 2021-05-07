@@ -23,13 +23,11 @@
   </div>
 
   <div class="col-md-6 col-lg-4">
-    <lib-pdname-dropdown label="Requesting PD" [showInactiveToggle]="false"></lib-pdname-dropdown>
+    <lib-pdname-dropdown label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
   </div>
 
   <div class="col-md-6 col-lg-2">
-    <lib-cancer-activities-dropdown [maxSelection]="1" label="Requesting PD's CA"></lib-cancer-activities-dropdown>
+    <lib-cancer-activities-dropdown [maxSelection]="1" [syncWithPd]="true" label="Requesting PD's CA"></lib-cancer-activities-dropdown>
   </div>
-
-  <app-pd-ca-integrated></app-pd-ca-integrated>
 
 </div><!-- END Row -->
