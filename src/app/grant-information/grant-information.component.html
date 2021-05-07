@@ -10,7 +10,12 @@
     <div class="col-lg-3">
         <div class="form-group">
             <p class="like-label">Grant Number</p>
-            <p><a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a></p>
+            <p>
+              <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
+              <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants" class="hint--right" style="float:right">
+                <img src="images/egrants_icon.svg" height="18" style="padding:3px;margin:0px 2px;border: 0px;">
+              </a>
+            </p>
         </div>
     </div>
 
@@ -41,7 +46,7 @@
             <p><span [innerHTML]="grant|mailtoFormatter: 'pdFullName':'pdEmailAddress':'Grant related stuff'"></span></p>
         </div>
     </div>
-    
+
     <div class="col-lg-3">
         <div class="form-group">
             <p class="like-label">I2 Status</p>

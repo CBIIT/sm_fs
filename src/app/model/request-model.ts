@@ -24,6 +24,7 @@ export class RequestModel {
 
   // Request comments
   private _requestComments: string;
+  private _eGrantsUrl: string;
 
 
   get requestComments(): string {
@@ -70,8 +71,14 @@ export class RequestModel {
     return this._grantViewerUrl;
   }
 
+  get eGrantsUrl(): string {
+    return this._eGrantsUrl;
+  }
+
   constructor(private propertiesService: AppPropertiesService) {
     this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
+    this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
+    this._requestDto = {};
   }
 
 }
