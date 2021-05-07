@@ -58,5 +58,9 @@ export class AppUserSessionService {
     return this.userCancerActivities;
   }
 
+  getLoggedOnUser():NciPerson{
+    return this.loggedOnUser;
+  }
+
 
 }
