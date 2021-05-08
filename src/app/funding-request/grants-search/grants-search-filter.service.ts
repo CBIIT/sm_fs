@@ -1,24 +1,25 @@
-import { GrantsSearchCriteriaDto } from "@nci-cbiit/i2ecws-lib";
-import { getCurrentFiscalYear } from "src/app/utils/utils";
+import { GrantsSearchCriteriaDto } from '@nci-cbiit/i2ecws-lib';
+import { getCurrentFiscalYear } from 'src/app/utils/utils';
 
 export class GrantsSearchFilterService {
 
-    grantsSearchCriteria: GrantsSearchCriteriaDto
-    ={grantType:'',grantMech:'',grantIc:'',grantSerial:'',grantYear:'',grantSuffix:''};
+    grantsSearchCriteria: GrantsSearchCriteriaDto;
 
-    searchWithin:string='mypf';
+    searchWithin = 'mypf';
 
-    selectedPd:number;
+    selectedPd: number;
 
-    searched:boolean;
+    searched: boolean;
 
     constructor() {
-        let curFy=getCurrentFiscalYear();
-        this.grantsSearchCriteria.fromFy=curFy-1;
-        this.grantsSearchCriteria.toFy=curFy;
+        this.grantsSearchCriteria =
+        {grantType: '', grantMech: '', grantIc: '', grantSerial: '', grantYear: '', grantSuffix: ''};
+        const curFy = getCurrentFiscalYear();
+        this.grantsSearchCriteria.fromFy = curFy - 1;
+        this.grantsSearchCriteria.toFy = curFy;
     }
 
-    getGrantsSearchCriteria():GrantsSearchCriteriaDto {
+    getGrantsSearchCriteria(): GrantsSearchCriteriaDto {
         return this.grantsSearchCriteria;
     }
 
