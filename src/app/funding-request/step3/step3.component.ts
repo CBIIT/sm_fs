@@ -4,7 +4,6 @@ import 'select2';
 import { Options } from 'select2';
 import { CgRefCodControllerService, CgRefCodesDto, DocumentsDto } from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
-import { DragulaService } from 'ng2-dragula';
 import { RequestModel } from '../../model/request-model';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
@@ -76,7 +75,6 @@ export class Step3Component implements OnInit {
   constructor(private router: Router,
     private cgRefCodControllerService: CgRefCodControllerService,
     private documentService: DocumentService,
-    private dragulaService: DragulaService,
     private requestModel: RequestModel) {
 
   }
