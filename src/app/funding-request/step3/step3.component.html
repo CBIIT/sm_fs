@@ -31,26 +31,32 @@
             <textarea class="form-control" id="file-description" rows="5" [(ngModel)]="docDescription"></textarea>
         </div>
 
-        
+
     </div><!-- END left col -->
 
     <div class="col-lg-8" id="submission-package">
-        <h2>Submission Package</h2>
-        <h3>Included Content</h3>
-        <p>That goes here...</p>
-        <h3>Excluded Content</h3>
-        <p>That goes here...</p>
+        <ng-container cdkDropListGroup>
+            <div class='wrapper'>
+                <h2>Submission Package</h2>
 
-        <div class='wrapper'>
-            <div [dragula]='"first-bag"' [dragulaModel]="items" (dragulaModelChange)="items = $event">
-                <div *ngFor="let item of items">{{item.docFilename}}</div>
+                <ul cdkDropList [cdkDropListData]="items" (cdkDropListDropped)="drop($event)">
+                    <li cdkDrag *ngFor='let item of items'>
+                        {{ item.docFilename }}
+                    </li>
+                </ul>
+
             </div>
-        </div>
-
+            <div class='wrapper'>
+                <h2>Excluded Content</h2>
+                <ul id="excludedId" cdkDropList [cdkDropListData]="itemsExcluded" (cdkDropListDropped)="drop($event)">
+                    <label>Type</label> <!-- TODo: Remove the Label after CSS changes are implemented -->
+                    <li cdkDrag *ngFor='let task of itemsExcluded'>
+                        {{ task.docFilename }}
+                    </li>
+                </ul>
+            </div>
+        </ng-container>
     </div>
-
-
-
 
 
 </div>

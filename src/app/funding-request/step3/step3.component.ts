@@ -6,6 +6,7 @@ import { CgRefCodControllerService, CgRefCodesDto, DocumentsDto } from '@nci-cbi
 import { DocumentService } from '../../service/document.service';
 import { DragulaService } from 'ng2-dragula';
 import { RequestModel } from '../../model/request-model';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-step3',
@@ -16,8 +17,7 @@ export class Step3Component implements OnInit {
 
 
   public items: DocumentsDto[];
-
-
+  itemsExcluded: DocumentsDto[] = [];
   public DocTypes: Array<CgRefCodesDto>;
   public options: Options;
   public _selectedDocType: string = '';
@@ -59,7 +59,7 @@ export class Step3Component implements OnInit {
     for (let i = 0; i < this.selectedFiles.length; i++) {
       this._docDto.docDescription = this.docDescription;
       this._docDto.docType = this.selectedDocType;
-      this._docDto.keyId = 1; //TODO: Get this ID from step 2 once implemented
+      this._docDto.keyId = 2; //TODO: Get this ID from step 2 once implemented
       this._docDto.keyType = 'PFR';
       this.upload(this.selectedFiles[i], this._docDto);
     }
@@ -73,27 +73,18 @@ export class Step3Component implements OnInit {
       });
   }
 
-
   constructor(private router: Router,
     private cgRefCodControllerService: CgRefCodControllerService,
     private documentService: DocumentService,
     private dragulaService: DragulaService,
     private requestModel: RequestModel) {
 
-    dragulaService.dropModel().subscribe((value) => {
-      console.log(`dropModel: ${value.item}, ${value.name}, ${value.sourceIndex}, ${value.targetIndex}, ${value.sourceModel}, ${value.targetModel}`);
-      value.sourceModel.forEach(element => {
-        console.log(element.docFilename);
-        //We may have to save this order to the DB.
-      });
-    });
-
   }
 
 
   ngOnInit(): void {
 
-    this.documentService.getFiles().subscribe(
+    this.documentService.getFiles(1, 'PFR').subscribe(
       result => {
         this.fileInfos = result;
         this.items = result;
@@ -107,6 +98,21 @@ export class Step3Component implements OnInit {
       }, error => {
         console.log('HttpClient get request error for----- ' + error.message);
       });
+
+  }
+
+  drop(event: CdkDragDrop<DocumentsDto[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    }
 
   }
 

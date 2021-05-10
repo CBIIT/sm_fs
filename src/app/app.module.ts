@@ -44,7 +44,7 @@ import { NextScheduledApproversRequestComponent } from './next-scheduled-approve
 import { FundingSourceComponent } from './funding-source/funding-source.component';
 import { OtherDocsContributingFundsComponent } from './other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { PdCaIntegratedComponent } from './pd-ca-integrated/pd-ca-integrated.component';
-import { DragulaModule } from 'ng2-dragula';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
@@ -110,7 +110,7 @@ async function appInitialization(
     NgbModule,
     FormsModule,
     DataTablesModule,
-    DragulaModule.forRoot()
+    DragDropModule
   ],
   providers: [RequestModel, PlanModel,
     {provide: BASE_PATH, useValue: '/i2ecws'},
