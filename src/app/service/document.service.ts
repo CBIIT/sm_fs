@@ -33,5 +33,11 @@ export class DocumentService {
   getFiles(keyId: number, keyType: string): Observable<DocumentsDto[]> {
     return this.documentsControllerService.loadDocumentsUsingGET(keyId, keyType);
   }
-  
+
+  downloadById(id: number): Observable<Blob> {
+    var url = this.docUrl + '/' + id;
+		return this.http.get(`${url}`, {responseType: 'blob'});
+  }
+
+ 
 }

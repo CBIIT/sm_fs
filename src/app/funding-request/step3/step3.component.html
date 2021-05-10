@@ -41,7 +41,7 @@
 
                 <ul cdkDropList [cdkDropListData]="items" (cdkDropListDropped)="drop($event)">
                     <li cdkDrag *ngFor='let item of items'>
-                        {{ item.docFilename }}
+                        <a [routerLink]="" (click)="downloadFile(item.id, item.docFilename)">{{ item.docFilename }}</a>
                     </li>
                 </ul>
 
@@ -50,8 +50,8 @@
                 <h2>Excluded Content</h2>
                 <ul id="excludedId" cdkDropList [cdkDropListData]="itemsExcluded" (cdkDropListDropped)="drop($event)">
                     <label>Type</label> <!-- TODo: Remove the Label after CSS changes are implemented -->
-                    <li cdkDrag *ngFor='let task of itemsExcluded'>
-                        {{ task.docFilename }}
+                    <li cdkDrag *ngFor='let excludedItem of itemsExcluded'>
+                        <a [routerLink]="" (click)="downloadFile(excludedItem.id, excludedItem.docFilename)">{{ excludedItem.docFilename }}</a>
                     </li>
                 </ul>
             </div>

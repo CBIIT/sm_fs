@@ -6,6 +6,7 @@ import { CgRefCodControllerService, CgRefCodesDto, DocumentsDto } from '@nci-cbi
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request-model';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-step3',
@@ -112,6 +113,12 @@ export class Step3Component implements OnInit {
       );
     }
 
+  }
+
+  downloadFile(id: number, fileName: string) {
+    this.documentService.downloadById(id).subscribe(blob => saveAs(blob, fileName)), error =>
+      console.log('Error downloading the file'),
+      () => console.info('File downloaded successfully');
   }
 
   nextStep() {
