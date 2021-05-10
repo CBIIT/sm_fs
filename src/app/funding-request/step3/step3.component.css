@@ -6,4 +6,20 @@
     #add-docs {
         padding-right:30px;
     }
+
+    
+    #excludedId {
+      border:1px solid #c1c2c9;
+      
+      
+  }
+
+  .cdk-drop-list-dragging .cdk-drag {
+    transition: transform 250ms cubic-bezier(0, 0, 0.3, 1);
+  }
+  
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.3, 1);
+  }
+
 }
