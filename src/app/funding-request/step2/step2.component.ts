@@ -23,6 +23,7 @@ export class Step2Component implements OnInit {
     if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
+    this.requestModel.requestDto.pdNpnId = this.requestModel.grant.pdNpnId;
   }
 
   saveAndContinue(): void {
