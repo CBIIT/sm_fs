@@ -91,7 +91,7 @@ export class Step1Component implements OnInit, AfterViewInit {
             callback({
               recordsTotal: result.recordsTotal,
               recordsFiltered: result.recordsFiltered,
-              data: []
+              data: result.data
             });
           }, error => {
             console.log('HttpClient get request error for----- ' + error.message);
@@ -139,7 +139,32 @@ export class Step1Component implements OnInit, AfterViewInit {
         {responsivePriority: 12, targets: 1 }, // project title
         {responsivePriority: 13, targets: 11 }, // budget start date
         {responsivePriority: 14, targets: 4 }  // institute
-      ]
+      ],
+      // dom:  '<"table-controls"<""l><"ml-auto mr-2"B><""p>>' +
+      //       '<"row"<"col-12"tr>>' +
+      //       '<"table-controls"<""i><"ml-auto mr-2"B><""p>>',
+      // buttons: {
+      //     dom: {
+      //       button: {
+      //         tag: 'button',
+      //         className: 'btn btn-sm btn-outline-secondary'
+      //       }
+      //     },
+          dom: 'Bfrtip',
+          buttons: [
+            'excel'
+            // {
+            // extend: 'excel',
+            // className: 'btn-excel',
+            // titleAttr: 'Excel export',
+            // text: 'Export to Excel',
+            // filename: 'fs-grants-search-result',
+            // title: null,
+            // header: true,
+            // exportOptions: { columns: [ 0, 1, 2, 3, 4 , 5 , 6 ] }
+            // }
+        ]
+      // },
     };
   }
 

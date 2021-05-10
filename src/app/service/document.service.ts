@@ -30,8 +30,8 @@ export class DocumentService {
 
   }
 
-  getFiles(): Observable<DocumentsDto[]> {
-    return this.documentsControllerService.loadDocumentsUsingGET(1, 'PFR');
+  getFiles(keyId: number, keyType: string): Observable<DocumentsDto[]> {
+    return this.documentsControllerService.loadDocumentsUsingGET(keyId, keyType);
   }
   
 }
