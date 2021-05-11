@@ -26,9 +26,10 @@ export class FundingRequestTypeComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<number>();
 
   set selectedValue(value: number) {
-    console.log('Funding Request Type selectedValue setter called ', value);
+    console.log('request type selectedValue setter called ', value);
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
+    this.searchFilter.requestType = String(value);
   }
 
   private _selectedValue: number;
@@ -41,6 +42,7 @@ export class FundingRequestTypeComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('filter =', this.filter);
+    this.searchFilter = this.searchFilterService.searchFilter;
 
     this.evoke(this.filter).subscribe(
       result => {
@@ -54,9 +56,6 @@ export class FundingRequestTypeComponent implements OnInit {
         console.log('HttpClient get request error for----- ' + error.message);
       });
     console.log('funding-request-type component ngOnInit()');
-
-    this.searchFilter = this.searchFilterService.searchFilter;
-
   }
 
   evoke(filter): any {
@@ -69,7 +68,7 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   onChange(event): any {
-    console.log('change');
+    console.log('change', event);
   }
 
 }

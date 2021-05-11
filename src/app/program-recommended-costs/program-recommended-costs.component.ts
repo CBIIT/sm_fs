@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
@@ -11,6 +11,7 @@ import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 export class ProgramRecommendedCostsComponent implements OnInit {
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+
 
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService) {
   }

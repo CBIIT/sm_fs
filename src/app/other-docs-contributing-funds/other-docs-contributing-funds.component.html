@@ -1,1 +1,11 @@
-<p>other-docs-contributing-funds works!</p>
+<div class="form-group">
+  <label for="doc-select">{{ label }}</label>
+  <ng-select2
+    id="doc-select"
+    [(ngModel)]="selectedValue"
+    [allowClear]="false"
+    [options]="options">
+    <option></option>
+    <option *ngFor="let doc of docs" [value]="doc.id"> {{doc.abbreviation}} - {{doc.description}}</option>
+  </ng-select2>
+</div>
