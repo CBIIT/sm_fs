@@ -8,16 +8,16 @@
 <div class="row">
   <div class="col-lg-4">
     <div class="form-group">
-      <lib-doc-dropdown [(selectedValue)]="selectedDocs" label="Other NCI DOCs Contributing Funds"></lib-doc-dropdown>
+      <app-other-docs-contributing-funds [(selectedValue)]="selectedDocs" label="Other NCI DOCs Contributing Funds"></app-other-docs-contributing-funds>
     </div>
   </div>
 
   <div class="col-lg-8">
     <div class="form-group">
       <label for="cost-comments">Comments <span class="optional">(optional)</span></label>
-      <textarea class="form-control" id="cost-comments" [(ngModel)]="model.requestDto.comments" rows="2"
+      <textarea class="form-control" #cost_comments id="cost-comments" [(ngModel)]="model.requestDto.comments" rows="2"
                 maxlength="1000"></textarea>
-      <span class="character-counter">{{ model.requestDto.comments ? model.requestDto.comments.length : 0 }}/1000</span>
+      <span class="character-counter">{{ cost_comments.value.length }}/1000</span>
     </div>
   </div>
 </div>
