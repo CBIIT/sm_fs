@@ -11,21 +11,12 @@ import {isArray} from 'rxjs/internal-compatibility';
 })
 export class RequestInformationComponent implements OnInit {
 
-  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
-
-  get requestName(): string {
-    return this.requestModel.requestDto.requestName;
-  }
-
-  set requestName(value: string) {
-    this.requestModel.requestDto.requestName = value;
-  }
-
   get selectedRequestType(): number {
     return this.requestModel.requestDto.frtId;
   }
 
   set selectedRequestType(value: number) {
+    console.log('set selected request type:', value);
     this.requestModel.requestDto.frtId = value;
   }
 
@@ -73,6 +64,7 @@ export class RequestInformationComponent implements OnInit {
     console.log(this.requestModel.requestDto.pdNpnId);
     console.log(this.requestModel.requestDto.cayCode);
     console.log(this.requestModel.requestDto.frtId);
+    console.log(this.requestModel.requestDto.requestName);
   }
 
   get grant(): NciPfrGrantQueryDto {

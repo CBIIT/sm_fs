@@ -11,8 +11,15 @@ import {errorObject} from 'rxjs/internal-compatibility';
   styleUrls: ['./step2.component.css']
 })
 export class Step2Component implements OnInit {
+  _selectedDocs: number[];
 
-  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+  get selectedDocs(): number[] {
+    return this._selectedDocs;
+  }
+
+  set selectedDocs(value: number[]) {
+    this._selectedDocs = value;
+  }
 
   constructor(private router: Router, private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
@@ -51,14 +58,20 @@ export class Step2Component implements OnInit {
 
   saveFundingRequest(): void {
     // TODO: make sure model is properly constructed
+    console.log(JSON.stringify(this.requestModel.requestDto));
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
         this.requestModel.requestDto = result;
+
       }, error => {
         // TODO: properly handle errors here
         console.log('HttpClient get request error for----- ' + error.message);
       }
     );
+  }
+
+  updateCounter(event): any {
+
   }
 
 
