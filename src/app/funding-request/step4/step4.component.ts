@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {AppPropertiesService} from '../../service/app-properties.service';
-import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-step4',
@@ -13,7 +13,10 @@ export class Step4Component implements OnInit {
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
 
-  constructor(private router: Router, private requestModel: RequestModel, private propertiesService: AppPropertiesService) {
+  constructor(private router: Router,
+              private requestModel: RequestModel,
+              private propertiesService: AppPropertiesService,
+              private fsRequestService: FsRequestControllerService) {
   }
 
   ngOnInit(): void {
@@ -29,6 +32,25 @@ export class Step4Component implements OnInit {
 
   get model(): RequestModel {
     return this.requestModel;
+  }
+
+  deleteRequest(): void {
+    if (confirm('Are you sure you want to delete this request?')){
+      console.log('do delete');
+      this.fsRequestService.deleteRequestUsingDELETE(this.model.requestDto.frqId).subscribe(
+        result => {
+          console.log('call delete api successfull');
+          this.router.navigate(['/search']);
+        },
+        error => {
+          console.log('Error when calling delelteRequest API ', error);
+        }
+      );
+    }
+  }
+
+  submitRequest(): void {
+    console.log('submit request not implemented!!!');
   }
 
 }

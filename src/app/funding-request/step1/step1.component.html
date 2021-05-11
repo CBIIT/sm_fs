@@ -108,7 +108,7 @@
                 <td>{{grant.irgPercentileNum}}</td>
                 <td>{{grant.priorityScoreNum}}</td>
                 <td><a [routerLink]="" ngbTooltip="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="mouseenter:mouseleave" placement="top">{{grant.cayCode}}</a></td>
-                <td><a href="mailto:{{grant.pdEmailAddress}}">{{grant.roleUsageCode}}</a></td>
+                <td><a href="mailto:{{grant.pdEmailAddress}}">{{grant.pdFullName}}</a></td>
                 <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>
                 <td>{{grant.requestCount}}</td>
                 <td>
@@ -119,8 +119,8 @@
                         <button class="btn btn-primary"  (click)="nextStep($event, grant)">Select</button>
                     </ng-template>
                 </td>
-                <td></td>
-              </tr>
+                <td></td> 
+                </tr> 
             </tbody>
           </table>
     </div>

@@ -31,7 +31,7 @@ export class Step1Component implements OnInit, AfterViewInit {
 
   dataTable: any;
 
-  grantList: NciPfrGrantQueryDto[];
+  grantList: NciPfrGrantQueryDto[] = [];
 
 //  dtOptions:  DataTables.Settings;
   dtOptions: any;
@@ -120,11 +120,12 @@ export class Step1Component implements OnInit, AfterViewInit {
           target: -1
         }
       },
-      columnDefs: [{
+      columnDefs: [
+        {
         className: 'control',
         orderable: false,
         targets: -1
-      },
+        },
         {responsivePriority: 1, targets: 0 }, // grant_num
         {responsivePriority: 2, targets: 13 }, // action
         {responsivePriority: 3, targets: 3 }, // pi
@@ -150,7 +151,7 @@ export class Step1Component implements OnInit, AfterViewInit {
       //         className: 'btn btn-sm btn-outline-secondary'
       //       }
       //     },
-          dom: 'Bfrtip',
+          dom: 'lBfrtip',
           buttons: [
             'excel'
             // {
@@ -197,6 +198,18 @@ export class Step1Component implements OnInit, AfterViewInit {
     if (this.grantNumberComponent && this.grantNumberComponent.grantNumberIC && this.grantNumberComponent.grantNumberSerial) {
       return true;
     }
+    return false;
+  }
+
+  showNoResult(): boolean {
+    console.log('showNoResult called', this.grantList);
+    if (!this.grantList) {
+      return true;
+    }
+    else if ( this.grantList.length === 0) {
+      return true;
+    }
+
     return false;
   }
 
