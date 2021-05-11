@@ -1,7 +1,6 @@
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
-import {DataTableDirective} from 'angular-datatables';
 import {Subject} from 'rxjs';
 import {AppPropertiesService} from 'src/app/service/app-properties.service';
 import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.service';
@@ -108,39 +107,40 @@ export class Step1Component implements OnInit, AfterViewInit {
                 {data: 'irgPercentileNum'},
                 {data: 'priorityScoreNum'},
                 {data: 'cayCode'},
-                {data: 'roleUsageCode'},
+                {data: 'pdFullName'},
                 {data: 'budgetStartDate'},
                 {data: 'requestCount'},
-                {data: null, defaultContent: 'Select'}, {data: null, defaultContent: ''}
+                {data: null, defaultContent: 'Select'}
+ //               {data: null, defaultContent: ''}
               ],
 
-      responsive: {
-        details: {
-          type: 'column',
-          target: -1
-        }
-      },
-      columnDefs: [
-        {
-        className: 'control',
-        orderable: false,
-        targets: -1
-        },
-        {responsivePriority: 1, targets: 0 }, // grant_num
-        {responsivePriority: 2, targets: 13 }, // action
-        {responsivePriority: 3, targets: 3 }, // pi
-        {responsivePriority: 4, targets: 6 }, // ncab
-        {responsivePriority: 5, targets: 5 }, // fy
-        {responsivePriority: 6, targets: 10 }, // pd
-        {responsivePriority: 7, targets: 9 }, // ca
-        {responsivePriority: 8, targets: 7 }, // pctl
-        {responsivePriority: 9, targets: 8 }, // priscr
-        {responsivePriority: 10, targets: 12 }, // existing requests
-        {responsivePriority: 11, targets: 2 }, // i2 status
-        {responsivePriority: 12, targets: 1 }, // project title
-        {responsivePriority: 13, targets: 11 }, // budget start date
-        {responsivePriority: 14, targets: 4 }  // institute
-      ],
+      // responsive: {
+      //   details: {
+      //     type: 'column',
+      //     target: -1
+      //   }
+      // },
+      // columnDefs: [
+      //   {
+      //   className: 'control',
+      //   orderable: false,
+      //   targets: -1
+      //   },
+      //   {responsivePriority: 1, targets: 0 }, // grant_num
+      //   {responsivePriority: 2, targets: 13 }, // action
+      //   {responsivePriority: 3, targets: 3 }, // pi
+      //   {responsivePriority: 4, targets: 6 }, // ncab
+      //   {responsivePriority: 5, targets: 5 }, // fy
+      //   {responsivePriority: 6, targets: 10 }, // pd
+      //   {responsivePriority: 7, targets: 9 }, // ca
+      //   {responsivePriority: 8, targets: 7 }, // pctl
+      //   {responsivePriority: 9, targets: 8 }, // priscr
+      //   {responsivePriority: 10, targets: 12 }, // existing requests
+      //   {responsivePriority: 11, targets: 2 }, // i2 status
+      //   {responsivePriority: 12, targets: 1 }, // project title
+      //   {responsivePriority: 13, targets: 11 }, // budget start date
+      //   {responsivePriority: 14, targets: 4 }  // institute
+      // ],
       // dom:  '<"table-controls"<""l><"ml-auto mr-2"B><""p>>' +
       //       '<"row"<"col-12"tr>>' +
       //       '<"table-controls"<""i><"ml-auto mr-2"B><""p>>',
@@ -153,17 +153,17 @@ export class Step1Component implements OnInit, AfterViewInit {
       //     },
           dom: 'lBfrtip',
           buttons: [
-            'excel'
-            // {
-            // extend: 'excel',
-            // className: 'btn-excel',
-            // titleAttr: 'Excel export',
-            // text: 'Export to Excel',
-            // filename: 'fs-grants-search-result',
-            // title: null,
-            // header: true,
+//            'excel'
+            {
+            extend: 'excel',
+            className: 'btn-excel',
+            titleAttr: 'Excel export',
+            text: 'Export to Excel',
+            filename: 'fs-grants-search-result',
+            title: null,
+            header: true,
             // exportOptions: { columns: [ 0, 1, 2, 3, 4 , 5 , 6 ] }
-            // }
+            }
         ]
       // },
     };

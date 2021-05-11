@@ -68,10 +68,10 @@
 <span class='institutionLocation'>{{tooltipGrant.institutionCity}},&nbsp;{{tooltipGrant.institutionState}}</span>
 </ng-template>
 <div class="row">
-    <div class="col-12">
+    <div class="col-12" style="overflow-x: scroll;">
         <h2>Results</h2>
-        <p *ngIf="!grantList">No results to display. Try applying a filter above and clicking "Search."</p>
-        <table id="grantDt" #grantDt class="table no-footer dtr-column dataTable row-border" role="grid">
+        <p *ngIf="!grantList || grantList.length===0">No results to display. Try applying a filter above and clicking "Search."</p>
+        <table id="grantDt" #grantDt class="dataTable row-border">
             <thead>
               <tr>
                 <th>Grant Number</th>
@@ -88,7 +88,7 @@
                 <th>Budget Start Date</th>
                 <th>Existing Requests</th>
                 <th>Action</th>
-                <th>&nbsp;</th>
+            <!--    <th>&nbsp;</th> control column for responsive-->
               </tr>
             </thead>
             <tbody>
@@ -119,7 +119,7 @@
                         <button class="btn btn-primary"  (click)="nextStep($event, grant)">Select</button>
                     </ng-template>
                 </td>
-                <td></td> 
+                <!-- <td></td> control column for responsive -->
                 </tr> 
             </tbody>
           </table>
