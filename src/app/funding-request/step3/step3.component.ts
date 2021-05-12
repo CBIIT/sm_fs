@@ -59,7 +59,7 @@ export class Step3Component implements OnInit {
     for (let i = 0; i < this.selectedFiles.length; i++) {
       this._docDto.docDescription = this.docDescription;
       this._docDto.docType = this.selectedDocType;
-      this._docDto.keyId = 2; //TODO: Get this ID from step 2 once implemented
+      this._docDto.keyId = 1; //TODO: Get this ID from step 2 once implemented
       this._docDto.keyType = 'PFR';
       this.upload(this.selectedFiles[i], this._docDto);
     }
@@ -117,6 +117,12 @@ export class Step3Component implements OnInit {
 
   downloadFile(id: number, fileName: string) {
     this.documentService.downloadById(id).subscribe(blob => saveAs(blob, fileName)), error =>
+      console.log('Error downloading the file'),
+      () => console.info('File downloaded successfully');
+  }
+
+  downloadCoverSheet() {
+    this.documentService.downloadFrqCoverSheet(36182).subscribe(blob => saveAs(blob, 'Cover Page.pdf')), error =>
       console.log('Error downloading the file'),
       () => console.info('File downloaded successfully');
   }

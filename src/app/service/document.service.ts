@@ -39,5 +39,10 @@ export class DocumentService {
 		return this.http.get(`${url}`, {responseType: 'blob'});
   }
 
+  downloadFrqCoverSheet(frqId: number): Observable<Blob> {
+    var url = this.docUrl + '/funding-requests-cover-page/' + frqId;
+		return this.http.get(`${url}`, {responseType: 'blob'});
+  }
+
  
 }
