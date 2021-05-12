@@ -9,6 +9,7 @@ import { Step1Component } from './funding-request/step1/step1.component';
 import { Step2Component } from './funding-request/step2/step2.component';
 import { Step3Component } from './funding-request/step3/step3.component';
 import { Step4Component } from './funding-request/step4/step4.component';
+import { PdAuthGuard } from './funding-request/step1/pd.auth.guard';
 
 const routes: Routes = [
   {
@@ -16,9 +17,9 @@ const routes: Routes = [
       { path: '', redirectTo: '/search', pathMatch: 'full' },
       { path: 'search', component: SearchComponent, canActivate: [AuthGuard] },
       { path: 'newplan', component: NewRequestComponent },
-      { path: 'request', component: FundingRequestComponent, children:[
+      { path: 'request', component: FundingRequestComponent, children: [
         {path: '', redirectTo: 'step1', pathMatch: 'full'},
-        {path: 'step1', component: Step1Component},
+        {path: 'step1', component: Step1Component, canActivate: [PdAuthGuard]},
         {path: 'step2', component: Step2Component},
         {path: 'step3', component: Step3Component},
         {path: 'step4', component: Step4Component}
