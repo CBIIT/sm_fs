@@ -39,12 +39,12 @@ export class RequestInformationComponent implements OnInit {
     console.log('setSelectedCayCode', value, typeof value, isArray(value));
 
     if (isArray(value) && value[0]) {
-      this.requestModel.requestDto.cayCode = value[0];
+      this.requestModel.requestDto.requestorCayCode = value[0];
     } else if (typeof value === 'string' || value instanceof String) {
       console.log('This should not be happening.  The value parameter a string[]!');
-      this.requestModel.requestDto.cayCode = String(value);
+      this.requestModel.requestDto.requestorCayCode = String(value);
     } else {
-      this.requestModel.requestDto.cayCode = undefined;
+      this.requestModel.requestDto.requestorCayCode = undefined;
     }
     this._selectedCayCode = value;
   }
@@ -61,8 +61,9 @@ export class RequestInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(this.requestModel.requestDto.requestorNpnId);
     console.log(this.requestModel.requestDto.pdNpnId);
-    console.log(this.requestModel.requestDto.cayCode);
+    console.log(this.requestModel.requestDto.requestorCayCode);
     console.log(this.requestModel.requestDto.frtId);
     console.log(this.requestModel.requestDto.requestName);
   }
