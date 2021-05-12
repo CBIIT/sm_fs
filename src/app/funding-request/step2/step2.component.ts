@@ -62,6 +62,7 @@ export class Step2Component implements OnInit {
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
         this.requestModel.requestDto = result;
+        console.log(JSON.stringify(this.requestModel.requestDto));
 
       }, error => {
         // TODO: properly handle errors here

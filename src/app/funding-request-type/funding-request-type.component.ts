@@ -43,7 +43,6 @@ export class FundingRequestTypeComponent implements OnInit {
   ngOnInit(): void {
     console.log('filter =', this.filter);
     this.searchFilter = this.searchFilterService.searchFilter;
-    this.model.requestDto.requestorNpnId = this.userService.currentUserValue.npnId;
 
     this.evoke(this.filter).subscribe(
       result => {

@@ -48,6 +48,7 @@ export class RequestModel {
   }
 
   set requestDto(value: FundingRequestDtoReq) {
+    console.log('model updated with new FundingRequest data.  Redistribute fields as necessary.');
     this._requestDto = value;
   }
 
@@ -56,10 +57,13 @@ export class RequestModel {
   }
 
   set grant(value: NciPfrGrantQueryDto) {
+    console.log('setting grant on request model');
     // TODO: map appropriate values from grant to requestDto
     this._requestDto.applId = value.applId;
-    // this._requestDto.financialInfoVO = {};
-    // this._requestDto.financialInfoVO.applId = value.applId;
+    if (!this._requestDto.financialInfoVO) {
+      this._requestDto.financialInfoVO = {};
+    }
+    this._requestDto.financialInfoVO.applId = value.applId;
     this._grant = value;
   }
 

@@ -55,6 +55,7 @@ export class RequestInformationComponent implements OnInit {
 
   set selectedPd(value: number) {
     this.requestModel.requestDto.pdNpnId = value;
+    this.requestModel.requestDto.requestorNpnId = value;
   }
 
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService) {
