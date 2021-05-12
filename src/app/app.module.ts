@@ -4,7 +4,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {ApiModule, BASE_PATH} from '@nci-cbiit/i2ecws-lib';
-import {HttpClientModule} from '@angular/common/http';
+import { HTTP_INTERCEPTORS,HttpClientModule} from '@angular/common/http';
 import {NgSelect2Module} from 'ng-select2';
 import {I2ecuiLibModule} from '@nci-cbiit/i2ecui-lib';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -45,7 +45,9 @@ import { FundingSourceComponent } from './funding-source/funding-source.componen
 import { OtherDocsContributingFundsComponent } from './other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { PdCaIntegratedComponent } from './pd-ca-integrated/pd-ca-integrated.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-
+import { LoaderSpinnerComponent } from './loader-spinner/loader-spinner.component';
+import { LoaderService } from './service/loader-spinner.service';
+import { LoaderInterceptor } from './interceptors/loader-spinner.interceptor';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
                                         appLookupsService: AppLookupsService,
@@ -98,7 +100,8 @@ async function appInitialization(
     NextScheduledApproversRequestComponent,
     FundingSourceComponent,
     OtherDocsContributingFundsComponent,
-    PdCaIntegratedComponent
+    PdCaIntegratedComponent,
+    LoaderSpinnerComponent
   ],
   imports: [
     BrowserModule,
@@ -120,7 +123,9 @@ async function appInitialization(
       provide: APP_INITIALIZER, useFactory: initializeAppProperties,
       deps: [AppPropertiesService, AppLookupsService,
         AppUserSessionService], multi: true
-    }
+    },
+    LoaderService,
+    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })
