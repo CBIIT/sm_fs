@@ -60,10 +60,10 @@ export class RequestModel {
     console.log('setting grant on request model');
     // TODO: map appropriate values from grant to requestDto
     this._requestDto.applId = value.applId;
-    if (!this._requestDto.financialInfoVO) {
-      this._requestDto.financialInfoVO = {};
+    if (!this._requestDto.financialInfoDto) {
+      this._requestDto.financialInfoDto = {};
     }
-    this._requestDto.financialInfoVO.applId = value.applId;
+    this._requestDto.financialInfoDto.applId = value.applId;
     this._grant = value;
   }
 
@@ -87,7 +87,7 @@ export class RequestModel {
     this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this._requestDto = {};
-    this._requestDto.financialInfoVO = {};
+    this._requestDto.financialInfoDto = {};
   }
 
 }
