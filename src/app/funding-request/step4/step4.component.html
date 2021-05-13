@@ -48,7 +48,41 @@
   </div>
 
   <div class="col-12">
-    <p>Table goes here...</p>
+    <table class="table table-striped table-bordered next-approvers-table">
+        <thead>
+            <tr>
+                <th scope="col" style="width:4rem">Order</th>
+                <th scope="col">Name</th>
+                <th scope="col">Official Role</th>
+                <th scope="col">Designees</th>
+                <th scope="col" style="width:5rem">Action</th>
+            </tr>
+        </thead>
+        <tbody cdkDropList>
+            <tr cdkDrag >
+                <td><span class="order-icon"></span>1</td>
+                <td>Last, First</td>
+                <td>Role Goes Here</td>
+                <td></td>
+                <td><button class="btn btn-link btn-delete btn-slim" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button></td>
+            </tr>
+            <tr cdkDrag >
+                <td><span class="order-icon"></span>2</td>
+                <td>Last, First</td>
+                <td>Role Goes Here</td>
+                <td></td>
+                <td><button class="btn btn-link btn-delete btn-slim" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button></td>
+            </tr>
+            <tr cdkDrag cdkDragDisabled >
+                <td><span class="order-icon"></span>3</td>
+                <td>Last, First</td>
+                <td>Role Goes Here</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+
+    </table>
   </div>
 
   <div class="col-12">
