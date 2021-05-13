@@ -1,19 +1,18 @@
-<div class="col-12">
-  <h2>Request History</h2>
-  <table id="requestHistory" class="table no-footer dtr-column dataTable row-border" role="grid">
+
+<table id="requestHistory" class="table no-footer dtr-column dataTable row-border" role="grid">
     <thead>
     <tr>
-      <th>Date</th>
-      <th>Action</th>
-      <th>Comments</th>
+        <th>Date</th>
+        <th>Action</th>
+        <th>Comments</th>
     </tr>
     </thead>
     <tbody>
     <tr *ngFor="let history of histories">
-      <td>{{history.startDate}}</td>
-      <td>{{history.statusDescrip}}</td>
-      <td>{{history.comments}}</td>
+        <td>{{history.startDate}}</td>
+        <td>{{history.statusDescrip}}</td>
+        <td>{{history.comments}}</td>
     </tr>
     </tbody>
-  </table>
-</div>
+</table>
+

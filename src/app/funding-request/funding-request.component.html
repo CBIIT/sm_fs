@@ -1,9 +1,13 @@
-<div class="container">
+<div>
     <div class="row">
-        <h1>New Request - Step {{activeStep.step}}: {{activeStep.name}}</h1>
+        <div class="col">
+            <h1>New Request - Step {{activeStep.step}}: {{activeStep.name}}</h1>
+        </div>
     </div>
-    <div class="row">
-        <app-step-indicator [steps]="steps" [activeStep]="activeStep"></app-step-indicator>
+    <div class="row justify-content-center mb-3">
+        <div class="col-md-8 col-xl-6">
+            <app-step-indicator [steps]="steps" [activeStep]="activeStep"></app-step-indicator>
+        </div>
     </div>
 
     <router-outlet></router-outlet>
