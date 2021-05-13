@@ -61,17 +61,17 @@ export class RequestModel {
     console.log('setting grant on request model');
     // TODO: map appropriate values from grant to requestDto
     this._requestDto.applId = value.applId;
-    if (!this._requestDto.financialInfoVO) {
-      this._requestDto.financialInfoVO = {};
+    if (!this._requestDto.financialInfoDto) {
+      this._requestDto.financialInfoDto = {};
     }
     Object.keys(value).forEach(key => {
-      if (hasOwnProperty(this.requestDto.financialInfoVO, key)) {
-        this.requestDto.financialInfoVO[key] = value[key];
+      if (hasOwnProperty(this.requestDto.financialInfoDto, key)) {
+        this.requestDto.financialInfoDto[key] = value[key];
       }
     });
 
-    this._requestDto.financialInfoVO.applId = value.applId;
-    this._requestDto.financialInfoVO.fy = value.fy;
+    this._requestDto.financialInfoDto.applId = value.applId;
+    this._requestDto.financialInfoDto.fy = value.fy;
     this._grant = value;
   }
 
