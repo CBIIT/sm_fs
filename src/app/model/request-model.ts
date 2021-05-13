@@ -56,6 +56,7 @@ export class RequestModel {
     return this._grant;
   }
 
+
   set grant(value: NciPfrGrantQueryDto) {
     console.log('setting grant on request model');
     // TODO: map appropriate values from grant to requestDto
@@ -63,7 +64,14 @@ export class RequestModel {
     if (!this._requestDto.financialInfoVO) {
       this._requestDto.financialInfoVO = {};
     }
+    Object.keys(value).forEach(key => {
+      if (hasOwnProperty(this.requestDto.financialInfoVO, key)) {
+        this.requestDto.financialInfoVO[key] = value[key];
+      }
+    });
+
     this._requestDto.financialInfoVO.applId = value.applId;
+    this._requestDto.financialInfoVO.fy = value.fy;
     this._grant = value;
   }
 
@@ -90,4 +98,13 @@ export class RequestModel {
     this._requestDto.financialInfoVO = {};
   }
 
+}
+
+/**
+ * Stolen from the web to build a simple copy properties implementation
+ * @param obj
+ * @param prop
+ */
+function hasOwnProperty<X extends {}, Y extends PropertyKey>(obj: X, prop: Y): obj is X & Record<Y, unknown> {
+  return obj.hasOwnProperty(prop);
 }

@@ -62,11 +62,6 @@ export class RequestInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.requestModel.requestDto.requestorNpnId);
-    console.log(this.requestModel.requestDto.pdNpnId);
-    console.log(this.requestModel.requestDto.requestorCayCode);
-    console.log(this.requestModel.requestDto.frtId);
-    console.log(this.requestModel.requestDto.requestName);
   }
 
   get grant(): NciPfrGrantQueryDto {
