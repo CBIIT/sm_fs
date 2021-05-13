@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import {FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../service/app-properties.service';
+import {hasOwnProperty} from 'src/app/utils/utils';
+
 
 @Injectable({
   providedIn: 'root'
@@ -110,11 +112,4 @@ export class RequestModel {
 }
 
 
-/**
- * Stolen from the web to build a simple copy properties implementation
- * @param obj
- * @param prop
- */
-function hasOwnProperty<X extends {}, Y extends PropertyKey>(obj: X, prop: Y): obj is X & Record<Y, unknown> {
-  return obj.hasOwnProperty(prop);
-}
+
