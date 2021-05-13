@@ -1,6 +1,4 @@
-<div class="container">
-    <ul class="progressbar">
+<ul class="progressbar">
         <li *ngFor="let step of steps" 
         [ngClass]="{'complete': step.step<activeStep.step, 'active': step.step==activeStep.step}">{{step.name}}</li>
 </ul>
-</div>
