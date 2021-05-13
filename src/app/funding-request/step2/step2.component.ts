@@ -71,9 +71,8 @@ export class Step2Component implements OnInit {
     );
   }
 
-  updateCounter(event): any {
-
+  isSaveable(): boolean {
+    console.log('Validation before saving');
+    return this.model.canSave();
   }
-
-
 }

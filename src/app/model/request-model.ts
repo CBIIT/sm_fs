@@ -58,17 +58,17 @@ export class RequestModel {
 
 
   set grant(value: NciPfrGrantQueryDto) {
-    console.log('setting grant on request model');
+    console.log('setting grant on request model - propagate properties as necessary');
     // TODO: map appropriate values from grant to requestDto
     this._requestDto.applId = value.applId;
     if (!this._requestDto.financialInfoDto) {
       this._requestDto.financialInfoDto = {};
     }
-    Object.keys(value).forEach(key => {
-      if (hasOwnProperty(this.requestDto.financialInfoDto, key)) {
-        this.requestDto.financialInfoDto[key] = value[key];
-      }
-    });
+    // Object.keys(value).forEach(key => {
+    //   if (hasOwnProperty(this.requestDto.financialInfoDto, key)) {
+    //     this.requestDto.financialInfoDto[key] = value[key];
+    //   }
+    // });
 
     this._requestDto.financialInfoDto.applId = value.applId;
     this._requestDto.financialInfoDto.fy = value.fy;
@@ -98,7 +98,17 @@ export class RequestModel {
     this._requestDto.financialInfoDto = {};
   }
 
+  canSave(): boolean {
+    // TODO: implement validation rules here
+    return true;
+  }
+
+  canSubmit(): boolean {
+    // TODO: implement validation rules here
+    return true;
+  }
 }
+
 
 /**
  * Stolen from the web to build a simple copy properties implementation
