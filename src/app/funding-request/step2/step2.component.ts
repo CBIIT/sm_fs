@@ -30,6 +30,13 @@ export class Step2Component implements OnInit {
     if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
+    this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
+        this.requestModel.requestDto.grantAwarded = result;
+      }, error => {
+        // TODO: properly handle errors here
+        console.log('HttpClient get request error for----- ' + error.message);
+      }
+    );
     this.requestModel.requestDto.pdNpnId = this.requestModel.grant.pdNpnId;
   }
 
