@@ -14,6 +14,8 @@ export class RequestHistoryComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(this.requestModel.requestDto.frqId);
+    console.log(this.requestModel.requestDto.financialInfoDto.fundingRequestId);
     if (this.requestModel.requestDto.frqId != null) {
       this.fsLookupControllerService.getRequestHistoryUsingGET(this.requestModel.requestDto.frqId).subscribe(
         result => {

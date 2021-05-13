@@ -10,8 +10,6 @@ import {AppPropertiesService} from '../service/app-properties.service';
 })
 export class GrantInformationComponent implements OnInit {
 
-  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
-
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService) {
   }
 

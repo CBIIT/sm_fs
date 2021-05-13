@@ -81,7 +81,6 @@ export class Step1Component implements OnInit, AfterViewInit {
       pagingType: 'full_numbers',
       pageLength: 10,
       serverSide: true,
-      processing: true,
 
       ajax: (dataTablesParameters: any, callback) => {
         console.log('calling search backend');
