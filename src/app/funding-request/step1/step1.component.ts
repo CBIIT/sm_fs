@@ -52,6 +52,10 @@ export class Step1Component implements OnInit, AfterViewInit {
 
   tooltipGrant: any;
 
+  get noResult(): boolean {
+    return !this.grantList || this.grantList.length === 0;
+  }
+
   ngAfterViewInit(): void {
     // console.log("step1 afterViewInit() is called");
     // this.initDatatable();
@@ -257,7 +261,7 @@ export class Step1Component implements OnInit, AfterViewInit {
 
   private initDatatable(): void {
     this.dataTable = $('table#grantDt').DataTable(this.dtOptions);
-    this.dataTable.columns.adjust().responsive.recalc();
+  //  this.dataTable.columns.adjust().responsive.recalc();
   }
 
   clear(): void {
@@ -265,7 +269,7 @@ export class Step1Component implements OnInit, AfterViewInit {
     this.piName = '';
     this.fyRange = {fromFy: '', toFy: ''};
     this.ncabRange = {fromNcab: '', toNcab: ''};
-    this.selectedPd = undefined;
+    this.selectedPd = null;
     this.selectedRfaPa = '';
     this.selectedCas = [];
     this.i2Status = '';

@@ -95,7 +95,7 @@ export class RequestModel {
     this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this._requestDto = {};
-    this._requestDto.financialInfoVO = {};
+    this._requestDto.financialInfoDto = {};
   }
 
 }
