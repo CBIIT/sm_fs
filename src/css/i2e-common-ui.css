@@ -24222,42 +24222,44 @@ table.dataTable tbody tr td {
   border: 1px solid #a3a6ad;
   border-top-width: 0px;
   border-right-width: 0px;
+  vertical-align: top;
+  line-height: 1.2;
 }
 
-/* line 55, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 57, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr td.child {
   padding: .3rem .75rem .4rem .75rem;
 }
 
-/* line 57, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 59, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr td.child ul.dtr-details {
   width: 100%;
 }
 
-/* line 59, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 61, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr td.child ul.dtr-details li {
   width: 100%;
   padding: .4rem 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-/* line 63, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 65, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr td.child ul.dtr-details li:last-child {
   border-bottom: none;
 }
 
-/* line 66, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 68, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr td.child ul.dtr-details li span.dtr-title {
   margin-right: .3rem;
   min-width: unset;
 }
 
-/* line 82, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 84, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable.dtr-column td.control, table.dataTable.dtr-column th.control {
   border-left-width: 0px;
 }
 
-/* line 88, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 90, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable.dtr-column tbody tr > td.control:before {
   font-family: "Font Awesome 5 Pro";
   font-weight: 900;
@@ -24275,25 +24277,25 @@ table.dataTable.dtr-column tbody tr > td.control:before {
   font-size: 1.2rem;
 }
 
-/* line 104, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 106, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable.dtr-column tbody tr > td.control:hover:before {
   color: #0076a8;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
-/* line 110, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 112, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable.dtr-column tbody tr.parent > td.control:before {
   content: '\f056';
   color: #82858a;
   background-color: #fff;
 }
 
-/* line 115, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 117, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable.dtr-column tbody tr.parent > td.control:hover:before {
   color: #63666a;
 }
 
-/* line 124, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 126, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls {
   display: flex;
   flex-direction: row;
@@ -24301,87 +24303,87 @@ div.dataTables_wrapper .table-controls {
   flex-wrap: wrap;
 }
 
-/* line 129, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 131, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls > div {
   display: flex;
   align-items: flex-start;
 }
 
-/* line 134, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 136, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls .dataTables_filter label {
   margin-bottom: 0rem;
 }
 
-/* line 138, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 140, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls div.dataTables_info {
   padding-top: 0rem;
   font-size: 0.7875rem;
 }
 
-/* line 142, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 144, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls div.dataTables_length {
   font-size: 0.7875rem;
 }
 
-/* line 144, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 146, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls div.dataTables_length label {
   font-size: 0.7875rem;
   margin-bottom: 0rem;
 }
 
-/* line 147, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 149, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls div.dataTables_length label .form-control {
   padding: .25rem 0.3rem;
 }
 
-/* line 153, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 155, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls ul.pagination {
   margin: 0rem !important;
 }
 
-/* line 156, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 158, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls ul.pagination .page-item .page-link {
   font-size: 0.7875rem;
   padding: 0.35rem 0.6rem;
   color: #0076a8;
 }
 
-/* line 160, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 162, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls ul.pagination .page-item .page-link:hover {
   background-color: #f4f5f6;
   color: #003e51;
 }
 
-/* line 166, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 168, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls ul.pagination .page-item.disabled .page-link {
   background-color: #f4f5f6;
   color: #a3a6ad;
 }
 
-/* line 172, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 174, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls ul.pagination .page-item.active .page-link {
   color: #fff;
   background-color: #63666a;
   border-color: #63666a;
 }
 
-/* line 176, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 178, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 div.dataTables_wrapper .table-controls ul.pagination .page-item.active .page-link:hover {
   background-color: #4b4e52;
   border-color: #4b4e52;
 }
 
-/* line 188, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 190, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr .select-checkbox, table.dataTable thead tr .select-checkbox {
   text-align: center;
 }
 
-/* line 190, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 192, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr .select-checkbox:hover, table.dataTable thead tr .select-checkbox:hover {
   cursor: pointer;
 }
 
-/* line 193, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 195, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr .select-checkbox:before, table.dataTable thead tr .select-checkbox:before {
   font-family: "Font Awesome 5 Pro";
   font-weight: 400;
@@ -24401,7 +24403,7 @@ table.dataTable tbody tr .select-checkbox:before, table.dataTable thead tr .sele
   border-radius: .2rem;
 }
 
-/* line 211, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 213, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr .select-checkbox.selected:before, table.dataTable thead tr .select-checkbox.selected:before {
   color: #003e51;
   font-family: "Font Awesome 5 Pro";
@@ -24409,57 +24411,57 @@ table.dataTable tbody tr .select-checkbox.selected:before, table.dataTable thead
   content: '\f14a';
 }
 
-/* line 217, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 219, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr .select-checkbox:focus:before, table.dataTable thead tr .select-checkbox:focus:before {
   box-shadow: 0 0 0 0.1rem rgba(0, 118, 168, 0.25), inset 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
 }
 
-/* line 221, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 223, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected, table.dataTable thead tr.selected {
   color: #333;
 }
 
-/* line 223, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 225, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected.even, table.dataTable thead tr.selected.even {
   background-color: #e5f6ff;
 }
 
-/* line 225, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 227, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected.even + tr.child, table.dataTable tbody tr.selected.even + tr.child:hover, table.dataTable thead tr.selected.even + tr.child, table.dataTable thead tr.selected.even + tr.child:hover {
   background-color: #e5f6ff !important;
 }
 
-/* line 229, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 231, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected.odd, table.dataTable thead tr.selected.odd {
   background-color: #a8e5ff !important;
 }
 
-/* line 231, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 233, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected.odd + tr.child, table.dataTable tbody tr.selected.odd + tr.child:hover, table.dataTable thead tr.selected.odd + tr.child, table.dataTable thead tr.selected.odd + tr.child:hover {
   background-color: #a8e5ff !important;
 }
 
-/* line 235, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 237, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected a, table.dataTable thead tr.selected a {
   color: #0076a8;
 }
 
-/* line 237, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 239, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected a.btn-primary, table.dataTable tbody tr.selected a.btn-danger, table.dataTable tbody tr.selected a.btn-secondary, table.dataTable tbody tr.selected a.btn-success, table.dataTable tbody tr.selected a.btn-dark, table.dataTable thead tr.selected a.btn-primary, table.dataTable thead tr.selected a.btn-danger, table.dataTable thead tr.selected a.btn-secondary, table.dataTable thead tr.selected a.btn-success, table.dataTable thead tr.selected a.btn-dark {
   color: white;
 }
 
-/* line 240, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 242, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected a.btn-outline-primary, table.dataTable thead tr.selected a.btn-outline-primary {
   color: #0076a8;
 }
 
-/* line 243, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 245, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected a.btn-outline-secondary, table.dataTable thead tr.selected a.btn-outline-secondary {
   color: #63666a;
 }
 
-/* line 248, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 250, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected .select-checkbox:before, table.dataTable thead tr.selected .select-checkbox:before {
   font-family: "Font Awesome 5 Pro";
   font-weight: 900;
@@ -24467,12 +24469,12 @@ table.dataTable tbody tr.selected .select-checkbox:before, table.dataTable thead
   color: #003e51;
 }
 
-/* line 254, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 256, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected .select-checkbox:after, table.dataTable thead tr.selected .select-checkbox:after {
   content: none;
 }
 
-/* line 257, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
+/* line 259, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.selected .select-checkbox:focus:before, table.dataTable thead tr.selected .select-checkbox:focus:before {
   box-shadow: 0 0 0 0.1rem rgba(0, 118, 168, 0.25), inset 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
 }
