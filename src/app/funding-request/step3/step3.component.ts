@@ -71,6 +71,8 @@ export class Step3Component implements OnInit {
       err => {
         console.log("error occured while uploading a document")
       });
+
+      this.loadFiles();
   }
 
   constructor(private router: Router,
@@ -83,12 +85,8 @@ export class Step3Component implements OnInit {
 
   ngOnInit(): void {
 
-    this.documentService.getFiles(1, 'PFR').subscribe(
-      result => {
-        this.fileInfos = result;
-        this.items = result;
-      }
-    );
+    this.loadFiles();
+    
 
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
@@ -98,6 +96,15 @@ export class Step3Component implements OnInit {
         console.log('HttpClient get request error for----- ' + error.message);
       });
 
+  }
+
+  loadFiles() {
+    this.documentService.getFiles(1, 'PFR').subscribe(
+      result => {
+        this.fileInfos = result;
+        this.items = result;
+      }
+    );
   }
 
   drop(event: CdkDragDrop<DocumentsDto[]>) {
@@ -125,6 +132,18 @@ export class Step3Component implements OnInit {
     this.documentService.downloadFrqCoverSheet(36182).subscribe(blob => saveAs(blob, 'Cover Page.pdf')), error =>
       console.log('Error downloading the file'),
       () => console.info('File downloaded successfully');
+  }
+
+  deleteDoc(id: number) {
+    this.documentService.deleteDocById(id).subscribe(
+      result => {
+        console.log("Delete Success")
+      }
+    ), error => {
+      console.log("Error while deleting the document")
+    };
+
+    this.loadFiles();
   }
 
   nextStep() {

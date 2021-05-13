@@ -44,5 +44,9 @@ export class DocumentService {
 		return this.http.get(`${url}`, {responseType: 'blob'});
   }
 
+  deleteDocById(id: number) {
+    return this.documentsControllerService.deleteDocumentUsingGET(id);
+  }
+
  
 }
