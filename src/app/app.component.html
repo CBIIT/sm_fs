@@ -1,10 +1,10 @@
-<app-header></app-header>
+<app-header *ngIf="router.url !== '/fundingSourceDetails'"></app-header>
 <app-loader-spinner></app-loader-spinner>
 
 <div class="container">
     <div class="row">
         <div class="col-lg-2">
-            <app-fs-menu></app-fs-menu>
+            <app-fs-menu *ngIf="router.url !== '/fundingSourceDetails'"></app-fs-menu>
         </div>
         <div class="col-lg-10">
             <main id="main">
