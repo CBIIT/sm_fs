@@ -100,7 +100,6 @@ async function appInitialization(
     NextScheduledApproversRequestComponent,
     FundingSourceComponent,
     OtherDocsContributingFundsComponent,
-    PdCaIntegratedComponent,
     LoaderSpinnerComponent,
     FundingSourcesNamesComponent,
     
