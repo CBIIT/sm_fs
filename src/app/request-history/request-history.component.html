@@ -10,7 +10,8 @@
     <tbody>
     <tr *ngFor="let history of histories">
         <td>{{history.startDate}}</td>
-        <td>{{history.statusDescrip}} by {{ history | mailtoFormatter:'performedBy':'email':'Request History' }}</td>
+<!--        <td [innerHTML]="history.statusDescrip + ' by ' + history | mailtoFormatter:'performedBy':'email':'Request History'"></td>-->
+        <td>{{ history.statusDescrip }} by {{ history.performedBy }}</td>
         <td>{{history.comments}}</td>
     </tr>
     </tbody>
