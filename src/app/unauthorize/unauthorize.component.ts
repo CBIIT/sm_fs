@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 })
 export class UnauthorizeComponent implements OnInit {
 
-  techSupport: String;
+  techSupport: string;
 
   constructor() { }
 

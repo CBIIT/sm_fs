@@ -66,8 +66,11 @@
 <div class="row">
     <div class="col-12 d-flex mb-4">
         <button class="btn btn-outline-secondary  mr-auto" (click)="prevStep()">Previous</button>
-        <button class="btn btn-danger mr-2" (click)="deleteRequest()">Delete Request</button>
-        <button class="btn btn-primary" (click)="submitRequest()">Submit Request</button>
+        <button class="btn btn-danger mr-2" (click)="deleteRequest()" *ngIf="deleteVisible()">Delete Request</button>
+        <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled() ">Submit Request</button>
+        <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
+            <button class="btn btn-primary" disabled>Submit Request</button>
+        </span>    
     </div>
 </div>
 
