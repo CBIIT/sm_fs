@@ -18,7 +18,13 @@ export class Step2Component implements OnInit {
   }
 
   set selectedDocs(value: string) {
+    this.requestModel.requestDto.otherDocsText = value;
     this._selectedDocs = value;
+    if (value) {
+      this.requestModel.requestDto.otherDocsFlag = 'Y';
+    } else {
+      this.requestModel.requestDto.otherDocsFlag = undefined;
+    }
   }
 
   constructor(private router: Router, private requestModel: RequestModel,
@@ -47,7 +53,7 @@ export class Step2Component implements OnInit {
 
   saveAsDraft(): void {
     this.saveFundingRequest();
-    this.router.navigate(['/request/step2']);
+    this.router.navigate(['/request/step4']);
   }
 
   prevStep(): void {
@@ -64,6 +70,10 @@ export class Step2Component implements OnInit {
   }
 
   saveFundingRequest(): void {
+    if (!this.isSaveable()) {
+      console.log('Can\'t save at this point');
+      return;
+    }
     // TODO: make sure model is properly constructed
     console.log(JSON.stringify(this.requestModel.requestDto));
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
@@ -80,6 +90,7 @@ export class Step2Component implements OnInit {
 
   isSaveable(): boolean {
     // console.log('Validation before saving');
+    // TODO: convert to service for bi-directional checking
     return this.model.canSave();
   }
 }

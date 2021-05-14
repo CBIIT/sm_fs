@@ -44,7 +44,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
         console.log('Getting the Doc Dropdown results');
         // result.push({id: '', abbreviation: '', description: ''});
         result.forEach(r => {
-          console.log({id: r.abbreviation, text: r.abbreviation + ' - ' + r.description});
+          // console.log({id: r.abbreviation, text: r.abbreviation + ' - ' + r.description});
         });
         this.docs = result;
       }, error => {
