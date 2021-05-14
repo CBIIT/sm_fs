@@ -8,7 +8,7 @@ import { DocumentsControllerService, DocumentsDto } from '@nci-cbiit/i2ecws-lib'
 })
 export class DocumentService {
 
-  private docUrl = 'i2ecws/api/v1/documents';
+  private docUrl = '/i2ecws/api/v1/documents';
 
   constructor(private http: HttpClient,
     private documentsControllerService: DocumentsControllerService) { }
