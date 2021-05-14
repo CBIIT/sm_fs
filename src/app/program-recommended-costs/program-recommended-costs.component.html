@@ -35,7 +35,7 @@
                 <tr>
                     <td>
                         <div class="form-group">
-                            <label for="fundingsource-1">Funding Source</label>
+                          <span><label for="fundingsource-1">Funding Source</label> <a href="#" (click)="openFsDetails()"><i class="fas fa-question-circle ml-1"></i></a></span>
                             <select class="form-control" id="fundingsource-1">
                               <option></option>
                               <option>Example of a Very Long Funding Source</option>
@@ -49,7 +49,7 @@
                     <td>
 
                         <div class="form-group row mb-2">
-                            <span class="col-sm-auto col-form-label prc-inline-label"><b>Enter</b><a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information#mynci-polmatrix" target="_blank"><i class="fas fa-question-circle ml-1"></i></a></span>
+                            <span class="col-sm-auto col-form-label prc-inline-label"><b>Enter</b><a href="#" (click)="openOefiaLink()"><i class="fas fa-question-circle ml-1"></i></a></span>
                             <div class="col-sm-auto">
                                 <div class="btn-group btn-group-toggle mb-2" ngbRadioGroup name="fundtype-1">
                                     <label ngbButtonLabel class="btn-outline-secondary">

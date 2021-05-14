@@ -9,13 +9,12 @@ import {FsLookupControllerService} from '@nci-cbiit/i2ecws-lib';
 export class FundingSourcesNamesComponent implements OnInit {
 
   constructor(private fslookupControllerService: FsLookupControllerService) { }
- public fundingSourceNames: any;
+  public fundingSourceNames: any;
   ngOnInit(): void {
 
     this.fslookupControllerService.getFundingSourcesNameDetailsUsingGET().subscribe(
       result => {
-        console.log('Getting the Doc Dropdown results');
-        // result.push({id: '', abbreviation: '', description: ''});
+        console.log('Getting the funding source help results');
         this.fundingSourceNames = result;
       }, error => {
         console.log('HttpClient get request error for----- ' + error.message);

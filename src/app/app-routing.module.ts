@@ -10,6 +10,7 @@ import { Step2Component } from './funding-request/step2/step2.component';
 import { Step3Component } from './funding-request/step3/step3.component';
 import { Step4Component } from './funding-request/step4/step4.component';
 import { PdAuthGuard } from './funding-request/step1/pd.auth.guard';
+import { FundingSourcesNamesComponent } from './funding-sources-names/funding-sources-names.component';
 
 const routes: Routes = [
   {
@@ -22,8 +23,10 @@ const routes: Routes = [
         {path: 'step1', component: Step1Component, canActivate: [PdAuthGuard]},
         {path: 'step2', component: Step2Component},
         {path: 'step3', component: Step3Component},
-        {path: 'step4', component: Step4Component}
-      ]}
+        {path: 'step4', component: Step4Component},
+      ]},
+      {path: 'fundingSourceDetails', component: FundingSourcesNamesComponent},
+
     ]
   },
   { path: 'unauthorize', component: UnauthorizeComponent }
