@@ -5,11 +5,11 @@ import { Subject } from 'rxjs';
 export class LoaderService {
     isLoading = new Subject<boolean>();
 
-    show() {
+    show(): void {
         this.isLoading.next(true);
     }
 
-    hide() {
+    hide(): void {
         this.isLoading.next(false);
     }
 }
