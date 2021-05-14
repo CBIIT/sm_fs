@@ -3,6 +3,7 @@ import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {AppPropertiesService} from '../../service/app-properties.service';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+// import { request } from 'node:http';
 
 @Component({
   selector: 'app-step4',
@@ -36,10 +37,10 @@ export class Step4Component implements OnInit {
 
   deleteRequest(): void {
     if (confirm('Are you sure you want to delete this request?')){
-      console.log('do delete');
+      console.log('Call deleteRequest API for frqId ', this.model.requestDto.frqId);
       this.fsRequestService.deleteRequestUsingDELETE(this.model.requestDto.frqId).subscribe(
         result => {
-          console.log('call delete api successfull');
+          console.log('Call API to delete completed route to /search, API returned ', result);
           this.router.navigate(['/search']);
         },
         error => {
@@ -51,6 +52,14 @@ export class Step4Component implements OnInit {
 
   submitRequest(): void {
     console.log('submit request not implemented!!!');
+    this.fsRequestService.submitRequestUsingPOST(this.requestModel.requestDto).subscribe(
+      (result) => {
+        console.log('calling submitRequestUsingPost successful, it returns', result);
+
+      },
+      (error) => {
+        console.log('Failed when calling submitRequestUsingPOST', error);
+      } );
   }
 
 }

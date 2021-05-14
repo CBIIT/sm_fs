@@ -83,10 +83,10 @@ export class Step1Component implements OnInit, AfterViewInit {
       serverSide: true,
       language: {
           paginate: {
-              first: "<i class='far fa-chevron-double-left' title='First'></i>",
-              previous: "<i class='far fa-chevron-left' title='Previous'></i>",
-              next: "<i class='far fa-chevron-right' title='Next'></i>",
-              last: "<i class='far fa-chevron-double-right' Last='First'></i>"
+              first: '<i class="far fa-chevron-double-left" title="First"></i>',
+              previous: '<i class="far fa-chevron-left" title="Previous"></i>',
+              next: '<i class="far fa-chevron-right" title="Next"></i>',
+              last: '<i class="far fa-chevron-double-right" Last="First"></i>'
           }
       },
 
