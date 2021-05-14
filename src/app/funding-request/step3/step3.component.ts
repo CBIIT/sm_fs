@@ -7,6 +7,14 @@ import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request-model';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { saveAs } from 'file-saver';
+import { of, Observable } from 'rxjs';
+import { HttpEventType, HttpResponse } from '@angular/common/http';
+import { map } from 'rxjs/operators';
+
+export interface Swimlane {
+  name: string;
+  array: DocumentsDto[];
+}
 
 @Component({
   selector: 'app-step3',
@@ -23,8 +31,15 @@ export class Step3Component implements OnInit {
   public _selectedDocType: string = '';
   public _docDescription: string = '';
 
+
+  baseTaskList: Observable<DocumentsDto[]>;
+  include: Observable<DocumentsDto[]>;
+  exclude: Observable<DocumentsDto[]>;
+
+  swimlanes: Swimlane[] = [];
+
   selectedFiles: FileList;
-  fileInfos: Array<DocumentsDto>;
+  fileInfos: Observable<DocumentsDto[]>;
 
 
   get model(): RequestModel {
@@ -67,12 +82,32 @@ export class Step3Component implements OnInit {
 
   upload(file, DocumentsDto) {
     this.documentService.upload(file, this._docDto).subscribe(
-      event => { },
+      event => {
+        if (event.type === HttpEventType.UploadProgress) {
+
+        } else if (event instanceof HttpResponse) {
+
+          this.fileInfos = this.documentService.getFiles(this._docDto.keyId, 'PFR');
+        }
+      },
       err => {
-        console.log("error occured while uploading a document")
+        console.log("error occured while uploading a document");
+        this.fileInfos = this.documentService.getFiles(this._docDto.keyId, 'PFR');
+
+        this.documentService.getLatestFile(this._docDto.keyId, 'PFR').subscribe(
+          result => {
+            console.log('Getting the Doc type Dropdown results');
+
+            this.baseTaskList.subscribe(items => {
+              this.swimlanes[0]['array'].push(result);
+            });
+
+          }, error => {
+            console.log('HttpClient get request error for----- ' + error.message);
+          });
       });
 
-      this.loadFiles();
+
   }
 
   constructor(private router: Router,
@@ -86,7 +121,6 @@ export class Step3Component implements OnInit {
   ngOnInit(): void {
 
     this.loadFiles();
-    
 
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
@@ -101,10 +135,27 @@ export class Step3Component implements OnInit {
   loadFiles() {
     this.documentService.getFiles(1, 'PFR').subscribe(
       result => {
-        this.fileInfos = result;
-        this.items = result;
-      }
-    );
+        console.log('Getting the Doc type Dropdown results');
+        this.baseTaskList = of(result);
+        this.include = this.baseTaskList.pipe(
+          map(tasks => tasks.filter(task => task.createDate !== null))
+        );
+        this.exclude = this.baseTaskList.pipe(
+          map(tasks => tasks.filter(task => task.createDate === null))
+        );
+
+        this.include.subscribe(data => {
+          console.log("included data:" +data);
+          this.swimlanes.push({ name: 'Included Content', array: data });
+        });
+        this.exclude.subscribe(data => {
+          console.log("excluded data:" +data);
+          this.swimlanes.push({ name: 'Excluded Content', array: data });
+        });
+    
+      }, error => {
+        console.log('HttpClient get request error for----- ' + error.message);
+      });
   }
 
   drop(event: CdkDragDrop<DocumentsDto[]>) {
@@ -137,13 +188,15 @@ export class Step3Component implements OnInit {
   deleteDoc(id: number) {
     this.documentService.deleteDocById(id).subscribe(
       result => {
-        console.log("Delete Success")
+        console.log("Delete Success");
+        this.loadFiles();
       }
     ), error => {
-      console.log("Error while deleting the document")
+      console.log("Error while deleting the document");
+      this.loadFiles();
     };
 
-    this.loadFiles();
+    
   }
 
   nextStep() {

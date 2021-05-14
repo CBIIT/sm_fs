@@ -10,27 +10,26 @@ import {Options} from 'select2';
   styleUrls: ['./other-docs-contributing-funds.component.css']
 })
 export class OtherDocsContributingFundsComponent implements OnInit {
-
-
-  @Input() maxSelection = 1;
   @Input() label = 'Division/Office/Center (DOC)';
 
   @Input()
-  get selectedValue(): number[] {
+  get selectedValue(): string {
     return this._selectedValue;
   }
 
-  @Output() selectedValueChange = new EventEmitter<number[]>();
+  @Output() selectedValueChange = new EventEmitter<string>();
 
-  set selectedValue(value: number[]) {
+  set selectedValue(value: string) {
     console.log('DOC selectedValue setter called ', value);
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
   }
 
-  private _selectedValue: number [] = [];
+  private _selectedValue: string;
 
   // NOTE: if the following array is typed as Select2OptionData, compilation fails
+  // Select2OptionData requires id and text attributes. If the supplied data doesn't
+  // have those values, you should modify the data appropriately.
   public docs: Array<any>;
   public options: Options;
 
@@ -39,18 +38,14 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
   ngOnInit(): void {
     this.options = {};
-    const multi = (Number(this.maxSelection) !== Number(1));
-    console.log('Multiple select:', multi);
-    if (multi) {
-      this.options.multiple = true;
-    }
-    if (multi && this.maxSelection !== -1) {
-      this.options.maximumSelectionLength = this.maxSelection;
-    }
+
     this.lookupsControllerService.getNciDocsUsingGET().subscribe(
       result => {
         console.log('Getting the Doc Dropdown results');
         // result.push({id: '', abbreviation: '', description: ''});
+        result.forEach(r => {
+          console.log({id: r.abbreviation, text: r.abbreviation + ' - ' + r.description});
+        });
         this.docs = result;
       }, error => {
         console.log('HttpClient get request error for----- ' + error.message);

@@ -11,13 +11,13 @@ import {errorObject} from 'rxjs/internal-compatibility';
   styleUrls: ['./step2.component.css']
 })
 export class Step2Component implements OnInit {
-  _selectedDocs: number[];
+  _selectedDocs: string;
 
-  get selectedDocs(): number[] {
+  get selectedDocs(): string {
     return this._selectedDocs;
   }
 
-  set selectedDocs(value: number[]) {
+  set selectedDocs(value: string) {
     this._selectedDocs = value;
   }
 
@@ -79,7 +79,7 @@ export class Step2Component implements OnInit {
   }
 
   isSaveable(): boolean {
-    console.log('Validation before saving');
+    // console.log('Validation before saving');
     return this.model.canSave();
   }
 }

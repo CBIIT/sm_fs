@@ -48,6 +48,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { LoaderSpinnerComponent } from './loader-spinner/loader-spinner.component';
 import { LoaderService } from './service/loader-spinner.service';
 import { LoaderInterceptor } from './interceptors/loader-spinner.interceptor';
+import { FundingSourcesNamesComponent } from './funding-sources-names/funding-sources-names.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
                                         appLookupsService: AppLookupsService,
@@ -101,7 +102,9 @@ async function appInitialization(
     FundingSourceComponent,
     OtherDocsContributingFundsComponent,
     PdCaIntegratedComponent,
-    LoaderSpinnerComponent
+    LoaderSpinnerComponent,
+    FundingSourcesNamesComponent,
+    
   ],
   imports: [
     BrowserModule,
@@ -115,7 +118,7 @@ async function appInitialization(
     DataTablesModule,
     DragDropModule
   ],
-  providers: [RequestModel, PlanModel,
+  providers: [RequestModel, PlanModel,LoaderService,
     {provide: BASE_PATH, useValue: '/i2ecws'},
     {provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS'},
     {provide: PROPERTIES_OVERRIDE, useValue: environment},
@@ -123,9 +126,7 @@ async function appInitialization(
       provide: APP_INITIALIZER, useFactory: initializeAppProperties,
       deps: [AppPropertiesService, AppLookupsService,
         AppUserSessionService], multi: true
-    },
-    LoaderService,
-    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
+    }
   ],
   bootstrap: [AppComponent]
 })

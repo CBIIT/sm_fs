@@ -25297,4 +25297,24 @@ table ~ .dt-controls {
   margin-top: .5rem;
 }
 
+/* line 294, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.next-approvers-table tbody tr.cdk-drag .order-icon:before {
+  content: '\f7a4';
+  font-family: "Font Awesome 5 Pro";
+  display: inline-block;
+  margin-right: .75rem;
+  color: #63666a;
+  font-weight: 900;
+}
+
+/* line 303, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.next-approvers-table tbody tr.cdk-drag.cdk-drag-disabled .order-icon:before {
+  content: '\f023';
+}
+
+/* line 308, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.next-approvers-table tbody tr td {
+  vertical-align: middle;
+}
+
 /*# sourceMappingURL=i2e-common-ui.css.map */

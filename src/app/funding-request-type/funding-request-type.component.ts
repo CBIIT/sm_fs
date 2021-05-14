@@ -71,9 +71,10 @@ export class FundingRequestTypeComponent implements OnInit {
   onChange(event): any {
     console.log('change', event);
   }
-  openPdfDoc(){
+
+  openPdfDoc(): boolean {
     openNewWindow('assets/docs/PFR-Request-type-definitions.pdf', 'Request_Type_Description');
-     return false;
+    return false;
   }
 
 }
