@@ -102,19 +102,19 @@ export class RequestModel {
 
   canSave(): boolean {
     // TODO: implement validation rules here
-    if (this.requestDto.frtId === undefined || this.requestDto.frtId === null) {
+    if (!this.requestDto.frtId) {
       return false;
     }
 
-    if (this.requestDto.pdNpnId === undefined || this.requestDto.pdNpnId === null) {
+    if (!this.requestDto.pdNpnId) {
       return false;
     }
 
-    if (this.requestDto.requestorNpnId === undefined || this.requestDto.requestorNpnId === null) {
+    if (!this.requestDto.requestorNpnId) {
       return false;
     }
 
-    if (this.requestDto.requestorCayCode === undefined || this.requestDto.requestorCayCode === null) {
+    if (!this.requestDto.requestorCayCode || this.requestDto.requestorCayCode.trim().length === 0) {
       return false;
     }
 

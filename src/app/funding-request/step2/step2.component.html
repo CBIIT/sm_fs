@@ -8,7 +8,8 @@
 <div class="row">
   <div class="col-lg-4">
     <div class="form-group">
-      <app-other-docs-contributing-funds [(selectedValue)]="selectedDocs" label="Other NCI DOCs Contributing Funds"></app-other-docs-contributing-funds>
+      <app-other-docs-contributing-funds [(selectedValue)]="selectedDocs"
+                                         label="Other NCI DOCs Contributing Funds"></app-other-docs-contributing-funds>
     </div>
   </div>
 
@@ -26,7 +27,19 @@
 <div class="row">
   <div class="col-12 d-flex">
     <button class="btn btn-outline-secondary mr-auto" (click)="prevStep()">Previous</button>
-    <button class="btn btn-outline-primary mr-2" [disabled]="!isSaveable()" (click)="saveAsDraft()">Save as Draft</button>
-    <button class="btn btn-primary" [disabled]="!isSaveable()" (click)="saveAndContinue()">Save and Continue</button>
+    <button class="btn btn-outline-primary mr-2" *ngIf="isSaveable(); else saveDisabled" (click)="saveAsDraft()">
+      Save as Draft
+    </button>
+    <ng-template #saveDisabled>
+        <span ngbTooltip="Missing required search criteria">
+            <button class="btn btn-outline-primary mr-2" disabled>Save as Draft</button>
+        </span>
+    </ng-template>
+    <button class="btn btn-primary" *ngIf="isSaveable(); else saveAndContinueDisabled" (click)="saveAndContinue()">Save and Continue</button>
+    <ng-template #saveAndContinueDisabled>
+        <span ngbTooltip="Missing required search criteria">
+            <button class="btn btn-primary" disabled>Save and Continue</button>
+        </span>
+    </ng-template>
   </div>
 </div>

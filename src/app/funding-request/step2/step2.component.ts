@@ -91,6 +91,7 @@ export class Step2Component implements OnInit {
   isSaveable(): boolean {
     // console.log('Validation before saving');
     // TODO: convert to service for bi-directional checking
+    console.log('Can save:', this.model.canSave());
     return this.model.canSave();
   }
 }
