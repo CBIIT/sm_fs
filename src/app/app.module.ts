@@ -43,7 +43,6 @@ import { ProgramRecommendedCostsReadonlyComponent } from './program-recommended-
 import { NextScheduledApproversRequestComponent } from './next-scheduled-approvers-request/next-scheduled-approvers-request.component';
 import { FundingSourceComponent } from './funding-source/funding-source.component';
 import { OtherDocsContributingFundsComponent } from './other-docs-contributing-funds/other-docs-contributing-funds.component';
-import { PdCaIntegratedComponent } from './pd-ca-integrated/pd-ca-integrated.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { LoaderSpinnerComponent } from './loader-spinner/loader-spinner.component';
 import { LoaderService } from './service/loader-spinner.service';
