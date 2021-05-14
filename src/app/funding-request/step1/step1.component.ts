@@ -8,6 +8,7 @@ import {RequestModel} from '../../model/request-model';
 import {AppUserSessionService} from 'src/app/service/app-user-session.service';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
 import {getCurrentFiscalYear} from 'src/app/utils/utils';
+import { LoaderService } from 'src/app/service/loader-spinner.service';
 
 @Component({
   selector: 'app-step1',
@@ -21,7 +22,8 @@ export class Step1Component implements OnInit, AfterViewInit {
               private fsRequestControllerService: FsRequestControllerService,
               private propertiesService: AppPropertiesService,
               private userSessionService: AppUserSessionService,
-              private requestModel: RequestModel) {
+              private requestModel: RequestModel,
+              private loaderService: LoaderService) {
   }
 
   @ViewChild('grantDt') myTable;
@@ -91,6 +93,7 @@ export class Step1Component implements OnInit, AfterViewInit {
       },
 
       ajax: (dataTablesParameters: any, callback) => {
+        this.loaderService.show();
         console.log('calling search backend');
         this.fsRequestControllerService.searchDtGrantsUsingPOST(
           Object.assign(dataTablesParameters, this.searchCriteria)).subscribe(
@@ -103,7 +106,9 @@ export class Step1Component implements OnInit, AfterViewInit {
               recordsFiltered: result.recordsFiltered,
               data: result.data
             });
+            this.loaderService.hide();
           }, error => {
+            this.loaderService.hide();
             console.log('HttpClient get request error for----- ' + error.message);
           });
       },
