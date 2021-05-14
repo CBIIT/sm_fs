@@ -43,6 +43,7 @@
     "rxjs": "~6.6.0",
     "select2": "^4.0.13",
     "tslib": "^2.0.0",
+    "typescript-tslint-plugin": "^1.0.1",
     "zone.js": "~0.11.3"
   },
   "main": "dist/i2ecui-lib/bundles/i2ecui-lib.umd.js",
