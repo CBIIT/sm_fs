@@ -25134,4 +25134,187 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   content: '✔';
 }
 
+/* line 170, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls {
+  display: flex;
+  align-items: center;
+  margin-bottom: .5rem;
+}
+
+/* line 174, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls label {
+  margin-bottom: 0rem;
+}
+
+/* line 177, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_length {
+  float: unset;
+  display: inline-block;
+}
+
+/* line 180, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_length select {
+  padding: 2px;
+}
+
+/* line 184, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dt-buttons {
+  float: unset;
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+/* line 188, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dt-buttons .btn-excel {
+  color: #63666a;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+  display: inline-block;
+  background: transparent;
+  border: 1px solid #63666a;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  margin-right: 0rem;
+  margin-bottom: 0rem;
+}
+
+/* line 200, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dt-buttons .btn-excel:focus {
+  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5);
+  background: transparent;
+}
+
+/* line 204, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dt-buttons .btn-excel:hover {
+  background: rgba(99, 102, 106, 0.15);
+  color: #3e4042;
+}
+
+/* line 208, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dt-buttons .btn-excel:before {
+  display: inline-block;
+  font-family: 'Font Awesome 5 Pro';
+  content: '\f1c3';
+  margin-right: .2rem;
+}
+
+/* line 216, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_filter {
+  float: unset;
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+/* line 220, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_filter input {
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+/* line 228, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_paginate {
+  float: unset;
+  display: flex;
+}
+
+/* line 231, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_paginate > span {
+  display: flex;
+}
+
+/* line 234, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_paginate .paginate_button {
+  position: relative;
+  display: block;
+  padding: 0.25rem 0.5rem;
+  margin-left: -1px;
+  line-height: 1.5;
+  color: #0076a8;
+  background: #fff;
+  border: 1px solid #c1c2c9;
+  font-size: 0.7875rem;
+  border-radius: 0rem;
+}
+
+/* line 245, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_paginate .paginate_button:hover {
+  z-index: 2;
+  color: #00405c !important;
+  text-decoration: none;
+  background: #dbdde0;
+  border-color: #c1c2c9;
+}
+
+/* line 252, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_paginate .paginate_button:focus {
+  z-index: 2;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
+}
+
+/* line 257, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_paginate .paginate_button.current {
+  z-index: 1;
+  color: white !important;
+  background: #0076a8;
+  border-color: #0076a8;
+}
+
+/* line 262, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_paginate .paginate_button.current:hover {
+  color: white !important;
+  background: #0076a8;
+}
+
+/* line 267, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_paginate .paginate_button.disabled {
+  color: #a3a6ad !important;
+  pointer-events: none;
+  cursor: auto;
+  background: #fff;
+  border-color: #c1c2c9;
+}
+
+/* line 276, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_paginate > .paginate_button:first-child {
+  margin-left: 0;
+  border-top-left-radius: 0.2rem;
+  border-bottom-left-radius: 0.2rem;
+}
+
+/* line 280, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.dt-controls .dataTables_paginate > .paginate_button:last-child {
+  border-top-right-radius: 0.2rem;
+  border-bottom-right-radius: 0.2rem;
+}
+
+/* line 286, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+table ~ .dt-controls {
+  margin-top: .5rem;
+}
+
+/* line 294, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.next-approvers-table tbody tr.cdk-drag .order-icon:before {
+  content: '\f7a4';
+  font-family: "Font Awesome 5 Pro";
+  display: inline-block;
+  margin-right: .75rem;
+  color: #63666a;
+  font-weight: 900;
+}
+
+/* line 303, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.next-approvers-table tbody tr.cdk-drag.cdk-drag-disabled .order-icon:before {
+  content: '\f023';
+}
+
+/* line 308, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.next-approvers-table tbody tr td {
+  vertical-align: middle;
+}
+
 /*# sourceMappingURL=i2e-common-ui.css.map */

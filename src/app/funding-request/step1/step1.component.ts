@@ -81,6 +81,14 @@ export class Step1Component implements OnInit, AfterViewInit {
       pagingType: 'full_numbers',
       pageLength: 10,
       serverSide: true,
+      language: {
+          paginate: {
+              first: "<i class='far fa-chevron-double-left' title='First'></i>",
+              previous: "<i class='far fa-chevron-left' title='Previous'></i>",
+              next: "<i class='far fa-chevron-right' title='Next'></i>",
+              last: "<i class='far fa-chevron-double-right' Last='First'></i>"
+          }
+      },
 
       ajax: (dataTablesParameters: any, callback) => {
         console.log('calling search backend');
@@ -154,14 +162,14 @@ export class Step1Component implements OnInit, AfterViewInit {
       //         className: 'btn btn-sm btn-outline-secondary'
       //       }
       //     },
-          dom: 'lBfrtip',
+          dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
           buttons: [
 //            'excel'
             {
             extend: 'excel',
             className: 'btn-excel',
             titleAttr: 'Excel export',
-            text: 'Export to Excel',
+            text: 'Export',
             filename: 'fs-grants-search-result',
             title: null,
             header: true,

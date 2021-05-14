@@ -48,5 +48,9 @@ export class DocumentService {
     return this.documentsControllerService.deleteDocumentUsingGET(id);
   }
 
+  getLatestFile(keyId: number, keyType: string): Observable<DocumentsDto> {
+    return this.documentsControllerService.loadLatestDocumentUsingGET(keyId, keyType);
+  }
+
  
 }
