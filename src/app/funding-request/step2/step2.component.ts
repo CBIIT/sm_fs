@@ -3,7 +3,7 @@ import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../../service/app-properties.service';
-import {errorObject} from 'rxjs/internal-compatibility';
+import {errorObject, isNumeric} from 'rxjs/internal-compatibility';
 
 @Component({
   selector: 'app-step2',
@@ -89,9 +89,11 @@ export class Step2Component implements OnInit {
   }
 
   isSaveable(): boolean {
-    // console.log('Validation before saving');
-    // TODO: convert to service for bi-directional checking
-    console.log('Can save:', this.model.canSave());
     return this.model.canSave();
   }
+
+  showPrc(): boolean {
+    return isNumeric(this.requestModel.requestDto.frtId);
+  }
+
 }

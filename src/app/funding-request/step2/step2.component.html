@@ -2,7 +2,7 @@
 <hr>
 <app-request-information></app-request-information>
 <hr>
-<app-program-recommended-costs></app-program-recommended-costs>
+<app-program-recommended-costs *ngIf="showPrc()"></app-program-recommended-costs>
 
 <!-- note: the following div was taken out of the program recommended costs component above -->
 <div class="row">
