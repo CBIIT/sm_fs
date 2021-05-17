@@ -44,7 +44,7 @@
     </div>
 
     <div class="col-lg-6" *ngIf="showAdvancedFilters">
-        <lib-cancer-activities-dropdown  [(selectedValue)]="selectedCas"></lib-cancer-activities-dropdown>
+        <lib-cancer-activities-dropdown  [(selectedValue)]="selectedCas" [syncWithPd]="false"></lib-cancer-activities-dropdown>
     </div>
 
     <!-- END Advanced Filters -->

@@ -37,7 +37,7 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
     this.routerSub = this.router.events.subscribe((val) => {
       console.log('Router event', val);
       if (val instanceof NavigationEnd) {
-        for (var step of this.steps) {
+        for (const step of this.steps) {
           if (step.route === val.urlAfterRedirects) {
             console.log('matched URL');
             this.activeStep = step;
@@ -47,8 +47,8 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
       }
     });
 
-    //when direct access using url
-    for (var step of this.steps) {
+    // when direct access using url
+    for (const step of this.steps) {
       if (step.route === this.router.url) {
         console.log('oninit matched url');
         this.activeStep = step;

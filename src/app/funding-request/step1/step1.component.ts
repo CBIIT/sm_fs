@@ -295,7 +295,7 @@ export class Step1Component implements OnInit, AfterViewInit {
   }
 
   restoreSearchFilter(): void {
-    console.log('inside restore search filter');
+    console.log('inside restore search filter', this.gsfs, this.searchCriteria);
     console.log('gsfs i2status', this.searchCriteria.applStatusGroupCode);
     this.searchWithin = '';
     this.piName = this.searchCriteria.piName;
