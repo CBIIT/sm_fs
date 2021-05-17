@@ -37,11 +37,7 @@ export class ProgramRecommendedCostsComponent implements OnInit {
 
   // open the funding source help in the new window..
   openFsDetails(){
-    //const url = this.router.serializeUrl(
-      //this.router.createUrlTree([`/fundingSourceDetails`])
-    //);
-    const url = "/fs"+this.router.createUrlTree(['fundingSourceDetails']).toString();
-    openNewWindow(url,'fundingSourceDetails');
+    openNewWindow("fundingSourceDetails",'fundingSourceDetails');
     return false;
   }
 }
