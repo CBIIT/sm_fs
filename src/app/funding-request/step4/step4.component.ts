@@ -1,29 +1,53 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {AppPropertiesService} from '../../service/app-properties.service';
-import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {FsRequestControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
-// import { request } from 'node:http';
+import { FundingRequestIntegrationService } from '../integration/integration.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-step4',
   templateUrl: './step4.component.html',
   styleUrls: ['./step4.component.css']
 })
-export class Step4Component implements OnInit {
+export class Step4Component implements OnInit, OnDestroy {
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+  isRequestSubmitted: boolean;
+  requestHistorySubscriber: Subscription;
 
   constructor(private router: Router,
               private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
               private fsRequestService: FsRequestControllerService,
-              private userSessionService: AppUserSessionService) {
+              private userSessionService: AppUserSessionService,
+              private requestIntegrationService: FundingRequestIntegrationService) {
+  }
+
+  ngOnDestroy(): void {
+    if (this.requestHistorySubscriber) {
+      this.requestHistorySubscriber.unsubscribe();
+    }
   }
 
   ngOnInit(): void {
     console.log('Step4 requestModel ', this.requestModel);
+    this.requestHistorySubscriber = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
+      this.requestHistoryParser
+    );
+  }
+
+  requestHistoryParser(historyResult: FundingReqStatusHistoryDto[]): void {
+    historyResult.forEach ((item: FundingReqStatusHistoryDto) => {
+        console.log('My request history ', item);
+        if (item.statusCode === 'SUBMITTED') {
+          this.isRequestSubmitted = true;
+          return;
+        }
+    });
+    this.isRequestSubmitted = false;
   }
 
   prevStep(): void {
@@ -89,7 +113,7 @@ export class Step4Component implements OnInit {
   }
 
   deleteVisible(): boolean {
-    if (this.userCanSubmitAndDelete() && this.requestModel.requestDto.status !== 'SUBMITTED')
+    if (this.userCanSubmitAndDelete() && !this.isRequestSubmitted)
     {
             return true;
     }
@@ -104,7 +128,13 @@ export class Step4Component implements OnInit {
   }
 
   submitDisableTooltip(): string {
-    return 'You must upload <Justification><and><Transition Memo> to submit this request';
+  /*
+  Justification is required for ALL request types
+	Justification and Memo are required for PayType 4
+
+  so depending on the type and missing doc, tool tip has to be created accordingly.
+  */
+    return 'You must upload Justification and Transition Memo to submit this request.';
   }
 
 }
