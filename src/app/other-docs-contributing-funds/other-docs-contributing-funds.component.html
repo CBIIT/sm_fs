@@ -6,28 +6,19 @@
     [allowClear]="false"
     [options]="options">
     <option></option>
-    <option *ngFor="let doc of availableDocs()" [value]="doc.abbreviation"> {{doc.abbreviation}} - {{doc.description}}</option>
+    <option *ngFor="let doc of availableDocs()" [value]="doc.abbreviation"> {{doc.abbreviation}}
+      - {{doc.description}}</option>
   </ng-select2>
 </div>
-<div class="form-group">
-  <table class="table table-striped table-bordered other-docs-table">
-    <thead>
-    <tr>
-      <th scope="col" style="width:4rem">Order</th>
-      <th scope="col">DOC</th>
-      <th scope="col" style="width:5rem">Action</th>
-    </tr>
-    </thead>
-    <tbody cdkDropList (cdkDropListDropped)="dropped($event)" [cdkDropListData]="selectedDocs()">
-    <tr cdkDrag *ngFor="let doc of selectedDocs()">
-      <td><span class="order-icon"></span>{{ doc.order }}</td>
-      <td>{{ doc.abbreviation }} - {{ doc.description }}</td>
-      <td>
+<div class="example-container">
+  <div cdkDropList (cdkDropListDropped)="dropped($event)" [cdkDropListData]="selectedDocs()">
+    <div class="drag-item" cdkDrag *ngFor="let doc of selectedDocs()">
+      <span>{{ doc.abbreviation }} - {{ doc.description }}</span>
+      <div class="ml-auto">
         <button class="btn btn-link btn-delete btn-slim" title="Delete" (click)="deselect(doc.abbreviation)">
           <i class="fas fa-trash" aria-hidden="true"></i>
         </button>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+      </div>
+    </div>
+  </div>
 </div>

@@ -30,11 +30,10 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
   set selectedValue(value: string) {
     console.log('DOC selectedValue setter called ', value);
-    const ord = this.selectedDocs().length + 1;
     this.docs.forEach(d => {
       if (d.abbreviation === value) {
         d.selected = true;
-        d.order = ord;
+        // this._selectedDocs.push(d);
       }
     });
     this._selectedValue = this.getSelectionString();
@@ -80,9 +79,9 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   }
 
   selectedDocs(): Array<DocData> {
-    return this.docs.filter(d => d.selected).sort((d1, d2) => {
-      return d1.order - d2.order;
-    });
+    console.log('getSelectedDocs');
+    return this.docs.filter(d => d.selected);
+    // .sort((d1, d2) => {return d1.order - d2.order;});
   }
 
   deselect(abbreviation: string): void {
@@ -91,6 +90,16 @@ export class OtherDocsContributingFundsComponent implements OnInit {
         d.selected = false;
       }
     });
+    // let i = 0;
+    // let j = 0;
+    // this._selectedDocs.forEach(d => {
+    //   if (d.abbreviation === abbreviation) {
+    //     j = i;
+    //   }
+    //   i++;
+    // });
+    //
+    // this._selectedDocs.splice(j, 1);
   }
 
   getSelectionString(): string {
