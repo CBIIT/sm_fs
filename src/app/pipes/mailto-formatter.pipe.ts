@@ -12,14 +12,15 @@ export class MailtoFormatterPipe implements PipeTransform {
 
     const nameField = args[0];
     const emailField = args[1];
-    if (!nameField) {
+    console.log('"' + emailField + '"');
+    if (!value[nameField]) {
       return '';
     }
-    if (nameField.trim().length === 1) {
+    if (value[nameField].trim().length === 1) {
       return '';
     }
-    if (!emailField) {
-      return nameField;
+    if (!value[emailField])  {
+      return value[nameField];
     }
 
     let subject = '';
