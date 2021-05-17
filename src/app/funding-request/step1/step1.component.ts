@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {AfterContentInit, AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {Subject} from 'rxjs';
@@ -15,7 +15,7 @@ import { LoaderService } from 'src/app/service/loader-spinner.service';
   templateUrl: './step1.component.html',
   styleUrls: ['./step1.component.css']
 })
-export class Step1Component implements OnInit, AfterViewInit {
+export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
 
   constructor(private router: Router,
               private gsfs: GrantsSearchFilterService,
@@ -68,10 +68,16 @@ export class Step1Component implements OnInit, AfterViewInit {
     this.grantNumberComponent.grantNumberYear = this.searchCriteria.grantYear;
     this.grantNumberComponent.grantNumberSuffix = this.searchCriteria.grantSuffix;
 
-    this.restoreSearchFilter();
     if (this.gsfs.searched) {
       this.initDatatable();
     }
+
+  }
+
+  ngAfterContentInit(): void {
+ 
+
+    this.restoreSearchFilter();
 
   }
 
@@ -126,9 +132,10 @@ export class Step1Component implements OnInit, AfterViewInit {
                 {data: 'pdFullName'},
                 {data: 'budgetStartDate'},
                 {data: 'requestCount'},
-                {data: null, defaultContent: 'Select'}
+                {data: null, defaultContent: 'Select', }
  //               {data: null, defaultContent: ''}
               ],
+      columnDefs: [ { orderable: false, targets: -1 }],
 
       // responsive: {
       //   details: {
@@ -169,7 +176,6 @@ export class Step1Component implements OnInit, AfterViewInit {
       //     },
           dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
           buttons: [
-//            'excel'
             {
             extend: 'excel',
             className: 'btn-excel',
@@ -297,7 +303,7 @@ export class Step1Component implements OnInit, AfterViewInit {
   restoreSearchFilter(): void {
     console.log('inside restore search filter', this.gsfs, this.searchCriteria);
     console.log('gsfs i2status', this.searchCriteria.applStatusGroupCode);
-    this.searchWithin = '';
+  //  this.searchWithin = '';
     this.piName = this.searchCriteria.piName;
     this.fyRange = {fromFy: this.searchCriteria.fromFy, toFy: this.searchCriteria.toFy};
     this.ncabRange = {fromNcab: this.searchCriteria.fromCouncilMeetingDate, toNcab: this.searchCriteria.toCouncileMeetingDate};
