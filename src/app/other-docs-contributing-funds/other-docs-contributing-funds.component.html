@@ -11,8 +11,8 @@
   </ng-select2>
 </div>
 <div class="example-container">
-  <div cdkDropList (cdkDropListDropped)="dropped($event)" [cdkDropListData]="selectedDocs()">
-    <div class="drag-item" cdkDrag *ngFor="let doc of selectedDocs()">
+  <div cdkDropList (cdkDropListDropped)="dropped($event)">
+    <div class="drag-item" cdkDrag *ngFor="let doc of selectedDocsArr">
       <span>{{ doc.abbreviation }} - {{ doc.description }}</span>
       <div class="ml-auto">
         <button class="btn btn-link btn-delete btn-slim" title="Delete" (click)="deselect(doc.abbreviation)">

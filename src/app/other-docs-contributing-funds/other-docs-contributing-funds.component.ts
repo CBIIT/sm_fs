@@ -13,12 +13,17 @@ class DocData {
   order: number;
 }
 
+
 @Component({
   selector: 'app-other-docs-contributing-funds',
   templateUrl: './other-docs-contributing-funds.component.html',
   styleUrls: ['./other-docs-contributing-funds.component.css']
 })
 export class OtherDocsContributingFundsComponent implements OnInit {
+
+
+  selectedDocsArr: DocData[]= [];
+  
   @Input() label = 'Division/Office/Center (DOC)';
 
   @Input()
@@ -34,6 +39,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
       if (d.abbreviation === value) {
         d.selected = true;
         // this._selectedDocs.push(d);
+        this.selectedDocsArr.push(d);
       }
     });
     this._selectedValue = this.getSelectionString();
@@ -80,9 +86,12 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
   selectedDocs(): Array<DocData> {
     console.log('getSelectedDocs');
+  
     return this.docs.filter(d => d.selected);
     // .sort((d1, d2) => {return d1.order - d2.order;});
   }
+
+
 
   deselect(abbreviation: string): void {
     this.docs.forEach(d => {
@@ -112,7 +121,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   }
 
   dropped(event: CdkDragDrop<DocData[]>): void {
-    console.log(JSON.stringify(event));
-    moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+   // console.log(JSON.stringify(event));
+    moveItemInArray(this.selectedDocsArr, event.previousIndex, event.currentIndex);
   }
 }
