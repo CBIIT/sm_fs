@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {AppPropertiesService} from '../../service/app-properties.service';
-import {FsRequestControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {FsRequestControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto, FundingRequestDtoReq} from '@nci-cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { Subscription } from 'rxjs';
@@ -17,6 +17,7 @@ export class Step4Component implements OnInit, OnDestroy {
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   isRequestSubmitted: boolean;
   requestHistorySubscriber: Subscription;
+  submissionResult: any;
 
   constructor(private router: Router,
               private requestModel: RequestModel,
@@ -78,14 +79,21 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   submitRequest(): void {
-    console.log('submit request not implemented!!!');
-    this.fsRequestService.submitRequestUsingPOST(this.requestModel.requestDto).subscribe(
+    const submissionDto: FundingRequestDtoReq = {};
+    // submitRequest DAO method only needs following parameters
+    submissionDto.frqId = this.requestModel.requestDto.frqId;
+    submissionDto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
+    submissionDto.certCode = this.requestModel.requestDto.certCode;
+    submissionDto.comments = this.requestModel.requestDto.comments;
+    console.log('submitRquest, requestDto=', submissionDto);
+    this.fsRequestService.submitRequestUsingPOST(submissionDto).subscribe(
       (result) => {
         console.log('calling submitRequestUsingPost successful, it returns', result);
-
+        this.submissionResult = { frqId: submissionDto.frqId, approver: 'Mr. Approver'};
       },
       (error) => {
         console.log('Failed when calling submitRequestUsingPOST', error);
+        this.submissionResult = { frqId: submissionDto.frqId, approver: 'Mr. Approver'};
       } );
   }
 
@@ -123,7 +131,7 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   submitEnabled(): boolean {
-    return false;
+    return true;
   //  return this.requestModel.canSubmit();
   }
 

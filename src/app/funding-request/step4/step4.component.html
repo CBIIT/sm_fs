@@ -1,3 +1,8 @@
+<div class="alert alert-success" role="alert" *ngIf="submissionResult">
+  <h1>Success!</h1>
+    <b>Request #{{submissionResult.frqId}}</b> was sent to {{submissionResult.approver}} for review. 
+    View the request below or return to the <a routerLink="/search">Search</a>.
+</div>
 <app-grant-information></app-grant-information>
 <hr>
 
