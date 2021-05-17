@@ -50,18 +50,18 @@
 
                     <div class="example-container" *ngFor="let lane of swimlanes">
 
-                        <div *ngIf="lane.name==='Included Content'" cdkDropList [cdkDropListData]="lane.array"
+                        <div *ngIf="lane.name==='Included Content'" class="drop-well min-height-5" cdkDropList [cdkDropListData]="lane.array"
                             (cdkDropListDropped)="drop($event)">
 
                             <div class="drag-item" cdkDrag *ngFor="let item of lane.array" tabindex="0">
                                 <span class="doc-name">{{ item.docFilename }}</span>
                                 <span class="doc-desc">Document description</span>
                                 <div class="ml-auto">
-                                    <button class="btn btn-link btn-slim ml-2 btn-delete" title="Delete"
+                                    <button *ngIf="item.docFilename!=='Summary Statement'" class="btn btn-link btn-slim ml-2 btn-delete" title="Delete"
                                         (click)="deleteDoc(item.id)"><i class="fas fa-trash"
                                             aria-hidden="true"></i></button>
-                                    <button class="btn btn-link btn-slim ml-2" title="Edit"><i class="fas fa-pencil"
-                                            aria-hidden="true"></i></button>
+                                    <!-- <button *ngIf="item.docFilename!=='Summary Statement'" class="btn btn-link btn-slim ml-2" title="Edit"><i class="fas fa-pencil"
+                                            aria-hidden="true"></i></button> -->
                                     <button class="btn btn-link btn-slim ml-1" title="View"
                                         (click)="downloadFile(item.id, item.docFilename)"><i class="fas fa-eye"
                                             aria-hidden="true"></i></button>
@@ -83,7 +83,14 @@
                         <div id="excludedId" class="drop-well min-height-5" cdkDropList [cdkDropListData]="lane.array"
                             (cdkDropListDropped)="drop($event)">
                             <div class="drag-item" cdkDrag *ngFor='let item of lane.array' tabindex="0">
-                                {{ item.docFilename }}
+                                <span class="doc-name">{{ item.docFilename }}</span>
+                               <span class="doc-desc">(Retrieved form IMPAC II)</span>
+                               <div class="ml-auto">
+                                
+                                <button class="btn btn-link btn-slim ml-1" title="View"
+                                    (click)="downloadFile(item.id, item.docFilename)"><i class="fas fa-eye"
+                                        aria-hidden="true"></i></button>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -99,7 +106,7 @@
 <div class="row">
     <div class="col-12 d-flex">
         <button class="btn btn-outline-secondary mr-auto" (click)="prevStep()">Previous</button>
-        <button class="btn btn-outline-primary mr-2"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i> View
+        <button class="btn btn-outline-primary mr-2" (click)="downloadPackage()"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i>> View
             Package</button>
         <button class="btn btn-primary" (click)="nextStep()">Save and Continue</button>
     </div>

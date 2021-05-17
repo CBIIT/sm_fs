@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import 'select2';
 import { Options } from 'select2';
-import { CgRefCodControllerService, CgRefCodesDto, DocumentsDto } from '@nci-cbiit/i2ecws-lib';
+import { CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request-model';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -42,6 +42,10 @@ export class Step3Component implements OnInit {
   fileInfos: Observable<DocumentsDto[]>;
 
 
+  get grant(): NciPfrGrantQueryDto {
+    return this.model.grant;
+  }
+
   get model(): RequestModel {
     return this.requestModel;
   }
@@ -74,29 +78,19 @@ export class Step3Component implements OnInit {
     for (let i = 0; i < this.selectedFiles.length; i++) {
       this._docDto.docDescription = this.docDescription;
       this._docDto.docType = this.selectedDocType;
-      this._docDto.keyId = 1; //TODO: Get this ID from step 2 once implemented
+      this._docDto.keyId = this.requestModel.requestDto.frqId;
       this._docDto.keyType = 'PFR';
-      this.upload(this.selectedFiles[i], this._docDto);
+      this.upload(this.selectedFiles[i]);
     }
   }
 
-  upload(file, DocumentsDto) {
+  upload(file) {
     this.documentService.upload(file, this._docDto).subscribe(
-      event => {
-        if (event.type === HttpEventType.UploadProgress) {
-
-        } else if (event instanceof HttpResponse) {
-
-          this.fileInfos = this.documentService.getFiles(this._docDto.keyId, 'PFR');
-        }
-      },
+      event => { },
       err => {
-        console.log("error occured while uploading a document");
-        this.fileInfos = this.documentService.getFiles(this._docDto.keyId, 'PFR');
-
         this.documentService.getLatestFile(this._docDto.keyId, 'PFR').subscribe(
           result => {
-            console.log('Getting the Doc type Dropdown results');
+            console.log('Retrieving the Doc that just got inserted since we need to know the ID');
 
             this.baseTaskList.subscribe(items => {
               this.swimlanes[0]['array'].push(result);
@@ -120,7 +114,9 @@ export class Step3Component implements OnInit {
 
   ngOnInit(): void {
 
-    this.loadFiles();
+    if (!this.requestModel.grant) {
+      this.router.navigate(['/request']);
+    }
 
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
@@ -130,29 +126,31 @@ export class Step3Component implements OnInit {
         console.log('HttpClient get request error for----- ' + error.message);
       });
 
+    this.loadFiles();
+
   }
 
   loadFiles() {
-    this.documentService.getFiles(1, 'PFR').subscribe(
+    this.documentService.getFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
       result => {
-        console.log('Getting the Doc type Dropdown results');
+        console.log('loading documents');
         this.baseTaskList = of(result);
         this.include = this.baseTaskList.pipe(
-          map(tasks => tasks.filter(task => task.createDate !== null))
+          map(tasks => tasks.filter(task => task.included === 'Y'))
         );
         this.exclude = this.baseTaskList.pipe(
-          map(tasks => tasks.filter(task => task.createDate === null))
+          map(tasks => tasks.filter(task => task.included === 'N'))
         );
 
         this.include.subscribe(data => {
-          console.log("included data:" +data);
+          console.log("included data:" + data);
           this.swimlanes.push({ name: 'Included Content', array: data });
         });
         this.exclude.subscribe(data => {
-          console.log("excluded data:" +data);
+          console.log("excluded data:" + data);
           this.swimlanes.push({ name: 'Excluded Content', array: data });
         });
-    
+
       }, error => {
         console.log('HttpClient get request error for----- ' + error.message);
       });
@@ -174,13 +172,24 @@ export class Step3Component implements OnInit {
   }
 
   downloadFile(id: number, fileName: string) {
-    this.documentService.downloadById(id).subscribe(blob => saveAs(blob, fileName)), error =>
+    if (fileName === 'Summary Statement') {
+      this.downloadSummaryStatement();
+    } else {
+      this.documentService.downloadById(id).subscribe(blob => saveAs(blob, fileName)), error =>
+        console.log('Error downloading the file'),
+        () => console.info('File downloaded successfully');
+    }
+
+  }
+
+  downloadCoverSheet() {
+    this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId).subscribe(blob => saveAs(blob, 'Cover Page.pdf')), error =>
       console.log('Error downloading the file'),
       () => console.info('File downloaded successfully');
   }
 
-  downloadCoverSheet() {
-    this.documentService.downloadFrqCoverSheet(36182).subscribe(blob => saveAs(blob, 'Cover Page.pdf')), error =>
+  downloadSummaryStatement() {
+    this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId).subscribe(blob => saveAs(blob, 'Summary Statement.pdf')), error =>
       console.log('Error downloading the file'),
       () => console.info('File downloaded successfully');
   }
@@ -189,14 +198,29 @@ export class Step3Component implements OnInit {
     this.documentService.deleteDocById(id).subscribe(
       result => {
         console.log("Delete Success");
-        this.loadFiles();
+        this.baseTaskList.subscribe(items => {
+          this.swimlanes[0]['array'].forEach((value, index) => {
+            if (value.id == id) this.swimlanes[0]['array'].splice(index, 1);
+          });
+        });
+
       }
-    ), error => {
+    ), err => {
       console.log("Error while deleting the document");
       this.loadFiles();
     };
 
-    
+  }
+
+  downloadPackage() {
+    var docIds: number[] = [];
+    docIds.push(28246);
+    docIds.push(28245);
+
+    this.documentService.downLoadFrqPackage(this.requestModel.requestDto.frqId,
+      this.requestModel.grant.applId, docIds).subscribe(blob => saveAs(blob, 'Package.pdf')), error =>
+        console.log('Error downloading the file'),
+      () => console.info('File downloaded successfully');
   }
 
   nextStep() {

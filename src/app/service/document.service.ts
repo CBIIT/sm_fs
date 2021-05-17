@@ -36,21 +36,31 @@ export class DocumentService {
 
   downloadById(id: number): Observable<Blob> {
     var url = this.docUrl + '/' + id;
-		return this.http.get(`${url}`, {responseType: 'blob'});
+    return this.http.get(`${url}`, { responseType: 'blob' });
   }
 
   downloadFrqCoverSheet(frqId: number): Observable<Blob> {
     var url = this.docUrl + '/funding-requests-cover-page/' + frqId;
-		return this.http.get(`${url}`, {responseType: 'blob'});
+    return this.http.get(`${url}`, { responseType: 'blob' });
+  }
+
+  downloadFrqSummaryStatement(applId: number): Observable<Blob> {
+    var url = this.docUrl + '/funding-requests-summary-statement/' + applId;
+    return this.http.get(`${url}`, { responseType: 'blob' });
   }
 
   deleteDocById(id: number) {
-    return this.documentsControllerService.deleteDocumentUsingGET(id);
+    return this.documentsControllerService.deleteDocumentUsingPOST(id);
   }
 
   getLatestFile(keyId: number, keyType: string): Observable<DocumentsDto> {
     return this.documentsControllerService.loadLatestDocumentUsingGET(keyId, keyType);
   }
 
- 
+  downLoadFrqPackage(frqId: number, applId: number, docIds: number[]): Observable<Blob> {
+    var url = this.docUrl + '/funding-requests-view-package/' + frqId + '/' + applId + '/' + docIds;
+    return this.http.get(`${url}`, { responseType: 'blob' });
+  }
+
+
 }
