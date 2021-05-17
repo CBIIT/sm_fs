@@ -50,13 +50,11 @@ export class Step2Component implements OnInit {
   }
 
   saveAndContinue(): void {
-    this.saveFundingRequest();
-    this.router.navigate(['/request/step3']);
+    this.saveFundingRequest('/request/step3');
   }
 
   saveAsDraft(): void {
-    this.saveFundingRequest();
-    this.router.navigate(['/request/step4']);
+    this.saveFundingRequest('/request/step4');
   }
 
   prevStep(): void {
@@ -72,7 +70,7 @@ export class Step2Component implements OnInit {
     return this.requestModel;
   }
 
-  saveFundingRequest(): void {
+  saveFundingRequest(navigate: string): void {
     if (!this.isSaveable()) {
       console.log('Can\'t save at this point');
       return;
@@ -82,6 +80,10 @@ export class Step2Component implements OnInit {
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
         this.requestModel.requestDto = result;
+        if (navigate) {
+          this.router.navigate([navigate]);
+        }
+
         console.log(JSON.stringify(this.requestModel.requestDto));
 
       }, error => {

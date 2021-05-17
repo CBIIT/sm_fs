@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {LookupsControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {Options} from 'select2';
+import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 
 class DocData {
@@ -29,9 +30,11 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
   set selectedValue(value: string) {
     console.log('DOC selectedValue setter called ', value);
+    const ord = this.selectedDocs().length + 1;
     this.docs.forEach(d => {
       if (d.abbreviation === value) {
         d.selected = true;
+        d.order = ord;
       }
     });
     this._selectedValue = this.getSelectionString();
@@ -97,5 +100,10 @@ export class OtherDocsContributingFundsComponent implements OnInit {
     }
 
     return dox.join();
+  }
+
+  dropped(event: CdkDragDrop<DocData[]>): void {
+    console.log(JSON.stringify(event));
+    moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
   }
 }

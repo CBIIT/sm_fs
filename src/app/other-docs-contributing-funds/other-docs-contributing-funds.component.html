@@ -18,11 +18,15 @@
       <th scope="col" style="width:5rem">Action</th>
     </tr>
     </thead>
-    <tbody cdkDropList>
-    <tr *ngFor="let doc of selectedDocs(); let i = index">
-      <td><span class="order-icon"></span>{{ i + 1 }}</td>
+    <tbody cdkDropList (cdkDropListDropped)="dropped($event)" [cdkDropListData]="selectedDocs()">
+    <tr cdkDrag *ngFor="let doc of selectedDocs()">
+      <td><span class="order-icon"></span>{{ doc.order }}</td>
       <td>{{ doc.abbreviation }} - {{ doc.description }}</td>
-      <td><button class="btn btn-link btn-delete btn-slim" title="Delete" (click)="deselect(doc.abbreviation)"><i class="fas fa-trash" aria-hidden="true"></i></button></td>
+      <td>
+        <button class="btn btn-link btn-delete btn-slim" title="Delete" (click)="deselect(doc.abbreviation)">
+          <i class="fas fa-trash" aria-hidden="true"></i>
+        </button>
+      </td>
     </tr>
     </tbody>
   </table>
