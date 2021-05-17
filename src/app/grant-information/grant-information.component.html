@@ -29,7 +29,7 @@
     <div class="col-lg-2">
         <div class="form-group">
             <p class="like-label">PI</p>
-            <p><span [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail':'Grant related stuff'"></span></p>
+            <p><span [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail': 'PI/PD name':'fullGrantNum': 'lastName'"></span></p>
         </div>
     </div>
 
@@ -43,7 +43,7 @@
     <div class="col-lg-3">
         <div class="form-group">
             <p class="like-label">PD</p>
-            <p><span [innerHTML]="grant|mailtoFormatter: 'pdFullName':'pdEmailAddress':'Grant related stuff'"></span></p>
+            <p><span [innerHTML]="grant|mailtoFormatter: 'pdFullName':'pdEmailAddress':'PI/PD name':'fullGrantNum': 'lastName'"></span></p>
         </div>
     </div>
 

@@ -25,7 +25,12 @@ export class MailtoFormatterPipe implements PipeTransform {
 
     let subject = '';
     if (args[2]) {
+    // for PI/PD Email Subject: Displaying Grant number - PiLastName
+      if(args[2]==="PI/PD name" && value[args[3]] && value[args[4]]){
+        subject = '?subject=' + value[args[3]] + ' - '+ value[args[4]];
+      }else{
       subject = '?subject=' + args[2];
+      }
     }
 
     const href = '<a href="mailto:' + value[emailField] + subject + '">' + value[nameField] + '</a>';

@@ -102,14 +102,14 @@
                 </td>
                 <td>{{grant.projectTitle}}</td>
                 <td>{{grant.applStatusGroupDescrip}}</td>
-                <td><a href="mailto:{{grant.piEmail}}">{{grant.piFullName}}</a></td>
+                <td><a href="mailto:{{grant.piEmail}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.piFullName}}</a></td>
                 <td>{{grant.orgName}}</td>
                 <td>{{grant.fy}}</td>
                 <td>{{grant.councilMeetingDate|formatNcabDate}}</td>
                 <td>{{grant.irgPercentileNum}}</td>
                 <td>{{grant.priorityScoreNum}}</td>
                 <td><a [routerLink]="" ngbTooltip="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="mouseenter:mouseleave" placement="top">{{grant.cayCode}}</a></td>
-                <td><a href="mailto:{{grant.pdEmailAddress}}">{{grant.pdFullName}}</a></td>
+                <td><a href="mailto:{{grant.pdEmailAddress}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.pdFullName}}</a></td>
                 <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>
                 <td>{{grant.requestCount}}</td>
                 <td>
