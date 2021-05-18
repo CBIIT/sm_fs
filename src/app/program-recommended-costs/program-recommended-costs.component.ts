@@ -14,9 +14,9 @@ import {Router} from '@angular/router';
 export class ProgramRecommendedCostsComponent implements OnInit {
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+  _selectedDocs: string;
 
-
-  constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService , private router: Router) {
+  constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -30,14 +30,31 @@ export class ProgramRecommendedCostsComponent implements OnInit {
     return this.requestModel;
   }
 
-  openOefiaLink(){
-    openNewWindow('https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information','oefiaLink');
+  openOefiaLink(): boolean {
+    openNewWindow('https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information', 'oefiaLink');
     return false;
   }
 
+  get selectedDocs(): string {
+    return this._selectedDocs;
+  }
+
+  set selectedDocs(value: string) {
+    this.requestModel.requestDto.otherDocsText = value;
+    this.requestModel.requestDto.financialInfoDto.otherDocText = value;
+    this._selectedDocs = value;
+    if (value) {
+      this.requestModel.requestDto.otherDocsFlag = 'Y';
+      this.requestModel.requestDto.financialInfoDto.otherDocFlag = 'Y';
+    } else {
+      this.requestModel.requestDto.otherDocsFlag = undefined;
+      this.requestModel.requestDto.financialInfoDto.otherDocFlag = undefined;
+    }
+  }
+
   // open the funding source help in the new window..
-  openFsDetails(){
-    openNewWindow("fundingSourceDetails",'fundingSourceDetails');
+  openFsDetails(): boolean {
+    openNewWindow('fundingSourceDetails', 'fundingSourceDetails');
     return false;
   }
 }

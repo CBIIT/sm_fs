@@ -1,27 +1,10 @@
 <app-grant-information></app-grant-information>
 <hr>
 <app-request-information></app-request-information>
-<hr>
-<app-program-recommended-costs *ngIf="showPrc()"></app-program-recommended-costs>
 
-<!-- note: the following div was taken out of the program recommended costs component above -->
-<div class="row">
-  <div class="col-lg-4">
-    <div class="form-group">
-      <app-other-docs-contributing-funds [(selectedValue)]="selectedDocs"
-                                         label="Other NCI DOCs Contributing Funds"></app-other-docs-contributing-funds>
-    </div>
-  </div>
+<app-program-recommended-costs *ngIf="requestTypeSelected()"></app-program-recommended-costs>
 
-  <div class="col-lg-8">
-    <div class="form-group">
-      <label for="cost-comments">Comments <span class="optional">(optional)</span></label>
-      <textarea class="form-control" #cost_comments id="cost-comments" [(ngModel)]="model.requestDto.comments" rows="2"
-                maxlength="1000"></textarea>
-      <span class="character-counter">{{ cost_comments.value.length }}/1000</span>
-    </div>
-  </div>
-</div>
+
 
 <hr>
 <div class="row">
@@ -31,13 +14,13 @@
       Save as Draft
     </button>
     <ng-template #saveDisabled>
-        <span ngbTooltip="Missing required search criteria">
+        <span ngbTooltip="Missing required values to save request">
             <button class="btn btn-outline-primary mr-2" disabled>Save as Draft</button>
         </span>
     </ng-template>
     <button class="btn btn-primary" *ngIf="isSaveable(); else saveAndContinueDisabled" (click)="saveAndContinue()">Save and Continue</button>
     <ng-template #saveAndContinueDisabled>
-        <span ngbTooltip="Missing required search criteria">
+        <span ngbTooltip="Missing required  values to save request">
             <button class="btn btn-primary" disabled>Save and Continue</button>
         </span>
     </ng-template>

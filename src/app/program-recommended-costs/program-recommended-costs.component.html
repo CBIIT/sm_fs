@@ -1,3 +1,5 @@
+<hr>
+
 <div class="row">
 
     <div class="col-12">
@@ -61,7 +63,7 @@
                                 </div>
                             </div>
                         </div>
-            
+
                         <div class="form-group row mb-2">
                             <label for="fs1-fy1-percent" class="col-sm-auto col-form-label prc-inline-label">% Cut</label>
                             <div class="col-sm-auto">
@@ -83,7 +85,7 @@
                         </div>
 
                         <button type="button" class="btn btn-sm btn-outline-secondary">Set DC Future Years to 1<sup>st</sup> Year</button>
-                        
+
                     </td>
                     <td>
                         <input type="text" class="form-control funds-input" id="fs1-fy2" aria-label="FY 2 Amount">
@@ -125,7 +127,7 @@
                                 </div>
                             </div>
                         </div>
-            
+
                         <div class="form-group row mb-2">
                             <label for="fs1-fy1-direct-cost" class="col-sm-auto col-form-label prc-inline-label">Direct Cost&nbsp;($)</label>
                             <div class="col-sm-auto">
@@ -171,6 +173,22 @@
         </table>
 
     </div>
+</div>
 
+<div class="row">
+  <div class="col-lg-4">
+    <div class="form-group">
+      <app-other-docs-contributing-funds [(selectedValue)]="selectedDocs"
+                                         label="Other NCI DOCs Contributing Funds"></app-other-docs-contributing-funds>
+    </div>
+  </div>
 
+  <div class="col-lg-8">
+    <div class="form-group">
+      <label for="cost-comments">Comments <span class="optional">(optional)</span></label>
+      <textarea class="form-control" #cost_comments id="cost-comments" [(ngModel)]="model.requestDto.comments" rows="2"
+                maxlength="1000"></textarea>
+      <span class="character-counter">{{ cost_comments.value.length }}/1000</span>
+    </div>
+  </div>
 </div>

@@ -11,24 +11,8 @@ import {errorObject, isNumeric} from 'rxjs/internal-compatibility';
   styleUrls: ['./step2.component.css']
 })
 export class Step2Component implements OnInit {
-  _selectedDocs: string;
 
-  get selectedDocs(): string {
-    return this._selectedDocs;
-  }
 
-  set selectedDocs(value: string) {
-    this.requestModel.requestDto.otherDocsText = value;
-    this.requestModel.requestDto.financialInfoDto.otherDocText = value;
-    this._selectedDocs = value;
-    if (value) {
-      this.requestModel.requestDto.otherDocsFlag = 'Y';
-      this.requestModel.requestDto.financialInfoDto.otherDocFlag = 'Y';
-    } else {
-      this.requestModel.requestDto.otherDocsFlag = undefined;
-      this.requestModel.requestDto.financialInfoDto.otherDocFlag = undefined;
-    }
-  }
 
   constructor(private router: Router, private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
@@ -97,7 +81,7 @@ export class Step2Component implements OnInit {
     return this.model.canSave();
   }
 
-  showPrc(): boolean {
+  requestTypeSelected(): boolean {
     return isNumeric(this.requestModel.requestDto.frtId);
   }
 
