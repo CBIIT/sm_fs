@@ -75,10 +75,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
   }
 
   ngAfterContentInit(): void {
- 
-
     this.restoreSearchFilter();
-
   }
 
   ngOnInit(): void {
@@ -343,6 +340,13 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     this.tooltipGrant = grant;
   }
 
+  isDate(value): boolean {
+    return value instanceof Date && !isNaN(value.valueOf());
+  }
+
+  toDate(value): Date {
+    return new Date(value.replace(/-/g, '/'));
+  }
 
 
 }
