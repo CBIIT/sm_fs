@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild  } from '@angular/core';
 import { Router } from '@angular/router';
 import 'select2';
 import { Options } from 'select2';
@@ -41,6 +41,9 @@ export class Step3Component implements OnInit {
   selectedFiles: FileList;
   fileInfos: Observable<DocumentsDto[]>;
 
+  @ViewChild('inputFile') 
+  myInputVariable: ElementRef;
+
 
   get grant(): NciPfrGrantQueryDto {
     return this.model.grant;
@@ -81,8 +84,14 @@ export class Step3Component implements OnInit {
       this._docDto.keyId = this.requestModel.requestDto.frqId;
       this._docDto.keyType = 'PFR';
       this.upload(this.selectedFiles[i]);
+      this.reset();
     }
   }
+
+  reset() {
+    this.myInputVariable.nativeElement.value = '';
+    this.selectedDocType = '';
+}
 
   upload(file) {
     this.documentService.upload(file, this._docDto).subscribe(
