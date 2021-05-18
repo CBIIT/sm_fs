@@ -15,7 +15,8 @@
         </div>
 
         <div class="form-group">
-            <input #inputFile type="file" (change)="selectFiles($event)">
+            <label for="add-file" class="sr-only">Choose File</label>
+            <input id="add-file" #inputFile type="file" (change)="selectFiles($event)">
         </div>
 
         <div class="form-group">
@@ -106,7 +107,7 @@
 <div class="row">
     <div class="col-12 d-flex">
         <button class="btn btn-outline-secondary mr-auto" (click)="prevStep()">Previous</button>
-        <button class="btn btn-outline-primary mr-2" (click)="downloadPackage()"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i>> View
+        <button class="btn btn-outline-primary mr-2" (click)="downloadPackage()"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i> View
             Package</button>
         <button class="btn btn-primary" (click)="nextStep()">Save and Continue</button>
     </div>
