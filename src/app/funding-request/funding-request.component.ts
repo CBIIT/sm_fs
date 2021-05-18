@@ -22,6 +22,8 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
 
   private routerSub: Subscription;
 
+  model;
+
   constructor(private route: ActivatedRoute,
               private router: Router,
               private requestModel: RequestModel) {
@@ -34,6 +36,8 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.model = this.requestModel;
+
     this.routerSub = this.router.events.subscribe((val) => {
       console.log('Router event', val);
       if (val instanceof NavigationEnd) {
