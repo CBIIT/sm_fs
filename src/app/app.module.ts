@@ -4,7 +4,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {ApiModule, BASE_PATH} from '@nci-cbiit/i2ecws-lib';
-import { HTTP_INTERCEPTORS,HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {NgSelect2Module} from 'ng-select2';
 import {I2ecuiLibModule} from '@nci-cbiit/i2ecui-lib';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -32,22 +32,22 @@ import {CodeDescriptionPipe} from './pipes/code-description.pipe';
 import {RequestModel} from './model/request-model';
 import {PlanModel} from './model/plan-model';
 import {AppUserSessionService} from './service/app-user-session.service';
-import { MailtoFormatterPipe } from './pipes/mailto-formatter.pipe';
-import { GrantInformationComponent } from './grant-information/grant-information.component';
-import { ProgramRecommendedCostsComponent } from './program-recommended-costs/program-recommended-costs.component';
-import { RequestInformationComponent } from './request-information/request-information.component';
-import { RequestInformationReadonlyComponent } from './request-information-readonly/request-information-readonly.component';
-import { RequestHistoryComponent } from './request-history/request-history.component';
-import { NextScheduledApproversRequestReadonlyComponent } from './next-scheduled-approvers-request-readonly/next-scheduled-approvers-request-readonly.component';
-import { ProgramRecommendedCostsReadonlyComponent } from './program-recommended-costs-readonly/program-recommended-costs-readonly.component';
-import { NextScheduledApproversRequestComponent } from './next-scheduled-approvers-request/next-scheduled-approvers-request.component';
-import { FundingSourceComponent } from './funding-source/funding-source.component';
-import { OtherDocsContributingFundsComponent } from './other-docs-contributing-funds/other-docs-contributing-funds.component';
-import { DragDropModule } from '@angular/cdk/drag-drop';
-import { LoaderSpinnerComponent } from './loader-spinner/loader-spinner.component';
-import { LoaderService } from './service/loader-spinner.service';
-import { LoaderInterceptor } from './interceptors/loader-spinner.interceptor';
-import { FundingSourcesNamesComponent } from './funding-sources-names/funding-sources-names.component';
+import {MailtoFormatterPipe} from './pipes/mailto-formatter.pipe';
+import {GrantInformationComponent} from './grant-information/grant-information.component';
+import {ProgramRecommendedCostsComponent} from './program-recommended-costs/program-recommended-costs.component';
+import {RequestInformationComponent} from './request-information/request-information.component';
+import {RequestInformationReadonlyComponent} from './request-information-readonly/request-information-readonly.component';
+import {RequestHistoryComponent} from './request-history/request-history.component';
+import {NextScheduledApproversRequestReadonlyComponent} from './next-scheduled-approvers-request-readonly/next-scheduled-approvers-request-readonly.component';
+import {ProgramRecommendedCostsReadonlyComponent} from './program-recommended-costs-readonly/program-recommended-costs-readonly.component';
+import {NextScheduledApproversRequestComponent} from './next-scheduled-approvers-request/next-scheduled-approvers-request.component';
+import {FundingSourceComponent} from './funding-source/funding-source.component';
+import {OtherDocsContributingFundsComponent} from './other-docs-contributing-funds/other-docs-contributing-funds.component';
+import {DragDropModule} from '@angular/cdk/drag-drop';
+import {LoaderSpinnerComponent} from './loader-spinner/loader-spinner.component';
+import {LoaderService} from './service/loader-spinner.service';
+import {LoaderInterceptor} from './interceptors/loader-spinner.interceptor';
+import {FundingSourcesNamesComponent} from './funding-sources-names/funding-sources-names.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
                                         appLookupsService: AppLookupsService,
@@ -116,7 +116,7 @@ async function appInitialization(
     DataTablesModule,
     DragDropModule
   ],
-  providers: [RequestModel, PlanModel,LoaderService,
+  providers: [RequestModel, PlanModel, LoaderService,
     {provide: BASE_PATH, useValue: '/i2ecws'},
     {provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS'},
     {provide: PROPERTIES_OVERRIDE, useValue: environment},

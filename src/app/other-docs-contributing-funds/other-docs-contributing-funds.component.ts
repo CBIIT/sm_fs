@@ -33,7 +33,6 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<string>();
 
   set selectedValue(value: string) {
-    console.log('DOC selectedValue setter called ', value);
     this.docs.forEach(d => {
       if (d.abbreviation === value) {
         d.selected = true;
@@ -48,9 +47,6 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
   private _selectedValue: string;
 
-  // NOTE: if the following array is typed as Select2OptionData, compilation fails
-  // Select2OptionData requires id and text attributes. If the supplied data doesn't
-  // have those values, you should modify the data appropriately.
   public docs: Array<DocData> = new Array<DocData>();
   public options: Options;
 
@@ -62,6 +58,9 @@ export class OtherDocsContributingFundsComponent implements OnInit {
     if (!this.docs) {
       this.docs = new Array<DocData>();
     }
+
+    // TODO: on restore of a request, pre-select any existing selected DOCs
+    const selectedDocs = this.requestModel.requestDto.financialInfoDto.otherDocText;
 
     this.lookupsControllerService.getNciDocsUsingGET().subscribe(
       result => {

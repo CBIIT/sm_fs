@@ -1,3 +1,14 @@
+<div class="form-group">
+  <label for="req-approver-select">{{ label }}</label>
+  <ng-select2
+    id="req-approver-select"
+    [(ngModel)]="selectedValue"
+    [allowClear]="false"
+    [options]="options">
+    <option></option>
+    <option *ngFor="let approver of approvers" [value]="approver.abbreviation">{{approver}}</option>
+  </ng-select2>
+</div>
 <table class="table table-striped table-bordered next-approvers-table">
   <thead>
   <tr>
