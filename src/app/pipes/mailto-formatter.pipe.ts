@@ -19,17 +19,18 @@ export class MailtoFormatterPipe implements PipeTransform {
     if (value[nameField].trim().length === 1) {
       return '';
     }
-    if (!value[emailField])  {
+    if (!value[emailField]) {
       return value[nameField];
     }
 
     let subject = '';
+    // TODO: look at making this more generic and reusable by using template literals
     if (args[2]) {
-    // for PI/PD Email Subject: Displaying Grant number - PiLastName
-      if(args[2]==="PI/PD name" && value[args[3]] && value[args[4]]){
-        subject = '?subject=' + value[args[3]] + ' - '+ value[args[4]];
-      }else{
-      subject = '?subject=' + args[2];
+      // for PI/PD Email Subject: Displaying Grant number - PiLastName
+      if (args[2] === 'PI/PD name' && value[args[3]] && value[args[4]]) {
+        subject = '?subject=' + value[args[3]] + ' - ' + value[args[4]];
+      } else {
+        subject = '?subject=' + args[2];
       }
     }
 
