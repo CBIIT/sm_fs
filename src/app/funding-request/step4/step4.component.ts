@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {AppPropertiesService} from '../../service/app-properties.service';
@@ -14,10 +14,12 @@ import { Subscription } from 'rxjs';
 })
 export class Step4Component implements OnInit, OnDestroy {
 
+  @ViewChild('submitSuccess') submitSuccess: ElementRef;
+
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
-  isRequestSubmitted: boolean;
+  isRequestEverSubmitted: boolean;
   requestHistorySubscriber: Subscription;
-  submissionResult: any;
+  submissionResult = {frqId: null, approver: null};
 
   constructor(private router: Router,
               private requestModel: RequestModel,
@@ -36,19 +38,19 @@ export class Step4Component implements OnInit, OnDestroy {
   ngOnInit(): void {
     console.log('Step4 requestModel ', this.requestModel);
     this.requestHistorySubscriber = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
-      this.requestHistoryParser
+      (historyResult) => {this.parseRequestHistories(historyResult); }
     );
   }
 
-  requestHistoryParser(historyResult: FundingReqStatusHistoryDto[]): void {
+  parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
     historyResult.forEach ((item: FundingReqStatusHistoryDto) => {
-        console.log('My request history ', item);
+        console.log('inside loop of parseRequestHistories ', item);
         if (item.statusCode === 'SUBMITTED') {
-          this.isRequestSubmitted = true;
+          this.isRequestEverSubmitted = true;
           return;
         }
     });
-    this.isRequestSubmitted = false;
+    this.isRequestEverSubmitted = false;
   }
 
   prevStep(): void {
@@ -90,10 +92,11 @@ export class Step4Component implements OnInit, OnDestroy {
       (result) => {
         console.log('calling submitRequestUsingPost successful, it returns', result);
         this.submissionResult = { frqId: submissionDto.frqId, approver: 'Mr. Approver'};
+        this.requestIntegrationService.requestSubmissionEmitter.next(submissionDto.frqId);
+        this.submitSuccess.nativeElement.scrollIntoView();
       },
       (error) => {
         console.log('Failed when calling submitRequestUsingPOST', error);
-        this.submissionResult = { frqId: submissionDto.frqId, approver: 'Mr. Approver'};
       } );
   }
 
@@ -121,9 +124,9 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   deleteVisible(): boolean {
-    if (this.userCanSubmitAndDelete() && !this.isRequestSubmitted)
+    if (this.userCanSubmitAndDelete() && !this.isRequestEverSubmitted)
     {
-            return true;
+      return true;
     }
     else {
       return false;
@@ -131,8 +134,7 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   submitEnabled(): boolean {
-    return true;
-  //  return this.requestModel.canSubmit();
+    return this.requestModel.canSubmit();
   }
 
   submitDisableTooltip(): string {

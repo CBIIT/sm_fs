@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild  } from '@angular/core';
 import { Router } from '@angular/router';
 import 'select2';
 import { Options } from 'select2';
@@ -41,6 +41,9 @@ export class Step3Component implements OnInit {
   selectedFiles: FileList;
   fileInfos: Observable<DocumentsDto[]>;
 
+  @ViewChild('inputFile') 
+  myInputVariable: ElementRef;
+
 
   get grant(): NciPfrGrantQueryDto {
     return this.model.grant;
@@ -81,8 +84,14 @@ export class Step3Component implements OnInit {
       this._docDto.keyId = this.requestModel.requestDto.frqId;
       this._docDto.keyType = 'PFR';
       this.upload(this.selectedFiles[i]);
+      this.reset();
     }
   }
+
+  reset() {
+    this.myInputVariable.nativeElement.value = '';
+    this.selectedDocType = '';
+}
 
   upload(file) {
     this.documentService.upload(file, this._docDto).subscribe(
@@ -158,8 +167,9 @@ export class Step3Component implements OnInit {
 
   drop(event: CdkDragDrop<DocumentsDto[]>) {
     if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-
+      moveItemInArray(event.container.data,
+        event.previousIndex,
+        event.currentIndex);
     } else {
       transferArrayItem(
         event.previousContainer.data,
@@ -168,7 +178,6 @@ export class Step3Component implements OnInit {
         event.currentIndex
       );
     }
-
   }
 
   downloadFile(id: number, fileName: string) {
@@ -214,8 +223,11 @@ export class Step3Component implements OnInit {
 
   downloadPackage() {
     var docIds: number[] = [];
-    docIds.push(28246);
-    docIds.push(28245);
+    this.baseTaskList.subscribe(items => {
+      this.swimlanes[0]['array'].forEach((value, index) => {
+        docIds.push(value.id);
+      });
+    });
 
     this.documentService.downLoadFrqPackage(this.requestModel.requestDto.frqId,
       this.requestModel.grant.applId, docIds).subscribe(blob => saveAs(blob, 'Package.pdf')), error =>
