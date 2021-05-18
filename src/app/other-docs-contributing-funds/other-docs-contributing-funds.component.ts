@@ -21,9 +21,8 @@ class DocData {
 })
 export class OtherDocsContributingFundsComponent implements OnInit {
 
+  selectedDocsArr: DocData[] = [];
 
-  selectedDocsArr: DocData[]= [];
-  
   @Input() label = 'Division/Office/Center (DOC)';
 
   @Input()
@@ -38,12 +37,12 @@ export class OtherDocsContributingFundsComponent implements OnInit {
     this.docs.forEach(d => {
       if (d.abbreviation === value) {
         d.selected = true;
-        // this._selectedDocs.push(d);
-        this.selectedDocsArr.push(d);
+        if (!this.selectedDocsArr.includes(d)) {
+          this.selectedDocsArr.push(d);
+        }
       }
     });
     this._selectedValue = this.getSelectionString();
-    console.log(this._selectedValue);
     this.selectedValueChange.emit(this.getSelectionString());
   }
 
@@ -66,14 +65,10 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
     this.lookupsControllerService.getNciDocsUsingGET().subscribe(
       result => {
-        console.log('Getting the Doc Dropdown results');
-        // result.push({id: '', abbreviation: '', description: ''});
         result.forEach(r => {
           console.log(r);
           this.docs.push({selected: false, id: r.id, abbreviation: r.abbreviation, description: r.description, order: 0});
-          // console.log({id: r.abbreviation, text: r.abbreviation + ' - ' + r.description});
         });
-        // this.docs = result;
       }, error => {
         console.log('HttpClient get request error for----- ' + error.message);
       });
@@ -85,12 +80,8 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   }
 
   selectedDocs(): Array<DocData> {
-    console.log('getSelectedDocs');
-  
-    return this.docs.filter(d => d.selected);
-    // .sort((d1, d2) => {return d1.order - d2.order;});
+    return this.selectedDocsArr;
   }
-
 
 
   deselect(abbreviation: string): void {
@@ -99,20 +90,20 @@ export class OtherDocsContributingFundsComponent implements OnInit {
         d.selected = false;
       }
     });
-    // let i = 0;
-    // let j = 0;
-    // this._selectedDocs.forEach(d => {
-    //   if (d.abbreviation === abbreviation) {
-    //     j = i;
-    //   }
-    //   i++;
-    // });
-    //
-    // this._selectedDocs.splice(j, 1);
+    let i = 0;
+    let j = 0;
+    this.selectedDocsArr.forEach(d => {
+      if (d.abbreviation === abbreviation) {
+        j = i;
+      }
+      i++;
+    });
+
+    this.selectedDocsArr.splice(j, 1);
   }
 
   getSelectionString(): string {
-    const dox = this.selectedDocs().map(d => d.abbreviation);
+    const dox = this.selectedDocsArr.map(d => d.abbreviation);
     if (!dox || dox.length === 0) {
       return '';
     }
@@ -121,7 +112,8 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   }
 
   dropped(event: CdkDragDrop<DocData[]>): void {
-   // console.log(JSON.stringify(event));
     moveItemInArray(this.selectedDocsArr, event.previousIndex, event.currentIndex);
+    this._selectedValue = this.getSelectionString();
+    this.selectedValueChange.emit(this.getSelectionString());
   }
 }
