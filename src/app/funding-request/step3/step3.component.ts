@@ -158,8 +158,9 @@ export class Step3Component implements OnInit {
 
   drop(event: CdkDragDrop<DocumentsDto[]>) {
     if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-
+      moveItemInArray(event.container.data,
+        event.previousIndex,
+        event.currentIndex);
     } else {
       transferArrayItem(
         event.previousContainer.data,
@@ -168,7 +169,6 @@ export class Step3Component implements OnInit {
         event.currentIndex
       );
     }
-
   }
 
   downloadFile(id: number, fileName: string) {
@@ -214,8 +214,11 @@ export class Step3Component implements OnInit {
 
   downloadPackage() {
     var docIds: number[] = [];
-    docIds.push(28246);
-    docIds.push(28245);
+    this.baseTaskList.subscribe(items => {
+      this.swimlanes[0]['array'].forEach((value, index) => {
+        docIds.push(value.id);
+      });
+    });
 
     this.documentService.downLoadFrqPackage(this.requestModel.requestDto.frqId,
       this.requestModel.grant.applId, docIds).subscribe(blob => saveAs(blob, 'Package.pdf')), error =>
