@@ -12,7 +12,6 @@ export class MailtoFormatterPipe implements PipeTransform {
 
     const nameField = args[0];
     const emailField = args[1];
-    console.log('"' + emailField + '"');
     if (!value[nameField]) {
       return '';
     }
@@ -25,6 +24,9 @@ export class MailtoFormatterPipe implements PipeTransform {
 
     let subject = '';
     // TODO: look at making this more generic and reusable by using template literals
+    // If args[2] exists:
+    //    if no further arguments, use as is
+    //    otherwise, interpolate those values into args 2
     if (args[2]) {
       // for PI/PD Email Subject: Displaying Grant number - PiLastName
       if (args[2] === 'PI/PD name' && value[args[3]] && value[args[4]]) {
@@ -34,8 +36,7 @@ export class MailtoFormatterPipe implements PipeTransform {
       }
     }
 
-    const href = '<a href="mailto:' + value[emailField] + subject + '">' + value[nameField] + '</a>';
-    return href;
+    return '<a href="mailto:' + value[emailField] + subject + '">' + value[nameField] + '</a>';
   }
 
 }
