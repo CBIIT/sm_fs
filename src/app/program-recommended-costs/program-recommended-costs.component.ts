@@ -54,8 +54,8 @@ export class ProgramRecommendedCostsComponent implements OnInit {
 
   // open the funding source help in the new window..
   openFsDetails(): boolean {
-    // temporarily using # for the hashtrue file not found issue .. 
-    const url = "/#"+this.router.createUrlTree(['fundingSourceDetails']).toString();
+    // temporarily using # for the hashtrue file not found issue.. 
+    const url = "/fs/#"+ this.router.createUrlTree(['fundingSourceDetails']).toString();
     openNewWindow(url, 'fundingSourceDetails');
     return false;
   }
