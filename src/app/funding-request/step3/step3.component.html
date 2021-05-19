@@ -25,7 +25,10 @@
             <span class="counter">xxxx/1000</span>
         </div>
 
+        
+
         <div class="d-flex w-100">
+            <button class="btn btn-outline-secondary mr-2" (click)="reset()">Clear</button>
             <button class="btn btn-primary ml-auto" [disabled]="!selectedFiles" (click)="uploadFiles()">Add Doc</button>
         </div>
 
