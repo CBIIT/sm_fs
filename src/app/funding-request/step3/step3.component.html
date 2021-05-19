@@ -8,7 +8,7 @@
 
         <div class="form-group">
             <label for="type">Type</label>
-            <ng-select2 id="type" [(ngModel)]="selectedDocType" [allowClear]="true">
+            <ng-select2 id="type" [(ngModel)]="selectedDocType" [allowClear]="true" (ngModelChange)="onDocTypeChange($event)">
                 <option></option>
                 <option *ngFor="let docType of DocTypes | async" [value]="docType.rvLowValue"> {{docType.rvLowValue}}</option>
             </ng-select2>
@@ -19,13 +19,11 @@
             <input id="add-file" #inputFile type="file" (change)="selectFiles($event)">
         </div>
 
-        <div class="form-group">
-            <label for="file-description">Description</label>
+        <div *ngIf="showJustification" class="form-group">
+            <label for="file-description">Justification</label>
             <textarea class="form-control" id="file-description" rows="5" [(ngModel)]="docDescription"></textarea>
             <span class="counter">xxxx/1000</span>
         </div>
-
-        
 
         <div class="d-flex w-100">
             <button class="btn btn-outline-secondary mr-2" (click)="reset()">Clear</button>

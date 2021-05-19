@@ -30,6 +30,7 @@ export class Step3Component implements OnInit {
   public _docDescription: string = '';
   justificationUploaded?: Observable<boolean>;
 
+  showJustification: boolean = false ;
 
   baseTaskList: Observable<DocumentsDto[]>;
   include: Observable<DocumentsDto[]>;
@@ -95,6 +96,7 @@ export class Step3Component implements OnInit {
   reset() {
     this.myInputVariable.nativeElement.value = '';
     this.selectedDocType = '';
+    this.docDescription = '';
 }
 
   upload(file) {
@@ -260,6 +262,15 @@ export class Step3Component implements OnInit {
       this.requestModel.grant.applId, docIds).subscribe(blob => saveAs(blob, 'Package.pdf')), error =>
         console.log('Error downloading the file'),
       () => console.info('File downloaded successfully');
+  }
+
+  onDocTypeChange(event): any {
+    console.log('change', event);
+    if (event === 'Justification') {
+      this.showJustification = true;
+    } else {
+      this.showJustification = false;
+    }
   }
 
   nextStep() {
