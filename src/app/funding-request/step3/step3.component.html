@@ -10,7 +10,7 @@
             <label for="type">Type</label>
             <ng-select2 id="type" [(ngModel)]="selectedDocType" [allowClear]="true">
                 <option></option>
-                <option *ngFor="let DocType of DocTypes" [value]="DocType.rvLowValue"> {{DocType.rvLowValue}}</option>
+                <option *ngFor="let docType of DocTypes | async" [value]="docType.rvLowValue"> {{docType.rvLowValue}}</option>
             </ng-select2>
         </div>
 

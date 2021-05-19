@@ -24,7 +24,7 @@ export interface Swimlane {
 export class Step3Component implements OnInit {
 
 
-  public DocTypes: Array<CgRefCodesDto>;
+  public DocTypes: Observable<Array<CgRefCodesDto>>;
   public options: Options;
   public _selectedDocType: string = '';
   public _docDescription: string = '';
@@ -116,6 +116,16 @@ export class Step3Component implements OnInit {
           }, error => {
             console.log('HttpClient get request error for----- ' + error.message);
           });
+
+
+          this.DocTypes.forEach(element => {
+            element.forEach((e, index) => {
+              if(e.rvLowValue === this._docDto.docType) {
+                element.splice(index, 1);
+              }
+            })
+          });
+
       });
 
 
@@ -138,7 +148,7 @@ export class Step3Component implements OnInit {
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
         console.log('Getting the Doc type Dropdown results');
-        this.DocTypes = result;
+        this.DocTypes = of(result);
       }, error => {
         console.log('HttpClient get request error for----- ' + error.message);
       });
