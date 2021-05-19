@@ -77,6 +77,7 @@ export class RequestModel {
   }
 
   constructor(private propertiesService: AppPropertiesService) {
+    console.log('Construction of request model happening now');
     this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this._requestDto = {};
@@ -116,6 +117,8 @@ export class RequestModel {
   reset(): void {
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
+    this._requestType = undefined;
+    this._requestName = undefined;
   }
 }
 

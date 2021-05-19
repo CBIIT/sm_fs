@@ -3,9 +3,9 @@ import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {AppPropertiesService} from '../../service/app-properties.service';
 import {FsRequestControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto, FundingRequestDtoReq} from '@nci-cbiit/i2ecws-lib';
-import { AppUserSessionService } from 'src/app/service/app-user-session.service';
-import { FundingRequestIntegrationService } from '../integration/integration.service';
-import { Subscription } from 'rxjs';
+import {AppUserSessionService} from 'src/app/service/app-user-session.service';
+import {FundingRequestIntegrationService} from '../integration/integration.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-step4',
@@ -41,22 +41,30 @@ export class Step4Component implements OnInit, OnDestroy {
   ngOnInit(): void {
     console.log('Step4 requestModel ', this.requestModel);
     this.requestHistorySubscriber = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
-      (historyResult) => {this.parseRequestHistories(historyResult); }
+      (historyResult) => {
+        this.parseRequestHistories(historyResult);
+      }
     );
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
     let submitted = false;
-    historyResult.forEach ((item: FundingReqStatusHistoryDto) => {
-        console.log('inside loop of parseRequestHistories ', item);
-        if (item.statusCode === 'SUBMITTED') {
-          console.log('isRequestEverSubmitted=true');
-          submitted = true;
-        }
+    historyResult.forEach((item: FundingReqStatusHistoryDto) => {
+      console.log('inside loop of parseRequestHistories ', item);
+      // const i = item.statusDescrip.indexOf(' by ');
+      const i = item.statusDescrip.search(/ by /gi);
+      if (i > 0) {
+        item.statusDescrip = item.statusDescrip.substring(0, i);
+      }
 
-        if (!item.endDate) {
-          this.requestStatus = item.statusCode;
-        }
+      if (item.statusCode === 'SUBMITTED') {
+        console.log('isRequestEverSubmitted=true');
+        submitted = true;
+      }
+
+      if (!item.endDate) {
+        this.requestStatus = item.statusCode;
+      }
 
     });
     this.isRequestEverSubmitted = submitted;
@@ -76,7 +84,7 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   deleteRequest(): void {
-    if (confirm('Are you sure you want to delete this request?')){
+    if (confirm('Are you sure you want to delete this request?')) {
       console.log('Call deleteRequest API for frqId ', this.model.requestDto.frqId);
       this.fsRequestService.deleteRequestUsingDELETE(this.model.requestDto.frqId).subscribe(
         result => {
@@ -101,25 +109,24 @@ export class Step4Component implements OnInit, OnDestroy {
     this.fsRequestService.submitRequestUsingPOST(submissionDto).subscribe(
       (result) => {
         console.log('calling submitRequestUsingPost successful, it returns', result);
-        this.submissionResult = { frqId: submissionDto.frqId, approver: 'Mr. Approver'};
+        this.submissionResult = {frqId: submissionDto.frqId, approver: 'Mr. Approver'};
         this.requestIntegrationService.requestSubmissionEmitter.next(submissionDto.frqId);
         this.submitSuccess.nativeElement.scrollIntoView();
       },
       (error) => {
         console.log('Failed when calling submitRequestUsingPOST', error);
-      } );
+      });
   }
 
   userCanSubmitAndDelete(): boolean {
-    if (  this.userSessionService.isPD() )
-    // need to add checks whether loggedOn user is the requesting pd or if the logged on user's CA
-    // is the same as the requesting pd's CA && this.userSessionService.getLoggedOnUser().npnId === this.model.requestDto.requestorNpnId)
-     {
-        return true;
-     }
-     else {
-       return false;
-     }
+    if (this.userSessionService.isPD())
+      // need to add checks whether loggedOn user is the requesting pd or if the logged on user's CA
+      // is the same as the requesting pd's CA && this.userSessionService.getLoggedOnUser().npnId === this.model.requestDto.requestorNpnId)
+    {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   submitVisible(): boolean {
@@ -135,12 +142,12 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   submitDisableTooltip(): string {
-  /*
-  Justification is required for ALL request types
-	Justification and Memo are required for PayType 4
+    /*
+    Justification is required for ALL request types
+    Justification and Memo are required for PayType 4
 
-  so depending on the type and missing doc, tool tip has to be created accordingly.
-  */
+    so depending on the type and missing doc, tool tip has to be created accordingly.
+    */
     return 'You must upload Justification and Transition Memo to submit this request.';
   }
 
