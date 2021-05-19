@@ -24,12 +24,11 @@ export interface Swimlane {
 export class Step3Component implements OnInit {
 
 
-  public items: DocumentsDto[];
-  itemsExcluded: DocumentsDto[] = [];
   public DocTypes: Array<CgRefCodesDto>;
   public options: Options;
   public _selectedDocType: string = '';
   public _docDescription: string = '';
+  justificationUploaded?: Observable<boolean>;
 
 
   baseTaskList: Observable<DocumentsDto[]>;
@@ -39,8 +38,7 @@ export class Step3Component implements OnInit {
   swimlanes: Swimlane[] = [];
 
   selectedFiles: FileList;
-  fileInfos: Observable<DocumentsDto[]>;
-
+  
   @ViewChild('inputFile') 
   myInputVariable: ElementRef;
 
@@ -85,6 +83,12 @@ export class Step3Component implements OnInit {
       this._docDto.keyType = 'PFR';
       this.upload(this.selectedFiles[i]);
       this.reset();
+
+
+      if (this._docDto.docType === 'Justification') {
+        this.justificationUploaded = of(true);
+      }
+
     }
   }
 
@@ -100,10 +104,14 @@ export class Step3Component implements OnInit {
         this.documentService.getLatestFile(this._docDto.keyId, 'PFR').subscribe(
           result => {
             console.log('Retrieving the Doc that just got inserted since we need to know the ID');
+            console.log(result.docType);
 
-            this.baseTaskList.subscribe(items => {
-              this.swimlanes[0]['array'].push(result);
-            });
+            if (result.docType !== 'Justification') {
+              this.baseTaskList.subscribe(items => {
+                this.swimlanes[0]['array'].push(result);
+              });
+            }
+            
 
           }, error => {
             console.log('HttpClient get request error for----- ' + error.message);
@@ -143,6 +151,15 @@ export class Step3Component implements OnInit {
     this.documentService.getFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
       result => {
         console.log('loading documents');
+
+        result.forEach(element => {
+          if (element.docFilename == 'Justification') {
+
+            this.justificationUploaded = of(true);
+          }
+        });
+
+
         this.baseTaskList = of(result);
         this.include = this.baseTaskList.pipe(
           map(tasks => tasks.filter(task => task.included === 'Y'))

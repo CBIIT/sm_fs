@@ -49,6 +49,23 @@
                         </div>
                     </div>
 
+                   <div *ngIf="justificationUploaded | async" class="drag-item drag-item-locked" tabindex="0">
+                        <span class="doc-name">Justification</span>
+                        <span class="doc-desc">Required, not yet added</span>
+                        <div class="ml-auto">
+                            <button class="btn btn-link btn-slim ml-1" title="Add"><i class="fas fa-plus" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!(justificationUploaded | async)" class="drag-item drag-item-placeholder" tabindex="0">
+                        <span class="doc-name">Justification</span>
+                        <span class="doc-desc">Required, not yet added</span>
+                        <div class="ml-auto">
+                            <button class="btn btn-link btn-slim ml-1" title="Add"><i class="fas fa-plus" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+
+
                     <div class="example-container" *ngFor="let lane of swimlanes">
 
                         <div *ngIf="lane.name==='Included Content'" class="drop-well min-height-5" cdkDropList [cdkDropListData]="lane.array"
