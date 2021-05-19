@@ -2,9 +2,9 @@
 
     <div class="col-lg-4" id="add-docs">
         <h2>Add Docs</h2>
-        <p><small class="text-muted">You may upload Microsoft Word, Microsoft Excel, (OR) Adobe Acrobat document(s)
-                only. Note: if you upload MS Excel, make sure to upload only one worksheet per file in order to have it
-                included in the submission packaged. Maximum file upload is 10 megabytes.</small></p>
+        <p><small class="text-muted">You may upload Microsoft Word, Microsoft Excel, or Abobe Acrobat document(s) only. 
+            Note: If you upload MS Excel, make sure it contains only one worksheet per file in order to have it included in the submission package. 
+            Please upload only the documents that support the approval of this request. <b>Maximum File Size is 10 MB per file.</b></small></p>
 
         <div class="form-group">
             <label for="type">Type</label>
@@ -15,7 +15,8 @@
         </div>
 
         <div class="form-group">
-            <input #inputFile type="file" (change)="selectFiles($event)">
+            <label for="add-file" class="sr-only">Choose File</label>
+            <input id="add-file" #inputFile type="file" (change)="selectFiles($event)">
         </div>
 
         <div class="form-group">
@@ -106,7 +107,7 @@
 <div class="row">
     <div class="col-12 d-flex">
         <button class="btn btn-outline-secondary mr-auto" (click)="prevStep()">Previous</button>
-        <button class="btn btn-outline-primary mr-2" (click)="downloadPackage()"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i>> View
+        <button class="btn btn-outline-primary mr-2" (click)="downloadPackage()"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i> View
             Package</button>
         <button class="btn btn-primary" (click)="nextStep()">Save and Continue</button>
     </div>

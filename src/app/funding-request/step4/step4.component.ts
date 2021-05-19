@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {AppPropertiesService} from '../../service/app-properties.service';
@@ -17,16 +17,19 @@ export class Step4Component implements OnInit, OnDestroy {
   @ViewChild('submitSuccess') submitSuccess: ElementRef;
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
-  isRequestEverSubmitted: boolean;
+  isRequestEverSubmitted = false;
   requestHistorySubscriber: Subscription;
   submissionResult = {frqId: null, approver: null};
+  dv = true;
+  requestStatus: string;
 
   constructor(private router: Router,
               private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
               private fsRequestService: FsRequestControllerService,
               private userSessionService: AppUserSessionService,
-              private requestIntegrationService: FundingRequestIntegrationService) {
+              private requestIntegrationService: FundingRequestIntegrationService,
+              private changeDetection: ChangeDetectorRef) {
   }
 
   ngOnDestroy(): void {
@@ -43,14 +46,21 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
+    let submitted = false;
     historyResult.forEach ((item: FundingReqStatusHistoryDto) => {
         console.log('inside loop of parseRequestHistories ', item);
         if (item.statusCode === 'SUBMITTED') {
-          this.isRequestEverSubmitted = true;
-          return;
+          console.log('isRequestEverSubmitted=true');
+          submitted = true;
         }
+
+        if (!item.endDate) {
+          this.requestStatus = item.statusCode;
+        }
+
     });
-    this.isRequestEverSubmitted = false;
+    this.isRequestEverSubmitted = submitted;
+    this.changeDetection.detectChanges();
   }
 
   prevStep(): void {
@@ -113,24 +123,11 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   submitVisible(): boolean {
-    return true;
-    // if (this.userCanSubmitAndDelete() && this.requestModel.requestDto.status === 'DRAFT')
-    // {
-    //         return true;
-    // }
-    // else {
-    //   return false;
-    // }
+    return this.userCanSubmitAndDelete() && this.requestStatus === 'DRAFT';
   }
 
   deleteVisible(): boolean {
-    if (this.userCanSubmitAndDelete() && !this.isRequestEverSubmitted)
-    {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return this.userCanSubmitAndDelete() && !this.isRequestEverSubmitted;
   }
 
   submitEnabled(): boolean {
