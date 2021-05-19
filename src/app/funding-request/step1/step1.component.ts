@@ -188,11 +188,9 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     };
   }
 
-
-
-
   nextStep(event, grant): void {
     this.requestModel.reset();
+    this.requestModel.requestDto.userLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     this.requestModel.grant = grant;
     this.router.navigate(['/request/step2']);
   }

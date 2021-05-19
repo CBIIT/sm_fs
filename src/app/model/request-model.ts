@@ -23,17 +23,8 @@ export class RequestModel {
   private _requestType: string;
 
   // Request comments
-  private _requestComments: string;
+  private requestComments: string;
   private _eGrantsUrl: string;
-
-
-  get requestComments(): string {
-    return this._requestComments;
-  }
-
-  set requestComments(value: string) {
-    this._requestComments = value;
-  }
 
   get requestType(): string {
     return this._requestType;
@@ -64,12 +55,6 @@ export class RequestModel {
     if (!this._requestDto.financialInfoDto) {
       this._requestDto.financialInfoDto = {};
     }
-    // Object.keys(value).forEach(key => {
-    //   if (hasOwnProperty(this.requestDto.financialInfoDto, key)) {
-    //     this.requestDto.financialInfoDto[key] = value[key];
-    //   }
-    // });
-
     this._requestDto.financialInfoDto.applId = value.applId;
     this._requestDto.financialInfoDto.fy = value.fy;
     this._grant = value;
