@@ -102,6 +102,10 @@ export class RequestModel {
 
   canSave(): boolean {
     // TODO: implement validation rules here
+    if (!this.requestDto.requestName) {
+      return false;
+    }
+
     if (!this.requestDto.frtId) {
       return false;
     }
