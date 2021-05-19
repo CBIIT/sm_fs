@@ -51,6 +51,15 @@ export class AppUserSessionService {
     return this.roles.indexOf('PD') > -1;
   }
 
+  isPA(): boolean{
+    // to-do: need to check roles to determine if PD
+    return this.roles.indexOf('PA') > -1;
+  }
+
+  isProgramStuff(): boolean {
+    return this.isPD() || this.isPA();
+  }
+
   getEnvironment(): string{
     return this.environment;
   }

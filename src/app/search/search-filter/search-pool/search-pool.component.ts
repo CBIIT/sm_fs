@@ -11,14 +11,14 @@ export class SearchPoolComponent implements OnInit {
 
   public searchPools: { key: string, value: string }[];
 
-  @Input() grantSearch:boolean=false;
+  @Input() grantSearch = false;
 
-  @Input() 
-  get selectedValue():string {
+  @Input()
+  get selectedValue(): string {
     return this._selectedValue;
   }
 
-  @Output() selectedValueChange=new EventEmitter<string>();
+  @Output() selectedValueChange = new EventEmitter<string>();
 
   set selectedValue(value:string) {
     console.log("search pool selectedValue setter called ",value);
@@ -28,29 +28,38 @@ export class SearchPoolComponent implements OnInit {
 
   private _selectedValue: string = '';
 
-  constructor(private appUserSessionService:AppUserSessionService) {
+  constructor(private appUserSessionService: AppUserSessionService) {
   }
 
 
   ngOnInit(): void {
     console.log('search-pool component ngOnInit()');
 
-    let myCA =this.appUserSessionService.getUserCaAsString();
+    const myCA = this.appUserSessionService.getUserCaAsString();
 
-    myCA=(myCA)?'My Cancer Activities'+' ('+myCA+')':'My Cancer Activities';
+    const myCAText = (myCA) ? 'My Cancer Activities' + ' (' + myCA + ')' : 'My Cancer Activities';
 
-    if (this.grantSearch)
-      this.searchPools=[{key: 'myca',   value: myCA },
-      {key: 'mypf',   value: 'My Portfolio' }];
+    if (this.grantSearch) {
+      this.searchPools = [];
+      if (this.appUserSessionService.isPD()) {
+        this.searchPools.push({key: 'mypf',   value: 'My Portfolio' });
+      }
 
-    else if (this.appUserSessionService.isPD()) 
-      this.searchPools=[{key: 'myca',   value: myCA },
+      if (myCA) {
+        this.searchPools.push({key: 'myca',   value: myCAText });
+      }
+    }
+
+    else if (this.appUserSessionService.isProgramStuff()) {
+      this.searchPools = [{key: 'myca',   value: myCAText },
                         {key: 'mypf',   value: 'My Portfolio' },
                         {key: 'myrq',   value: 'My Requests' },
                         {key: 'myrqur', value: 'My Requests Under Review' },
                         {key: 'rqawme', value: 'Requests Awaiting My Response' }];
-    else 
-      this.searchPools=[{key: 'rqawme', value: 'Requests Awaiting My Response' }];
+    }
+    else {
+      this.searchPools = [{key: 'rqawme', value: 'Requests Awaiting My Response' }];
+ }
   }
 
 
