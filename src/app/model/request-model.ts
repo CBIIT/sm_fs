@@ -1,8 +1,6 @@
 import {Injectable} from '@angular/core';
 import {FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../service/app-properties.service';
-import {hasOwnProperty} from 'src/app/utils/utils';
-
 
 @Injectable({
   providedIn: 'root'
