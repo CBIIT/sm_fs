@@ -10,8 +10,6 @@ import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
 import {getCurrentFiscalYear} from 'src/app/utils/utils';
 import { LoaderService } from 'src/app/service/loader-spinner.service';
 
-declare function logMe(): any;
-
 @Component({
   selector: 'app-step1',
   templateUrl: './step1.component.html',
@@ -131,7 +129,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
                 {data: 'pdFullName'},
                 {data: 'budgetStartDate'},
                 {data: 'requestCount'},
-                {data: null, defaultContent: 'Select' }
+                {data: null, defaultContent: 'Select', }
  //               {data: null, defaultContent: ''}
               ],
       columnDefs: [ { orderable: false, targets: -1 }],
@@ -191,11 +189,12 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
   }
 
 
+
+
   nextStep(event, grant): void {
+    this.requestModel.reset();
     this.requestModel.grant = grant;
     this.router.navigate(['/request/step2']);
-    // TODO: identify and emit the selected grant
-    // TODO: identify and emit the npnId of the current user
   }
 
   toString(aString): string{
@@ -339,6 +338,15 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
   setGrant(grant): void {
     this.tooltipGrant = grant;
   }
+
+  isDate(value): boolean {
+    return value instanceof Date && !isNaN(value.valueOf());
+  }
+
+  toDate(value): Date {
+    return new Date(value.replace(/-/g, '/'));
+  }
+
 
 }
 

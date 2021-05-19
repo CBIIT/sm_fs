@@ -125,6 +125,11 @@ export class RequestModel {
     // TODO: implement validation rules here
     return true;
   }
+
+  reset(): void {
+    this._requestDto = {};
+    this._requestDto.financialInfoDto = {};
+  }
 }
 
 
