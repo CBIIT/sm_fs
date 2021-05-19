@@ -102,7 +102,7 @@ export class RequestModel {
 
   canSave(): boolean {
     // TODO: implement validation rules here
-    if (!this.requestDto.requestName) {
+    if (!this.requestDto.requestName || this.requestDto.requestName.trim().length === 0) {
       return false;
     }
 
