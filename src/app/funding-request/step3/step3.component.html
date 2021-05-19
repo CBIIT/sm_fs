@@ -20,7 +20,7 @@
         </div>
 
         <div *ngIf="showJustification" class="form-group">
-            <label for="file-description">Justification</label>
+            <label for="file-description">Justification Text</label>
             <textarea class="form-control" maxlength="1000" id="file-description" [disabled]="disableJustification" rows="5" 
             (change)="justificationOnChange()" [(ngModel)]="docDescription"></textarea>
             <span class="counter">xxxx/1000</span>
