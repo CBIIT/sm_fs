@@ -1,7 +1,7 @@
 <div #submitSuccess></div>
 <div class="alert alert-success" role="alert" *ngIf="submissionResult.frqId">
   <h1>Success!</h1>
-    <b>Request #{{submissionResult.frqId}}</b> was sent to {{submissionResult.approver}} for review. 
+    <b>Request #{{submissionResult.frqId}}</b> was sent to {{submissionResult.approver}} for review.
     View the request below or return to the <a routerLink="/search">Search</a>.
 </div>
 <app-grant-information></app-grant-information>
@@ -47,8 +47,6 @@
 <div class="row collapse show" id="workflow-collapse">
   <div class="col-12">
     <div class="form-group">
-      <label for="add-approvers">Add Approver(s) <span class="optional">(optional)</span></label>
-      <p>Select goes here...</p>
       <app-next-scheduled-approvers-request></app-next-scheduled-approvers-request>
     </div>
   </div>
@@ -78,7 +76,7 @@
         <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled() ">Submit Request</button>
         <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
             <button class="btn btn-primary" disabled>Submit Request</button>
-        </span>    
+        </span>
     </div>
 </div>
 
