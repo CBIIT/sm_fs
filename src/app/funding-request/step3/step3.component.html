@@ -16,12 +16,13 @@
 
         <div class="form-group">
             <label for="add-file" class="sr-only">Choose File</label>
-            <input id="add-file" #inputFile type="file" (change)="selectFiles($event)">
+            <input id="add-file" #inputFile type="file" [disabled]="disableFile" (change)="selectFiles($event)">
         </div>
 
         <div *ngIf="showJustification" class="form-group">
             <label for="file-description">Justification</label>
-            <textarea class="form-control" id="file-description" rows="5" [(ngModel)]="docDescription"></textarea>
+            <textarea class="form-control" maxlength="1000" id="file-description" [disabled]="disableJustification" rows="5" 
+            (change)="justificationOnChange()" [(ngModel)]="docDescription"></textarea>
             <span class="counter">xxxx/1000</span>
         </div>
 

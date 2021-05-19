@@ -8,7 +8,6 @@ import { RequestModel } from '../../model/request-model';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { saveAs } from 'file-saver';
 import { of, Observable } from 'rxjs';
-import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 
 export interface Swimlane {
@@ -29,6 +28,8 @@ export class Step3Component implements OnInit {
   public _selectedDocType: string = '';
   public _docDescription: string = '';
   justificationUploaded?: Observable<boolean>;
+  disableJustification: boolean = false;
+  disableFile: boolean = false;
 
   showJustification: boolean = false ;
 
@@ -72,6 +73,8 @@ export class Step3Component implements OnInit {
 
   selectFiles(event) {
     this.selectedFiles = event.target.files;
+    this.disableJustification = true;
+    
   }
 
   public _docDto: DocumentsDto = {};
@@ -97,6 +100,8 @@ export class Step3Component implements OnInit {
     this.myInputVariable.nativeElement.value = '';
     this.selectedDocType = '';
     this.docDescription = '';
+    this.disableJustification = false;
+    this.disableFile = false;
 }
 
   upload(file) {
@@ -270,6 +275,14 @@ export class Step3Component implements OnInit {
       this.showJustification = true;
     } else {
       this.showJustification = false;
+    }
+  }
+
+  justificationOnChange() {
+    if (this.docDescription !== '') {
+      this.disableFile = true;
+    } else {
+      this.disableFile = false;
     }
   }
 
