@@ -20,7 +20,10 @@ export class HeaderComponent implements OnInit {
 
 	public headerTemplateData = {
 		appName: "Funding Selections",
-		docs: [{ docName: "Example Doc1", docLink: "" }],
+		docs: [{ docName: "User Guides", docLink: "" },
+		{ docName: "Video Tutorials", docLink: "" },
+		{ docName: "FAQ", docLink: "" },
+		{ docName: "Release Notes", docLink: "" }],
 		helpGuides: [{ helpGuideName: "Example Link", helpGuideLink: "" }]
 	}
 
