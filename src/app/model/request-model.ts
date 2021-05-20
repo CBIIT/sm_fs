@@ -115,6 +115,7 @@ export class RequestModel {
   }
 
   reset(): void {
+    console.log('Reset RequestModel to baseline');
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
     this._requestType = undefined;

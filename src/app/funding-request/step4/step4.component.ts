@@ -122,6 +122,7 @@ export class Step4Component implements OnInit, OnDestroy {
     if (this.userSessionService.isPD())
       // need to add checks whether loggedOn user is the requesting pd or if the logged on user's CA
       // is the same as the requesting pd's CA && this.userSessionService.getLoggedOnUser().npnId === this.model.requestDto.requestorNpnId)
+      // TODO: Bin, I have put validation logic on the request model for saving a request.  You could also put submit validation there.
     {
       return true;
     } else {
