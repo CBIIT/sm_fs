@@ -12,6 +12,7 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { saveAs } from 'file-saver';
 import { of, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { HttpEventType, HttpResponse } from '@angular/common/http';
 
 export interface Swimlane {
   name: string;
@@ -124,33 +125,37 @@ export class Step3Component implements OnInit {
 
   upload(file) {
     this.documentService.upload(file, this._docDto).subscribe(
-      event => { },
-      err => {
-        this.documentService.getLatestFile(this._docDto.keyId, 'PFR').subscribe(
-          result => {
-            console.log('Retrieving the Doc that just got inserted since we need to know the ID');
-            console.log(result.docType);
+      event => {
+        if (event instanceof HttpResponse) {
 
-            if (result.docType !== 'Justification') {
-              this.baseTaskList.subscribe(items => {
-                this.swimlanes[0]['array'].push(result);
-              });
-            }
+          this.documentService.getLatestFile(this._docDto.keyId, 'PFR').subscribe(
+            result => {
+              console.log('Retrieving the Doc that just got inserted since we need to know the ID');
+              console.log(result.docType);
+
+              if (result.docType !== 'Justification') {
+                this.baseTaskList.subscribe(items => {
+                  this.swimlanes[0]['array'].push(result);
+                });
+              }
 
 
-          }, error => {
-            console.log('HttpClient get request error for----- ' + error.message);
+            }, error => {
+              console.log('HttpClient get request error for----- ' + error.message);
+            });
+
+          this.DocTypes.forEach(element => {
+            element.forEach((e, index) => {
+              if (e.rvLowValue === this._docDto.docType) {
+                element.splice(index, 1);
+              }
+            })
           });
 
-
-        this.DocTypes.forEach(element => {
-          element.forEach((e, index) => {
-            if (e.rvLowValue === this._docDto.docType) {
-              element.splice(index, 1);
-            }
-          })
-        });
-
+        }
+      },
+      err => {
+        console.log('Error occured while uploading doc----- ' + err.message);
       });
 
 
