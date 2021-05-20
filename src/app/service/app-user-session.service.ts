@@ -30,7 +30,7 @@ export class AppUserSessionService {
         this.roles = [];
         result.authorities.forEach(authority => {
             this.roles.push(authority.authority); } );
-        this.caService.getCasForPdUsingGET(this.loggedOnUser.npnId).subscribe(
+        this.caService.getCasForPdUsingGET(this.loggedOnUser.npnId, true).subscribe(
           result2 => {
             console.log('user assigned cancer activities:', result2);
             this.userCancerActivities = result2;
