@@ -114,7 +114,7 @@
                 <td><a [routerLink]="" ngbTooltip="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="mouseenter:mouseleave" placement="top">{{grant.cayCode}}</a></td>
                 <td><a href="mailto:{{grant.pdEmailAddress}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.pdFullName}}</a></td>
                 <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>
-                <td>{{grant.requestCount}}</td>
+                <td><span *ngIf="grant.requestCount>0"><a routerLink="/search">{{grant.requestCount}}</a></span></td>
                 <td>
                     <a href="javascript:void(0);" ngbTooltip={{disabledTooltip(grant)}} *ngIf="actionDisabled(grant); else actionEnabled">
                         <button class="btn btn-primary" disabled>Select</button>
