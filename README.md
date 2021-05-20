@@ -1,4 +1,4 @@
-# Funding Selection
+# Funding Selections
 
 ## Action Items
 - [ ] Document standards and usage

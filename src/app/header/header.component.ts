@@ -19,7 +19,7 @@ export class HeaderComponent implements OnInit {
 	canChangeUser: boolean;
 
 	public headerTemplateData = {
-		appName: "Funding Selection",
+		appName: "Funding Selections",
 		docs: [{ docName: "Example Doc1", docLink: "" }],
 		helpGuides: [{ helpGuideName: "Example Link", helpGuideLink: "" }]
 	}
