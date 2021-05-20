@@ -4,7 +4,7 @@ import 'select2';
 import { Options } from 'select2';
 import {
   CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
-  FsRequestControllerService
+  FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto
 } from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request-model';
@@ -34,6 +34,7 @@ export class Step3Component implements OnInit {
   justificationUploaded?: Observable<boolean>;
   disableJustification: boolean = false;
   disableFile: boolean = false;
+  _docOrderDto: FundingRequestDocOrderDto = {};
 
   showJustification: boolean = false;
 
@@ -128,6 +129,7 @@ export class Step3Component implements OnInit {
       event => {
         if (event instanceof HttpResponse) {
 
+          //Get the ID of the latest record
           this.documentService.getLatestFile(this._docDto.keyId, 'PFR').subscribe(
             result => {
               console.log('Retrieving the Doc that just got inserted since we need to know the ID');
@@ -139,11 +141,23 @@ export class Step3Component implements OnInit {
                 });
               }
 
+              // Insert records into FUNDING_REQUEST_DOC_ORDER_T
 
+              this._docOrderDto
+              this._docOrderDto.docTypeCode = result.docType;
+              this._docOrderDto.docId = result.id;
+              this._docOrderDto.frqId = result.keyId;
+              this.fsDocOrderControllerService.createDocOrderUsingPOST(this._docOrderDto).subscribe(
+                res => {
+                  console.log("Doc order save successful")
+                }, error => {
+                  console.log('Error occured while saving DOC ORDER----- ' + error.message);
+                });
             }, error => {
               console.log('HttpClient get request error for----- ' + error.message);
             });
 
+          //Remove Doc Type from the drop down
           this.DocTypes.forEach(element => {
             element.forEach((e, index) => {
               if (e.rvLowValue === this._docDto.docType) {
@@ -151,6 +165,9 @@ export class Step3Component implements OnInit {
               }
             })
           });
+
+
+
 
         }
       },
@@ -165,7 +182,8 @@ export class Step3Component implements OnInit {
     private cgRefCodControllerService: CgRefCodControllerService,
     private documentService: DocumentService,
     private requestModel: RequestModel,
-    private fsRequestControllerService: FsRequestControllerService) {
+    private fsRequestControllerService: FsRequestControllerService,
+    private fsDocOrderControllerService: FsDocOrderControllerService) {
 
   }
 
@@ -228,6 +246,9 @@ export class Step3Component implements OnInit {
       moveItemInArray(event.container.data,
         event.previousIndex,
         event.currentIndex);
+        console.log("In the same container")
+        //If container.id = 'included', then sort order needs to be updated.
+        //update sort order for both records
     } else {
       transferArrayItem(
         event.previousContainer.data,
@@ -235,6 +256,11 @@ export class Step3Component implements OnInit {
         event.previousIndex,
         event.currentIndex
       );
+      console.log("In the different container")
+      //If previousContainer == included and container = excluded, data is moved to excluded.
+      //Delete data from the DOC order table
+      //Else if previousContainer = excluded and container = included, data is moved to included.
+      //Insert new record and then update sort order for all of them for this frqId
     }
   }
 

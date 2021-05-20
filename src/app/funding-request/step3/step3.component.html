@@ -70,7 +70,7 @@
 
                     <div class="example-container" *ngFor="let lane of swimlanes">
 
-                        <div *ngIf="lane.name==='Included Content'" class="drop-well min-height-5" cdkDropList [cdkDropListData]="lane.array"
+                        <div id="includedId" *ngIf="lane.name==='Included Content'" class="drop-well min-height-5" cdkDropList [cdkDropListData]="lane.array"
                             (cdkDropListDropped)="drop($event)">
 
                             <div class="drag-item" cdkDrag *ngFor="let item of lane.array" tabindex="0">
