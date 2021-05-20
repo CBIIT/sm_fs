@@ -1,8 +1,11 @@
-import { Component, ElementRef, OnInit, ViewChild  } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import 'select2';
 import { Options } from 'select2';
-import { CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import {
+  CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
+  FsRequestControllerService
+} from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request-model';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -31,7 +34,7 @@ export class Step3Component implements OnInit {
   disableJustification: boolean = false;
   disableFile: boolean = false;
 
-  showJustification: boolean = false ;
+  showJustification: boolean = false;
 
   baseTaskList: Observable<DocumentsDto[]>;
   include: Observable<DocumentsDto[]>;
@@ -40,8 +43,8 @@ export class Step3Component implements OnInit {
   swimlanes: Swimlane[] = [];
 
   selectedFiles: FileList;
-  
-  @ViewChild('inputFile') 
+
+  @ViewChild('inputFile')
   myInputVariable: ElementRef;
 
 
@@ -74,26 +77,41 @@ export class Step3Component implements OnInit {
   selectFiles(event) {
     this.selectedFiles = event.target.files;
     this.disableJustification = true;
-    
+
   }
 
   public _docDto: DocumentsDto = {};
 
   uploadFiles() {
-    for (let i = 0; i < this.selectedFiles.length; i++) {
-      this._docDto.docDescription = this.docDescription;
-      this._docDto.docType = this.selectedDocType;
-      this._docDto.keyId = this.requestModel.requestDto.frqId;
-      this._docDto.keyType = 'PFR';
-      this.upload(this.selectedFiles[i]);
-      this.reset();
+    if (this.docDescription !== '') {
 
+      //Upate justification Text
+      this.fsRequestControllerService.updateJustificationUsingPUT(this.requestModel.requestDto.frqId, this.docDescription).subscribe(
+        result => {
+          this.justificationUploaded = of(true);
+          this.requestModel.requestDto = result;
+          this.reset();
+        }, error => {
+          console.log('HttpClient get request error for----- ' + error.message);
+        });
 
-      if (this._docDto.docType === 'Justification') {
-        this.justificationUploaded = of(true);
+    } else {
+
+      for (let i = 0; i < this.selectedFiles.length; i++) {
+        this._docDto.docDescription = this.docDescription;
+        this._docDto.docType = this.selectedDocType;
+        this._docDto.keyId = this.requestModel.requestDto.frqId;
+        this._docDto.keyType = 'PFR';
+        this.upload(this.selectedFiles[i]);
+        this.reset();
+
+        if (this._docDto.docType === 'Justification') {
+          this.justificationUploaded = of(true);
+        }
+
       }
-
     }
+
   }
 
   reset() {
@@ -102,7 +120,7 @@ export class Step3Component implements OnInit {
     this.docDescription = '';
     this.disableJustification = false;
     this.disableFile = false;
-}
+  }
 
   upload(file) {
     this.documentService.upload(file, this._docDto).subscribe(
@@ -118,20 +136,20 @@ export class Step3Component implements OnInit {
                 this.swimlanes[0]['array'].push(result);
               });
             }
-            
+
 
           }, error => {
             console.log('HttpClient get request error for----- ' + error.message);
           });
 
 
-          this.DocTypes.forEach(element => {
-            element.forEach((e, index) => {
-              if(e.rvLowValue === this._docDto.docType) {
-                element.splice(index, 1);
-              }
-            })
-          });
+        this.DocTypes.forEach(element => {
+          element.forEach((e, index) => {
+            if (e.rvLowValue === this._docDto.docType) {
+              element.splice(index, 1);
+            }
+          })
+        });
 
       });
 
@@ -141,7 +159,8 @@ export class Step3Component implements OnInit {
   constructor(private router: Router,
     private cgRefCodControllerService: CgRefCodControllerService,
     private documentService: DocumentService,
-    private requestModel: RequestModel) {
+    private requestModel: RequestModel,
+    private fsRequestControllerService: FsRequestControllerService) {
 
   }
 
