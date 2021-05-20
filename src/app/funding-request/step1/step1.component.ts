@@ -248,8 +248,19 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     this.gsfs.searchWithin = this.searchWithin;
     this.searchCriteria.fromFy = this.fyRange.fromFy;
     this.searchCriteria.toFy = this.fyRange.toFy;
+    if (this.searchCriteria.toFy && this.searchCriteria.fromFy
+      && this.searchCriteria.toFy < this.searchCriteria.fromFy) {
+        alert('The "From" fiscal year should be equal to or less than the "To" fiscal year.');
+        return;
+    }
     this.searchCriteria.fromCouncilMeetingDate = this.ncabRange.fromNcab;
     this.searchCriteria.toCouncileMeetingDate = this.ncabRange.toNcab;
+    if (this.searchCriteria.fromCouncilMeetingDate && this.searchCriteria.toCouncileMeetingDate
+      && this.searchCriteria.toCouncileMeetingDate < this.searchCriteria.fromCouncilMeetingDate) {
+        alert('The "From" NCAB should be equal to or less than the "To" NCAB.');
+        return;
+    }
+
     this.searchCriteria.applStatusGroupCode = this.i2Status;
     this.searchCriteria.piName = this.piName;
 
