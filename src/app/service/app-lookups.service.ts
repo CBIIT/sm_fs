@@ -6,14 +6,13 @@ import { CancerActivityControllerService, LookupsControllerService } from '@nci-
 })
 export class AppLookupsService {
 
-  private lookups:{}={};
+  private lookups = {};
 
-  constructor(private cancerActivityController:CancerActivityControllerService) {
+  constructor(private cancerActivityController: CancerActivityControllerService) {
   }
 
-  delay = ms => new Promise(res => setTimeout(res, ms));
 
-  async loadCancerActivities() {
+  async loadCancerActivities(): Promise<any> {
     console.log('AppLookupsService loadCancerActivities starts');
     const result = await this.cancerActivityController.getAllActiveCaListUsingGET().toPromise();
     const cays = {};
