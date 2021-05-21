@@ -79,9 +79,9 @@
             <thead>
               <tr>
                 <th>Grant Number</th>
-                <th>Project Title</th>
-                <th>I2 Status</th>
                 <th>PI</th>
+                <th>I2 Status</th>
+                <th>Project Title</th>
                 <th>Institution</th>
                 <th>FY</th>
                 <th>NCAB Date</th>
@@ -103,9 +103,9 @@
                     </a>
                     <span style="padding:3px;margin:0px 2px;border: 0px;float:inline-end;" (mouseenter)="setGrant(grant)"  [ngbTooltip]="InstituteTooltip"><i class='fa fa-university' aria-hidden='true'></i></span>
                 </td>
-                <td>{{grant.projectTitle}}</td>
-                <td>{{grant.applStatusGroupDescrip}}</td>
                 <td><a href="mailto:{{grant.piEmail}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.piFullName}}</a></td>
+                <td>{{grant.applStatusGroupDescrip}}</td>
+                <td>{{grant.projectTitle}}</td>
                 <td>{{grant.orgName}}</td>
                 <td>{{grant.fy}}</td>
                 <td>{{grant.councilMeetingDate|formatNcabDate}}</td>
@@ -117,7 +117,7 @@
                 <td><span *ngIf="grant.requestCount>0"><a routerLink="/search">{{grant.requestCount}}</a></span></td>
                 <td>
                     <a href="javascript:void(0);" ngbTooltip={{disabledTooltip(grant)}} *ngIf="actionDisabled(grant); else actionEnabled">
-                        <button class="btn btn-primary" disabled>Select</button>
+                        <button class="btn btn-primary" disabled>Select Grant</button>
                     </a>
                     <ng-template #actionEnabled>
                         <button class="btn btn-primary"  (click)="nextStep($event, grant)">Select Grant</button>

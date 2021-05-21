@@ -84,7 +84,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
 
     this.dtOptions = {
       pagingType: 'full_numbers',
-      pageLength: 10,
+      pageLength: 100,
       serverSide: true,
       language: {
           paginate: {
@@ -117,9 +117,9 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
       },
 
       columns: [ {data: 'fullGrantNum'},
-                {data: 'projectTitle'},
-                {data: 'applStatusGroupDescrip'},
                 {data: 'piFullName'},
+                {data: 'applStatusGroupDescrip'},
+                {data: 'projectTitle'},
                 {data: 'orgName'},
                 {data: 'fy'},
                 {data: 'councilMeetingDate'},
@@ -181,7 +181,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
             filename: 'fs-grants-search-result',
             title: null,
             header: true,
-            // exportOptions: { columns: [ 0, 1, 2, 3, 4 , 5 , 6 ] }
+            exportOptions: { columns: [ 0, 1, 2, 3, 4 , 5 , 6, 7, 8, 9, 10, 11, 12 ] }
             }
         ]
       // },
