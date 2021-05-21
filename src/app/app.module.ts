@@ -64,9 +64,9 @@ async function appInitialization(
   appPropertiesService: AppPropertiesService,
   appLookupsService: AppLookupsService,
   appUserSessionService: AppUserSessionService) {
-  appPropertiesService.initialize();
-  appLookupsService.initialize();
-  appUserSessionService.initialize();
+  await appPropertiesService.initialize();
+  await appLookupsService.initialize();
+  await appUserSessionService.initialize();
 }
 
 @NgModule({
