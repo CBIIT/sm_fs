@@ -250,14 +250,14 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     this.searchCriteria.toFy = this.fyRange.toFy;
     if (this.searchCriteria.toFy && this.searchCriteria.fromFy
       && this.searchCriteria.toFy < this.searchCriteria.fromFy) {
-        alert('The "From" fiscal year should be equal to or less than the "To" fiscal year.');
+        alert('Invalid FY date range provided.');
         return;
     }
     this.searchCriteria.fromCouncilMeetingDate = this.ncabRange.fromNcab;
     this.searchCriteria.toCouncileMeetingDate = this.ncabRange.toNcab;
     if (this.searchCriteria.fromCouncilMeetingDate && this.searchCriteria.toCouncileMeetingDate
       && this.searchCriteria.toCouncileMeetingDate < this.searchCriteria.fromCouncilMeetingDate) {
-        alert('The "From" NCAB should be equal to or less than the "To" NCAB.');
+        alert('Invalid NCAB date range provided."');
         return;
     }
 
