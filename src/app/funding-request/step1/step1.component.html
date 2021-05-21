@@ -117,10 +117,10 @@
                 <td><span *ngIf="grant.requestCount>0"><a routerLink="/search">{{grant.requestCount}}</a></span></td>
                 <td>
                     <a href="javascript:void(0);" ngbTooltip={{disabledTooltip(grant)}} *ngIf="actionDisabled(grant); else actionEnabled">
-                        <button class="btn btn-primary" disabled>Select Grant</button>
+                        <button class="btn btn-primary" disabled>Select</button>
                     </a>
                     <ng-template #actionEnabled>
-                        <button class="btn btn-primary"  (click)="nextStep($event, grant)">Select Grant</button>
+                        <button class="btn btn-primary"  (click)="nextStep($event, grant)">Select</button>
                     </ng-template>
                 </td>
                 <!-- <td></td> control column for responsive -->
