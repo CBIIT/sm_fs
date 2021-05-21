@@ -16,7 +16,7 @@
 
         <div class="form-group">
             <label for="add-file" class="sr-only">Choose File</label>
-            <input id="add-file" #inputFile type="file" [disabled]="disableFile" (change)="selectFiles($event)">
+            <input id="add-file" #inputFile type="file"  accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile" (change)="selectFiles($event)">
         </div>
 
         <div *ngIf="showJustification" class="form-group">
