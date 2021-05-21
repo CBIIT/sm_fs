@@ -257,7 +257,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     this.searchCriteria.toCouncileMeetingDate = this.ncabRange.toNcab;
     if (this.searchCriteria.fromCouncilMeetingDate && this.searchCriteria.toCouncileMeetingDate
       && this.searchCriteria.toCouncileMeetingDate < this.searchCriteria.fromCouncilMeetingDate) {
-        alert('Invalid NCAB date range provided."');
+        alert('Invalid NCAB date range provided.');
         return;
     }
 
