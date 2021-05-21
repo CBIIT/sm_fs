@@ -1,1 +1,11 @@
-<p>funding-source works!</p>
+<label for="fs-select-1">{{ label }} <a href="#" (click)="openFsDetails()"><i
+  class="fas fa-question-circle ml-1"></i></a></label>
+
+<ng-select2
+  id="fs-select-1"
+  [(ngModel)]="selectedValue"
+  [allowClear]="false"
+  [options]="options">
+  <option></option>
+  <option *ngFor="let source of fundingSources" [value]="source.fundingSourceId">{{source.fundingSourceName}}</option>
+</ng-select2>

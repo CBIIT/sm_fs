@@ -159,12 +159,8 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="form-group">
-                        <label for="fs-select-1">Funding Source <a href="#" (click)="openFsDetails()"><i class="fas fa-question-circle ml-1"></i></a></label>
-                        <select class="form-control" id="fs-select-1">
-                          <option></option>
-                          <option>Example of a Long Funding Source</option>
-                        </select>
-                      </div>
+                      <app-funding-source></app-funding-source>
+                    </div>
                 </div>
             </div>
 
@@ -254,7 +250,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="fsource-fy1-form">
                                     <div class="form-row form-inline">
                                         <div class="col left-label">
@@ -346,12 +342,12 @@
                                 XXX,XXX.XX
                             </td>
                         </tr>
-    
+
                     </tbody>
                 </table>
             </div>
 
-            
+
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>

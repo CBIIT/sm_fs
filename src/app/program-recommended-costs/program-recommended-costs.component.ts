@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {AppPropertiesService} from '../service/app-properties.service';
-import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {openNewWindow} from 'src/app/utils/utils';
 import {Router} from '@angular/router';
+import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
 
 @Component({
@@ -13,13 +14,15 @@ import {Router} from '@angular/router';
 })
 export class ProgramRecommendedCostsComponent implements OnInit {
 
-  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   _selectedDocs: string;
 
-  constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService, private router: Router) {
+
+  constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
+              private fsRequestControllerService: FsRequestControllerService) {
   }
 
   ngOnInit(): void {
+
   }
 
   get grant(): NciPfrGrantQueryDto {
@@ -52,11 +55,5 @@ export class ProgramRecommendedCostsComponent implements OnInit {
     }
   }
 
-  // open the funding source help in the new window..
-  openFsDetails(): boolean {
-    // temporarily using # for the hashtrue file not found issue.. 
-    const url = "/fs/#"+ this.router.createUrlTree(['fundingSourceDetails']).toString();
-    openNewWindow(url, 'fundingSourceDetails');
-    return false;
-  }
+
 }
