@@ -16,8 +16,9 @@ import {openNewWindow} from '../utils/utils';
 })
 export class FundingSourceComponent implements OnInit {
   @Input() label = 'Funding Source';
+  @Input() name = '';
   fundingSources: Array<FundingRequestFundsSrcDto>;
-  selectedFundingSources: Set<number>;
+  selectedFundingSources: Set<number> = new Set<number>();
   _selectedValue: number;
   options: Options;
 
@@ -26,13 +27,16 @@ export class FundingSourceComponent implements OnInit {
   }
 
   set selectedValue(value: number) {
-    if (isNumeric(this._selectedValue)) {
-      this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this._selectedValue);
+    const oldValue = this._selectedValue;
+    this._selectedValue = value;
+
+    if (isNumeric(oldValue)) {
+      this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(oldValue);
     }
     if (isNumeric(value)) {
       this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.next(value);
     }
-    this._selectedValue = value;
+
   }
 
   constructor(private requestModel: RequestModel,
@@ -43,10 +47,21 @@ export class FundingSourceComponent implements OnInit {
 
   ngOnInit(): void {
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(select => {
-      console.log('select:', select);
+      console.log('select:', select, 'mine:', this._selectedValue);
+      if (Number(select) === Number(this._selectedValue)) {
+        console.log(this.name, ': I did this');
+      } else {
+        console.log(this.name, ': someone else did this');
+        this.selectedFundingSources.add(Number(select));
+        console.log('my exclusions:', this.selectedFundingSources);
+      }
+
     });
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.subscribe(deselect => {
       console.log('deselect:', deselect);
+      this.selectedFundingSources.delete(Number(deselect));
+      console.log('my exclusions after deselect:', this.selectedFundingSources);
+
     });
     this.fsRequestControllerService.getFundingSourcesUsingGET(
       this.requestModel.requestDto.frtId,
@@ -67,5 +82,11 @@ export class FundingSourceComponent implements OnInit {
     const url = '/fs/#' + this.router.createUrlTree(['fundingSourceDetails']).toString();
     openNewWindow(url, 'fundingSourceDetails');
     return false;
+  }
+
+  availableFundingSources(): Array<FundingRequestFundsSrcDto> {
+    return this.fundingSources.filter(f => {
+      return !this.selectedFundingSources.has(Number(f.fundingSourceId));
+    });
   }
 }

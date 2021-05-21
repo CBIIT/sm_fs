@@ -7,5 +7,5 @@
   [allowClear]="false"
   [options]="options">
   <option></option>
-  <option *ngFor="let source of fundingSources" [value]="source.fundingSourceId">{{source.fundingSourceName}}</option>
+  <option *ngFor="let source of availableFundingSources()" [value]="source.fundingSourceId">{{source.fundingSourceName}}</option>
 </ng-select2>
