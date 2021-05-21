@@ -23,6 +23,9 @@ export class GrantsSearchFilterService {
         if (this.userSessionService.isPD()) {
             this.searchWithin = 'mypf';
         }
+        else if (this.userSessionService.isPA()) {
+            this.searchWithin = 'myca';
+        }
 
     }
 
