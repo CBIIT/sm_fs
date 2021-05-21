@@ -79,9 +79,9 @@
             <thead>
               <tr>
                 <th>Grant Number</th>
-                <th>Project Title</th>
-                <th>I2 Status</th>
                 <th>PI</th>
+                <th>I2 Status</th>
+                <th>Project Title</th>
                 <th>Institution</th>
                 <th>FY</th>
                 <th>NCAB Date</th>
@@ -103,9 +103,9 @@
                     </a>
                     <span style="padding:3px;margin:0px 2px;border: 0px;float:inline-end;" (mouseenter)="setGrant(grant)"  [ngbTooltip]="InstituteTooltip"><i class='fa fa-university' aria-hidden='true'></i></span>
                 </td>
-                <td>{{grant.projectTitle}}</td>
-                <td>{{grant.applStatusGroupDescrip}}</td>
                 <td><a href="mailto:{{grant.piEmail}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.piFullName}}</a></td>
+                <td>{{grant.applStatusGroupDescrip}}</td>
+                <td>{{grant.projectTitle}}</td>
                 <td>{{grant.orgName}}</td>
                 <td>{{grant.fy}}</td>
                 <td>{{grant.councilMeetingDate|formatNcabDate}}</td>
@@ -120,7 +120,7 @@
                         <button class="btn btn-primary" disabled>Select</button>
                     </a>
                     <ng-template #actionEnabled>
-                        <button class="btn btn-primary"  (click)="nextStep($event, grant)">Select Grant</button>
+                        <button class="btn btn-primary"  (click)="nextStep($event, grant)">Select</button>
                     </ng-template>
                 </td>
                 <!-- <td></td> control column for responsive -->

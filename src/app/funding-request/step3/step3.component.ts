@@ -35,6 +35,7 @@ export class Step3Component implements OnInit {
   disableJustification: boolean = false;
   disableFile: boolean = false;
   _docOrderDto: FundingRequestDocOrderDto = {};
+  _docOrderDtos: FundingRequestDocOrderDto[] = [];
 
   showJustification: boolean = false;
 
@@ -142,17 +143,8 @@ export class Step3Component implements OnInit {
               }
 
               // Insert records into FUNDING_REQUEST_DOC_ORDER_T
+              this.insertDocOrder(result);
 
-              this._docOrderDto
-              this._docOrderDto.docTypeCode = result.docType;
-              this._docOrderDto.docId = result.id;
-              this._docOrderDto.frqId = result.keyId;
-              this.fsDocOrderControllerService.createDocOrderUsingPOST(this._docOrderDto).subscribe(
-                res => {
-                  console.log("Doc order save successful")
-                }, error => {
-                  console.log('Error occured while saving DOC ORDER----- ' + error.message);
-                });
             }, error => {
               console.log('HttpClient get request error for----- ' + error.message);
             });
@@ -246,9 +238,15 @@ export class Step3Component implements OnInit {
       moveItemInArray(event.container.data,
         event.previousIndex,
         event.currentIndex);
-        console.log("In the same container")
-        //If container.id = 'included', then sort order needs to be updated.
-        //update sort order for both records
+      console.log("In the same container")
+      //If container.id = 'included', then sort order needs to be updated.
+      //update sort order for both records
+
+      if (event.container.id === 'includedId') {
+        this.updateDocOrder(event.container.data);
+      }
+
+
     } else {
       transferArrayItem(
         event.previousContainer.data,
@@ -259,8 +257,17 @@ export class Step3Component implements OnInit {
       console.log("In the different container")
       //If previousContainer == included and container = excluded, data is moved to excluded.
       //Delete data from the DOC order table
-      //Else if previousContainer = excluded and container = included, data is moved to included.
-      //Insert new record and then update sort order for all of them for this frqId
+      if (event.previousContainer.id === 'includedId') {
+        this.deleteDocOrder(event.container.data[event.currentIndex]);
+      } else {
+
+        //Else if previousContainer = excluded and container = included, data is moved to included.
+        //Insert new record and then update sort order for all of them for this frqId
+        this.insertDocOrder(event.container.data[event.currentIndex]);
+        this.updateDocOrder(event.container.data);
+
+      }
+
     }
   }
 
@@ -288,19 +295,23 @@ export class Step3Component implements OnInit {
   }
 
   deleteDoc(id: number) {
+    let tempDocDto: DocumentsDto;
     this.documentService.deleteDocById(id).subscribe(
       result => {
         console.log("Delete Success");
         this.baseTaskList.subscribe(items => {
           this.swimlanes[0]['array'].forEach((value, index) => {
-            if (value.id == id) this.swimlanes[0]['array'].splice(index, 1);
+            if (value.id == id) {
+              this.swimlanes[0]['array'].splice(index, 1);
+              this.deleteDocOrder(value);
+            }
+
           });
         });
 
       }
     ), err => {
       console.log("Error while deleting the document");
-      this.loadFiles();
     };
 
   }
@@ -334,6 +345,50 @@ export class Step3Component implements OnInit {
     } else {
       this.disableFile = false;
     }
+  }
+
+  updateDocOrder(docDtos: DocumentsDto[]) {
+    docDtos.forEach((value, index) => {
+      this._docOrderDto.docId = value.id;
+      this._docOrderDto.sortOrderNum = index + 1;
+      this._docOrderDtos.push(this._docOrderDto);
+      this._docOrderDto = {};
+
+    });
+
+    this.fsDocOrderControllerService.updateDocOrderUsingPUT(this._docOrderDtos).subscribe(
+      res => {
+        console.log("Doc order update successful")
+        this._docOrderDtos.length = 0;
+      }, error => {
+        console.log('Error occured while updating DOC ORDER----- ' + error.message);
+      });
+
+  }
+
+  deleteDocOrder(docDto: DocumentsDto) {
+
+    
+    this.fsDocOrderControllerService.deleteDocOrderUsingDELETE(docDto.id).subscribe(
+      res => {
+        console.log("Doc order delete successful")
+      }, error => {
+        console.log('Error occured while deleting DOC ORDER----- ' + error.message);
+      });
+  }
+
+  insertDocOrder(docDto: DocumentsDto) {
+
+    this._docOrderDto.docTypeCode = docDto.docType;
+    this._docOrderDto.docId = docDto.id;
+    this._docOrderDto.frqId = docDto.keyId;
+
+    this.fsDocOrderControllerService.createDocOrderUsingPOST(this._docOrderDto).subscribe(
+      res => {
+        console.log("Doc order save successful")
+      }, error => {
+        console.log('Error occured while saving DOC ORDER----- ' + error.message);
+      });
   }
 
   nextStep() {

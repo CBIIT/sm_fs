@@ -84,7 +84,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
 
     this.dtOptions = {
       pagingType: 'full_numbers',
-      pageLength: 10,
+      pageLength: 100,
       serverSide: true,
       language: {
           paginate: {
@@ -117,9 +117,9 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
       },
 
       columns: [ {data: 'fullGrantNum'},
-                {data: 'projectTitle'},
-                {data: 'applStatusGroupDescrip'},
                 {data: 'piFullName'},
+                {data: 'applStatusGroupDescrip'},
+                {data: 'projectTitle'},
                 {data: 'orgName'},
                 {data: 'fy'},
                 {data: 'councilMeetingDate'},
@@ -181,7 +181,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
             filename: 'fs-grants-search-result',
             title: null,
             header: true,
-            // exportOptions: { columns: [ 0, 1, 2, 3, 4 , 5 , 6 ] }
+            exportOptions: { columns: [ 0, 1, 2, 3, 4 , 5 , 6, 7, 8, 9, 10, 11, 12 ] }
             }
         ]
       // },
@@ -250,14 +250,14 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     this.searchCriteria.toFy = this.fyRange.toFy;
     if (this.searchCriteria.toFy && this.searchCriteria.fromFy
       && this.searchCriteria.toFy < this.searchCriteria.fromFy) {
-        alert('The "From" fiscal year should be equal to or less than the "To" fiscal year.');
+        alert('Invalid FY date range provided.');
         return;
     }
     this.searchCriteria.fromCouncilMeetingDate = this.ncabRange.fromNcab;
     this.searchCriteria.toCouncileMeetingDate = this.ncabRange.toNcab;
     if (this.searchCriteria.fromCouncilMeetingDate && this.searchCriteria.toCouncileMeetingDate
       && this.searchCriteria.toCouncileMeetingDate < this.searchCriteria.fromCouncilMeetingDate) {
-        alert('The "From" NCAB should be equal to or less than the "To" NCAB.');
+        alert('Invalid NCAB date range provided.');
         return;
     }
 

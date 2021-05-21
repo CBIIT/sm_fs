@@ -24,7 +24,7 @@ export class HeaderComponent implements OnInit {
 		{ docName: "Video Tutorials", docLink: "" },
 		{ docName: "FAQ", docLink: "" },
 		{ docName: "Release Notes", docLink: "" }],
-		helpGuides: [{ helpGuideName: "Example Link", helpGuideLink: "" }]
+		helpGuides: [{ helpGuideName: "Technical Support", helpGuideLink: "mailto:NCII2ESupport@mail.nih.gov?subject=Funding Selections" }]
 	}
 
 	mainMenus = [];
