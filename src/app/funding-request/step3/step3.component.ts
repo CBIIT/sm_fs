@@ -33,7 +33,7 @@ export class Step3Component implements OnInit {
   public _docDescription: string = '';
   justificationUploaded?: Observable<boolean>;
   disableJustification: boolean = false;
-  disableFile: boolean = false;
+  disableFile: boolean = true;
   _docOrderDto: FundingRequestDocOrderDto = {};
   _docOrderDtos: FundingRequestDocOrderDto[] = [];
 
@@ -338,6 +338,12 @@ export class Step3Component implements OnInit {
     } else {
       this.showJustification = false;
     }
+    if (event === '') {
+      this.disableFile = true;
+    } else {
+      this.disableFile = false;
+    }
+    
   }
 
   justificationOnChange() {
