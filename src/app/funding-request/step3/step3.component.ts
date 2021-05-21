@@ -4,7 +4,7 @@ import 'select2';
 import { Options } from 'select2';
 import {
   CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
-  FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto
+  FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto, DocumentsControllerService
 } from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request-model';
@@ -175,7 +175,8 @@ export class Step3Component implements OnInit {
     private documentService: DocumentService,
     private requestModel: RequestModel,
     private fsRequestControllerService: FsRequestControllerService,
-    private fsDocOrderControllerService: FsDocOrderControllerService) {
+    private fsDocOrderControllerService: FsDocOrderControllerService,
+    private documentsControllerService: DocumentsControllerService) {
 
   }
 
@@ -381,7 +382,7 @@ export class Step3Component implements OnInit {
 
     this._docOrderDto.docTypeCode = docDto.docType;
     this._docOrderDto.docId = docDto.id;
-    this._docOrderDto.frqId = docDto.keyId;
+    this._docOrderDto.frqId = this.requestModel.requestDto.frqId;
 
     this.fsDocOrderControllerService.createDocOrderUsingPOST(this._docOrderDto).subscribe(
       res => {
@@ -392,7 +393,20 @@ export class Step3Component implements OnInit {
   }
 
   nextStep() {
-    this.router.navigate(['/request/step4']);
+
+
+    this.documentsControllerService.loadDocumentsBySortOrderUsingGET(this.requestModel.requestDto.frqId).subscribe(
+
+      result => {
+        console.log("Docs retrieved by doc order");
+        this.requestModel.requestDto.includedDocs = result;
+        this.router.navigate(['/request/step4']);
+      }, error => {
+        console.log('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
+      }
+    );
+
+    
   }
 
   prevStep() {
