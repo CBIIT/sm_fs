@@ -13,6 +13,7 @@ import { saveAs } from 'file-saver';
 import { of, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 
 export interface Swimlane {
   name: string;
@@ -36,19 +37,24 @@ export class Step3Component implements OnInit {
   disableFile: boolean = true;
   _docOrderDto: FundingRequestDocOrderDto = {};
   _docOrderDtos: FundingRequestDocOrderDto[] = [];
-
   showJustification: boolean = false;
-
   baseTaskList: Observable<DocumentsDto[]>;
   include: Observable<DocumentsDto[]>;
   exclude: Observable<DocumentsDto[]>;
-
   swimlanes: Swimlane[] = [];
-
   selectedFiles: FileList;
+  justificationType: string = '';
+  justificationEnteredBy: string = '';
+  justificationEnteredByEmail: string = '';
+  justificationFileName: string = '';
+  justificationUploadedOn: Date;
+  justificationId: number;
+  justificationText: string = '';
+  _docType: CgRefCodesDto = {};
+  closeResult: string;
 
   @ViewChild('inputFile')
-  myInputVariable: ElementRef;
+  inputFile: ElementRef;
 
 
   get grant(): NciPfrGrantQueryDto {
@@ -77,6 +83,35 @@ export class Step3Component implements OnInit {
   }
 
 
+  constructor(private router: Router,
+    private cgRefCodControllerService: CgRefCodControllerService,
+    private documentService: DocumentService,
+    private requestModel: RequestModel,
+    private fsRequestControllerService: FsRequestControllerService,
+    private fsDocOrderControllerService: FsDocOrderControllerService,
+    private documentsControllerService: DocumentsControllerService,
+    private modalService: NgbModal) {
+
+  }
+
+  ngOnInit(): void {
+
+    if (!this.requestModel.grant) {
+      this.router.navigate(['/request']);
+    }
+
+    this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
+      result => {
+        console.log('Getting the Doc type Dropdown results');
+        this.DocTypes = of(result);
+      }, error => {
+        console.log('HttpClient get request error for----- ' + error.message);
+      });
+
+    this.loadFiles();
+
+  }
+
   selectFiles(event) {
     this.selectedFiles = event.target.files;
     this.disableJustification = true;
@@ -87,17 +122,8 @@ export class Step3Component implements OnInit {
 
   uploadFiles() {
     if (this.docDescription !== '') {
-
       //Upate justification Text
-      this.fsRequestControllerService.updateJustificationUsingPUT(this.requestModel.requestDto.frqId, this.docDescription).subscribe(
-        result => {
-          this.justificationUploaded = of(true);
-          this.requestModel.requestDto = result;
-          this.reset();
-        }, error => {
-          console.log('HttpClient get request error for----- ' + error.message);
-        });
-
+      this.uploadJustification(this.docDescription);
     } else {
 
       for (let i = 0; i < this.selectedFiles.length; i++) {
@@ -106,19 +132,27 @@ export class Step3Component implements OnInit {
         this._docDto.keyId = this.requestModel.requestDto.frqId;
         this._docDto.keyType = 'PFR';
         this.upload(this.selectedFiles[i]);
-        this.reset();
-
-        if (this._docDto.docType === 'Justification') {
-          this.justificationUploaded = of(true);
-        }
-
       }
     }
+    this.reset();
 
   }
 
+  uploadJustification(justification: string) {
+    this.fsRequestControllerService.updateJustificationUsingPUT(this.requestModel.requestDto.frqId, justification).subscribe(
+      result => {
+        this.justificationUploaded = of(true);
+        this.requestModel.requestDto.justification = justification;
+        this.justificationText = justification;
+      }, error => {
+        console.log('HttpClient get request error for----- ' + error.message);
+      });
+
+    this.justificationType = 'text';
+  }
+
   reset() {
-    this.myInputVariable.nativeElement.value = '';
+    this.inputFile.nativeElement.value = '';
     this.selectedDocType = '';
     this.docDescription = '';
     this.disableJustification = false;
@@ -130,26 +164,29 @@ export class Step3Component implements OnInit {
       event => {
         if (event instanceof HttpResponse) {
 
-          //Get the ID of the latest record
-          this.documentService.getLatestFile(this._docDto.keyId, 'PFR').subscribe(
-            result => {
-              console.log('Retrieving the Doc that just got inserted since we need to know the ID');
-              console.log(result.docType);
 
-              if (result.docType !== 'Justification') {
-                this.baseTaskList.subscribe(items => {
-                  this.swimlanes[0]['array'].push(result);
-                });
-              }
+          const result = event.body;
+          console.log(result);
 
-              // Insert records into FUNDING_REQUEST_DOC_ORDER_T
-              this.insertDocOrder(result);
-
-            }, error => {
-              console.log('HttpClient get request error for----- ' + error.message);
+          if (result.docType !== 'Justification') {
+            this.baseTaskList.subscribe(items => {
+              this.swimlanes[0]['array'].push(result);
             });
+          } else {
+            if (this._docDto.docType === 'Justification') {
+              this.justificationUploaded = of(true);
+              this.justificationType = 'file';
+              this.justificationEnteredBy = result.uploadByName;
+              this.justificationEnteredByEmail = result.uploadByEmail;
+              this.justificationFileName = result.docFilename;
+              this.justificationUploadedOn = result.createDate;
+              this.justificationId = result.id;
+            }
+          }
 
-          //Remove Doc Type from the drop down
+          this.insertDocOrder(result);
+
+         //Remove Doc Type from the drop down
           this.DocTypes.forEach(element => {
             element.forEach((e, index) => {
               if (e.rvLowValue === this._docDto.docType) {
@@ -167,35 +204,6 @@ export class Step3Component implements OnInit {
         console.log('Error occured while uploading doc----- ' + err.message);
       });
 
-
-  }
-
-  constructor(private router: Router,
-    private cgRefCodControllerService: CgRefCodControllerService,
-    private documentService: DocumentService,
-    private requestModel: RequestModel,
-    private fsRequestControllerService: FsRequestControllerService,
-    private fsDocOrderControllerService: FsDocOrderControllerService,
-    private documentsControllerService: DocumentsControllerService) {
-
-  }
-
-
-  ngOnInit(): void {
-
-    if (!this.requestModel.grant) {
-      this.router.navigate(['/request']);
-    }
-
-    this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
-      result => {
-        console.log('Getting the Doc type Dropdown results');
-        this.DocTypes = of(result);
-      }, error => {
-        console.log('HttpClient get request error for----- ' + error.message);
-      });
-
-    this.loadFiles();
 
   }
 
@@ -241,7 +249,7 @@ export class Step3Component implements OnInit {
         event.currentIndex);
       console.log("In the same container")
       //If container.id = 'included', then sort order needs to be updated.
-      //update sort order for both records
+      //update sort order for all records
 
       if (event.container.id === 'includedId') {
         this.updateDocOrder(event.container.data);
@@ -295,8 +303,8 @@ export class Step3Component implements OnInit {
       () => console.info('File downloaded successfully');
   }
 
-  deleteDoc(id: number) {
-    let tempDocDto: DocumentsDto;
+  deleteDoc(id: number, docType: string) {
+
     this.documentService.deleteDocById(id).subscribe(
       result => {
         console.log("Delete Success");
@@ -310,10 +318,26 @@ export class Step3Component implements OnInit {
           });
         });
 
+        this.pushDocType(docType);
+
+        if (docType == 'Justification') {
+
+          this.justificationUploaded = of(false);
+        }
+
       }
     ), err => {
       console.log("Error while deleting the document");
     };
+
+  }
+
+  pushDocType(docType: string) {
+
+    this._docType.rvLowValue = docType;
+    this.DocTypes.forEach(element => {
+      element.push(this._docType);
+    });
 
   }
 
@@ -343,7 +367,7 @@ export class Step3Component implements OnInit {
     } else {
       this.disableFile = false;
     }
-    
+
   }
 
   justificationOnChange() {
@@ -375,7 +399,7 @@ export class Step3Component implements OnInit {
 
   deleteDocOrder(docDto: DocumentsDto) {
 
-    
+
     this.fsDocOrderControllerService.deleteDocOrderUsingDELETE(docDto.id).subscribe(
       res => {
         console.log("Doc order delete successful")
@@ -398,8 +422,33 @@ export class Step3Component implements OnInit {
       });
   }
 
-  nextStep() {
+  deleteJustification() {
+    if (this.justificationType == 'text') {
+      this.uploadJustification('')
+    } else {
+      this.deleteDoc(this.justificationId, 'Justification');
+    }
+  }
 
+  open(content) {
+    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+  
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return  `with: ${reason}`;
+    }
+  }
+
+  nextStep() {
 
     this.documentsControllerService.loadDocumentsBySortOrderUsingGET(this.requestModel.requestDto.frqId).subscribe(
 
@@ -412,7 +461,7 @@ export class Step3Component implements OnInit {
       }
     );
 
-    
+
   }
 
   prevStep() {

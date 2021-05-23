@@ -24,7 +24,7 @@ export class DocumentService {
 
     const req = new HttpRequest('POST', `${this.docUrl}/add`, formData, {
       reportProgress: true,
-      responseType: 'text'
+      responseType: 'json'
     });
     return this.http.request(req);
 
