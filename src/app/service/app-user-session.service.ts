@@ -17,21 +17,36 @@ export class AppUserSessionService {
               private caService: CancerActivityControllerService) {
   }
 
-  async initialize(): Promise<any> {
-    console.log('AppUserSessionService initialize starts');
-    const result = await this.userService.getSecurityCredentials().toPromise();
-    console.log('UserService.getSecurityCrentials returns ', result);
-    this.loggedOnUser = result.nciPerson;
-    this.environment = result.environment;
-//        console.log("nci_person", result.nciPerson);
-//          this.canChangeUser = this.userService.isTechSupportAuth(result.authorities);
-    this.roles = [];
-    result.authorities.forEach(authority => {
-            this.roles.push(authority.authority); } );
-    const result2 = await this.caService.getCasForPdUsingGET(this.loggedOnUser.npnId, true).toPromise();
-    console.log('user assigned cancer activities:', result2);
-    this.userCancerActivities = result2;
-    console.log('AppUserSessionService Returns');
+  initialize(): Promise<any> {
+    return new Promise<void>((resolve, reject) => {
+      console.log('AppUserSessionService initialize starts');
+      this.userService.getSecurityCredentials().subscribe(
+        (result) => {
+          console.log('UserService.getSecurityCrentials returns ', result);
+          this.loggedOnUser = result.nciPerson;
+          this.environment = result.environment;
+          this.roles = [];
+          result.authorities.forEach(authority => {
+                  this.roles.push(authority.authority); } );
+          this.caService.getCasForPdUsingGET(this.loggedOnUser.npnId, true).subscribe(
+            (caresult) => {
+              console.log('user assigned cancer activities:', caresult);
+              this.userCancerActivities = caresult;
+              console.log('AppUserSessionService Done');
+              resolve();
+            },
+            (caerror) => {
+              console.log('Failed to get User CAs for error', caerror);
+              reject();
+            }
+          );
+        },
+        (error) => {
+          console.log('Failed to userService.getSecurityCrentials', error);
+          reject();
+        }
+      );
+      });
   }
 
   isPD(): boolean{

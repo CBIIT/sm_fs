@@ -50,24 +50,22 @@ import {LoaderInterceptor} from './interceptors/loader-spinner.interceptor';
 import {FundingSourcesNamesComponent} from './funding-sources-names/funding-sources-names.component';
 import { FinalLoaComponent } from './final-loa/final-loa.component';
 
-export function initializeAppProperties(appPropertiesService: AppPropertiesService,
-                                        appLookupsService: AppLookupsService,
-                                        appUserSessionService: AppUserSessionService) {
+export function initializeAppProperties(appPropertiesService: AppPropertiesService): any{
   return (): Promise<any> => {
-    // add async loading proerties and other initialization functions below.
-    // calling rest api to load application properties and override properties
-    return appInitialization(appPropertiesService,
-      appLookupsService, appUserSessionService);
+    return appPropertiesService.initialize();
   };
 }
 
-async function appInitialization(
-  appPropertiesService: AppPropertiesService,
-  appLookupsService: AppLookupsService,
-  appUserSessionService: AppUserSessionService) {
-  await appPropertiesService.initialize();
-  await appLookupsService.initialize();
-  await appUserSessionService.initialize();
+export function initializeUserSession(userSessionService: AppUserSessionService): any{
+  return (): Promise<any> => {
+    return userSessionService.initialize();
+  };
+}
+
+export function initializeLookupMaps(lookupService: AppLookupsService): any{
+  return (): Promise<any> => {
+    return lookupService.initialize();
+  };
 }
 
 @NgModule({
@@ -122,11 +120,12 @@ async function appInitialization(
     {provide: BASE_PATH, useValue: '/i2ecws'},
     {provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS'},
     {provide: PROPERTIES_OVERRIDE, useValue: environment},
-    {
-      provide: APP_INITIALIZER, useFactory: initializeAppProperties,
-      deps: [AppPropertiesService, AppLookupsService,
-        AppUserSessionService], multi: true
-    }
+    {provide: APP_INITIALIZER, useFactory: initializeAppProperties,
+     deps: [AppPropertiesService], multi: true},
+    {provide: APP_INITIALIZER, useFactory: initializeUserSession,
+      deps: [AppUserSessionService], multi: true},
+    {provide: APP_INITIALIZER, useFactory: initializeLookupMaps,
+        deps: [AppLookupsService], multi: true}
   ],
   bootstrap: [AppComponent]
 })
