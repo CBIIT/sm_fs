@@ -25,6 +25,7 @@ export class Step2Component implements OnInit {
     }
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.requestDto.grantAwarded = result;
+        console.log('Appl Periods/Grant awards:', result);
       }, error => {
         // TODO: properly handle errors here
         console.log('HttpClient get request error for----- ' + error.message);

@@ -1,0 +1,5 @@
+#side-nav ul li a.active {
+    border-left: 0.3rem solid #40c1ac;
+    padding-left: calc(.5rem - .3rem);
+    font-weight: bold;
+}

@@ -48,6 +48,7 @@ import {LoaderSpinnerComponent} from './loader-spinner/loader-spinner.component'
 import {LoaderService} from './service/loader-spinner.service';
 import {LoaderInterceptor} from './interceptors/loader-spinner.interceptor';
 import {FundingSourcesNamesComponent} from './funding-sources-names/funding-sources-names.component';
+import { FinalLoaComponent } from './final-loa/final-loa.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService,
                                         appLookupsService: AppLookupsService,
@@ -64,9 +65,9 @@ async function appInitialization(
   appPropertiesService: AppPropertiesService,
   appLookupsService: AppLookupsService,
   appUserSessionService: AppUserSessionService) {
-  appPropertiesService.initialize();
-  appLookupsService.initialize();
-  appUserSessionService.initialize();
+  await appPropertiesService.initialize();
+  await appLookupsService.initialize();
+  await appUserSessionService.initialize();
 }
 
 @NgModule({
@@ -102,6 +103,7 @@ async function appInitialization(
     OtherDocsContributingFundsComponent,
     LoaderSpinnerComponent,
     FundingSourcesNamesComponent,
+    FinalLoaComponent,
 
   ],
   imports: [

@@ -14,8 +14,8 @@ export class AppPropertiesService {
   constructor(private lookupService:LookupsControllerService,
     @Inject(PROPERTIES_APP_NAME) appName: string,
     @Inject(PROPERTIES_OVERRIDE) overrideProperties: any) {
-      this.appName=appName;
-      this.overrideProperties=overrideProperties;
+      this.appName = appName;
+      this.overrideProperties = overrideProperties;
   }
 
   delay = ms => new Promise(res => setTimeout(res, ms));
@@ -23,7 +23,7 @@ export class AppPropertiesService {
   async initialize() {
     //await this.delay(5000);
     console.log("AppPropertiesService initialize Starts, appName="+this.appName);
-    let result= await this.lookupService.getAppPropertiesByAppNameUsingGET(this.appName).toPromise();
+    let  result = await this.lookupService.getAppPropertiesByAppNameUsingGET(this.appName).toPromise();
 
     this.appProperties={};
     result.forEach((element) => {

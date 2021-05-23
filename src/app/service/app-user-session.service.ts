@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { UserService } from '@nci-cbiit/i2ecui-lib';
 import { CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
-import { RequestHistoryComponent } from '../request-history/request-history.component';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +9,7 @@ export class AppUserSessionService {
 
   private loggedOnUser: NciPerson;
   private environment: string;
-  private userCancerActivities: any[];
+  private userCancerActivities;
 
   private roles: string[];
 
@@ -20,30 +19,19 @@ export class AppUserSessionService {
 
   async initialize(): Promise<any> {
     console.log('AppUserSessionService initialize starts');
-    this.userService.getSecurityCredentials().subscribe(
-      result => {
-        console.log('UserService.getSecurityCrentials returns ', result);
-        this.loggedOnUser = result.nciPerson;
-        this.environment = result.environment;
+    const result = await this.userService.getSecurityCredentials().toPromise();
+    console.log('UserService.getSecurityCrentials returns ', result);
+    this.loggedOnUser = result.nciPerson;
+    this.environment = result.environment;
 //        console.log("nci_person", result.nciPerson);
 //          this.canChangeUser = this.userService.isTechSupportAuth(result.authorities);
-        this.roles = [];
-        result.authorities.forEach(authority => {
+    this.roles = [];
+    result.authorities.forEach(authority => {
             this.roles.push(authority.authority); } );
-        this.caService.getCasForPdUsingGET(this.loggedOnUser.npnId, true).subscribe(
-          result2 => {
-            console.log('user assigned cancer activities:', result2);
-            this.userCancerActivities = result2;
-          },
-          error2 => {
-            console.log('error get user cancer activities, ', error2);
-          }
-        );
-        console.log('AppUserSessionService initialize done');
-      },
-      error => {
-        console.log('AppUserSessionService initialze error ', error);
-      });
+    const result2 = await this.caService.getCasForPdUsingGET(this.loggedOnUser.npnId, true).toPromise();
+    console.log('user assigned cancer activities:', result2);
+    this.userCancerActivities = result2;
+    console.log('AppUserSessionService Returns');
   }
 
   isPD(): boolean{
@@ -92,5 +80,8 @@ export class AppUserSessionService {
     return this.loggedOnUser;
   }
 
+  hasRole(role: string): boolean {
+    return this.roles.indexOf(role) > -1;
+  }
 
 }

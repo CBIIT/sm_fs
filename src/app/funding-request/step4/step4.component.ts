@@ -2,10 +2,12 @@ import {ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild} 
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {AppPropertiesService} from '../../service/app-properties.service';
-import {FsRequestControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto, FundingRequestDtoReq} from '@nci-cbiit/i2ecws-lib';
+import {FsRequestControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto, FundingRequestDtoReq, DocumentsDto} from '@nci-cbiit/i2ecws-lib';
 import {AppUserSessionService} from 'src/app/service/app-user-session.service';
 import {FundingRequestIntegrationService} from '../integration/integration.service';
 import {Subscription} from 'rxjs';
+import { DocumentService } from '../../service/document.service';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-step4',
@@ -22,6 +24,7 @@ export class Step4Component implements OnInit, OnDestroy {
   submissionResult = {frqId: null, approver: null};
   dv = true;
   requestStatus: string;
+  docDtos: DocumentsDto[];
 
   constructor(private router: Router,
               private requestModel: RequestModel,
@@ -29,6 +32,7 @@ export class Step4Component implements OnInit, OnDestroy {
               private fsRequestService: FsRequestControllerService,
               private userSessionService: AppUserSessionService,
               private requestIntegrationService: FundingRequestIntegrationService,
+              private documentService: DocumentService,
               private changeDetection: ChangeDetectorRef) {
   }
 
@@ -45,6 +49,7 @@ export class Step4Component implements OnInit, OnDestroy {
         this.parseRequestHistories(historyResult);
       }
     );
+    this.docDtos = this.requestModel.requestDto.includedDocs;
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
@@ -150,6 +155,29 @@ export class Step4Component implements OnInit, OnDestroy {
     so depending on the type and missing doc, tool tip has to be created accordingly.
     */
     return 'You must upload Justification and Transition Memo to submit this request.';
+  }
+
+  downloadCoverSheet() {
+    this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId).subscribe(blob => saveAs(blob, 'Cover Page.pdf')), error =>
+      console.log('Error downloading the file'),
+      () => console.info('File downloaded successfully');
+  }
+
+  downloadFile(id: number, fileName: string) {
+    if (fileName === 'Summary Statement') {
+      this.downloadSummaryStatement();
+    } else {
+      this.documentService.downloadById(id).subscribe(blob => saveAs(blob, fileName)), error =>
+        console.log('Error downloading the file'),
+        () => console.info('File downloaded successfully');
+    }
+
+  }
+
+  downloadSummaryStatement() {
+    this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId).subscribe(blob => saveAs(blob, 'Summary Statement.pdf')), error =>
+      console.log('Error downloading the file'),
+      () => console.info('File downloaded successfully');
   }
 
 }
