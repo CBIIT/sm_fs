@@ -61,7 +61,7 @@
     <div class="col-sm-6 col-lg-2">
         <div class="form-group">
             <p class="like-label">Cancer Activity</p>
-            <p>{{ grant.cayCode }}</p>
+            <p><a [routerLink]="" ngbTooltip="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="mouseenter:mouseleave" placement="top">{{grant.cayCode}}</a></p>
         </div>
     </div>
 
