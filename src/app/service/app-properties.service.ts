@@ -1,5 +1,5 @@
-import { Inject, Injectable, InjectionToken } from '@angular/core';
-import { LookupsControllerService } from '@nci-cbiit/i2ecws-lib';
+import {Inject, Injectable, InjectionToken} from '@angular/core';
+import {LookupsControllerService} from '@nci-cbiit/i2ecws-lib';
 
 @Injectable({
   providedIn: 'root'
@@ -10,26 +10,25 @@ export class AppPropertiesService {
   private overrideProperties: any;
   private appName: string;
 
-
   constructor(private lookupService: LookupsControllerService,
               @Inject(PROPERTIES_APP_NAME) appName: string,
               @Inject(PROPERTIES_OVERRIDE) overrideProperties: any) {
-      this.appName = appName;
-      this.overrideProperties = overrideProperties;
+    this.appName = appName;
+    this.overrideProperties = overrideProperties;
   }
 
   delay = ms => new Promise(res => setTimeout(res, ms));
 
   initialize(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      console.log('AppPropertiesService initialize Starts, appName=' + this.appName);
-      this.lookupService.getAppPropertiesByAppNameUsingGET(this.appName).subscribe (
+      // console.log('AppPropertiesService initialize Starts, appName=' + this.appName);
+      this.lookupService.getAppPropertiesByAppNameUsingGET(this.appName).subscribe(
         (result) => {
           result.forEach((element) => {
-                console.log('App_Properties_T name/value ' + element.propKey + '/' + element.propValue);
-                this.appProperties[element.propKey] = element.propValue;
+            // console.log('App_Properties_T name/value ' + element.propKey + '/' + element.propValue);
+            this.appProperties[element.propKey] = element.propValue;
           });
-          console.log('AppPropertiesService initialize Done');
+          // console.log('AppPropertiesService initialize Done');
           resolve();
         },
         (error) => {
@@ -37,15 +36,14 @@ export class AppPropertiesService {
           reject();
         }
       );
-      });
+    });
   }
 
-  getProperty(name: string): string{
-    if (this.overrideProperties && this.overrideProperties[name]){
+  getProperty(name: string): string {
+    if (this.overrideProperties && this.overrideProperties[name]) {
       return this.overrideProperties[name];
-    }
-    else {
-      return this.appProperties[name] ;
+    } else {
+      return this.appProperties[name];
     }
   }
 

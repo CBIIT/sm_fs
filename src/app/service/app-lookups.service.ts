@@ -19,7 +19,7 @@ export class AppLookupsService {
   }
 
   loadCancerActivities(): void {
-    console.log('AppLookupsService loadCancerActivities starts');
+    // console.log('AppLookupsService loadCancerActivities starts');
     this.cancerActivityController.getAllActiveCaListUsingGET().subscribe(
       (result) => {
         const cays = {};
@@ -27,7 +27,7 @@ export class AppLookupsService {
           cays[element.code] = element.referralDescription;
         });
         this.lookups.CancerActivities = cays;
-        console.log('AppLookupsService loadCancerActivities done', cays);
+        // console.log('AppLookupsService loadCancerActivities done', cays);
         this.cancerActivitiesLoaded = true;
         this.tryResolve();
       },
@@ -49,9 +49,9 @@ export class AppLookupsService {
 
   loadDummyLookupMap(): void {
     // Simulate another load, let it delay 1/10 seconds;
-    console.log('AppLookupsService loadDummyLookupMap starts');
+    // console.log('AppLookupsService loadDummyLookupMap starts');
     setTimeout(() => {
-      console.log('AppLookupsService loadDummyLookupMap done');
+      // console.log('AppLookupsService loadDummyLookupMap done');
       this.dummyLookupMapLoaded = true;
       this.tryResolve();
     }, 100);
@@ -59,7 +59,7 @@ export class AppLookupsService {
 
   initialize(): Promise<any> {
     return new Promise<void>( (resolve, reject) => {
-      console.log('AppLookupsService starts');
+      // console.log('AppLookupsService starts');
       this.dummyLookupMapLoaded = false;
       this.cancerActivitiesLoaded = false;
       this.resolve = resolve;

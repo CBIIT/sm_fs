@@ -39,7 +39,7 @@ export class RequestModel {
   }
 
   set requestDto(value: FundingRequestDtoReq) {
-    console.log('model updated with new FundingRequest data.  Redistribute fields as necessary.');
+    // console.log('model updated with new FundingRequest data.  Redistribute fields as necessary.');
     this._requestDto = value;
   }
 
@@ -49,7 +49,7 @@ export class RequestModel {
 
 
   set grant(value: NciPfrGrantQueryDto) {
-    console.log('setting grant on request model - propagate properties as necessary');
+    // console.log('setting grant on request model - propagate properties as necessary');
     // TODO: map appropriate values from grant to requestDto
     this._requestDto.applId = value.applId;
     if (!this._requestDto.financialInfoDto) {
@@ -77,7 +77,7 @@ export class RequestModel {
   }
 
   constructor(private propertiesService: AppPropertiesService) {
-    console.log('Construction of request model happening now');
+    // console.log('Construction of request model happening now');
     this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this._requestDto = {};
@@ -115,7 +115,7 @@ export class RequestModel {
   }
 
   reset(): void {
-    console.log('Reset RequestModel to baseline');
+    // console.log('Reset RequestModel to baseline');
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
     this._requestType = undefined;
