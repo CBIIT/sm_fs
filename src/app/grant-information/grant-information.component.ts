@@ -10,6 +10,8 @@ import {AppPropertiesService} from '../service/app-properties.service';
 })
 export class GrantInformationComponent implements OnInit {
 
+  tooltipGrant: any;
+
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService) {
   }
 
@@ -23,5 +25,8 @@ export class GrantInformationComponent implements OnInit {
   get model(): RequestModel {
     return this.requestModel;
   }
-
+  
+  setGrant(grant): void {
+    this.tooltipGrant = grant;
+  }
 }
