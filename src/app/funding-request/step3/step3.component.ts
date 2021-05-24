@@ -52,6 +52,8 @@ export class Step3Component implements OnInit {
   justificationText: string = '';
   _docType: CgRefCodesDto = {};
   closeResult: string;
+  maxFileSize: number  = 10485760; //10MB
+  maxFileSizeError: string;
 
   @ViewChild('inputFile')
   inputFile: ElementRef;
@@ -131,11 +133,15 @@ export class Step3Component implements OnInit {
         this._docDto.docType = this.selectedDocType;
         this._docDto.keyId = this.requestModel.requestDto.frqId;
         this._docDto.keyType = 'PFR';
-        this.upload(this.selectedFiles[i]);
+        if (this.selectedFiles[i].size <= this.maxFileSize) {
+          this.upload(this.selectedFiles[i]);
+        } else {
+          alert('file size is more than 10 MB');
+        }
+        
       }
     }
     this.reset();
-
   }
 
   uploadJustification(justification: string) {
