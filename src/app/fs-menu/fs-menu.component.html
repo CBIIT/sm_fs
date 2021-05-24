@@ -2,7 +2,7 @@
     <ul class="list-group">
         <li class="list-group-item"><a routerLink="/search" class="menu-item" routerLinkActive="active">Search</a></li>
         <li class="list-group-item" *ngIf="ogaCertifier || oefiaCertifier">
-            <a href="#paylist" class="parent" data-toggle="collapse" href="#nav-collapse-paylist" role="button" aria-expanded="true" aria-controls="nav-collapse-paylist">Paylists</a>
+            <a href="#paylist" class="parent" data-toggle="collapse" href="#nav-collapse-paylist" role="button" aria-expanded="false" aria-controls="nav-collapse-paylist">Paylists</a>
             <ul class="collapse" id="nav-collapse-paylist">
                 <li class="list-group-item"><a href="{{paylistDashboardUrl}}">Dashboard</a></li>
                 <li class="list-group-item" *ngIf="ogaCertifier"><a href="{{paylistPendingGrantsUrl}}">Pending Grants</a></li>

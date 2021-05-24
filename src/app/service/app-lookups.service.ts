@@ -32,6 +32,7 @@ export class AppLookupsService {
         this.tryResolve();
       },
       (error) => {
+        console.error('Failed loading CanerActivities in AppLookupService for error, ', error);
         this.doReject();
       }
     );

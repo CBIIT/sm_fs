@@ -42,7 +42,7 @@ export class AppUserSessionService {
           );
         },
         (error) => {
-          console.error('Failed to userService.getSecurityCrentials', error);
+          console.error('Failed to userService.getSecurityCrentials for error', error);
           reject();
         }
       );
