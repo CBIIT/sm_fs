@@ -19,10 +19,10 @@ export class AppUserSessionService {
 
   initialize(): Promise<any> {
     return new Promise<void>((resolve, reject) => {
-      console.log('AppUserSessionService initialize starts');
+      // console.log('AppUserSessionService initialize starts');
       this.userService.getSecurityCredentials().subscribe(
         (result) => {
-          console.log('UserService.getSecurityCrentials returns ', result);
+          // console.log('UserService.getSecurityCrentials returns ', result);
           this.loggedOnUser = result.nciPerson;
           this.environment = result.environment;
           this.roles = [];
@@ -30,19 +30,19 @@ export class AppUserSessionService {
                   this.roles.push(authority.authority); } );
           this.caService.getCasForPdUsingGET(this.loggedOnUser.npnId, true).subscribe(
             (caresult) => {
-              console.log('user assigned cancer activities:', caresult);
+              // console.log('user assigned cancer activities:', caresult);
               this.userCancerActivities = caresult;
-              console.log('AppUserSessionService Done');
+              // console.log('AppUserSessionService Done');
               resolve();
             },
             (caerror) => {
-              console.log('Failed to get User CAs for error', caerror);
+              console.error('Failed to get User CAs for error', caerror);
               reject();
             }
           );
         },
         (error) => {
-          console.log('Failed to userService.getSecurityCrentials', error);
+          console.error('Failed to userService.getSecurityCrentials', error);
           reject();
         }
       );

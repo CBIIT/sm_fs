@@ -1,8 +1,8 @@
-import { Component, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
-import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
-import { FundSelectSearchCriteriaRes } from '@nci-cbiit/i2ecws-lib';
-import { SearchCriteria } from '../search-criteria';
-import { SearchFilterService } from '../search-filter.service';
+import {Component, OnInit, Output, ViewChild, EventEmitter} from '@angular/core';
+import {GrantnumberSearchCriteriaComponent} from '@nci-cbiit/i2ecui-lib';
+import {FundSelectSearchCriteriaRes} from '@nci-cbiit/i2ecws-lib';
+import {SearchCriteria} from '../search-criteria';
+import {SearchFilterService} from '../search-filter.service';
 
 @Component({
   selector: 'app-search-filter',
@@ -12,30 +12,33 @@ import { SearchFilterService } from '../search-filter.service';
 })
 export class SearchFilterComponent implements OnInit {
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
-  @Output() callSearch=new EventEmitter<SearchCriteria>();
+  @Output() callSearch = new EventEmitter<SearchCriteria>();
   public searchFilter: SearchCriteria;
 
-  constructor(private searchFilterService:SearchFilterService) {}
+  constructor(private searchFilterService: SearchFilterService) {
+  }
 
   ngOnInit(): void {
-    console.log("search-filter component ngOnInit()");
-    this.searchFilter=this.searchFilterService.searchFilter;
+    // console.log("search-filter component ngOnInit()");
+    this.searchFilter = this.searchFilterService.searchFilter;
   }
 
-  rfaPaSelected(event:string) {
-    this.searchFilter.rfaPa=event;
+  // TODO: this method is apparently unused.  Can it be deleted?
+  rfaPaSelected(event: string): void {
+    this.searchFilter.rfaPa = event;
   }
 
-  fyRangeChanged(event:{fromFy:number,toFy:number}) {
-    this.searchFilter.fyRange=event;
+  // TODO: this method is apparently unused.  Can it be deleted?
+  fyRangeChanged(event: { fromFy: number, toFy: number }): void {
+    this.searchFilter.fyRange = event;
   }
 
-  isSearchingRequest():boolean {
-    return this.searchFilter.requestOrPlan==='Request';
+  isSearchingRequest(): boolean {
+    return this.searchFilter.requestOrPlan === 'Request';
   }
 
-  doSearch() {
-    console.log("search-filter.component doSearch Called");
+  doSearch(): void {
+    console.log('search-filter.component doSearch Called');
     this.callSearch.emit(this.searchFilter);
   }
 

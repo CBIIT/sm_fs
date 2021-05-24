@@ -46,20 +46,15 @@ export class FundingSourceComponent implements OnInit {
 
   ngOnInit(): void {
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(select => {
-      console.log('select:', select, 'mine:', this._selectedValue);
       if (Number(select) === Number(this._selectedValue)) {
-        console.log(this.name, ': I did this');
+        console.log('My selection; do not exclude');
       } else {
-        console.log(this.name, ': someone else did this');
         this.selectedFundingSources.add(Number(select));
-        console.log('my exclusions:', this.selectedFundingSources);
       }
 
     });
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.subscribe(deselect => {
-      console.log('deselect:', deselect);
       this.selectedFundingSources.delete(Number(deselect));
-      console.log('my exclusions after deselect:', this.selectedFundingSources);
 
     });
     this.fsRequestControllerService.getFundingSourcesUsingGET(
@@ -68,7 +63,6 @@ export class FundingSourceComponent implements OnInit {
       this.requestModel.grant.fy,
       this.requestModel.requestDto.pdNpnId,
       this.requestModel.requestDto.requestorCayCode).subscribe(result => {
-      console.log(result);
       this.fundingSources = result;
     }, error => {
       console.log('HttpClient get request error for----- ' + error.message);

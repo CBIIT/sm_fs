@@ -23,7 +23,7 @@ export class FsMenuComponent implements OnInit {
               private userSessionService: AppUserSessionService) { }
 
   ngOnInit(): void {
-    console.log('inside fs menu ngOnInit()');
+    // console.log('inside fs menu ngOnInit()');
     this.paylistDashboardUrl = this.appPropertiesService.getProperty('paylistUrl') + '#side-nav-paylists';
     this.paylistPendingGrantsUrl = this.appPropertiesService.getProperty('paylistUrl') + '#side-nav-grants';
     this.paylistSearchUrl = this.appPropertiesService.getProperty('paylistUrl') + '#side-nav-find-paylists';
