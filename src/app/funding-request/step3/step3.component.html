@@ -28,7 +28,7 @@
             <label for="file-description">Justification Text</label>
             <textarea class="form-control" maxlength="1000" id="file-description" [disabled]="disableJustification"
                 rows="5" (change)="justificationOnChange()" [(ngModel)]="docDescription"></textarea>
-            <span class="counter">xxxx/1000</span>
+            <span class="counter">{{ docDescription.length }}/1000</span>
         </div>
 
         <div class="d-flex w-100">
@@ -157,15 +157,13 @@
 
 <ng-template #justificationModal let-modal>
     <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title">Bootstrap Modal</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">×</span>
-        </button>
-    </div>
+        <h2 class="modal-title h4 mb-0" id="i2group-title">Justification Text</h2>
+        <button type="button" class="close"  (click)="modal.dismiss('')"><i class="fas fa-times" aria-label="close modal"></i></button>
+     </div>
     <div class="modal-body">
         {{justificationText}}
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Ok</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="modal.close()">Close</button>
     </div>
 </ng-template>
