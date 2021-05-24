@@ -65,11 +65,10 @@ export class OtherDocsContributingFundsComponent implements OnInit {
     this.lookupsControllerService.getNciDocsUsingGET().subscribe(
       result => {
         result.forEach(r => {
-          console.log(r);
           this.docs.push({selected: false, id: r.id, abbreviation: r.abbreviation, description: r.description, order: 0});
         });
       }, error => {
-        console.log('HttpClient get request error for----- ' + error.message);
+        console.error('HttpClient get request error for----- ' + error.message);
       });
 
   }

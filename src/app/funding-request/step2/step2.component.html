@@ -5,11 +5,17 @@
 <app-program-recommended-costs *ngIf="requestTypeSelected()"></app-program-recommended-costs>
 
 
-
 <hr>
 <div class="row">
   <div class="col-12 d-flex">
-    <button class="btn btn-outline-secondary mr-auto" (click)="prevStep()">Previous</button>
+    <button class="btn btn-outline-secondary mr-auto" [disabled]="!canGoBack()" (click)="prevStep()">
+      Previous
+    </button>
+    <ng-template #cantGoBack>
+        <span ngbTooltip="Request has been saved so 'Previous' is disabled.">
+            <button class="btn btn-outline-secondary mr-auto" disabled>Previous</button>
+        </span>
+    </ng-template>
     <button class="btn btn-outline-primary mr-2" *ngIf="isSaveable(); else saveDisabled" (click)="saveAsDraft()">
       Save as Draft
     </button>
@@ -18,7 +24,9 @@
             <button class="btn btn-outline-primary mr-2" disabled>Save as Draft</button>
         </span>
     </ng-template>
-    <button class="btn btn-primary" *ngIf="isSaveable(); else saveAndContinueDisabled" (click)="saveAndContinue()">Save and Continue</button>
+    <button class="btn btn-primary" *ngIf="isSaveable(); else saveAndContinueDisabled" (click)="saveAndContinue()">Save
+      and Continue
+    </button>
     <ng-template #saveAndContinueDisabled>
         <span ngbTooltip="Missing required  values to save request">
             <button class="btn btn-primary" disabled>Save and Continue</button>

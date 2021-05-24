@@ -4,6 +4,7 @@ import {RequestModel} from '../../model/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../../service/app-properties.service';
 import {errorObject, isNumeric} from 'rxjs/internal-compatibility';
+import {NGXLogger} from 'ngx-logger';
 
 @Component({
   selector: 'app-step2',
@@ -13,10 +14,10 @@ import {errorObject, isNumeric} from 'rxjs/internal-compatibility';
 export class Step2Component implements OnInit {
 
 
-
   constructor(private router: Router, private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
-              private fsRequestControllerService: FsRequestControllerService) {
+              private fsRequestControllerService: FsRequestControllerService,
+              private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
@@ -25,10 +26,10 @@ export class Step2Component implements OnInit {
     }
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.requestDto.grantAwarded = result;
-        console.log('Appl Periods/Grant awards:', result);
+        this.logger.debug('Appl Periods/Grant awards:', result);
       }, error => {
         // TODO: properly handle errors here
-        console.log('HttpClient get request error for----- ' + error.message);
+        this.logger.error('HttpClient get request error for----- ' + error.message);
       }
     );
     this.requestModel.requestDto.pdNpnId = this.requestModel.grant.pdNpnId;
@@ -57,11 +58,11 @@ export class Step2Component implements OnInit {
 
   saveFundingRequest(navigate: string): void {
     if (!this.isSaveable()) {
-      console.log('Can\'t save at this point');
+      this.logger.error('Can\'t save at this point');
       return;
     }
     // TODO: make sure model is properly constructed
-    console.log(JSON.stringify(this.requestModel.requestDto));
+    this.logger.debug(JSON.stringify(this.requestModel.requestDto));
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
         this.requestModel.requestDto = result;
@@ -69,11 +70,11 @@ export class Step2Component implements OnInit {
           this.router.navigate([navigate]);
         }
 
-        console.log(JSON.stringify(this.requestModel.requestDto));
+        this.logger.debug(JSON.stringify(this.requestModel.requestDto));
 
       }, error => {
         // TODO: properly handle errors here
-        console.log('HttpClient get request error for----- ' + error.message);
+        this.logger.error('HttpClient get request error for----- ' + error.message);
       }
     );
   }
@@ -86,4 +87,7 @@ export class Step2Component implements OnInit {
     return isNumeric(this.requestModel.requestDto.frtId);
   }
 
+  canGoBack(): boolean {
+    return this.model.requestDto.frqId === undefined;
+  }
 }
