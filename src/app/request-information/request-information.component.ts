@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
-import {AppPropertiesService} from '../service/app-properties.service';
 import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {isArray} from 'rxjs/internal-compatibility';
+import {NGXLogger} from 'ngx-logger';
 
 @Component({
   selector: 'app-request-information',
@@ -16,7 +16,6 @@ export class RequestInformationComponent implements OnInit {
   }
 
   set selectedRequestType(value: number) {
-    console.log('set selected request type:', value);
     this.requestModel.requestDto.frtId = value;
   }
 
@@ -32,16 +31,12 @@ export class RequestInformationComponent implements OnInit {
     return this._selectedCayCode;
   }
 
-  /**
-   * @param value
-   */
   set selectedCayCode(value: string[]) {
-    console.log('setSelectedCayCode', value, typeof value, isArray(value));
 
     if (isArray(value) && value[0]) {
       this.requestModel.requestDto.requestorCayCode = value[0];
     } else if (typeof value === 'string' || value instanceof String) {
-      console.log('This should not be happening.  The value parameter a string[]!');
+      // console.log('This should not be happening.  The value parameter a string[]!');
       this.requestModel.requestDto.requestorCayCode = String(value);
     } else {
       this.requestModel.requestDto.requestorCayCode = undefined;
@@ -58,7 +53,7 @@ export class RequestInformationComponent implements OnInit {
     this.requestModel.requestDto.requestorNpnId = value;
   }
 
-  constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService) {
+  constructor(private requestModel: RequestModel, private logger: NGXLogger) {
   }
 
   ngOnInit(): void {

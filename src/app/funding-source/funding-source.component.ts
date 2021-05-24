@@ -78,6 +78,9 @@ export class FundingSourceComponent implements OnInit {
   }
 
   availableFundingSources(): Array<FundingRequestFundsSrcDto> {
+    if (!this.fundingSources) {
+      return [];
+    }
     return this.fundingSources.filter(f => {
       return !this.selectedFundingSources.has(Number(f.fundingSourceId));
     });
