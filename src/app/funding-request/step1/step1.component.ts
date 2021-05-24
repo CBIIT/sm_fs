@@ -9,6 +9,7 @@ import {AppUserSessionService} from 'src/app/service/app-user-session.service';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
 import {getCurrentFiscalYear} from 'src/app/utils/utils';
 import { LoaderService } from 'src/app/service/loader-spinner.service';
+import { NGXLogger } from "ngx-logger";
 
 @Component({
   selector: 'app-step1',
@@ -23,7 +24,8 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
               private propertiesService: AppPropertiesService,
               private userSessionService: AppUserSessionService,
               private requestModel: RequestModel,
-              private loaderService: LoaderService) {
+              private loaderService: LoaderService,
+              private logger: NGXLogger) {
   }
 
   @ViewChild('grantDt') myTable;
@@ -59,7 +61,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
   }
 
   ngAfterViewInit(): void {
-    // console.log("step1 afterViewInit() is called");
+    this.logger.debug("step1 afterViewInit() is called");
     // this.initDatatable();
     this.grantNumberComponent.grantNumberType = this.searchCriteria.grantType;
     this.grantNumberComponent.grantNumberMech = this.searchCriteria.grantMech;

@@ -49,6 +49,7 @@ import {LoaderService} from './service/loader-spinner.service';
 import {LoaderInterceptor} from './interceptors/loader-spinner.interceptor';
 import {FundingSourcesNamesComponent} from './funding-sources-names/funding-sources-names.component';
 import { FinalLoaComponent } from './final-loa/final-loa.component';
+import { LoggerModule, NgxLoggerLevel } from "ngx-logger";
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any{
   return (): Promise<any> => {
@@ -114,7 +115,8 @@ export function initializeLookupMaps(lookupService: AppLookupsService): any{
     NgbModule,
     FormsModule,
     DataTablesModule,
-    DragDropModule
+    DragDropModule,
+    LoggerModule.forRoot({serverLoggingUrl: '/api/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR})
   ],
   providers: [RequestModel, PlanModel, LoaderService,
     {provide: BASE_PATH, useValue: '/i2ecws'},
