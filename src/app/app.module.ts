@@ -116,7 +116,7 @@ export function initializeLookupMaps(lookupService: AppLookupsService): any{
     FormsModule,
     DataTablesModule,
     DragDropModule,
-    LoggerModule.forRoot({serverLoggingUrl: '/api/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR})
+    LoggerModule.forRoot({serverLoggingUrl: '/i2ecws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR})
   ],
   providers: [RequestModel, PlanModel, LoaderService,
     {provide: BASE_PATH, useValue: '/i2ecws'},

@@ -33,13 +33,22 @@ export class RequestInformationComponent implements OnInit {
 
   set selectedCayCode(value: string[]) {
 
+    let testVal = '';
     if (isArray(value) && value[0]) {
       this.requestModel.requestDto.requestorCayCode = value[0];
+      testVal = value[0];
     } else if (typeof value === 'string' || value instanceof String) {
       // console.log('This should not be happening.  The value parameter a string[]!');
       this.requestModel.requestDto.requestorCayCode = String(value);
+      testVal = String(value);
     } else {
       this.requestModel.requestDto.requestorCayCode = undefined;
+    }
+    // TODO: FS-163 - display an error message if user selects 'MB' for type 9 or 1001 request types
+    if ([9, 1001].includes(Number(this.requestModel.requestDto.frtId))) {
+      if (testVal === 'MB') {
+        this.logger.error('You must select Diversity Supplement (includes CURE Supplements) as the request type');
+      }
     }
     this._selectedCayCode = value;
   }
