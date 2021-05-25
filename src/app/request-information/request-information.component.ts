@@ -3,6 +3,8 @@ import {RequestModel} from '../model/request-model';
 import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {isArray} from 'rxjs/internal-compatibility';
 import {NGXLogger} from 'ngx-logger';
+import {FundingRequestValidationService} from '../model/funding-request-validation-service';
+import {FundingRequestErrorCodes} from '../model/funding-request-error-codes';
 
 @Component({
   selector: 'app-request-information',
@@ -47,6 +49,8 @@ export class RequestInformationComponent implements OnInit {
     // TODO: FS-163 - display an error message if user selects 'MB' for type 9 or 1001 request types
     if ([9, 1001].includes(Number(this.requestModel.requestDto.frtId))) {
       if (testVal === 'MB') {
+        this.fundingRequestValidationService.raiseError.next(
+          FundingRequestErrorCodes.MUST_SELECT_DIVERSITY_SUPPLEMENT_FOR_MB);
         this.logger.error('You must select Diversity Supplement (includes CURE Supplements) as the request type');
       }
     }
@@ -62,7 +66,8 @@ export class RequestInformationComponent implements OnInit {
     this.requestModel.requestDto.requestorNpnId = value;
   }
 
-  constructor(private requestModel: RequestModel, private logger: NGXLogger) {
+  constructor(private requestModel: RequestModel, private logger: NGXLogger,
+              private fundingRequestValidationService: FundingRequestValidationService) {
   }
 
   ngOnInit(): void {

@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../service/app-properties.service';
+import {FundingRequestErrorCodes} from './funding-request-error-codes';
 
 @Injectable({
   providedIn: 'root'
@@ -84,25 +85,34 @@ export class RequestModel {
     this._requestDto.financialInfoDto = {};
   }
 
-  canSave(): boolean {
-    // TODO: implement validation rules here
+  getValidationErrors(): Array<FundingRequestErrorCodes> {
+    const errors = new Array<FundingRequestErrorCodes>();
     if (!this.requestDto.requestName || this.requestDto.requestName.trim().length === 0) {
-      return false;
+      errors.push(FundingRequestErrorCodes.REQUEST_NAME_REQUIRED);
+    }
+    if (this.requestDto.requestName && this.requestDto.requestName.length > 100) {
+      errors.push(FundingRequestErrorCodes.REQUEST_NAME_TOO_LONG);
     }
 
     if (!this.requestDto.frtId) {
-      return false;
-    }
-
-    if (!this.requestDto.pdNpnId) {
-      return false;
-    }
-
-    if (!this.requestDto.requestorNpnId) {
-      return false;
+      errors.push(FundingRequestErrorCodes.REQUEST_TYPE_REQUIRED);
     }
 
     if (!this.requestDto.requestorCayCode || this.requestDto.requestorCayCode.trim().length === 0) {
+      errors.push(FundingRequestErrorCodes.REQUEST_CAY_CODE_REQUIRED);
+    }
+
+    // TODO: Double check this logic.  We probably only need one of these to be set.
+    if (!this.requestDto.pdNpnId || !this.requestDto.requestorNpnId) {
+      errors.push(FundingRequestErrorCodes.REQUEST_PD_REQUIRED);
+    }
+
+    return errors;
+
+  }
+
+  canSave(): boolean {
+    if (this.getValidationErrors().length > 0) {
       return false;
     }
 
