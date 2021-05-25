@@ -5,6 +5,8 @@ import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws
 import {AppPropertiesService} from '../../service/app-properties.service';
 import {errorObject, isNumeric} from 'rxjs/internal-compatibility';
 import {NGXLogger} from 'ngx-logger';
+import {FundingRequestValidationService} from '../../model/funding-request-validation-service';
+import {FundingRequestErrorCodes} from '../../model/funding-request-error-codes';
 
 @Component({
   selector: 'app-step2',
@@ -17,7 +19,8 @@ export class Step2Component implements OnInit {
   constructor(private router: Router, private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService,
-              private logger: NGXLogger) {
+              private logger: NGXLogger,
+              private fundingRequestValidationService: FundingRequestValidationService) {
   }
 
   ngOnInit(): void {
@@ -33,6 +36,12 @@ export class Step2Component implements OnInit {
       }
     );
     this.requestModel.requestDto.pdNpnId = this.requestModel.grant.pdNpnId;
+    this.fundingRequestValidationService.raiseError.subscribe(e => {
+      this.showError(e);
+    });
+    this.fundingRequestValidationService.resolveError.subscribe(e => {
+      this.clearError(e);
+    });
   }
 
   saveAndContinue(): void {
@@ -80,7 +89,14 @@ export class Step2Component implements OnInit {
   }
 
   isSaveable(): boolean {
-    return this.model.canSave();
+    if (!this.model.canSave()) {
+      const errorCodes = this.model.getValidationErrors();
+      errorCodes.forEach(e => {
+        this.fundingRequestValidationService.raiseError.next(e);
+      });
+      return false;
+    }
+    return true;
   }
 
   requestTypeSelected(): boolean {
@@ -89,5 +105,13 @@ export class Step2Component implements OnInit {
 
   canGoBack(): boolean {
     return this.model.requestDto.frqId === undefined;
+  }
+
+  private showError(e: FundingRequestErrorCodes): void {
+    this.logger.info('handling error code', e);
+  }
+
+  private clearError(e: FundingRequestErrorCodes): void {
+    this.logger.info('clear error code', e);
   }
 }
