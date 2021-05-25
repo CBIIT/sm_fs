@@ -136,7 +136,7 @@ export class Step3Component implements OnInit {
         if (this.selectedFiles[i].size <= this.maxFileSize) {
           this.upload(this.selectedFiles[i]);
         } else {
-          alert('file size is more than 10 MB');
+          alert('The size of the file you are attaching exceeds 10 MBs maximum file limit.');
         }
         
       }
