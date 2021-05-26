@@ -53,23 +53,29 @@ export class Step4Component implements OnInit, OnDestroy {
       }
     );
     this.docDtos = this.requestModel.requestDto.includedDocs;
-    
+
     if (!this.requestModel.mainApproverCreated) {
       this.createApprovers();
     }
     else if ( this.requestModel.recreateMainApproverNeeded) {
       this.fsWorkflowService.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
-        () => { this.createApprovers(); },
+        () => {
+          this.requestModel.mainApproverCreated = false;
+          this.createApprovers(); },
         (error) => {}
       );
     }
   }
 
   createApprovers(): void {
-    const workflowDto = {frqId:this.requestModel.requestDto.frqId, requestorNpeId: this.userSessionService.getLoggedOnUser().npnId };
+    const workflowDto = {frqId: this.requestModel.requestDto.frqId, requestorNpeId: this.userSessionService.getLoggedOnUser().npnId };
     this.fsWorkflowService.createRequestApproversUsingPOST(workflowDto).subscribe(
-      () => { console.log('create main approvers called and returned '); },
-      (error) => {}
+      () => {
+        this.requestModel.mainApproverCreated = true;
+        console.log('create main approvers called and returned '); },
+      (error) => {
+
+      }
     );
   }
 
