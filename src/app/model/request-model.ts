@@ -27,6 +27,16 @@ export class RequestModel {
   private requestComments: string;
   private _eGrantsUrl: string;
 
+  // approver stuff
+  mainApproverCreated = false;
+
+  get recreateMainApproverNeeded(): boolean {
+    // need to have logic to determine something changed in request that
+    // warrants deletion and recreate of main approvers
+    const somethingChanged = false;
+    return this.mainApproverCreated && somethingChanged;
+  }
+
   get requestType(): string {
     return this._requestType;
   }

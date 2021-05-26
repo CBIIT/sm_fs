@@ -28,7 +28,6 @@ export class FsMenuComponent implements OnInit {
     this.paylistPendingGrantsUrl = this.appPropertiesService.getProperty('paylistUrl') + '#side-nav-grants';
     this.paylistSearchUrl = this.appPropertiesService.getProperty('paylistUrl') + '#side-nav-find-paylists';
 
-
     this.ogaCertifier = this.userSessionService.hasRole('GMBRCHF');
     this.oefiaCertifier = this.userSessionService.hasRole('OEFIACRT');
     this.splCertifier = this.userSessionService.hasRole('DES');
