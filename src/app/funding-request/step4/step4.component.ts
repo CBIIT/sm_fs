@@ -2,7 +2,9 @@ import {ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild} 
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {AppPropertiesService} from '../../service/app-properties.service';
-import {FsRequestControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto, FundingRequestDtoReq, DocumentsDto} from '@nci-cbiit/i2ecws-lib';
+import {FsRequestControllerService, FundingReqStatusHistoryDto,
+  NciPfrGrantQueryDto, FundingRequestDtoReq, DocumentsDto,
+  FsWorkflowControllerService} from '@nci-cbiit/i2ecws-lib';
 import {AppUserSessionService} from 'src/app/service/app-user-session.service';
 import {FundingRequestIntegrationService} from '../integration/integration.service';
 import {Subscription} from 'rxjs';
@@ -30,6 +32,7 @@ export class Step4Component implements OnInit, OnDestroy {
               private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
               private fsRequestService: FsRequestControllerService,
+              private fsWorkflowService: FsWorkflowControllerService,
               private userSessionService: AppUserSessionService,
               private requestIntegrationService: FundingRequestIntegrationService,
               private documentService: DocumentService,
@@ -50,7 +53,26 @@ export class Step4Component implements OnInit, OnDestroy {
       }
     );
     this.docDtos = this.requestModel.requestDto.includedDocs;
+    
+    if (!this.requestModel.mainApproverCreated) {
+      this.createApprovers();
+    }
+    else if ( this.requestModel.recreateMainApproverNeeded) {
+      this.fsWorkflowService.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
+        () => { this.createApprovers(); },
+        (error) => {}
+      );
+    }
   }
+
+  createApprovers(): void {
+    const workflowDto = {frqId:this.requestModel.requestDto.frqId, requestorNpeId: this.userSessionService.getLoggedOnUser().npnId };
+    this.fsWorkflowService.createRequestApproversUsingPOST(workflowDto).subscribe(
+      () => { console.log('create main approvers called and returned '); },
+      (error) => {}
+    );
+  }
+
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
     let submitted = false;

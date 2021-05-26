@@ -5,13 +5,9 @@ import { getCurrentFiscalYear } from 'src/app/utils/utils';
 
 @Injectable()
 export class GrantsSearchFilterService {
-
     grantsSearchCriteria: GrantsSearchCriteriaDto;
-
     searchWithin: string;
-
     selectedPd: number;
-
     searched: boolean;
 
     constructor(private userSessionService: AppUserSessionService) {
@@ -26,7 +22,6 @@ export class GrantsSearchFilterService {
         else if (this.userSessionService.isPA()) {
             this.searchWithin = 'myca';
         }
-
     }
 
     getGrantsSearchCriteria(): GrantsSearchCriteriaDto {
