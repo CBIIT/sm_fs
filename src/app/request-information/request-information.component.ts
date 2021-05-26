@@ -5,6 +5,7 @@ import {isArray} from 'rxjs/internal-compatibility';
 import {NGXLogger} from 'ngx-logger';
 import {FundingRequestValidationService} from '../model/funding-request-validation-service';
 import {FundingRequestErrorCodes} from '../model/funding-request-error-codes';
+import {FundingRequestTypes} from '../model/funding-request-types';
 
 @Component({
   selector: 'app-request-information',
@@ -79,5 +80,9 @@ export class RequestInformationComponent implements OnInit {
 
   get model(): RequestModel {
     return this.requestModel;
+  }
+
+  payUsingSkip(): boolean {
+    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.PAY_USING_SKIP_FUNDS);
   }
 }
