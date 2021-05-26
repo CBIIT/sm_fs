@@ -50,6 +50,7 @@ import {LoaderInterceptor} from './interceptors/loader-spinner.interceptor';
 import {FundingSourcesNamesComponent} from './funding-sources-names/funding-sources-names.component';
 import { FinalLoaComponent } from './final-loa/final-loa.component';
 import { LoggerModule, NgxLoggerLevel } from "ngx-logger";
+import { SkippedGrantsComponent } from './skipped-grants/skipped-grants.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any{
   return (): Promise<any> => {
@@ -103,6 +104,7 @@ export function initializeLookupMaps(lookupService: AppLookupsService): any{
     LoaderSpinnerComponent,
     FundingSourcesNamesComponent,
     FinalLoaComponent,
+    SkippedGrantsComponent,
 
   ],
   imports: [
