@@ -1,7 +1,7 @@
 <app-header *ngIf="router.url !== '/fundingSourceDetails'"></app-header>
 <app-loader-spinner></app-loader-spinner>
 
-<div class="container">
+<div class="container" id="site-content">
     <div class="row">
         <div class="col-lg-2">
             <app-fs-menu *ngIf="router.url !== '/fundingSourceDetails'"></app-fs-menu>
@@ -14,3 +14,4 @@
     </div>
 </div>
 
+<app-footer></app-footer>

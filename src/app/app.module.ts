@@ -51,6 +51,7 @@ import {FundingSourcesNamesComponent} from './funding-sources-names/funding-sour
 import { FinalLoaComponent } from './final-loa/final-loa.component';
 import { LoggerModule, NgxLoggerLevel } from "ngx-logger";
 import { SkippedGrantsComponent } from './skipped-grants/skipped-grants.component';
+import { FooterComponent } from './footer/footer.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any{
   return (): Promise<any> => {
@@ -105,6 +106,7 @@ export function initializeLookupMaps(lookupService: AppLookupsService): any{
     FundingSourcesNamesComponent,
     FinalLoaComponent,
     SkippedGrantsComponent,
+    FooterComponent,
 
   ],
   imports: [
