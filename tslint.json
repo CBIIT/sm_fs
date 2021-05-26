@@ -137,6 +137,7 @@
     "template-no-negated-async": true,
     "use-lifecycle-interface": true,
     "use-pipe-transform-interface": true,
+    "adjacent-overload-signatures": false,
     "directive-selector": [
       true,
       "attribute",
