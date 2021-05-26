@@ -24067,54 +24067,54 @@ label .optional, .like-label .optional {
 }
 
 /* line 1, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn {
-  cursor: pointer;
+.btn:disabled {
+  cursor: not-allowed;
 }
 
 /* line 5, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-outline-primary:hover {
+.btn-outline-primary:not([disabled]):hover {
   background-color: rgba(0, 118, 168, 0.15);
   color: #00405c;
 }
 
 /* line 9, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-outline-secondary:hover {
+.btn-outline-secondary:not([disabled]):hover {
   background-color: rgba(99, 102, 106, 0.15);
   color: #3e4042;
 }
 
 /* line 13, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-outline-success:hover {
+.btn-outline-success:not([disabled]):hover {
   background-color: rgba(17, 126, 70, 0.15);
   color: #083b21;
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-outline-danger:hover {
+.btn-outline-danger:not([disabled]):hover {
   background-color: rgba(166, 10, 61, 0.15);
   color: #5e0622;
 }
 
 /* line 21, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-outline-warning:hover {
+.btn-outline-warning:not([disabled]):hover {
   background-color: rgba(255, 184, 28, 0.15);
   color: #ffd069;
 }
 
 /* line 25, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-outline-info:hover {
+.btn-outline-info:not([disabled]):hover {
   background-color: rgba(23, 162, 184, 0.15);
   color: #0f6674;
 }
 
 /* line 29, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-outline-light:hover {
+.btn-outline-light:not([disabled]):hover {
   background-color: rgba(244, 245, 246, 0.15);
   color: white;
 }
 
 /* line 33, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-outline-dark:hover {
+.btn-outline-dark:not([disabled]):hover {
   background-color: rgba(0, 62, 81, 0.15);
   color: #000305;
 }
