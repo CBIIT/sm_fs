@@ -13,7 +13,7 @@ import { saveAs } from 'file-saver';
 import { of, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 export interface Swimlane {
   name: string;
@@ -52,7 +52,7 @@ export class Step3Component implements OnInit {
   justificationText: string = '';
   _docType: CgRefCodesDto = {};
   closeResult: string;
-  maxFileSize: number  = 10485760; //10MB
+  maxFileSize: number = 10485760; //10MB
   maxFileSizeError: string;
 
   @ViewChild('inputFile')
@@ -138,7 +138,7 @@ export class Step3Component implements OnInit {
         } else {
           alert('The size of the file you are attaching exceeds 10 MBs maximum file limit.');
         }
-        
+
       }
     }
     this.reset();
@@ -192,7 +192,7 @@ export class Step3Component implements OnInit {
 
           this.insertDocOrder(result);
 
-         //Remove Doc Type from the drop down
+          //Remove Doc Type from the drop down
           this.DocTypes.forEach(element => {
             element.forEach((e, index) => {
               if (e.rvLowValue === this._docDto.docType) {
@@ -286,26 +286,37 @@ export class Step3Component implements OnInit {
     }
   }
 
-  downloadFile(id: number, fileName: string) {
-    if (fileName === 'Summary Statement') {
-      this.downloadSummaryStatement();
-    } else {
-      this.documentService.downloadById(id).subscribe(blob => saveAs(blob, fileName)), error =>
-        console.log('Error downloading the file'),
-        () => console.info('File downloaded successfully');
-    }
 
+  downloadFile(id: number, fileName: string) {
+    this.documentService.downloadById(id)
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          saveAs(blob, fileName)
+        }
+      )
   }
 
   downloadCoverSheet() {
-    this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId).subscribe(blob => saveAs(blob, 'Cover Page.pdf')), error =>
-      console.log('Error downloading the file'),
-      () => console.info('File downloaded successfully');
+    this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId)
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          saveAs(blob, 'Cover Page.pdf')
+        }
+      )
+
   }
 
   downloadSummaryStatement() {
-    this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId).subscribe(blob => saveAs(blob, 'Summary Statement.pdf')), error =>
-      console.log('Error downloading the file'),
+    this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId)
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          saveAs(blob, 'Summary Statement.pdf')
+        }
+      ), error =>
+        console.log('Error downloading the sunnary statement'),
       () => console.info('File downloaded successfully');
   }
 
@@ -356,7 +367,13 @@ export class Step3Component implements OnInit {
     });
 
     this.documentService.downLoadFrqPackage(this.requestModel.requestDto.frqId,
-      this.requestModel.grant.applId, docIds).subscribe(blob => saveAs(blob, 'Package.pdf')), error =>
+      this.requestModel.grant.applId, docIds)
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          saveAs(blob, 'Package.pdf')
+        }
+      ), error =>
         console.log('Error downloading the file'),
       () => console.info('File downloaded successfully');
   }
@@ -437,20 +454,20 @@ export class Step3Component implements OnInit {
   }
 
   open(content) {
-    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
   }
-  
+
   private getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
       return 'by clicking on a backdrop';
     } else {
-      return  `with: ${reason}`;
+      return `with: ${reason}`;
     }
   }
 

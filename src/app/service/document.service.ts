@@ -34,19 +34,19 @@ export class DocumentService {
     return this.documentsControllerService.loadDocumentsUsingGET(keyId, keyType);
   }
 
-  downloadById(id: number): Observable<Blob> {
-    var url = this.docUrl + '/' + id;
-    return this.http.get(`${url}`, { responseType: 'blob' });
+  downloadById(uuid: number) {
+    var url = this.docUrl + '/' + uuid;
+    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
-  downloadFrqCoverSheet(frqId: number): Observable<Blob> {
+  downloadFrqCoverSheet(frqId: number) {
     var url = this.docUrl + '/funding-requests-cover-page/' + frqId;
-    return this.http.get(`${url}`, { responseType: 'blob' });
+    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
-  downloadFrqSummaryStatement(applId: number): Observable<Blob> {
+  downloadFrqSummaryStatement(applId: number) {
     var url = this.docUrl + '/funding-requests-summary-statement/' + applId;
-    return this.http.get(`${url}`, { responseType: 'blob' });
+    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
   deleteDocById(id: number) {
@@ -57,9 +57,9 @@ export class DocumentService {
     return this.documentsControllerService.loadLatestDocumentUsingGET(keyId, keyType);
   }
 
-  downLoadFrqPackage(frqId: number, applId: number, docIds: number[]): Observable<Blob> {
+  downLoadFrqPackage(frqId: number, applId: number, docIds: number[]) {
     var url = this.docUrl + '/funding-requests-view-package/' + frqId + '/' + applId + '/' + docIds;
-    return this.http.get(`${url}`, { responseType: 'blob' });
+    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' });
   }
 
 
