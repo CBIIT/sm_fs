@@ -29,6 +29,7 @@ export class RequestModel {
 
   // approver stuff
   mainApproverCreated = false;
+  private stepLinkable = [false, false, false, false, false];
 
   get recreateMainApproverNeeded(): boolean {
     // need to have logic to determine something changed in request that
@@ -134,12 +135,21 @@ export class RequestModel {
     return true;
   }
 
+  isStepLinkable(step: number): boolean {
+    return this.stepLinkable[step];
+  }
+
+  setStepLinkable(step: number, linkable: boolean): void {
+    this.stepLinkable[step] = linkable;
+  }
+
   reset(): void {
     // console.log('Reset RequestModel to baseline');
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
     this._requestType = undefined;
     this._requestName = undefined;
+    this.stepLinkable = [false, false, false, false, false];
   }
 }
 

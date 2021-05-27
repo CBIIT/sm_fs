@@ -102,6 +102,7 @@ export class Step3Component implements OnInit {
       this.router.navigate(['/request']);
     }
 
+    this.requestModel.setStepLinkable(3, true);
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
         console.log('Getting the Doc type Dropdown results');

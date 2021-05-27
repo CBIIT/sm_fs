@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
+import { RequestModel } from 'src/app/model/request-model';
 
 @Component({
   selector: 'app-step-indicator',
@@ -9,10 +10,13 @@ export class StepIndicatorComponent implements OnInit {
   @Input() activeStep;
   @Input() steps: { step: number, name: string, route: string }[];
 
-  constructor() {
+  constructor(private requestModel: RequestModel) {
   }
 
   ngOnInit(): void {
   }
 
+  isStepLinkable(step: number): boolean {
+    return this.requestModel.isStepLinkable(step);
+  }
 }

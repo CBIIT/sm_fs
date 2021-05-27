@@ -27,6 +27,7 @@ export class Step2Component implements OnInit {
     if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
+    this.requestModel.setStepLinkable(2, true);
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.requestDto.grantAwarded = result;
         this.logger.debug('Appl Periods/Grant awards:', result);

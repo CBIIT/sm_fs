@@ -47,6 +47,7 @@ export class Step4Component implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     console.log('Step4 requestModel ', this.requestModel);
+    this.requestModel.setStepLinkable(4, true);
     this.requestHistorySubscriber = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
       (historyResult) => {
         this.parseRequestHistories(historyResult);

@@ -1,4 +1,9 @@
 <ul class="progressbar">
     <li *ngFor="let step of steps" 
-    [ngClass]="{'complete': step.step<activeStep.step, 'active': step.step==activeStep.step}"><a href="" class="stretched-link">{{step.name}}</a></li>
+    [ngClass]="{'complete': step.step<activeStep.step, 'active': step.step==activeStep.step}">
+        <a [routerLink] ="step.route" class="stretched-link" *ngIf="isStepLinkable(step.step) else notLinkable">{{step.name}}</a>
+        <ng-template #notLinkable>
+            {{step.name}}
+        </ng-template>
+    </li>
 </ul>
