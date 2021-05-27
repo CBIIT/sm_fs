@@ -52,6 +52,7 @@ import { FinalLoaComponent } from './final-loa/final-loa.component';
 import { LoggerModule, NgxLoggerLevel } from "ngx-logger";
 import { SkippedGrantsComponent } from './skipped-grants/skipped-grants.component';
 import { FooterComponent } from './footer/footer.component';
+import { GwbLinksService } from './service/gwb-links.service';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any{
   return (): Promise<any> => {
@@ -68,6 +69,12 @@ export function initializeUserSession(userSessionService: AppUserSessionService)
 export function initializeLookupMaps(lookupService: AppLookupsService): any{
   return (): Promise<any> => {
     return lookupService.initialize();
+  };
+}
+
+export function initializeGwbLinks(gwbLinksService: GwbLinksService): any{
+  return (): Promise<any> => {
+    return gwbLinksService.initialize();
   };
 }
 
@@ -131,7 +138,9 @@ export function initializeLookupMaps(lookupService: AppLookupsService): any{
     {provide: APP_INITIALIZER, useFactory: initializeUserSession,
       deps: [AppUserSessionService], multi: true},
     {provide: APP_INITIALIZER, useFactory: initializeLookupMaps,
-        deps: [AppLookupsService], multi: true}
+        deps: [AppLookupsService], multi: true},
+    {provide: APP_INITIALIZER, useFactory: initializeGwbLinks,
+          deps: [GwbLinksService], multi: true},  
   ],
   bootstrap: [AppComponent]
 })
