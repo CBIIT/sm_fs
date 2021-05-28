@@ -3,6 +3,7 @@ import {RequestModel} from '../model/request-model';
 import {Options} from 'select2';
 import {AppUserSessionService} from '../service/app-user-session.service';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
 
 class Approver {
   id: number;
@@ -11,6 +12,8 @@ class Approver {
 }
 
 const approverMap = new Map<number, any>();
+
+const addedApproverMap = new Map<number, any>();
 
 
 @Component({
@@ -21,6 +24,8 @@ const approverMap = new Map<number, any>();
 export class NextScheduledApproversRequestComponent implements OnInit {
   @Input() label = 'Add Approver';
   options: Options;
+
+  requestApprovers: FundingReqApproversDto[];
 
   @Input()
   get selectedValue(): number {
@@ -34,6 +39,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     user.role = 'Added by ' + this.userSessionService.getLoggedOnUser().fullNameLF;
     console.log('additional details:', user);
     this.approverList.push(user);
+    addedApproverMap.set(Number(value), true);
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
   }
@@ -42,16 +48,31 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   approvers: Array<{ id: number; text: '' }>;
   approverList: Array<any> = new Array<any>();
 
-  constructor(private requestModel: RequestModel, private userSessionService: AppUserSessionService) {
+  constructor(private requestModel: RequestModel,
+              private userSessionService: AppUserSessionService,
+              private workflowController: FsWorkflowControllerService) {
   }
 
-  storeData(data: any): void {
-    console.log('storing data', data);
-    data.forEach(user => {
-      console.log(user);
+
+  storeData(data: any): any {
+   // console.log('filtering & storing data ', data);
+    const data2 = data.filter( (user) => {
+      if (user.classification !== 'EMPLOYEE') {
+        return false;
+      }
+      else if ( addedApproverMap.get(Number(user.id)) ) {
+        return false;
+      }
+      return true;
+    });
+
+    data2.forEach(user => {
+    //  console.log(user);
       approverMap.set(Number(user.id), user);
     });
     console.log(approverMap);
+    return data2;
+
   }
 
   ngOnInit(): void {
@@ -76,9 +97,9 @@ export class NextScheduledApproversRequestComponent implements OnInit {
           };
         },
         processResults(data): any {
-          callback(data);
+          const data2 = callback(data);
           return {
-            results: $.map(data, user => {
+            results: $.map(data2, user => {
               return {
                 id: user.id,
                 text: user.fullName,
@@ -89,6 +110,19 @@ export class NextScheduledApproversRequestComponent implements OnInit {
         }
       }
     };
+
+    this.workflowController.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
+      (result) => {
+        this.requestApprovers = result;
+        this.requestApprovers.forEach ( (approver) => {
+          addedApproverMap.set( approver.approverNpnId, true );
+          console.log(addedApproverMap);
+        });
+      },
+      (error) => {
+        console.log('Error getting approvers ', error);
+      }
+    );
 
   }
 
@@ -104,9 +138,16 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     });
 
     this.approverList.splice(j, 1);
+    addedApproverMap.delete(Number(id));
   }
 
   dropped(event: CdkDragDrop<any[]>): void {
+    console.log('drag droped', event);
     moveItemInArray(this.approverList, event.previousIndex, event.currentIndex);
   }
+
+  loadApprovers(): void {
+
+  }
+
 }
