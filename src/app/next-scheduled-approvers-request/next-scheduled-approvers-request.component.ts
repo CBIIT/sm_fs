@@ -1,15 +1,9 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {Options} from 'select2';
 import {AppUserSessionService} from '../service/app-user-session.service';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
-
-class Approver {
-  id: number;
-  text: '';
-  user: any;
-}
 
 const approverMap = new Map<number, any>();
 
@@ -22,26 +16,28 @@ const addedApproverMap = new Map<number, any>();
   styleUrls: ['./next-scheduled-approvers-request.component.css']
 })
 export class NextScheduledApproversRequestComponent implements OnInit {
+
   @Input() label = 'Add Approver';
   options: Options;
 
   requestApprovers: FundingReqApproversDto[];
 
-  @Input()
-  get selectedValue(): number {
-    return this._selectedValue;
-  }
+  // @Input()
+  // get selectedValue(): number {
+  //   return this._selectedValue;
+  // }
 
-  @Output() selectedValueChange = new EventEmitter<number>();
+  // @Output() selectedValueChange = new EventEmitter<number>();
 
   set selectedValue(value: number) {
     const user = approverMap.get(Number(value));
-    user.role = 'Added by ' + this.userSessionService.getLoggedOnUser().fullNameLF;
-    console.log('additional details:', user);
-    this.approverList.push(user);
-    addedApproverMap.set(Number(value), true);
-    this._selectedValue = value;
-    this.selectedValueChange.emit(value);
+    // user.role = 'Added by ' + this.userSessionService.getLoggedOnUser().fullNameLF;
+    console.log('selected approver for add is ', user);
+    // this.approverList.push(user);
+    this.saveAdditionalApprover(user);
+    // addedApproverMap.set(Number(value), true);
+    // this._selectedValue = value;
+    // this.selectedValueChange.emit(value);
   }
 
   private _selectedValue: number;
@@ -50,7 +46,8 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   constructor(private requestModel: RequestModel,
               private userSessionService: AppUserSessionService,
-              private workflowController: FsWorkflowControllerService) {
+              private workflowController: FsWorkflowControllerService,
+              private changeDetection: ChangeDetectorRef) {
   }
 
 
@@ -111,19 +108,60 @@ export class NextScheduledApproversRequestComponent implements OnInit {
       }
     };
 
-    this.workflowController.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
-      (result) => {
+    if (!this.requestModel.mainApproverCreated) {
+      this.createMainApprovers();
+    }
+    else if ( this.requestModel.recreateMainApproverNeeded) {
+      this.workflowController.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
+        () => {
+          this.requestModel.mainApproverCreated = false;
+          this.createMainApprovers(); },
+        (error) => { console.log('deleteRequestApprovers failed ', error); }
+      );
+    }
+    else {
+      this.workflowController.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe (
+        (result) => {
+          this.requestModel.mainApproverCreated = true;
+          addedApproverMap.clear();
+          this.requestApprovers = result;
+          this.requestApprovers.forEach ( (approver) => {
+            addedApproverMap.set( approver.approverNpnId, true );
+          });
+          },
+          (error) => {
+            console.log('Error calling createRequestApprovers', error);
+          }
+      );
+    }
+  }
+
+  processApproversResult(result: any): void {
+    addedApproverMap.clear();
+    this.requestApprovers = result;
+    this.requestApprovers.forEach ( (approver) => {
+      addedApproverMap.set( approver.approverNpnId, true );
+    });
+   // this.changeDetection.detectChanges();
+    console.log('processApproversResult ', addedApproverMap);
+  }
+
+  createMainApprovers(): void {
+    console.log('createMainApprovers called');
+    const workflowDto = {frqId: this.requestModel.requestDto.frqId, requestorNpeId: this.userSessionService.getLoggedOnUser().npnId };
+    this.workflowController.createRequestApproversUsingPOST(workflowDto).subscribe(
+        (result) => {
+        this.requestModel.mainApproverCreated = true;
+        addedApproverMap.clear();
         this.requestApprovers = result;
         this.requestApprovers.forEach ( (approver) => {
           addedApproverMap.set( approver.approverNpnId, true );
-          console.log(addedApproverMap);
         });
-      },
-      (error) => {
-        console.log('Error getting approvers ', error);
-      }
+        },
+        (error) => {
+          console.log('Error calling createRequestApprovers', error);
+        }
     );
-
   }
 
   deleteApprover(id): void {
@@ -143,11 +181,37 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   dropped(event: CdkDragDrop<any[]>): void {
     console.log('drag droped', event);
-    moveItemInArray(this.approverList, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.requestApprovers, event.previousIndex, event.currentIndex);
   }
 
-  loadApprovers(): void {
+  saveAdditionalApprover(user: any): void {
+    this.workflowController.saveAdditionalApproverUsingPOST(this.requestModel.requestDto.frqId, user.nciLdapCn).subscribe(
+      (result) => {
+        addedApproverMap.clear();
+        this.requestApprovers = result;
+        this.requestApprovers.forEach ( (approver) => {
+          addedApproverMap.set( approver.approverNpnId, true );
+        });
+        },
+      (error) => {
+        console.log('Error saveAdditionalApproverUsingPOST ', error);
+      }
+    );
+  }
 
+  deleteAdditionalApprover(fraId: number): void {
+    this.workflowController.deleteAdditionalApproverUsingPOST(fraId, this.requestModel.requestDto.frqId).subscribe(
+      (result) => {
+        addedApproverMap.clear();
+        this.requestApprovers = result;
+        this.requestApprovers.forEach ( (approver) => {
+          addedApproverMap.set( approver.approverNpnId, true );
+        });
+        },
+      (error) => {
+        console.log('Error saveAdditionalApproverUsingPOST ', error);
+      }
+    );
   }
 
 }
