@@ -120,14 +120,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     }
     else {
       this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe (
-        (result) => {
-          this.requestModel.mainApproverCreated = true;
-          addedApproverMap.clear();
-          this.requestApprovers = result;
-          this.requestApprovers.forEach ( (approver) => {
-            addedApproverMap.set( approver.approverNpnId, true );
-          });
-          },
+        (result) => { this.processApproversResult(result); },
           (error) => {
             console.log('Error calling createRequestApprovers', error);
           }
@@ -141,8 +134,6 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     this.requestApprovers.forEach ( (approver) => {
       addedApproverMap.set( approver.approverNpnId, true );
     });
-   // this.changeDetection.detectChanges();
-    console.log('processApproversResult ', addedApproverMap);
   }
 
   createMainApprovers(): void {
@@ -151,12 +142,8 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     this.workflowControllerService.createRequestApproversUsingPOST(workflowDto).subscribe(
         (result) => {
         this.requestModel.mainApproverCreated = true;
-        addedApproverMap.clear();
-        this.requestApprovers = result;
-        this.requestApprovers.forEach ( (approver) => {
-          addedApproverMap.set( approver.approverNpnId, true );
-        });
-        },
+        this.processApproversResult(result);
+      },
         (error) => {
           console.log('Error calling createRequestApprovers', error);
         }
@@ -185,13 +172,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   saveAdditionalApprover(user: any): void {
     this.workflowControllerService.saveAdditionalApproverUsingPOST(this.requestModel.requestDto.frqId, user.nciLdapCn).subscribe(
-      (result) => {
-        addedApproverMap.clear();
-        this.requestApprovers = result;
-        this.requestApprovers.forEach ( (approver) => {
-          addedApproverMap.set( approver.approverNpnId, true );
-        });
-        },
+      (result) => {this.processApproversResult(result); },
       (error) => {
         console.log('Error saveAdditionalApproverUsingPOST ', error);
       }
@@ -200,13 +181,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   deleteAdditionalApprover(fraId: number): void {
     this.workflowControllerService.deleteAdditionalApproverUsingPOST(fraId, this.requestModel.requestDto.frqId).subscribe(
-      (result) => {
-        addedApproverMap.clear();
-        this.requestApprovers = result;
-        this.requestApprovers.forEach ( (approver) => {
-          addedApproverMap.set( approver.approverNpnId, true );
-        });
-        },
+      (result) => {this.processApproversResult(result); },
       (error) => {
         console.log('Error saveAdditionalApproverUsingPOST ', error);
       }
