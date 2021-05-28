@@ -12,7 +12,7 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { saveAs } from 'file-saver';
 import { of, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { HttpEventType, HttpResponse } from '@angular/common/http';
+import { HttpResponse } from '@angular/common/http';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 export interface Swimlane {
@@ -289,13 +289,19 @@ export class Step3Component implements OnInit {
 
 
   downloadFile(id: number, fileName: string) {
-    this.documentService.downloadById(id)
+
+    if (fileName === 'Summary Statement') {
+      this.downloadSummaryStatement();
+    } else {
+      this.documentService.downloadById(id)
       .subscribe(
         (response: HttpResponse<Blob>) => {
           let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
           saveAs(blob, fileName)
         }
       )
+    }
+   
   }
 
   downloadCoverSheet() {

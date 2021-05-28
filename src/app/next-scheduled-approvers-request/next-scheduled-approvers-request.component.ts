@@ -1,9 +1,10 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {Options} from 'select2';
 import {AppUserSessionService} from '../service/app-user-session.service';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
+import {NGXLogger} from 'ngx-logger';
 
 const approverMap = new Map<number, any>();
 
@@ -46,13 +47,12 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   constructor(private requestModel: RequestModel,
               private userSessionService: AppUserSessionService,
-              private workflowController: FsWorkflowControllerService,
-              private changeDetection: ChangeDetectorRef) {
+              private workflowControllerService: FsWorkflowControllerService,
+              private logger: NGXLogger) {
   }
 
 
   storeData(data: any): any {
-   // console.log('filtering & storing data ', data);
     const data2 = data.filter( (user) => {
       if (user.classification !== 'EMPLOYEE') {
         return false;
@@ -64,7 +64,6 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     });
 
     data2.forEach(user => {
-    //  console.log(user);
       approverMap.set(Number(user.id), user);
     });
     console.log(approverMap);
@@ -112,7 +111,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
       this.createMainApprovers();
     }
     else if ( this.requestModel.recreateMainApproverNeeded) {
-      this.workflowController.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
+      this.workflowControllerService.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
         () => {
           this.requestModel.mainApproverCreated = false;
           this.createMainApprovers(); },
@@ -120,7 +119,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
       );
     }
     else {
-      this.workflowController.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe (
+      this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe (
         (result) => {
           this.requestModel.mainApproverCreated = true;
           addedApproverMap.clear();
@@ -149,7 +148,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   createMainApprovers(): void {
     console.log('createMainApprovers called');
     const workflowDto = {frqId: this.requestModel.requestDto.frqId, requestorNpeId: this.userSessionService.getLoggedOnUser().npnId };
-    this.workflowController.createRequestApproversUsingPOST(workflowDto).subscribe(
+    this.workflowControllerService.createRequestApproversUsingPOST(workflowDto).subscribe(
         (result) => {
         this.requestModel.mainApproverCreated = true;
         addedApproverMap.clear();
@@ -165,7 +164,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   deleteApprover(id): void {
-    console.log('Remove approver:', id);
+    this.logger.debug('Remove Approver ID:', id);
     let i = 0;
     let j = 0;
     this.approverList.forEach(d => {
@@ -185,7 +184,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   saveAdditionalApprover(user: any): void {
-    this.workflowController.saveAdditionalApproverUsingPOST(this.requestModel.requestDto.frqId, user.nciLdapCn).subscribe(
+    this.workflowControllerService.saveAdditionalApproverUsingPOST(this.requestModel.requestDto.frqId, user.nciLdapCn).subscribe(
       (result) => {
         addedApproverMap.clear();
         this.requestApprovers = result;
@@ -200,7 +199,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   deleteAdditionalApprover(fraId: number): void {
-    this.workflowController.deleteAdditionalApproverUsingPOST(fraId, this.requestModel.requestDto.frqId).subscribe(
+    this.workflowControllerService.deleteAdditionalApproverUsingPOST(fraId, this.requestModel.requestDto.frqId).subscribe(
       (result) => {
         addedApproverMap.clear();
         this.requestApprovers = result;
