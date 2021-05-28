@@ -10,6 +10,7 @@ import {FundingRequestIntegrationService} from '../integration/integration.servi
 import {Subscription} from 'rxjs';
 import { DocumentService } from '../../service/document.service';
 import { saveAs } from 'file-saver';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-step4',
@@ -187,20 +188,30 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   downloadCoverSheet() {
-    this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId).subscribe(blob => saveAs(blob, 'Cover Page.pdf')), error =>
-      console.log('Error downloading the file'),
-      () => console.info('File downloaded successfully');
+    this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId)
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          saveAs(blob, 'Cover Page.pdf')
+        }
+      )
+
   }
 
   downloadFile(id: number, fileName: string) {
+
     if (fileName === 'Summary Statement') {
       this.downloadSummaryStatement();
     } else {
-      this.documentService.downloadById(id).subscribe(blob => saveAs(blob, fileName)), error =>
-        console.log('Error downloading the file'),
-        () => console.info('File downloaded successfully');
+      this.documentService.downloadById(id)
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          saveAs(blob, fileName)
+        }
+      )
     }
-
+   
   }
 
   downloadSummaryStatement() {
