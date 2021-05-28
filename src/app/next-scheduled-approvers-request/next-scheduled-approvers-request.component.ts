@@ -4,6 +4,7 @@ import {Options} from 'select2';
 import {AppUserSessionService} from '../service/app-user-session.service';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
+import {NGXLogger} from 'ngx-logger';
 
 class Approver {
   id: number;
@@ -50,12 +51,12 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   constructor(private requestModel: RequestModel,
               private userSessionService: AppUserSessionService,
-              private workflowController: FsWorkflowControllerService) {
+              private workflowControllerService: FsWorkflowControllerService,
+              private logger: NGXLogger) {
   }
 
 
   storeData(data: any): any {
-   // console.log('filtering & storing data ', data);
     const data2 = data.filter( (user) => {
       if (user.classification !== 'EMPLOYEE') {
         return false;
@@ -67,7 +68,6 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     });
 
     data2.forEach(user => {
-    //  console.log(user);
       approverMap.set(Number(user.id), user);
     });
     console.log(approverMap);
@@ -111,12 +111,12 @@ export class NextScheduledApproversRequestComponent implements OnInit {
       }
     };
 
-    this.workflowController.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
+    this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
       (result) => {
         this.requestApprovers = result;
         this.requestApprovers.forEach ( (approver) => {
-          addedApproverMap.set( approver.approverNpnId, true );
-          console.log(addedApproverMap);
+          addedApproverMap.set(approver.approverNpnId, true);
+          this.logger.debug('Approver npn ID:', approver.approverNpnId);
         });
       },
       (error) => {
@@ -127,7 +127,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   deleteApprover(id): void {
-    console.log('Remove approver:', id);
+    this.logger.debug('Remove Approver ID:', id);
     let i = 0;
     let j = 0;
     this.approverList.forEach(d => {
@@ -142,7 +142,6 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   dropped(event: CdkDragDrop<any[]>): void {
-    console.log('drag droped', event);
     moveItemInArray(this.approverList, event.previousIndex, event.currentIndex);
   }
 
