@@ -53,6 +53,7 @@ import { LoggerModule, NgxLoggerLevel } from "ngx-logger";
 import { SkippedGrantsComponent } from './skipped-grants/skipped-grants.component';
 import { FooterComponent } from './footer/footer.component';
 import { GwbLinksService } from './service/gwb-links.service';
+import { ConversionGrantActivityMechComponent } from './conversion-grant-activity-mech/conversion-grant-activity-mech.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -114,6 +115,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FinalLoaComponent,
     SkippedGrantsComponent,
     FooterComponent,
+    ConversionGrantActivityMechComponent,
 
   ],
   imports: [

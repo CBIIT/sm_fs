@@ -28,15 +28,7 @@ export class Step2Component implements OnInit {
       this.router.navigate(['/request']);
     }
     this.requestModel.setStepLinkable(2, true);
-    this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
-        this.requestModel.requestDto.grantAwarded = result;
-        this.logger.debug('Appl Periods/Grant awards:', result);
-        this.requestModel.initializeProgramRecommendedCosts(result);
-      }, error => {
-        // TODO: properly handle errors here
-        this.logger.error('HttpClient get request error for----- ' + error.message);
-      }
-    );
+
     this.fundingRequestValidationService.raiseError.subscribe(e => {
       this.showError(e);
     });
@@ -109,10 +101,10 @@ export class Step2Component implements OnInit {
   }
 
   private showError(e: FundingRequestErrorCodes): void {
-    this.logger.info('handling error code', e);
+    // this.logger.info('handling error code', e);
   }
 
   private clearError(e: FundingRequestErrorCodes): void {
-    this.logger.info('clear error code', e);
+    // this.logger.info('clear error code', e);
   }
 }

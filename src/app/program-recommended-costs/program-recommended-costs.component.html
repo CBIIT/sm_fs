@@ -2,129 +2,124 @@
 
 <div class="row">
 
-    <div class="col-12">
-        <h2>Program Recommended Costs</h2>
-        <p>Please note that the Standard Policy Reduction should be taken into consideration when determining the recommended dollar amounts for the request. If you would like to include a waiver to the Standard Policy Reduction, please provide it as part of the justification. The current fiscal year's policy reductions can be viewed on the <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information" target="_blank" class="external-link">OEFIA web site</a>.</p>
+  <div class="col-12">
+    <h2>Program Recommended Costs</h2>
+    <p>Please note that the Standard Policy Reduction should be taken into consideration when determining the
+      recommended dollar amounts for the request. If you would like to include a waiver to the Standard Policy
+      Reduction, please provide it as part of the justification. The current fiscal year's policy reductions can be
+      viewed on the <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information"
+                       target="_blank" class="external-link">OEFIA web site</a>.</p>
+  </div>
+
+  <div class="col-12">
+    <div class="table-responsive">
+      <table class="table table-striped prc-table mb-0">
+        <thead>
+        <tr>
+          <th scope="row">Fiscal Year</th>
+          <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.year }}</th>
+        </tr>
+        <tr *ngIf="showPiCosts()">
+          <th scope="row">PI Requested Direct Cost</th>
+          <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.requestAmount | currency }}</th>
+        </tr>
+        <tr *ngIf="showPiCosts()">
+          <th scope="row">PI Requested Total Cost</th>
+          <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.requestTotalAmount | currency }}</th>
+        </tr>
+        <tr *ngIf="showAwardedCosts()">
+          <th scope="row">Awarded Direct Cost</th>
+          <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.directAmount | currency }}</th>
+        </tr>
+        <tr *ngIf="showAwardedCosts()">
+          <th scope="row">Awarded Total Cost</th>
+          <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.totalAwarded | currency }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>
+            <div class="row">
+              <div class="form-group col">
+                <span class="like-label">Funding Source</span>
+                <span>Funding Source Goes Here</span>
+              </div>
+              <div class="col-sm-auto">
+                <button type="button" class="btn btn-sm btn-danger mr-2" title="Remove"><i class="fas fa-trash"
+                                                                                           aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-pencil"
+                                                                                     aria-hidden="true"></i></button>
+              </div>
+            </div>
+          </td>
+          <td *ngFor="let ga of grantAwarded">
+            <div class="form-row">
+              <div class="col-6 font-weight-bold">
+                Direct
+              </div>
+              <div class="col-6">
+                XXX,XXX.XX
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="col-6 font-weight-bold">
+                Total
+              </div>
+              <div class="col-6">
+                XXX,XXX.XX
+              </div>
+            </div>
+          </td>
+
+        </tr>
+
+        <tr>
+          <td>
+            <div class="row">
+              <div class="form-group col">
+                <span class="like-label">Funding Source</span>
+                <span>Funding Source Goes Here</span>
+              </div>
+              <div class="col-sm-auto">
+                <button type="button" class="btn btn-sm btn-danger mr-2" title="Remove"><i class="fas fa-trash"
+                                                                                           aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-pencil"
+                                                                                     aria-hidden="true"></i></button>
+              </div>
+            </div>
+          </td>
+          <td *ngFor="let ga of grantAwarded">
+            <div class="form-row">
+              <div class="col-6 font-weight-bold">
+                Direct
+              </div>
+              <div class="col-6">
+                XXX,XXX.XX
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="col-6 font-weight-bold">
+                Total
+              </div>
+              <div class="col-6">
+                XXX,XXX.XX
+              </div>
+            </div>
+          </td>
+
+        </tr>
+
+        </tbody>
+      </table>
     </div>
 
-    <div class="col-12">
-        <div class="table-responsive">
-            <table class="table table-striped prc-table mb-0">
-                <thead>
-                    <tr>
-                        <th scope="row">Fiscal Year</th>
-                        <th scope="col">1</th>
-                        <th scope="col">2</th>
-                        <th scope="col">3</th>
-                        <th scope="col">4</th>
-                    </tr>
-                    <tr>
-                        <th scope="row">PI Requested Direct Cost</th>
-                        <th scope="col">XXX,XXX.XX</th>
-                        <th scope="col">XXX,XXX.XX</th>
-                        <th scope="col">XXX,XXX.XX</th>
-                        <th scope="col">XXX,XXX.XX</th>
-                    </tr>
-                    <tr>
-                        <th scope="row">PI Requested Total Cost</th>
-                        <th scope="col">XXX,XXX.XX</th>
-                        <th scope="col">XXX,XXX.XX</th>
-                        <th scope="col">XXX,XXX.XX</th>
-                        <th scope="col">XXX,XXX.XX</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <div class="row">
-                                <div class="form-group col">
-                                    <span class="like-label">Funding Source</span>
-                                    <span>Funding Source Goes Here</span>
-                                </div>
-                                <div class="col-sm-auto">
-                                    <button type="button" class="btn btn-sm btn-danger mr-2" title="Remove"><i class="fas fa-trash" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-pencil" aria-hidden="true"></i></button>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-row">
-                                <div class="col-6 font-weight-bold">
-                                    Direct
-                                </div>
-                                <div class="col-6">
-                                    XXX,XXX.XX
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col-6 font-weight-bold">
-                                    Total
-                                </div>
-                                <div class="col-6">
-                                    XXX,XXX.XX
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            XXX,XXX.XX
-                        </td>
-                        <td>
-                            XXX,XXX.XX
-                        </td>
-                        <td>
-                            XXX,XXX.XX
-                        </td>
-                    </tr>
+    <button type="button" class="btn btn-primary mt-2 mb-3" data-toggle="modal" data-target="#add-fsource-modal"><i
+      class="fas fa-plus mr-2" aria-hidden="true"></i> Add Funding Source
+    </button>
 
-                    <tr>
-                        <td>
-                            <div class="row">
-                                <div class="form-group col">
-                                    <span class="like-label">Funding Source</span>
-                                    <span>Funding Source Goes Here</span>
-                                </div>
-                                <div class="col-sm-auto">
-                                    <button type="button" class="btn btn-sm btn-danger mr-2" title="Remove"><i class="fas fa-trash" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-pencil" aria-hidden="true"></i></button>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-row">
-                                <div class="col-6 font-weight-bold">
-                                    Direct
-                                </div>
-                                <div class="col-6">
-                                    XXX,XXX.XX
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col-6 font-weight-bold">
-                                    Total
-                                </div>
-                                <div class="col-6">
-                                    XXX,XXX.XX
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            XXX,XXX.XX
-                        </td>
-                        <td>
-                            XXX,XXX.XX
-                        </td>
-                        <td>
-                            XXX,XXX.XX
-                        </td>
-                    </tr>
-
-                </tbody>
-            </table>
-        </div>
-
-        <button type="button" class="btn btn-primary mt-2 mb-3" data-toggle="modal" data-target="#add-fsource-modal"><i class="fas fa-plus mr-2" aria-hidden="true"></i> Add Funding Source</button>
-
-    </div>
+  </div>
 </div>
 
 <div class="row">
@@ -138,7 +133,8 @@
   <div class="col-lg-8">
     <div class="form-group">
       <label for="cost-comments">Comments <span class="optional">(optional)</span></label>
-      <textarea class="form-control" #cost_comments id="cost-comments" [(ngModel)]="model.requestDto.financialInfoDto.comments" rows="2"
+      <textarea class="form-control" #cost_comments id="cost-comments"
+                [(ngModel)]="model.requestDto.financialInfoDto.comments" rows="2"
                 maxlength="1000"></textarea>
       <span class="character-counter">{{ cost_comments.value.length }}/1000</span>
     </div>
@@ -153,214 +149,219 @@
   </div>
 </div>
 
-<div class="modal fade" id="add-fsource-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Add Funding Source</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true"><i class="far fa-times"></i></span>
-            </button>
-          </div>
-          <div class="modal-body">
+<div class="modal fade" id="add-fsource-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Funding Source</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true"><i class="far fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body">
 
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="form-group">
-                      <app-funding-source></app-funding-source>
-                    </div>
-                </div>
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="form-group">
+              <app-funding-source></app-funding-source>
             </div>
-
-            <div class="table-responsive">
-                <table class="table prc-table mb-0">
-                    <thead>
-                        <tr>
-                            <th scope="row">Fiscal Year</th>
-                            <th scope="col">
-                                <div class="fsource-fy1-form">
-                                    <div class="form-row">
-                                        <div class="col left-label"></div>
-                                        <div class="col-sm-auto">
-                                           <span class="read-only-th">1</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </th>
-                            <th scope="col">2</th>
-                            <th scope="col">3</th>
-                            <th scope="col">4</th>
-                        </tr>
-                        <tr>
-                            <th scope="row">PI Requested Direct Cost</th>
-                            <th scope="col">
-                                <div class="fsource-fy1-form">
-                                    <div class="form-row">
-                                        <div class="col left-label"></div>
-                                        <div class="col-sm-auto">
-                                           <span class="read-only-th">XX,XXX.XX</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </th>
-                            <th scope="col">XXX,XXX.XX</th>
-                            <th scope="col">XXX,XXX.XX</th>
-                            <th scope="col">XXX,XXX.XX</th>
-                        </tr>
-                        <tr>
-                            <th scope="row">PI Requested Total Cost</th>
-                            <th scope="col">
-                                <div class="fsource-fy1-form">
-                                    <div class="form-row">
-                                        <div class="col left-label"></div>
-                                        <div class="col-sm-auto">
-                                           <span class="read-only-th">XX,XXX.XX</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </th>
-                            <th scope="col">XXX,XXX.XX</th>
-                            <th scope="col">XXX,XXX.XX</th>
-                            <th scope="col">XXX,XXX.XX</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td>
-
-                                <div class="fsource-fy1-form mb-2">
-                                    <div class="form-row">
-                                        <div class="col left-label"></div>
-                                        <div class="col-sm-auto">
-                                            <div class="btn-group btn-group-toggle" ngbRadioGroup name="value">
-                                                <label ngbButtonLabel class="btn-outline-secondary">
-                                                    <input ngbButton type="radio" value="dollar">Dollar
-                                                  </label>
-                                                  <label ngbButtonLabel class="btn-outline-secondary">
-                                                    <input ngbButton type="radio" value="percent">% Cut
-                                                  </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="fsource-fy1-form mb-2">
-                                    <div class="form-row form-inline">
-                                        <div class="col left-label">
-                                            <label for="dc-dollar">Direct Cost</label>
-                                        </div>
-                                        <div class="col-sm-auto">
-                                            <input type="text" class="form-control funds-input" id="dc-dollar" aria-describedby="dc-dollar-percent">
-                                        </div>
-                                        <div class="col-sm-auto right-label">
-                                            <span id="dc-dollar-percent">XXX% Cut</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="fsource-fy1-form">
-                                    <div class="form-row form-inline">
-                                        <div class="col left-label">
-                                            <label for="tc-dollar">Total Cost</label>
-                                        </div>
-                                        <div class="col-sm-auto">
-                                            <input type="text" class="form-control funds-input" id="tc-dollar" aria-describedby="tc-dollar-percent">
-                                        </div>
-                                        <div class="col-sm-auto right-label">
-                                            <span id="tc-dollar-percent">XXX% Cut</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </td>
-                            <td>
-                                XXX,XXX.XX
-                            </td>
-                            <td>
-                                XXX,XXX.XX
-                            </td>
-                            <td>
-                                XXX,XXX.XX
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td></td>
-                            <td>
-
-                                <div class="fsource-fy1-form mb-2">
-                                    <div class="form-row">
-                                        <div class="col left-label"></div>
-                                        <div class="col-sm-auto">
-                                            <div class="btn-group btn-group-toggle" ngbRadioGroup name="value">
-                                                <label ngbButtonLabel class="btn-outline-secondary">
-                                                    <input ngbButton type="radio" value="dollar">Dollar
-                                                  </label>
-                                                  <label ngbButtonLabel class="btn-outline-secondary active">
-                                                    <input ngbButton type="radio" value="percent">% Cut
-                                                  </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="fsource-fy1-form mb-2">
-                                    <div class="form-row form-inline">
-                                        <div class="col left-label"></div>
-                                        <div class="col-sm-auto">
-                                            <input type="text" class="form-control percent-input" id="perc-cut">
-                                        </div>
-                                        <div class="col-sm-auto right-label">
-                                            <label for="perc-cut">% Cut</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="fsource-fy1-form mb-2">
-                                    <div class="form-row form-inline">
-                                        <div class="col left-label">
-                                            <label for="dc-percent-dollar">Direct Cost</label>
-                                        </div>
-                                        <div class="col-sm-auto">
-                                            <input type="text" readonly class="funds-input form-control-plaintext" id="dc-percent-dollar" value="XXX,XXX.XX">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="fsource-fy1-form">
-                                    <div class="form-row form-inline">
-                                        <div class="col left-label">
-                                            <label for="tc-percent-dollar">Total Cost</label>
-                                        </div>
-                                        <div class="col-sm-auto">
-                                            <input type="text" readonly class="funds-input form-control-plaintext" id="tc-percent-dollar" value="XXX,XXX.XX">
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </td>
-                            <td>
-                                XXX,XXX.XX
-                            </td>
-                            <td>
-                                XXX,XXX.XX
-                            </td>
-                            <td>
-                                XXX,XXX.XX
-                            </td>
-                        </tr>
-
-                    </tbody>
-                </table>
-            </div>
-
-
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Add Funding Source</button>
           </div>
         </div>
+
+        <div class="table-responsive">
+          <table class="table prc-table mb-0">
+            <thead>
+            <tr>
+              <th scope="row">Fiscal Year</th>
+              <th scope="col">
+                <div class="fsource-fy1-form">
+                  <div class="form-row">
+                    <div class="col left-label"></div>
+                    <div class="col-sm-auto">
+                      <span class="read-only-th">1</span>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th scope="col">2</th>
+              <th scope="col">3</th>
+              <th scope="col">4</th>
+            </tr>
+            <tr>
+              <th scope="row">PI Requested Direct Cost</th>
+              <th scope="col">
+                <div class="fsource-fy1-form">
+                  <div class="form-row">
+                    <div class="col left-label"></div>
+                    <div class="col-sm-auto">
+                      <span class="read-only-th">XX,XXX.XX</span>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th scope="col">XXX,XXX.XX</th>
+              <th scope="col">XXX,XXX.XX</th>
+              <th scope="col">XXX,XXX.XX</th>
+            </tr>
+            <tr>
+              <th scope="row">PI Requested Total Cost</th>
+              <th scope="col">
+                <div class="fsource-fy1-form">
+                  <div class="form-row">
+                    <div class="col left-label"></div>
+                    <div class="col-sm-auto">
+                      <span class="read-only-th">XX,XXX.XX</span>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th scope="col">XXX,XXX.XX</th>
+              <th scope="col">XXX,XXX.XX</th>
+              <th scope="col">XXX,XXX.XX</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td></td>
+              <td>
+
+                <div class="fsource-fy1-form mb-2">
+                  <div class="form-row">
+                    <div class="col left-label"></div>
+                    <div class="col-sm-auto">
+                      <div class="btn-group btn-group-toggle" ngbRadioGroup name="value">
+                        <label ngbButtonLabel class="btn-outline-secondary">
+                          <input ngbButton type="radio" value="dollar">Dollar
+                        </label>
+                        <label ngbButtonLabel class="btn-outline-secondary">
+                          <input ngbButton type="radio" value="percent">% Cut
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fsource-fy1-form mb-2">
+                  <div class="form-row form-inline">
+                    <div class="col left-label">
+                      <label for="dc-dollar">Direct Cost</label>
+                    </div>
+                    <div class="col-sm-auto">
+                      <input type="text" class="form-control funds-input" id="dc-dollar"
+                             aria-describedby="dc-dollar-percent">
+                    </div>
+                    <div class="col-sm-auto right-label">
+                      <span id="dc-dollar-percent">XXX% Cut</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fsource-fy1-form">
+                  <div class="form-row form-inline">
+                    <div class="col left-label">
+                      <label for="tc-dollar">Total Cost</label>
+                    </div>
+                    <div class="col-sm-auto">
+                      <input type="text" class="form-control funds-input" id="tc-dollar"
+                             aria-describedby="tc-dollar-percent">
+                    </div>
+                    <div class="col-sm-auto right-label">
+                      <span id="tc-dollar-percent">XXX% Cut</span>
+                    </div>
+                  </div>
+                </div>
+
+              </td>
+              <td>
+                XXX,XXX.XX
+              </td>
+              <td>
+                XXX,XXX.XX
+              </td>
+              <td>
+                XXX,XXX.XX
+              </td>
+            </tr>
+
+            <tr>
+              <td></td>
+              <td>
+
+                <div class="fsource-fy1-form mb-2">
+                  <div class="form-row">
+                    <div class="col left-label"></div>
+                    <div class="col-sm-auto">
+                      <div class="btn-group btn-group-toggle" ngbRadioGroup name="value">
+                        <label ngbButtonLabel class="btn-outline-secondary">
+                          <input ngbButton type="radio" value="dollar">Dollar
+                        </label>
+                        <label ngbButtonLabel class="btn-outline-secondary active">
+                          <input ngbButton type="radio" value="percent">% Cut
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fsource-fy1-form mb-2">
+                  <div class="form-row form-inline">
+                    <div class="col left-label"></div>
+                    <div class="col-sm-auto">
+                      <input type="text" class="form-control percent-input" id="perc-cut">
+                    </div>
+                    <div class="col-sm-auto right-label">
+                      <label for="perc-cut">% Cut</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fsource-fy1-form mb-2">
+                  <div class="form-row form-inline">
+                    <div class="col left-label">
+                      <label for="dc-percent-dollar">Direct Cost</label>
+                    </div>
+                    <div class="col-sm-auto">
+                      <input type="text" readonly class="funds-input form-control-plaintext" id="dc-percent-dollar"
+                             value="XXX,XXX.XX">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fsource-fy1-form">
+                  <div class="form-row form-inline">
+                    <div class="col left-label">
+                      <label for="tc-percent-dollar">Total Cost</label>
+                    </div>
+                    <div class="col-sm-auto">
+                      <input type="text" readonly class="funds-input form-control-plaintext" id="tc-percent-dollar"
+                             value="XXX,XXX.XX">
+                    </div>
+                  </div>
+                </div>
+
+              </td>
+              <td>
+                XXX,XXX.XX
+              </td>
+              <td>
+                XXX,XXX.XX
+              </td>
+              <td>
+                XXX,XXX.XX
+              </td>
+            </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Add Funding Source</button>
+      </div>
     </div>
+  </div>
 </div>

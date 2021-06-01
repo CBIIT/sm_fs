@@ -130,8 +130,8 @@ export class RequestModel {
 
   }
 
-  initializeProgramRecommendedCosts(awards: Array<GrantAwardedDto>): void {
-    const size = awards ? awards.length : 0;
+  initializeProgramRecommendedCosts(): void {
+    const size = this.requestDto.grantAwarded ? this.requestDto.grantAwarded.length : 0;
 
     this.requestDto.financialInfoDto.dcAmount0 = new Array(size);
     this.requestDto.financialInfoDto.tcAmount0 = new Array(size);
