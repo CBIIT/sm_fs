@@ -7,8 +7,6 @@ export const environment = {
   nciHome: 'https://i2e-dev.nci.nih.gov/',
   techSupport: 'prakash.garapati@nih.gov',
   workBenchUrl: 'https://i2e-dev.nci.nih.gov/workbench/WorkbenchView',
-  nearUrl: 'https://i2e-dev.nci.nih.gov/entmaintreq/',
-  paylistUrl: 'http://i2e-dev.nci.nih.gov/paylist/',
   appVersion: require('../../package.json').version 
   
 
