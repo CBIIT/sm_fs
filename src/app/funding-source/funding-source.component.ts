@@ -88,4 +88,8 @@ export class FundingSourceComponent implements OnInit {
       return !this.selectedFundingSources.has(Number(f.fundingSourceId));
     });
   }
+
+  isInvalid(): string {
+    return 'is-invalid';
+  }
 }

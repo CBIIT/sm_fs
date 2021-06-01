@@ -29,6 +29,7 @@ export class RequestInformationComponent implements OnInit {
   // value, it blows up at runtime.  Ditto the getter, which blows up at runtime if I try to return an array
   // of strings, but won't compile if I try to return a string.
   _selectedCayCode: string[] = (this.requestModel.requestDto.cayCode ? [this.requestModel.requestDto.cayCode] : []);
+  isValid: any;
 
   get selectedCayCode(): string[] {
     return this._selectedCayCode;

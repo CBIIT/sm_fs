@@ -3,6 +3,7 @@
 
 <ng-select2
   id="fs-select-1"
+  [ngClass]="isInvalid()"
   [(ngModel)]="selectedValue"
   [allowClear]="false"
   [options]="options">

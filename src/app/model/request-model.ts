@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FundingRequestErrorCodes} from './funding-request-error-codes';
+import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 
 @Injectable({
   providedIn: 'root'
@@ -67,8 +68,15 @@ export class RequestModel {
     if (!this._requestDto.financialInfoDto) {
       this._requestDto.financialInfoDto = {};
     }
+
+    this._requestDto.pdNpnId = value.pdNpnId;
+
     this._requestDto.financialInfoDto.applId = value.applId;
     this._requestDto.financialInfoDto.fy = value.fy;
+    this._requestDto.financialInfoDto.requestorNpnId = value.pdNpnId;
+    this._requestDto.financialInfoDto.requestorNpeId = value.pdNpeId;
+    this._requestDto.financialInfoDto.requestorCayCode = value.cayCode;
+
     this._grant = value;
   }
 
@@ -119,6 +127,26 @@ export class RequestModel {
     }
 
     return errors;
+
+  }
+
+  initializeProgramRecommendedCosts(awards: Array<GrantAwardedDto>): void {
+    const size = awards ? awards.length : 0;
+
+    this.requestDto.financialInfoDto.dcAmount0 = new Array(size);
+    this.requestDto.financialInfoDto.tcAmount0 = new Array(size);
+    this.requestDto.financialInfoDto.id0 = new Array(size);
+
+    this.requestDto.financialInfoDto.dcAmount1 = new Array(size);
+    this.requestDto.financialInfoDto.tcAmount1 = new Array(size);
+    this.requestDto.financialInfoDto.id1 = new Array(size);
+
+    this.requestDto.financialInfoDto.dcAmount2 = new Array(size);
+    this.requestDto.financialInfoDto.tcAmount2 = new Array(size);
+    this.requestDto.financialInfoDto.id2 = new Array(size);
+
+    this.requestDto.financialInfoDto.dcTotal = new Array(size);
+    this.requestDto.financialInfoDto.tcTotal = new Array(size);
 
   }
 

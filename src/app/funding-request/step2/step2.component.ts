@@ -31,12 +31,12 @@ export class Step2Component implements OnInit {
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.requestDto.grantAwarded = result;
         this.logger.debug('Appl Periods/Grant awards:', result);
+        this.requestModel.initializeProgramRecommendedCosts(result);
       }, error => {
         // TODO: properly handle errors here
         this.logger.error('HttpClient get request error for----- ' + error.message);
       }
     );
-    this.requestModel.requestDto.pdNpnId = this.requestModel.grant.pdNpnId;
     this.fundingRequestValidationService.raiseError.subscribe(e => {
       this.showError(e);
     });

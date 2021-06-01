@@ -191,6 +191,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
   }
 
   nextStep(event, grant): void {
+    // NOTE: reset() isn't necessary since we will always be starting from scratch here.  User can't go back from step2 to step1.
     this.requestModel.reset();
     this.requestModel.requestDto.userLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     this.requestModel.grant = grant;

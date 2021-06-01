@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
-import {openNewWindow} from 'src/app/utils/utils';
+import {getDisplayCategory, openNewWindow} from 'src/app/utils/utils';
 import {Router} from '@angular/router';
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
@@ -15,6 +15,7 @@ import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequ
 export class ProgramRecommendedCostsComponent implements OnInit {
 
   _selectedDocs: string;
+  displayCategory: number;
 
 
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
@@ -22,7 +23,7 @@ export class ProgramRecommendedCostsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    this.displayCategory = getDisplayCategory(this.requestModel.requestDto.frtId);
   }
 
   get grant(): NciPfrGrantQueryDto {
