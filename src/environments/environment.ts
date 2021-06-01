@@ -8,7 +8,10 @@ export const environment = {
   techSupport: 'prakash.garapati@nih.gov',
   workBenchUrl: 'https://i2e-dev.nci.nih.gov/workbench/WorkbenchView',
   nearUrl: 'https://i2e-dev.nci.nih.gov/entmaintreq/',
-  paylistUrl: 'http://localhost/paylist/'
+  paylistUrl: 'http://i2e-dev.nci.nih.gov/paylist/',
+  appVersion: require('../../package.json').version 
+  
+
 };
 
 /*
