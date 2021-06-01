@@ -24,9 +24,7 @@ export class FsMenuComponent implements OnInit {
               private userSessionService: AppUserSessionService,
               private gwbLinksService: GwbLinksService) { }
 
-  ngOnInit(): void {
-    // console.log('inside fs menu ngOnInit()');
-  
+  ngOnInit(): void {  
     this.paylistUrl = this.gwbLinksService.getProperty('Paylist');
     this.paylistDashboardUrl = this.paylistUrl+ '#side-nav-paylists';
     this.paylistPendingGrantsUrl = this.paylistUrl + '#side-nav-grants';

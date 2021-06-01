@@ -15,7 +15,6 @@ export class HeaderComponent implements OnInit {
   loggedOnUser: NciPerson;
   nciHome: string;
   workBenchUrl: string;
-  nearUrl: string;
   canChangeUser: boolean;
 
   public headerTemplateData = {
@@ -76,7 +75,6 @@ export class HeaderComponent implements OnInit {
 
     this.workBenchUrl = this.appPropertiesService.getProperty('workBenchUrl');
     this.nciHome = this.appPropertiesService.getProperty('nciHome');
-    this.nearUrl = this.appPropertiesService.getProperty('nearUrl');
 
   }
 }

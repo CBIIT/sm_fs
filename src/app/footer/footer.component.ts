@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import { AppPropertiesService } from '../service/app-properties.service';
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
@@ -7,9 +7,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FooterComponent implements OnInit {
 
-  constructor() { }
-
+  constructor( private appPropertiesService: AppPropertiesService) { }
+  version;
   ngOnInit(): void {
+  this.version = this.appPropertiesService.getProperty('appVersion');
+
   }
 
 }
