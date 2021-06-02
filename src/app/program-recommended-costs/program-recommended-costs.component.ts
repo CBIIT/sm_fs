@@ -6,6 +6,7 @@ import {openNewWindow} from 'src/app/utils/utils';
 import {NGXLogger} from 'ngx-logger';
 import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 import {
+  FundingRequestTypes,
   INITIAL_PAY_TYPES,
   PRC_AWARDED_DIRECT_TOTAL_DISPLAY_TYPES,
   PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES
@@ -182,5 +183,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   editSource(i: number): void {
+  }
+
+  isNotSkipReqTypeSelected(): boolean { 
+    return this.requestModel.requestDto.frtId !== FundingRequestTypes.SKIP;
   }
 }
