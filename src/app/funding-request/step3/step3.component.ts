@@ -14,6 +14,7 @@ import { of, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NGXLogger } from 'ngx-logger';
 
 export interface Swimlane {
   name: string;
@@ -92,7 +93,8 @@ export class Step3Component implements OnInit {
     private fsRequestControllerService: FsRequestControllerService,
     private fsDocOrderControllerService: FsDocOrderControllerService,
     private documentsControllerService: DocumentsControllerService,
-    private modalService: NgbModal) {
+    private modalService: NgbModal,
+    private logger: NGXLogger) {
 
   }
 
@@ -105,10 +107,10 @@ export class Step3Component implements OnInit {
     this.requestModel.setStepLinkable(3, true);
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
-        console.log('Getting the Doc type Dropdown results');
         this.DocTypes = of(result);
+        this.logger.debug('Getting the Doc type Dropdown results: ', this.DocTypes);
       }, error => {
-        console.log('HttpClient get request error for----- ' + error.message);
+        this.logger.error('HttpClient get request error for----- ' + error.message);
       });
 
     this.loadFiles();
@@ -152,7 +154,7 @@ export class Step3Component implements OnInit {
         this.requestModel.requestDto.justification = justification;
         this.justificationText = justification;
       }, error => {
-        console.log('HttpClient get request error for----- ' + error.message);
+        this.logger.error('HttpClient get request error for----- ' + error.message);
       });
 
     this.justificationType = 'text';
@@ -173,7 +175,7 @@ export class Step3Component implements OnInit {
 
 
           const result = event.body;
-          console.log(result);
+          this.logger.debug('Upload Doc: ', result);
 
           if (result.docType !== 'Justification') {
             this.baseTaskList.subscribe(items => {
@@ -201,31 +203,22 @@ export class Step3Component implements OnInit {
               }
             })
           });
-
-
-
-
         }
       },
       err => {
-        console.log('Error occured while uploading doc----- ' + err.message);
+        this.logger.error('Error occured while uploading doc----- ' + err.message);
       });
-
-
   }
 
   loadFiles() {
     this.documentService.getFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
       result => {
-        console.log('loading documents');
-
         result.forEach(element => {
           if (element.docFilename == 'Justification') {
-
+            this.logger.debug('Loading Document type: ', element.docFilename);
             this.justificationUploaded = of(true);
           }
         });
-
 
         this.baseTaskList = of(result);
         this.include = this.baseTaskList.pipe(
@@ -236,16 +229,16 @@ export class Step3Component implements OnInit {
         );
 
         this.include.subscribe(data => {
-          console.log("included data:" + data);
+          this.logger.debug("Included data: " + data);
           this.swimlanes.push({ name: 'Included Content', array: data });
         });
         this.exclude.subscribe(data => {
-          console.log("excluded data:" + data);
+          this.logger.debug("Excluded data: " + data);
           this.swimlanes.push({ name: 'Excluded Content', array: data });
         });
 
       }, error => {
-        console.log('HttpClient get request error for----- ' + error.message);
+        this.logger.error('HttpClient get request error for----- ' + error.message);
       });
   }
 
@@ -254,15 +247,12 @@ export class Step3Component implements OnInit {
       moveItemInArray(event.container.data,
         event.previousIndex,
         event.currentIndex);
-      console.log("In the same container")
+
       //If container.id = 'included', then sort order needs to be updated.
       //update sort order for all records
-
       if (event.container.id === 'includedId') {
         this.updateDocOrder(event.container.data);
       }
-
-
     } else {
       transferArrayItem(
         event.previousContainer.data,
@@ -270,38 +260,35 @@ export class Step3Component implements OnInit {
         event.previousIndex,
         event.currentIndex
       );
-      console.log("In the different container")
+
       //If previousContainer == included and container = excluded, data is moved to excluded.
       //Delete data from the DOC order table
       if (event.previousContainer.id === 'includedId') {
         this.deleteDocOrder(event.container.data[event.currentIndex]);
-      } else {
-
+      }
+      else {
         //Else if previousContainer = excluded and container = included, data is moved to included.
         //Insert new record and then update sort order for all of them for this frqId
         this.insertDocOrder(event.container.data[event.currentIndex]);
         this.updateDocOrder(event.container.data);
-
       }
-
     }
   }
-
 
   downloadFile(id: number, fileName: string) {
 
     if (fileName === 'Summary Statement') {
       this.downloadSummaryStatement();
-    } else {
-      this.documentService.downloadById(id)
-      .subscribe(
-        (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
-          saveAs(blob, fileName)
-        }
-      )
     }
-   
+    else {
+      this.documentService.downloadById(id)
+        .subscribe(
+          (response: HttpResponse<Blob>) => {
+            let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+            saveAs(blob, fileName)
+          }
+        )
+    }
   }
 
   downloadCoverSheet() {
@@ -312,7 +299,6 @@ export class Step3Component implements OnInit {
           saveAs(blob, 'Cover Page.pdf')
         }
       )
-
   }
 
   downloadSummaryStatement() {
@@ -323,22 +309,20 @@ export class Step3Component implements OnInit {
           saveAs(blob, 'Summary Statement.pdf')
         }
       ), error =>
-        console.log('Error downloading the sunnary statement'),
-      () => console.info('File downloaded successfully');
+        this.logger.error('Error downloading the summary statement'),
+      () => this.logger.info('File downloaded successfully');
   }
 
   deleteDoc(id: number, docType: string) {
-
     this.documentService.deleteDocById(id).subscribe(
       result => {
-        console.log("Delete Success");
+        this.logger.info("Delete Success");
         this.baseTaskList.subscribe(items => {
           this.swimlanes[0]['array'].forEach((value, index) => {
             if (value.id == id) {
               this.swimlanes[0]['array'].splice(index, 1);
               this.deleteDocOrder(value);
             }
-
           });
         });
 
@@ -351,18 +335,16 @@ export class Step3Component implements OnInit {
 
       }
     ), err => {
-      console.log("Error while deleting the document");
+      this.logger.error("Error while deleting the document");
     };
 
   }
 
   pushDocType(docType: string) {
-
     this._docType.rvLowValue = docType;
     this.DocTypes.forEach(element => {
       element.push(this._docType);
     });
-
   }
 
   downloadPackage() {
@@ -381,12 +363,12 @@ export class Step3Component implements OnInit {
           saveAs(blob, 'Package.pdf')
         }
       ), error =>
-        console.log('Error downloading the file'),
+      this.logger.error('Error downloading the file'),
       () => console.info('File downloaded successfully');
   }
 
   onDocTypeChange(event): any {
-    console.log('change', event);
+    this.logger.debug('Doc Type Change: ', event);
     if (event === 'Justification') {
       this.showJustification = true;
     } else {
@@ -397,7 +379,6 @@ export class Step3Component implements OnInit {
     } else {
       this.disableFile = false;
     }
-
   }
 
   justificationOnChange() {
@@ -419,36 +400,33 @@ export class Step3Component implements OnInit {
 
     this.fsDocOrderControllerService.updateDocOrderUsingPUT(this._docOrderDtos).subscribe(
       res => {
-        console.log("Doc order update successful")
+        this.logger.debug("Doc order delete successful for docId: ", this._docOrderDtos);
         this._docOrderDtos.length = 0;
       }, error => {
-        console.log('Error occured while updating DOC ORDER----- ' + error.message);
+        this.logger.error('Error occured while updating DOC ORDER----- ' + error.message);
       });
 
   }
 
   deleteDocOrder(docDto: DocumentsDto) {
-
-
     this.fsDocOrderControllerService.deleteDocOrderUsingDELETE(docDto.id).subscribe(
       res => {
-        console.log("Doc order delete successful")
+        this.logger.debug("Doc order delete successful for docId: ", docDto.id);
       }, error => {
-        console.log('Error occured while deleting DOC ORDER----- ' + error.message);
+        this.logger.error('Error occured while deleting DOC ORDER----- ' + error.message);
       });
   }
 
   insertDocOrder(docDto: DocumentsDto) {
-
     this._docOrderDto.docTypeCode = docDto.docType;
     this._docOrderDto.docId = docDto.id;
     this._docOrderDto.frqId = this.requestModel.requestDto.frqId;
 
     this.fsDocOrderControllerService.createDocOrderUsingPOST(this._docOrderDto).subscribe(
       res => {
-        console.log("Doc order save successful")
+        this.logger.debug("Doc order save successful for doc: ", this._docOrderDto);
       }, error => {
-        console.log('Error occured while saving DOC ORDER----- ' + error.message);
+        this.logger.error('Error occured while saving DOC ORDER----- ' + error.message);
       });
   }
 
@@ -479,19 +457,15 @@ export class Step3Component implements OnInit {
   }
 
   nextStep() {
-
     this.documentsControllerService.loadDocumentsBySortOrderUsingGET(this.requestModel.requestDto.frqId).subscribe(
-
       result => {
-        console.log("Docs retrieved by doc order");
         this.requestModel.requestDto.includedDocs = result;
+        this.logger.debug("Docs retrieved by doc order: ", result);
         this.router.navigate(['/request/step4']);
       }, error => {
-        console.log('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
+        this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
       }
     );
-
-
   }
 
   prevStep() {

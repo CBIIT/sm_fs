@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { UserService } from '@nci-cbiit/i2ecui-lib';
 import { CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -14,47 +15,46 @@ export class AppUserSessionService {
   private roles: string[];
 
   constructor(private userService: UserService,
-              private caService: CancerActivityControllerService) {
+    private caService: CancerActivityControllerService, private logger: NGXLogger) {
   }
 
   initialize(): Promise<any> {
     return new Promise<void>((resolve, reject) => {
-      // console.log('AppUserSessionService initialize starts');
       this.userService.getSecurityCredentials().subscribe(
         (result) => {
-          // console.log('UserService.getSecurityCrentials returns ', result);
+          this.logger.debug('UserService.getSecurityCrentials: ', result);
           this.loggedOnUser = result.nciPerson;
           this.environment = result.environment;
           this.roles = [];
           result.authorities.forEach(authority => {
-                  this.roles.push(authority.authority); } );
+            this.roles.push(authority.authority);
+          });
           this.caService.getCasForPdUsingGET(this.loggedOnUser.npnId, true).subscribe(
             (caresult) => {
-              // console.log('user assigned cancer activities:', caresult);
+              this.logger.debug('User assigned cancer activities: ', caresult);
               this.userCancerActivities = caresult;
-              // console.log('AppUserSessionService Done');
               resolve();
             },
             (caerror) => {
-              console.error('Failed to get User CAs for error', caerror);
+              this.logger.error('Failed to get User CAs for error', caerror);
               reject();
             }
           );
         },
         (error) => {
-          console.error('Failed to userService.getSecurityCrentials for error', error);
+          this.logger.error('Failed to userService.getSecurityCrentials for error', error);
           reject();
         }
       );
-      });
+    });
   }
 
-  isPD(): boolean{
+  isPD(): boolean {
     // to-do: need to check roles to determine if PD
     return this.roles.indexOf('PD') > -1;
   }
 
-  isPA(): boolean{
+  isPA(): boolean {
     // to-do: need to check roles to determine if PD
     return this.roles.indexOf('PA') > -1;
   }
@@ -63,7 +63,7 @@ export class AppUserSessionService {
     return this.isPD() || this.isPA();
   }
 
-  getEnvironment(): string{
+  getEnvironment(): string {
     return this.environment;
   }
 
@@ -82,7 +82,7 @@ export class AppUserSessionService {
   }
 
   getUserCaCodes(): string[] {
-    if (this.userCancerActivities && this.userCancerActivities.length > 0 ) {
+    if (this.userCancerActivities && this.userCancerActivities.length > 0) {
       const cas = this.userCancerActivities.map(item => {
         return item.code;
       });
@@ -91,7 +91,7 @@ export class AppUserSessionService {
     return null;
   }
 
-  getLoggedOnUser(): NciPerson{
+  getLoggedOnUser(): NciPerson {
     return this.loggedOnUser;
   }
 

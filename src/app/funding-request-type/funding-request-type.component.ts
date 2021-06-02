@@ -1,11 +1,11 @@
-import {Component, OnInit, Input, Output, EventEmitter, Inject} from '@angular/core';
-import {FsLookupControllerService} from '@nci-cbiit/i2ecws-lib';
+import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { FsLookupControllerService } from '@nci-cbiit/i2ecws-lib';
 import 'select2';
-import {SearchFilterService} from '../search/search-filter.service';
-import {UserService} from '@nci-cbiit/i2ecui-lib';
-import {RequestModel} from '../model/request-model';
-import {openNewWindow} from 'src/app/utils/utils';
-import {NGXLogger} from 'ngx-logger';
+import { SearchFilterService } from '../search/search-filter.service';
+import { UserService } from '@nci-cbiit/i2ecui-lib';
+import { RequestModel } from '../model/request-model';
+import { openNewWindow } from 'src/app/utils/utils';
+import { NGXLogger } from 'ngx-logger';
 
 
 @Component({
@@ -18,7 +18,7 @@ export class FundingRequestTypeComponent implements OnInit {
   public requestTypes: { id?: number, requestName?: string }[] = [];
   public searchFilter:
     { requestOrPlan: string; searchPool: string; requestType: string; }
-    = {requestOrPlan: '', searchPool: '', requestType: ''};
+    = { requestOrPlan: '', searchPool: '', requestType: '' };
 
   @Input()
   get selectedValue(): number {
@@ -28,7 +28,7 @@ export class FundingRequestTypeComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<number>();
 
   set selectedValue(value: number) {
-    // console.log('request type selectedValue setter called ', value);
+    this.logger.debug('Request Type selectedValue setter called: ', value);
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
     this.searchFilter.requestType = String(value);
@@ -37,19 +37,19 @@ export class FundingRequestTypeComponent implements OnInit {
   private _selectedValue: number;
 
   constructor(private fsLookupControllerService: FsLookupControllerService,
-              private searchFilterService: SearchFilterService,
-              private userService: UserService,
-              private model: RequestModel,
-              private logger: NGXLogger) {
+    private searchFilterService: SearchFilterService,
+    private userService: UserService,
+    private model: RequestModel,
+    private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
-    // console.log('filter =', this.filter);
+    this.logger.debug('Request Types Search Filter: ', this.filter);
     this.searchFilter = this.searchFilterService.searchFilter;
 
     this.evoke(this.filter).subscribe(
       result => {
-        // console.log('getRequestTypes returned ', result);
+        this.logger.debug('Request Types results: ', result);
         if (this.filter) {
           this.requestTypes = result.fundingRequestTypeRulesDtoList;
         } else {
@@ -62,7 +62,7 @@ export class FundingRequestTypeComponent implements OnInit {
           this.selectedValue = this.model.requestDto.financialInfoDto.requestTypeId;
         }
       }, error => {
-        console.error('HttpClient get request error for----- ' + error.message);
+        this.logger.error('HttpClient get request error for----- ' + error.message);
       });
   }
 

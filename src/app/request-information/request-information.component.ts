@@ -42,7 +42,6 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.requestDto.requestorCayCode = value[0];
       testVal = value[0];
     } else if (typeof value === 'string' || value instanceof String) {
-      // console.log('This should not be happening.  The value parameter a string[]!');
       this.requestModel.requestDto.requestorCayCode = String(value);
       testVal = String(value);
     } else {

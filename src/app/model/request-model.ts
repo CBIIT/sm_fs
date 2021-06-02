@@ -1,9 +1,8 @@
-import {Injectable} from '@angular/core';
-import {FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
-import {AppPropertiesService} from '../service/app-properties.service';
-import {FundingRequestErrorCodes} from './funding-request-error-codes';
-import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
-import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { Injectable } from '@angular/core';
+import { FundingRequestDtoReq, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { AppPropertiesService } from '../service/app-properties.service';
+import { FundingRequestErrorCodes } from './funding-request-error-codes';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -55,7 +54,6 @@ export class RequestModel {
   }
 
   set requestDto(value: FundingRequestDtoReq) {
-    // console.log('model updated with new FundingRequest data.  Redistribute fields as necessary.');
     this._requestDto = value;
   }
 
@@ -65,7 +63,6 @@ export class RequestModel {
 
 
   set grant(value: NciPfrGrantQueryDto) {
-    // console.log('setting grant on request model - propagate properties as necessary');
     // TODO: map appropriate values from grant to requestDto
     this._requestDto.applId = value.applId;
     if (!this._requestDto.financialInfoDto) {
@@ -81,6 +78,7 @@ export class RequestModel {
     this._requestDto.financialInfoDto.requestorCayCode = value.cayCode;
 
     this._grant = value;
+    this.logger.debug('Request model: ', this._grant);
   }
 
   get requestName(): string {
@@ -99,8 +97,7 @@ export class RequestModel {
     return this._eGrantsUrl;
   }
 
-  constructor(private propertiesService: AppPropertiesService) {
-    // console.log('Construction of request model happening now');
+  constructor(private propertiesService: AppPropertiesService, private logger: NGXLogger) {
     this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this._requestDto = {};
@@ -175,7 +172,6 @@ export class RequestModel {
   }
 
   reset(): void {
-    // console.log('Reset RequestModel to baseline');
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
     this._requestType = undefined;
@@ -183,6 +179,3 @@ export class RequestModel {
     this.stepLinkable = [false, false, false, false, false];
   }
 }
-
-
-

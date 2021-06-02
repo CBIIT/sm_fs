@@ -61,7 +61,6 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
   }
 
   ngAfterViewInit(): void {
-    this.logger.debug('step1 afterViewInit() is called');
     // this.initDatatable();
     this.grantNumberComponent.grantNumberType = this.searchCriteria.grantType;
     this.grantNumberComponent.grantNumberMech = this.searchCriteria.grantMech;
@@ -99,11 +98,11 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
 
       ajax: (dataTablesParameters: any, callback) => {
         this.loaderService.show();
-        console.log('calling search backend');
+        this.logger.debug('Funding Request search for: ', this.searchCriteria);
         this.fsRequestControllerService.searchDtGrantsUsingPOST(
           Object.assign(dataTablesParameters, this.searchCriteria)).subscribe(
           result => {
-            console.log('searchDtGrantsUsingPost returned ', result);
+            this.logger.debug('Funding Request search result: ', result);
             this.grantList = result.data;
             this.gsfs.searched = true;
             callback({
@@ -114,7 +113,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
             this.loaderService.hide();
           }, error => {
             this.loaderService.hide();
-            console.log('HttpClient get request error for----- ' + error.message);
+            this.logger.error('HttpClient get request error for----- ' + error.message);
           });
       },
 
@@ -221,7 +220,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
   }
 
   showNoResult(): boolean {
-    console.log('showNoResult called', this.grantList);
+    this.logger.debug('showNoResult grant list:', this.grantList);
     if (!this.grantList) {
       return true;
     }
@@ -275,12 +274,9 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     this.searchCriteria.grantYear = this.toString(this.grantNumberComponent.grantNumberYear);
     this.searchCriteria.grantSuffix = this.toString(this.grantNumberComponent.grantNumberSuffix);
 
-    console.log('grant search criteria', this.searchCriteria);
-
     if (this.dataTable) {
-          console.log('destroy datatable');
-          this.dataTable.destroy();
-          this.dataTable = null;
+      this.dataTable.destroy();
+      this.dataTable = null;
     }
     setTimeout(() => this.initDatatable(), 0);
   }
@@ -309,8 +305,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
   }
 
   restoreSearchFilter(): void {
-    console.log('inside restore search filter', this.gsfs, this.searchCriteria);
-    console.log('gsfs i2status', this.searchCriteria.applStatusGroupCode);
+    this.logger.debug('Restore search filter: ', this.gsfs, this.searchCriteria);
   //  this.searchWithin = '';
     this.piName = this.searchCriteria.piName;
     this.fyRange = {fromFy: this.searchCriteria.fromFy, toFy: this.searchCriteria.toFy};

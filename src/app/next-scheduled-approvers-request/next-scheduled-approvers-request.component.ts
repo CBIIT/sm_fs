@@ -1,10 +1,10 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {RequestModel} from '../model/request-model';
-import {Options} from 'select2';
-import {AppUserSessionService} from '../service/app-user-session.service';
-import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { RequestModel } from '../model/request-model';
+import { Options } from 'select2';
+import { AppUserSessionService } from '../service/app-user-session.service';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
-import {NGXLogger} from 'ngx-logger';
+import { NGXLogger } from 'ngx-logger';
 
 const approverMap = new Map<number, any>();
 
@@ -23,22 +23,10 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   requestApprovers: FundingReqApproversDto[];
 
-  // @Input()
-  // get selectedValue(): number {
-  //   return this._selectedValue;
-  // }
-
-  // @Output() selectedValueChange = new EventEmitter<number>();
-
   set selectedValue(value: number) {
     const user = approverMap.get(Number(value));
-    // user.role = 'Added by ' + this.userSessionService.getLoggedOnUser().fullNameLF;
-    console.log('selected approver for add is ', user);
-    // this.approverList.push(user);
+    this.logger.debug('Selected Approver to Add: ', user);
     this.saveAdditionalApprover(user);
-    // addedApproverMap.set(Number(value), true);
-    // this._selectedValue = value;
-    // this.selectedValueChange.emit(value);
   }
 
   private _selectedValue: number;
@@ -46,18 +34,16 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   approverList: Array<any> = new Array<any>();
 
   constructor(private requestModel: RequestModel,
-              private userSessionService: AppUserSessionService,
-              private workflowControllerService: FsWorkflowControllerService,
-              private logger: NGXLogger) {
+    private userSessionService: AppUserSessionService,
+    private workflowControllerService: FsWorkflowControllerService,
+    private logger: NGXLogger) {
   }
-
-
   storeData(data: any): any {
-    const data2 = data.filter( (user) => {
+    const data2 = data.filter((user) => {
       if (user.classification !== 'EMPLOYEE') {
         return false;
       }
-      else if ( addedApproverMap.get(Number(user.id)) ) {
+      else if (addedApproverMap.get(Number(user.id))) {
         return false;
       }
       return true;
@@ -66,7 +52,6 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     data2.forEach(user => {
       approverMap.set(Number(user.id), user);
     });
-    console.log(approverMap);
     return data2;
 
   }
@@ -110,20 +95,21 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     if (!this.requestModel.mainApproverCreated) {
       this.createMainApprovers();
     }
-    else if ( this.requestModel.recreateMainApproverNeeded) {
+    else if (this.requestModel.recreateMainApproverNeeded) {
       this.workflowControllerService.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
         () => {
           this.requestModel.mainApproverCreated = false;
-          this.createMainApprovers(); },
-        (error) => { console.log('deleteRequestApprovers failed ', error); }
+          this.createMainApprovers();
+        },
+        (error) => { this.logger.error('deleteRequestApprovers failed ', error); }
       );
     }
     else {
-      this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe (
+      this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
         (result) => { this.processApproversResult(result); },
-          (error) => {
-            console.log('Error calling createRequestApprovers', error);
-          }
+        (error) => {
+          this.logger.error('Error calling createRequestApprovers', error);
+        }
       );
     }
   }
@@ -131,22 +117,22 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   processApproversResult(result: any): void {
     addedApproverMap.clear();
     this.requestApprovers = result;
-    this.requestApprovers.forEach ( (approver) => {
-      addedApproverMap.set( approver.approverNpnId, true );
+    this.requestApprovers.forEach((approver) => {
+      addedApproverMap.set(approver.approverNpnId, true);
     });
   }
 
   createMainApprovers(): void {
-    console.log('createMainApprovers called');
-    const workflowDto = {frqId: this.requestModel.requestDto.frqId, requestorNpeId: this.userSessionService.getLoggedOnUser().npnId };
+    const workflowDto = { frqId: this.requestModel.requestDto.frqId, requestorNpeId: this.userSessionService.getLoggedOnUser().npnId };
     this.workflowControllerService.createRequestApproversUsingPOST(workflowDto).subscribe(
-        (result) => {
+      (result) => {
         this.requestModel.mainApproverCreated = true;
         this.processApproversResult(result);
+        this.logger.debug('Main approvers are created: ', result);
       },
-        (error) => {
-          console.log('Error calling createRequestApprovers', error);
-        }
+      (error) => {
+        this.logger.error('Error calling createRequestApprovers', error);
+      }
     );
   }
 
@@ -166,24 +152,23 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   dropped(event: CdkDragDrop<any[]>): void {
-    console.log('drag droped', event);
     moveItemInArray(this.requestApprovers, event.previousIndex, event.currentIndex);
   }
 
   saveAdditionalApprover(user: any): void {
     this.workflowControllerService.saveAdditionalApproverUsingPOST(this.requestModel.requestDto.frqId, user.nciLdapCn).subscribe(
-      (result) => {this.processApproversResult(result); },
+      (result) => { this.processApproversResult(result); },
       (error) => {
-        console.log('Error saveAdditionalApproverUsingPOST ', error);
+        this.logger.error('Error saveAdditionalApproverUsingPOST ', error);
       }
     );
   }
 
   deleteAdditionalApprover(fraId: number): void {
     this.workflowControllerService.deleteAdditionalApproverUsingPOST(fraId, this.requestModel.requestDto.frqId).subscribe(
-      (result) => {this.processApproversResult(result); },
+      (result) => { this.processApproversResult(result); },
       (error) => {
-        console.log('Error saveAdditionalApproverUsingPOST ', error);
+        this.logger.error('Error saveAdditionalApproverUsingPOST ', error);
       }
     );
   }
