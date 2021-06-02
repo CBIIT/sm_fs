@@ -185,7 +185,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   editSource(i: number): void {
   }
 
-  isNotSkipReqTypeSelected(): boolean { 
-    return this.requestModel.requestDto.frtId !== FundingRequestTypes.SKIP;
+  isSkipReqTypeSelected(): boolean { 
+    return this.requestModel.requestDto.frtId === FundingRequestTypes.SKIP;
   }
 }
