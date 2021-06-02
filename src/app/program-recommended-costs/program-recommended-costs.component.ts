@@ -186,6 +186,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   isSkipReqTypeSelected(): boolean { 
-    return this.requestModel.requestDto.frtId === FundingRequestTypes.SKIP;
+    return this.requestModel.requestDto.frtId == FundingRequestTypes.SKIP;
   }
 }
