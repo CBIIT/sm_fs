@@ -7,7 +7,11 @@ import {NGXLogger} from 'ngx-logger';
 import {FundingRequestValidationService} from '../model/funding-request-validation-service';
 import {FundingRequestErrorCodes} from '../model/funding-request-error-codes';
 import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
-import {PRC_AWARDED_DIRECT_TOTAL_DISPLAY_TYPES, PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES} from '../model/funding-request-types';
+import {
+  INITIAL_PAY_TYPES,
+  PRC_AWARDED_DIRECT_TOTAL_DISPLAY_TYPES,
+  PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES
+} from '../model/funding-request-types';
 
 
 @Component({
@@ -19,6 +23,8 @@ export class ProgramRecommendedCostsComponent implements OnInit {
 
   _selectedDocs: string;
   displayCategory: number;
+  fundingSources: Array<any>;
+  initialPay: boolean;
 
   get grantAwarded(): Array<GrantAwardedDto> {
     return this.requestModel.requestDto.grantAwarded;
@@ -30,10 +36,14 @@ export class ProgramRecommendedCostsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // this.fundingSources = new Array<any>(3);
     this.displayCategory = getDisplayCategory(this.requestModel.requestDto.frtId);
+    this.initialPay = INITIAL_PAY_TYPES.includes(this.requestModel.requestDto.frtId);
+    this.logger.debug('Display category:', this.displayCategory);
+    this.logger.debug('Initial pay     :', this.initialPay);
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.requestDto.grantAwarded = result;
-        this.logger.debug('Appl Periods/Grant awards:', result);
+        // this.logger.debug('Appl Periods/Grant awards:', result);
         this.requestModel.initializeProgramRecommendedCosts();
       }, error => {
         // TODO: properly handle errors here
@@ -88,8 +98,6 @@ export class ProgramRecommendedCostsComponent implements OnInit {
   }
 
   showPiCosts(): boolean {
-    this.logger.debug('Request Type:', this.requestModel.requestDto.frtId);
-    this.logger.debug('Parent Request Type:', this.requestModel.requestDto.parentFrtId);
     return PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES.includes(Number(this.requestModel.requestDto.frtId));
   }
 

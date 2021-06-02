@@ -37,44 +37,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-          <td>
-            <div class="row">
-              <div class="form-group col">
-                <span class="like-label">Funding Source</span>
-                <span>Funding Source Goes Here</span>
-              </div>
-              <div class="col-sm-auto">
-                <button type="button" class="btn btn-sm btn-danger mr-2" title="Remove"><i class="fas fa-trash"
-                                                                                           aria-hidden="true"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-pencil"
-                                                                                     aria-hidden="true"></i></button>
-              </div>
-            </div>
-          </td>
-          <td *ngFor="let ga of grantAwarded">
-            <div class="form-row">
-              <div class="col-6 font-weight-bold">
-                Direct
-              </div>
-              <div class="col-6">
-                XXX,XXX.XX
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="col-6 font-weight-bold">
-                Total
-              </div>
-              <div class="col-6">
-                XXX,XXX.XX
-              </div>
-            </div>
-          </td>
-
-        </tr>
-
-        <tr>
+        <tr *ngFor="let f of fundingSources">
           <td>
             <div class="row">
               <div class="form-group col">
@@ -174,51 +137,51 @@
             <thead>
             <tr>
               <th scope="row">Fiscal Year</th>
-              <th scope="col">
-                <div class="fsource-fy1-form">
+              <th *ngFor="let ga of grantAwarded; let i = index;" scope="col">
+                <div class="fsource-fy1-form" *ngIf="i === 0; else notFirst">
                   <div class="form-row">
                     <div class="col left-label"></div>
                     <div class="col-sm-auto">
-                      <span class="read-only-th">1</span>
+                      <span class="read-only-th">{{ ga.year }}</span>
                     </div>
                   </div>
                 </div>
+                <ng-template #notFirst>
+                  {{ ga.year }}
+                </ng-template>
               </th>
-              <th scope="col">2</th>
-              <th scope="col">3</th>
-              <th scope="col">4</th>
             </tr>
             <tr>
               <th scope="row">PI Requested Direct Cost</th>
-              <th scope="col">
-                <div class="fsource-fy1-form">
+              <th *ngFor="let ga of grantAwarded; let i = index;" scope="col">
+                <div class="fsource-fy1-form" *ngIf="i === 0; else notFirst">
                   <div class="form-row">
                     <div class="col left-label"></div>
                     <div class="col-sm-auto">
-                      <span class="read-only-th">XX,XXX.XX</span>
+                      <span class="read-only-th">{{ ga.requestAmount | currency }}</span>
                     </div>
                   </div>
                 </div>
+                <ng-template #notFirst>
+                  {{ ga.requestAmount | currency }}
+                </ng-template>
               </th>
-              <th scope="col">XXX,XXX.XX</th>
-              <th scope="col">XXX,XXX.XX</th>
-              <th scope="col">XXX,XXX.XX</th>
             </tr>
             <tr>
               <th scope="row">PI Requested Total Cost</th>
-              <th scope="col">
-                <div class="fsource-fy1-form">
+              <th *ngFor="let ga of grantAwarded; let i = index;" scope="col">
+                <div class="fsource-fy1-form" *ngIf="i === 0; else notFirst">
                   <div class="form-row">
                     <div class="col left-label"></div>
                     <div class="col-sm-auto">
-                      <span class="read-only-th">XX,XXX.XX</span>
+                      <span class="read-only-th">{{ ga.requestTotalAmount | currency }}</span>
                     </div>
                   </div>
                 </div>
+                <ng-template #notFirst>
+                  {{ ga.requestTotalAmount | currency }}
+                </ng-template>
               </th>
-              <th scope="col">XXX,XXX.XX</th>
-              <th scope="col">XXX,XXX.XX</th>
-              <th scope="col">XXX,XXX.XX</th>
             </tr>
             </thead>
             <tbody>

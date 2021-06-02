@@ -1,3 +1,5 @@
+import {FundingSourceTypes} from '../model/funding-source-types';
+
 export function getCurrentFiscalYear(): number {
   const today = new Date();
   const curMonth = today.getMonth();
@@ -69,7 +71,7 @@ function checkForFinalLoa(): void {
   let finalLoaSpl = false;
   // If any of the funding sources are MoonShot Funds (542), we need to select SPL and disable the final LOA radio button
   $('.fundingSourceSelectClass').each(function() {
-    if ($(this).val() === 542) {
+    if ($(this).val() === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
       finalLoaSpl = true;
     }
   });
