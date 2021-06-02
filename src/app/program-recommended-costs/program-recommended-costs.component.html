@@ -37,18 +37,18 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let f of fundingSources">
+        <tr *ngFor="let f of selectedFundingSources; let i = index;">
           <td>
             <div class="row">
               <div class="form-group col">
                 <span class="like-label">Funding Source</span>
-                <span>Funding Source Goes Here</span>
+                <span>{{ f.fundingSourceName }}</span>
               </div>
               <div class="col-sm-auto">
-                <button type="button" class="btn btn-sm btn-danger mr-2" title="Remove"><i class="fas fa-trash"
+                <button type="button" class="btn btn-sm btn-danger mr-2" (click)="deleteSource(i)" title="Remove"><i class="fas fa-trash"
                                                                                            aria-hidden="true"></i>
                 </button>
-                <button type="button" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-pencil"
+                <button type="button" class="btn btn-sm btn-primary" (click)="editSource(i)" title="Edit"><i class="fas fa-pencil"
                                                                                      aria-hidden="true"></i></button>
               </div>
             </div>
@@ -78,9 +78,13 @@
       </table>
     </div>
 
-    <button type="button" class="btn btn-primary mt-2 mb-3" data-toggle="modal" data-target="#add-fsource-modal"><i
-      class="fas fa-plus mr-2" aria-hidden="true"></i> Add Funding Source
+    <button type="button" class="btn btn-primary mt-2 mb-3" data-toggle="modal" data-target="#add-fsource-modal" *ngIf="selectedFundingSources.length < 3; else break">
+      <i class="fas fa-plus mr-2" aria-hidden="true"></i> Add Funding Source
     </button>
+    <ng-template #break>
+      <br/>
+      <br/>
+    </ng-template>
 
   </div>
 </div>
@@ -185,79 +189,70 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
+            <tr *ngIf="showDollar">
               <td></td>
-              <td>
-
-                <div class="fsource-fy1-form mb-2">
+              <td *ngFor="let ga of grantAwarded; let i = index;" scope="col">
+                <div class="fsource-fy1-form mb-2" *ngIf="i === 0; else notFirst;">
                   <div class="form-row">
                     <div class="col left-label"></div>
                     <div class="col-sm-auto">
                       <div class="btn-group btn-group-toggle" ngbRadioGroup name="value">
-                        <label ngbButtonLabel class="btn-outline-secondary">
+                        <label ngbButtonLabel class="btn-outline-secondary active">
                           <input ngbButton type="radio" value="dollar">Dollar
                         </label>
                         <label ngbButtonLabel class="btn-outline-secondary">
-                          <input ngbButton type="radio" value="percent">% Cut
+                          <input ngbButton type="radio" (change)="toggleCostDisplay('percent')" value="percent">% Cut
                         </label>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div class="fsource-fy1-form mb-2">
+                <div class="fsource-fy1-form mb-2" *ngIf="i === 0">
                   <div class="form-row form-inline">
                     <div class="col left-label">
                       <label for="dc-dollar">Direct Cost</label>
                     </div>
                     <div class="col-sm-auto">
-                      <input type="text" class="form-control funds-input" id="dc-dollar"
+                      <input type="text" class="form-control funds-input" [(ngModel)]="directCost" id="dc-dollar"
                              aria-describedby="dc-dollar-percent">
                     </div>
                     <div class="col-sm-auto right-label">
-                      <span id="dc-dollar-percent">XXX% Cut</span>
+                      <span id="dc-dollar-percent">{{ directPercentCutCalculated | percent }}</span>
                     </div>
                   </div>
                 </div>
 
-                <div class="fsource-fy1-form">
+                <div class="fsource-fy1-form" *ngIf="i === 0">
                   <div class="form-row form-inline">
                     <div class="col left-label">
                       <label for="tc-dollar">Total Cost</label>
                     </div>
                     <div class="col-sm-auto">
-                      <input type="text" class="form-control funds-input" id="tc-dollar"
+                      <input type="text" class="form-control funds-input" id="tc-dollar" [(ngModel)]="totalCost"
                              aria-describedby="tc-dollar-percent">
                     </div>
                     <div class="col-sm-auto right-label">
-                      <span id="tc-dollar-percent">XXX% Cut</span>
+                      <span id="tc-dollar-percent">{{ totalPercentCutCalculated | percent }}</span>
                     </div>
                   </div>
                 </div>
+                <ng-template #notFirst>{{ directCost | currency }}</ng-template>
 
               </td>
-              <td>
-                XXX,XXX.XX
-              </td>
-              <td>
-                XXX,XXX.XX
-              </td>
-              <td>
-                XXX,XXX.XX
-              </td>
+
             </tr>
 
-            <tr>
+            <tr *ngIf="showPercent">
               <td></td>
-              <td>
-
-                <div class="fsource-fy1-form mb-2">
+              <td *ngFor="let ga of grantAwarded; let i = index;">
+                <div class="fsource-fy1-form mb-2" *ngIf="i === 0; else notFirst">
                   <div class="form-row">
                     <div class="col left-label"></div>
                     <div class="col-sm-auto">
                       <div class="btn-group btn-group-toggle" ngbRadioGroup name="value">
                         <label ngbButtonLabel class="btn-outline-secondary">
-                          <input ngbButton type="radio" value="dollar">Dollar
+                          <input ngbButton type="radio" (change)="toggleCostDisplay('dollar')" value="dollar">Dollar
                         </label>
                         <label ngbButtonLabel class="btn-outline-secondary active">
                           <input ngbButton type="radio" value="percent">% Cut
@@ -267,11 +262,11 @@
                   </div>
                 </div>
 
-                <div class="fsource-fy1-form mb-2">
+                <div class="fsource-fy1-form mb-2" *ngIf="i === 0">
                   <div class="form-row form-inline">
                     <div class="col left-label"></div>
                     <div class="col-sm-auto">
-                      <input type="text" class="form-control percent-input" id="perc-cut">
+                      <input type="text" class="form-control percent-input" [(ngModel)]="percentCut" id="perc-cut">
                     </div>
                     <div class="col-sm-auto right-label">
                       <label for="perc-cut">% Cut</label>
@@ -279,39 +274,33 @@
                   </div>
                 </div>
 
-                <div class="fsource-fy1-form mb-2">
+                <div class="fsource-fy1-form mb-2" *ngIf="i === 0">
                   <div class="form-row form-inline">
                     <div class="col left-label">
                       <label for="dc-percent-dollar">Direct Cost</label>
                     </div>
                     <div class="col-sm-auto">
-                      <input type="text" readonly class="funds-input form-control-plaintext" id="dc-percent-dollar"
+                      <input type="text" readonly class="funds-input form-control-plaintext" [(ngModel)]="directCost"
+                             id="dc-percent-dollar"
                              value="XXX,XXX.XX">
                     </div>
                   </div>
                 </div>
 
-                <div class="fsource-fy1-form">
+                <div class="fsource-fy1-form" *ngIf="i === 0;">
                   <div class="form-row form-inline">
                     <div class="col left-label">
                       <label for="tc-percent-dollar">Total Cost</label>
                     </div>
                     <div class="col-sm-auto">
-                      <input type="text" readonly class="funds-input form-control-plaintext" id="tc-percent-dollar"
+                      <input type="text" readonly class="funds-input form-control-plaintext" [(ngModel)]="totalCost"
+                             id="tc-percent-dollar"
                              value="XXX,XXX.XX">
                     </div>
                   </div>
                 </div>
 
-              </td>
-              <td>
-                XXX,XXX.XX
-              </td>
-              <td>
-                XXX,XXX.XX
-              </td>
-              <td>
-                XXX,XXX.XX
+                <ng-template #notFirst>{{ directCost | currency }}</ng-template>
               </td>
             </tr>
 
@@ -323,7 +312,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Add Funding Source</button>
+        <button type="button" class="btn btn-primary" (click)="addFundingSource($event)">Add Funding Source</button>
       </div>
     </div>
   </div>

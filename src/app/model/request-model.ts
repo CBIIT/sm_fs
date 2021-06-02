@@ -3,11 +3,14 @@ import {FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FundingRequestErrorCodes} from './funding-request-error-codes';
 import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
+import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RequestModel {
+
+  fundingSources: Array<FundingRequestFundsSrcDto>;
 
   // Stores the grant selected in Step 1
   private _grant: NciPfrGrantQueryDto;

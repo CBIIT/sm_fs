@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --evalSourceMap=true",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -39,6 +39,7 @@
     "jquery": "^3.5.1",
     "jszip": "^3.6.0",
     "ng-select2": "^1.2.5",
+    "ngx-bootstrap": "^6.2.0",
     "ngx-logger": "^4.2.2",
     "rxjs": "~6.6.0",
     "select2": "^4.0.13",
