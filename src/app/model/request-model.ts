@@ -3,6 +3,7 @@ import { FundingRequestDtoReq, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib
 import { AppPropertiesService } from '../service/app-properties.service';
 import { FundingRequestErrorCodes } from './funding-request-error-codes';
 import { NGXLogger } from 'ngx-logger';
+import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
 @Injectable({
   providedIn: 'root'

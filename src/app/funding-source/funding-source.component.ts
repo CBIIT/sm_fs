@@ -69,7 +69,7 @@ export class FundingSourceComponent implements OnInit {
         this.requestModel.fundingSources = result;
         this.fundingSources = result;
       }, error => {
-        console.log('HttpClient get request error for----- ' + error.message);
+        this.logger.error('HttpClient get request error for----- ' + error.message);
       });
     }
   }
