@@ -78,7 +78,6 @@ export class Step4Component implements OnInit, OnDestroy {
   //   this.fsWorkflowService.createRequestApproversUsingPOST(workflowDto).subscribe(
   //     () => {
   //       this.requestModel.mainApproverCreated = true;
-  //       console.log('create main approvers called and returned '); },
   //     (error) => {
 
   //     }

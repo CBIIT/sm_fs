@@ -1,8 +1,9 @@
-import {Component, OnInit, Output, ViewChild, EventEmitter} from '@angular/core';
-import {GrantnumberSearchCriteriaComponent} from '@nci-cbiit/i2ecui-lib';
-import {FundSelectSearchCriteriaRes} from '@nci-cbiit/i2ecws-lib';
-import {SearchCriteria} from '../search-criteria';
-import {SearchFilterService} from '../search-filter.service';
+import { Component, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
+import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
+import { FundSelectSearchCriteriaRes } from '@nci-cbiit/i2ecws-lib';
+import { SearchCriteria } from '../search-criteria';
+import { SearchFilterService } from '../search-filter.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-search-filter',
@@ -15,11 +16,10 @@ export class SearchFilterComponent implements OnInit {
   @Output() callSearch = new EventEmitter<SearchCriteria>();
   public searchFilter: SearchCriteria;
 
-  constructor(private searchFilterService: SearchFilterService) {
+  constructor(private searchFilterService: SearchFilterService, private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
-    // console.log("search-filter component ngOnInit()");
     this.searchFilter = this.searchFilterService.searchFilter;
   }
 
@@ -38,7 +38,7 @@ export class SearchFilterComponent implements OnInit {
   }
 
   doSearch(): void {
-    console.log('search-filter.component doSearch Called');
+    this.logger.debug('Search Filter: ', this.searchFilter);
     this.callSearch.emit(this.searchFilter);
   }
 

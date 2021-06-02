@@ -1,13 +1,14 @@
-import { Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import { CancerActivityControllerService, LookupsControllerService } from '@nci-cbiit/i2ecws-lib';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppLookupsService {
 
-  private lookups: {CancerActivities: any, AnptherLookupMap: any}
-                   = {CancerActivities: {}, AnptherLookupMap: {} };
+  private lookups: { CancerActivities: any, AnptherLookupMap: any }
+    = { CancerActivities: {}, AnptherLookupMap: {} };
 
   // for resolve and reject the promise
   private resolve: any;
@@ -15,11 +16,10 @@ export class AppLookupsService {
   private cancerActivitiesLoaded = false;
   private dummyLookupMapLoaded = false;
 
-  constructor(private cancerActivityController: CancerActivityControllerService) {
+  constructor(private cancerActivityController: CancerActivityControllerService, private logger: NGXLogger) {
   }
 
   loadCancerActivities(): void {
-    // console.log('AppLookupsService loadCancerActivities starts');
     this.cancerActivityController.getAllActiveCaListUsingGET().subscribe(
       (result) => {
         const cays = {};
@@ -27,12 +27,11 @@ export class AppLookupsService {
           cays[element.code] = element.referralDescription;
         });
         this.lookups.CancerActivities = cays;
-        // console.log('AppLookupsService loadCancerActivities done', cays);
         this.cancerActivitiesLoaded = true;
         this.tryResolve();
       },
       (error) => {
-        console.error('Failed loading CanerActivities in AppLookupService for error, ', error);
+        this.logger.error('Failed loading CanerActivities in AppLookupService for error, ', error);
         this.doReject();
       }
     );
@@ -49,18 +48,14 @@ export class AppLookupsService {
   }
 
   loadDummyLookupMap(): void {
-    // Simulate another load, let it delay 1/10 seconds;
-    // console.log('AppLookupsService loadDummyLookupMap starts');
     setTimeout(() => {
-      // console.log('AppLookupsService loadDummyLookupMap done');
       this.dummyLookupMapLoaded = true;
       this.tryResolve();
     }, 100);
   }
 
   initialize(): Promise<any> {
-    return new Promise<void>( (resolve, reject) => {
-      // console.log('AppLookupsService starts');
+    return new Promise<void>((resolve, reject) => {
       this.dummyLookupMapLoaded = false;
       this.cancerActivitiesLoaded = false;
       this.resolve = resolve;

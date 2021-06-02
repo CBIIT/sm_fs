@@ -1,5 +1,6 @@
-import {Inject, Injectable, InjectionToken} from '@angular/core';
-import {LookupsControllerService} from '@nci-cbiit/i2ecws-lib';
+import { Inject, Injectable, InjectionToken } from '@angular/core';
+import { LookupsControllerService } from '@nci-cbiit/i2ecws-lib';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,9 @@ export class AppPropertiesService {
   private appName: string;
 
   constructor(private lookupService: LookupsControllerService,
-              @Inject(PROPERTIES_APP_NAME) appName: string,
-              @Inject(PROPERTIES_OVERRIDE) overrideProperties: any) {
+    @Inject(PROPERTIES_APP_NAME) appName: string,
+    @Inject(PROPERTIES_OVERRIDE) overrideProperties: any,
+    private logger: NGXLogger) {
     this.appName = appName;
     this.overrideProperties = overrideProperties;
   }
@@ -21,18 +23,17 @@ export class AppPropertiesService {
 
   initialize(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      // console.log('AppPropertiesService initialize Starts, appName=' + this.appName);
+      this.logger.debug('AppPropertiesService initialize Starts, appName: ' + this.appName);
       this.lookupService.getAppPropertiesByAppNameUsingGET(this.appName).subscribe(
         (result) => {
           result.forEach((element) => {
-            // console.log('App_Properties_T name/value ' + element.propKey + '/' + element.propValue);
+            this.logger.debug('App_Properties_T name/value: ' + element.propKey + '/' + element.propValue);
             this.appProperties[element.propKey] = element.propValue;
           });
-          // console.log('AppPropertiesService initialize Done');
           resolve();
         },
         (error) => {
-          console.error('Failed to load App Properties because of error, ', error);
+          this.logger.error('Failed to load App Properties because of error, ', error);
           reject();
         }
       );

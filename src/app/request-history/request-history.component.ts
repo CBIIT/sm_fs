@@ -1,8 +1,9 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {RequestModel} from '../model/request-model';
-import {FsLookupControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { RequestModel } from '../model/request-model';
+import { FsLookupControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { FundingRequestIntegrationService } from '../funding-request/integration/integration.service';
 import { Subscription } from 'rxjs';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-request-history',
@@ -14,8 +15,9 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
   requestSubmissionEventSubscriber: Subscription;
 
   constructor(private requestModel: RequestModel,
-              private fsLookupControllerService: FsLookupControllerService,
-              private requestIntegrationService: FundingRequestIntegrationService) {
+    private fsLookupControllerService: FsLookupControllerService,
+    private requestIntegrationService: FundingRequestIntegrationService,
+    private logger: NGXLogger) {
   }
 
   ngOnDestroy(): void {
@@ -25,34 +27,23 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log(this.requestModel.requestDto.frqId);
-    console.log(this.requestModel.requestDto.financialInfoDto.fundingRequestId);
+    this.logger.debug("Funding Request info: ", this.requestModel.requestDto);
     this.loadHistory();
     this.requestSubmissionEventSubscriber = this.requestIntegrationService.requestSubmissionEmitter.subscribe(
-      (frqId) => {this.loadHistory(); }
+      (frqId) => { this.loadHistory(); }
     );
-    // if (this.requestModel.requestDto.frqId != null) {
-    //   this.fsLookupControllerService.getRequestHistoryUsingGET(this.requestModel.requestDto.frqId).subscribe(
-    //     result => {
-    //       this.histories = result;
-    //       this.requestIntegrationService.requestHistoryLoadEmitter.next(result);
-    //     },
-    //     error => {
-    //       console.log('HttpClient get request error for----- ' + error.message);
-    //     });
-    // }
   }
 
   loadHistory(): void {
     if (this.requestModel.requestDto.frqId != null) {
       this.fsLookupControllerService.getRequestHistoryUsingGET(this.requestModel.requestDto.frqId).subscribe(
         result => {
-          console.log('request history loaded ', result);
+          this.logger.debug('Request History result: ', result);
           this.histories = result;
           this.requestIntegrationService.requestHistoryLoadEmitter.next(result);
         },
         error => {
-          console.log('HttpClient get request error for----- ' + error.message);
+          this.logger.error('HttpClient get request error for----- ' + error.message);
         });
     }
   }

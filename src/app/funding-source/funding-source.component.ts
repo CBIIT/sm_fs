@@ -1,12 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {RequestModel} from '../model/request-model';
-import {Router} from '@angular/router';
-import {FsRequestControllerService} from '@nci-cbiit/i2ecws-lib';
-import {Options} from 'select2';
-import {isNumeric} from 'rxjs/internal-compatibility';
-import {FundingSourceSynchronizerService} from './funding-source-synchronizer-service';
-import {openNewWindow} from '../utils/utils';
+import { Component, Input, OnInit } from '@angular/core';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { RequestModel } from '../model/request-model';
+import { Router } from '@angular/router';
+import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
+import { Options } from 'select2';
+import { isNumeric } from 'rxjs/internal-compatibility';
+import { FundingSourceSynchronizerService } from './funding-source-synchronizer-service';
+import { openNewWindow } from '../utils/utils';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-funding-source',
@@ -42,15 +43,16 @@ export class FundingSourceComponent implements OnInit {
   }
 
   constructor(private requestModel: RequestModel,
-              private fsRequestControllerService: FsRequestControllerService,
-              private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
-              private router: Router) {
+    private fsRequestControllerService: FsRequestControllerService,
+    private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
+    private router: Router,
+    private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(select => {
       if (Number(select) === Number(this._selectedValue)) {
-        console.log('My selection; do not exclude');
+        this.logger.debug('My selection; do not exclude: ', select);
       } else {
         this.selectedFundingSources.add(Number(select));
       }
@@ -66,10 +68,10 @@ export class FundingSourceComponent implements OnInit {
       this.requestModel.grant.fy,
       this.requestModel.requestDto.pdNpnId,
       this.requestModel.requestDto.requestorCayCode).subscribe(result => {
-      this.fundingSources = result;
-    }, error => {
-      console.log('HttpClient get request error for----- ' + error.message);
-    });
+        this.fundingSources = result;
+      }, error => {
+        this.logger.error('HttpClient get request error for----- ' + error.message);
+      });
   }
 
   // open the funding source help in the new window..

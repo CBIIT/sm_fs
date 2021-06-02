@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FundSelectSearchCriteriaRes, FsSearchControllerService , FundingRequestQueryDatatableDto, FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { FundSelectSearchCriteriaRes, FsSearchControllerService, FundingRequestQueryDatatableDto, FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { NGXLogger } from 'ngx-logger';
 
 class DataTablesResponse {
   data: any[];
@@ -23,7 +23,7 @@ export class SearchResultComponent implements OnInit {
 
   searchResult;
 
-  constructor(private fsSearchControllerService: FsSearchControllerService) { }
+  constructor(private fsSearchControllerService: FsSearchControllerService, private logger: NGXLogger) { }
 
   ngOnInit(): void {
 
@@ -38,7 +38,7 @@ export class SearchResultComponent implements OnInit {
 
         this.fsSearchControllerService.searchFundingRequestsUsingPOST(Object.assign(dataTablesParameters, this.userData)).subscribe(
           result => {
-            console.log('searchPaylinePaylistGrantsUsingPOST1 returned ', result);
+            this.logger.debug('Search Funding Requests result: ', result);
             this.fundingRequests = result.data;
             callback({
               recordsTotal: result.recordsTotal,
@@ -46,7 +46,7 @@ export class SearchResultComponent implements OnInit {
               data: []
             });
           }, error => {
-            console.log('HttpClient get request error for----- ' + error.message);
+            this.logger.error('HttpClient get request error for----- ' + error.message);
           });
 
       },
@@ -56,7 +56,6 @@ export class SearchResultComponent implements OnInit {
   }
 
   doSearch(criteria: FundSelectSearchCriteriaRes) {
-    console.log("search-result.component doSearch Called");
     this.userData = { fyFrom: criteria.fyFrom };
   }
 }
