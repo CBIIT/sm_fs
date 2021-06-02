@@ -52,7 +52,7 @@ import { FinalLoaComponent } from './final-loa/final-loa.component';
 import { LoggerModule, NgxLoggerLevel } from "ngx-logger";
 import { SkippedGrantsComponent } from './skipped-grants/skipped-grants.component';
 import { FooterComponent } from './footer/footer.component';
-import { GwbLinksService } from './service/gwb-links.service';
+import { GwbLinksService } from '@nci-cbiit/i2ecui-lib';
 import { ConversionGrantActivityMechComponent } from './conversion-grant-activity-mech/conversion-grant-activity-mech.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
