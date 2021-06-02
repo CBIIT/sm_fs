@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AppPropertiesService } from '../service/app-properties.service';
 import { AppUserSessionService } from '../service/app-user-session.service';
-import { GwbLinksService } from '../service/gwb-links.service';
+import { GwbLinksService } from '@nci-cbiit/i2ecui-lib';
 @Component({
   selector: 'app-fs-menu',
   templateUrl: './fs-menu.component.html',
