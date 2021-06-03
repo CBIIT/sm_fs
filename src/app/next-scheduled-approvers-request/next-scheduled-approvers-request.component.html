@@ -1,4 +1,4 @@
-<div class="form-group">
+<div class="form-group" *ngIf="!readonly">
   <label for="req-add-approvers">Add Approver(s) <span class="optional">(optional)</span></label>
   <ng-select2
     id="req-add-approvers"
@@ -8,8 +8,9 @@
     <option></option>
     <option *ngFor="let approver of approvers" [value]="approver.id">{{approver.text}}</option>
   </ng-select2>
-</div>
-<table class="table table-striped table-bordered next-approvers-table">
+</div>  
+<label for="approver-list">Next Scheduled Approvers</label>
+<table class="table table-striped table-bordered next-approvers-table" id="approver-list">
   <thead>
   <tr>
     <th scope="col" style="width:4rem">Order</th>
@@ -20,8 +21,8 @@
   </tr>
   </thead>
   <tbody cdkDropList (cdkDropListDropped)="dropped($event)" class="drag-boundary">
-  <tr *ngFor="let a of additionalApprovers; let i = index" cdkDrag cdkDragBoundary=".drag-boundary">
-    <td><span class="order-icon"></span>&nbsp;{{ a.orderNum}}</td>
+  <tr *ngFor="let a of additionalApprovers; let i = index" cdkDrag cdkDragBoundary=".drag-boundary" [cdkDragDisabled]="readonly">
+    <td><span class="order-icon" *ngIf="!readonly"></span>&nbsp;{{ a.orderNum}}</td>
     <td>{{ a.approverFullName }}</td>
     <td>{{ a.roleName }}</td>
     <td>{{ a.approverAltFullName }}</td>
@@ -35,7 +36,7 @@
   </tbody>
   <tbody >
     <tr *ngFor="let a of mainApprovers; let i = index">
-      <td><span class="fa fa-lock"></span>&nbsp;{{ a.orderNum}}</td>
+      <td><span class="fa fa-lock" *ngIf="!readonly"></span>&nbsp;{{ a.orderNum}}</td>
       <td>{{ a.approverFullName }}</td>
       <td>{{ a.roleName }}</td>
       <td>{{ a.approverAltFullName }}</td>

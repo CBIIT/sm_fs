@@ -71,7 +71,7 @@
 <div class="row collapse show" id="workflow-collapse">
   <div class="col-12">
     <div class="form-group">
-      <app-next-scheduled-approvers-request></app-next-scheduled-approvers-request>
+      <app-next-scheduled-approvers-request [readonly]="readonly"></app-next-scheduled-approvers-request>
     </div>
   </div>
 
@@ -79,7 +79,7 @@
   </div>
 
   <div class="col-12">
-    <div class="form-group">
+    <div class="form-group" *ngIf="!readonly">
       <label for="workflow-comments">Workflow Comments <span class="optional">(optional)</span></label>
       <textarea class="form-control" id="workflow-comments" rows="2" maxlength="1000"></textarea>
       <!-- Until workflow is implemented -->

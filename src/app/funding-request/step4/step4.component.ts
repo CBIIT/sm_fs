@@ -32,6 +32,8 @@ export class Step4Component implements OnInit, OnDestroy {
   requestStatus: string;
   docDtos: DocumentsDto[];
 
+  readonly = false;
+
   constructor(private router: Router,
     private requestModel: RequestModel,
     private propertiesService: AppPropertiesService,

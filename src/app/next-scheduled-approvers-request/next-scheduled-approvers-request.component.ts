@@ -19,13 +19,14 @@ const addedApproverMap = new Map<number, any>();
 export class NextScheduledApproversRequestComponent implements OnInit {
 
   @Input() label = 'Add Approver';
+  @Input() readonly = false;
+
   options: Options;
 
   mainApprovers: FundingReqApproversDto[];
-
   additionalApprovers: FundingReqApproversDto[];
 
-  iSelectedValue: number;
+  private iSelectedValue: number;
 
   set selectedValue(value: number) {
     this.iSelectedValue = value;
