@@ -9,19 +9,23 @@ export class GrantsSearchFilterService {
     searchWithin: string;
     selectedPd: number;
     searched: boolean;
+    currentFy: number;
+    defaultSearchWithin: string;
 
     constructor(private userSessionService: AppUserSessionService) {
         this.grantsSearchCriteria =
         {grantType: '', grantMech: '', grantIc: '', grantSerial: '', grantYear: '', grantSuffix: ''};
-        const curFy = getCurrentFiscalYear();
-        this.grantsSearchCriteria.fromFy = curFy - 1;
-        this.grantsSearchCriteria.toFy = curFy;
+        this.currentFy = getCurrentFiscalYear();
+        this.grantsSearchCriteria.fromFy = this.currentFy - 1;
+        this.grantsSearchCriteria.toFy = this.currentFy;
         if (this.userSessionService.isPD()) {
-            this.searchWithin = 'mypf';
+            this.defaultSearchWithin = 'mypf';
         }
         else if (this.userSessionService.isPA()) {
-            this.searchWithin = 'myca';
+            this.defaultSearchWithin = 'myca';
         }
+
+        this.searchWithin = this.defaultSearchWithin;
     }
 
     getGrantsSearchCriteria(): GrantsSearchCriteriaDto {
