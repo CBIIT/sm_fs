@@ -61,7 +61,7 @@
   <div class="col-md-6 col-lg-4">
     <div class="form-group">
       <p class="like-label">Requesting PD's Cancer Activity</p>
-      <p>{{ model.requestDto.requestorCayCode }}</p>
+      <p><a [routerLink]="" ngbTooltip="{{model.requestDto.requestorCayCode|codeDescription:'CancerActivities'}}" triggers="mouseenter:mouseleave" placement="top">{{model.requestDto.requestorCayCode}}</a></p>
     </div>
   </div>
 
