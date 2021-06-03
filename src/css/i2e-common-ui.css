@@ -24902,42 +24902,42 @@ ul.no-bullets {
   top: .75rem;
 }
 
-/* line 384, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-#side-nav ul li.active a {
+/* line 382, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+#side-nav ul li a.active {
   border-left: 0.3rem solid #40c1ac;
-  padding-left: calc(.5rem - .3rem);
+  padding-left: calc(1.5rem - .3rem);
   font-weight: bold;
 }
 
-/* line 392, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 390, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul ul {
   padding: 0rem !important;
 }
 
-/* line 395, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 393, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul ul li a {
   padding-left: 1.5rem;
 }
 
-/* line 398, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-#side-nav ul ul li.active a {
+/* line 395, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+#side-nav ul ul li a.active {
   padding-left: calc(1.5rem - .3rem);
 }
 
-/* line 406, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 404, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .infoTooltip {
   padding: .2rem;
   margin-left: -.2rem;
 }
 
-/* line 410, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 408, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .infoTooltip > i {
   line-height: inherit;
   vertical-align: top;
   font-size: 90%;
 }
 
-/* line 416, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+/* line 414, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   font-size: 85%;
 }
@@ -25130,7 +25130,7 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   list-style-type: none;
   width: 25%;
   float: left;
-  font-size: 12px;
+  font-size: .9rem;
   position: relative;
   text-align: center;
   text-transform: none;
