@@ -4,7 +4,7 @@
 
   <div class="col-12">
     <h2>Program Recommended Costs</h2>
-    <div *ngIf="!isSkipReqTypeSelected()">
+    <div *ngIf="!isSkipRequest()">
     <p><b>Please note that the Standard Policy Reduction should be taken into
         consideration when determining the recommended dollar amounts for the request. If you would like to include a
         waiver to the Standard Policy Reduction, please provide it as part of the justification. The current fiscal
@@ -94,7 +94,7 @@
 </div>
 
 <div class="row">
-  <div class="col-lg-4">
+  <div class="col-lg-4" *ngIf="!isSkipRequest()">
     <div class="form-group">
       <app-other-docs-contributing-funds [(selectedValue)]="selectedDocs" label="Other NCI DOCs Contributing Funds">
       </app-other-docs-contributing-funds>
