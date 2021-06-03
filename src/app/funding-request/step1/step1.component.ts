@@ -7,7 +7,6 @@ import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.s
 import {RequestModel} from '../../model/request-model';
 import {AppUserSessionService} from 'src/app/service/app-user-session.service';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
-import {getCurrentFiscalYear} from 'src/app/utils/utils';
 import { LoaderService } from 'src/app/service/loader-spinner.service';
 import { NGXLogger } from 'ngx-logger';
 
@@ -287,9 +286,9 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
   }
 
   clear(): void {
-    this.searchWithin = '';
+    this.searchWithin = this.gsfs.defaultSearchWithin;
+    this.fyRange = {fromFy: this.gsfs.currentFy - 1, toFy: this.gsfs.currentFy};
     this.piName = '';
-    this.fyRange = {fromFy: '', toFy: ''};
     this.ncabRange = {fromNcab: '', toNcab: ''};
     this.selectedPd = null;
     this.selectedRfaPa = '';
@@ -304,6 +303,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     this.grantNumberComponent.grantNumberSuffix = '';
   }
 
+  // restore the search criteria when user navigates back to step1 from step2, step3 ...
   restoreSearchFilter(): void {
     this.logger.debug('Restore search filter: ', this.gsfs, this.searchCriteria);
   //  this.searchWithin = '';

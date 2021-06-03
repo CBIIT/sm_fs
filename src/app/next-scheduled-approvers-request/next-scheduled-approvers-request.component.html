@@ -19,8 +19,8 @@
     <th scope="col" style="width:5rem">Action</th>
   </tr>
   </thead>
-  <tbody cdkDropList (cdkDropListDropped)="dropped($event)">
-  <tr *ngFor="let a of additionalApprovers; let i = index" cdkDrag >
+  <tbody cdkDropList (cdkDropListDropped)="dropped($event)" class="drag-boundary">
+  <tr *ngFor="let a of additionalApprovers; let i = index" cdkDrag cdkDragBoundary=".drag-boundary">
     <td><span class="order-icon"></span>&nbsp;{{ a.orderNum}}</td>
     <td>{{ a.approverFullName }}</td>
     <td>{{ a.roleName }}</td>
@@ -43,5 +43,4 @@
       </td>
     </tr>
     </tbody>
-
 </table>
