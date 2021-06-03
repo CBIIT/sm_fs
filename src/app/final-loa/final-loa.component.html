@@ -1,1 +1,23 @@
-<p>final-loa works! - is this where it goes?</p>
+<div class="form-row">
+  <div class="form-group">
+    <label for="final-loa">What is the final scientific level of authority based on NCI Policy?&nbsp;&nbsp;
+    <a href="${loaReviewPolicy}" target="_blank">Review Policy</a>
+    </label>
+    <div class="col-12">
+      <div id="final-loa" class="btn-group btn-group-toggle" ngbRadioGroup name="value">
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input ngbButton type="radio" value="1">Program Director
+        </label>
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input ngbButton type="radio" value="2">DOC Director
+        </label>
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input ngbButton type="radio" value="3">NCI Director
+        </label>
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input ngbButton type="radio" value="4">NCI Scientific Program Leaders
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
