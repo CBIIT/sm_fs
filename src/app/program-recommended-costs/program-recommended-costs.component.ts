@@ -1,8 +1,7 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
-import {openNewWindow} from 'src/app/utils/utils';
 import {NGXLogger} from 'ngx-logger';
 import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 import {
@@ -13,7 +12,6 @@ import {
 } from '../model/funding-request-types';
 import {FundingSourceSynchronizerService} from '../funding-source/funding-source-synchronizer-service';
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {ProgramRecommendedCostsModel} from './program-recommended-costs-model';
 import {FundingSourceTypes} from '../model/funding-source-types';
 
 
@@ -25,8 +23,6 @@ import {FundingSourceTypes} from '../model/funding-source-types';
 export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   _selectedDocs: string;
-  displayCategory: number;
-  selectedFundingSources = new Array<FundingRequestFundsSrcDto>();
   initialPay: boolean;
   showPercent = true;
   showDollar = false;
@@ -36,7 +32,12 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   directPercentCutCalculated: number;
   totalPercentCutCalculated: number;
   private selectedSource: number;
-  private allFundingSources = new Map<number, FundingRequestFundsSrcDto>();
+
+
+  // Convenience method to save typing in the UI
+  get selectedFundingSources(): FundingRequestFundsSrcDto[] {
+    return this.requestModel.programRecommendedCostsModel.selectedFundingSources;
+  }
 
   get directCost(): number {
     return this._directCost;
@@ -69,23 +70,18 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService, private logger: NGXLogger,
-              private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
-              private programRecommendedCostsModel: ProgramRecommendedCostsModel) {
+              private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
   }
 
   ngAfterViewInit(): void {
   }
 
   ngOnDestroy(): void {
-    this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.unsubscribe();
+    this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.unsubscribe();
   }
 
   ngOnInit(): void {
-    // this.fundingSources = new Array<any>(3);
-    // this.displayCategory = getDisplayCategory(this.requestModel.requestDto.frtId);
     this.initialPay = INITIAL_PAY_TYPES.includes(this.requestModel.requestDto.frtId);
-    this.logger.debug('Display category:', this.displayCategory);
-    this.logger.debug('Initial pay     :', this.initialPay);
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.requestDto.grantAwarded = result;
         // this.this.logger.debug('Appl Periods/Grant awards:', result);
@@ -96,19 +92,20 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       }
     );
 
-    this.fsRequestControllerService.getFundingSourcesUsingGET(
-      this.requestModel.requestDto.frtId,
-      this.requestModel.grant.fullGrantNum,
-      this.requestModel.grant.fy,
-      this.requestModel.requestDto.pdNpnId,
-      this.requestModel.requestDto.requestorCayCode).subscribe(result => {
-      this.requestModel.fundingSources = result;
-      this.allFundingSources = new Map(result.map(key => [key.fundingSourceId, key] as [number, FundingRequestFundsSrcDto]));
-      this.logger.debug(this.requestModel.fundingSources);
-      this.logger.debug(this.allFundingSources);
-    }, error => {
-      this.logger.debug('HttpClient get request error for----- ' + error.message);
-    });
+    if (!this.requestModel.programRecommendedCostsModel.fundingSources
+      || this.requestModel.programRecommendedCostsModel.fundingSources.length === 0) {
+      this.logger.debug('loading funding sources');
+      this.fsRequestControllerService.getFundingSourcesUsingGET(
+        this.requestModel.requestDto.frtId,
+        this.requestModel.grant.fullGrantNum,
+        this.requestModel.grant.fy,
+        this.requestModel.requestDto.pdNpnId,
+        this.requestModel.requestDto.requestorCayCode).subscribe(result => {
+        this.requestModel.programRecommendedCostsModel.fundingSources = result;
+      }, error => {
+        this.logger.debug('HttpClient get request error for----- ' + error.message);
+      });
+    }
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
       this.selectedSource = selection;
@@ -121,11 +118,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   get model(): RequestModel {
     return this.requestModel;
-  }
-
-  openOefiaLink(): boolean {
-    openNewWindow('https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information', 'oefiaLink');
-    return false;
   }
 
   get selectedDocs(): string {
@@ -154,14 +146,15 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   addFundingSource(e): void {
-    this.logger.debug('add funding source', this.selectedSource);
-    if (this.allFundingSources.size === 0) {
-      this.logger.error('funding sources not initialized');
-      this.requestModel.fundingSources.forEach(s => {
-        this.allFundingSources.set(s.fundingSourceId, s);
-      });
+    this.logger.debug('Add funding source', this.selectedSource);
+    if (this.requestModel.programRecommendedCostsModel.fundingSourcesMap.size === 0) {
+      this.logger.error('Funding sources not initialized');
+      // this.requestModel.programRecommendedCostsModel.fundingSources.forEach(s => {
+      //   this.allFundingSources.set(s.fundingSourceId, s);
+      // });
     }
-    this.selectedFundingSources.push(this.allFundingSources.get(Number(this.selectedSource)));
+    this.requestModel.programRecommendedCostsModel.selectedFundingSources.push(
+      this.requestModel.programRecommendedCostsModel.fundingSourcesMap.get(Number(this.selectedSource)));
     this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(this.selectedSource);
     // @ts-ignore
     $('#add-fsource-modal').modal('hide');
@@ -180,9 +173,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   deleteSource(i: number): void {
-    const removed = this.selectedFundingSources[i];
+    const removed = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed.fundingSourceId);
-    this.selectedFundingSources.splice(i, 1);
+    this.requestModel.programRecommendedCostsModel.selectedFundingSources.splice(i, 1);
   }
 
   editSource(i: number): void {
@@ -193,13 +186,13 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   showFinalLOA(): boolean {
-    return this.isMoonshot() && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
+    return !this.isMoonshot() && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
       Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestModel.requestDto.frtId));
   }
 
   isMoonshot(): boolean {
     let result = false;
-    this.selectedFundingSources.forEach(f => {
+    this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(f => {
       if (Number(f.fundingSourceId) === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
         result = true;
       }
