@@ -80,15 +80,15 @@
               <tr>
                 <th>Grant Number</th>
                 <th>PI</th>
-                <th>I2 Status</th>
                 <th>Project Title</th>
-                <th>Institution</th>
+                <th>RFA/PA</th>
+                <th>I2 Status</th>
+                <th>PD</th>
+                <th>CA</th>
                 <th>FY</th>
-                <th>NCAB Date</th>
+                <th>NCAB</th>
                 <th>Pctl</th>
                 <th>PriScr</th>
-                <th>CA</th>
-                <th>PD</th>
                 <th>Budget Start Date</th>
                 <th>Existing Requests</th>
                 <th>Action</th>
@@ -104,15 +104,15 @@
                     <span style="padding:3px;margin:0px 2px;border: 0px;float:inline-end;" (mouseenter)="setGrant(grant)"  [ngbTooltip]="InstituteTooltip"><i class='fa fa-university' aria-hidden='true'></i></span>
                 </td>
                 <td><a href="mailto:{{grant.piEmail}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.piFullName}}</a></td>
-                <td>{{grant.applStatusGroupDescrip}}</td>
                 <td>{{grant.projectTitle}}</td>
-                <td>{{grant.orgName}}</td>
+                <td>{{grant.rfaPaNumber}}</td>
+                <td>{{grant.applStatusGroupDescrip}}</td>
+                <td><a href="mailto:{{grant.pdEmailAddress}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.pdFullName}}</a></td>
+                <td><a [routerLink]="" ngbTooltip="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="mouseenter:mouseleave" placement="top">{{grant.cayCode}}</a></td>
                 <td>{{grant.fy}}</td>
                 <td>{{grant.councilMeetingDate|formatNcabDate}}</td>
                 <td>{{grant.irgPercentileNum}}</td>
                 <td>{{grant.priorityScoreNum}}</td>
-                <td><a [routerLink]="" ngbTooltip="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="mouseenter:mouseleave" placement="top">{{grant.cayCode}}</a></td>
-                <td><a href="mailto:{{grant.pdEmailAddress}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.pdFullName}}</a></td>
                 <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>
                 <td><span *ngIf="grant.requestCount>0"><a routerLink="/search">{{grant.requestCount}}</a></span></td>
                 <td>
