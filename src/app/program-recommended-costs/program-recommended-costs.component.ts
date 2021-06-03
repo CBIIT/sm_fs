@@ -13,6 +13,8 @@ import {
 } from '../model/funding-request-types';
 import {FundingSourceSynchronizerService} from '../funding-source/funding-source-synchronizer-service';
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import {ProgramRecommendedCostsModel} from './program-recommended-costs-model';
+import {FundingSourceTypes} from '../model/funding-source-types';
 
 
 @Component({
@@ -31,8 +33,8 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   _percentCut: number;
   _directCost: number;
   _totalCost: number;
-  directPercentCutCalculated: number = 0.04;
-  totalPercentCutCalculated: number = 0.03;
+  directPercentCutCalculated: number;
+  totalPercentCutCalculated: number;
   private selectedSource: number;
   private allFundingSources = new Map<number, FundingRequestFundsSrcDto>();
 
@@ -67,7 +69,8 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService, private logger: NGXLogger,
-              private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
+              private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
+              private programRecommendedCostsModel: ProgramRecommendedCostsModel) {
   }
 
   ngAfterViewInit(): void {
@@ -185,7 +188,31 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   editSource(i: number): void {
   }
 
-  isSkipReqTypeSelected(): boolean { 
-    return this.requestModel.requestDto.frtId == FundingRequestTypes.SKIP;
+  isSkipReqTypeSelected(): boolean {
+    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP);
+  }
+
+  showFinalLOA(): boolean {
+    return this.isMoonshot() && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
+      Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestModel.requestDto.frtId));
+  }
+
+  isMoonshot(): boolean {
+    let result = false;
+    this.selectedFundingSources.forEach(f => {
+      if (Number(f.fundingSourceId) === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
+        result = true;
+      }
+    });
+    return result;
+  }
+
+
+  isDiversitySupplement(): boolean {
+    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.DIVERSITY_SUPPLEMENT_INCLUDES_CURE_SUPPLEMENTS);
+  }
+
+  isNewInvestigator(): boolean {
+    return this.requestModel.grant.activityCode === 'R01' && ([1, 2].includes(Number(this.requestModel.grant.applTypeCode)));
   }
 }

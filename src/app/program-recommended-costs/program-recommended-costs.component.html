@@ -111,10 +111,26 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" *ngIf="showFinalLOA()">
   <div class="col-lg-12">
     <div class="form-group">
       <app-final-loa></app-final-loa>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="isDiversitySupplement()">
+  <div class="col-lg-12">
+    <div class="form-group">
+      <app-diversity-supplement></app-diversity-supplement>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="isNewInvestigator()">
+  <div class="col-lg-12">
+    <div class="form-group">
+      <app-new-investigator></app-new-investigator>
     </div>
   </div>
 </div>

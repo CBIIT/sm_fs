@@ -54,6 +54,8 @@ import {SkippedGrantsComponent} from './skipped-grants/skipped-grants.component'
 import {FooterComponent} from './footer/footer.component';
 import {GwbLinksService} from '@nci-cbiit/i2ecui-lib';
 import {ConversionGrantActivityMechComponent} from './conversion-grant-activity-mech/conversion-grant-activity-mech.component';
+import { DiversitySupplementComponent } from './diversity-supplement/diversity-supplement.component';
+import { NewInvestigatorComponent } from './new-investigator/new-investigator.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -116,6 +118,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SkippedGrantsComponent,
     FooterComponent,
     ConversionGrantActivityMechComponent,
+    DiversitySupplementComponent,
+    NewInvestigatorComponent,
 
   ],
   imports: [
