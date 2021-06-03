@@ -14,15 +14,28 @@ import {NGXLogger} from 'ngx-logger';
   styleUrls: ['./funding-source.component.css']
 })
 export class FundingSourceComponent implements OnInit {
+
   @Input() label = 'Funding Source';
   @Input() name = '';
-  fundingSources: Array<FundingRequestFundsSrcDto>;
-  selectedFundingSources = new Set<number>();
   _selectedValue: number;
   options: Options;
 
+  // TODO: evaluate getters and setters for removal since they just pass through to underlying model anyway
+
+  get selectedFundingSources(): Set<number> {
+    return this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds;
+  }
+
+  set selectedFundingSources(value: Set<number>) {
+    this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds = value;
+  }
+
   get selectedValue(): number {
     return this._selectedValue;
+  }
+
+  get fundingSources(): Array<FundingRequestFundsSrcDto> {
+    return this.requestModel.programRecommendedCostsModel.fundingSources;
   }
 
   set selectedValue(value: number) {
@@ -51,17 +64,16 @@ export class FundingSourceComponent implements OnInit {
       this.selectedFundingSources.delete(Number(deselect));
 
     });
-    if (this.requestModel.fundingSources) {
-      this.fundingSources = this.requestModel.fundingSources;
-    } else {
+    if (!this.requestModel.programRecommendedCostsModel.fundingSources
+      || this.requestModel.programRecommendedCostsModel.fundingSources.length === 0) {
+      this.logger.debug('loading funding sources');
       this.fsRequestControllerService.getFundingSourcesUsingGET(
         this.requestModel.requestDto.frtId,
         this.requestModel.grant.fullGrantNum,
         this.requestModel.grant.fy,
         this.requestModel.requestDto.pdNpnId,
         this.requestModel.requestDto.requestorCayCode).subscribe(result => {
-        this.requestModel.fundingSources = result;
-        this.fundingSources = result;
+        this.requestModel.programRecommendedCostsModel.fundingSources = result;
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });

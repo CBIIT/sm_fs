@@ -25,8 +25,6 @@ import {FundingSourceTypes} from '../model/funding-source-types';
 export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   _selectedDocs: string;
-  displayCategory: number;
-  selectedFundingSources = new Array<FundingRequestFundsSrcDto>();
   initialPay: boolean;
   showPercent = true;
   showDollar = false;
@@ -36,7 +34,20 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   directPercentCutCalculated: number;
   totalPercentCutCalculated: number;
   private selectedSource: number;
-  private allFundingSources = new Map<number, FundingRequestFundsSrcDto>();
+
+  // TODO: evaluate getters and setters for removal since they just pass through to underlying model
+
+  get selectedFundingSources(): FundingRequestFundsSrcDto[] {
+    return this.requestModel.programRecommendedCostsModel.selectedFundingSources;
+  }
+
+  set selectedFundingSources(value: FundingRequestFundsSrcDto[]) {
+    this.requestModel.programRecommendedCostsModel.selectedFundingSources = value;
+  }
+
+  get allFundingSources(): Map<number, FundingRequestFundsSrcDto> {
+    return this.requestModel.programRecommendedCostsModel.fundingSourcesMap;
+  }
 
   get directCost(): number {
     return this._directCost;
@@ -81,11 +92,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   ngOnInit(): void {
-    // this.fundingSources = new Array<any>(3);
-    // this.displayCategory = getDisplayCategory(this.requestModel.requestDto.frtId);
     this.initialPay = INITIAL_PAY_TYPES.includes(this.requestModel.requestDto.frtId);
-    this.logger.debug('Display category:', this.displayCategory);
-    this.logger.debug('Initial pay     :', this.initialPay);
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.requestDto.grantAwarded = result;
         // this.this.logger.debug('Appl Periods/Grant awards:', result);
@@ -96,19 +103,20 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       }
     );
 
-    this.fsRequestControllerService.getFundingSourcesUsingGET(
-      this.requestModel.requestDto.frtId,
-      this.requestModel.grant.fullGrantNum,
-      this.requestModel.grant.fy,
-      this.requestModel.requestDto.pdNpnId,
-      this.requestModel.requestDto.requestorCayCode).subscribe(result => {
-      this.requestModel.fundingSources = result;
-      this.allFundingSources = new Map(result.map(key => [key.fundingSourceId, key] as [number, FundingRequestFundsSrcDto]));
-      this.logger.debug(this.requestModel.fundingSources);
-      this.logger.debug(this.allFundingSources);
-    }, error => {
-      this.logger.debug('HttpClient get request error for----- ' + error.message);
-    });
+    if (!this.requestModel.programRecommendedCostsModel.fundingSources
+      || this.requestModel.programRecommendedCostsModel.fundingSources.length === 0) {
+      this.logger.debug('loading funding sources');
+      this.fsRequestControllerService.getFundingSourcesUsingGET(
+        this.requestModel.requestDto.frtId,
+        this.requestModel.grant.fullGrantNum,
+        this.requestModel.grant.fy,
+        this.requestModel.requestDto.pdNpnId,
+        this.requestModel.requestDto.requestorCayCode).subscribe(result => {
+        this.requestModel.programRecommendedCostsModel.fundingSources = result;
+      }, error => {
+        this.logger.debug('HttpClient get request error for----- ' + error.message);
+      });
+    }
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
       this.selectedSource = selection;
@@ -154,12 +162,12 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   addFundingSource(e): void {
-    this.logger.debug('add funding source', this.selectedSource);
+    this.logger.debug('Add funding source', this.selectedSource);
     if (this.allFundingSources.size === 0) {
-      this.logger.error('funding sources not initialized');
-      this.requestModel.fundingSources.forEach(s => {
-        this.allFundingSources.set(s.fundingSourceId, s);
-      });
+      this.logger.error('Funding sources not initialized');
+      // this.requestModel.programRecommendedCostsModel.fundingSources.forEach(s => {
+      //   this.allFundingSources.set(s.fundingSourceId, s);
+      // });
     }
     this.selectedFundingSources.push(this.allFundingSources.get(Number(this.selectedSource)));
     this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(this.selectedSource);
@@ -193,7 +201,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   showFinalLOA(): boolean {
-    return this.isMoonshot() && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
+    return !this.isMoonshot() && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
       Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestModel.requestDto.frtId));
   }
 
