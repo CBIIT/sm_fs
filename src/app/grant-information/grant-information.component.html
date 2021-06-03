@@ -103,14 +103,14 @@
     <div class="col-sm-6 col-lg-2">
         <div class="form-group">
             <p class="like-label">Score</p>
-            <p>{{ grant.priorityScoreNum }}</p>
+            <p>{{ grant.priorityScoreNum | formatScorePctl }}</p>
         </div>
     </div>
 
     <div class="col-sm-6 col-lg-2">
         <div class="form-group">
             <p class="like-label">Percentile</p>
-            <p>{{ grant.irgPercentileNum }}</p>
+            <p>{{ grant.irgPercentileNum | formatScorePctl }}</p>
         </div>
     </div>
 
