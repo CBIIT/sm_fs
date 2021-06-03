@@ -21,7 +21,9 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   @Input() label = 'Add Approver';
   options: Options;
 
-  requestApprovers: FundingReqApproversDto[];
+  mainApprovers: FundingReqApproversDto[];
+
+  additionalApprovers: FundingReqApproversDto[];
 
   set selectedValue(value: number) {
     const user = approverMap.get(Number(value));
@@ -116,9 +118,16 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   processApproversResult(result: any): void {
     addedApproverMap.clear();
-    this.requestApprovers = result;
-    this.requestApprovers.forEach((approver) => {
+    result.forEach((approver) => {
       addedApproverMap.set(approver.approverNpnId, true);
+    });
+
+    this.mainApprovers = result.filter((approver) => {
+      return approver.roleCode !== null;
+    });
+
+    this.additionalApprovers = result.filter((approver) => {
+      return approver.roleCode === null;
     });
   }
 
