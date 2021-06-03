@@ -34,9 +34,9 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   approverList: Array<any> = new Array<any>();
 
   constructor(private requestModel: RequestModel,
-    private userSessionService: AppUserSessionService,
-    private workflowControllerService: FsWorkflowControllerService,
-    private logger: NGXLogger) {
+              private userSessionService: AppUserSessionService,
+              private workflowControllerService: FsWorkflowControllerService,
+              private logger: NGXLogger) {
   }
   storeData(data: any): any {
     const data2 = data.filter((user) => {
@@ -152,7 +152,17 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   dropped(event: CdkDragDrop<any[]>): void {
-    moveItemInArray(this.requestApprovers, event.previousIndex, event.currentIndex);
+   // moveItemInArray(this.requestApprovers, event.previousIndex, event.currentIndex);
+   if (event.previousIndex === event.currentIndex) {
+     return;
+   }
+   this.workflowControllerService.moveAdditionalApproverUsingPOST(
+     event.currentIndex + 1, this.requestModel.requestDto.frqId, event.previousIndex + 1).subscribe(
+      (result) => { this.processApproversResult(result); },
+      (error) => {
+        this.logger.error('Error moveAdditionalApproverUsingPOST ', error);
+      }
+     );
   }
 
   saveAdditionalApprover(user: any): void {
