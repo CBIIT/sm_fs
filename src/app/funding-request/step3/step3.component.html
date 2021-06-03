@@ -77,7 +77,7 @@
                         </div>
                     </div>
 
-                    <div *ngIf="!(justificationUploaded | async)" class="drag-item drag-item-placeholder" tabindex="0">
+                    <div *ngIf="!(justificationUploaded | async)" class="drag-item drag-item-placeholder drag-item-locked" tabindex="0">
                         <span class="doc-name">Justification</span>
                         <span class="doc-desc" [style.color]="'red'">Not Entered/Uploaded</span>
                     </div>
