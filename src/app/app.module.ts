@@ -53,9 +53,10 @@ import {LoggerModule, NgxLoggerLevel} from 'ngx-logger';
 import {SkippedGrantsComponent} from './skipped-grants/skipped-grants.component';
 import {FooterComponent} from './footer/footer.component';
 import {GwbLinksService} from '@nci-cbiit/i2ecui-lib';
-import {ConversionGrantActivityMechComponent} from './conversion-grant-activity-mech/conversion-grant-activity-mech.component';
 import { DiversitySupplementComponent } from './diversity-supplement/diversity-supplement.component';
 import { NewInvestigatorComponent } from './new-investigator/new-investigator.component';
+import {ConversionGrantActivityMechComponent} from './conversion-grant-activity-mech/conversion-grant-activity-mech.component';
+import { ScorePctlDisplayPipe } from './pipes/score-pctl-display.pipe';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -120,6 +121,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     ConversionGrantActivityMechComponent,
     DiversitySupplementComponent,
     NewInvestigatorComponent,
+    ScorePctlDisplayPipe,
 
   ],
   imports: [
