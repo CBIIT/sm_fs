@@ -1,8 +1,7 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
-import {openNewWindow} from 'src/app/utils/utils';
 import {NGXLogger} from 'ngx-logger';
 import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 import {
@@ -13,7 +12,6 @@ import {
 } from '../model/funding-request-types';
 import {FundingSourceSynchronizerService} from '../funding-source/funding-source-synchronizer-service';
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {ProgramRecommendedCostsModel} from './program-recommended-costs-model';
 import {FundingSourceTypes} from '../model/funding-source-types';
 
 
@@ -35,18 +33,10 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   totalPercentCutCalculated: number;
   private selectedSource: number;
 
-  // TODO: evaluate getters and setters for removal since they just pass through to underlying model
 
+  // Convenience method to save typing in the UI
   get selectedFundingSources(): FundingRequestFundsSrcDto[] {
     return this.requestModel.programRecommendedCostsModel.selectedFundingSources;
-  }
-
-  set selectedFundingSources(value: FundingRequestFundsSrcDto[]) {
-    this.requestModel.programRecommendedCostsModel.selectedFundingSources = value;
-  }
-
-  get allFundingSources(): Map<number, FundingRequestFundsSrcDto> {
-    return this.requestModel.programRecommendedCostsModel.fundingSourcesMap;
   }
 
   get directCost(): number {
@@ -80,15 +70,14 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService, private logger: NGXLogger,
-              private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
-              private programRecommendedCostsModel: ProgramRecommendedCostsModel) {
+              private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
   }
 
   ngAfterViewInit(): void {
   }
 
   ngOnDestroy(): void {
-    this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.unsubscribe();
+    this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -131,11 +120,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     return this.requestModel;
   }
 
-  openOefiaLink(): boolean {
-    openNewWindow('https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information', 'oefiaLink');
-    return false;
-  }
-
   get selectedDocs(): string {
     return this._selectedDocs;
   }
@@ -163,13 +147,14 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   addFundingSource(e): void {
     this.logger.debug('Add funding source', this.selectedSource);
-    if (this.allFundingSources.size === 0) {
+    if (this.requestModel.programRecommendedCostsModel.fundingSourcesMap.size === 0) {
       this.logger.error('Funding sources not initialized');
       // this.requestModel.programRecommendedCostsModel.fundingSources.forEach(s => {
       //   this.allFundingSources.set(s.fundingSourceId, s);
       // });
     }
-    this.selectedFundingSources.push(this.allFundingSources.get(Number(this.selectedSource)));
+    this.requestModel.programRecommendedCostsModel.selectedFundingSources.push(
+      this.requestModel.programRecommendedCostsModel.fundingSourcesMap.get(Number(this.selectedSource)));
     this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(this.selectedSource);
     // @ts-ignore
     $('#add-fsource-modal').modal('hide');
@@ -188,9 +173,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   deleteSource(i: number): void {
-    const removed = this.selectedFundingSources[i];
+    const removed = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed.fundingSourceId);
-    this.selectedFundingSources.splice(i, 1);
+    this.requestModel.programRecommendedCostsModel.selectedFundingSources.splice(i, 1);
   }
 
   editSource(i: number): void {
@@ -207,7 +192,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   isMoonshot(): boolean {
     let result = false;
-    this.selectedFundingSources.forEach(f => {
+    this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(f => {
       if (Number(f.fundingSourceId) === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
         result = true;
       }

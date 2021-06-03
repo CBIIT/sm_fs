@@ -26,10 +26,6 @@ export class FundingSourceComponent implements OnInit {
     return this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds;
   }
 
-  set selectedFundingSources(value: Set<number>) {
-    this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds = value;
-  }
-
   get selectedValue(): number {
     return this._selectedValue;
   }
@@ -95,9 +91,5 @@ export class FundingSourceComponent implements OnInit {
     return this.fundingSources.filter(f => {
       return !this.selectedFundingSources.has(Number(f.fundingSourceId));
     });
-  }
-
-  isInvalid(): string {
-    return 'is-invalid';
   }
 }
