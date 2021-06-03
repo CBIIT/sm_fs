@@ -1,0 +1,33 @@
+a.show-advance:before {
+    content: '\f055';
+    font-family: 'Font Awesome 5 Pro';
+    display: inline-block;
+    font-weight: 300;
+    color: #0076a8;
+}
+
+a.show-advance:after {
+    content: 'Show Advanced Filters';
+    font-family: "Noto Sans", sans-serif;
+    display: inline-block;
+    font-weight: regular;
+    color: #0076a8;
+    margin-left: .2rem;
+}
+
+a.hide-advance:before {
+    content: '\f056';
+    font-family: 'Font Awesome 5 Pro';
+    display: inline-block;
+    font-weight: 300;
+    color: #0076a8;
+}
+
+a.hide-advance:after {
+    content: 'Hide Advanced Filters';
+    font-family: "Noto Sans", sans-serif;
+    display: inline-block;
+    font-weight: regular;
+    color: #0076a8;
+    margin-left: .2rem;
+}
