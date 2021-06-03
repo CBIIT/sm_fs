@@ -158,7 +158,7 @@
                   </ng-template>
                 </th>
               </tr>
-              <tr>
+              <tr *ngIf="showPiCosts()">
                 <th scope="row">PI Requested Direct Cost</th>
                 <th *ngFor="let ga of grantAwarded; let i = index;" scope="col">
                   <div class="fsource-fy1-form" *ngIf="i === 0; else notFirst">
@@ -174,7 +174,7 @@
                   </ng-template>
                 </th>
               </tr>
-              <tr>
+              <tr *ngIf="showPiCosts()">
                 <th scope="row">PI Requested Total Cost</th>
                 <th *ngFor="let ga of grantAwarded; let i = index;" scope="col">
                   <div class="fsource-fy1-form" *ngIf="i === 0; else notFirst">
@@ -187,6 +187,38 @@
                   </div>
                   <ng-template #notFirst>
                     {{ ga.requestTotalAmount | currency }}
+                  </ng-template>
+                </th>
+              </tr>
+              <tr *ngIf="showAwardedCosts()">
+                <th scope="row">Awarded Direct Cost</th>
+                <th *ngFor="let ga of grantAwarded; let i = index;" scope="col">
+                  <div class="fsource-fy1-form" *ngIf="i === 0; else notFirst">
+                    <div class="form-row">
+                      <div class="col left-label"></div>
+                      <div class="col-sm-auto">
+                        <span class="read-only-th">{{ ga.directAmount | currency }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #notFirst>
+                    {{ ga.directAmount | currency }}
+                  </ng-template>
+                </th>
+              </tr>
+              <tr *ngIf="showAwardedCosts()">
+                <th scope="row">Awarded Total Cost</th>
+                <th *ngFor="let ga of grantAwarded; let i = index;" scope="col">
+                  <div class="fsource-fy1-form" *ngIf="i === 0; else notFirst">
+                    <div class="form-row">
+                      <div class="col left-label"></div>
+                      <div class="col-sm-auto">
+                        <span class="read-only-th">{{ ga.totalAwarded | currency }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #notFirst>
+                    {{ ga.totalAwarded | currency }}
                   </ng-template>
                 </th>
               </tr>

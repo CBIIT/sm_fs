@@ -30,12 +30,6 @@ export class FundingSourceComponent implements OnInit {
     this._selectedValue = value;
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.next(value);
 
-    // if (isNumeric(oldValue)) {
-    //   this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(oldValue);
-    // }
-    // if (isNumeric(value)) {
-    //   this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.next(value);
-    // }
     // TODO: FS-111
     // If request type is 30 or 1001 (Other Pay; Special Actions), and the user selects 'Moonshot Funds' (542)
     // Final LOA will be SPL committee and the final-loa section should be hidden
