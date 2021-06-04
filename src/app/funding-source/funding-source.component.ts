@@ -58,7 +58,10 @@ export class FundingSourceComponent implements OnInit {
     });
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.subscribe(deselect => {
       this.selectedFundingSources.delete(Number(deselect));
-
+    });
+    this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.subscribe(restore => {
+      this.selectedFundingSources.delete(Number(restore));
+      this.selectedValue = restore;
     });
     if (!this.requestModel.programRecommendedCostsModel.fundingSources
       || this.requestModel.programRecommendedCostsModel.fundingSources.length === 0) {
