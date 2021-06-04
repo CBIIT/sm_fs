@@ -36,6 +36,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
 
   // Convenience method to save typing in the UI
+  private editing: number;
   get selectedFundingSources(): FundingRequestFundsSrcDto[] {
     return this.requestModel.programRecommendedCostsModel.selectedFundingSources;
   }
@@ -156,6 +157,13 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   addFundingSource(e): void {
     // TODO: Validation
     this.logger.debug('Add funding source', this.selectedSourceId);
+    if(this.editing) {
+      const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[this.editing];
+      if(this.selectedSourceId !== edit.fundingSourceId) {
+        this.deleteSource(this.editing);
+        this.editing = undefined;
+      }
+    }
     if (this.requestModel.programRecommendedCostsModel.fundingSourcesMap.size === 0) {
       this.logger.error('Funding sources not initialized');
     }
@@ -198,6 +206,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   editSource(i: number): void {
     const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
+    this.editing = i;
     this.lineItem = this.getLineItem(edit);
     this.logger.debug('editing line item', this.lineItem);
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
@@ -282,6 +291,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
    * So we will just preemptively remove any selected sources again.
    */
   cleanUpSources(): void {
+    this.editing = undefined;
     this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(s => {
       this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(s.fundingSourceId);
     });
