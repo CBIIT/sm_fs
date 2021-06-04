@@ -31,8 +31,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   _percentCut: number;
   _directCost: number;
   _totalCost: number;
-  directPercentCutCalculated: number;
-  totalPercentCutCalculated: number;
   private selectedSourceId: number;
   lineItem: PrcDataPoint[];
 
@@ -201,7 +199,8 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   editSource(i: number): void {
     const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
     this.lineItem = this.getLineItem(edit);
-    // this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
+    this.logger.debug('editing line item', this.lineItem);
+    this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     // @ts-ignore
     $('#add-fsource-modal').modal('show');
@@ -286,5 +285,36 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(s => {
       this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(s.fundingSourceId);
     });
+  }
+
+  canSave(): boolean {
+    if (!this.selectedSourceId) {
+      return false;
+    }
+    if (!this.lineItem[0]) {
+      return false;
+    }
+    if (this.showPercent && !this.lineItem[0].percentCut) {
+      return false;
+    } else if (!this.lineItem[0].recommendedTotal && !this.lineItem[0].recommendedDirect) {
+      return false;
+    }
+    return true;
+  }
+
+  grandTotal(i: number): number {
+    let result = 0;
+    this.selectedFundingSources.forEach(s => {
+      result += this.getLineItem(s)[i].recommendedTotal;
+    });
+    return result;
+  }
+
+  grandTotalDirect(i: number): number {
+    let result = 0;
+    this.selectedFundingSources.forEach(s => {
+      result += this.getLineItem(s)[i].recommendedDirect;
+    });
+    return result;
   }
 }

@@ -82,7 +82,7 @@ export class PrcDataPoint {
   private _recommendedTotal: number;
   percentCutDirectCalculated = 0.0;
   percentCutTotalCalculated = 0.0;
-  private _percentCut = 0.0;
+  private _percentCut: number;
   fundingSource: FundingRequestFundsSrcDto;
   grantAward: GrantAwardedDto;
   type: PrcLineItemType;

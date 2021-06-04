@@ -35,7 +35,6 @@ export class FundingSourceComponent implements OnInit {
   }
 
   set selectedValue(value: number) {
-    // const oldValue = this._selectedValue;
     this._selectedValue = value;
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.next(value);
 
@@ -54,13 +53,15 @@ export class FundingSourceComponent implements OnInit {
 
   ngOnInit(): void {
     this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.subscribe(select => {
+      this.logger.debug('filter', select);
       this.selectedFundingSources.add(Number(select));
     });
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.subscribe(deselect => {
+      this.logger.debug('unfilter', deselect);
       this.selectedFundingSources.delete(Number(deselect));
     });
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.subscribe(restore => {
-      this.selectedFundingSources.delete(Number(restore));
+      this.logger.debug('restore', restore);
       this.selectedValue = restore;
     });
     if (!this.requestModel.programRecommendedCostsModel.fundingSources

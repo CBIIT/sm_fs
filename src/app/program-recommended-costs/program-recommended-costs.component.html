@@ -72,6 +72,23 @@
           </td>
 
         </tr>
+        <tr *ngIf="selectedFundingSources.length > 1">
+          <td></td>
+          <td *ngFor="let li of grantAwarded; let i = index; let first = first; let last = last;">
+            <div class="form-row">
+              <div class="col-6 font-weight-bold">
+                Grand Total Direct
+              </div>
+              <div class="col-6">{{grandTotalDirect(i) | currency}}</div>
+            </div>
+            <div class="form-row">
+              <div class="col-6 font-weight-bold">
+                Grand Total
+              </div>
+              <div class="col-6">{{grandTotal(i) | currency}}</div>
+            </div>
+          </td>
+        </tr>
 
         </tbody>
       </table>
@@ -357,8 +374,8 @@
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" (click)="addFundingSource($event)">Add Funding Source</button>
+        <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal" (click)="cleanUpSources()">Close</button>
+        <button type="button" class="btn btn-primary" [disabled]="!canSave()" (click)="addFundingSource($event)">Add Funding Source</button>
       </div>
     </div>
   </div>
