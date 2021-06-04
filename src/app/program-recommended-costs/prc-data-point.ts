@@ -19,6 +19,7 @@
  */
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
+import {isNumeric} from 'rxjs/internal-compatibility';
 
 export enum PrcLineItemType {
   PERCENT_CUT,
@@ -31,13 +32,53 @@ export enum PrcBaselineSource {
 }
 
 export class PrcDataPoint {
+  get recommendedDirect(): number {
+    return this._recommendedDirect;
+  }
+
+  set recommendedDirect(value: number) {
+    this._recommendedDirect = value;
+    if (!this.baselineDirect || this.baselineDirect === 0) {
+      return;
+    }
+    if (isNumeric(value)) {
+      this.percentCutDirectCalculated = 1 - (value / this.baselineDirect);
+    }
+  }
+
+  get recommendedTotal(): number {
+    return this._recommendedTotal;
+  }
+
+  set recommendedTotal(value: number) {
+    this._recommendedTotal = value;
+    if (!this.baselineTotal || this.baselineTotal === 0) {
+      return;
+    }
+    if (isNumeric(value)) {
+      this.percentCutTotalCalculated = 1 - (value / this.baselineTotal);
+    }
+  }
+
+  get percentCut(): number {
+    return this._percentCut;
+  }
+
+  set percentCut(value: number) {
+    this._percentCut = value;
+    if (isNumeric(value)) {
+      this._recommendedDirect = (1 - value) * this.baselineDirect;
+      this._recommendedTotal = (1 - value) * this._recommendedDirect;
+    }
+  }
+
   baselineDirect: number;
   baselineTotal: number;
-  recommendedDirect: number;
-  recommendedTotal: number;
-  percentCutDirectCalculated: number;
-  percentCutTotalCalculated: number;
-  percentCut: number;
+  private _recommendedDirect: number;
+  private _recommendedTotal: number;
+  percentCutDirectCalculated = 0.0;
+  percentCutTotalCalculated = 0.0;
+  private _percentCut = 0.0;
   fundingSource: FundingRequestFundsSrcDto;
   grantAward: GrantAwardedDto;
   type: PrcLineItemType;

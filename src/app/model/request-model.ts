@@ -141,26 +141,6 @@ export class RequestModel {
 
   }
 
-  initializeProgramRecommendedCosts(): void {
-    const size = this.requestDto.grantAwarded ? this.requestDto.grantAwarded.length : 0;
-
-    this.requestDto.financialInfoDto.dcAmount0 = new Array(size);
-    this.requestDto.financialInfoDto.tcAmount0 = new Array(size);
-    this.requestDto.financialInfoDto.id0 = new Array(size);
-
-    this.requestDto.financialInfoDto.dcAmount1 = new Array(size);
-    this.requestDto.financialInfoDto.tcAmount1 = new Array(size);
-    this.requestDto.financialInfoDto.id1 = new Array(size);
-
-    this.requestDto.financialInfoDto.dcAmount2 = new Array(size);
-    this.requestDto.financialInfoDto.tcAmount2 = new Array(size);
-    this.requestDto.financialInfoDto.id2 = new Array(size);
-
-    this.requestDto.financialInfoDto.dcTotal = new Array(size);
-    this.requestDto.financialInfoDto.tcTotal = new Array(size);
-
-  }
-
   canSave(): boolean {
     if (this.getValidationErrors().length > 0) {
       return false;
