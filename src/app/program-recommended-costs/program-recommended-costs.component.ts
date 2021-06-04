@@ -13,6 +13,8 @@ import {
 import {FundingSourceSynchronizerService} from '../funding-source/funding-source-synchronizer-service';
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import {FundingSourceTypes} from '../model/funding-source-types';
+import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point';
+import {PRC_DISPLAY_FORMAT} from './program-recommended-costs-model';
 
 
 @Component({
@@ -31,7 +33,8 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   _totalCost: number;
   directPercentCutCalculated: number;
   totalPercentCutCalculated: number;
-  private selectedSource: number;
+  private selectedSourceId: number;
+  lineItem: PrcDataPoint[];
 
 
   // Convenience method to save typing in the UI
@@ -65,7 +68,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   get grantAwarded(): Array<GrantAwardedDto> {
-    return this.requestModel.requestDto.grantAwarded;
+    return this.requestModel.programRecommendedCostsModel.grantAwarded;
   }
 
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
@@ -83,9 +86,8 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   ngOnInit(): void {
     this.initialPay = INITIAL_PAY_TYPES.includes(this.requestModel.requestDto.frtId);
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
-        this.requestModel.requestDto.grantAwarded = result;
+        this.requestModel.programRecommendedCostsModel.grantAwarded = result;
         // this.this.logger.debug('Appl Periods/Grant awards:', result);
-        this.requestModel.initializeProgramRecommendedCosts();
       }, error => {
         // TODO: properly handle errors here
         this.logger.error('HttpClient get request error for----- ' + error.message);
@@ -107,8 +109,10 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       });
     }
 
+    this.requestModel.programRecommendedCostsModel.fundingRequestType = this.requestModel.requestDto.frtId;
+
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
-      this.selectedSource = selection;
+      this.selectedSourceId = selection;
     });
   }
 
@@ -138,27 +142,30 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   showPiCosts(): boolean {
+    // TODO: the display will need to handle restoration of a future year
     return PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES.includes(Number(this.requestModel.requestDto.frtId));
   }
 
   showAwardedCosts(): boolean {
+    // TODO: the display will need to handle restoration of a future year
     return PRC_AWARDED_DIRECT_TOTAL_DISPLAY_TYPES.includes(Number(this.requestModel.requestDto.frtId));
   }
 
+  isRestoration(): boolean {
+    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.RESTORATION_OF_A_FUTURE_YEAR);
+  }
+
   addFundingSource(e): void {
-    this.logger.debug('Add funding source', this.selectedSource);
+    // TODO: Validation
+    this.logger.debug('Add funding source', this.selectedSourceId);
     if (this.requestModel.programRecommendedCostsModel.fundingSourcesMap.size === 0) {
       this.logger.error('Funding sources not initialized');
-      // this.requestModel.programRecommendedCostsModel.fundingSources.forEach(s => {
-      //   this.allFundingSources.set(s.fundingSourceId, s);
-      // });
     }
-    this.requestModel.programRecommendedCostsModel.selectedFundingSources.push(
-      this.requestModel.programRecommendedCostsModel.fundingSourcesMap.get(Number(this.selectedSource)));
-    this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(this.selectedSource);
+
+    this.requestModel.programRecommendedCostsModel.addFundingSourceById(this.selectedSourceId, this.lineItem);
+    this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(this.selectedSourceId);
     // @ts-ignore
     $('#add-fsource-modal').modal('hide');
-    // validation here
   }
 
   toggleCostDisplay(value: string): void {
@@ -173,16 +180,16 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   deleteSource(i: number): void {
-    const removed = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
-    this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed.fundingSourceId);
-    this.requestModel.programRecommendedCostsModel.selectedFundingSources.splice(i, 1);
+    const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i);
+    this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed);
   }
 
   editSource(i: number): void {
   }
 
   isSkipRequest(): boolean {
-    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP);
+    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP) ||
+      Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP__NCI_RFA);
   }
 
   showFinalLOA(): boolean {
@@ -207,5 +214,45 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   isNewInvestigator(): boolean {
     return this.requestModel.grant.activityCode === 'R01' && ([1, 2].includes(Number(this.requestModel.grant.applTypeCode)));
+  }
+
+  prepareLineItem(): void {
+    this.logger.debug('Prepare line item');
+    this.lineItem = new Array<PrcDataPoint>();
+    this.grantAwarded.forEach(ga => {
+      const tmp = new PrcDataPoint();
+      tmp.grantAward = ga;
+      if (this.displayFormat() === PRC_DISPLAY_FORMAT.INITIAL_PAY) {
+        tmp.baselineSource = PrcBaselineSource.PI_REQUESTED;
+        tmp.type = PrcLineItemType.PERCENT_CUT;
+        tmp.baselineDirect = ga.requestAmount;
+        tmp.baselineTotal = ga.requestTotalAmount;
+      } else {
+        tmp.baselineSource = PrcBaselineSource.AWARDED;
+        tmp.type = PrcLineItemType.PERCENT_CUT;
+        tmp.baselineDirect = ga.directAmount;
+        tmp.baselineTotal = ga.totalAwarded;
+      }
+      this.lineItem.push(tmp);
+    });
+    this.logger.debug(this.lineItem);
+  }
+
+  displayFormat(): PRC_DISPLAY_FORMAT {
+    // TODO: Resolve display of Skip and Pay Type 4
+    if (INITIAL_PAY_TYPES.includes(this.requestModel.requestDto.frtId)) {
+      return PRC_DISPLAY_FORMAT.INITIAL_PAY;
+    } else if (this.requestModel.requestDto.frtId === FundingRequestTypes.RESTORATION_OF_A_FUTURE_YEAR) {
+      return PRC_DISPLAY_FORMAT.RESTORATION_OF_FUTURE_YEAR;
+    } else if (![FundingRequestTypes.SKIP, FundingRequestTypes.SKIP__NCI_RFA, FundingRequestTypes.PAY_TYPE_4]
+      .includes(this.requestModel.requestDto.frtId)) {
+      return PRC_DISPLAY_FORMAT.ADD_FUNDS;
+    }
+
+    return PRC_DISPLAY_FORMAT.OTHER;
+  }
+
+  getLineItem(f: FundingRequestFundsSrcDto): PrcDataPoint[] {
+    return this.requestModel.programRecommendedCostsModel.getLineItemsForSource(f);
   }
 }
