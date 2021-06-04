@@ -23,9 +23,9 @@
   <tbody cdkDropList (cdkDropListDropped)="dropped($event)" class="drag-boundary">
   <tr *ngFor="let a of additionalApprovers; let i = index" cdkDrag cdkDragBoundary=".drag-boundary" [cdkDragDisabled]="readonly">
     <td><span class="order-icon" *ngIf="!readonly"></span>&nbsp;{{ a.orderNum}}</td>
-    <td>{{ a.approverFullName }}</td>
+    <td><a href="mailto:{{a.approverEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverFullName }}</a></td>
     <td>{{ a.roleName }}</td>
-    <td>{{ a.approverAltFullName }}</td>
+    <td><a href="mailto:{{a.approverAltEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverAltFullName }}</a></td>
     <td>
       <button class="btn btn-link btn-delete btn-slim" title="Delete" 
       (click)="deleteAdditionalApprover(a.fraId)">
