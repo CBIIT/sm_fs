@@ -5,7 +5,7 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 import {
   FsRequestControllerService, FundingReqStatusHistoryDto,
   NciPfrGrantQueryDto, FundingRequestDtoReq, DocumentsDto,
-  FsWorkflowControllerService
+  FsWorkflowControllerService, WorkflowTaskDto
 } from '@nci-cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
@@ -31,19 +31,18 @@ export class Step4Component implements OnInit, OnDestroy {
   dv = true;
   requestStatus: string;
   docDtos: DocumentsDto[];
-
   readonly = false;
 
   constructor(private router: Router,
-    private requestModel: RequestModel,
-    private propertiesService: AppPropertiesService,
-    private fsRequestService: FsRequestControllerService,
-    private fsWorkflowService: FsWorkflowControllerService,
-    private userSessionService: AppUserSessionService,
-    private requestIntegrationService: FundingRequestIntegrationService,
-    private documentService: DocumentService,
-    private changeDetection: ChangeDetectorRef,
-    private logger: NGXLogger) {
+              private requestModel: RequestModel,
+              private propertiesService: AppPropertiesService,
+              private fsRequestService: FsRequestControllerService,
+              private fsWorkflowService: FsWorkflowControllerService,
+              private userSessionService: AppUserSessionService,
+              private requestIntegrationService: FundingRequestIntegrationService,
+              private documentService: DocumentService,
+              private changeDetection: ChangeDetectorRef,
+              private logger: NGXLogger) {
   }
 
   ngOnDestroy(): void {
@@ -61,31 +60,7 @@ export class Step4Component implements OnInit, OnDestroy {
       }
     );
     this.docDtos = this.requestModel.requestDto.includedDocs;
-
-    // if (!this.requestModel.mainApproverCreated) {
-    //   this.createApprovers();
-    // }
-    // else if ( this.requestModel.recreateMainApproverNeeded) {
-    //   this.fsWorkflowService.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
-    //     () => {
-    //       this.requestModel.mainApproverCreated = false;
-    //       this.createApprovers(); },
-    //     (error) => {}
-    //   );
-    // }
   }
-
-  // createApprovers(): void {
-  //   const workflowDto = {frqId: this.requestModel.requestDto.frqId, requestorNpeId: this.userSessionService.getLoggedOnUser().npnId };
-  //   this.fsWorkflowService.createRequestApproversUsingPOST(workflowDto).subscribe(
-  //     () => {
-  //       this.requestModel.mainApproverCreated = true;
-  //     (error) => {
-
-  //     }
-  //   );
-  // }
-
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
     let submitted = false;
@@ -151,10 +126,51 @@ export class Step4Component implements OnInit, OnDestroy {
         this.submissionResult = { frqId: submissionDto.frqId, approver: 'Mr. Approver' };
         this.requestIntegrationService.requestSubmissionEmitter.next(submissionDto.frqId);
         this.submitSuccess.nativeElement.scrollIntoView();
+        this.readonly = true;
       },
       (error) => {
         this.logger.error('Failed when calling submitRequestUsingPOST', error);
       });
+  }
+
+  withdrawRequest(): void {
+    if (!confirm('Are you sure you want to withdraw this request?')) {
+      return;
+    }
+    const dto: WorkflowTaskDto = {};
+    dto.action = 'WITHDRAW';
+    dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
+    dto.frqId = this.requestModel.requestDto.frqId;
+    this.fsWorkflowService.withdrawRequestUsingPOST(dto).subscribe(
+      result => {
+        this.logger.debug('withdrawRequestUsingPOST successfully returned', result);
+        this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
+      },
+      error => {
+        this.logger.error('withdrawRequestUsingPOST returned error', error );
+      }
+    );
+  }
+
+  putRequestOnHold(): void {
+    if (!confirm('Are you sure you want to put this request on hold?')) {
+      return;
+    }
+    const dto: WorkflowTaskDto = {};
+    dto.action = 'HOLD';
+    dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
+    dto.frqId = this.requestModel.requestDto.frqId;
+    this.fsWorkflowService.holdRequestUsingPOST(dto).subscribe(
+      result => {
+        this.logger.debug('holdRequestUsingPOST successfully returned', result);
+        this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
+      },
+      error => {
+        this.logger.error('holdRequestUsingPOST returned error', error );
+      }
+    );
   }
 
   userCanSubmitAndDelete(): boolean {
@@ -167,6 +183,14 @@ export class Step4Component implements OnInit, OnDestroy {
     } else {
       return false;
     }
+  }
+
+  withdrawVisible(): boolean {
+    return this.requestStatus === 'SUBMITTED';
+  }
+
+  putOnHoldVisible(): boolean {
+    return this.requestStatus === 'SUBMITTED';
   }
 
   submitVisible(): boolean {
@@ -191,18 +215,17 @@ export class Step4Component implements OnInit, OnDestroy {
     return 'You must upload Justification and Transition Memo to submit this request.';
   }
 
-  downloadCoverSheet() {
+  downloadCoverSheet(): void {
     this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
-          saveAs(blob, 'Cover Page.pdf')
+          const blob = new Blob([response.body], {type: response.headers.get('content-type') });
+          saveAs(blob, 'Cover Page.pdf');
         }
-      )
-
+      );
   }
 
-  downloadFile(id: number, fileName: string) {
+  downloadFile(id: number, fileName: string): void {
 
     if (fileName === 'Summary Statement') {
       this.downloadSummaryStatement();
@@ -210,18 +233,21 @@ export class Step4Component implements OnInit, OnDestroy {
       this.documentService.downloadById(id)
         .subscribe(
           (response: HttpResponse<Blob>) => {
-            let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
-            saveAs(blob, fileName)
+            const blob = new Blob([response.body], {type: response.headers.get('content-type') });
+            saveAs(blob, fileName);
           }
-        )
+        );
     }
 
   }
 
-  downloadSummaryStatement() {
-    this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId).subscribe(blob => saveAs(blob, 'Summary Statement.pdf')), error =>
-      this.logger.error('Error downloading the file'),
-      () => console.info('File downloaded successfully');
+  downloadSummaryStatement(): void {
+    this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId)
+    .subscribe(
+      blob => saveAs(blob, 'Summary Statement.pdf'),
+      _error => this.logger.error('Error downloading the file'),
+      () => this.logger.debug('File downloaded successfully')
+      );
   }
 
 }
