@@ -25,6 +25,18 @@ export class ProgramRecommendedCostsModel {
 
   deletedSources: number[] = [];
 
+  // TODO - we need to roll back selections and line items when a new request type is selected.
+  reset(): void {
+    // this.fundingRequestType = undefined;
+    this.prcLineItems = new Map<FundingRequestFundsSrcDto, PrcDataPoint[]>();
+    // this._fundingSources = new Array<FundingRequestFundsSrcDto>();
+    // this._fundingSourcesMap = new Map<number, FundingRequestFundsSrcDto>();
+    this._selectedFundingSourceIds = new Set<number>();
+    this._selectedFundingSources = new Array<FundingRequestFundsSrcDto>();
+    // this._grantAwarded = undefined;
+    this.deletedSources = [];
+  }
+
   constructor(private logger: NGXLogger) {
   }
 

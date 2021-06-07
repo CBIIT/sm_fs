@@ -169,6 +169,7 @@ export class RequestModel {
     this._requestName = undefined;
     this.stepLinkable = [false, false, false, false, false];
     this.mainApproverCreated = false;
+    this.programRecommendedCostsModel.reset();
   }
 
   prepareBudgets(): void {

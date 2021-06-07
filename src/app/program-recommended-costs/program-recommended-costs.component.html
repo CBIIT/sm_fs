@@ -268,9 +268,6 @@
                              id="dc-dollar"
                              aria-describedby="dc-dollar-percent">
                     </div>
-                    <div class="col-sm-auto right-label">
-                      <span id="dc-dollar-percent">{{ li.percentCutDirectCalculated | percent:'.1' }} Cut</span>
-                    </div>
                   </div>
                 </div>
 
@@ -283,9 +280,6 @@
                       <input type="text" class="form-control funds-input" id="tc-dollar"
                              [(ngModel)]="li.recommendedTotal"
                              aria-describedby="tc-dollar-percent">
-                    </div>
-                    <div class="col-sm-auto right-label">
-                      <span id="tc-dollar-percent">{{ li.percentCutTotalCalculated | percent:'.1' }} Cut</span>
                     </div>
                   </div>
                 </div>
@@ -323,7 +317,7 @@
                              id="dc-dollar"
                              aria-describedby="dc-dollar-percent">
                     </div>
-                    <div class="col-sm-auto right-label">
+                    <div class="col-sm-auto right-label" *ngIf="initialPay">
                       <span id="dc-dollar-percent">{{ li.percentCutDirectCalculated | percent:'.1' }} Cut</span>
                     </div>
                   </div>
@@ -339,7 +333,7 @@
                              [(ngModel)]="li.recommendedTotal"
                              aria-describedby="tc-dollar-percent">
                     </div>
-                    <div class="col-sm-auto right-label">
+                    <div class="col-sm-auto right-label" *ngIf="initialPay">
                       <span id="tc-dollar-percent">{{ li.percentCutTotalCalculated | percent:'.1' }} Cut</span>
                     </div>
                   </div>
@@ -381,7 +375,7 @@
                   </div>
                 </div>
 
-                <div class="fsource-fy1-form mb-2" *ngIf="i === 0">
+                <div class="fsource-fy1-form mb-2" *ngIf="first">
                   <div class="form-row form-inline">
                     <div class="col left-label">
                       <label for="dc-percent-dollar">Direct Cost</label>
@@ -392,7 +386,7 @@
                   </div>
                 </div>
 
-                <div class="fsource-fy1-form" *ngIf="i === 0;">
+                <div class="fsource-fy1-form" *ngIf="first;">
                   <div class="form-row form-inline">
                     <div class="col left-label">
                       <label for="tc-percent-dollar">Total Cost</label>

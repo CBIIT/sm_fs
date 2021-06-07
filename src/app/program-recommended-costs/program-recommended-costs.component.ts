@@ -101,22 +101,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       }
     );
 
-    if (!this.requestModel.programRecommendedCostsModel.fundingSources
-      || this.requestModel.programRecommendedCostsModel.fundingSources.length === 0) {
-      this.logger.debug('loading funding sources');
-      this.fsRequestControllerService.getFundingSourcesUsingGET(
-        this.requestModel.requestDto.frtId,
-        this.requestModel.grant.fullGrantNum,
-        this.requestModel.grant.fy,
-        this.requestModel.requestDto.pdNpnId,
-        this.requestModel.requestDto.requestorCayCode).subscribe(result => {
-        this.requestModel.programRecommendedCostsModel.fundingSources = result;
-      }, error => {
-        this.logger.debug('HttpClient get request error for----- ' + error.message);
-      });
-    }
 
-    this.requestModel.programRecommendedCostsModel.fundingRequestType = this.requestModel.requestDto.frtId;
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
       this.selectedSourceId = selection;
@@ -317,14 +302,18 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   canSave(): boolean {
     if (!this.selectedSourceId) {
+      this.logger.info('no selected source id');
       return false;
     }
     if (!this.lineItem[0]) {
+      this.logger.info('no data at all');
       return false;
     }
     if (this.showPercent && !this.lineItem[0].percentCut) {
+      this.logger.info('no percentage provided');
       return false;
-    } else if (!this.lineItem[0].recommendedTotal && !this.lineItem[0].recommendedDirect) {
+    } else if (!(this.lineItem[0].recommendedTotal && this.lineItem[0].recommendedDirect)) {
+      this.logger.info('missing one of recommended total or recommended direct');
       return false;
     }
     return true;

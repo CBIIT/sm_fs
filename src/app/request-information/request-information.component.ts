@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
-import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {isArray} from 'rxjs/internal-compatibility';
 import {NGXLogger} from 'ngx-logger';
 import {FundingRequestValidationService} from '../model/funding-request-validation-service';
@@ -20,6 +20,21 @@ export class RequestInformationComponent implements OnInit {
 
   set selectedRequestType(value: number) {
     this.requestModel.requestDto.frtId = value;
+    this.requestModel.programRecommendedCostsModel.fundingRequestType = value;
+    this.logger.debug('Reset data in PRC model');
+    this.requestModel.programRecommendedCostsModel.reset();
+
+    this.logger.debug('loading funding sources');
+    this.fsRequestControllerService.getFundingSourcesUsingGET(
+      this.requestModel.requestDto.frtId,
+      this.requestModel.grant.fullGrantNum,
+      this.requestModel.grant.fy,
+      this.requestModel.requestDto.pdNpnId,
+      this.requestModel.requestDto.requestorCayCode).subscribe(result => {
+      this.requestModel.programRecommendedCostsModel.fundingSources = result;
+    }, error => {
+      this.logger.debug('HttpClient get request error for----- ' + error.message);
+    });
   }
 
 
@@ -29,7 +44,6 @@ export class RequestInformationComponent implements OnInit {
   // value, it blows up at runtime.  Ditto the getter, which blows up at runtime if I try to return an array
   // of strings, but won't compile if I try to return a string.
   _selectedCayCode: string[] = (this.requestModel.requestDto.cayCode ? [this.requestModel.requestDto.cayCode] : []);
-  isValid: any;
 
   get selectedCayCode(): string[] {
     return this._selectedCayCode;
@@ -69,7 +83,8 @@ export class RequestInformationComponent implements OnInit {
   }
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger,
-              private fundingRequestValidationService: FundingRequestValidationService) {
+              private fundingRequestValidationService: FundingRequestValidationService,
+              private fsRequestControllerService: FsRequestControllerService) {
   }
 
   ngOnInit(): void {
