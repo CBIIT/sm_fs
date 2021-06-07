@@ -176,18 +176,22 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       this.logger.error('Funding sources not initialized');
     }
     // propagate changes from the line item user provided if necessary
-    if (this.lineItem.length > 1) {
-      const first = this.lineItem[0];
-      this.lineItem.forEach((li, index) => {
-        if (index !== 0) {
-          if (this.showPercent) {
-            li.percentCut = first.percentCut;
-          } else {
-            li.recommendedDirect = first.recommendedDirect;
-            li.recommendedTotal = first.recommendedTotal;
+    if (this.isRestoration()) {
+      this.logger.debug('Handle restoration grants');
+    } else {
+      if (this.lineItem.length > 1) {
+        const first = this.lineItem[0];
+        this.lineItem.forEach((li, index) => {
+          if (index !== 0) {
+            if (this.showPercent) {
+              li.percentCut = first.percentCut;
+            } else {
+              li.recommendedDirect = first.recommendedDirect;
+              li.recommendedTotal = first.recommendedTotal;
+            }
           }
-        }
-      });
+        });
+      }
     }
 
     this.requestModel.programRecommendedCostsModel.addFundingSourceById(this.selectedSourceId, this.lineItem);

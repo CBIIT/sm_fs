@@ -77,13 +77,13 @@
           <td *ngFor="let li of grantAwarded; let i = index; let first = first; let last = last;">
             <div class="form-row">
               <div class="col-6 font-weight-bold">
-                Grand Total Direct
+                Direct ($)
               </div>
               <div class="col-6">{{grandTotalDirect(i) | currency}}</div>
             </div>
             <div class="form-row">
               <div class="col-6 font-weight-bold">
-                Grand Total
+                Total ($)
               </div>
               <div class="col-6">{{grandTotal(i) | currency}}</div>
             </div>
@@ -254,7 +254,47 @@
             </tr>
             </thead>
             <tbody>
-            <tr *ngIf="showDollar">
+            <tr *ngIf="isRestoration()">
+              <td></td>
+              <td *ngFor="let li of lineItem; let i = index; let first = first; let last = last" scope="col">
+
+                <div class="fsource-fy1-form mb-2" *ngIf="last; else notLast">
+                  <div class="form-row form-inline">
+                    <div class="col left-label">
+                      <label for="dc-dollar">Direct Cost</label>
+                    </div>
+                    <div class="col-sm-auto">
+                      <input type="text" class="form-control funds-input" [(ngModel)]="li.recommendedDirect"
+                             id="dc-dollar"
+                             aria-describedby="dc-dollar-percent">
+                    </div>
+                    <div class="col-sm-auto right-label">
+                      <span id="dc-dollar-percent">{{ li.percentCutDirectCalculated | percent:'.1' }} Cut</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fsource-fy1-form" *ngIf="last">
+                  <div class="form-row form-inline">
+                    <div class="col left-label">
+                      <label for="tc-dollar">Total Cost</label>
+                    </div>
+                    <div class="col-sm-auto">
+                      <input type="text" class="form-control funds-input" id="tc-dollar"
+                             [(ngModel)]="li.recommendedTotal"
+                             aria-describedby="tc-dollar-percent">
+                    </div>
+                    <div class="col-sm-auto right-label">
+                      <span id="tc-dollar-percent">{{ li.percentCutTotalCalculated | percent:'.1' }} Cut</span>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #notLast>---</ng-template>
+
+              </td>
+
+            </tr>
+            <tr *ngIf="showDollar && !isRestoration()">
               <td></td>
               <td *ngFor="let li of lineItem; let i = index; let first = first; let last = last" scope="col">
                 <div class="fsource-fy1-form mb-2" *ngIf="first; else notFirst;">
@@ -310,7 +350,7 @@
 
             </tr>
 
-            <tr *ngIf="showPercent">
+            <tr *ngIf="showPercent && !isRestoration()">
               <td></td>
               <td *ngFor="let li of lineItem; let i = index; let first = first; let last = last">
                 <div class="fsource-fy1-form mb-2" *ngIf="first; else notFirst">

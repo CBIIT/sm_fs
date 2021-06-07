@@ -22,12 +22,16 @@
     </div>
   </div>
 
-  <div class="col-md-6 col-lg-4">
+  <div class="col-md-4 col-lg-4">
     <lib-pdname-dropdown [(selectedValue)]="selectedPd" label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
   </div>
 
-  <div class="col-md-6 col-lg-4">
+  <div class="col-md-4 col-lg-4">
     <lib-cancer-activities-dropdown [selectSingleOption]="true" [(selectedValue)]="selectedCayCode" [maxSelection]="1" [syncWithPd]="true" label="Requesting PD's Cancer Activity"></lib-cancer-activities-dropdown>
+  </div>
+
+  <div class="col-md-2 col-lg-4">
+    <app-type4-conversion-mechanism *ngIf="type4Selected()"></app-type4-conversion-mechanism>
   </div>
 
 </div><!-- END Row -->
