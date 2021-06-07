@@ -35,6 +35,8 @@ export class Step4Component implements OnInit, OnDestroy {
   docDtos: DocumentsDto[];
   readonly = false;
 
+  comments = '';
+
   constructor(private router: Router,
               private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
@@ -120,7 +122,7 @@ export class Step4Component implements OnInit, OnDestroy {
     submissionDto.frqId = this.requestModel.requestDto.frqId;
     submissionDto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
     submissionDto.certCode = this.requestModel.requestDto.certCode;
-    submissionDto.comments = this.requestModel.requestDto.comments;
+    submissionDto.comments = this.comments;
     this.logger.debug('Submit Request for: ', submissionDto);
     this.fsRequestService.submitRequestUsingPOST(submissionDto).subscribe(
       (result) => {
