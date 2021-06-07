@@ -85,7 +85,9 @@ export class ProgramRecommendedCostsModel {
     if (!source) {
       return false;
     }
-    this._selectedFundingSources.push(source);
+    if (!this._selectedFundingSources.includes(source)) {
+      this._selectedFundingSources.push(source);
+    }
     dataPoints.forEach(d => {
       d.fundingSource = source;
     });
@@ -120,8 +122,6 @@ export class ProgramRecommendedCostsModel {
     // TODO: Error handling?
     return this.prcLineItems.get(src);
   }
-
-
 
 
 }

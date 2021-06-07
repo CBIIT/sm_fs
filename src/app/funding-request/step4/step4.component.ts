@@ -14,6 +14,7 @@ import { DocumentService } from '../../service/document.service';
 import { saveAs } from 'file-saver';
 import { HttpResponse } from '@angular/common/http';
 import { NGXLogger } from 'ngx-logger';
+import { WorkflowModalComponent } from '../workflow-modal/workflow-modal.component';
 
 @Component({
   selector: 'app-step4',
@@ -23,6 +24,7 @@ import { NGXLogger } from 'ngx-logger';
 export class Step4Component implements OnInit, OnDestroy {
 
   @ViewChild('submitSuccess') submitSuccess: ElementRef;
+  @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   isRequestEverSubmitted = false;
@@ -133,45 +135,88 @@ export class Step4Component implements OnInit, OnDestroy {
       });
   }
 
-  withdrawRequest(): void {
-    if (!confirm('Are you sure you want to withdraw this request?')) {
-      return;
-    }
-    const dto: WorkflowTaskDto = {};
-    dto.action = 'WITHDRAW';
-    dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-    dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
-    dto.frqId = this.requestModel.requestDto.frqId;
-    this.fsWorkflowService.withdrawRequestUsingPOST(dto).subscribe(
-      result => {
-        this.logger.debug('withdrawRequestUsingPOST successfully returned', result);
-        this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
-      },
-      error => {
-        this.logger.error('withdrawRequestUsingPOST returned error', error );
-      }
-    );
+  submitWorkflow(action: string): void {
+    this.workflowModal.openConfirmModal(action).then(
+        (result) => {
+          this.logger.debug('calling API to ' + action + ' return successfully', result);
+          this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
+        }
+      )
+      .catch(
+        (reason) => {
+          this.logger.debug('user dismissed workflow confirmation modal without proceed', reason);
+        }
+      );
   }
+  //   // if (!confirm('Are you sure you want to withdraw this request?')) {
+  //   //   return;
+  //   // }
+  //   // const dto: WorkflowTaskDto = {};
+  //   // dto.action = 'WITHDRAW';
+  //   // dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+  //   // dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
+  //   // dto.frqId = this.requestModel.requestDto.frqId;
+  //   // this.fsWorkflowService.withdrawRequestUsingPOST(dto).subscribe(
+  //   //   result => {
+  //   //     this.logger.debug('withdrawRequestUsingPOST successfully returned', result);
+  //   //     this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
+  //   //   },
+  //   //   error => {
+  //   //     this.logger.error('withdrawRequestUsingPOST returned error', error );
+  //   //   }
+  //   // );
+  // }
 
-  putRequestOnHold(): void {
-    if (!confirm('Are you sure you want to put this request on hold?')) {
-      return;
-    }
-    const dto: WorkflowTaskDto = {};
-    dto.action = 'HOLD';
-    dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-    dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
-    dto.frqId = this.requestModel.requestDto.frqId;
-    this.fsWorkflowService.holdRequestUsingPOST(dto).subscribe(
-      result => {
-        this.logger.debug('holdRequestUsingPOST successfully returned', result);
-        this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
-      },
-      error => {
-        this.logger.error('holdRequestUsingPOST returned error', error );
-      }
-    );
-  }
+  // withdrawRequest(): void {
+  //   this.workflowModal.openConfirmModal('WITHDRAW').then(
+  //       (result) => {
+  //         this.logger.debug('withdrawRequestUsingPOST successfully returned', result);
+  //         this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
+  //       }
+  //     )
+  //     .catch(
+  //       (reason) => {
+  //         this.logger.debug('used dismissed withdraw modal', reason);
+  //       }
+  //     );
+  //   // if (!confirm('Are you sure you want to withdraw this request?')) {
+  //   //   return;
+  //   // }
+  //   // const dto: WorkflowTaskDto = {};
+  //   // dto.action = 'WITHDRAW';
+  //   // dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+  //   // dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
+  //   // dto.frqId = this.requestModel.requestDto.frqId;
+  //   // this.fsWorkflowService.withdrawRequestUsingPOST(dto).subscribe(
+  //   //   result => {
+  //   //     this.logger.debug('withdrawRequestUsingPOST successfully returned', result);
+  //   //     this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
+  //   //   },
+  //   //   error => {
+  //   //     this.logger.error('withdrawRequestUsingPOST returned error', error );
+  //   //   }
+  //   // );
+  // }
+
+  // putRequestOnHold(): void {
+  //   if (!confirm('Are you sure you want to put this request on hold?')) {
+  //     return;
+  //   }
+  //   const dto: WorkflowTaskDto = {};
+  //   dto.action = 'HOLD';
+  //   dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+  //   dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
+  //   dto.frqId = this.requestModel.requestDto.frqId;
+  //   this.fsWorkflowService.holdRequestUsingPOST(dto).subscribe(
+  //     result => {
+  //       this.logger.debug('holdRequestUsingPOST successfully returned', result);
+  //       this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
+  //     },
+  //     error => {
+  //       this.logger.error('holdRequestUsingPOST returned error', error );
+  //     }
+  //   );
+  // }
 
   userCanSubmitAndDelete(): boolean {
     if (this.userSessionService.isPD())

@@ -72,6 +72,23 @@
           </td>
 
         </tr>
+        <tr *ngIf="selectedFundingSources.length > 1">
+          <td></td>
+          <td *ngFor="let li of grantAwarded; let i = index; let first = first; let last = last;">
+            <div class="form-row">
+              <div class="col-6 font-weight-bold">
+                Grand Total Direct
+              </div>
+              <div class="col-6">{{grandTotalDirect(i) | currency}}</div>
+            </div>
+            <div class="form-row">
+              <div class="col-6 font-weight-bold">
+                Grand Total
+              </div>
+              <div class="col-6">{{grandTotal(i) | currency}}</div>
+            </div>
+          </td>
+        </tr>
 
         </tbody>
       </table>
@@ -138,7 +155,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Add Funding Source</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cleanUpSources()">
           <span aria-hidden="true"><i class="far fa-times"></i></span>
         </button>
       </div>
@@ -295,8 +312,8 @@
 
             <tr *ngIf="showPercent">
               <td></td>
-              <td *ngFor="let ga of grantAwarded; let i = index;">
-                <div class="fsource-fy1-form mb-2" *ngIf="i === 0; else notFirst">
+              <td *ngFor="let li of lineItem; let i = index; let first = first; let last = last">
+                <div class="fsource-fy1-form mb-2" *ngIf="first; else notFirst">
                   <div class="form-row">
                     <div class="col left-label"></div>
                     <div class="col-sm-auto">
@@ -312,11 +329,11 @@
                   </div>
                 </div>
 
-                <div class="fsource-fy1-form mb-2" *ngIf="i === 0">
+                <div class="fsource-fy1-form mb-2" *ngIf="first">
                   <div class="form-row form-inline">
                     <div class="col left-label"></div>
                     <div class="col-sm-auto">
-                      <input type="text" class="form-control percent-input" [(ngModel)]="percentCut" id="perc-cut">
+                      <input type="text" class="form-control percent-input" [(ngModel)]="li.percentCut" id="perc-cut">
                     </div>
                     <div class="col-sm-auto right-label">
                       <label for="perc-cut">% Cut</label>
@@ -330,8 +347,7 @@
                       <label for="dc-percent-dollar">Direct Cost</label>
                     </div>
                     <div class="col-sm-auto">
-                      <input type="text" readonly class="funds-input form-control-plaintext" [(ngModel)]="directCost"
-                             id="dc-percent-dollar" value="XXX,XXX.XX">
+                      <span id="dc-percent-dollar">{{ li.recommendedDirect | currency }}</span>
                     </div>
                   </div>
                 </div>
@@ -342,13 +358,12 @@
                       <label for="tc-percent-dollar">Total Cost</label>
                     </div>
                     <div class="col-sm-auto">
-                      <input type="text" readonly class="funds-input form-control-plaintext" [(ngModel)]="totalCost"
-                             id="tc-percent-dollar" value="XXX,XXX.XX">
+                      <span id="tc-percent-dollar">{{ li.recommendedTotal | currency}}</span>
                     </div>
                   </div>
                 </div>
 
-                <ng-template #notFirst>{{ directCost | currency }}</ng-template>
+                <ng-template #notFirst>{{ li.recommendedDirect | currency }}</ng-template>
               </td>
             </tr>
 
@@ -359,8 +374,8 @@
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" (click)="addFundingSource($event)">Add Funding Source</button>
+        <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal" (click)="cleanUpSources()">Close</button>
+        <button type="button" class="btn btn-primary" [disabled]="!canSave()" (click)="addFundingSource($event)">Add Funding Source</button>
       </div>
     </div>
   </div>

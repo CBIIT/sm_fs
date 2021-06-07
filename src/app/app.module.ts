@@ -57,6 +57,7 @@ import { DiversitySupplementComponent } from './diversity-supplement/diversity-s
 import { NewInvestigatorComponent } from './new-investigator/new-investigator.component';
 import {ConversionGrantActivityMechComponent} from './conversion-grant-activity-mech/conversion-grant-activity-mech.component';
 import { ScorePctlDisplayPipe } from './pipes/score-pctl-display.pipe';
+import { WorkflowModalComponent } from './funding-request/workflow-modal/workflow-modal.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -122,6 +123,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     DiversitySupplementComponent,
     NewInvestigatorComponent,
     ScorePctlDisplayPipe,
+    WorkflowModalComponent,
 
   ],
   imports: [

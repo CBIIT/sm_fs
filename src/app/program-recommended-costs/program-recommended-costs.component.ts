@@ -31,13 +31,12 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   _percentCut: number;
   _directCost: number;
   _totalCost: number;
-  directPercentCutCalculated: number;
-  totalPercentCutCalculated: number;
   private selectedSourceId: number;
   lineItem: PrcDataPoint[];
 
 
   // Convenience method to save typing in the UI
+  private editing: number;
   get selectedFundingSources(): FundingRequestFundsSrcDto[] {
     return this.requestModel.programRecommendedCostsModel.selectedFundingSources;
   }
@@ -158,8 +157,29 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   addFundingSource(e): void {
     // TODO: Validation
     this.logger.debug('Add funding source', this.selectedSourceId);
+    if(this.editing) {
+      const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[this.editing];
+      if(this.selectedSourceId !== edit.fundingSourceId) {
+        this.deleteSource(this.editing);
+        this.editing = undefined;
+      }
+    }
     if (this.requestModel.programRecommendedCostsModel.fundingSourcesMap.size === 0) {
       this.logger.error('Funding sources not initialized');
+    }
+    // propagate changes from the line item user provided if necessary
+    if (this.lineItem.length > 1) {
+      const first = this.lineItem[0];
+      this.lineItem.forEach((li, index) => {
+        if (index !== 0) {
+          if (this.showPercent) {
+            li.percentCut = first.percentCut;
+          } else {
+            li.recommendedDirect = first.recommendedDirect;
+            li.recommendedTotal = first.recommendedTotal;
+          }
+        }
+      });
     }
 
     this.requestModel.programRecommendedCostsModel.addFundingSourceById(this.selectedSourceId, this.lineItem);
@@ -185,6 +205,14 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   editSource(i: number): void {
+    const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
+    this.editing = i;
+    this.lineItem = this.getLineItem(edit);
+    this.logger.debug('editing line item', this.lineItem);
+    this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
+    this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
+    // @ts-ignore
+    $('#add-fsource-modal').modal('show');
   }
 
   isSkipRequest(): boolean {
@@ -254,5 +282,49 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   getLineItem(f: FundingRequestFundsSrcDto): PrcDataPoint[] {
     return this.requestModel.programRecommendedCostsModel.getLineItemsForSource(f);
+  }
+
+  /**
+   * On edit, we make the selected funding source available for selection again, so it will show up in the
+   * list on the modal. If the user closes the dialog without saving, there's nothing to take it out again.
+   *
+   * So we will just preemptively remove any selected sources again.
+   */
+  cleanUpSources(): void {
+    this.editing = undefined;
+    this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(s => {
+      this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(s.fundingSourceId);
+    });
+  }
+
+  canSave(): boolean {
+    if (!this.selectedSourceId) {
+      return false;
+    }
+    if (!this.lineItem[0]) {
+      return false;
+    }
+    if (this.showPercent && !this.lineItem[0].percentCut) {
+      return false;
+    } else if (!this.lineItem[0].recommendedTotal && !this.lineItem[0].recommendedDirect) {
+      return false;
+    }
+    return true;
+  }
+
+  grandTotal(i: number): number {
+    let result = 0;
+    this.selectedFundingSources.forEach(s => {
+      result += this.getLineItem(s)[i].recommendedTotal;
+    });
+    return result;
+  }
+
+  grandTotalDirect(i: number): number {
+    let result = 0;
+    this.selectedFundingSources.forEach(s => {
+      result += this.getLineItem(s)[i].recommendedDirect;
+    });
+    return result;
   }
 }
