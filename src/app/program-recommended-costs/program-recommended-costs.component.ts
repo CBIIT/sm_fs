@@ -200,7 +200,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   deleteSource(i: number): void {
-    const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i);
+    // TODO: the 'saved' logic is faulty - they might have added a source, then deleted it, then added it again
+    const saved = this.requestModel.requestDto.frqId ? true : false;
+    const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i, saved);
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed);
   }
 

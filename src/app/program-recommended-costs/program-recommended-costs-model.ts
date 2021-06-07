@@ -23,6 +23,8 @@ export class ProgramRecommendedCostsModel {
 
   private _grantAwarded: Array<GrantAwardedDto>;
 
+  deletedSources: number[] = [];
+
   constructor(private logger: NGXLogger) {
   }
 
@@ -68,7 +70,7 @@ export class ProgramRecommendedCostsModel {
     this._fundingSourcesMap = value;
   }
 
-  deleteFundingSourceByIndex(index: number): number {
+  deleteFundingSourceByIndex(index: number, saved: boolean): number {
     const removed = this._selectedFundingSources[index];
     if (!removed) {
       this.logger.error('No funding source found for removal at index ', index);
@@ -76,6 +78,9 @@ export class ProgramRecommendedCostsModel {
       this._selectedFundingSources.splice(index, 1);
       this.prcLineItems.delete(removed);
       this.logger.debug(this.prcLineItems);
+    }
+    if (saved) {
+      this.deletedSources.push(removed.fundingSourceId);
     }
     return removed ? removed.fundingSourceId : -1;
   }
@@ -91,25 +96,6 @@ export class ProgramRecommendedCostsModel {
     dataPoints.forEach(d => {
       d.fundingSource = source;
     });
-    // const dataPoints = new Array<PrcDataPoint>();
-    //
-    // this.grantAwarded.forEach(ga => {
-    //   const tmp = new PrcDataPoint();
-    //   tmp.grantAward = ga;
-    //   tmp.fundingSource = source;
-    //   if (this.displayFormat() === PRC_DISPLAY_FORMAT.INITIAL_PAY) {
-    //     tmp.baselineSource = PrcBaselineSource.PI_REQUESTED;
-    //     tmp.type = PrcLineItemType.PERCENT_CUT;
-    //     tmp.baselineDirect = ga.requestAmount;
-    //     tmp.baselineTotal = ga.requestTotalAmount;
-    //   } else {
-    //     tmp.baselineSource = PrcBaselineSource.AWARDED;
-    //     tmp.type = PrcLineItemType.PERCENT_CUT;
-    //     tmp.baselineDirect = ga.directAmount;
-    //     tmp.baselineTotal = ga.totalAwarded;
-    //   }
-    //   dataPoints.push(tmp);
-    // });
 
     this.prcLineItems.set(source, dataPoints);
     this.logger.debug(this.prcLineItems);

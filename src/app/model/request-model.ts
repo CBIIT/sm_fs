@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {FundingReqBudgetsDto, FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FundingRequestErrorCodes} from './funding-request-error-codes';
 import {NGXLogger} from 'ngx-logger';
@@ -168,5 +168,21 @@ export class RequestModel {
     this._requestType = undefined;
     this._requestName = undefined;
     this.stepLinkable = [false, false, false, false, false];
+  }
+
+  prepareBudgets(): void {
+    this.requestDto.financialInfoDto.fundingReqBudgetsDtos = new Array<FundingReqBudgetsDto>();
+
+    let temp: FundingReqBudgetsDto;
+    this.programRecommendedCostsModel.prcLineItems.forEach((value, key) => {
+      this.logger.debug('preparing budgets for source', key);
+      value.forEach(p => {
+        temp = p.asBudget();
+        this.requestDto.financialInfoDto.fundingReqBudgetsDtos.push(temp);
+      });
+    });
+
+    this.requestDto.financialInfoDto.deleteSources = this.programRecommendedCostsModel.deletedSources;
+
   }
 }

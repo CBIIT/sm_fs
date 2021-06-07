@@ -1,5 +1,6 @@
 /**
- * This class is a data structure to track the program recommended costs for a given request.
+ * This class is a data structure to track the program recommended costs for a given request.  It is more or less
+ * equivalent to the FundingReqBudgetsDto class.
  *
  * the PrcLineItemType enum tracks whether the user is providing a percent cut or straight-up values,
  * in which case we would need to calculate the direct and total percent cut values.
@@ -20,6 +21,7 @@
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 import {isNumeric} from 'rxjs/internal-compatibility';
+import {FundingReqBudgetsDto} from '@nci-cbiit/i2ecws-lib';
 
 export enum PrcLineItemType {
   PERCENT_CUT,
@@ -76,6 +78,7 @@ export class PrcDataPoint {
     }
   }
 
+
   baselineDirect: number;
   baselineTotal: number;
   private _recommendedDirect: number;
@@ -87,4 +90,25 @@ export class PrcDataPoint {
   grantAward: GrantAwardedDto;
   type: PrcLineItemType;
   baselineSource: PrcBaselineSource;
+  budgetId: number;
+  fundingRequestId: number;
+
+
+  asBudget(): FundingReqBudgetsDto {
+    const result: FundingReqBudgetsDto = {};
+    result.dcRecAmt = this._recommendedDirect;
+    result.tcRecAmt = this._recommendedTotal;
+    result.fseId = this.fundingSource.fundingSourceId;
+    result.name = this.fundingSource.fundingSourceName;
+    result.supportYear = this.grantAward.year;
+    result.frqId = this.fundingRequestId;
+    result.id = this.budgetId;
+    return result;
+  }
+
+  // TODO - restore from budget
+  fromBudget(b: FundingReqBudgetsDto): void {
+    this.budgetId = b.id;
+    this.fundingRequestId = b.frqId;
+  }
 }
