@@ -37,6 +37,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   // Convenience method to save typing in the UI
   private editing: number;
+
   get selectedFundingSources(): FundingRequestFundsSrcDto[] {
     return this.requestModel.programRecommendedCostsModel.selectedFundingSources;
   }
@@ -157,9 +158,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   addFundingSource(e): void {
     // TODO: Validation
     this.logger.debug('Add funding source', this.selectedSourceId);
-    if(this.editing) {
+    if (this.editing) {
       const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[this.editing];
-      if(this.selectedSourceId !== edit.fundingSourceId) {
+      if (this.selectedSourceId !== edit.fundingSourceId) {
         this.deleteSource(this.editing);
         this.editing = undefined;
       }
@@ -252,7 +253,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     this.grantAwarded.forEach(ga => {
       const tmp = new PrcDataPoint();
       tmp.grantAward = ga;
-      if (this.displayFormat() === PRC_DISPLAY_FORMAT.INITIAL_PAY) {
+      if (Number(this.displayFormat()) === Number(PRC_DISPLAY_FORMAT.INITIAL_PAY)) {
         tmp.baselineSource = PrcBaselineSource.PI_REQUESTED;
         tmp.type = PrcLineItemType.PERCENT_CUT;
         tmp.baselineDirect = ga.requestAmount;
@@ -270,15 +271,19 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   displayFormat(): PRC_DISPLAY_FORMAT {
     // TODO: Resolve display of Skip and Pay Type 4
-    if (INITIAL_PAY_TYPES.includes(this.requestModel.requestDto.frtId)) {
+    this.logger.debug('Request type: ', this.requestModel.requestDto.frtId);
+    if (INITIAL_PAY_TYPES.includes(Number(this.requestModel.requestDto.frtId))) {
+      this.logger.debug('Initial pay');
       return PRC_DISPLAY_FORMAT.INITIAL_PAY;
-    } else if (this.requestModel.requestDto.frtId === FundingRequestTypes.RESTORATION_OF_A_FUTURE_YEAR) {
+    } else if (Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.RESTORATION_OF_A_FUTURE_YEAR)) {
+      this.logger.debug('Restoration of future year');
       return PRC_DISPLAY_FORMAT.RESTORATION_OF_FUTURE_YEAR;
-    } else if (![FundingRequestTypes.SKIP, FundingRequestTypes.SKIP__NCI_RFA, FundingRequestTypes.PAY_TYPE_4]
-      .includes(this.requestModel.requestDto.frtId)) {
+    } else if (![Number(FundingRequestTypes.SKIP), Number(FundingRequestTypes.SKIP__NCI_RFA), Number(FundingRequestTypes.PAY_TYPE_4)]
+      .includes(Number(this.requestModel.requestDto.frtId))) {
+      this.logger.debug('Add funds');
       return PRC_DISPLAY_FORMAT.ADD_FUNDS;
     }
-
+    this.logger.debug('Other');
     return PRC_DISPLAY_FORMAT.OTHER;
   }
 
