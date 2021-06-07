@@ -1,0 +1,29 @@
+<ng-template #workflowModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">{{ title }}</h5>
+      <button type="button" class="close"  (click)="modal.dismiss('clicked cross button')"><i class="fas fa-times" aria-label="close modal"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="row" *ngIf="mode==='WITHDRAW'">
+          Once you withdraw the request, an automated email will be sent to the requesting
+          PD, the Creator, and any previous approvers on this request.
+      </div>
+      <div class="row" *ngIf="mode==='HOLD'">
+          Placing this request on hold will stop further processing of this request. An automated
+          email will be sent to the scheduled approvers and their designees to indicate that the 
+          request is placed on hold.
+      </div>
+      <div class="row">
+        <label>Workflow Comments</label>
+        <textarea [(ngModel)]="comments" rows="3" cols="80" maxlength="2000"></textarea>
+        {{comments.length}}/2000
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button"
+              class="btn btn-primary"
+              (click)="submit()">
+              {{buttonText}}
+      </button>
+    </div>
+  </ng-template>

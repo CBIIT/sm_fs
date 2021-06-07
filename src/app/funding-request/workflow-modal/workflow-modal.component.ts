@@ -1,0 +1,88 @@
+import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { FsWorkflowControllerService, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NGXLogger } from 'ngx-logger';
+import { Observable } from 'rxjs';
+import { RequestModel } from 'src/app/model/request-model';
+import { AppUserSessionService } from 'src/app/service/app-user-session.service';
+
+@Component({
+  selector: 'app-workflow-modal',
+  templateUrl: './workflow-modal.component.html',
+  styleUrls: ['./workflow-modal.component.css']
+})
+
+export class WorkflowModalComponent implements OnInit {
+
+  @ViewChild('workflowModal') private modalContent: TemplateRef<WorkflowModalComponent>;
+  private modalRef: NgbModalRef;
+
+  mode = '';
+  buttonText = '';
+  title = '';
+  comments = '';
+
+  constructor(private modalService: NgbModal,
+              private requestModel: RequestModel,
+              private fsWorkflowService: FsWorkflowControllerService,
+              private userSessionService: AppUserSessionService,
+              private logger: NGXLogger) { }
+
+  ngOnInit(): void { }
+
+  openConfirmModal(mode: string): Promise<boolean> {
+    this.mode = mode;
+    if (mode === 'WITHDRAW') {
+      this.title = 'Withdraw Request';
+      this.buttonText = 'Withdraw';
+    }
+    else {
+      this.title = 'Hold Request';
+      this.buttonText = 'Hold';
+    }
+    return new Promise<boolean>( (resolve, reject) => {
+      this.modalRef = this.modalService.open(this.modalContent);
+      this.modalRef.result.then(resolve, reject);
+    });
+  }
+
+  submit(): void {
+    this.invoke(this.mode).subscribe(
+      (result) => {
+        this.modalRef.close(result);
+      },
+      (error) => {
+        this.logger.error('calling ' + this.mode + ' service failed with error ', error);
+      }
+    );
+  }
+
+  invoke(mode: string): Observable<any> {
+    const dto: WorkflowTaskDto = {};
+    dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
+    dto.frqId = this.requestModel.requestDto.frqId;
+    dto.comments = this.comments;
+    if (mode === 'WITHDRAW') {
+      dto.action = 'WITHDRAW';
+      return this.fsWorkflowService.withdrawRequestUsingPOST(dto);
+    } else {
+      return this.fsWorkflowService.holdRequestUsingPOST(dto);
+    }
+  }
+
+  // async close(): Promise<void> {
+  //   if (this.modalConfig.shouldClose === undefined || (await this.modalConfig.shouldClose())) {
+  //     const result = this.modalConfig.onClose === undefined || (await this.modalConfig.onClose());
+  //     this.modalRef.close(result);
+  //   }
+  // }
+
+  // async dismiss(): Promise<void> {
+  //   if (this.modalConfig.shouldDismiss === undefined || (await this.modalConfig.shouldDismiss())) {
+  //     const result = this.modalConfig.onDismiss === undefined || (await this.modalConfig.onDismiss());
+  //     this.modalRef.dismiss(result);
+  //   }
+  // }
+}
+

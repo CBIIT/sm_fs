@@ -4,6 +4,7 @@
   <b>Request #{{submissionResult.frqId}}</b> was sent to {{submissionResult.approver}} for review.
   View the request below or return to the <a routerLink="/search">Search</a>.
 </div>
+<app-workflow-modal></app-workflow-modal>
 <app-grant-information></app-grant-information>
 <hr>
 
@@ -102,8 +103,8 @@
     <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
       <button class="btn btn-primary" disabled>Submit Request</button>
     </span>
-    <button class="btn btn-primary mr-2" (click)="withdrawRequest()" *ngIf="withdrawVisible()">Withdraw</button>
-    <button class="btn btn-primary mr-2" (click)="putRequestOnHold()" *ngIf="putOnHoldVisible()">Hold</button>
+    <button class="btn btn-primary mr-2" (click)="submitWorkflow('WITHDRAW')" *ngIf="withdrawVisible()">Withdraw</button>
+    <button class="btn btn-primary mr-2" (click)="submitWorkflow('HOLD')" *ngIf="putOnHoldVisible()">Hold</button>
 
   </div>
 </div>
