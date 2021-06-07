@@ -63,11 +63,14 @@ export class WorkflowModalComponent implements OnInit {
     dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
     dto.frqId = this.requestModel.requestDto.frqId;
     dto.comments = this.comments;
+    dto.action = mode;
     if (mode === 'WITHDRAW') {
-      dto.action = 'WITHDRAW';
       return this.fsWorkflowService.withdrawRequestUsingPOST(dto);
-    } else {
+    } else if (mode === 'HOLD') {
       return this.fsWorkflowService.holdRequestUsingPOST(dto);
+    }
+    else {
+      throw new Error(mode + ' is not supported in funding request workflow');
     }
   }
 

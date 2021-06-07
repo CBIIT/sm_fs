@@ -45,7 +45,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   approvers: Array<{ id: number; text: '' }>;
 //  approverList: Array<any> = new Array<any>();
 
-  constructor(private requestModel: RequestModel,
+  constructor(public requestModel: RequestModel,
               private userSessionService: AppUserSessionService,
               private workflowControllerService: FsWorkflowControllerService,
               private logger: NGXLogger) {

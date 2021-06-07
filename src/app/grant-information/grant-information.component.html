@@ -18,7 +18,7 @@
               <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants" class="hint--right" style="float: inline-end">
                 <img src="images/egrants_icon.svg" height="18" style="padding:3px;margin:0px 2px;border: 0px;">
               </a>
-              <span style="padding:3px;margin:0px 2px;border: 0px;float:inline-end;" (mouseenter)="setGrant(grant)"  [ngbTooltip]="InstituteTooltip"><i class='fa fa-university' aria-hidden='true'></i></span>
+              <a [routerLink]="" style="padding:3px;margin:0px 2px;border: 0px;float:inline-end;" (mouseenter)="setGrant(grant)"  [ngbTooltip]="InstituteTooltip" triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
             </p>
         </div>
     </div>
@@ -47,7 +47,7 @@
     <div class="col-lg-3">
         <div class="form-group">
             <p class="like-label">PD</p>
-            <p><span [innerHTML]="grant|mailtoFormatter: 'pdFullName':'pdEmailAddress':'PI/PD name':'fullGrantNum': 'lastName'"></span></p>
+            <p><a href="mailto:{{grant.pdEmailAddress}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.pdFullName}} ({{grant.roleUsageCode}})</a></p>
         </div>
     </div>
 

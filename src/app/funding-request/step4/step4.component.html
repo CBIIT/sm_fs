@@ -82,10 +82,8 @@
   <div class="col-12">
     <div class="form-group" *ngIf="!readonly">
       <label for="workflow-comments">Workflow Comments <span class="optional">(optional)</span></label>
-      <textarea class="form-control" id="workflow-comments" rows="2" maxlength="1000"></textarea>
-      <!-- Until workflow is implemented -->
-      <!-- <span class="character-counter">{{ workflow-comments.value.length }}/1000</span> -->
-      <span class="character-counter">#/1000</span>
+      <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000"></textarea>
+      <span class="character-counter">#/2000</span>
     </div>
   </div>
 </div>
