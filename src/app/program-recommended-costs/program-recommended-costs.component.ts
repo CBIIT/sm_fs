@@ -84,7 +84,14 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   ngOnInit(): void {
-    this.initialPay = INITIAL_PAY_TYPES.includes(this.requestModel.requestDto.frtId);
+    this.initialPay = INITIAL_PAY_TYPES.includes(Number(this.requestModel.requestDto.frtId));
+    if (this.initialPay) {
+      this.showPercent = true;
+      this.showDollar = false;
+    } else {
+      this.showDollar = true;
+      this.showPercent = false;
+    }
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.programRecommendedCostsModel.grantAwarded = result;
         // this.this.logger.debug('Appl Periods/Grant awards:', result);
