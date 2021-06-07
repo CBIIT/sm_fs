@@ -47,7 +47,7 @@
     <div class="col-lg-3">
         <div class="form-group">
             <p class="like-label">PD</p>
-            <p><span [innerHTML]="grant|mailtoFormatter: 'pdFullName':'pdEmailAddress':'PI/PD name':'fullGrantNum': 'lastName'"></span></p>
+            <p><a href="mailto:{{grant.pdEmailAddress}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.pdFullName}} ({{grant.roleUsageCode}})</a></p>
         </div>
     </div>
 
