@@ -32,6 +32,7 @@ export class WorkflowModalComponent implements OnInit {
 
   openConfirmModal(mode: string): Promise<boolean> {
     this.mode = mode;
+    this.comments = '';
     if (mode === 'WITHDRAW') {
       this.title = 'Withdraw Request';
       this.buttonText = 'Withdraw';
