@@ -168,6 +168,7 @@ export class RequestModel {
     this._requestType = undefined;
     this._requestName = undefined;
     this.stepLinkable = [false, false, false, false, false];
+    this.mainApproverCreated = false;
   }
 
   prepareBudgets(): void {
