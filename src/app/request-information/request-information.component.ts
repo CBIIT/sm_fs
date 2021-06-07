@@ -65,10 +65,11 @@ export class RequestInformationComponent implements OnInit {
   set selectedPd(value: number) {
     this.requestModel.requestDto.pdNpnId = value;
     this.requestModel.requestDto.requestorNpnId = value;
+    this.requestModel.requestDto.requestorCayCode = undefined;
   }
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger,
-    private fundingRequestValidationService: FundingRequestValidationService) {
+              private fundingRequestValidationService: FundingRequestValidationService) {
   }
 
   ngOnInit(): void {
