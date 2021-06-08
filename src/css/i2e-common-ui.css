@@ -24938,6 +24938,15 @@ ul.no-bullets {
 }
 
 /* line 414, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.more-info {
+  padding: 0px 2px;
+  padding: 0rem .2rem;
+  margin-left: -.2rem;
+  cursor: pointer;
+  color: #0076a8;
+}
+
+/* line 421, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   font-size: 85%;
 }
