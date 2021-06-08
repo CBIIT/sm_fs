@@ -302,18 +302,14 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   canSave(): boolean {
     // TODO - update this logic to handle Restoration of Future Years types
     if (!this.selectedSourceId) {
-      this.logger.info('no selected source id');
       return false;
     }
     if (!this.lineItem[0]) {
-      this.logger.info('no data at all');
       return false;
     }
     if (this.showPercent && !this.lineItem[0].percentCut) {
-      this.logger.info('no percentage provided');
       return false;
     } else if (!(this.lineItem[0].recommendedTotal && this.lineItem[0].recommendedDirect)) {
-      this.logger.info('missing one of recommended total or recommended direct');
       return false;
     }
     return true;
