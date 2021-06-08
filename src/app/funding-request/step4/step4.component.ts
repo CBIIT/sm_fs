@@ -113,6 +113,7 @@ export class Step4Component implements OnInit, OnDestroy {
       this.fsRequestService.deleteRequestUsingDELETE(this.model.requestDto.frqId).subscribe(
         result => {
           this.logger.debug('Funding request was deleted: ', result);
+          this.requestModel.reset();
           this.router.navigate(['/search']);
         },
         error => {
@@ -128,6 +129,7 @@ export class Step4Component implements OnInit, OnDestroy {
     // submitRequest DAO method only needs following parameters
     submissionDto.frqId = this.requestModel.requestDto.frqId;
     submissionDto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
+    submissionDto.userLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     submissionDto.certCode = this.requestModel.requestDto.certCode;
     submissionDto.comments = this.comments;
     this.logger.debug('Submit Request for: ', submissionDto);
