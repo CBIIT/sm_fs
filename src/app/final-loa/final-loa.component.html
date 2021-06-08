@@ -1,23 +1,19 @@
-<div class="form-row">
-  <div class="form-group">
-    <label for="final-loa">What is the final scientific level of authority based on NCI Policy?&nbsp;&nbsp;
-    <a href="http://intranet.cancer.gov/admin/grants/policy/nci/ncipolicy.htm" target="_blank">Review Policy</a>
-    </label>
-    <div class="col-12">
-      <div id="final-loa" class="btn-group btn-group-toggle" ngbRadioGroup name="value">
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="1">Program Director
-        </label>
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="2">DOC Director
-        </label>
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="3">NCI Director
-        </label>
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="4">NCI Scientific Program Leaders
-        </label>
-      </div>
+<div class="row">
+  <div class="col">
+    <div class="form-group">
+      <label for="loa">What is the final scientific level of authority based on
+        <a href="${loaReviewPolicy}" target="_blank" class="external-link">NCI Policy</a>?
+      </label>
+      <select
+        id="loa"
+        class="form-control w-auto"
+        [(ngModel)]="selectedValue"> <!-- add class "form-control" only if it's not a select2 -->
+        <option value="-1"></option>
+        <option value="1">Program Director</option>
+        <option value="2">DOC Director</option>
+        <option value="3">NCI Director</option>
+        <option value="4">NCI Scientific Program Leaders</option>
+      </select>
     </div>
   </div>
 </div>

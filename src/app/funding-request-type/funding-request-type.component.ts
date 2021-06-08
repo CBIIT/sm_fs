@@ -1,11 +1,13 @@
-import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
-import { FsLookupControllerService } from '@nci-cbiit/i2ecws-lib';
+import {Component, OnInit, Input, Output, EventEmitter, Inject} from '@angular/core';
+import {FsLookupControllerService} from '@nci-cbiit/i2ecws-lib';
 import 'select2';
-import { SearchFilterService } from '../search/search-filter.service';
-import { UserService } from '@nci-cbiit/i2ecui-lib';
-import { RequestModel } from '../model/request-model';
-import { openNewWindow } from 'src/app/utils/utils';
-import { NGXLogger } from 'ngx-logger';
+import {SearchFilterService} from '../search/search-filter.service';
+import {UserService} from '@nci-cbiit/i2ecui-lib';
+import {RequestModel} from '../model/request-model';
+import {openNewWindow} from 'src/app/utils/utils';
+import {NGXLogger} from 'ngx-logger';
+import {Select2OptionData} from 'ng-select2';
+import {FundingRequestTypeRulesDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestTypeRulesDto';
 
 
 @Component({
@@ -15,10 +17,11 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class FundingRequestTypeComponent implements OnInit {
   @Input() filter: boolean;
-  public requestTypes: { id?: number, requestName?: string }[] = [];
+  public requestTypes: FundingRequestTypeRulesDto[] = [];
   public searchFilter:
     { requestOrPlan: string; searchPool: string; requestType: string; }
-    = { requestOrPlan: '', searchPool: '', requestType: '' };
+    = {requestOrPlan: '', searchPool: '', requestType: ''};
+  data: Array<Select2OptionData>;
 
   @Input()
   get selectedValue(): number {
@@ -37,10 +40,10 @@ export class FundingRequestTypeComponent implements OnInit {
   private _selectedValue: number;
 
   constructor(private fsLookupControllerService: FsLookupControllerService,
-    private searchFilterService: SearchFilterService,
-    private userService: UserService,
-    private model: RequestModel,
-    private logger: NGXLogger) {
+              private searchFilterService: SearchFilterService,
+              private userService: UserService,
+              private model: RequestModel,
+              private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
@@ -55,6 +58,7 @@ export class FundingRequestTypeComponent implements OnInit {
         } else {
           this.requestTypes = result;
         }
+        this.prepareData(this.requestTypes);
         // TODO: this is a hack. Make sure we understand how to properly restore the funding request type
         this.logger.debug('Restoring selected type ID:', this.model.requestDto.financialInfoDto.requestTypeId);
         if (this.model.requestDto.financialInfoDto.requestTypeId) {
@@ -64,6 +68,44 @@ export class FundingRequestTypeComponent implements OnInit {
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
+  }
+
+
+  prepareData(list: FundingRequestTypeRulesDto): void {
+    // this.logger.debug('Preparing funding type data');
+    const results = new Array<Select2OptionData>();
+    const children = new Map<string, Select2OptionData[]>();
+    let tmp: Select2OptionData;
+    list.forEach(t => {
+      tmp = {
+        id: t.id,
+        text: t.requestName,
+        children: undefined,
+        disabled: false,
+      };
+      if (!(t.parentFrtId)) {
+        results.push(tmp);
+        const c = children.get(t.id);
+        if (!c) {
+          children.set(t.id, new Array<Select2OptionData>());
+        }
+      } else {
+        const c = children.get(t.parentFrtId);
+        if (!c) {
+          children.set(t.parentFrtId, [tmp]);
+        } else {
+          c.push(tmp);
+        }
+      }
+    });
+    results.forEach(r => {
+      const c = children.get(r.id);
+      if (c && c.length > 0) {
+        r.children = c;
+      }
+    });
+    this.logger.debug(results);
+    this.data = results;
   }
 
   evoke(filter): any {

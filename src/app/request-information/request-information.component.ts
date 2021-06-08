@@ -24,17 +24,19 @@ export class RequestInformationComponent implements OnInit {
     this.logger.debug('Reset data in PRC model');
     this.requestModel.programRecommendedCostsModel.reset();
 
-    this.logger.debug('loading funding sources');
-    this.fsRequestControllerService.getFundingSourcesUsingGET(
-      this.requestModel.requestDto.frtId,
-      this.requestModel.grant.fullGrantNum,
-      this.requestModel.grant.fy,
-      this.requestModel.requestDto.pdNpnId,
-      this.requestModel.requestDto.requestorCayCode).subscribe(result => {
-      this.requestModel.programRecommendedCostsModel.fundingSources = result;
-    }, error => {
-      this.logger.debug('HttpClient get request error for----- ' + error.message);
-    });
+    if (value) {
+      this.logger.debug('loading funding sources');
+      this.fsRequestControllerService.getFundingSourcesUsingGET(
+        this.requestModel.requestDto.frtId,
+        this.requestModel.grant.fullGrantNum,
+        this.requestModel.grant.fy,
+        this.requestModel.requestDto.pdNpnId,
+        this.requestModel.requestDto.requestorCayCode).subscribe(result => {
+        this.requestModel.programRecommendedCostsModel.fundingSources = result;
+      }, error => {
+        this.logger.debug('HttpClient get request error for----- ' + error.message);
+      });
+    }
   }
 
 

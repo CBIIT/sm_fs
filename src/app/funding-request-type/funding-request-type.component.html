@@ -1,8 +1,15 @@
 <div class="form-group">
-    <label for="request-type-select">Request Type <a href="#" (click)="openPdfDoc()">
-        <i class="fas fa-question-circle"></i></a></label>
-    <ng-select2 id="request-type-select" [(ngModel)]="selectedValue" [allowClear]="true">
-        <option></option>
-        <option *ngFor="let requestType of requestTypes" [value]="requestType.id"> {{requestType.requestName}}</option>
-    </ng-select2>
+  <label for="request-type-select">Request Type <a href="#" (click)="openPdfDoc()">
+    <i class="fas fa-question-circle"></i></a></label>
+  <ng-select2
+    id="request-type-select"
+    [(ngModel)]="selectedValue"
+    [allowClear]="true"
+    [data]="data">
+    <option></option>
+<!--    <option-->
+<!--      *ngFor="let requestType of requestTypes"-->
+<!--      [value]="requestType.id"> {{requestType.requestName}}-->
+<!--    </option>-->
+  </ng-select2>
 </div>
