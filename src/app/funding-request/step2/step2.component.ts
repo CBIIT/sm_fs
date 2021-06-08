@@ -69,6 +69,7 @@ export class Step2Component implements OnInit {
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
         this.requestModel.requestDto = result;
+        this.requestModel.requestName = this.requestModel.requestDto.financialInfoDto.requestName;
         if (navigate) {
           this.router.navigate([navigate]);
         }

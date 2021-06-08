@@ -34,7 +34,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   private selectedSourceId: number;
   lineItem: PrcDataPoint[];
 
-
   // Convenience method to save typing in the UI
   private editing: number;
 
@@ -60,7 +59,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   set percentCut(pc: number) {
     this._percentCut = pc;
-    this.logger.debug('percent cut:', pc);
   }
 
   get percentCut(): number {
@@ -100,7 +98,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
         this.logger.error('HttpClient get request error for----- ' + error.message);
       }
     );
-
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
       this.selectedSourceId = selection;
@@ -148,7 +145,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   addFundingSource(e): void {
     // TODO: Validation
-    this.logger.debug('Add funding source', this.selectedSourceId);
     if (this.editing) {
       const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[this.editing];
       if (this.selectedSourceId !== edit.fundingSourceId) {
@@ -159,24 +155,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     if (this.requestModel.programRecommendedCostsModel.fundingSourcesMap.size === 0) {
       this.logger.error('Funding sources not initialized');
     }
-    // propagate changes from the line item user provided if necessary
-    if (this.isRestoration()) {
-      this.logger.debug('Handle restoration grants');
-    } else if (this.initialPay) {
-      if (this.lineItem.length > 1) {
-        const first = this.lineItem[0];
-        this.lineItem.forEach((li, index) => {
-          if (index !== 0) {
-            if (this.showPercent) {
-              li.percentCut = first.percentCut;
-            } else {
-              li.recommendedDirect = first.recommendedDirect;
-              li.recommendedTotal = first.recommendedTotal;
-            }
-          }
-        });
-      }
-    }
 
     this.requestModel.programRecommendedCostsModel.addFundingSourceById(this.selectedSourceId, this.lineItem);
     this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(this.selectedSourceId);
@@ -185,7 +163,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   toggleCostDisplay(value: string): void {
-    this.logger.debug('radio selected:', value);
     if ('percent' === value) {
       this.showDollar = false;
       this.showPercent = true;
@@ -196,7 +173,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   deleteSource(i: number): void {
-    // TODO: the 'saved' logic is faulty - they might have added a source, then deleted it, then added it again
     const saved = this.requestModel.requestDto.frqId ? true : false;
     const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i, saved);
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed);
@@ -243,7 +219,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   prepareLineItem(): void {
-    this.logger.debug('Prepare line item');
     this.lineItem = new Array<PrcDataPoint>();
     this.grantAwarded.forEach(ga => {
       const tmp = new PrcDataPoint();
@@ -261,24 +236,18 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       }
       this.lineItem.push(tmp);
     });
-    this.logger.debug(this.lineItem);
   }
 
   displayFormat(): PRC_DISPLAY_FORMAT {
     // TODO: Resolve display of Skip and Pay Type 4
-    this.logger.debug('Request type: ', this.requestModel.requestDto.frtId);
     if (INITIAL_PAY_TYPES.includes(Number(this.requestModel.requestDto.frtId))) {
-      this.logger.debug('Initial pay');
       return PRC_DISPLAY_FORMAT.INITIAL_PAY;
     } else if (Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.RESTORATION_OF_A_FUTURE_YEAR)) {
-      this.logger.debug('Restoration of future year');
       return PRC_DISPLAY_FORMAT.RESTORATION_OF_FUTURE_YEAR;
     } else if (![Number(FundingRequestTypes.SKIP), Number(FundingRequestTypes.SKIP__NCI_RFA), Number(FundingRequestTypes.PAY_TYPE_4)]
       .includes(Number(this.requestModel.requestDto.frtId))) {
-      this.logger.debug('Add funds');
       return PRC_DISPLAY_FORMAT.ADD_FUNDS;
     }
-    this.logger.debug('Other');
     return PRC_DISPLAY_FORMAT.OTHER;
   }
 
@@ -302,18 +271,18 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   canSave(): boolean {
     // TODO - update this logic to handle Restoration of Future Years types
     if (!this.selectedSourceId) {
-      this.logger.debug('no selected source');
+      // this.logger.debug('no selected source');
       return false;
     }
     if (!this.lineItem[0]) {
-      this.logger.debug('no line item');
+      // this.logger.debug('no line item');
       return false;
     }
     if (this.showPercent && !this.lineItem[0].percentCut) {
-      this.logger.debug('no percent cut');
+      // this.logger.debug('no percent cut');
       return false;
     } else if (!(this.lineItem[0].recommendedTotal && this.lineItem[0].recommendedDirect)) {
-      this.logger.debug('missing recommended direct or total');
+      // this.logger.debug('missing recommended direct or total');
       return false;
     }
     return true;
@@ -336,16 +305,30 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   propagate(): void {
+    if (!this.initialPay) {
+      return;
+    }
     this.logger.debug('Propagating:', this.lineItem);
     if (this.lineItem.length > 1) {
       const first = this.lineItem[0];
       this.lineItem.forEach((li, index) => {
         if (index !== 0) {
-          if (this.initialPay && this.showPercent) {
+          if (this.showPercent) {
             li.percentCut = first.percentCut;
           } else {
             li.recommendedDirect = first.recommendedDirect;
           }
+        }
+      });
+    }
+  }
+
+  propagateManually(): void {
+    if (this.lineItem.length > 1) {
+      const first = this.lineItem[0];
+      this.lineItem.forEach((li, index) => {
+        if (index !== 0) {
+          li.recommendedDirect = first.recommendedDirect;
         }
       });
     }
