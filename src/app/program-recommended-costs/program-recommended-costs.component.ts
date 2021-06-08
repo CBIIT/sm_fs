@@ -102,7 +102,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     );
 
 
-
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
       this.selectedSourceId = selection;
     });
@@ -163,7 +162,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     // propagate changes from the line item user provided if necessary
     if (this.isRestoration()) {
       this.logger.debug('Handle restoration grants');
-    } else {
+    } else if (this.initialPay) {
       if (this.lineItem.length > 1) {
         const first = this.lineItem[0];
         this.lineItem.forEach((li, index) => {
@@ -301,6 +300,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   canSave(): boolean {
+    // TODO - update this logic to handle Restoration of Future Years types
     if (!this.selectedSourceId) {
       this.logger.info('no selected source id');
       return false;
@@ -322,7 +322,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   grandTotal(i: number): number {
     let result = 0;
     this.selectedFundingSources.forEach(s => {
-      result += this.getLineItem(s)[i].recommendedTotal;
+      result += Number(this.getLineItem(s)[i].recommendedTotal);
     });
     return result;
   }
@@ -330,8 +330,20 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   grandTotalDirect(i: number): number {
     let result = 0;
     this.selectedFundingSources.forEach(s => {
-      result += this.getLineItem(s)[i].recommendedDirect;
+      result += Number(this.getLineItem(s)[i].recommendedDirect);
     });
     return result;
+  }
+
+  propagate(i: number): void {
+    this.logger.debug('Propagating:', i, this.lineItem);
+    if (this.lineItem.length > 1) {
+      const first = this.lineItem[0];
+      this.lineItem.forEach((li, index) => {
+        if (index !== 0) {
+          li.recommendedDirect = first.recommendedDirect;
+        }
+      });
+    }
   }
 }
