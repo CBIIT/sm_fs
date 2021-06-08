@@ -5,7 +5,7 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 import {
   FsRequestControllerService, FundingReqStatusHistoryDto,
   NciPfrGrantQueryDto, FundingRequestDtoReq, DocumentsDto,
-  FsWorkflowControllerService, WorkflowTaskDto
+  FsWorkflowControllerService, WorkflowTaskDto, FundingReqApproversDto
 } from '@nci-cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
@@ -30,12 +30,13 @@ export class Step4Component implements OnInit, OnDestroy {
   isRequestEverSubmitted = false;
   requestHistorySubscriber: Subscription;
   submissionResult = { frqId: null, approver: null };
-  dv = true;
+  // dv = true;
   requestStatus: string;
   docDtos: DocumentsDto[];
   readonly = false;
-
+  readonlyStatuses = ['SUBMITTED'];
   comments = '';
+  activeApprover: FundingReqApproversDto;
 
   constructor(private router: Router,
               private requestModel: RequestModel,
@@ -85,11 +86,17 @@ export class Step4Component implements OnInit, OnDestroy {
 
     });
     this.isRequestEverSubmitted = submitted;
+    this.readonly = this.readonlyStatuses.indexOf(this.requestStatus) > -1;
     this.changeDetection.detectChanges();
   }
 
   prevStep(): void {
     this.router.navigate(['/request/step3']);
+  }
+
+  setActiveApprover(event): void {
+    this.logger.debug('setActiveApprover', event);
+    this.activeApprover = event;
   }
 
   get grant(): NciPfrGrantQueryDto {
@@ -127,7 +134,7 @@ export class Step4Component implements OnInit, OnDestroy {
     this.fsRequestService.submitRequestUsingPOST(submissionDto).subscribe(
       (result) => {
         this.logger.debug('Submit Request result: ', result);
-        this.submissionResult = { frqId: submissionDto.frqId, approver: 'Mr. Approver' };
+        this.submissionResult = { frqId: submissionDto.frqId, approver: this.activeApprover };
         this.requestIntegrationService.requestSubmissionEmitter.next(submissionDto.frqId);
         this.submitSuccess.nativeElement.scrollIntoView();
         this.readonly = true;
