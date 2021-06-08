@@ -20,6 +20,8 @@ export class RequestModel {
   // Note that swagger generated two versions of the DTO, one for the request and one for the response.  But they are identical.
   private _requestDto: FundingRequestDtoReq;
 
+  conversionMechanism: string;
+
   // Holds the request title
   private _requestName: string;
 

@@ -1,6 +1,9 @@
-<label for="fs-select-1">{{ label }}</label>
+<label for="t4-select-1">{{ label }}</label>
 
 <ng-select2
-  id="fs-select-1">
-  <option></option>
+  id="t4-select-1">
+  [(ngModel)]="model.conversionMechanism"
+  [allowClear]="true"
+  [options]="options">
+  <option *ngFor="let p of conversionMechs" [value]="p.id">{{p.text}}</option>
 </ng-select2>
