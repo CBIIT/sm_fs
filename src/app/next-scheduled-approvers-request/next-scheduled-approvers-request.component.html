@@ -28,7 +28,7 @@
     <td><a href="mailto:{{a.approverAltEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverAltFullName }}</a></td>
     <td>
       <button class="btn btn-link btn-delete btn-slim" title="Delete" 
-      (click)="deleteAdditionalApprover(a.fraId)">
+      (click)="deleteAdditionalApprover(a.fraId)" *ngIf="!readonly">
       <i class="fas fa-trash" aria-hidden="true"></i>
       </button>
     </td>

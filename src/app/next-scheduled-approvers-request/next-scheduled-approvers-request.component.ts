@@ -140,7 +140,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     this.additionalApprovers = result.filter((approver) => {
       return approver.roleCode === null;
     });
-    
+
     this.activeApprover.emit(result.length > 0 ? result[0] : null);
   }
 
@@ -188,7 +188,10 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   saveAdditionalApprover(user: any): void {
-    this.workflowControllerService.saveAdditionalApproverUsingPOST(this.requestModel.requestDto.frqId, user.nciLdapCn).subscribe(
+    this.workflowControllerService.saveAdditionalApproverUsingPOST(
+      this.userSessionService.getLoggedOnUser().nihNetworkId,
+      this.requestModel.requestDto.frqId,
+      user.nciLdapCn).subscribe(
       (result) => { this.processApproversResult(result); },
       (error) => {
         this.logger.error('Error saveAdditionalApproverUsingPOST ', error);
