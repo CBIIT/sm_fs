@@ -302,14 +302,18 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   canSave(): boolean {
     // TODO - update this logic to handle Restoration of Future Years types
     if (!this.selectedSourceId) {
+      this.logger.debug('no selected source');
       return false;
     }
     if (!this.lineItem[0]) {
+      this.logger.debug('no line item');
       return false;
     }
     if (this.showPercent && !this.lineItem[0].percentCut) {
+      this.logger.debug('no percent cut');
       return false;
     } else if (!(this.lineItem[0].recommendedTotal && this.lineItem[0].recommendedDirect)) {
+      this.logger.debug('missing recommended direct or total');
       return false;
     }
     return true;
@@ -331,13 +335,17 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     return result;
   }
 
-  propagate(i: number): void {
-    this.logger.debug('Propagating:', i, this.lineItem);
+  propagate(): void {
+    this.logger.debug('Propagating:', this.lineItem);
     if (this.lineItem.length > 1) {
       const first = this.lineItem[0];
       this.lineItem.forEach((li, index) => {
         if (index !== 0) {
-          li.recommendedDirect = first.recommendedDirect;
+          if (this.initialPay && this.showPercent) {
+            li.percentCut = first.percentCut;
+          } else {
+            li.recommendedDirect = first.recommendedDirect;
+          }
         }
       });
     }

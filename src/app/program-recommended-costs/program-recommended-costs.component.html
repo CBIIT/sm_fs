@@ -58,16 +58,34 @@
           </td>
           <td *ngFor="let li of getLineItem(f); let i = index; let first = first; let last = last;">
             <div class="form-row">
-              <div class="col-6 font-weight-bold">
-                Direct
-              </div>
-              <div class="col-6">{{li.recommendedDirect | currency}}</div>
+              <ng-template *ngIf="!initialPay; else withPercent" >
+                <div class="col-6 font-weight-bold">
+                  Direct
+                </div>
+                <div class="col-6">{{li.recommendedDirect | currency}}</div>
+              </ng-template>
+              <ng-template #withPercent>
+                <div class="col-6 font-weight-bold">Direct (% Cut)</div>
+                <div class="col-6">{{li.recommendedDirect | currency}}
+                  ({{ li.percentCutDirectCalculated | percent:'.1'}} Cut)
+                </div>
+              </ng-template>
             </div>
             <div class="form-row">
+              <ng-template *ngIf="!initialPay; else withTotalPercent">
               <div class="col-6 font-weight-bold">
                 Total
               </div>
               <div class="col-6">{{li.recommendedTotal | currency}}</div>
+              </ng-template>
+              <ng-template #withTotalPercent>
+                <div class="col-6 font-weight-bold">
+                  Total (% Cut)
+                </div>
+                <div class="col-6">{{li.recommendedTotal | currency}}
+                  ({{ li.percentCutTotalCalculated | percent:'.1' }} Cut)
+                </div>
+              </ng-template>
             </div>
           </td>
 
@@ -316,13 +334,15 @@
                     <div class="col-sm-auto">
                       <input type="text" class="form-control funds-input" [(ngModel)]="li.recommendedDirect"
                              id="dc-dollar"
-                             aria-describedby="dc-dollar-percent">
+                             aria-describedby="dc-dollar-percent"
+                             (keyup)="propagate()">
                     </div>
                     <div class="col-sm-auto right-label" *ngIf="initialPay; else showPropagateButton">
                       <span id="dc-dollar-percent">{{ li.percentCutDirectCalculated | percent:'.1' }} Cut</span>
                     </div>
                     <ng-template #showPropagateButton>
-                      <button type="button" class="btn btn-primary" [disabled]="li.recommendedDirect === undefined" (click)="propagate(i)">
+                      <button type="button" class="btn btn-primary" [disabled]="li.recommendedDirect === undefined"
+                              (click)="propagate()">
                         Set DC Future Years to First Year
                       </button>
                     </ng-template>
@@ -373,7 +393,8 @@
                   <div class="form-row form-inline">
                     <div class="col left-label"></div>
                     <div class="col-sm-auto">
-                      <input type="text" class="form-control percent-input" [(ngModel)]="li.percentCut" id="perc-cut">
+                      <input type="text" (keyup)="propagate()" class="form-control percent-input"
+                             [(ngModel)]="li.percentCut" id="perc-cut">
                     </div>
                     <div class="col-sm-auto right-label">
                       <label for="perc-cut">% Cut</label>
@@ -414,8 +435,12 @@
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal" (click)="cleanUpSources()">Close</button>
-        <button type="button" class="btn btn-primary" [disabled]="!canSave()" (click)="addFundingSource($event)">Add Funding Source</button>
+        <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal" (click)="cleanUpSources()">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" [disabled]="!canSave()" (click)="addFundingSource($event)">Add
+          Funding Source
+        </button>
       </div>
     </div>
   </div>
