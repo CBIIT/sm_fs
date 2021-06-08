@@ -71,14 +71,14 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
 
-  prepareData(list: FundingRequestTypeRulesDto): void {
+  prepareData(list: FundingRequestTypeRulesDto[]): void {
     // this.logger.debug('Preparing funding type data');
     const results = new Array<Select2OptionData>();
-    const children = new Map<string, Select2OptionData[]>();
+    const children = new Map<number, Select2OptionData[]>();
     let tmp: Select2OptionData;
     list.forEach(t => {
       tmp = {
-        id: t.id,
+        id: String(t.id),
         text: t.requestName,
         children: undefined,
         disabled: false,
@@ -99,7 +99,7 @@ export class FundingRequestTypeComponent implements OnInit {
       }
     });
     results.forEach(r => {
-      const c = children.get(r.id);
+      const c = children.get(Number(r.id));
       if (c && c.length > 0) {
         r.children = c;
       }
