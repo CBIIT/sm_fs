@@ -10,14 +10,14 @@
 
   <div class="col-lg-6">
     <div class="form-group">
-      <label for="request-name-text">Request Name <i class="fas fa-question-circle text-primary"  placement="top" ngbTooltip="Provide a request name that you can easily identify and track"></i></label>
+      <label for="request-name-text">Request Name <i class="fas fa-question-circle more-info"  triggers="click:blur" placement="top" ngbTooltip="Provide a request name that you can easily identify and track"></i></label>
       <input id="request-name-text" maxlength="100" class="form-control" type="text" [(ngModel)]="model.requestDto.requestName">
     </div>
   </div>
 
   <div class="col-lg-2">
     <div class="form-group">
-      <label for="grant-fy">FY</label>
+      <label for="grant-fy">Request FY</label>
       <input id="grant-fy" type="text" readonly class="form-control-plaintext" value="{{ grant.fy }}">
     </div>
   </div>

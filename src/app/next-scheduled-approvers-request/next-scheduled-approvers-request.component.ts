@@ -20,6 +20,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   @Input() label = 'Add Approver';
   @Input() readonly = false;
+  @Output() activeApprover = new EventEmitter<FundingReqApproversDto>();
 
   options: Options;
 
@@ -139,6 +140,8 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     this.additionalApprovers = result.filter((approver) => {
       return approver.roleCode === null;
     });
+
+    this.activeApprover.emit(result.length > 0 ? result[0] : null);
   }
 
   createMainApprovers(): void {
@@ -185,7 +188,10 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   saveAdditionalApprover(user: any): void {
-    this.workflowControllerService.saveAdditionalApproverUsingPOST(this.requestModel.requestDto.frqId, user.nciLdapCn).subscribe(
+    this.workflowControllerService.saveAdditionalApproverUsingPOST(
+      this.userSessionService.getLoggedOnUser().nihNetworkId,
+      this.requestModel.requestDto.frqId,
+      user.nciLdapCn).subscribe(
       (result) => { this.processApproversResult(result); },
       (error) => {
         this.logger.error('Error saveAdditionalApproverUsingPOST ', error);

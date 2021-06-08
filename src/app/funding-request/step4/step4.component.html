@@ -1,7 +1,8 @@
 <div #submitSuccess></div>
 <div class="alert alert-success" role="alert" *ngIf="submissionResult.frqId">
   <h1>Success!</h1>
-  <b>Request #{{submissionResult.frqId}}</b> was sent to {{submissionResult.approver}} for review.
+  <b>Request #{{submissionResult.frqId}}</b> was sent to 
+  <a href="mailto: {{submissionResult.approver.approverEmailAddress}}">{{submissionResult.approver.approverFullName}}</a> for review.
   View the request below or return to the <a routerLink="/search">Search</a>.
 </div>
 <app-workflow-modal></app-workflow-modal>
@@ -72,7 +73,7 @@
 <div class="row collapse show" id="workflow-collapse">
   <div class="col-12">
     <div class="form-group">
-      <app-next-scheduled-approvers-request [readonly]="readonly"></app-next-scheduled-approvers-request>
+      <app-next-scheduled-approvers-request [readonly]="readonly" (activeApprover)="setActiveApprover($event)"></app-next-scheduled-approvers-request>
     </div>
   </div>
 
@@ -94,7 +95,7 @@
 <hr>
 <div class="row">
   <div class="col-12 d-flex mb-4">
-    <button class="btn btn-outline-secondary  mr-auto" (click)="prevStep()">Previous</button>
+    <button class="btn btn-outline-secondary  mr-auto" (click)="prevStep()" *ngIf="!readonly">Previous</button>
     <button class="btn btn-danger mr-2" (click)="deleteRequest()" *ngIf="deleteVisible()">Delete Request</button>
     <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled() ">Submit
       Request</button>
