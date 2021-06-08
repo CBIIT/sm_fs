@@ -193,6 +193,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     this.requestModel.reset();
     this.requestModel.requestDto.userLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     this.requestModel.grant = grant;
+    this.requestModel.requestDto.fy = this.gsfs.currentFy;
     this.router.navigate(['/request/step2']);
   }
 
