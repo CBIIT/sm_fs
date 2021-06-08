@@ -3,10 +3,10 @@ import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../../service/app-properties.service';
-import {errorObject, isNumeric} from 'rxjs/internal-compatibility';
 import {NGXLogger} from 'ngx-logger';
 import {FundingRequestValidationService} from '../../model/funding-request-validation-service';
 import {FundingRequestErrorCodes} from '../../model/funding-request-error-codes';
+import {FundingRequestTypes} from '../../model/funding-request-types';
 
 @Component({
   selector: 'app-step2',
@@ -94,7 +94,8 @@ export class Step2Component implements OnInit {
   }
 
   requestTypeSelected(): boolean {
-    return isNumeric(this.requestModel.requestDto.frtId);
+    return Number(this.requestModel.requestDto.frtId) &&
+      !([FundingRequestTypes.SKIP].includes(Number(this.requestModel.requestDto.frtId)));
   }
 
   canGoBack(): boolean {
