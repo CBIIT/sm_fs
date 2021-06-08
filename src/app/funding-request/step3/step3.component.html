@@ -8,7 +8,7 @@
                 Please upload only the documents that support the approval of this request. <b>Maximum File Size is 10
                     MB per file.</b></small></p>
 
-        <div class="form-group">
+        <div class="form-group mb-4">
             <label for="type">Type</label>
             <ng-select2 id="type" [(ngModel)]="selectedDocType" [allowClear]="true"
                 (ngModelChange)="onDocTypeChange($event)">
@@ -18,24 +18,36 @@
             </ng-select2>
         </div>
 
-        <div class="form-group">
-            <label for="add-file" class="sr-only">Choose File</label>
-            <input id="add-file" #inputFile type="file" accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile"
-                (change)="selectFiles($event)">
+
+
+        <div class="row">
+            <div class="col">
+                    <label for="add-file" class="sr-only">Choose File</label>
+                    <input id="add-file" #inputFile type="file" accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile"
+                        (change)="selectFiles($event)">
+            </div>
+            <div class="col-sm-auto">
+                <button class="btn btn-primary ml-auto" [disabled]="!selectedFiles && docDescription ===''"
+                (click)="uploadFiles()">Add Doc</button>
+            </div>
         </div>
 
-        <div *ngIf="showJustification" class="form-group">
+        <hr *ngIf="showJustification" class="hr-text" data-content="or" aria-label="or">
+
+        <!-- Supplement Application Button
+        <button type="button" class="btn btn-outline-secondary btn-block mt-2" (click)="open(suppAppModal)">Select Application from IMPAC II</button>-->
+
+        <div *ngIf="showJustification" class="form-group mb-2">
             <label for="file-description">Justification Text</label>
             <textarea class="form-control" maxlength="1000" id="file-description" [disabled]="disableJustification"
                 rows="5" (change)="justificationOnChange()" [(ngModel)]="docDescription"></textarea>
             <span class="counter">{{ docDescription.length }}/1000</span>
         </div>
 
-        <div class="d-flex w-100">
+        <div  *ngIf="showJustification" class="d-flex w-100">
             <button class="btn btn-primary ml-auto" [disabled]="!selectedFiles && docDescription ===''"
-                (click)="uploadFiles()">Add Doc</button>
+            (click)="uploadFiles()">Add Text</button>
         </div>
-
 
     </div><!-- END left col -->
 
@@ -156,11 +168,55 @@
 
 <ng-template #justificationModal let-modal>
     <div class="modal-header">
-        <h2 class="modal-title h4 mb-0" id="i2group-title">Justification Text</h2>
+        <span class="modal-title h4 mb-0" id="i2group-title">Justification Text</span>
         <button type="button" class="close"  (click)="modal.dismiss('')"><i class="fas fa-times" aria-label="close modal"></i></button>
      </div>
     <div class="modal-body">
         {{justificationText}}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="modal.close()">Close</button>
+    </div>
+</ng-template>
+
+<ng-template #suppAppModal let-modal>
+    <div class="modal-header">
+        <span class="modal-title h4 mb-0" id="i2group-title">Add Supplement Application from IMPAC II</span>
+        <button type="button" class="close"  (click)="modal.dismiss('')"><i class="fas fa-times" aria-label="close modal"></i></button>
+     </div>
+    <div class="modal-body">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Application File</th>
+                    <th scope="col">Submitted Date</th>
+                    <th scope="col">Accession #</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a href="#" class="external-link">Application File</a>
+                    </td>
+                    <td>MM/DD/YYYY</td>
+                    <td>#######</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm">Add</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="#" target="_blank" class="external-link">Application File</a>
+                    </td>
+                    <td>MM/DD/YYYY</td>
+                    <td>#######</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm">Add</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" (click)="modal.close()">Close</button>

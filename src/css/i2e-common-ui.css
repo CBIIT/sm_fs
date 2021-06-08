@@ -24951,6 +24951,40 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   font-size: 85%;
 }
 
+/* line 426, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.hr-text {
+  line-height: 1em;
+  position: relative;
+  outline: 0;
+  border: 0;
+  text-align: center;
+  height: 1.5em;
+}
+
+/* line 433, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.hr-text:before {
+  content: '';
+  background: #c1c2c9;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+}
+
+/* line 442, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.hr-text:after {
+  content: attr(data-content);
+  position: relative;
+  display: inline-block;
+  padding: 0 .5em;
+  line-height: 1.5em;
+  color: #272a2b;
+  background-color: #fcfcfa;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
 /* line 1, ../Github/sm_i2e_common_ui/src/scss/custom/_utilities.scss */
 .text-lg {
   font-size: 1.125rem;
