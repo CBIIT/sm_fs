@@ -67,7 +67,7 @@
               <ng-template #withPercent>
                 <div class="col-6 font-weight-bold">Direct (% Cut)</div>
                 <div class="col-6">{{li.recommendedDirect | currency}}
-                  ({{ li.percentCutDirectCalculated | percent:'.1'}} Cut)
+                  ({{ li.percentCutDirectCalculated | percent:'1.1-3'}} Cut)
                 </div>
               </ng-template>
             </div>
@@ -83,7 +83,7 @@
                   Total (% Cut)
                 </div>
                 <div class="col-6">{{li.recommendedTotal | currency}}
-                  ({{ li.percentCutTotalCalculated | percent:'.1' }} Cut)
+                  ({{ li.percentCutTotalCalculated | percent:'1.1-3' }} Cut)
                 </div>
               </ng-template>
             </div>
@@ -338,7 +338,7 @@
                              (keyup)="propagate()">
                     </div>
                     <div class="col-sm-auto right-label" *ngIf="initialPay; else showPropagateButton">
-                      <span id="dc-dollar-percent">{{ li.percentCutDirectCalculated | percent:'.1' }} Cut</span>
+                      <span id="dc-dollar-percent">{{ li.percentCutDirectCalculated | percent:'1.1-3' }} Cut</span>
                     </div>
                     <ng-template #showPropagateButton>
                       <button type="button" class="btn btn-primary" [disabled]="li.recommendedDirect === undefined"
@@ -360,7 +360,7 @@
                              aria-describedby="tc-dollar-percent">
                     </div>
                     <div class="col-sm-auto right-label" *ngIf="initialPay">
-                      <span id="tc-dollar-percent">{{ li.percentCutTotalCalculated | percent:'.1' }} Cut</span>
+                      <span id="tc-dollar-percent">{{ li.percentCutTotalCalculated | percent:'1.1-3' }} Cut</span>
                     </div>
                   </div>
                 </div>
