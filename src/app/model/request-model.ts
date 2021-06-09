@@ -197,6 +197,6 @@ export class RequestModel {
    *
    */
   restoreLineItems(budgets: Array<FundingReqBudgetsDto>): void {
-
+    this.logger.debug('Restoring line items from budgets', budgets);
   }
 }

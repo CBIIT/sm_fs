@@ -1,20 +1,20 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Router} from '@angular/router';
 import 'select2';
-import { Options } from 'select2';
+import {Options} from 'select2';
 import {
   CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
   FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto, DocumentsControllerService
 } from '@nci-cbiit/i2ecws-lib';
-import { DocumentService } from '../../service/document.service';
-import { RequestModel } from '../../model/request-model';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { saveAs } from 'file-saver';
-import { of, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { HttpResponse } from '@angular/common/http';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { NGXLogger } from 'ngx-logger';
+import {DocumentService} from '../../service/document.service';
+import {RequestModel} from '../../model/request-model';
+import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import {saveAs} from 'file-saver';
+import {of, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {HttpResponse} from '@angular/common/http';
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import {NGXLogger} from 'ngx-logger';
 
 export interface Swimlane {
   name: string;
@@ -87,14 +87,14 @@ export class Step3Component implements OnInit {
 
 
   constructor(private router: Router,
-    private cgRefCodControllerService: CgRefCodControllerService,
-    private documentService: DocumentService,
-    private requestModel: RequestModel,
-    private fsRequestControllerService: FsRequestControllerService,
-    private fsDocOrderControllerService: FsDocOrderControllerService,
-    private documentsControllerService: DocumentsControllerService,
-    private modalService: NgbModal,
-    private logger: NGXLogger) {
+              private cgRefCodControllerService: CgRefCodControllerService,
+              private documentService: DocumentService,
+              private requestModel: RequestModel,
+              private fsRequestControllerService: FsRequestControllerService,
+              private fsDocOrderControllerService: FsDocOrderControllerService,
+              private documentsControllerService: DocumentsControllerService,
+              private modalService: NgbModal,
+              private logger: NGXLogger) {
 
   }
 
@@ -201,7 +201,7 @@ export class Step3Component implements OnInit {
               if (e.rvLowValue === this._docDto.docType) {
                 element.splice(index, 1);
               }
-            })
+            });
           });
         }
       },
@@ -229,12 +229,12 @@ export class Step3Component implements OnInit {
         );
 
         this.include.subscribe(data => {
-          this.logger.debug("Included data: " + data);
-          this.swimlanes.push({ name: 'Included Content', array: data });
+          this.logger.debug('Included data: ' + data);
+          this.swimlanes.push({name: 'Included Content', array: data});
         });
         this.exclude.subscribe(data => {
-          this.logger.debug("Excluded data: " + data);
-          this.swimlanes.push({ name: 'Excluded Content', array: data });
+          this.logger.debug('Excluded data: ' + data);
+          this.swimlanes.push({name: 'Excluded Content', array: data});
         });
 
       }, error => {
@@ -265,8 +265,7 @@ export class Step3Component implements OnInit {
       //Delete data from the DOC order table
       if (event.previousContainer.id === 'includedId') {
         this.deleteDocOrder(event.container.data[event.currentIndex]);
-      }
-      else {
+      } else {
         //Else if previousContainer = excluded and container = included, data is moved to included.
         //Insert new record and then update sort order for all of them for this frqId
         this.insertDocOrder(event.container.data[event.currentIndex]);
@@ -279,15 +278,14 @@ export class Step3Component implements OnInit {
 
     if (fileName === 'Summary Statement') {
       this.downloadSummaryStatement();
-    }
-    else {
+    } else {
       this.documentService.downloadById(id)
         .subscribe(
           (response: HttpResponse<Blob>) => {
-            let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
-            saveAs(blob, fileName)
+            let blob = new Blob([response.body], {'type': response.headers.get('content-type')});
+            saveAs(blob, fileName);
           }
-        )
+        );
     }
   }
 
@@ -295,28 +293,28 @@ export class Step3Component implements OnInit {
     this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
-          saveAs(blob, 'Cover Page.pdf')
+          let blob = new Blob([response.body], {'type': response.headers.get('content-type')});
+          saveAs(blob, 'Cover Page.pdf');
         }
-      )
+      );
   }
 
   downloadSummaryStatement() {
     this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
-          saveAs(blob, 'Summary Statement.pdf')
+          let blob = new Blob([response.body], {'type': response.headers.get('content-type')});
+          saveAs(blob, 'Summary Statement.pdf');
         }
       ), error =>
-        this.logger.error('Error downloading the summary statement'),
+      this.logger.error('Error downloading the summary statement'),
       () => this.logger.info('File downloaded successfully');
   }
 
   deleteDoc(id: number, docType: string) {
     this.documentService.deleteDocById(id).subscribe(
       result => {
-        this.logger.info("Delete Success");
+        this.logger.info('Delete Success');
         this.baseTaskList.subscribe(items => {
           this.swimlanes[0]['array'].forEach((value, index) => {
             if (value.id == id) {
@@ -335,7 +333,7 @@ export class Step3Component implements OnInit {
 
       }
     ), err => {
-      this.logger.error("Error while deleting the document");
+      this.logger.error('Error while deleting the document');
     };
 
   }
@@ -359,8 +357,8 @@ export class Step3Component implements OnInit {
       this.requestModel.grant.applId, docIds)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
-          saveAs(blob, 'Package.pdf')
+          let blob = new Blob([response.body], {'type': response.headers.get('content-type')});
+          saveAs(blob, 'Package.pdf');
         }
       ), error =>
       this.logger.error('Error downloading the file'),
@@ -400,7 +398,7 @@ export class Step3Component implements OnInit {
 
     this.fsDocOrderControllerService.updateDocOrderUsingPUT(this._docOrderDtos).subscribe(
       res => {
-        this.logger.debug("Doc order delete successful for docId: ", this._docOrderDtos);
+        this.logger.debug('Doc order delete successful for docId: ', this._docOrderDtos);
         this._docOrderDtos.length = 0;
       }, error => {
         this.logger.error('Error occured while updating DOC ORDER----- ' + error.message);
@@ -411,7 +409,7 @@ export class Step3Component implements OnInit {
   deleteDocOrder(docDto: DocumentsDto) {
     this.fsDocOrderControllerService.deleteDocOrderUsingDELETE(docDto.id).subscribe(
       res => {
-        this.logger.debug("Doc order delete successful for docId: ", docDto.id);
+        this.logger.debug('Doc order delete successful for docId: ', docDto.id);
       }, error => {
         this.logger.error('Error occured while deleting DOC ORDER----- ' + error.message);
       });
@@ -424,7 +422,7 @@ export class Step3Component implements OnInit {
 
     this.fsDocOrderControllerService.createDocOrderUsingPOST(this._docOrderDto).subscribe(
       res => {
-        this.logger.debug("Doc order save successful for doc: ", this._docOrderDto);
+        this.logger.debug('Doc order save successful for doc: ', this._docOrderDto);
       }, error => {
         this.logger.error('Error occured while saving DOC ORDER----- ' + error.message);
       });
@@ -432,14 +430,14 @@ export class Step3Component implements OnInit {
 
   deleteJustification() {
     if (this.justificationType == 'text') {
-      this.uploadJustification('')
+      this.uploadJustification('');
     } else {
       this.deleteDoc(this.justificationId, 'Justification');
     }
   }
 
   open(content) {
-    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then((result) => {
+    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -456,11 +454,11 @@ export class Step3Component implements OnInit {
     }
   }
 
-  nextStep() {
+  nextStep(): void {
     this.documentsControllerService.loadDocumentsBySortOrderUsingGET(this.requestModel.requestDto.frqId).subscribe(
       result => {
         this.requestModel.requestDto.includedDocs = result;
-        this.logger.debug("Docs retrieved by doc order: ", result);
+        this.logger.debug('Docs retrieved by doc order: ', result);
         this.router.navigate(['/request/step4']);
       }, error => {
         this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
@@ -468,8 +466,13 @@ export class Step3Component implements OnInit {
     );
   }
 
-  prevStep() {
-    this.router.navigate(['/request/step2']);
+  prevStep(): void {
+    this.fsRequestControllerService.getRequestBudgetsUsingGET(this.requestModel.requestDto.financialInfoDto.fundingRequestId).subscribe(
+      result => {
+        this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos = result;
+        this.requestModel.restoreLineItems(result);
+        this.router.navigate(['/request/step2']);
+      });
   }
 
 }
