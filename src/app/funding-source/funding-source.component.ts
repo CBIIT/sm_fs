@@ -87,6 +87,8 @@ export class FundingSourceComponent implements OnInit {
   openFsDetails(): boolean {
     // temporarily using # for the hashtrue file not found issue..
     const url = '/fs/#' + this.router.createUrlTree(['fundingSourceDetails']).toString();
+    // storaing the funding sources details for popup window.. removing the object in the component once retrieved
+    localStorage.setItem('fundingSources', JSON.stringify(this.availableFundingSources()));
     openNewWindow(url, 'fundingSourceDetails');
     return false;
   }
