@@ -125,7 +125,6 @@ export class Step4Component implements OnInit, OnDestroy {
 
   submitRequest(): void {
     const submissionDto: FundingRequestDtoReq = {};
-
     // submitRequest DAO method only needs following parameters
     submissionDto.frqId = this.requestModel.requestDto.frqId;
     submissionDto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
@@ -140,6 +139,7 @@ export class Step4Component implements OnInit, OnDestroy {
         this.requestIntegrationService.requestSubmissionEmitter.next(submissionDto.frqId);
         this.submitSuccess.nativeElement.scrollIntoView();
         this.readonly = true;
+        this.requestModel.disableStepLinks();
       },
       (error) => {
         this.logger.error('Failed when calling submitRequestUsingPOST', error);
@@ -149,8 +149,11 @@ export class Step4Component implements OnInit, OnDestroy {
   submitWorkflow(action: string): void {
     this.workflowModal.openConfirmModal(action).then(
         (result) => {
-          this.logger.debug('calling API to ' + action + ' return successfully', result);
+          this.logger.debug(action + ' API call returned successfully', result);
           this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
+          if (action === 'WITHDRAW') {
+            this.requestModel.enableStepLinks();
+          }
         }
       )
       .catch(
