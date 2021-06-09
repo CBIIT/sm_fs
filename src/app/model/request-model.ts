@@ -191,4 +191,12 @@ export class RequestModel {
     this.requestDto.financialInfoDto.deleteSources = this.programRecommendedCostsModel.deletedSources;
 
   }
+
+  /**
+   * After saving, the budgets need to be converted back to line items for the PRC component
+   *
+   */
+  restoreLineItems(budgets: Array<FundingReqBudgetsDto>): void {
+
+  }
 }

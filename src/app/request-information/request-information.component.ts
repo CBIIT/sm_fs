@@ -107,7 +107,11 @@ export class RequestInformationComponent implements OnInit {
   }
 
   payUsingSkip(): boolean {
-    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.PAY_USING_SKIP_FUNDS);
+    return [FundingRequestTypes.PAY_USING_SKIP_FUNDS,
+      FundingRequestTypes.PAY_USING_SKIP_FUNDS__NCI_RFA,
+      FundingRequestTypes.PAY_USING_SKIP_FUNDS__GENERIC_PAY_USING_SKIP_FUNDS,
+      FundingRequestTypes.PAY_USING_SKIP_FUNDS__OUTSIDE_OF_DOC_EXCEPTION_SELECTIONS,
+      FundingRequestTypes.PAY_USING_SKIP_FUNDS__WITHIN_DOC_EXCEPTION_SELECTIONS].includes(Number(this.requestModel.requestDto.frtId));
   }
 
   type4Selected(): boolean {
