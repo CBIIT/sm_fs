@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FsLookupControllerService } from '@nci-cbiit/i2ecws-lib';
+import {  FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({
@@ -9,18 +9,13 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class FundingSourcesNamesComponent implements OnInit {
 
-  constructor(private fslookupControllerService: FsLookupControllerService, private logger: NGXLogger) { }
-  public fundingSourceNames: any;
-  ngOnInit(): void {
+  constructor(  private logger: NGXLogger) {  }
 
-    this.fslookupControllerService.getFundingSourcesNameDetailsUsingGET().subscribe(
-      result => {
-        this.fundingSourceNames = result;
-        this.logger.debug('Funding source help results: ', result);
-      }, error => {
-        this.logger.error('HttpClient get request error for----- ' + error.message);
-      });
-
+  public fundingSources: Array<FundingRequestFundsSrcDto> = [];
+  
+  
+  ngOnInit()	: void {
+    this.fundingSources = JSON.parse(localStorage.getItem('fundingSources'));
+    localStorage.removeItem('fundingSources');
   }
-
 }

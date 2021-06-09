@@ -70,9 +70,12 @@ export class FundingSourceComponent implements OnInit {
       this.fsRequestControllerService.getFundingSourcesUsingGET(
         this.requestModel.requestDto.frtId,
         this.requestModel.grant.fullGrantNum,
-        this.requestModel.grant.fy,
-        this.requestModel.requestDto.pdNpnId,
-        this.requestModel.requestDto.requestorCayCode).subscribe(result => {
+        // TODO: Grant or current default FY?
+        // this.requestModel.grant.fy,
+        this.requestModel.requestDto.fy,
+        // TODO: are the funding sources the ones available to the requesting pd the user selected, or the user?
+        this.requestModel.requestDto.financialInfoDto.requestorNpnId,
+        this.requestModel.requestDto.financialInfoDto.requestorCayCode).subscribe(result => {
         this.requestModel.programRecommendedCostsModel.fundingSources = result;
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
@@ -84,6 +87,8 @@ export class FundingSourceComponent implements OnInit {
   openFsDetails(): boolean {
     // temporarily using # for the hashtrue file not found issue..
     const url = '/fs/#' + this.router.createUrlTree(['fundingSourceDetails']).toString();
+    // storaing the funding sources details for popup window.. removing the object in the component once retrieved
+    localStorage.setItem('fundingSources', JSON.stringify(this.availableFundingSources()));
     openNewWindow(url, 'fundingSourceDetails');
     return false;
   }

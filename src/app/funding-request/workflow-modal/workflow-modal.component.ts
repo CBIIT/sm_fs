@@ -64,6 +64,7 @@ export class WorkflowModalComponent implements OnInit {
   invokeRestApi(mode: string): Observable<any> {
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    // TODO - this is wrong.  NPE and NPN ids are different things
     dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
     dto.frqId = this.requestModel.requestDto.frqId;
     dto.comments = this.comments;
