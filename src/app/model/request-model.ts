@@ -37,6 +37,7 @@ export class RequestModel {
 
   // approver stuff
   mainApproverCreated = false;
+  // note, element 0 is not used, element 1 represents step1 and so on.
   private stepLinkable = [false, false, false, false, false];
 
   get recreateMainApproverNeeded(): boolean {
@@ -110,7 +111,9 @@ export class RequestModel {
     return this._eGrantsUrl;
   }
 
-  constructor(private propertiesService: AppPropertiesService, private logger: NGXLogger, private _programRecommendedCostsModel: ProgramRecommendedCostsModel) {
+  constructor(private propertiesService: AppPropertiesService,
+              private logger: NGXLogger,
+              private _programRecommendedCostsModel: ProgramRecommendedCostsModel) {
     this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this._requestDto = {};
@@ -172,6 +175,14 @@ export class RequestModel {
     this.stepLinkable = [false, false, false, false, false];
     this.mainApproverCreated = false;
     this.programRecommendedCostsModel.reset();
+  }
+
+  disableStepLinks(): void {
+    this.stepLinkable = [false, false, false, false, false];
+  }
+
+  enableStepLinks(): void {
+    this.stepLinkable = [false, false, true, true, true];
   }
 
   prepareBudgets(): void {
