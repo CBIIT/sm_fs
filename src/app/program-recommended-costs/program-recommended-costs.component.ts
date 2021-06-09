@@ -117,16 +117,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   set selectedDocs(value: string) {
-    this.requestModel.requestDto.otherDocsText = value;
-    this.requestModel.requestDto.financialInfoDto.otherDocText = value;
-    this._selectedDocs = value;
-    if (value) {
-      this.requestModel.requestDto.otherDocsFlag = 'Y';
-      this.requestModel.requestDto.financialInfoDto.otherDocFlag = 'Y';
-    } else {
-      this.requestModel.requestDto.otherDocsFlag = undefined;
-      this.requestModel.requestDto.financialInfoDto.otherDocFlag = undefined;
-    }
+
   }
 
   showPiCosts(): boolean {
