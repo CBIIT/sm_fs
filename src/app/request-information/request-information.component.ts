@@ -96,6 +96,7 @@ export class RequestInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.logger.debug('request information component', this.requestModel.requestDto.financialInfoDto.otherDocText);
   }
 
   get grant(): NciPfrGrantQueryDto {

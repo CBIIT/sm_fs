@@ -10,11 +10,6 @@
     <button class="btn btn-outline-secondary mr-auto" [disabled]="!canGoBack()" (click)="prevStep()">
       Previous
     </button>
-    <ng-template #cantGoBack>
-        <span ngbTooltip="Request has been saved so 'Previous' is disabled.">
-            <button class="btn btn-outline-secondary mr-auto" disabled>Previous</button>
-        </span>
-    </ng-template>
     <button class="btn btn-outline-primary mr-2" *ngIf="isSaveable(); else saveDisabled" (click)="saveAsDraft()">
       Save as Draft
     </button>

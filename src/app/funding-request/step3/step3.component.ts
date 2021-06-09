@@ -55,6 +55,7 @@ export class Step3Component implements OnInit {
   closeResult: string;
   maxFileSize: number = 10485760; //10MB
   maxFileSizeError: string;
+  public _docDto: DocumentsDto = {};
 
   @ViewChild('inputFile')
   inputFile: ElementRef;
@@ -103,6 +104,7 @@ export class Step3Component implements OnInit {
     if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
+    this.logger.debug('Selected DOCs in step 3:', this.requestModel.requestDto.financialInfoDto.otherDocText);
 
     this.requestModel.setStepLinkable(3, true);
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
@@ -117,13 +119,13 @@ export class Step3Component implements OnInit {
 
   }
 
-  selectFiles(event) {
+  selectFiles(event): void {
     this.selectedFiles = event.target.files;
     this.disableJustification = true;
 
   }
 
-  public _docDto: DocumentsDto = {};
+
 
   uploadFiles() {
     if (this.docDescription !== '') {
