@@ -20,6 +20,7 @@ export class RequestInformationComponent implements OnInit {
 
   set selectedRequestType(value: number) {
     this.requestModel.requestDto.frtId = value;
+    this.requestModel.requestDto.financialInfoDto.requestTypeId = value;
     this.requestModel.programRecommendedCostsModel.fundingRequestType = value;
     this.logger.debug('Reset data in PRC model');
     this.requestModel.programRecommendedCostsModel.reset();
@@ -27,11 +28,14 @@ export class RequestInformationComponent implements OnInit {
     if (value) {
       this.logger.debug('loading funding sources');
       this.fsRequestControllerService.getFundingSourcesUsingGET(
-        this.requestModel.requestDto.frtId,
+        this.requestModel.requestDto.financialInfoDto.requestTypeId,
         this.requestModel.grant.fullGrantNum,
-        this.requestModel.grant.fy,
-        this.requestModel.requestDto.pdNpnId,
-        this.requestModel.requestDto.requestorCayCode).subscribe(result => {
+        // TODO: Which fiscal year do we use? From the grant or current default fy?
+        // this.requestModel.grant.fy,
+        this.requestModel.requestDto.fy,
+        // TODO: Selected PD or PD from Grant?
+        this.requestModel.requestDto.financialInfoDto.requestorNpnId,
+        this.requestModel.requestDto.financialInfoDto.requestorCayCode).subscribe(result => {
         this.requestModel.programRecommendedCostsModel.fundingSources = result;
       }, error => {
         this.logger.debug('HttpClient get request error for----- ' + error.message);
@@ -55,13 +59,13 @@ export class RequestInformationComponent implements OnInit {
 
     let testVal = '';
     if (isArray(value) && value[0]) {
-      this.requestModel.requestDto.requestorCayCode = value[0];
+      this.requestModel.requestDto.financialInfoDto.requestorCayCode = value[0];
       testVal = value[0];
     } else if (typeof value === 'string' || value instanceof String) {
-      this.requestModel.requestDto.requestorCayCode = String(value);
+      this.requestModel.requestDto.financialInfoDto.requestorCayCode = String(value);
       testVal = String(value);
     } else {
-      this.requestModel.requestDto.requestorCayCode = undefined;
+      this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
     }
     // TODO: FS-163 - display an error message if user selects 'MB' for type 9 or 1001 request types
     if ([FundingRequestTypes.GENERAL_ADMINISTRATIVE_SUPPLEMENTS_ADJUSTMENT_POST_AWARD,
@@ -74,14 +78,16 @@ export class RequestInformationComponent implements OnInit {
     this._selectedCayCode = value;
   }
 
+  // TODO: Clarify the pdNpnId vs requestorNpnId
   get selectedPd(): number {
-    return this.requestModel.requestDto.pdNpnId;
+    return this.requestModel.requestDto.financialInfoDto.requestorNpnId;
   }
 
   set selectedPd(value: number) {
-    this.requestModel.requestDto.pdNpnId = value;
+    // TODO - do we need requestorNpnId on requestDto?
     this.requestModel.requestDto.requestorNpnId = value;
-    this.requestModel.requestDto.requestorCayCode = undefined;
+    this.requestModel.requestDto.financialInfoDto.requestorNpnId = value;
+    this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
   }
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger,

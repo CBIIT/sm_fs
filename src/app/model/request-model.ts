@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {FundingReqBudgetsDto, FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {FinancialInfoDtoReq, FundingReqBudgetsDto, FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FundingRequestErrorCodes} from './funding-request-error-codes';
 import {NGXLogger} from 'ngx-logger';
@@ -21,9 +21,6 @@ export class RequestModel {
   private _requestDto: FundingRequestDtoReq;
 
   conversionMechanism: string;
-
-  // Holds the request title
-  private _requestName: string;
 
   // Grant viewer URL for use in links
   private _grantViewerUrl: string;
@@ -69,29 +66,24 @@ export class RequestModel {
 
   set grant(value: NciPfrGrantQueryDto) {
     // TODO: map appropriate values from grant to requestDto
+    // TODO: remove duplication of values across various DTOs
     this._requestDto.applId = value.applId;
+    this.requestDto.financialInfoDto.applId = value.applId;
     if (!this._requestDto.financialInfoDto) {
-      this._requestDto.financialInfoDto = {};
+      this._requestDto.financialInfoDto = {} as FinancialInfoDtoReq;
     }
 
+    // This is and should always be the PD from the grant
     this._requestDto.pdNpnId = value.pdNpnId;
 
     this._requestDto.financialInfoDto.applId = value.applId;
     this._requestDto.financialInfoDto.fy = value.fy;
+    // This npnId is what the user supplies in step2; default is the value from the grant
     this._requestDto.financialInfoDto.requestorNpnId = value.pdNpnId;
-    this._requestDto.financialInfoDto.requestorNpeId = value.pdNpeId;
-    this._requestDto.financialInfoDto.requestorCayCode = value.cayCode;
+    // this._requestDto.financialInfoDto.requestorCayCode = value.cayCode;
 
     this._grant = value;
     this.logger.debug('Request model: ', this._grant);
-  }
-
-  get requestName(): string {
-    return this._requestName;
-  }
-
-  set requestName(value: string) {
-    this._requestName = value;
   }
 
   get programRecommendedCostsModel(): ProgramRecommendedCostsModel {
@@ -119,10 +111,10 @@ export class RequestModel {
 
   getValidationErrors(): Array<FundingRequestErrorCodes> {
     const errors = new Array<FundingRequestErrorCodes>();
-    if (!this.requestDto.requestName || this.requestDto.requestName.trim().length === 0) {
+    if (!this.requestDto.financialInfoDto.requestName || this.requestDto.financialInfoDto.requestName.trim().length === 0) {
       errors.push(FundingRequestErrorCodes.REQUEST_NAME_REQUIRED);
     }
-    if (this.requestDto.requestName && this.requestDto.requestName.length > 100) {
+    if (this.requestDto.financialInfoDto.requestName && this.requestDto.financialInfoDto.requestName.length > 100) {
       errors.push(FundingRequestErrorCodes.REQUEST_NAME_TOO_LONG);
     }
 
@@ -130,7 +122,7 @@ export class RequestModel {
       errors.push(FundingRequestErrorCodes.REQUEST_TYPE_REQUIRED);
     }
 
-    if (!this.requestDto.requestorCayCode || this.requestDto.requestorCayCode.trim().length === 0) {
+    if (!this.requestDto.financialInfoDto.requestorCayCode || this.requestDto.financialInfoDto.requestorCayCode.trim().length === 0) {
       errors.push(FundingRequestErrorCodes.REQUEST_CAY_CODE_REQUIRED);
     }
 
@@ -168,7 +160,6 @@ export class RequestModel {
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
     this._requestType = undefined;
-    this._requestName = undefined;
     this.stepLinkable = [false, false, false, false, false];
     this.mainApproverCreated = false;
     this.programRecommendedCostsModel.reset();

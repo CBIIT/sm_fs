@@ -192,6 +192,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     // NOTE: reset() isn't necessary since we will always be starting from scratch here.  User can't go back from step2 to step1.
     this.requestModel.reset();
     this.requestModel.requestDto.userLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    this.requestModel.requestDto.pdNpnId = this.userSessionService.getLoggedOnUser().npnId;
     this.requestModel.grant = grant;
     this.requestModel.requestDto.fy = this.gsfs.currentFy;
     this.router.navigate(['/request/step2']);

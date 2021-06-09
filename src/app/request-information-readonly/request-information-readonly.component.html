@@ -26,7 +26,7 @@
   <div class="col-md-6 col-lg-2">
     <div class="form-group">
       <p class="like-label">Request FY</p>
-      <p>{{ grant.fy }}</p>
+      <p>{{ model.requestDto.fy }}</p>
     </div>
   </div>
 
@@ -61,7 +61,7 @@
   <div class="col-md-6 col-lg-4">
     <div class="form-group">
       <p class="like-label">Requesting PD's Cancer Activity</p>
-      <p><a [routerLink]="" style="padding:3px;margin:0px 2px;border: 0px;float:inline-end;" ngbTooltip="{{model.requestDto.requestorCayCode|codeDescription:'CancerActivities'}}" triggers="click:blur" placement="top">{{model.requestDto.requestorCayCode}}</a></p>
+      <p><a [routerLink]="" style="padding:3px;margin:0px 2px;border: 0px;float:inline-end;" ngbTooltip="{{model.requestDto.financialInfoDto.requestorCayCode|codeDescription:'CancerActivities'}}" triggers="click:blur" placement="top">{{model.requestDto.financialInfoDto.requestorCayCode}}</a></p>
     </div>
   </div>
 
