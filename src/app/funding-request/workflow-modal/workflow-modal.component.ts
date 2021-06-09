@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FsWorkflowControllerService, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
@@ -37,9 +37,12 @@ export class WorkflowModalComponent implements OnInit {
       this.title = 'Withdraw Request';
       this.buttonText = 'Withdraw';
     }
-    else {
+    else if (mode === 'HOLD') {
       this.title = 'Hold Request';
       this.buttonText = 'Hold';
+    }
+    else {
+      throw new Error(mode + ' is not supported in funding request workflow');
     }
     return new Promise<boolean>( (resolve, reject) => {
       this.modalRef = this.modalService.open(this.modalContent);
@@ -48,17 +51,17 @@ export class WorkflowModalComponent implements OnInit {
   }
 
   submit(): void {
-    this.invoke(this.mode).subscribe(
+    this.invokeRestApi(this.mode).subscribe(
       (result) => {
         this.modalRef.close(result);
       },
       (error) => {
-        this.logger.error('calling ' + this.mode + ' service failed with error ', error);
+        this.logger.error('calling ' + this.mode + ' service API failed with error ', error);
       }
     );
   }
 
-  invoke(mode: string): Observable<any> {
+  invokeRestApi(mode: string): Observable<any> {
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
@@ -75,18 +78,5 @@ export class WorkflowModalComponent implements OnInit {
     }
   }
 
-  // async close(): Promise<void> {
-  //   if (this.modalConfig.shouldClose === undefined || (await this.modalConfig.shouldClose())) {
-  //     const result = this.modalConfig.onClose === undefined || (await this.modalConfig.onClose());
-  //     this.modalRef.close(result);
-  //   }
-  // }
-
-  // async dismiss(): Promise<void> {
-  //   if (this.modalConfig.shouldDismiss === undefined || (await this.modalConfig.shouldDismiss())) {
-  //     const result = this.modalConfig.onDismiss === undefined || (await this.modalConfig.onDismiss());
-  //     this.modalRef.dismiss(result);
-  //   }
-  // }
 }
 

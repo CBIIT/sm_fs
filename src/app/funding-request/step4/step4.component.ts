@@ -5,7 +5,7 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 import {
   FsRequestControllerService, FundingReqStatusHistoryDto,
   NciPfrGrantQueryDto, FundingRequestDtoReq, DocumentsDto,
-  FsWorkflowControllerService, WorkflowTaskDto, FundingReqApproversDto
+  FundingReqApproversDto
 } from '@nci-cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
@@ -42,7 +42,6 @@ export class Step4Component implements OnInit, OnDestroy {
               private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
               private fsRequestService: FsRequestControllerService,
-              private fsWorkflowService: FsWorkflowControllerService,
               private userSessionService: AppUserSessionService,
               private requestIntegrationService: FundingRequestIntegrationService,
               private documentService: DocumentService,
@@ -125,7 +124,7 @@ export class Step4Component implements OnInit, OnDestroy {
 
   submitRequest(): void {
     const submissionDto: FundingRequestDtoReq = {};
-    // submitRequest DAO method only needs following parameters
+    // submitRequest method only needs following properties in Dto
     submissionDto.frqId = this.requestModel.requestDto.frqId;
     submissionDto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
     submissionDto.userLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
@@ -162,75 +161,6 @@ export class Step4Component implements OnInit, OnDestroy {
         }
       );
   }
-  //   // if (!confirm('Are you sure you want to withdraw this request?')) {
-  //   //   return;
-  //   // }
-  //   // const dto: WorkflowTaskDto = {};
-  //   // dto.action = 'WITHDRAW';
-  //   // dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-  //   // dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
-  //   // dto.frqId = this.requestModel.requestDto.frqId;
-  //   // this.fsWorkflowService.withdrawRequestUsingPOST(dto).subscribe(
-  //   //   result => {
-  //   //     this.logger.debug('withdrawRequestUsingPOST successfully returned', result);
-  //   //     this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
-  //   //   },
-  //   //   error => {
-  //   //     this.logger.error('withdrawRequestUsingPOST returned error', error );
-  //   //   }
-  //   // );
-  // }
-
-  // withdrawRequest(): void {
-  //   this.workflowModal.openConfirmModal('WITHDRAW').then(
-  //       (result) => {
-  //         this.logger.debug('withdrawRequestUsingPOST successfully returned', result);
-  //         this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
-  //       }
-  //     )
-  //     .catch(
-  //       (reason) => {
-  //         this.logger.debug('used dismissed withdraw modal', reason);
-  //       }
-  //     );
-  //   // if (!confirm('Are you sure you want to withdraw this request?')) {
-  //   //   return;
-  //   // }
-  //   // const dto: WorkflowTaskDto = {};
-  //   // dto.action = 'WITHDRAW';
-  //   // dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-  //   // dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
-  //   // dto.frqId = this.requestModel.requestDto.frqId;
-  //   // this.fsWorkflowService.withdrawRequestUsingPOST(dto).subscribe(
-  //   //   result => {
-  //   //     this.logger.debug('withdrawRequestUsingPOST successfully returned', result);
-  //   //     this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
-  //   //   },
-  //   //   error => {
-  //   //     this.logger.error('withdrawRequestUsingPOST returned error', error );
-  //   //   }
-  //   // );
-  // }
-
-  // putRequestOnHold(): void {
-  //   if (!confirm('Are you sure you want to put this request on hold?')) {
-  //     return;
-  //   }
-  //   const dto: WorkflowTaskDto = {};
-  //   dto.action = 'HOLD';
-  //   dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-  //   dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
-  //   dto.frqId = this.requestModel.requestDto.frqId;
-  //   this.fsWorkflowService.holdRequestUsingPOST(dto).subscribe(
-  //     result => {
-  //       this.logger.debug('holdRequestUsingPOST successfully returned', result);
-  //       this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
-  //     },
-  //     error => {
-  //       this.logger.error('holdRequestUsingPOST returned error', error );
-  //     }
-  //   );
-  // }
 
   userCanSubmitAndDelete(): boolean {
     if (this.userSessionService.isPD())
