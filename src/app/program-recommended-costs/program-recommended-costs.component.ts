@@ -173,9 +173,11 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   deleteSource(i: number): void {
-    const saved = this.requestModel.requestDto.frqId ? true : false;
-    const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i, saved);
-    this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed);
+    if (confirm('Are you sure you want to delete this row?')) {
+      const saved = this.requestModel.requestDto.frqId ? true : false;
+      const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i, saved);
+      this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed);
+    }
   }
 
   editSource(i: number): void {
