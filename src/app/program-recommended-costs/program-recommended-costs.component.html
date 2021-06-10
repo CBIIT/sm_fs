@@ -45,16 +45,17 @@
               <span *ngIf="!initialPay; then a else b"></span>
               <ng-template #a>
                 <div class="form-row">
-                  <div class="col-6 font-weight-bold">Direct</div>
+                  <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                  <ng-template #notFirst><div class="col-6 font-weight-bold"></div></ng-template>
                   <div class="col-6">{{li.recommendedDirect | currency}}</div>
                 </div>
               </ng-template>
               <ng-template #b>
                 <div class="form-row">
-                  <div class="col-6 font-weight-bold">Direct (% Cut)</div>
-                  <div class="col-6">{{li.recommendedDirect | currency}}
-                    ({{ li.percentCutDirectCalculated | percent:'1.1-3'}} Cut)
-                  </div>
+                  <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                  <ng-template #notFirst><div class="col-6 font-weight-bold"></div></ng-template>
+                  <div class="col-6">{{li.recommendedDirect | currency}}</div>
+                  <div class="col-6" *ngIf="first">({{ li.percentCutDirectCalculated | percent:'1.1-3'}} Cut)</div>
                 </div>
               </ng-template>
               <span *ngIf="!initialPay; then c else d"></span>
@@ -66,7 +67,7 @@
               </ng-template>
               <ng-template #d>
                 <div class="form-row" *ngIf="first">
-                  <div class="col-6 font-weight-bold">Total (% Cut)</div>
+                  <div class="col-6 font-weight-bold">Total</div>
                   <div class="col-6">{{li.recommendedTotal | currency}}
                     ({{ li.percentCutTotalCalculated | percent:'1.1-3' }} Cut)
                   </div>
@@ -162,16 +163,17 @@
               <span *ngIf="!initialPay; then a else b"></span>
               <ng-template #a>
                 <div class="form-row">
-                  <div class="col-6 font-weight-bold">Direct</div>
+                  <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                  <ng-template #notFirst><div class="col-6 font-weight-bold"></div></ng-template>
                   <div class="col-6">{{li.recommendedDirect | currency}}</div>
                 </div>
               </ng-template>
               <ng-template #b>
                 <div class="form-row">
-                  <div class="col-6 font-weight-bold">Direct (% Cut)</div>
-                  <div class="col-6">{{li.recommendedDirect | currency}}
-                    ({{ li.percentCutDirectCalculated | percent:'1.1-3'}} Cut)
-                  </div>
+                  <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                  <ng-template #notFirst><div class="col-6 font-weight-bold"></div></ng-template>
+                  <div class="col-6">{{li.recommendedDirect | currency}}</div>
+                  <div class="col-6" *ngIf="first">({{ li.percentCutDirectCalculated | percent:'1.1-3'}} Cut)</div>
                 </div>
               </ng-template>
               <span *ngIf="!initialPay; then c else d"></span>
@@ -183,7 +185,7 @@
               </ng-template>
               <ng-template #d>
                 <div class="form-row" *ngIf="first">
-                  <div class="col-6 font-weight-bold">Total (% Cut)</div>
+                  <div class="col-6 font-weight-bold">Total</div>
                   <div class="col-6">{{li.recommendedTotal | currency}}
                     ({{ li.percentCutTotalCalculated | percent:'1.1-3' }} Cut)
                   </div>
@@ -499,7 +501,7 @@
                         <input type="text" (keyup)="propagate()" class="form-control percent-input"
                                [(ngModel)]="li.percentCut" id="perc-cut">
                       </div>
-                      <div class="col-sm-auto right-label">
+                      <div class="col-sm-auto right-label" *ngIf="first">
                         <label for="perc-cut">% Cut</label>
                       </div>
                     </div>
