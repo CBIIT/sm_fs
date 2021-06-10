@@ -5,7 +5,7 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 import {
   FsRequestControllerService, FundingReqStatusHistoryDto,
   NciPfrGrantQueryDto, FundingRequestDtoReq, DocumentsDto,
-  FsWorkflowControllerService, WorkflowTaskDto, FundingReqApproversDto
+  FundingReqApproversDto
 } from '@nci-cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
@@ -38,11 +38,15 @@ export class Step4Component implements OnInit, OnDestroy {
   comments = '';
   activeApprover: FundingReqApproversDto;
 
+  userCanSubmit = false;
+  userCanDelete = false;
+  justificationMissing = false;
+  transitionMemoMissing = false;
+
   constructor(private router: Router,
               private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
               private fsRequestService: FsRequestControllerService,
-              private fsWorkflowService: FsWorkflowControllerService,
               private userSessionService: AppUserSessionService,
               private requestIntegrationService: FundingRequestIntegrationService,
               private documentService: DocumentService,
@@ -65,6 +69,8 @@ export class Step4Component implements OnInit, OnDestroy {
       }
     );
     this.docDtos = this.requestModel.requestDto.includedDocs;
+    this.checkUserRolesCas();
+    this.checkDocs();
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
@@ -88,6 +94,65 @@ export class Step4Component implements OnInit, OnDestroy {
     this.isRequestEverSubmitted = submitted;
     this.readonly = this.readonlyStatuses.indexOf(this.requestStatus) > -1;
     this.changeDetection.detectChanges();
+  }
+
+  checkUserRolesCas(): void {
+    const isPd = this.userSessionService.isPD();
+    const isPa = this.userSessionService.isPA();
+    const userCas = this.userSessionService.getUserCaCodes();
+    const userNpnId = this.userSessionService.getLoggedOnUser().npnId;
+    const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    if ( !isPd && !isPa) {
+      this.logger.debug('Neither PD or PA, submit & delete = false');
+      this.userCanDelete = false;
+      this.userCanSubmit = false;
+      return;
+    }
+    else if ( isPd && userNpnId === this.requestModel.requestDto.requestorNpnId ) {
+      this.logger.debug('PD & is this requestor, submit & delete = true');
+      this.userCanSubmit = true;
+      this.userCanDelete = true;
+      return;
+    }
+    else if (isPd && (userCas !== null ) && ( userCas.length > 0)
+      && (userCas.indexOf (this.requestModel.requestDto.cayCode) > -1 )) {
+        this.logger.debug('PD & CA matches request\'s CA, submit & delete = true');
+        this.userCanSubmit = true;
+        this.userCanDelete = true;
+        return;
+    }
+    else if (isPa && userId === this.requestModel.requestDto.requestCreateUserId ) {
+      this.logger.debug('PA & is request creator, submit = false, delete = true');
+      this.userCanSubmit = false;
+      this.userCanDelete = true;
+      return;
+    }
+  }
+
+  checkDocs(): void {
+    this.justificationMissing = true;
+    this.transitionMemoMissing = false;
+    if ( this.requestModel.requestDto.justification ) {
+      this.justificationMissing = false;
+    }
+    else {
+      for (const doc of this.docDtos)  {
+        if (doc.docType === 'Justification') {
+          this.justificationMissing = false;
+          break;
+        }
+      }
+    }
+
+    if (this.requestModel.requestDto.requestType.indexOf('Pay Type 4') > -1) {
+      this.transitionMemoMissing = true;
+      for (const doc of this.docDtos) {
+        if (doc.docType === 'TransitionMemo') {
+          this.transitionMemoMissing = false;
+          break;
+        }
+      }
+    }
   }
 
   prevStep(): void {
@@ -125,7 +190,7 @@ export class Step4Component implements OnInit, OnDestroy {
 
   submitRequest(): void {
     const submissionDto: FundingRequestDtoReq = {};
-    // submitRequest DAO method only needs following parameters
+    // submitRequest method only needs following properties in Dto
     submissionDto.frqId = this.requestModel.requestDto.frqId;
     submissionDto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
     submissionDto.userLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
@@ -162,87 +227,6 @@ export class Step4Component implements OnInit, OnDestroy {
         }
       );
   }
-  //   // if (!confirm('Are you sure you want to withdraw this request?')) {
-  //   //   return;
-  //   // }
-  //   // const dto: WorkflowTaskDto = {};
-  //   // dto.action = 'WITHDRAW';
-  //   // dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-  //   // dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
-  //   // dto.frqId = this.requestModel.requestDto.frqId;
-  //   // this.fsWorkflowService.withdrawRequestUsingPOST(dto).subscribe(
-  //   //   result => {
-  //   //     this.logger.debug('withdrawRequestUsingPOST successfully returned', result);
-  //   //     this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
-  //   //   },
-  //   //   error => {
-  //   //     this.logger.error('withdrawRequestUsingPOST returned error', error );
-  //   //   }
-  //   // );
-  // }
-
-  // withdrawRequest(): void {
-  //   this.workflowModal.openConfirmModal('WITHDRAW').then(
-  //       (result) => {
-  //         this.logger.debug('withdrawRequestUsingPOST successfully returned', result);
-  //         this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
-  //       }
-  //     )
-  //     .catch(
-  //       (reason) => {
-  //         this.logger.debug('used dismissed withdraw modal', reason);
-  //       }
-  //     );
-  //   // if (!confirm('Are you sure you want to withdraw this request?')) {
-  //   //   return;
-  //   // }
-  //   // const dto: WorkflowTaskDto = {};
-  //   // dto.action = 'WITHDRAW';
-  //   // dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-  //   // dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
-  //   // dto.frqId = this.requestModel.requestDto.frqId;
-  //   // this.fsWorkflowService.withdrawRequestUsingPOST(dto).subscribe(
-  //   //   result => {
-  //   //     this.logger.debug('withdrawRequestUsingPOST successfully returned', result);
-  //   //     this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
-  //   //   },
-  //   //   error => {
-  //   //     this.logger.error('withdrawRequestUsingPOST returned error', error );
-  //   //   }
-  //   // );
-  // }
-
-  // putRequestOnHold(): void {
-  //   if (!confirm('Are you sure you want to put this request on hold?')) {
-  //     return;
-  //   }
-  //   const dto: WorkflowTaskDto = {};
-  //   dto.action = 'HOLD';
-  //   dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-  //   dto.requestorNpeId = this.userSessionService.getLoggedOnUser().npnId;
-  //   dto.frqId = this.requestModel.requestDto.frqId;
-  //   this.fsWorkflowService.holdRequestUsingPOST(dto).subscribe(
-  //     result => {
-  //       this.logger.debug('holdRequestUsingPOST successfully returned', result);
-  //       this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
-  //     },
-  //     error => {
-  //       this.logger.error('holdRequestUsingPOST returned error', error );
-  //     }
-  //   );
-  // }
-
-  userCanSubmitAndDelete(): boolean {
-    if (this.userSessionService.isPD())
-    // need to add checks whether loggedOn user is the requesting pd or if the logged on user's CA
-    // is the same as the requesting pd's CA && this.userSessionService.getLoggedOnUser().npnId === this.model.requestDto.requestorNpnId)
-    // TODO: Bin, I have put validation logic on the request model for saving a request.  You could also put submit validation there.
-    {
-      return true;
-    } else {
-      return false;
-    }
-  }
 
   withdrawVisible(): boolean {
     return this.requestStatus === 'SUBMITTED';
@@ -253,25 +237,27 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   submitVisible(): boolean {
-    return this.userCanSubmitAndDelete() && this.requestStatus === 'DRAFT';
+    return this.userCanSubmit && this.requestStatus === 'DRAFT';
   }
 
   deleteVisible(): boolean {
-    return this.userCanSubmitAndDelete() && !this.isRequestEverSubmitted;
+    return this.userCanDelete && !this.isRequestEverSubmitted;
   }
 
   submitEnabled(): boolean {
-    return this.requestModel.canSubmit();
+    return !this.justificationMissing && !this.transitionMemoMissing;
   }
 
   submitDisableTooltip(): string {
-    /*
-    Justification is required for ALL request types
-    Justification and Memo are required for PayType 4
-
-    so depending on the type and missing doc, tool tip has to be created accordingly.
-    */
-    return 'You must upload Justification and Transition Memo to submit this request.';
+    if (this.justificationMissing && this.transitionMemoMissing) {
+      return 'You must upload Justification and Transition Memo to submit this request.';
+    }
+    else if (this.justificationMissing) {
+      return 'You must upload Justification to submit this request.';
+    }
+    else {
+      return '';
+    }
   }
 
   downloadCoverSheet(): void {

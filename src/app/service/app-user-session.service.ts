@@ -15,7 +15,8 @@ export class AppUserSessionService {
   private roles: string[];
 
   constructor(private userService: UserService,
-    private caService: CancerActivityControllerService, private logger: NGXLogger) {
+              private caService: CancerActivityControllerService,
+              private logger: NGXLogger) {
   }
 
   initialize(): Promise<any> {
