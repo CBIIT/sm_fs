@@ -1,20 +1,20 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {Router} from '@angular/router';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import 'select2';
-import {Options} from 'select2';
+import { Options } from 'select2';
 import {
   CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
   FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto, DocumentsControllerService
 } from '@nci-cbiit/i2ecws-lib';
-import {DocumentService} from '../../service/document.service';
-import {RequestModel} from '../../model/request-model';
-import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
-import {saveAs} from 'file-saver';
-import {of, Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
-import {HttpResponse} from '@angular/common/http';
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
-import {NGXLogger} from 'ngx-logger';
+import { DocumentService } from '../../service/document.service';
+import { RequestModel } from '../../model/request-model';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { saveAs } from 'file-saver';
+import { of, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { HttpResponse } from '@angular/common/http';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NGXLogger } from 'ngx-logger';
 
 export interface Swimlane {
   name: string;
@@ -56,6 +56,7 @@ export class Step3Component implements OnInit {
   maxFileSize: number = 10485760; //10MB
   maxFileSizeError: string;
   public _docDto: DocumentsDto = {};
+  otherDocsCount: number = 0;
 
   @ViewChild('inputFile')
   inputFile: ElementRef;
@@ -88,14 +89,14 @@ export class Step3Component implements OnInit {
 
 
   constructor(private router: Router,
-              private cgRefCodControllerService: CgRefCodControllerService,
-              private documentService: DocumentService,
-              private requestModel: RequestModel,
-              private fsRequestControllerService: FsRequestControllerService,
-              private fsDocOrderControllerService: FsDocOrderControllerService,
-              private documentsControllerService: DocumentsControllerService,
-              private modalService: NgbModal,
-              private logger: NGXLogger) {
+    private cgRefCodControllerService: CgRefCodControllerService,
+    private documentService: DocumentService,
+    private requestModel: RequestModel,
+    private fsRequestControllerService: FsRequestControllerService,
+    private fsDocOrderControllerService: FsDocOrderControllerService,
+    private documentsControllerService: DocumentsControllerService,
+    private modalService: NgbModal,
+    private logger: NGXLogger) {
 
   }
 
@@ -175,7 +176,6 @@ export class Step3Component implements OnInit {
       event => {
         if (event instanceof HttpResponse) {
 
-
           const result = event.body;
           this.logger.debug('Upload Doc: ', result);
 
@@ -197,19 +197,32 @@ export class Step3Component implements OnInit {
 
           this.insertDocOrder(result);
 
-          //Remove Doc Type from the drop down
-          this.DocTypes.forEach(element => {
-            element.forEach((e, index) => {
-              if (e.rvLowValue === this._docDto.docType) {
-                element.splice(index, 1);
-              }
-            });
-          });
+          if (result.docType === 'Other') {
+            this.otherDocsCount++;
+            //If Doc Type is Other, check if there are 3 docs uploaded for this type and then splice it
+            if (this.otherDocsCount == 3) {
+              this.spliceDocType();
+            }
+          } else {
+            this.spliceDocType();
+          }
+
         }
       },
       err => {
         this.logger.error('Error occured while uploading doc----- ' + err.message);
       });
+  }
+
+  //Remove Doc Type from the drop down
+  spliceDocType() {
+    this.DocTypes.forEach(element => {
+      element.forEach((e, index) => {
+        if (e.rvLowValue === this._docDto.docType) {
+          element.splice(index, 1);
+        }
+      });
+    });
   }
 
   loadFiles() {
@@ -232,11 +245,11 @@ export class Step3Component implements OnInit {
 
         this.include.subscribe(data => {
           this.logger.debug('Included data: ' + data);
-          this.swimlanes.push({name: 'Included Content', array: data});
+          this.swimlanes.push({ name: 'Included Content', array: data });
         });
         this.exclude.subscribe(data => {
           this.logger.debug('Excluded data: ' + data);
-          this.swimlanes.push({name: 'Excluded Content', array: data});
+          this.swimlanes.push({ name: 'Excluded Content', array: data });
         });
 
       }, error => {
@@ -284,7 +297,7 @@ export class Step3Component implements OnInit {
       this.documentService.downloadById(id)
         .subscribe(
           (response: HttpResponse<Blob>) => {
-            let blob = new Blob([response.body], {'type': response.headers.get('content-type')});
+            let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
             saveAs(blob, fileName);
           }
         );
@@ -295,7 +308,7 @@ export class Step3Component implements OnInit {
     this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], {'type': response.headers.get('content-type')});
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
           saveAs(blob, 'Cover Page.pdf');
         }
       );
@@ -305,11 +318,11 @@ export class Step3Component implements OnInit {
     this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], {'type': response.headers.get('content-type')});
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
           saveAs(blob, 'Summary Statement.pdf');
         }
       ), error =>
-      this.logger.error('Error downloading the summary statement'),
+        this.logger.error('Error downloading the summary statement'),
       () => this.logger.info('File downloaded successfully');
   }
 
@@ -341,9 +354,22 @@ export class Step3Component implements OnInit {
   }
 
   pushDocType(docType: string) {
+    
+    if (docType === 'Other') {
+      this.otherDocsCount--;
+    }
+      
     this._docType.rvLowValue = docType;
+    var isDocTypeExists: boolean = false;
     this.DocTypes.forEach(element => {
-      element.push(this._docType);
+      element.forEach(e => {
+        if (e.rvLowValue === docType) {
+          isDocTypeExists = true;
+        }
+      });
+      if (!isDocTypeExists) {
+        element.push(this._docType);
+      }
     });
   }
 
@@ -359,11 +385,11 @@ export class Step3Component implements OnInit {
       this.requestModel.grant.applId, docIds)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], {'type': response.headers.get('content-type')});
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
           saveAs(blob, 'Package.pdf');
         }
       ), error =>
-      this.logger.error('Error downloading the file'),
+        this.logger.error('Error downloading the file'),
       () => console.info('File downloaded successfully');
   }
 
@@ -439,7 +465,7 @@ export class Step3Component implements OnInit {
   }
 
   open(content) {
-    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
