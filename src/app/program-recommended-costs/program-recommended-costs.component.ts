@@ -34,7 +34,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   private selectedSourceId: number;
   lineItem: PrcDataPoint[];
 
-  // Convenience method to save typing in the UI
   private editing: number;
   @Input() readOnlyView = false;
 
@@ -91,14 +90,16 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       this.showDollar = true;
       this.showPercent = false;
     }
-    this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
-        this.requestModel.programRecommendedCostsModel.grantAwarded = result;
-        // this.this.logger.debug('Appl Periods/Grant awards:', result);
-      }, error => {
-        // TODO: properly handle errors here
-        this.logger.error('HttpClient get request error for----- ' + error.message);
-      }
-    );
+    if (!this.requestModel.programRecommendedCostsModel.grantAwarded) {
+      this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
+          this.requestModel.programRecommendedCostsModel.grantAwarded = result;
+          // this.this.logger.debug('Appl Periods/Grant awards:', result);
+        }, error => {
+          // TODO: properly handle errors here
+          this.logger.error('HttpClient get request error for----- ' + error.message);
+        }
+      );
+    }
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
       this.selectedSourceId = selection;
