@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewInit, Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
@@ -36,6 +36,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   // Convenience method to save typing in the UI
   private editing: number;
+  @Input() readOnlyView = false;
 
   get selectedFundingSources(): FundingRequestFundsSrcDto[] {
     return this.requestModel.programRecommendedCostsModel.selectedFundingSources;
