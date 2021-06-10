@@ -125,7 +125,8 @@ export class RequestModel {
     }
 
     // TODO: Double check this logic.  We probably only need one of these to be set.
-    if (!this.requestDto.pdNpnId || !this.requestDto.requestorNpnId) {
+    // NOTE: pdNpnId is the PD on the underlying grant; requestorNpnId is the one chosen in step 2,
+    if (!this.requestDto.pdNpnId || !this.requestDto.financialInfoDto.requestorNpnId) {
       errors.push(FundingRequestErrorCodes.REQUEST_PD_REQUIRED);
     }
 
@@ -134,7 +135,9 @@ export class RequestModel {
   }
 
   canSave(): boolean {
-    if (this.getValidationErrors().length > 0) {
+    const errors = this.getValidationErrors();
+    if (errors.length > 0) {
+      this.logger.debug('Validation errors:', errors);
       return false;
     }
 

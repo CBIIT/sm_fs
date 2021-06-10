@@ -68,7 +68,6 @@ export class FundingRequestTypeComponent implements OnInit {
           this.requestTypes = result;
         }
         this.prepareData(this.requestTypes);
-        // TODO: this is a hack. Make sure we understand how to properly restore the funding request type
         if (this.model.requestDto.financialInfoDto.requestTypeId) {
           this.selectedValue = this.model.requestDto.financialInfoDto.requestTypeId;
         }

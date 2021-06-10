@@ -89,10 +89,9 @@ export class Step2Component implements OnInit {
     return true;
   }
 
-  // TODO: this logic is flawed.  There are multiple SKIP subtypes that have to be checked also
   requestTypeSelected(): boolean {
     return Number(this.requestModel.requestDto.frtId) &&
-      !([FundingRequestTypes.SKIP].includes(Number(this.requestModel.requestDto.frtId)));
+      !([FundingRequestTypes.SKIP, FundingRequestTypes.SKIP__NCI_RFA].includes(Number(this.requestModel.requestDto.frtId)));
   }
 
   canGoBack(): boolean {
