@@ -39,7 +39,6 @@ import {RequestInformationComponent} from './request-information/request-informa
 import {RequestInformationReadonlyComponent} from './request-information-readonly/request-information-readonly.component';
 import {RequestHistoryComponent} from './request-history/request-history.component';
 import {NextScheduledApproversRequestReadonlyComponent} from './next-scheduled-approvers-request-readonly/next-scheduled-approvers-request-readonly.component';
-import {ProgramRecommendedCostsReadonlyComponent} from './program-recommended-costs-readonly/program-recommended-costs-readonly.component';
 import {NextScheduledApproversRequestComponent} from './next-scheduled-approvers-request/next-scheduled-approvers-request.component';
 import {FundingSourceComponent} from './funding-source/funding-source.component';
 import {OtherDocsContributingFundsComponent} from './other-docs-contributing-funds/other-docs-contributing-funds.component';
@@ -111,7 +110,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     RequestInformationReadonlyComponent,
     RequestHistoryComponent,
     NextScheduledApproversRequestReadonlyComponent,
-    ProgramRecommendedCostsReadonlyComponent,
     NextScheduledApproversRequestComponent,
     FundingSourceComponent,
     OtherDocsContributingFundsComponent,

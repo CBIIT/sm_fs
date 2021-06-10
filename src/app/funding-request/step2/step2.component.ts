@@ -21,14 +21,15 @@ export class Step2Component implements OnInit {
   constructor(private router: Router, private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService,
-              private logger: NGXLogger,
-              private fundingRequestValidationService: FundingRequestValidationService) {
+              private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
     if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
+    this.logger.debug('Request type:', this.requestModel.requestDto.financialInfoDto.requestTypeId);
+
     this.requestModel.setStepLinkable(2, true);
     this.logger.debug('Selected DOCS in step 2 init:', this.requestModel.requestDto.financialInfoDto.otherDocText);
   }
@@ -88,10 +89,9 @@ export class Step2Component implements OnInit {
     return true;
   }
 
-  // TODO: this logic is flawed.  There are multiple SKIP subtypes that have to be checked also
   requestTypeSelected(): boolean {
     return Number(this.requestModel.requestDto.frtId) &&
-      !([FundingRequestTypes.SKIP].includes(Number(this.requestModel.requestDto.frtId)));
+      !([FundingRequestTypes.SKIP, FundingRequestTypes.SKIP__NCI_RFA].includes(Number(this.requestModel.requestDto.frtId)));
   }
 
   canGoBack(): boolean {

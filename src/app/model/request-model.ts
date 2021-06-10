@@ -3,17 +3,12 @@ import {FinancialInfoDtoReq, FundingReqBudgetsDto, FundingRequestDtoReq, NciPfrG
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FundingRequestErrorCodes} from './funding-request-error-codes';
 import {NGXLogger} from 'ngx-logger';
-import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import {ProgramRecommendedCostsModel} from '../program-recommended-costs/program-recommended-costs-model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RequestModel {
-
-
-  // fundingSources: Array<FundingRequestFundsSrcDto>;
-
   // Stores the grant selected in Step 1
   private _grant: NciPfrGrantQueryDto;
 
@@ -130,7 +125,8 @@ export class RequestModel {
     }
 
     // TODO: Double check this logic.  We probably only need one of these to be set.
-    if (!this.requestDto.pdNpnId || !this.requestDto.requestorNpnId) {
+    // NOTE: pdNpnId is the PD on the underlying grant; requestorNpnId is the one chosen in step 2,
+    if (!this.requestDto.pdNpnId || !this.requestDto.financialInfoDto.requestorNpnId) {
       errors.push(FundingRequestErrorCodes.REQUEST_PD_REQUIRED);
     }
 
@@ -139,7 +135,9 @@ export class RequestModel {
   }
 
   canSave(): boolean {
-    if (this.getValidationErrors().length > 0) {
+    const errors = this.getValidationErrors();
+    if (errors.length > 0) {
+      this.logger.debug('Validation errors:', errors);
       return false;
     }
 

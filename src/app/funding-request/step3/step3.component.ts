@@ -127,7 +127,6 @@ export class Step3Component implements OnInit {
   }
 
 
-
   uploadFiles() {
     if (this.docDescription !== '') {
       //Upate justification Text
@@ -495,12 +494,16 @@ export class Step3Component implements OnInit {
   }
 
   prevStep(): void {
+    this.logger.debug('Request type:', this.requestModel.requestDto.financialInfoDto.requestTypeId);
+    // if (!this.requestModel.programRecommendedCostsModel.prcLineItems) {
     this.fsRequestControllerService.getRequestBudgetsUsingGET(this.requestModel.requestDto.financialInfoDto.fundingRequestId).subscribe(
       result => {
         this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos = result;
         this.requestModel.restoreLineItems(result);
         this.router.navigate(['/request/step2']);
       });
+    // }
+    // this.router.navigate(['/request/step2']);
   }
 
 }

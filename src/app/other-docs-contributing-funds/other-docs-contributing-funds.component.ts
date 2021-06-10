@@ -65,6 +65,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.logger.debug('Request type:', this.requestModel.requestDto.financialInfoDto.requestTypeId);
 
     this.initializeDocs();
 
