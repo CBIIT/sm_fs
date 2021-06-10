@@ -69,7 +69,6 @@ export class Step4Component implements OnInit, OnDestroy {
       }
     );
     this.docDtos = this.requestModel.requestDto.includedDocs;
-    console.log('Docs', this.docDtos);
     this.checkUserRolesCas();
     this.checkDocs();
   }
