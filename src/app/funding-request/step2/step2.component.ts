@@ -21,14 +21,15 @@ export class Step2Component implements OnInit {
   constructor(private router: Router, private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService,
-              private logger: NGXLogger,
-              private fundingRequestValidationService: FundingRequestValidationService) {
+              private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
     if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
+    this.logger.debug('Request type:', this.requestModel.requestDto.financialInfoDto.requestTypeId);
+
     this.requestModel.setStepLinkable(2, true);
     this.logger.debug('Selected DOCS in step 2 init:', this.requestModel.requestDto.financialInfoDto.otherDocText);
   }

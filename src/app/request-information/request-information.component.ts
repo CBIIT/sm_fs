@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, Component, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {isArray} from 'rxjs/internal-compatibility';
@@ -15,18 +15,13 @@ import {FundingRequestTypes} from '../model/funding-request-types';
 export class RequestInformationComponent implements OnInit {
 
   get selectedRequestType(): number {
-    return this.requestModel.requestDto.frtId;
+    this.logger.debug('getSelectedRequestType():', this.requestModel.requestDto.financialInfoDto.requestTypeId);
+    return this.requestModel.requestDto.financialInfoDto.requestTypeId;
   }
 
   set selectedRequestType(value: number) {
-    this.requestModel.requestDto.frtId = value;
-    this.requestModel.requestDto.financialInfoDto.requestTypeId = value;
-    this.requestModel.programRecommendedCostsModel.fundingRequestType = value;
-    this.logger.debug('Reset data in PRC model');
-    this.requestModel.programRecommendedCostsModel.reset();
-
     if (value) {
-      this.logger.debug('loading funding sources');
+      this.logger.debug('loading funding sources for type:', value);
       this.fsRequestControllerService.getFundingSourcesUsingGET(
         this.requestModel.requestDto.financialInfoDto.requestTypeId,
         this.requestModel.grant.fullGrantNum,
@@ -96,7 +91,6 @@ export class RequestInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.debug('request information component', this.requestModel.requestDto.financialInfoDto.otherDocText);
   }
 
   get grant(): NciPfrGrantQueryDto {

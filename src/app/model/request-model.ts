@@ -3,17 +3,12 @@ import {FinancialInfoDtoReq, FundingReqBudgetsDto, FundingRequestDtoReq, NciPfrG
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FundingRequestErrorCodes} from './funding-request-error-codes';
 import {NGXLogger} from 'ngx-logger';
-import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import {ProgramRecommendedCostsModel} from '../program-recommended-costs/program-recommended-costs-model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RequestModel {
-
-
-  // fundingSources: Array<FundingRequestFundsSrcDto>;
-
   // Stores the grant selected in Step 1
   private _grant: NciPfrGrantQueryDto;
 

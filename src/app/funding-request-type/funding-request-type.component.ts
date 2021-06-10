@@ -32,9 +32,18 @@ export class FundingRequestTypeComponent implements OnInit {
 
   set selectedValue(value: number) {
     this.logger.debug('Request Type selectedValue setter called: ', value);
+    const valueChanged = this._selectedValue && (value !== this._selectedValue);
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
     this.searchFilter.requestType = String(value);
+    this.model.requestDto.frtId = value;
+    this.model.requestDto.financialInfoDto.requestTypeId = value;
+    this.model.programRecommendedCostsModel.fundingRequestType = value;
+    this.logger.debug('value changed', valueChanged);
+    if (valueChanged) {
+      this.logger.debug('Reset PRC model');
+      this.model.programRecommendedCostsModel.reset();
+    }
   }
 
   private _selectedValue: number;
@@ -47,12 +56,12 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.debug('Request Types Search Filter: ', this.filter);
+    this.logger.debug('init request types');
     this.searchFilter = this.searchFilterService.searchFilter;
 
     this.evoke(this.filter).subscribe(
       result => {
-        this.logger.debug('Request Types results: ', result);
+        // this.logger.debug('Request Types results: ', result);
         if (this.filter) {
           this.requestTypes = result.fundingRequestTypeRulesDtoList;
         } else {
@@ -60,9 +69,7 @@ export class FundingRequestTypeComponent implements OnInit {
         }
         this.prepareData(this.requestTypes);
         // TODO: this is a hack. Make sure we understand how to properly restore the funding request type
-        this.logger.debug('Restoring selected type ID:', this.model.requestDto.financialInfoDto.requestTypeId);
         if (this.model.requestDto.financialInfoDto.requestTypeId) {
-          this.logger.debug('Restoring selected type ID:', this.model.requestDto.financialInfoDto.requestTypeId);
           this.selectedValue = this.model.requestDto.financialInfoDto.requestTypeId;
         }
       }, error => {
@@ -104,7 +111,7 @@ export class FundingRequestTypeComponent implements OnInit {
         r.children = c;
       }
     });
-    this.logger.debug(results);
+    // this.logger.debug(results);
     this.data = results;
   }
 

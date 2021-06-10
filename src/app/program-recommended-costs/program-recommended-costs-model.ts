@@ -1,9 +1,8 @@
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import {Injectable} from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
-import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point';
+import {PrcDataPoint} from './prc-data-point';
 import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
-import {FundingRequestTypes, INITIAL_PAY_TYPES} from '../model/funding-request-types';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +24,6 @@ export class ProgramRecommendedCostsModel {
 
   deletedSources: number[] = [];
 
-  // TODO - we need to roll back selections and line items when a new request type is selected.
   reset(): void {
     // this.fundingRequestType = undefined;
     this.prcLineItems = new Map<FundingRequestFundsSrcDto, PrcDataPoint[]>();
