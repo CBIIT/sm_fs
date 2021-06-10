@@ -145,7 +145,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   createMainApprovers(): void {
-    const workflowDto = { frqId: this.requestModel.requestDto.frqId, requestorNpeId: this.userSessionService.getLoggedOnUser().npnId };
+    const workflowDto = { frqId: this.requestModel.requestDto.frqId, requestorNpeId: this.requestModel.requestDto.requestorNpeId};
     this.workflowControllerService.createRequestApproversUsingPOST(workflowDto).subscribe(
       (result) => {
         this.requestModel.mainApproverCreated = true;
