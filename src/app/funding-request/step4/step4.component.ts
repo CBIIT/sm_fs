@@ -229,11 +229,11 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   withdrawVisible(): boolean {
-    return this.requestStatus === 'SUBMITTED';
+    return this.requestStatus === 'SUBMITTED' && this.userCanSubmit;
   }
 
   putOnHoldVisible(): boolean {
-    return this.requestStatus === 'SUBMITTED';
+    return this.requestStatus === 'SUBMITTED' && this.userCanSubmit;
   }
 
   submitVisible(): boolean {
