@@ -46,14 +46,18 @@
               <ng-template #a>
                 <div class="form-row">
                   <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
-                  <ng-template #notFirst><div class="col-6 font-weight-bold"></div></ng-template>
+                  <ng-template #notFirst>
+                    <div class="col-6 font-weight-bold"></div>
+                  </ng-template>
                   <div class="col-6">{{li.recommendedDirect | currency}}</div>
                 </div>
               </ng-template>
               <ng-template #b>
                 <div class="form-row">
                   <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
-                  <ng-template #notFirst><div class="col-6 font-weight-bold"></div></ng-template>
+                  <ng-template #notFirst>
+                    <div class="col-6 font-weight-bold"></div>
+                  </ng-template>
                   <div class="col-6">{{li.recommendedDirect | currency}}</div>
                   <div class="col-6" *ngIf="first">({{ li.percentCutDirectCalculated | percent:'1.1-3'}} Cut)</div>
                 </div>
@@ -164,14 +168,18 @@
               <ng-template #a>
                 <div class="form-row">
                   <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
-                  <ng-template #notFirst><div class="col-6 font-weight-bold"></div></ng-template>
+                  <ng-template #notFirst>
+                    <div class="col-6 font-weight-bold"></div>
+                  </ng-template>
                   <div class="col-6">{{li.recommendedDirect | currency}}</div>
                 </div>
               </ng-template>
               <ng-template #b>
                 <div class="form-row">
                   <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
-                  <ng-template #notFirst><div class="col-6 font-weight-bold"></div></ng-template>
+                  <ng-template #notFirst>
+                    <div class="col-6 font-weight-bold"></div>
+                  </ng-template>
                   <div class="col-6">{{li.recommendedDirect | currency}}</div>
                   <div class="col-6" *ngIf="first">({{ li.percentCutDirectCalculated | percent:'1.1-3'}} Cut)</div>
                 </div>
@@ -426,7 +434,6 @@
                             <input ngbButton type="radio" (change)="toggleCostDisplay('percent')" value="percent">% Cut
                           </label>
                         </div>
-
                       </div>
                     </div>
                   </div>
@@ -439,18 +446,11 @@
                       <div class="col-sm-auto">
                         <input type="text" class="form-control funds-input" [(ngModel)]="li.recommendedDirect"
                                id="dc-dollar"
-                               aria-describedby="dc-dollar-percent"
-                               (keyup)="propagate()">
+                               aria-describedby="dc-dollar-percent">
                       </div>
-                      <div class="col-sm-auto right-label" *ngIf="initialPay; else showPropagateButton">
+                      <div class="col-sm-auto right-label">
                         <span id="dc-dollar-percent">{{ li.percentCutDirectCalculated | percent:'1.1-3' }} Cut</span>
                       </div>
-                      <ng-template #showPropagateButton>
-                        <button type="button" class="btn btn-primary" [disabled]="li.recommendedDirect === undefined"
-                                (click)="propagateManually()">
-                          Set DC Future Years to First Year
-                        </button>
-                      </ng-template>
                     </div>
                   </div>
 
@@ -469,7 +469,23 @@
                       </div>
                     </div>
                   </div>
-                  <ng-template #notFirst>{{ li.recommendedDirect | currency }}</ng-template>
+                  <div class="fsource-fy1-form" *ngIf="first">
+                    <div class="form-row form-inline">
+                      <div class="col-sm-auto">
+                        <button type="button" class="btn btn-primary" [disabled]="li.recommendedDirect === undefined"
+                                (click)="propagate()">
+                          Copy FY1 Direct Cost to Future Years
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #notFirst>
+                    <div class="col-sm-auto">
+                      <input type="text" class="form-control funds-input" id="tc-dollar"
+                             [(ngModel)]="li.recommendedDirect"
+                             aria-describedby="tc-dollar-percent">
+                    </div>
+                  </ng-template>
 
                 </td>
 
@@ -498,7 +514,7 @@
                     <div class="form-row form-inline">
                       <div class="col left-label"></div>
                       <div class="col-sm-auto">
-                        <input type="text" (keyup)="propagate()" class="form-control percent-input"
+                        <input type="text" class="form-control percent-input"
                                [(ngModel)]="li.percentCut" id="perc-cut">
                       </div>
                       <div class="col-sm-auto right-label" *ngIf="first">
@@ -528,8 +544,23 @@
                       </div>
                     </div>
                   </div>
-
-                  <ng-template #notFirst>{{ li.recommendedDirect | currency }}</ng-template>
+                  <div class="fsource-fy1-form" *ngIf="first">
+                    <div class="form-row form-inline">
+                      <div class="col-sm-auto">
+                        <button type="button" class="btn btn-primary" [disabled]="li.recommendedDirect === undefined"
+                                (click)="propagate()">
+                          Copy FY1 Direct Cost to Future Years
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #notFirst>
+                    <div class="col-sm-auto">
+                      <input type="text" class="form-control funds-input" id="tc-dollar"
+                             [(ngModel)]="li.recommendedDirect"
+                             aria-describedby="tc-dollar-percent">
+                    </div>
+                  </ng-template>
                 </td>
               </tr>
 
@@ -540,7 +571,8 @@
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal" (click)="cleanUpSources()">
+          <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal"
+                  (click)="cleanUpSources()">
             Close
           </button>
           <button type="button" class="btn btn-primary" [disabled]="!canSave()" (click)="addFundingSource($event)">Add

@@ -22,6 +22,7 @@ export class FundingRequestTypeComponent implements OnInit {
     { requestOrPlan: string; searchPool: string; requestType: string; }
     = {requestOrPlan: '', searchPool: '', requestType: ''};
   data: Array<Select2OptionData>;
+  private _selectedValue: number;
 
   @Input()
   get selectedValue(): number {
@@ -39,14 +40,11 @@ export class FundingRequestTypeComponent implements OnInit {
     this.model.requestDto.frtId = value;
     this.model.requestDto.financialInfoDto.requestTypeId = value;
     this.model.programRecommendedCostsModel.fundingRequestType = value;
-    this.logger.debug('value changed', valueChanged);
     if (valueChanged) {
       this.logger.debug('Reset PRC model');
       this.model.programRecommendedCostsModel.reset();
     }
   }
-
-  private _selectedValue: number;
 
   constructor(private fsLookupControllerService: FsLookupControllerService,
               private searchFilterService: SearchFilterService,
@@ -75,7 +73,6 @@ export class FundingRequestTypeComponent implements OnInit {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
   }
-
 
   prepareData(list: FundingRequestTypeRulesDto[]): void {
     // this.logger.debug('Preparing funding type data');
