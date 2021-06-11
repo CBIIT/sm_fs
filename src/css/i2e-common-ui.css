@@ -25113,7 +25113,17 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   flex-direction: column;
 }
 
-/* line 93, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 94, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.cdk-drop-list:hover {
+  cursor: grab;
+}
+
+/* line 97, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.cdk-drop-list.cdk-drop-list-dragging {
+  cursor: move;
+}
+
+/* line 102, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .drag-item {
   border-radius: 0.25rem;
   padding: .5rem 1rem;
@@ -25125,7 +25135,7 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   background: white;
 }
 
-/* line 102, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 111, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .drag-item:before {
   content: '\f7a4';
   font-family: "Font Awesome 5 Pro";
@@ -25136,39 +25146,39 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   margin-right: .75rem;
 }
 
-/* line 111, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 120, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .drag-item.drag-item-locked {
   background: #f4f5f6;
 }
 
-/* line 113, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 122, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .drag-item.drag-item-locked:before {
   content: '\f023';
 }
 
-/* line 117, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 126, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .drag-item.drag-item-placeholder {
   border: none;
   background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='4' ry='4' stroke='black' stroke-width='1' stroke-dasharray='6%2c 6' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
 }
 
-/* line 124, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 133, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .drag-item .doc-name {
   font-weight: bold;
   margin-right: .5rem;
 }
 
-/* line 128, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 137, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .drag-item .doc-desc {
   font-style: italic;
 }
 
-/* line 136, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 145, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .progressbar {
   counter-reset: step;
 }
 
-/* line 138, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 147, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .progressbar li {
   list-style-type: none;
   width: 25%;
@@ -25179,17 +25189,17 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   text-transform: none;
 }
 
-/* line 146, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 155, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .progressbar li a {
   color: #63666a;
 }
 
-/* line 148, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 157, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .progressbar li a:hover, .progressbar li a:focus {
   text-decoration: underline !important;
 }
 
-/* line 152, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 161, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .progressbar li:before {
   width: 30px;
   height: 30px;
@@ -25207,7 +25217,7 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   font-weight: 700;
 }
 
-/* line 168, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 177, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .progressbar li:after {
   width: 100%;
   height: 2px;
@@ -25219,30 +25229,30 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   z-index: -1;
 }
 
-/* line 178, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 187, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .progressbar li:first-child:after {
   content: none;
 }
 
-/* line 181, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 190, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .progressbar li.active {
   text-align: auto;
   font-weight: bold;
 }
 
-/* line 184, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 193, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .progressbar li.active:before {
   border-color: #63666a;
   background-color: #63666a;
   color: white;
 }
 
-/* line 189, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 198, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .progressbar li.active + li:after {
   color: #117e46;
 }
 
-/* line 193, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 202, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .progressbar li.complete:before {
   border-color: #117e46;
   background-color: #117e46;
@@ -25250,37 +25260,37 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   content: '✔';
 }
 
-/* line 205, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 214, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls {
   display: flex;
   align-items: center;
   margin-bottom: .5rem;
 }
 
-/* line 209, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 218, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls label {
   margin-bottom: 0rem;
 }
 
-/* line 212, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 221, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_length {
   float: unset;
   display: inline-block;
 }
 
-/* line 215, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 224, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_length select {
   padding: 2px;
 }
 
-/* line 219, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 228, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dt-buttons {
   float: unset;
   display: inline-block;
   margin-right: 1rem;
 }
 
-/* line 223, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 232, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dt-buttons .btn-excel {
   color: #63666a;
   padding: 0.25rem 0.5rem;
@@ -25295,19 +25305,19 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   margin-bottom: 0rem;
 }
 
-/* line 235, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 244, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dt-buttons .btn-excel:focus {
   box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5);
   background: transparent;
 }
 
-/* line 239, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 248, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dt-buttons .btn-excel:hover {
   background: rgba(99, 102, 106, 0.15);
   color: #3e4042;
 }
 
-/* line 243, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 252, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dt-buttons .btn-excel:before {
   display: inline-block;
   font-family: 'Font Awesome 5 Pro';
@@ -25315,14 +25325,14 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   margin-right: .2rem;
 }
 
-/* line 251, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 260, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_filter {
   float: unset;
   display: inline-block;
   margin-right: 1rem;
 }
 
-/* line 255, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 264, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_filter input {
   height: calc(1.5em + 0.5rem + 2px);
   padding: 0.25rem 0.5rem;
@@ -25331,18 +25341,18 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   border-radius: 0.2rem;
 }
 
-/* line 263, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 272, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_paginate {
   float: unset;
   display: flex;
 }
 
-/* line 266, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 275, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_paginate > span {
   display: flex;
 }
 
-/* line 269, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 278, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_paginate .paginate_button {
   position: relative;
   display: block;
@@ -25356,7 +25366,7 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   border-radius: 0rem;
 }
 
-/* line 280, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 289, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_paginate .paginate_button:hover {
   z-index: 2;
   color: #00405c !important;
@@ -25365,14 +25375,14 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   border-color: #c1c2c9;
 }
 
-/* line 287, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 296, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_paginate .paginate_button:focus {
   z-index: 2;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
 }
 
-/* line 292, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 301, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_paginate .paginate_button.current {
   z-index: 1;
   color: white !important;
@@ -25380,13 +25390,13 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   border-color: #0076a8;
 }
 
-/* line 297, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 306, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_paginate .paginate_button.current:hover {
   color: white !important;
   background: #0076a8;
 }
 
-/* line 302, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 311, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_paginate .paginate_button.disabled {
   color: #a3a6ad !important;
   pointer-events: none;
@@ -25395,25 +25405,25 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   border-color: #c1c2c9;
 }
 
-/* line 311, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 320, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_paginate > .paginate_button:first-child {
   margin-left: 0;
   border-top-left-radius: 0.2rem;
   border-bottom-left-radius: 0.2rem;
 }
 
-/* line 315, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 324, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dataTables_paginate > .paginate_button:last-child {
   border-top-right-radius: 0.2rem;
   border-bottom-right-radius: 0.2rem;
 }
 
-/* line 321, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 330, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 table ~ .dt-controls {
   margin-top: .5rem;
 }
 
-/* line 329, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 338, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .next-approvers-table tbody tr.cdk-drag .order-icon:before {
   content: '\f7a4';
   font-family: "Font Awesome 5 Pro";
@@ -25423,12 +25433,12 @@ table ~ .dt-controls {
   font-weight: 900;
 }
 
-/* line 338, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 347, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .next-approvers-table tbody tr.cdk-drag.cdk-drag-disabled .order-icon:before {
   content: '\f023';
 }
 
-/* line 343, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+/* line 352, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .next-approvers-table tbody tr td {
   vertical-align: middle;
 }
