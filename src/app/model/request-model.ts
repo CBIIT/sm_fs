@@ -76,10 +76,8 @@ export class RequestModel {
     this._requestDto.financialInfoDto.fy = value.fy;
     // This npnId is what the user supplies in step2; default is the value from the grant
     this._requestDto.financialInfoDto.requestorNpnId = value.pdNpnId;
-    // this._requestDto.financialInfoDto.requestorCayCode = value.cayCode;
 
     this._grant = value;
-    this.logger.debug('Request model: ', this._grant);
   }
 
   get programRecommendedCostsModel(): ProgramRecommendedCostsModel {
@@ -120,6 +118,7 @@ export class RequestModel {
       errors.push(FundingRequestErrorCodes.REQUEST_TYPE_REQUIRED);
     }
 
+    this.logger.debug('requestorCayCode:', this.requestDto.financialInfoDto.requestorCayCode);
     if (!this.requestDto.financialInfoDto.requestorCayCode || this.requestDto.financialInfoDto.requestorCayCode.trim().length === 0) {
       errors.push(FundingRequestErrorCodes.REQUEST_CAY_CODE_REQUIRED);
     }

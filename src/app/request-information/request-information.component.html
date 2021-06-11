@@ -23,11 +23,11 @@
   </div>
 
   <div class="col-md-4 col-lg-4">
-    <lib-pdname-dropdown #pdnameDropdownComponent [(selectedValue)]="selectedPd" label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
+    <lib-pdname-dropdown [(selectedValue)]="selectedPd" label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
   </div>
 
   <div class="col-md-4 col-lg-4">
-    <lib-cancer-activities-dropdown #cancerActivitiesDropdownComponent [selectSingleOption]="true" [(selectedValue)]="selectedCayCode" [maxSelection]="1" [syncWithPd]="true" label="Requesting PD's Cancer Activity"></lib-cancer-activities-dropdown>
+    <lib-cancer-activities-dropdown [selectSingleOption]="true" [(selectedValue)]="selectedCayCode" [maxSelection]="1" [syncWithPd]="true" label="Requesting PD's Cancer Activity"></lib-cancer-activities-dropdown>
   </div>
 
   <div class="col-md-2 col-lg-4">

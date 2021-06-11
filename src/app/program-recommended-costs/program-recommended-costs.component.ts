@@ -78,7 +78,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   ngOnDestroy(): void {
-    this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.unsubscribe();
+    // this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.unsubscribe();
   }
 
   ngOnInit(): void {

@@ -15,7 +15,7 @@ import {FundingRequestTypes} from '../model/funding-request-types';
 export class RequestInformationComponent implements OnInit {
 
   get selectedRequestType(): number {
-    this.logger.debug('getSelectedRequestType():', this.requestModel.requestDto.financialInfoDto.requestTypeId);
+    // this.logger.debug('getSelectedRequestType():', this.requestModel.requestDto.financialInfoDto.requestTypeId);
     return this.requestModel.requestDto.financialInfoDto.requestTypeId;
   }
 
@@ -44,23 +44,31 @@ export class RequestInformationComponent implements OnInit {
   // just a string, and even though _selectedCayCode is typed as a string[], if I try to assign it a string[]
   // value, it blows up at runtime.  Ditto the getter, which blows up at runtime if I try to return an array
   // of strings, but won't compile if I try to return a string.
-  _selectedCayCode: string[] = (this.requestModel.requestDto.cayCode ? [this.requestModel.requestDto.cayCode] : []);
+  _selectedCayCode: string[] = (this.requestModel.requestDto.financialInfoDto.requestorCayCode
+    ? [this.requestModel.requestDto.financialInfoDto.requestorCayCode] : []);
 
   get selectedCayCode(): string[] {
+    // this.logger.debug('getSelectedCayCode():', this._selectedCayCode);
     return this._selectedCayCode;
   }
 
   set selectedCayCode(value: string[]) {
-
+    this.logger.debug('setSelectedCayCode():', value);
     let testVal = '';
     if (isArray(value) && value[0]) {
+      this.logger.debug('requestorCayCode set to first element of array', value[0]);
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = value[0];
+      this.requestModel.requestDto.requestorCayCode = value[0];
       testVal = value[0];
     } else if (typeof value === 'string' || value instanceof String) {
+      this.logger.debug('Requestor cayCode set to string value', value);
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = String(value);
+      this.requestModel.requestDto.requestorCayCode = String(value);
       testVal = String(value);
     } else {
+      this.logger.debug('Requestor cayCode set to undefined');
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
+      this.requestModel.requestDto.requestorCayCode = undefined;
     }
     // TODO: FS-163 - display an error message if user selects 'MB' for type 9 or 1001 request types
     if ([FundingRequestTypes.GENERAL_ADMINISTRATIVE_SUPPLEMENTS_ADJUSTMENT_POST_AWARD,
@@ -80,9 +88,13 @@ export class RequestInformationComponent implements OnInit {
 
   set selectedPd(value: number) {
     // TODO - do we need requestorNpnId on requestDto?
+    const valueChanged = this.requestModel.requestDto.requestorNpnId && (this.requestModel.requestDto.requestorNpnId !== value);
     this.requestModel.requestDto.requestorNpnId = value;
     this.requestModel.requestDto.financialInfoDto.requestorNpnId = value;
-    this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
+    if (valueChanged) {
+      this.logger.debug('Resetting requestorCayCode');
+      this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
+    }
   }
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger,
