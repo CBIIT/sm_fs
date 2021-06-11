@@ -353,11 +353,11 @@ export class Step3Component implements OnInit {
   }
 
   pushDocType(docType: string) {
-    
+
     if (docType === 'Other') {
       this.otherDocsCount--;
     }
-      
+
     this._docType.rvLowValue = docType;
     var isDocTypeExists: boolean = false;
     this.DocTypes.forEach(element => {
@@ -501,6 +501,7 @@ export class Step3Component implements OnInit {
         this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos = result;
         this.requestModel.restoreLineItems(result);
         this.router.navigate(['/request/step2']);
+        this.logger.debug('loaded budgets', result);
       });
     // }
     // this.router.navigate(['/request/step2']);

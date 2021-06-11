@@ -80,10 +80,6 @@ export class Step2Component implements OnInit {
 
   isSaveable(): boolean {
     if (!this.model.canSave()) {
-      // const errorCodes = this.model.getValidationErrors();
-      // errorCodes.forEach(e => {
-      //   this.fundingRequestValidationService.raiseError.next(e);
-      // });
       return false;
     }
     return true;

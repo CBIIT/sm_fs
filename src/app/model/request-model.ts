@@ -195,5 +195,15 @@ export class RequestModel {
    */
   restoreLineItems(budgets: Array<FundingReqBudgetsDto>): void {
     this.logger.debug('Restoring line items from budgets', budgets);
+    budgets.forEach(b => {
+      const source = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
+
+      const lineItems = this.programRecommendedCostsModel.prcLineItems.get(source);
+      lineItems.forEach(li => {
+        if (b.supportYear === li.grantAward.year) {
+          li.budgetId = b.id;
+        }
+      });
+    });
   }
 }

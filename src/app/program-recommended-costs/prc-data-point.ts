@@ -34,6 +34,20 @@ export enum PrcBaselineSource {
 }
 
 export class PrcDataPoint {
+  baselineDirect: number;
+  baselineTotal: number;
+  private _recommendedDirect: number;
+  private _recommendedTotal: number;
+  percentCutDirectCalculated = 0.0;
+  percentCutTotalCalculated = 0.0;
+  private _percentCut: number;
+  fundingSource: FundingRequestFundsSrcDto;
+  grantAward: GrantAwardedDto;
+  type: PrcLineItemType;
+  baselineSource: PrcBaselineSource;
+  budgetId: number;
+  fundingRequestId: number;
+
   get recommendedDirect(): number {
     return this._recommendedDirect;
   }
@@ -79,21 +93,6 @@ export class PrcDataPoint {
   }
 
 
-  baselineDirect: number;
-  baselineTotal: number;
-  private _recommendedDirect: number;
-  private _recommendedTotal: number;
-  percentCutDirectCalculated = 0.0;
-  percentCutTotalCalculated = 0.0;
-  private _percentCut: number;
-  fundingSource: FundingRequestFundsSrcDto;
-  grantAward: GrantAwardedDto;
-  type: PrcLineItemType;
-  baselineSource: PrcBaselineSource;
-  budgetId: number;
-  fundingRequestId: number;
-
-
   asBudget(): FundingReqBudgetsDto {
     const result: FundingReqBudgetsDto = {};
     result.dcRecAmt = this._recommendedDirect;
@@ -110,5 +109,7 @@ export class PrcDataPoint {
   fromBudget(b: FundingReqBudgetsDto): void {
     this.budgetId = b.id;
     this.fundingRequestId = b.frqId;
+    this.recommendedDirect = b.dcRecAmt;
+    this.recommendedTotal = b.tcRecAmt;
   }
 }
