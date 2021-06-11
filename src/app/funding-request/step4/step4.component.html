@@ -72,6 +72,15 @@
 
 <div class="row collapse show" id="workflow-collapse">
   <div class="col-12">
+
+    <ngb-alert [dismissible]="false" class="workflow-comments">
+        <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
+        <div class="comment-content">
+            <div class="comment-details">Comment from <strong>Jane Doe</strong> on MM/DD/YYY at HH:MM PM</div>
+            <div>Content of the comment goes here. Make sure this stays in a seperate div from the line above.</div>
+        </div>
+    </ngb-alert>
+
     <div class="form-group">
       <app-next-scheduled-approvers-request [readonly]="readonly" (activeApprover)="setActiveApprover($event)"></app-next-scheduled-approvers-request>
     </div>

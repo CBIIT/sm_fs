@@ -25443,4 +25443,21 @@ table ~ .dt-controls {
   vertical-align: middle;
 }
 
+/* line 359, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.workflow-comments {
+  display: flex;
+  flex-direction: row;
+}
+
+/* line 362, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.workflow-comments .comment-content {
+  margin-left: 1rem;
+}
+
+/* line 364, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.workflow-comments .comment-content .comment-details {
+  font-size: 0.7875rem;
+  font-style: italic;
+}
+
 /*# sourceMappingURL=i2e-common-ui.css.map */
