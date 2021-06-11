@@ -20,10 +20,11 @@ export class RequestInformationComponent implements OnInit {
   }
 
   set selectedRequestType(value: number) {
+    this.logger.debug('request-information-component sees new value', value);
     if (value) {
       this.logger.debug('loading funding sources for type:', value);
       this.fsRequestControllerService.getFundingSourcesUsingGET(
-        this.requestModel.requestDto.financialInfoDto.requestTypeId,
+        value,
         this.requestModel.grant.fullGrantNum,
         // TODO: Which fiscal year do we use? From the grant or current default fy?
         // this.requestModel.grant.fy,

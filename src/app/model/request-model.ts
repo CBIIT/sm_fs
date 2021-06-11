@@ -118,7 +118,7 @@ export class RequestModel {
       errors.push(FundingRequestErrorCodes.REQUEST_TYPE_REQUIRED);
     }
 
-    this.logger.debug('requestorCayCode:', this.requestDto.financialInfoDto.requestorCayCode);
+    // this.logger.debug('requestorCayCode:', this.requestDto.financialInfoDto.requestorCayCode);
     if (!this.requestDto.financialInfoDto.requestorCayCode || this.requestDto.financialInfoDto.requestorCayCode.trim().length === 0) {
       errors.push(FundingRequestErrorCodes.REQUEST_CAY_CODE_REQUIRED);
     }
@@ -136,7 +136,7 @@ export class RequestModel {
   canSave(): boolean {
     const errors = this.getValidationErrors();
     if (errors.length > 0) {
-      this.logger.debug('Validation errors:', errors);
+      // this.logger.debug('Validation errors:', errors);
       return false;
     }
 
@@ -196,14 +196,18 @@ export class RequestModel {
   restoreLineItems(budgets: Array<FundingReqBudgetsDto>): void {
     this.logger.debug('Restoring line items from budgets', budgets);
     budgets.forEach(b => {
+      this.logger.debug('budget', b);
       const source = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
+      console.log('source', source);
 
       const lineItems = this.programRecommendedCostsModel.prcLineItems.get(source);
-      lineItems.forEach(li => {
-        if (b.supportYear === li.grantAward.year) {
-          li.budgetId = b.id;
-        }
-      });
+      if (lineItems) {
+        lineItems.forEach(li => {
+          if (b.supportYear === li.grantAward.year) {
+            li.budgetId = b.id;
+          }
+        });
+      }
     });
   }
 }

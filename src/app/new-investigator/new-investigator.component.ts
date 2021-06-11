@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import {RequestModel} from '../model/request-model';
+import {NGXLogger} from 'ngx-logger';
 
 @Component({
   selector: 'app-new-investigator',
@@ -7,7 +9,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NewInvestigatorComponent implements OnInit {
 
-  constructor() { }
+  get model(): RequestModel {
+    return this.requestModel;
+  }
+
+  constructor(private requestModel: RequestModel, private logger: NGXLogger) { }
 
   ngOnInit(): void {
   }

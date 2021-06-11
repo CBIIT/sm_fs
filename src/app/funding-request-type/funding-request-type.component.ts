@@ -32,8 +32,14 @@ export class FundingRequestTypeComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<number>();
 
   set selectedValue(value: number) {
-    this.logger.debug('Request Type selectedValue setter called: ', value);
+    this.logger.debug('funding-request-type-component sets new value of', value);
+    this.model.requestDto.frtId = value;
+    this.model.requestDto.financialInfoDto.requestTypeId = value;
+    this.model.programRecommendedCostsModel.fundingRequestType = value;
     const valueChanged = this._selectedValue && (value !== this._selectedValue);
+    if (valueChanged) {
+      this.logger.debug('Request type changed from', this._selectedValue, 'to', value);
+    }
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
     this.searchFilter.requestType = String(value);
