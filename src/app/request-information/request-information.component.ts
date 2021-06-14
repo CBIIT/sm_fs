@@ -6,6 +6,8 @@ import {NGXLogger} from 'ngx-logger';
 import {FundingRequestValidationService} from '../model/funding-request-validation-service';
 import {FundingRequestErrorCodes} from '../model/funding-request-error-codes';
 import {FundingRequestTypes} from '../model/funding-request-types';
+import {AlertService} from '../service/alert.service';
+import {Alert} from '../service/alert';
 
 @Component({
   selector: 'app-request-information',
@@ -21,6 +23,7 @@ export class RequestInformationComponent implements OnInit {
 
   set selectedRequestType(value: number) {
     this.logger.debug('request-information-component sees new value', value);
+
     if (value) {
       this.logger.debug('loading funding sources for type:', value);
       this.fsRequestControllerService.getFundingSourcesUsingGET(
@@ -83,6 +86,7 @@ export class RequestInformationComponent implements OnInit {
   }
 
   // TODO: Clarify the pdNpnId vs requestorNpnId
+
   get selectedPd(): number {
     return this.requestModel.requestDto.financialInfoDto.requestorNpnId;
   }
@@ -100,7 +104,8 @@ export class RequestInformationComponent implements OnInit {
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger,
               private fundingRequestValidationService: FundingRequestValidationService,
-              private fsRequestControllerService: FsRequestControllerService) {
+              private fsRequestControllerService: FsRequestControllerService,
+              public alertService: AlertService) {
   }
 
   ngOnInit(): void {

@@ -3,9 +3,14 @@
   <div class="col-12">
     <h2 class="mb-3">Request Information</h2>
   </div>
+  <div class="col-12" *ngFor="let alert of alertService.alerts">
+  <p>
+    <ngb-alert [type]="alert.type" (closed)="alertService.clearAlert(alert)">{{ alert.message }}</ngb-alert>
+  </p>
+  </div>
 
   <div class="col-lg-4">
-    <app-funding-request-type #fundingRequestTypeComponent [(selectedValue)]="selectedRequestType" [filter]="true"></app-funding-request-type>
+    <app-funding-request-type [(selectedValue)]="selectedRequestType" [filter]="true"></app-funding-request-type>
   </div>
 
   <div class="col-lg-6">

@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, Output, EventEmitter, Inject} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FsLookupControllerService} from '@nci-cbiit/i2ecws-lib';
 import 'select2';
 import {SearchFilterService} from '../search/search-filter.service';
@@ -8,6 +8,9 @@ import {openNewWindow} from 'src/app/utils/utils';
 import {NGXLogger} from 'ngx-logger';
 import {Select2OptionData} from 'ng-select2';
 import {FundingRequestTypeRulesDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestTypeRulesDto';
+import {FundingRequestTypes} from '../model/funding-request-types';
+import {Alert} from '../service/alert';
+import {AlertService} from '../service/alert.service';
 
 
 @Component({
@@ -32,6 +35,10 @@ export class FundingRequestTypeComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<number>();
 
   set selectedValue(value: number) {
+    if (value && Number(value) === FundingRequestTypes.OTHER_PAY_COMPETING_ONLY) {
+      // alert('You have chosen \'Other Pay\'');
+      this.alertService.pushAlert({type: 'warning', message: 'You have chosen \'Other Pay\''} as Alert);
+    }
     this.logger.debug('funding-request-type-component sets new value of', value);
     this.model.requestDto.frtId = value;
     this.model.requestDto.financialInfoDto.requestTypeId = value;
@@ -56,7 +63,8 @@ export class FundingRequestTypeComponent implements OnInit {
               private searchFilterService: SearchFilterService,
               private userService: UserService,
               private model: RequestModel,
-              private logger: NGXLogger) {
+              private logger: NGXLogger,
+              private alertService: AlertService) {
   }
 
   ngOnInit(): void {
@@ -130,5 +138,4 @@ export class FundingRequestTypeComponent implements OnInit {
     openNewWindow('assets/docs/PFR-Request-type-definitions.pdf', 'Request_Type_Description');
     return false;
   }
-
 }
