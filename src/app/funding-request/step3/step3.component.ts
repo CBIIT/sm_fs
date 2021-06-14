@@ -132,6 +132,7 @@ export class Step3Component implements OnInit {
     if (this.docDescription !== '') {
       //Upate justification Text
       this.uploadJustification(this.docDescription);
+      this.removeDocType("Justification");
     } else {
 
       for (let i = 0; i < this.selectedFiles.length; i++) {
@@ -235,7 +236,7 @@ export class Step3Component implements OnInit {
     this.documentService.getFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
       result => {
         result.forEach(element => {
-         this.loadJustification(element);
+          this.loadJustification(element);
           this.removeDocType(element.docType);
         });
 
@@ -479,6 +480,8 @@ export class Step3Component implements OnInit {
   deleteJustification() {
     if (this.justificationType == 'text') {
       this.uploadJustification('');
+      this.justificationUploaded = of(false);
+      this.pushDocType('Justification');
     } else {
       this.deleteDoc(this.justificationId, 'Justification');
     }
@@ -503,7 +506,7 @@ export class Step3Component implements OnInit {
   }
 
   editJustification() {
-    
+
     this.showJustification = true;
     this.docDescription = this.justificationText;
   }
