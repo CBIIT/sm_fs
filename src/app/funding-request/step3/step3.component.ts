@@ -195,17 +195,7 @@ export class Step3Component implements OnInit {
           }
 
           this.insertDocOrder(result);
-
-          if (result.docType === 'Other') {
-            this.otherDocsCount++;
-            //If Doc Type is Other, check if there are 3 docs uploaded for this type and then splice it
-            if (this.otherDocsCount == 3) {
-              this.spliceDocType();
-            }
-          } else {
-            this.spliceDocType();
-          }
-
+          this.removeDocType(result.docType);
         }
       },
       err => {
@@ -214,10 +204,24 @@ export class Step3Component implements OnInit {
   }
 
   //Remove Doc Type from the drop down
-  spliceDocType() {
+  removeDocType(docType: string) {
+
+    if (docType === 'Other') {
+      this.otherDocsCount++;
+      if (this.otherDocsCount == 3) {
+        this.spliceDocType(docType)
+      }
+    } else {
+      this.spliceDocType(docType)
+    }
+
+  }
+
+  spliceDocType(docType: string) {
+
     this.DocTypes.forEach(element => {
       element.forEach((e, index) => {
-        if (e.rvLowValue === this._docDto.docType) {
+        if (e.rvLowValue === docType) {
           element.splice(index, 1);
         }
       });
@@ -232,6 +236,8 @@ export class Step3Component implements OnInit {
             this.logger.debug('Loading Document type: ', element.docFilename);
             this.justificationUploaded = of(true);
           }
+
+          this.removeDocType(element.docType);
         });
 
         this.baseTaskList = of(result);
