@@ -132,7 +132,8 @@ export class Step4Component implements OnInit, OnDestroy {
   checkDocs(): void {
     this.justificationMissing = true;
     this.transitionMemoMissing = false;
-    if ( this.requestModel.requestDto.justification ) {
+    if ( this.requestModel.requestDto.justification
+      && this.requestModel.requestDto.justification.length > 0 ) {
       this.justificationMissing = false;
     }
     else {
