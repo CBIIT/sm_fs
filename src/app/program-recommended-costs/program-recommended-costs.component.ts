@@ -300,9 +300,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   propagate(): void {
-    if (!this.initialPay) {
-      return;
-    }
     this.logger.debug('Propagating:', this.lineItem);
     if (this.lineItem.length > 1) {
       const first = this.lineItem[0];
