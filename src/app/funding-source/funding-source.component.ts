@@ -7,6 +7,7 @@ import {Options} from 'select2';
 import {FundingSourceSynchronizerService} from './funding-source-synchronizer-service';
 import {openNewWindow} from '../utils/utils';
 import {NGXLogger} from 'ngx-logger';
+import {FundingSourceTypes} from '../model/funding-source-types';
 
 @Component({
   selector: 'app-funding-source',
@@ -35,11 +36,6 @@ export class FundingSourceComponent implements OnInit {
   set selectedValue(value: number) {
     this._selectedValue = value;
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.next(value);
-
-    // TODO: FS-111
-    // If request type is 30 or 1001 (Other Pay; Special Actions), and the user selects 'Moonshot Funds' (542)
-    // Final LOA will be SPL committee and the final-loa section should be hidden
-    // Can probably use the synchronizer service and evaluate it in the program recommended costs component.
   }
 
   constructor(private requestModel: RequestModel,

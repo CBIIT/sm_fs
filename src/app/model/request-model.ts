@@ -4,6 +4,8 @@ import {AppPropertiesService} from '../service/app-properties.service';
 import {FundingRequestErrorCodes} from './funding-request-error-codes';
 import {NGXLogger} from 'ngx-logger';
 import {ProgramRecommendedCostsModel} from '../program-recommended-costs/program-recommended-costs-model';
+import {FundingSourceTypes} from './funding-source-types';
+import {FundingRequestTypes} from './funding-request-types';
 
 @Injectable({
   providedIn: 'root'
@@ -173,17 +175,31 @@ export class RequestModel {
     this.stepLinkable = [false, false, true, true, true];
   }
 
-  prepareBudgets(): void {
+  prepareBudgetsAndSetFinalLoa(): void {
     this.requestDto.financialInfoDto.fundingReqBudgetsDtos = new Array<FundingReqBudgetsDto>();
+    let isMoonshot = false;
 
     let temp: FundingReqBudgetsDto;
     this.programRecommendedCostsModel.prcLineItems.forEach((value, key) => {
       this.logger.debug('preparing budgets for source', key);
+      if (Number(key.fundingSourceId) === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
+        isMoonshot = true;
+      }
       value.forEach(p => {
         temp = p.asBudget();
         this.requestDto.financialInfoDto.fundingReqBudgetsDtos.push(temp);
       });
     });
+
+    // Set final loa to SPL if MoonShot funds selected and the request is type Other Pay or Special Actions
+    if (isMoonshot && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
+      Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestDto.frtId))) {
+      this.logger.debug('Setting final LOA to SPL Committee');
+      // TODO: figure out which of these should be set and which can be deleted
+      this.requestDto.loaId = 4;
+      this.requestDto.financialInfoDto.loaId = 4;
+    }
+
 
     this.requestDto.financialInfoDto.deleteSources = this.programRecommendedCostsModel.deletedSources;
 

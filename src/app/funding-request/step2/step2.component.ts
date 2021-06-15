@@ -61,7 +61,7 @@ export class Step2Component implements OnInit {
       return;
     }
     // TODO: make sure model is properly constructed
-    this.requestModel.prepareBudgets();
+    this.requestModel.prepareBudgetsAndSetFinalLoa();
     this.logger.debug(JSON.stringify(this.requestModel.requestDto));
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
