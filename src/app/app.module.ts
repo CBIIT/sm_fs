@@ -60,6 +60,7 @@ import { WorkflowModalComponent } from './funding-request/workflow-modal/workflo
 import { RetrieveRequestComponent } from './funding-request/retrieve-request/retrieve-request.component';
 import { Type4ConversionMechanismComponent } from './type4-conversion-mechanism/type4-conversion-mechanism.component';
 import { AlertBillboardComponent } from './alert-billboard/alert-billboard.component';
+import { OpenRequestComponent } from './search/open-request/open-request.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -128,6 +129,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     Type4ConversionMechanismComponent,
     RetrieveRequestComponent,
     AlertBillboardComponent,
+    OpenRequestComponent,
   ],
 
 

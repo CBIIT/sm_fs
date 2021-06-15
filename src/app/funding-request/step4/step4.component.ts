@@ -93,6 +93,12 @@ export class Step4Component implements OnInit, OnDestroy {
     });
     this.isRequestEverSubmitted = submitted;
     this.readonly = this.readonlyStatuses.indexOf(this.requestStatus) > -1;
+    if (this.readonly) {
+      this.requestModel.disableStepLinks();
+    }
+    else {
+      this.requestModel.enableStepLinks();
+    }
     this.changeDetection.detectChanges();
   }
 
