@@ -93,7 +93,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     if (!this.requestModel.programRecommendedCostsModel.grantAwarded) {
       this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
           this.requestModel.programRecommendedCostsModel.grantAwarded = result;
-          // this.this.logger.debug('Appl Periods/Grant awards:', result);
+          this.logger.debug('Appl Periods/Grant awards:', result);
         }, error => {
           // TODO: properly handle errors here
           this.logger.error('HttpClient get request error for----- ' + error.message);

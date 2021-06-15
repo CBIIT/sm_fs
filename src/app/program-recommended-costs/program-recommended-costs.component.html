@@ -12,23 +12,23 @@
           <thead>
           <tr>
             <th scope="row">Fiscal Year</th>
-            <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.year }}</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.year }}</span></th>
           </tr>
           <tr *ngIf="showPiCosts()">
             <th scope="row">PI Requested Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.requestAmount | currency }}</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.requestAmount | currency }}</span></th>
           </tr>
           <tr *ngIf="showPiCosts()">
             <th scope="row">PI Requested Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.requestTotalAmount | currency }}</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.requestTotalAmount | currency }}</span></th>
           </tr>
           <tr *ngIf="showAwardedCosts()">
             <th scope="row">Awarded Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.directAmount | currency }}</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.directAmount | currency }}</span>></th>
           </tr>
           <tr *ngIf="showAwardedCosts()">
             <th scope="row">Awarded Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.totalAwarded | currency }}</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.totalAwarded | currency }}</span></th>
           </tr>
           </thead>
           <tbody>
@@ -127,23 +127,23 @@
           <thead>
           <tr>
             <th scope="row">Fiscal Year</th>
-            <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.year }}</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.year }}</span></th>
           </tr>
           <tr *ngIf="showPiCosts()">
             <th scope="row">PI Requested Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.requestAmount | currency }}</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.requestAmount | currency }}</span></th>
           </tr>
           <tr *ngIf="showPiCosts()">
             <th scope="row">PI Requested Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.requestTotalAmount | currency }}</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.requestTotalAmount | currency }}</span></th>
           </tr>
           <tr *ngIf="showAwardedCosts()">
             <th scope="row">Awarded Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.directAmount | currency }}</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.directAmount | currency }}</span></th>
           </tr>
           <tr *ngIf="showAwardedCosts()">
             <th scope="row">Awarded Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded">{{ ga.totalAwarded | currency }}</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.totalAwarded | currency }}</span></th>
           </tr>
           </thead>
           <tbody>
@@ -315,7 +315,9 @@
                     </div>
                   </div>
                   <ng-template #notFirst>
+                    <span class="read-only-th">
                     {{ li.grantAward.year }}
+                    </span>
                   </ng-template>
                 </th>
               </tr>
@@ -331,7 +333,9 @@
                     </div>
                   </div>
                   <ng-template #notFirst>
+                    <span class="read-only-th">
                     {{ li.grantAward.requestAmount | currency }}
+                    </span>
                   </ng-template>
                 </th>
               </tr>
@@ -347,7 +351,9 @@
                     </div>
                   </div>
                   <ng-template #notFirst>
+                    <span class="read-only-th">
                     {{ li.grantAward.requestTotalAmount | currency }}
+                    </span>
                   </ng-template>
                 </th>
               </tr>
@@ -363,7 +369,9 @@
                     </div>
                   </div>
                   <ng-template #notFirst>
+                    <span class="read-only-th">
                     {{ li.grantAward.directAmount | currency }}
+                    </span>
                   </ng-template>
                 </th>
               </tr>
@@ -379,7 +387,9 @@
                     </div>
                   </div>
                   <ng-template #notFirst>
+                    <span class="read-only-th">
                     {{ li.grantAward.totalAwarded | currency }}
+                    </span>
                   </ng-template>
                 </th>
               </tr>
@@ -472,7 +482,8 @@
                   <div class="fsource-fy1-form" *ngIf="first">
                     <div class="form-row form-inline">
                       <div class="col-sm-auto">
-                        <button type="button" class="btn btn-outline-secondary mt-2" [disabled]="li.recommendedDirect === undefined"
+                        <button type="button" class="btn btn-outline-secondary mt-2"
+                                [disabled]="li.recommendedDirect === undefined"
                                 (click)="propagate()">
                           Copy FY1 DC to Future Years
                         </button>
