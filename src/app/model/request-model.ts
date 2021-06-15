@@ -73,7 +73,7 @@ export class RequestModel {
     this._requestDto.pdNpnId = value.pdNpnId;
 
     this._requestDto.financialInfoDto.applId = value.applId;
-    this._requestDto.financialInfoDto.fy = value.fy;
+    // this._requestDto.financialInfoDto.fy = value.fy;
     // This npnId is what the user supplies in step2; default is the value from the grant
     this._requestDto.financialInfoDto.requestorNpnId = value.pdNpnId;
 
