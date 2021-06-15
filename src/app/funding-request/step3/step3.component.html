@@ -1,5 +1,20 @@
 <div class="row">
 
+    <div *ngIf="showValidations" class="alert alert-danger">
+        Your attempt to upload a file is incomplete. You must either clear the fields identified in red or complete the
+        file upload to proceed.
+
+        <!-- <div *ngIf="name.errors?.required">
+    Name is required.
+  </div>
+  <div *ngIf="name.errors?.minlength">
+    Name must be at least 4 characters long.
+  </div>
+  <div *ngIf="name.errors?.forbiddenName">
+    Name cannot be Bob.
+  </div> -->
+    </div>
+
     <div class="col-lg-4" id="add-docs">
         <h2>Add Docs</h2>
         <p><small class="text-muted">You may upload Microsoft Word, Microsoft Excel, or Adobe Acrobat document(s) only.
@@ -22,13 +37,13 @@
 
         <div class="row">
             <div class="col">
-                    <label for="add-file" class="sr-only">Choose File</label>
-                    <input id="add-file" #inputFile type="file" accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile"
-                        (change)="selectFiles($event)">
+                <label for="add-file" class="sr-only">Choose File</label>
+                <input [ngClass]="[ isFileSelected ? 'has-error' : '']" id="add-file" #inputFile type="file" accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile"
+                    (change)="selectFiles($event)">
             </div>
             <div class="col-sm-auto">
-                <button class="btn btn-primary ml-auto" [disabled]="!selectedFiles"
-                (click)="uploadFiles()">Add Doc</button>
+                <button class="btn btn-primary ml-auto" [disabled]="!selectedFiles" (click)="uploadFiles()">Add
+                    Doc</button>
             </div>
         </div>
 
@@ -39,14 +54,14 @@
 
         <div *ngIf="showJustification" class="form-group mb-2">
             <label for="file-description">Justification Text</label>
-            <textarea class="form-control" maxlength="1000" id="file-description" [disabled]="disableJustification"
+            <textarea class="form-control" [ngClass]="[ isJustificationEntered ? 'has-error' : '']" maxlength="1000" id="file-description" [disabled]="disableJustification"
                 rows="5" (change)="justificationOnChange()" [(ngModel)]="docDescription"></textarea>
             <span class="counter">{{ docDescription.length }}/1000</span>
         </div>
 
-        <div  *ngIf="showJustification" class="d-flex w-100">
-            <button class="btn btn-primary ml-auto" [disabled]="docDescription ===''"
-            (click)="uploadFiles()">Add Text</button>
+        <div *ngIf="showJustification" class="d-flex w-100">
+            <button class="btn btn-primary ml-auto" [disabled]="docDescription ===''" (click)="uploadFiles()">Add
+                Text</button>
         </div>
 
     </div><!-- END left col -->
@@ -77,18 +92,21 @@
                             {{justificationUploadedOn}})</span>
                         <div class="ml-auto">
 
-                            <button *ngIf="justificationType === 'text'" class="btn btn-link btn-slim ml-2"
-                                title="Edit" (click)="editJustification()"><i class="fas fa-pencil" aria-hidden="true"></i></button>
+                            <button *ngIf="justificationType === 'text'" class="btn btn-link btn-slim ml-2" title="Edit"
+                                (click)="editJustification()"><i class="fas fa-pencil" aria-hidden="true"></i></button>
                             <button *ngIf="justificationType === 'text'" class="btn btn-link btn-slim ml-1" title="View"
-                                (click)="open(justificationModal)"><i class="fas fa-eye" aria-hidden="true"></i></button>
+                                (click)="open(justificationModal)"><i class="fas fa-eye"
+                                    aria-hidden="true"></i></button>
                             <button *ngIf="justificationType !== 'text'" class="btn btn-link btn-slim ml-1" title="View"
-                                (click)="downloadFile(justificationId, justificationFileName)"><i class="fas fa-eye" aria-hidden="true"></i></button>
+                                (click)="downloadFile(justificationId, justificationFileName)"><i class="fas fa-eye"
+                                    aria-hidden="true"></i></button>
                             <button class="btn btn-link btn-slim ml-2 btn-delete" title="Delete"
                                 (click)="deleteJustification()"><i class="fas fa-trash" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
-                    <div *ngIf="!(justificationUploaded | async)" class="drag-item drag-item-placeholder drag-item-locked" tabindex="0">
+                    <div *ngIf="!(justificationUploaded | async)"
+                        class="drag-item drag-item-placeholder drag-item-locked" tabindex="0">
                         <span class="doc-name">Justification</span>
                         <span class="doc-desc" [style.color]="'red'">Not Entered/Uploaded</span>
                     </div>
@@ -96,8 +114,8 @@
 
                     <div class="example-container" *ngFor="let lane of swimlanes">
 
-                        <div id="includedId" *ngIf="lane.name==='Included Content'" class="min-height-5"
-                            cdkDropList [cdkDropListData]="lane.array" (cdkDropListDropped)="drop($event)">
+                        <div id="includedId" *ngIf="lane.name==='Included Content'" class="min-height-5" cdkDropList
+                            [cdkDropListData]="lane.array" (cdkDropListDropped)="drop($event)">
 
                             <div class="drag-item" cdkDrag *ngFor="let item of lane.array" tabindex="0">
                                 <span class="doc-name">{{ item.docFilename }}</span>
@@ -169,8 +187,9 @@
 <ng-template #justificationModal let-modal>
     <div class="modal-header">
         <span class="modal-title h4 mb-0" id="i2group-title">Justification Text</span>
-        <button type="button" class="close"  (click)="modal.dismiss('')"><i class="fas fa-times" aria-label="close modal"></i></button>
-     </div>
+        <button type="button" class="close" (click)="modal.dismiss('')"><i class="fas fa-times"
+                aria-label="close modal"></i></button>
+    </div>
     <div class="modal-body">
         {{justificationText}}
     </div>
@@ -182,8 +201,9 @@
 <ng-template #suppAppModal let-modal>
     <div class="modal-header">
         <span class="modal-title h4 mb-0" id="i2group-title">Add Supplement Application from IMPAC II</span>
-        <button type="button" class="close"  (click)="modal.dismiss('')"><i class="fas fa-times" aria-label="close modal"></i></button>
-     </div>
+        <button type="button" class="close" (click)="modal.dismiss('')"><i class="fas fa-times"
+                aria-label="close modal"></i></button>
+    </div>
     <div class="modal-body">
         <table class="table table-striped table-bordered">
             <thead>

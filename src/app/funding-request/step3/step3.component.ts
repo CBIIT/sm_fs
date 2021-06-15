@@ -58,6 +58,9 @@ export class Step3Component implements OnInit {
   maxFileSizeError: string;
   public _docDto: DocumentsDto = {};
   otherDocsCount: number = 0;
+  showValidations: boolean = false;
+  isFileSelected: boolean = false;
+  isJustificationEntered: boolean = false;
 
   @ViewChild('inputFile')
   inputFile: ElementRef;
@@ -171,6 +174,9 @@ export class Step3Component implements OnInit {
     this.docDescription = '';
     this.disableJustification = false;
     this.disableFile = false;
+    this.showValidations = false;
+    this.isJustificationEntered = false;
+    this.isFileSelected = false;
   }
 
   upload(file) {
@@ -415,7 +421,9 @@ export class Step3Component implements OnInit {
   }
 
   onDocTypeChange(event): any {
-    this.logger.debug('Doc Type Change: ', event);
+    console.log('Doc Type Change: ', event);
+    this.inputFile.nativeElement.value = ''
+    this.disableJustification = false;
     if (event === 'Justification') {
       this.showJustification = true;
     } else {
@@ -511,16 +519,35 @@ export class Step3Component implements OnInit {
     this.docDescription = this.justificationText;
   }
 
+  validate(): boolean {
+
+    if (this.docDescription !== '') {
+      this.isJustificationEntered = true;
+    }
+    if (this.inputFile.nativeElement.value !== '') {
+      this.isFileSelected = true;
+    }
+    if (this.docDescription === '' && this.inputFile.nativeElement.value === '') {
+      return true;
+    }
+    return false;
+  }
+
   nextStep(): void {
-    this.documentsControllerService.loadDocumentsBySortOrderUsingGET(this.requestModel.requestDto.frqId).subscribe(
-      result => {
-        this.requestModel.requestDto.includedDocs = result;
-        this.logger.debug('Docs retrieved by doc order: ', result);
-        this.router.navigate(['/request/step4']);
-      }, error => {
-        this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
-      }
-    );
+    if (this.validate()) {
+      this.documentsControllerService.loadDocumentsBySortOrderUsingGET(this.requestModel.requestDto.frqId).subscribe(
+        result => {
+          this.requestModel.requestDto.includedDocs = result;
+          this.logger.debug('Docs retrieved by doc order: ', result);
+          this.router.navigate(['/request/step4']);
+        }, error => {
+          this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
+        }
+      );
+    } else {
+      this.showValidations = true;
+    }
+
   }
 
   prevStep(): void {
