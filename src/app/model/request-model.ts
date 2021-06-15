@@ -66,10 +66,11 @@ export class RequestModel {
     // TODO: map appropriate values from grant to requestDto
     // TODO: remove duplication of values across various DTOs
     this._requestDto.applId = value.applId;
-    this.requestDto.financialInfoDto.applId = value.applId;
     if (!this._requestDto.financialInfoDto) {
       this._requestDto.financialInfoDto = {} as FinancialInfoDtoReq;
     }
+    this.requestDto.financialInfoDto.applId = value.applId;
+
 
     // This is and should always be the PD from the grant
     this._requestDto.pdNpnId = value.pdNpnId;
