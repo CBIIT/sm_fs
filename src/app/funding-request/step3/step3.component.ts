@@ -15,6 +15,7 @@ import { map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
+import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 
 export interface Swimlane {
   name: string;
@@ -131,6 +132,7 @@ export class Step3Component implements OnInit {
     if (this.docDescription !== '') {
       //Upate justification Text
       this.uploadJustification(this.docDescription);
+      this.removeDocType("Justification");
     } else {
 
       for (let i = 0; i < this.selectedFiles.length; i++) {
@@ -160,6 +162,7 @@ export class Step3Component implements OnInit {
       });
 
     this.justificationType = 'text';
+    this.showJustification = false;
   }
 
   reset() {
@@ -203,6 +206,7 @@ export class Step3Component implements OnInit {
       });
   }
 
+
   //Remove Doc Type from the drop down
   removeDocType(docType: string) {
 
@@ -232,11 +236,7 @@ export class Step3Component implements OnInit {
     this.documentService.getFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
       result => {
         result.forEach(element => {
-          if (element.docFilename == 'Justification') {
-            this.logger.debug('Loading Document type: ', element.docFilename);
-            this.justificationUploaded = of(true);
-          }
-
+          this.loadJustification(element);
           this.removeDocType(element.docType);
         });
 
@@ -260,6 +260,22 @@ export class Step3Component implements OnInit {
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
+  }
+
+  loadJustification(element: DocumentsDto) {
+
+    if (element.docFilename == 'Justification') {
+      this.logger.debug('Loading Document type: ', element.docFilename);
+      this.justificationUploaded = of(true);
+    }
+
+    if (this.requestModel.requestDto.justification != null) {
+      console.log(this.requestModel.requestDto.justification);
+      this.justificationUploaded = of(true);
+      this.justificationText = this.requestModel.requestDto.justification;
+      this.docDescription = this.justificationText;
+      this.justificationType = 'text';
+    }
   }
 
   drop(event: CdkDragDrop<DocumentsDto[]>) {
@@ -464,6 +480,8 @@ export class Step3Component implements OnInit {
   deleteJustification() {
     if (this.justificationType == 'text') {
       this.uploadJustification('');
+      this.justificationUploaded = of(false);
+      this.pushDocType('Justification');
     } else {
       this.deleteDoc(this.justificationId, 'Justification');
     }
@@ -485,6 +503,12 @@ export class Step3Component implements OnInit {
     } else {
       return `with: ${reason}`;
     }
+  }
+
+  editJustification() {
+
+    this.showJustification = true;
+    this.docDescription = this.justificationText;
   }
 
   nextStep(): void {

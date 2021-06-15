@@ -57,6 +57,7 @@ import { NewInvestigatorComponent } from './new-investigator/new-investigator.co
 import {ConversionGrantActivityMechComponent} from './conversion-grant-activity-mech/conversion-grant-activity-mech.component';
 import { ScorePctlDisplayPipe } from './pipes/score-pctl-display.pipe';
 import { WorkflowModalComponent } from './funding-request/workflow-modal/workflow-modal.component';
+import { RetrieveRequestComponent } from './funding-request/retrieve-request/retrieve-request.component';
 import { Type4ConversionMechanismComponent } from './type4-conversion-mechanism/type4-conversion-mechanism.component';
 import { AlertBillboardComponent } from './alert-billboard/alert-billboard.component';
 
@@ -125,9 +126,11 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     ScorePctlDisplayPipe,
     WorkflowModalComponent,
     Type4ConversionMechanismComponent,
+    RetrieveRequestComponent,
     AlertBillboardComponent,
-
   ],
+
+
   imports: [
     BrowserModule,
     AppRoutingModule,

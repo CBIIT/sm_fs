@@ -10,7 +10,7 @@ import {AlertService} from '../service/alert.service';
 export class AlertBillboardComponent implements OnInit {
   @Input() alert: Alert;
 
-  constructor(private alertService: AlertService) {
+  constructor(public alertService: AlertService) {
   }
 
   ngOnInit(): void {
