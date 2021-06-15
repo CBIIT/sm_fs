@@ -138,10 +138,13 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   addFundingSource(e): void {
     // TODO: Validation
-    if (this.editing) {
+    this.logger.debug('Selected source', this.selectedSourceId);
+    this.logger.debug('Editing source', this.editing);
+    if (this.editing >= 0) {
       const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[this.editing];
+      this.logger.debug('Original source', edit);
       if (this.selectedSourceId !== edit.fundingSourceId) {
-        this.deleteSource(this.editing);
+        this.deleteSourceUnchecked(this.editing);
         this.editing = undefined;
       }
     }
@@ -154,6 +157,17 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     // @ts-ignore
     $('#add-fsource-modal').modal('hide');
     this.selectedSourceId = undefined;
+  }
+
+  editSource(i: number): void {
+    const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
+    this.editing = i;
+    this.lineItem = this.getLineItem(edit);
+    this.logger.debug('editing line item', this.lineItem);
+    this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
+    this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
+    // @ts-ignore
+    $('#add-fsource-modal').modal('show');
   }
 
   toggleCostDisplay(value: string): void {
@@ -174,15 +188,10 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     }
   }
 
-  editSource(i: number): void {
-    const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
-    this.editing = i;
-    this.lineItem = this.getLineItem(edit);
-    this.logger.debug('editing line item', this.lineItem);
-    this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
-    this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
-    // @ts-ignore
-    $('#add-fsource-modal').modal('show');
+  deleteSourceUnchecked(i: number): void {
+    const saved = this.requestModel.requestDto.frqId ? true : false;
+    const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i, saved);
+    this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed);
   }
 
   isSkipRequest(): boolean {
