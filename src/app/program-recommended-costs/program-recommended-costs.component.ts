@@ -280,13 +280,17 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       // this.logger.debug('missing recommended direct or total');
       return false;
     }
+    if ((this.lineItem[0].recommendedTotal && this.lineItem[0].recommendedDirect)
+      && (this.lineItem[0].recommendedTotal < this.lineItem[0].recommendedDirect)) {
+      return false;
+    }
     return true;
   }
 
   grandTotal(i: number): number {
     let result = 0;
     this.selectedFundingSources.forEach(s => {
-      result += Number(this.getLineItem(s)[i].recommendedTotal);
+      result += Number(this.getLineItem(s)[i].recommendedTotal || 0);
     });
     return result;
   }
@@ -294,7 +298,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   grandTotalDirect(i: number): number {
     let result = 0;
     this.selectedFundingSources.forEach(s => {
-      result += Number(this.getLineItem(s)[i].recommendedDirect);
+      result += Number(this.getLineItem(s)[i].recommendedDirect || 0);
     });
     return result;
   }
