@@ -4,9 +4,6 @@
     </div>
     <div class="row">
         <p *ngIf="!searchResult">No results to display. Try applying a filter above and clicking "Search."</p>
-        <p>{{searchResult|json}}</p>
-
-
          <table datatable [dtOptions]="dtOptions" class="row-border hover">
             <thead>
               <tr>
