@@ -20,8 +20,6 @@ export class FundingSourceComponent implements OnInit {
   _selectedValue: number;
   options: Options;
 
-  // TODO: evaluate getters and setters for removal since they just pass through to underlying model anyway
-
   get selectedFundingSources(): Set<number> {
     return this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds;
   }

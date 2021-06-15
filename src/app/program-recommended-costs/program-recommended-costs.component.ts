@@ -153,6 +153,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(this.selectedSourceId);
     // @ts-ignore
     $('#add-fsource-modal').modal('hide');
+    this.selectedSourceId = undefined;
   }
 
   toggleCostDisplay(value: string): void {
@@ -257,7 +258,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
    * So we will just preemptively remove any selected sources again.
    */
   cleanUpSources(): void {
+    this.logger.debug('cleanup time');
     this.editing = undefined;
+    this.selectedSourceId = undefined;
     this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(s => {
       this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(s.fundingSourceId);
     });
@@ -314,17 +317,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
           } else {
             li.recommendedDirect = first.recommendedDirect;
           }
-        }
-      });
-    }
-  }
-
-  propagateManually(): void {
-    if (this.lineItem.length > 1) {
-      const first = this.lineItem[0];
-      this.lineItem.forEach((li, index) => {
-        if (index !== 0) {
-          li.recommendedDirect = first.recommendedDirect;
         }
       });
     }
