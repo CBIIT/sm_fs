@@ -36,8 +36,10 @@ export class FundingRequestTypeComponent implements OnInit {
 
   set selectedValue(value: number) {
     if (value && Number(value) === FundingRequestTypes.OTHER_PAY_COMPETING_ONLY) {
-      // alert('You have chosen \'Other Pay\'');
-      this.alertService.pushAlert({type: 'warning', message: 'You have chosen \'Other Pay\''} as Alert);
+      this.alertService.pushAlert({
+        type: 'warning',
+        message: 'WARNING: This option should be selected only if your request will not be using any NCI funds. Are you sure you want to continue?'
+      } as Alert);
     }
     this.logger.debug('funding-request-type-component sets new value of', value);
     this.model.requestDto.frtId = value;
