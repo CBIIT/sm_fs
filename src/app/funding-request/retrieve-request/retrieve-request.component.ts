@@ -11,6 +11,7 @@ import { RequestModel } from 'src/app/model/request-model';
 })
 export class RetrieveRequestComponent implements OnInit {
   frqId: number;
+  error = '';
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -34,8 +35,11 @@ export class RetrieveRequestComponent implements OnInit {
         },
         (error) => {
           this.logger.error('retrieveFundingRequest failed ', error);
+          this.error = 'not found';
         }
       );
+    } else {
+      this.error = 'not found';
     }
 
   }

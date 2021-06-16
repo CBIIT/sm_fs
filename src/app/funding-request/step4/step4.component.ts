@@ -40,6 +40,7 @@ export class Step4Component implements OnInit, OnDestroy {
 
   userCanSubmit = false;
   userCanDelete = false;
+  userReadonly = true;
   justificationMissing = false;
   transitionMemoMissing = false;
 
@@ -92,7 +93,7 @@ export class Step4Component implements OnInit, OnDestroy {
 
     });
     this.isRequestEverSubmitted = submitted;
-    this.readonly = this.readonlyStatuses.indexOf(this.requestStatus) > -1;
+    this.readonly = (this.userReadonly) || (this.readonlyStatuses.indexOf(this.requestStatus) > -1);
     if (this.readonly) {
       this.requestModel.disableStepLinks();
     }
@@ -112,12 +113,14 @@ export class Step4Component implements OnInit, OnDestroy {
       this.logger.debug('Neither PD or PA, submit & delete = false');
       this.userCanDelete = false;
       this.userCanSubmit = false;
+      this.userReadonly = true;
       return;
     }
     else if ( isPd && userNpnId === this.requestModel.requestDto.requestorNpnId ) {
       this.logger.debug('PD & is this requestor, submit & delete = true');
       this.userCanSubmit = true;
       this.userCanDelete = true;
+      this.userReadonly = false;
       return;
     }
     else if (isPd && (userCas !== null ) && ( userCas.length > 0)
@@ -125,12 +128,21 @@ export class Step4Component implements OnInit, OnDestroy {
         this.logger.debug('PD & CA matches request\'s CA, submit & delete = true');
         this.userCanSubmit = true;
         this.userCanDelete = true;
+        this.userReadonly = false;
         return;
     }
     else if (isPa && userId === this.requestModel.requestDto.requestCreateUserId ) {
       this.logger.debug('PA & is request creator, submit = false, delete = true');
       this.userCanSubmit = false;
       this.userCanDelete = true;
+      this.userReadonly = false;
+      return;
+    }
+    else {
+      this.logger.debug('PD or PA but not the right ones, submit & delete = false');
+      this.userCanDelete = false;
+      this.userCanSubmit = false;
+      this.userReadonly = true;
       return;
     }
   }
