@@ -61,6 +61,7 @@ export class Step3Component implements OnInit {
   showValidations: boolean = false;
   isFileSelected: boolean = false;
   isJustificationEntered: boolean = false;
+  isTypeSelected: boolean = false;
 
   @ViewChild('inputFile')
   inputFile: ElementRef;
@@ -177,6 +178,7 @@ export class Step3Component implements OnInit {
     this.showValidations = false;
     this.isJustificationEntered = false;
     this.isFileSelected = false;
+    this.isTypeSelected = false;
   }
 
   upload(file) {
@@ -424,6 +426,7 @@ export class Step3Component implements OnInit {
     console.log('Doc Type Change: ', event);
     this.inputFile.nativeElement.value = ''
     this.disableJustification = false;
+    this.isTypeSelected = false;
     if (event === 'Justification') {
       this.showJustification = true;
     } else {
@@ -527,7 +530,10 @@ export class Step3Component implements OnInit {
     if (this.inputFile.nativeElement.value !== '') {
       this.isFileSelected = true;
     }
-    if (this.docDescription === '' && this.inputFile.nativeElement.value === '') {
+    if (this.selectedDocType !== '') {
+      this.isTypeSelected = true;
+    }
+    if (!this.isJustificationEntered && !this.isFileSelected && !this.isTypeSelected) {
       return true;
     }
     return false;
