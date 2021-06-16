@@ -419,6 +419,8 @@
                 </th>
               </tr>
               </thead>
+
+
               <tbody>
               <tr *ngIf="isRestoration()">
                 <td></td>
@@ -516,8 +518,8 @@
                     </div>
                   </div>
                   <ng-template #notFirst>
-                    <div class="col-sm-auto">
-                      <input type="text" class="form-control funds-input" id="tc-dollar"
+                    <div class="d-flex">
+                        <input type="text" class="form-control funds-input ml-auto" aria-label="direct cost"
                              [(ngModel)]="li.recommendedDirect"
                              aria-describedby="tc-dollar-percent">
                     </div>
@@ -583,9 +585,9 @@
                   <div class="fsource-fy1-form" *ngIf="first">
                     <div class="form-row form-inline">
                       <div class="col-sm-auto">
-                        <button type="button" class="btn btn-primary" [disabled]="li.recommendedDirect === undefined"
+                        <button type="button" class="btn btn-outline-secondary mt-2" [disabled]="li.recommendedDirect === undefined"
                                 (click)="propagate()">
-                          Copy FY1 Direct Cost to Future Years
+                                Copy FY1 DC to Future Years
                         </button>
                       </div>
                     </div>
