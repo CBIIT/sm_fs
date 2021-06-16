@@ -195,13 +195,7 @@ export class Step3Component implements OnInit {
             });
           } else {
             if (this._docDto.docType === 'Justification') {
-              this.justificationUploaded = of(true);
-              this.justificationType = 'file';
-              this.justificationEnteredBy = result.uploadByName;
-              this.justificationEnteredByEmail = result.uploadByEmail;
-              this.justificationFileName = result.docFilename;
-              this.justificationUploadedOn = result.createDate;
-              this.justificationId = result.id;
+              this.loadJustification(result);
             }
           }
 
@@ -250,7 +244,7 @@ export class Step3Component implements OnInit {
 
         this.baseTaskList = of(result);
         this.include = this.baseTaskList.pipe(
-          map(tasks => tasks.filter(task => task.included === 'Y'))
+          map(tasks => tasks.filter(task => task.included === 'Y' && task.docType !== 'Justification'))
         );
         this.exclude = this.baseTaskList.pipe(
           map(tasks => tasks.filter(task => task.included === 'N'))
@@ -272,9 +266,15 @@ export class Step3Component implements OnInit {
 
   loadJustification(element: DocumentsDto) {
 
-    if (element.docFilename == 'Justification') {
+    if (element.docType === 'Justification') {
       this.logger.debug('Loading Document type: ', element.docFilename);
       this.justificationUploaded = of(true);
+      this.justificationType = 'file';
+      this.justificationEnteredBy = element.uploadByName;
+      this.justificationEnteredByEmail = element.uploadByEmail;
+      this.justificationFileName = element.docFilename;
+      this.justificationUploadedOn = element.createDate;
+      this.justificationId = element.id;
     }
 
     if (this.requestModel.requestDto.justification != null) {
