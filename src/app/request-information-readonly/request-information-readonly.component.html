@@ -70,7 +70,7 @@
     <br>
   </div>
 
-  <div class="col-12">
+  <div class="col-12" *ngIf=(model.requestDto.comments)>
     <div class="form-group">
       <p class="like-label">Request Comments</p>
       <p>{{ model.requestDto.comments }}</p>
