@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
@@ -15,6 +15,7 @@ import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequ
 import {FundingSourceTypes} from '../model/funding-source-types';
 import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point';
 import {PRC_DISPLAY_FORMAT} from './program-recommended-costs-model';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 
 
 @Component({
@@ -22,7 +23,9 @@ import {PRC_DISPLAY_FORMAT} from './program-recommended-costs-model';
   templateUrl: './program-recommended-costs.component.html',
   styleUrls: ['./program-recommended-costs.component.css']
 })
-export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
+
+  programRecommendedCostsEntryForm: FormGroup;
 
   _selectedDocs: string;
   initialPay: boolean;
@@ -31,11 +34,12 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   _percentCut: number;
   _directCost: number;
   _totalCost: number;
-  private selectedSourceId: number;
+  public selectedSourceId: number;
   lineItem: PrcDataPoint[];
 
   private editing: number;
   @Input() readOnlyView = false;
+  public modalSourceId: number;
 
   get selectedFundingSources(): FundingRequestFundsSrcDto[] {
     return this.requestModel.programRecommendedCostsModel.selectedFundingSources;
@@ -74,9 +78,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
               private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
   }
 
-  ngAfterViewInit(): void {
-  }
-
   ngOnDestroy(): void {
     // this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.unsubscribe();
   }
@@ -99,12 +100,15 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
           this.logger.error('HttpClient get request error for----- ' + error.message);
         }
       );
+      this.initializeReactiveForm();
+
     }
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
       this.selectedSourceId = selection;
     });
   }
+
 
   get grant(): NciPfrGrantQueryDto {
     return this.requestModel.grant;
@@ -136,7 +140,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.RESTORATION_OF_A_FUTURE_YEAR);
   }
 
-  addFundingSource(e): void {
+  addFundingSource(): void {
     // TODO: Validation
     this.logger.debug('Selected source', this.selectedSourceId);
     this.logger.debug('Editing source', this.editing);
@@ -330,4 +334,30 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       });
     }
   }
+
+
+  private initializeReactiveForm(): void {
+    this.programRecommendedCostsEntryForm = new FormGroup({
+      'recommendedDirect': new FormControl(null, [Validators.required, this.isNumericValue.bind(this)]),
+      'recommendedTotal': new FormControl(null),
+      'percentCut': new FormControl(null),
+      'fundingSourceSelect': new FormControl(null, [Validators.required])
+    });
+  }
+
+  onSubmit(): void {
+    this.logger.debug(this.programRecommendedCostsEntryForm);
+    if (this.programRecommendedCostsEntryForm.valid) {
+      this.addFundingSource();
+    }
+  }
+
+  isNumericValue(control: FormControl): { [s: string]: boolean } {
+    this.logger.debug('evaluating', control.value);
+    if (isNaN(Number(control.value))) {
+      return {'valueNotNumeric': true};
+    }
+    return null;
+  }
+
 }

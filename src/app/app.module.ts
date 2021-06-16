@@ -1,12 +1,12 @@
 import {APP_INITIALIZER, NgModule} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {ApiModule, BASE_PATH} from '@nci-cbiit/i2ecws-lib';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {NgSelect2Module} from 'ng-select2';
-import {I2ecuiLibModule} from '@nci-cbiit/i2ecui-lib';
+import {GwbLinksService, I2ecuiLibModule} from '@nci-cbiit/i2ecui-lib';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {HeaderComponent} from './header/header.component';
 import {SearchFilterComponent} from './search/search-filter/search-filter.component';
@@ -51,16 +51,15 @@ import {FinalLoaComponent} from './final-loa/final-loa.component';
 import {LoggerModule, NgxLoggerLevel} from 'ngx-logger';
 import {SkippedGrantsComponent} from './skipped-grants/skipped-grants.component';
 import {FooterComponent} from './footer/footer.component';
-import {GwbLinksService} from '@nci-cbiit/i2ecui-lib';
-import { DiversitySupplementComponent } from './diversity-supplement/diversity-supplement.component';
-import { NewInvestigatorComponent } from './new-investigator/new-investigator.component';
+import {DiversitySupplementComponent} from './diversity-supplement/diversity-supplement.component';
+import {NewInvestigatorComponent} from './new-investigator/new-investigator.component';
 import {ConversionGrantActivityMechComponent} from './conversion-grant-activity-mech/conversion-grant-activity-mech.component';
-import { ScorePctlDisplayPipe } from './pipes/score-pctl-display.pipe';
-import { WorkflowModalComponent } from './funding-request/workflow-modal/workflow-modal.component';
-import { RetrieveRequestComponent } from './funding-request/retrieve-request/retrieve-request.component';
-import { Type4ConversionMechanismComponent } from './type4-conversion-mechanism/type4-conversion-mechanism.component';
-import { AlertBillboardComponent } from './alert-billboard/alert-billboard.component';
-import { OpenRequestComponent } from './search/open-request/open-request.component';
+import {ScorePctlDisplayPipe} from './pipes/score-pctl-display.pipe';
+import {WorkflowModalComponent} from './funding-request/workflow-modal/workflow-modal.component';
+import {RetrieveRequestComponent} from './funding-request/retrieve-request/retrieve-request.component';
+import {Type4ConversionMechanismComponent} from './type4-conversion-mechanism/type4-conversion-mechanism.component';
+import {AlertBillboardComponent} from './alert-billboard/alert-billboard.component';
+import {OpenRequestComponent} from './search/open-request/open-request.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -142,6 +141,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     NgSelect2Module,
     NgbModule,
     FormsModule,
+    ReactiveFormsModule,
     DataTablesModule,
     DragDropModule,
     LoggerModule.forRoot({

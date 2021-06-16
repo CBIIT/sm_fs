@@ -7,7 +7,7 @@ import {Options} from 'select2';
 import {FundingSourceSynchronizerService} from './funding-source-synchronizer-service';
 import {openNewWindow} from '../utils/utils';
 import {NGXLogger} from 'ngx-logger';
-import {FundingSourceTypes} from '../model/funding-source-types';
+import {FormGroup} from '@angular/forms';
 
 @Component({
   selector: 'app-funding-source',
@@ -16,8 +16,10 @@ import {FundingSourceTypes} from '../model/funding-source-types';
 })
 export class FundingSourceComponent implements OnInit {
 
+  @Input() parentForm: FormGroup;
+
   @Input() label = 'Funding Source';
-  @Input() name = '';
+  @Input() name = 'fundingSourceComponent';
   _selectedValue: number;
   options: Options;
 
@@ -94,5 +96,8 @@ export class FundingSourceComponent implements OnInit {
     return this.fundingSources.filter(f => {
       return !this.selectedFundingSources.has(Number(f.fundingSourceId));
     });
+  }
+
+  onSubmit(): void {
   }
 }
