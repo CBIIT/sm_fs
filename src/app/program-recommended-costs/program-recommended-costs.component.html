@@ -605,11 +605,10 @@
                     <div class="fsource-fy1-form" *ngIf="first">
                       <div class="form-row form-inline">
                         <div class="col-sm-auto">
-                          <button
-                            type="button"
-                            class="btn-outline-secondary mt-2"
-                            [disabled]="li.recommendedDirect === undefined"
-                            (click)="propagate()">
+                          <button type="button"
+                                  class="btn btn-outline-secondary mt-2"
+                                  [disabled]="li.recommendedDirect === undefined"
+                                  (click)="propagate()">
                             Copy FY1 DC to Future Years
                           </button>
                         </div>
