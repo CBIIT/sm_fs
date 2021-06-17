@@ -335,11 +335,12 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   private initializeReactiveForm(): void {
     this.programRecommendedCostsEntryForm = new FormGroup({
-      'recommendedDirect': new FormControl(null, [Validators.required, this.isNumericValue.bind(this)]),
-      'recommendedTotal': new FormControl(null),
+      'dollarValues': new FormGroup({
+        'recommendedDirect': new FormControl(null, [Validators.required, this.isNumericValue.bind(this)]),
+        'recommendedTotal': new FormControl(null)
+      }),
       'percentCut': new FormControl(null),
       'fundingSourceSelect': new FormControl(null, [Validators.required])
     });
