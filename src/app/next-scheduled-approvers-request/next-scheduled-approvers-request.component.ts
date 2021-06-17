@@ -109,6 +109,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
       this.createMainApprovers();
     }
     else if (this.requestModel.recreateMainApproverNeeded) {
+      this.logger.debug('needs to recreate main approvers because of changes in funding request');
       this.workflowControllerService.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
         () => {
           this.requestModel.mainApproverCreated = false;
@@ -119,7 +120,10 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     }
     else {
       this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
-        (result) => { this.processApproversResult(result); },
+        (result) => {
+          this.processApproversResult(result);
+          this.requestModel.setApproverCriteria();
+        },
         (error) => {
           this.logger.error('Error calling createRequestApprovers', error);
         }
@@ -149,6 +153,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     this.workflowControllerService.createRequestApproversUsingPOST(workflowDto).subscribe(
       (result) => {
         this.requestModel.mainApproverCreated = true;
+        this.requestModel.setApproverCriteria();
         this.processApproversResult(result);
         this.logger.debug('Main approvers are created: ', result);
       },

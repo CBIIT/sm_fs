@@ -31,14 +31,34 @@ export class RequestModel {
 
   // approver stuff
   mainApproverCreated = false;
+  approverCriteria: any = {};
   // note, element 0 is not used, element 1 represents step1 and so on.
   private stepLinkable = [false, false, false, false, false];
 
   get recreateMainApproverNeeded(): boolean {
     // need to have logic to determine something changed in request that
-    // warrants deletion and recreate of main approvers
-    const somethingChanged = false;
-    return this.mainApproverCreated && somethingChanged;
+    // warrants deletion and recreate of main approvers =
+    return this.mainApproverCreated && this.approverCriteriaChanged();
+  }
+
+  approverCriteriaChanged(): boolean {
+    const newCriteria = this.captureApproverCriteria();
+    return  newCriteria.requestType !== this.approverCriteria.requestType
+                || newCriteria.cayCode !== this.approverCriteria.cayCode
+                || newCriteria.fundingSources !== this.approverCriteria.fundingSources;
+  }
+
+  captureApproverCriteria(): any {
+    const approverCriteria: any = {};
+    approverCriteria.requestType = this.requestDto.financialInfoDto.requestTypeId;
+    approverCriteria.cayCode = this.requestDto.cayCode;
+    approverCriteria.fundingSources = Array.from(this._programRecommendedCostsModel.selectedFundingSourceIds);
+    approverCriteria.fundingSources.sort();
+    return approverCriteria;
+  }
+
+  setApproverCriteria(): void {
+    this.approverCriteria = this.captureApproverCriteria();
   }
 
   get requestType(): string {
