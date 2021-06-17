@@ -154,7 +154,7 @@ export class Step4Component implements OnInit, OnDestroy {
       && this.requestModel.requestDto.justification.length > 0 ) {
       this.justificationMissing = false;
     }
-    else {
+    else if (this.docDtos && this.docDtos.length > 0 ){
       for (const doc of this.docDtos)  {
         if (doc.docType === 'Justification') {
           this.justificationMissing = false;
@@ -165,10 +165,12 @@ export class Step4Component implements OnInit, OnDestroy {
 
     if (this.requestModel.requestDto.requestType.indexOf('Pay Type 4') > -1) {
       this.transitionMemoMissing = true;
-      for (const doc of this.docDtos) {
-        if (doc.docType === 'TransitionMemo') {
-          this.transitionMemoMissing = false;
-          break;
+      if (this.docDtos && this.docDtos.length > 0) {
+        for (const doc of this.docDtos) {
+          if (doc.docType === 'TransitionMemo') {
+            this.transitionMemoMissing = false;
+            break;
+          }
         }
       }
     }

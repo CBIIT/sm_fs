@@ -43,23 +43,28 @@ export class RequestModel {
   }
 
   approverCriteriaChanged(): boolean {
-    const newCriteria = this.captureApproverCriteria();
+    const newCriteria = this.makeApproverCriteria();
+    this.logger.debug('new approver criteria ', newCriteria);
+    this.logger.debug('prior approver criteria ', this.approverCriteria);
     return  newCriteria.requestType !== this.approverCriteria.requestType
                 || newCriteria.cayCode !== this.approverCriteria.cayCode
                 || newCriteria.fundingSources !== this.approverCriteria.fundingSources;
   }
 
-  captureApproverCriteria(): any {
+  makeApproverCriteria(): any {
     const approverCriteria: any = {};
     approverCriteria.requestType = this.requestDto.financialInfoDto.requestTypeId;
     approverCriteria.cayCode = this.requestDto.cayCode;
-    approverCriteria.fundingSources = Array.from(this._programRecommendedCostsModel.selectedFundingSourceIds);
-    approverCriteria.fundingSources.sort();
+    const fundingSources = Array.from(this._programRecommendedCostsModel.selectedFundingSourceIds);
+    fundingSources.sort();
+    approverCriteria.fundingSources = fundingSources.join(',');
+    // from the create_main_approvers sp, it seems otherDocs has no effect on funding request approvers,
+    // only affects funding plan approvers, needs double check with David and Subashini.
     return approverCriteria;
   }
 
-  setApproverCriteria(): void {
-    this.approverCriteria = this.captureApproverCriteria();
+  captureApproverCriteria(): void {
+    this.approverCriteria = this.makeApproverCriteria();
   }
 
   get requestType(): string {

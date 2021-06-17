@@ -122,7 +122,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
       this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
         (result) => {
           this.processApproversResult(result);
-          this.requestModel.setApproverCriteria();
+          this.requestModel.captureApproverCriteria();
         },
         (error) => {
           this.logger.error('Error calling createRequestApprovers', error);
@@ -153,7 +153,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     this.workflowControllerService.createRequestApproversUsingPOST(workflowDto).subscribe(
       (result) => {
         this.requestModel.mainApproverCreated = true;
-        this.requestModel.setApproverCriteria();
+        this.requestModel.captureApproverCriteria();
         this.processApproversResult(result);
         this.logger.debug('Main approvers are created: ', result);
       },
