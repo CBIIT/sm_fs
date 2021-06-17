@@ -23,14 +23,14 @@ import { WorkflowModalComponent } from '../workflow-modal/workflow-modal.compone
 })
 export class Step4Component implements OnInit, OnDestroy {
 
-  @ViewChild('submitSuccess') submitSuccess: ElementRef;
+  @ViewChild('submitResult') submitResultElement: ElementRef;
   @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   isRequestEverSubmitted = false;
   requestHistorySubscriber: Subscription;
-  submissionResult = { frqId: null, approver: null };
-  // dv = true;
+  submissionResult: {status: 'success'|'failure'|'', frqId?: number, approver?: FundingReqApproversDto, errorMessage?: string}
+                    = {status: ''};
   requestStatus: string;
   docDtos: DocumentsDto[];
   readonly = false;
@@ -219,14 +219,19 @@ export class Step4Component implements OnInit, OnDestroy {
     this.fsRequestService.submitRequestUsingPOST(submissionDto).subscribe(
       (result) => {
         this.logger.debug('Submit Request result: ', result);
-        this.submissionResult = { frqId: submissionDto.frqId, approver: this.activeApprover };
+        this.submissionResult = { status: 'success', frqId: submissionDto.frqId, approver: this.activeApprover };
         this.requestIntegrationService.requestSubmissionEmitter.next(submissionDto.frqId);
-        this.submitSuccess.nativeElement.scrollIntoView();
+        this.submitResultElement.nativeElement.scrollIntoView();
         this.readonly = true;
         this.requestModel.disableStepLinks();
       },
       (error) => {
         this.logger.error('Failed when calling submitRequestUsingPOST', error);
+        this.submissionResult = {status: 'failure'};
+        if (error.error) {
+          this.submissionResult.errorMessage = error.error.errorMessage;
+        }
+        this.submitResultElement.nativeElement.scrollIntoView();
       });
   }
 
