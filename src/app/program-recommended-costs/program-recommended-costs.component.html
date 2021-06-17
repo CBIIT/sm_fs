@@ -528,8 +528,11 @@
                       </div>
                     </div>
                     <ng-template #notFirst>
-                      <div class="col-sm-auto">
-                        <input type="text" class="form-control funds-input" id="tc-dollar3"
+                      <div class="d-flex">
+                        <input type="text"
+                               class="form-control funds-input ml-auto"
+                               id="tc-dollar3"
+                               aria-label="direct cost"
                                [(ngModel)]="li.recommendedDirect"
                                formControlName="recommendedDirect"
                                aria-describedby="tc-dollar-percent">
@@ -558,16 +561,6 @@
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <ng-template #notFirst>
-                    <div class="d-flex">
-                        <input type="text" class="form-control funds-input ml-auto" aria-label="direct cost"
-                             [(ngModel)]="li.recommendedDirect"
-                             aria-describedby="tc-dollar-percent">
-                    </div>
-                  </ng-template>
-
-                </td>
 
                     <div class="fsource-fy1-form mb-2" *ngIf="first">
                       <div class="form-row form-inline">
@@ -607,8 +600,11 @@
                     <div class="fsource-fy1-form" *ngIf="first">
                       <div class="form-row form-inline">
                         <div class="col-sm-auto">
-                          <button type="button" class="btn btn-primary" [disabled]="li.recommendedDirect === undefined"
-                                  (click)="propagate()">
+                          <button
+                            type="button"
+                            class="btn-outline-secondary mt-2"
+                            [disabled]="li.recommendedDirect === undefined"
+                            (click)="propagate()">
                             Copy FY1 DC to Future Years
                           </button>
                         </div>
@@ -616,7 +612,9 @@
                     </div>
                     <ng-template #notFirst>
                       <div class="col-sm-auto">
-                        <input type="text" class="form-control funds-input" id="tc-dollar"
+                        <input type="text"
+                               class="form-control funds-input"
+                               id="tc-dollar"
                                [(ngModel)]="li.recommendedDirect"
                                formControlName="recommendedDirect"
                                aria-describedby="tc-dollar-percent">
@@ -635,9 +633,9 @@
                     (click)="cleanUpSources()">
               Close
             </button>
-<!--            <button type="submit" class="btn btn-primary" [disabled]="!canSave()" (click)="addFundingSource()">Add-->
-<!--              Funding Source-->
-<!--            </button>-->
+            <!--            <button type="submit" class="btn btn-primary" [disabled]="!canSave()" (click)="addFundingSource()">Add-->
+            <!--              Funding Source-->
+            <!--            </button>-->
             <input type="submit" class="btn btn-primary" value="Add Funding Source">
           </div>
         </div>
