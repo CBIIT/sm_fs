@@ -41,14 +41,11 @@ export class FundingRequestTypeComponent implements OnInit {
         message: 'WARNING: This option should be selected only if your request will not be using any NCI funds. Are you sure you want to continue?'
       } as Alert);
     }
-    this.logger.debug('funding-request-type-component sets new value of', value);
     this.model.requestDto.frtId = value;
     this.model.requestDto.financialInfoDto.requestTypeId = value;
     this.model.programRecommendedCostsModel.fundingRequestType = value;
     const valueChanged = this._selectedValue && (value !== this._selectedValue);
-    if (valueChanged) {
-      this.logger.debug('Request type changed from', this._selectedValue, 'to', value);
-    }
+
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
     this.searchFilter.requestType = String(value);
@@ -56,7 +53,6 @@ export class FundingRequestTypeComponent implements OnInit {
     this.model.requestDto.financialInfoDto.requestTypeId = value;
     this.model.programRecommendedCostsModel.fundingRequestType = value;
     if (valueChanged) {
-      this.logger.debug('Reset PRC model');
       this.model.programRecommendedCostsModel.reset();
     }
   }
@@ -70,12 +66,10 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.debug('init request types');
     this.searchFilter = this.searchFilterService.searchFilter;
 
     this.evoke(this.filter).subscribe(
       result => {
-        // this.logger.debug('Request Types results: ', result);
         if (this.filter) {
           this.requestTypes = result.fundingRequestTypeRulesDtoList;
         } else {
@@ -91,7 +85,6 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   prepareData(list: FundingRequestTypeRulesDto[]): void {
-    // this.logger.debug('Preparing funding type data');
     const results = new Array<Select2OptionData>();
     const children = new Map<number, Select2OptionData[]>();
     let tmp: Select2OptionData;
@@ -123,7 +116,6 @@ export class FundingRequestTypeComponent implements OnInit {
         r.children = c;
       }
     });
-    // this.logger.debug(results);
     this.data = results;
   }
 

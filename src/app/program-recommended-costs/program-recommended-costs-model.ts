@@ -67,7 +67,6 @@ export class ProgramRecommendedCostsModel {
   }
 
   set fundingSources(value: FundingRequestFundsSrcDto[]) {
-    // this.logger.debug('Setting funding sources and preparing detail map');
     this._fundingSources = value;
     this._fundingSourcesMap = new Map(value.map(key => [key.fundingSourceId, key] as [number, FundingRequestFundsSrcDto]));
   }
@@ -83,11 +82,10 @@ export class ProgramRecommendedCostsModel {
   deleteFundingSourceByIndex(index: number, saved: boolean): number {
     const removed = this._selectedFundingSources[index];
     if (!removed) {
-      this.logger.error('No funding source found for removal at index ', index);
+      this.logger.warn('No funding source found for removal at index ', index);
     } else {
       this._selectedFundingSources.splice(index, 1);
       this.prcLineItems.delete(removed);
-      this.logger.debug(this.prcLineItems);
     }
     if (saved) {
       this.deletedSources.push(removed.fundingSourceId);
@@ -108,7 +106,6 @@ export class ProgramRecommendedCostsModel {
     });
 
     this.prcLineItems.set(source, dataPoints);
-    this.logger.debug(this.prcLineItems);
 
     return true;
   }
