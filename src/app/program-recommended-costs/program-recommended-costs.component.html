@@ -430,12 +430,12 @@
                         <div class="col left-label">
                           <label for="dc-dollar1">Direct Cost</label>
                         </div>
-                        <div class="col-sm-auto" formGroupName="dollarValues">
+                        <div class="col-sm-auto" formArrayName="recommendedDirect">
                           <input
                             type="text"
                             class="form-control funds-input"
                             [(ngModel)]="li.recommendedDirect"
-                            formControlName="recommendedDirect"
+                            [formControlName]="i"
                             id="dc-dollar1"
                             aria-describedby="dc-dollar-percent">
                         </div>
@@ -447,7 +447,7 @@
                         <div class="col left-label">
                           <label for="tc-dollar1">Total Cost</label>
                         </div>
-                        <div class="col-sm-auto" formGroupName="dollarValues">
+                        <div class="col-sm-auto">
                           <input
                             type="text"
                             class="form-control funds-input"
@@ -488,12 +488,12 @@
                         <div class="col left-label">
                           <label for="dc-dollar">Direct Cost</label>
                         </div>
-                        <div class="col-sm-auto" formGroupName="dollarValues">
+                        <div class="col-sm-auto" formArrayName="recommendedDirect">
                           <input
                             type="text"
                             class="form-control funds-input"
                             [(ngModel)]="li.recommendedDirect"
-                            formControlName="recommendedDirect"
+                            [formControlName]="i"
                             id="dc-dollar"
                             aria-describedby="dc-dollar-percent">
                         </div>
@@ -508,7 +508,7 @@
                         <div class="col left-label">
                           <label for="tc-dollar2">Total Cost</label>
                         </div>
-                        <div class="col-sm-auto" formGroupName="dollarValues">
+                        <div class="col-sm-auto">
                           <input
                             type="text"
                             class="form-control funds-input"
@@ -535,13 +535,13 @@
                       </div>
                     </div>
                     <ng-template #notFirst>
-                      <div class="d-flex" formGroupName="dollarValues">
+                      <div class="d-flex" formArrayName="recommendedDirect">
                         <input type="text"
                                class="form-control funds-input ml-auto"
                                id="tc-dollar3"
                                aria-label="direct cost"
                                [(ngModel)]="li.recommendedDirect"
-                               formControlName="recommendedDirect"
+                               [formControlName]="i"
                                aria-describedby="tc-dollar-percent">
                       </div>
                     </ng-template>
@@ -597,7 +597,7 @@
                       </div>
                     </div>
 
-                    <div class="fsource-fy1-form" *ngIf="first;">
+                    <div class="fsource-fy1-form" *ngIf="first">
                       <div class="form-row form-inline">
                         <div class="col left-label">
                           <label for="tc-percent-dollar">Total Cost</label>
@@ -621,12 +621,12 @@
                       </div>
                     </div>
                     <ng-template #notFirst>
-                      <div class="col-sm-auto" formGroupName="dollarValues">
+                      <div class="col-sm-auto" formArrayName="recommendedDirect">
                         <input type="text"
                                class="form-control funds-input"
                                id="tc-dollar"
                                [(ngModel)]="li.recommendedDirect"
-                               formControlName="recommendedDirect"
+                               [formControlName]="i"
                                aria-describedby="tc-dollar-percent">
                       </div>
                     </ng-template>

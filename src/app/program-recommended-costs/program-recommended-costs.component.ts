@@ -15,7 +15,7 @@ import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequ
 import {FundingSourceTypes} from '../model/funding-source-types';
 import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point';
 import {PRC_DISPLAY_FORMAT} from './program-recommended-costs-model';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 
 @Component({
@@ -27,7 +27,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   programRecommendedCostsEntryForm: FormGroup;
 
-  _selectedDocs: string;
   initialPay: boolean;
   showPercent = true;
   showDollar = false;
@@ -95,7 +94,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     if (!this.requestModel.programRecommendedCostsModel.grantAwarded) {
       this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
           this.requestModel.programRecommendedCostsModel.grantAwarded = result;
-          this.logger.debug('Appl Periods/Grant awards:', result);
+          // this.logger.debug('Appl Periods/Grant awards:', result);
         }, error => {
           // TODO: properly handle errors here
           this.logger.error('HttpClient get request error for----- ' + error.message);
@@ -118,14 +117,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   get model(): RequestModel {
     return this.requestModel;
-  }
-
-  get selectedDocs(): string {
-    return this._selectedDocs;
-  }
-
-  set selectedDocs(value: string) {
-
   }
 
   showPiCosts(): boolean {
@@ -249,6 +240,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
         tmp.baselineTotal = ga.totalAwarded;
       }
       this.lineItem.push(tmp);
+      (this.programRecommendedCostsEntryForm.get('recommendedDirect') as FormArray).push(new FormControl(null));
     });
   }
 
@@ -341,18 +333,12 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   private initializeReactiveForm(): void {
-    let f: FormGroup;
-
-    f = this.fb.group({
-      'dollarValues': new FormGroup({
-        'recommendedDirect': new FormControl(null),
-        'recommendedTotal': new FormControl(null)
-      }),
-      'percentCut': new FormControl(null),
-      'fundingSourceSelect': new FormControl(null, [Validators.required])
+    this.programRecommendedCostsEntryForm = new FormGroup({
+      recommendedDirect: new FormArray([]),
+      recommendedTotal: new FormControl(null),
+      percentCut: new FormControl(null),
+      fundingSourceSelect: new FormControl(null, [Validators.required])
     }, this.validateAddSource.bind(this));
-
-    this.programRecommendedCostsEntryForm = f;
   }
 
   onSubmit(): void {
@@ -365,7 +351,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   isNumericValue(control: FormControl): { [s: string]: boolean } {
     this.logger.debug('evaluating', control.value);
     if (isNaN(Number(control.value))) {
-      return {'valueNotNumeric': true};
+      return {valueNotNumeric: true};
     }
     return null;
   }
