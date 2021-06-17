@@ -25466,4 +25466,30 @@ table ~ .dt-controls {
   font-style: italic;
 }
 
+/* line 380, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.grant-icons {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+/* line 384, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.grant-icons a {
+  padding: .2rem;
+}
+
+/* line 389, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+td .grant-icons {
+  display: flex;
+}
+
+/* line 393, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.egrants-icon {
+  background: transparent url("../images/egrants_icon.svg") no-repeat center;
+  height: .8rem;
+  width: .8rem;
+  display: inline-block;
+  line-height: 1;
+}
+
 /*# sourceMappingURL=i2e-common-ui.css.map */

@@ -99,10 +99,14 @@
             <tbody>
             <tr *ngFor="let grant of grantList">
                 <td><a href="{{grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
-                    <a href="{{eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants" class="hint--right" style="float: inline-end;">
-                        <img src="images/egrants_icon.svg" height="18" style="padding:3px;margin:0px 2px;border: 0px;">
-                    </a>
-                    <a [routerLink]="" style="padding:3px;margin:0px 2px;border: 0px;float:inline-end;" (mouseenter)="setGrant(grant)"  [ngbTooltip]="InstituteTooltip" triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
+                    <div class="grant-icons">
+                        <a href="{{eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants">
+                            <span class="egrants-icon"></span>
+                        </a>
+                        <a [routerLink]="" (mouseenter)="setGrant(grant)"  [ngbTooltip]="InstituteTooltip" triggers="click:blur">
+                            <i class='fa fa-university' aria-hidden='true'></i>
+                        </a>
+                    </div>
                 </td>
                 <td><a href="mailto:{{grant.piEmail}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.piFullName}}</a></td>
                 <td>{{grant.projectTitle}}</td>

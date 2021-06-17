@@ -14,11 +14,13 @@
         <div class="form-group">
             <p class="like-label">Grant Number</p>
             <p>
-              <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
-              <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants" class="hint--right" style="float: inline-end">
-                <img src="images/egrants_icon.svg" height="18" style="padding:3px;margin:0px 2px;border: 0px;">
-              </a>
-              <a [routerLink]="" style="padding:3px;margin:0px 2px;border: 0px;float:inline-end;" (mouseenter)="setGrant(grant)"  [ngbTooltip]="InstituteTooltip" triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
+                <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
+                <span class="grant-icons ml-2">
+                    <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants">
+                        <span class="egrants-icon"></span>
+                    </a>
+                    <a [routerLink]="" (mouseenter)="setGrant(grant)" [ngbTooltip]="InstituteTooltip" triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
+                </span>
             </p>
         </div>
     </div>
