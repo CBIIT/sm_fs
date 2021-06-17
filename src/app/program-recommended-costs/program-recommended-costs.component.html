@@ -430,7 +430,7 @@
                         <div class="col left-label">
                           <label for="dc-dollar1">Direct Cost</label>
                         </div>
-                        <div class="col-sm-auto">
+                        <div class="col-sm-auto" formGroupName="dollarValues">
                           <input
                             type="text"
                             class="form-control funds-input"
@@ -447,7 +447,7 @@
                         <div class="col left-label">
                           <label for="tc-dollar1">Total Cost</label>
                         </div>
-                        <div class="col-sm-auto">
+                        <div class="col-sm-auto" formGroupName="dollarValues">
                           <input
                             type="text"
                             class="form-control funds-input"
@@ -488,7 +488,7 @@
                         <div class="col left-label">
                           <label for="dc-dollar">Direct Cost</label>
                         </div>
-                        <div class="col-sm-auto">
+                        <div class="col-sm-auto" formGroupName="dollarValues">
                           <input
                             type="text"
                             class="form-control funds-input"
@@ -508,7 +508,7 @@
                         <div class="col left-label">
                           <label for="tc-dollar2">Total Cost</label>
                         </div>
-                        <div class="col-sm-auto">
+                        <div class="col-sm-auto" formGroupName="dollarValues">
                           <input
                             type="text"
                             class="form-control funds-input"
@@ -535,7 +535,7 @@
                       </div>
                     </div>
                     <ng-template #notFirst>
-                      <div class="d-flex">
+                      <div class="d-flex" formGroupName="dollarValues">
                         <input type="text"
                                class="form-control funds-input ml-auto"
                                id="tc-dollar3"
@@ -621,7 +621,7 @@
                       </div>
                     </div>
                     <ng-template #notFirst>
-                      <div class="col-sm-auto">
+                      <div class="col-sm-auto" formGroupName="dollarValues">
                         <input type="text"
                                class="form-control funds-input"
                                id="tc-dollar"

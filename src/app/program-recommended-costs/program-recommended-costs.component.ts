@@ -15,7 +15,7 @@ import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequ
 import {FundingSourceTypes} from '../model/funding-source-types';
 import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point';
 import {PRC_DISPLAY_FORMAT} from './program-recommended-costs-model';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 
 @Component({
@@ -75,7 +75,8 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService, private logger: NGXLogger,
-              private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
+              private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
+              private fb: FormBuilder) {
   }
 
   ngOnDestroy(): void {
@@ -336,14 +337,18 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   private initializeReactiveForm(): void {
-    this.programRecommendedCostsEntryForm = new FormGroup({
-//      'dollarValues': new FormGroup({
-        'recommendedDirect': new FormControl(null, [/*Validators.required, this.isNumericValue.bind(this)*/]),
-        'recommendedTotal': new FormControl(null),
-//      }),
+    let f: FormGroup;
+
+    f = this.fb.group({
+      'dollarValues': new FormGroup({
+        'recommendedDirect': this.fb.array([]),
+        'recommendedTotal': new FormControl(null)
+      }),
       'percentCut': new FormControl(null),
-      'fundingSourceSelect': new FormControl(null, [/*Validators.required*/])
-    });
+      'fundingSourceSelect': new FormControl(null, [Validators.required])
+    }, this.validateAddSource.bind(this));
+
+    this.programRecommendedCostsEntryForm = f;
   }
 
   onSubmit(): void {
@@ -358,6 +363,11 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     if (isNaN(Number(control.value))) {
       return {'valueNotNumeric': true};
     }
+    return null;
+  }
+
+  validateAddSource(form: FormGroup): { [s: string]: boolean } {
+    this.logger.debug(form);
     return null;
   }
 

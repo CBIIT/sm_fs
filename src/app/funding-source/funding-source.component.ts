@@ -49,20 +49,16 @@ export class FundingSourceComponent implements OnInit {
 
   ngOnInit(): void {
     this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.subscribe(select => {
-      this.logger.debug('filter', select);
       this.selectedFundingSources.add(Number(select));
     });
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.subscribe(deselect => {
-      this.logger.debug('unfilter', deselect);
       this.selectedFundingSources.delete(Number(deselect));
     });
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.subscribe(restore => {
-      this.logger.debug('restore', restore);
       this.selectedValue = restore;
     });
     if (!this.requestModel.programRecommendedCostsModel.fundingSources
       || this.requestModel.programRecommendedCostsModel.fundingSources.length === 0) {
-      this.logger.debug('loading funding sources');
       this.fsRequestControllerService.getFundingSourcesUsingGET(
         this.requestModel.requestDto.frtId,
         this.requestModel.grant.fullGrantNum,
