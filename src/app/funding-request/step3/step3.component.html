@@ -17,7 +17,7 @@
 
         <div class="form-group mb-4">
             <label for="type">Type</label>
-            <ng-select2 id="type" [(ngModel)]="selectedDocType" [allowClear]="true"
+            <ng-select2 [ngClass]="[ isTypeSelected ? 'has-error' : '']" id="type" [(ngModel)]="selectedDocType" [allowClear]="true"
                 (ngModelChange)="onDocTypeChange($event)">
                 <option></option>
                 <option *ngFor="let docType of DocTypes | async" [value]="docType.rvLowValue"> {{docType.rvLowValue}}
@@ -34,8 +34,7 @@
                     (change)="selectFiles($event)">
             </div>
             <div class="col-sm-auto">
-                <button class="btn btn-primary ml-auto" [disabled]="!selectedFiles" (click)="uploadFiles()">Add
-                    Doc</button>
+                <button class="btn btn-primary ml-auto" [disabled]="!selectedFiles" (click)="uploadFiles()">Add Document</button>
             </div>
         </div>
 
