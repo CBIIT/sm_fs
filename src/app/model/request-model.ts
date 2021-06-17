@@ -16,6 +16,7 @@ export class RequestModel {
 
   // Note that swagger generated two versions of the DTO, one for the request and one for the response.  But they are identical.
   private _requestDto: FundingRequestDtoReq;
+  private _programRecommendedCostsModel: ProgramRecommendedCostsModel;
 
   conversionMechanism: string;
 
@@ -121,11 +122,12 @@ export class RequestModel {
 
   constructor(private propertiesService: AppPropertiesService,
               private logger: NGXLogger,
-              private _programRecommendedCostsModel: ProgramRecommendedCostsModel) {
+              ) {
     this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
+    this.programRecommendedCostsModel = new ProgramRecommendedCostsModel(logger);
   }
 
   getValidationErrors(): Array<FundingRequestErrorCodes> {
@@ -233,9 +235,9 @@ export class RequestModel {
   restoreLineItems(budgets: Array<FundingReqBudgetsDto>): void {
     this.logger.debug('Restoring line items from budgets', budgets);
     budgets.forEach(b => {
-      this.logger.debug('budget', b);
+      // this.logger.debug('budget', b);
       const source = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
-      console.log('source', source);
+      // console.log('source', source);
 
       const lineItems = this.programRecommendedCostsModel.prcLineItems.get(source);
       if (lineItems) {
@@ -244,6 +246,8 @@ export class RequestModel {
             li.budgetId = b.id;
           }
         });
+      } else {
+        this.logger.warn('no line items for source', source.fundingSourceName);
       }
     });
   }

@@ -110,8 +110,6 @@ export class Step3Component implements OnInit {
     if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
-    this.logger.debug('Selected DOCs in step 3:', this.requestModel.requestDto.financialInfoDto.otherDocText);
-
     this.requestModel.setStepLinkable(3, true);
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
