@@ -150,6 +150,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       if (this.selectedSourceId !== edit.fundingSourceId) {
         this.deleteSourceUnchecked(this.editing);
         this.editing = undefined;
+        this.lineItem.forEach(l => {
+          l.budgetId = undefined;
+        });
       }
     }
     if (this.requestModel.programRecommendedCostsModel.fundingSourcesMap.size === 0) {
