@@ -101,8 +101,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
           this.logger.error('HttpClient get request error for----- ' + error.message);
         }
       );
+      this.logger.debug('----------> initializing reactive form <----------');
       this.initializeReactiveForm();
-
+      this.logger.debug('--------> done initializing reactive form <-------');
     }
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
@@ -344,7 +345,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
     f = this.fb.group({
       'dollarValues': new FormGroup({
-        'recommendedDirect': this.fb.array([]),
+        'recommendedDirect': new FormControl(null),
         'recommendedTotal': new FormControl(null)
       }),
       'percentCut': new FormControl(null),

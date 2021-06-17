@@ -215,9 +215,9 @@ export class RequestModel {
   restoreLineItems(budgets: Array<FundingReqBudgetsDto>): void {
     this.logger.debug('Restoring line items from budgets', budgets);
     budgets.forEach(b => {
-      this.logger.debug('budget', b);
+      // this.logger.debug('budget', b);
       const source = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
-      console.log('source', source);
+      // console.log('source', source);
 
       const lineItems = this.programRecommendedCostsModel.prcLineItems.get(source);
       if (lineItems) {
@@ -227,7 +227,7 @@ export class RequestModel {
           }
         });
       } else {
-        this.logger.warn('no line items for source', source);
+        this.logger.warn('no line items for source', source.fundingSourceName);
       }
     });
   }
