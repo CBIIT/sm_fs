@@ -434,6 +434,7 @@
                           <input
                             type="text"
                             class="form-control funds-input"
+                            name="recommendedDirect"
                             [(ngModel)]="li.recommendedDirect"
                             id="dc-dollar1"
                             aria-describedby="dc-dollar-percent">
@@ -450,6 +451,7 @@
                           <input
                             type="text"
                             class="form-control funds-input"
+                            name="recommendedTotal"
                             id="tc-dollar1"
                             [(ngModel)]="li.recommendedTotal"
                             aria-describedby="tc-dollar-percent">
@@ -490,6 +492,7 @@
                           <input
                             type="text"
                             class="form-control funds-input"
+                            name="recommendedDirect"
                             [(ngModel)]="li.recommendedDirect"
                             id="dc-dollar"
                             aria-describedby="dc-dollar-percent">
@@ -509,6 +512,7 @@
                           <input
                             type="text"
                             class="form-control funds-input"
+                            name="recommendedTotal"
                             id="tc-dollar2"
                             [(ngModel)]="li.recommendedTotal"
                             aria-describedby="tc-dollar-percent">
@@ -535,6 +539,7 @@
                         <input type="text"
                                class="form-control funds-input ml-auto"
                                id="tc-dollar3"
+                               name="recommendedDirect[{{ i }}]"
                                aria-label="direct cost"
                                [(ngModel)]="li.recommendedDirect"
                                aria-describedby="tc-dollar-percent">
@@ -572,6 +577,7 @@
                             type="text"
                             class="form-control percent-input"
                             [(ngModel)]="li.percentCut"
+                            name="percentCut"
                             id="perc-cut">
                         </div>
                         <div class="col-sm-auto right-label">
@@ -618,6 +624,7 @@
                         <input type="text"
                                class="form-control funds-input"
                                id="tc-dollar"
+                               name="recommendedDirect[{{ i }}]"
                                [(ngModel)]="li.recommendedDirect"
                                aria-describedby="tc-dollar-percent">
                       </div>
@@ -635,9 +642,7 @@
                     (click)="cleanUpSources()">
               Close
             </button>
-            <button type="submit" class="btn btn-primary" (click)="addFundingSource()">Add
-              Funding Source
-            </button>
+            <input type="submit" class="btn btn-primary" value="Add Funding Source">
           </div>
         </div>
       </div>
