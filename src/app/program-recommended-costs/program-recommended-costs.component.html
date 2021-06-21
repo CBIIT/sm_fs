@@ -305,7 +305,7 @@
     </div>
   </div>
 
-  <form [formGroup]="programRecommendedCostsEntryForm" (ngSubmit)="onSubmit()">
+<!--  <form [formGroup]="programRecommendedCostsEntryForm" (ngSubmit)="onSubmit()">-->
     <div class="modal fade" id="add-fsource-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -321,7 +321,8 @@
             <div class="row">
               <div class="col-lg-6">
                 <div class="form-group">
-                  <app-funding-source [parentForm]="programRecommendedCostsEntryForm"></app-funding-source>
+<!--                  <app-funding-source [parentForm]="programRecommendedCostsEntryForm"></app-funding-source>-->
+                  <app-funding-source></app-funding-source>
                 </div>
               </div>
             </div>
@@ -453,7 +454,6 @@
                             class="form-control funds-input"
                             id="tc-dollar1"
                             [(ngModel)]="li.recommendedTotal"
-                            formControlName="recommendedTotal"
                             aria-describedby="tc-dollar-percent">
                         </div>
                       </div>
@@ -514,7 +514,6 @@
                             class="form-control funds-input"
                             id="tc-dollar2"
                             [(ngModel)]="li.recommendedTotal"
-                            formControlName="recommendedTotal"
                             aria-describedby="tc-dollar-percent">
                         </div>
                         <div class="col-sm-auto right-label" *ngIf="initialPay">
@@ -577,7 +576,6 @@
                             type="text"
                             class="form-control percent-input"
                             [(ngModel)]="li.percentCut"
-                            formControlName="percentCut"
                             id="perc-cut">
                         </div>
                         <div class="col-sm-auto right-label">
@@ -610,11 +608,10 @@
                     <div class="fsource-fy1-form" *ngIf="first">
                       <div class="form-row form-inline">
                         <div class="col-sm-auto">
-                          <button
-                            type="button"
-                            class="btn-outline-secondary mt-2"
-                            [disabled]="li.recommendedDirect === undefined"
-                            (click)="propagate()">
+                          <button type="button"
+                                  class="btn btn-outline-secondary mt-2"
+                                  [disabled]="li.recommendedDirect === undefined"
+                                  (click)="propagate()">
                             Copy FY1 DC to Future Years
                           </button>
                         </div>
@@ -643,14 +640,14 @@
                     (click)="cleanUpSources()">
               Close
             </button>
-<!--            <button type="submit" class="btn btn-primary" [disabled]="!canSave()" (click)="addFundingSource()">Add-->
-<!--              Funding Source-->
-<!--            </button>-->
-            <input type="submit" class="btn btn-primary" value="Add Funding Source">
+            <button type="submit" class="btn btn-primary" (click)="addFundingSource()">Add
+              Funding Source
+            </button>
+<!--            <input type="submit" class="btn btn-primary" value="Add Funding Source">-->
           </div>
         </div>
       </div>
     </div>
-  </form>
+<!--  </form>-->
 
 </ng-template>
