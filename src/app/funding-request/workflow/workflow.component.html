@@ -1,1 +1,34 @@
-<p>workflow works!</p>
+<div class="row">
+    <div class="col-12 d-flex">
+      <h2 id="workflow">Workflow</h2>
+      <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#workflow-collapse" role="button"
+        aria-expanded="true" aria-controls="workflow-collapse"></a>
+    </div>
+  </div>
+  
+  <div class="row collapse show" id="workflow-collapse">
+    <div class="col-12">
+      <ngb-alert [dismissible]="false" class="workflow-comments">
+          <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
+          <div class="comment-content">
+              <div class="comment-details">Comment from <strong>Jane Doe</strong> on MM/DD/YYY at HH:MM PM</div>
+              <div>Content of the comment goes here. Make sure this stays in a seperate div from the line above.</div>
+          </div>
+      </ngb-alert>
+    </div>
+    
+    <div class="col-12">
+          <app-next-scheduled-approvers-request [readonly]="readonly" (activeApprover)="setActiveApprover($event)"></app-next-scheduled-approvers-request>
+    </div>
+  
+  
+    <div class="col-12">
+      <div class="form-group" *ngIf="!readonly">
+        <label for="workflow-comments">Workflow Comments <span class="optional">(optional)</span></label>
+        <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments"></textarea>
+        <span class="character-counter">{{comments.length}}/2000</span>
+      </div>
+    </div>
+    
+  </div>
+  
