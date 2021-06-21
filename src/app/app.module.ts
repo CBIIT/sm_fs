@@ -1,5 +1,5 @@
 import {APP_INITIALIZER, NgModule} from '@angular/core';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
@@ -141,7 +141,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     NgSelect2Module,
     NgbModule,
     FormsModule,
-    ReactiveFormsModule,
     DataTablesModule,
     DragDropModule,
     LoggerModule.forRoot({

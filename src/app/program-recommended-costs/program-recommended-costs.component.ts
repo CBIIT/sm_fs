@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
@@ -15,7 +15,7 @@ import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequ
 import {FundingSourceTypes} from '../model/funding-source-types';
 import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point';
 import {PRC_DISPLAY_FORMAT} from './program-recommended-costs-model';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {Form, FormBuilder, FormControl, FormGroup, NgForm, Validators} from '@angular/forms';
 
 
 @Component({
@@ -25,7 +25,8 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 })
 export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
-  programRecommendedCostsEntryForm: FormGroup;
+  @ViewChild('prcForm', { static: false }) prcEntryForm: NgForm;
+
 
   _selectedDocs: string;
   initialPay: boolean;
@@ -75,8 +76,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService, private logger: NGXLogger,
-              private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
-              private fb: FormBuilder) {
+              private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
   }
 
   ngOnDestroy(): void {
@@ -101,9 +101,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
           this.logger.error('HttpClient get request error for----- ' + error.message);
         }
       );
-      this.logger.debug('----------> initializing reactive form <----------');
-      this.initializeReactiveForm();
-      this.logger.debug('--------> done initializing reactive form <-------');
     }
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
@@ -340,39 +337,10 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private initializeReactiveForm(): void {
-    let f: FormGroup;
-
-    f = this.fb.group({
-      'dollarValues': new FormGroup({
-        'recommendedDirect': new FormControl(null),
-        'recommendedTotal': new FormControl(null)
-      }),
-      'percentCut': new FormControl(null),
-      'fundingSourceSelect': new FormControl(null, [Validators.required])
-    }, this.validateAddSource.bind(this));
-
-    this.programRecommendedCostsEntryForm = f;
-  }
-
   onSubmit(): void {
-    this.logger.debug(this.programRecommendedCostsEntryForm);
-    if (this.programRecommendedCostsEntryForm.valid) {
+    this.logger.debug(this.prcEntryForm);
+    if (this.prcEntryForm.valid) {
       this.addFundingSource();
     }
   }
-
-  isNumericValue(control: FormControl): { [s: string]: boolean } {
-    this.logger.debug('evaluating', control.value);
-    if (isNaN(Number(control.value))) {
-      return {'valueNotNumeric': true};
-    }
-    return null;
-  }
-
-  validateAddSource(form: FormGroup): { [s: string]: boolean } {
-    this.logger.debug(form);
-    return null;
-  }
-
 }

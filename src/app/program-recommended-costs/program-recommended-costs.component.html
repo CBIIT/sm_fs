@@ -305,7 +305,7 @@
     </div>
   </div>
 
-<!--  <form [formGroup]="programRecommendedCostsEntryForm" (ngSubmit)="onSubmit()">-->
+  <form #prcForm="ngForm" (ngSubmit)="onSubmit()">
     <div class="modal fade" id="add-fsource-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -321,7 +321,6 @@
             <div class="row">
               <div class="col-lg-6">
                 <div class="form-group">
-<!--                  <app-funding-source [parentForm]="programRecommendedCostsEntryForm"></app-funding-source>-->
                   <app-funding-source></app-funding-source>
                 </div>
               </div>
@@ -639,11 +638,10 @@
             <button type="submit" class="btn btn-primary" (click)="addFundingSource()">Add
               Funding Source
             </button>
-<!--            <input type="submit" class="btn btn-primary" value="Add Funding Source">-->
           </div>
         </div>
       </div>
     </div>
-<!--  </form>-->
+  </form>
 
 </ng-template>
