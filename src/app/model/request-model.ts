@@ -32,14 +32,39 @@ export class RequestModel {
 
   // approver stuff
   mainApproverCreated = false;
+  approverCriteria: any = {};
   // note, element 0 is not used, element 1 represents step1 and so on.
   private stepLinkable = [false, false, false, false, false];
 
   get recreateMainApproverNeeded(): boolean {
     // need to have logic to determine something changed in request that
-    // warrants deletion and recreate of main approvers
-    const somethingChanged = false;
-    return this.mainApproverCreated && somethingChanged;
+    // warrants deletion and recreate of main approvers =
+    return this.mainApproverCreated && this.approverCriteriaChanged();
+  }
+
+  approverCriteriaChanged(): boolean {
+    const newCriteria = this.makeApproverCriteria();
+    this.logger.debug('new approver criteria ', newCriteria);
+    this.logger.debug('prior approver criteria ', this.approverCriteria);
+    return  newCriteria.requestType !== this.approverCriteria.requestType
+                || newCriteria.cayCode !== this.approverCriteria.cayCode
+                || newCriteria.fundingSources !== this.approverCriteria.fundingSources;
+  }
+
+  makeApproverCriteria(): any {
+    const approverCriteria: any = {};
+    approverCriteria.requestType = this.requestDto.financialInfoDto.requestTypeId;
+    approverCriteria.cayCode = this.requestDto.cayCode;
+    const fundingSources = Array.from(this._programRecommendedCostsModel.selectedFundingSourceIds);
+    fundingSources.sort();
+    approverCriteria.fundingSources = fundingSources.join(',');
+    // from the create_main_approvers sp, it seems otherDocs has no effect on funding request approvers,
+    // only affects funding plan approvers, needs double check with David and Subashini.
+    return approverCriteria;
+  }
+
+  captureApproverCriteria(): void {
+    this.approverCriteria = this.makeApproverCriteria();
   }
 
   get requestType(): string {
