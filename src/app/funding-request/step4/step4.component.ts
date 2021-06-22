@@ -125,7 +125,7 @@ export class Step4Component implements OnInit, OnDestroy {
       this.userReadonly = true;
       return;
     }
-    else if ( isPd && userNpnId === this.requestModel.requestDto.requestorNpnId ) {
+    else if ( isPd && userNpnId === this.requestModel.requestDto.financialInfoDto.requestorNpnId ) {
       this.logger.debug('PD & is this requestor, submit & delete = true');
       this.userCanSubmit = true;
       this.userCanDelete = true;
@@ -133,7 +133,7 @@ export class Step4Component implements OnInit, OnDestroy {
       return;
     }
     else if (isPd && (userCas !== null ) && ( userCas.length > 0)
-      && (userCas.indexOf (this.requestModel.requestDto.cayCode) > -1 )) {
+      && (userCas.indexOf (this.requestModel.requestDto.financialInfoDto.requestorCayCode) > -1 )) {
         this.logger.debug('PD & CA matches request\'s CA, submit & delete = true');
         this.userCanSubmit = true;
         this.userCanDelete = true;
