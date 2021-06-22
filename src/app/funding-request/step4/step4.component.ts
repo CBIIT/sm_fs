@@ -26,6 +26,9 @@ export class Step4Component implements OnInit, OnDestroy {
   @ViewChild('submitResult') submitResultElement: ElementRef;
   @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
 
+  statusesCanWithdraw = ['SUBMITTED', 'ON HOLD', 'RFC'];
+  statusesCanOnHold = ['SUBMITTED'];
+
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   isRequestEverSubmitted = false;
   requestHistorySubscriber: Subscription;
@@ -264,11 +267,11 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   withdrawVisible(): boolean {
-    return this.requestStatus === 'SUBMITTED' && this.userCanSubmit;
+    return (this.statusesCanWithdraw.indexOf(this.requestStatus) > -1) && this.userCanSubmit;
   }
 
   putOnHoldVisible(): boolean {
-    return this.requestStatus === 'SUBMITTED' && this.userCanSubmit;
+    return (this.statusesCanOnHold.indexOf(this.requestStatus) > -1) && this.userCanSubmit;
   }
 
   submitVisible(): boolean {
