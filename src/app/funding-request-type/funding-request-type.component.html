@@ -3,13 +3,9 @@
     <i class="fas fa-question-circle more-info"></i></a></label>
   <ng-select2
     id="request-type-select"
+    name="fundingRequestType"
     [(ngModel)]="selectedValue"
     [allowClear]="true"
     [data]="data">
-    <option></option>
-    <!--    <option-->
-    <!--      *ngFor="let requestType of requestTypes"-->
-    <!--      [value]="requestType.id"> {{requestType.requestName}}-->
-    <!--    </option>-->
   </ng-select2>
 </div>

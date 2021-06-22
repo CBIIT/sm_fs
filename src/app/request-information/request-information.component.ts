@@ -1,19 +1,21 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {isArray} from 'rxjs/internal-compatibility';
 import {NGXLogger} from 'ngx-logger';
 import {FundingRequestValidationService} from '../model/funding-request-validation-service';
-import {FundingRequestErrorCodes} from '../model/funding-request-error-codes';
 import {FundingRequestTypes} from '../model/funding-request-types';
 import {Alert} from '../alert-billboard/alert';
+import {ControlContainer, NgForm} from '@angular/forms';
 
 @Component({
   selector: 'app-request-information',
   templateUrl: './request-information.component.html',
-  styleUrls: ['./request-information.component.css']
+  styleUrls: ['./request-information.component.css'],
+  viewProviders: [{provide: ControlContainer, useExisting: NgForm}],
 })
 export class RequestInformationComponent implements OnInit {
+  @Input() parentForm: NgForm;
 
   myAlerts: Alert[] = [];
 
@@ -24,8 +26,6 @@ export class RequestInformationComponent implements OnInit {
 
   set selectedRequestType(value: number) {
     this.logger.debug('request-information-component sees new value', value);
-
-    this.checkDiversitySupplementRule();
 
     if (value) {
       this.logger.debug('loading funding sources for type:', value);
@@ -77,31 +77,7 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
       this.requestModel.requestDto.requestorCayCode = undefined;
     }
-    this.checkDiversitySupplementRule();
     this._selectedCayCode = value;
-  }
-
-  private checkDiversitySupplementRule(): void {
-    const testVal: string = this.requestModel.requestDto.financialInfoDto.requestorCayCode;
-    // TODO: FS-163 - display an error message if user selects 'MB' for type 9 or 1001 request types
-    if ([FundingRequestTypes.GENERAL_ADMINISTRATIVE_SUPPLEMENTS_ADJUSTMENT_POST_AWARD,
-      FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS].includes(Number(this.selectedRequestType))) {
-      const alert: Alert = {
-        type: 'danger',
-        message: 'You must select Diversity Supplement (includes CURE Supplements) as the request type',
-        title: ''
-      };
-      if (testVal === 'MB') {
-        this.fundingRequestValidationService.raiseError.next(FundingRequestErrorCodes.MUST_SELECT_DIVERSITY_SUPPLEMENT_FOR_MB);
-        this.logger.error(alert);
-        // TODO: this must be added to validation rules.
-
-        this.myAlerts.push(alert);
-      } else {
-        const i = this.myAlerts.indexOf(alert);
-        this.myAlerts.splice(i, 1);
-      }
-    }
   }
 
 // TODO: Clarify the pdNpnId vs requestorNpnId

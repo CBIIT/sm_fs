@@ -8,6 +8,7 @@ import {FundingRequestTypes} from '../../model/funding-request-types';
 import {ProgramRecommendedCostsComponent} from '../../program-recommended-costs/program-recommended-costs.component';
 import {Alert} from '../../alert-billboard/alert';
 import {NgForm} from '@angular/forms';
+import SubmitEvent = JQuery.SubmitEvent;
 
 @Component({
   selector: 'app-step2',
@@ -98,7 +99,9 @@ export class Step2Component implements OnInit {
     return this.model.requestDto.frqId === undefined;
   }
 
-  onSubmit(): void {
+  onSubmit(event: SubmitEvent): void {
+    // @ts-ignore
+    const action = event.submitter?.name;
     this.logger.debug(this.step2Form);
   }
 }

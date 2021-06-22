@@ -10,7 +10,9 @@ export class FundingSourceCostValidatorDirective implements Validator {
     return fundingSourceCostValidator(control);
   }
 }
-
+// This is the actual function that does the validation. To use it in a template, we need to wrap it in a directive
+// (see above). It could have been implemented inline above, but this form makes the validator function also
+// usable by itself in a Reactive model.
 export const fundingSourceCostValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const recommendedDirect = control.get('recommendedDirect');
   const recommendedTotal = control.get('recommendedTotal');
@@ -19,8 +21,6 @@ export const fundingSourceCostValidator: ValidatorFn = (control: AbstractControl
   if (!recommendedDirect || !recommendedTotal || isNaN(recommendedDirect.value) || isNaN(recommendedTotal.value)) {
     return null;
   }
-  console.log('recommendedDirect:', recommendedDirect.value);
-  console.log('recommendedTotal:', recommendedTotal.value);
 
   if (Number(recommendedTotal.value) < Number(recommendedDirect.value)) {
     return {totalCostLessThanDirectCost: true};

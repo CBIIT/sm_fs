@@ -14,7 +14,13 @@
   <div class="col-lg-6">
     <div class="form-group">
       <label for="request-name-text">Request Name <i class="fas fa-question-circle more-info"  triggers="click:blur" placement="top" ngbTooltip="Provide a request name that you can easily identify and track"></i></label>
-      <input id="request-name-text" maxlength="100" class="form-control" type="text" [(ngModel)]="model.requestDto.financialInfoDto.requestName">
+      <input
+        id="request-name-text"
+        maxlength="100"
+        class="form-control"
+        type="text"
+        name="requestName"
+        [(ngModel)]="model.requestDto.financialInfoDto.requestName" required>
     </div>
   </div>
 
@@ -34,13 +40,13 @@
   </div>
 
   <div class="col-md-2 col-lg-4" *ngIf="type4Selected()">
-    <app-type4-conversion-mechanism ></app-type4-conversion-mechanism>
+    <app-type4-conversion-mechanism name="conversionMech"></app-type4-conversion-mechanism>
   </div>
 
 </div><!-- END Row -->
 
 <div class="row">
   <div class="col-12"*ngIf="payUsingSkip()">
-    <app-skipped-grants ></app-skipped-grants>
+    <app-skipped-grants name="skippedGrants"></app-skipped-grants>
   </div>
 </div>

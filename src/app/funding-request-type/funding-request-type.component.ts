@@ -10,12 +10,14 @@ import {Select2OptionData} from 'ng-select2';
 import {FundingRequestTypeRulesDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestTypeRulesDto';
 import {FundingRequestTypes} from '../model/funding-request-types';
 import {Alert} from '../alert-billboard/alert';
+import {ControlContainer, NgForm} from '@angular/forms';
 
 
 @Component({
   selector: 'app-funding-request-type',
   templateUrl: './funding-request-type.component.html',
-  styleUrls: ['./funding-request-type.component.css']
+  styleUrls: ['./funding-request-type.component.css'],
+  viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
 })
 export class FundingRequestTypeComponent implements OnInit {
   @Input() filter: boolean;

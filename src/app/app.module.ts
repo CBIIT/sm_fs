@@ -63,6 +63,7 @@ import {OpenRequestComponent} from './search/open-request/open-request.component
 import { WorkflowComponent } from './funding-request/workflow/workflow.component';
 import { ApproverListsComponent } from './funding-request/workflow/approver-lists/approver-lists.component';
 import {FundingSourceCostValidatorDirective} from './validators/funding-source-cost-validator.directive';
+import {DiversitySupplementValidatorDirective} from './validators/diversity-supplement-validator-directive';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
@@ -136,6 +137,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     WorkflowComponent,
     ApproverListsComponent,
     FundingSourceCostValidatorDirective,
+    DiversitySupplementValidatorDirective,
   ],
 
 

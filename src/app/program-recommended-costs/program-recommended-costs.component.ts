@@ -368,21 +368,4 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       this.alerts.push(alert);
     }
   }
-
-  deleteAlert(alert: Alert): void {
-    this.logger.debug('Deleting alert now', alert);
-    let i = this.alerts.indexOf(alert);
-    if (i === -1) {
-      this.logger.warn('Alert not found in queue');
-      this.alerts.forEach((a, index) => {
-        if (a.type === alert.type && a.message === alert.message) {
-          console.log('found manually at index', index);
-          i = index;
-        }
-      });
-      this.alerts.splice(i, 1);
-    } else {
-      this.alerts.splice(i, 1);
-    }
-  }
 }
