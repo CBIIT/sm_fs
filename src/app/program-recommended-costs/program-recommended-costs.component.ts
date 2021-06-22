@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
@@ -15,7 +15,9 @@ import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequ
 import {FundingSourceTypes} from '../model/funding-source-types';
 import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point';
 import {PRC_DISPLAY_FORMAT} from './program-recommended-costs-model';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {NgForm} from '@angular/forms';
+import {FundingSourceComponent} from '../funding-source/funding-source.component';
+import {AlertService} from '../service/alert.service';
 
 
 @Component({
@@ -25,7 +27,8 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 })
 export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
-  programRecommendedCostsEntryForm: FormGroup;
+  @ViewChild('prcForm', {static: false}) prcForm: NgForm;
+  @ViewChild(FundingSourceComponent) fsc: FundingSourceComponent;
 
   _selectedDocs: string;
   initialPay: boolean;
@@ -76,7 +79,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService, private logger: NGXLogger,
               private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
-              private fb: FormBuilder) {
+              public alertService: AlertService) {
   }
 
   ngOnDestroy(): void {
@@ -101,9 +104,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
           this.logger.error('HttpClient get request error for----- ' + error.message);
         }
       );
-      this.logger.debug('----------> initializing reactive form <----------');
-      this.initializeReactiveForm();
-      this.logger.debug('--------> done initializing reactive form <-------');
     }
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
@@ -166,6 +166,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     // @ts-ignore
     $('#add-fsource-modal').modal('hide');
     this.selectedSourceId = undefined;
+    this.fsc.selectedValue = undefined;
   }
 
   editSource(i: number): void {
@@ -331,48 +332,35 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       this.lineItem.forEach((li, index) => {
         if (index !== 0) {
           if (this.showPercent) {
-            li.percentCut = first.percentCut;
+            if (!isNaN(first.percentCut)) {
+              li.percentCut = first.percentCut;
+            }
           } else {
-            li.recommendedDirect = first.recommendedDirect;
+            if (!isNaN(first.recommendedDirect)) {
+              li.recommendedDirect = first.recommendedDirect;
+            }
           }
         }
       });
     }
   }
 
-  private initializeReactiveForm(): void {
-    let f: FormGroup;
-
-    f = this.fb.group({
-      'dollarValues': new FormGroup({
-        'recommendedDirect': new FormControl(null),
-        'recommendedTotal': new FormControl(null)
-      }),
-      'percentCut': new FormControl(null),
-      'fundingSourceSelect': new FormControl(null, [Validators.required])
-    }, this.validateAddSource.bind(this));
-
-    this.programRecommendedCostsEntryForm = f;
-  }
-
   onSubmit(): void {
-    this.logger.debug(this.programRecommendedCostsEntryForm);
-    if (this.programRecommendedCostsEntryForm.valid) {
+    this.logger.debug(this.prcForm);
+    if (this.prcForm.valid) {
       this.addFundingSource();
+      // TODO: Clear form after successful save
+      // this.prcForm.reset();
+      for (const name in this.prcForm.controls) {
+        this.logger.debug('control:', name, this.prcForm.controls[name]);
+      }
+      // this.logger.debug('resetting form');
+      // this.prcForm.reset();
+      // for (const name in this.prcForm.controls) {
+      //   this.logger.debug('control:', name, this.prcForm.controls[name]);
+      // }
+    } else {
+      this.logger.warn('Validation error on add funding source modal');
     }
   }
-
-  isNumericValue(control: FormControl): { [s: string]: boolean } {
-    this.logger.debug('evaluating', control.value);
-    if (isNaN(Number(control.value))) {
-      return {'valueNotNumeric': true};
-    }
-    return null;
-  }
-
-  validateAddSource(form: FormGroup): { [s: string]: boolean } {
-    this.logger.debug(form);
-    return null;
-  }
-
 }

@@ -7,16 +7,17 @@ import {Options} from 'select2';
 import {FundingSourceSynchronizerService} from './funding-source-synchronizer-service';
 import {openNewWindow} from '../utils/utils';
 import {NGXLogger} from 'ngx-logger';
-import {FormGroup} from '@angular/forms';
+import {ControlContainer, FormGroup, NgForm} from '@angular/forms';
 
 @Component({
   selector: 'app-funding-source',
   templateUrl: './funding-source.component.html',
-  styleUrls: ['./funding-source.component.css']
+  styleUrls: ['./funding-source.component.css'],
+  viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
 })
 export class FundingSourceComponent implements OnInit {
 
-  @Input() parentForm: FormGroup;
+  @Input() parentForm: NgForm;
 
   @Input() label = 'Funding Source';
   @Input() name = 'fundingSourceComponent';
@@ -73,7 +74,6 @@ export class FundingSourceComponent implements OnInit {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
     }
-    this.logger.debug(this.parentForm);
   }
 
   // open the funding source help in the new window..

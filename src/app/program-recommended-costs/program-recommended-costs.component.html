@@ -305,12 +305,13 @@
     </div>
   </div>
 
-<!--  <form [formGroup]="programRecommendedCostsEntryForm" (ngSubmit)="onSubmit()">-->
+  <form #prcForm="ngForm" (ngSubmit)="onSubmit()" appFundingSourceCostValidator>
     <div class="modal fade" id="add-fsource-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
           <div class="modal-header">
+            <app-alert-billboard></app-alert-billboard>
             <h5 class="modal-title" id="exampleModalLabel">Add Funding Source</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cleanUpSources()">
               <span aria-hidden="true"><i class="far fa-times"></i></span>
@@ -321,8 +322,7 @@
             <div class="row">
               <div class="col-lg-6">
                 <div class="form-group">
-<!--                  <app-funding-source [parentForm]="programRecommendedCostsEntryForm"></app-funding-source>-->
-                  <app-funding-source></app-funding-source>
+                  <app-funding-source [parentForm]="prcForm"></app-funding-source>
                 </div>
               </div>
             </div>
@@ -435,9 +435,23 @@
                           <input
                             type="text"
                             class="form-control funds-input"
+                            name="recommendedDirect"
+                            #recommendedDirect="ngModel"
                             [(ngModel)]="li.recommendedDirect"
                             id="dc-dollar1"
-                            aria-describedby="dc-dollar-percent">
+                            aria-describedby="dc-dollar-percent"
+                            pattern="[0-9]*"
+                            required>
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="recommendedDirect.errors?.pattern && (recommendedDirect.touched || prcForm.submitted)">
+                          Recommended direct cost must be numeric
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="recommendedDirect.errors?.required && (recommendedDirect.touched || prcForm.submitted)">
+                          Recommended direct cost is required
                         </div>
                       </div>
                     </div>
@@ -451,16 +465,27 @@
                           <input
                             type="text"
                             class="form-control funds-input"
+                            name="recommendedTotal"
+                            #recommendedTotal="ngModel"
                             id="tc-dollar1"
                             [(ngModel)]="li.recommendedTotal"
                             aria-describedby="tc-dollar-percent">
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="prcForm.errors?.totalCostLessThanDirectCost && (recommendedTotal.touched || prcForm.submitted)">
+                          Total cost must be greater than direct cost
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="recommendedTotal.errors.pattern && (recommendedTotal.touched || prcForm.submitted)">
+                          Total cost must be numeric
                         </div>
                       </div>
                     </div>
                     <ng-template #notLast>---</ng-template>
 
                   </td>
-
                 </tr>
                 <tr *ngIf="showDollar && !isRestoration()">
                   <td></td>
@@ -491,12 +516,26 @@
                           <input
                             type="text"
                             class="form-control funds-input"
+                            name="recommendedDirect"
+                            #recommendedDirect="ngModel"
                             [(ngModel)]="li.recommendedDirect"
                             id="dc-dollar"
-                            aria-describedby="dc-dollar-percent">
+                            aria-describedby="dc-dollar-percent"
+                            pattern="[0-9]*"
+                            required>
                         </div>
                         <div class="col-sm-auto right-label" *ngIf="initialPay">
                           <span id="dc-dollar-percent">{{ li.percentCutDirectCalculated | percent:'1.1-3' }} Cut</span>
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="recommendedDirect.errors?.pattern && (recommendedDirect.touched || prcForm.submitted)">
+                          Recommended direct cost must be numeric
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="recommendedDirect.errors?.required && (recommendedDirect.touched || prcForm.submitted)">
+                          Recommended direct cost is required
                         </div>
                       </div>
                     </div>
@@ -510,12 +549,25 @@
                           <input
                             type="text"
                             class="form-control funds-input"
+                            name="recommendedTotal"
+                            #recommendedTotal="ngModel"
                             id="tc-dollar2"
                             [(ngModel)]="li.recommendedTotal"
-                            aria-describedby="tc-dollar-percent">
+                            aria-describedby="tc-dollar-percent"
+                            pattern="[0-9]*">
                         </div>
                         <div class="col-sm-auto right-label" *ngIf="initialPay">
                           <span id="tc-dollar-percent">{{ li.percentCutTotalCalculated | percent:'1.1-3' }} Cut</span>
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="prcForm.errors?.totalCostLessThanDirectCost && (recommendedTotal.touched || prcForm.submitted)">
+                          Total cost must be greater than direct cost
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="recommendedTotal.errors?.pattern && (recommendedTotal.touched || prcForm.submitted)">
+                          Total cost must be numeric
                         </div>
                       </div>
                     </div>
@@ -536,9 +588,17 @@
                         <input type="text"
                                class="form-control funds-input ml-auto"
                                id="tc-dollar3"
+                               name="recommendedDirect"
+                               #recommendedDirectX="ngModel"
                                aria-label="direct cost"
                                [(ngModel)]="li.recommendedDirect"
-                               aria-describedby="tc-dollar-percent">
+                               aria-describedby="tc-dollar-percent"
+                               pattern="[0-9]*">
+                      </div>
+                      <div
+                        class="text-danger mt-1"
+                        *ngIf="recommendedDirectX.errors?.pattern && (recommendedDirectX.touched || prcForm.submitted)">
+                        Recommended direct cost must be numeric
                       </div>
                     </ng-template>
 
@@ -573,10 +633,25 @@
                             type="text"
                             class="form-control percent-input"
                             [(ngModel)]="li.percentCut"
-                            id="perc-cut">
+                            name="percentCut"
+                            #percentCut="ngModel"
+                            id="perc-cut"
+                            pattern="[0-9]*"
+                            required
+                            maxlength="2">
                         </div>
                         <div class="col-sm-auto right-label">
                           <label for="perc-cut">% Cut</label>
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="percentCut.errors?.pattern && (percentCut.touched || prcForm.submitted)">
+                          Percent cut must be numeric
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="percentCut.errors?.required && (percentCut.touched || prcForm.submitted)">
+                          Percent cut is required
                         </div>
                       </div>
                     </div>
@@ -619,8 +694,16 @@
                         <input type="text"
                                class="form-control funds-input"
                                id="tc-dollar"
+                               name="recommendedDirect[{{ i }}]"
+                               #recommendedDirectX="ngModel"
                                [(ngModel)]="li.recommendedDirect"
-                               aria-describedby="tc-dollar-percent">
+                               aria-describedby="tc-dollar-percent"
+                               pattern="[0-9]*">
+                      </div>
+                      <div
+                        class="text-danger mt-1"
+                        *ngIf="recommendedDirectX.errors?.pattern && (recommendedDirectX.touched || prcForm.submitted)">
+                        Recommended direct cost must be numeric
                       </div>
                     </ng-template>
                   </td>
@@ -636,14 +719,11 @@
                     (click)="cleanUpSources()">
               Close
             </button>
-            <button type="submit" class="btn btn-primary" (click)="addFundingSource()">Add
-              Funding Source
-            </button>
-<!--            <input type="submit" class="btn btn-primary" value="Add Funding Source">-->
+            <input type="submit" class="btn btn-primary" value="Add Funding Source">
           </div>
         </div>
       </div>
     </div>
-<!--  </form>-->
+  </form>
 
 </ng-template>

@@ -1,14 +1,19 @@
 <label for="fs-select-1">{{ label }} <a href="#" (click)="openFsDetails()"><i
   class="fas fa-question-circle more-info"></i></a></label>
 
-<!--<div [formGroup]="parentForm">-->
 <ng-select2
   id="fs-select-1"
   name="fundingSourceSelect"
+  #fundingSourceSelect="ngModel"
   [(ngModel)]="selectedValue"
   [allowClear]="false"
-  [options]="options">
+  [options]="options"
+  required>
   <option></option>
   <option *ngFor="let source of availableFundingSources()" [value]="source.fundingSourceId">{{source.fundingSourceName}}</option>
 </ng-select2>
-<!--</div>-->
+<div
+  class="text-danger mt-1"
+  *ngIf="!fundingSourceSelect.valid && (fundingSourceSelect.touched || fundingSourceSelect.dirty || parentForm.submitted)">
+  Funding source is required
+</div>

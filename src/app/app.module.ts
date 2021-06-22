@@ -1,5 +1,5 @@
 import {APP_INITIALIZER, NgModule} from '@angular/core';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
@@ -62,6 +62,8 @@ import {AlertBillboardComponent} from './alert-billboard/alert-billboard.compone
 import {OpenRequestComponent} from './search/open-request/open-request.component';
 import { WorkflowComponent } from './funding-request/workflow/workflow.component';
 import { ApproverListsComponent } from './funding-request/workflow/approver-lists/approver-lists.component';
+import {FundingSourceCostValidatorDirective} from './validators/funding-source-cost-validator.directive';
+
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -133,6 +135,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     OpenRequestComponent,
     WorkflowComponent,
     ApproverListsComponent,
+    FundingSourceCostValidatorDirective,
   ],
 
 
@@ -145,7 +148,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     NgSelect2Module,
     NgbModule,
     FormsModule,
-    ReactiveFormsModule,
     DataTablesModule,
     DragDropModule,
     LoggerModule.forRoot({
