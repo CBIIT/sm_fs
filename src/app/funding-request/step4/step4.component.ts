@@ -140,8 +140,8 @@ export class Step4Component implements OnInit, OnDestroy {
         this.userReadonly = false;
         return;
     }
-    else if (isPa && userId === this.requestModel.requestDto.requestCreateUserId ) {
-      this.logger.debug('PA & is request creator, submit = false, delete = true');
+    else if ((isPa || isPd) && userId === this.requestModel.requestDto.requestCreateUserId ) {
+      this.logger.debug('PA or PD & is request creator, submit = false, delete = true');
       this.userCanSubmit = false;
       this.userCanDelete = true;
       this.userReadonly = false;

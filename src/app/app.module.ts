@@ -61,7 +61,9 @@ import {Type4ConversionMechanismComponent} from './type4-conversion-mechanism/ty
 import {AlertBillboardComponent} from './alert-billboard/alert-billboard.component';
 import {OpenRequestComponent} from './search/open-request/open-request.component';
 import { WorkflowComponent } from './funding-request/workflow/workflow.component';
+import { ApproverListsComponent } from './funding-request/workflow/approver-lists/approver-lists.component';
 import {FundingSourceCostValidatorDirective} from './validators/funding-source-cost-validator.directive';
+
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -132,6 +134,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     AlertBillboardComponent,
     OpenRequestComponent,
     WorkflowComponent,
+    ApproverListsComponent,
     FundingSourceCostValidatorDirective,
   ],
 

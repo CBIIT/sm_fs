@@ -28,6 +28,7 @@ export class RetrieveRequestComponent implements OnInit {
           this.logger.debug('retrieveFundingReuest returned ', result);
           this.requestModel.requestDto = result.requestDto;
           this.requestModel.grant = result.grantDto;
+          this.requestModel.requestDto.financialInfoDto.requestorNpnId = this.requestModel.requestDto.requestorNpnId;
           if (this.requestModel.requestDto.scheduledApprovers && this.requestModel.requestDto.scheduledApprovers.length > 0 ) {
             this.requestModel.mainApproverCreated = true;
           }
