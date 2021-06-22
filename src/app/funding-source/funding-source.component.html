@@ -12,4 +12,8 @@
   <option></option>
   <option *ngFor="let source of availableFundingSources()" [value]="source.fundingSourceId">{{source.fundingSourceName}}</option>
 </ng-select2>
-<div class="text-danger mt-1" *ngIf="!fundingSourceSelect.valid && fundingSourceSelect.touched">Funding source is required</div>
+<div
+  class="text-danger mt-1"
+  *ngIf="!fundingSourceSelect.valid && (fundingSourceSelect.touched || fundingSourceSelect.dirty || parentForm.submitted)">
+  Funding source is required
+</div>

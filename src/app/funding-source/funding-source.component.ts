@@ -17,7 +17,7 @@ import {ControlContainer, FormGroup, NgForm} from '@angular/forms';
 })
 export class FundingSourceComponent implements OnInit {
 
-  @Input() parentForm: FormGroup;
+  @Input() parentForm: NgForm;
 
   @Input() label = 'Funding Source';
   @Input() name = 'fundingSourceComponent';
@@ -74,7 +74,6 @@ export class FundingSourceComponent implements OnInit {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
     }
-    this.logger.debug(this.parentForm);
   }
 
   // open the funding source help in the new window..

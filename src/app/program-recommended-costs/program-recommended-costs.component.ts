@@ -15,7 +15,9 @@ import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequ
 import {FundingSourceTypes} from '../model/funding-source-types';
 import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point';
 import {PRC_DISPLAY_FORMAT} from './program-recommended-costs-model';
-import {Form, FormBuilder, FormControl, FormGroup, NgForm, Validators} from '@angular/forms';
+import {NgForm} from '@angular/forms';
+import {FundingSourceComponent} from '../funding-source/funding-source.component';
+import {AlertService} from '../service/alert.service';
 
 
 @Component({
@@ -25,8 +27,8 @@ import {Form, FormBuilder, FormControl, FormGroup, NgForm, Validators} from '@an
 })
 export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
-  @ViewChild('prcForm', { static: false }) prcEntryForm: NgForm;
-
+  @ViewChild('prcForm', {static: false}) prcForm: NgForm;
+  @ViewChild(FundingSourceComponent) fsc: FundingSourceComponent;
 
   _selectedDocs: string;
   initialPay: boolean;
@@ -76,7 +78,8 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService, private logger: NGXLogger,
-              private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
+              private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
+              public alertService: AlertService) {
   }
 
   ngOnDestroy(): void {
@@ -163,6 +166,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     // @ts-ignore
     $('#add-fsource-modal').modal('hide');
     this.selectedSourceId = undefined;
+    this.fsc.selectedValue = undefined;
   }
 
   editSource(i: number): void {
@@ -338,9 +342,11 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    this.logger.debug(this.prcEntryForm);
-    if (this.prcEntryForm.valid) {
+    this.logger.debug(this.prcForm);
+    if (this.prcForm.valid) {
       this.addFundingSource();
+    } else {
+      this.logger.warn('Validation error on add funding source modal');
     }
   }
 }
