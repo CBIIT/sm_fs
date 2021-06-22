@@ -29,6 +29,7 @@ export class Step4Component implements OnInit, OnDestroy {
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   isRequestEverSubmitted = false;
   requestHistorySubscriber: Subscription;
+  activeApproverSubscriber: Subscription;
   submissionResult: {status: 'success'|'failure'|'', frqId?: number, approver?: FundingReqApproversDto, errorMessage?: string}
                     = {status: ''};
   requestStatus: string;
@@ -59,6 +60,9 @@ export class Step4Component implements OnInit, OnDestroy {
     if (this.requestHistorySubscriber) {
       this.requestHistorySubscriber.unsubscribe();
     }
+    if (this.activeApproverSubscriber) {
+      this.activeApproverSubscriber.unsubscribe();
+    }
   }
 
   ngOnInit(): void {
@@ -67,6 +71,11 @@ export class Step4Component implements OnInit, OnDestroy {
     this.requestHistorySubscriber = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
       (historyResult) => {
         this.parseRequestHistories(historyResult);
+      }
+    );
+    this.activeApproverSubscriber = this.requestIntegrationService.activeApproverEmitter.subscribe(
+      (approver) => {
+        this.setActiveApprover(approver);
       }
     );
     this.docDtos = this.requestModel.requestDto.includedDocs;
@@ -116,7 +125,7 @@ export class Step4Component implements OnInit, OnDestroy {
       this.userReadonly = true;
       return;
     }
-    else if ( isPd && userNpnId === this.requestModel.requestDto.requestorNpnId ) {
+    else if ( isPd && userNpnId === this.requestModel.requestDto.financialInfoDto.requestorNpnId ) {
       this.logger.debug('PD & is this requestor, submit & delete = true');
       this.userCanSubmit = true;
       this.userCanDelete = true;
@@ -124,7 +133,7 @@ export class Step4Component implements OnInit, OnDestroy {
       return;
     }
     else if (isPd && (userCas !== null ) && ( userCas.length > 0)
-      && (userCas.indexOf (this.requestModel.requestDto.cayCode) > -1 )) {
+      && (userCas.indexOf (this.requestModel.requestDto.financialInfoDto.requestorCayCode) > -1 )) {
         this.logger.debug('PD & CA matches request\'s CA, submit & delete = true');
         this.userCanSubmit = true;
         this.userCanDelete = true;

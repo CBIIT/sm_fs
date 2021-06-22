@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
+import { FundingRequestIntegrationService } from '../integration/integration.service';
 
 @Component({
   selector: 'app-workflow',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class WorkflowComponent implements OnInit {
 
-  constructor() { }
+  @Input() readonly = false;
+
+  comments = '';
+
+  constructor(private requestIntegrationService: FundingRequestIntegrationService,
+              private logger: NGXLogger) { }
 
   ngOnInit(): void {
   }
 
+  setActiveApprover(event): void {
+    this.requestIntegrationService.activeApproverEmitter.next(event);
+  }
 }
