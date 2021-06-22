@@ -588,11 +588,17 @@
                         <input type="text"
                                class="form-control funds-input ml-auto"
                                id="tc-dollar3"
-                               name="recommendedDirect[{{ i }}]"
+                               name="recommendedDirect"
+                               #recommendedDirectX="ngModel"
                                aria-label="direct cost"
                                [(ngModel)]="li.recommendedDirect"
                                aria-describedby="tc-dollar-percent"
                                pattern="[0-9]*">
+                      </div>
+                      <div
+                        class="text-danger mt-1"
+                        *ngIf="recommendedDirectX.errors?.pattern && (recommendedDirectX.touched || prcForm.submitted)">
+                        Recommended direct cost must be numeric
                       </div>
                     </ng-template>
 
@@ -691,7 +697,8 @@
                                name="recommendedDirect[{{ i }}]"
                                #recommendedDirectX="ngModel"
                                [(ngModel)]="li.recommendedDirect"
-                               aria-describedby="tc-dollar-percent">
+                               aria-describedby="tc-dollar-percent"
+                               pattern="[0-9]*">
                       </div>
                       <div
                         class="text-danger mt-1"

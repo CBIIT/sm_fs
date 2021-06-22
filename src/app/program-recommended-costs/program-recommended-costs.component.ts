@@ -332,9 +332,13 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       this.lineItem.forEach((li, index) => {
         if (index !== 0) {
           if (this.showPercent) {
-            li.percentCut = first.percentCut;
+            if (!isNaN(first.percentCut)) {
+              li.percentCut = first.percentCut;
+            }
           } else {
-            li.recommendedDirect = first.recommendedDirect;
+            if (!isNaN(first.recommendedDirect)) {
+              li.recommendedDirect = first.recommendedDirect;
+            }
           }
         }
       });
@@ -345,6 +349,16 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     this.logger.debug(this.prcForm);
     if (this.prcForm.valid) {
       this.addFundingSource();
+      // TODO: Clear form after successful save
+      // this.prcForm.reset();
+      for (const name in this.prcForm.controls) {
+        this.logger.debug('control:', name, this.prcForm.controls[name]);
+      }
+      // this.logger.debug('resetting form');
+      // this.prcForm.reset();
+      // for (const name in this.prcForm.controls) {
+      //   this.logger.debug('control:', name, this.prcForm.controls[name]);
+      // }
     } else {
       this.logger.warn('Validation error on add funding source modal');
     }
