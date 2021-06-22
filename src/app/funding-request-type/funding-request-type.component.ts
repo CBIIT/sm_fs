@@ -9,8 +9,7 @@ import {NGXLogger} from 'ngx-logger';
 import {Select2OptionData} from 'ng-select2';
 import {FundingRequestTypeRulesDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestTypeRulesDto';
 import {FundingRequestTypes} from '../model/funding-request-types';
-import {Alert} from '../service/alert';
-import {AlertService} from '../service/alert.service';
+import {Alert} from '../alert-billboard/alert';
 
 
 @Component({
@@ -20,6 +19,7 @@ import {AlertService} from '../service/alert.service';
 })
 export class FundingRequestTypeComponent implements OnInit {
   @Input() filter: boolean;
+  alerts: Alert[] = [];
   public requestTypes: FundingRequestTypeRulesDto[] = [];
   public searchFilter:
     { requestOrPlan: string; searchPool: string; requestType: string; }
@@ -33,13 +33,16 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   @Output() selectedValueChange = new EventEmitter<number>();
+  alert: Alert = {
+    type: 'warning',
+    message: 'WARNING: This option should be selected only if your request will not be using any NCI funds. Are you sure you want to continue?'
+  };
 
   set selectedValue(value: number) {
     if (value && Number(value) === FundingRequestTypes.OTHER_PAY_COMPETING_ONLY) {
-      this.alertService.pushAlert({
-        type: 'warning',
-        message: 'WARNING: This option should be selected only if your request will not be using any NCI funds. Are you sure you want to continue?'
-      } as Alert);
+      this.alerts.push(this.alert);
+    } else {
+      this.alerts.splice(this.alerts.indexOf(this.alert), 1);
     }
     this.model.requestDto.frtId = value;
     this.model.requestDto.financialInfoDto.requestTypeId = value;
@@ -61,8 +64,7 @@ export class FundingRequestTypeComponent implements OnInit {
               private searchFilterService: SearchFilterService,
               private userService: UserService,
               private model: RequestModel,
-              private logger: NGXLogger,
-              private alertService: AlertService) {
+              private logger: NGXLogger) {
   }
 
   ngOnInit(): void {

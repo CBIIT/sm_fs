@@ -310,8 +310,8 @@
          aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
+          <app-alert-billboard [alerts]="alerts"></app-alert-billboard>
           <div class="modal-header">
-            <app-alert-billboard></app-alert-billboard>
             <h5 class="modal-title" id="exampleModalLabel">Add Funding Source</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cleanUpSources()">
               <span aria-hidden="true"><i class="far fa-times"></i></span>

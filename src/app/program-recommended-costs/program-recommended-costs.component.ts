@@ -17,8 +17,7 @@ import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point
 import {PRC_DISPLAY_FORMAT} from './program-recommended-costs-model';
 import {NgForm} from '@angular/forms';
 import {FundingSourceComponent} from '../funding-source/funding-source.component';
-import {AlertService} from '../service/alert.service';
-
+import {Alert} from '../alert-billboard/alert';
 
 @Component({
   selector: 'app-program-recommended-costs',
@@ -29,6 +28,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   @ViewChild('prcForm', {static: false}) prcForm: NgForm;
   @ViewChild(FundingSourceComponent) fsc: FundingSourceComponent;
+  alerts: Alert[] = [];
 
   _selectedDocs: string;
   initialPay: boolean;
@@ -78,8 +78,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService, private logger: NGXLogger,
-              private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
-              public alertService: AlertService) {
+              private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
   }
 
   ngOnDestroy(): void {
@@ -349,6 +348,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     this.logger.debug(this.prcForm);
     if (this.prcForm.valid) {
       this.addFundingSource();
+      this.alerts = [];
       // TODO: Clear form after successful save
       // this.prcForm.reset();
       for (const name in this.prcForm.controls) {
@@ -360,7 +360,29 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       //   this.logger.debug('control:', name, this.prcForm.controls[name]);
       // }
     } else {
-      this.logger.warn('Validation error on add funding source modal');
+      const alert: Alert = {
+        type: 'danger',
+        message: 'Please correct all errors below before continuing',
+        title: ''
+      };
+      this.alerts.push(alert);
+    }
+  }
+
+  deleteAlert(alert: Alert): void {
+    this.logger.debug('Deleting alert now', alert);
+    let i = this.alerts.indexOf(alert);
+    if (i === -1) {
+      this.logger.warn('Alert not found in queue');
+      this.alerts.forEach((a, index) => {
+        if (a.type === alert.type && a.message === alert.message) {
+          console.log('found manually at index', index);
+          i = index;
+        }
+      });
+      this.alerts.splice(i, 1);
+    } else {
+      this.alerts.splice(i, 1);
     }
   }
 }

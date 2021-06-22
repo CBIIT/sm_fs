@@ -4,7 +4,7 @@
     <h2 class="mb-3">Request Information</h2>
   </div>
   <div class="col-12">
-    <app-alert-billboard></app-alert-billboard>
+    <app-alert-billboard [alerts]="myAlerts"></app-alert-billboard>
   </div>
 
   <div class="col-lg-4">
@@ -33,13 +33,14 @@
     <lib-cancer-activities-dropdown [selectSingleOption]="true" [(selectedValue)]="selectedCayCode" [maxSelection]="1" [syncWithPd]="true" label="Requesting PD's Cancer Activity"></lib-cancer-activities-dropdown>
   </div>
 
-  <div class="col-md-2 col-lg-4">
-    <app-type4-conversion-mechanism *ngIf="type4Selected()"></app-type4-conversion-mechanism>
+  <div class="col-md-2 col-lg-4" *ngIf="type4Selected()">
+    <app-type4-conversion-mechanism ></app-type4-conversion-mechanism>
   </div>
 
 </div><!-- END Row -->
+
 <div class="row">
-  <div class="col-12">
-    <app-skipped-grants *ngIf="payUsingSkip()"></app-skipped-grants>
+  <div class="col-12"*ngIf="payUsingSkip()">
+    <app-skipped-grants ></app-skipped-grants>
   </div>
 </div>

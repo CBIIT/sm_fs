@@ -1,8 +1,15 @@
-<app-grant-information></app-grant-information>
-<hr>
-<app-request-information></app-request-information>
+<div class="row">
+  <div class="col-12 d-flex">
+    <app-alert-billboard [alerts]="alerts"></app-alert-billboard>
+  </div>
+</div>
+<form #step2Form="ngForm" (ngSubmit)="onSubmit()">
+  <app-grant-information></app-grant-information>
+  <hr>
+  <app-request-information></app-request-information>
 
-<app-program-recommended-costs *ngIf="requestTypeSelected()"></app-program-recommended-costs>
+  <app-program-recommended-costs *ngIf="requestTypeSelected()"></app-program-recommended-costs>
+</form>
 
 <hr>
 <div class="row">

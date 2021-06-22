@@ -1,12 +1,13 @@
-import {AfterContentChecked, Component, Inject, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../../service/app-properties.service';
 import {NGXLogger} from 'ngx-logger';
-import {FundingRequestValidationService} from '../../model/funding-request-validation-service';
 import {FundingRequestTypes} from '../../model/funding-request-types';
 import {ProgramRecommendedCostsComponent} from '../../program-recommended-costs/program-recommended-costs.component';
+import {Alert} from '../../alert-billboard/alert';
+import {NgForm} from '@angular/forms';
 
 @Component({
   selector: 'app-step2',
@@ -16,6 +17,9 @@ import {ProgramRecommendedCostsComponent} from '../../program-recommended-costs/
 export class Step2Component implements OnInit {
 
   @ViewChild(ProgramRecommendedCostsComponent) prc: ProgramRecommendedCostsComponent;
+  @ViewChild('step2Form', {static: false}) step2Form: NgForm;
+
+  alerts: Alert[] = [];
 
 
   constructor(private router: Router, private requestModel: RequestModel,
@@ -92,5 +96,9 @@ export class Step2Component implements OnInit {
 
   canGoBack(): boolean {
     return this.model.requestDto.frqId === undefined;
+  }
+
+  onSubmit(): void {
+    this.logger.debug(this.step2Form);
   }
 }
