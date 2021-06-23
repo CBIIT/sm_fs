@@ -16,8 +16,8 @@
 </div>
 <div class="col-12 col-md-3 form-group">
 <app-search-pool></app-search-pool>
-  <form #form>
-<app-funding-request-type [parentForm]="form" [filter]="false" *ngIf="isSearchingRequest()"></app-funding-request-type>
+  <form #xyz="ngForm">
+<app-funding-request-type [parentForm]="xyz" [filter]="false" *ngIf="isSearchingRequest()"></app-funding-request-type>
   </form>
 <lib-rfa-pa-dropdown  *ngIf="!isSearchingRequest()"></lib-rfa-pa-dropdown>
 <lib-fy-range [minYear]="2001" [maxYear]="2025" ></lib-fy-range>

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {isArray} from 'rxjs/internal-compatibility';
@@ -7,6 +7,7 @@ import {FundingRequestValidationService} from '../model/funding-request-validati
 import {FundingRequestTypes} from '../model/funding-request-types';
 import {Alert} from '../alert-billboard/alert';
 import {ControlContainer, NgForm} from '@angular/forms';
+import {CancerActivitiesDropdownComponent} from '@nci-cbiit/i2ecui-lib';
 
 @Component({
   selector: 'app-request-information',
@@ -15,6 +16,7 @@ import {ControlContainer, NgForm} from '@angular/forms';
   viewProviders: [{provide: ControlContainer, useExisting: NgForm}],
 })
 export class RequestInformationComponent implements OnInit {
+  @ViewChild(CancerActivitiesDropdownComponent) cayCode: CancerActivitiesDropdownComponent;
   @Input() parentForm: NgForm;
 
   myAlerts: Alert[] = [];
@@ -93,7 +95,9 @@ export class RequestInformationComponent implements OnInit {
     this.requestModel.requestDto.financialInfoDto.requestorNpnId = value;
     if (valueChanged) {
       this.logger.debug('Resetting requestorCayCode');
+      this.requestModel.requestDto.requestorCayCode = undefined;
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
+      this.cayCode.selectedValue = null;
     }
   }
 

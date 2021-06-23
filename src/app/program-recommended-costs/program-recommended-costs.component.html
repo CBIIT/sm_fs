@@ -285,7 +285,7 @@
       <div class="col-lg-6">
         <div class="form-group">
           <label for="cost-comments">Comments <span class="optional">(optional)</span></label>
-          <textarea class="form-control" #cost_comments id="cost-comments"
+          <textarea class="form-control" #cost_comments id="cost-comments" name="comments"
                     [(ngModel)]="model.requestDto.financialInfoDto.comments" rows="3" maxlength="2000"></textarea>
           <span class="character-counter">{{ cost_comments.value.length }}/2000</span>
         </div>
