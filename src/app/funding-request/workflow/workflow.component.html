@@ -17,6 +17,17 @@
       </ngb-alert>
     </div>
     
+    <div class="form-group">
+        <label for="workflow-action">Action</label>
+        <ng-select2
+          id="workflow-action"
+          name="workflowAction"
+          [(ngModel)]="selectedWorkflowAction"
+          [allowClear]="true"
+          [data]="workflowActions">
+        </ng-select2>
+    </div>
+
     <div class="col-12">
           <app-next-scheduled-approvers-request [readonly]="readonly" (activeApprover)="setActiveApprover($event)"></app-next-scheduled-approvers-request>
     </div>

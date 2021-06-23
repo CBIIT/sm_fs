@@ -66,7 +66,31 @@
 
 <!-- START Workflow -->
 
-<app-workflow [readonly]="readonly"></app-workflow>
+<div class="row">
+  <div class="col-12 d-flex">
+    <h2 id="workflow">Workflow</h2>
+    <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#workflow-collapse" role="button"
+      aria-expanded="true" aria-controls="workflow-collapse"></a>
+  </div>
+</div>
+
+<div class="row collapse show" id="workflow-collapse">
+  
+  <div class="col-12">
+        <app-next-scheduled-approvers-request [readonly]="readonly" (activeApprover)="setActiveApprover($event)"></app-next-scheduled-approvers-request>
+  </div>
+
+
+  <div class="col-12">
+    <div class="form-group" *ngIf="!readonly">
+      <label for="workflow-comments">Workflow Comments <span class="optional">(optional)</span></label>
+      <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments"></textarea>
+      <span class="character-counter">{{comments.length}}/2000</span>
+    </div>
+  </div>
+  
+</div>
+
 
 <!-- END Workflow -->
 
