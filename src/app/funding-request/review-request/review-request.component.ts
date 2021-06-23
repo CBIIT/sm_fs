@@ -5,7 +5,8 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 import {
   FsRequestControllerService, FundingReqStatusHistoryDto,
   NciPfrGrantQueryDto, FundingRequestDtoReq, DocumentsDto,
-  FundingReqApproversDto
+  FundingReqApproversDto, FsWorkflowControllerService, FundingRequestPermDelDto,
+  NciPerson, I2ERoles
 } from '@nci-cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
@@ -28,13 +29,14 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
 
   statusesCanWithdraw = ['SUBMITTED', 'ON HOLD', 'RFC'];
   statusesCanOnHold = ['SUBMITTED'];
+  terminalStatus = ['COMPLETED', 'REJECTED'];
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   isRequestEverSubmitted = false;
   requestHistorySubscriber: Subscription;
   activeApproverSubscriber: Subscription;
-  submissionResult: {status: 'success'|'failure'|'', frqId?: number, approver?: FundingReqApproversDto, errorMessage?: string}
-                    = {status: ''};
+  submissionResult: { status: 'success' | 'failure' | '', frqId?: number, approver?: FundingReqApproversDto, errorMessage?: string }
+    = { status: '' };
   requestStatus: string;
   docDtos: DocumentsDto[];
   readonly = false;
@@ -47,16 +49,18 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
   userReadonly = true;
   justificationMissing = false;
   transitionMemoMissing = false;
+  isDisplayBudgetDocsUploadVar: boolean = false;
 
   constructor(private router: Router,
-              private requestModel: RequestModel,
-              private propertiesService: AppPropertiesService,
-              private fsRequestService: FsRequestControllerService,
-              private userSessionService: AppUserSessionService,
-              private requestIntegrationService: FundingRequestIntegrationService,
-              private documentService: DocumentService,
-              private changeDetection: ChangeDetectorRef,
-              private logger: NGXLogger) {
+    private requestModel: RequestModel,
+    private propertiesService: AppPropertiesService,
+    private fsRequestService: FsRequestControllerService,
+    private userSessionService: AppUserSessionService,
+    private requestIntegrationService: FundingRequestIntegrationService,
+    private documentService: DocumentService,
+    private changeDetection: ChangeDetectorRef,
+    private logger: NGXLogger,
+    private fsWorkflowControllerService: FsWorkflowControllerService) {
   }
 
   ngOnDestroy(): void {
@@ -84,6 +88,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
     this.docDtos = this.requestModel.requestDto.includedDocs;
     this.checkUserRolesCas();
     this.checkDocs();
+    this.isDisplayBudgetDocsUploadVar = true;
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
@@ -121,29 +126,29 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
     const userCas = this.userSessionService.getUserCaCodes();
     const userNpnId = this.userSessionService.getLoggedOnUser().npnId;
     const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-    if ( !isPd && !isPa) {
+    if (!isPd && !isPa) {
       this.logger.debug('Neither PD or PA, submit & delete = false');
       this.userCanDelete = false;
       this.userCanSubmit = false;
       this.userReadonly = true;
       return;
     }
-    else if ( isPd && userNpnId === this.requestModel.requestDto.financialInfoDto.requestorNpnId ) {
+    else if (isPd && userNpnId === this.requestModel.requestDto.financialInfoDto.requestorNpnId) {
       this.logger.debug('PD & is this requestor, submit & delete = true');
       this.userCanSubmit = true;
       this.userCanDelete = true;
       this.userReadonly = false;
       return;
     }
-    else if (isPd && (userCas !== null ) && ( userCas.length > 0)
-      && (userCas.indexOf (this.requestModel.requestDto.financialInfoDto.requestorCayCode) > -1 )) {
-        this.logger.debug('PD & CA matches request\'s CA, submit & delete = true');
-        this.userCanSubmit = true;
-        this.userCanDelete = true;
-        this.userReadonly = false;
-        return;
+    else if (isPd && (userCas !== null) && (userCas.length > 0)
+      && (userCas.indexOf(this.requestModel.requestDto.financialInfoDto.requestorCayCode) > -1)) {
+      this.logger.debug('PD & CA matches request\'s CA, submit & delete = true');
+      this.userCanSubmit = true;
+      this.userCanDelete = true;
+      this.userReadonly = false;
+      return;
     }
-    else if ((isPa || isPd) && userId === this.requestModel.requestDto.requestCreateUserId ) {
+    else if ((isPa || isPd) && userId === this.requestModel.requestDto.requestCreateUserId) {
       this.logger.debug('PA or PD & is request creator, submit = false, delete = true');
       this.userCanSubmit = false;
       this.userCanDelete = true;
@@ -162,12 +167,12 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
   checkDocs(): void {
     this.justificationMissing = true;
     this.transitionMemoMissing = false;
-    if ( this.requestModel.requestDto.justification
-      && this.requestModel.requestDto.justification.length > 0 ) {
+    if (this.requestModel.requestDto.justification
+      && this.requestModel.requestDto.justification.length > 0) {
       this.justificationMissing = false;
     }
-    else if (this.docDtos && this.docDtos.length > 0 ){
-      for (const doc of this.docDtos)  {
+    else if (this.docDtos && this.docDtos.length > 0) {
+      for (const doc of this.docDtos) {
         if (doc.docType === 'Justification') {
           this.justificationMissing = false;
           break;
@@ -241,7 +246,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
       },
       (error) => {
         this.logger.error('Failed when calling submitRequestUsingPOST', error);
-        this.submissionResult = {status: 'failure'};
+        this.submissionResult = { status: 'failure' };
         if (error.error) {
           this.submissionResult.errorMessage = error.error.errorMessage;
         }
@@ -251,14 +256,14 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
 
   submitWorkflow(action: string): void {
     this.workflowModal.openConfirmModal(action).then(
-        (result) => {
-          this.logger.debug(action + ' API call returned successfully', result);
-          this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
-          if (action === 'WITHDRAW') {
-            this.requestModel.enableStepLinks();
-          }
+      (result) => {
+        this.logger.debug(action + ' API call returned successfully', result);
+        this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
+        if (action === 'WITHDRAW') {
+          this.requestModel.enableStepLinks();
         }
-      )
+      }
+    )
       .catch(
         (reason) => {
           this.logger.debug('user dismissed workflow confirmation modal without proceed', reason);
@@ -302,7 +307,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
     this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          const blob = new Blob([response.body], {type: response.headers.get('content-type') });
+          const blob = new Blob([response.body], { type: response.headers.get('content-type') });
           saveAs(blob, 'Cover Page.pdf');
         }
       );
@@ -316,7 +321,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
       this.documentService.downloadById(id)
         .subscribe(
           (response: HttpResponse<Blob>) => {
-            const blob = new Blob([response.body], {type: response.headers.get('content-type') });
+            const blob = new Blob([response.body], { type: response.headers.get('content-type') });
             saveAs(blob, fileName);
           }
         );
@@ -326,11 +331,98 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
 
   downloadSummaryStatement(): void {
     this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId)
-    .subscribe(
-      blob => saveAs(blob, 'Summary Statement.pdf'),
-      _error => this.logger.error('Error downloading the file'),
-      () => this.logger.debug('File downloaded successfully')
+      .subscribe(
+        blob => saveAs(blob, 'Summary Statement.pdf'),
+        _error => this.logger.error('Error downloading the file'),
+        () => this.logger.debug('File downloaded successfully')
       );
+  }
+
+  isDisplayBudgetDocsUpload(): boolean {
+    var isFundApprover: boolean = false;
+    this.fsWorkflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
+      result => {
+        if (result) {
+          if (!this.isTerminalStatus() && this.requestStatus !== 'ON HOLD') {
+            for (let role in result) {
+              if (this.isCurrentApprover(result[role])) {
+                if (result[role].roleCode == "FCARC" ||
+                  result[role].roleCode == "FCNCI") {
+                  isFundApprover = true;
+                }
+              }
+            }
+          }
+        }
+        this.logger.debug('Getting Approvers: ', result);
+      }, error => {
+        this.logger.error('HttpClient get request error for----- ' + error.message);
+      });
+    return false
+  }
+
+  isTerminalStatus(): boolean {
+    return (this.terminalStatus.indexOf(this.requestStatus) > -1);
+  }
+
+  isCurrentApprover(approver: FundingReqApproversDto): boolean {
+    var isApprover: boolean = false;
+    var loggedOnUser: NciPerson = this.userSessionService.getLoggedOnUser();
+    const userId = loggedOnUser.nihNetworkId;
+    if (approver.activeFlag === 'Y') {
+      if (approver.approverLdap.toLowerCase === userId.toLowerCase ||
+        this.isCurrentUserDesignee(approver.designees) ||
+        this.isUserPfrGmCommonApprover(approver, loggedOnUser)) {
+
+      }
+    }
+    return false;
+  }
+
+  isCurrentUserDesignee(designees: Array<FundingRequestPermDelDto>): boolean {
+    if (designees) {
+      const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+      for (let designee in designees) {
+        if (designees[designee].delegateTo.toLowerCase === userId.toLowerCase) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  isUserOEFIAFinacialAnalyst(approver: FundingReqApproversDto, loggedOnUser: NciPerson): boolean {
+    if (approver.roleCode === 'FCNCI' && this.hasOEFIARole(loggedOnUser)) {
+      return true;
+    }
+    return false;
+  }
+
+  hasOEFIARole(loggedOnUser: NciPerson): boolean {
+    var rolesList: I2ERoles[] = loggedOnUser.roles;
+    for (let role in rolesList) {
+      if (rolesList[role].roleCode === 'FA' && rolesList[role].orgAbbrev === 'OEFIA') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isUserPfrGmCommonApprover(approver: FundingReqApproversDto, loggedOnUser: NciPerson): boolean {
+    if (approver.roleCode === 'GM' && this.hasPFRGMAPRRole(loggedOnUser)) {
+      return true;
+    }
+    return false;
+  }
+
+  hasPFRGMAPRRole(loggedOnUser: NciPerson): boolean {
+    var rolesList: I2ERoles[] = loggedOnUser.roles;
+    for (let role in rolesList) {
+      if (rolesList[role].roleCode === 'PFRGMAPR') {
+        return true;
+      }
+    }
+    return false;
   }
 
 }

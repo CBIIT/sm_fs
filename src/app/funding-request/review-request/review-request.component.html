@@ -1,11 +1,13 @@
 <div #submitResult></div>
 <div class="alert alert-success" role="alert" *ngIf="submissionResult && submissionResult.status === 'success'">
   <h1>Success!</h1>
-  <b>Request #{{submissionResult.frqId}}</b> was sent to 
-  <a href="mailto: {{submissionResult.approver.approverEmailAddress}}">{{submissionResult.approver.approverFullName}}</a> for review.
+  <b>Request #{{submissionResult.frqId}}</b> was sent to
+  <a
+    href="mailto: {{submissionResult.approver.approverEmailAddress}}">{{submissionResult.approver.approverFullName}}</a>
+  for review.
   View the request below or return to the <a routerLink="/search">Search</a>.
 </div>
-<div class="alert alert-danger" *ngIf="submissionResult && submissionResult.status === 'failure'" >
+<div class="alert alert-danger" *ngIf="submissionResult && submissionResult.status === 'failure'">
   <h1>Failed to submit request</h1>
   {{submissionResult.errorMessage}}
 </div>
@@ -47,9 +49,9 @@
       <span *ngIf="item.docFilename !== 'Summary Statement'" class="doc-desc">(Added by <a
           href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
         {{item.createDate}})</span>
-      
+
       <div class="ml-auto">
-        
+
         <button class="btn btn-link btn-slim ml-1" title="View" (click)="downloadFile(item.id, item.docFilename)"><i
             class="fas fa-eye" aria-hidden="true"></i></button>
       </div>
@@ -63,6 +65,13 @@
 <!-- END Supporting Docs -->
 
 <hr>
+
+<!-- START Budget Documents-->
+<!-- <div *ngIf="isDisplayBudgetDocsUploadVar">
+<app-upload-budget-documents *ngIf="isDisplayBudgetDocsUploadVar"></app-upload-budget-documents>
+</div> -->
+<app-upload-budget-documents *ngIf="isDisplayBudgetDocsUploadVar"></app-upload-budget-documents>
+<!-- END Budget Documents-->
 
 <!-- START Workflow -->
 
@@ -81,7 +90,8 @@
     <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
       <button class="btn btn-primary" disabled>Submit Request</button>
     </span>
-    <button class="btn btn-primary mr-2" (click)="submitWorkflow('WITHDRAW')" *ngIf="withdrawVisible()">Withdraw</button>
+    <button class="btn btn-primary mr-2" (click)="submitWorkflow('WITHDRAW')"
+      *ngIf="withdrawVisible()">Withdraw</button>
     <button class="btn btn-primary mr-2" (click)="submitWorkflow('HOLD')" *ngIf="putOnHoldVisible()">Hold</button>
 
   </div>

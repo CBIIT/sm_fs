@@ -67,6 +67,7 @@ import {FundingSourceCostValidatorDirective} from './validators/funding-source-c
 import {DiversitySupplementValidatorDirective} from './validators/diversity-supplement-validator-directive';
 import {PdNameRequiredValidatorDirective} from './validators/pd-name-required-validator-directive';
 import {CancerActivityRequiredValidatorDirective} from './validators/cancer-activity-required-validator-directive';
+import { UploadBudgetDocumentsComponent } from './upload-budget-documents/upload-budget-documents.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
@@ -144,6 +145,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     DiversitySupplementValidatorDirective,
     PdNameRequiredValidatorDirective,
     CancerActivityRequiredValidatorDirective,
+    UploadBudgetDocumentsComponent,
   ],
 
 

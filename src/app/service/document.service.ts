@@ -62,5 +62,9 @@ export class DocumentService {
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' });
   }
 
+  getFSBudgetFiles(keyId: number, keyType: string): Observable<Array<DocumentsDto>> {
+    return this.documentsControllerService.loadFsFinanceDocumentsUsingGET(keyId, keyType);
+  }
+
 
 }
