@@ -1,15 +1,15 @@
 <div class="form-row">
   <div class="form-group">
     <label for="div-supp">Type of Supplement</label>
-    <div class="col-12">
-      <div id="div-supp" class="btn-group btn-group-toggle" ngbRadioGroup name="value">
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="1">New
-        </label>
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="2">Additional Year
-        </label>
-      </div>
-    </div>
+    <ng-select2
+      id="div-supp"
+      name="divSuppType"
+      #divSuppType="ngModel"
+      [(ngModel)]="requestModel.requestDto.financialInfoDto.supplementType"
+      [allowClear]="false">
+      <option></option>
+      <option value="1">New</option>
+      <option value="2">Additional Year</option>
+    </ng-select2>
   </div>
 </div>
