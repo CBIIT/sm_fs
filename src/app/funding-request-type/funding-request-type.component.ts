@@ -21,6 +21,7 @@ import {ControlContainer, NgForm} from '@angular/forms';
 })
 export class FundingRequestTypeComponent implements OnInit {
   @Input() filter: boolean;
+  @Input() parentForm: NgForm;
   alerts: Alert[] = [];
   public requestTypes: FundingRequestTypeRulesDto[] = [];
   public searchFilter:

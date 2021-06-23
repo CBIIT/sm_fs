@@ -8,7 +8,7 @@
   </div>
 
   <div class="col-lg-4">
-    <app-funding-request-type [(selectedValue)]="selectedRequestType" [filter]="true"></app-funding-request-type>
+    <app-funding-request-type [parentForm]="parentForm" [(selectedValue)]="selectedRequestType" [filter]="true"></app-funding-request-type>
   </div>
 
   <div class="col-lg-6">
@@ -20,7 +20,13 @@
         class="form-control"
         type="text"
         name="requestName"
+        #requestName="ngModel"
         [(ngModel)]="model.requestDto.financialInfoDto.requestName" required>
+      <div
+        class="text-danger mt-1"
+        *ngIf="!requestName.valid && (requestName.touched || parentForm.submitted)">
+        Request name is required
+      </div>
     </div>
   </div>
 
@@ -33,10 +39,21 @@
 
   <div class="col-md-4 col-lg-4">
     <lib-pdname-dropdown [(selectedValue)]="selectedPd" label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
+    <div
+      class="text-danger mt-1"
+      *ngIf="parentForm.errors?.pdNameRequired && (parentForm.submitted || parentForm.touched)">
+      PD is required
+    </div>
+
   </div>
 
   <div class="col-md-4 col-lg-4">
     <lib-cancer-activities-dropdown [selectSingleOption]="true" [(selectedValue)]="selectedCayCode" [maxSelection]="1" [syncWithPd]="true" label="Requesting PD's Cancer Activity"></lib-cancer-activities-dropdown>
+    <div
+      class="text-danger mt-1"
+      *ngIf="parentForm.errors?.cayCodeIsRequired && (parentForm.submitted || parentForm.touched)">
+      Cancer activity is required
+    </div>
   </div>
 
   <div class="col-md-2 col-lg-4" *ngIf="type4Selected()">

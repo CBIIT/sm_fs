@@ -1,7 +1,5 @@
 import {Directive} from '@angular/core';
 import {AbstractControl, NG_VALIDATORS, ValidationErrors, Validator} from '@angular/forms';
-import {NGXLogger} from 'ngx-logger';
-import {RequestModel} from '../model/request-model';
 import {FundingRequestTypes} from '../model/funding-request-types';
 import {isArray} from 'rxjs/internal-compatibility';
 
@@ -11,8 +9,7 @@ import {isArray} from 'rxjs/internal-compatibility';
 })
 export class DiversitySupplementValidatorDirective implements Validator {
 
-  constructor(private logger: NGXLogger,
-              private model: RequestModel) {
+  constructor() {
   }
 
   validate(control: AbstractControl): ValidationErrors | null {

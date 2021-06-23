@@ -61,10 +61,12 @@ import {RetrieveRequestComponent} from './funding-request/retrieve-request/retri
 import {Type4ConversionMechanismComponent} from './type4-conversion-mechanism/type4-conversion-mechanism.component';
 import {AlertBillboardComponent} from './alert-billboard/alert-billboard.component';
 import {OpenRequestComponent} from './search/open-request/open-request.component';
-import { WorkflowComponent } from './funding-request/workflow/workflow.component';
-import { ApproverListsComponent } from './funding-request/workflow/approver-lists/approver-lists.component';
+import {WorkflowComponent} from './funding-request/workflow/workflow.component';
+import {ApproverListsComponent} from './funding-request/workflow/approver-lists/approver-lists.component';
 import {FundingSourceCostValidatorDirective} from './validators/funding-source-cost-validator.directive';
 import {DiversitySupplementValidatorDirective} from './validators/diversity-supplement-validator-directive';
+import {PdNameRequiredValidatorDirective} from './validators/pd-name-required-validator-directive';
+import {CancerActivityRequiredValidatorDirective} from './validators/cancer-activity-required-validator-directive';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
@@ -140,6 +142,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     ApproverListsComponent,
     FundingSourceCostValidatorDirective,
     DiversitySupplementValidatorDirective,
+    PdNameRequiredValidatorDirective,
+    CancerActivityRequiredValidatorDirective,
   ],
 
 

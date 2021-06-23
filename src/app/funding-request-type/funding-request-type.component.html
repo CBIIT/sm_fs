@@ -4,8 +4,18 @@
   <ng-select2
     id="request-type-select"
     name="fundingRequestType"
+    #fundingRequestType="ngModel"
     [(ngModel)]="selectedValue"
     [allowClear]="true"
-    [data]="data">
+    [data]="data"
+    required>
   </ng-select2>
+  <div
+    class="text-danger mt-1"
+    *ngIf="!fundingRequestType.valid && (fundingRequestType.touched || parentForm.submitted)">
+    Request type is required
+  </div>
 </div>
+
+
+
