@@ -1,6 +1,6 @@
 
 <form #step2Form="ngForm" (ngSubmit)="onSubmit($event)" appDiversitySupplementValidator>
-  <input type="hidden" name="prcValid" [value]="prcValidated()" ngModel required>
+  <input type="hidden" name="prcValid" [ngModel]="prcValidated()" required>
 
   <app-grant-information></app-grant-information>
   <hr>

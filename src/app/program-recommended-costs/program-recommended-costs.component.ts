@@ -346,9 +346,10 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     this.logger.debug(this.prcForm);
+    this.alerts = [];
+
     if (this.prcForm.valid) {
       this.addFundingSource();
-      this.alerts = [];
       // TODO: Clear form after successful save
       // this.prcForm.reset();
       for (const name in this.prcForm.controls) {
