@@ -103,8 +103,8 @@ export class Step2Component implements OnInit {
     // @ts-ignore
     const action = event.submitter?.name;
     this.logger.debug(this.step2Form);
+    this.alerts = [];
     if (this.step2Form.valid) {
-      this.alerts = [];
       if (action === 'saveAsDraft') {
         this.saveAsDraft();
       } else {
@@ -128,10 +128,13 @@ export class Step2Component implements OnInit {
    * TODO - modify the logic for skip grants and other exceptions
    */
   prcValidated(): string | null {
+    this.logger.debug('validating prc:', this.prc);
 
-    if (this.prc?.selectedFundingSources.length > 1) {
-      return 'Y';
-    }
-    return null;
+    return 'Y';
+
+    // if (this.prc?.selectedFundingSources.length > 1) {
+    //   return 'Y';
+    // }
+    // return null;
   }
 }

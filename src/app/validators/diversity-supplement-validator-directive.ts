@@ -19,8 +19,6 @@ export class DiversitySupplementValidatorDirective implements Validator {
     const cayCode = control.get('cancerActivities');
     const requestType = control.get('fundingRequestType');
 
-    this.logger.warn('Performing validation on CA "' + cayCode?.value + '" and type', requestType?.value);
-
     if (!cayCode || !requestType) {
       return null;
     }
