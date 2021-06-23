@@ -8,7 +8,7 @@ import { RequestModel } from 'src/app/model/request-model';
 })
 export class StepIndicatorComponent implements OnInit {
   @Input() activeStep;
-  @Input() steps: { step: number, name: string, route: string }[];
+  @Input() steps: { step: number, name: string, route: string}[];
 
   constructor(private requestModel: RequestModel) {
   }

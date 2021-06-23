@@ -12,12 +12,12 @@ import {GrantsSearchFilterService} from './grants-search/grants-search-filter.se
   providers: [GrantsSearchFilterService, SearchFilterService]
 })
 export class FundingRequestComponent implements OnInit, OnDestroy {
-  activeStep = {step: 0, name: '', route: ''};
+  activeStep = {step: 0, name: '', route: null};
   steps = [
     {step: 1, name: 'Select Grant', route: '/request/step1'},
     {step: 2, name: 'Request Info', route: '/request/step2'},
     {step: 3, name: 'Supporting Docs', route: '/request/step3'},
-    {step: 4, name: 'Review', route: '/request/step4'},
+    {step: 4, name: 'Review', route: '/request/step4 /request/review'}
   ];
 
   private routerSub: Subscription;
@@ -41,7 +41,7 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
     this.routerSub = this.router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {
         for (const step of this.steps) {
-          if (step.route === val.urlAfterRedirects) {
+          if (step.route.indexOf (val.urlAfterRedirects ) > -1 ) {
             this.activeStep = step;
             break;
           }
@@ -51,7 +51,7 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
 
     // when direct access using url
     for (const step of this.steps) {
-      if (step.route === this.router.url) {
+      if (step.route.indexOf(this.router.url) > -1) {
         this.activeStep = step;
       }
     }
