@@ -33,6 +33,7 @@ export class RetrieveRequestComponent implements OnInit {
           this.requestModel.requestDto.financialInfoDto.requestorNpnId = this.requestModel.requestDto.requestorNpnId;
           if (this.requestModel.requestDto.scheduledApprovers && this.requestModel.requestDto.scheduledApprovers.length > 0 ) {
             this.requestModel.mainApproverCreated = true;
+            this.requestModel.captureApproverCriteria();
           }
           if (this.userSessionService.getEnvironment() === 'development') {
             this.router.navigate(['/request/review']);

@@ -54,7 +54,7 @@ export class RequestModel {
   makeApproverCriteria(): any {
     const approverCriteria: any = {};
     approverCriteria.requestType = this.requestDto.financialInfoDto.requestTypeId;
-    approverCriteria.cayCode = this.requestDto.cayCode;
+    approverCriteria.cayCode = this.requestDto.financialInfoDto.requestorCayCode;
     const fundingSources = Array.from(this._programRecommendedCostsModel.selectedFundingSourceIds);
     fundingSources.sort();
     approverCriteria.fundingSources = fundingSources.join(',');
@@ -65,6 +65,7 @@ export class RequestModel {
 
   captureApproverCriteria(): void {
     this.approverCriteria = this.makeApproverCriteria();
+    this.mainApproverCreated = true;
   }
 
   get requestType(): string {
