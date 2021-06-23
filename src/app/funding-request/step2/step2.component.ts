@@ -17,11 +17,11 @@ import SubmitEvent = JQuery.SubmitEvent;
 })
 export class Step2Component implements OnInit {
 
+
   @ViewChild(ProgramRecommendedCostsComponent) prc: ProgramRecommendedCostsComponent;
   @ViewChild('step2Form', {static: false}) step2Form: NgForm;
 
   alerts: Alert[] = [];
-
 
   constructor(private router: Router, private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
@@ -120,21 +120,12 @@ export class Step2Component implements OnInit {
     }
   }
 
-  /**
-   * This flag will allow us to add validation of the overall PRC form to the save buttons.  We'll assume that if there
-   * is ta least one funding source selected that the form is correct. This method is tied to a field that is marked as
-   * required, so an empty value should cause overall validation to fail.
-   *
-   * TODO - modify the logic for skip grants and other exceptions
-   */
-  prcValidated(): string | null {
-    this.logger.debug('validating prc:', this.prc);
+  get prcValid(): string | null {
+    // return 'Y';
 
-    return 'Y';
-
-    // if (this.prc?.selectedFundingSources.length > 1) {
-    //   return 'Y';
-    // }
-    // return null;
+    if (this.prc?.selectedFundingSources.length > 0) {
+      return 'Y';
+    }
+    return null;
   }
 }
