@@ -103,5 +103,20 @@ export class Step2Component implements OnInit {
     // @ts-ignore
     const action = event.submitter?.name;
     this.logger.debug(this.step2Form);
+    if (this.step2Form.valid) {
+      this.alerts = [];
+      if (action === 'saveAsDraft') {
+        this.saveAsDraft();
+      } else {
+        this.saveAndContinue();
+      }
+    } else {
+      const alert: Alert = {
+        type: 'danger',
+        message: 'Please correct all errors below before saving',
+        title: ''
+      };
+      this.alerts.push(alert);
+    }
   }
 }
