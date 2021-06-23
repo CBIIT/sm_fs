@@ -119,4 +119,19 @@ export class Step2Component implements OnInit {
       this.alerts.push(alert);
     }
   }
+
+  /**
+   * This flag will allow us to add validation of the overall PRC form to the save buttons.  We'll assume that if there
+   * is ta least one funding source selected that the form is correct. This method is tied to a field that is marked as
+   * required, so an empty value should cause overall validation to fail.
+   *
+   * TODO - modify the logic for skip grants and other exceptions
+   */
+  prcValidated(): string | null {
+
+    if (this.prc?.selectedFundingSources.length > 1) {
+      return 'Y';
+    }
+    return null;
+  }
 }

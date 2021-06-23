@@ -1,11 +1,14 @@
-<div class="row">
-  <div class="col-12 d-flex">
-    <app-alert-billboard [alerts]="alerts"></app-alert-billboard>
-  </div>
-</div>
+
 <form #step2Form="ngForm" (ngSubmit)="onSubmit($event)" appDiversitySupplementValidator>
+  <input type="hidden" name="prcValid" [value]="prcValidated()" ngModel required>
+
   <app-grant-information></app-grant-information>
   <hr>
+  <div class="row">
+    <div class="col-12">
+      <app-alert-billboard [alerts]="alerts"></app-alert-billboard>
+    </div>
+  </div>
   <app-request-information [parentForm]="step2Form"></app-request-information>
 
   <app-program-recommended-costs *ngIf="requestTypeSelected()"></app-program-recommended-costs>
