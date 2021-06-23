@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request-model';
+import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
 @Component({
   selector: 'app-retrieve-request',
@@ -17,6 +18,7 @@ export class RetrieveRequestComponent implements OnInit {
               private route: ActivatedRoute,
               private requestModel: RequestModel,
               private requestService: FsRequestControllerService,
+              private userSessionService: AppUserSessionService,
               private logger: NGXLogger) { }
 
   ngOnInit(): void {
@@ -32,7 +34,12 @@ export class RetrieveRequestComponent implements OnInit {
           if (this.requestModel.requestDto.scheduledApprovers && this.requestModel.requestDto.scheduledApprovers.length > 0 ) {
             this.requestModel.mainApproverCreated = true;
           }
-          this.router.navigate(['/request/step4']);
+          if (this.userSessionService.getEnvironment() === 'development') {
+            this.router.navigate(['/request/review']);
+          }
+          else {
+            this.router.navigate(['/request/step4']);
+          }
         },
         (error) => {
           this.logger.error('retrieveFundingRequest failed ', error);
