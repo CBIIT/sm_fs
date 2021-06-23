@@ -13,6 +13,50 @@
 
   <app-program-recommended-costs *ngIf="requestTypeSelected()"></app-program-recommended-costs>
 
+  <div *ngIf="requestTypeSelected()">
+    <div class="row" *ngIf="showFinalLOA()">
+      <div class="col-lg-12">
+        <div class="form-group">
+          <app-final-loa></app-final-loa>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6" *ngIf="!isSkipRequest()">
+        <div class="form-group">
+          <app-other-docs-contributing-funds></app-other-docs-contributing-funds>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="form-group">
+          <label for="cost-comments">Comments <span class="optional">(optional)</span></label>
+          <textarea class="form-control" #cost_comments id="cost-comments" name="comments"
+                    [(ngModel)]="model.requestDto.financialInfoDto.comments" rows="3" maxlength="2000"></textarea>
+          <span class="character-counter">{{ cost_comments.value.length }}/2000</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="isDiversitySupplement()">
+      <div class="col-lg-12">
+        <div class="form-group">
+          <app-diversity-supplement [parentForm]="step2Form"></app-diversity-supplement>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="isNewInvestigator()">
+      <div class="col-lg-12">
+        <div class="form-group">
+          <app-new-investigator></app-new-investigator>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
   <hr>
   <div class="row">
     <div class="col-12 d-flex">

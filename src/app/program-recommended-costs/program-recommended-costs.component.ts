@@ -12,7 +12,6 @@ import {
 } from '../model/funding-request-types';
 import {FundingSourceSynchronizerService} from '../funding-source/funding-source-synchronizer-service';
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {FundingSourceTypes} from '../model/funding-source-types';
 import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point';
 import {PRC_DISPLAY_FORMAT} from './program-recommended-costs-model';
 import {NgForm} from '@angular/forms';
@@ -206,30 +205,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   isSkipRequest(): boolean {
     return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP) ||
       Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP__NCI_RFA);
-  }
-
-  showFinalLOA(): boolean {
-    return !this.isMoonshot() && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
-      Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestModel.requestDto.frtId));
-  }
-
-  isMoonshot(): boolean {
-    let result = false;
-    this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(f => {
-      if (Number(f.fundingSourceId) === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
-        result = true;
-      }
-    });
-    return result;
-  }
-
-
-  isDiversitySupplement(): boolean {
-    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.DIVERSITY_SUPPLEMENT_INCLUDES_CURE_SUPPLEMENTS);
-  }
-
-  isNewInvestigator(): boolean {
-    return this.requestModel.grant.activityCode === 'R01' && ([1, 2].includes(Number(this.requestModel.grant.applTypeCode)));
   }
 
   prepareLineItem(): void {

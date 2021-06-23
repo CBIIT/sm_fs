@@ -8,6 +8,7 @@ import {FundingRequestTypes} from '../../model/funding-request-types';
 import {ProgramRecommendedCostsComponent} from '../../program-recommended-costs/program-recommended-costs.component';
 import {Alert} from '../../alert-billboard/alert';
 import {NgForm} from '@angular/forms';
+import {FundingSourceTypes} from '../../model/funding-source-types';
 import SubmitEvent = JQuery.SubmitEvent;
 
 @Component({
@@ -16,8 +17,6 @@ import SubmitEvent = JQuery.SubmitEvent;
   styleUrls: ['./step2.component.css']
 })
 export class Step2Component implements OnInit {
-
-
   @ViewChild(ProgramRecommendedCostsComponent) prc: ProgramRecommendedCostsComponent;
   @ViewChild('step2Form', {static: false}) step2Form: NgForm;
 
@@ -127,5 +126,34 @@ export class Step2Component implements OnInit {
       return 'Y';
     }
     return null;
+  }
+
+  // TODO - move all following methods to requestModel.
+  isDiversitySupplement(): boolean {
+    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.DIVERSITY_SUPPLEMENT_INCLUDES_CURE_SUPPLEMENTS);
+  }
+
+  isNewInvestigator(): boolean {
+    return this.requestModel.grant.activityCode === 'R01' && ([1, 2].includes(Number(this.requestModel.grant.applTypeCode)));
+  }
+
+  showFinalLOA(): boolean {
+    return !this.isMoonshot() && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
+      Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestModel.requestDto.frtId));
+  }
+
+  isMoonshot(): boolean {
+    let result = false;
+    this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(f => {
+      if (Number(f.fundingSourceId) === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
+        result = true;
+      }
+    });
+    return result;
+  }
+
+  isSkipRequest(): boolean {
+    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP) ||
+      Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP__NCI_RFA);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
 import {ControlContainer, NgForm} from '@angular/forms';
 
@@ -9,6 +9,7 @@ import {ControlContainer, NgForm} from '@angular/forms';
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
 })
 export class DiversitySupplementComponent implements OnInit {
+  @Input() parentForm: NgForm;
 
   constructor(public requestModel: RequestModel) { }
 

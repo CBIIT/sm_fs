@@ -6,10 +6,16 @@
       name="divSuppType"
       #divSuppType="ngModel"
       [(ngModel)]="requestModel.requestDto.financialInfoDto.supplementType"
-      [allowClear]="false">
+      [allowClear]="false"
+      required>
       <option></option>
       <option value="1">New</option>
-      <option value="2">Additional Year</option>
+      <option value="2">Additional Year (Extension)</option>
     </ng-select2>
+    <div
+      class="text-danger mt-1"
+      *ngIf="divSuppType.errors?.required && (divSuppType.touched || parentForm.submitted)">
+      Diversity supplement type is required
+    </div>
   </div>
 </div>
