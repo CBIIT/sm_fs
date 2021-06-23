@@ -25,6 +25,7 @@ import {Step1Component} from './funding-request/step1/step1.component';
 import {Step3Component} from './funding-request/step3/step3.component';
 import {Step2Component} from './funding-request/step2/step2.component';
 import {Step4Component} from './funding-request/step4/step4.component';
+import {ReviewRequestComponent} from './funding-request/review-request/review-request.component';
 import {DataTablesModule} from 'angular-datatables';
 import {FormatNcabDatePipe} from './pipes/format-ncab-date.pipe';
 import {AppLookupsService} from './service/app-lookups.service';
@@ -108,6 +109,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     Step3Component,
     Step2Component,
     Step4Component,
+    ReviewRequestComponent,
     FormatNcabDatePipe,
     CodeDescriptionPipe,
     MailtoFormatterPipe,

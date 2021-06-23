@@ -12,6 +12,7 @@ import { Step4Component } from './funding-request/step4/step4.component';
 import { PdAuthGuard } from './funding-request/step1/pd.auth.guard';
 import { FundingSourcesNamesComponent } from './funding-sources-names/funding-sources-names.component';
 import { RetrieveRequestComponent } from './funding-request/retrieve-request/retrieve-request.component';
+import { ReviewRequestComponent } from './funding-request/review-request/review-request.component';
 
 const routes: Routes = [
   {
@@ -25,6 +26,7 @@ const routes: Routes = [
         {path: 'step2', component: Step2Component},
         {path: 'step3', component: Step3Component},
         {path: 'step4', component: Step4Component},
+        {path: 'review', component: ReviewRequestComponent},
         {path: 'retrieve/:frqId', component: RetrieveRequestComponent}
       ]},
       {path: 'fundingSourceDetails', component: FundingSourcesNamesComponent},
