@@ -15,6 +15,11 @@
     *ngIf="!fundingRequestType.valid && (fundingRequestType.touched || parentForm.submitted)">
     Request type is required
   </div>
+  <div
+    class="text-danger mt-1"
+    *ngIf="parentForm.errors?.mustSelectDiversitySupplement">
+    You must select Diversity Supplement (includes CURE Supplements) as the request type
+  </div>
 </div>
 
 
