@@ -43,7 +43,10 @@ export class OtherDocsContributingFundsComponent implements OnInit {
       }
     });
     this._selectedValue = this.getSelectionString();
+    this.updateRequestModel();
+  }
 
+  private updateRequestModel(): void {
     // TODO: Figure out which of these to use
     this.requestModel.requestDto.otherDocsText = this._selectedValue;
     this.requestModel.requestDto.financialInfoDto.otherDocText = this._selectedValue;
@@ -127,6 +130,8 @@ export class OtherDocsContributingFundsComponent implements OnInit {
     });
 
     this.selectedDocsArr.splice(j, 1);
+    this._selectedValue = this.getSelectionString();
+    this.updateRequestModel();
   }
 
   getSelectionString(): string {
@@ -141,6 +146,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   dropped(event: CdkDragDrop<DocData[]>): void {
     moveItemInArray(this.selectedDocsArr, event.previousIndex, event.currentIndex);
     this._selectedValue = this.getSelectionString();
+    this.updateRequestModel();
     this.selectedValueChange.emit(this.getSelectionString());
   }
 }
