@@ -338,7 +338,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     } else {
       const alert: Alert = {
         type: 'danger',
-        message: 'Please correct all errors below before continuing',
+        message: 'Please correct the errors identified below.',
         title: ''
       };
       this.alerts.push(alert);

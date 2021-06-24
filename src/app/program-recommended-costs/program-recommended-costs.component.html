@@ -407,7 +407,7 @@
                         <div
                           class="text-danger mt-1"
                           *ngIf="recommendedDirect.errors?.pattern && (recommendedDirect.touched || prcForm.submitted)">
-                          Recommended direct cost must be numeric
+                          Enter numeric value
                         </div>
                         <div
                           class="text-danger mt-1"
@@ -440,7 +440,7 @@
                         <div
                           class="text-danger mt-1"
                           *ngIf="recommendedTotal.errors.pattern && (recommendedTotal.touched || prcForm.submitted)">
-                          Total cost must be numeric
+                          Enter numeric value
                         </div>
                       </div>
                     </div>
@@ -494,7 +494,7 @@
                         <div
                           class="text-danger mt-1"
                           *ngIf="recommendedDirect.errors?.pattern && (recommendedDirect.touched || prcForm.submitted)">
-                          Recommended direct cost must be numeric
+                          Enter numeric value
                         </div>
                         <div
                           class="text-danger mt-1"
@@ -526,12 +526,12 @@
                         <div
                           class="text-danger mt-1"
                           *ngIf="prcForm.errors?.totalCostLessThanDirectCost && (recommendedTotal.touched || prcForm.submitted)">
-                          Error: Total Cost must be equal to or greater that the Direct Cost
+                          Error: Total Cost must be equal to or greater than the Direct Cost
                         </div>
                         <div
                           class="text-danger mt-1"
                           *ngIf="recommendedTotal.errors?.pattern && (recommendedTotal.touched || prcForm.submitted)">
-                          Total cost must be numeric
+                          Enter numeric value
                         </div>
                       </div>
                     </div>
@@ -562,7 +562,7 @@
                       <div
                         class="text-danger mt-1"
                         *ngIf="recommendedDirectX.errors?.pattern && (recommendedDirectX.touched || prcForm.submitted)">
-                        Recommended direct cost must be numeric
+                        Enter numeric value
                       </div>
                     </ng-template>
 
@@ -613,7 +613,7 @@
                         <div
                           class="text-danger mt-1"
                           *ngIf="percentCut.errors?.pattern && (percentCut.touched || prcForm.submitted)">
-                          Percent cut must be numeric
+                          Enter numeric value
                         </div>
                         <div
                           class="text-danger mt-1"
@@ -670,7 +670,7 @@
                       <div
                         class="text-danger mt-1"
                         *ngIf="recommendedDirectX.errors?.pattern && (recommendedDirectX.touched || prcForm.submitted)">
-                        Recommended direct cost must be numeric
+                        Enter numeric value
                       </div>
                     </ng-template>
                   </td>
