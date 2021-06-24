@@ -1,0 +1,8 @@
+#provided-CAN {
+    width:100%;
+    margin-right:.5rem;
+}
+
+.budget-info-table td, .budget-info-table th  {
+    vertical-align: middle;
+}

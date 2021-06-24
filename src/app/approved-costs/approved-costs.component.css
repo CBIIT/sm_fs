@@ -1,0 +1,8 @@
+#apvd-costs-table td, #apvd-costs-table th  {
+    text-align:center;
+    vertical-align: middle;
+}
+#apvd-future-years {
+    max-width:5rem;
+    margin:auto;
+}

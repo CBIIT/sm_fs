@@ -24114,6 +24114,28 @@ select.is-invalid ~ span.select2-container.select2-container--focus .select2-sel
   transition: all 0.2s, color 0.2s !important;
 }
 
+/* line 73, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
+.btn-link.btn-link-warning {
+  color: #9c5300;
+}
+
+/* line 75, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
+.btn-link.btn-link-warning:hover, .btn-link.btn-link-warning:focus {
+  background-color: rgba(255, 184, 28, 0.1);
+  transition: all 0.2s, color 0.2s !important;
+}
+
+/* line 80, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
+.btn-link.btn-link-danger {
+  color: #a60a3d;
+}
+
+/* line 82, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
+.btn-link.btn-link-danger:hover, .btn-link.btn-link-danger:focus {
+  background-color: rgba(166, 10, 61, 0.1);
+  transition: all 0.2s, color 0.2s !important;
+}
+
 /* line 7, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 .table-striped-reverse tbody tr:nth-of-type(2n+1) {
   background-color: transparent;
