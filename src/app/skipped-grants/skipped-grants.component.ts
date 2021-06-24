@@ -1,14 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {Options} from 'select2';
 import {RequestModel} from '../model/request-model';
-import {AppUserSessionService} from '../service/app-user-session.service';
-import {FsWorkflowControllerService} from '@nci-cbiit/i2ecws-lib';
 import {NGXLogger} from 'ngx-logger';
+import {ControlContainer, NgForm} from '@angular/forms';
 
 @Component({
   selector: 'app-skipped-grants',
   templateUrl: './skipped-grants.component.html',
-  styleUrls: ['./skipped-grants.component.css']
+  styleUrls: ['./skipped-grants.component.css'],
+  viewProviders: [{provide: ControlContainer, useExisting: NgForm}]
 })
 export class SkippedGrantsComponent implements OnInit {
   get selectedValue(): string {

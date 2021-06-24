@@ -12,6 +12,8 @@
     <ng-select2
       id="req-add-skip"
       [(ngModel)]="selectedValue"
+      name="skippedGrants"
+      #skippedGrants="ngModel"
       [allowClear]="false"
       [options]="options">
       <option></option>

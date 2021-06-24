@@ -54,7 +54,6 @@ import {SkippedGrantsComponent} from './skipped-grants/skipped-grants.component'
 import {FooterComponent} from './footer/footer.component';
 import {DiversitySupplementComponent} from './diversity-supplement/diversity-supplement.component';
 import {NewInvestigatorComponent} from './new-investigator/new-investigator.component';
-import {ConversionGrantActivityMechComponent} from './conversion-grant-activity-mech/conversion-grant-activity-mech.component';
 import {ScorePctlDisplayPipe} from './pipes/score-pctl-display.pipe';
 import {WorkflowModalComponent} from './funding-request/workflow-modal/workflow-modal.component';
 import {RetrieveRequestComponent} from './funding-request/retrieve-request/retrieve-request.component';
@@ -132,7 +131,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FinalLoaComponent,
     SkippedGrantsComponent,
     FooterComponent,
-    ConversionGrantActivityMechComponent,
     DiversitySupplementComponent,
     NewInvestigatorComponent,
     ScorePctlDisplayPipe,

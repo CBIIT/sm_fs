@@ -25,7 +25,6 @@ export class ProgramRecommendedCostsModel {
   deletedSources: number[] = [];
 
   reset(): void {
-    this.logger.warn('resetting prc model');
     // this.fundingRequestType = undefined;
     this.prcLineItems = new Map<FundingRequestFundsSrcDto, PrcDataPoint[]>();
     // this._fundingSources = new Array<FundingRequestFundsSrcDto>();
@@ -37,7 +36,6 @@ export class ProgramRecommendedCostsModel {
   }
 
   constructor(private logger: NGXLogger) {
-    logger.debug('construct PRC model');
   }
 
   get grantAwarded(): Array<GrantAwardedDto> {

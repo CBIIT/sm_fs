@@ -2,6 +2,8 @@
 
 <ng-select2
   id="t4-select-1"
+  name="conversionMech"
+  #conversionMech="ngModel"
   [(ngModel)]="model.conversionMechanism"
   [allowClear]="true">
   <option *ngFor="let p of conversionMechs" [value]="p.id">{{p.text}}</option>

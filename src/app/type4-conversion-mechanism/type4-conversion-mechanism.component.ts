@@ -1,14 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request-model';
-import {FsRequestControllerService} from '@nci-cbiit/i2ecws-lib';
-import {FundingSourceSynchronizerService} from '../funding-source/funding-source-synchronizer-service';
-import {Router} from '@angular/router';
 import {NGXLogger} from 'ngx-logger';
+import {ControlContainer, NgForm} from '@angular/forms';
 
 @Component({
   selector: 'app-type4-conversion-mechanism',
   templateUrl: './type4-conversion-mechanism.component.html',
-  styleUrls: ['./type4-conversion-mechanism.component.css']
+  styleUrls: ['./type4-conversion-mechanism.component.css'],
+  viewProviders: [{provide: ControlContainer, useExisting: NgForm}],
 })
 export class Type4ConversionMechanismComponent implements OnInit {
   label = 'Type 4 Conversion Mechanism';
