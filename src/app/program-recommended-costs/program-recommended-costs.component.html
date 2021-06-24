@@ -435,7 +435,7 @@
                         <div
                           class="text-danger mt-1"
                           *ngIf="prcForm.errors?.totalCostLessThanDirectCost && (recommendedTotal.touched || prcForm.submitted)">
-                          Total cost must be greater than direct cost
+                          Error: Total Cost must be equal to or greater that the Direct Cost
                         </div>
                         <div
                           class="text-danger mt-1"
@@ -526,7 +526,7 @@
                         <div
                           class="text-danger mt-1"
                           *ngIf="prcForm.errors?.totalCostLessThanDirectCost && (recommendedTotal.touched || prcForm.submitted)">
-                          Total cost must be greater than direct cost
+                          Error: Total Cost must be equal to or greater that the Direct Cost
                         </div>
                         <div
                           class="text-danger mt-1"
