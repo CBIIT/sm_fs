@@ -48,7 +48,8 @@ export class RequestModel {
     this.logger.debug('prior approver criteria ', this.approverCriteria);
     return  newCriteria.requestType !== this.approverCriteria.requestType
                 || newCriteria.cayCode !== this.approverCriteria.cayCode
-                || newCriteria.fundingSources !== this.approverCriteria.fundingSources;
+                || newCriteria.fundingSources !== this.approverCriteria.fundingSources
+                || newCriteria.otherDocs !== this.approverCriteria.otherDocs;
   }
 
   makeApproverCriteria(): any {
@@ -56,8 +57,10 @@ export class RequestModel {
     approverCriteria.requestType = this.requestDto.financialInfoDto.requestTypeId;
     approverCriteria.cayCode = this.requestDto.financialInfoDto.requestorCayCode;
     const fundingSources = Array.from(this._programRecommendedCostsModel.selectedFundingSourceIds);
-    fundingSources.sort();
+    // fundingSources.sort(); commented for now to make the order of
+    // fundingSources important in determining when approvers need to be regen.
     approverCriteria.fundingSources = fundingSources.join(',');
+    approverCriteria.otherDocs = this.requestDto.financialInfoDto.otherDocText;
     // from the create_main_approvers sp, it seems otherDocs has no effect on funding request approvers,
     // only affects funding plan approvers, needs double check with David and Subashini.
     return approverCriteria;
