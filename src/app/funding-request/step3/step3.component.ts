@@ -560,7 +560,7 @@ export class Step3Component implements OnInit {
     this.fsRequestControllerService.getRequestBudgetsUsingGET(this.requestModel.requestDto.financialInfoDto.fundingRequestId).subscribe(
       result => {
         this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos = result;
-        this.requestModel.restoreLineItems(result);
+        this.requestModel.restoreLineItemIds(result);
         this.router.navigate(['/request/step2']);
         this.logger.debug('loaded budgets', result);
       });

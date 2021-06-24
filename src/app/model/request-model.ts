@@ -224,9 +224,7 @@ export class RequestModel {
     if (isMoonshot && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
       Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestDto.frtId))) {
       this.logger.debug('Setting final LOA to SPL Committee');
-      // TODO: figure out which of these should be set and which can be deleted
       this.requestDto.loaId = 4;
-      this.requestDto.financialInfoDto.loaId = 4;
     }
 
 
@@ -237,8 +235,18 @@ export class RequestModel {
   /**
    * After saving, the budgets need to be converted back to line items for the PRC component
    *
+   * To restore entirely from the set of budgets:
+   * 1. Get the list of funding sources for this request, and set the funding source map
+   *    appropriately.
+   * 2. Get the list of grant awards as well.
+   * 3. Create a line item for each budget
+   *    a. set the grant award where the support years match
+   *    b. set the funding source from the map based on the fseId
+   * 4. Unfortunately, we'll need to infer the line item type (percent or dollar-based),
+   *    since we're only keeping the dollar values, but that's minor
+   *
    */
-  restoreLineItems(budgets: Array<FundingReqBudgetsDto>): void {
+  restoreLineItemIds(budgets: Array<FundingReqBudgetsDto>): void {
     this.logger.debug('Restoring line items from budgets', budgets);
     budgets.forEach(b => {
       // this.logger.debug('budget', b);

@@ -7,6 +7,8 @@
       <select
         id="loa"
         class="form-control w-auto"
+        name="finalLoa"
+        #finalLoa="ngModel"
         [(ngModel)]="selectedValue"> <!-- add class "form-control" only if it's not a select2 -->
         <option value="-1"></option>
         <option value="1">Program Director</option>

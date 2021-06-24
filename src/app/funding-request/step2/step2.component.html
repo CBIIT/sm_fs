@@ -1,6 +1,6 @@
 
 <form #step2Form="ngForm" (ngSubmit)="onSubmit($event)" appDiversitySupplementValidator appPdNameRequired appCancerActivityRequired>
-  <input type="hidden" [ngModel]="prcValid" name="prcValid" required>
+  <input type="hidden" #prcValidValue="ngModel" [ngModel]="prcValid" name="prcValid" required>
 
   <app-grant-information></app-grant-information>
   <hr>
@@ -12,6 +12,16 @@
   <app-request-information [parentForm]="step2Form"></app-request-information>
 
   <app-program-recommended-costs *ngIf="requestTypeSelected()"></app-program-recommended-costs>
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div
+        *ngIf="prcValidValue.errors?.required && step2Form.submitted"
+        class="text-danger mt-1">
+        Select at least one funding source to continue
+      </div>
+    </div>
+  </div>
 
   <div *ngIf="requestTypeSelected()">
     <div class="row" *ngIf="showFinalLOA()">
