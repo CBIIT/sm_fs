@@ -555,7 +555,7 @@ export class Step3Component implements OnInit {
   }
 
   prevStep(): void {
-    this.logger.debug('Request type:', this.requestModel.requestDto.financialInfoDto.requestTypeId);
+    this.requestModel.clearAlerts();
     // if (!this.requestModel.programRecommendedCostsModel.prcLineItems) {
     this.fsRequestControllerService.getRequestBudgetsUsingGET(this.requestModel.requestDto.financialInfoDto.fundingRequestId).subscribe(
       result => {
