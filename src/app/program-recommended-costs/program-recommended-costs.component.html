@@ -430,16 +430,23 @@
                             #recommendedTotal="ngModel"
                             id="tc-dollar1"
                             [(ngModel)]="li.recommendedTotal"
-                            aria-describedby="tc-dollar-percent">
+                            aria-describedby="tc-dollar-percent"
+                            required
+                            pattern="[0-9]*">
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="recommendedTotal.errors?.required && (recommendedTotal.touched || prcForm.submitted)">
+                          Recommended Total Cost is required
                         </div>
                         <div
                           class="text-danger mt-1"
                           *ngIf="prcForm.errors?.totalCostLessThanDirectCost && (recommendedTotal.touched || prcForm.submitted)">
-                          Total Cost must be equal to or greater that the Direct Cost
+                          Total Cost must be equal to or greater than the Direct Cost
                         </div>
                         <div
                           class="text-danger mt-1"
-                          *ngIf="recommendedTotal.errors.pattern && (recommendedTotal.touched || prcForm.submitted)">
+                          *ngIf="recommendedTotal.errors?.pattern && (recommendedTotal.touched || prcForm.submitted)">
                           Enter numeric value
                         </div>
                       </div>
@@ -518,10 +525,16 @@
                             id="tc-dollar2"
                             [(ngModel)]="li.recommendedTotal"
                             aria-describedby="tc-dollar-percent"
-                            pattern="[0-9]*">
+                            pattern="[0-9]*"
+                            required>
                         </div>
                         <div class="col-sm-auto right-label" *ngIf="initialPay">
                           <span id="tc-dollar-percent">{{ li.percentCutTotalCalculated | percent:'1.1-3' }} Cut</span>
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="recommendedTotal.errors?.required && (recommendedTotal.touched || prcForm.submitted)">
+                          Recommended Total Cost is required
                         </div>
                         <div
                           class="text-danger mt-1"
