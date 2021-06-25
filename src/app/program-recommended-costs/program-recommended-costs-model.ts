@@ -1,5 +1,4 @@
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {Injectable} from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
 import {PrcDataPoint} from './prc-data-point';
 import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
@@ -10,7 +9,7 @@ import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 export class ProgramRecommendedCostsModel {
 
   fundingRequestType: number;
-  prcLineItems = new Map<FundingRequestFundsSrcDto, PrcDataPoint[]>();
+  prcLineItems = new Map<number, PrcDataPoint[]>();
   private _fundingSources = new Array<FundingRequestFundsSrcDto>();
   private _fundingSourcesMap = new Map<number, FundingRequestFundsSrcDto>();
 
@@ -26,7 +25,7 @@ export class ProgramRecommendedCostsModel {
 
   reset(): void {
     // this.fundingRequestType = undefined;
-    this.prcLineItems = new Map<FundingRequestFundsSrcDto, PrcDataPoint[]>();
+    this.prcLineItems = new Map<number, PrcDataPoint[]>();
     // this._fundingSources = new Array<FundingRequestFundsSrcDto>();
     // this._fundingSourcesMap = new Map<number, FundingRequestFundsSrcDto>();
     this._selectedFundingSourceIds = new Set<number>();
@@ -85,7 +84,7 @@ export class ProgramRecommendedCostsModel {
       this.logger.warn('No funding source found for removal at index ', index);
     } else {
       this._selectedFundingSources.splice(index, 1);
-      this.prcLineItems.delete(removed);
+      this.prcLineItems.delete(removed.fundingSourceId);
     }
     if (saved) {
       this.deletedSources.push(removed.fundingSourceId);
@@ -94,26 +93,48 @@ export class ProgramRecommendedCostsModel {
   }
 
   addFundingSourceById(id: number, dataPoints: Array<PrcDataPoint>): boolean {
+    this.logger.debug('addFundingSourceById', id, dataPoints);
     const source = this._fundingSourcesMap.get(Number(id));
+    this.logger.debug('Found source', source);
     if (!source) {
+      this.logger.warn('no source found in', this._fundingSourcesMap);
       return false;
     }
-    if (!this._selectedFundingSources.includes(source)) {
+    if (!this.isSelected(source)) {
+      this.logger.debug('pushing source');
       this._selectedFundingSources.push(source);
     }
     dataPoints.forEach(d => {
       d.fundingSource = source;
     });
 
-    this.prcLineItems.set(source, dataPoints);
+    this.prcLineItems.set(Number(id), dataPoints);
+    this.logger.debug(this.prcLineItems);
 
     return true;
+  }
+
+  isSelected(source: FundingRequestFundsSrcDto): boolean {
+    this.logger.debug('isSelected:', source);
+    if (!this._selectedFundingSources || this._selectedFundingSources.length === 0) {
+      this.logger.debug('not selected');
+      return false;
+    }
+    let result = false;
+    this._selectedFundingSources.forEach(s => {
+      this.logger.debug(s.fundingSourceId + '===' + source.fundingSourceId);
+      if (s.fundingSourceId === source.fundingSourceId) {
+        result = true;
+      }
+    });
+
+    return result;
   }
 
   // This will only be useful on the main table, since the modal doesn't have a funding source yet
   getLineItemsForSource(src: FundingRequestFundsSrcDto): PrcDataPoint[] {
     // TODO: Error handling?
-    return this.prcLineItems.get(src);
+    return this.prcLineItems.get(Number(src.fundingSourceId));
   }
 
 

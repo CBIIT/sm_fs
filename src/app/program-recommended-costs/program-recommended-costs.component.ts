@@ -144,7 +144,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     // TODO: Validation
     this.logger.debug('Selected source', this.selectedSourceId);
     this.logger.debug('Editing source', this.editing);
-    if (this.editing >= 0) {
+    if (this.editing && this.editing >= 0) {
       const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[this.editing];
       this.logger.debug('Original source', edit);
       if (this.selectedSourceId !== edit.fundingSourceId) {
@@ -194,7 +194,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.showPercent) {
-      const pc: number = this.lineItem[0].percentCut;
+      const pc: number = this.lineItem[0]?.percentCut;
       if (!isNaN(pc)) {
         this.lineItem[0].percentCut = pc;
       }
@@ -264,7 +264,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
    * So we will just preemptively remove any selected sources again.
    */
   cleanUpSources(): void {
-    this.logger.debug('cleanup time');
     this.editing = undefined;
     this.selectedSourceId = undefined;
     this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(s => {
@@ -339,15 +338,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     if (this.prcForm.valid) {
       this.addFundingSource();
       // TODO: Clear form after successful save
-      // this.prcForm.reset();
-      for (const name in this.prcForm.controls) {
-        this.logger.debug('control:', name, this.prcForm.controls[name]);
-      }
-      // this.logger.debug('resetting form');
-      // this.prcForm.reset();
-      // for (const name in this.prcForm.controls) {
-      //   this.logger.debug('control:', name, this.prcForm.controls[name]);
-      // }
     } else {
       const alert: Alert = {
         type: 'danger',
