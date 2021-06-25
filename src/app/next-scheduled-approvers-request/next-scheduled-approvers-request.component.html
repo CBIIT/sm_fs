@@ -44,7 +44,7 @@
                     <td><span class="fa fa-lock" *ngIf="!readonly"></span>&nbsp;{{ a.orderNum}}</td>
                     <td><a href="mailto:{{a.approverEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverFullName }}</a></td>
                     <td>{{ a.roleName }}</td>
-                    <td><a href="mailto:{{a.approverAltEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverAltFullName }}</a></td>
+                    <td><span *ngFor="let d of a.designees">{{d.delegateToFullName}}<br></span></td>
                     <td>
                     </td>
                 </tr>
