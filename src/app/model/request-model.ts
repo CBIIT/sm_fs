@@ -218,7 +218,7 @@ export class RequestModel {
     let temp: FundingReqBudgetsDto;
     this.programRecommendedCostsModel.prcLineItems.forEach((value, key) => {
       this.logger.debug('preparing budgets for source', key);
-      if (Number(key.fundingSourceId) === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
+      if (Number(key) === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
         isMoonshot = true;
       }
       value.forEach(p => {
@@ -254,13 +254,13 @@ export class RequestModel {
    *
    */
   restoreLineItemIds(budgets: Array<FundingReqBudgetsDto>): void {
-    this.logger.debug('Restoring line items from budgets', budgets);
+    // this.logger.debug('Restoring line items from budgets', budgets);
     budgets.forEach(b => {
       // this.logger.debug('budget', b);
       const source = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
       // console.log('source', source);
 
-      const lineItems = this.programRecommendedCostsModel.prcLineItems.get(source);
+      const lineItems = this.programRecommendedCostsModel.prcLineItems.get(source.fundingSourceId);
       if (lineItems) {
         lineItems.forEach(li => {
           if (b.supportYear === li.grantAward.year) {
