@@ -28,11 +28,19 @@
         </ng-select2>
     </div>
 
-    <div class="col-12">
-          <app-next-scheduled-approvers-request [readonly]="readonly" (activeApprover)="setActiveApprover($event)"></app-next-scheduled-approvers-request>
+    <div class="col-lg-6">
+      <div class="form-group" *ngIf="canAddApprover()">
+          <label for="req-add-approvers">Add Approver(s) <span class="optional">(optional)</span></label>
+          <ng-select2
+              id="req-add-approvers"
+              [(ngModel)]="selectedValue"
+              [allowClear]="false"
+              [options]="options">
+              <option></option>
+          </ng-select2>
+      </div>  
     </div>
-  
-  
+    <app-approver-list [readonly]="readonly"></app-approver-list>
     <div class="col-12">
       <div class="form-group" *ngIf="!readonly">
         <label for="workflow-comments">Workflow Comments <span class="optional">(optional)</span></label>
@@ -41,5 +49,8 @@
       </div>
     </div>
     
+    <div class="col-12 d-flex mb-4">
+        <button class="btn btn-primary mr-2" (click)="submitWorkflow()" [disabled]="buttonDisabled">{{buttonLabel}}</button>
+    </div>
   </div>
   

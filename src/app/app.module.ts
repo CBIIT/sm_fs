@@ -61,7 +61,7 @@ import {Type4ConversionMechanismComponent} from './type4-conversion-mechanism/ty
 import {AlertBillboardComponent} from './alert-billboard/alert-billboard.component';
 import {OpenRequestComponent} from './search/open-request/open-request.component';
 import {WorkflowComponent} from './funding-request/workflow/workflow.component';
-import {ApproverListsComponent} from './funding-request/workflow/approver-lists/approver-lists.component';
+import {ApproverListComponent} from './funding-request/workflow/approver-list/approver-list.component';
 import {FundingSourceCostValidatorDirective} from './validators/funding-source-cost-validator.directive';
 import {DiversitySupplementValidatorDirective} from './validators/diversity-supplement-validator-directive';
 import {PdNameRequiredValidatorDirective} from './validators/pd-name-required-validator-directive';
@@ -140,7 +140,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     AlertBillboardComponent,
     OpenRequestComponent,
     WorkflowComponent,
-    ApproverListsComponent,
+    ApproverListComponent,
     FundingSourceCostValidatorDirective,
     DiversitySupplementValidatorDirective,
     PdNameRequiredValidatorDirective,

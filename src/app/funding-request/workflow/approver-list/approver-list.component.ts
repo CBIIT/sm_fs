@@ -7,16 +7,15 @@ import { RequestModel } from 'src/app/model/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
 const approverMap = new Map<number, any>();
-
 const addedApproverMap = new Map<number, any>();
 
-
 @Component({
-  selector: 'app-approver-lists',
-  templateUrl: './approver-lists.component.html',
-  styleUrls: ['./approver-lists.component.css']
+  selector: 'app-approver-list',
+  templateUrl: './approver-list.component.html',
+  styleUrls: ['./approver-list.component.css']
 })
-export class ApproverListsComponent implements OnInit {
+
+export class ApproverListComponent implements OnInit {
 
   @Input() readonly = false;
   @Output() activeApprover = new EventEmitter<FundingReqApproversDto>();
@@ -25,6 +24,7 @@ export class ApproverListsComponent implements OnInit {
 
   previousApprovers: FundingReqApproversDto[];
   mainApprovers: FundingReqApproversDto[];
+  oneApprover: FundingReqApproversDto;
   additionalApprovers: FundingReqApproversDto[];
 
   private iSelectedValue: number;
@@ -44,7 +44,6 @@ export class ApproverListsComponent implements OnInit {
 
   private _selectedValue: number;
   approvers: Array<{ id: number; text: '' }>;
-//  approverList: Array<any> = new Array<any>();
 
   constructor(public requestModel: RequestModel,
               private userSessionService: AppUserSessionService,
@@ -138,11 +137,11 @@ export class ApproverListsComponent implements OnInit {
     });
 
     this.mainApprovers = result.filter((approver) => {
-      return approver.roleCode !== null;
+      return approver.responseDate === null && approver.roleCode !== null;
     });
 
     this.additionalApprovers = result.filter((approver) => {
-      return approver.roleCode === null;
+      return approver.responseDate === null && approver.roleCode === null;
     });
 
     this.previousApprovers = result.filter((approver) => {
@@ -150,6 +149,7 @@ export class ApproverListsComponent implements OnInit {
     });
 
     this.activeApprover.emit(result.length > 0 ? result[0] : null);
+
   }
 
   createMainApprovers(): void {
@@ -166,21 +166,6 @@ export class ApproverListsComponent implements OnInit {
       }
     );
   }
-
-  // deleteApprover(id): void {
-  //   this.logger.debug('Remove Approver ID:', id);
-  //   let i = 0;
-  //   let j = 0;
-  //   this.approverList.forEach(d => {
-  //     if (d.id === id) {
-  //       j = i;
-  //     }
-  //     i++;
-  //   });
-
-  //   this.approverList.splice(j, 1);
-  //   addedApproverMap.delete(Number(id));
-  // }
 
   dropped(event: CdkDragDrop<any[]>): void {
    // moveItemInArray(this.requestApprovers, event.previousIndex, event.currentIndex);
