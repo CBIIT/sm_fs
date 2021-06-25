@@ -186,6 +186,19 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       this.showDollar = true;
       this.showPercent = false;
     }
+    this.resetLineItem();
+  }
+
+  resetLineItem(): void {
+    if (!this.lineItem) {
+      return;
+    }
+    if (this.showPercent) {
+      const pc: number = this.lineItem[0].percentCut;
+      if (!isNaN(pc)) {
+        this.lineItem[0].percentCut = pc;
+      }
+    }
   }
 
   deleteSource(i: number): void {
