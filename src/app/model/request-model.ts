@@ -6,11 +6,15 @@ import {NGXLogger} from 'ngx-logger';
 import {ProgramRecommendedCostsModel} from '../program-recommended-costs/program-recommended-costs-model';
 import {FundingSourceTypes} from './funding-source-types';
 import {FundingRequestTypes} from './funding-request-types';
+import {Alert} from '../alert-billboard/alert';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RequestModel {
+
+  pendingAlerts: Alert[] = [];
+
   // Stores the grant selected in Step 1
   private _grant: NciPfrGrantQueryDto;
 
@@ -46,10 +50,10 @@ export class RequestModel {
     const newCriteria = this.makeApproverCriteria();
     this.logger.debug('new approver criteria ', newCriteria);
     this.logger.debug('prior approver criteria ', this.approverCriteria);
-    return  newCriteria.requestType !== this.approverCriteria.requestType
-                || newCriteria.cayCode !== this.approverCriteria.cayCode
-                || newCriteria.fundingSources !== this.approverCriteria.fundingSources
-                || newCriteria.otherDocs !== this.approverCriteria.otherDocs;
+    return newCriteria.requestType !== this.approverCriteria.requestType
+      || newCriteria.cayCode !== this.approverCriteria.cayCode
+      || newCriteria.fundingSources !== this.approverCriteria.fundingSources
+      || newCriteria.otherDocs !== this.approverCriteria.otherDocs;
   }
 
   makeApproverCriteria(): any {
@@ -131,7 +135,7 @@ export class RequestModel {
 
   constructor(private propertiesService: AppPropertiesService,
               private logger: NGXLogger,
-              ) {
+  ) {
     this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this._requestDto = {};
@@ -267,5 +271,13 @@ export class RequestModel {
         this.logger.warn('no line items for source', source.fundingSourceName);
       }
     });
+  }
+
+  pushAlert(a: Alert): boolean {
+    return true;
+  }
+
+  clearAlerts(): void {
+    this.pendingAlerts = [];
   }
 }

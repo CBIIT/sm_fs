@@ -1,7 +1,7 @@
 <div #submitResult></div>
 <div class="alert alert-success" role="alert" *ngIf="submissionResult && submissionResult.status === 'success'">
   <h1>Success!</h1>
-  <b>Request #{{submissionResult.frqId}}</b> was sent to 
+  <b>Request #{{submissionResult.frqId}}</b> was sent to
   <a href="mailto: {{submissionResult.approver.approverEmailAddress}}">{{submissionResult.approver.approverFullName}}</a> for review.
   View the request below or return to the <a routerLink="/search">Search</a>.
 </div>
@@ -9,6 +9,7 @@
   <h1>Failed to submit request</h1>
   {{submissionResult.errorMessage}}
 </div>
+<app-alert-billboard [alerts]="model.pendingAlerts"></app-alert-billboard>
 <app-workflow-modal></app-workflow-modal>
 <app-grant-information></app-grant-information>
 <hr>
@@ -47,9 +48,9 @@
       <span *ngIf="item.docFilename !== 'Summary Statement'" class="doc-desc">(Added by <a
           href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
         {{item.createDate}})</span>
-      
+
       <div class="ml-auto">
-        
+
         <button class="btn btn-link btn-slim ml-1" title="View" (click)="downloadFile(item.id, item.docFilename)"><i
             class="fas fa-eye" aria-hidden="true"></i></button>
       </div>
@@ -75,7 +76,7 @@
 </div>
 
 <div class="row collapse show" id="workflow-collapse">
-  
+
   <div class="col-12">
         <app-next-scheduled-approvers-request [readonly]="readonly" (activeApprover)="setActiveApprover($event)"></app-next-scheduled-approvers-request>
   </div>
@@ -88,7 +89,7 @@
       <span class="character-counter">{{comments.length}}/2000</span>
     </div>
   </div>
-  
+
 </div>
 
 

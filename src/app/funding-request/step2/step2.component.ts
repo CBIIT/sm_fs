@@ -61,15 +61,24 @@ export class Step2Component implements OnInit {
 
   saveFundingRequest(navigate: string): void {
     if (!this.isSaveable()) {
-      this.logger.error('Can\'t save at this point');
-      return;
+      this.model.pendingAlerts.push({
+        type: 'danger',
+        message: 'Unexpected error encountered while saving the request. Please contact app support.',
+        title: ''
+      });
     }
+    this.requestModel.clearAlerts();
     // TODO: make sure model is properly constructed
     this.requestModel.prepareBudgetsAndSetFinalLoa();
     this.logger.debug(JSON.stringify(this.requestModel.requestDto));
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
         this.requestModel.requestDto = result;
+        this.requestModel.pendingAlerts.push({
+          type: 'success',
+          message: 'You have successfully saved your request',
+          title: ''
+        });
         this.logger.debug(JSON.stringify(this.requestModel.requestDto));
 
         if (navigate) {
@@ -77,7 +86,12 @@ export class Step2Component implements OnInit {
         }
       }, error => {
         // TODO: properly handle errors here
-        this.logger.error('HttpClient get request error for----- ' + error.message);
+        this.logger.error('HttpClient get request error during save request ----- ' + error.message);
+        this.requestModel.pendingAlerts.push({
+          type: 'danger',
+          message: 'Unexpected system error encountered: \'' + error.message + '\'',
+          title: ''
+        });
       }
     );
   }
