@@ -287,9 +287,14 @@ export class Step4Component implements OnInit, OnDestroy {
   submitDisableTooltip(): string {
     if (this.justificationMissing && this.transitionMemoMissing) {
       return 'You must upload Justification and Transition Memo to submit this request.';
-    } else if (this.justificationMissing) {
+    }
+    else if (this.justificationMissing) {
       return 'You must upload Justification to submit this request.';
-    } else {
+    }
+    else if (this.transitionMemoMissing) {
+      return 'You must upload Transition Memo to submit this request.';
+    }
+    else {
       return '';
     }
   }

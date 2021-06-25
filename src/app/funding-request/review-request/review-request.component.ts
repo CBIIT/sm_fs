@@ -298,6 +298,9 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
     else if (this.justificationMissing) {
       return 'You must upload Justification to submit this request.';
     }
+    else if (this.transitionMemoMissing) {
+      return 'You must upload Transition Memo to submit this request.';
+    }
     else {
       return '';
     }
