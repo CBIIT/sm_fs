@@ -5,9 +5,8 @@ import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
-
-const approverMap = new Map<number, any>();
-const addedApproverMap = new Map<number, any>();
+import { WorkflowModel } from '../workflow.model';
+import { FundingRequestIntegrationService } from '../../integration/integration.service';
 
 @Component({
   selector: 'app-approver-list',
@@ -18,154 +17,50 @@ const addedApproverMap = new Map<number, any>();
 export class ApproverListComponent implements OnInit {
 
   @Input() readonly = false;
-  @Output() activeApprover = new EventEmitter<FundingReqApproversDto>();
+//  @Output() nextApprover = new EventEmitter<FundingReqApproversDto>();
 
   options: Options;
 
   previousApprovers: FundingReqApproversDto[];
-  mainApprovers: FundingReqApproversDto[];
-  oneApprover: FundingReqApproversDto;
+  pendingApprovers: FundingReqApproversDto[];
   additionalApprovers: FundingReqApproversDto[];
-
-  private iSelectedValue: number;
-
-  set selectedValue(value: number) {
-    this.iSelectedValue = value;
-    const user = approverMap.get(Number(value));
-    this.logger.debug('Selected Approver to Add: ', user);
-    this.saveAdditionalApprover(user);
-    setTimeout(() => {this.iSelectedValue = null; this.approvers = []; }, 0);
-  }
-
-  get selectedValue(): number {
-    return this.iSelectedValue;
-  }
-
-
-  private _selectedValue: number;
-  approvers: Array<{ id: number; text: '' }>;
+  oneApprover: FundingReqApproversDto;
 
   constructor(public requestModel: RequestModel,
-              private userSessionService: AppUserSessionService,
+              private workflowModel: WorkflowModel,
               private workflowControllerService: FsWorkflowControllerService,
+              private requestIntegrationService: FundingRequestIntegrationService,
               private logger: NGXLogger) {
-  }
-  storeData(data: any): any {
-    const data2 = data.filter((user) => {
-      if (user.classification !== 'EMPLOYEE') {
-        return false;
-      }
-      else if (addedApproverMap.get(Number(user.id))) {
-        return false;
-      }
-      return true;
-    });
-
-    data2.forEach(user => {
-      approverMap.set(Number(user.id), user);
-    });
-    return data2;
-
   }
 
   ngOnInit(): void {
-    const callback = this.storeData;
-    this.options = {
-      allowClear: true,
-      minimumInputLength: 2,
-      closeOnSelect: true,
-      placeholder: '',
-      language: {
-        inputTooShort(): string {
-          return '';
-        }
-      },
-      ajax: {
-        url: '/i2ecws/api/v1/fs/lookup/funding-request/approvers/',
-        delay: 500,
-        type: 'POST',
-        data(params): any {
-          return {
-            term: params.term
-          };
-        },
-        processResults(data): any {
-          const data2 = callback(data);
-          return {
-            results: $.map(data2, user => {
-              return {
-                id: user.id,
-                text: user.fullName,
-                user
-              };
-            })
-          };
-        }
-      }
-    };
-
-    if (!this.requestModel.mainApproverCreated) {
-      this.createMainApprovers();
-    }
-    else if (this.requestModel.recreateMainApproverNeeded) {
-      this.logger.debug('needs to recreate main approvers because of changes in funding request');
-      this.workflowControllerService.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
-        () => {
-          this.requestModel.mainApproverCreated = false;
-          this.createMainApprovers();
-        },
-        (error) => { this.logger.error('deleteRequestApprovers failed ', error); }
-      );
-    }
-    else {
-      this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
-        (result) => {
-          this.processApproversResult(result);
-          this.requestModel.captureApproverCriteria();
-        },
-        (error) => {
-          this.logger.error('Error calling createRequestApprovers', error);
-        }
-      );
-    }
-  }
-
-  processApproversResult(result: FundingReqApproversDto[]): void {
-    addedApproverMap.clear();
-    result.forEach((approver) => {
-      addedApproverMap.set(approver.approverNpnId, true);
-    });
-
-    this.mainApprovers = result.filter((approver) => {
-      return approver.responseDate === null && approver.roleCode !== null;
-    });
-
-    this.additionalApprovers = result.filter((approver) => {
-      return approver.responseDate === null && approver.roleCode === null;
-    });
-
-    this.previousApprovers = result.filter((approver) => {
-      return approver.responseDate !== null;
-    });
-
-    this.activeApprover.emit(result.length > 0 ? result[0] : null);
-
-  }
-
-  createMainApprovers(): void {
-    const workflowDto = { frqId: this.requestModel.requestDto.frqId, requestorNpeId: this.requestModel.requestDto.requestorNpeId};
-    this.workflowControllerService.createRequestApproversUsingPOST(workflowDto).subscribe(
-      (result) => {
-        this.requestModel.mainApproverCreated = true;
-        this.requestModel.captureApproverCriteria();
-        this.processApproversResult(result);
-        this.logger.debug('Main approvers are created: ', result);
-      },
-      (error) => {
-        this.logger.error('Error calling createRequestApprovers', error);
+    this.requestIntegrationService.approverListChangeEmitter.subscribe(
+      () => {
+        this.pendingApprovers = this.workflowModel.pendingApprovers;
+        this.previousApprovers = this.workflowModel.previousApprovers;
       }
     );
+
   }
+
+//   createMainApprovers(): void {
+//     const workflowDto = { frqId: this.requestModel.requestDto.frqId, requestorNpeId: this.requestModel.requestDto.requestorNpeId};
+//     this.workflowControllerService.createRequestApproversUsingPOST(workflowDto).subscribe(
+//       (result) => {
+//         this.requestModel.mainApproverCreated = true;
+//         this.requestModel.captureApproverCriteria();
+// //        this.processApproversResult(result);
+//         this.logger.debug('Main approvers are created: ', result);
+//       },
+//       (error) => {
+//         this.logger.error('Error calling createRequestApprovers', error);
+//       }
+//     );
+//   }
+
+processApproversResult(result: FundingReqApproversDto[]): void {
+
+}
 
   dropped(event: CdkDragDrop<any[]>): void {
    // moveItemInArray(this.requestApprovers, event.previousIndex, event.currentIndex);
@@ -181,25 +76,25 @@ export class ApproverListComponent implements OnInit {
      );
   }
 
-  saveAdditionalApprover(user: any): void {
-    this.workflowControllerService.saveAdditionalApproverUsingPOST(
-      this.userSessionService.getLoggedOnUser().nihNetworkId,
-      this.requestModel.requestDto.frqId,
-      user.nciLdapCn).subscribe(
-      (result) => { this.processApproversResult(result); },
-      (error) => {
-        this.logger.error('Error saveAdditionalApproverUsingPOST ', error);
-      }
-    );
-  }
+//   saveAdditionalApprover(user: any): void {
+//     this.workflowControllerService.saveAdditionalApproverUsingPOST(
+//       this.userSessionService.getLoggedOnUser().nihNetworkId,
+//       this.requestModel.requestDto.frqId,
+//       user.nciLdapCn).subscribe(
+//       (result) => { this.processApproversResult(result); },
+//       (error) => {
+//         this.logger.error('Error saveAdditionalApproverUsingPOST ', error);
+//       }
+//     );
+//   }
 
-  deleteAdditionalApprover(fraId: number): void {
-    this.workflowControllerService.deleteAdditionalApproverUsingPOST(fraId, this.requestModel.requestDto.frqId).subscribe(
-      (result) => { this.processApproversResult(result); },
-      (error) => {
-        this.logger.error('Error saveAdditionalApproverUsingPOST ', error);
-      }
-    );
-  }
+//   deleteAdditionalApprover(fraId: number): void {
+//     this.workflowControllerService.deleteAdditionalApproverUsingPOST(fraId, this.requestModel.requestDto.frqId).subscribe(
+//       (result) => { this.processApproversResult(result); },
+//       (error) => {
+//         this.logger.error('Error saveAdditionalApproverUsingPOST ', error);
+//       }
+//     );
+//   }
 
 }

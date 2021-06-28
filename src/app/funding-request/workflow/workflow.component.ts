@@ -29,7 +29,7 @@ export class WorkflowComponent implements OnInit {
   buttonLabel = 'Process Action';
   buttonDisabled = true;
 
-  workflowActions = this.workflowModel.getWorkflowList('FCSPL');
+  workflowActions: any[];
   private iSelectedValue: number;
 
   set selectedValue(value: number) {
@@ -41,7 +41,6 @@ export class WorkflowComponent implements OnInit {
   }
 
   saveAdditionalApprover(user): void{
-
   }
 
   constructor(private requestIntegrationService: FundingRequestIntegrationService,
@@ -103,6 +102,14 @@ export class WorkflowComponent implements OnInit {
         }
       }
     };
+
+    this.requestIntegrationService.approverListChangeEmitter.subscribe(
+      () => {
+        this.workflowActions = this.workflowModel.getWorkflowList();
+      }
+    );
+    this.workflowModel.initialize();
+
   }
 
   setActiveApprover(event): void {
@@ -111,6 +118,10 @@ export class WorkflowComponent implements OnInit {
 
   canAddApprover(): boolean {
     return false;
+  }
+
+  isApprover(): boolean {
+    return this.workflowModel.isNextApproverOrDesignee;
   }
 
   get selectedWorkflowAction(): string {
