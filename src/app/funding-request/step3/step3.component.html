@@ -1,7 +1,7 @@
 <div class="row">
-  <div class="col-lg-12">
-    <app-alert-billboard [alerts]="model.pendingAlerts"></app-alert-billboard>
-  </div>
+    <div class="col-lg-12">
+        <app-alert-billboard [alerts]="model.pendingAlerts"></app-alert-billboard>
+    </div>
 </div>
 <div class="row">
 
@@ -23,8 +23,8 @@
 
         <div class="form-group mb-4">
             <label for="type">Type</label>
-            <ng-select2 [ngClass]="[ isTypeSelected ? 'has-error' : '']" id="type" [(ngModel)]="selectedDocType" [allowClear]="true"
-                (ngModelChange)="onDocTypeChange($event)">
+            <ng-select2 [ngClass]="[ isTypeSelected ? 'has-error' : '']" id="type" [(ngModel)]="selectedDocType"
+                [allowClear]="true" (ngModelChange)="onDocTypeChange($event)">
                 <option></option>
                 <option *ngFor="let docType of DocTypes | async" [value]="docType.rvLowValue"> {{docType.rvLowValue}}
                 </option>
@@ -36,23 +36,26 @@
         <div class="row">
             <div class="col">
                 <label for="add-file" class="sr-only">Choose File</label>
-                <input [ngClass]="[ isFileSelected ? 'has-error' : '']" id="add-file" #inputFile type="file" accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile"
-                    (change)="selectFiles($event)">
+                <input [ngClass]="[ isFileSelected ? 'has-error' : '']" id="add-file" #inputFile type="file"
+                    accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile" (change)="selectFiles($event)">
             </div>
             <div class="col-sm-auto">
-                <button class="btn btn-primary ml-auto" [disabled]="!selectedFiles" (click)="uploadFiles()">Add Document</button>
+                <button class="btn btn-primary ml-auto" [disabled]="!selectedFiles" (click)="uploadFiles()">Add
+                    Document</button>
             </div>
         </div>
 
         <hr *ngIf="showJustification" class="hr-text" data-content="or" aria-label="or">
 
-        <!-- Supplement Application Button
-        <button type="button" class="btn btn-outline-secondary btn-block mt-2" (click)="open(suppAppModal)">Select Application from IMPAC II</button>-->
+        <!-- Supplement Application Button -->
+        <button type="button" *ngIf="showSuppApplications" class="btn btn-outline-secondary btn-block mt-2"
+            (click)="open(suppAppModal)">Select Application from IMPAC II</button>
 
         <div *ngIf="showJustification" class="form-group mb-2">
             <label for="file-description">Justification Text</label>
-            <textarea class="form-control" [ngClass]="[ isJustificationEntered ? 'has-error' : '']" maxlength="1000" id="file-description" [disabled]="disableJustification"
-                rows="5" (change)="justificationOnChange()" [(ngModel)]="docDescription"></textarea>
+            <textarea class="form-control" [ngClass]="[ isJustificationEntered ? 'has-error' : '']" maxlength="1000"
+                id="file-description" [disabled]="disableJustification" rows="5" (change)="justificationOnChange()"
+                [(ngModel)]="docDescription"></textarea>
             <span class="counter">{{ docDescription.length }}/1000</span>
         </div>
 
@@ -212,26 +215,18 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+
+                <tr *ngFor="let item of applAdminSuppRoutingsDtos" tabindex="0">
                     <td>
-                        <a href="#" class="external-link">Application File</a>
+                        <a href="{{item.docUrl}}" class="external-link">Application File</a>
                     </td>
-                    <td>MM/DD/YYYY</td>
-                    <td>#######</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm">Add</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="#" target="_blank" class="external-link">Application File</a>
-                    </td>
-                    <td>MM/DD/YYYY</td>
-                    <td>#######</td>
+                    <td>{{item.submittedDate}}</td>
+                    <td>{{item.accessionNum}}</td>
                     <td>
                         <button class="btn btn-primary btn-sm">Add</button>
                     </td>
                 </tr>
+
             </tbody>
         </table>
     </div>
