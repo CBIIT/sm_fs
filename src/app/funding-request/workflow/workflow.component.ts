@@ -1,6 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FsWorkflowControllerService, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
+import { Subscription } from 'rxjs';
 import { Options } from 'select2';
 import { RequestModel } from 'src/app/model/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
@@ -17,18 +18,16 @@ const addedApproverMap = new Map<number, any>();
   styleUrls: ['./workflow.component.css'],
   providers: [WorkflowModel]
 })
-export class WorkflowComponent implements OnInit {
+export class WorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
 
-  options: Options;
+  approverChangeSubscription: Subscription;
 
+  options: Options;
   _selectedWorkflowAction: WorkflowAction;
   comments = '';
-  // workflowActions: {id: string, text: string}[];
-
   buttonLabel = 'Process Action';
   buttonDisabled = true;
-
   workflowActions: any[];
   private iSelectedValue: number;
 
@@ -49,6 +48,12 @@ export class WorkflowComponent implements OnInit {
               private requestModel: RequestModel,
               private workflowModel: WorkflowModel,
               private logger: NGXLogger) { }
+
+  ngOnDestroy(): void {
+    if (this.approverChangeSubscription) {
+      this.approverChangeSubscription.unsubscribe();
+    }
+  }
 
   storeData(data: any): any {
     const data2 = data.filter((user) => {
@@ -103,7 +108,7 @@ export class WorkflowComponent implements OnInit {
       }
     };
 
-    this.requestIntegrationService.approverListChangeEmitter.subscribe(
+    this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
       () => {
         this.workflowActions = this.workflowModel.getWorkflowList();
       }
@@ -145,6 +150,8 @@ export class WorkflowComponent implements OnInit {
     this.workflowService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('submit workflow returned okay ', result);
+        this.workflowModel.initialize();
+        this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
       },
       (error) => {
         this.logger.error('submit workflow dto returned error', error);

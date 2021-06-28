@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Options } from 'select2';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
@@ -7,6 +7,7 @@ import { RequestModel } from 'src/app/model/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { WorkflowModel } from '../workflow.model';
 import { FundingRequestIntegrationService } from '../../integration/integration.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-approver-list',
@@ -14,7 +15,7 @@ import { FundingRequestIntegrationService } from '../../integration/integration.
   styleUrls: ['./approver-list.component.css']
 })
 
-export class ApproverListComponent implements OnInit {
+export class ApproverListComponent implements OnInit, OnDestroy {
 
   @Input() readonly = false;
 //  @Output() nextApprover = new EventEmitter<FundingReqApproversDto>();
@@ -26,15 +27,22 @@ export class ApproverListComponent implements OnInit {
   additionalApprovers: FundingReqApproversDto[];
   oneApprover: FundingReqApproversDto;
 
+  approverChangeSubscription: Subscription;
+
   constructor(public requestModel: RequestModel,
               private workflowModel: WorkflowModel,
               private workflowControllerService: FsWorkflowControllerService,
               private requestIntegrationService: FundingRequestIntegrationService,
               private logger: NGXLogger) {
   }
+  ngOnDestroy(): void {
+    if (this.approverChangeSubscription) {
+      this.approverChangeSubscription.unsubscribe();
+    }
+  }
 
   ngOnInit(): void {
-    this.requestIntegrationService.approverListChangeEmitter.subscribe(
+    this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
       () => {
         this.pendingApprovers = this.workflowModel.pendingApprovers;
         this.previousApprovers = this.workflowModel.previousApprovers;
