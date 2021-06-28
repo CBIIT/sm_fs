@@ -13,7 +13,7 @@ import {SearchFilterComponent} from './search/search-filter/search-filter.compon
 import {FundingRequestTypeComponent} from './funding-request-type/funding-request-type.component';
 import {SearchPoolComponent} from './search/search-filter/search-pool/search-pool.component';
 import {SearchComponent} from './search/search.component';
-import {NewRequestComponent} from './new-request/new-request.component';
+import {FundingPlanComponent} from './funding-plan/funding-plan.component';
 import {FsMenuComponent} from './fs-menu/fs-menu.component';
 import {AppPropertiesService, PROPERTIES_APP_NAME, PROPERTIES_OVERRIDE} from './service/app-properties.service';
 import {environment} from 'src/environments/environment';
@@ -103,7 +103,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SearchPoolComponent,
     HeaderComponent,
     SearchComponent,
-    NewRequestComponent,
+    FundingPlanComponent,
     FsMenuComponent,
     SearchResultComponent,
     UnauthorizeComponent,

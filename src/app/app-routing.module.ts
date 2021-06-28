@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { NewRequestComponent } from './new-request/new-request.component';
+import { FundingPlanComponent } from './funding-plan/funding-plan.component';
 import { SearchComponent } from './search/search.component';
 import { UnauthorizeComponent } from './unauthorize/unauthorize.component';
 import { AuthGuard } from './auth/auth.guard';
@@ -19,7 +19,7 @@ const routes: Routes = [
     path: '', canActivate: [AuthGuard], children: [
       { path: '', redirectTo: '/search', pathMatch: 'full' },
       { path: 'search', component: SearchComponent, canActivate: [AuthGuard] },
-      { path: 'newplan', component: NewRequestComponent },
+      { path: 'plan', component: FundingPlanComponent },
       { path: 'request', component: FundingRequestComponent, children: [
         {path: '', redirectTo: 'step1', pathMatch: 'full'},
         {path: 'step1', component: Step1Component, canActivate: [PdAuthGuard]},
