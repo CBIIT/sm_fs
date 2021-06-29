@@ -70,11 +70,13 @@
     <br>
   </div>
 
-  <div class="col-12" *ngIf=(model.requestDto.comments)>
-    <div class="form-group">
-      <p class="like-label">Request Comments</p>
-      <p>{{ model.requestDto.comments }}</p>
+    <div class="col-12" *ngIf=(model.requestDto.comments)>
+      <ngb-alert [dismissible]="false" class="workflow-comments">
+          <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
+          <div class="comment-content">
+              <div class="comment-details">{{ model.requestDto.comments }}</div>
+          </div>
+      </ngb-alert>
     </div>
-  </div>
 
 </div>
