@@ -12,12 +12,11 @@ export class WorkflowModel {
  allApprovers: FundingReqApproversDto[];
  previousApprovers: FundingReqApproversDto[];
  pendingApprovers: FundingReqApproversDto[];
- oneApprover: FundingReqApproversDto;
 
  nextApprover: FundingReqApproversDto;
 
  nextApproverRoleCode = '';
- isNextApproverOrDesignee = false;
+ isUserNextInChain = false;
 
   constructor(
     public requestModel: RequestModel,
@@ -33,7 +32,7 @@ export class WorkflowModel {
     this.awa.push(new WorkflowAction('reassign', 'Reassign', 'Reassign', true, false, true));
     this.awa.push(new WorkflowAction('reject', 'Reject', 'Reject', true, true, false));
     this.awa.push(new WorkflowAction('route_ap', 'Route Before Approving', 'Route', true, false, true));
-    this.awa.push(new WorkflowAction('return', 'Return to PD for Changes', 'Return', true, true, true, ['-GM']));
+    this.awa.push(new WorkflowAction('return', 'Return to PD for Changes', 'Return', true, true, false, ['-GM']));
     this.awa.push(new WorkflowAction('defer', 'Defer', 'Defer', false, true, false, ['FCSPL', 'FCNCIDIR']));
   }
 
@@ -103,20 +102,20 @@ export class WorkflowModel {
       this.nextApproverRoleCode = this.nextApprover.roleCode;
 
       const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-      this.isNextApproverOrDesignee = false;
+      this.isUserNextInChain = false;
       if (userId === this.nextApprover.approverLdap) {
-        this.isNextApproverOrDesignee = true;
+        this.isUserNextInChain = true;
       }
       else if (this.nextApprover.designees && this.nextApprover.designees.length > 0){
         const designees = this.nextApprover.designees.map( d => d.delegateTo);
         if (designees.indexOf(userId) > -1) {
-          this.isNextApproverOrDesignee = true;
+          this.isUserNextInChain = true;
         }
       }
     }
     else {
       this.nextApproverRoleCode = null;
-      this.isNextApproverOrDesignee = false;
+      this.isUserNextInChain = false;
     }
   }
 }

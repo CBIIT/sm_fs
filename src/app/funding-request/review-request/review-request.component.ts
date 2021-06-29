@@ -49,19 +49,18 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
   userReadonly = true;
   justificationMissing = false;
   transitionMemoMissing = false;
-  isDisplayBudgetDocsUploadVar: boolean = false;
+  isDisplayBudgetDocsUploadVar = false;
 
   constructor(private router: Router,
-    private requestModel: RequestModel,
-    private propertiesService: AppPropertiesService,
-    private fsRequestService: FsRequestControllerService,
-    private userSessionService: AppUserSessionService,
-    private requestIntegrationService: FundingRequestIntegrationService,
-    private documentService: DocumentService,
-    private changeDetection: ChangeDetectorRef,
-    private logger: NGXLogger,
-    private fsWorkflowControllerService: FsWorkflowControllerService) {
-  }
+              private requestModel: RequestModel,
+              private propertiesService: AppPropertiesService,
+              private fsRequestService: FsRequestControllerService,
+              private userSessionService: AppUserSessionService,
+              private requestIntegrationService: FundingRequestIntegrationService,
+              private documentService: DocumentService,
+              private changeDetection: ChangeDetectorRef,
+              private logger: NGXLogger,
+              private fsWorkflowControllerService: FsWorkflowControllerService) {}
 
   ngOnDestroy(): void {
     if (this.requestHistorySubscriber) {
@@ -342,7 +341,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
   }
 
   isDisplayBudgetDocsUpload(): boolean {
-    var isFundApprover: boolean = false;
+    let isFundApprover = false;
     this.fsWorkflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
       result => {
         if (result) {
@@ -361,7 +360,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
-    return false
+    return false;
   }
 
   isTerminalStatus(): boolean {

@@ -16,7 +16,6 @@ import { Subscription } from 'rxjs';
 })
 
 export class ApproverListComponent implements OnInit, OnDestroy {
-
   @Input() readonly = false;
 //  @Output() nextApprover = new EventEmitter<FundingReqApproversDto>();
 
@@ -70,18 +69,45 @@ processApproversResult(result: FundingReqApproversDto[]): void {
 
 }
 
+resetApproverList(): void {
+  this.pendingApprovers = this.workflowModel.pendingApprovers;
+  this.oneApprover = null;
+}
+
+separateApproverLists(action: string): void {
+  if (action === 'ap_route') {
+    this.pendingApprovers = this.workflowModel.pendingApprovers.slice();
+    if (this.pendingApprovers.length > 0) {
+      this.oneApprover = this.pendingApprovers[0];
+      this.pendingApprovers.splice(0, 1);
+    }
+    this.logger.debug('separateApproverList oneApprover=', this.oneApprover);
+    this.logger.debug('separateApproverList nextApprove=', this.pendingApprovers);
+  }
+}
+
+addAdditionalApprover(user: any): void {
+  if (!this.additionalApprovers) {
+    this.additionalApprovers = [];
+  }
+  const approver: FundingReqApproversDto = {};
+  approver.approverLdap = user.nciLdapCn;
+  approver.approverFullName = user.fullName;
+  this.additionalApprovers.push(approver);
+}
+
   dropped(event: CdkDragDrop<any[]>): void {
-   // moveItemInArray(this.requestApprovers, event.previousIndex, event.currentIndex);
-   if (event.previousIndex === event.currentIndex) {
-     return;
-   }
-   this.workflowControllerService.moveAdditionalApproverUsingPOST(
-     event.currentIndex + 1, this.requestModel.requestDto.frqId, event.previousIndex + 1).subscribe(
-      (result) => { this.processApproversResult(result); },
-      (error) => {
-        this.logger.error('Error moveAdditionalApproverUsingPOST ', error);
-      }
-     );
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
+    moveItemInArray(this.additionalApprovers, event.previousIndex, event.currentIndex);
+  //  this.workflowControllerService.moveAdditionalApproverUsingPOST(
+  //    event.currentIndex + 1, this.requestModel.requestDto.frqId, event.previousIndex + 1).subscribe(
+  //     (result) => { this.processApproversResult(result); },
+  //     (error) => {
+  //       this.logger.error('Error moveAdditionalApproverUsingPOST ', error);
+  //     }
+  //    );
   }
 
 //   saveAdditionalApprover(user: any): void {
