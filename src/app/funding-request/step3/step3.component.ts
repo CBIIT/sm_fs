@@ -4,7 +4,8 @@ import 'select2';
 import { Options } from 'select2';
 import {
   CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
-  FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto, DocumentsControllerService
+  FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto, DocumentsControllerService,
+  ApplAdminSuppRoutingsDto
 } from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request-model';
@@ -40,6 +41,7 @@ export class Step3Component implements OnInit {
   _docOrderDto: FundingRequestDocOrderDto = {};
   _docOrderDtos: FundingRequestDocOrderDto[] = [];
   showJustification: boolean = false;
+  showSuppApplications: boolean = false;
   baseTaskList: Observable<DocumentsDto[]>;
   include: Observable<DocumentsDto[]>;
   exclude: Observable<DocumentsDto[]>;
@@ -62,6 +64,7 @@ export class Step3Component implements OnInit {
   isFileSelected: boolean = false;
   isJustificationEntered: boolean = false;
   isTypeSelected: boolean = false;
+  applAdminSuppRoutingsDtos: ApplAdminSuppRoutingsDto[] = [];
 
   @ViewChild('inputFile')
   inputFile: ElementRef;
@@ -114,13 +117,27 @@ export class Step3Component implements OnInit {
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
         this.DocTypes = of(result);
+        this.loadFiles();
+        this.removeSupplementAction();
         this.logger.debug('Getting the Doc type Dropdown results: ', this.DocTypes);
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
+  }
 
-    this.loadFiles();
-
+  removeSupplementAction() {
+    //TODO: Still need to check for "Add Funds"
+    if (this.requestModel.requestDto.requestType !== 'Pay Type 4') {
+      this.removeDocType("Supplement Application");
+    } else {
+      //TODO: load supp actions from IMPAC II
+      this.fsRequestControllerService.retrieveAdminSuppRoutingsUsingGET(8455782).subscribe(
+        result => {
+          this.applAdminSuppRoutingsDtos = result;
+        }, error => {
+          this.logger.error('HttpClient get request error for----- ' + error.message);
+        });
+    }
   }
 
   selectFiles(event): void {
@@ -429,6 +446,11 @@ export class Step3Component implements OnInit {
       this.showJustification = true;
     } else {
       this.showJustification = false;
+    }
+    if (event === 'Supplement Application') {
+      this.showSuppApplications = true;
+    } else {
+      this.showSuppApplications = false;
     }
     if (event === '') {
       this.disableFile = true;
