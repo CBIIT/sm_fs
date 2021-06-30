@@ -52,7 +52,12 @@
                     <td>Additional Approver (Added by {{a.assignerFullName}})</td>
                     <td><span *ngFor="let d of a.designees">
                         <a href="mailto:{{d.delegateToEmailAddr}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{d.delegateToFullName}}</a><br/>
-                        </span></td>
+                        </span>
+                        <button class="btn btn-link btn-delete btn-slim" title="Delete" 
+                        (click)="deleteAdditionalApprover(i)">
+                        <i class="fas fa-trash" aria-hidden="true"></i>
+                        </button>
+                    </td>
                     </tr>
             </ng-container>
             <ng-container na>

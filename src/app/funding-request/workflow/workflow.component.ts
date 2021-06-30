@@ -10,7 +10,7 @@ import { ApproverListComponent } from './approver-list/approver-list.component';
 import { WorkflowAction, WorkflowModel } from './workflow.model';
 
 const approverMap = new Map<number, any>();
-const addedApproverMap = new Map<number, any>();
+let addedApproverMap = new Map<number, any>();
 
 @Component({
   selector: 'app-workflow',
@@ -20,8 +20,9 @@ const addedApproverMap = new Map<number, any>();
 })
 export class WorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
-  @ViewChild(ApproverListComponent) approverListComponent: ApproverListComponent;
+  // @ViewChild(ApproverListComponent) approverListComponent: ApproverListComponent;
 
+  approverInitializationSubscription: Subscription;
   approverChangeSubscription: Subscription;
 
   options: Options;
@@ -39,16 +40,14 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.iSelectedValue = value;
     const user = approverMap.get(Number(value));
     this.logger.debug('Selected Approver to Add: ', user);
-    this.addAdditionalApprover(user);
+    if (this._selectedWorkflowAction) {
+      this.workflowModel.addAdditionalApprover(user, this._selectedWorkflowAction.action);
+    }
     setTimeout(() => {this.iSelectedValue = null; }, 0);
   }
 
   get selectedValue(): number {
     return this.iSelectedValue;
-  }
-
-  addAdditionalApprover(user: any): void{
-    this.approverListComponent.addAdditionalApprover(user);
   }
 
   constructor(private requestIntegrationService: FundingRequestIntegrationService,
@@ -59,6 +58,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
               private logger: NGXLogger) { }
 
   ngOnDestroy(): void {
+    if (this.approverInitializationSubscription) {
+      this.approverInitializationSubscription.unsubscribe();
+    }
     if (this.approverChangeSubscription) {
       this.approverChangeSubscription.unsubscribe();
     }
@@ -117,17 +119,21 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
+    this.approverInitializationSubscription = this.requestIntegrationService.approverInitializationEmitter.subscribe(
       () => {
         this.workflowActions = this.workflowModel.getWorkflowList();
       }
     );
+
+    this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
+      () => {
+        addedApproverMap = this.workflowModel.addedApproverMap;
+      }
+    );
+
+
     this.workflowModel.initialize();
 
-  }
-
-  setActiveApprover(event): void {
-    this.requestIntegrationService.activeApproverEmitter.next(event);
   }
 
   isApprover(): boolean {
@@ -147,14 +153,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.buttonLabel = this._selectedWorkflowAction.actionButtonText;
     this.buttonDisabled = this._selectedWorkflowAction.commentsRequired || this._selectedWorkflowAction.newApproverRequired;
 
-    if (this._selectedWorkflowAction.newApproverRequired) {
-      this.showAddApprover = true;
-      this.approverListComponent.separateApproverLists(action);
-    }
-    else {
-      this.approverListComponent.resetApproverList();
-      this.showAddApprover = false;
-    }
+    this.showAddApprover = this._selectedWorkflowAction.newApproverRequired;
+    this.workflowModel.prepareApproverListsForView(this._selectedWorkflowAction.action);
   }
 
   submitWorkflow(): void {
