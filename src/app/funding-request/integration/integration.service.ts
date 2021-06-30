@@ -6,6 +6,7 @@ import {Subject} from 'rxjs';
 export class FundingRequestIntegrationService {
   requestHistoryLoadEmitter = new Subject<FundingReqStatusHistoryDto[]>();
   requestSubmissionEmitter = new Subject<number>();
+  approverInitializationEmitter = new Subject<void>();
   approverListChangeEmitter = new Subject<void>();
   activeApproverEmitter = new Subject<FundingReqApproversDto>();
 }

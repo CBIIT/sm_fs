@@ -66,7 +66,6 @@ export class NextScheduledApproversRequestComponent implements OnInit {
       approverMap.set(Number(user.id), user);
     });
     return data2;
-
   }
 
   ngOnInit(): void {

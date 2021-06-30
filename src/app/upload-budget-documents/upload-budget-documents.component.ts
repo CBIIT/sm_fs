@@ -5,6 +5,7 @@ import { RequestModel } from '../model/request-model';
 import { DocumentService } from '../service/document.service';
 import { HttpResponse } from '@angular/common/http';
 import { saveAs } from 'file-saver';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-upload-budget-documents',
@@ -48,7 +49,8 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   }
 
   constructor(private requestModel: RequestModel,
-    private documentService: DocumentService,) { }
+    private documentService: DocumentService,
+    private logger: NGXLogger) { }
 
   ngOnInit(): void {
     this.loadFiles();
@@ -63,7 +65,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
           this.spliceDocType(element.docType);
         });
       }, error => {
-        console.log('HttpClient get request error for----- ' + error.message);
+        this.logger.error('HttpClient get request error for----- ' + error.message);
       });
   }
 
@@ -72,7 +74,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   }
 
   onDocTypeChange(event): any {
-    console.log('Doc Type Change: ', event);
+    this.logger.debug('Doc Type Change: ', event);
     this.inputFile.nativeElement.value = ''
 
     if (event === '') {
@@ -105,13 +107,13 @@ export class UploadBudgetDocumentsComponent implements OnInit {
         if (event instanceof HttpResponse) {
 
           const result = event.body;
-          console.log('Upload Doc: ', result);
+          this.logger.debug('Upload Doc: ', result);
           this.spliceDocType(result.docType);
           this.loadFiles();
         }
       },
       err => {
-        console.log('Error occured while uploading doc----- ' + err.message);
+        this.logger.error('Error occured while uploading doc----- ' + err.message);
       });
   }
 
@@ -150,12 +152,12 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   deleteDoc(id: number, docType: string) {
     this.documentService.deleteDocById(id).subscribe(
       result => {
-        console.log('Delete Success');
+        this.logger.debug('Delete Success');
         this.loadFiles();
         this.pushDocType(docType);
       }
     ), err => {
-      console.log('Error while deleting the document');
+      this.logger.error('Error while deleting the document for the docId:' + id);
     };
 
   }

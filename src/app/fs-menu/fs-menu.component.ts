@@ -33,9 +33,12 @@ export class FsMenuComponent implements OnInit {
     this.ogaCertifier = this.userSessionService.hasRole('GMBRCHF');
     this.oefiaCertifier = this.userSessionService.hasRole('OEFIACRT');
     this.splCertifier = this.userSessionService.hasRole('DES');
+    this.paylistReadOnlyRole = this.userSessionService.hasRole('PAYLSTVW');
     this.pd = this.userSessionService.isPD();
     this.pa = this.userSessionService.isPA();
    
+
+    
   }
 
 }

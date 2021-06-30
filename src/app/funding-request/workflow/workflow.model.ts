@@ -7,17 +7,23 @@ import { FundingRequestIntegrationService } from '../integration/integration.ser
 
 @Injectable()
 export class WorkflowModel {
+
  private awa: WorkflowAction[] = [];
 
- allApprovers: FundingReqApproversDto[];
- previousApprovers: FundingReqApproversDto[];
- pendingApprovers: FundingReqApproversDto[];
- oneApprover: FundingReqApproversDto;
+ _allApprovers: FundingReqApproversDto[];
+ _previousApprovers: FundingReqApproversDto[];
+ _pendingApprovers: FundingReqApproversDto[];
 
  nextApprover: FundingReqApproversDto;
+ addedApproverMap = new Map<number, any>();
+ previousApprovers: FundingReqApproversDto[];
+ oneApprover: FundingReqApproversDto;
+ pendingApprovers: FundingReqApproversDto[];
+ additionalApprovers: FundingReqApproversDto[];
+
 
  nextApproverRoleCode = '';
- isNextApproverOrDesignee = false;
+ isUserNextInChain = false;
 
   constructor(
     public requestModel: RequestModel,
@@ -33,7 +39,7 @@ export class WorkflowModel {
     this.awa.push(new WorkflowAction('reassign', 'Reassign', 'Reassign', true, false, true));
     this.awa.push(new WorkflowAction('reject', 'Reject', 'Reject', true, true, false));
     this.awa.push(new WorkflowAction('route_ap', 'Route Before Approving', 'Route', true, false, true));
-    this.awa.push(new WorkflowAction('return', 'Return to PD for Changes', 'Return', true, true, true, ['-GM']));
+    this.awa.push(new WorkflowAction('return', 'Return to PD for Changes', 'Return', true, true, false, ['-GM']));
     this.awa.push(new WorkflowAction('defer', 'Defer', 'Defer', false, true, false, ['FCSPL', 'FCNCIDIR']));
   }
 
@@ -74,7 +80,7 @@ export class WorkflowModel {
       (result) => {
         this.processApproversResult(result);
         this.requestModel.captureApproverCriteria();
-        this.requestIntegrationService.approverListChangeEmitter.next();
+        this.requestIntegrationService.approverInitializationEmitter.next();
       },
       (error) => {
         this.logger.error('Error calling createRequestApprovers', error);
@@ -83,41 +89,98 @@ export class WorkflowModel {
   }
 
   processApproversResult(result: FundingReqApproversDto[]): void {
-    // addedApproverMap.clear();
-    // result.forEach((approver) => {
-    //   addedApproverMap.set(approver.approverNpnId, true);
-    // });
+    this._allApprovers = result;
 
-    this.allApprovers = result;
-
-    this.pendingApprovers = result.filter((approver) => {
+    this._pendingApprovers = result.filter((approver) => {
       return approver.responseDate === null && approver.roleCode !== null;
     });
 
-    this.previousApprovers = result.filter((approver) => {
+    this._previousApprovers = result.filter((approver) => {
       return approver.responseDate !== null;
     });
 
-    this.nextApprover = this.pendingApprovers && this.pendingApprovers.length > 0 ? this.pendingApprovers[0] : null;
+    this.nextApprover = this._pendingApprovers && this._pendingApprovers.length > 0 ? this._pendingApprovers[0] : null;
     if ( this.nextApprover ) {
       this.nextApproverRoleCode = this.nextApprover.roleCode;
 
       const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-      this.isNextApproverOrDesignee = false;
+      this.isUserNextInChain = false;
       if (userId === this.nextApprover.approverLdap) {
-        this.isNextApproverOrDesignee = true;
+        this.isUserNextInChain = true;
       }
       else if (this.nextApprover.designees && this.nextApprover.designees.length > 0){
         const designees = this.nextApprover.designees.map( d => d.delegateTo);
         if (designees.indexOf(userId) > -1) {
-          this.isNextApproverOrDesignee = true;
+          this.isUserNextInChain = true;
         }
       }
     }
     else {
       this.nextApproverRoleCode = null;
-      this.isNextApproverOrDesignee = false;
+      this.isUserNextInChain = false;
     }
+
+    this.resetApproverLists();
+    this.requestIntegrationService.approverListChangeEmitter.next();
+  }
+
+  resetApproverLists(): void {
+    this.pendingApprovers = this._pendingApprovers.slice();
+    this.previousApprovers = this._previousApprovers;
+    this.oneApprover = null;
+    this.additionalApprovers = null;
+    this.addedApproverMap.clear();
+    this._allApprovers.forEach((approver) => {
+      this.addedApproverMap.set(approver.approverNpnId, true);
+    });
+
+  }
+
+
+  prepareApproverListsForView(action: string): void {
+    this.resetApproverLists();
+    if (action === 'ap_route') {
+      if (this.pendingApprovers.length > 0) {
+        this.oneApprover = this.pendingApprovers.splice(0, 1)[0];
+      }
+    }
+    this.requestIntegrationService.approverListChangeEmitter.next();
+  }
+
+  addAdditionalApprover(user: any, action: string): void {
+
+    if (action === 'reassign') {
+      const approver: FundingReqApproversDto =  JSON.parse(JSON.stringify(this.pendingApprovers[0]));
+      approver.approverNpnId = user.id;
+      approver.approverLdap = user.nciLdapCn;
+      approver.approverFullName = user.fullName;
+      approver.approverEmailAddress = user.emailAddress;
+      this.pendingApprovers[0] = approver;
+      this.addedApproverMap.set(user.id, true);
+      this.logger.debug('pending approvers ', this.pendingApprovers);
+      this.logger.debug('_pending approvers ', this._pendingApprovers);
+      this.requestIntegrationService.approverListChangeEmitter.next();
+    }
+    else if ( action === 'ap_route' || action === 'route_ap') {
+      if (!this.additionalApprovers) {
+        this.additionalApprovers = [];
+      }
+      const approver: FundingReqApproversDto = {};
+      approver.approverNpnId = user.id;
+      approver.approverLdap = user.nciLdapCn;
+      approver.approverFullName = user.fullName;
+      approver.approverEmailAddress = user.emailAddress;
+      this.additionalApprovers.push(approver);
+      this.addedApproverMap.set(user.id, true);
+      this.requestIntegrationService.approverListChangeEmitter.next();
+    }
+  }
+
+  deleteAdditionalApprover(index: number): void {
+    if (this.additionalApprovers) {
+      this.addedApproverMap.delete(this.additionalApprovers.splice(index, 1)[0].approverNpnId);
+    }
+    this.requestIntegrationService.approverListChangeEmitter.next();
   }
 }
 
