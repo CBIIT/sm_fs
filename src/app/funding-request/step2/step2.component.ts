@@ -32,10 +32,7 @@ export class Step2Component implements OnInit {
     if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
-    this.logger.debug('Request type:', this.requestModel.requestDto.financialInfoDto.requestTypeId);
-
     this.requestModel.setStepLinkable(2, true);
-    this.logger.debug('Selected DOCS in step 2 init:', this.requestModel.requestDto.financialInfoDto.otherDocText);
   }
 
   saveAndContinue(): void {
@@ -48,6 +45,9 @@ export class Step2Component implements OnInit {
 
   prevStep(): void {
     // TODO - alert for unsaved changes?
+    if(this.step2Form.dirty) {
+      alert('All unsaved changes will be lost');
+    }
     this.router.navigate(['/request/step1']);
   }
 
@@ -115,6 +115,7 @@ export class Step2Component implements OnInit {
   onSubmit(event: SubmitEvent): void {
     // @ts-ignore
     const action = event.submitter?.name;
+    this.step2Form.control.updateValueAndValidity();
     this.logger.debug(this.step2Form);
     this.alerts = [];
     if (this.step2Form.valid) {

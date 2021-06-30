@@ -1,5 +1,11 @@
 <app-alert-billboard [alerts]="model.pendingAlerts"></app-alert-billboard>
-<form #step2Form="ngForm" (ngSubmit)="onSubmit($event)" appDiversitySupplementValidator appPdNameRequired appCancerActivityRequired>
+<form
+  #step2Form="ngForm"
+  (ngSubmit)="onSubmit($event)"
+  appDiversitySupplementValidator
+  appPdNameRequired
+  appCancerActivityRequired
+  [ngFormOptions]="{updateOn: 'submit'}">
   <input type="hidden" #prcValidValue="ngModel" [ngModel]="prcValid" name="prcValid" required>
 
   <app-grant-information></app-grant-information>

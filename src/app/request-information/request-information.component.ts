@@ -22,15 +22,12 @@ export class RequestInformationComponent implements OnInit {
   myAlerts: Alert[] = [];
 
   get selectedRequestType(): number {
-    // this.logger.debug('getSelectedRequestType():', this.requestModel.requestDto.financialInfoDto.requestTypeId);
     return this.requestModel.requestDto.financialInfoDto.requestTypeId;
   }
 
   set selectedRequestType(value: number) {
-    this.logger.debug('request-information-component sees new value', value);
 
     if (value) {
-      this.logger.debug('loading funding sources for type:', value);
       this.fsRequestControllerService.getFundingSourcesUsingGET(
         value,
         this.requestModel.grant.fullGrantNum,
@@ -57,32 +54,22 @@ export class RequestInformationComponent implements OnInit {
     ? [this.requestModel.requestDto.financialInfoDto.requestorCayCode] : []);
 
   get selectedCayCode(): string[] {
-    // this.logger.debug('getSelectedCayCode():', this._selectedCayCode);
     return this._selectedCayCode;
   }
 
   set selectedCayCode(value: string[]) {
-    this.logger.debug('setSelectedCayCode():', value);
-    let testVal = '';
     if (isArray(value) && value[0]) {
-      this.logger.debug('requestorCayCode set to first element of array', value[0]);
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = value[0];
       this.requestModel.requestDto.requestorCayCode = value[0];
-      testVal = value[0];
     } else if (typeof value === 'string' || value instanceof String) {
-      this.logger.debug('Requestor cayCode set to string value', value);
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = String(value);
       this.requestModel.requestDto.requestorCayCode = String(value);
-      testVal = String(value);
     } else {
-      this.logger.debug('Requestor cayCode set to undefined');
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
       this.requestModel.requestDto.requestorCayCode = undefined;
     }
     this._selectedCayCode = value;
   }
-
-// TODO: Clarify the pdNpnId vs requestorNpnId
 
   get selectedPd(): number {
     return this.requestModel.requestDto.financialInfoDto.requestorNpnId;
@@ -94,7 +81,6 @@ export class RequestInformationComponent implements OnInit {
     this.requestModel.requestDto.requestorNpnId = value;
     this.requestModel.requestDto.financialInfoDto.requestorNpnId = value;
     if (valueChanged) {
-      this.logger.debug('Resetting requestorCayCode');
       this.requestModel.requestDto.requestorCayCode = undefined;
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
       this.cayCode.selectedValue = null;

@@ -25,20 +25,19 @@ export class RequestModel {
   conversionMechanism: string;
 
   // Grant viewer URL for use in links
-  private _grantViewerUrl: string;
+  private readonly _grantViewerUrl: string;
 
   // Request type
   private _requestType: string;
 
-  // Request comments
-  private requestComments: string;
-  private _eGrantsUrl: string;
+  private readonly _eGrantsUrl: string;
 
   // approver stuff
   mainApproverCreated = false;
   approverCriteria: any = {};
   // note, element 0 is not used, element 1 represents step1 and so on.
   private stepLinkable = [false, false, false, false, false];
+  initialPay: number;
 
   get recreateMainApproverNeeded(): boolean {
     // need to have logic to determine something changed in request that
@@ -173,12 +172,9 @@ export class RequestModel {
 
   canSave(): boolean {
     const errors = this.getValidationErrors();
-    if (errors.length > 0) {
-      // this.logger.debug('Validation errors:', errors);
-      return false;
-    }
+    return errors.length <= 0;
 
-    return true;
+
   }
 
   canSubmit(): boolean {
@@ -271,10 +267,6 @@ export class RequestModel {
         this.logger.warn('no line items for source', source.fundingSourceName);
       }
     });
-  }
-
-  pushAlert(a: Alert): boolean {
-    return true;
   }
 
   clearAlerts(): void {

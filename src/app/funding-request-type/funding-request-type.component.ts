@@ -66,7 +66,7 @@ export class FundingRequestTypeComponent implements OnInit {
   constructor(private fsLookupControllerService: FsLookupControllerService,
               private searchFilterService: SearchFilterService,
               private userService: UserService,
-              private model: RequestModel,
+              public model: RequestModel,
               private logger: NGXLogger) {
   }
 
