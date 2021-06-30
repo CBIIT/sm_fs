@@ -14,7 +14,6 @@ class DocData {
   order: number;
 }
 
-
 @Component({
   selector: 'app-other-docs-contributing-funds',
   templateUrl: './other-docs-contributing-funds.component.html',
@@ -68,10 +67,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.debug('Request type:', this.requestModel.requestDto.financialInfoDto.requestTypeId);
-
     this.initializeDocs();
-
   }
 
   initializeDocs(): void {
@@ -79,9 +75,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
     if (!this.docs) {
       this.docs = new Array<DocData>();
     }
-    // TODO: on restore of a request, pre-select any existing selected DOCs
     const selectedDocs = this.requestModel.requestDto.financialInfoDto.otherDocText || '';
-    this.logger.debug('initializing pre-selected DOCS: ', selectedDocs);
 
     this.lookupsControllerService.getNciDocsUsingGET().subscribe(
       result => {

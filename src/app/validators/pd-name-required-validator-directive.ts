@@ -16,7 +16,6 @@ export class PdNameRequiredValidatorDirective implements Validator {
     if (!pd) {
       return null;
     }
-    this.logger.debug('Validating pd value of', pd.value);
     if (!pd.value || isNaN(pd.value) || Number(pd.value) <= 0) {
       return {pdNameRequired: true};
     }

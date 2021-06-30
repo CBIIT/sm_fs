@@ -9,17 +9,25 @@
     [allowClear]="true"
     [data]="data"
     [ngClass]="{'is-invalid': (!fundingRequestType.valid && (fundingRequestType.touched || parentForm.submitted) || parentForm.errors?.mustSelectDiversitySupplement ) }"
-    required>
+    required
+    appActiveInitialPayValidator
+    [ngModelOptions]="{updateOn: 'change'}">
   </ng-select2>
   <div
     class="text-danger mt-1"
-    *ngIf="!fundingRequestType.valid && (fundingRequestType.touched || parentForm.submitted)">
+    *ngIf="fundingRequestType.errors?.required && (fundingRequestType.touched || parentForm.submitted)">
     Request type is required
   </div>
   <div
     class="text-danger mt-1"
     *ngIf="parentForm.errors?.mustSelectDiversitySupplement">
     You must select Diversity Supplement (includes CURE Supplements) as the request type
+  </div>
+  <div
+    class="text-danger mt-1"
+    *ngIf="fundingRequestType.errors?.initialPayGrantExists">
+    There is another "Initial Pay" request in the system for this grant. There can only be ONE Initial Pay request per
+    grant per fiscal year. The other funding request ID is {{model.initialPay}}.
   </div>
 </div>
 

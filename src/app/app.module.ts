@@ -69,6 +69,7 @@ import {CancerActivityRequiredValidatorDirective} from './validators/cancer-acti
 import { UploadBudgetDocumentsComponent } from './upload-budget-documents/upload-budget-documents.component';
 import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
 import { BudgetInfoComponent } from './budget-info/budget-info.component';
+import {ActiveInitialPayValidatorDirective} from "./validators/active-initial-pay-validator-directive";
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
@@ -148,6 +149,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     UploadBudgetDocumentsComponent,
     ApprovedCostsComponent,
     BudgetInfoComponent,
+    ActiveInitialPayValidatorDirective,
   ],
 
 

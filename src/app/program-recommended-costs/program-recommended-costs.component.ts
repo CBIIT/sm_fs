@@ -96,7 +96,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     if (!this.requestModel.programRecommendedCostsModel.grantAwarded) {
       this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
           this.requestModel.programRecommendedCostsModel.grantAwarded = result;
-          this.logger.debug('Appl Periods/Grant awards:', result);
         }, error => {
           // TODO: properly handle errors here
           this.logger.error('HttpClient get request error for----- ' + error.message);
@@ -141,9 +140,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   addFundingSource(): void {
-    // TODO: Validation
-    this.logger.debug('Selected source', this.selectedSourceId);
-    this.logger.debug('Editing source', this.editing);
     if (this.editing && this.editing >= 0) {
       const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[this.editing];
       this.logger.debug('Original source', edit);
@@ -171,7 +167,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
     this.editing = i;
     this.lineItem = this.getLineItem(edit);
-    this.logger.debug('editing line item', this.lineItem);
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     // @ts-ignore
@@ -274,18 +269,14 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   canSave(): boolean {
     // TODO - update this logic to handle Restoration of Future Years types
     if (!this.selectedSourceId) {
-      // this.logger.debug('no selected source');
       return false;
     }
     if (!this.lineItem[0]) {
-      // this.logger.debug('no line item');
       return false;
     }
     if (this.showPercent && !this.lineItem[0].percentCut) {
-      // this.logger.debug('no percent cut');
       return false;
     } else if (!(this.lineItem[0].recommendedTotal && this.lineItem[0].recommendedDirect)) {
-      // this.logger.debug('missing recommended direct or total');
       return false;
     }
     if ((this.lineItem[0].recommendedTotal && this.lineItem[0].recommendedDirect)
@@ -312,7 +303,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   propagate(): void {
-    this.logger.debug('Propagating:', this.lineItem);
     if (this.lineItem.length > 1) {
       const first = this.lineItem[0];
       this.lineItem.forEach((li, index) => {
