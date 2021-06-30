@@ -6,14 +6,14 @@ import { AppLookupsService } from '../service/app-lookups.service';
 })
 export class CodeDescriptionPipe implements PipeTransform {
 
-  constructor(private appLookupsService:AppLookupsService) {
+  constructor(private appLookupsService: AppLookupsService) {
   }
 
   transform(value: string, ...args: string[]): string {
     if (!args[0]) {
       throw new Error('codeDescription pipe requires type parameter, such as CancerActivities.');
     }
-    return this.appLookupsService.getDescription(args[0],value);
+    return this.appLookupsService.getDescription(args[0], value);
   }
 
 }
