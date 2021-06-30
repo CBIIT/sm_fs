@@ -5,7 +5,7 @@ import { Options } from 'select2';
 import {
   CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
   FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto, DocumentsControllerService,
-  ApplAdminSuppRoutingsDto
+  ApplAdminSuppRoutingsDto, FundingRequestTypesDto
 } from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request-model';
@@ -118,26 +118,49 @@ export class Step3Component implements OnInit {
       result => {
         this.DocTypes = of(result);
         this.loadFiles();
-        this.removeSupplementAction();
+        this.isSupplementAction()
+        this.loadSUppApps();
         this.logger.debug('Getting the Doc type Dropdown results: ', this.DocTypes);
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
   }
 
-  removeSupplementAction() {
-    //TODO: Still need to check for "Add Funds"
-    if (this.requestModel.requestDto.requestType !== 'Pay Type 4') {
-      this.removeDocType("Supplement Application");
-    } else {
-      //TODO: load supp actions from IMPAC II
-      this.fsRequestControllerService.retrieveAdminSuppRoutingsUsingGET(8455782).subscribe(
+  loadSUppApps() {
+    this.fsRequestControllerService.retrieveAdminSuppRoutingsUsingGET(8455782).subscribe(
+      result => {
+        this.applAdminSuppRoutingsDtos = result;
+      }, error => {
+        this.logger.error('HttpClient get request error for----- ' + error.message);
+      });
+  }
+
+
+
+  isSupplementAction() {
+    var isSuppAction: boolean = false;
+    if (this.requestModel.requestDto.requestType === 'Pay Type 4') {
+      isSuppAction = true;
+
+    }
+    if (!isSuppAction) {
+      this.fsRequestControllerService.findByRequestTypeCategoryUsingGET('SUPPLEMENT').subscribe(
         result => {
-          this.applAdminSuppRoutingsDtos = result;
+          result.forEach((element, index) => {
+            if (Number(element.id) === Number(this.requestModel.requestDto.parentFrtId)) {
+              isSuppAction = true;
+            }
+
+          });
+          if (!isSuppAction) {
+            this.removeDocType("Supplement Application");
+          }
+
         }, error => {
           this.logger.error('HttpClient get request error for----- ' + error.message);
         });
     }
+
   }
 
   selectFiles(event): void {

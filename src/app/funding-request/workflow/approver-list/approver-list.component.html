@@ -10,7 +10,7 @@
                     <th scope="col">Designees</th>
                 </tr>
             </thead>
-            <tbody >
+            <tbody pa >
                 <tr *ngFor="let a of previousApprovers; let i = index">
                     <td><span class="fa fa-lock" *ngIf="!readonly"></span>&nbsp;{{ a.orderNum}}</td>
                     <td><a href="mailto:{{a.approverEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverFullName }}</a></td>
@@ -34,7 +34,8 @@
                     <th scope="col">Designees</th>
                 </tr>
             </thead>
-            <tbody >
+            <tbody cdkDropList (cdkDropListDropped)="dropped($event)">
+            <ng-container oa >
                 <tr *ngIf="oneApprover">
                     <td><span class="fa fa-lock" *ngIf="!readonly"></span>&nbsp;{{ oneApprover.orderNum}}</td>
                     <td><a href="mailto:{{oneApprover.approverEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ oneApprover.approverFullName }}</a></td>
@@ -43,18 +44,23 @@
                         <a href="mailto:{{d.delegateToEmailAddr}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{d.delegateToFullName}}</a><br/>
                         </span></td>
                     </tr>
-            </tbody>
-            <tbody cdkDropList (cdkDropListDropped)="dropped($event)" class="drag-boundary">
-                <tr *ngFor="let a of additionalApprovers; let i = index" cdkDrag cdkDragBoundary=".drag-boundary" [cdkDragDisabled]="readonly">
-                    <td><span class="order-icon" ngbTooltip="Drag & Drop to Order" *ngIf="!readonly"></span>&nbsp;{{ a.orderNum}}</td>
+            </ng-container>
+            <ng-container aa class="drag-boundary">
+                <tr *ngFor="let a of additionalApprovers; let i = index" cdkDrag cdkDragBoundary=".drag-boundary">
+                    <td><span class="order-icon" ngbTooltip="Drag & Drop to Order"></span>&nbsp;{{ a.orderNum}}</td>
                     <td><a href="mailto:{{a.approverEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverFullName }}</a></td>
                     <td>Additional Approver (Added by {{a.assignerFullName}})</td>
                     <td><span *ngFor="let d of a.designees">
                         <a href="mailto:{{d.delegateToEmailAddr}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{d.delegateToFullName}}</a><br/>
-                        </span></td>
+                        </span>
+                        <button class="btn btn-link btn-delete btn-slim" title="Delete" 
+                        (click)="deleteAdditionalApprover(i)">
+                        <i class="fas fa-trash" aria-hidden="true"></i>
+                        </button>
+                    </td>
                     </tr>
-            </tbody>
-            <tbody >
+            </ng-container>
+            <ng-container na>
                 <tr *ngFor="let a of pendingApprovers; let i = index">
                     <td><span class="fa fa-lock" *ngIf="!readonly"></span>&nbsp;{{ a.orderNum}}</td>
                     <td><a href="mailto:{{a.approverEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverFullName }}</a></td>
@@ -63,7 +69,8 @@
                     <a href="mailto:{{d.delegateToEmailAddr}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{d.delegateToFullName}}</a><br/>
                     </span></td>
                 </tr>
-            </tbody>
+            </ng-container>
+        </tbody>
         </table>
     </div>
 </div>

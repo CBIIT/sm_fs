@@ -29,7 +29,7 @@
     </div>
 
     <div class="col-lg-6">
-      <div class="form-group" *ngIf="canAddApprover()">
+      <div class="form-group" *ngIf="showAddApprover">
           <label for="req-add-approvers">Add Approver(s) <span class="optional">(optional)</span></label>
           <ng-select2
               id="req-add-approvers"
@@ -40,6 +40,7 @@
           </ng-select2>
       </div>  
     </div>
+
     <app-approver-list [readonly]="readonly"></app-approver-list>
 
     <div class="col-12">
