@@ -636,7 +636,7 @@
                       </div>
                     </div>
 
-                    <div class="fsource-fy1-form mb-2" *ngIf="first">
+                    <div class="fsource-fy1-form mb-2" *ngIf="first && li.recommendedDirect != null">
                       <div class="form-row form-inline">
                         <div class="col left-label">
                           <label for="dc-percent-dollar">Direct Cost</label>
@@ -647,7 +647,7 @@
                       </div>
                     </div>
 
-                    <div class="fsource-fy1-form" *ngIf="first;">
+                    <div class="fsource-fy1-form" *ngIf="first && li.recommendedTotal != null">
                       <div class="form-row form-inline">
                         <div class="col left-label">
                           <label for="tc-percent-dollar">Total Cost</label>
