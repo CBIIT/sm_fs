@@ -6,7 +6,7 @@ import { Options } from 'select2';
 import { RequestModel } from 'src/app/model/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
-import { WorkflowAction, WorkflowModel } from './workflow.model';
+import { ApprovingStatuses, WorkflowAction, WorkflowModel } from './workflow.model';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -32,6 +32,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   showAddApprover = false;
   requestStatus: FundingReqStatusHistoryDto;
+  private approvingState = false;
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
@@ -147,6 +148,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
           item.statusDescrip = item.statusDescrip.substring(0, i);
         }
         this.requestStatus = item;
+        this.approvingState = ApprovingStatuses.indexOf(this.requestStatus.statusCode) > -1;
         this.logger.debug('requestStatus= ', item);
         return ;
       }
@@ -154,7 +156,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   isApprover(): boolean {
-    return this.workflowModel.isUserNextInChain;
+    return this.workflowModel.isUserNextInChain && this.approvingState;
   }
 
   get selectedWorkflowAction(): string {

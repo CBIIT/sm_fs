@@ -210,3 +210,32 @@ export class WorkflowAction {
     this.actionRoleCodes = roles;
   }
 }
+
+export enum RequestStatus {
+  DRAFT = 'DRAFT',
+  SUBMITTED = 'SUBMITTED',
+  WITHDRAWN = 'WITHDRAWN',
+  APPROVED = 'APPROVED',
+  ON_HOLD = 'ON HOLD',
+  REJECTED = 'REJECTED',
+  RFC = 'RFC',
+  RELEASED = 'RELEASED',
+  COMPLETED = 'COMPLETED',
+  DELEGATED = 'DELEGATED',
+  ROUTED = 'ROUTED',
+  REASSIGNED = 'REASSIGNED',
+  AWC = 'AWC',
+  DEFER = 'DEFER',
+  CANCELLED = 'CANCELLED',
+}
+
+export const ApprovingStatuses: string[] = [
+  RequestStatus.SUBMITTED,
+  RequestStatus.REASSIGNED,
+  RequestStatus.APPROVED,
+  RequestStatus.AWC,
+  RequestStatus.ROUTED,
+  RequestStatus.DELEGATED
+];
+
+
