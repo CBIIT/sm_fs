@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { UserService } from '@nci-cbiit/i2ecui-lib';
-import { CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
-import { NGXLogger } from 'ngx-logger';
+import {Injectable} from '@angular/core';
+import {UserService} from '@nci-cbiit/i2ecui-lib';
+import {CancerActivityControllerService, NciPerson} from '@nci-cbiit/i2ecws-lib';
+import {NGXLogger} from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -60,8 +60,27 @@ export class AppUserSessionService {
     return this.roles.indexOf('PA') > -1;
   }
 
-  isProgramStuff(): boolean {
+  isProgramStaff(): boolean {
     return this.isPD() || this.isPA();
+  }
+
+  isOefiaFundsCertifier(): boolean {
+    return this.roles.indexOf('FCNCI') > -1 || this.roles.indexOf('PFRNAPR') > -1;
+  }
+
+  isSuperUser(): boolean {
+    return this.roles.indexOf('PFRNAPR') > -1;
+  }
+
+  isOga(): boolean {
+    return this.roles.indexOf('GM') > -1;
+  }
+
+  isScientificApprover(): boolean {
+    return this.roles.indexOf('PD') > -1
+      || this.roles.indexOf('DOC') > -1
+      || this.roles.indexOf('DD') > -1
+      || this.roles.indexOf('SPL') > -1;
   }
 
   getEnvironment(): string {
@@ -76,8 +95,7 @@ export class AppUserSessionService {
     const cas = this.getUserCaCodes();
     if (cas) {
       return cas.join(', ');
-    }
-    else {
+    } else {
       return null;
     }
   }

@@ -15,7 +15,7 @@ export class PdAuthGuard implements CanActivate {
 
   canActivate(): boolean {
     const allowedRoles: string[] = ['PD', 'PA'];
-    if (!this.userSessionService.isProgramStuff()) {
+    if (!this.userSessionService.isProgramStaff()) {
       this.router.navigate(['/unauthorize']);
       return false;
     }
