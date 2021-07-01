@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FsWorkflowControllerService, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { FsWorkflowControllerService, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { Options } from 'select2';
@@ -22,6 +22,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   approverInitializationSubscription: Subscription;
   approverChangeSubscription: Subscription;
+  requestHistorySubscription: Subscription;
 
   options: Options;
   comments = '';
@@ -30,6 +31,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   workflowActions: any[];
 
   showAddApprover = false;
+  requestStatus: FundingReqStatusHistoryDto;
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
@@ -61,6 +63,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     }
     if (this.approverChangeSubscription) {
       this.approverChangeSubscription.unsubscribe();
+    }
+    if (this.requestHistorySubscription) {
+      this.requestHistorySubscription.unsubscribe();
     }
   }
 
@@ -125,7 +130,27 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       () => addedApproverMap = this.workflowModel.addedApproverMap
     );
 
+    this.requestHistorySubscription = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
+      (historyResult) => {
+        this.parseRequestHistories(historyResult);
+      }
+    );
+
     this.workflowModel.initialize();
+  }
+
+  parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
+    historyResult.forEach((item: FundingReqStatusHistoryDto) => {
+      if (!item.endDate) {
+        const i = item.statusDescrip.search(/ by /gi);
+        if (i > 0) {
+          item.statusDescrip = item.statusDescrip.substring(0, i);
+        }
+        this.requestStatus = item;
+        this.logger.debug('requestStatus= ', item);
+        return ;
+      }
+    });
   }
 
   isApprover(): boolean {
@@ -140,6 +165,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this._selectedWorkflowAction = this.workflowModel.getWorkflowAction(action);
     if (!this._selectedWorkflowAction) {
       this.showAddApprover = false;
+      this.buttonLabel = 'Process Action';
       return;
 
     }
