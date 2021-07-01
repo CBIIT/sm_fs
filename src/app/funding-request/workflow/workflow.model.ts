@@ -24,6 +24,7 @@ export class WorkflowModel {
 
  nextApproverRoleCode = '';
  isUserNextInChain = false;
+ hasNewApprover = false;
 
   constructor(
     public requestModel: RequestModel,
@@ -55,7 +56,7 @@ export class WorkflowModel {
 
   // for workflow action drop down
   getWorkflowList(): {id: string, text: string}[] {
-    const roleCode = this.nextApproverRoleCode;
+    const roleCode = this.nextApproverRoleCode ? this.nextApproverRoleCode : 'ADDITIONAL';
     if (roleCode) {
       return this.awa.filter((a) => {
         if (a.allRoleCode &&
@@ -92,7 +93,7 @@ export class WorkflowModel {
     this._allApprovers = result;
 
     this._pendingApprovers = result.filter((approver) => {
-      return approver.responseDate === null && approver.roleCode !== null;
+      return approver.responseDate === null;
     });
 
     this._previousApprovers = result.filter((approver) => {
@@ -130,6 +131,7 @@ export class WorkflowModel {
     this.oneApprover = null;
     this.additionalApprovers = null;
     this.addedApproverMap.clear();
+    this.hasNewApprover = false;
     this._allApprovers.forEach((approver) => {
       this.addedApproverMap.set(approver.approverNpnId, true);
     });
@@ -157,6 +159,7 @@ export class WorkflowModel {
       approver.approverEmailAddress = user.emailAddress;
       this.pendingApprovers[0] = approver;
       this.addedApproverMap.set(user.id, true);
+      this.hasNewApprover = true;
       this.logger.debug('pending approvers ', this.pendingApprovers);
       this.logger.debug('_pending approvers ', this._pendingApprovers);
       this.requestIntegrationService.approverListChangeEmitter.next();
@@ -172,6 +175,7 @@ export class WorkflowModel {
       approver.approverEmailAddress = user.emailAddress;
       this.additionalApprovers.push(approver);
       this.addedApproverMap.set(user.id, true);
+      this.hasNewApprover = true;
       this.requestIntegrationService.approverListChangeEmitter.next();
     }
   }
@@ -180,6 +184,7 @@ export class WorkflowModel {
     if (this.additionalApprovers) {
       this.addedApproverMap.delete(this.additionalApprovers.splice(index, 1)[0].approverNpnId);
     }
+    this.hasNewApprover = (!this.additionalApprovers || this.additionalApprovers.length === 0) ? false : true;
     this.requestIntegrationService.approverListChangeEmitter.next();
   }
 }

@@ -119,14 +119,14 @@ export class Step3Component implements OnInit {
         this.DocTypes = of(result);
         this.loadFiles();
         this.isSupplementAction()
-        this.loadSUppApps();
+        this.loadSuppApps();
         this.logger.debug('Getting the Doc type Dropdown results: ', this.DocTypes);
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
   }
 
-  loadSUppApps() {
+  loadSuppApps() {
     this.fsRequestControllerService.retrieveAdminSuppRoutingsUsingGET(8455782).subscribe(
       result => {
         this.applAdminSuppRoutingsDtos = result;
@@ -171,31 +171,41 @@ export class Step3Component implements OnInit {
 
 
   uploadFiles() {
-    if (this.docDescription !== '') {
-      //Upate justification Text
-      this.uploadJustification(this.docDescription);
-      this.removeDocType("Justification");
-    } else {
 
-      for (let i = 0; i < this.selectedFiles.length; i++) {
-        this._docDto.docDescription = this.docDescription;
-        this._docDto.docType = this.selectedDocType;
-        this._docDto.keyId = this.requestModel.requestDto.frqId;
-        this._docDto.keyType = 'PFR';
-        if (this.selectedFiles[i].size <= this.maxFileSize) {
-          this.upload(this.selectedFiles[i]);
-        } else {
-          alert('The size of the file you are attaching exceeds 10 MBs maximum file limit.');
-        }
-
+    if (this.selectedDocType === 'Justification') {
+      if (this.docDescription !== '') {
+        //Upate justification Text
+        this.uploadJustification(this.docDescription);
+        this.removeDocType("Justification");
+      } else {
+        this.populateDocDto();
       }
+    } else {
+      this.populateDocDto();
     }
+
     this.reset();
+  }
+
+  private populateDocDto() {
+    for (let i = 0; i < this.selectedFiles.length; i++) {
+      this._docDto.docDescription = this.docDescription;
+      this._docDto.docType = this.selectedDocType;
+      this._docDto.keyId = this.requestModel.requestDto.frqId;
+      this._docDto.keyType = 'PFR';
+      if (this.selectedFiles[i].size <= this.maxFileSize) {
+        this.upload(this.selectedFiles[i]);
+      } else {
+        alert('The size of the file you are attaching exceeds 10 MBs maximum file limit.');
+      }
+
+    }
   }
 
   uploadJustification(justification: string) {
     this.fsRequestControllerService.updateJustificationUsingPUT(this.requestModel.requestDto.frqId, justification).subscribe(
       result => {
+
         this.justificationUploaded = of(true);
         this.requestModel.requestDto.justification = justification;
         this.justificationText = justification;
@@ -217,6 +227,7 @@ export class Step3Component implements OnInit {
     this.isJustificationEntered = false;
     this.isFileSelected = false;
     this.isTypeSelected = false;
+    this.showSuppApplications = false;
   }
 
   upload(file) {
@@ -563,6 +574,26 @@ export class Step3Component implements OnInit {
 
     this.showJustification = true;
     this.docDescription = this.justificationText;
+  }
+
+  uploadSuppDocs(formerApplId: number) {
+    this.logger.debug('updatind supp appl id: ' + formerApplId)
+    this.fsRequestControllerService.updateSuppApplIdUsingPUT(this.requestModel.requestDto.frqId, formerApplId).subscribe(
+      result => {
+
+        this.requestModel.requestDto.suppApplId = formerApplId;
+        this.baseTaskList.subscribe(items => {
+          this.swimlanes[0]['array'].push(result);
+
+          this.insertDocOrder(result);
+        });
+      }, error => {
+        this.logger.error('HttpClient get request error for----- ' + error.message);
+      });
+
+    this.removeDocType("Supplement Application");
+    this.showSuppApplications = false;
+    this.modalService.dismissAll();
   }
 
   validate(): boolean {

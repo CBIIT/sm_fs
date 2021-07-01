@@ -39,7 +39,7 @@
                 <tr *ngIf="oneApprover">
                     <td><span class="fa fa-lock" *ngIf="!readonly"></span>&nbsp;{{ oneApprover.orderNum}}</td>
                     <td><a href="mailto:{{oneApprover.approverEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ oneApprover.approverFullName }}</a></td>
-                    <td>{{ oneApprover.roleName }}</td>
+                    <td>{{approverRoleName(oneApprover)}}</td>
                     <td><span *ngFor="let d of oneApprover.designees">
                         <a href="mailto:{{d.delegateToEmailAddr}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{d.delegateToFullName}}</a><br/>
                         </span></td>
@@ -49,7 +49,7 @@
                 <tr *ngFor="let a of additionalApprovers; let i = index" cdkDrag cdkDragBoundary=".drag-boundary">
                     <td><span class="order-icon" ngbTooltip="Drag & Drop to Order"></span>&nbsp;{{ a.orderNum}}</td>
                     <td><a href="mailto:{{a.approverEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverFullName }}</a></td>
-                    <td>Additional Approver (Added by {{a.assignerFullName}})</td>
+                    <td>{{approverRoleName(a)}}</td>
                     <td><span *ngFor="let d of a.designees">
                         <a href="mailto:{{d.delegateToEmailAddr}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{d.delegateToFullName}}</a><br/>
                         </span>
@@ -64,7 +64,7 @@
                 <tr *ngFor="let a of pendingApprovers; let i = index">
                     <td><span class="fa fa-lock" *ngIf="!readonly"></span>&nbsp;{{ a.orderNum}}</td>
                     <td><a href="mailto:{{a.approverEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverFullName }}</a></td>
-                    <td>{{ a.roleName }}</td>
+                    <td>{{approverRoleName(a)}}</td>
                     <td><span *ngFor="let d of a.designees">
                     <a href="mailto:{{d.delegateToEmailAddr}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{d.delegateToFullName}}</a><br/>
                     </span></td>

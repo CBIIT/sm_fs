@@ -1,12 +1,11 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FsWorkflowControllerService, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { FsWorkflowControllerService, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { Options } from 'select2';
 import { RequestModel } from 'src/app/model/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
-import { ApproverListComponent } from './approver-list/approver-list.component';
 import { WorkflowAction, WorkflowModel } from './workflow.model';
 
 const approverMap = new Map<number, any>();
@@ -20,34 +19,35 @@ let addedApproverMap = new Map<number, any>();
 })
 export class WorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
-  // @ViewChild(ApproverListComponent) approverListComponent: ApproverListComponent;
 
   approverInitializationSubscription: Subscription;
   approverChangeSubscription: Subscription;
+  requestHistorySubscription: Subscription;
 
   options: Options;
-  _selectedWorkflowAction: WorkflowAction;
   comments = '';
   buttonLabel = 'Process Action';
-  buttonDisabled = true;
+  // buttonDisabled = true;
   workflowActions: any[];
 
   showAddApprover = false;
+  requestStatus: FundingReqStatusHistoryDto;
 
-  private iSelectedValue: number;
+  private _selectedValue: number;
+  private _selectedWorkflowAction: WorkflowAction;
 
   set selectedValue(value: number) {
-    this.iSelectedValue = value;
+    this._selectedValue = value;
     const user = approverMap.get(Number(value));
     this.logger.debug('Selected Approver to Add: ', user);
     if (this._selectedWorkflowAction) {
       this.workflowModel.addAdditionalApprover(user, this._selectedWorkflowAction.action);
     }
-    setTimeout(() => {this.iSelectedValue = null; }, 0);
+    setTimeout(() => {this._selectedValue = null; }, 0);
   }
 
   get selectedValue(): number {
-    return this.iSelectedValue;
+    return this._selectedValue;
   }
 
   constructor(private requestIntegrationService: FundingRequestIntegrationService,
@@ -63,6 +63,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     }
     if (this.approverChangeSubscription) {
       this.approverChangeSubscription.unsubscribe();
+    }
+    if (this.requestHistorySubscription) {
+      this.requestHistorySubscription.unsubscribe();
     }
   }
 
@@ -120,20 +123,34 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     };
 
     this.approverInitializationSubscription = this.requestIntegrationService.approverInitializationEmitter.subscribe(
-      () => {
-        this.workflowActions = this.workflowModel.getWorkflowList();
-      }
+      () => this.workflowActions = this.workflowModel.getWorkflowList()
     );
 
     this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
-      () => {
-        addedApproverMap = this.workflowModel.addedApproverMap;
+      () => addedApproverMap = this.workflowModel.addedApproverMap
+    );
+
+    this.requestHistorySubscription = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
+      (historyResult) => {
+        this.parseRequestHistories(historyResult);
       }
     );
 
-
     this.workflowModel.initialize();
+  }
 
+  parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
+    historyResult.forEach((item: FundingReqStatusHistoryDto) => {
+      if (!item.endDate) {
+        const i = item.statusDescrip.search(/ by /gi);
+        if (i > 0) {
+          item.statusDescrip = item.statusDescrip.substring(0, i);
+        }
+        this.requestStatus = item;
+        this.logger.debug('requestStatus= ', item);
+        return ;
+      }
+    });
   }
 
   isApprover(): boolean {
@@ -147,14 +164,30 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   set selectedWorkflowAction(action: string) {
     this._selectedWorkflowAction = this.workflowModel.getWorkflowAction(action);
     if (!this._selectedWorkflowAction) {
+      this.showAddApprover = false;
+      this.buttonLabel = 'Process Action';
       return;
+
     }
 
     this.buttonLabel = this._selectedWorkflowAction.actionButtonText;
-    this.buttonDisabled = this._selectedWorkflowAction.commentsRequired || this._selectedWorkflowAction.newApproverRequired;
+    // this.buttonDisabled = this._selectedWorkflowAction.commentsRequired || this._selectedWorkflowAction.newApproverRequired;
 
     this.showAddApprover = this._selectedWorkflowAction.newApproverRequired;
     this.workflowModel.prepareApproverListsForView(this._selectedWorkflowAction.action);
+  }
+
+  get buttonDisabled(): boolean {
+    if (!this._selectedWorkflowAction) { return true; }
+
+    if (this._selectedWorkflowAction.commentsRequired && (!this.comments || this.comments.length === 0)) {
+      return true;
+    }
+    else if ( this._selectedWorkflowAction.newApproverRequired && (!this.workflowModel.hasNewApprover)) {
+      return true;
+    }
+
+    return false;
   }
 
   submitWorkflow(): void {
@@ -163,6 +196,16 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     dto.frqId = this.requestModel.requestDto.frqId;
     dto.comments = this.comments;
     dto.action = this._selectedWorkflowAction.action;
+    if (( dto.action === 'ap_route' || dto.action === 'route_ap') &&
+       this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0 )
+    {
+      dto.additionalApproverList = this.workflowModel.additionalApprovers.map( a => {
+        return a.approverLdap;
+      });
+    }
+    else if (dto.action === 'reassign') {
+      dto.reassignedApproverId = this.workflowModel.pendingApprovers[0].approverLdap;
+    }
     this.logger.debug('workflow dto for submission is ', dto);
     this.workflowService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
@@ -171,7 +214,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
       },
       (error) => {
-        this.logger.error('submit workflow dto returned error', error);
+        this.logger.error('submit workflow returned error', error);
       }
     );
   }

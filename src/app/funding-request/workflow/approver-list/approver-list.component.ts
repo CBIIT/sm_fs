@@ -1,13 +1,12 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Options } from 'select2';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request-model';
-import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { WorkflowModel } from '../workflow.model';
 import { FundingRequestIntegrationService } from '../../integration/integration.service';
 import { Subscription } from 'rxjs';
+import { FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-approver-list',
@@ -17,7 +16,6 @@ import { Subscription } from 'rxjs';
 
 export class ApproverListComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
-//  @Output() nextApprover = new EventEmitter<FundingReqApproversDto>();
 
   options: Options;
 
@@ -55,33 +53,6 @@ export class ApproverListComponent implements OnInit, OnDestroy {
 
   }
 
-// resetApproverList(): void {
-//   this.pendingApprovers = this.workflowModel.pendingApprovers;
-//   this.oneApprover = null;
-// }
-
-// separateApproverLists(action: string): void {
-//   if (action === 'ap_route') {
-//     this.pendingApprovers = this.workflowModel.pendingApprovers.slice();
-//     if (this.pendingApprovers.length > 0) {
-//       this.oneApprover = this.pendingApprovers[0];
-//       this.pendingApprovers.splice(0, 1);
-//     }
-//     this.logger.debug('separateApproverList oneApprover=', this.oneApprover);
-//     this.logger.debug('separateApproverList nextApprove=', this.pendingApprovers);
-//   }
-// }
-
-// addAdditionalApprover(user: any): void {
-//   if (!this.additionalApprovers) {
-//     this.additionalApprovers = [];
-//   }
-//   const approver: FundingReqApproversDto = {};
-//   approver.approverLdap = user.nciLdapCn;
-//   approver.approverFullName = user.fullName;
-//   this.additionalApprovers.push(approver);
-// }
-
   dropped(event: CdkDragDrop<any[]>): void {
     if (event.previousIndex === event.currentIndex) {
       return;
@@ -91,6 +62,10 @@ export class ApproverListComponent implements OnInit, OnDestroy {
 
   deleteAdditionalApprover(index: number): void {
     this.workflowModel.deleteAdditionalApprover(index);
+  }
+
+  approverRoleName(value: FundingReqApproversDto): string {
+    return value.roleName ? value.roleName : 'Additional Approver (Added by ' + value.assignerFullName + ')';
   }
 
 }

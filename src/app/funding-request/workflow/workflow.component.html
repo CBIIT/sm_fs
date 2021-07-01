@@ -7,12 +7,12 @@
   </div>
   
   <div class="row collapse show" id="workflow-collapse">
-    <div class="col-12">
+    <div class="col-12" *ngIf="requestStatus.comments">
       <ngb-alert [dismissible]="false" class="workflow-comments">
           <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
           <div class="comment-content">
-              <div class="comment-details">Comment from <strong>Jane Doe</strong> on MM/DD/YYY at HH:MM PM</div>
-              <div>Content of the comment goes here. Make sure this stays in a seperate div from the line above.</div>
+              <div class="comment-details">Comment from <strong>{{requestStatus.performedBy}}</strong> on {{requestStatus.startDate}}</div>
+              <div>{{requestStatus.comments}}</div>
           </div>
       </ngb-alert>
     </div>

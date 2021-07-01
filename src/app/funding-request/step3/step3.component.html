@@ -119,11 +119,16 @@
 
                             <div class="drag-item" cdkDrag *ngFor="let item of lane.array" tabindex="0">
                                 <span class="doc-name">{{ item.docFilename }}</span>
-                                <span *ngIf="item.docFilename === 'Summary Statement'" class="doc-desc">(Retrieved form
+                                <span
+                                    *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayUserName"
+                                    class="doc-desc">(Retrieved form
                                     IMPAC II)</span>
-                                <span *ngIf="item.docFilename !== 'Summary Statement'" class="doc-desc">(Added by <a
-                                        href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
-                                    {{item.createDate}})</span>
+                                <ng-template #displayUserName>
+                                    <span class="doc-desc">(Added by <a
+                                            href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
+                                        {{item.createDate}})</span>
+                                </ng-template>
+
                                 <div class="ml-auto">
                                     <button *ngIf="item.docFilename!=='Summary Statement'"
                                         class="btn btn-link btn-slim ml-2 btn-delete" title="Delete"
@@ -223,7 +228,7 @@
                     <td>{{item.submittedDate}}</td>
                     <td>{{item.accessionNum}}</td>
                     <td>
-                        <button class="btn btn-primary btn-sm">Add</button>
+                        <button class="btn btn-primary btn-sm" (click)="uploadSuppDocs(item.formerApplId)">Add</button>
                     </td>
                 </tr>
 

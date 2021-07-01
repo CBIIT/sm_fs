@@ -25512,6 +25512,7 @@ td .grant-icons {
   width: .8rem;
   display: inline-block;
   line-height: 1;
+  margin-bottom: -1px;
 }
 
 /*# sourceMappingURL=i2e-common-ui.css.map */
