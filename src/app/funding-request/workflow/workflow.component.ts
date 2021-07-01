@@ -31,7 +31,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   workflowActions: any[];
 
   showAddApprover = false;
-  requestStatus: FundingReqStatusHistoryDto;
+  requestStatus: FundingReqStatusHistoryDto = {};
   private approvingState = false;
 
   private _selectedValue: number;
