@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { AppPropertiesService } from '../service/app-properties.service';
 import { AppUserSessionService } from '../service/app-user-session.service';
 import { GwbLinksService } from '@nci-cbiit/i2ecui-lib';
+import { PaylistControllerService } from '@nci-cbiit/i2ecws-lib';
+import { NGXLogger } from 'ngx-logger';
+
 @Component({
   selector: 'app-fs-menu',
   templateUrl: './fs-menu.component.html',
@@ -20,9 +23,13 @@ export class FsMenuComponent implements OnInit {
   pa: boolean;
   paylistReadOnlyRole: boolean =false;
   paylistUrl: string; 
-  constructor(private appPropertiesService: AppPropertiesService,
+  pendingGrantsCount;
+
+  constructor(
               private userSessionService: AppUserSessionService,
-              private gwbLinksService: GwbLinksService) { }
+              private gwbLinksService: GwbLinksService,
+              private paylistControllerService: PaylistControllerService,
+              private logger: NGXLogger) { }
 
   ngOnInit(): void {  
     this.paylistUrl = this.gwbLinksService.getProperty('Paylist');
@@ -36,8 +43,16 @@ export class FsMenuComponent implements OnInit {
     this.paylistReadOnlyRole = this.userSessionService.hasRole('PAYLSTVW');
     this.pd = this.userSessionService.isPD();
     this.pa = this.userSessionService.isPA();
-   
+        
+    this.paylistControllerService.getPaylistPendingGrantsCountUsingGET().subscribe(
+      (result) => {
+        this.pendingGrantsCount = result;
 
+      },
+      (error) => {
+        this.logger.error('retrieveFundingRequest failed ', error);
+      }
+    );
     
   }
 
