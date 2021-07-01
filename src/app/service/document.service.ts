@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpRequest, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { DocumentsControllerService, DocumentsDto } from '@nci-cbiit/i2ecws-lib';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class DocumentService {
   private docUrl = '/i2ecws/api/v1/documents';
 
   constructor(private http: HttpClient,
-    private documentsControllerService: DocumentsControllerService) { }
+    private documentsControllerService: DocumentsControllerService, private logger: NGXLogger) { }
 
   upload(file: File, docDto: DocumentsDto): Observable<HttpEvent<any>> {
     const formData: FormData = new FormData();
@@ -41,11 +42,13 @@ export class DocumentService {
 
   downloadFrqCoverSheet(frqId: number) {
     var url = this.docUrl + '/funding-requests-cover-page/' + frqId;
+    this.logger.debug('Step3 FRQ Cover Sheet URL:', url);
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
   downloadFrqSummaryStatement(applId: number) {
     var url = this.docUrl + '/funding-requests-summary-statement/' + applId;
+    this.logger.debug('Step3 Summary Statement URL:', url);
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
@@ -54,15 +57,18 @@ export class DocumentService {
   }
 
   getLatestFile(keyId: number, keyType: string): Observable<DocumentsDto> {
+    this.logger.debug('Step3 latest files for (keyId, KeyType): ', '(' + keyId + ',' + keyType + ')');
     return this.documentsControllerService.loadLatestDocumentUsingGET(keyId, keyType);
   }
 
   downLoadFrqPackage(frqId: number, applId: number, docIds: number[]) {
     var url = this.docUrl + '/funding-requests-view-package/' + frqId + '/' + applId + '/' + docIds;
+    this.logger.debug('Step3 FRQ Package URL: ', url);
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' });
   }
 
   getFSBudgetFiles(keyId: number, keyType: string): Observable<Array<DocumentsDto>> {
+    this.logger.debug('Step3 budget files for (keyId, KeyType): ', '(' + keyId + ',' + keyType + ')');
     return this.documentsControllerService.loadFsFinanceDocumentsUsingGET(keyId, keyType);
   }
 

@@ -4,8 +4,7 @@
   (ngSubmit)="onSubmit($event)"
   appDiversitySupplementValidator
   appPdNameRequired
-  appCancerActivityRequired
-  [ngFormOptions]="{updateOn: 'submit'}">
+  appCancerActivityRequired>
   <input type="hidden" #prcValidValue="ngModel" [ngModel]="prcValid" name="prcValid" required>
 
   <app-grant-information></app-grant-information>

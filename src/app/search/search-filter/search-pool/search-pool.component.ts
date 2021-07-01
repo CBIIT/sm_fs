@@ -46,7 +46,7 @@ export class SearchPoolComponent implements OnInit {
       if (myCA) {
         this.searchPools.push({ key: 'myca', value: myCAText });
       }
-    } else if (this.appUserSessionService.isProgramStuff()) {
+    } else if (this.appUserSessionService.isProgramStaff()) {
       this.searchPools = [{ key: 'myca', value: myCAText },
       { key: 'mypf', value: 'My Portfolio' },
       { key: 'myrq', value: 'My Requests' },

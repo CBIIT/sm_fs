@@ -410,6 +410,7 @@ export class Step3Component implements OnInit {
         this.logger.info('Delete Success');
         this.baseTaskList.subscribe(items => {
           this.swimlanes[0]['array'].forEach((value, index) => {
+            this.logger.info('Value, Index:', value.id + ','+index)
             if (value.id == id) {
               this.swimlanes[0]['array'].splice(index, 1);
               this.deleteDocOrder(value);
