@@ -16,12 +16,10 @@ export class ActiveInitialPayValidatorDirective implements AsyncValidator {
   }
 
   validate(control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
-    this.logger.debug('validation', control);
     const requestType = control?.value;
 
     if (!control || isNaN(control.value)) {
       return new Promise(resolve => {
-        this.logger.debug('no value: returning null');
         this.requestModel.initialPay = undefined;
         resolve(null);
       });
@@ -34,7 +32,7 @@ export class ActiveInitialPayValidatorDirective implements AsyncValidator {
           this.requestModel.initialPay = undefined;
           resolve(null);
         } else {
-          this.requestModel.initialPay = result;
+          this.requestModel.initialPay = Number(result) !== 0 ? result : undefined;
           resolve({initialPayGrantExists: true});
         }
       });
