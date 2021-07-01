@@ -16,8 +16,6 @@ export class ActiveInitialPayValidatorDirective implements AsyncValidator {
   }
 
   validate(control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
-    const requestType = control?.value;
-
     if (!control || isNaN(control.value)) {
       return new Promise(resolve => {
         this.requestModel.initialPay = undefined;
