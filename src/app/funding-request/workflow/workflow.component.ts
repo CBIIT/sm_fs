@@ -199,7 +199,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.frqId = this.requestModel.requestDto.frqId;
     dto.comments = this.comments;
-    dto.action = WorkflowActionCode[this._selectedWorkflowAction.action];
+    dto.action = action;
     if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&
        this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0 )
     {

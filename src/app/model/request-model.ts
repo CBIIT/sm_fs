@@ -38,6 +38,8 @@ export class RequestModel {
   // note, element 0 is not used, element 1 represents step1 and so on.
   private stepLinkable = [false, false, false, false, false];
   initialPay: number;
+  // "New Request " or "View Request Label"
+  title = 'New Request';
 
   get recreateMainApproverNeeded(): boolean {
     // need to have logic to determine something changed in request that
@@ -61,7 +63,7 @@ export class RequestModel {
     approverCriteria.cayCode = this.requestDto.financialInfoDto.requestorCayCode;
     const fundingSources = Array.from(this._programRecommendedCostsModel.selectedFundingSourceIds);
     // fundingSources.sort(); commented for now to make the order of
-    // fundingSources important in determining when approvers need to be regen.
+    // fundingSources important in determining if approvers need to be regen.
     approverCriteria.fundingSources = fundingSources.join(',');
     approverCriteria.otherDocs = this.requestDto.financialInfoDto.otherDocText;
     // from the create_main_approvers sp, it seems otherDocs has no effect on funding request approvers,
@@ -191,6 +193,7 @@ export class RequestModel {
   }
 
   reset(): void {
+    this.title = 'New Request';
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
     this._requestType = undefined;

@@ -2,7 +2,6 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
-import {AppPropertiesService} from '../../service/app-properties.service';
 import {NGXLogger} from 'ngx-logger';
 import {FundingRequestTypes} from '../../model/funding-request-types';
 import {ProgramRecommendedCostsComponent} from '../../program-recommended-costs/program-recommended-costs.component';
@@ -10,6 +9,7 @@ import {Alert} from '../../alert-billboard/alert';
 import {NgForm} from '@angular/forms';
 import {FundingSourceTypes} from '../../model/funding-source-types';
 import SubmitEvent = JQuery.SubmitEvent;
+import { FundingRequestIntegrationService } from '../integration/integration.service';
 
 @Component({
   selector: 'app-step2',
@@ -23,7 +23,7 @@ export class Step2Component implements OnInit {
   alerts: Alert[] = [];
 
   constructor(private router: Router, private requestModel: RequestModel,
-              private propertiesService: AppPropertiesService,
+              private requestIntegrationService: FundingRequestIntegrationService,
               private fsRequestControllerService: FsRequestControllerService,
               private logger: NGXLogger) {
   }
@@ -45,7 +45,7 @@ export class Step2Component implements OnInit {
 
   prevStep(): void {
     // TODO - alert for unsaved changes?
-    if(this.step2Form.dirty) {
+    if (this.step2Form.dirty) {
       alert('All unsaved changes will be lost');
     }
     this.router.navigate(['/request/step1']);
@@ -80,7 +80,7 @@ export class Step2Component implements OnInit {
           title: ''
         });
         this.logger.debug(JSON.stringify(this.requestModel.requestDto));
-
+        this.requestIntegrationService.requestSavedEmitter.next(this.requestModel.requestDto.frqId);
         if (navigate) {
           this.router.navigate([navigate]);
         }

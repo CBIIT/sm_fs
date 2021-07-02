@@ -28,6 +28,8 @@ export class RetrieveRequestComponent implements OnInit {
       this.requestService.retrieveFundingRequestUsingGET(this.frqId).subscribe(
         (result) => {
           this.logger.debug('retrieveFundingReuest returned ', result);
+          this.requestModel.reset();
+          this.requestModel.title = 'View Request';
           this.requestModel.requestDto = result.requestDto;
           this.requestModel.grant = result.grantDto;
           this.requestModel.requestDto.financialInfoDto.requestorNpnId = this.requestModel.requestDto.requestorNpnId;
