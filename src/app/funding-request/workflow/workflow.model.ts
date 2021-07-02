@@ -24,6 +24,7 @@ export class WorkflowModel {
 
  nextApproverRoleCode = '';
  isUserNextInChain = false;
+ lastInChain = false;
  hasNewApprover = false;
 
   constructor(
@@ -34,17 +35,17 @@ export class WorkflowModel {
     private logger: NGXLogger
     ) {
     this.awa = [];
-    this.awa.push(new WorkflowAction('approve', 'Approve', 'Approve', true, false, false));
-    this.awa.push(new WorkflowAction('ap_route', 'Approve and Route', 'Approve and Route', true, false, true));
-    this.awa.push(new WorkflowAction('ap_comment', 'Approve with Comments', 'Approve', false, true, false, ['FCSPL', 'FCNCIDIR']));
-    this.awa.push(new WorkflowAction('reassign', 'Reassign', 'Reassign', true, false, true));
-    this.awa.push(new WorkflowAction('reject', 'Reject', 'Reject', true, true, false));
-    this.awa.push(new WorkflowAction('route_ap', 'Route Before Approving', 'Route', true, false, true));
-    this.awa.push(new WorkflowAction('return', 'Return to PD for Changes', 'Return', true, true, false, ['-GM']));
-    this.awa.push(new WorkflowAction('defer', 'Defer', 'Defer', false, true, false, ['FCSPL', 'FCNCIDIR']));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE, 'Approve', 'Approve', true, false, false));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE_ROUTE, 'Approve and Route', 'Approve and Route', true, false, true));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE_COMMENT, 'Approve with Comments', 'Approve', false, true, false, ['FCSPL', 'FCNCIDIR']));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.REASSIGN, 'Reassign', 'Reassign', true, false, true));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.REJECT, 'Reject', 'Reject', true, true, false));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.ROUTE_APPROVE, 'Route Before Approving', 'Route', true, false, true));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.RETURN, 'Return to PD for Changes', 'Return', true, true, false, ['-GM']));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.DEFER, 'Defer', 'Defer', false, true, false, ['FCSPL', 'FCNCIDIR']));
   }
 
-  getWorkflowAction(action: string): WorkflowAction {
+  getWorkflowAction(action: WorkflowActionCode): WorkflowAction {
     for (const wa of this.awa) {
       if (wa.action === action) {
         return wa;
@@ -55,7 +56,7 @@ export class WorkflowModel {
   }
 
   // for workflow action drop down
-  getWorkflowList(): {id: string, text: string}[] {
+  getWorkflowList(): {id: WorkflowActionCode, text: string}[] {
     const roleCode = this.nextApproverRoleCode ? this.nextApproverRoleCode : 'ADDITIONAL';
     if (roleCode) {
       return this.awa.filter((a) => {
@@ -77,6 +78,9 @@ export class WorkflowModel {
   }
 
   initialize(): void {
+    this.nextApproverRoleCode = null;
+    this.isUserNextInChain = false;
+    this.lastInChain = false;
     this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
       (result) => {
         this.processApproversResult(result);
@@ -103,7 +107,6 @@ export class WorkflowModel {
     this.nextApprover = this._pendingApprovers && this._pendingApprovers.length > 0 ? this._pendingApprovers[0] : null;
     if ( this.nextApprover ) {
       this.nextApproverRoleCode = this.nextApprover.roleCode;
-
       const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
       this.isUserNextInChain = false;
       if (userId === this.nextApprover.approverLdap) {
@@ -116,9 +119,9 @@ export class WorkflowModel {
         }
       }
     }
-    else {
-      this.nextApproverRoleCode = null;
-      this.isUserNextInChain = false;
+
+    if (this.isUserNextInChain && this._pendingApprovers.length === 0 ) {
+      this.lastInChain = true;
     }
 
     this.resetApproverLists();
@@ -139,9 +142,9 @@ export class WorkflowModel {
   }
 
 
-  prepareApproverListsForView(action: string): void {
+  prepareApproverListsForView(action: WorkflowActionCode): void {
     this.resetApproverLists();
-    if (action === 'ap_route') {
+    if (action === WorkflowActionCode.APPROVE_ROUTE) {
       if (this.pendingApprovers.length > 0) {
         this.oneApprover = this.pendingApprovers.splice(0, 1)[0];
       }
@@ -149,9 +152,8 @@ export class WorkflowModel {
     this.requestIntegrationService.approverListChangeEmitter.next();
   }
 
-  addAdditionalApprover(user: any, action: string): void {
-
-    if (action === 'reassign') {
+  addAdditionalApprover(user: any, action: WorkflowActionCode): void {
+    if (action === WorkflowActionCode.REASSIGN) {
       const approver: FundingReqApproversDto =  JSON.parse(JSON.stringify(this.pendingApprovers[0]));
       approver.approverNpnId = user.id;
       approver.approverLdap = user.nciLdapCn;
@@ -164,7 +166,7 @@ export class WorkflowModel {
       this.logger.debug('_pending approvers ', this._pendingApprovers);
       this.requestIntegrationService.approverListChangeEmitter.next();
     }
-    else if ( action === 'ap_route' || action === 'route_ap') {
+    else if ( action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) {
       if (!this.additionalApprovers) {
         this.additionalApprovers = [];
       }
@@ -190,7 +192,7 @@ export class WorkflowModel {
 }
 
 export class WorkflowAction {
-  action: string;
+  action: WorkflowActionCode;
   actionName: string;
   allRoleCode: boolean;
   actionRoleCodes: string[];
@@ -198,7 +200,7 @@ export class WorkflowAction {
   commentsRequired: boolean;
   newApproverRequired: boolean;
 
-  constructor(action: string, actionName: string, actionButtonText: string, allRoles: boolean,
+  constructor(action: WorkflowActionCode, actionName: string, actionButtonText: string, allRoles: boolean,
               commentsRequired: boolean, newApproverRequired: boolean, roles?: string[])
   {
     this.action = action;
@@ -238,4 +240,14 @@ export const ApprovingStatuses: string[] = [
   RequestStatus.DELEGATED
 ];
 
+export enum WorkflowActionCode {
+  APPROVE = 'APPROVE',
+  APPROVE_ROUTE = 'APPROVE_ROUTE',
+  APPROVE_COMMENT = 'APPROVE_COMMENT',
+  REASSIGN = 'REASSIGN',
+  REJECT = 'REJECT',
+  ROUTE_APPROVE = 'ROUTE_APPROVE',
+  RETURN = 'RETURN',
+  DEFER = 'DEFER'
+}
 

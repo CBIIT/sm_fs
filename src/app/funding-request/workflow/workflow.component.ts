@@ -6,7 +6,7 @@ import { Options } from 'select2';
 import { RequestModel } from 'src/app/model/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
-import { ApprovingStatuses, WorkflowAction, WorkflowModel } from './workflow.model';
+import { ApprovingStatuses, WorkflowAction, WorkflowActionCode, WorkflowModel } from './workflow.model';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -124,7 +124,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     };
 
     this.approverInitializationSubscription = this.requestIntegrationService.approverInitializationEmitter.subscribe(
-      () => this.workflowActions = this.workflowModel.getWorkflowList()
+      () => {this.workflowActions = this.workflowModel.getWorkflowList();
+             this.logger.debug('workflow acitons = ', this.workflowActions); }
     );
 
     this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
@@ -159,11 +160,11 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     return this.workflowModel.isUserNextInChain && this.approvingState;
   }
 
-  get selectedWorkflowAction(): string {
-    return (this._selectedWorkflowAction) ? this._selectedWorkflowAction.action : '';
+  get selectedWorkflowAction(): WorkflowActionCode {
+    return (this._selectedWorkflowAction) ? this._selectedWorkflowAction.action : null;
   }
 
-  set selectedWorkflowAction(action: string) {
+  set selectedWorkflowAction(action: WorkflowActionCode) {
     this._selectedWorkflowAction = this.workflowModel.getWorkflowAction(action);
     if (!this._selectedWorkflowAction) {
       this.showAddApprover = false;
@@ -193,21 +194,30 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   submitWorkflow(): void {
+    const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.frqId = this.requestModel.requestDto.frqId;
     dto.comments = this.comments;
-    dto.action = this._selectedWorkflowAction.action;
-    if (( dto.action === 'ap_route' || dto.action === 'route_ap') &&
+    dto.action = WorkflowActionCode[this._selectedWorkflowAction.action];
+    if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&
        this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0 )
     {
       dto.additionalApproverList = this.workflowModel.additionalApprovers.map( a => {
         return a.approverLdap;
       });
     }
-    else if (dto.action === 'reassign') {
+    else if (action === WorkflowActionCode.REASSIGN) {
       dto.reassignedApproverId = this.workflowModel.pendingApprovers[0].approverLdap;
     }
+    // complete the request when last in chain approving.
+    if (this.workflowModel.lastInChain) {
+      if (action === WorkflowActionCode.APPROVE ||
+          action === WorkflowActionCode.APPROVE_COMMENT ){
+            dto.completeRequest = true;
+          }
+    }
+
     this.logger.debug('workflow dto for submission is ', dto);
     this.workflowService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
