@@ -45,10 +45,10 @@ export class Step2Component implements OnInit {
 
   prevStep(): void {
     // TODO - alert for unsaved changes?
-    if(this.step2Form.dirty) {
-      alert('All unsaved changes will be lost');
+    if (this.step2Form.dirty && confirm('Unsaved changes will be lost if you continue.')) {
+      this.router.navigate(['/request/step1']);
     }
-    this.router.navigate(['/request/step1']);
+
   }
 
   get grant(): NciPfrGrantQueryDto {

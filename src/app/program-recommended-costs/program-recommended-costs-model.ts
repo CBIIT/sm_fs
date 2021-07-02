@@ -19,7 +19,7 @@ export class ProgramRecommendedCostsModel {
   // Used by the program recommended costs component to track the details of the sources that have been selected
   private _selectedFundingSources = new Array<FundingRequestFundsSrcDto>();
 
-  private _grantAwarded: Array<GrantAwardedDto>;
+  public grantAwarded: Array<GrantAwardedDto>;
 
   deletedSources: number[] = [];
 
@@ -35,14 +35,6 @@ export class ProgramRecommendedCostsModel {
   }
 
   constructor(private logger: NGXLogger) {
-  }
-
-  get grantAwarded(): Array<GrantAwardedDto> {
-    return this._grantAwarded;
-  }
-
-  set grantAwarded(value: Array<GrantAwardedDto>) {
-    this._grantAwarded = value;
   }
 
   get selectedFundingSourceIds(): Set<number> {
