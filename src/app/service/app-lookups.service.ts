@@ -7,8 +7,8 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class AppLookupsService {
 
-  private lookups: { CancerActivities: any, AnptherLookupMap: any }
-    = { CancerActivities: {}, AnptherLookupMap: {} };
+  private lookups: { CancerActivities: any, AnotherLookupMap: any }
+    = { CancerActivities: {}, AnotherLookupMap: {} };
 
   // for resolve and reject the promise
   private resolve: any;

@@ -1,5 +1,10 @@
 import {Injectable} from '@angular/core';
-import {FinancialInfoDtoReq, FundingReqBudgetsDto, FundingRequestDtoReq, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {
+  FinancialInfoDtoReq,
+  FundingReqBudgetsDto,
+  FundingRequestDtoReq,
+  NciPfrGrantQueryDto
+} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FundingRequestErrorCodes} from './funding-request-error-codes';
 import {NGXLogger} from 'ngx-logger';
@@ -252,9 +257,26 @@ export class RequestModel {
    *    since we're only keeping the dollar values, but that's minor
    *
    */
-  restoreLineItemIds(budgets: Array<FundingReqBudgetsDto>): void {
+  restoreLineItems() : boolean {
+    if(!this.requestDto.financialInfoDto.fundingReqBudgetsDtos) {
+      this.logger.warn('Budgets are required');
+      return false;
+    }
+    if(!this.programRecommendedCostsModel.fundingSources || !this.programRecommendedCostsModel.fundingSourcesMap) {
+      this.logger.warn('Funding sources are required');
+      return false;
+    }
+    if(!this.programRecommendedCostsModel.grantAwarded) {
+      this.logger.warn('Grant awards are required');
+      return false;
+    }
+    return true;
+  }
+
+  restoreLineItemIds(): void {
+    if (!this.requestDto.financialInfoDto.fundingReqBudgetsDtos) return;
     // this.logger.debug('Restoring line items from budgets', budgets);
-    budgets.forEach(b => {
+    this.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
       // this.logger.debug('budget', b);
       const source = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
       // console.log('source', source);

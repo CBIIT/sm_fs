@@ -223,12 +223,12 @@
 
                 <tr *ngFor="let item of applAdminSuppRoutingsDtos" tabindex="0">
                     <td>
-                        <a href="{{item.docUrl}}" class="external-link">Application File</a>
+                        <a href="javascript: void(0);" class="external-link" (click)="downloadSupplementAppDoc(item.suppApplId)">Application File</a>
                     </td>
                     <td>{{item.submittedDate}}</td>
                     <td>{{item.accessionNum}}</td>
                     <td>
-                        <button class="btn btn-primary btn-sm" (click)="uploadSuppDocs(item.formerApplId)">Add</button>
+                        <button class="btn btn-primary btn-sm" (click)="uploadSuppDocs(item.suppApplId)">Add</button>
                     </td>
                 </tr>
 

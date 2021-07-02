@@ -2,6 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {RequestModel} from '../../model/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {AppPropertiesService} from '../../service/app-properties.service';
 import {NGXLogger} from 'ngx-logger';
 import {FundingRequestTypes} from '../../model/funding-request-types';
 import {ProgramRecommendedCostsComponent} from '../../program-recommended-costs/program-recommended-costs.component';
@@ -45,10 +46,10 @@ export class Step2Component implements OnInit {
 
   prevStep(): void {
     // TODO - alert for unsaved changes?
-    if (this.step2Form.dirty) {
-      alert('All unsaved changes will be lost');
+    if (this.step2Form.dirty && confirm('Unsaved changes will be lost if you continue.')) {
+      this.router.navigate(['/request/step1']);
     }
-    this.router.navigate(['/request/step1']);
+
   }
 
   get grant(): NciPfrGrantQueryDto {
