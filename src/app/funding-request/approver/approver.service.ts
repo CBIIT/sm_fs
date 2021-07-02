@@ -29,7 +29,9 @@ export class RequestApproverService {
           reject(error); }
       );
     }
-    resolve();
+    else {
+      resolve();
+    }
     });
   }
 

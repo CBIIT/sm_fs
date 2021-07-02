@@ -166,7 +166,7 @@ export class WorkflowModel {
       this.logger.debug('_pending approvers ', this._pendingApprovers);
       this.requestIntegrationService.approverListChangeEmitter.next();
     }
-    else if ( action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) {
+    else {// if ( action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) {
       if (!this.additionalApprovers) {
         this.additionalApprovers = [];
       }
@@ -175,6 +175,7 @@ export class WorkflowModel {
       approver.approverLdap = user.nciLdapCn;
       approver.approverFullName = user.fullName;
       approver.approverEmailAddress = user.emailAddress;
+      approver.assignerFullName = this.userSessionService.getLoggedOnUser().fullName;
       this.additionalApprovers.push(approver);
       this.addedApproverMap.set(user.id, true);
       this.hasNewApprover = true;

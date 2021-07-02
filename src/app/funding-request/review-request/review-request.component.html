@@ -74,9 +74,7 @@
 <!-- END Budget Documents-->
 
 <!-- START Workflow -->
-
 <app-workflow [readonly]="readonly"></app-workflow>
-
 <!-- END Workflow -->
 
 
@@ -90,9 +88,9 @@
     <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
       <button class="btn btn-primary" disabled>Submit Request</button>
     </span>
-    <button class="btn btn-primary mr-2" (click)="submitWorkflow('WITHDRAW')"
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('WITHDRAW')"
       *ngIf="withdrawVisible()">Withdraw</button>
-    <button class="btn btn-primary mr-2" (click)="submitWorkflow('HOLD')" *ngIf="putOnHoldVisible()">Hold</button>
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('HOLD')" *ngIf="putOnHoldVisible()">Hold</button>
 
   </div>
 </div>

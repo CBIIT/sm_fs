@@ -14,8 +14,7 @@ let addedApproverMap = new Map<number, any>();
 @Component({
   selector: 'app-workflow',
   templateUrl: './workflow.component.html',
-  styleUrls: ['./workflow.component.css'],
-  providers: [WorkflowModel]
+  styleUrls: ['./workflow.component.css']
 })
 export class WorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
@@ -41,9 +40,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this._selectedValue = value;
     const user = approverMap.get(Number(value));
     this.logger.debug('Selected Approver to Add: ', user);
-    if (this._selectedWorkflowAction) {
-      this.workflowModel.addAdditionalApprover(user, this._selectedWorkflowAction.action);
-    }
+   // if (this._selectedWorkflowAction) {
+    this.workflowModel.addAdditionalApprover(user, this._selectedWorkflowAction ? this._selectedWorkflowAction.action : null);
+   // }
     setTimeout(() => {this._selectedValue = null; }, 0);
   }
 
@@ -137,8 +136,6 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.parseRequestHistories(historyResult);
       }
     );
-
-    this.workflowModel.initialize();
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {

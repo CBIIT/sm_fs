@@ -16,11 +16,13 @@ import { saveAs } from 'file-saver';
 import { HttpResponse } from '@angular/common/http';
 import { NGXLogger } from 'ngx-logger';
 import { WorkflowModalComponent } from '../workflow-modal/workflow-modal.component';
+import { WorkflowModel } from '../workflow/workflow.model';
 
 @Component({
   selector: 'app-review-request',
   templateUrl: './review-request.component.html',
-  styleUrls: ['./review-request.component.css']
+  styleUrls: ['./review-request.component.css'],
+  providers: [WorkflowModel]
 })
 export class ReviewRequestComponent implements OnInit, OnDestroy {
 
@@ -60,7 +62,8 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
               private documentService: DocumentService,
               private changeDetection: ChangeDetectorRef,
               private logger: NGXLogger,
-              private fsWorkflowControllerService: FsWorkflowControllerService) {}
+              private fsWorkflowControllerService: FsWorkflowControllerService,
+              private workflowModel: WorkflowModel) {}
 
   ngOnDestroy(): void {
     if (this.requestHistorySubscriber) {
@@ -79,15 +82,16 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
         this.parseRequestHistories(historyResult);
       }
     );
-    this.activeApproverSubscriber = this.requestIntegrationService.activeApproverEmitter.subscribe(
-      (approver) => {
-        this.setActiveApprover(approver);
-      }
-    );
+    // this.activeApproverSubscriber = this.requestIntegrationService.activeApproverEmitter.subscribe(
+    //   (approver) => {
+    //     this.setActiveApprover(approver);
+    //   }
+    // );
     this.docDtos = this.requestModel.requestDto.includedDocs;
+    this.workflowModel.initialize();
     this.checkUserRolesCas();
     this.checkDocs();
-    this.isDisplayBudgetDocsUploadVar = true;
+    this.isDisplayBudgetDocsUploadVar = false;
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
@@ -196,10 +200,10 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
     this.router.navigate(['/request/step3']);
   }
 
-  setActiveApprover(event): void {
-    this.logger.debug('setActiveApprover', event);
-    this.activeApprover = event;
-  }
+  // setActiveApprover(event): void {
+  //   this.logger.debug('setActiveApprover', event);
+  //   this.activeApprover = event;
+  // }
 
   get grant(): NciPfrGrantQueryDto {
     return this.requestModel.grant;
@@ -253,7 +257,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
       });
   }
 
-  submitWorkflow(action: string): void {
+  submitWithdrawHold(action: string): void {
     this.workflowModal.openConfirmModal(action).then(
       (result) => {
         this.logger.debug(action + ' API call returned successfully', result);

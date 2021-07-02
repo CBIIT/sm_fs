@@ -4,9 +4,10 @@
       <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#workflow-collapse" role="button"
         aria-expanded="true" aria-controls="workflow-collapse"></a>
     </div>
-  </div>
+</div>
   
-  <div class="row collapse show" id="workflow-collapse">
+<div class="row collapse show" id="workflow-collapse">
+
     <div class="col-12" *ngIf="requestStatus && requestStatus.comments">
       <ngb-alert [dismissible]="false" class="workflow-comments">
           <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
@@ -28,8 +29,8 @@
         </ng-select2>
     </div>
 
-    <div class="col-lg-6">
-      <div class="form-group" *ngIf="showAddApprover">
+    <div class="col-6">
+      <div class="form-group" *ngIf="showAddApprover || !readonly">
           <label for="req-add-approvers">Add Approver(s) <span class="optional">(optional)</span></label>
           <ng-select2
               id="req-add-approvers"
