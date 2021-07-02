@@ -70,15 +70,12 @@ export class RequestInformationComponent implements OnInit {
     }
     this._selectedCayCode = value;
   }
-  _selectedPd: number;
 
   get selectedPd(): number {
-    this.logger.debug('getSelectedPd:', this.requestModel.requestDto.financialInfoDto.requestorNpnId);
-    return this.requestModel.requestDto.financialInfoDto.requestorNpnId || this._selectedPd;
+    return this.requestModel.requestDto.financialInfoDto.requestorNpnId;
   }
 
   set selectedPd(value: number) {
-    this.logger.debug('setSelectedPd:', value);
     const valueChanged = this.requestModel.requestDto.requestorNpnId && (this.requestModel.requestDto.requestorNpnId !== value);
     this.requestModel.requestDto.requestorNpnId = value;
     this.requestModel.requestDto.financialInfoDto.requestorNpnId = value;
@@ -87,7 +84,6 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
       this.cayCode.selectedValue = null;
     }
-    this._selectedPd = value;
   }
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger,
