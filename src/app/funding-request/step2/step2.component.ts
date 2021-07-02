@@ -23,7 +23,7 @@ export class Step2Component implements OnInit {
   alerts: Alert[] = [];
 
   constructor(private router: Router, private requestModel: RequestModel,
-              private propertiesService: AppPropertiesService,
+              private requestIntegrationService: FundingRequestIntegrationService,
               private fsRequestControllerService: FsRequestControllerService,
               private logger: NGXLogger) {
   }
@@ -80,7 +80,7 @@ export class Step2Component implements OnInit {
           title: ''
         });
         this.logger.debug(JSON.stringify(this.requestModel.requestDto));
-
+        this.requestIntegrationService.requestSavedEmitter.next(this.requestModel.requestDto.frqId);
         if (navigate) {
           this.router.navigate([navigate]);
         }

@@ -5,6 +5,7 @@ import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { RequestModel } from 'src/app/model/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
+import { WorkflowActionCode } from '../workflow/workflow.model';
 
 @Component({
   selector: 'app-workflow-modal',
@@ -66,7 +67,7 @@ export class WorkflowModalComponent implements OnInit {
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.frqId = this.requestModel.requestDto.frqId;
     dto.comments = this.comments;
-//    dto.action = mode;
+    dto.action =  WorkflowActionCode[mode];
     if (mode === 'WITHDRAW') {
       return this.fsWorkflowService.withdrawRequestUsingPOST(dto);
     } else if (mode === 'HOLD') {

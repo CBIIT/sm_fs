@@ -248,6 +248,9 @@ export enum WorkflowActionCode {
   REJECT = 'REJECT',
   ROUTE_APPROVE = 'ROUTE_APPROVE',
   RETURN = 'RETURN',
-  DEFER = 'DEFER'
+  DEFER = 'DEFER',
+  SUBMIT = 'SUBMIT',
+  WITHDRAW = 'WITHDRAW',
+  HOLD = 'HOLD'
 }
 

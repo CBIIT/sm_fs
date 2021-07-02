@@ -127,7 +127,7 @@ export class Step3Component implements OnInit {
   }
 
   loadSuppApps() {
-    this.fsRequestControllerService.retrieveAdminSuppRoutingsUsingGET(8455782).subscribe(
+    this.fsRequestControllerService.retrieveAdminSuppRoutingsUsingGET(this.requestModel.grant.applId).subscribe(
       result => {
         this.applAdminSuppRoutingsDtos = result;
       }, error => {
@@ -371,6 +371,8 @@ export class Step3Component implements OnInit {
 
     if (fileName === 'Summary Statement') {
       this.downloadSummaryStatement();
+    } else if (fileName === 'Supplement Application') {
+      this.downloadSupplementAppDoc(this.requestModel.requestDto.suppApplId);
     } else {
       this.documentService.downloadById(id)
         .subscribe(
@@ -410,7 +412,6 @@ export class Step3Component implements OnInit {
         this.logger.info('Delete Success');
         this.baseTaskList.subscribe(items => {
           this.swimlanes[0]['array'].forEach((value, index) => {
-            this.logger.info('Value, Index:', value.id + ','+index)
             if (value.id == id) {
               this.swimlanes[0]['array'].splice(index, 1);
               this.deleteDocOrder(value);
@@ -453,15 +454,10 @@ export class Step3Component implements OnInit {
   }
 
   downloadPackage() {
-    var docIds: number[] = [];
-    this.baseTaskList.subscribe(items => {
-      this.swimlanes[0]['array'].forEach((value, index) => {
-        docIds.push(value.id);
-      });
-    });
+    
 
     this.documentService.downLoadFrqPackage(this.requestModel.requestDto.frqId,
-      this.requestModel.grant.applId, docIds)
+      this.requestModel.grant.applId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
           let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
@@ -595,6 +591,16 @@ export class Step3Component implements OnInit {
     this.removeDocType("Supplement Application");
     this.showSuppApplications = false;
     this.modalService.dismissAll();
+  }
+
+  downloadSupplementAppDoc(suppApplId: number) {
+    this.documentService.downloadSupplementAppDoc(suppApplId)
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          saveAs(blob, response.headers.get('filename'));
+        }
+      );
   }
 
   validate(): boolean {
