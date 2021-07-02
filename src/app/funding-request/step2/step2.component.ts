@@ -9,7 +9,7 @@ import {Alert} from '../../alert-billboard/alert';
 import {NgForm} from '@angular/forms';
 import {FundingSourceTypes} from '../../model/funding-source-types';
 import SubmitEvent = JQuery.SubmitEvent;
-import { FundingRequestIntegrationService } from '../integration/integration.service';
+import { RequestApproverService } from '../approver/approver.service';
 
 @Component({
   selector: 'app-step2',
@@ -23,7 +23,7 @@ export class Step2Component implements OnInit {
   alerts: Alert[] = [];
 
   constructor(private router: Router, private requestModel: RequestModel,
-              private requestIntegrationService: FundingRequestIntegrationService,
+              private requestApproverService: RequestApproverService,
               private fsRequestControllerService: FsRequestControllerService,
               private logger: NGXLogger) {
   }
@@ -80,10 +80,14 @@ export class Step2Component implements OnInit {
           title: ''
         });
         this.logger.debug(JSON.stringify(this.requestModel.requestDto));
-        this.requestIntegrationService.requestSavedEmitter.next(this.requestModel.requestDto.frqId);
-        if (navigate) {
-          this.router.navigate([navigate]);
-        }
+        // always go to next step even if create approver fails. that's behavior before moving
+        // create approvers here.
+        this.requestApproverService.checkCreateApprovers().finally(
+          () => {
+            if (navigate) {
+              this.router.navigate([navigate]);
+            }
+          });
       }, error => {
         // TODO: properly handle errors here
         this.logger.error('HttpClient get request error during save request ----- ' + error.message);
