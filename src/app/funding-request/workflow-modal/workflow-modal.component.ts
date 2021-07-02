@@ -66,7 +66,7 @@ export class WorkflowModalComponent implements OnInit {
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.frqId = this.requestModel.requestDto.frqId;
     dto.comments = this.comments;
-    dto.action = mode;
+//    dto.action = mode;
     if (mode === 'WITHDRAW') {
       return this.fsWorkflowService.withdrawRequestUsingPOST(dto);
     } else if (mode === 'HOLD') {
