@@ -29,10 +29,10 @@
         <td>{{source.fundingSourceName}}</td>
         <td>{{ approvedTotal(source.fundingSourceId) | currency }}</td>
         <td>
-          <app-oefia-types (change)="setOefiaType(source.fundingSourceId, i)"></app-oefia-types>
+          <app-oefia-types [(ngModel)]="oefiaTypeId" (change)="setOefiaType(source.fundingSourceId, i)"></app-oefia-types>
         </td>
         <td>
-          <a href="#">1234567</a> | NCI OD GRANT MANPOWER-OD-K-AWARDS
+          <app-projected-can [fundingSourceId]="source.fundingSourceId" [oefiaTypeId]="oefiaTypeId"></app-projected-can>
         </td>
         <td>
           <div class="d-flex align-items-center">

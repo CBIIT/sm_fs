@@ -71,6 +71,7 @@ import { ApprovedCostsComponent } from './approved-costs/approved-costs.componen
 import { BudgetInfoComponent } from './budget-info/budget-info.component';
 import {ActiveInitialPayValidatorDirective} from "./validators/active-initial-pay-validator-directive";
 import { OefiaTypesComponent } from './oefia-types/oefia-types.component';
+import { ProjectedCanComponent } from './projected-can/projected-can.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
@@ -152,6 +153,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     BudgetInfoComponent,
     ActiveInitialPayValidatorDirective,
     OefiaTypesComponent,
+    ProjectedCanComponent,
   ],
 
 

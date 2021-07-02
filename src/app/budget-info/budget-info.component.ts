@@ -12,6 +12,7 @@ import {PrcDataPoint} from "../program-recommended-costs/prc-data-point";
 })
 export class BudgetInfoComponent implements OnInit {
   sources: FundingRequestFundsSrcDto[];
+  oefiaTypeId: number;
 
 
   constructor(private logger: NGXLogger, private canService: CanManagementService, private model: RequestModel) {
