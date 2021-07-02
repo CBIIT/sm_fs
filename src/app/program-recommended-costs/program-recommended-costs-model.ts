@@ -126,7 +126,11 @@ export class ProgramRecommendedCostsModel {
   // This will only be useful on the main table, since the modal doesn't have a funding source yet
   getLineItemsForSource(src: FundingRequestFundsSrcDto): PrcDataPoint[] {
     // TODO: Error handling?
-    return this.prcLineItems.get(Number(src.fundingSourceId));
+    return this.getLineItemsForSourceId(Number(src.fundingSourceId));
+  }
+
+  getLineItemsForSourceId(id: number) {
+    return this.prcLineItems.get(Number(id));
   }
 
 

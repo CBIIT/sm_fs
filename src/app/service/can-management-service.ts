@@ -7,18 +7,16 @@ import {Observable} from "rxjs";
 @Injectable({
   providedIn: 'root'
 })
-export class CanManagementService implements OnInit {
+export class CanManagementService {
 
-  nciSourceFlag = '';
+  nciSourceFlag: string = null;
   defaultCans: Array<CanCcxDto>;
   grantCans: Array<FundingRequestGrantCanDto>;
   oefiaCodes: Array<OefiaCodingDto>;
 
   constructor(private logger: NGXLogger, private canService: FsCanControllerService,
               private requestModel: RequestModel) {
-  }
-
-  ngOnInit() {
+    this.logger.debug('construction');
     this.refreshCans();
     this.refreshOefiaCodes();
   }
@@ -51,6 +49,7 @@ export class CanManagementService implements OnInit {
       this.requestModel.requestDto.activityCode,
       this.requestModel.requestDto.bmmCode,
       this.nciSourceFlag).subscribe(result => {
+      this.logger.debug(result);
       this.defaultCans = result;
     }, error => {
       this.logger.error(error);

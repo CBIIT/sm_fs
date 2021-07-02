@@ -25,11 +25,11 @@
       </tr>
       </thead>
       <tbody>
-      <tr>
-        <td>DC Discretionary RPG Funds</td>
-        <td>$1,111,110.00</td>
+      <tr *ngFor="let source of sources; let i = index">
+        <td>{{source.fundingSourceName}}</td>
+        <td>{{ approvedTotal(source.fundingSourceId) | currency }}</td>
         <td>
-
+          <app-oefia-types (change)="setOefiaType(source.fundingSourceId, i)"></app-oefia-types>
         </td>
         <td>
           <a href="#">1234567</a> | NCI OD GRANT MANPOWER-OD-K-AWARDS
@@ -37,13 +37,13 @@
         <td>
           <div class="d-flex align-items-center">
 
-            <button class="btn btn-link btn-slim" title="Copy Projected CAN">
+            <button class="btn btn-link btn-slim" title="Copy Projected CAN" (click)="copyProjectedCan(i)">
               <i class="far fa-copy" aria-hidden="true"></i>
             </button>
-            <span class="btn btn-link btn-slim btn-link-warning" title="Non-default CAN" role="alert">
+            <span *ngIf="nonDefaultCan(i)" class="btn btn-link btn-slim btn-link-warning" title="Non-default CAN" role="alert">
                                 <i class="far fa-exclamation-circle" aria-hidden="true"></i>
                             </span>
-            <span class="btn btn-link btn-slim btn-link-warning" title="Duplicate CANs" role="alert">
+            <span *ngIf="duplicateCan(i)" class="btn btn-link btn-slim btn-link-warning" title="Duplicate CANs" role="alert">
                                 <i class="far fa-exclamation-triangle" aria-hidden="true"></i>
                             </span>
           </div>
@@ -69,7 +69,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <p *ngFor="let can of canService.defaultCans">{{can.canActiveCode}} | {{can.canDescrip}}</p>
+        <p *ngFor="let can of defaultCans">{{can.can}} | {{can.canDescrip}}</p>
       </div>
     </div>
   </div>
