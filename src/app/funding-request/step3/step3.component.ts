@@ -119,6 +119,7 @@ export class Step3Component implements OnInit {
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
         this.DocTypes = of(result);
+        this.addTransitionMemo();
         this.loadFiles();
         this.isSupplementAction()
         this.loadSuppApps();
@@ -127,6 +128,12 @@ export class Step3Component implements OnInit {
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
+  }
+
+  addTransitionMemo() {
+    if (this.requestModel.conversionMechanism && this.requestModel.conversionMechanism !== null) {
+      this.pushDocType("Transition Memo");
+    }
   }
 
   loadJustificationText() {
@@ -142,6 +149,7 @@ export class Step3Component implements OnInit {
           this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
           this.docDescription = this.justificationText;
           this.justificationType = 'text';
+          this.removeDocType('Justification');
         }, error => {
           this.logger.error('HttpClient get request error for----- ' + error.message);
         });
@@ -257,7 +265,7 @@ export class Step3Component implements OnInit {
     this.selectedDocType = '';
     this.docDescription = '';
     this.disableJustification = false;
-    this.disableFile = false;
+    this.disableFile = true;
     this.showValidations = false;
     this.isJustificationEntered = false;
     this.isFileSelected = false;
