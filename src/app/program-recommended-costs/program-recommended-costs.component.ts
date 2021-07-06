@@ -309,7 +309,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
         if (index !== 0) {
           if (this.showPercent) {
             if (!isNaN(first.percentCut)) {
-              li.percentCut = first.percentCut;
+              li.recommendedDirect = first.recommendedDirect;
             }
           } else {
             if (!isNaN(first.recommendedDirect)) {
