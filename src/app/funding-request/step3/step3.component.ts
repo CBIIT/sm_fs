@@ -5,7 +5,7 @@ import { Options } from 'select2';
 import {
   CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
   FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto, DocumentsControllerService,
-  ApplAdminSuppRoutingsDto, FundingRequestTypesDto
+  ApplAdminSuppRoutingsDto, FundingRequestTypesDto, UserControllerService
 } from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request-model';
@@ -103,6 +103,7 @@ export class Step3Component implements OnInit {
     private fsRequestControllerService: FsRequestControllerService,
     private fsDocOrderControllerService: FsDocOrderControllerService,
     private documentsControllerService: DocumentsControllerService,
+    private userControllerService: UserControllerService,
     private modalService: NgbModal,
     private logger: NGXLogger) {
 
@@ -120,10 +121,31 @@ export class Step3Component implements OnInit {
         this.loadFiles();
         this.isSupplementAction()
         this.loadSuppApps();
+        this.loadJustificationText();
         this.logger.debug('Getting the Doc type Dropdown results: ', this.DocTypes);
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
+  }
+
+  loadJustificationText() {
+    if (this.requestModel.requestDto.justification !== null) {
+      this.userControllerService.findByNpnIdUsingGET(this.requestModel.requestDto.justificationCreateNpnId).subscribe(
+        result => {
+          this.justificationUploaded = of(true);
+          this.justificationText = this.requestModel.requestDto.justification;
+          this.requestModel.requestDto.justificationCreateByFullName = result.fullNameLF;
+          this.requestModel.requestDto.justificationCreateByEmailAddress = result.emailAddress;
+          this.justificationEnteredBy = this.requestModel.requestDto.justificationCreateByFullName;
+          this.justificationEnteredByEmail = this.requestModel.requestDto.justificationCreateByEmailAddress;
+          this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
+          this.docDescription = this.justificationText;
+          this.justificationType = 'text';
+        }, error => {
+          this.logger.error('HttpClient get request error for----- ' + error.message);
+        });
+    }
+    
   }
 
   loadSuppApps() {
@@ -175,7 +197,7 @@ export class Step3Component implements OnInit {
     if (this.selectedDocType === 'Justification') {
       if (this.docDescription !== '') {
         //Upate justification Text
-        this.uploadJustification(this.docDescription);
+        this.uploadJustificationText(this.docDescription);
         this.removeDocType("Justification");
       } else {
         this.populateDocDto();
@@ -202,13 +224,20 @@ export class Step3Component implements OnInit {
     }
   }
 
-  uploadJustification(justification: string) {
+  uploadJustificationText(justification: string) {
     this.fsRequestControllerService.updateJustificationUsingPUT(this.requestModel.requestDto.frqId, justification).subscribe(
       result => {
 
         this.justificationUploaded = of(true);
         this.requestModel.requestDto.justification = justification;
+        this.requestModel.requestDto.justificationCreateByFullName = result.justificationCreateByFullName;
+        this.requestModel.requestDto.justificationCreateByEmailAddress = result.justificationCreateByEmailAddress;
+        this.requestModel.requestDto.justificationCreateDate = result.justificationCreateDate;
+        this.requestModel.requestDto.justificationCreateNpnId = result.justificationCreateNpnId;
         this.justificationText = justification;
+        this.justificationEnteredBy = this.requestModel.requestDto.justificationCreateByFullName;
+        this.justificationEnteredByEmail = this.requestModel.requestDto.justificationCreateByEmailAddress;
+        this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
@@ -287,7 +316,10 @@ export class Step3Component implements OnInit {
     this.documentService.getFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
       result => {
         result.forEach(element => {
-          this.loadJustification(element);
+          if (element.docType === 'Justification') {
+            this.loadJustification(element);
+          }
+
           this.removeDocType(element.docType);
         });
 
@@ -311,6 +343,7 @@ export class Step3Component implements OnInit {
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
+
   }
 
   loadJustification(element: DocumentsDto) {
@@ -326,13 +359,6 @@ export class Step3Component implements OnInit {
       this.justificationId = element.id;
     }
 
-    if (this.requestModel.requestDto.justification != null) {
-      console.log(this.requestModel.requestDto.justification);
-      this.justificationUploaded = of(true);
-      this.justificationText = this.requestModel.requestDto.justification;
-      this.docDescription = this.justificationText;
-      this.justificationType = 'text';
-    }
   }
 
   drop(event: CdkDragDrop<DocumentsDto[]>) {
@@ -454,7 +480,7 @@ export class Step3Component implements OnInit {
   }
 
   downloadPackage() {
-    
+
 
     this.documentService.downLoadFrqPackage(this.requestModel.requestDto.frqId,
       this.requestModel.grant.applId)
@@ -541,7 +567,7 @@ export class Step3Component implements OnInit {
 
   deleteJustification() {
     if (this.justificationType == 'text') {
-      this.uploadJustification('');
+      this.uploadJustificationText('');
       this.justificationUploaded = of(false);
       this.pushDocType('Justification');
     } else {
@@ -571,6 +597,8 @@ export class Step3Component implements OnInit {
 
     this.showJustification = true;
     this.docDescription = this.justificationText;
+    this.pushDocType('Justification');
+    this.selectedDocType = 'Justification';
   }
 
   uploadSuppDocs(formerApplId: number) {
