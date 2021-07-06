@@ -434,4 +434,17 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     return false;
   }
 
+  downloadPackage() {
+    this.documentService.downLoadFrqPackage(this.requestModel.requestDto.frqId,
+      this.requestModel.grant.applId)
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          saveAs(blob, 'Package.pdf');
+        }
+      ), error =>
+        this.logger.error('Error downloading the file'),
+      () => console.info('File downloaded successfully');
+  }
+
 }
