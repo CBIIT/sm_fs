@@ -220,6 +220,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       (result) => {
         this.logger.debug('submit workflow returned okay ', result);
         this.workflowModel.initialize();
+        this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
       },
       (error) => {

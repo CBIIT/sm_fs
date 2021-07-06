@@ -68,9 +68,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     this.grantNumberComponent.grantNumberYear = this.searchCriteria.grantYear;
     this.grantNumberComponent.grantNumberSuffix = this.searchCriteria.grantSuffix;
 
-    if (this.gsfs.searched) {
-      this.initDatatable();
-    }
+    this.search();
 
   }
 
