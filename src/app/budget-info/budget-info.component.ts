@@ -17,6 +17,7 @@ export class BudgetInfoComponent implements OnInit {
 
   constructor(private logger: NGXLogger, private canService: CanManagementService, private model: RequestModel) {
     this.sources = model.programRecommendedCostsModel.selectedFundingSources;
+    this.logger.debug(this.sources);
   }
 
   ngOnInit(): void {

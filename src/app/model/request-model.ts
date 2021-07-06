@@ -198,6 +198,7 @@ export class RequestModel {
   }
 
   reset(): void {
+    this.logger.warn('About to reset the request model');
     this.title = 'New Request';
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};

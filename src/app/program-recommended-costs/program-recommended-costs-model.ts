@@ -24,6 +24,7 @@ export class ProgramRecommendedCostsModel {
   deletedSources: number[] = [];
 
   reset(): void {
+    this.logger.warn('Resetting program recommended costs model');
     // this.fundingRequestType = undefined;
     this.prcLineItems = new Map<number, PrcDataPoint[]>();
     // this._fundingSources = new Array<FundingRequestFundsSrcDto>();
