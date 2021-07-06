@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { RequestModel } from '../../model/request-model';
 import { AppPropertiesService } from '../../service/app-properties.service';
@@ -25,7 +25,7 @@ import { WorkflowComponent } from '../workflow/workflow.component';
   styleUrls: ['./review-request.component.css'],
   providers: [WorkflowModel]
 })
-export class ReviewRequestComponent implements OnInit, OnDestroy {
+export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('submitResult') submitResultElement: ElementRef;
   @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
@@ -66,6 +66,10 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
               private logger: NGXLogger,
               private fsWorkflowControllerService: FsWorkflowControllerService,
               private workflowModel: WorkflowModel) {}
+
+  ngAfterViewInit(): void {
+    this.submitResultElement.nativeElement.scrollIntoView();
+  }
 
   ngOnDestroy(): void {
     if (this.requestHistorySubscriber) {

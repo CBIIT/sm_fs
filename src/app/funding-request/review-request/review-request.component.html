@@ -11,6 +11,7 @@
   <h1>Failed to submit request</h1>
   {{submissionResult.errorMessage}}
 </div>
+<app-alert-billboard [alerts]="model.pendingAlerts"></app-alert-billboard>
 <app-workflow-modal></app-workflow-modal>
 <app-grant-information></app-grant-information>
 <hr>

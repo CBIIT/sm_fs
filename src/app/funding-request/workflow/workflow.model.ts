@@ -38,7 +38,7 @@ export class WorkflowModel {
     this.awa = [];
     this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE, 'Approve', 'Approve', true, false, false));
     this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE_ROUTE, 'Approve and Route', 'Approve and Route', true, false, true));
-    this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE_COMMENT, 'Approve with Comments', 'Approve', false, true, false, ['FCSPL', 'FCNCIDIR']));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE_COMMENT, 'Approve with Comments', 'Approve', false, true, false, ['SPL', 'FCNCI']));
     this.awa.push(new WorkflowAction(WorkflowActionCode.REASSIGN, 'Reassign', 'Reassign', true, false, true));
     this.awa.push(new WorkflowAction(WorkflowActionCode.REJECT, 'Reject', 'Reject', true, true, false));
     this.awa.push(new WorkflowAction(WorkflowActionCode.ROUTE_APPROVE, 'Route Before Approving', 'Route', true, false, true));
@@ -58,7 +58,7 @@ export class WorkflowModel {
 
   // for workflow action drop down
   getWorkflowList(): {id: WorkflowActionCode, text: string}[] {
-    const roleCode = this.nextApproverRoleCode ? this.nextApproverRoleCode : 'ADDITIONAL';
+    const roleCode = this.nextApproverRoleCode;
     if (roleCode) {
       return this.awa.filter((a) => {
         if (a.allRoleCode &&
@@ -107,7 +107,6 @@ export class WorkflowModel {
 
     this.nextApprover = this._pendingApprovers && this._pendingApprovers.length > 0 ? this._pendingApprovers[0] : null;
     if ( this.nextApprover ) {
-      this.nextApproverRoleCode = this.nextApprover.roleCode;
       const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
       this.isUserNextInChain = false;
       if (userId === this.nextApprover.approverLdap) {
@@ -119,10 +118,13 @@ export class WorkflowModel {
           this.isUserNextInChain = true;
         }
       }
-    }
 
-    if (this.isUserNextInChain && this._pendingApprovers.length === 0 ) {
-      this.lastInChain = true;
+      if (this.isUserNextInChain) {
+        this.nextApproverRoleCode = this.nextApprover.roleCode ? this.nextApprover.roleCode : 'ADDITIONAL';
+        if (this._pendingApprovers.length === 1 ) {
+          this.lastInChain = true;
+        }
+      }
     }
 
     this.resetApproverLists();

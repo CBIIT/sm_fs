@@ -17,7 +17,7 @@ export class StepIndicatorComponent implements OnInit {
   }
 
   isStepLinkable(step: number): boolean {
-    this.requestModel.clearAlerts();
+    // this.requestModel.clearAlerts();
     return this.requestModel.isStepLinkable(step);
   }
 }
