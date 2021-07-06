@@ -6,7 +6,7 @@ import {
   FsRequestControllerService, FundingReqStatusHistoryDto,
   NciPfrGrantQueryDto, FundingRequestDtoReq, DocumentsDto,
   FundingReqApproversDto, FsWorkflowControllerService, FundingRequestPermDelDto,
-  NciPerson, I2ERoles
+  NciPerson, I2ERoles, WorkflowTaskDto
 } from '@nci-cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
@@ -16,7 +16,8 @@ import { saveAs } from 'file-saver';
 import { HttpResponse } from '@angular/common/http';
 import { NGXLogger } from 'ngx-logger';
 import { WorkflowModalComponent } from '../workflow-modal/workflow-modal.component';
-import { WorkflowModel } from '../workflow/workflow.model';
+import { WorkflowActionCode, WorkflowModel } from '../workflow/workflow.model';
+import { WorkflowComponent } from '../workflow/workflow.component';
 
 @Component({
   selector: 'app-review-request',
@@ -28,9 +29,11 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
 
   @ViewChild('submitResult') submitResultElement: ElementRef;
   @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
+  @ViewChild(WorkflowComponent) workflowComponent: WorkflowComponent;
 
   statusesCanWithdraw = ['SUBMITTED', 'ON HOLD', 'RFC'];
   statusesCanOnHold = ['SUBMITTED'];
+  statusesCanSubmit = ['DRAFT', 'WITHDRAW'];
   terminalStatus = ['COMPLETED', 'REJECTED'];
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
@@ -42,8 +45,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
   requestStatus: string;
   docDtos: DocumentsDto[];
   readonly = false;
-  readonlyStatuses = ['SUBMITTED'];
-  comments = '';
+  readonlyStatuses = ['SUBMITTED', 'APPROVED', 'COMPLETED', 'REJECTED'];
   activeApprover: FundingReqApproversDto;
 
   userCanSubmit = false;
@@ -82,11 +84,6 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
         this.parseRequestHistories(historyResult);
       }
     );
-    // this.activeApproverSubscriber = this.requestIntegrationService.activeApproverEmitter.subscribe(
-    //   (approver) => {
-    //     this.setActiveApprover(approver);
-    //   }
-    // );
     this.docDtos = this.requestModel.requestDto.includedDocs;
     this.workflowModel.initialize();
     this.checkUserRolesCas();
@@ -200,11 +197,6 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
     this.router.navigate(['/request/step3']);
   }
 
-  // setActiveApprover(event): void {
-  //   this.logger.debug('setActiveApprover', event);
-  //   this.activeApprover = event;
-  // }
-
   get grant(): NciPfrGrantQueryDto {
     return this.requestModel.grant;
   }
@@ -230,19 +222,26 @@ export class ReviewRequestComponent implements OnInit, OnDestroy {
   }
 
   submitRequest(): void {
-    const submissionDto: FundingRequestDtoReq = {};
-    // submitRequest method only needs following properties in Dto
-    submissionDto.frqId = this.requestModel.requestDto.frqId;
-    submissionDto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
-    submissionDto.userLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-    submissionDto.certCode = this.requestModel.requestDto.certCode;
-    submissionDto.comments = this.comments;
-    this.logger.debug('Submit Request for: ', submissionDto);
-    this.fsRequestService.submitRequestUsingPOST(submissionDto).subscribe(
+    const dto: WorkflowTaskDto = {};
+    dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    dto.frqId = this.requestModel.requestDto.frqId;
+    dto.action = WorkflowActionCode.SUBMIT;
+    dto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
+    dto.certCode = this.requestModel.requestDto.certCode;
+    dto.comments = this.workflowComponent.comments;
+    if (this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0) {
+      dto.additionalApproverList = this.workflowModel.additionalApprovers.map( a => {
+        return a.approverLdap;
+      });
+    }
+    this.logger.debug('Submit Request for: ', dto);
+    const nextApproverInChain = this.workflowModel.getNextApproverInChain();
+    this.fsWorkflowControllerService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('Submit Request result: ', result);
-        this.submissionResult = { status: 'success', frqId: submissionDto.frqId, approver: this.activeApprover };
-        this.requestIntegrationService.requestSubmissionEmitter.next(submissionDto.frqId);
+        this.submissionResult = { status: 'success', frqId: dto.frqId, approver: nextApproverInChain };
+        this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
+        this.workflowModel.initialize();
         this.submitResultElement.nativeElement.scrollIntoView();
         this.readonly = true;
         this.requestModel.disableStepLinks();

@@ -27,7 +27,7 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.logger.debug("Funding Request info: ", this.requestModel.requestDto);
+    this.logger.debug('Funding Request info: ', this.requestModel.requestDto);
     this.loadHistory();
     this.requestSubmissionEventSubscriber = this.requestIntegrationService.requestSubmissionEmitter.subscribe(
       (frqId) => { this.loadHistory(); }

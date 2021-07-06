@@ -37,12 +37,14 @@ export class RetrieveRequestComponent implements OnInit {
             this.requestModel.mainApproverCreated = true;
             this.requestModel.captureApproverCriteria();
           }
-          if (this.userSessionService.getEnvironment() === 'development') {
-            this.router.navigate(['/request/review']);
-          }
-          else {
-            this.router.navigate(['/request/step4']);
-          }
+
+          this.router.navigate(['/request/review']);
+          // if (this.userSessionService.getEnvironment() === 'development') {
+          //   this.router.navigate(['/request/review']);
+          // }
+          // else {
+          //   this.router.navigate(['/request/step4']);
+          // }
         },
         (error) => {
           this.logger.error('retrieveFundingRequest failed ', error);

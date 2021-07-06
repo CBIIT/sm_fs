@@ -17,6 +17,7 @@ export class WorkflowModel {
  nextApprover: FundingReqApproversDto;
  addedApproverMap = new Map<number, any>();
  previousApprovers: FundingReqApproversDto[];
+ // oneApprover is used when doing Approve & Route
  oneApprover: FundingReqApproversDto;
  pendingApprovers: FundingReqApproversDto[];
  additionalApprovers: FundingReqApproversDto[];
@@ -179,6 +180,7 @@ export class WorkflowModel {
       this.additionalApprovers.push(approver);
       this.addedApproverMap.set(user.id, true);
       this.hasNewApprover = true;
+      this.reorderApprovers();
       this.requestIntegrationService.approverListChangeEmitter.next();
     }
   }
@@ -188,7 +190,38 @@ export class WorkflowModel {
       this.addedApproverMap.delete(this.additionalApprovers.splice(index, 1)[0].approverNpnId);
     }
     this.hasNewApprover = (!this.additionalApprovers || this.additionalApprovers.length === 0) ? false : true;
+    this.reorderApprovers();
     this.requestIntegrationService.approverListChangeEmitter.next();
+  }
+
+  reorderApprovers(): void {
+    let orderNum = (this.previousApprovers) ? this.previousApprovers.length : 0;
+    if (this.oneApprover) {
+      orderNum ++;
+    }
+    for (const a of this.additionalApprovers) {
+      orderNum ++;
+      a.orderNum = orderNum;
+    }
+    for (const a of this.pendingApprovers ) {
+      orderNum ++;
+      a.orderNum = orderNum;
+    }
+  }
+
+  // this is used by SubmitRequest method to show the next approver in the submission message.
+  getNextApproverInChain(): FundingReqApproversDto{
+    if (this.oneApprover) {
+      return this.oneApprover;
+    }
+    else if (this.additionalApprovers && this.additionalApprovers.length > 0) {
+      return this.additionalApprovers[0];
+    }
+    else if (this.pendingApprovers && this.pendingApprovers.length > 0) {
+      return this.pendingApprovers[0];
+    }
+
+    return {};
   }
 }
 

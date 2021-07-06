@@ -58,6 +58,7 @@ export class ApproverListComponent implements OnInit, OnDestroy {
       return;
     }
     moveItemInArray(this.additionalApprovers, event.previousIndex, event.currentIndex);
+    this.workflowModel.reorderApprovers();
   }
 
   deleteAdditionalApprover(index: number): void {

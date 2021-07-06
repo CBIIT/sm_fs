@@ -4,7 +4,6 @@ import {Subject} from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class FundingRequestIntegrationService {
-  requestSavedEmitter = new Subject<number>();
   requestHistoryLoadEmitter = new Subject<FundingReqStatusHistoryDto[]>();
   requestSubmissionEmitter = new Subject<number>();
   approverInitializationEmitter = new Subject<void>();
