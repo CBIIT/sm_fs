@@ -264,7 +264,7 @@ export class Step3Component implements OnInit {
     this.selectedDocType = '';
     this.docDescription = '';
     this.disableJustification = false;
-    this.disableFile = false;
+    this.disableFile = true;
     this.showValidations = false;
     this.isJustificationEntered = false;
     this.isFileSelected = false;
