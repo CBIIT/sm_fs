@@ -65,6 +65,7 @@ export class Step3Component implements OnInit {
   isJustificationEntered: boolean = false;
   isTypeSelected: boolean = false;
   applAdminSuppRoutingsDtos: ApplAdminSuppRoutingsDto[] = [];
+  disableAddDocButton: boolean = true;
 
   @ViewChild('inputFile')
   inputFile: ElementRef;
@@ -145,7 +146,7 @@ export class Step3Component implements OnInit {
           this.logger.error('HttpClient get request error for----- ' + error.message);
         });
     }
-    
+
   }
 
   loadSuppApps() {
@@ -188,6 +189,9 @@ export class Step3Component implements OnInit {
   selectFiles(event): void {
     this.selectedFiles = event.target.files;
     this.disableJustification = true;
+    if (this.selectedFiles.length > 0) {
+      this.disableAddDocButton = false;
+    }
 
   }
 
@@ -210,6 +214,7 @@ export class Step3Component implements OnInit {
   }
 
   private populateDocDto() {
+    console.log('Logging in before populateDocDto: ' + this.selectedFiles.length);
     for (let i = 0; i < this.selectedFiles.length; i++) {
       this._docDto.docDescription = this.docDescription;
       this._docDto.docType = this.selectedDocType;
@@ -222,6 +227,7 @@ export class Step3Component implements OnInit {
       }
 
     }
+    console.log('Logging in populateDocDto: ' + this.selectedFiles.length);
   }
 
   uploadJustificationText(justification: string) {
@@ -257,6 +263,8 @@ export class Step3Component implements OnInit {
     this.isFileSelected = false;
     this.isTypeSelected = false;
     this.showSuppApplications = false;
+    this.disableAddDocButton = true;
+    console.log('logging in reset:' + this.selectedFiles.length)
   }
 
   upload(file) {
@@ -513,6 +521,11 @@ export class Step3Component implements OnInit {
       this.disableFile = true;
     } else {
       this.disableFile = false;
+    }
+    if (this.selectedFiles.length > 0) {
+      this.disableAddDocButton = false;
+    } else {
+      this.disableAddDocButton = true;
     }
   }
 

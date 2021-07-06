@@ -40,7 +40,7 @@
                     accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile" (change)="selectFiles($event)">
             </div>
             <div class="col-sm-auto">
-                <button class="btn btn-primary ml-auto" [disabled]="!selectedFiles" (click)="uploadFiles()">Add
+                <button class="btn btn-primary ml-auto" [disabled]="disableAddDocButton" (click)="uploadFiles()">Add
                     Document</button>
             </div>
         </div>
