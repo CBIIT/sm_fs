@@ -149,6 +149,7 @@ export class Step3Component implements OnInit {
           this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
           this.docDescription = this.justificationText;
           this.justificationType = 'text';
+          this.removeDocType('Justification');
         }, error => {
           this.logger.error('HttpClient get request error for----- ' + error.message);
         });
