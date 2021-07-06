@@ -147,7 +147,6 @@ export class Step3Component implements OnInit {
           this.justificationEnteredBy = this.requestModel.requestDto.justificationCreateByFullName;
           this.justificationEnteredByEmail = this.requestModel.requestDto.justificationCreateByEmailAddress;
           this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
-          this.docDescription = this.justificationText;
           this.justificationType = 'text';
           this.removeDocType('Justification');
         }, error => {
