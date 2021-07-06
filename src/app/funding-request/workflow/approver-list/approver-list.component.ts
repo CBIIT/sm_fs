@@ -46,7 +46,7 @@ export class ApproverListComponent implements OnInit, OnDestroy {
         this.previousApprovers = this.workflowModel.previousApprovers;
         this.oneApprover = this.workflowModel.oneApprover;
         this.additionalApprovers = this.workflowModel.additionalApprovers;
-        this.logger.debug('approver change subscription is run, pending approvers are ', this.pendingApprovers);
+        this.logger.debug('approver lists change subscription is run, pending approvers are ', this.pendingApprovers);
         this.changeDetection.detectChanges();
       }
     );

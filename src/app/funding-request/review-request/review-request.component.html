@@ -11,6 +11,7 @@
   <h1>Failed to submit request</h1>
   {{submissionResult.errorMessage}}
 </div>
+<app-alert-billboard [alerts]="model.pendingAlerts"></app-alert-billboard>
 <app-workflow-modal></app-workflow-modal>
 <app-grant-information></app-grant-information>
 <hr>
@@ -26,7 +27,7 @@
 
   <div class="col-12 d-flex">
     <h2>Supporting Docs</h2>
-    <button class="btn btn-outline-primary mr-2 ml-auto"><i class="far fa-file-pdf" aria-hidden="true"></i> View Package
+    <button class="btn btn-outline-primary mr-2 ml-auto" (click)="downloadPackage()"><i class="far fa-file-pdf" aria-hidden="true"></i> View Package
     </button>
     <a class="collapse-toggle btn btn-link ml-1" data-toggle="collapse" href="#docs-collapse" role="button"
       aria-expanded="true" aria-controls="docs-collapse"></a>
