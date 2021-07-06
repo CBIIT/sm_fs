@@ -16,7 +16,6 @@ export class CanManagementService {
 
   constructor(private logger: NGXLogger, private canService: FsCanControllerService,
               private requestModel: RequestModel) {
-    this.logger.debug('construction');
     this.refreshCans();
     this.refreshOefiaCodes();
   }
@@ -34,7 +33,6 @@ export class CanManagementService {
   }
 
   refreshOefiaCodes(): void {
-    this.logger.debug('refreshing OEFIA codes')
     this.canService.getOefiaTypesUsingGET().subscribe(result => {
       this.oefiaCodes = result;
     });
@@ -42,7 +40,7 @@ export class CanManagementService {
 
   refreshDefaultCans(): boolean {
     if (!this.requestModel.requestDto.bmmCode || !this.requestModel.requestDto.activityCode) {
-      this.logger.debug('Not refreshing default cans due to missing bmmCode or activityCode');
+      // this.logger.debug('Not refreshing default cans due to missing bmmCode or activityCode');
       return false;
     }
     this.canService.getDefaultCansUsingGET(
@@ -59,7 +57,7 @@ export class CanManagementService {
 
   refreshGrantCans(): boolean {
     if (!this.requestModel.grant || !this.requestModel.grant.applId) {
-      this.logger.debug('Not refreshing grant cans due to missing applId');
+      // this.logger.debug('Not refreshing grant cans due to missing applId');
       return false;
     }
     this.canService.getGrantCansUsingGET(this.requestModel.grant.applId).subscribe(result => {

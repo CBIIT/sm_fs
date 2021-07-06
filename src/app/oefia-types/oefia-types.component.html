@@ -1,12 +1,12 @@
-<div class="form-row">
-  <div class="form-group">
-    <label for="oefia-type">OEFIA Type</label>
-    <ng-select2
-      id="oefia-type"
-      name="oefiaType"
-      [allowClear]="false">
-      <option></option>
-      <option *ngFor="let code of oefiaCodes()" value="{{code.id}}">{{code.category}}</option>
-    </ng-select2>
-  </div>
+<div class="form-group">
+<!--  <label for="oefia-type">OEFIA Type</label>-->
+  <ng-select2
+    id="oefia-type"
+    name="oefiaType"
+    [(ngModel)]="selectedValue"
+    [allowClear]="false">
+    <option></option>
+    <option *ngFor="let code of oefiaCodes()" value="{{code.id}}">{{code.category}}</option>
+  </ng-select2>
 </div>
+

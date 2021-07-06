@@ -1,0 +1,11 @@
+<div class="form-group">
+  <!--    <label for="oefia-type">OEFIA Type</label>-->
+  <ng-select2
+    id="can"
+    name="can"
+    [allowClear]="true">
+    <option></option>
+    <option *ngFor="let can of defaultCans" value="{{can.can}}">{{can.can}} | {{can.canDescrip}}</option>
+  </ng-select2>
+</div>
+
