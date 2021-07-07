@@ -114,7 +114,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
 
     });
     this.isRequestEverSubmitted = submitted;
-    this.readonly = (!this.userReadonly) || (this.readonlyStatuses.indexOf(this.requestStatus) > -1);
+    this.readonly = (this.userReadonly) || (this.readonlyStatuses.indexOf(this.requestStatus) > -1);
     if (this.readonly) {
       this.requestModel.disableStepLinks();
     }
