@@ -9,53 +9,58 @@
 <div class="row collapse show" id="workflow-collapse">
 
     <div class="col-12" *ngIf="requestStatus && requestStatus.comments">
-      <ngb-alert [dismissible]="false" class="workflow-comments">
-          <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
-          <div class="comment-content">
-              <div class="comment-details">Comment from <strong>{{requestStatus.performedBy}}</strong> on {{requestStatus.startDate}}</div>
-              <div>{{requestStatus.comments}}</div>
-          </div>
-      </ngb-alert>
+        <ngb-alert [dismissible]="false" class="workflow-comments">
+            <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
+            <div class="comment-content">
+                <div class="comment-details">Comment from <strong>{{requestStatus.performedBy}}</strong> on {{requestStatus.startDate}}</div>
+                <div>{{requestStatus.comments}}</div>
+            </div>
+        </ngb-alert>
     </div>
     
+    <div class="col-md-6 col-lg-4" *ngIf="isApprover()">
+        <div class="form-group">
+            <label for="workflow-action">Action</label>
+            <ng-select2
+            id="workflow-action"
+            name="workflowAction"
+            [(ngModel)]="selectedWorkflowAction"
+            [allowClear]="true"
+            [data]="workflowActions">
+            </ng-select2>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group" *ngIf="showAddApprover || !readonly">
+            <label for="req-add-approvers">Add Approver(s) <span class="optional">(optional)</span></label>
+            <ng-select2
+                id="req-add-approvers"
+                [(ngModel)]="selectedValue"
+                [allowClear]="false"
+                [options]="options">
+                <option></option>
+            </ng-select2>
+        </div>  
+    </div>
+
+    <app-approver-list [readonly]="readonly"></app-approver-list>
+
     <div class="col-12">
-    <div class="col-6" *ngIf="isApprover()">
-        <label for="workflow-action">Action</label>
-        <ng-select2
-          id="workflow-action"
-          name="workflowAction"
-          [(ngModel)]="selectedWorkflowAction"
-          [allowClear]="true"
-          [data]="workflowActions">
-        </ng-select2>
+        <div class="form-group" *ngIf=" isApprover() || !readonly">
+            <label for="workflow-comments">Workflow Comments <span class="optional">(optional)</span></label>
+            <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments"></textarea>
+            <span class="character-counter">{{comments.length}}/2000</span>
+        </div>
     </div>
 
-    <div class="col-6">
-      <div class="form-group" *ngIf="showAddApprover || !readonly">
-          <label for="req-add-approvers">Add Approver(s) <span class="optional">(optional)</span></label>
-          <ng-select2
-              id="req-add-approvers"
-              [(ngModel)]="selectedValue"
-              [allowClear]="false"
-              [options]="options">
-              <option></option>
-          </ng-select2>
-      </div>  
-    </div>
-  </div>
-  
-  <app-approver-list [readonly]="readonly"></app-approver-list>
+</div><!-- END Row Collapse -->
 
-  <div class="col-12">
-      <div class="form-group" *ngIf=" isApprover() || !readonly">
-        <label for="workflow-comments">Workflow Comments <span class="optional">(optional)</span></label>
-        <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments"></textarea>
-        <span class="character-counter">{{comments.length}}/2000</span>
-      </div>
-  </div>
-    
+<div class="row">  
+    <div class="col-12">
+        <hr>
+    </div> 
     <div class="col-12 d-flex mb-4" *ngIf="isApprover()">
-        <button class="btn btn-primary mr-2" (click)="submitWorkflow()" [disabled]="buttonDisabled">{{buttonLabel}}</button>
+        <button class="btn btn-primary ml-auto" (click)="submitWorkflow()" [disabled]="buttonDisabled">{{buttonLabel}}</button>
     </div>
-  </div>
-  
+</div>
