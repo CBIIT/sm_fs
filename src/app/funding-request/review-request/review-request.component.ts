@@ -33,7 +33,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
 
   statusesCanWithdraw = ['SUBMITTED', 'ON HOLD', 'RFC'];
   statusesCanOnHold = ['SUBMITTED'];
-  statusesCanSubmit = ['DRAFT', 'WITHDRAW'];
+  statusesCanSubmit = ['DRAFT', 'WITHDRAW', 'RFC'];
   terminalStatus = ['COMPLETED', 'REJECTED'];
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
@@ -114,7 +114,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
 
     });
     this.isRequestEverSubmitted = submitted;
-    this.readonly = (this.userReadonly) || (this.readonlyStatuses.indexOf(this.requestStatus) > -1);
+    this.readonly = (!this.userReadonly) || (this.readonlyStatuses.indexOf(this.requestStatus) > -1);
     if (this.readonly) {
       this.requestModel.disableStepLinks();
     }
@@ -286,7 +286,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   submitVisible(): boolean {
-    return this.userCanSubmit && this.requestStatus === 'DRAFT';
+    return this.userCanSubmit && this.statusesCanSubmit.indexOf(this.requestStatus) > -1;
   }
 
   deleteVisible(): boolean {
