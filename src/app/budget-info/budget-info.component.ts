@@ -1,4 +1,14 @@
-import {Component, Input, OnInit, Output, EventEmitter, ViewChild, AfterViewInit} from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  Output,
+  EventEmitter,
+  ViewChild,
+  AfterViewInit,
+  ViewChildren,
+  QueryList
+} from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
 import {CanManagementService} from '../service/can-management-service';
 import {RequestModel} from '../model/request-model';
@@ -13,13 +23,13 @@ import {OefiaTypesComponent} from '../oefia-types/oefia-types.component';
   styleUrls: ['./budget-info.component.css']
 })
 export class BudgetInfoComponent implements OnInit, AfterViewInit {
-  oefiaTypeId: number;
+  oefiaTypeId: number[] = [];
 
   get sources(): FundingRequestFundsSrcDto[] {
     return this.model.programRecommendedCostsModel.selectedFundingSources;
   }
 
-  @ViewChild(OefiaTypesComponent) oefiaType: OefiaTypesComponent;
+  @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
 
   constructor(private logger: NGXLogger, private canService: CanManagementService, private model: RequestModel) {
   }
@@ -66,13 +76,13 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.logger.debug('afterViewInit()', this.oefiaType);
-    if (!this.oefiaType) {
-      return;
-    }
-    this.oefiaType.selectedValueChange.subscribe(val => {
-      this.logger.debug('OEFIA type:', val);
-      this.oefiaTypeId = Number(val);
+    this.logger.debug('afterViewInit()', this.oefiaTypes);
+    this.oefiaTypes.forEach((oefiaType, index) => {
+
+      oefiaType.selectedValueChange.subscribe(val => {
+        this.logger.debug('OEFIA type:', val);
+        this.oefiaTypeId[index] = Number(val);
+      });
     });
   }
 }

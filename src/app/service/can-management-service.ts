@@ -38,6 +38,13 @@ export class CanManagementService {
     });
   }
 
+  getCans(nciSourceFlag: string): Observable<CanCcxDto[]> {
+    return this.canService.getDefaultCansUsingGET(
+      this.requestModel.requestDto.activityCode,
+      this.requestModel.requestDto.bmmCode,
+      nciSourceFlag);
+  }
+
   refreshDefaultCans(): boolean {
     if (!this.requestModel.requestDto.bmmCode || !this.requestModel.requestDto.activityCode) {
       // this.logger.debug('Not refreshing default cans due to missing bmmCode or activityCode');

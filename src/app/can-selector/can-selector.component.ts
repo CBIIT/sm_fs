@@ -1,7 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {CanManagementService} from "../service/can-management-service";
-import {RequestModel} from "../model/request-model";
-import {NGXLogger} from "ngx-logger";
+import {Component, Input, OnInit} from '@angular/core';
+import {CanManagementService} from '../service/can-management-service';
+import {RequestModel} from '../model/request-model';
+import {NGXLogger} from 'ngx-logger';
+import {CanCcxDto} from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-can-selector',
@@ -10,16 +11,17 @@ import {NGXLogger} from "ngx-logger";
 })
 export class CanSelectorComponent implements OnInit {
 
+  @Input() nciSourceFlag: string;
+  defaultCans: CanCcxDto[];
+
   constructor(private canService: CanManagementService,
               private requestModel: RequestModel,
               private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
+    this.canService.getCans(this.nciSourceFlag).subscribe(result => {
+      this.defaultCans = result;
+    });
   }
-
-  get defaultCans() {
-    return this.canService.defaultCans;
-  }
-
 }

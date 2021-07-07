@@ -12,7 +12,6 @@ import {NGXLogger} from "ngx-logger";
 export class ActiveInitialPayValidatorDirective implements AsyncValidator {
   constructor(private fsRequestService: FsRequestControllerService, private requestModel: RequestModel,
               private logger: NGXLogger) {
-    this.logger.debug('construction junction');
   }
 
   validate(control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
