@@ -451,11 +451,12 @@ export class Step3Component implements OnInit {
     this.documentService.deleteDocById(id).subscribe(
       result => {
         this.logger.info('Delete Success');
+        this.deleteDocOrder(result);
         this.baseTaskList.subscribe(items => {
           this.swimlanes[0]['array'].forEach((value, index) => {
             if (value.id == id) {
               this.swimlanes[0]['array'].splice(index, 1);
-              this.deleteDocOrder(value);
+              
             }
           });
         });
