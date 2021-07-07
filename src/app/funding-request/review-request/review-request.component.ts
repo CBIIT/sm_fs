@@ -188,7 +188,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       this.transitionMemoMissing = true;
       if (this.docDtos && this.docDtos.length > 0) {
         for (const doc of this.docDtos) {
-          if (doc.docType === 'TransitionMemo') {
+          if (doc.docType === 'Transition Memo') {
             this.transitionMemoMissing = false;
             break;
           }
