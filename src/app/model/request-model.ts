@@ -12,6 +12,8 @@ import {ProgramRecommendedCostsModel} from '../program-recommended-costs/program
 import {FundingSourceTypes} from './funding-source-types';
 import {FundingRequestTypes} from './funding-request-types';
 import {Alert} from '../alert-billboard/alert';
+import {PrcDataPoint} from '../program-recommended-costs/prc-data-point';
+import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 
 @Injectable({
   providedIn: 'root'
@@ -258,24 +260,55 @@ export class RequestModel {
    *    since we're only keeping the dollar values, but that's minor
    *
    */
-  restoreLineItems() : boolean {
-    if(!this.requestDto.financialInfoDto.fundingReqBudgetsDtos) {
+  restoreLineItems(): boolean {
+    this.logger.info('restoring budget line items');
+    if (!this.requestDto.financialInfoDto.fundingReqBudgetsDtos) {
       this.logger.warn('Budgets are required');
       return false;
     }
-    if(!this.programRecommendedCostsModel.fundingSources || !this.programRecommendedCostsModel.fundingSourcesMap) {
+    if (!this.programRecommendedCostsModel.fundingSources || !this.programRecommendedCostsModel.fundingSourcesMap) {
       this.logger.warn('Funding sources are required');
       return false;
     }
-    if(!this.programRecommendedCostsModel.grantAwarded) {
+    if (!this.programRecommendedCostsModel.grantAwarded) {
       this.logger.warn('Grant awards are required');
       return false;
     }
+
+    const awardMap = new Map<number, GrantAwardedDto>();
+    this.programRecommendedCostsModel.grantAwarded.forEach(g => {
+      awardMap.set(g.year, g);
+    });
+
+    this.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
+      let lineItem: PrcDataPoint[] = this.programRecommendedCostsModel.prcLineItems.get(b.fseId);
+      if (!lineItem) {
+        lineItem = [];
+        this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
+      }
+      const tmp = new PrcDataPoint();
+      tmp.fromBudget(b);
+      tmp.grantAward = awardMap.get(b.supportYear);
+      tmp.fundingSource = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
+      lineItem.push(tmp);
+      this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
+    });
+
+    this.programRecommendedCostsModel.selectedFundingSources = [];
+    this.programRecommendedCostsModel.selectedFundingSourceIds.forEach(i => {
+      const source = this.programRecommendedCostsModel.fundingSourcesMap.get(i);
+      this.programRecommendedCostsModel.selectedFundingSources.push(source);
+    });
+
+    // TODO: Consider sorting each line item by FY?
+
     return true;
   }
 
   restoreLineItemIds(): void {
-    if (!this.requestDto.financialInfoDto.fundingReqBudgetsDtos) return;
+    if (!this.requestDto.financialInfoDto.fundingReqBudgetsDtos) {
+      return;
+    }
     // this.logger.debug('Restoring line items from budgets', budgets);
     this.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
       // this.logger.debug('budget', b);

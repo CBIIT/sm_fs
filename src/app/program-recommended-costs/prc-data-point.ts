@@ -105,7 +105,6 @@ export class PrcDataPoint {
     return result;
   }
 
-  // TODO - restore from budget
   fromBudget(b: FundingReqBudgetsDto): void {
     this.budgetId = b.id;
     this.fundingRequestId = b.frqId;

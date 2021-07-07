@@ -43,6 +43,7 @@ export class ProgramRecommendedCostsModel {
   }
 
   set selectedFundingSourceIds(value: Set<number>) {
+    this.logger.debug(value);
     this._selectedFundingSourceIds = value;
   }
 
@@ -61,15 +62,16 @@ export class ProgramRecommendedCostsModel {
   set fundingSources(value: FundingRequestFundsSrcDto[]) {
     this._fundingSources = value;
     this._fundingSourcesMap = new Map(value.map(key => [key.fundingSourceId, key] as [number, FundingRequestFundsSrcDto]));
+    this.logger.debug(this._fundingSourcesMap);
   }
 
   get fundingSourcesMap(): Map<number, FundingRequestFundsSrcDto> {
     return this._fundingSourcesMap;
   }
 
-  set fundingSourcesMap(value: Map<number, FundingRequestFundsSrcDto>) {
-    this._fundingSourcesMap = value;
-  }
+  // set fundingSourcesMap(value: Map<number, FundingRequestFundsSrcDto>) {
+  //   this._fundingSourcesMap = value;
+  // }
 
   deleteFundingSourceByIndex(index: number, saved: boolean): number {
     const removed = this._selectedFundingSources[index];
