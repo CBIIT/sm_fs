@@ -5961,7 +5961,7 @@
             "name": "oefiaTypeId",
             "in": "query",
             "description": "oefiaTypeId",
-            "required": true,
+            "required": false,
             "style": "form",
             "schema": {
               "type": "integer",
@@ -11492,14 +11492,26 @@
         "operationId": "searchUsingGET",
         "parameters": [
           {
-            "name": "cancerActivity",
+            "name": "mech",
             "in": "query",
-            "description": "cancerActivity",
+            "description": "mech",
             "required": false,
             "style": "form",
             "allowReserved": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "minDaysSinceReferral",
+            "in": "query",
+            "description": "minDaysSinceReferral",
+            "required": false,
+            "style": "form",
+            "allowReserved": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           },
           {
@@ -11514,20 +11526,9 @@
             }
           },
           {
-            "name": "ncabToDate",
+            "name": "pocNpnId",
             "in": "query",
-            "description": "ncabToDate",
-            "required": false,
-            "style": "form",
-            "allowReserved": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "minDaysSinceReferral",
-            "in": "query",
-            "description": "minDaysSinceReferral",
+            "description": "pocNpnId",
             "required": false,
             "style": "form",
             "allowReserved": true,
@@ -11559,9 +11560,9 @@
             }
           },
           {
-            "name": "mech",
+            "name": "ncabToDate",
             "in": "query",
-            "description": "mech",
+            "description": "ncabToDate",
             "required": false,
             "style": "form",
             "allowReserved": true,
@@ -11570,15 +11571,14 @@
             }
           },
           {
-            "name": "pocNpnId",
+            "name": "cancerActivity",
             "in": "query",
-            "description": "pocNpnId",
+            "description": "cancerActivity",
             "required": false,
             "style": "form",
             "allowReserved": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             }
           },
           {

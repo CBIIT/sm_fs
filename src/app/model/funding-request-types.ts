@@ -112,9 +112,6 @@ export const INITIAL_PAY_TYPES = [
   FundingRequestTypes.PAY_A_POST_NCAB_TRANSFERRED_APPLICATION__OTHER,
   FundingRequestTypes.PAY_CONFERENCE_APPLICATION,
   FundingRequestTypes.OTHER_PAY_COMPETING_ONLY,
-  FundingRequestTypes.SKIP,
-  FundingRequestTypes.SKIP__NCI_RFA,
-  FundingRequestTypes.PAY_TYPE_4
 ];
 
 export const PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES = [
