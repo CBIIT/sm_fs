@@ -72,6 +72,7 @@ export class Step2Component implements OnInit {
     // TODO: make sure model is properly constructed
     this.requestModel.prepareBudgetsAndSetFinalLoa();
     this.logger.debug(JSON.stringify(this.requestModel.requestDto));
+    this.logger.debug(JSON.stringify(this.requestModel.programRecommendedCostsModel));
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
         this.requestModel.requestDto = result;
@@ -81,6 +82,7 @@ export class Step2Component implements OnInit {
           title: ''
         });
         this.logger.debug(JSON.stringify(this.requestModel.requestDto));
+        this.logger.debug(JSON.stringify(this.requestModel.programRecommendedCostsModel));
         // always go to next step even if create approver fails. that's behavior before moving
         // create approvers here.
         this.requestApproverService.checkCreateApprovers().finally(

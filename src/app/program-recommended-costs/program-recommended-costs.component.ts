@@ -155,7 +155,26 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       this.logger.error('Funding sources not initialized');
     }
 
-    this.requestModel.programRecommendedCostsModel.addFundingSourceById(this.selectedSourceId, this.lineItem);
+    const liClone: PrcDataPoint[] = [];
+
+    this.lineItem.forEach(l => {
+      let tmp: PrcDataPoint = new PrcDataPoint();
+      tmp.type = l.type;
+      tmp.baselineTotal = l.baselineTotal;
+      tmp.baselineDirect = l.baselineDirect;
+      tmp.baselineSource = l.baselineSource;
+      tmp.grantAward = l.grantAward;
+      tmp.recommendedDirect = l.recommendedDirect;
+      tmp.recommendedTotal = l.recommendedTotal;
+      tmp.budgetId = l.budgetId;
+      tmp.fundingRequestId = l.fundingRequestId;
+      tmp.fundingSource = l.fundingSource;
+      tmp.percentCut = l.percentCut;
+
+      liClone.push(tmp);
+    });
+
+    this.requestModel.programRecommendedCostsModel.addFundingSourceById(this.selectedSourceId, liClone);
     this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(this.selectedSourceId);
     // @ts-ignore
     $('#add-fsource-modal').modal('hide');

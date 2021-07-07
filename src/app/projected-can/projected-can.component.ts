@@ -9,21 +9,34 @@ import {CanCcxDto} from "@nci-cbiit/i2ecws-lib";
   styleUrls: ['./projected-can.component.css']
 })
 export class ProjectedCanComponent implements OnInit {
-  @Input() fundingSourceId: number;
-  @Input() oefiaTypeId: number;
-  projectedCan: CanCcxDto;
+  _oefiaType: number;
+
+  @Input()
+  get oefiaType(): number {
+    return this._oefiaType;
+  }
+
+  set oefiaType(value: number) {
+    this._oefiaType = value;
+    this.updateProjectedCan();
+  }
+
+  @Input() fseId: number;
+
+  @Input() projectedCan: CanCcxDto;
 
   constructor(private logger: NGXLogger, private canService: CanManagementService) {
   }
 
   ngOnInit(): void {
-    if(!isNaN(this.fundingSourceId) && !isNaN(this.oefiaTypeId)) {
-      this.canService.getProjectedCan(this.fundingSourceId, this.oefiaTypeId).subscribe(result => {
-        this.projectedCan = result;
-      }, error => {
-        this.logger.error(error);
-      });
-    }
   }
 
+  updateProjectedCan(): void {
+    const source = Number(this.fseId);
+
+    this.canService.getProjectedCan(source, this.oefiaType).subscribe(result => {
+      this.logger.debug('getting new projected CAN for', source, this.oefiaType);
+      this.projectedCan = result;
+    });
+  }
 }
