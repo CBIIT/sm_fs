@@ -281,13 +281,10 @@ export class RequestModel {
     });
 
     this.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
-      this.logger.debug('processing budget', b);
       let lineItem: PrcDataPoint[] = this.programRecommendedCostsModel.prcLineItems.get(b.fseId);
       if (!lineItem) {
-        this.logger.debug('no line item; creating new one for source', b.fseId);
         lineItem = [];
         this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
-        this.logger.debug(this.programRecommendedCostsModel.prcLineItems);
       }
       const tmp = new PrcDataPoint();
       tmp.fromBudget(b);
@@ -295,18 +292,13 @@ export class RequestModel {
       tmp.fundingSource = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
       lineItem.push(tmp);
       this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
-      this.logger.debug(lineItem);
     });
 
     this.programRecommendedCostsModel.selectedFundingSources = [];
     this.programRecommendedCostsModel.selectedFundingSourceIds.forEach(i => {
       const source = this.programRecommendedCostsModel.fundingSourcesMap.get(i);
       this.programRecommendedCostsModel.selectedFundingSources.push(source);
-    })
-    this.logger.debug(this.programRecommendedCostsModel.selectedFundingSourceIds);
-    this.logger.debug(this.programRecommendedCostsModel.prcLineItems);
-    this.logger.debug(JSON.stringify(this.requestDto));
-    this.logger.debug(JSON.stringify(this.programRecommendedCostsModel));
+    });
 
     // TODO: Consider sorting each line item by FY?
 

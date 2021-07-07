@@ -47,8 +47,6 @@ export class PrcDataPoint {
   baselineSource: PrcBaselineSource;
   budgetId: number;
   fundingRequestId: number;
-  // This field is only used for restoring data from the DB
-  supportYear: number;
 
   get recommendedDirect(): number {
     return this._recommendedDirect;
@@ -112,6 +110,5 @@ export class PrcDataPoint {
     this.fundingRequestId = b.frqId;
     this.recommendedDirect = b.dcRecAmt;
     this.recommendedTotal = b.tcRecAmt;
-    this.supportYear = b.supportYear;
   }
 }
