@@ -67,9 +67,9 @@ import {DiversitySupplementValidatorDirective} from './validators/diversity-supp
 import {PdNameRequiredValidatorDirective} from './validators/pd-name-required-validator-directive';
 import {CancerActivityRequiredValidatorDirective} from './validators/cancer-activity-required-validator-directive';
 import { UploadBudgetDocumentsComponent } from './upload-budget-documents/upload-budget-documents.component';
-import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
+import { ApprovedCostsComponent } from './funding-request/approved-costs/approved-costs.component';
 import { BudgetInfoComponent } from './budget-info/budget-info.component';
-import {ActiveInitialPayValidatorDirective} from "./validators/active-initial-pay-validator-directive";
+import {ActiveInitialPayValidatorDirective} from './validators/active-initial-pay-validator-directive';
 import { OefiaTypesComponent } from './oefia-types/oefia-types.component';
 import { ProjectedCanComponent } from './projected-can/projected-can.component';
 import { CanSelectorComponent } from './can-selector/can-selector.component';

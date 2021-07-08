@@ -22,14 +22,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>XXX</td>
-                    <td>XXX</td>
-                    <td>XXX</td>
-                    <td>XXX</td>
-                    <td>XXX</td>
+                <tr *ngFor=" let can of cans">
+                    <td>{{can.fundingSourceName}}</td>
+                    <td>fut</td>
+                    <td>{{can.requestedTc|currency}}</td>
+                    <td>{{can.approvedTc|currency}}</td>
+                    <td>{{can.requestedFutureYrs}}</td>
                     <td>
-                        <input id="apvd-future-years" class="form-control form-control-sm" type="text" aria-label="approved future years">
+                        <input id="apvd-future-years" class="form-control form-control-sm" 
+                        type="text" aria-label="approved future years" [(ngModel)]="can.approvedFutureYrs">
                     </td>
                 </tr>
             </tbody>
