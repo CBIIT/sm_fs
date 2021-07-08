@@ -97,7 +97,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     this.workflowModel.initialize();
     this.checkUserRolesCas();
     this.checkDocs();
-    this.isDisplayBudgetDocsUploadVar = false;
+    this.isDisplayBudgetDocsUploadVar = this.isDisplayBudgetDocsUpload();
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
