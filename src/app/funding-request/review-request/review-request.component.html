@@ -64,7 +64,7 @@
 
       <div class="ml-auto">
 
-        <button *ngIf="justificationType === 'text'; else displayDownloadIcon" class="btn btn-link btn-slim ml-1"
+        <button *ngIf="item.docFilename === 'Justification' && justificationType === 'text'; else displayDownloadIcon" class="btn btn-link btn-slim ml-1"
           title="View" (click)="open(justificationModal)"><i class="fas fa-eye" aria-hidden="true"></i></button>
         <ng-template #displayDownloadIcon>
           <button class="btn btn-link btn-slim ml-1" title="View" (click)="downloadFile(item.id, item.docFilename)"><i
