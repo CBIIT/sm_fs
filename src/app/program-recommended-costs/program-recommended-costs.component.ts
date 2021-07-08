@@ -121,10 +121,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     return this._selectedDocs;
   }
 
-  set selectedDocs(value: string) {
-
-  }
-
   showPiCosts(): boolean {
     // TODO: the display will need to handle restoration of a future year
     return PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES.includes(Number(this.requestModel.requestDto.frtId));
@@ -158,7 +154,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     const liClone: PrcDataPoint[] = [];
 
     this.lineItem.forEach(l => {
-      let tmp: PrcDataPoint = new PrcDataPoint();
+      const tmp: PrcDataPoint = new PrcDataPoint();
       tmp.type = l.type;
       tmp.baselineTotal = l.baselineTotal;
       tmp.baselineDirect = l.baselineDirect;
@@ -298,11 +294,8 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     } else if (!(this.lineItem[0].recommendedTotal && this.lineItem[0].recommendedDirect)) {
       return false;
     }
-    if ((this.lineItem[0].recommendedTotal && this.lineItem[0].recommendedDirect)
-      && (this.lineItem[0].recommendedTotal < this.lineItem[0].recommendedDirect)) {
-      return false;
-    }
-    return true;
+    return !((this.lineItem[0].recommendedTotal && this.lineItem[0].recommendedDirect)
+      && (this.lineItem[0].recommendedTotal < this.lineItem[0].recommendedDirect));
   }
 
   grandTotal(i: number): number {

@@ -51,46 +51,71 @@
               </div>
             </td>
             <td *ngFor="let li of getLineItem(f); let i = index; let first = first; let last = last;">
-              <span *ngIf="!initialPay; then a else b"></span>
-              <ng-template #a>
-                <div class="form-row">
-                  <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
-                  <ng-template #notFirst>
-                    <div class="col-6 font-weight-bold"></div>
-                  </ng-template>
-                  <div class="col-6">{{li.recommendedDirect | currency}}</div>
+              <span *ngIf="isRestoration(); then restoration else not_restoration"></span>
+              <ng-template #restoration>
+                <div *ngIf="first" class="form-row">
+                  <div class="col-6 font-weight-bold">Direct</div>
                 </div>
-              </ng-template>
-              <ng-template #b>
-                <div class="form-row">
-                  <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
-                  <ng-template #notFirst>
+                <div *ngIf="first" class="form-row">
+                  <div class="col-6 font-weight-bold">Total</div>
+                </div>
+                <span *ngIf="last; then isLast else notLast"></span>
+                <ng-template #isLast>
+                  <div class="form-row">
                     <div class="col-6 font-weight-bold"></div>
-                  </ng-template>
-                  <div class="col-6" *ngIf="first; else not">{{li.recommendedDirect | currency}}
-                    ({{ li.percentCutDirectCalculated | percent:'1.1-3'}} Cut)
-                  </div>
-                  <ng-template #not>
                     <div class="col-6">{{li.recommendedDirect | currency}}</div>
-                  </ng-template>
-                </div>
-              </ng-template>
-              <span *ngIf="!initialPay; then c else d"></span>
-              <ng-template #c>
-                <div class="form-row" *ngIf="first">
-                  <div class="col-6 font-weight-bold">Total</div>
-                  <div class="col-6">{{li.recommendedTotal | currency}}</div>
-                </div>
-              </ng-template>
-              <ng-template #d>
-                <div class="form-row" *ngIf="first">
-                  <div class="col-6 font-weight-bold">Total</div>
-                  <div class="col-6">{{li.recommendedTotal | currency}}
-                    ({{ li.percentCutTotalCalculated | percent:'1.1-3' }} Cut)
                   </div>
-                </div>
+                  <div class="form-row">
+                    <div class="col-6 font-weight-bold"></div>
+                    <div class="col-6">{{li.recommendedTotal | currency}}</div>
+                  </div>
+                </ng-template>
+                <ng-template #notLast>
+                  <div *ngIf="!first">---</div>
+                </ng-template>
               </ng-template>
 
+              <ng-template #not_restoration>
+                <span *ngIf="!initialPay; then a else b"></span>
+                <ng-template #a>
+                  <div class="form-row">
+                    <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                    <ng-template #notFirst>
+                      <div class="col-6 font-weight-bold"></div>
+                    </ng-template>
+                    <div class="col-6">{{li.recommendedDirect | currency}}</div>
+                  </div>
+                </ng-template>
+                <ng-template #b>
+                  <div class="form-row">
+                    <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                    <ng-template #notFirst>
+                      <div class="col-6 font-weight-bold"></div>
+                    </ng-template>
+                    <div class="col-6" *ngIf="first; else not">{{li.recommendedDirect | currency}}
+                      ({{ li.percentCutDirectCalculated | percent:'1.1-3'}} Cut)
+                    </div>
+                    <ng-template #not>
+                      <div class="col-6">{{li.recommendedDirect | currency}}</div>
+                    </ng-template>
+                  </div>
+                </ng-template>
+                <span *ngIf="!initialPay; then c else d"></span>
+                <ng-template #c>
+                  <div class="form-row" *ngIf="first">
+                    <div class="col-6 font-weight-bold">Total</div>
+                    <div class="col-6">{{li.recommendedTotal | currency}}</div>
+                  </div>
+                </ng-template>
+                <ng-template #d>
+                  <div class="form-row" *ngIf="first">
+                    <div class="col-6 font-weight-bold">Total</div>
+                    <div class="col-6">{{li.recommendedTotal | currency}}
+                      ({{ li.percentCutTotalCalculated | percent:'1.1-3' }} Cut)
+                    </div>
+                  </div>
+                </ng-template>
+              </ng-template>
             </td>
 
           </tr>
@@ -122,153 +147,153 @@
 -->
 <ng-template #edit>
 
-    <hr>
+  <hr>
 
-    <div class="row">
+  <div class="row">
 
-      <div class="col-12">
-        <h2>Program Recommended Costs</h2>
-        <div *ngIf="!isSkipRequest()">
-          <p>Please note that the Standard Policy Reduction should be taken into
-            consideration when determining the recommended dollar amounts for the request. If you would like to include
-            a
-            waiver to the Standard Policy Reduction, please provide it as part of the justification. The current fiscal
-            year's policy reductions can be viewed on the <a
-              href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information" target="_blank"
-              class="external-link">OEFIA web site</a>.</p>
-        </div>
-      </div>
-
-      <div class="col-12">
-        <div class="table-responsive">
-          <table class="table table-striped prc-table mb-0">
-            <thead>
-            <tr>
-              <th scope="row">Fiscal Year</th>
-              <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.year }}</span></th>
-            </tr>
-            <tr *ngIf="showPiCosts()">
-              <th scope="row">PI Requested Direct Cost</th>
-              <th scope="col" *ngFor="let ga of grantAwarded"><span
-                class="read-only-th">{{ ga.requestAmount | currency }}</span></th>
-            </tr>
-            <tr *ngIf="showPiCosts()">
-              <th scope="row">PI Requested Total Cost</th>
-              <th scope="col" *ngFor="let ga of grantAwarded"><span
-                class="read-only-th">{{ ga.requestTotalAmount | currency }}</span></th>
-            </tr>
-            <tr *ngIf="showAwardedCosts()">
-              <th scope="row">Awarded Direct Cost</th>
-              <th scope="col" *ngFor="let ga of grantAwarded"><span
-                class="read-only-th">{{ ga.directAmount | currency }}</span></th>
-            </tr>
-            <tr *ngIf="showAwardedCosts()">
-              <th scope="row">Awarded Total Cost</th>
-              <th scope="col" *ngFor="let ga of grantAwarded"><span
-                class="read-only-th">{{ ga.totalAwarded | currency }}</span></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let f of selectedFundingSources; let i = index;">
-              <td>
-                <div class="row">
-                  <div class="form-group col">
-                    <span class="like-label">Funding Source</span>
-                    <span>{{ f.fundingSourceName }}</span>
-                  </div>
-                  <div class="col-sm-auto">
-                    <button type="button" class="btn btn-sm btn-danger mr-2" (click)="deleteSource(i)" title="Remove"><i
-                      class="fas fa-trash" aria-hidden="true"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-primary" (click)="editSource(i)" title="Edit"><i
-                      class="fas fa-pencil" aria-hidden="true"></i></button>
-                  </div>
-                </div>
-              </td>
-              <td *ngFor="let li of getLineItem(f); let i = index; let first = first; let last = last;">
-                <ng-container *ngIf="!initialPay; then a else b"></ng-container>
-                <ng-template #a>
-                  <div class="form-row">
-                    <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
-                    <ng-template #notFirst>
-                      <div class="col-6 font-weight-bold"></div>
-                    </ng-template>
-                    <div class="col-6">{{li.recommendedDirect | currency}}</div>
-                  </div>
-                </ng-template>
-                <ng-template #b>
-                  <div class="form-row">
-                    <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
-                    <ng-template #notFirst>
-                      <div class="col-6 font-weight-bold"></div>
-                    </ng-template>
-                    <div class="col-6" *ngIf="first; else not">{{li.recommendedDirect | currency}}
-                      ({{ li.percentCutDirectCalculated | percent:'1.1-3'}} Cut)
-                    </div>
-                    <ng-template #not>
-                      <div class="col-6">{{li.recommendedDirect | currency}}</div>
-                    </ng-template>
-
-                  </div>
-                </ng-template>
-                <ng-container *ngIf="!initialPay; then c else d"></ng-container>
-                <ng-template #c>
-                  <div class="form-row" *ngIf="first">
-                    <div class="col-6 font-weight-bold">Total</div>
-                    <div class="col-6">{{li.recommendedTotal | currency}}</div>
-                  </div>
-                  <div class="form-row" *ngIf="last && isRestoration()">
-                    <div class="col-6 font-weight-bold"></div>
-                    <div class="col-6">{{li.recommendedTotal | currency}}</div>
-                  </div>
-                </ng-template>
-                <ng-template #d>
-                  <div class="form-row" *ngIf="first">
-                    <div class="col-6 font-weight-bold">Total</div>
-                    <div class="col-6">{{li.recommendedTotal | currency}}
-                      ({{ li.percentCutTotalCalculated | percent:'1.1-3' }} Cut)
-                    </div>
-                  </div>
-
-                </ng-template>
-
-              </td>
-
-            </tr>
-            <tr *ngIf="selectedFundingSources.length > 1">
-              <td><span class="like-label">Recommended Costs</span></td>
-              <td *ngFor="let li of grantAwarded; let i = index; let first = first; let last = last;">
-                <div class="form-row">
-                  <div class="col-6 font-weight-bold">
-                    Direct ($)
-                  </div>
-                  <div class="col-6">{{grandTotalDirect(i) | currency}}</div>
-                </div>
-                <div class="form-row" *ngIf="first">
-                  <div class="col-6 font-weight-bold">
-                    Total ($)
-                  </div>
-                  <div class="col-6">{{grandTotal(i) | currency}}</div>
-                </div>
-              </td>
-            </tr>
-
-            </tbody>
-          </table>
-        </div>
-
-        <button type="button" class="btn btn-primary mt-2 mb-3" data-toggle="modal" data-target="#add-fsource-modal"
-                (click)="prepareLineItem()"
-                *ngIf="selectedFundingSources.length < 3; else blankSpace">
-          <i class="fas fa-plus mr-2" aria-hidden="true"></i> Add Funding Source
-        </button>
-        <ng-template #blankSpace>
-          <br/>
-          <br/>
-        </ng-template>
-
+    <div class="col-12">
+      <h2>Program Recommended Costs</h2>
+      <div *ngIf="!isSkipRequest()">
+        <p>Please note that the Standard Policy Reduction should be taken into
+          consideration when determining the recommended dollar amounts for the request. If you would like to include
+          a
+          waiver to the Standard Policy Reduction, please provide it as part of the justification. The current fiscal
+          year's policy reductions can be viewed on the <a
+            href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information" target="_blank"
+            class="external-link">OEFIA web site</a>.</p>
       </div>
     </div>
+
+    <div class="col-12">
+      <div class="table-responsive">
+        <table class="table table-striped prc-table mb-0">
+          <thead>
+          <tr>
+            <th scope="row">Fiscal Year</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.year }}</span></th>
+          </tr>
+          <tr *ngIf="showPiCosts()">
+            <th scope="row">PI Requested Direct Cost</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span
+              class="read-only-th">{{ ga.requestAmount | currency }}</span></th>
+          </tr>
+          <tr *ngIf="showPiCosts()">
+            <th scope="row">PI Requested Total Cost</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span
+              class="read-only-th">{{ ga.requestTotalAmount | currency }}</span></th>
+          </tr>
+          <tr *ngIf="showAwardedCosts()">
+            <th scope="row">Awarded Direct Cost</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span
+              class="read-only-th">{{ ga.directAmount | currency }}</span></th>
+          </tr>
+          <tr *ngIf="showAwardedCosts()">
+            <th scope="row">Awarded Total Cost</th>
+            <th scope="col" *ngFor="let ga of grantAwarded"><span
+              class="read-only-th">{{ ga.totalAwarded | currency }}</span></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let f of selectedFundingSources; let i = index;">
+            <td>
+              <div class="row">
+                <div class="form-group col">
+                  <span class="like-label">Funding Source</span>
+                  <span>{{ f.fundingSourceName }}</span>
+                </div>
+                <div class="col-sm-auto">
+                  <button type="button" class="btn btn-sm btn-danger mr-2" (click)="deleteSource(i)" title="Remove"><i
+                    class="fas fa-trash" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-primary" (click)="editSource(i)" title="Edit"><i
+                    class="fas fa-pencil" aria-hidden="true"></i></button>
+                </div>
+              </div>
+            </td>
+            <td *ngFor="let li of getLineItem(f); let i = index; let first = first; let last = last;">
+              <ng-container *ngIf="!initialPay; then a else b"></ng-container>
+              <ng-template #a>
+                <div class="form-row">
+                  <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                  <ng-template #notFirst>
+                    <div class="col-6 font-weight-bold"></div>
+                  </ng-template>
+                  <div class="col-6">{{li.recommendedDirect | currency}}</div>
+                </div>
+              </ng-template>
+              <ng-template #b>
+                <div class="form-row">
+                  <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                  <ng-template #notFirst>
+                    <div class="col-6 font-weight-bold"></div>
+                  </ng-template>
+                  <div class="col-6" *ngIf="first; else not">{{li.recommendedDirect | currency}}
+                    ({{ li.percentCutDirectCalculated | percent:'1.1-3'}} Cut)
+                  </div>
+                  <ng-template #not>
+                    <div class="col-6">{{li.recommendedDirect | currency}}</div>
+                  </ng-template>
+
+                </div>
+              </ng-template>
+              <ng-container *ngIf="!initialPay; then c else d"></ng-container>
+              <ng-template #c>
+                <div class="form-row" *ngIf="first">
+                  <div class="col-6 font-weight-bold">Total</div>
+                  <div class="col-6">{{li.recommendedTotal | currency}}</div>
+                </div>
+                <div class="form-row" *ngIf="last && isRestoration()">
+                  <div class="col-6 font-weight-bold"></div>
+                  <div class="col-6">{{li.recommendedTotal | currency}}</div>
+                </div>
+              </ng-template>
+              <ng-template #d>
+                <div class="form-row" *ngIf="first">
+                  <div class="col-6 font-weight-bold">Total</div>
+                  <div class="col-6">{{li.recommendedTotal | currency}}
+                    ({{ li.percentCutTotalCalculated | percent:'1.1-3' }} Cut)
+                  </div>
+                </div>
+
+              </ng-template>
+
+            </td>
+
+          </tr>
+          <tr *ngIf="selectedFundingSources.length > 1">
+            <td><span class="like-label">Recommended Costs</span></td>
+            <td *ngFor="let li of grantAwarded; let i = index; let first = first; let last = last;">
+              <div class="form-row">
+                <div class="col-6 font-weight-bold">
+                  Direct ($)
+                </div>
+                <div class="col-6">{{grandTotalDirect(i) | currency}}</div>
+              </div>
+              <div class="form-row" *ngIf="first">
+                <div class="col-6 font-weight-bold">
+                  Total ($)
+                </div>
+                <div class="col-6">{{grandTotal(i) | currency}}</div>
+              </div>
+            </td>
+          </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <button type="button" class="btn btn-primary mt-2 mb-3" data-toggle="modal" data-target="#add-fsource-modal"
+              (click)="prepareLineItem()"
+              *ngIf="selectedFundingSources.length < 3; else blankSpace">
+        <i class="fas fa-plus mr-2" aria-hidden="true"></i> Add Funding Source
+      </button>
+      <ng-template #blankSpace>
+        <br/>
+        <br/>
+      </ng-template>
+
+    </div>
+  </div>
 
 
   <form #prcForm="ngForm" (ngSubmit)="onSubmit()" appFundingSourceCostValidator>
