@@ -17,6 +17,8 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   selectedFiles: FileList;
   @ViewChild('inputFile')
   inputFile: ElementRef;
+  @ViewChild('labelImport')
+  labelImport: ElementRef;
 
   public _selectedDocType: string = '';
   disableFile: boolean = true;
@@ -70,6 +72,10 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   }
 
   selectFiles(event): void {
+    let files: FileList = event.target.files;
+    this.labelImport.nativeElement.innerText = Array.from(files)
+      .map(f => f.name)
+      .join(', ');
     this.selectedFiles = event.target.files;
   }
 
@@ -130,9 +136,10 @@ export class UploadBudgetDocumentsComponent implements OnInit {
 
   reset() {
     this.inputFile.nativeElement.value = '';
+    this.labelImport.nativeElement.innerText = 'Choose file';
     this.selectedDocType = '';
     this.docDescription = '';
-    this.disableFile = false;
+    this.disableFile = true;
 
 
   }
