@@ -374,12 +374,15 @@ export class Step3Component implements OnInit {
     if (element.docType === 'Justification') {
       this.logger.debug('Loading Document type: ', element.docFilename);
       this.justificationUploaded = of(true);
-      this.justificationType = 'file';
+      
       this.justificationEnteredBy = element.uploadByName;
       this.justificationEnteredByEmail = element.uploadByEmail;
       this.justificationFileName = element.docFilename;
       this.justificationUploadedOn = element.createDate;
       this.justificationId = element.id;
+      if (element.id !== null) {
+        this.justificationType = 'file';
+      }
     }
 
   }
@@ -557,6 +560,8 @@ export class Step3Component implements OnInit {
     docDtos.forEach((value, index) => {
       this._docOrderDto.docId = value.id;
       this._docOrderDto.sortOrderNum = index + 1;
+      this._docOrderDto.frqId = this.requestModel.requestDto.frqId;
+      this._docOrderDto.docTypeCode = value.docType;
       this._docOrderDtos.push(this._docOrderDto);
       this._docOrderDto = {};
 
@@ -564,7 +569,7 @@ export class Step3Component implements OnInit {
 
     this.fsDocOrderControllerService.updateDocOrderUsingPUT(this._docOrderDtos).subscribe(
       res => {
-        this.logger.debug('Doc order delete successful for docId: ', this._docOrderDtos);
+        this.logger.debug('Doc order update successful for docId: ', this._docOrderDtos);
         this._docOrderDtos.length = 0;
       }, error => {
         this.logger.error('Error occured while updating DOC ORDER----- ' + error.message);

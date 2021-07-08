@@ -51,25 +51,27 @@
       <span class="doc-desc" [style.color]="'red'">Required, Not entered/Uploaded</span>
     </div>
 
-    <div class="drag-item" *ngFor="let item of docDtos" tabindex="0">
-      <span class="doc-name">{{ item.docFilename }}</span>
-      <span
-        *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayUserName"
-        class="doc-desc">(Retrieved form
-        IMPAC II)</span>
-      <ng-template #displayUserName>
-        <span class="doc-desc">(Added by <a href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
-          {{item.createDate}})</span>
-      </ng-template>
-
-      <div class="ml-auto">
-
-        <button *ngIf="item.docFilename === 'Justification' && justificationType === 'text'; else displayDownloadIcon" class="btn btn-link btn-slim ml-1"
-          title="View" (click)="open(justificationModal)"><i class="fas fa-eye" aria-hidden="true"></i></button>
-        <ng-template #displayDownloadIcon>
-          <button class="btn btn-link btn-slim ml-1" title="View" (click)="downloadFile(item.id, item.docFilename)"><i
-              class="fas fa-eye" aria-hidden="true"></i></button>
+    <div *ngFor="let item of docDtos">
+      <div [ngClass]="[ item.docType === 'Justification' ? 'drag-item drag-item-locked' : 'drag-item']" tabindex="0">
+        <span class="doc-name">{{ item.docFilename }}</span>
+        <span
+          *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayUserName"
+          class="doc-desc">(Retrieved form
+          IMPAC II)</span>
+        <ng-template #displayUserName>
+          <span class="doc-desc">(Added by <a href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
+            {{item.createDate}})</span>
         </ng-template>
+  
+        <div class="ml-auto">
+  
+          <button *ngIf="item.docFilename === 'Justification' && justificationType === 'text'; else displayDownloadIcon" class="btn btn-link btn-slim ml-1"
+            title="View" (click)="open(justificationModal)"><i class="fas fa-eye" aria-hidden="true"></i></button>
+          <ng-template #displayDownloadIcon>
+            <button class="btn btn-link btn-slim ml-1" title="View" (click)="downloadFile(item.id, item.docFilename)"><i
+                class="fas fa-eye" aria-hidden="true"></i></button>
+          </ng-template>
+        </div>
       </div>
     </div>
 
