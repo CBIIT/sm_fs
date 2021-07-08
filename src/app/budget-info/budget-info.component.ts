@@ -30,6 +30,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   }
 
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
+  selectedCan: CanCcxDto[];
 
   constructor(private logger: NGXLogger, private canService: CanManagementService, private model: RequestModel) {
   }
@@ -62,7 +63,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   }
 
   copyProjectedCan(i: number): void {
-    // this.logger.debug('copy projected can in row', i);
+    this.logger.debug('copy projected can in row', i);
   }
 
   nonDefaultCan(i: number): boolean {

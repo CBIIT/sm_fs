@@ -93,21 +93,26 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       this.showDollar = true;
       this.showPercent = false;
     }
-    if (!this.requestModel.programRecommendedCostsModel.grantAwarded) {
-      this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
-          this.requestModel.programRecommendedCostsModel.grantAwarded = result;
-        }, error => {
-          // TODO: properly handle errors here
-          this.logger.error('HttpClient get request error for----- ' + error.message);
-        }
-      );
-    }
+    this.loadApplAwardPeriods();
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
       this.selectedSourceId = selection;
     });
   }
 
+
+  private loadApplAwardPeriods(): void {
+    this.logger.debug('loadApplAwardPeriods(', this.requestModel.grant.applId, ')');
+    // if (!this.requestModel.programRecommendedCostsModel.grantAwarded) {
+    this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
+        this.requestModel.programRecommendedCostsModel.grantAwarded = result;
+      }, error => {
+        // TODO: properly handle errors here
+        this.logger.error('HttpClient get request error for----- ' + error.message);
+      }
+    );
+    // }
+  }
 
   get grant(): NciPfrGrantQueryDto {
     return this.requestModel.grant;

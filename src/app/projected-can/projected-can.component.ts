@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {NGXLogger} from "ngx-logger";
-import {CanManagementService} from "../service/can-management-service";
-import {CanCcxDto} from "@nci-cbiit/i2ecws-lib";
+import {NGXLogger} from 'ngx-logger';
+import {CanManagementService} from '../service/can-management-service';
+import {CanCcxDto} from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-projected-can',
@@ -10,6 +10,8 @@ import {CanCcxDto} from "@nci-cbiit/i2ecws-lib";
 })
 export class ProjectedCanComponent implements OnInit {
   _oefiaType: number;
+
+  @Input() index: number;
 
   @Input()
   get oefiaType(): number {
@@ -23,7 +25,7 @@ export class ProjectedCanComponent implements OnInit {
 
   @Input() fseId: number;
 
-  @Input() projectedCan: CanCcxDto;
+  projectedCan: CanCcxDto;
 
   constructor(private logger: NGXLogger, private canService: CanManagementService) {
   }

@@ -12,6 +12,7 @@ import {CanCcxDto} from '@nci-cbiit/i2ecws-lib';
 export class CanSelectorComponent implements OnInit {
 
   @Input() nciSourceFlag: string;
+  @Input() selectedCan: CanCcxDto;
   defaultCans: CanCcxDto[];
 
   constructor(private canService: CanManagementService,
