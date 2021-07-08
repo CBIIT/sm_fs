@@ -251,6 +251,14 @@ export class Step3Component implements OnInit {
         this.justificationEnteredBy = this.requestModel.requestDto.justificationCreateByFullName;
         this.justificationEnteredByEmail = this.requestModel.requestDto.justificationCreateByEmailAddress;
         this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
+
+        //Inserting doc order
+        let docDto: DocumentsDto = {};
+        docDto.docType = 'Justification';
+        docDto.keyId = this.requestModel.requestDto.frqId;
+        docDto.keyType = 'PFR';
+        this.insertDocOrder(docDto);
+                
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
@@ -588,7 +596,24 @@ export class Step3Component implements OnInit {
 
   deleteJustification() {
     if (this.justificationType == 'text') {
-      this.uploadJustificationText('');
+
+
+      this.fsRequestControllerService.deleteJustificationUsingPUT(this.requestModel.requestDto.frqId).subscribe(
+        res => {
+          this.logger.debug('justification deleted');
+          this.requestModel.requestDto.justification = '';
+        }, error => {
+          this.logger.error('Error occured while deleting justification----- ' + error.message);
+        });
+
+        this.fsDocOrderControllerService.deleteDocOrderByDocTypesUsingDELETE('Justification', this.requestModel.requestDto.frqId).subscribe(
+          res => {
+            this.logger.debug('Doc order delete successful for docId: ', this.requestModel.requestDto.frqId);
+          }, error => {
+            this.logger.error('Error occured while deleting DOC ORDER----- ' + error.message);
+          });
+
+      //this.uploadJustificationText('');
       this.justificationUploaded = of(false);
       this.pushDocType('Justification');
     } else {

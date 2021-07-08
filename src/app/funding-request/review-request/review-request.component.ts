@@ -18,6 +18,7 @@ import { NGXLogger } from 'ngx-logger';
 import { WorkflowModalComponent } from '../workflow-modal/workflow-modal.component';
 import { WorkflowActionCode, WorkflowModel } from '../workflow/workflow.model';
 import { WorkflowComponent } from '../workflow/workflow.component';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-review-request',
@@ -52,20 +53,24 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   userCanDelete = false;
   userReadonly = true;
   justificationMissing = false;
+  justificationType: string = '';
+  justificationText: string = '';
   transitionMemoMissing = false;
   isDisplayBudgetDocsUploadVar = false;
+  closeResult: string;
 
   constructor(private router: Router,
-              private requestModel: RequestModel,
-              private propertiesService: AppPropertiesService,
-              private fsRequestService: FsRequestControllerService,
-              private userSessionService: AppUserSessionService,
-              private requestIntegrationService: FundingRequestIntegrationService,
-              private documentService: DocumentService,
-              private changeDetection: ChangeDetectorRef,
-              private logger: NGXLogger,
-              private fsWorkflowControllerService: FsWorkflowControllerService,
-              private workflowModel: WorkflowModel) {}
+    private requestModel: RequestModel,
+    private propertiesService: AppPropertiesService,
+    private fsRequestService: FsRequestControllerService,
+    private userSessionService: AppUserSessionService,
+    private requestIntegrationService: FundingRequestIntegrationService,
+    private documentService: DocumentService,
+    private changeDetection: ChangeDetectorRef,
+    private logger: NGXLogger,
+    private fsWorkflowControllerService: FsWorkflowControllerService,
+    private modalService: NgbModal,
+    private workflowModel: WorkflowModel) { }
 
   ngAfterViewInit(): void {
     this.submitResultElement.nativeElement.scrollIntoView();
@@ -174,6 +179,8 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     if (this.requestModel.requestDto.justification
       && this.requestModel.requestDto.justification.length > 0) {
       this.justificationMissing = false;
+      this.justificationType = 'text';
+      this.justificationText = this.requestModel.requestDto.justification;
     }
     else if (this.docDtos && this.docDtos.length > 0) {
       for (const doc of this.docDtos) {
@@ -234,7 +241,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     dto.certCode = this.requestModel.requestDto.certCode;
     dto.comments = this.workflowComponent.comments;
     if (this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0) {
-      dto.additionalApproverList = this.workflowModel.additionalApprovers.map( a => {
+      dto.additionalApproverList = this.workflowModel.additionalApprovers.map(a => {
         return a.approverLdap;
       });
     }
@@ -328,14 +335,32 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       this.downloadSummaryStatement();
     } else {
       this.documentService.downloadById(id)
-        .subscribe(
-          (response: HttpResponse<Blob>) => {
-            const blob = new Blob([response.body], { type: response.headers.get('content-type') });
-            saveAs(blob, fileName);
-          }
-        );
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          const blob = new Blob([response.body], { type: response.headers.get('content-type') });
+          saveAs(blob, fileName);
+        }
+      );
     }
 
+  }
+
+  open(content) {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return `with: ${reason}`;
+    }
   }
 
   downloadSummaryStatement(): void {
