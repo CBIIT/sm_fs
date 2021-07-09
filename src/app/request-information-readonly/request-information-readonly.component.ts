@@ -16,8 +16,8 @@ export class RequestInformationReadonlyComponent implements OnInit {
   ngOnInit(): void {
     this.loaMap = new Map<string, string>()
     .set("PD", "PD")
-    .set("DD", "NCI Director or Designeee")
-    .set("SPL", "Scientific Program Leaders Committee (SPL)")
+    .set("DD", "NCI Director")
+    .set("SPL", "Scientific Program Leaders Committee")
     .set("DAO", "Division/Office/Center Approver");
   }
 
