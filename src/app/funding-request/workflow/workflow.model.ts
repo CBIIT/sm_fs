@@ -22,12 +22,13 @@ export class WorkflowModel {
  pendingApprovers: FundingReqApproversDto[];
  additionalApprovers: FundingReqApproversDto[];
 
-
  nextApproverRoleCode = '';
  isUserNextInChain = false;
  lastInChain = false;
  hasNewApprover = false;
-
+ isScientificApprover = false;
+ approvedScientifically = false;
+ scientificRoleCodes = ['DOC', 'DD', 'SPL' ];
   constructor(
     public requestModel: RequestModel,
     private userSessionService: AppUserSessionService,
@@ -38,12 +39,12 @@ export class WorkflowModel {
     this.awa = [];
     this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE, 'Approve', 'Approve', true, false, false));
     this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE_ROUTE, 'Approve and Route', 'Approve and Route', true, false, true));
-    this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE_COMMENT, 'Approve with Comments', 'Approve', false, true, false, ['SPL', 'FCNCI']));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE_COMMENT, 'Approve with Comments', 'Approve', false, true, false, ['SPL', 'DD']));
     this.awa.push(new WorkflowAction(WorkflowActionCode.REASSIGN, 'Reassign', 'Reassign', true, false, true));
     this.awa.push(new WorkflowAction(WorkflowActionCode.REJECT, 'Reject', 'Reject', true, true, false));
     this.awa.push(new WorkflowAction(WorkflowActionCode.ROUTE_APPROVE, 'Route Before Approving', 'Route', true, false, true));
     this.awa.push(new WorkflowAction(WorkflowActionCode.RETURN, 'Return to PD for Changes', 'Return', true, true, false, ['-GM']));
-    this.awa.push(new WorkflowAction(WorkflowActionCode.DEFER, 'Defer', 'Defer', false, true, false, ['SPL', 'FCNCI']));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.DEFER, 'Defer', 'Defer', false, true, false, ['SPL', 'DD']));
   }
 
   getWorkflowAction(action: WorkflowActionCode): WorkflowAction {
@@ -82,6 +83,7 @@ export class WorkflowModel {
     this.nextApproverRoleCode = null;
     this.isUserNextInChain = false;
     this.lastInChain = false;
+    this.isScientificApprover = false;
     this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
       (result) => {
         this.processApproversResult(result);
@@ -123,6 +125,19 @@ export class WorkflowModel {
         this.nextApproverRoleCode = this.nextApprover.roleCode ? this.nextApprover.roleCode : 'ADDITIONAL';
         if (this._pendingApprovers.length === 1 ) {
           this.lastInChain = true;
+        }
+
+        if (this.scientificRoleCodes.indexOf(this.nextApproverRoleCode) > -1) {
+          this.isScientificApprover = true;
+        }
+      }
+
+      if (this._previousApprovers && this._previousApprovers.length > 0) {
+        for ( const a of this._previousApprovers) {
+          if (this.scientificRoleCodes.indexOf(a.roleCode) > -1 ) {
+            this.approvedScientifically = true;
+            break;
+          }
         }
       }
     }

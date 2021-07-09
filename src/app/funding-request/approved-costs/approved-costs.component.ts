@@ -25,7 +25,7 @@ export class ApprovedCostsComponent implements OnInit {
       result => {
         if (result && result.length > 0) {
           this.cans = result;
-          this.logger.debug('f_r_c_t from db ', this.cans);
+          this.logger.debug('f_r_can_t from db ', this.cans);
         }
         else {
           this.cans = [];
@@ -43,18 +43,22 @@ export class ApprovedCostsComponent implements OnInit {
               dto.requestedDc = lineItem0.recommendedDirect;
               dto.approvedTc = dto.requestedTc;
               dto.approvedPctCut = lineItem0.percentCutTotalCalculated;
-              dto.requestedFutureYrs = lineItems.filter( l => l.recommendedTotal > 0).length - 1;
+              dto.requestedFutureYrs = lineItems.filter( li => li.recommendedTotal > 0).length - 1;
               dto.approvedFutureYrs = dto.requestedFutureYrs;
               this.cans.push(dto);
             }
           }
-          this.logger.debug('f_r_c_t from program_cost_model ', this.cans);
+          this.logger.debug('built f_r_can_t from program_cost_model ', this.cans);
         }
       },
       error => {
         this.logger.error('get request cans failed', error);
       }
     );
+  }
+
+  getCans(): FundingRequestCanDto[] {
+    return this.cans;
   }
 
 }

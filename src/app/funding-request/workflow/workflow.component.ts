@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 import { Options } from 'select2';
 import { RequestModel } from 'src/app/model/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
+import { setSyntheticLeadingComments } from 'typescript';
+import { ApprovedCostsComponent } from '../approved-costs/approved-costs.component';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { ApprovingStatuses, WorkflowAction, WorkflowActionCode, WorkflowModel } from './workflow.model';
 
@@ -18,6 +20,7 @@ let addedApproverMap = new Map<number, any>();
 })
 export class WorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
+  @ViewChild(ApprovedCostsComponent) approvedCostsComponent: ApprovedCostsComponent;
 
   approverInitializationSubscription: Subscription;
   approverChangeSubscription: Subscription;
@@ -30,6 +33,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   workflowActions: any[];
 
   showAddApprover = false;
+  showApprovedCosts = false;
   requestStatus: FundingReqStatusHistoryDto = {};
   private approvingState = false;
 
@@ -157,6 +161,14 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     return this.workflowModel.isUserNextInChain && this.approvingState;
   }
 
+  isScientificApprover(): boolean {
+    return this.workflowModel.isScientificApprover && this.approvingState;
+  }
+
+  hasApprovedScientifically(): boolean {
+    return this.workflowModel.approvedScientifically;
+  }
+
   get selectedWorkflowAction(): WorkflowActionCode {
     return (this._selectedWorkflowAction) ? this._selectedWorkflowAction.action : null;
   }
@@ -214,7 +226,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
             dto.completeRequest = true;
           }
     }
-
+    // set approved costs cans if scientific approver;
+    this.setCansToDto(dto, action);
     this.logger.debug('workflow dto for submission is ', dto);
     this.workflowService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
@@ -227,5 +240,12 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.logger.error('submit workflow returned error', error);
       }
     );
+  }
+
+  setCansToDto(dto: WorkflowTaskDto, action: WorkflowActionCode): void {
+    if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE)
+        && this.workflowModel.isScientificApprover ) {
+          dto.requestCans = this.approvedCostsComponent.getCans();
+    }
   }
 }
