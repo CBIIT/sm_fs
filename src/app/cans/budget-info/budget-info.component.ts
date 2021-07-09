@@ -30,7 +30,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   }
 
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
-  selectedCan: CanCcxDto[];
+  selectedCan: CanCcxDto[] = [];
 
   constructor(private logger: NGXLogger, private canService: CanManagementServiceBus, private model: RequestModel) {
   }
