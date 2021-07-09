@@ -6,7 +6,7 @@ import { Options } from 'select2';
 import { RequestModel } from 'src/app/model/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { setSyntheticLeadingComments } from 'typescript';
-import { ApprovedCostsComponent } from '../approved-costs/approved-costs.component';
+import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { ApprovingStatuses, WorkflowAction, WorkflowActionCode, WorkflowModel } from './workflow.model';
 
@@ -33,9 +33,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   workflowActions: any[];
 
   showAddApprover = false;
-  showApprovedCosts = false;
   requestStatus: FundingReqStatusHistoryDto = {};
-  private approvingState = false;
+  approvingState = false;
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
@@ -161,12 +160,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     return this.workflowModel.isUserNextInChain && this.approvingState;
   }
 
-  isScientificApprover(): boolean {
-    return this.workflowModel.isScientificApprover && this.approvingState;
-  }
-
-  hasApprovedScientifically(): boolean {
-    return this.workflowModel.approvedScientifically;
+  showApprovedCosts(): boolean {
+    return this.workflowModel.approvedScientifically ||
+    (this.workflowModel.isScientificApprover && this.approvingState);
   }
 
   get selectedWorkflowAction(): WorkflowActionCode {
@@ -243,9 +239,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   setCansToDto(dto: WorkflowTaskDto, action: WorkflowActionCode): void {
-    if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE)
-        && this.workflowModel.isScientificApprover ) {
+    // if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE)
+    //     && this.workflowModel.isScientificApprover ) {
           dto.requestCans = this.approvedCostsComponent.getCans();
-    }
+    // }
   }
 }

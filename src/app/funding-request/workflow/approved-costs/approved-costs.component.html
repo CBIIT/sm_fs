@@ -29,8 +29,11 @@
                     <td>{{can.approvedTc|currency}}</td>
                     <td>{{can.requestedFutureYrs}}</td>
                     <td>
-                        <input id="apvd-future-years" class="form-control form-control-sm" 
+                        <input *ngIf="editable; else readonly" id="apvd-future-years" class="form-control form-control-sm" 
                         type="text" aria-label="approved future years" [(ngModel)]="can.approvedFutureYrs">
+                        <ng-template #readonly>
+                            {{can.approvedFutureYrs}}
+                         </ng-template>
                     </td>
                 </tr>
             </tbody>

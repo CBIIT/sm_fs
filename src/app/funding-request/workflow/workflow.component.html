@@ -1,4 +1,4 @@
-<app-approved-costs *ngIf="isScientificApprover() || hasApprovedScientifically()"></app-approved-costs>
+<app-approved-costs *ngIf="showApprovedCosts()" [approvingState]="approvingState"></app-approved-costs>
 
 <div class="row">
     <div class="col-12 d-flex">

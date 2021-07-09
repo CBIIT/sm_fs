@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FsCanControllerService, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request-model';
+import { WorkflowModel } from '../workflow.model';
 
 @Component({
   selector: 'app-approved-costs',
@@ -9,11 +10,13 @@ import { RequestModel } from 'src/app/model/request-model';
   styleUrls: ['./approved-costs.component.css']
 })
 export class ApprovedCostsComponent implements OnInit {
+  @Input() approvingState = false;
 
   cans: FundingRequestCanDto[];
 
   constructor(private canControllerService: FsCanControllerService,
               private requestModel: RequestModel,
+              private workflowModel: WorkflowModel,
               private logger: NGXLogger) { }
 
   ngOnInit(): void {
@@ -59,6 +62,10 @@ export class ApprovedCostsComponent implements OnInit {
 
   getCans(): FundingRequestCanDto[] {
     return this.cans;
+  }
+
+  get editable(): boolean {
+    return this.workflowModel.isScientificApprover && this.approvingState;
   }
 
 }
