@@ -58,7 +58,8 @@ export class SkippedGrantsComponent implements OnInit {
             results: $.map(data, sg => {
               return {
                 id: sg.fullGrantNum,
-                text: sg.fullGrantNum
+                text: sg.fullGrantNum,
+                payload: sg
               };
             })
           };
