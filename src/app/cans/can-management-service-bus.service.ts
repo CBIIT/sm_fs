@@ -7,7 +7,7 @@ import {Observable} from "rxjs";
 @Injectable({
   providedIn: 'root'
 })
-export class CanManagementService {
+export class CanManagementServiceBus {
 
   nciSourceFlag: string = null;
   defaultCans: Array<CanCcxDto>;

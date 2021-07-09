@@ -2,13 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { RequestModel } from '../model/request-model';
 import { NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 
-let loaMap = new Map([
-  ["PD", "PD"],
-  ["DD", "NCI Director or Designeee"],
-  ["SPL", "Scientific Program Leaders Committee (SPL)"],
-  ["DAO", "Division/Office/Center Approver"]
-]);
-
 @Component({
   selector: 'app-request-information-readonly',
   templateUrl: './request-information-readonly.component.html',
@@ -17,9 +10,15 @@ let loaMap = new Map([
 
 export class RequestInformationReadonlyComponent implements OnInit {
 
+  loaMap: any;
   constructor(private requestModel: RequestModel) { }
 
   ngOnInit(): void {
+    this.loaMap = new Map<string, string>()
+    .set("PD", "PD")
+    .set("DD", "NCI Director or Designeee")
+    .set("SPL", "Scientific Program Leaders Committee (SPL)")
+    .set("DAO", "Division/Office/Center Approver");
   }
 
   get grant(): NciPfrGrantQueryDto {
@@ -30,7 +29,4 @@ export class RequestInformationReadonlyComponent implements OnInit {
     return this.requestModel;
   }
 
-  get loaMap(): typeof loaMap {
-    return this.loaMap;
-  }
 }

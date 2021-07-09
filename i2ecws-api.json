@@ -13,7 +13,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:80",
+      "url": "https://i2e-dev.nci.nih.gov:443",
       "description": "Inferred Url"
     }
   ],
@@ -6014,6 +6014,52 @@
         }
       }
     },
+    "/i2ecws/api/v1/fs/cans/request-cans/{frqId}": {
+      "get": {
+        "tags": [
+          "fs-can-controller"
+        ],
+        "summary": "getRequestCans",
+        "operationId": "getRequestCansUsingGET",
+        "parameters": [
+          {
+            "name": "frqId",
+            "in": "path",
+            "description": "frqId",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FundingRequestCanDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/i2ecws/api/v1/fs/cans/save-can": {
       "post": {
         "tags": [
@@ -6140,6 +6186,59 @@
           },
           "404": {
             "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/i2ecws/api/v1/fs/doc-order/delete-doc-order-by-doc-type/{docType}/{frqId}": {
+      "delete": {
+        "tags": [
+          "fs-doc-order-controller"
+        ],
+        "summary": "deleteDocOrderByDocTypes",
+        "operationId": "deleteDocOrderByDocTypesUsingDELETE",
+        "parameters": [
+          {
+            "name": "docType",
+            "in": "path",
+            "description": "docType",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "frqId",
+            "in": "path",
+            "description": "frqId",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingRequestDocOrderDto"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         }
       }
@@ -6602,16 +6701,50 @@
             "schema": {
               "type": "string"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FundingRequestSkipDto"
+                  }
+                }
+              }
+            }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/i2ecws/api/v1/fs/lookup/funding-requests/skip-requests/": {
+      "get": {
+        "tags": [
+          "fs-lookup-controller"
+        ],
+        "summary": "getFundingRequestSkipRequests",
+        "operationId": "getFundingRequestSkipRequestsUsingGET",
+        "parameters": [
           {
-            "name": "fy",
+            "name": "term",
             "in": "query",
-            "description": "fy",
-            "required": false,
+            "description": "term",
+            "required": true,
             "style": "form",
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             }
           }
         ],
@@ -6623,7 +6756,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SkipGrantDto"
+                    "$ref": "#/components/schemas/FundingRequestQueryDto"
                   }
                 }
               }
@@ -7406,6 +7539,52 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/i2ecws/api/v1/fs/funding-requests/justification/{frqId}": {
+      "put": {
+        "tags": [
+          "fs-request-controller"
+        ],
+        "summary": "deleteJustification",
+        "operationId": "deleteJustificationUsingPUT",
+        "parameters": [
+          {
+            "name": "frqId",
+            "in": "path",
+            "description": "frqId",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingRequestDtoRes"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
           },
           "401": {
             "description": "Unauthorized"
@@ -11492,55 +11671,20 @@
         "operationId": "searchUsingGET",
         "parameters": [
           {
-            "name": "mech",
+            "name": "cancerActivity",
             "in": "query",
-            "description": "mech",
+            "description": "cancerActivity",
             "required": false,
             "style": "form",
             "allowReserved": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "minDaysSinceReferral",
-            "in": "query",
-            "description": "minDaysSinceReferral",
-            "required": false,
-            "style": "form",
-            "allowReserved": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
             }
           },
           {
             "name": "ncabFromDate",
             "in": "query",
             "description": "ncabFromDate",
-            "required": false,
-            "style": "form",
-            "allowReserved": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "pocNpnId",
-            "in": "query",
-            "description": "pocNpnId",
-            "required": false,
-            "style": "form",
-            "allowReserved": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "referralDateHigh",
-            "in": "query",
-            "description": "referralDateHigh",
             "required": false,
             "style": "form",
             "allowReserved": true,
@@ -11571,14 +11715,49 @@
             }
           },
           {
-            "name": "cancerActivity",
+            "name": "minDaysSinceReferral",
             "in": "query",
-            "description": "cancerActivity",
+            "description": "minDaysSinceReferral",
+            "required": false,
+            "style": "form",
+            "allowReserved": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "referralDateHigh",
+            "in": "query",
+            "description": "referralDateHigh",
             "required": false,
             "style": "form",
             "allowReserved": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "mech",
+            "in": "query",
+            "description": "mech",
+            "required": false,
+            "style": "form",
+            "allowReserved": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pocNpnId",
+            "in": "query",
+            "description": "pocNpnId",
+            "required": false,
+            "style": "form",
+            "allowReserved": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           },
           {
@@ -19665,6 +19844,10 @@
             "type": "integer",
             "format": "int64"
           },
+          "approvedPctCut": {
+            "type": "integer",
+            "format": "int64"
+          },
           "approvedTc": {
             "type": "integer",
             "format": "int64"
@@ -19724,8 +19907,16 @@
           "phsOrgCode": {
             "type": "string"
           },
+          "previousAfy": {
+            "type": "integer",
+            "format": "int64"
+          },
           "reimburseableCode": {
             "type": "string"
+          },
+          "requestedDc": {
+            "type": "integer",
+            "format": "int64"
           },
           "requestedFutureYrs": {
             "type": "integer",
@@ -20099,9 +20290,6 @@
             "type": "string"
           },
           "loaCode": {
-            "type": "string"
-          },
-          "loaDescription": {
             "type": "string"
           },
           "loaId": {
@@ -20612,9 +20800,6 @@
             "type": "string"
           },
           "loaCode": {
-            "type": "string"
-          },
-          "loaDescription": {
             "type": "string"
           },
           "loaId": {
@@ -23178,15 +23363,6 @@
           }
         }
       },
-      "SkipGrantDto": {
-        "title": "SkipGrantDto",
-        "type": "object",
-        "properties": {
-          "fullGrantNum": {
-            "type": "string"
-          }
-        }
-      },
       "TemplateVariable": {
         "title": "TemplateVariable",
         "type": "object",
@@ -23314,6 +23490,12 @@
           },
           "reassignedApproverId": {
             "type": "string"
+          },
+          "requestCans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FundingRequestCanDto"
+            }
           },
           "requestorNpeId": {
             "type": "integer",

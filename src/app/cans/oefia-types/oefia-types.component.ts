@@ -1,6 +1,6 @@
 import {Component, Input, EventEmitter, OnInit} from '@angular/core';
 import {NGXLogger} from "ngx-logger";
-import {CanManagementService} from "../service/can-management-service";
+import {CanManagementServiceBus} from "../can-management-service-bus.service";
 import {OefiaCodingDto} from "@nci-cbiit/i2ecws-lib";
 import {Output} from "@angular/core";
 
@@ -25,7 +25,7 @@ export class OefiaTypesComponent implements OnInit {
 
   private _selectedValue: number;
 
-  constructor(private logger: NGXLogger, private canService: CanManagementService) {
+  constructor(private logger: NGXLogger, private canService: CanManagementServiceBus) {
   }
 
   ngOnInit(): void {

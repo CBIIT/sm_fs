@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {CanManagementService} from '../service/can-management-service';
-import {RequestModel} from '../model/request-model';
+import {CanManagementServiceBus} from '../can-management-service-bus.service';
+import {RequestModel} from '../../model/request-model';
 import {NGXLogger} from 'ngx-logger';
 import {CanCcxDto} from '@nci-cbiit/i2ecws-lib';
 
@@ -15,7 +15,7 @@ export class CanSelectorComponent implements OnInit {
   @Input() selectedCan: CanCcxDto;
   defaultCans: CanCcxDto[];
 
-  constructor(private canService: CanManagementService,
+  constructor(private canService: CanManagementServiceBus,
               private requestModel: RequestModel,
               private logger: NGXLogger) {
   }

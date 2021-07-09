@@ -10,10 +10,10 @@ import {
   QueryList
 } from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
-import {CanManagementService} from '../service/can-management-service';
-import {RequestModel} from '../model/request-model';
+import {CanManagementServiceBus} from '../can-management-service-bus.service';
+import {RequestModel} from '../../model/request-model';
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {PrcDataPoint} from '../program-recommended-costs/prc-data-point';
+import {PrcDataPoint} from '../../program-recommended-costs/prc-data-point';
 import {CanCcxDto} from '@nci-cbiit/i2ecws-lib';
 import {OefiaTypesComponent} from '../oefia-types/oefia-types.component';
 
@@ -32,7 +32,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
   selectedCan: CanCcxDto[];
 
-  constructor(private logger: NGXLogger, private canService: CanManagementService, private model: RequestModel) {
+  constructor(private logger: NGXLogger, private canService: CanManagementServiceBus, private model: RequestModel) {
   }
 
   ngOnInit(): void {
