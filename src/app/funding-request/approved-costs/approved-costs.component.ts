@@ -40,7 +40,9 @@ export class ApprovedCostsComponent implements OnInit {
               dto.fseId = fs.fundingSourceId;
               dto.fundingSourceName = fs.fundingSourceName;
               dto.requestedTc = lineItem0.recommendedTotal;
+              dto.requestedDc = lineItem0.recommendedDirect;
               dto.approvedTc = dto.requestedTc;
+              dto.approvedPctCut = lineItem0.percentCutTotalCalculated;
               dto.requestedFutureYrs = lineItems.filter( l => l.recommendedTotal > 0).length - 1;
               dto.approvedFutureYrs = dto.requestedFutureYrs;
               this.cans.push(dto);

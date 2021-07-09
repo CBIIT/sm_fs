@@ -24,7 +24,7 @@
             <tbody>
                 <tr *ngFor=" let can of cans">
                     <td>{{can.fundingSourceName}}</td>
-                    <td>fut</td>
+                    <td>{{can.requestedDc | currency}}</td>
                     <td>{{can.requestedTc|currency}}</td>
                     <td>{{can.approvedTc|currency}}</td>
                     <td>{{can.requestedFutureYrs}}</td>

@@ -82,66 +82,9 @@
 
 <hr>
 
-<!-- START Budget Documents-->
-<!-- <div *ngIf="isDisplayBudgetDocsUploadVar">
 <app-upload-budget-documents *ngIf="isDisplayBudgetDocsUploadVar"></app-upload-budget-documents>
-</div> -->
-<app-upload-budget-documents *ngIf="isDisplayBudgetDocsUploadVar"></app-upload-budget-documents>
-<!-- END Budget Documents-->
-
-<!-- START Grants Management Information -->
-<!--
-<div class="row">
-    <div class="col-12 d-flex">
-        <h2>Grants Management Information</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#grants-mgmt-collapse" role="button" aria-expanded="true" aria-controls="grants-mgmt-collapse"></a>
-    </div>
-</div>
-
-<div class="row collapse show" id="grants-mgmt-collapse">
-    <div class="col-lg-auto">
-        <div class="form-group">
-            <span class="like-label" id="action-type-desc">Action Type</span>
-            <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="model" aria-describedby="action-type-desc">
-                <label ngbButtonLabel class="btn-outline-secondary">
-                  <input ngbButton type="radio" value="award">Award
-                </label>
-                <label ngbButtonLabel class="btn-outline-secondary">
-                  <input ngbButton type="radio" value="revision">Revision
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4">
-        <div class="form-group">
-            <label for="specialist">Specialist</label>
-            <input type="text" readonly class="form-control-plaintext" id="specialist" value="Firstname Lastname">
-        </div>
-    </div>
-
-    <div class="col">
-        <div class="form-group">
-            <label for="backup-specialist">Backup Specialist <span class="optional">(optional)</span></label>
-            <ng-select2
-                id="backup-specialist"
-                name="backup-specialist"
-                [allowClear]="true"
-                [options]="options">
-            </ng-select2>
-        </div>
-    </div>
-
-    <div class="col-12">
-        <hr>
-    </div>
-</div>
--->
-<!-- END Grants Management Information -->
-
-<!-- START Workflow -->
+<app-approved-costs *ngIf="showApprovedCosts"></app-approved-costs>
 <app-workflow [readonly]="!submitVisible()"></app-workflow>
-<!-- END Workflow -->
 
 
 <hr>

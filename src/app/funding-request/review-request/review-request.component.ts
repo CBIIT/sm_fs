@@ -48,6 +48,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   readonly = false;
   readonlyStatuses = ['SUBMITTED', 'APPROVED', 'COMPLETED', 'REJECTED'];
   activeApprover: FundingReqApproversDto;
+  showApprovedCosts = false;
 
   userCanSubmit = false;
   userCanDelete = false;
