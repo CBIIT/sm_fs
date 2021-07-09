@@ -196,7 +196,7 @@ export class Step3Component implements OnInit {
   selectFiles(event): void {
     this.selectedFiles = event.target.files;
     this.disableJustification = true;
-    if (this.selectedFiles.length > 0) {
+    if (this.selectedFiles && this.selectedFiles.length > 0) {
       this.disableAddDocButton = false;
     }
 
@@ -221,7 +221,7 @@ export class Step3Component implements OnInit {
   }
 
   private populateDocDto() {
-    console.log('Logging in before populateDocDto: ' + this.selectedFiles.length);
+    
     for (let i = 0; i < this.selectedFiles.length; i++) {
       this._docDto.docDescription = this.docDescription;
       this._docDto.docType = this.selectedDocType;
@@ -234,7 +234,7 @@ export class Step3Component implements OnInit {
       }
 
     }
-    console.log('Logging in populateDocDto: ' + this.selectedFiles.length);
+    
   }
 
   uploadJustificationText(justification: string) {
@@ -279,7 +279,7 @@ export class Step3Component implements OnInit {
     this.isTypeSelected = false;
     this.showSuppApplications = false;
     this.disableAddDocButton = true;
-    console.log('logging in reset:' + this.selectedFiles.length)
+    
   }
 
   upload(file) {
@@ -522,7 +522,7 @@ export class Step3Component implements OnInit {
   }
 
   onDocTypeChange(event): any {
-    console.log('Doc Type Change: ', event);
+    
     this.inputFile.nativeElement.value = ''
     this.disableJustification = false;
     this.isTypeSelected = false;
@@ -541,7 +541,7 @@ export class Step3Component implements OnInit {
     } else {
       this.disableFile = false;
     }
-    if (this.selectedFiles.length > 0) {
+    if (this.selectedFiles && this.selectedFiles.length > 0) {
       this.disableAddDocButton = false;
     } else {
       this.disableAddDocButton = true;
@@ -578,12 +578,22 @@ export class Step3Component implements OnInit {
   }
 
   deleteDocOrder(docDto: DocumentsDto) {
-    this.fsDocOrderControllerService.deleteDocOrderUsingDELETE(docDto.id).subscribe(
-      res => {
-        this.logger.debug('Doc order delete successful for docId: ', docDto.id);
-      }, error => {
-        this.logger.error('Error occured while deleting DOC ORDER----- ' + error.message);
-      });
+    if (docDto.id !== null) {
+      this.fsDocOrderControllerService.deleteDocOrderUsingDELETE(docDto.id).subscribe(
+        res => {
+          this.logger.debug('Doc order delete successful for docId: ', docDto.id);
+        }, error => {
+          this.logger.error('Error occured while deleting DOC ORDER----- ' + error.message);
+        });
+    } else {
+
+      this.fsDocOrderControllerService.deleteDocOrderByDocTypesUsingDELETE(docDto.docType, this.requestModel.requestDto.frqId).subscribe(
+        res => {
+          this.logger.debug('Doc order delete successful for docId: ', this.requestModel.requestDto.frqId);
+        }, error => {
+          this.logger.error('Error occured while deleting DOC ORDER----- ' + error.message);
+        });
+    }
   }
 
   insertDocOrder(docDto: DocumentsDto) {
