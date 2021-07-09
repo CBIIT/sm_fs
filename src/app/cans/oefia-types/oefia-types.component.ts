@@ -1,8 +1,8 @@
 import {Component, Input, EventEmitter, OnInit} from '@angular/core';
-import {NGXLogger} from "ngx-logger";
-import {CanManagementServiceBus} from "../can-management-service-bus.service";
-import {OefiaCodingDto} from "@nci-cbiit/i2ecws-lib";
-import {Output} from "@angular/core";
+import {NGXLogger} from 'ngx-logger';
+import {CanManagementServiceBus} from '../can-management-service-bus.service';
+import {OefiaCodingDto} from '@nci-cbiit/i2ecws-lib';
+import {Output} from '@angular/core';
 
 @Component({
   selector: 'app-oefia-types',
@@ -10,6 +10,8 @@ import {Output} from "@angular/core";
   styleUrls: ['./oefia-types.component.css']
 })
 export class OefiaTypesComponent implements OnInit {
+  @Input() index = 0;
+
   @Input()
   get selectedValue(): number {
     return this._selectedValue;
@@ -21,6 +23,7 @@ export class OefiaTypesComponent implements OnInit {
     this._selectedValue = value;
     this.logger.debug('emitting new value:', value);
     this.selectedValueChange.emit(value);
+    this.canService.oefiaTypeEmitter.next({index: this.index, value});
   }
 
   private _selectedValue: number;
@@ -33,9 +36,5 @@ export class OefiaTypesComponent implements OnInit {
 
   oefiaCodes(): OefiaCodingDto[] {
     return this.canService.oefiaCodes;
-  }
-
-  iChanged() {
-    console.log('iChanged()');
   }
 }

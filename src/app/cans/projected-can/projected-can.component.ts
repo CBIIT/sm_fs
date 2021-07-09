@@ -9,19 +9,8 @@ import {CanCcxDto} from '@nci-cbiit/i2ecws-lib';
   styleUrls: ['./projected-can.component.css']
 })
 export class ProjectedCanComponent implements OnInit {
-  _oefiaType: number;
 
-  @Input() index: number;
-
-  @Input()
-  get oefiaType(): number {
-    return this._oefiaType;
-  }
-
-  set oefiaType(value: number) {
-    this._oefiaType = value;
-    this.updateProjectedCan();
-  }
+  @Input() index = 0;
 
   @Input() fseId: number;
 
@@ -31,14 +20,21 @@ export class ProjectedCanComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.canService.oefiaTypeEmitter.subscribe(next => {
+      if (Number(this.index) === Number(next.index)) {
+        this.updateProjectedCan(next.value);
+      }
+    });
   }
 
-  updateProjectedCan(): void {
+  updateProjectedCan(oefiaType: number): void {
     const source = Number(this.fseId);
 
-    this.canService.getProjectedCan(source, this.oefiaType).subscribe(result => {
-      this.logger.debug('getting new projected CAN for', source, this.oefiaType);
+    this.canService.getProjectedCan(source, oefiaType).subscribe(result => {
+      this.logger.debug('getting new projected CAN for', source, oefiaType);
+      this.logger.debug(JSON.stringify(result));
       this.projectedCan = result;
+      this.canService.projectedCanEmitter.next({index: this.index, can: result});
     });
   }
 }

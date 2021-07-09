@@ -7,15 +7,15 @@ import {
   ViewChild,
   AfterViewInit,
   ViewChildren,
-  QueryList
+  QueryList, Query
 } from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
 import {CanManagementServiceBus} from '../can-management-service-bus.service';
 import {RequestModel} from '../../model/request-model';
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {PrcDataPoint} from '../../program-recommended-costs/prc-data-point';
-import {CanCcxDto} from '@nci-cbiit/i2ecws-lib';
+import {CanCcxDto, FundingRequestCanDto} from '@nci-cbiit/i2ecws-lib';
 import {OefiaTypesComponent} from '../oefia-types/oefia-types.component';
+import {CanSelectorComponent} from '../can-selector/can-selector.component';
 
 @Component({
   selector: 'app-budget-info',
@@ -23,47 +23,60 @@ import {OefiaTypesComponent} from '../oefia-types/oefia-types.component';
   styleUrls: ['./budget-info.component.css']
 })
 export class BudgetInfoComponent implements OnInit, AfterViewInit {
-  oefiaTypeId: number[] = [];
-
-  get sources(): FundingRequestFundsSrcDto[] {
-    return this.model.programRecommendedCostsModel.selectedFundingSources;
-  }
 
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
-  selectedCan: CanCcxDto[] = [];
+  @ViewChildren(CanSelectorComponent) canSelectors: QueryList<CanSelectorComponent>;
+  fundingRequestCans: FundingRequestCanDto[];
 
   constructor(private logger: NGXLogger, private canService: CanManagementServiceBus, private model: RequestModel) {
   }
 
   ngOnInit(): void {
     this.logger.debug('Initialize');
+    this.canService.getRequestCans(this.model.requestDto.frqId).subscribe(result => {
+      this.setRequestCans(result);
+    });
     this.canService.refreshCans();
     this.canService.refreshOefiaCodes();
     this.logger.debug(this.canService.defaultCans);
     this.logger.debug(this.canService.grantCans);
   }
 
+  setRequestCans(cans: FundingRequestCanDto[]): void {
+    this.fundingRequestCans = cans;
+  }
+
   get defaultCans(): CanCcxDto[] {
     return this.canService.defaultCans;
   }
 
+  get sources(): FundingRequestFundsSrcDto[] {
+    return this.model.programRecommendedCostsModel.selectedFundingSources;
+  }
+
+  // TODO: this needs to come from funding request cans t
   approvedTotal(fundingSourceId: number): number {
     let total = 0;
-    const p: PrcDataPoint[] = this.model.programRecommendedCostsModel.getLineItemsForSourceId(Number(fundingSourceId));
-    p.forEach(li => {
-      if (!isNaN(li.recommendedDirect)) {
-        total += Number(li.recommendedDirect);
+    this.fundingRequestCans.forEach(c => {
+      if (c.fseId === fundingSourceId) {
+        total += Number(c.approvedTc);
       }
     });
     return total;
   }
 
-  setOefiaType(i: number): void {
-
-  }
-
   copyProjectedCan(i: number): void {
     this.logger.debug('copy projected can in row', i);
+    this.canSelectors.forEach((control, index) => {
+      if (i === index) {
+        const result = control.selectProjectedCan();
+        if (result) {
+          this.logger.debug('Projected CAN copied in row', index);
+        } else {
+          this.logger.debug('No projected CAN in row', index, 'to copy');
+        }
+      }
+    });
   }
 
   nonDefaultCan(i: number): boolean {
@@ -77,13 +90,13 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.logger.debug('afterViewInit()', this.oefiaTypes);
-    this.oefiaTypes.forEach((oefiaType, index) => {
-
-      oefiaType.selectedValueChange.subscribe(val => {
-        this.logger.debug('OEFIA type:', val);
-        this.oefiaTypeId[index] = Number(val);
-      });
-    });
+    // this.logger.debug('afterViewInit()', this.oefiaTypes);
+    // this.oefiaTypes.forEach((oefiaType, index) => {
+    //
+    //   oefiaType.selectedValueChange.subscribe(val => {
+    //     this.logger.debug('OEFIA type:', val);
+    //     this.oefiaTypeId[index] = Number(val);
+    //   });
+    // });
   }
 }

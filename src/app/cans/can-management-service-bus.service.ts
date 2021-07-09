@@ -1,13 +1,23 @@
-import {Injectable, OnInit} from "@angular/core";
-import {NGXLogger} from "ngx-logger";
-import {CanCcxDto, FsCanControllerService, FundingRequestGrantCanDto, OefiaCodingDto} from "@nci-cbiit/i2ecws-lib";
-import {RequestModel} from "../model/request-model";
-import {Observable} from "rxjs";
+import {Injectable, OnInit} from '@angular/core';
+import {NGXLogger} from 'ngx-logger';
+import {
+  CanCcxDto,
+  FsCanControllerService,
+  FundingRequestCanDto,
+  FundingRequestGrantCanDto,
+  OefiaCodingDto
+} from '@nci-cbiit/i2ecws-lib';
+import {RequestModel} from '../model/request-model';
+import {Observable, Subject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CanManagementServiceBus {
+
+  oefiaTypeEmitter = new Subject<{ index: number; value: number }>();
+  projectedCanEmitter = new Subject<{ index: number; can: CanCcxDto }>();
+  selectedCanEmitter = new Subject<{ index: number; can: CanCcxDto }>();
 
   nciSourceFlag: string = null;
   defaultCans: Array<CanCcxDto>;
@@ -26,9 +36,11 @@ export class CanManagementServiceBus {
   }
 
   getProjectedCan(fseId: number, oefiaTypeId: number): Observable<CanCcxDto> {
+    this.logger.debug('getProjectedCan(', this.requestModel.grant.applId, fseId, oefiaTypeId, this.requestModel.requestDto.frtId, ')');
     return this.canService.retrieveProjectedCanUsingGET(
       this.requestModel.grant.applId,
-      fseId, oefiaTypeId,
+      fseId,
+      oefiaTypeId,
       this.requestModel.requestDto.frtId);
   }
 
@@ -43,6 +55,10 @@ export class CanManagementServiceBus {
       this.requestModel.requestDto.activityCode,
       this.requestModel.requestDto.bmmCode,
       nciSourceFlag);
+  }
+
+  getRequestCans(frqId: number): Observable<FundingRequestCanDto[]> {
+    return this.canService.getRequestCansUsingGET(frqId);
   }
 
   refreshDefaultCans(): boolean {

@@ -3,7 +3,8 @@
   <ng-select2
     id="can"
     name="can"
-    [allowClear]="true">
+    [allowClear]="true"
+    [(ngModel)]="selectedCan">
     <option></option>
     <option *ngFor="let can of defaultCans" value="{{can.can}}">{{can.can}} | {{can.canDescrip}}</option>
   </ng-select2>

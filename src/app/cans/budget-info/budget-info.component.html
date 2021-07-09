@@ -29,13 +29,13 @@
         <td>{{source.fundingSourceName}}</td>
         <td>{{ approvedTotal(source.fundingSourceId) | currency }}</td>
         <td>
-          <app-oefia-types></app-oefia-types>
+          <app-oefia-types [index]="i"></app-oefia-types>
         </td>
         <td>
-          <app-projected-can [index]="i" [fseId]="source.fundingSourceId" [oefiaType]="oefiaTypeId[i]"></app-projected-can>
+          <app-projected-can [index]="i" [fseId]="source.fundingSourceId"></app-projected-can>
         </td>
         <td>
-          <app-can-selector [selectedCan]="selectedCan[i]" [nciSourceFlag]="source.nciSourceFlag"></app-can-selector>
+          <app-can-selector [index]="i" [nciSourceFlag]="source.nciSourceFlag"></app-can-selector>
           <div class="d-flex align-items-center">
 
             <button class="btn btn-link btn-slim" title="Copy Projected CAN" (click)="copyProjectedCan(i)">
