@@ -16,6 +16,7 @@ import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequ
 import {CanCcxDto, FundingRequestCanDto} from '@nci-cbiit/i2ecws-lib';
 import {OefiaTypesComponent} from '../oefia-types/oefia-types.component';
 import {CanSelectorComponent} from '../can-selector/can-selector.component';
+import {ProjectedCanComponent} from '../projected-can/projected-can.component';
 
 @Component({
   selector: 'app-budget-info',
@@ -26,13 +27,14 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
 
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
   @ViewChildren(CanSelectorComponent) canSelectors: QueryList<CanSelectorComponent>;
+  @ViewChildren(ProjectedCanComponent) projectedCans: QueryList<ProjectedCanComponent>;
+
   fundingRequestCans: FundingRequestCanDto[];
 
   constructor(private logger: NGXLogger, private canService: CanManagementServiceBus, private model: RequestModel) {
   }
 
   ngOnInit(): void {
-    this.logger.debug('Initialize');
     this.canService.getRequestCans(this.model.requestDto.frqId).subscribe(result => {
       this.setRequestCans(result);
     });
@@ -82,13 +84,42 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   }
 
   nonDefaultCan(i: number): boolean {
+    if (!this.canSelectors || !this.projectedCans) {
+      return false;
+    }
     // this.logger.debug('validate non-default CAN in row', i);
-    return false;
+    const selectedCan: CanCcxDto = this.canSelectors.get(i).selectedCan;
+    const projectedCan: CanCcxDto = this.projectedCans.get(i).projectedCan;
+    if (!projectedCan || !projectedCan.can || !projectedCan.canDescrip) {
+      return false;
+    }
+    if (!selectedCan || !selectedCan.can || !selectedCan.canDescrip) {
+      return false;
+    }
+    return selectedCan.can !== projectedCan.can;
   }
 
   duplicateCan(i: number): boolean {
+    if (!this.canSelectors) {
+      return false;
+    }
+    const cans: string[] = [];
+    const dupes: boolean[] = [false, false, false];
     // this.logger.debug('validate duplicate CAN in row', i);
-    return false;
+    this.canSelectors.forEach((control) => {
+      cans.push(control.selectedCan?.can || '');
+    });
+
+    cans.forEach((c1, i1) => {
+      cans.forEach((c2, i2) => {
+        if (i1 !== i2 && c1 !== '') {
+          if (c1 === c2) {
+            dupes[i] = true;
+          }
+        }
+      });
+    });
+    return dupes[i];
   }
 
   ngAfterViewInit(): void {

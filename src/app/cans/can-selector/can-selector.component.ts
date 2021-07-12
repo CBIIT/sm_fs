@@ -48,7 +48,7 @@ export class CanSelectorComponent implements OnInit {
   }
 
   selectProjectedCan(): boolean {
-    if(this.projectedCan) {
+    if (this.projectedCan && this.projectedCan.can && this.projectedCan.canDescrip) {
       this.selectedCan = this.projectedCan;
       return true;
     }
