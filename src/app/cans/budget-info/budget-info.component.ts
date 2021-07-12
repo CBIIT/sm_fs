@@ -57,11 +57,13 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   // TODO: this needs to come from funding request cans t
   approvedTotal(fundingSourceId: number): number {
     let total = 0;
-    this.fundingRequestCans.forEach(c => {
-      if (c.fseId === fundingSourceId) {
-        total += Number(c.approvedTc);
-      }
-    });
+    if (this.fundingRequestCans) {
+      this.fundingRequestCans.forEach(c => {
+        if (c.fseId === fundingSourceId) {
+          total += Number(c.approvedTc);
+        }
+      });
+    }
     return total;
   }
 
