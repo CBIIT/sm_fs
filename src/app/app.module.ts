@@ -73,6 +73,8 @@ import {ActiveInitialPayValidatorDirective} from './validators/active-initial-pa
 import { OefiaTypesComponent } from './cans/oefia-types/oefia-types.component';
 import { ProjectedCanComponent } from './cans/projected-can/projected-can.component';
 import { CanSelectorComponent } from './cans/can-selector/can-selector.component';
+import { FundableScoreRangeComponent } from './funding-plan/fundable-score-range/fundable-score-range.component';
+import { GrantTableComponent } from './funding-plan/grant-table/grant-table.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
@@ -156,6 +158,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     OefiaTypesComponent,
     ProjectedCanComponent,
     CanSelectorComponent,
+    FundableScoreRangeComponent,
+    GrantTableComponent,
   ],
 
 

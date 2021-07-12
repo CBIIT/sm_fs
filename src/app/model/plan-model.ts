@@ -1,12 +1,19 @@
 import {Injectable} from '@angular/core';
+import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {AppPropertiesService} from '../service/app-properties.service';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class PlanModel {
-  grant: any;
+    grantViewerUrl: string;
+    eGrantsUrl: string;
+    grants: NciPfrGrantQueryDto[] = [];
 
-  constructor() {
-    this.grant = {};
-  }
+
+    constructor(propertiesService: AppPropertiesService) {
+        this.grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
+        this.eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
+
+    }
 }
