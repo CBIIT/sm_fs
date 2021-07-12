@@ -239,9 +239,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   setCansToDto(dto: WorkflowTaskDto, action: WorkflowActionCode): void {
-    // if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE)
-    //     && this.workflowModel.isScientificApprover ) {
+     // TO-do, need to check if cans should be updated for all workflow actions for sci approvers
+     if ( this.workflowModel.isScientificApprover) {
           dto.requestCans = this.approvedCostsComponent.getCans();
-    // }
+     }
   }
 }
