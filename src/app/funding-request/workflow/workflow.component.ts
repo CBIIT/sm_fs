@@ -223,7 +223,10 @@ export class WorkflowComponent implements OnInit, OnDestroy {
           }
     }
     // set approved costs cans if scientific approver;
-    this.setCansToDto(dto, action);
+    if (this.workflowModel.isScientificApprover
+        && this.workflowModel.isApprovalAction(action))  {
+      dto.requestCans = this.approvedCostsComponent.getCans();
+    }
     this.logger.debug('workflow dto for submission is ', dto);
     this.workflowService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
@@ -238,10 +241,4 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     );
   }
 
-  setCansToDto(dto: WorkflowTaskDto, action: WorkflowActionCode): void {
-     // TO-do, need to check if cans should be updated for all workflow actions for sci approvers
-     if ( this.workflowModel.isScientificApprover) {
-          dto.requestCans = this.approvedCostsComponent.getCans();
-     }
-  }
 }
