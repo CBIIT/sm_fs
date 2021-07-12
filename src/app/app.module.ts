@@ -36,7 +36,7 @@ import {AppUserSessionService} from './service/app-user-session.service';
 import {MailtoFormatterPipe} from './pipes/mailto-formatter.pipe';
 import {GrantInformationComponent} from './grant-information/grant-information.component';
 import {ProgramRecommendedCostsComponent} from './program-recommended-costs/program-recommended-costs.component';
-import {RequestInformationComponent} from './request-information/request-information.component';
+import {RequestInformationComponent} from './funding-request/request-information/request-information.component';
 import {RequestInformationReadonlyComponent} from './request-information-readonly/request-information-readonly.component';
 import {RequestHistoryComponent} from './request-history/request-history.component';
 import {NextScheduledApproversRequestReadonlyComponent} from './next-scheduled-approvers-request-readonly/next-scheduled-approvers-request-readonly.component';
@@ -75,6 +75,7 @@ import { ProjectedCanComponent } from './cans/projected-can/projected-can.compon
 import { CanSelectorComponent } from './cans/can-selector/can-selector.component';
 import { FundableScoreRangeComponent } from './funding-plan/fundable-score-range/fundable-score-range.component';
 import { GrantTableComponent } from './funding-plan/grant-table/grant-table.component';
+import {MinMaxValidatorDirective} from './validators/min-max-validator-directive';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
@@ -160,6 +161,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     CanSelectorComponent,
     FundableScoreRangeComponent,
     GrantTableComponent,
+    MinMaxValidatorDirective,
   ],
 
 

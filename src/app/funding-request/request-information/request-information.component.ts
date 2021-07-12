@@ -1,11 +1,11 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {RequestModel} from '../model/request-model';
+import {RequestModel} from '../../model/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {isArray} from 'rxjs/internal-compatibility';
 import {NGXLogger} from 'ngx-logger';
-import {FundingRequestValidationService} from '../model/funding-request-validation-service';
-import {FundingRequestTypes} from '../model/funding-request-types';
-import {Alert} from '../alert-billboard/alert';
+import {FundingRequestValidationService} from '../../model/funding-request-validation-service';
+import {FundingRequestTypes} from '../../model/funding-request-types';
+import {Alert} from '../../alert-billboard/alert';
 import {ControlContainer, NgForm} from '@angular/forms';
 import {CancerActivitiesDropdownComponent} from '@nci-cbiit/i2ecui-lib';
 
