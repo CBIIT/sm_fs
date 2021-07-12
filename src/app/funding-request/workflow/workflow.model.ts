@@ -29,6 +29,10 @@ export class WorkflowModel {
  isScientificApprover = false;
  approvedScientifically = false;
  scientificRoleCodes = ['DOC', 'DD', 'SPL' ];
+ approvalActions = [WorkflowActionCode.APPROVE,
+                    WorkflowActionCode.APPROVE_COMMENT,
+                    WorkflowActionCode.APPROVE_ROUTE];
+
   constructor(
     public requestModel: RequestModel,
     private userSessionService: AppUserSessionService,
@@ -239,6 +243,10 @@ export class WorkflowModel {
     }
 
     return {};
+  }
+
+  isApprovalAction(action: WorkflowActionCode): boolean {
+    return this.approvalActions.indexOf(action) > -1;
   }
 }
 
