@@ -13,7 +13,7 @@
                     <th rowspan="2" scope="col">Funding Source</th>
                     <th colspan="2" scope="col">Program Recommended Costs (1<sup>st</sup>&nbsp;Year)</th>
                     <th rowspan="2" scope="col">Approved Total Cost (1<sup>st</sup>&nbsp;Year)</th>
-                    <th rowspan="2" scope="col">Program Recommended Costs Future Years</th>
+                    <th rowspan="2" scope="col">Program Recommended <br>Costs Future Years</th>
                     <th rowspan="2" scope="col">Approved Future Years</th>
                 </tr>
                 <tr>
@@ -24,9 +24,9 @@
             <tbody>
                 <tr *ngFor=" let can of cans">
                     <td>{{can.fundingSourceName}}</td>
-                    <td>{{can.requestedDc | currency}}</td>
-                    <td>{{can.requestedTc|currency}}</td>
-                    <td>{{can.approvedTc|currency}}</td>
+                    <td>{{can.requestedDc|currency}} ({{can.approvedPctCut}}% cut)</td>
+                    <td>{{can.requestedTc|currency}} ({{can.approvedPctCut}}% cut)</td>
+                    <td>{{can.approvedTc|currency}} ({{can.approvedPctCut}}% cut)</td>
                     <td>{{can.requestedFutureYrs}}</td>
                     <td>
                         <input *ngIf="editable; else readonly" id="apvd-future-years" class="form-control form-control-sm" 
