@@ -76,6 +76,7 @@ import { CanSelectorComponent } from './cans/can-selector/can-selector.component
 import { FundableScoreRangeComponent } from './funding-plan/fundable-score-range/fundable-score-range.component';
 import { GrantTableComponent } from './funding-plan/grant-table/grant-table.component';
 import {MinMaxValidatorDirective} from './validators/min-max-validator-directive';
+import { GmInfoComponent } from './funding-request/workflow/gm-info/gm-info.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
@@ -162,6 +163,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FundableScoreRangeComponent,
     GrantTableComponent,
     MinMaxValidatorDirective,
+    GmInfoComponent,
   ],
 
 
