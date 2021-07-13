@@ -145,24 +145,26 @@ export class WorkflowModel {
         }
       }
 
-      if (this._previousApprovers && this._previousApprovers.length > 0) {
-        for ( const a of this._previousApprovers) {
-          if (this.scientificRoleCodes.indexOf(a.roleCode) > -1 && a.responseCode === 'Y') {
-            this.approvedScientifically = true;
-          }
-          if (a.roleCode === 'GM' && a.responseCode === 'Y') {
-            this.approvedByGM = true;
-          }
+    }
 
-          if (this.approvedByGM && this.approvedScientifically) {
-            break;
-          }
+    if (this._previousApprovers && this._previousApprovers.length > 0) {
+      for ( const a of this._previousApprovers) {
+        if (this.scientificRoleCodes.indexOf(a.roleCode) > -1 && a.responseCode === 'Y') {
+          this.approvedScientifically = true;
+        }
+        if (a.roleCode === 'GM' && a.responseCode === 'Y') {
+          this.approvedByGM = true;
+        }
+
+        if (this.approvedByGM && this.approvedScientifically) {
+          break;
         }
       }
     }
 
     this.resetApproverLists();
     this.requestIntegrationService.approverListChangeEmitter.next();
+    this.logger.debug('WorkflowModel after initialization', this);
   }
 
   resetApproverLists(): void {
