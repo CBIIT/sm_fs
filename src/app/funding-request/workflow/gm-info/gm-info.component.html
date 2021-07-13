@@ -9,12 +9,12 @@
     <div class="col-lg-auto">
         <div class="form-group">
             <span class="like-label" id="action-type-desc">Action Type</span>
-            <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="model" aria-describedby="action-type-desc">
+            <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="gmInfo.actionType" aria-describedby="action-type-desc">
                 <label ngbButtonLabel class="btn-outline-secondary">
-                  <input ngbButton type="radio" value="award">Award
+                  <input ngbButton type="radio" value="AWARD">Award
                 </label>
                 <label ngbButtonLabel class="btn-outline-secondary">
-                  <input ngbButton type="radio" value="revision">Revision
+                  <input ngbButton type="radio" value="REVISION">Revision
                 </label>
             </div>
         </div>
@@ -22,8 +22,12 @@
     <div class="col-lg-4">
         <div class="form-group">
             <label for="specialist">Specialist</label>
-            <input type="text" readonly class="form-control-plaintext" id="specialist" value="Firstname Lastname">
-        </div>
+            <ng-select2
+                id="default-specialist"
+                name="default-specialist"
+                [allowClear]="true"
+                [data] = "defaultSpecList">
+            </ng-select2>        </div>
     </div>
     <div class="col">
         <div class="form-group">
@@ -32,7 +36,7 @@
                 id="backup-specialist"
                 name="backup-specialist"
                 [allowClear]="true"
-                [options]="options">
+                [data] = "bkupSpecList">
             </ng-select2>
         </div>
     </div>
