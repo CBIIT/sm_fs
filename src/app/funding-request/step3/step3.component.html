@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <hr *ngIf="showJustification" class="hr-text" data-content="or" aria-label="or">
+        <hr *ngIf="showJustification || showSuppApplications" class="hr-text" data-content="or" aria-label="or">
 
         <!-- Supplement Application Button -->
         <button type="button" *ngIf="showSuppApplications" class="btn btn-outline-secondary btn-block mt-2"
@@ -118,7 +118,12 @@
                             [cdkDropListData]="lane.array" (cdkDropListDropped)="drop($event)">
 
                             <div class="drag-item" cdkDrag *ngFor="let item of lane.array" tabindex="0">
-                                <span class="doc-name">{{ item.docFilename }}</span>
+                                <span
+                                    *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayFileNameFormat"
+                                    class="doc-name">{{ item.docFilename }}</span>
+                                <ng-template #displayFileNameFormat>
+                                    <span class="doc-name">{{ item.docType + ' ' + item.docFilename }}</span>
+                                </ng-template>
                                 <span
                                     *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayUserName"
                                     class="doc-desc">(Retrieved form
@@ -155,8 +160,15 @@
                         <div id="excludedId" class="drop-well min-height-5" cdkDropList [cdkDropListData]="lane.array"
                             (cdkDropListDropped)="drop($event)">
                             <div class="drag-item" cdkDrag *ngFor='let item of lane.array' tabindex="0">
-                                <span class="doc-name">{{ item.docFilename }}</span>
-                                <span *ngIf="item.docFilename === 'Summary Statement'" class="doc-desc">(Retrieved form
+                                <span
+                                    *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayFileNameFormat"
+                                    class="doc-name">{{ item.docFilename }}</span>
+                                <ng-template #displayFileNameFormat>
+                                    <span class="doc-name">{{ item.docType + ' ' + item.docFilename }}</span>
+                                </ng-template>
+                                <span
+                                    *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'"
+                                    class="doc-desc">(Retrieved form
                                     IMPAC II)</span>
                                 <span *ngIf="item.docFilename !== 'Summary Statement'" class="doc-desc">(Added by <a
                                         href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
@@ -223,7 +235,8 @@
 
                 <tr *ngFor="let item of applAdminSuppRoutingsDtos" tabindex="0">
                     <td>
-                        <a href="javascript: void(0);" class="external-link" (click)="downloadSupplementAppDoc(item.suppApplId)">Application File</a>
+                        <a href="javascript: void(0);" class="external-link"
+                            (click)="downloadSupplementAppDoc(item.suppApplId)">Application File</a>
                     </td>
                     <td>{{item.submittedDate}}</td>
                     <td>{{item.accessionNum}}</td>
