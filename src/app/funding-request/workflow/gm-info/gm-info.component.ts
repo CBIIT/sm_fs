@@ -13,6 +13,7 @@ import { WorkflowModel } from '../workflow.model';
 export class GmInfoComponent implements OnInit {
   @Input() approvingState = false;
 
+  readonly = false;
   options: any = {};
   gmInfo: GmInfoDto = {};
   gmSpecialistMap: Map<number, any> = new Map<number, any>();
@@ -30,36 +31,46 @@ export class GmInfoComponent implements OnInit {
   }
 
   loadData(): void {
-      this.workflowService.getDefaultGmInfoUsingGET(this.requestModel.requestDto.frqId).subscribe(
-      result => {
-        if (result) {
-          this.gmInfo = result;
-          this.logger.debug('getDefaultGmInfoUsingGET returned', result);
-        }
-        else {
-          this.gmInfo = {};
-        }
-        this.gmInfo.frqId = this.requestModel.requestDto.frqId;
-        this.gmInfo.actionType = this.requestModel.requestDto.defaultActionType;
-      },
-      error => {
-        this.logger.error('getDefaultGmInfoUsingGET failed', error);
+      if (this.requestModel.requestDto.actionType) {
+        this.gmInfo.actionType = this.requestModel.requestDto.actionType;
+        this.gmInfo.defaultSpecFullName = this.requestModel.requestDto.pfrSpecFullName;
+        this.gmInfo.bkupSpecNpeId = this.requestModel.requestDto.pfrBkupSpecNpeId;
+        this.gmInfo.bkupSpecFullName = this.requestModel.requestDto.pfrBkupSpecFullName;
+        this.readonly = true;
       }
-    );
-      this.lookupService.getGmActiveSpecialistsUsingGET().subscribe(
-      result => {
-        if (result) {
-          this.logger.debug('getGmActiveSpecialistsUsingGET returned', result);
-          this.bkupSpecList = result.map( (data) => ({id: String(data.specNpeId), text: data.specFullName}));
-          this.defaultSpecList = result.map( (data) => ({id: data.specFullName, text: data.specFullName}));
-        }
-        this.gmInfo.frqId = this.requestModel.requestDto.frqId;
-        this.gmInfo.actionType = this.requestModel.requestDto.defaultActionType;
-      },
-      error => {
-        this.logger.error('getGmActiveSpecialistsUsingGET failed', error);
+      else {
+        this.workflowService.getDefaultGmInfoUsingGET(this.requestModel.requestDto.frqId).subscribe(
+          result => {
+            if (result) {
+              this.gmInfo = result;
+              this.logger.debug('getDefaultGmInfoUsingGET returned', result);
+            }
+            else {
+              this.gmInfo = {};
+            }
+            this.gmInfo.frqId = this.requestModel.requestDto.frqId;
+            this.gmInfo.actionType = this.requestModel.requestDto.defaultActionType;
+          },
+          error => {
+            this.logger.error('getDefaultGmInfoUsingGET failed', error);
+          }
+        );
+
+        this.lookupService.getGmActiveSpecialistsUsingGET().subscribe(
+          result => {
+            if (result) {
+              this.logger.debug('getGmActiveSpecialistsUsingGET returned', result);
+              this.bkupSpecList = result.map( (data) => ({id: String(data.specNpeId), text: data.specFullName}));
+              this.defaultSpecList = result.map( (data) => ({id: data.specFullName, text: data.specFullName}));
+            }
+            this.gmInfo.frqId = this.requestModel.requestDto.frqId;
+            this.gmInfo.actionType = this.requestModel.requestDto.defaultActionType;
+          },
+          error => {
+            this.logger.error('getGmActiveSpecialistsUsingGET failed', error);
+          }
+        );
       }
-    );
   }
 
   getGmInfo(): GmInfoDto {

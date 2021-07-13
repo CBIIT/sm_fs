@@ -9,6 +9,7 @@ import { setSyntheticLeadingComments } from 'typescript';
 import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { ApprovingStatuses, WorkflowAction, WorkflowActionCode, WorkflowModel } from './workflow.model';
+import { GmInfoComponent } from './gm-info/gm-info.component';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -21,6 +22,7 @@ let addedApproverMap = new Map<number, any>();
 export class WorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
   @ViewChild(ApprovedCostsComponent) approvedCostsComponent: ApprovedCostsComponent;
+  @ViewChild(GmInfoComponent) gmInfoComponent: GmInfoComponent;
 
   approverInitializationSubscription: Subscription;
   approverChangeSubscription: Subscription;
@@ -165,6 +167,11 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     (this.workflowModel.isScientificApprover && this.approvingState);
   }
 
+  showGmInfo(): boolean {
+    return this.workflowModel.approvedByGM ||
+    (this.workflowModel.isGMApprover && this.approvingState);
+  }
+
   get selectedWorkflowAction(): WorkflowActionCode {
     return (this._selectedWorkflowAction) ? this._selectedWorkflowAction.action : null;
   }
@@ -227,6 +234,12 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         && this.workflowModel.isApprovalAction(action))  {
       dto.requestCans = this.approvedCostsComponent.getCans();
     }
+
+    if (this.workflowModel.isGMApprover
+      && this.workflowModel.isApprovalAction(action) )  {
+      dto.gmInfo = this.gmInfoComponent.getGmInfo();
+    }
+
     this.logger.debug('workflow dto for submission is ', dto);
     this.workflowService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {

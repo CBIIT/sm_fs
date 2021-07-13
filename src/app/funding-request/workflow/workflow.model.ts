@@ -27,7 +27,9 @@ export class WorkflowModel {
  lastInChain = false;
  hasNewApprover = false;
  isScientificApprover = false;
+ isGMApprover = false;
  approvedScientifically = false;
+ approvedByGM = false;
  scientificRoleCodes = ['DOC', 'DD', 'SPL' ];
  approvalActions = [WorkflowActionCode.APPROVE,
                     WorkflowActionCode.APPROVE_COMMENT,
@@ -88,6 +90,9 @@ export class WorkflowModel {
     this.isUserNextInChain = false;
     this.lastInChain = false;
     this.isScientificApprover = false;
+    this.approvedScientifically = false;
+    this.isGMApprover = false;
+    this.approvedByGM = false;
     this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
       (result) => {
         this.processApproversResult(result);
@@ -134,12 +139,22 @@ export class WorkflowModel {
         if (this.scientificRoleCodes.indexOf(this.nextApproverRoleCode) > -1) {
           this.isScientificApprover = true;
         }
+
+        if (this.nextApproverRoleCode === 'GM') {
+          this.isGMApprover = true;
+        }
       }
 
       if (this._previousApprovers && this._previousApprovers.length > 0) {
         for ( const a of this._previousApprovers) {
-          if (this.scientificRoleCodes.indexOf(a.roleCode) > -1 ) {
+          if (this.scientificRoleCodes.indexOf(a.roleCode) > -1 && a.responseCode === 'Y') {
             this.approvedScientifically = true;
+          }
+          if (a.roleCode === 'GM' && a.responseCode === 'Y') {
+            this.approvedByGM = true;
+          }
+
+          if (this.approvedByGM && this.approvedScientifically) {
             break;
           }
         }

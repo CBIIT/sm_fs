@@ -9,7 +9,10 @@
     <div class="col-lg-auto">
         <div class="form-group">
             <span class="like-label" id="action-type-desc">Action Type</span>
-            <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="gmInfo.actionType" aria-describedby="action-type-desc">
+            <span *ngIf="readonly">{{gmInfo.actionType}}</span>
+            <div class="btn-group btn-group-toggle" *ngIf="!readonly"
+                ngbRadioGroup name="radioBasic" [(ngModel)]="gmInfo.actionType" 
+                aria-describedby="action-type-desc">
                 <label ngbButtonLabel class="btn-outline-secondary">
                   <input ngbButton type="radio" value="AWARD">Award
                 </label>
@@ -22,21 +25,26 @@
     <div class="col-lg-4">
         <div class="form-group">
             <label for="specialist">Specialist</label>
-            <ng-select2
+            <span *ngIf="readonly">{{gmInfo.defaultSpecFullName}}</span>
+            <ng-select2 *ngIf="!readonly"
                 id="default-specialist"
                 name="default-specialist"
                 [allowClear]="true"
-                [data] = "defaultSpecList">
-            </ng-select2>        </div>
+                [data] = "defaultSpecList"
+                [(ngModel)]= "gmInfo.defaultSpecFullName"
+            ></ng-select2>
+        </div>
     </div>
     <div class="col">
         <div class="form-group">
             <label for="backup-specialist">Backup Specialist <span class="optional">(optional)</span></label>
-            <ng-select2
+            <span *ngIf="readonly">{{gmInfo.bkupSpecFullName}}</span>
+            <ng-select2 *ngIf="!readonly"
                 id="backup-specialist"
                 name="backup-specialist"
                 [allowClear]="true"
-                [data] = "bkupSpecList">
+                [data] = "bkupSpecList"
+                [(ngModel)]="gmInfo.bkupSpecNpeId">
             </ng-select2>
         </div>
     </div>
