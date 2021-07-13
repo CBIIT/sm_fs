@@ -1,8 +1,41 @@
-<h3>Select Fundable Score Range</h3>
-<p>Donec dolor dolor, aliquet sit amet auctor vestibulum, vestibulum quis tortor. Pellentesque et massa id est efficitur
-    rutrum maximus sed felis. Duis commodo velit tristique gravida iaculis. Aliquam erat volutpat.</p>
-<h3>Applications Within Fundable Score Range</h3>
-<app-grant-table [grantList]="applicationsWithinRange()"></app-grant-table>
-<h3>Applications Outside Fundable Score Range</h3>
-<app-grant-table [grantList]="applicationsOutsideRange()"></app-grant-table>
+<div class="row">
+    <div class="col-12">
+        <h2>Select Fundable Score Range</h2>
+        <p class="text-muted text-sm">
+            The fundable score range is the range of priority scores for applications being recommended for funding under this funding plan. It begins with the best scored application in this RFA/PA and should end with the priority score that is the "natural" cut-off for funding selections.
+            <a href="javascript:void(0);" data-toggle="collapse" href="#readmore" role="button" aria-expanded="false" aria-controls="readmore">Read More</a>
+        </p>
+        <p class="collapse text-muted text-sm" id="readmore">
+            The range of priority scores for applications being recommended for funding under this funding plan. The fundable range begins with the best scored application in this RFA/PA and should end with the priority score that is the "natural" cut-off for the funding selections. Applications selected outside the recommended fundable range will be marked as "Exceptions". Applications within the recommended score range not selected for funding will be marked as "Skips". Justifications for Exceptions and Skips must be provided in the funding plan. Please note that the funding plan will be rejected if you have not provided justification for each grant application marked as "Exception" or "Skip".
+        </p>
+    </div>
+    <div class="col-12 d-flex align-items-center">
+        <span><strong class="mr-1">30</strong> to</span>
+        <input id="score-max" type="text" class="form-control mx-2" style="width:4rem" aria-label="score range maximum">
+        <button type="button" class="btn btn-primary">Apply</button>
+    </div>
+    <div class="col-12">
+        <hr>
+    </div>
+</div>
 
+<div class="row">
+    <div class="col-12 mb-5">
+        <h2>Applications Within Fundable Score Range</h2>
+        <app-grant-table [grantList]="applicationsWithinRange()"></app-grant-table>
+    </div>
+    <div class="col-12">
+        <h2>Applications Outside Fundable Score Range</h2>
+        <app-grant-table [grantList]="applicationsOutsideRange()"></app-grant-table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <hr>
+    </div>
+    <div class="col-12 d-flex">
+        <button type="button" class="btn btn-outline-secondary mr-auto">Previous</button>
+        <button type="button" class="btn btn-primary">Save and Continue</button>
+    </div>
+</div>

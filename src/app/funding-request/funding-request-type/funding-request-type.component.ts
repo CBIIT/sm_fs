@@ -1,15 +1,15 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FsLookupControllerService} from '@nci-cbiit/i2ecws-lib';
 import 'select2';
-import {SearchFilterService} from '../search/search-filter.service';
+import {SearchFilterService} from '../../search/search-filter.service';
 import {UserService} from '@nci-cbiit/i2ecui-lib';
-import {RequestModel} from '../model/request/request-model';
+import {RequestModel} from '../../model/request/request-model';
 import {openNewWindow} from 'src/app/utils/utils';
 import {NGXLogger} from 'ngx-logger';
 import {Select2OptionData} from 'ng-select2';
 import {FundingRequestTypeRulesDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestTypeRulesDto';
-import {FundingRequestTypes} from '../model/request/funding-request-types';
-import {Alert} from '../alert-billboard/alert';
+import {FundingRequestTypes} from '../../model/request/funding-request-types';
+import {Alert} from '../../alert-billboard/alert';
 import {ControlContainer, NgForm} from '@angular/forms';
 
 

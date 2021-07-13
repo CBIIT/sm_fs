@@ -94,6 +94,7 @@ export class Step2Component implements OnInit {
       }, error => {
         // TODO: properly handle errors here
         this.logger.error('HttpClient get request error during save request ----- ' + error.message);
+        this.logger.error('Request data: ', JSON.stringify(this.model));
         this.requestModel.pendingAlerts.push({
           type: 'danger',
           message: 'Unexpected system error encountered: \'' + error.message + '\'',
