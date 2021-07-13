@@ -54,14 +54,17 @@
   <div class="col-md-6 col-lg-2">
     <div class="form-group">
       <p class="like-label">Requesting PD</p>
-      <p [innerHTML]="model.requestDto|mailtoFormatter:'requestorPdFullName':'pdEmailAddress':'PI/PD name':'fullGrantNum': 'lastName'"></p>
+      <p
+        [innerHTML]="model.requestDto|mailtoFormatter:'requestorPdFullName':'pdEmailAddress':'PI/PD name':'fullGrantNum': 'lastName'"></p>
     </div>
   </div>
 
   <div class="col-md-6 col-lg-4">
     <div class="form-group">
       <p class="like-label">Requesting PD's Cancer Activity</p>
-      <p><a [routerLink]="" ngbTooltip="{{model.requestDto.financialInfoDto.requestorCayCode|codeDescription:'CancerActivities'}}" triggers="click:blur" placement="top">{{model.requestDto.financialInfoDto.requestorCayCode}}</a></p>
+      <p><a [routerLink]=""
+            ngbTooltip="{{model.requestDto.financialInfoDto.requestorCayCode|codeDescription:'CancerActivities'}}"
+            triggers="click:blur" placement="top">{{model.requestDto.financialInfoDto.requestorCayCode}}</a></p>
     </div>
   </div>
 
@@ -69,13 +72,13 @@
     <app-program-recommended-costs [readOnlyView]="true"></app-program-recommended-costs>
   </div>
 
-    <div class="col-12" *ngIf=(model.requestDto.comments)>
-      <ngb-alert [dismissible]="false" class="workflow-comments">
-          <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
-          <div class="comment-content">
-              <div class="comment-details">{{ model.requestDto.comments }}</div>
-          </div>
-      </ngb-alert>
-    </div>
+  <div class="col-12" *ngIf=(model.requestDto.comments)>
+    <ngb-alert type="primary" [dismissible]="false" class="workflow-comments">
+      <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
+      <div class="comment-content">
+        <div class="comment-details">{{ model.requestDto.comments }}</div>
+      </div>
+    </ngb-alert>
+  </div>
 
 </div>

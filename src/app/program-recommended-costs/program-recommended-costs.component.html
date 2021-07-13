@@ -5,11 +5,11 @@
 -->
 <ng-template #readonly>
   <div class="row">
-    
+
     <div class="col-12">
       <h2>Program Recommended Costs</h2>
     </div>
-    
+
     <div class="col-12">
       <div class="table-responsive">
         <table class="table table-striped prc-table mb-0">
@@ -74,7 +74,7 @@
                   <div *ngIf="!first">---</div>
                 </ng-template>
               </ng-template>
-              
+
               <ng-template #not_restoration>
                 <span *ngIf="!initialPay; then a else b"></span>
                 <ng-template #a>
@@ -117,7 +117,7 @@
                 </ng-template>
               </ng-template>
             </td>
-          
+
           </tr>
           <tr *ngIf="selectedFundingSources.length > 1">
             <td></td>
@@ -141,29 +141,32 @@
       </div>
     </div>
   </div>
+
+
 </ng-template>
 <!--
   Main editable table on Step 2
 -->
 <ng-template #edit>
-  
+
   <hr>
-  
+
   <div class="row">
-    
+
     <div class="col-12">
       <h2>Program Recommended Costs</h2>
       <div *ngIf="!isSkipRequest()">
-        <p>Please note that the Standard Policy Reduction should be taken into
-          consideration when determining the recommended dollar amounts for the request. If you would like to include
-          a
-          waiver to the Standard Policy Reduction, please provide it as part of the justification. The current fiscal
-          year's policy reductions can be viewed on the <a
-            href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information" target="_blank"
-            class="external-link">OEFIA web site</a>.</p>
+        <p>
+          Please note that the Standard Policy Reduction should be taken into consideration when determining the
+          recommended dollar amounts for the request. If you would like to include a waiver to the Standard Policy
+          Reduction, please provide it as part of the justification. The current fiscal year's policy reductions can be
+          viewed on the
+          <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information" target="_blank"
+             class="external-link">OEFIA web site</a>.
+        </p>
       </div>
     </div>
-    
+
     <div class="col-12">
       <div class="table-responsive">
         <table class="table table-striped prc-table mb-0">
@@ -233,7 +236,7 @@
                   <ng-template #not>
                     <div class="col-6">{{li.recommendedDirect | currency}}</div>
                   </ng-template>
-                
+
                 </div>
               </ng-template>
               <ng-container *ngIf="!initialPay; then c else d"></ng-container>
@@ -254,11 +257,11 @@
                     ({{ li.percentCutTotalCalculated | percent:'1.1-3' }} Cut)
                   </div>
                 </div>
-              
+
               </ng-template>
-            
+
             </td>
-          
+
           </tr>
           <tr *ngIf="selectedFundingSources.length > 1">
             <td><span class="like-label">Recommended Costs</span></td>
@@ -277,11 +280,11 @@
               </div>
             </td>
           </tr>
-          
+
           </tbody>
         </table>
       </div>
-      
+
       <button type="button" class="btn btn-primary mt-2 mb-3" data-toggle="modal" data-target="#add-fsource-modal"
               (click)="prepareLineItem()"
               *ngIf="selectedFundingSources.length < 3; else blankSpace">
@@ -291,11 +294,11 @@
         <br/>
         <br/>
       </ng-template>
-    
+
     </div>
   </div>
-  
-  
+
+
   <form #prcForm="ngForm" (ngSubmit)="onSubmit()" appFundingSourceCostValidator>
     <div class="modal fade" id="add-fsource-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
@@ -309,7 +312,7 @@
             </button>
           </div>
           <div class="modal-body">
-            
+
             <div class="row">
               <div class="col-lg-6">
                 <div class="form-group">
@@ -317,7 +320,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="table-responsive">
               <table class="table prc-table mb-0">
                 <thead>
@@ -416,7 +419,7 @@
                 <tr *ngIf="isRestoration()">
                   <td></td>
                   <td *ngFor="let li of lineItem; let i = index; let first = first; let last = last" scope="col">
-                    
+
                     <div class="fsource-fy1-form mb-2" *ngIf="last; else notLast">
                       <div class="form-row form-inline">
                         <div class="col left-label">
@@ -452,7 +455,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="fsource-fy1-form" *ngIf="last">
                       <div class="form-row form-inline">
                         <div class="col left-label">
@@ -494,7 +497,7 @@
                       </div>
                     </div>
                     <ng-template #notLast>---</ng-template>
-                  
+
                   </td>
                 </tr>
                 <tr *ngIf="showDollar && !isRestoration()">
@@ -519,7 +522,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="fsource-fy1-form mb-2" *ngIf="first;">
                       <div class="form-row form-inline">
                         <div class="col left-label">
@@ -558,7 +561,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="fsource-fy1-form" *ngIf="first">
                       <div class="form-row form-inline">
                         <div class="col left-label">
@@ -638,11 +641,11 @@
                         Enter numeric value
                       </div>
                     </ng-template>
-                  
+
                   </td>
-                
+
                 </tr>
-                
+
                 <tr *ngIf="showPercent && !isRestoration()">
                   <td></td>
                   <td *ngFor="let li of lineItem; let i = index; let first = first; let last = last">
@@ -664,7 +667,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="fsource-fy1-form mb-2" *ngIf="first">
                       <div class="form-row form-inline">
                         <div class="col left-label"></div>
@@ -695,7 +698,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="fsource-fy1-form mb-2" *ngIf="first && li.recommendedDirect != null">
                       <div class="form-row form-inline">
                         <div class="col left-label">
@@ -706,7 +709,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="fsource-fy1-form" *ngIf="first && li.recommendedTotal != null">
                       <div class="form-row form-inline">
                         <div class="col left-label">
@@ -757,8 +760,8 @@
                 </tbody>
               </table>
             </div>
-          
-          
+
+
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary mr-auto" data-dismiss="modal"
