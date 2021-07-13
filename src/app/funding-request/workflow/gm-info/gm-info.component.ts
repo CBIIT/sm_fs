@@ -50,8 +50,8 @@ export class GmInfoComponent implements OnInit {
       result => {
         if (result) {
           this.logger.debug('getGmActiveSpecialistsUsingGET returned', result);
-          this.bkupSpecList = result.map( (data) => ({id: data.specNpeId, text: data.specFullName}));
-          this.defaultSpecList = result.map( (data) => (data.specFullName));
+          this.bkupSpecList = result.map( (data) => ({id: data.specNpeId as string, text: data.specFullName}));
+          this.defaultSpecList = result.map( (data) => ({id: data.specFullName, text: data.specFullName}));
         }
         this.gmInfo.frqId = this.requestModel.requestDto.frqId;
         this.gmInfo.actionType = this.requestModel.requestDto.defaultActionType;
