@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { RequestModel } from '../../model/request-model';
+import { RequestModel } from '../../model/request/request-model';
 import { AppPropertiesService } from '../../service/app-properties.service';
 import {
   FsRequestControllerService, FundingReqStatusHistoryDto,

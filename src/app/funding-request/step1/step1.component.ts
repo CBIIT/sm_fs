@@ -4,7 +4,7 @@ import {FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto
 import {Subject} from 'rxjs';
 import {AppPropertiesService} from 'src/app/service/app-properties.service';
 import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.service';
-import {RequestModel} from '../../model/request-model';
+import {RequestModel} from '../../model/request/request-model';
 import {AppUserSessionService} from 'src/app/service/app-user-session.service';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
 import { LoaderService } from 'src/app/service/loader-spinner.service';

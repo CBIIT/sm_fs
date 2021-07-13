@@ -1,5 +1,5 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {RequestModel} from '../model/request-model';
+import {RequestModel} from '../model/request/request-model';
 import {AppPropertiesService} from '../service/app-properties.service';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {NGXLogger} from 'ngx-logger';
@@ -9,7 +9,7 @@ import {
   INITIAL_PAY_TYPES,
   PRC_AWARDED_DIRECT_TOTAL_DISPLAY_TYPES,
   PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES
-} from '../model/funding-request-types';
+} from '../model/request/funding-request-types';
 import {FundingSourceSynchronizerService} from '../funding-source/funding-source-synchronizer-service';
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point';

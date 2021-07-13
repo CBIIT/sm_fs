@@ -8,7 +8,7 @@ import {
   ApplAdminSuppRoutingsDto, FundingRequestTypesDto, UserControllerService, FundingRequestDtoReq
 } from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
-import { RequestModel } from '../../model/request-model';
+import { RequestModel } from '../../model/request/request-model';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { saveAs } from 'file-saver';
 import { of, Observable } from 'rxjs';

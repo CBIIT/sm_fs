@@ -1,7 +1,7 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
-import {RequestModel} from '../model/request-model';
+import {RequestModel} from '../model/request/request-model';
 import {SearchFilterService} from '../search/search-filter.service';
 import {GrantsSearchFilterService} from './grants-search/grants-search-filter.service';
 

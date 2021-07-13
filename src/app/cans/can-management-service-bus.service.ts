@@ -7,7 +7,7 @@ import {
   FundingRequestGrantCanDto,
   OefiaCodingDto
 } from '@nci-cbiit/i2ecws-lib';
-import {RequestModel} from '../model/request-model';
+import {RequestModel} from '../model/request/request-model';
 import {Observable, Subject} from 'rxjs';
 
 @Injectable({

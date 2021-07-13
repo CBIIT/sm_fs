@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RequestModel } from '../model/request-model';
+import { RequestModel } from '../model/request/request-model';
 import { FsLookupControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { FundingRequestIntegrationService } from '../funding-request/integration/integration.service';
 import { Subscription } from 'rxjs';

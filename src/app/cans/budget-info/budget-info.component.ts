@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
 import {CanManagementServiceBus} from '../can-management-service-bus.service';
-import {RequestModel} from '../../model/request-model';
+import {RequestModel} from '../../model/request/request-model';
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import {CanCcxDto, FundingRequestCanDto} from '@nci-cbiit/i2ecws-lib';
 import {OefiaTypesComponent} from '../oefia-types/oefia-types.component';

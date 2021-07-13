@@ -5,14 +5,14 @@ import {
   FundingRequestDtoReq,
   NciPfrGrantQueryDto
 } from '@nci-cbiit/i2ecws-lib';
-import {AppPropertiesService} from '../service/app-properties.service';
+import {AppPropertiesService} from '../../service/app-properties.service';
 import {FundingRequestErrorCodes} from './funding-request-error-codes';
 import {NGXLogger} from 'ngx-logger';
-import {ProgramRecommendedCostsModel} from '../program-recommended-costs/program-recommended-costs-model';
+import {ProgramRecommendedCostsModel} from '../../program-recommended-costs/program-recommended-costs-model';
 import {FundingSourceTypes} from './funding-source-types';
 import {FundingRequestTypes} from './funding-request-types';
-import {Alert} from '../alert-billboard/alert';
-import {PrcDataPoint} from '../program-recommended-costs/prc-data-point';
+import {Alert} from '../../alert-billboard/alert';
+import {PrcDataPoint} from '../../program-recommended-costs/prc-data-point';
 import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 
 @Injectable({

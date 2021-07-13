@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { RequestModel } from '../model/request-model';
+import { RequestModel } from '../model/request/request-model';
 import { Options } from 'select2';
 import { AppUserSessionService } from '../service/app-user-session.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';

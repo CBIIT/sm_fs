@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FsWorkflowControllerService } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
-import { RequestModel } from 'src/app/model/request-model';
+import { RequestModel } from 'src/app/model/request/request-model';
 
 @Injectable({
   providedIn: 'root'

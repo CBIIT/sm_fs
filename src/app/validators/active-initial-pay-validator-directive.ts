@@ -1,7 +1,7 @@
 import {Directive} from '@angular/core';
 import {AbstractControl, AsyncValidator, NG_ASYNC_VALIDATORS, ValidationErrors, Validator} from '@angular/forms';
 import {FsRequestControllerService} from '@nci-cbiit/i2ecws-lib';
-import {RequestModel} from '../model/request-model';
+import {RequestModel} from '../model/request/request-model';
 import {Observable} from 'rxjs';
 import {NGXLogger} from 'ngx-logger';
 

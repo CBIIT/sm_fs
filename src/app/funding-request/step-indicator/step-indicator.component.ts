@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import { RequestModel } from 'src/app/model/request-model';
+import { RequestModel } from 'src/app/model/request/request-model';
 
 @Component({
   selector: 'app-step-indicator',

@@ -1,14 +1,14 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
-import {RequestModel} from '../../model/request-model';
+import {RequestModel} from '../../model/request/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../../service/app-properties.service';
 import {NGXLogger} from 'ngx-logger';
-import {FundingRequestTypes} from '../../model/funding-request-types';
+import {FundingRequestTypes} from '../../model/request/funding-request-types';
 import {ProgramRecommendedCostsComponent} from '../../program-recommended-costs/program-recommended-costs.component';
 import {Alert} from '../../alert-billboard/alert';
 import {NgForm} from '@angular/forms';
-import {FundingSourceTypes} from '../../model/funding-source-types';
+import {FundingSourceTypes} from '../../model/request/funding-source-types';
 import SubmitEvent = JQuery.SubmitEvent;
 import { RequestApproverService } from '../approver/approver.service';
 

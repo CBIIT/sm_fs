@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {RequestModel} from '../model/request-model';
+import {RequestModel} from '../model/request/request-model';
 import {ControlContainer, NgForm} from '@angular/forms';
 
 @Component({

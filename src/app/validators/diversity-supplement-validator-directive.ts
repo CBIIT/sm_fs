@@ -1,6 +1,6 @@
 import {Directive} from '@angular/core';
 import {AbstractControl, NG_VALIDATORS, ValidationErrors, Validator} from '@angular/forms';
-import {FundingRequestTypes} from '../model/funding-request-types';
+import {FundingRequestTypes} from '../model/request/funding-request-types';
 import {isArray} from 'rxjs/internal-compatibility';
 
 @Directive({

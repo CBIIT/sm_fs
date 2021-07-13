@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { of, Observable } from 'rxjs';
 import { DocumentsDto } from '@nci-cbiit/i2ecws-lib';
-import { RequestModel } from '../model/request-model';
+import { RequestModel } from '../model/request/request-model';
 import { DocumentService } from '../service/document.service';
 import { HttpResponse } from '@angular/common/http';
 import { saveAs } from 'file-saver';

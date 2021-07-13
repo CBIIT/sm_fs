@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FsCanControllerService, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
-import { RequestModel } from 'src/app/model/request-model';
+import { RequestModel } from 'src/app/model/request/request-model';
 import { WorkflowModel } from '../workflow.model';
 
 @Component({

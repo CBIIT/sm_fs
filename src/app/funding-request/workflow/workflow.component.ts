@@ -3,7 +3,7 @@ import { FsWorkflowControllerService, FundingReqStatusHistoryDto, WorkflowTaskDt
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { Options } from 'select2';
-import { RequestModel } from 'src/app/model/request-model';
+import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { setSyntheticLeadingComments } from 'typescript';
 import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';

@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
-import {PlanModel} from '../../model/plan-model';
+import {PlanModel} from '../../model/plan/plan-model';
 import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 
 @Component({

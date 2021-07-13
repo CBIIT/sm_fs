@@ -3,7 +3,7 @@ import { FsWorkflowControllerService, WorkflowTaskDto } from '@nci-cbiit/i2ecws-
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
-import { RequestModel } from 'src/app/model/request-model';
+import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { WorkflowActionCode } from '../workflow/workflow.model';
 

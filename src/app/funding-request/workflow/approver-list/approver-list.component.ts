@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular
 import { Options } from 'select2';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { NGXLogger } from 'ngx-logger';
-import { RequestModel } from 'src/app/model/request-model';
+import { RequestModel } from 'src/app/model/request/request-model';
 import { WorkflowModel } from '../workflow.model';
 import { FundingRequestIntegrationService } from '../../integration/integration.service';
 import { Subscription } from 'rxjs';

@@ -30,8 +30,8 @@ import {DataTablesModule} from 'angular-datatables';
 import {FormatNcabDatePipe} from './pipes/format-ncab-date.pipe';
 import {AppLookupsService} from './service/app-lookups.service';
 import {CodeDescriptionPipe} from './pipes/code-description.pipe';
-import {RequestModel} from './model/request-model';
-import {PlanModel} from './model/plan-model';
+import {RequestModel} from './model/request/request-model';
+import {PlanModel} from './model/plan/plan-model';
 import {AppUserSessionService} from './service/app-user-session.service';
 import {MailtoFormatterPipe} from './pipes/mailto-formatter.pipe';
 import {GrantInformationComponent} from './grant-information/grant-information.component';
@@ -77,6 +77,12 @@ import { FundableScoreRangeComponent } from './funding-plan/fundable-score-range
 import { GrantTableComponent } from './funding-plan/grant-table/grant-table.component';
 import {MinMaxValidatorDirective} from './validators/min-max-validator-directive';
 import { GmInfoComponent } from './funding-request/workflow/gm-info/gm-info.component';
+import { PlanStep1Component } from './funding-plan/plan-step1/plan-step1.component';
+import { PlanStep2Component } from './funding-plan/plan-step2/plan-step2.component';
+import { PlanStep3Component } from './funding-plan/plan-step3/plan-step3.component';
+import { PlanStep4Component } from './funding-plan/plan-step4/plan-step4.component';
+import { PlanStep5Component } from './funding-plan/plan-step5/plan-step5.component';
+import { PlanStep6Component } from './funding-plan/plan-step6/plan-step6.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
@@ -164,6 +170,12 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     GrantTableComponent,
     MinMaxValidatorDirective,
     GmInfoComponent,
+    PlanStep1Component,
+    PlanStep2Component,
+    PlanStep3Component,
+    PlanStep4Component,
+    PlanStep5Component,
+    PlanStep6Component,
   ],
 
 

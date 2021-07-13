@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../../service/app-properties.service';
-import {PlanModel} from '../../model/plan-model';
+import {PlanModel} from '../../model/plan/plan-model';
 
 @Component({
     selector: 'app-grant-table',

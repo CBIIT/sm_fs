@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {RequestModel} from '../model/request-model';
+import {RequestModel} from '../model/request/request-model';
 import {NGXLogger} from 'ngx-logger';
 import {ControlContainer, NgForm} from '@angular/forms';
 

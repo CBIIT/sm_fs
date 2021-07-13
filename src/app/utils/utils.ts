@@ -1,4 +1,4 @@
-import {FundingSourceTypes} from '../model/funding-source-types';
+import {FundingSourceTypes} from '../model/request/funding-source-types';
 
 export function getCurrentFiscalYear(): number {
   const today = new Date();

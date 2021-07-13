@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {RequestModel} from '../model/request-model';
+import {RequestModel} from '../model/request/request-model';
 import {Router} from '@angular/router';
 import {FsRequestControllerService} from '@nci-cbiit/i2ecws-lib';
 import {Options} from 'select2';
