@@ -115,6 +115,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
 
       if (!item.endDate) {
         this.requestStatus = item.statusCode;
+        this.requestModel.requestDto.requestStatusName = item.statusDescrip + ' by ' + item.performedBy;
       }
 
     });
