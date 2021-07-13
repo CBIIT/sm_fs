@@ -535,7 +535,10 @@ export class Step3Component implements OnInit {
       this.showJustification = false;
     }
     if (event === 'Supplement Application') {
-      this.showSuppApplications = true;
+      if (this.applAdminSuppRoutingsDtos.length > 0) {
+        this.showSuppApplications = true;
+      }
+      
     } else {
       this.showSuppApplications = false;
     }
