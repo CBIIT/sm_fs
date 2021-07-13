@@ -11,7 +11,7 @@
 <div class="row collapse show" id="workflow-collapse">
 
     <div class="col-12" *ngIf="requestStatus && requestStatus.comments">
-        <ngb-alert [dismissible]="false" class="workflow-comments">
+        <ngb-alert type="primary" [dismissible]="false" class="workflow-comments">
             <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
             <div class="comment-content">
                 <div class="comment-details">Comment from <strong>{{requestStatus.performedBy}}</strong> on {{requestStatus.startDate}}</div>
