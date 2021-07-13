@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FsLookupControllerService, FsWorkflowControllerService, GmInfoDto } from '@nci-cbiit/i2ecws-lib';
+import { Select2OptionData } from 'ng-select2';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { WorkflowModel } from '../workflow.model';
@@ -15,8 +16,8 @@ export class GmInfoComponent implements OnInit {
   options: any = {};
   gmInfo: GmInfoDto = {};
   gmSpecialistMap: Map<number, any> = new Map<number, any>();
-  bkupSpecList: {id: string, text: string}[];
-  defaultSpecList: string[];
+  bkupSpecList: Select2OptionData[];
+  defaultSpecList: Select2OptionData[];
 
   constructor(private workflowService: FsWorkflowControllerService,
               private requestModel: RequestModel,
