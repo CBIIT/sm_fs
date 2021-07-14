@@ -163,8 +163,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   showApprovedCosts(): boolean {
-    return this.workflowModel.approvedScientifically ||
-    (this.workflowModel.isScientificApprover && this.approvingState);
+    return !this.requestModel.isSkip() && (this.workflowModel.approvedScientifically ||
+           (this.workflowModel.isScientificApprover && this.approvingState));
   }
 
   showGmInfo(): boolean {
