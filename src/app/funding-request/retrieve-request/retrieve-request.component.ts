@@ -62,6 +62,7 @@ export class RetrieveRequestComponent implements OnInit {
             this.requestModel.restoreLineItems();
           });
 
+          this.requestModel.requestDto.financialInfoDto.fundingRequestId = this.requestModel.requestDto.frqId;
 
           this.router.navigate(['/request/review']);
           // if (this.userSessionService.getEnvironment() === 'development') {

@@ -735,7 +735,7 @@ export class Step3Component implements OnInit {
   prevStep(): void {
     this.requestModel.clearAlerts();
     // if (!this.requestModel.programRecommendedCostsModel.prcLineItems) {
-    this.fsRequestControllerService.getRequestBudgetsUsingGET(this.requestModel.requestDto.financialInfoDto.fundingRequestId).subscribe(
+    this.fsRequestControllerService.getRequestBudgetsUsingGET(this.requestModel.requestDto.frqId).subscribe(
       result => {
         this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos = result;
         this.requestModel.restoreLineItemIds();
