@@ -117,7 +117,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
       },
 
       columns: [
-        {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, render: () => '', className: 'all'},
+        {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'},
         {title: 'PI', data: 'piFullName', render: ( data, type, row, meta ) => {
             return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }, className: 'all'},
@@ -129,7 +129,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
             return '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }},
-        {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, render: () => '', className: 'all'},
+        {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'},
         {title: 'FY', data: 'fy'},
         {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', render: ( data, type, row, meta) => {
             return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
@@ -138,9 +138,9 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         {title: 'PriScr', data: 'priorityScoreNum'},
         {title: 'Budjet Start Date', data: 'budgetStartDate'},
         {title: 'Existing Requests', data: 'requestCount',
-         ngTemplateRef: { ref: this.existingRequestsRenderer}, render: () => '', className: 'all'},
+         ngTemplateRef: { ref: this.existingRequestsRenderer}, className: 'all'},
         {title: 'Action', data: null,  defaultContent: 'Select',
-         ngTemplateRef: { ref: this.fundingRequestActionRenderer}, render: () => '', className: 'all'},
+         ngTemplateRef: { ref: this.fundingRequestActionRenderer}, className: 'all'},
         {data: null, defaultContent: ''}
       ],
       // columnDefs: [ { orderable: false, targets: -1 }],.
@@ -195,8 +195,20 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
           header: true,
           exportOptions: { columns: [ 0, 1, 2, 3, 4 , 5 , 6, 7, 8, 9, 10, 11, 12 ] }
         }
-      ]
-      // },
+      ],
+      rowCallback: (row: Node, data: any[] | object, index: number) => {
+        // Fix for Excel output - I removed empty renderers in column definitions
+        // But now, I have to remove the first "text" child node to prevent it
+        // from rendering (angular datatables bug)
+        this.dtOptions.columns.forEach((column, ind) => {
+          if (column.ngTemplateRef) {
+            const cell = row.childNodes.item(ind);
+            if (cell.childNodes.length > 1) { // you have to leave at least one child node
+              $(cell.childNodes.item(0)).remove();
+            }
+          }
+        });
+      }      // },
     };
 
     this.search();

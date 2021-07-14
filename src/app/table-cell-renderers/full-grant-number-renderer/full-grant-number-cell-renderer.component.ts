@@ -10,7 +10,6 @@ export class FullGrantNumberCellRendererComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    // console.debug("THIS IS DATA", this.data.vasya.petya);
   }
 
   @Input()
