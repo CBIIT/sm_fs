@@ -1,8 +1,8 @@
-import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
-import {CanManagementServiceBus} from '../can-management-service-bus.service';
-import {RequestModel} from '../../model/request/request-model';
-import {NGXLogger} from 'ngx-logger';
-import {CanCcxDto} from '@nci-cbiit/i2ecws-lib';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { CanManagementServiceBus } from '../can-management-service-bus.service';
+import { RequestModel } from '../../model/request/request-model';
+import { NGXLogger } from 'ngx-logger';
+import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-can-selector',
@@ -13,6 +13,7 @@ export class CanSelectorComponent implements OnInit {
   _selectedCan: CanCcxDto;
   defaultCans: CanCcxDto[];
   projectedCan: CanCcxDto;
+  canMap: Map<string, CanCcxDto>;
 
   @Input() index = 0;
 
@@ -25,10 +26,14 @@ export class CanSelectorComponent implements OnInit {
 
   @Output() selectedValueChange = new EventEmitter<CanCcxDto>();
 
+  setSelectedCan(can: string): void {
+    this.selectedCan = this.canMap.get(can);
+  }
+
   set selectedCan(value: CanCcxDto) {
     this._selectedCan = value;
     this.selectedValueChange.emit(value);
-    this.canService.selectedCanEmitter.next({index: this.index, can: value});
+    this.canService.selectedCanEmitter.next({ index: this.index, can: value });
   }
 
   constructor(private canService: CanManagementServiceBus,
@@ -39,6 +44,7 @@ export class CanSelectorComponent implements OnInit {
   ngOnInit(): void {
     this.canService.getCans(this.nciSourceFlag).subscribe(result => {
       this.defaultCans = result;
+      this.canMap = new Map(result.map(c => [c.can, c]));
     });
     this.canService.projectedCanEmitter.subscribe(next => {
       if (Number(next.index) === Number(this.index)) {

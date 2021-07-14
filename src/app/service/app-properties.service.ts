@@ -23,11 +23,11 @@ export class AppPropertiesService {
 
   initialize(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this.logger.debug('AppPropertiesService initialize Starts, appName: ' + this.appName);
+      // this.logger.debug('AppPropertiesService initialize Starts, appName: ' + this.appName);
       this.lookupService.getAppPropertiesByAppNameUsingGET(this.appName).subscribe(
         (result) => {
           result.forEach((element) => {
-            this.logger.debug('App_Properties_T name/value: ' + element.propKey + '/' + element.propValue);
+            // this.logger.debug('App_Properties_T name/value: ' + element.propKey + '/' + element.propValue);
             this.appProperties[element.propKey] = element.propValue;
           });
           resolve();

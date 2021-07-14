@@ -38,7 +38,7 @@ export class SearchResultComponent implements OnInit {
 
         this.fsSearchControllerService.searchFundingRequestsUsingPOST(Object.assign(dataTablesParameters, this.userData)).subscribe(
           result => {
-            this.logger.debug('Search Funding Requests result: ', result);
+            // this.logger.debug('Search Funding Requests result: ', result);
             this.fundingRequests = result.data;
             callback({
               recordsTotal: result.recordsTotal,
@@ -55,7 +55,7 @@ export class SearchResultComponent implements OnInit {
 
   }
 
-  doSearch(criteria: FundSelectSearchCriteriaRes) {
+  doSearch(criteria: FundSelectSearchCriteriaRes): void {
     this.userData = { fyFrom: criteria.fyFrom };
   }
 }

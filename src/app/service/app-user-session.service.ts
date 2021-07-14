@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
-import {UserService} from '@nci-cbiit/i2ecui-lib';
-import {CancerActivityControllerService, NciPerson} from '@nci-cbiit/i2ecws-lib';
-import {NGXLogger} from 'ngx-logger';
+import { Injectable } from '@angular/core';
+import { UserService } from '@nci-cbiit/i2ecui-lib';
+import { CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,7 @@ export class AppUserSessionService {
     return new Promise<void>((resolve, reject) => {
       this.userService.getSecurityCredentials().subscribe(
         (result) => {
-          this.logger.debug('UserService.getSecurityCrentials: ', result);
+          // this.logger.debug('UserService.getSecurityCrentials: ', result);
           this.loggedOnUser = result.nciPerson;
           this.environment = result.environment;
           this.roles = [];
@@ -32,7 +32,7 @@ export class AppUserSessionService {
           });
           this.caService.getCasForPdUsingGET(this.loggedOnUser.npnId, true).subscribe(
             (caresult) => {
-              this.logger.debug('User assigned cancer activities: ', caresult);
+              // this.logger.debug('User assigned cancer activities: ', caresult);
               this.userCancerActivities = caresult;
               resolve();
             },

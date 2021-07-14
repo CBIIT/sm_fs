@@ -17,12 +17,12 @@ import {AppUserSessionService} from 'src/app/service/app-user-session.service';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
 import { LoaderService } from 'src/app/service/loader-spinner.service';
 import { NGXLogger } from 'ngx-logger';
-import {FullGrantNumberCellRendererComponent} from "../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component";
-import {DataTableDirective} from "angular-datatables";
-import {AppLookupsService} from "../../service/app-lookups.service";
-import {ExistingRequestsCellRendererComponent} from "./existing-requests-cell-renderer/existing-requests-cell-renderer.component";
-import {FundingRequestActionCellRendererComponent} from "./funding-request-action-cell-renderer/funding-request-action-cell-renderer.component";
-import {CancerActivityCellRendererComponent} from "../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component";
+import {FullGrantNumberCellRendererComponent} from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+import {DataTableDirective} from 'angular-datatables';
+import {AppLookupsService} from '../../service/app-lookups.service';
+import {ExistingRequestsCellRendererComponent} from './existing-requests-cell-renderer/existing-requests-cell-renderer.component';
+import {FundingRequestActionCellRendererComponent} from './funding-request-action-cell-renderer/funding-request-action-cell-renderer.component';
+import {CancerActivityCellRendererComponent} from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
 
 @Component({
   selector: 'app-step1',
@@ -120,26 +120,26 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
       },
 
       columns: [
-        {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, render: () => "", className: "all"},
-        {title: 'PI', data: 'piFullName',render: ( data, type, row, meta ) => {
+        {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, render: () => '', className: 'all'},
+        {title: 'PI', data: 'piFullName', render: ( data, type, row, meta ) => {
             return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-          }, className: "all"},
+          }, className: 'all'},
         {title: 'Project Title', data: 'projectTitle'},
         {title: 'RFA/PA', data: 'rfaPaNumber'},
         {title: 'I2 Status', data: 'applStatusGroupDescrip'},
         {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
             return '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }},
-        {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, render: () => "", className: "all"},
+        {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, render: () => '', className: 'all'},
         {title: 'FY', data: 'fy'},
         {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', render: ( data, type, row, meta) => {
-            return (data) ? data.substr(4,2)+'/'+data.substr(0,4) : '';
+            return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
           }},
         {title: 'Pctl', data: 'irgPercentileNum'},
         {title: 'PriScr', data: 'priorityScoreNum'},
         {title: 'Budjet Start Date', data: 'budgetStartDate'},
-        {title: 'Existing Requests', data: 'requestCount', ngTemplateRef: { ref: this.existingRequestsRenderer}, render: () => "", className: "all"},
-        {title: 'Action', data: null,  defaultContent: 'Select', ngTemplateRef: { ref: this.fundingRequestActionRenderer}, render: () => "", className: "all"},
+        {title: 'Existing Requests', data: 'requestCount', ngTemplateRef: { ref: this.existingRequestsRenderer}, render: () => '', className: 'all'},
+        {title: 'Action', data: null,  defaultContent: 'Select', ngTemplateRef: { ref: this.fundingRequestActionRenderer}, render: () => '', className: 'all'},
         {data: null, defaultContent: ''}
       ],
       // columnDefs: [ { orderable: false, targets: -1 }],.
@@ -166,7 +166,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         {responsivePriority: 7, targets: 6 }, // ca
         {responsivePriority: 8, targets: 9 }, // pctl
         {responsivePriority: 9, targets: 10 }, // priscr
-        {responsivePriority: 10, targets: 3 }, //rfa/pa
+        {responsivePriority: 10, targets: 3 }, // rfa/pa
         {responsivePriority: 11, targets: 12 }, // existing requests
         {responsivePriority: 12, targets: 2 }, // project title
         {responsivePriority: 13, targets: 4 }, // i2 status
@@ -297,7 +297,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     if (this.dtElement.dtInstance) {
       this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
         dtInstance.destroy();
-        this.dtTrigger.next()
+        this.dtTrigger.next();
       });
     }
   }

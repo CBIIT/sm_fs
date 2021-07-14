@@ -6,6 +6,7 @@ import { DocumentService } from '../service/document.service';
 import { HttpResponse } from '@angular/common/http';
 import { saveAs } from 'file-saver';
 import { NGXLogger } from 'ngx-logger';
+import { BudgetInfoComponent } from '../cans/budget-info/budget-info.component';
 
 @Component({
   selector: 'app-upload-budget-documents',
@@ -20,9 +21,12 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   @ViewChild('labelImport')
   labelImport: ElementRef;
 
+  @ViewChild(BudgetInfoComponent) budgetInfoComponent: BudgetInfoComponent;
+
   public _selectedDocType: string = '';
   disableFile: boolean = true;
-  public docTypesStr: Array<string> = ['Interagency Agreement', 'Direct Citation Form', 'NCI Memo', 'Other Funding Document'];;
+  public docTypesStr: Array<string> = ['Interagency Agreement', 'Direct Citation Form', 'NCI Memo', 'Other Funding Document'];
+;
   public docTypes: Observable<Array<string>> = of(this.docTypesStr);
   public _docDescription: string = '';
   public _docDto: DocumentsDto = {};
@@ -51,8 +55,9 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   }
 
   constructor(private requestModel: RequestModel,
-    private documentService: DocumentService,
-    private logger: NGXLogger) { }
+              private documentService: DocumentService,
+              private logger: NGXLogger) {
+  }
 
   ngOnInit(): void {
     this.loadFiles();

@@ -24,14 +24,12 @@ export class RetrieveRequestComponent implements OnInit {
 
   ngOnInit(): void {
     this.frqId = this.route.snapshot.params.frqId;
-    this.logger.debug('retrieving request frqId = ' + this.frqId);
+    // this.logger.debug('retrieving request frqId = ' + this.frqId);
     if (this.frqId) {
       this.requestService.retrieveFundingRequestUsingGET(this.frqId).subscribe(
         (result) => {
           // this.logger.debug('retrieveFundingReuest returned ', JSON.stringify(result));
-          this.logger.debug('before requestModel reset');
           this.requestModel.reset();
-          this.logger.debug('after requestModel reset');
           this.requestModel.title = 'View Request';
           this.requestModel.requestDto = result.requestDto;
           this.requestModel.grant = result.grantDto;
@@ -65,12 +63,6 @@ export class RetrieveRequestComponent implements OnInit {
           this.requestModel.requestDto.financialInfoDto.fundingRequestId = this.requestModel.requestDto.frqId;
 
           this.router.navigate(['/request/review']);
-          // if (this.userSessionService.getEnvironment() === 'development') {
-          //   this.router.navigate(['/request/review']);
-          // }
-          // else {
-          //   this.router.navigate(['/request/step4']);
-          // }
         },
         (error) => {
           this.logger.error('retrieveFundingRequest failed ', error);

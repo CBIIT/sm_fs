@@ -19,6 +19,8 @@ import { WorkflowModalComponent } from '../workflow-modal/workflow-modal.compone
 import { WorkflowActionCode, WorkflowModel } from '../workflow/workflow.model';
 import { WorkflowComponent } from '../workflow/workflow.component';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
+import { UploadBudgetDocumentsComponent } from '../../upload-budget-documents/upload-budget-documents.component';
 
 @Component({
   selector: 'app-review-request',
@@ -31,6 +33,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   @ViewChild('submitResult') submitResultElement: ElementRef;
   @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
   @ViewChild(WorkflowComponent) workflowComponent: WorkflowComponent;
+  @ViewChild(UploadBudgetDocumentsComponent) uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
 
   statusesCanWithdraw = ['SUBMITTED', 'ON HOLD', 'RFC'];
   statusesCanOnHold = ['SUBMITTED'];
@@ -53,27 +56,34 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   userCanDelete = false;
   userReadonly = true;
   justificationMissing = false;
-  justificationType: string = '';
-  justificationText: string = '';
+  justificationType = '';
+  justificationText = '';
   transitionMemoMissing = false;
   isDisplayBudgetDocsUploadVar = false;
   closeResult: string;
 
   constructor(private router: Router,
-    private requestModel: RequestModel,
-    private propertiesService: AppPropertiesService,
-    private fsRequestService: FsRequestControllerService,
-    private userSessionService: AppUserSessionService,
-    private requestIntegrationService: FundingRequestIntegrationService,
-    private documentService: DocumentService,
-    private changeDetection: ChangeDetectorRef,
-    private logger: NGXLogger,
-    private fsWorkflowControllerService: FsWorkflowControllerService,
-    private modalService: NgbModal,
-    private workflowModel: WorkflowModel) { }
+              private requestModel: RequestModel,
+              private propertiesService: AppPropertiesService,
+              private fsRequestService: FsRequestControllerService,
+              private userSessionService: AppUserSessionService,
+              private requestIntegrationService: FundingRequestIntegrationService,
+              private documentService: DocumentService,
+              private changeDetection: ChangeDetectorRef,
+              private logger: NGXLogger,
+              private fsWorkflowControllerService: FsWorkflowControllerService,
+              private modalService: NgbModal,
+              private workflowModel: WorkflowModel) {
+  }
 
   ngAfterViewInit(): void {
     this.submitResultElement.nativeElement.scrollIntoView();
+    this.logger.info(this.uploadBudgetDocumentsComponent);
+    this.logger.info(this.uploadBudgetDocumentsComponent?.budgetInfoComponent);
+    this.logger.info(this.workflowComponent);
+    if (this.uploadBudgetDocumentsComponent?.budgetInfoComponent && this.workflowComponent) {
+      this.workflowComponent.budgetInfoComponent = this.uploadBudgetDocumentsComponent.budgetInfoComponent;
+    }
   }
 
   ngOnDestroy(): void {
@@ -86,7 +96,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   ngOnInit(): void {
-    this.logger.debug('Step4 requestModel: ', this.requestModel);
+    // this.logger.debug('Step4 requestModel: ', this.requestModel);
     this.requestModel.setStepLinkable(4, true);
     this.requestHistorySubscriber = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
       (historyResult) => {
@@ -97,13 +107,12 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     this.workflowModel.initialize();
     this.checkUserRolesCas();
     this.checkDocs();
-    this.isDisplayBudgetDocsUploadVar = this.isDisplayBudgetDocsUpload();
+    this.isDisplayBudgetDocsUpload();
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
     let submitted = false;
     historyResult.forEach((item: FundingReqStatusHistoryDto) => {
-      this.logger.debug('Parse Request History: ', item);
       const i = item.statusDescrip.search(/ by /gi);
       if (i > 0) {
         item.statusDescrip = item.statusDescrip.substring(0, i);
@@ -123,8 +132,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     this.readonly = (this.userReadonly) || (this.readonlyStatuses.indexOf(this.requestStatus) > -1);
     if (this.readonly) {
       this.requestModel.disableStepLinks();
-    }
-    else {
+    } else {
       this.requestModel.enableStepLinks();
     }
     this.changeDetection.detectChanges();
@@ -137,35 +145,31 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     const userNpnId = this.userSessionService.getLoggedOnUser().npnId;
     const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     if (!isPd && !isPa) {
-      this.logger.debug('Neither PD or PA, submit & delete = false');
+      // this.logger.debug('Neither PD or PA, submit & delete = false');
       this.userCanDelete = false;
       this.userCanSubmit = false;
       this.userReadonly = true;
       return;
-    }
-    else if (isPd && userNpnId === this.requestModel.requestDto.financialInfoDto.requestorNpnId) {
-      this.logger.debug('PD & is this requestor, submit & delete = true');
+    } else if (isPd && userNpnId === this.requestModel.requestDto.financialInfoDto.requestorNpnId) {
+      // this.logger.debug('PD & is this requestor, submit & delete = true');
       this.userCanSubmit = true;
       this.userCanDelete = true;
       this.userReadonly = false;
       return;
-    }
-    else if (isPd && (userCas !== null) && (userCas.length > 0)
+    } else if (isPd && (userCas !== null) && (userCas.length > 0)
       && (userCas.indexOf(this.requestModel.requestDto.financialInfoDto.requestorCayCode) > -1)) {
-      this.logger.debug('PD & CA matches request\'s CA, submit & delete = true');
+      // this.logger.debug('PD & CA matches request\'s CA, submit & delete = true');
       this.userCanSubmit = true;
       this.userCanDelete = true;
       this.userReadonly = false;
       return;
-    }
-    else if ((isPa || isPd) && userId === this.requestModel.requestDto.requestCreateUserId) {
-      this.logger.debug('PA or PD & is request creator, submit = false, delete = true');
+    } else if ((isPa || isPd) && userId === this.requestModel.requestDto.requestCreateUserId) {
+      // this.logger.debug('PA or PD & is request creator, submit = false, delete = true');
       this.userCanSubmit = false;
       this.userCanDelete = true;
       this.userReadonly = false;
       return;
-    }
-    else {
+    } else {
       this.logger.debug('PD or PA but not the right ones, submit & delete = false');
       this.userCanDelete = false;
       this.userCanSubmit = false;
@@ -182,8 +186,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       this.justificationMissing = false;
       this.justificationType = 'text';
       this.justificationText = this.requestModel.requestDto.justification;
-    }
-    else if (this.docDtos && this.docDtos.length > 0) {
+    } else if (this.docDtos && this.docDtos.length > 0) {
       for (const doc of this.docDtos) {
         if (doc.docType === 'Justification') {
           this.justificationMissing = false;
@@ -308,14 +311,11 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   submitDisableTooltip(): string {
     if (this.justificationMissing && this.transitionMemoMissing) {
       return 'You must upload Justification and Transition Memo to submit this request.';
-    }
-    else if (this.justificationMissing) {
+    } else if (this.justificationMissing) {
       return 'You must upload Justification to submit this request.';
-    }
-    else if (this.transitionMemoMissing) {
+    } else if (this.transitionMemoMissing) {
       return 'You must upload Transition Memo to submit this request.';
-    }
-    else {
+    } else {
       return '';
     }
   }
@@ -336,12 +336,12 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       this.downloadSummaryStatement();
     } else {
       this.documentService.downloadById(id)
-      .subscribe(
-        (response: HttpResponse<Blob>) => {
-          const blob = new Blob([response.body], { type: response.headers.get('content-type') });
-          saveAs(blob, fileName);
-        }
-      );
+        .subscribe(
+          (response: HttpResponse<Blob>) => {
+            const blob = new Blob([response.body], { type: response.headers.get('content-type') });
+            saveAs(blob, fileName);
+          }
+        );
     }
 
   }
@@ -373,27 +373,26 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       );
   }
 
-  isDisplayBudgetDocsUpload(): boolean {
-    let isFundApprover = false;
+  isDisplayBudgetDocsUpload(): void {
     this.fsWorkflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
       result => {
         if (result) {
           if (!this.isTerminalStatus() && this.requestStatus !== 'ON HOLD') {
-            for (let role in result) {
+            for (const role in result) {
               if (this.isCurrentApprover(result[role])) {
-                if (result[role].roleCode == "FCARC" ||
-                  result[role].roleCode == "FCNCI") {
-                  isFundApprover = true;
+                if (result[role].roleCode === 'FCARC' ||
+                  result[role].roleCode === 'FCNCI') {
+                  this.logger.debug('user is funds approver');
+                  this.isDisplayBudgetDocsUploadVar = true;
+                  break;
                 }
               }
             }
           }
         }
-        this.logger.debug('Getting Approvers: ', result);
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
-    return false;
   }
 
   isTerminalStatus(): boolean {
@@ -401,14 +400,13 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   isCurrentApprover(approver: FundingReqApproversDto): boolean {
-    var isApprover: boolean = false;
-    var loggedOnUser: NciPerson = this.userSessionService.getLoggedOnUser();
+    const loggedOnUser: NciPerson = this.userSessionService.getLoggedOnUser();
     const userId = loggedOnUser.nihNetworkId;
     if (approver.activeFlag === 'Y') {
-      if (approver.approverLdap.toLowerCase === userId.toLowerCase ||
+      if (approver.approverLdap.toLowerCase() === userId.toLowerCase() ||
         this.isCurrentUserDesignee(approver.designees) ||
         this.isUserPfrGmCommonApprover(approver, loggedOnUser)) {
-
+        return true;
       }
     }
     return false;
@@ -417,7 +415,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   isCurrentUserDesignee(designees: Array<FundingRequestPermDelDto>): boolean {
     if (designees) {
       const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-      for (let designee in designees) {
+      for (const designee in designees) {
         if (designees[designee].delegateTo.toLowerCase === userId.toLowerCase) {
           return true;
         }
@@ -434,8 +432,8 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   hasOEFIARole(loggedOnUser: NciPerson): boolean {
-    var rolesList: I2ERoles[] = loggedOnUser.roles;
-    for (let role in rolesList) {
+    const rolesList: I2ERoles[] = loggedOnUser.roles;
+    for (const role in rolesList) {
       if (rolesList[role].roleCode === 'FA' && rolesList[role].orgAbbrev === 'OEFIA') {
         return true;
       }
@@ -451,8 +449,8 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   hasPFRGMAPRRole(loggedOnUser: NciPerson): boolean {
-    var rolesList: I2ERoles[] = loggedOnUser.roles;
-    for (let role in rolesList) {
+    const rolesList: I2ERoles[] = loggedOnUser.roles;
+    for (const role in rolesList) {
       if (rolesList[role].roleCode === 'PFRGMAPR') {
         return true;
       }
@@ -465,11 +463,11 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       this.requestModel.grant.applId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          const blob = new Blob([response.body], { type: response.headers.get('content-type') });
           saveAs(blob, 'Package.pdf');
         }
       ), error =>
-        this.logger.error('Error downloading the file'),
+      this.logger.error('Error downloading the file'),
       () => console.info('File downloaded successfully');
   }
 

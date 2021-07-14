@@ -1,5 +1,5 @@
-import {Injectable, OnInit} from '@angular/core';
-import {NGXLogger} from 'ngx-logger';
+import { Injectable, OnInit } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 import {
   CanCcxDto,
   FsCanControllerService,
@@ -7,8 +7,8 @@ import {
   FundingRequestGrantCanDto,
   OefiaCodingDto
 } from '@nci-cbiit/i2ecws-lib';
-import {RequestModel} from '../model/request/request-model';
-import {Observable, Subject} from 'rxjs';
+import { RequestModel } from '../model/request/request-model';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'

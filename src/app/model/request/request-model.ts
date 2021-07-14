@@ -56,8 +56,8 @@ export class RequestModel {
 
   approverCriteriaChanged(): boolean {
     const newCriteria = this.makeApproverCriteria();
-    this.logger.debug('new approver criteria ', newCriteria);
-    this.logger.debug('prior approver criteria ', this.approverCriteria);
+    // this.logger.debug('new approver criteria ', newCriteria);
+    // this.logger.debug('prior approver criteria ', this.approverCriteria);
     return newCriteria.requestType !== this.approverCriteria.requestType
       || newCriteria.cayCode !== this.approverCriteria.cayCode
       || newCriteria.fundingSources !== this.approverCriteria.fundingSources
@@ -200,7 +200,7 @@ export class RequestModel {
   }
 
   reset(): void {
-    this.logger.warn('About to reset the request model');
+    // this.logger.warn('About to reset the request model');
     this.title = 'New Request';
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
@@ -224,7 +224,7 @@ export class RequestModel {
 
     let temp: FundingReqBudgetsDto;
     this.programRecommendedCostsModel.prcLineItems.forEach((value, key) => {
-      this.logger.debug('preparing budgets for source', key);
+      // this.logger.debug('preparing budgets for source', key);
       if (Number(key) === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
         isMoonshot = true;
       }
@@ -237,7 +237,7 @@ export class RequestModel {
     // Set final loa to SPL if MoonShot funds selected and the request is type Other Pay or Special Actions
     if (isMoonshot && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
       Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestDto.frtId))) {
-      this.logger.debug('Setting final LOA to SPL Committee');
+      // this.logger.debug('Setting final LOA to SPL Committee');
       this.requestDto.loaId = 4;
     }
 
@@ -261,17 +261,17 @@ export class RequestModel {
    *
    */
   restoreLineItems(): boolean {
-    this.logger.info('restoring budget line items');
+    // this.logger.info('restoring budget line items');
     if (!this.requestDto.financialInfoDto.fundingReqBudgetsDtos) {
-      this.logger.warn('Budgets are required');
+      // this.logger.warn('Budgets are required');
       return false;
     }
     if (!this.programRecommendedCostsModel.fundingSources || !this.programRecommendedCostsModel.fundingSourcesMap) {
-      this.logger.warn('Funding sources are required');
+      // this.logger.warn('Funding sources are required');
       return false;
     }
     if (!this.programRecommendedCostsModel.grantAwarded) {
-      this.logger.warn('Grant awards are required');
+      // this.logger.warn('Grant awards are required');
       return false;
     }
 

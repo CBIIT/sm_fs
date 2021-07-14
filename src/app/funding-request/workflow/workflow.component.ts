@@ -10,6 +10,7 @@ import { ApprovedCostsComponent } from './approved-costs/approved-costs.componen
 import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { ApprovingStatuses, WorkflowAction, WorkflowActionCode, WorkflowModel } from './workflow.model';
 import { GmInfoComponent } from './gm-info/gm-info.component';
+import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -23,6 +24,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
   @ViewChild(ApprovedCostsComponent) approvedCostsComponent: ApprovedCostsComponent;
   @ViewChild(GmInfoComponent) gmInfoComponent: GmInfoComponent;
+  budgetInfoComponent: BudgetInfoComponent;
 
   approverInitializationSubscription: Subscription;
   approverChangeSubscription: Subscription;
@@ -45,10 +47,12 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this._selectedValue = value;
     const user = approverMap.get(Number(value));
     this.logger.debug('Selected Approver to Add: ', user);
-   // if (this._selectedWorkflowAction) {
+    // if (this._selectedWorkflowAction) {
     this.workflowModel.addAdditionalApprover(user, this._selectedWorkflowAction ? this._selectedWorkflowAction.action : null);
-   // }
-    setTimeout(() => {this._selectedValue = null; }, 0);
+    // }
+    setTimeout(() => {
+      this._selectedValue = null;
+    }, 0);
   }
 
   get selectedValue(): number {
@@ -60,7 +64,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
               private userSessionService: AppUserSessionService,
               private requestModel: RequestModel,
               private workflowModel: WorkflowModel,
-              private logger: NGXLogger) { }
+              private logger: NGXLogger) {
+  }
 
   ngOnDestroy(): void {
     if (this.approverInitializationSubscription) {
@@ -78,8 +83,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     const data2 = data.filter((user) => {
       if (user.classification !== 'EMPLOYEE') {
         return false;
-      }
-      else if (addedApproverMap.get(Number(user.id))) {
+      } else if (addedApproverMap.get(Number(user.id))) {
         return false;
       }
       return true;
@@ -128,8 +132,10 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     };
 
     this.approverInitializationSubscription = this.requestIntegrationService.approverInitializationEmitter.subscribe(
-      () => {this.workflowActions = this.workflowModel.getWorkflowList();
-             this.logger.debug('workflow acitons = ', this.workflowActions); }
+      () => {
+        this.workflowActions = this.workflowModel.getWorkflowList();
+        this.logger.debug('workflow acitons = ', this.workflowActions);
+      }
     );
 
     this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
@@ -153,7 +159,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.requestStatus = item;
         this.approvingState = ApprovingStatuses.indexOf(this.requestStatus.statusCode) > -1;
         this.logger.debug('requestStatus= ', item);
-        return ;
+        return;
       }
     });
   }
@@ -164,12 +170,12 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   showApprovedCosts(): boolean {
     return this.workflowModel.approvedScientifically ||
-    (this.workflowModel.isScientificApprover && this.approvingState);
+      (this.workflowModel.isScientificApprover && this.approvingState);
   }
 
   showGmInfo(): boolean {
     return this.workflowModel.approvedByGM ||
-    (this.workflowModel.isGMApprover && this.approvingState);
+      (this.workflowModel.isGMApprover && this.approvingState);
   }
 
   get selectedWorkflowAction(): WorkflowActionCode {
@@ -193,12 +199,13 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   get buttonDisabled(): boolean {
-    if (!this._selectedWorkflowAction) { return true; }
+    if (!this._selectedWorkflowAction) {
+      return true;
+    }
 
     if (this._selectedWorkflowAction.commentsRequired && (!this.comments || this.comments.length === 0)) {
       return true;
-    }
-    else if ( this._selectedWorkflowAction.newApproverRequired && (!this.workflowModel.hasNewApprover)) {
+    } else if (this._selectedWorkflowAction.newApproverRequired && (!this.workflowModel.hasNewApprover)) {
       return true;
     }
 
@@ -212,31 +219,31 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     dto.frqId = this.requestModel.requestDto.frqId;
     dto.comments = this.comments;
     dto.action = action;
+    this.logger.info(this.budgetInfoComponent.getRequestCans());
+    return;
     if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&
-       this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0 )
-    {
-      dto.additionalApproverList = this.workflowModel.additionalApprovers.map( a => {
+      this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0) {
+      dto.additionalApproverList = this.workflowModel.additionalApprovers.map(a => {
         return a.approverLdap;
       });
-    }
-    else if (action === WorkflowActionCode.REASSIGN) {
+    } else if (action === WorkflowActionCode.REASSIGN) {
       dto.reassignedApproverId = this.workflowModel.pendingApprovers[0].approverLdap;
     }
     // complete the request when last in chain approving.
     if (this.workflowModel.lastInChain) {
       if (action === WorkflowActionCode.APPROVE ||
-          action === WorkflowActionCode.APPROVE_COMMENT ){
-            dto.completeRequest = true;
-          }
+        action === WorkflowActionCode.APPROVE_COMMENT) {
+        dto.completeRequest = true;
+      }
     }
     // set approved costs cans if scientific approver;
     if (this.workflowModel.isScientificApprover
-        && this.workflowModel.isApprovalAction(action))  {
+      && this.workflowModel.isApprovalAction(action)) {
       dto.requestCans = this.approvedCostsComponent.getCans();
     }
 
     if (this.workflowModel.isGMApprover
-      && this.workflowModel.isApprovalAction(action) )  {
+      && this.workflowModel.isApprovalAction(action)) {
       dto.gmInfo = this.gmInfoComponent.getGmInfo();
     }
 

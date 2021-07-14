@@ -24,7 +24,7 @@ export class ProgramRecommendedCostsModel {
   deletedSources: number[] = [];
 
   reset(): void {
-    this.logger.warn('Resetting program recommended costs model');
+    // this.logger.warn('Resetting program recommended costs model');
     // this.fundingRequestType = undefined;
     this.prcLineItems = new Map<number, PrcDataPoint[]>();
     // this._fundingSources = new Array<FundingRequestFundsSrcDto>();
@@ -43,7 +43,6 @@ export class ProgramRecommendedCostsModel {
   }
 
   set selectedFundingSourceIds(value: Set<number>) {
-    this.logger.debug(value);
     this._selectedFundingSourceIds = value;
   }
 
@@ -83,15 +82,12 @@ export class ProgramRecommendedCostsModel {
   }
 
   addFundingSourceById(id: number, dataPoints: Array<PrcDataPoint>): boolean {
-    this.logger.debug('addFundingSourceById', id, dataPoints);
     const source = this._fundingSourcesMap.get(Number(id));
-    this.logger.debug('Found source', source);
     if (!source) {
       this.logger.warn('no source found in', this._fundingSourcesMap);
       return false;
     }
     if (!this.isSelected(source)) {
-      this.logger.debug('pushing source');
       this._selectedFundingSources.push(source);
     }
     dataPoints.forEach(d => {
@@ -99,20 +95,16 @@ export class ProgramRecommendedCostsModel {
     });
 
     this.prcLineItems.set(Number(id), dataPoints);
-    this.logger.debug(this.prcLineItems);
 
     return true;
   }
 
   isSelected(source: FundingRequestFundsSrcDto): boolean {
-    this.logger.debug('isSelected:', source);
     if (!this._selectedFundingSources || this._selectedFundingSources.length === 0) {
-      this.logger.debug('not selected');
       return false;
     }
     let result = false;
     this._selectedFundingSources.forEach(s => {
-      this.logger.debug(s.fundingSourceId + '===' + source.fundingSourceId);
       if (s.fundingSourceId === source.fundingSourceId) {
         result = true;
       }
