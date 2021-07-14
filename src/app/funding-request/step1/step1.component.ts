@@ -2,13 +2,11 @@ import {
   AfterContentInit,
   AfterViewInit,
   Component,
-  Inject,
   OnInit,
   OnDestroy,
   ViewChild,
   TemplateRef
 } from '@angular/core';
-import {Router} from '@angular/router';
 import {FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {Subject} from 'rxjs';
 import {AppPropertiesService} from 'src/app/service/app-properties.service';
@@ -19,7 +17,6 @@ import { LoaderService } from 'src/app/service/loader-spinner.service';
 import { NGXLogger } from 'ngx-logger';
 import {FullGrantNumberCellRendererComponent} from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import {DataTableDirective} from 'angular-datatables';
-import {AppLookupsService} from '../../service/app-lookups.service';
 import {ExistingRequestsCellRendererComponent} from './existing-requests-cell-renderer/existing-requests-cell-renderer.component';
 import {FundingRequestActionCellRendererComponent} from './funding-request-action-cell-renderer/funding-request-action-cell-renderer.component';
 import {CancerActivityCellRendererComponent} from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
@@ -125,7 +122,9 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
             return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }, className: 'all'},
         {title: 'Project Title', data: 'projectTitle'},
-        {title: 'RFA/PA', data: 'rfaPaNumber'},
+        {title: 'RFA/PA', data: 'rfaPaNumber', render: ( data, type, row, meta ) => {
+          return '<a href="' + row.nihGuideAddr + '" target="blank" >' + data + '</a>';
+        }},
         {title: 'I2 Status', data: 'applStatusGroupDescrip'},
         {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
             return '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
@@ -138,8 +137,10 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         {title: 'Pctl', data: 'irgPercentileNum'},
         {title: 'PriScr', data: 'priorityScoreNum'},
         {title: 'Budjet Start Date', data: 'budgetStartDate'},
-        {title: 'Existing Requests', data: 'requestCount', ngTemplateRef: { ref: this.existingRequestsRenderer}, render: () => '', className: 'all'},
-        {title: 'Action', data: null,  defaultContent: 'Select', ngTemplateRef: { ref: this.fundingRequestActionRenderer}, render: () => '', className: 'all'},
+        {title: 'Existing Requests', data: 'requestCount',
+         ngTemplateRef: { ref: this.existingRequestsRenderer}, render: () => '', className: 'all'},
+        {title: 'Action', data: null,  defaultContent: 'Select',
+         ngTemplateRef: { ref: this.fundingRequestActionRenderer}, render: () => '', className: 'all'},
         {data: null, defaultContent: ''}
       ],
       // columnDefs: [ { orderable: false, targets: -1 }],.
