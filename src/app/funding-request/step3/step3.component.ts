@@ -462,31 +462,57 @@ export class Step3Component implements OnInit {
   }
 
   deleteDoc(id: number, docType: string) {
-    this.documentService.deleteDocById(id).subscribe(
-      result => {
-        this.logger.info('Delete Success');
-        this.deleteDocOrder(result);
+    if (id !== null) {
+      this.documentService.deleteDocById(id).subscribe(
+        result => {
+          this.logger.info('Delete Success');
+          this.deleteDocOrder(result);
+          this.baseTaskList.subscribe(items => {
+            this.swimlanes[0]['array'].forEach((value, index) => {
+              if (value.id == id) {
+                this.swimlanes[0]['array'].splice(index, 1);
+                
+              }
+            });
+          });
+  
+          this.pushDocType(docType);
+            if (docType == 'Justification') {
+            this.justificationUploaded = of(false);
+          }
+  
+        }
+      ), err => {
+        this.logger.error('Error while deleting the document');
+      };
+    } else {
+      if (docType === 'Supplement Application') {
+        //delete supp apps in the funding_requests_t table
+        this.deleteSuppApplDocs(docType);
+      }
+    }
+    
+
+  }
+
+  private deleteSuppApplDocs(docType: string) {
+    this.fsRequestControllerService.deleteSuppApplIdUsingPUT(this.requestModel.requestDto.frqId).subscribe(
+      res => {
+        this.logger.debug('justification deleted');
+        this.requestModel.requestDto.suppApplId = null;
+        this.deleteDocOrder(res);
+        this.pushDocType(docType);
         this.baseTaskList.subscribe(items => {
           this.swimlanes[0]['array'].forEach((value, index) => {
-            if (value.id == id) {
+            if (value.docType === docType) {
               this.swimlanes[0]['array'].splice(index, 1);
-              
+
             }
           });
         });
-
-        this.pushDocType(docType);
-
-        if (docType == 'Justification') {
-
-          this.justificationUploaded = of(false);
-        }
-
-      }
-    ), err => {
-      this.logger.error('Error while deleting the document');
-    };
-
+      }, error => {
+        this.logger.error('Error occured while deleting justification----- ' + error.message);
+      });
   }
 
   pushDocType(docType: string) {
