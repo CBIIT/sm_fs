@@ -1,0 +1,15 @@
+<ng-template #InstituteTooltip>
+  <span class='institutionName'>{{data.orgName}}</span><br>
+  <span class='institutionLocation'>{{data.institutionCity}},&nbsp;{{data.institutionState}}</span>
+</ng-template>
+
+<a href="{{grantViewerUrl+data.applId}}" target="yourgrant">{{data.fullGrantNum}}</a>
+<div class="grant-icons">
+  <a href="{{eGrantsUrl+data.applId}}" target="yourgrant" ngbTooltip="eGrants">
+    <span class="egrants-icon"></span>
+  </a>
+  <a [routerLink]="" [ngbTooltip]="InstituteTooltip" triggers="click:blur">
+    <i class='fa fa-university' aria-hidden='true'></i>
+  </a>
+</div>
+

@@ -36,19 +36,19 @@
 
     <!-- START Advanced Filters -->
 
-    <div class="col-lg-6" *ngIf="showAdvancedFilters">
+    <div class="col-lg-6" [hidden]="!showAdvancedFilters">
         <lib-pdname-dropdown  [(selectedValue)]="selectedPd" [broadcast]="true"></lib-pdname-dropdown>
     </div>
 
-    <div class="col-lg-3" *ngIf="showAdvancedFilters">
+    <div class="col-lg-3" [hidden]="!showAdvancedFilters">
         <lib-rfa-pa-dropdown [(selectedValue)]="selectedRfaPa"></lib-rfa-pa-dropdown>
     </div>
 
-    <div class="col-lg-3" *ngIf="showAdvancedFilters">
+    <div class="col-lg-3" [hidden]="!showAdvancedFilters">
         <lib-ncab-daterange [(selectedValue)]="ncabRange"></lib-ncab-daterange>
     </div>
 
-    <div class="col-lg-6" *ngIf="showAdvancedFilters">
+    <div class="col-lg-6" [hidden]="!showAdvancedFilters">
         <lib-cancer-activities-dropdown  [(selectedValue)]="selectedCas" [syncWithPd]="true"></lib-cancer-activities-dropdown>
     </div>
 
@@ -69,70 +69,26 @@
     </div>
 
 </div> <!-- END Row -->
-<ng-template #InstituteTooltip><span class='institutionName'>{{tooltipGrant.orgName}}</span><br>
-<span class='institutionLocation'>{{tooltipGrant.institutionCity}},&nbsp;{{tooltipGrant.institutionState}}</span>
-</ng-template>
 <div class="row">
     <div class="col-12">
         <h2>Results</h2>
         <p *ngIf="noResult">No results to display. Try applying a filter above and clicking "Search."</p>
         <div [ngStyle]="{display:noResult?'none':'inline'}">
-        <table id="grantDt" #grantDt class="dataTable row-border">
-            <thead>
-              <tr>
-                <th>Grant Number</th>
-                <th>PI</th>
-                <th>Project Title</th>
-                <th>RFA/PA</th>
-                <th>I2 Status</th>
-                <th>PD</th>
-                <th>CA</th>
-                <th>FY</th>
-                <th>NCAB</th>
-                <th>Pctl</th>
-                <th>PriScr</th>
-                <th>Budget Start Date</th>
-                <th>Existing Requests</th>
-                <th>Action</th>
-            <!--    <th>&nbsp;</th> control column for responsive-->
-              </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let grant of grantList">
-                <td><a href="{{grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
-                    <div class="grant-icons">
-                        <a href="{{eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants">
-                            <span class="egrants-icon"></span>
-                        </a>
-                        <a [routerLink]="" (mouseenter)="setGrant(grant)"  [ngbTooltip]="InstituteTooltip" triggers="click:blur">
-                            <i class='fa fa-university' aria-hidden='true'></i>
-                        </a>
-                    </div>
-                </td>
-                <td><a href="mailto:{{grant.piEmail}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.piFullName}}</a></td>
-                <td>{{grant.projectTitle}}</td>
-                <td>{{grant.rfaPaNumber}}</td>
-                <td>{{grant.applStatusGroupDescrip}}</td>
-                <td><a href="mailto:{{grant.pdEmailAddress}}?subject={{grant.fullGrantNum}} - {{grant.lastName}}">{{grant.pdFullName}}</a></td>
-                <td><a [routerLink]="" ngbTooltip="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="click:blur" placement="top">{{grant.cayCode}}</a></td>
-                <td>{{grant.fy}}</td>
-                <td>{{grant.councilMeetingDate|formatNcabDate}}</td>
-                <td>{{grant.irgPercentileNum}}</td>
-                <td>{{grant.priorityScoreNum}}</td>
-                <td>{{grant.budgetStartDate|date:'MM/dd/yyyy'}}</td>
-                <td><span *ngIf="grant.requestCount>0"><a routerLink="/search">{{grant.requestCount}}</a></span></td>
-                <td>
-                    <a href="javascript:void(0);" ngbTooltip={{disabledTooltip(grant)}} *ngIf="actionDisabled(grant); else actionEnabled">
-                        <button class="btn btn-primary" disabled>Select</button>
-                    </a>
-                    <ng-template #actionEnabled>
-                        <button class="btn btn-primary"  (click)="nextStep($event, grant)">Select</button>
-                    </ng-template>
-                </td>
-                <!-- <td></td> control column for responsive -->
-                </tr>
-            </tbody>
+        <table id="grantDt" #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
           </table>
+<!--          Renderer templates -->
+          <ng-template #fullGrantNumberRenderer let-data="adtData" let-eGrantsUrl="eGrantsUrl" let-grantViewerUrl="grantViewerUrl">
+            <app-full-grant-number-cell-renderer [data]="data" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl"></app-full-grant-number-cell-renderer>
+          </ng-template>
+          <ng-template #cancerActivityRenderer let-data="adtData">
+            <app-cancer-activity-cell-renderer [data]="data"></app-cancer-activity-cell-renderer>
+          </ng-template>
+          <ng-template #existingRequestsRenderer let-data="adtData">
+            <app-existing-requests-cell-renderer [data]="data"></app-existing-requests-cell-renderer>
+          </ng-template>
+          <ng-template #fundingRequestActionRenderer let-data="adtData">
+            <app-funding-request-action-cell-renderer [data]="data"></app-funding-request-action-cell-renderer>
+          </ng-template>
         </div>
     </div>
 </div>

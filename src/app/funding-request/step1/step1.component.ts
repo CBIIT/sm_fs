@@ -1,42 +1,58 @@
-import {AfterContentInit, AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterContentInit,
+  AfterViewInit,
+  Component,
+  Inject,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  TemplateRef
+} from '@angular/core';
 import {Router} from '@angular/router';
 import {FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {Subject} from 'rxjs';
 import {AppPropertiesService} from 'src/app/service/app-properties.service';
 import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.service';
-import {RequestModel} from '../../model/request/request-model';
 import {AppUserSessionService} from 'src/app/service/app-user-session.service';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
 import { LoaderService } from 'src/app/service/loader-spinner.service';
 import { NGXLogger } from 'ngx-logger';
+import {FullGrantNumberCellRendererComponent} from "../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component";
+import {DataTableDirective} from "angular-datatables";
+import {AppLookupsService} from "../../service/app-lookups.service";
+import {ExistingRequestsCellRendererComponent} from "./existing-requests-cell-renderer/existing-requests-cell-renderer.component";
+import {FundingRequestActionCellRendererComponent} from "./funding-request-action-cell-renderer/funding-request-action-cell-renderer.component";
+import {CancerActivityCellRendererComponent} from "../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component";
 
 @Component({
   selector: 'app-step1',
   templateUrl: './step1.component.html',
   styleUrls: ['./step1.component.css']
 })
-export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
+export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, OnDestroy {
 
-  constructor(private router: Router,
-              private gsfs: GrantsSearchFilterService,
+  constructor(private gsfs: GrantsSearchFilterService,
               private fsRequestControllerService: FsRequestControllerService,
               private propertiesService: AppPropertiesService,
               private userSessionService: AppUserSessionService,
-              private requestModel: RequestModel,
               private loaderService: LoaderService,
               private logger: NGXLogger) {
   }
 
-  @ViewChild('grantDt') myTable;
- // @ViewChild(DataTableDirective, {static: false}) myTable: DataTableDirective;
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
+
+  @ViewChild(DataTableDirective, {static: false}) dtElement: DataTableDirective;
+  @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
+  @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
+  @ViewChild('existingRequestsRenderer') existingRequestsRenderer: TemplateRef<ExistingRequestsCellRendererComponent>;
+  @ViewChild('fundingRequestActionRenderer') fundingRequestActionRenderer: TemplateRef<FundingRequestActionCellRendererComponent>;
 
   dataTable: any;
 
   grantList: NciPfrGrantQueryDto[] = [];
 
 //  dtOptions:  DataTables.Settings;
-  dtOptions: any;
+  dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject();
   showAdvancedFilters = false;
   // search criteria
@@ -68,29 +84,18 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     this.grantNumberComponent.grantNumberYear = this.searchCriteria.grantYear;
     this.grantNumberComponent.grantNumberSuffix = this.searchCriteria.grantSuffix;
 
-    this.search();
-
-  }
-
-  ngAfterContentInit(): void {
-    this.restoreSearchFilter();
-  }
-
-  ngOnInit(): void {
-
- //   this.restoreSearchFilter();
-
     this.dtOptions = {
       pagingType: 'full_numbers',
       pageLength: 100,
       serverSide: true,
+      processing: true,
       language: {
-          paginate: {
-              first: '<i class="far fa-chevron-double-left" title="First"></i>',
-              previous: '<i class="far fa-chevron-left" title="Previous"></i>',
-              next: '<i class="far fa-chevron-right" title="Next"></i>',
-              last: '<i class="far fa-chevron-double-right" Last="First"></i>'
-          }
+        paginate: {
+          first: '<i class="far fa-chevron-double-left" title="First"></i>',
+          previous: '<i class="far fa-chevron-left" title="Previous"></i>',
+          next: '<i class="far fa-chevron-right" title="Next"></i>',
+          last: '<i class="far fa-chevron-double-right" Last="First"></i>'
+        }
       },
 
       ajax: (dataTablesParameters: any, callback) => {
@@ -114,51 +119,59 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
           });
       },
 
-      columns: [ {data: 'fullGrantNum'},
-                {data: 'piFullName'},
-                {data: 'projectTitle'},
-                {data: 'rfaPaNumber'},
-                {data: 'applStatusGroupDescrip'},
-                {data: 'pdFullName'},
-                {data: 'cayCode'},
-                {data: 'fy'},
-                {data: 'councilMeetingDate'},
-                {data: 'irgPercentileNum'},
-                {data: 'priorityScoreNum'},
-                {data: 'budgetStartDate'},
-                {data: 'requestCount'},
-                {data: null, defaultContent: 'Select', }
- //               {data: null, defaultContent: ''}
-              ],
-      columnDefs: [ { orderable: false, targets: -1 }],
+      columns: [
+        {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, render: () => "", className: "all"},
+        {title: 'PI', data: 'piFullName',render: ( data, type, row, meta ) => {
+            return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          }, className: "all"},
+        {title: 'Project Title', data: 'projectTitle'},
+        {title: 'RFA/PA', data: 'rfaPaNumber'},
+        {title: 'I2 Status', data: 'applStatusGroupDescrip'},
+        {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
+            return '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          }},
+        {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, render: () => "", className: "all"},
+        {title: 'FY', data: 'fy'},
+        {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', render: ( data, type, row, meta) => {
+            return (data) ? data.substr(4,2)+'/'+data.substr(0,4) : '';
+          }},
+        {title: 'Pctl', data: 'irgPercentileNum'},
+        {title: 'PriScr', data: 'priorityScoreNum'},
+        {title: 'Budjet Start Date', data: 'budgetStartDate'},
+        {title: 'Existing Requests', data: 'requestCount', ngTemplateRef: { ref: this.existingRequestsRenderer}, render: () => "", className: "all"},
+        {title: 'Action', data: null,  defaultContent: 'Select', ngTemplateRef: { ref: this.fundingRequestActionRenderer}, render: () => "", className: "all"},
+        {data: null, defaultContent: ''}
+      ],
+      // columnDefs: [ { orderable: false, targets: -1 }],.
+      // responsive: true,
 
-      // responsive: {
-      //   details: {
-      //     type: 'column',
-      //     target: -1
-      //   }
-      // },
-      // columnDefs: [
-      //   {
-      //   className: 'control',
-      //   orderable: false,
-      //   targets: -1
-      //   },
-      //   {responsivePriority: 1, targets: 0 }, // grant_num
-      //   {responsivePriority: 2, targets: 13 }, // action
-      //   {responsivePriority: 3, targets: 3 }, // pi
-      //   {responsivePriority: 4, targets: 6 }, // ncab
-      //   {responsivePriority: 5, targets: 5 }, // fy
-      //   {responsivePriority: 6, targets: 10 }, // pd
-      //   {responsivePriority: 7, targets: 9 }, // ca
-      //   {responsivePriority: 8, targets: 7 }, // pctl
-      //   {responsivePriority: 9, targets: 8 }, // priscr
-      //   {responsivePriority: 10, targets: 12 }, // existing requests
-      //   {responsivePriority: 11, targets: 2 }, // i2 status
-      //   {responsivePriority: 12, targets: 1 }, // project title
-      //   {responsivePriority: 13, targets: 11 }, // budget start date
-      //   {responsivePriority: 14, targets: 4 }  // institute
-      // ],
+      responsive: {
+        details: {
+          type: 'column',
+          target: -1
+        }
+      },
+      columnDefs: [
+        {
+          className: 'control',
+          orderable: false,
+          targets: -1
+        },
+        {responsivePriority: 1, targets: 0 }, // grant_num
+        {responsivePriority: 2, targets: 13 }, // action
+        {responsivePriority: 3, targets: 1 }, // pi
+        {responsivePriority: 4, targets: 8 }, // ncab
+        {responsivePriority: 5, targets: 7 }, // fy
+        {responsivePriority: 6, targets: 5 }, // pd
+        {responsivePriority: 7, targets: 6 }, // ca
+        {responsivePriority: 8, targets: 9 }, // pctl
+        {responsivePriority: 9, targets: 10 }, // priscr
+        {responsivePriority: 10, targets: 3 }, //rfa/pa
+        {responsivePriority: 11, targets: 12 }, // existing requests
+        {responsivePriority: 12, targets: 2 }, // project title
+        {responsivePriority: 13, targets: 4 }, // i2 status
+        {responsivePriority: 14, targets: 11 } // budget start date
+      ],
       // dom:  '<"table-controls"<""l><"ml-auto mr-2"B><""p>>' +
       //       '<"row"<"col-12"tr>>' +
       //       '<"table-controls"<""i><"ml-auto mr-2"B><""p>>',
@@ -169,33 +182,39 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
       //         className: 'btn btn-sm btn-outline-secondary'
       //       }
       //     },
-          dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
-          buttons: [
-            {
-            extend: 'excel',
-            className: 'btn-excel',
-            titleAttr: 'Excel export',
-            text: 'Export',
-            filename: 'fs-grants-search-result',
-            title: null,
-            header: true,
-            exportOptions: { columns: [ 0, 1, 2, 3, 4 , 5 , 6, 7, 8, 9, 10, 11, 12 ] }
-            }
-        ]
+      dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
+      buttons: [
+        {
+          extend: 'excel',
+          className: 'btn-excel',
+          titleAttr: 'Excel export',
+          text: 'Export',
+          filename: 'fs-grants-search-result',
+          title: null,
+          header: true,
+          exportOptions: { columns: [ 0, 1, 2, 3, 4 , 5 , 6, 7, 8, 9, 10, 11, 12 ] }
+        }
+      ]
       // },
     };
+
+    this.search();
+    setTimeout(() => this.dtTrigger.next(), 0);
+
   }
 
-  nextStep(event, grant): void {
-    // NOTE: reset() isn't necessary since we will always be starting from scratch here.  User can't go back from step2 to step1.
-    this.requestModel.reset();
-    this.requestModel.requestDto.userLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-    this.requestModel.requestDto.pdNpnId = this.userSessionService.getLoggedOnUser().npnId;
-    this.requestModel.grant = grant;
-    this.requestModel.requestDto.fy = this.gsfs.currentFy;
-    this.requestModel.requestDto.requestFy = this.gsfs.currentFy;
-    this.requestModel.requestDto.financialInfoDto.fy = this.requestModel.requestDto.fy;
-    this.router.navigate(['/request/step2']);
+  ngAfterContentInit(): void {
+    this.restoreSearchFilter();
+  }
+
+  ngOnInit(): void {
+
+ //   this.restoreSearchFilter();
+
+  }
+
+  ngOnDestroy(): void {
+    this.dtTrigger.unsubscribe();
   }
 
   toString(aString): string{
@@ -275,15 +294,16 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
     this.searchCriteria.grantYear = this.toString(this.grantNumberComponent.grantNumberYear);
     this.searchCriteria.grantSuffix = this.toString(this.grantNumberComponent.grantNumberSuffix);
 
-    if (this.dataTable) {
-      this.dataTable.destroy();
-      this.dataTable = null;
+    if (this.dtElement.dtInstance) {
+      this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+        dtInstance.destroy();
+        this.dtTrigger.next()
+      });
     }
-    setTimeout(() => this.initDatatable(), 0);
   }
 
   private initDatatable(): void {
-    this.dataTable = $('table#grantDt').DataTable(this.dtOptions);
+    // this.dataTable = $('table#grantDt').DataTable(this.dtOptions);
   //  this.dataTable.columns.adjust().responsive.recalc();
   }
 
@@ -322,26 +342,6 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit {
 
   showHideAdvanced(): void {
     this.showAdvancedFilters = !this.showAdvancedFilters;
-  }
-
-  actionDisabled(grant: NciPfrGrantQueryDto): boolean {
-    const disabledStatuses: string[] = ['W', 'T', 'C', 'U', 'N', 'RR'];
-    if (grant.applTypeCode === '3' || disabledStatuses.indexOf(grant.applStatusGroupCode) !== -1) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  disabledTooltip(grant: NciPfrGrantQueryDto): string {
-    if (grant.applTypeCode === '3') {
-      return 'Select the parent grant to request supplements';
-    }
-    else {
-      return 'Grant Application is in the ' + grant.applStatusGroupDescrip +
-      ' IMPAC II status and cannot be selected for requesting funds.';
-    }
   }
 
   setGrant(grant): void {

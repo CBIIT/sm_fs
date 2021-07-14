@@ -1,0 +1,6 @@
+<a href="javascript:void(0);" ngbTooltip={{disabledTooltip(data)}} *ngIf="actionDisabled(data); else actionEnabled">
+  <button class="btn btn-primary" disabled>Select</button>
+</a>
+<ng-template #actionEnabled>
+  <button class="btn btn-primary"  (click)="nextStep($event, data)">Select</button>
+</ng-template>

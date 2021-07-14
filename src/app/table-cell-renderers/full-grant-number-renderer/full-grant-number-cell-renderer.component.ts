@@ -1,0 +1,25 @@
+import {Component, Input, OnInit} from '@angular/core';
+
+@Component({
+  selector: 'app-full-grant-number-cell-renderer',
+  templateUrl: './full-grant-number-cell-renderer.component.html',
+  styleUrls: ['./full-grant-number-cell-renderer.component.css']
+})
+export class FullGrantNumberCellRendererComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit(): void {
+    // console.debug("THIS IS DATA", this.data.vasya.petya);
+  }
+
+  @Input()
+  data : any = {}
+
+  @Input()
+  eGrantsUrl=""
+
+  @Input()
+  grantViewerUrl=""
+
+}
