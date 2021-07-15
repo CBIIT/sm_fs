@@ -21,7 +21,7 @@ let addedApproverMap = new Map<number, any>();
 })
 export class WorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
-  @ViewChild(ApprovedCostsComponent) approvedCostsComponent: ApprovedCostsComponent;
+  // @ViewChild(ApprovedCostsComponent) approvedCostsComponent: ApprovedCostsComponent;
   @ViewChild(GmInfoComponent) gmInfoComponent: GmInfoComponent;
   budgetInfoComponent: BudgetInfoComponent;
 
@@ -236,8 +236,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     // set approved costs cans if scientific approver;
     if (this.workflowModel.isScientificApprover
       && this.workflowModel.isApprovalAction(action)) {
-      this.logger.debug('scientific approver:', this.approvedCostsComponent.getCans());
-      dto.requestCans = this.approvedCostsComponent.getCans();
+        dto.requestCans = this.requestModel.requestCans;
+        this.logger.debug('scientific approver:', dto.requestCans);
+//      dto.requestCans = this.approvedCostsComponent.getCans();
     }
 
     if (this.workflowModel.isApprovalAction(action) && this.budgetInfoComponent && this.budgetInfoComponent.getRequestCans().length > 0) {

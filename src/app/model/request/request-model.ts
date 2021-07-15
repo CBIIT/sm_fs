@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
   FinancialInfoDtoReq,
+  FsCanControllerService,
   FundingReqBudgetsDto,
+  FundingRequestCanDto,
   FundingRequestDtoReq,
   NciPfrGrantQueryDto
 } from '@nci-cbiit/i2ecws-lib';
@@ -42,6 +44,7 @@ export class RequestModel {
   // approver stuff
   mainApproverCreated = false;
   approverCriteria: any = {};
+  requestCans: FundingRequestCanDto[];
   // note, element 0 is not used, element 1 represents step1 and so on.
   private stepLinkable = [false, false, false, false, false];
   initialPay: number;
@@ -142,6 +145,7 @@ export class RequestModel {
   }
 
   constructor(private propertiesService: AppPropertiesService,
+              private canControllerService: FsCanControllerService,
               private logger: NGXLogger,
   ) {
     this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
@@ -301,7 +305,8 @@ export class RequestModel {
     });
 
     // TODO: Consider sorting each line item by FY?
-
+    // add load/build requestCans because PCM is needed when building cans
+    this.loadRequestCans();
     return true;
   }
 
@@ -326,6 +331,47 @@ export class RequestModel {
         this.logger.warn('no line items for source', source.fundingSourceName);
       }
     });
+  }
+
+  loadRequestCans(): void {
+    if (this.requestCans && this.requestCans.length > 0) {
+      return ;
+    }
+
+    this.canControllerService.getRequestCansUsingGET(this.requestDto.frqId).subscribe(
+      result => {
+        if (result && result.length > 0) {
+          this.requestCans = result;
+          this.logger.debug('loaded requestCans from db ', result);
+        }
+        else {
+          this.requestCans = [];
+          const programCostModel = this.programRecommendedCostsModel;
+          this.logger.debug('Program Cost Model ', programCostModel);
+          for (const fs of programCostModel.selectedFundingSources) {
+            const lineItems = programCostModel.getLineItemsForSourceId(fs.fundingSourceId);
+            if (lineItems.length > 0) {
+              const lineItem0 = lineItems[0];
+              const dto: FundingRequestCanDto = {};
+              dto.frqId = this.requestDto.frqId;
+              dto.fseId = fs.fundingSourceId;
+              dto.fundingSourceName = fs.fundingSourceName;
+              dto.requestedTc = lineItem0.recommendedTotal;
+              dto.requestedDc = lineItem0.recommendedDirect;
+              dto.approvedTc = dto.requestedTc;
+              dto.approvedPctCut = lineItem0.percentCutTotalCalculated;
+              dto.requestedFutureYrs = lineItems.filter( li => li.recommendedTotal > 0 || li.recommendedDirect > 0).length - 1;
+              dto.approvedFutureYrs = dto.requestedFutureYrs;
+              this.requestCans.push(dto);
+            }
+          }
+          this.logger.debug('built requestCans from program_cost_model ', this.requestCans);
+        }
+      },
+      error => {
+        this.logger.error('getRequestCansUsingGET failed', error);
+      }
+    );
   }
 
   clearAlerts(): void {
