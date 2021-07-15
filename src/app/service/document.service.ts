@@ -10,6 +10,7 @@ import { NGXLogger } from 'ngx-logger';
 export class DocumentService {
 
   private docUrl = '/i2ecws/api/v1/documents';
+  private docViewerUrl = '/i2ecws/api/v1/doc-viewer';
 
   constructor(private http: HttpClient,
     private documentsControllerService: DocumentsControllerService, private logger: NGXLogger) { }
@@ -61,8 +62,8 @@ export class DocumentService {
     return this.documentsControllerService.loadLatestDocumentUsingGET(keyId, keyType);
   }
 
-  downLoadFrqPackage(frqId: number, applId: number, docIds: number[]) {
-    var url = this.docUrl + '/funding-requests-view-package/' + frqId + '/' + applId + '/' + docIds;
+  downLoadFrqPackage(frqId: number, applId: number) {
+    var url = this.docUrl + '/funding-requests-view-package/' + frqId + '/' + applId;
     this.logger.debug('Step3 FRQ Package URL: ', url);
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' });
   }
@@ -70,6 +71,12 @@ export class DocumentService {
   getFSBudgetFiles(keyId: number, keyType: string): Observable<Array<DocumentsDto>> {
     this.logger.debug('Step3 budget files for (keyId, KeyType): ', '(' + keyId + ',' + keyType + ')');
     return this.documentsControllerService.loadFsFinanceDocumentsUsingGET(keyId, keyType);
+  }
+
+  downloadSupplementAppDoc(suppApplId: number) {
+    var url = this.docViewerUrl + '/supplement-app/' + suppApplId;
+    this.logger.debug('Step3 FRQ supplement applications URL:', url);
+    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
 
