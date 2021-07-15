@@ -158,10 +158,10 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       this.userCanSubmit = true;
       this.userCanDelete = true;
       this.userReadonly = false;
-      this.userCanSubmitApprove = true;
+      this.userCanSubmitApprove = this.requestModel.requestDto.loaCode === 'PD' ;
       return;
     } else if (isPd && (userCas !== null) && (userCas.length > 0)
-      && (userCas.indexOf(this.requestModel.requestDto.financialInfoDto.requestorCayCode) > -1)) {
+      && (userCas.includes(this.requestModel.requestDto.financialInfoDto.requestorCayCode))) {
       // this.logger.debug('PD & CA matches request\'s CA, submit & delete = true');
       this.userCanSubmit = true;
       this.userCanDelete = true;
@@ -318,8 +318,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   submitApprove(): boolean {
-    return  this.requestModel.requestDto.loaCode === 'PD' &&
-            this.userCanSubmitApprove &&
+    return  this.userCanSubmitApprove &&
             this.requestStatus === 'DRAFT' &&
             !this.workflowModel.hasNewApprover;
   }
