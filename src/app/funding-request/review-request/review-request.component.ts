@@ -146,27 +146,27 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     this.userCanSubmitApprove = false;
     if (!isPd && !isPa) {
-      // this.logger.debug('Neither PD or PA, submit & delete = false');
+      this.logger.debug('Neither PD or PA, submit & delete = false');
       this.userCanDelete = false;
       this.userCanSubmit = false;
       this.userReadonly = true;
       return;
     } else if (isPd && userNpnId === this.requestModel.requestDto.financialInfoDto.requestorNpnId) {
-      // this.logger.debug('PD & is this requestor, submit & delete = true');
+      this.logger.debug('PD & is this requestor, submit & delete = true');
       this.userCanSubmit = true;
       this.userCanDelete = true;
       this.userReadonly = false;
-      this.userCanSubmitApprove = true;
+      this.userCanSubmitApprove = this.requestModel.requestDto.loaCode === 'PD';
       return;
     } else if (isPd && (userCas !== null) && (userCas.length > 0)
       && (userCas.indexOf(this.requestModel.requestDto.financialInfoDto.requestorCayCode) > -1)) {
-      // this.logger.debug('PD & CA matches request\'s CA, submit & delete = true');
+      this.logger.debug('PD & CA matches request\'s CA, submit & delete = true');
       this.userCanSubmit = true;
       this.userCanDelete = true;
       this.userReadonly = false;
       return;
     } else if ((isPa || isPd) && userId === this.requestModel.requestDto.requestCreateUserId) {
-      // this.logger.debug('PA or PD & is request creator, submit = false, delete = true');
+      this.logger.debug('PA or PD & is request creator, submit = false, delete = true');
       this.userCanSubmit = false;
       this.userCanDelete = true;
       this.userReadonly = false;
