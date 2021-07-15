@@ -36,7 +36,7 @@ export class CanManagementServiceBus {
   }
 
   getProjectedCan(fseId: number, oefiaTypeId: number): Observable<CanCcxDto> {
-    this.logger.debug('getProjectedCan(', this.requestModel.grant.applId, fseId, oefiaTypeId, this.requestModel.requestDto.frtId, ')');
+    // this.logger.debug('getProjectedCan(', this.requestModel.grant.applId, fseId, oefiaTypeId, this.requestModel.requestDto.frtId, ')');
     return this.canService.retrieveProjectedCanUsingGET(
       this.requestModel.grant.applId,
       fseId,
@@ -70,7 +70,7 @@ export class CanManagementServiceBus {
       this.requestModel.requestDto.activityCode,
       this.requestModel.requestDto.bmmCode,
       this.nciSourceFlag).subscribe(result => {
-      this.logger.debug(result);
+      // this.logger.debug(result);
       this.defaultCans = result;
     }, error => {
       this.logger.error(error);

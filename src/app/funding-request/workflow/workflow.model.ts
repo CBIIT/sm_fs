@@ -264,6 +264,7 @@ export class WorkflowModel {
   }
 
   isApprovalAction(action: WorkflowActionCode): boolean {
+    this.logger.debug(this.approvalActions, action);
     return this.approvalActions.indexOf(action) > -1;
   }
 }

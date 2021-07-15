@@ -31,34 +31,18 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
 
   @Input() readOnly = false;
 
-  fundingRequestCans: FundingRequestCanDto[];
+  private _fundingRequestCans: FundingRequestCanDto[];
+
+  get fundingRequestCans(): FundingRequestCanDto[] {
+    return this._fundingRequestCans;
+  }
+
+  set fundingRequestCans(value: FundingRequestCanDto[]) {
+    this._fundingRequestCans = value;
+    this.restoreCanData();
+  }
 
   constructor(private logger: NGXLogger, private canService: CanManagementServiceBus, private model: RequestModel) {
-  }
-
-  getRequestCans(): FundingRequestCanDto[] {
-    this.fundingRequestCans.forEach((c, index) => {
-      const selected: CanCcxDto = this.canSelectors?.get(index)?.selectedCanData;
-      if (selected) {
-        c.can = selected.can;
-        c.canDescription = selected.canDescrip;
-      }
-      const oefiaType = this.oefiaTypes?.get(index)?.selectedValue;
-      c.octId = oefiaType;
-    });
-    return this.fundingRequestCans;
-  }
-
-  ngOnInit(): void {
-    this.canService.getRequestCans(this.model.requestDto.frqId).subscribe(result => {
-      this.setRequestCans(result);
-    });
-    this.canService.refreshCans();
-    this.canService.refreshOefiaCodes();
-  }
-
-  setRequestCans(cans: FundingRequestCanDto[]): void {
-    this.fundingRequestCans = cans;
   }
 
   get defaultCans(): CanCcxDto[] {
@@ -69,11 +53,44 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
     return this.model.programRecommendedCostsModel.selectedFundingSources;
   }
 
+  restoreCanData(): void {
+    this.logger.debug('restoring CAN data', this._fundingRequestCans);
+    this._fundingRequestCans.forEach((can, index) => {
+      this.oefiaTypes.get(index).selectedValue = can.octId || can.defaultOefiaTypeId;
+      this.canSelectors.get(index).selectedCan = can.can;
+    });
+  }
+
+  getRequestCans(): FundingRequestCanDto[] {
+    this._fundingRequestCans.forEach((c, index) => {
+      const selected: CanCcxDto = this.canSelectors?.get(index)?.selectedCanData;
+      if (selected) {
+        c.can = selected.can;
+        c.canDescription = selected.canDescrip;
+      }
+      const oefiaType = this.oefiaTypes?.get(index)?.selectedValue;
+      c.octId = oefiaType;
+    });
+    return this._fundingRequestCans;
+  }
+
+  ngOnInit(): void {
+    this.canService.getRequestCans(this.model.requestDto.frqId).subscribe(result => {
+      this.fundingRequestCans = result;
+    });
+    this.canService.refreshCans();
+    this.canService.refreshOefiaCodes();
+  }
+
+  setRequestCans(cans: FundingRequestCanDto[]): void {
+
+  }
+
   // TODO: this needs to come from funding request cans t
   approvedTotal(fundingSourceId: number): number {
     let total = 0;
-    if (this.fundingRequestCans) {
-      this.fundingRequestCans.forEach(c => {
+    if (this._fundingRequestCans) {
+      this._fundingRequestCans.forEach(c => {
         if (c.fseId === fundingSourceId) {
           total += Number(c.approvedTc);
         }
@@ -111,6 +128,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
     }
     return selectedCan.can !== projectedCan.can;
   }
+
   duplicateCan(i: number): boolean {
     if (!this.canSelectors) {
       return false;
@@ -133,9 +151,6 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.fundingRequestCans?.forEach((can, index) => {
-      this.oefiaTypes.get(index).selectedValue = can.octId || can.defaultOefiaTypeId;
-      this.canSelectors.get(index).selectedCan = can.can;
-    });
+
   }
 }

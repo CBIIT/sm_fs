@@ -80,10 +80,9 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
 
   ngAfterViewInit(): void {
     this.submitResultElement.nativeElement.scrollIntoView();
-    this.logger.info(this.uploadBudgetDocumentsComponent);
-    this.logger.info(this.uploadBudgetDocumentsComponent?.budgetInfoComponent);
-    this.logger.info(this.workflowComponent);
-    if (this.isDisplayBudgetDocsUploadVar && this.uploadBudgetDocumentsComponent?.budgetInfoComponent && this.workflowComponent) {
+
+    if (this.uploadBudgetDocumentsComponent?.budgetInfoComponent && this.workflowComponent) {
+      this.logger.debug('setting budget info component:', this.uploadBudgetDocumentsComponent.budgetInfoComponent);
       this.workflowComponent.budgetInfoComponent = this.uploadBudgetDocumentsComponent.budgetInfoComponent;
     }
   }
@@ -246,8 +245,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     dto.frqId = this.requestModel.requestDto.frqId;
     if (this.submitApprove()) {
       dto.action = WorkflowActionCode.SUBMIT_APPROVE;
-    }
-    else {
+    } else {
       dto.action = WorkflowActionCode.SUBMIT;
     }
     dto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
@@ -318,10 +316,10 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   submitApprove(): boolean {
-    return  this.requestModel.requestDto.loaCode === 'PD' &&
-            this.userCanSubmitApprove &&
-            this.requestStatus === 'DRAFT' &&
-            !this.workflowModel.hasNewApprover;
+    return this.requestModel.requestDto.loaCode === 'PD' &&
+      this.userCanSubmitApprove &&
+      this.requestStatus === 'DRAFT' &&
+      !this.workflowModel.hasNewApprover;
   }
 
   submitDisableTooltip(): string {
