@@ -62,6 +62,8 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   isDisplayBudgetDocsUploadVar = false;
   closeResult: string;
 
+  userCanSubmitApprove = false;
+
   constructor(private router: Router,
               private requestModel: RequestModel,
               private propertiesService: AppPropertiesService,
@@ -144,6 +146,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     const userCas = this.userSessionService.getUserCaCodes();
     const userNpnId = this.userSessionService.getLoggedOnUser().npnId;
     const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    this.userCanSubmitApprove = false;
     if (!isPd && !isPa) {
       // this.logger.debug('Neither PD or PA, submit & delete = false');
       this.userCanDelete = false;
@@ -155,6 +158,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       this.userCanSubmit = true;
       this.userCanDelete = true;
       this.userReadonly = false;
+      this.userCanSubmitApprove = true;
       return;
     } else if (isPd && (userCas !== null) && (userCas.length > 0)
       && (userCas.indexOf(this.requestModel.requestDto.financialInfoDto.requestorCayCode) > -1)) {
@@ -240,7 +244,12 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.frqId = this.requestModel.requestDto.frqId;
-    dto.action = WorkflowActionCode.SUBMIT;
+    if (this.submitApprove()) {
+      dto.action = WorkflowActionCode.SUBMIT_APPROVE;
+    }
+    else {
+      dto.action = WorkflowActionCode.SUBMIT;
+    }
     dto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
     dto.certCode = this.requestModel.requestDto.certCode;
     dto.comments = this.workflowComponent.comments;
@@ -306,6 +315,13 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
 
   submitEnabled(): boolean {
     return !this.justificationMissing && !this.transitionMemoMissing;
+  }
+
+  submitApprove(): boolean {
+    return  this.requestModel.requestDto.loaCode === 'PD' &&
+            this.userCanSubmitApprove &&
+            this.requestStatus === 'DRAFT' &&
+            !this.workflowModel.hasNewApprover;
   }
 
   submitDisableTooltip(): string {

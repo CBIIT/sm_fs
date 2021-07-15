@@ -1,5 +1,6 @@
+import { ConvertActionBindingResult } from '@angular/compiler/src/compiler_util/expression_converter';
 import { Injectable } from '@angular/core';
-import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
+import { FsWorkflowControllerService, FundingReqApproversDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
@@ -327,6 +328,7 @@ export enum WorkflowActionCode {
   DEFER = 'DEFER',
   SUBMIT = 'SUBMIT',
   WITHDRAW = 'WITHDRAW',
-  HOLD = 'HOLD'
+  HOLD = 'HOLD',
+  SUBMIT_APPROVE = 'SUBMIT_APPROVE'
 }
 
