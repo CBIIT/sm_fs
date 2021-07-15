@@ -117,7 +117,7 @@
                         <div id="includedId" *ngIf="lane.name==='Included Content'" class="min-height-5" cdkDropList
                             [cdkDropListData]="lane.array" (cdkDropListDropped)="drop($event)">
 
-                            <div class="drag-item" cdkDrag *ngFor="let item of lane.array" tabindex="0">
+                            <div class="drag-item" ngbTooltip="Drag and Drop" placement="top-left" cdkDrag *ngFor="let item of lane.array" tabindex="0">
                                 <span
                                     *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayFileNameFormat"
                                     class="doc-name">{{ item.docFilename }}</span>
@@ -159,7 +159,7 @@
 
                         <div id="excludedId" class="drop-well min-height-5" cdkDropList [cdkDropListData]="lane.array"
                             (cdkDropListDropped)="drop($event)">
-                            <div class="drag-item" cdkDrag *ngFor='let item of lane.array' tabindex="0">
+                            <div class="drag-item" ngbTooltip="Drag and Drop" placement="top-left" cdkDrag *ngFor='let item of lane.array' tabindex="0">
                                 <span
                                     *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayFileNameFormat"
                                     class="doc-name">{{ item.docFilename }}</span>
