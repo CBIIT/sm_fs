@@ -25515,4 +25515,41 @@ td .grant-icons {
   margin-bottom: -1px;
 }
 
+/* line 405, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+#submission-package .card .card-header:only-child {
+  border-bottom-width: 0px;
+}
+
+/* line 408, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+#submission-package .card .card-header h3 {
+  font-size: 1.08rem;
+  margin-bottom: 0;
+}
+
+/* line 412, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+#submission-package .card .card-header .doc-details {
+  margin-left: .5rem;
+  font-style: italic;
+}
+
+/* line 416, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+#submission-package .card .card-header .doc-buttons {
+  margin-left: auto;
+}
+
+/* line 424, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.grant-info-wrapper > div {
+  margin-bottom: .5rem;
+  width: 100%;
+  display: inline-block;
+}
+
+@media (min-width: 992px) {
+  /* line 432, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+  .grant-info-wrapper > div {
+    margin-bottom: .75rem;
+    width: 33%;
+  }
+}
+
 /*# sourceMappingURL=i2e-common-ui.css.map */

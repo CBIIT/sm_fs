@@ -1,1 +1,283 @@
-<p>plan-step5 works!</p>
+<!-- BEGIN Funding Plan Information Section -->
+
+<div class="row">
+    <div class="col-12 d-flex">
+        <h2>Funding Plan Information</h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#fplan-info-collapse" role="button" aria-expanded="true" aria-controls="fplan-info-collapse"></a>
+    </div>
+    <div class="col-12 collapse show mt-2" id="fplan-info-collapse">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">RFA/PA #</th>
+                    <th scope="col">Concept ID</th>
+                    <th scope="col">RFA/PA Title</th>
+                    <th scope="col">Issue Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a href="#">PAR19-264</a>
+                    </td>
+                    <td>
+                        <a href="#">6572</a>
+                    </td>
+                    <td>Integrative Analysis of the Human Tumor Immune Microenvironment</td>
+                    <td>
+                        <div class="d-flex">
+                            <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="radioBasic">
+                                <label ngbButtonLabel class="btn-outline-secondary">
+                                    <input ngbButton type="radio" value="new" disabled>New
+                                </label>
+                                <label ngbButtonLabel class="btn-outline-secondary">
+                                    <input ngbButton type="radio" value="reissue" disabled>Reissue
+                                </label>
+                            </div>
+                            <input type="text" id="issue-type" style="width:7rem" class="form-control form-control-sm ml-2" readonly>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="row">
+            <div class="col-lg-2 col-sm-6">
+                <div class="form-group">
+                    <label for="fundable-score-range">Fundable Score&nbsp;Range</label>
+                    <input type="text" readonly class="form-control-plaintext" id="fundable-score-range" value="23 &ndash; 26">
+                </div>
+            </div>
+        
+            <div class="col-lg-2 col-sm-6">
+                <div class="form-group">
+                    <label for="apps-recieved">Applications Recieved</label>
+                    <input type="text" readonly class="form-control-plaintext" id="apps-recieved" value="35">
+                </div>
+            </div>
+        
+            <div class="col-lg-3 col-sm-6">
+                <div class="form-group">
+                    <label for="apps-proposed">Applications Proposed for&nbsp;Funding</label>
+                    <input type="text" readonly class="form-control-plaintext" id="apps-proposed" value="6">
+                </div>
+            </div>
+        
+            <div class="col-lg-2 col-sm-6">
+                <div class="form-group">
+                    <label for="apps-skipped">Applications Skipped</label>
+                    <input type="text" readonly class="form-control-plaintext" id="apps-skipped" value="1">
+                </div>
+            </div>
+        
+            <div class="col-lg-3 col-sm-6">
+                <div class="form-group">
+                    <label for="apps-not-considered">Applications Not Considered for&nbsp;Funding</label>
+                    <input type="text" readonly class="form-control-plaintext" id="apps-not-considered" value="1">
+                </div>
+            </div>
+        </div><!-- END Row -->
+    </div><!-- END col-12 -->
+    <div class="col-12">
+        <hr>
+    </div>
+</div>
+
+<!-- END Funding Plan Information Section -->
+
+<!-- BEGIN Submission Package Section -->
+
+<div class="row" id="submission-package">
+    <div class="col-12 d-flex align-items-center">
+        <h2>Submission Package</h2>
+        <button type="button" class="btn btn-sm ml-auto btn-outline-primary"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i> View Package</button>
+    </div>
+    <div class="col-12 mt-2">
+
+        <ngb-accordion [closeOthers]="true">
+
+            <ngb-panel id="cover-panel">
+              <ng-template ngbPanelHeader>
+                <div class="d-flex align-items-center">
+                    <h3>Cover Page</h3>
+                    <div class="doc-details">
+                        (Automatically Generated)
+                    </div>
+                    <div class="doc-buttons">
+                        <button class="btn btn-link btn-slim"><i class="far fa-eye"></i></button>
+                    </div>
+                </div>
+              </ng-template>
+            </ngb-panel>
+
+            <ngb-panel id="sciRat-panel">
+              <ng-template ngbPanelHeader>
+                <div class="d-flex align-items-center">
+                    <h3>Scientific Rationale for Supporting RFA/PA</h3>
+                    <div class="doc-details">
+                        file-name.docx (Uploaded by <a href="#">Jane Doe</a> on MM/DD/YYYY)
+                    </div>
+                    <div class="doc-buttons">
+                        <button class="btn btn-link btn-slim"><i class="far fa-eye"></i></button>
+                        <button class="btn btn-link btn-link-danger btn-slim"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+              </ng-template>
+              <ng-template ngbPanelContent>
+                  <div class="row">
+                      <div class="col-lg-6">
+                          <p><strong>Note:</strong> Approvals can be completed only if you provide all the information requested in this <a href="#">template</a>.</p>
+                      </div>
+                      <div class="col">
+                        <div class="input-group">
+                            <div class="custom-file">
+                              <input type="file" class="custom-file-input" id="sciRat-file-input">
+                              <label class="custom-file-label" for="sciRat-file-input"></label>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="col-sm-auto">
+                          <button type="button" class="btn btn-primary">Upload</button>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-12">
+                        <p>DataTable goes here.</p>
+                      </div>
+                  </div>
+              </ng-template>
+            </ngb-panel>
+
+            <ngb-panel id="justExc-panel">
+                <ng-template ngbPanelHeader>
+                  <div class="d-flex align-items-center">
+                      <h3>Justification for Exception Application(s)</h3>
+                      <div class="doc-details">
+                          <span class="text-danger">(Document required, not uploaded)</span>
+                      </div>
+                      <div class="doc-buttons">
+                          <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
+                      </div>
+                  </div>
+                </ng-template>
+                <ng-template ngbPanelContent>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <p><strong>Note:</strong> Approvals can be completed only if you provide all the information requested in this <a href="#">template</a>.</p>
+                        </div>
+                        <div class="col">
+                          <div class="input-group">
+                              <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="justExc-file-input">
+                                <label class="custom-file-label" for="justExc-file-input"></label>
+                              </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-auto">
+                            <button type="button" class="btn btn-primary">Upload</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                          <p>DataTable goes here.</p>
+                        </div>
+                    </div>
+                </ng-template>
+              </ngb-panel>
+
+              <ngb-panel id="justSkip-panel">
+                <ng-template ngbPanelHeader>
+                  <div class="d-flex align-items-center">
+                      <h3>Justification for Skipped Application(s)</h3>
+                      <div class="doc-details">
+                          <span class="text-danger">(Document required, not uploaded)</span>
+                      </div>
+                      <div class="doc-buttons">
+                          <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
+                      </div>
+                  </div>
+                </ng-template>
+                <ng-template ngbPanelContent>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <p><strong>Note:</strong> Approvals can be completed only if you provide all the information requested in this <a href="#">template</a>.</p>
+                        </div>
+                        <div class="col">
+                          <div class="input-group">
+                              <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="justSkip-file-input">
+                                <label class="custom-file-label" for="justSkip-file-input"></label>
+                              </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-auto">
+                            <button type="button" class="btn btn-primary">Upload</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                          <p>DataTable goes here.</p>
+                        </div>
+                    </div>
+                </ng-template>
+              </ngb-panel>
+
+              <ngb-panel id="other-panel">
+                <ng-template ngbPanelHeader>
+                  <div class="d-flex align-items-center">
+                      <h3>Other Document</h3>
+                      <div class="doc-details">
+                          (Optional)
+                      </div>
+                      <div class="doc-buttons">
+                          <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
+                      </div>
+                  </div>
+                </ng-template>
+                <ng-template ngbPanelContent>
+                    <div class="row">
+                        <div class="col">
+                          <div class="input-group">
+                              <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="justSkip-file-input">
+                                <label class="custom-file-label" for="justSkip-file-input"></label>
+                              </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-auto">
+                            <button type="button" class="btn btn-primary">Upload</button>
+                        </div>
+                    </div>
+                </ng-template>
+              </ngb-panel>
+
+              <ngb-panel id="summary-panel">
+                <ng-template ngbPanelHeader>
+                  <div class="d-flex align-items-center">
+                      <h3>Summary Statement for Applications Proposed for Funding</h3>
+                      <div class="doc-details">
+                          (Retrieved from IMPAC II)
+                      </div>
+                      <div class="doc-buttons">
+                          <button class="btn btn-link btn-slim"><i class="far fa-eye"></i></button>
+                      </div>
+                  </div>
+                </ng-template>
+              </ngb-panel>
+
+          </ngb-accordion>
+
+    </div>
+    <div class="col-12">
+        <hr>
+    </div>
+</div>
+
+<!-- END Submission Package Section -->
+
+<div class="row">
+    <div class="col-12 d-flex">
+        <button type="button" class="btn btn-outline-secondary mr-auto">Previous</button>
+        <button type="button" class="btn btn-primary">Save and Continue</button>
+    </div>
+</div>
