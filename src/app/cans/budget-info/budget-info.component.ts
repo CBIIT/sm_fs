@@ -29,6 +29,8 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   @ViewChildren(CanSelectorComponent) canSelectors: QueryList<CanSelectorComponent>;
   @ViewChildren(ProjectedCanComponent) projectedCans: QueryList<ProjectedCanComponent>;
 
+  @Input() readOnly = false;
+
   fundingRequestCans: FundingRequestCanDto[];
 
   constructor(private logger: NGXLogger, private canService: CanManagementServiceBus, private model: RequestModel) {
@@ -36,7 +38,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
 
   getRequestCans(): FundingRequestCanDto[] {
     this.fundingRequestCans.forEach((c, index) => {
-      const selected: CanCcxDto = this.canSelectors?.get(index)?.selectedCan;
+      const selected: CanCcxDto = this.canSelectors?.get(index)?.selectedCanData;
       if (selected) {
         c.can = selected.can;
         c.canDescription = selected.canDescrip;
@@ -49,13 +51,10 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.canService.getRequestCans(this.model.requestDto.frqId).subscribe(result => {
-      this.logger.warn(result);
       this.setRequestCans(result);
     });
     this.canService.refreshCans();
     this.canService.refreshOefiaCodes();
-    this.logger.debug(this.canService.defaultCans);
-    this.logger.debug(this.canService.grantCans);
   }
 
   setRequestCans(cans: FundingRequestCanDto[]): void {
@@ -88,11 +87,11 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
     this.canSelectors.forEach((control, index) => {
       if (i === index) {
         const result = control.selectProjectedCan();
-        if (result) {
-          this.logger.debug('Projected CAN copied in row', index);
-        } else {
-          this.logger.debug('No projected CAN in row', index, 'to copy');
-        }
+        // if (result) {
+        //   this.logger.debug('Projected CAN copied in row', index);
+        // } else {
+        //   this.logger.debug('No projected CAN in row', index, 'to copy');
+        // }
       }
     });
   }
@@ -102,7 +101,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
       return false;
     }
     // this.logger.debug('validate non-default CAN in row', i);
-    const selectedCan: CanCcxDto = this.canSelectors?.get(i)?.selectedCan;
+    const selectedCan: CanCcxDto = this.canSelectors?.get(i)?.selectedCanData;
     const projectedCan: CanCcxDto = this.projectedCans?.get(i)?.projectedCan;
     if (!projectedCan || !projectedCan.can || !projectedCan.canDescrip) {
       return false;
@@ -112,23 +111,20 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
     }
     return selectedCan.can !== projectedCan.can;
   }
-
   duplicateCan(i: number): boolean {
     if (!this.canSelectors) {
       return false;
     }
     const cans: string[] = [];
     const dupes: boolean[] = [false, false, false];
-    // this.logger.debug('validate duplicate CAN in row', i);
     this.canSelectors.forEach((control) => {
-      cans.push(control.selectedCan?.can || '');
+      cans.push(control.selectedCan || '');
     });
-
     cans.forEach((c1, i1) => {
       cans.forEach((c2, i2) => {
         if (i1 !== i2 && c1 !== '') {
           if (c1 === c2) {
-            dupes[i] = true;
+            dupes[i1] = true;
           }
         }
       });
@@ -139,7 +135,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.fundingRequestCans?.forEach((can, index) => {
       this.oefiaTypes.get(index).selectedValue = can.octId || can.defaultOefiaTypeId;
-      this.canSelectors.get(index).setSelectedCan(can.can);
+      this.canSelectors.get(index).selectedCan = can.can;
     });
   }
 }

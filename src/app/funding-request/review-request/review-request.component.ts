@@ -83,7 +83,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     this.logger.info(this.uploadBudgetDocumentsComponent);
     this.logger.info(this.uploadBudgetDocumentsComponent?.budgetInfoComponent);
     this.logger.info(this.workflowComponent);
-    if (this.uploadBudgetDocumentsComponent?.budgetInfoComponent && this.workflowComponent) {
+    if (this.isDisplayBudgetDocsUploadVar && this.uploadBudgetDocumentsComponent?.budgetInfoComponent && this.workflowComponent) {
       this.workflowComponent.budgetInfoComponent = this.uploadBudgetDocumentsComponent.budgetInfoComponent;
     }
   }

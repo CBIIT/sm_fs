@@ -1,3 +1,10 @@
+<ng-container *ngIf="readOnly; then read_only else edit"></ng-container>
+
+<ng-template #read_only>
+  <p>Readonly version goes here</p>
+</ng-template>
+
+<ng-template #edit>
 <div class="row">
 
   <div class="col-12 d-flex">
@@ -57,7 +64,7 @@
   </div><!-- END col-12 collapse -->
 
 </div><!-- END Row -->
-
+</ng-template>
 
 <div class="modal fade bd-example-modal-lg" id="CAN-modal" tabindex="-1" role="dialog" aria-labelledby="CAN-modal-title"
      aria-hidden="true">

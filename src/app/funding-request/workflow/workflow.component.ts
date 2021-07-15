@@ -236,12 +236,13 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     // set approved costs cans if scientific approver;
     if (this.workflowModel.isScientificApprover
       && this.workflowModel.isApprovalAction(action)) {
-      // TODO: keep an eye on this - shouldn't we only get cans from approved cost or budget component, never both?
+      this.logger.debug('scientific approver:', this.approvedCostsComponent.getCans());
       dto.requestCans = this.approvedCostsComponent.getCans();
-      const budgetCans = this.budgetInfoComponent?.getRequestCans();
-      if (budgetCans) {
-        dto.requestCans = budgetCans;
-      }
+    }
+
+    if (this.workflowModel.isApprovalAction(action) && this.budgetInfoComponent) {
+      this.logger.debug('financial approver:', this.budgetInfoComponent?.getRequestCans());
+      dto.requestCans = this.budgetInfoComponent.getRequestCans();
     }
 
     if (this.workflowModel.isGMApprover

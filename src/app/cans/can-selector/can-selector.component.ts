@@ -10,7 +10,8 @@ import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
   styleUrls: ['./can-selector.component.css']
 })
 export class CanSelectorComponent implements OnInit {
-  _selectedCan: CanCcxDto;
+  private _selectedCan: string;
+  private _selectedCanData: CanCcxDto;
   defaultCans: CanCcxDto[];
   projectedCan: CanCcxDto;
   canMap: Map<string, CanCcxDto>;
@@ -20,20 +21,21 @@ export class CanSelectorComponent implements OnInit {
   @Input() nciSourceFlag: string;
 
   @Input()
-  get selectedCan(): CanCcxDto {
+  get selectedCan(): string {
     return this._selectedCan;
   }
 
-  @Output() selectedValueChange = new EventEmitter<CanCcxDto>();
+  @Output() selectedValueChange = new EventEmitter<string>();
 
-  setSelectedCan(can: string): void {
-    this.selectedCan = this.canMap.get(can);
+  get selectedCanData(): CanCcxDto {
+    return this._selectedCanData;
   }
 
-  set selectedCan(value: CanCcxDto) {
+  set selectedCan(value: string) {
     this._selectedCan = value;
+    this._selectedCanData = this.canMap.get(value);
     this.selectedValueChange.emit(value);
-    this.canService.selectedCanEmitter.next({ index: this.index, can: value });
+    this.canService.selectedCanEmitter.next({ index: this.index, can: this.canMap.get(value) });
   }
 
   constructor(private canService: CanManagementServiceBus,
@@ -55,7 +57,7 @@ export class CanSelectorComponent implements OnInit {
 
   selectProjectedCan(): boolean {
     if (this.projectedCan && this.projectedCan.can && this.projectedCan.canDescrip) {
-      this.selectedCan = this.projectedCan;
+      this.selectedCan = this.projectedCan.can;
       return true;
     }
     return false;

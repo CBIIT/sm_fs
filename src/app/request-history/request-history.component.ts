@@ -27,7 +27,6 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.logger.debug('Funding Request info: ', this.requestModel.requestDto);
     this.loadHistory();
     this.requestSubmissionEventSubscriber = this.requestIntegrationService.requestSubmissionEmitter.subscribe(
       (frqId) => { this.loadHistory(); }
@@ -38,7 +37,6 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
     if (this.requestModel.requestDto.frqId != null) {
       this.fsLookupControllerService.getRequestHistoryUsingGET(this.requestModel.requestDto.frqId).subscribe(
         result => {
-          this.logger.debug('Request History result: ', result);
           this.histories = result;
           this.requestIntegrationService.requestHistoryLoadEmitter.next(result);
         },
