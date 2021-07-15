@@ -82,7 +82,6 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     this.submitResultElement.nativeElement.scrollIntoView();
 
     if (this.uploadBudgetDocumentsComponent?.budgetInfoComponent && this.workflowComponent) {
-      this.logger.debug('setting budget info component:', this.uploadBudgetDocumentsComponent.budgetInfoComponent);
       this.workflowComponent.budgetInfoComponent = this.uploadBudgetDocumentsComponent.budgetInfoComponent;
     }
   }
@@ -316,10 +315,9 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   submitApprove(): boolean {
-    return this.requestModel.requestDto.loaCode === 'PD' &&
-      this.userCanSubmitApprove &&
-      this.requestStatus === 'DRAFT' &&
-      !this.workflowModel.hasNewApprover;
+    return  this.userCanSubmitApprove &&
+            this.requestStatus === 'DRAFT' &&
+            !this.workflowModel.hasNewApprover;
   }
 
   submitDisableTooltip(): string {
