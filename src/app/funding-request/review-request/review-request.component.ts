@@ -156,7 +156,8 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       this.userCanSubmit = true;
       this.userCanDelete = true;
       this.userReadonly = false;
-      this.userCanSubmitApprove = this.requestModel.requestDto.loaCode === 'PD';
+      this.userCanSubmitApprove = this.requestModel.requestDto.loaCode === 'PD' &&
+                                  !this.requestModel.requestDto.financialInfoDto.otherDocText ;
       return;
     } else if (isPd && (userCas !== null) && (userCas.length > 0)
       && (userCas.indexOf(this.requestModel.requestDto.financialInfoDto.requestorCayCode) > -1)) {
