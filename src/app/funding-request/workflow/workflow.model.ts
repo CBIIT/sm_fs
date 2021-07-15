@@ -131,13 +131,16 @@ export class WorkflowModel {
         }
       }
 
+      this.logger.debug('next in chain:', this.isUserNextInChain);
       if (this.isUserNextInChain) {
         this.nextApproverRoleCode = this.nextApprover.roleCode ? this.nextApprover.roleCode : 'ADDITIONAL';
         if (this._pendingApprovers.length === 1 ) {
           this.lastInChain = true;
         }
 
+        this.logger.debug(this.scientificRoleCodes, this.nextApproverRoleCode);
         if (this.scientificRoleCodes.indexOf(this.nextApproverRoleCode) > -1) {
+          this.logger.debug('Scientific approver');
           this.isScientificApprover = true;
         }
 
@@ -264,7 +267,6 @@ export class WorkflowModel {
   }
 
   isApprovalAction(action: WorkflowActionCode): boolean {
-    this.logger.debug(this.approvalActions, action);
     return this.approvalActions.indexOf(action) > -1;
   }
 }

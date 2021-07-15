@@ -75,16 +75,11 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.canService.getRequestCans(this.model.requestDto.frqId).subscribe(result => {
-      this.fundingRequestCans = result;
-    });
+
     this.canService.refreshCans();
     this.canService.refreshOefiaCodes();
   }
 
-  setRequestCans(cans: FundingRequestCanDto[]): void {
-
-  }
 
   // TODO: this needs to come from funding request cans t
   approvedTotal(fundingSourceId: number): number {
@@ -151,6 +146,13 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-
+    this.logger.debug('==============================><==============================')
+    this.logger.debug(this.oefiaTypes);
+    this.logger.debug(this.projectedCans);
+    this.logger.debug(this.canSelectors);
+    this.logger.debug('==============================><==============================')
+    this.canService.getRequestCans(this.model.requestDto.frqId).subscribe(result => {
+      this.fundingRequestCans = result;
+    });
   }
 }

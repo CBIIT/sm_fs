@@ -1,7 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {NGXLogger} from 'ngx-logger';
-import {CanManagementServiceBus} from '../can-management-service-bus.service';
-import {CanCcxDto} from '@nci-cbiit/i2ecws-lib';
+import { Component, Input, OnInit } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
+import { CanManagementServiceBus } from '../can-management-service-bus.service';
+import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-projected-can',
@@ -29,12 +29,15 @@ export class ProjectedCanComponent implements OnInit {
 
   updateProjectedCan(oefiaType: number): void {
     const source = Number(this.fseId);
+    if (!oefiaType) {
+      return;
+    }
 
     this.canService.getProjectedCan(source, oefiaType).subscribe(result => {
       this.logger.debug('getting new projected CAN for', source, oefiaType);
       this.logger.debug(JSON.stringify(result));
       this.projectedCan = result;
-      this.canService.projectedCanEmitter.next({index: this.index, can: result});
+      this.canService.projectedCanEmitter.next({ index: this.index, can: result });
     });
   }
 }
