@@ -33,9 +33,11 @@ export class CanSelectorComponent implements OnInit {
 
   set selectedCan(value: string) {
     this._selectedCan = value;
-    this._selectedCanData = this.canMap.get(value);
+    if (value) {
+      this._selectedCanData = this.canMap.get(value);
+    }
     this.selectedValueChange.emit(value);
-    this.canService.selectedCanEmitter.next({ index: this.index, can: this.canMap.get(value) });
+    // this.canService.selectedCanEmitter.next({ index: this.index, can: this.canMap.get(value) });
   }
 
   constructor(private canService: CanManagementServiceBus,
