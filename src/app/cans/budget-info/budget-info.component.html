@@ -42,7 +42,7 @@
           <app-projected-can [index]="i" [fseId]="source.fseId"></app-projected-can>
         </td>
         <td>
-          <app-can-selector [index]="i" [nciSourceFlag]="source.nciSourceFlag" [selectedCan]="source.can"></app-can-selector>
+          <app-can-selector [index]="i" [nciSourceFlag]="source.nciSourceFlag" [selectedValue]="source.can"></app-can-selector>
           <div class="d-flex align-items-center">
 
             <button class="btn btn-link btn-slim" title="Copy Projected CAN" (click)="copyProjectedCan(i)">

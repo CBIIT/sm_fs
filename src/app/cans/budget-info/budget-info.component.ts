@@ -30,6 +30,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
   @ViewChildren(ProjectedCanComponent) projectedCans: QueryList<ProjectedCanComponent>;
 
   @Input() readOnly = false;
+  @Input() editing = false;
 
   get fundingRequestCans(): FundingRequestCanDto[] {
     return this.model.requestCans;
@@ -46,11 +47,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
     return this.canService.defaultCans;
   }
 
-  get sources(): FundingRequestFundsSrcDto[] {
-    return this.model.programRecommendedCostsModel.selectedFundingSources;
-  }
-
-  getRequestCans(): FundingRequestCanDto[] {
+  refreshRequestCans(): void {
     this.model.requestCans.forEach((c, index) => {
       const selected: CanCcxDto = this.canSelectors?.get(index)?.selectedCanData;
       if (selected) {
@@ -58,9 +55,9 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
         c.canDescription = selected.canDescrip;
       }
       const oefiaType = this.oefiaTypes?.get(index)?.selectedValue;
-      c.octId = oefiaType;
+      this.logger.debug('found oefiaType', oefiaType, 'at index', index);
+      c.octId = !isNaN(oefiaType) ? Number(oefiaType) : null;
     });
-    return this.model.requestCans;
   }
 
   ngOnInit(): void {
@@ -100,7 +97,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
     const cans: string[] = [];
     const dupes: boolean[] = [false, false, false];
     this.canSelectors.forEach((control) => {
-      cans.push(control.selectedCan || '');
+      cans.push(control.selectedValue || '');
     });
     cans.forEach((c1, i1) => {
       cans.forEach((c2, i2) => {

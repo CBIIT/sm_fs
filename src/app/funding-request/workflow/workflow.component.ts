@@ -241,9 +241,10 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 //      dto.requestCans = this.approvedCostsComponent.getCans();
     }
 
-    if (this.workflowModel.isApprovalAction(action) && this.budgetInfoComponent && this.budgetInfoComponent.getRequestCans().length > 0) {
-      this.logger.debug('financial approver:', this.budgetInfoComponent?.getRequestCans());
-      dto.requestCans = this.budgetInfoComponent.getRequestCans();
+    if (this.workflowModel.isApprovalAction(action) && this.budgetInfoComponent.editing) {
+      this.logger.debug('financial approver:');
+      this.budgetInfoComponent.refreshRequestCans();
+      dto.requestCans = this.requestModel.requestCans;
     }
 
     if (this.workflowModel.isGMApprover
