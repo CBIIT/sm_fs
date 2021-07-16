@@ -34,7 +34,6 @@ export class CanSelectorComponent implements OnInit {
   }
 
   set selectedValue(value: string) {
-    this.logger.debug('selectedValue:', value);
     this._selectedValue = value;
     if (value && this.canMap) {
       this._selectedCanData = this.canMap.get(value);
@@ -42,7 +41,6 @@ export class CanSelectorComponent implements OnInit {
       this._selectedCanData = null;
     }
     this.selectedValueChange.emit(value);
-    // this.canService.selectedCanEmitter.next({ index: this.index, can: this.canMap.get(value) });
   }
 
   constructor(private canService: CanManagementServiceBus,
@@ -58,9 +56,7 @@ export class CanSelectorComponent implements OnInit {
       result.forEach(r => {
         this.data.push({id: r.can, text: r.can + ' | ' + r.canDescrip});
       });
-
-      this.logger.debug('setting selected value after loading data', this._selectedValue, this.data);
-      this.selectedValue = this._selectedValue;
+      // this.selectedValue = this._selectedValue;
     });
     this.canService.projectedCanEmitter.subscribe(next => {
       if (Number(next.index) === Number(this.index)) {
