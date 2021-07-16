@@ -23,6 +23,8 @@ export class CanManagementServiceBus {
   defaultCans: Array<CanCcxDto>;
   grantCans: Array<FundingRequestGrantCanDto>;
   oefiaCodes: Array<OefiaCodingDto>;
+  cachedRequestCans: Map<number, FundingRequestCanDto[]> = new Map();
+
 
   constructor(private logger: NGXLogger, private canService: FsCanControllerService,
               private requestModel: RequestModel) {
@@ -51,7 +53,12 @@ export class CanManagementServiceBus {
         subscriber.next(this.oefiaCodes);
       });
     }
-    return this.canService.getOefiaTypesUsingGET();
+    const fn = this.canService.getOefiaTypesUsingGET();
+    fn.subscribe(result => {
+      this.oefiaCodes = result;
+    });
+
+    return fn;
   }
 
   refreshOefiaCodes(): void {
@@ -68,7 +75,21 @@ export class CanManagementServiceBus {
   }
 
   getRequestCans(frqId: number): Observable<FundingRequestCanDto[]> {
-    return this.canService.getRequestCansUsingGET(frqId);
+    this.logger.debug('get request cans:', frqId);
+    const tmp = this.cachedRequestCans.get(frqId);
+    if (tmp) {
+      this.logger.debug('returning cached request cans:', frqId);
+      return new Observable(subscriber => {
+        subscriber.next(tmp);
+      });
+    }
+
+    const fn = this.canService.getRequestCansUsingGET(frqId);
+    fn.subscribe(result => {
+      this.logger.warn('getting request cans to cache:', frqId);
+      this.cachedRequestCans.set(frqId, result);
+    });
+    return fn;
   }
 
   refreshDefaultCans(): boolean {

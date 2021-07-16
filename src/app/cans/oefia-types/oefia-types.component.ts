@@ -30,13 +30,10 @@ export class OefiaTypesComponent implements OnInit {
   private _selectedValue: number;
 
   constructor(private logger: NGXLogger, private canService: CanManagementServiceBus) {
-    this.logger.warn('construction');
   }
 
   ngOnInit(): void {
-    this.logger.warn('Loading oefia types');
     this.canService.getOefiaCodes().subscribe(result => {
-      this.logger.warn('Done loading oefia types');
       this.oefiaCodes = result;
       if (this._selectedValue) {
         this.selectedValue = this._selectedValue;
