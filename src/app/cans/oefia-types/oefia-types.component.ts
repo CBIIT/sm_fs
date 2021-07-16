@@ -48,6 +48,7 @@ export class OefiaTypesComponent implements OnInit {
     this.canService.getOefiaCodes().subscribe(result => {
       this.oefiaCodes = result;
       this.data = [];
+      this.data.push({ id: '', text: '' });
       result.forEach(c => {
         this.data.push({ id: String(c.id), text: c.category });
       });
