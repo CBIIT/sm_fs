@@ -32,6 +32,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   public _docDto: DocumentsDto = {};
   maxFileSize: number = 10485760; //10MB
   budgetDocDtos: Observable<DocumentsDto[]>;
+  budgetInfoReadOnly = false;
 
 
   get selectedDocType(): string {

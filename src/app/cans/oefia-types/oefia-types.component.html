@@ -1,12 +1,18 @@
-<div class="form-group">
-<!--  <label for="oefia-type">OEFIA Type</label>-->
-  <ng-select2
-    id="oefia-type"
-    name="oefiaType"
-    [(ngModel)]="selectedValue"
-    [allowClear]="false">
-    <option></option>
-    <option *ngFor="let code of oefiaCodes" value="{{code.id}}">{{code.category}}</option>
-  </ng-select2>
-</div>
+<ng-container *ngIf="readonly; then read_only else edit;"></ng-container>
+<ng-template #edit>
+  <div class="form-group">
+    <!--  <label for="oefia-type">OEFIA Type</label>-->
+    <ng-select2
+      id="oefia-type"
+      name="oefiaType"
+      [(ngModel)]="selectedValue"
+      [allowClear]="false"
+      [data]="data">
+      <option></option>
+    </ng-select2>
+  </div>
+</ng-template>
+<ng-template #read_only>
+  <div>{{ selectedOefiaType.text }}</div>
+</ng-template>
 

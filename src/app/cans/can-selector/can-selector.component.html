@@ -1,12 +1,20 @@
-<div class="form-group">
-  <!--    <label for="oefia-type">OEFIA Type</label>-->
-  <ng-select2
-    id="can"
-    name="can"
-    [allowClear]="true"
-    [data]="data"
-    [(ngModel)]="selectedValue">
-    <option></option>
-  </ng-select2>
-</div>
+<ng-container *ngIf="readonly; then read_only else edit;"></ng-container>
+
+<ng-template #edit>
+  <div class="form-group">
+    <!--    <label for="oefia-type">OEFIA Type</label>-->
+    <ng-select2
+      id="can"
+      name="can"
+      [allowClear]="true"
+      [data]="data"
+      [(ngModel)]="selectedValue">
+      <option></option>
+    </ng-select2>
+  </div>
+</ng-template>
+
+<ng-template #read_only>
+  <div class="form-group">{{ selectedCanData?.can }} | {{ selectedCanData?.canDescrip }}</div>
+</ng-template>
 

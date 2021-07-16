@@ -22,6 +22,8 @@ export class CanSelectorComponent implements OnInit {
 
   @Input() nciSourceFlag: string;
 
+  @Input() readonly = false;
+
   @Input()
   get selectedValue(): string {
     return this._selectedValue;
@@ -54,7 +56,7 @@ export class CanSelectorComponent implements OnInit {
       this.canMap = new Map(result.map(c => [c.can, c]));
       this.data = new Array<Select2OptionData>();
       result.forEach(r => {
-        this.data.push({id: r.can, text: r.can + ' | ' + r.canDescrip});
+        this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip });
       });
       // this.selectedValue = this._selectedValue;
     });
