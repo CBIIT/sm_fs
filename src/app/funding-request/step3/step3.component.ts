@@ -11,12 +11,13 @@ import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request/request-model';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { saveAs } from 'file-saver';
-import { of, Observable } from 'rxjs';
+import { of, Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
+import { formatDate } from '@angular/common';
 
 export interface Swimlane {
   name: string;
@@ -51,7 +52,10 @@ export class Step3Component implements OnInit {
   justificationEnteredBy: string = '';
   justificationEnteredByEmail: string = '';
   justificationFileName: string = '';
-  justificationUploadedOn: Date;
+  justificationUploadedOn: Date = new Date();
+  justificationEnteredByEmit = new BehaviorSubject<string>(this.justificationEnteredBy);
+  justificationEnteredByEmailEmit = new BehaviorSubject<string>(this.justificationEnteredByEmail);
+  justificationUploadedOnEmit = new BehaviorSubject<string>(this.justificationUploadedOn.toString());
   justificationId: number;
   justificationText: string = '';
   _docType: CgRefCodesDto = {};
@@ -66,6 +70,7 @@ export class Step3Component implements OnInit {
   isTypeSelected: boolean = false;
   applAdminSuppRoutingsDtos: ApplAdminSuppRoutingsDto[] = [];
   disableAddDocButton: boolean = true;
+
 
   @ViewChild('inputFile')
   inputFile: ElementRef;
@@ -119,11 +124,12 @@ export class Step3Component implements OnInit {
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
         this.DocTypes = of(result);
+        this.loadJustificationText();
         this.addTransitionMemo();
         this.loadFiles();
         this.isSupplementAction()
         this.loadSuppApps();
-        this.loadJustificationText();
+
         this.logger.debug('Getting the Doc type Dropdown results: ', this.DocTypes);
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
@@ -138,22 +144,41 @@ export class Step3Component implements OnInit {
 
   loadJustificationText() {
     if (this.requestModel.requestDto.justification !== null) {
+      console.log('justification text: ' + this.requestModel.requestDto.justification);
+      console.log('justification created by npn id: ' + this.requestModel.requestDto.justificationCreateNpnId);
       this.userControllerService.findByNpnIdUsingGET(this.requestModel.requestDto.justificationCreateNpnId).subscribe(
         result => {
+          console.log('got result for justification user id: ' + result.fullNameLF);
           this.justificationUploaded = of(true);
           this.justificationText = this.requestModel.requestDto.justification;
           this.requestModel.requestDto.justificationCreateByFullName = result.fullNameLF;
           this.requestModel.requestDto.justificationCreateByEmailAddress = result.emailAddress;
-          this.justificationEnteredBy = this.requestModel.requestDto.justificationCreateByFullName;
-          this.justificationEnteredByEmail = this.requestModel.requestDto.justificationCreateByEmailAddress;
+          this.justificationEnteredBy = result.fullNameLF;
+         
+          
+          console.log('result.fullNameLF: ' + result.fullNameLF);
+          this.justificationEnteredByEmail = result.emailAddress;
           this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
+
+
+          this.justificationEnteredByEmit.next(this.justificationEnteredBy);
+          this.justificationEnteredByEmailEmit.next(this.justificationEnteredByEmail);
+          this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'dd/MM/yyyy'));
+
+          console.log('this.requestModel.requestDto.justificationCreateDate: ' + this.requestModel.requestDto.justificationCreateDate);
           this.justificationType = 'text';
           this.removeDocType('Justification');
         }, error => {
           this.logger.error('HttpClient get request error for----- ' + error.message);
+          console.log('error received while getting justification user info: ' + error.message);
         });
     }
 
+  }
+
+  format(date: Date, format: string): string {
+    const locale = 'en-US';
+    return formatDate(date, format, locale);
   }
 
   loadSuppApps() {
@@ -221,7 +246,7 @@ export class Step3Component implements OnInit {
   }
 
   private populateDocDto() {
-    
+
     for (let i = 0; i < this.selectedFiles.length; i++) {
       this._docDto.docDescription = this.docDescription;
       this._docDto.docType = this.selectedDocType;
@@ -234,7 +259,7 @@ export class Step3Component implements OnInit {
       }
 
     }
-    
+
   }
 
   uploadJustificationText(justification: string) {
@@ -254,6 +279,9 @@ export class Step3Component implements OnInit {
         this.justificationEnteredBy = this.requestModel.requestDto.justificationCreateByFullName;
         this.justificationEnteredByEmail = this.requestModel.requestDto.justificationCreateByEmailAddress;
         this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
+        this.justificationEnteredByEmit.next(this.justificationEnteredBy);
+        this.justificationEnteredByEmailEmit.next(this.justificationEnteredByEmail);
+        this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'dd/MM/yyyy'));
 
         //Inserting doc order
         let docDto: DocumentsDto = {};
@@ -261,7 +289,7 @@ export class Step3Component implements OnInit {
         docDto.keyId = this.requestModel.requestDto.frqId;
         docDto.keyType = 'PFR';
         this.insertDocOrder(docDto);
-                
+
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
@@ -282,7 +310,7 @@ export class Step3Component implements OnInit {
     this.isTypeSelected = false;
     this.showSuppApplications = false;
     this.disableAddDocButton = true;
-    
+
   }
 
   upload(file) {
@@ -377,7 +405,7 @@ export class Step3Component implements OnInit {
     if (element.docType === 'Justification') {
       this.logger.debug('Loading Document type: ', element.docFilename);
       this.justificationUploaded = of(true);
-      
+
       this.justificationEnteredBy = element.uploadByName;
       this.justificationEnteredByEmail = element.uploadByEmail;
       this.justificationFileName = 'Justification '.concat(element.docFilename);;
@@ -471,16 +499,16 @@ export class Step3Component implements OnInit {
             this.swimlanes[0]['array'].forEach((value, index) => {
               if (value.id == id) {
                 this.swimlanes[0]['array'].splice(index, 1);
-                
+
               }
             });
           });
-  
+
           this.pushDocType(docType);
-            if (docType == 'Justification') {
+          if (docType == 'Justification') {
             this.justificationUploaded = of(false);
           }
-  
+
         }
       ), err => {
         this.logger.error('Error while deleting the document');
@@ -491,7 +519,7 @@ export class Step3Component implements OnInit {
         this.deleteSuppApplDocs(docType);
       }
     }
-    
+
 
   }
 
@@ -551,7 +579,7 @@ export class Step3Component implements OnInit {
   }
 
   onDocTypeChange(event): any {
-    
+
     this.inputFile.nativeElement.value = ''
     this.disableJustification = false;
     this.isTypeSelected = false;
@@ -564,7 +592,7 @@ export class Step3Component implements OnInit {
       if (this.applAdminSuppRoutingsDtos.length > 0) {
         this.showSuppApplications = true;
       }
-      
+
     } else {
       this.showSuppApplications = false;
     }
@@ -653,12 +681,12 @@ export class Step3Component implements OnInit {
           this.logger.error('Error occured while deleting justification----- ' + error.message);
         });
 
-        this.fsDocOrderControllerService.deleteDocOrderByDocTypesUsingDELETE('Justification', this.requestModel.requestDto.frqId).subscribe(
-          res => {
-            this.logger.debug('Doc order delete successful for docId: ', this.requestModel.requestDto.frqId);
-          }, error => {
-            this.logger.error('Error occured while deleting DOC ORDER----- ' + error.message);
-          });
+      this.fsDocOrderControllerService.deleteDocOrderByDocTypesUsingDELETE('Justification', this.requestModel.requestDto.frqId).subscribe(
+        res => {
+          this.logger.debug('Doc order delete successful for docId: ', this.requestModel.requestDto.frqId);
+        }, error => {
+          this.logger.error('Error occured while deleting DOC ORDER----- ' + error.message);
+        });
 
       //this.uploadJustificationText('');
       this.justificationUploaded = of(false);

@@ -85,11 +85,12 @@
 
                     <div *ngIf="justificationUploaded | async" class="drag-item drag-item-locked" tabindex="0">
 
-                        <span class="doc-name">{{ justificationType == 'text' ? 'Justification' :
+                        <span class="doc-name">{{ justificationType === 'text' ? 'Justification' :
                             justificationFileName}}</span>
                         <span class="doc-desc">(Added by <a
-                                href="mailto: {{justificationEnteredByEmail}}">{{justificationEnteredBy}}</a> on
-                            {{justificationUploadedOn}})</span>
+                                href="mailto: {{justificationEnteredByEmailEmit | async}}">{{justificationEnteredByEmit | async}}</a> on
+                            {{justificationUploadedOnEmit | async}})</span>
+                        
                         <div class="ml-auto">
 
                             <button *ngIf="justificationType === 'text'" class="btn btn-link btn-slim ml-2" title="Edit"
