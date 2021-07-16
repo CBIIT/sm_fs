@@ -87,6 +87,7 @@ import { PlanStep3Component } from './funding-plan/plan-step3/plan-step3.compone
 import { PlanStep4Component } from './funding-plan/plan-step4/plan-step4.component';
 import { PlanStep5Component } from './funding-plan/plan-step5/plan-step5.component';
 import { PlanStep6Component } from './funding-plan/plan-step6/plan-step6.component';
+import { ApproverNameRendererComponent } from './funding-request/workflow/approver-list/approver-name-renderer/approver-name-renderer.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
@@ -184,6 +185,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     PlanStep4Component,
     PlanStep5Component,
     PlanStep6Component,
+    ApproverNameRendererComponent,
   ],
 
 
