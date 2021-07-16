@@ -6,7 +6,7 @@
     [(ngModel)]="selectedValue"
     [allowClear]="false">
     <option></option>
-    <option *ngFor="let code of oefiaCodes()" value="{{code.id}}">{{code.category}}</option>
+    <option *ngFor="let code of oefiaCodes" value="{{code.id}}">{{code.category}}</option>
   </ng-select2>
 </div>
 

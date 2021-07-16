@@ -1,8 +1,8 @@
-import {Component, Input, EventEmitter, OnInit} from '@angular/core';
-import {NGXLogger} from 'ngx-logger';
-import {CanManagementServiceBus} from '../can-management-service-bus.service';
-import {OefiaCodingDto} from '@nci-cbiit/i2ecws-lib';
-import {Output} from '@angular/core';
+import { Component, Input, EventEmitter, OnInit } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
+import { CanManagementServiceBus } from '../can-management-service-bus.service';
+import { OefiaCodingDto } from '@nci-cbiit/i2ecws-lib';
+import { Output } from '@angular/core';
 
 @Component({
   selector: 'app-oefia-types',
@@ -11,6 +11,7 @@ import {Output} from '@angular/core';
 })
 export class OefiaTypesComponent implements OnInit {
   @Input() index = 0;
+  oefiaCodes: OefiaCodingDto[];
 
   @Input()
   get selectedValue(): number {
@@ -21,20 +22,26 @@ export class OefiaTypesComponent implements OnInit {
 
   set selectedValue(value: number) {
     this._selectedValue = value;
-    this.logger.debug('emitting new value:', value);
+    this.logger.debug('emitting new value:', value, this.index, this.oefiaCodes);
     this.selectedValueChange.emit(value);
-    this.canService.oefiaTypeEmitter.next({index: this.index, value});
+    this.canService.oefiaTypeEmitter.next({ index: this.index, value });
   }
 
   private _selectedValue: number;
 
   constructor(private logger: NGXLogger, private canService: CanManagementServiceBus) {
+    this.logger.warn('construction');
   }
 
   ngOnInit(): void {
+    this.logger.warn('Loading oefia types');
+    this.canService.getOefiaCodes().subscribe(result => {
+      this.logger.warn('Done loading oefia types');
+      this.oefiaCodes = result;
+      if (this._selectedValue) {
+        this.selectedValue = this._selectedValue;
+      }
+    });
   }
 
-  oefiaCodes(): OefiaCodingDto[] {
-    return this.canService.oefiaCodes;
-  }
 }

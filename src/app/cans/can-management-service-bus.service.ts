@@ -44,6 +44,16 @@ export class CanManagementServiceBus {
       this.requestModel.requestDto.frtId);
   }
 
+  getOefiaCodes(): Observable<OefiaCodingDto[]> {
+    if (this.oefiaCodes && this.oefiaCodes.length > 0) {
+      this.logger.debug('returning cached oefia codes');
+      return new Observable(subscriber => {
+        subscriber.next(this.oefiaCodes);
+      });
+    }
+    return this.canService.getOefiaTypesUsingGET();
+  }
+
   refreshOefiaCodes(): void {
     this.canService.getOefiaTypesUsingGET().subscribe(result => {
       this.oefiaCodes = result;
