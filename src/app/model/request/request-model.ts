@@ -212,6 +212,7 @@ export class RequestModel {
     this.stepLinkable = [false, false, false, false, false];
     this.mainApproverCreated = false;
     this.programRecommendedCostsModel.reset();
+    this.requestCans = undefined;
   }
 
   disableStepLinks(): void {
