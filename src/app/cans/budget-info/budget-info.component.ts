@@ -4,15 +4,12 @@ import {
   OnInit,
   Output,
   EventEmitter,
-  ViewChild,
-  AfterViewInit,
   ViewChildren,
-  QueryList, Query
+  QueryList
 } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { CanManagementServiceBus } from '../can-management-service-bus.service';
 import { RequestModel } from '../../model/request/request-model';
-import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { OefiaTypesComponent } from '../oefia-types/oefia-types.component';
 import { CanSelectorComponent } from '../can-selector/can-selector.component';
@@ -23,7 +20,7 @@ import { ProjectedCanComponent } from '../projected-can/projected-can.component'
   templateUrl: './budget-info.component.html',
   styleUrls: ['./budget-info.component.css']
 })
-export class BudgetInfoComponent implements OnInit, AfterViewInit {
+export class BudgetInfoComponent implements OnInit {
 
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
   @ViewChildren(CanSelectorComponent) canSelectors: QueryList<CanSelectorComponent>;
@@ -55,8 +52,7 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
         c.canDescription = selected.canDescrip;
       }
       const oefiaType = this.oefiaTypes?.get(index)?.selectedValue;
-      this.logger.debug('found oefiaType', oefiaType, 'at index', index);
-      c.octId = !isNaN(oefiaType) ? Number(oefiaType) : null;
+      c.octId = c.oefiaTypeId = !isNaN(oefiaType) ? (Number(oefiaType) !== 0 ? Number(oefiaType) : null) : null;
     });
   }
 
@@ -109,13 +105,5 @@ export class BudgetInfoComponent implements OnInit, AfterViewInit {
       });
     });
     return dupes[i];
-  }
-
-  ngAfterViewInit(): void {
-    this.logger.debug('==============================><==============================');
-    this.logger.debug(this.oefiaTypes);
-    this.logger.debug(this.projectedCans);
-    this.logger.debug(this.canSelectors);
-    this.logger.debug('==============================><==============================');
   }
 }
