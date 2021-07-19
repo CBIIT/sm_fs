@@ -5,7 +5,7 @@ import { Options } from 'select2';
 import {
   CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
   FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto, DocumentsControllerService,
-  ApplAdminSuppRoutingsDto, FundingRequestTypesDto, UserControllerService, FundingRequestDtoReq
+  ApplAdminSuppRoutingsDto, UserControllerService, FundingRequestDtoReq
 } from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request/request-model';
@@ -16,7 +16,6 @@ import { map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
-import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 import { formatDate } from '@angular/common';
 
 export interface Swimlane {
@@ -144,33 +143,24 @@ export class Step3Component implements OnInit {
 
   loadJustificationText() {
     if (this.requestModel.requestDto.justification !== null) {
-      console.log('justification text: ' + this.requestModel.requestDto.justification);
-      console.log('justification created by npn id: ' + this.requestModel.requestDto.justificationCreateNpnId);
+
       this.userControllerService.findByNpnIdUsingGET(this.requestModel.requestDto.justificationCreateNpnId).subscribe(
         result => {
-          console.log('got result for justification user id: ' + result.fullNameLF);
+
           this.justificationUploaded = of(true);
           this.justificationText = this.requestModel.requestDto.justification;
           this.requestModel.requestDto.justificationCreateByFullName = result.fullNameLF;
           this.requestModel.requestDto.justificationCreateByEmailAddress = result.emailAddress;
           this.justificationEnteredBy = result.fullNameLF;
-         
-          
-          console.log('result.fullNameLF: ' + result.fullNameLF);
           this.justificationEnteredByEmail = result.emailAddress;
           this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
-
-
           this.justificationEnteredByEmit.next(this.justificationEnteredBy);
           this.justificationEnteredByEmailEmit.next(this.justificationEnteredByEmail);
           this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'dd/MM/yyyy'));
-
-          console.log('this.requestModel.requestDto.justificationCreateDate: ' + this.requestModel.requestDto.justificationCreateDate);
           this.justificationType = 'text';
           this.removeDocType('Justification');
         }, error => {
           this.logger.error('HttpClient get request error for----- ' + error.message);
-          console.log('error received while getting justification user info: ' + error.message);
         });
     }
 
@@ -548,8 +538,8 @@ export class Step3Component implements OnInit {
     if (docType === 'Other') {
       this.otherDocsCount--;
     }
-
-    this._docType.rvLowValue = docType;
+    var docTypeDto: CgRefCodesDto = {};
+    docTypeDto.rvLowValue = docType;
     var isDocTypeExists: boolean = false;
     this.DocTypes.forEach(element => {
       element.forEach(e => {
@@ -557,10 +547,15 @@ export class Step3Component implements OnInit {
           isDocTypeExists = true;
         }
       });
-      if (!isDocTypeExists) {
-        element.push(this._docType);
-      }
+
     });
+    if (!isDocTypeExists) {
+      this.DocTypes.subscribe(subscriber => {
+        subscriber.push(docTypeDto);
+      });
+
+    }
+
   }
 
   downloadPackage() {
@@ -677,20 +672,25 @@ export class Step3Component implements OnInit {
         res => {
           this.logger.debug('justification deleted');
           this.requestModel.requestDto.justification = '';
+
+          //Delete Doc Order
+          this.fsDocOrderControllerService.deleteDocOrderByDocTypesUsingDELETE('Justification', this.requestModel.requestDto.frqId).subscribe(
+            res => {
+              this.logger.debug('Doc order delete successful for docId: ', this.requestModel.requestDto.frqId);
+            }, error => {
+              this.logger.error('Error occured while deleting DOC ORDER----- ' + error.message);
+            });
+
+          this.justificationUploaded = of(false);
+          this.pushDocType('Justification');
         }, error => {
           this.logger.error('Error occured while deleting justification----- ' + error.message);
         });
 
-      this.fsDocOrderControllerService.deleteDocOrderByDocTypesUsingDELETE('Justification', this.requestModel.requestDto.frqId).subscribe(
-        res => {
-          this.logger.debug('Doc order delete successful for docId: ', this.requestModel.requestDto.frqId);
-        }, error => {
-          this.logger.error('Error occured while deleting DOC ORDER----- ' + error.message);
-        });
+
 
       //this.uploadJustificationText('');
-      this.justificationUploaded = of(false);
-      this.pushDocType('Justification');
+
     } else {
       this.deleteDoc(this.justificationId, 'Justification');
     }
