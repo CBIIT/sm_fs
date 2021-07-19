@@ -2,6 +2,11 @@
 <div class="row">
     <div class="col-12">
         <h3>Budget Documents</h3>
+        <p><small class="text-muted">You may upload Microsoft Word, Microsoft Excel, or Adobe Acrobat document(s) only.
+            Note: If you upload MS Excel, make sure it contains only one worksheet per file in order to have it
+            included in the submission package.
+            Please upload only the documents that support the approval of this request. <b>Maximum File Size is 10
+                MB per file.</b></small></p>
     </div>
 
     <div class="col-lg-5">
@@ -35,7 +40,7 @@
 
     <div class="col-12">
         <div class="drag-item" ngbTooltip="Drag & Drop to Order" placement="top-left" *ngFor="let item of budgetDocDtos | async" tabindex="0">
-            <span class="doc-name">{{ item.docFilename }}</span>
+            <span class="doc-name">{{ item.docType + ' ' + item.docFilename }}</span>
             <span class="doc-desc">(Added by <a href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
                 {{item.createDate}})</span>
     
