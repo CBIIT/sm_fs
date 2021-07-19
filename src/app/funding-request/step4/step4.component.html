@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="drag-item" *ngFor="let item of docDtos" tabindex="0">
+    <div *ngFor="let item of docDtos" tabindex="0">
       <span class="doc-name">{{ item.docFilename }}</span>
       <span *ngIf="item.docFilename !== 'Summary Statement'" class="doc-desc">(Added by <a
           href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on

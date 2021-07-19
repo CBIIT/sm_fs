@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    <div class="col-lg-3">
+    <div class="col-lg-4">
         <div class="form-group">
             <p class="like-label">Project Title</p>
             <p>{{ grant.projectTitle }}</p>
@@ -36,13 +36,6 @@
         <div class="form-group">
             <p class="like-label">PI Name</p>
             <p><span [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail': 'PI/PD name':'fullGrantNum': 'lastName'"></span></p>
-        </div>
-    </div>
-
-    <div class="col-lg-4">
-        <div class="form-group">
-            <p class="like-label">Institution</p>
-            <p>{{ grant.orgName }}</p>
         </div>
     </div>
 

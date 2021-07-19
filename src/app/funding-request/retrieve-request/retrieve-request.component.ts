@@ -30,7 +30,7 @@ export class RetrieveRequestComponent implements OnInit {
         (result) => {
           // this.logger.debug('retrieveFundingReuest returned ', JSON.stringify(result));
           this.requestModel.reset();
-          this.requestModel.title = 'View Request';
+          this.requestModel.title = 'View Request Details for';
           this.requestModel.requestDto = result.requestDto;
           this.requestModel.grant = result.grantDto;
           this.requestModel.requestDto.financialInfoDto.requestorNpnId = this.requestModel.requestDto.requestorNpnId;
