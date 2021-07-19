@@ -103,7 +103,7 @@
                               [selectedValue]="source.can"></app-can-selector>
             <div class="d-flex align-items-center">
 
-              <button class="btn btn-link btn-slim" title="Copy Projected CAN" (click)="copyProjectedCan(i)">
+              <button class="btn btn-link btn-slim" ngbTooltip="Copy NCI OEFIA Projected CAN" title="Copy Projected CAN" (click)="copyProjectedCan(i)">
                 <i class="far fa-copy" aria-hidden="true"></i>
               </button>
               <span *ngIf="nonDefaultCan(i)" class="btn btn-link btn-slim btn-link-warning" title="Non-default CAN"
