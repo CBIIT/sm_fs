@@ -57,8 +57,6 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.canService.refreshCans();
-    this.canService.refreshOefiaCodes();
   }
 
   copyProjectedCan(i: number): void {

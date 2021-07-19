@@ -48,11 +48,12 @@ export class CanManagementServiceBus {
 
   getOefiaCodes(): Observable<OefiaCodingDto[]> {
     if (this.oefiaCodes && this.oefiaCodes.length > 0) {
-      this.logger.debug('returning cached oefia codes');
       return new Observable(subscriber => {
         subscriber.next(this.oefiaCodes);
+        subscriber.complete();
       });
     }
+
     const fn = this.canService.getOefiaTypesUsingGET();
     fn.subscribe(result => {
       this.oefiaCodes = result;
@@ -75,7 +76,6 @@ export class CanManagementServiceBus {
   }
 
   getRequestCans(frqId: number): Observable<FundingRequestCanDto[]> {
-    this.logger.debug('get request cans:', frqId);
     const tmp = this.cachedRequestCans.get(frqId);
     if (tmp) {
       this.logger.debug('returning cached request cans:', frqId);
@@ -86,7 +86,6 @@ export class CanManagementServiceBus {
 
     const fn = this.canService.getRequestCansUsingGET(frqId);
     fn.subscribe(result => {
-      this.logger.warn('getting request cans to cache:', frqId);
       this.cachedRequestCans.set(frqId, result);
     });
     return fn;
