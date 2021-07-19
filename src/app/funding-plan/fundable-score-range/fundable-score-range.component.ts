@@ -19,11 +19,11 @@ export class FundableScoreRangeComponent implements OnInit {
     }
 
     applicationsWithinRange(): NciPfrGrantQueryDto[] {
-        return this.planModel.grants.filter(g => g.priorityScoreNum >= this.minimumScore && g.priorityScoreNum <= this.maximumScore);
+        return this.planModel.allGrants.filter(g => g.priorityScoreNum >= this.minimumScore && g.priorityScoreNum <= this.maximumScore);
     }
 
     applicationsOutsideRange(): NciPfrGrantQueryDto[] {
-        return this.planModel.grants.filter(g => g.priorityScoreNum < this.minimumScore || g.priorityScoreNum > this.maximumScore);
+        return this.planModel.allGrants.filter(g => g.priorityScoreNum < this.minimumScore || g.priorityScoreNum > this.maximumScore);
     }
 
 }

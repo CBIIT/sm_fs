@@ -8,7 +8,7 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 export class PlanModel {
   grantViewerUrl: string;
   eGrantsUrl: string;
-  allgrants: NciPfrGrantQueryDto[] = [];
+  allGrants: NciPfrGrantQueryDto[] = [];
   selectedGrants: NciPfrGrantQueryDto[] = [];
   unselectedGrants: NciPfrGrantQueryDto[] = [];
   skippedGrants: NciPfrGrantQueryDto[] = [];
