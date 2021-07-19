@@ -9,12 +9,8 @@
         class="form-control w-auto"
         name="finalLoa"
         #finalLoa="ngModel"
+        [data]="data"
         [(ngModel)]="selectedValue"> <!-- add class "form-control" only if it's not a select2 -->
-        <option value="-1"></option>
-        <option value="1">Program Director</option>
-        <option value="2">DOC Director</option>
-        <option value="3">NCI Director</option>
-        <option value="4">NCI Scientific Program Leaders</option>
       </select>
     </div>
   </div>

@@ -7,10 +7,8 @@
       #divSuppType="ngModel"
       [(ngModel)]="requestModel.requestDto.financialInfoDto.supplementType"
       [allowClear]="false"
+      [data]="data"
       required>
-      <option></option>
-      <option value="1">New</option>
-      <option value="2">Additional Year (Extension)</option>
     </ng-select2>
     <div
       class="text-danger mt-1"

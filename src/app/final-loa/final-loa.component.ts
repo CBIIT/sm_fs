@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {RequestModel} from '../model/request/request-model';
 import {ControlContainer, NgForm} from '@angular/forms';
+import { Select2OptionData } from 'ng-select2';
 
 @Component({
   selector: 'app-final-loa',
@@ -9,6 +10,9 @@ import {ControlContainer, NgForm} from '@angular/forms';
   viewProviders: [{provide: ControlContainer, useExisting: NgForm}]
 })
 export class FinalLoaComponent implements OnInit {
+  private _selectedValue: number;
+  data: Array<Select2OptionData>;
+
   get selectedValue(): number {
     return this._model.requestDto.loaId;
   }
@@ -18,13 +22,18 @@ export class FinalLoaComponent implements OnInit {
     this._model.requestDto.loaId = value;
   }
 
-  private _selectedValue: number;
 
   get model(): RequestModel {
     return this._model;
   }
 
   constructor(private _model: RequestModel) {
+    this.data = [];
+    this.data.push({id: '-1', text: ''});
+    this.data.push({id: '1', text: 'Program Director'});
+    this.data.push({id: '2', text: 'DOC Director'});
+    this.data.push({id: '3', text: 'NCI Director'});
+    this.data.push({id: '4', text: 'NCI Scientific Program Leaders'});
   }
 
   ngOnInit(): void {

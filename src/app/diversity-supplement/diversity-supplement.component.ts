@@ -1,6 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {RequestModel} from '../model/request/request-model';
-import {ControlContainer, NgForm} from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { RequestModel } from '../model/request/request-model';
+import { ControlContainer, NgForm } from '@angular/forms';
+import { Select2OptionData } from 'ng-select2';
 
 @Component({
   selector: 'app-diversity-supplement',
@@ -10,8 +11,14 @@ import {ControlContainer, NgForm} from '@angular/forms';
 })
 export class DiversitySupplementComponent implements OnInit {
   @Input() parentForm: NgForm;
+  data: Array<Select2OptionData>;
 
-  constructor(public requestModel: RequestModel) { }
+  constructor(public requestModel: RequestModel) {
+    this.data = [];
+    this.data.push({ id: '', text: '' });
+    this.data.push({ id: '1', text: 'New' });
+    this.data.push({ id: '2', text: 'Additional Year (Extension)' });
+  }
 
   ngOnInit(): void {
   }
