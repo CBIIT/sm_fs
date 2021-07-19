@@ -10,7 +10,7 @@
   
 <div class="row collapse show" id="workflow-collapse">
 
-    <div class="col-12" *ngIf="requestStatus && requestStatus.comments">
+    <div class="col-12" *ngIf="isApprover() && requestStatus && requestStatus.comments">
         <ngb-alert type="primary" [dismissible]="false" class="workflow-comments">
             <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
             <div class="comment-content">
