@@ -14,6 +14,8 @@ export class PlanModel {
   skippedGrants: NciPfrGrantQueryDto[] = [];
   exceptionGrants: NciPfrGrantQueryDto[] = [];
 
+  title = 'New Funding Plan';
+
 
   constructor(propertiesService: AppPropertiesService) {
     this.grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');

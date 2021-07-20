@@ -56,6 +56,4 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
       }
     }
   }
-
-
 }
