@@ -15,8 +15,9 @@
         <thead>
         <tr>
           <th scope="col">Funding Source</th>
-          <th scope="col">Approved Amount</th>
-          <th scope="col" [hidden]="isArc">OEFIA Coding</th>
+          <th scope="col">Approved Direct Cost</th>
+          <th scope="col">Approved Total Cost</th>
+          <th scope="col" [hidden]="!(isFinancialApprover() && isFcNci())">OEFIA Coding</th>
           <th scope="col">NCI OEFIA Projected CAN</th>
           <th scope="col">
             <div class="d-flex">
@@ -30,8 +31,9 @@
         <tbody>
         <tr *ngFor="let source of fundingRequestCans; let i = index">
           <td>{{source.fundingSourceName}}</td>
+          <td>{{ source.approvedDc | currency }}</td>
           <td>{{ source.approvedTc | currency }}</td>
-          <td [hidden]="isArc">
+          <td [hidden]="!(isFinancialApprover() && isFcNci())">
             <app-oefia-types [index]="i" [selectedValue]="source.octId" [readonly]="true"></app-oefia-types>
           </td>
           <td>
@@ -77,8 +79,9 @@
         <thead>
         <tr>
           <th scope="col">Funding Source</th>
-          <th scope="col">Approved Amount</th>
-          <th scope="col" [hidden]="isArc">OEFIA Coding</th>
+          <th scope="col">Approved Direct Cost</th>
+          <th scope="col">Approved Total Cost</th>
+          <th scope="col" [hidden]="!(isFinancialApprover() && isFcNci())">OEFIA Coding</th>
           <th scope="col">NCI OEFIA Projected CAN</th>
           <th scope="col">
             <div class="d-flex">
@@ -92,8 +95,9 @@
         <tbody>
         <tr *ngFor="let source of fundingRequestCans; let i = index">
           <td>{{source.fundingSourceName}}</td>
+          <td>{{ source.approvedDc | currency }}</td>
           <td>{{ source.approvedTc | currency }}</td>
-          <td [hidden]="isArc">
+          <td [hidden]="!(isFinancialApprover() && isFcNci())">
             <app-oefia-types [index]="i" [selectedValue]="source.octId || source.defaultOefiaTypeId"></app-oefia-types>
           </td>
           <td>

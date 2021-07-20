@@ -20,7 +20,6 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   inputFile: ElementRef;
   @ViewChild('labelImport')
   labelImport: ElementRef;
-  @Input() financialRoleCode;
 
   @ViewChild(BudgetInfoComponent) budgetInfoComponent: BudgetInfoComponent;
 
@@ -34,7 +33,6 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   maxFileSize = 10485760; // 10MB
   budgetDocDtos: Observable<DocumentsDto[]>;
   budgetInfoReadOnly = false;
-
 
   get selectedDocType(): string {
     return this._selectedDocType;

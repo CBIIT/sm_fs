@@ -19,7 +19,6 @@ import { WorkflowModalComponent } from '../workflow-modal/workflow-modal.compone
 import { WorkflowActionCode, WorkflowModel } from '../workflow/workflow.model';
 import { WorkflowComponent } from '../workflow/workflow.component';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 import { UploadBudgetDocumentsComponent } from '../../upload-budget-documents/upload-budget-documents.component';
 
 @Component({
@@ -63,7 +62,6 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   closeResult: string;
 
   userCanSubmitApprove = false;
-  financialRoleCode: string;
 
   constructor(private router: Router,
               private requestModel: RequestModel,
@@ -341,13 +339,12 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       result => {
         if (result) {
           if (!this.isTerminalStatus() && this.requestStatus !== 'ON HOLD') {
-            for (const role in result) {
-              if (this.isCurrentApprover(result[role])) {
-                if (result[role].roleCode === 'FCARC' ||
-                  result[role].roleCode === 'FCNCI') {
+            for (const approver in result) {
+              if (this.isCurrentApprover(result[approver])) {
+                if (result[approver].roleCode === 'FCARC' ||
+                  result[approver].roleCode === 'FCNCI') {
                   this.logger.debug('user is funds approver');
                   this.isDisplayBudgetDocsUploadVar = true;
-                  this.financialRoleCode = result[role].roleCode;
                   break;
                 }
               }

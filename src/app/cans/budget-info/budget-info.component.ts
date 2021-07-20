@@ -12,6 +12,7 @@ import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { OefiaTypesComponent } from '../oefia-types/oefia-types.component';
 import { CanSelectorComponent } from '../can-selector/can-selector.component';
 import { ProjectedCanComponent } from '../projected-can/projected-can.component';
+import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 
 @Component({
   selector: 'app-budget-info',
@@ -19,7 +20,6 @@ import { ProjectedCanComponent } from '../projected-can/projected-can.component'
   styleUrls: ['./budget-info.component.css']
 })
 export class BudgetInfoComponent implements OnInit {
-  @Input() financialRoleCode: string;
 
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
   @ViewChildren(CanSelectorComponent) canSelectors: QueryList<CanSelectorComponent>;
@@ -27,7 +27,7 @@ export class BudgetInfoComponent implements OnInit {
 
   @Input() readOnly = false;
   @Input() editing = false;
-  isArc: boolean;
+
 
   get fundingRequestCans(): FundingRequestCanDto[] {
     return this.model.requestCans;
@@ -37,7 +37,20 @@ export class BudgetInfoComponent implements OnInit {
     this.model.requestCans = value;
   }
 
-  constructor(private logger: NGXLogger, private canService: CanManagementServiceBus, private model: RequestModel) {
+  constructor(private logger: NGXLogger, private canService: CanManagementServiceBus, private model: RequestModel,
+              private workflowModel: WorkflowModel) {
+  }
+
+  isFcArc(): boolean {
+    return this.workflowModel.isFcArc;
+  }
+
+  isFcNci(): boolean {
+    return this.workflowModel.isFcNci;
+  }
+
+  isFinancialApprover(): boolean {
+    return this.workflowModel.isFinancialApprover;
   }
 
   get defaultCans(): CanCcxDto[] {
@@ -57,7 +70,6 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isArc = 'FCARC' === this.financialRoleCode;
   }
 
   copyProjectedCan(i: number): void {

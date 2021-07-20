@@ -9,32 +9,36 @@ import { FundingRequestIntegrationService } from '../integration/integration.ser
 @Injectable()
 export class WorkflowModel {
 
- private awa: WorkflowAction[] = [];
+  private awa: WorkflowAction[] = [];
 
- _allApprovers: FundingReqApproversDto[];
- _previousApprovers: FundingReqApproversDto[];
- _pendingApprovers: FundingReqApproversDto[];
+  _allApprovers: FundingReqApproversDto[];
+  _previousApprovers: FundingReqApproversDto[];
+  _pendingApprovers: FundingReqApproversDto[];
 
- nextApprover: FundingReqApproversDto;
- addedApproverMap = new Map<number, any>();
- previousApprovers: FundingReqApproversDto[];
- // oneApprover is used when doing Approve & Route
- oneApprover: FundingReqApproversDto;
- pendingApprovers: FundingReqApproversDto[];
- additionalApprovers: FundingReqApproversDto[];
+  nextApprover: FundingReqApproversDto;
+  addedApproverMap = new Map<number, any>();
+  previousApprovers: FundingReqApproversDto[];
+  // oneApprover is used when doing Approve & Route
+  oneApprover: FundingReqApproversDto;
+  pendingApprovers: FundingReqApproversDto[];
+  additionalApprovers: FundingReqApproversDto[];
 
- nextApproverRoleCode = '';
- isUserNextInChain = false;
- lastInChain = false;
- hasNewApprover = false;
- isScientificApprover = false;
- isGMApprover = false;
- approvedScientifically = false;
- approvedByGM = false;
- scientificRoleCodes = ['DOC', 'DD', 'SPL' ];
- approvalActions = [WorkflowActionCode.APPROVE,
-                    WorkflowActionCode.APPROVE_COMMENT,
-                    WorkflowActionCode.APPROVE_ROUTE];
+  nextApproverRoleCode = '';
+  isUserNextInChain = false;
+  lastInChain = false;
+  hasNewApprover = false;
+  isScientificApprover = false;
+  isGMApprover = false;
+  isFinancialApprover = false;
+  isFcArc = false;
+  isFcNci = false;
+  approvedScientifically = false;
+  approvedByGM = false;
+  scientificRoleCodes = ['DOC', 'DD', 'SPL'];
+  financialRoleCodes = ['FCNCI', 'FCARC'];
+  approvalActions = [WorkflowActionCode.APPROVE,
+    WorkflowActionCode.APPROVE_COMMENT,
+    WorkflowActionCode.APPROVE_ROUTE];
 
   constructor(
     public requestModel: RequestModel,
@@ -42,7 +46,7 @@ export class WorkflowModel {
     private workflowControllerService: FsWorkflowControllerService,
     private requestIntegrationService: FundingRequestIntegrationService,
     private logger: NGXLogger
-    ) {
+  ) {
     this.awa = [];
     this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE, 'Approve', 'Approve', true, false, false));
     this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE_ROUTE, 'Approve and Route', 'Approve and Route', true, false, true));
@@ -65,23 +69,21 @@ export class WorkflowModel {
   }
 
   // for workflow action drop down
-  getWorkflowList(): {id: WorkflowActionCode, text: string}[] {
+  getWorkflowList(): { id: WorkflowActionCode, text: string }[] {
     const roleCode = this.nextApproverRoleCode;
     if (roleCode) {
       return this.awa.filter((a) => {
         if (a.allRoleCode &&
-            (!a.actionRoleCodes || a.actionRoleCodes.indexOf('-' + roleCode) === -1)
-          ) {
+          (!a.actionRoleCodes || a.actionRoleCodes.indexOf('-' + roleCode) === -1)
+        ) {
           return true;
-        }
-        else if ( a.actionRoleCodes && a.actionRoleCodes.indexOf(roleCode) > -1 ) {
+        } else if (a.actionRoleCodes && a.actionRoleCodes.indexOf(roleCode) > -1) {
           return true;
         }
         return false;
-      }).map( a => ({id : a.action, text : a.actionName})
+      }).map(a => ({ id: a.action, text: a.actionName })
       );
-    }
-    else {
+    } else {
       return [];
     }
   }
@@ -118,14 +120,13 @@ export class WorkflowModel {
     });
 
     this.nextApprover = this._pendingApprovers && this._pendingApprovers.length > 0 ? this._pendingApprovers[0] : null;
-    if ( this.nextApprover ) {
+    if (this.nextApprover) {
       const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
       this.isUserNextInChain = false;
       if (userId === this.nextApprover.approverLdap) {
         this.isUserNextInChain = true;
-      }
-      else if (this.nextApprover.designees && this.nextApprover.designees.length > 0){
-        const designees = this.nextApprover.designees.map( d => d.delegateTo);
+      } else if (this.nextApprover.designees && this.nextApprover.designees.length > 0) {
+        const designees = this.nextApprover.designees.map(d => d.delegateTo);
         if (designees.indexOf(userId) > -1) {
           this.isUserNextInChain = true;
         }
@@ -134,14 +135,23 @@ export class WorkflowModel {
       this.logger.debug('next in chain:', this.isUserNextInChain);
       if (this.isUserNextInChain) {
         this.nextApproverRoleCode = this.nextApprover.roleCode ? this.nextApprover.roleCode : 'ADDITIONAL';
-        if (this._pendingApprovers.length === 1 ) {
+        if (this._pendingApprovers.length === 1) {
           this.lastInChain = true;
         }
 
-        this.logger.debug(this.scientificRoleCodes, this.nextApproverRoleCode);
         if (this.scientificRoleCodes.indexOf(this.nextApproverRoleCode) > -1) {
           this.logger.debug('Scientific approver');
           this.isScientificApprover = true;
+        }
+
+        if (this.financialRoleCodes.indexOf(this.nextApproverRoleCode) > -1) {
+          this.logger.debug('Financial approver');
+          this.isFinancialApprover = true;
+          if (this.nextApproverRoleCode === 'FCARC') {
+            this.isFcArc = true;
+          } else if (this.nextApproverRoleCode === 'FCNCI') {
+            this.isFcNci = true;
+          }
         }
 
         if (this.nextApproverRoleCode === 'GM') {
@@ -152,7 +162,7 @@ export class WorkflowModel {
     }
 
     if (this._previousApprovers && this._previousApprovers.length > 0) {
-      for ( const a of this._previousApprovers) {
+      for (const a of this._previousApprovers) {
         if (this.scientificRoleCodes.indexOf(a.roleCode) > -1 && a.responseCode === 'Y') {
           this.approvedScientifically = true;
         }
@@ -197,7 +207,7 @@ export class WorkflowModel {
 
   addAdditionalApprover(user: any, action: WorkflowActionCode): void {
     if (action === WorkflowActionCode.REASSIGN) {
-      const approver: FundingReqApproversDto =  JSON.parse(JSON.stringify(this.pendingApprovers[0]));
+      const approver: FundingReqApproversDto = JSON.parse(JSON.stringify(this.pendingApprovers[0]));
       approver.approverNpnId = user.id;
       approver.approverLdap = user.nciLdapCn;
       approver.approverFullName = user.fullName;
@@ -208,8 +218,7 @@ export class WorkflowModel {
       this.logger.debug('pending approvers ', this.pendingApprovers);
       this.logger.debug('_pending approvers ', this._pendingApprovers);
       this.requestIntegrationService.approverListChangeEmitter.next();
-    }
-    else {// if ( action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) {
+    } else {// if ( action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) {
       if (!this.additionalApprovers) {
         this.additionalApprovers = [];
       }
@@ -239,27 +248,25 @@ export class WorkflowModel {
   reorderApprovers(): void {
     let orderNum = (this.previousApprovers) ? this.previousApprovers.length : 0;
     if (this.oneApprover) {
-      orderNum ++;
+      orderNum++;
     }
     for (const a of this.additionalApprovers) {
-      orderNum ++;
+      orderNum++;
       a.orderNum = orderNum;
     }
-    for (const a of this.pendingApprovers ) {
-      orderNum ++;
+    for (const a of this.pendingApprovers) {
+      orderNum++;
       a.orderNum = orderNum;
     }
   }
 
   // this is used by SubmitRequest method to show the next approver in the submission message.
-  getNextApproverInChain(): FundingReqApproversDto{
+  getNextApproverInChain(): FundingReqApproversDto {
     if (this.oneApprover) {
       return this.oneApprover;
-    }
-    else if (this.additionalApprovers && this.additionalApprovers.length > 0) {
+    } else if (this.additionalApprovers && this.additionalApprovers.length > 0) {
       return this.additionalApprovers[0];
-    }
-    else if (this.pendingApprovers && this.pendingApprovers.length > 0) {
+    } else if (this.pendingApprovers && this.pendingApprovers.length > 0) {
       return this.pendingApprovers[0];
     }
 
@@ -281,8 +288,7 @@ export class WorkflowAction {
   newApproverRequired: boolean;
 
   constructor(action: WorkflowActionCode, actionName: string, actionButtonText: string, allRoles: boolean,
-              commentsRequired: boolean, newApproverRequired: boolean, roles?: string[])
-  {
+              commentsRequired: boolean, newApproverRequired: boolean, roles?: string[]) {
     this.action = action;
     this.actionName = actionName;
     this.actionButtonText = actionButtonText;
