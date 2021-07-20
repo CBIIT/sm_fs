@@ -13,13 +13,28 @@ import { PdAuthGuard } from './funding-request/step1/pd.auth.guard';
 import { FundingSourcesNamesComponent } from './funding-sources-names/funding-sources-names.component';
 import { RetrieveRequestComponent } from './funding-request/retrieve-request/retrieve-request.component';
 import { ReviewRequestComponent } from './funding-request/review-request/review-request.component';
+import { PlanStep1Component } from './funding-plan/plan-step1/plan-step1.component';
+import { PlanStep2Component } from './funding-plan/plan-step2/plan-step2.component';
+import { PlanStep3Component } from './funding-plan/plan-step3/plan-step3.component';
+import { PlanStep4Component } from './funding-plan/plan-step4/plan-step4.component';
+import { PlanStep5Component } from './funding-plan/plan-step5/plan-step5.component';
+import { PlanStep6Component } from './funding-plan/plan-step6/plan-step6.component';
 
 const routes: Routes = [
   {
     path: '', canActivate: [AuthGuard], children: [
       { path: '', redirectTo: '/search', pathMatch: 'full' },
       { path: 'search', component: SearchComponent, canActivate: [AuthGuard] },
-      { path: 'plan', component: FundingPlanComponent },
+      { path: 'plan', component: FundingPlanComponent, children: [
+        {path: '', redirectTo: 'step1', pathMatch: 'full'},
+        {path: 'step1', component: PlanStep1Component, canActivate: [PdAuthGuard]},
+        {path: 'step2', component: PlanStep2Component},
+        {path: 'step3', component: PlanStep3Component},
+        {path: 'step4', component: PlanStep4Component},
+        {path: 'step5', component: PlanStep5Component},
+        {path: 'step6', component: PlanStep6Component},
+        {path: 'retrieve/:fprId', component: RetrieveRequestComponent}
+      ]},
       { path: 'request', component: FundingRequestComponent, children: [
         {path: '', redirectTo: 'step1', pathMatch: 'full'},
         {path: 'step1', component: Step1Component, canActivate: [PdAuthGuard]},
