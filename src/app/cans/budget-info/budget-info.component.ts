@@ -116,4 +116,9 @@ export class BudgetInfoComponent implements OnInit {
     });
     return dupes[i];
   }
+
+  showCopyProjectedCan(i: number): boolean {
+    const projectedCan: CanCcxDto = this.projectedCans?.get(i)?.projectedCan;
+    return !!projectedCan;
+  }
 }

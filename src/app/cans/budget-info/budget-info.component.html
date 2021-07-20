@@ -29,18 +29,18 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let source of fundingRequestCans; let i = index">
-          <td>{{source.fundingSourceName}}</td>
-          <td>{{ source.approvedDc | currency }}</td>
-          <td>{{ source.approvedTc | currency }}</td>
+        <tr *ngFor="let can of fundingRequestCans; let i = index">
+          <td>{{can.fundingSourceName}}</td>
+          <td>{{ can.approvedDc | currency }} {{can.approvedPctCut | percentToggle}}</td>
+          <td>{{ can.approvedTc | currency }} {{can.approvedPctCut | percentToggle}}</td>
           <td [hidden]="!(isFinancialApprover() && isFcNci())">
-            <app-oefia-types [index]="i" [selectedValue]="source.octId" [readonly]="true"></app-oefia-types>
+            <app-oefia-types [index]="i" [selectedValue]="can.octId" [readonly]="true"></app-oefia-types>
           </td>
           <td>
-            <app-projected-can [index]="i" [fseId]="source.fseId"></app-projected-can>
+            <app-projected-can [index]="i" [fseId]="can.fseId"></app-projected-can>
           </td>
           <td>
-            <app-can-selector [index]="i" [nciSourceFlag]="source.nciSourceFlag" [selectedValue]="source.can"
+            <app-can-selector [index]="i" [nciSourceFlag]="can.nciSourceFlag" [selectedValue]="can.can"
                               [readonly]="true"></app-can-selector>
             <div class="d-flex align-items-center">
 
@@ -93,22 +93,22 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let source of fundingRequestCans; let i = index">
-          <td>{{source.fundingSourceName}}</td>
-          <td>{{ source.approvedDc | currency }}</td>
-          <td>{{ source.approvedTc | currency }}</td>
+        <tr *ngFor="let can of fundingRequestCans; let i = index">
+          <td>{{can.fundingSourceName}}</td>
+          <td>{{ can.approvedDc | currency }} {{can.approvedPctCut | percentToggle}}</td>
+          <td>{{ can.approvedTc | currency }} {{can.approvedPctCut | percentToggle}}</td>
           <td [hidden]="!(isFinancialApprover() && isFcNci())">
-            <app-oefia-types [index]="i" [selectedValue]="source.octId || source.defaultOefiaTypeId"></app-oefia-types>
+            <app-oefia-types [index]="i" [selectedValue]="can.octId || can.defaultOefiaTypeId"></app-oefia-types>
           </td>
           <td>
-            <app-projected-can [index]="i" [fseId]="source.fseId"></app-projected-can>
+            <app-projected-can [index]="i" [fseId]="can.fseId"></app-projected-can>
           </td>
           <td>
-            <app-can-selector [index]="i" [nciSourceFlag]="source.nciSourceFlag"
-                              [selectedValue]="source.can"></app-can-selector>
+            <app-can-selector [index]="i" [nciSourceFlag]="can.nciSourceFlag"
+                              [selectedValue]="can.can"></app-can-selector>
             <div class="d-flex align-items-center">
 
-              <button class="btn btn-link btn-slim" ngbTooltip="Copy NCI OEFIA Projected CAN" title="Copy Projected CAN"
+              <button class="btn btn-link btn-slim" *ngIf="showCopyProjectedCan(i)" ngbTooltip="Copy NCI OEFIA Projected CAN" title="Copy Projected CAN"
                       (click)="copyProjectedCan(i)">
                 <i class="far fa-copy" aria-hidden="true"></i>
               </button>
