@@ -360,6 +360,7 @@ export class RequestModel {
               dto.requestedTc = lineItem0.recommendedTotal;
               dto.requestedDc = lineItem0.recommendedDirect;
               dto.approvedTc = dto.requestedTc;
+              dto.approvedDc = dto.requestedDc;
               dto.approvedPctCut = lineItem0.percentCutTotalCalculated;
               dto.requestedFutureYrs = lineItems.filter( li => li.recommendedTotal > 0 || li.recommendedDirect > 0).length - 1;
               dto.approvedFutureYrs = dto.requestedFutureYrs;
