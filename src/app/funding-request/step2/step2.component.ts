@@ -72,7 +72,6 @@ export class Step2Component implements OnInit {
     // TODO: make sure model is properly constructed
     this.requestModel.prepareBudgetsAndSetFinalLoa();
     this.logger.debug(JSON.stringify(this.requestModel.requestDto));
-    this.logger.debug(JSON.stringify(this.requestModel.programRecommendedCostsModel));
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
         this.requestModel.requestDto = result;
@@ -82,7 +81,6 @@ export class Step2Component implements OnInit {
           title: ''
         });
         this.logger.debug(JSON.stringify(this.requestModel.requestDto));
-        this.logger.debug(JSON.stringify(this.requestModel.programRecommendedCostsModel));
         // always go to next step even if create approver fails. that's behavior before moving
         // create approvers here.
         this.requestApproverService.checkCreateApprovers().finally(
@@ -94,7 +92,7 @@ export class Step2Component implements OnInit {
       }, error => {
         // TODO: properly handle errors here
         this.logger.error('HttpClient get request error during save request ----- ' + error.message);
-        this.logger.error('Request data: ', JSON.stringify(this.requestModel));
+        this.logger.error('Request data: ', JSON.stringify(this.requestModel.requestDto));
         this.requestModel.pendingAlerts.push({
           type: 'danger',
           message: 'Unexpected system error encountered: \'' + error.message + '\'',

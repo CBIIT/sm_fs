@@ -102,7 +102,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
 
   private loadApplAwardPeriods(): void {
-    this.logger.debug('loadApplAwardPeriods(', this.requestModel.grant.applId, ')');
+    // this.logger.debug('loadApplAwardPeriods(', this.requestModel.grant.applId, ')');
     // if (!this.requestModel.programRecommendedCostsModel.grantAwarded) {
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.programRecommendedCostsModel.grantAwarded = result;

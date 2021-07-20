@@ -34,8 +34,6 @@ export class ProjectedCanComponent implements OnInit {
     }
 
     this.canService.getProjectedCan(source, oefiaType).subscribe(result => {
-      this.logger.debug('getting new projected CAN for', source, oefiaType);
-      this.logger.debug(JSON.stringify(result));
       this.projectedCan = result;
       this.canService.projectedCanEmitter.next({ index: this.index, can: result });
     });

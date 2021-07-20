@@ -132,7 +132,6 @@ export class WorkflowModel {
         }
       }
 
-      this.logger.debug('next in chain:', this.isUserNextInChain);
       if (this.isUserNextInChain) {
         this.nextApproverRoleCode = this.nextApprover.roleCode ? this.nextApprover.roleCode : 'ADDITIONAL';
         if (this._pendingApprovers.length === 1) {
@@ -140,12 +139,10 @@ export class WorkflowModel {
         }
 
         if (this.scientificRoleCodes.indexOf(this.nextApproverRoleCode) > -1) {
-          this.logger.debug('Scientific approver');
           this.isScientificApprover = true;
         }
 
         if (this.financialRoleCodes.indexOf(this.nextApproverRoleCode) > -1) {
-          this.logger.debug('Financial approver');
           this.isFinancialApprover = true;
           if (this.nextApproverRoleCode === 'FCARC') {
             this.isFcArc = true;
@@ -215,8 +212,6 @@ export class WorkflowModel {
       this.pendingApprovers[0] = approver;
       this.addedApproverMap.set(user.id, true);
       this.hasNewApprover = true;
-      this.logger.debug('pending approvers ', this.pendingApprovers);
-      this.logger.debug('_pending approvers ', this._pendingApprovers);
       this.requestIntegrationService.approverListChangeEmitter.next();
     } else {// if ( action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) {
       if (!this.additionalApprovers) {

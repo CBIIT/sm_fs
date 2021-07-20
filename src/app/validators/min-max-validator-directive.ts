@@ -15,8 +15,6 @@ export class MinMaxValidatorDirective implements Validator {
 
   validate(control: AbstractControl): ValidationErrors | null {
 
-    this.logger.debug('minMaxValidation on control', control);
-    this.logger.debug(this.minMax);
     const val = control.value;
     if (isNaN(val)) {
       return null;
