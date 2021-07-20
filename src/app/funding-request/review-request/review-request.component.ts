@@ -63,6 +63,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   closeResult: string;
 
   userCanSubmitApprove = false;
+  financialRoleCode: string;
 
   constructor(private router: Router,
               private requestModel: RequestModel,
@@ -397,6 +398,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
                   result[role].roleCode === 'FCNCI') {
                   this.logger.debug('user is funds approver');
                   this.isDisplayBudgetDocsUploadVar = true;
+                  this.financialRoleCode = result[role].roleCode;
                   break;
                 }
               }

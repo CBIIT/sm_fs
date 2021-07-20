@@ -21,6 +21,7 @@ import { ProjectedCanComponent } from '../projected-can/projected-can.component'
   styleUrls: ['./budget-info.component.css']
 })
 export class BudgetInfoComponent implements OnInit {
+  @Input() financialRoleCode: string;
 
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
   @ViewChildren(CanSelectorComponent) canSelectors: QueryList<CanSelectorComponent>;
@@ -28,6 +29,7 @@ export class BudgetInfoComponent implements OnInit {
 
   @Input() readOnly = false;
   @Input() editing = false;
+  isArc: boolean;
 
   get fundingRequestCans(): FundingRequestCanDto[] {
     return this.model.requestCans;
@@ -57,13 +59,14 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isArc = 'FCARC' === this.financialRoleCode;
   }
 
   copyProjectedCan(i: number): void {
     this.logger.debug('copy projected can in row', i);
     this.canSelectors.forEach((control, index) => {
       if (i === index) {
-        const result = control.selectProjectedCan();
+        control.selectProjectedCan();
       }
     });
   }
@@ -72,7 +75,6 @@ export class BudgetInfoComponent implements OnInit {
     if (!this.canSelectors || !this.projectedCans) {
       return false;
     }
-    // this.logger.debug('validate non-default CAN in row', i);
     const selectedCan: CanCcxDto = this.canSelectors?.get(i)?.selectedCanData;
     const projectedCan: CanCcxDto = this.projectedCans?.get(i)?.projectedCan;
     if (!projectedCan || !projectedCan.can || !projectedCan.canDescrip) {

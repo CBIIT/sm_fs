@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { of, Observable } from 'rxjs';
 import { DocumentsDto } from '@nci-cbiit/i2ecws-lib';
 import { RequestModel } from '../model/request/request-model';
@@ -20,17 +20,18 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   inputFile: ElementRef;
   @ViewChild('labelImport')
   labelImport: ElementRef;
+  @Input() financialRoleCode;
 
   @ViewChild(BudgetInfoComponent) budgetInfoComponent: BudgetInfoComponent;
 
-  public _selectedDocType: string = '';
-  disableFile: boolean = true;
+  public _selectedDocType = '';
+  disableFile = true;
   public docTypesStr: Array<string> = ['Interagency Agreement', 'Direct Citation Form', 'NCI Memo', 'Other Funding Document'];
-;
+
   public docTypes: Observable<Array<string>> = of(this.docTypesStr);
-  public _docDescription: string = '';
+  public _docDescription = '';
   public _docDto: DocumentsDto = {};
-  maxFileSize: number = 10485760; //10MB
+  maxFileSize = 10485760; // 10MB
   budgetDocDtos: Observable<DocumentsDto[]>;
   budgetInfoReadOnly = false;
 
@@ -64,7 +65,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
     this.loadFiles();
   }
 
-  loadFiles() {
+  loadFiles(): void {
     this.documentService.getFSBudgetFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
       result => {
         this.budgetDocDtos = of(result);
@@ -78,7 +79,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   }
 
   selectFiles(event): void {
-    let files: FileList = event.target.files;
+    const files: FileList = event.target.files;
     this.labelImport.nativeElement.innerText = Array.from(files)
       .map(f => f.name)
       .join(', ');
@@ -87,7 +88,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
 
   onDocTypeChange(event): any {
     this.logger.debug('Doc Type Change: ', event);
-    this.inputFile.nativeElement.value = ''
+    this.inputFile.nativeElement.value = '';
 
     if (event === '') {
       this.disableFile = true;
@@ -96,7 +97,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
     }
   }
 
-  uploadFiles() {
+  uploadFiles(): void {
     for (let i = 0; i < this.selectedFiles.length; i++) {
       this._docDto.docDescription = this.docDescription;
       this._docDto.docType = this.selectedDocType;
@@ -113,7 +114,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
 
   }
 
-  upload(file) {
+  upload(file): void {
     this.documentService.upload(file, this._docDto).subscribe(
       event => {
         if (event instanceof HttpResponse) {
@@ -129,7 +130,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
       });
   }
 
-  spliceDocType(docType: string) {
+  spliceDocType(docType: string): void {
 
     this.docTypes.forEach(element => {
       element.forEach((e, index) => {
@@ -140,14 +141,12 @@ export class UploadBudgetDocumentsComponent implements OnInit {
     });
   }
 
-  reset() {
+  reset(): void {
     this.inputFile.nativeElement.value = '';
     this.labelImport.nativeElement.innerText = 'Choose file';
     this.selectedDocType = '';
     this.docDescription = '';
     this.disableFile = true;
-
-
   }
 
   downloadFile(id: number, fileName: string): void {
@@ -162,22 +161,22 @@ export class UploadBudgetDocumentsComponent implements OnInit {
 
   }
 
-  deleteDoc(id: number, docType: string) {
+  deleteDoc(id: number, docType: string): void {
     this.documentService.deleteDocById(id).subscribe(
-      result => {
+      () => {
         this.logger.debug('Delete Success');
         this.loadFiles();
         this.pushDocType(docType);
       }
-    ), err => {
-      this.logger.error('Error while deleting the document for the docId:' + id);
+    ), error => {
+      this.logger.error('Error while deleting the document for the docId:' + id + ' ==> ' + error);
     };
 
   }
 
 
-  pushDocType(docType: string) {
-    var isDocTypeExists: boolean = false;
+  pushDocType(docType: string): void {
+    let isDocTypeExists = false;
     this.docTypes.forEach(element => {
       element.forEach(e => {
         if (e === docType) {
