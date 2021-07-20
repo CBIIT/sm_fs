@@ -39,7 +39,7 @@
     </div>
 
     <div class="col-12">
-        <div class="drag-item" ngbTooltip="Drag & Drop to Order" placement="top-left" *ngFor="let item of budgetDocDtos | async" tabindex="0">
+        <div class="drag-item" *ngFor="let item of budgetDocDtos | async" tabindex="0">
             <span class="doc-name">{{ item.docType + ' ' + item.docFilename }}</span>
             <span class="doc-desc">(Added by <a href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
                 {{item.createDate}})</span>
