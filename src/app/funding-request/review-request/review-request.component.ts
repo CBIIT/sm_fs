@@ -334,58 +334,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     }
   }
 
-  downloadCoverSheet(): void {
-    this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId)
-      .subscribe(
-        (response: HttpResponse<Blob>) => {
-          const blob = new Blob([response.body], { type: response.headers.get('content-type') });
-          saveAs(blob, 'Cover Page.pdf');
-        }
-      );
-  }
-
-  downloadFile(id: number, fileName: string): void {
-
-    if (fileName === 'Summary Statement') {
-      this.downloadSummaryStatement();
-    } else {
-      this.documentService.downloadById(id)
-        .subscribe(
-          (response: HttpResponse<Blob>) => {
-            const blob = new Blob([response.body], { type: response.headers.get('content-type') });
-            saveAs(blob, fileName);
-          }
-        );
-    }
-
-  }
-
-  open(content) {
-    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
-  }
-
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return `with: ${reason}`;
-    }
-  }
-
-  downloadSummaryStatement(): void {
-    this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId)
-      .subscribe(
-        blob => saveAs(blob, 'Summary Statement.pdf'),
-        _error => this.logger.error('Error downloading the file'),
-        () => this.logger.debug('File downloaded successfully')
-      );
-  }
+  
 
   isDisplayBudgetDocsUpload(): void {
     this.fsWorkflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
@@ -473,17 +422,9 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     return false;
   }
 
-  downloadPackage() {
-    this.documentService.downLoadFrqPackage(this.requestModel.requestDto.frqId,
-      this.requestModel.grant.applId)
-      .subscribe(
-        (response: HttpResponse<Blob>) => {
-          const blob = new Blob([response.body], { type: response.headers.get('content-type') });
-          saveAs(blob, 'Package.pdf');
-        }
-      ), error =>
-      this.logger.error('Error downloading the file'),
-      () => console.info('File downloaded successfully');
-  }
+  get self(): ReviewRequestComponent {
+    return this;
+}
+  
 
 }
