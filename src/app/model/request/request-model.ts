@@ -383,4 +383,18 @@ export class RequestModel {
   isSkip(): boolean {
     return [FundingRequestTypes.SKIP, FundingRequestTypes.SKIP__NCI_RFA].includes(Number(this.requestDto.frtId));
   }
+
+  isMoonshot(): boolean {
+    let result = false;
+    this.programRecommendedCostsModel.selectedFundingSources.forEach(f => {
+      if (Number(f.fundingSourceId) === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
+        result = true;
+      }
+    });
+    return result;
+  }
+
+  isDiversitySupplement(): boolean {
+    return Number(this.requestDto.frtId) === Number(FundingRequestTypes.DIVERSITY_SUPPLEMENT_INCLUDES_CURE_SUPPLEMENTS);
+  }
 }

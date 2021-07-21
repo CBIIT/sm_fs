@@ -398,8 +398,9 @@ export class Step3Component implements OnInit {
 
       this.justificationEnteredBy = element.uploadByName;
       this.justificationEnteredByEmail = element.uploadByEmail;
-      this.justificationFileName = 'Justification '.concat(element.docFilename);;
-      this.justificationUploadedOn = element.createDate;
+      this.justificationFileName = 'Justification '.concat(element.docFilename);
+      // TODO: simple hack here to convert string to Date. Needs to be verified.
+      this.justificationUploadedOn = new Date(element.createDate);
       this.justificationId = element.id;
       if (element.id !== null) {
         this.justificationType = 'file';

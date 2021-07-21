@@ -85,6 +85,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.lineItem = [];
     this.initialPay = INITIAL_PAY_TYPES.includes(Number(this.requestModel.requestDto.frtId));
     if (this.initialPay) {
       this.showPercent = true;

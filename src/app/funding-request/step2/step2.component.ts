@@ -1,14 +1,14 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Router} from '@angular/router';
-import {RequestModel} from '../../model/request/request-model';
-import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
-import {AppPropertiesService} from '../../service/app-properties.service';
-import {NGXLogger} from 'ngx-logger';
-import {FundingRequestTypes} from '../../model/request/funding-request-types';
-import {ProgramRecommendedCostsComponent} from '../../program-recommended-costs/program-recommended-costs.component';
-import {Alert} from '../../alert-billboard/alert';
-import {NgForm} from '@angular/forms';
-import {FundingSourceTypes} from '../../model/request/funding-source-types';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { RequestModel } from '../../model/request/request-model';
+import { FsRequestControllerService, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { AppPropertiesService } from '../../service/app-properties.service';
+import { NGXLogger } from 'ngx-logger';
+import { FundingRequestTypes } from '../../model/request/funding-request-types';
+import { ProgramRecommendedCostsComponent } from '../../program-recommended-costs/program-recommended-costs.component';
+import { Alert } from '../../alert-billboard/alert';
+import { NgForm } from '@angular/forms';
+import { FundingSourceTypes } from '../../model/request/funding-source-types';
 import SubmitEvent = JQuery.SubmitEvent;
 import { RequestApproverService } from '../approver/approver.service';
 
@@ -19,7 +19,7 @@ import { RequestApproverService } from '../approver/approver.service';
 })
 export class Step2Component implements OnInit {
   @ViewChild(ProgramRecommendedCostsComponent) prc: ProgramRecommendedCostsComponent;
-  @ViewChild('step2Form', {static: false}) step2Form: NgForm;
+  @ViewChild('step2Form', { static: false }) step2Form: NgForm;
 
   alerts: Alert[] = [];
 
@@ -149,12 +149,11 @@ export class Step2Component implements OnInit {
     return null;
   }
 
-  // TODO - move all following methods to requestModel.
   isDiversitySupplement(): boolean {
-    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.DIVERSITY_SUPPLEMENT_INCLUDES_CURE_SUPPLEMENTS);
+    return this.requestModel?.isDiversitySupplement() || false;
   }
 
-  isNewInvestigator(): boolean {
+  showNewInvestigator(): boolean {
     return this.requestModel.grant.activityCode === 'R01' && ([1, 2].includes(Number(this.requestModel.grant.applTypeCode)));
   }
 
@@ -164,17 +163,10 @@ export class Step2Component implements OnInit {
   }
 
   isMoonshot(): boolean {
-    let result = false;
-    this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(f => {
-      if (Number(f.fundingSourceId) === Number(FundingSourceTypes.MOONSHOT_FUNDS)) {
-        result = true;
-      }
-    });
-    return result;
+    return this.requestModel?.isMoonshot() || false;
   }
 
   isSkipRequest(): boolean {
-    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP) ||
-      Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP__NCI_RFA);
+    return this.requestModel?.isSkip() || false;
   }
 }

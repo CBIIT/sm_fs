@@ -156,7 +156,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       this.userCanDelete = true;
       this.userReadonly = false;
       this.userCanSubmitApprove = this.requestModel.requestDto.loaCode === 'PD' &&
-                                  !this.requestModel.requestDto.financialInfoDto.otherDocText ;
+        !this.requestModel.requestDto.financialInfoDto.otherDocText;
       return;
     } else if (isPd && (userCas !== null) && (userCas.length > 0)
       && (userCas.indexOf(this.requestModel.requestDto.financialInfoDto.requestorCayCode) > -1)) {
@@ -315,9 +315,9 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   submitApprove(): boolean {
-    return  this.userCanSubmitApprove &&
-            this.requestStatus === 'DRAFT' &&
-            !this.workflowModel.hasNewApprover;
+    return this.userCanSubmitApprove &&
+      this.requestStatus === 'DRAFT' &&
+      !this.workflowModel.hasNewApprover;
   }
 
   submitDisableTooltip(): string {
@@ -332,7 +332,6 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     }
   }
 
-  
 
   isDisplayBudgetDocsUpload(): void {
     this.fsWorkflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
@@ -421,7 +420,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
 
   get self(): ReviewRequestComponent {
     return this;
-}
-  
+  }
+
 
 }
