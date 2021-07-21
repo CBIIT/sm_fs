@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { FsWorkflowControllerService, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
@@ -23,6 +23,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
   // @ViewChild(ApprovedCostsComponent) approvedCostsComponent: ApprovedCostsComponent;
   @ViewChild(GmInfoComponent) gmInfoComponent: GmInfoComponent;
+  @Output() actionEmitter = new EventEmitter<string>();
   budgetInfoComponent: BudgetInfoComponent;
 
   approverInitializationSubscription: Subscription;
@@ -56,6 +57,10 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   get selectedValue(): number {
     return this._selectedValue;
+  }
+
+  onActionChange(value: string) {
+    this.actionEmitter.emit(value);
   }
 
   constructor(private requestIntegrationService: FundingRequestIntegrationService,
