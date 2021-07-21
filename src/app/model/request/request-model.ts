@@ -51,6 +51,9 @@ export class RequestModel {
   // "New Request " or "View Request Label"
   title = 'New Request';
 
+  // Boolean value to show th return to RequestQuery page link
+  returnToRequestPageLink = false;
+
   get recreateMainApproverNeeded(): boolean {
     // need to have logic to determine something changed in request that
     // warrants deletion and recreate of main approvers =

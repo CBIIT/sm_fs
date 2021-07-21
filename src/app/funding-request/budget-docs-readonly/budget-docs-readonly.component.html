@@ -1,0 +1,16 @@
+<div class="row">
+    <div class="col-12">
+        <h3>Budget Documents</h3>
+        <div class="drag-item" *ngFor="let item of budgetDocDtos" tabindex="0">
+            <span class="doc-name">{{ item.docType + ' ' + item.docFilename }}</span>
+            <span class="doc-desc">(Added by <a href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
+                {{item.createDate}})</span>
+
+            <div class="ml-auto">
+                <button class="btn btn-link btn-slim ml-1" title="View"
+                    (click)="downloadFile(item.id, item.docFilename)"><i class="fas fa-eye"
+                        aria-hidden="true"></i></button>
+            </div>
+        </div>
+    </div>
+</div>

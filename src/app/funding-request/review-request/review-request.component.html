@@ -17,6 +17,7 @@
 
 <hr>
 <app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar" [workflowName]="workFlowAction"></app-upload-budget-documents>
+<app-budget-docs-readonly [hidden]="isDisplayBudgetDocsUploadVar" ></app-budget-docs-readonly>
 <app-workflow (actionEmitter)="actionType($event)" [readonly]="!submitVisible() || !submitEnabled() "></app-workflow>
 
 
@@ -47,16 +48,4 @@
   </div>
 </div>
 
-<ng-template #justificationModal let-modal>
-  <div class="modal-header">
-    <span class="modal-title h4 mb-0" id="i2group-title">Justification Text</span>
-    <button type="button" class="close" (click)="modal.dismiss('')"><i class="fas fa-times"
-        aria-label="close modal"></i></button>
-  </div>
-  <div class="modal-body">
-    {{justificationText}}
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-outline-secondary" (click)="modal.close()">Close</button>
-  </div>
-</ng-template>
+
