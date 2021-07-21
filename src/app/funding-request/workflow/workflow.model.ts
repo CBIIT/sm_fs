@@ -14,6 +14,7 @@ export class WorkflowModel {
   _allApprovers: FundingReqApproversDto[];
   _previousApprovers: FundingReqApproversDto[];
   _pendingApprovers: FundingReqApproversDto[];
+  _docApprover: FundingReqApproversDto;
 
   nextApprover: FundingReqApproversDto;
   addedApproverMap = new Map<number, any>();
@@ -118,6 +119,12 @@ export class WorkflowModel {
     this._previousApprovers = result.filter((approver) => {
       return approver.responseDate !== null;
     });
+
+    const docList = result.filter((approver) => {
+      return approver.roleCode === 'DOC';
+    });
+
+    this._docApprover = docList && docList.length > 0 ? docList[0] : {approverFirstName: 'Unknown'};
 
     this.nextApprover = this._pendingApprovers && this._pendingApprovers.length > 0 ? this._pendingApprovers[0] : null;
     if (this.nextApprover) {
@@ -270,6 +277,10 @@ export class WorkflowModel {
 
   isApprovalAction(action: WorkflowActionCode): boolean {
     return this.approvalActions.indexOf(action) > -1;
+  }
+
+  getDocApprover(): FundingReqApproversDto {
+    return this._docApprover;
   }
 }
 

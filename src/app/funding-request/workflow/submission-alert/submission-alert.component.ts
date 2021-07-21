@@ -50,4 +50,8 @@ export class SubmissionAlertComponent implements OnInit, OnDestroy {
     return this.workflowModel.getNextApproverInChain();
   }
 
+  get docApprover(): FundingReqApproversDto {
+    return this.workflowModel.getDocApprover();
+  }
+
 }

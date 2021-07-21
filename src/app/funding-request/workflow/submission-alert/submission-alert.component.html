@@ -34,14 +34,14 @@
         <a routerLink="/search">search</a>.
     </span>
     <span *ngIf="action==='ROUTE_APPROVE'">
-        The request {{frqId}} has been successfully routed to
+        The request <b>{{frqId}}</b> has been successfully routed to
         <a href="mailto: {{approver.approverEmailAddress}}">
         {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
         You can view the request details below or return to the 
         <a routerLink="/search">search</a>.
     </span>
     <span *ngIf="action==='REASSIGN'">
-        The request {{frqId}} has been successfully reassigned to
+        The request <b>{{frqId}}</b> has been successfully reassigned to
         <a href="mailto: {{approver.approverEmailAddress}}">
         {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
         You can view the request details below or return to the 
@@ -54,14 +54,15 @@
         <a routerLink="/search">search</a>.
     </span>
     <span *ngIf="action==='RETURN'">
-        The request {{frqId}} has been returned back to the PD for changes.
+        The request <b>{{frqId}}</b> has been returned back to the PD for changes.
         The requesting PD and any previous approver(s) will be notified of your action.
         You can view the request details below or return to the 
         <a routerLink="/search">search</a>.
     </span>
-    <span *ngIf="action==='RETURN'">
-        The request {{frqId}} has been returned back to the PD for changes.
-        The requesting PD and any previous approver(s) will be notified of your action.
+    <span *ngIf="action==='DEFER'">
+        The request <b>{{frqId}}</b>  deferred and sent back to
+        the DOC approver <a href="mailto: {{docApprover.approverEmailAddress}}">
+        {{docApprover.approverFirstName + ' '+ docApprover.approverLastName}}</a> for review.
         You can view the request details below or return to the 
         <a routerLink="/search">search</a>.
     </span>
