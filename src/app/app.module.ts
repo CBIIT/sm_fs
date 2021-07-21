@@ -90,6 +90,7 @@ import { PlanStep6Component } from './funding-plan/plan-step6/plan-step6.compone
 import { ApproverNameRendererComponent } from './funding-request/workflow/approver-list/approver-name-renderer/approver-name-renderer.component';
 import { SupportingDocsReadonlyComponent } from './funding-request/supporting-docs-readonly/supporting-docs-readonly.component';
 import { PercentTogglePipe } from './pipes/percent-toggle-pipe';
+import { SubmissionAlertComponent } from './funding-request/workflow/submission-alert/submission-alert.component';
 
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
@@ -190,6 +191,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     ApproverNameRendererComponent,
     SupportingDocsReadonlyComponent,
     PercentTogglePipe,
+    SubmissionAlertComponent,
   ],
 
 

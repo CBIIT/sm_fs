@@ -232,7 +232,7 @@ export class Step4Component implements OnInit, OnDestroy {
       (result) => {
         this.logger.debug('Submit Request result: ', result);
         this.submissionResult = {status: 'success', frqId: submissionDto.frqId, approver: this.activeApprover};
-        this.requestIntegrationService.requestSubmissionEmitter.next(submissionDto.frqId);
+        this.requestIntegrationService.requestSubmissionEmitter.next(submissionDto);
         this.submitResultElement.nativeElement.scrollIntoView();
         this.readonly = true;
         this.requestModel.disableStepLinks();
@@ -251,7 +251,7 @@ export class Step4Component implements OnInit, OnDestroy {
     this.workflowModal.openConfirmModal(action).then(
       (result) => {
         this.logger.debug(action + ' API call returned successfully', result);
-        this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
+        this.requestIntegrationService.requestSubmissionEmitter.next();
         if (action === 'WITHDRAW') {
           this.requestModel.enableStepLinks();
         }

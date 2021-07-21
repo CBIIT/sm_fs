@@ -1,16 +1,5 @@
 <div #submitResult></div>
-<div class="alert alert-success" role="alert" *ngIf="submissionResult && submissionResult.status === 'success'">
-  <h1>Success!</h1>
-  <b>Request #{{submissionResult.frqId}}</b> was sent to
-  <a
-    href="mailto: {{submissionResult.approver.approverEmailAddress}}">{{submissionResult.approver.approverFullName}}</a>
-  for review.
-  View the request below or return to the <a routerLink="/search">Search</a>.
-</div>
-<div class="alert alert-danger" *ngIf="submissionResult && submissionResult.status === 'failure'">
-  <h1>Failed to submit request</h1>
-  {{submissionResult.errorMessage}}
-</div>
+<app-submission-alert></app-submission-alert>
 <app-alert-billboard [alerts]="model.pendingAlerts"></app-alert-billboard>
 <app-workflow-modal></app-workflow-modal>
 <app-grant-information></app-grant-information>

@@ -29,7 +29,7 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadHistory();
     this.requestSubmissionEventSubscriber = this.requestIntegrationService.requestSubmissionEmitter.subscribe(
-      (frqId) => { this.loadHistory(); }
+      () => { this.loadHistory(); }
     );
   }
 

@@ -1,0 +1,132 @@
+<div class="alert alert-success" role="alert" *ngIf="status === 'success'">
+    <b>Success!</b>
+    <span *ngIf="action==='APPROVE' || action==='APPROVE_COMMENT'">
+        The request <b>{{frqId}}</b> has been successfully approved and sent to
+        <a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
+        You can view the request details below or return to the 
+        <a routerLink="/search">search</a>.
+    </span>
+    <span *ngIf="action==='COMPLETE'">
+        Your request <b>{{frqId}}</b> has been successfully completed. You can view the 
+        request details below or return to the 
+        <a routerLink="/search">search</a>.
+    </span>
+    <span *ngIf="action==='APPROVE_ROUTE'">
+        The request {{frqId}} has been successfully approved and routed to
+        <a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
+        You can view the request details below or return to the 
+        <a routerLink="/search">search</a>.
+    </span>
+    <span *ngIf="action==='SUBMIT'">
+        Your request <b>{{frqId}}</b> has been successfully submitted and sent to
+        <a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
+        You can view the request details below or return to the 
+        <a routerLink="/search">search</a>.
+    </span>
+    <span *ngIf="action==='SUBMIT_APPROVE'">
+        Your request <b>{{frqId}}</b> has been successfully submitted and approved.
+        The request has been sent to <a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
+        You can view the request details below or return to the 
+        <a routerLink="/search">search</a>.
+    </span>
+    <span *ngIf="action==='ROUTE_APPROVE'">
+        The request {{frqId}} has been successfully routed to
+        <a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
+        You can view the request details below or return to the 
+        <a routerLink="/search">search</a>.
+    </span>
+    <span *ngIf="action==='REASSIGN'">
+        The request {{frqId}} has been successfully reassigned to
+        <a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
+        You can view the request details below or return to the 
+        <a routerLink="/search">search</a>.
+    </span>
+    <span *ngIf="action==='REJECT'">
+        The request {{frqId}} has been rejected. The requester and any previous approver(s)
+        will be notified of your action.
+        You can view the request details below or return to the 
+        <a routerLink="/search">search</a>.
+    </span>
+    <span *ngIf="action==='RETURN'">
+        The request {{frqId}} has been returned back to the PD for changes.
+        The requesting PD and any previous approver(s) will be notified of your action.
+        You can view the request details below or return to the 
+        <a routerLink="/search">search</a>.
+    </span>
+    <span *ngIf="action==='RETURN'">
+        The request {{frqId}} has been returned back to the PD for changes.
+        The requesting PD and any previous approver(s) will be notified of your action.
+        You can view the request details below or return to the 
+        <a routerLink="/search">search</a>.
+    </span>
+</div>
+<div class="alert alert-danger" *ngIf="status === 'failure'">
+    <b>Failed to submit request</b> {{errorMessage}}
+</div>
+<!-- 
+Approve with more approver:
+Success! The request <Display Request ID> has been successfully approved and sent to
+<Display the next scheduled approver's last, first name in bolded text> for review.
+You can view the request details below or return to the search.
+
+Approve with no more approver:
+Success! Your request <Display Request ID> has been successfully completed. 
+You can view the request details below or return to the search.
+
+Approve and Route:
+Success! The request <Display Request ID> has been successfully approved and routed to
+<Display the next scheduled approver's last, first name in bolded text> for review.
+You can view the request details below or return to the search.
+
+Approve with Comments:
+Success! The request <Display Request ID> has been successfully approved and sent to
+<Display the next scheduled approver's last, first name in bolded text> for review.
+You can view the request details below or return to the search.
+
+Route before Approving:
+Success! The request <Display Request ID> has been successfully routed to
+<Display the next scheduled approver's last, first name in bolded text> for review.
+You can view the request details below or return to the search.
+
+Reassign:
+Success! The request <Display Request ID> has been successfully reassigned to
+<Display the next scheduled approver's last, first name in bolded text> for review.
+You can view the request details below or return to the search.
+
+Reject:
+The request <Display Request ID> has been rejected. The requester and any previous approver(s)
+will be notified of your action. 
+You can view the request details below or return to the search.
+
+Return to PD:
+The request <Display Request ID> has been returned back to the PD for changes.
+The requesting PD and any previous approver(s) will be notified of your action.
+You can view the request details below or return to the search.
+
+Defer:
+Success! The request <Display Request ID> has been successfully deferred and sent back to
+the DOC approver <Display the Requesting DOC approver's last, first name in bolded text>
+for review. 
+You can view the request details below or return to the search.
+
+Submit:
+Success! Your request <Display Request ID> has been successfully submitted and sent to 
+<Display the next scheduled approver's last, first name in bolded text> for review. 
+You can view the request details below or return to the search. 
+
+Submit & Approve:
+Success! Your request <Display Request ID> has been successfully submitted and approved. 
+The request has been sent to <Display the next scheduled approver's last, first name in 
+bolded text> for review. 
+You can view the request details below or return to the search. 
+
+Clicking the search link in any of the success message, the system will navigate the user back to the previous search query page.
+Section Title: Request History: Refer to UI063 for the content and behavior of the request history table.
+Screen Footer: Refer to UI037 for the content and behavior of the screen element.
+-->

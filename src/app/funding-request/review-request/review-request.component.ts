@@ -43,8 +43,8 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   isRequestEverSubmitted = false;
   requestHistorySubscriber: Subscription;
   activeApproverSubscriber: Subscription;
-  submissionResult: { status: 'success' | 'failure' | '', frqId?: number, approver?: FundingReqApproversDto, errorMessage?: string }
-    = { status: '' };
+  // submissionResult: { status: 'success' | 'failure' | '', frqId?: number, approver?: FundingReqApproversDto, errorMessage?: string }
+  //   = { status: '' };
   requestStatus: string;
   docDtos: DocumentsDto[];
   readonly = false;
@@ -269,18 +269,19 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     this.fsWorkflowControllerService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('Submit Request result: ', result);
-        this.submissionResult = { status: 'success', frqId: dto.frqId, approver: nextApproverInChain };
-        this.requestIntegrationService.requestSubmissionEmitter.next(dto.frqId);
+        // this.submissionResult = { status: 'success', frqId: dto.frqId, approver: nextApproverInChain };
         this.workflowModel.initialize();
+        this.requestIntegrationService.requestSubmissionEmitter.next(dto);
         this.submitResultElement.nativeElement.scrollIntoView();
         this.readonly = true;
         this.requestModel.disableStepLinks();
       },
       (error) => {
         this.logger.error('Failed when calling submitRequestUsingPOST', error);
-        this.submissionResult = { status: 'failure' };
+        // this.submissionResult = { status: 'failure' };
         if (error.error) {
-          this.submissionResult.errorMessage = error.error.errorMessage;
+          // this.submissionResult.errorMessage = error.error.errorMessage;
+          this.requestIntegrationService.requestSubmitFailureEmitter.next(error.error.errorMessage);
         }
         this.submitResultElement.nativeElement.scrollIntoView();
       });
@@ -290,7 +291,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     this.workflowModal.openConfirmModal(action).then(
       (result) => {
         this.logger.debug(action + ' API call returned successfully', result);
-        this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
+        this.requestIntegrationService.requestSubmissionEmitter.next();
         if (action === 'WITHDRAW') {
           this.requestModel.enableStepLinks();
         }

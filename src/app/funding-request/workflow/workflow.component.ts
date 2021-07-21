@@ -59,7 +59,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     return this._selectedValue;
   }
 
-  onActionChange(value: string) {
+  onActionChange(value: string): void {
     this.actionEmitter.emit(value);
   }
 
@@ -263,7 +263,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.logger.debug('submit workflow returned okay ', result);
         this.workflowModel.initialize();
         this.showAddApprover = false;
-        this.requestIntegrationService.requestSubmissionEmitter.next(this.requestModel.requestDto.frqId);
+        this.requestIntegrationService.requestSubmissionEmitter.next(dto);
       },
       (error) => {
         this.logger.error('submit workflow returned error', error);
