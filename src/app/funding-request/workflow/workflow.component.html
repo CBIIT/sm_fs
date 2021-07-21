@@ -27,6 +27,7 @@
             id="workflow-action"
             name="workflowAction"
             [(ngModel)]="selectedWorkflowAction"
+            (ngModelChange)="onActionChange($event)"
             [allowClear]="true"
             [data]="workflowActions">
             </ng-select2>

@@ -1,13 +1,12 @@
-<!-- TODO: UI068 - don't show if user isn't current approver and it hasn't already been approved by a financial approver -->
 <app-budget-info [readOnly]="budgetInfoReadOnly" [editing]="true"></app-budget-info>
 <div class="row">
     <div class="col-12">
         <h3>Budget Documents</h3>
         <p><small class="text-muted">You may upload Microsoft Word, Microsoft Excel, or Adobe Acrobat document(s) only.
-            Note: If you upload MS Excel, make sure it contains only one worksheet per file in order to have it
-            included in the submission package.
-            Please upload only the documents that support the approval of this request. <b>Maximum File Size is 10
-                MB per file.</b></small></p>
+                Note: If you upload MS Excel, make sure it contains only one worksheet per file in order to have it
+                included in the submission package.
+                Please upload only the documents that support the approval of this request. <b>Maximum File Size is 10
+                    MB per file.</b></small></p>
     </div>
 
     <div class="col-lg-5">
@@ -16,8 +15,9 @@
             <label for="add-file">Choose File</label>
             <div class="input-group">
                 <div class="custom-file">
-                    <input class="custom-file-input" id="add-file" #inputFile type="file" accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile" (change)="selectFiles($event)">
-                    <span class="custom-file-label"  #labelImport for="add-file">Choose file</span>
+                    <input class="custom-file-input" id="add-file" #inputFile type="file"
+                        accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile" (change)="selectFiles($event)">
+                    <span class="custom-file-label" #labelImport for="add-file">Choose file</span>
                 </div>
             </div>
         </div>
@@ -27,7 +27,7 @@
         <div class="form-group">
             <label for="type">Doc Type</label>
             <ng-select2 id="type" [(ngModel)]="selectedDocType" [allowClear]="true"
-                (ngModelChange)="onDocTypeChange($event)">
+                (ngModelChange)="onDocTypeChange($event)" [disabled]="disableDocType">
                 <option></option>
                 <option *ngFor="let docType of docTypes | async" [value]="docType"> {{docType}}
                 </option>
@@ -44,7 +44,7 @@
             <span class="doc-name">{{ item.docType + ' ' + item.docFilename }}</span>
             <span class="doc-desc">(Added by <a href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
                 {{item.createDate}})</span>
-    
+
             <div class="ml-auto">
                 <button class="btn btn-link btn-slim ml-2 btn-delete" title="Delete"
                     (click)="deleteDoc(item.id, item.docType)"><i class="fas fa-trash" aria-hidden="true"></i></button>

@@ -60,21 +60,30 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   transitionMemoMissing = false;
   isDisplayBudgetDocsUploadVar = false;
   closeResult: string;
+  _workFlowAction: string = '';
 
   userCanSubmitApprove = false;
 
+  actionType(workFlowAction: string) {
+    this._workFlowAction = workFlowAction;
+  }
+
+  get workFlowAction(): string {
+    return this._workFlowAction;
+  }
+
   constructor(private router: Router,
-              private requestModel: RequestModel,
-              private propertiesService: AppPropertiesService,
-              private fsRequestService: FsRequestControllerService,
-              private userSessionService: AppUserSessionService,
-              private requestIntegrationService: FundingRequestIntegrationService,
-              private documentService: DocumentService,
-              private changeDetection: ChangeDetectorRef,
-              private logger: NGXLogger,
-              private fsWorkflowControllerService: FsWorkflowControllerService,
-              private modalService: NgbModal,
-              private workflowModel: WorkflowModel) {
+    private requestModel: RequestModel,
+    private propertiesService: AppPropertiesService,
+    private fsRequestService: FsRequestControllerService,
+    private userSessionService: AppUserSessionService,
+    private requestIntegrationService: FundingRequestIntegrationService,
+    private documentService: DocumentService,
+    private changeDetection: ChangeDetectorRef,
+    private logger: NGXLogger,
+    private fsWorkflowControllerService: FsWorkflowControllerService,
+    private modalService: NgbModal,
+    private workflowModel: WorkflowModel) {
   }
 
   ngAfterViewInit(): void {

@@ -7,6 +7,7 @@ import { HttpResponse } from '@angular/common/http';
 import { saveAs } from 'file-saver';
 import { NGXLogger } from 'ngx-logger';
 import { BudgetInfoComponent } from '../cans/budget-info/budget-info.component';
+import { ReviewRequestComponent } from '../funding-request/review-request/review-request.component';
 
 @Component({
   selector: 'app-upload-budget-documents',
@@ -23,6 +24,26 @@ export class UploadBudgetDocumentsComponent implements OnInit {
 
   @ViewChild(BudgetInfoComponent) budgetInfoComponent: BudgetInfoComponent;
 
+
+  _workflowName: string = '';
+  disableDocType: boolean = true;
+  @Input() set workflowName(value: string) {
+    this._workflowName = value;
+    
+    if (this._workflowName === 'APPROVE' ||
+      this._workflowName === 'APPROVE_ROUTE' ||
+      this._workflowName === 'ROUTE_APPROVE') {
+      this.disableDocType = false;
+    } else {
+      this.disableDocType = true;
+    }
+
+  }
+
+  get workflowName(): string {
+    return this._workflowName;
+  }
+
   public _selectedDocType = '';
   disableFile = true;
   public docTypesStr: Array<string> = ['Interagency Agreement', 'Direct Citation Form', 'NCI Memo', 'Other Funding Document'];
@@ -33,6 +54,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   maxFileSize = 10485760; // 10MB
   budgetDocDtos: Observable<DocumentsDto[]>;
   budgetInfoReadOnly = false;
+
 
   get selectedDocType(): string {
     return this._selectedDocType;
@@ -55,11 +77,12 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   }
 
   constructor(private requestModel: RequestModel,
-              private documentService: DocumentService,
-              private logger: NGXLogger) {
+    private documentService: DocumentService,
+    private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
+
     this.loadFiles();
   }
 
@@ -75,6 +98,8 @@ export class UploadBudgetDocumentsComponent implements OnInit {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
   }
+
+
 
   selectFiles(event): void {
     const files: FileList = event.target.files;

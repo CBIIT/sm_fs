@@ -27,8 +27,8 @@
 <!-- END Supporting Docs -->
 
 <hr>
-<app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar"></app-upload-budget-documents>
-<app-workflow [readonly]="!submitVisible() || !submitEnabled() "></app-workflow>
+<app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar" [workflowName]="workFlowAction"></app-upload-budget-documents>
+<app-workflow (actionEmitter)="actionType($event)" [readonly]="!submitVisible() || !submitEnabled() "></app-workflow>
 
 
 <hr>
