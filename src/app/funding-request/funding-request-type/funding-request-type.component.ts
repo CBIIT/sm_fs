@@ -1,16 +1,17 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FsLookupControllerService} from '@nci-cbiit/i2ecws-lib';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FsLookupControllerService } from '@nci-cbiit/i2ecws-lib';
 import 'select2';
-import {SearchFilterService} from '../../search/search-filter.service';
-import {UserService} from '@nci-cbiit/i2ecui-lib';
-import {RequestModel} from '../../model/request/request-model';
-import {openNewWindow} from 'src/app/utils/utils';
-import {NGXLogger} from 'ngx-logger';
-import {Select2OptionData} from 'ng-select2';
-import {FundingRequestTypeRulesDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestTypeRulesDto';
-import {FundingRequestTypes} from '../../model/request/funding-request-types';
-import {Alert} from '../../alert-billboard/alert';
-import {ControlContainer, NgForm} from '@angular/forms';
+import { SearchFilterService } from '../../search/search-filter.service';
+import { UserService } from '@nci-cbiit/i2ecui-lib';
+import { RequestModel } from '../../model/request/request-model';
+import { openNewWindow } from 'src/app/utils/utils';
+import { NGXLogger } from 'ngx-logger';
+import { Select2OptionData } from 'ng-select2';
+import { FundingRequestTypeRulesDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestTypeRulesDto';
+import { FundingRequestTypes } from '../../model/request/funding-request-types';
+import { Alert } from '../../alert-billboard/alert';
+import { ControlContainer, NgForm } from '@angular/forms';
+import { not } from 'rxjs/internal-compatibility';
 
 
 @Component({
@@ -26,7 +27,7 @@ export class FundingRequestTypeComponent implements OnInit {
   public requestTypes: FundingRequestTypeRulesDto[] = [];
   public searchFilter:
     { requestOrPlan: string; searchPool: string; requestType: string; }
-    = {requestOrPlan: '', searchPool: '', requestType: ''};
+    = { requestOrPlan: '', searchPool: '', requestType: '' };
   data: Array<Select2OptionData>;
   private _selectedValue: number = null;
 
@@ -51,7 +52,7 @@ export class FundingRequestTypeComponent implements OnInit {
     this.model.requestDto.financialInfoDto.requestTypeId = value;
     this.model.programRecommendedCostsModel.fundingRequestType = value;
     const valueChanged = this._selectedValue && (Number(value) !== Number(this._selectedValue));
-    if(valueChanged) {
+    if (valueChanged) {
       this.logger.debug('funding request type changed from', this._selectedValue, 'to', value);
     }
 
@@ -94,6 +95,7 @@ export class FundingRequestTypeComponent implements OnInit {
 
   prepareData(list: FundingRequestTypeRulesDto[]): void {
     const results = new Array<Select2OptionData>();
+    const notTopLevel = new Array<number>();
     const children = new Map<number, Select2OptionData[]>();
     let tmp: Select2OptionData;
     list.forEach(t => {
@@ -103,13 +105,18 @@ export class FundingRequestTypeComponent implements OnInit {
         children: undefined,
         disabled: false,
       };
-      if (!(t.parentFrtId)) {
+      if (!(t.parentFrtId) || t.parentCategoryFlag === 'Y') {
         results.push(tmp);
         const c = children.get(t.id);
         if (!c) {
           children.set(t.id, new Array<Select2OptionData>());
         }
-      } else {
+      }
+      //if (t.parentFrtId) {
+      else {
+        if (t.parentCategoryFlag === 'Y') {
+          notTopLevel.push(t.id);
+        }
         const c = children.get(t.parentFrtId);
         if (!c) {
           children.set(t.parentFrtId, [tmp]);
@@ -118,13 +125,16 @@ export class FundingRequestTypeComponent implements OnInit {
         }
       }
     });
+    this.data = new Array<Select2OptionData>();
     results.forEach(r => {
       const c = children.get(Number(r.id));
       if (c && c.length > 0) {
         r.children = c;
       }
+      // (!notTopLevel.includes(Number(r.id))) {
+      this.data.push(r);
+      //}
     });
-    this.data = results;
   }
 
   evoke(filter): any {

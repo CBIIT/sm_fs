@@ -141,8 +141,6 @@ export class Step2Component implements OnInit {
   }
 
   get prcValid(): string | null {
-    // return 'Y';
-
     if (this.requestModel?.isSkip() || this.prc?.selectedFundingSources.length) {
       return 'Y';
     }
