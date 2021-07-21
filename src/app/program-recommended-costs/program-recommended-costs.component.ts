@@ -1,22 +1,22 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {RequestModel} from '../model/request/request-model';
-import {AppPropertiesService} from '../service/app-properties.service';
-import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
-import {NGXLogger} from 'ngx-logger';
-import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { RequestModel } from '../model/request/request-model';
+import { AppPropertiesService } from '../service/app-properties.service';
+import { FsRequestControllerService, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { NGXLogger } from 'ngx-logger';
+import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 import {
   FundingRequestTypes,
   INITIAL_PAY_TYPES,
   PRC_AWARDED_DIRECT_TOTAL_DISPLAY_TYPES,
   PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES
 } from '../model/request/funding-request-types';
-import {FundingSourceSynchronizerService} from '../funding-source/funding-source-synchronizer-service';
-import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {PrcBaselineSource, PrcDataPoint, PrcLineItemType} from './prc-data-point';
-import {PRC_DISPLAY_FORMAT} from './program-recommended-costs-model';
-import {NgForm} from '@angular/forms';
-import {FundingSourceComponent} from '../funding-source/funding-source.component';
-import {Alert} from '../alert-billboard/alert';
+import { FundingSourceSynchronizerService } from '../funding-source/funding-source-synchronizer-service';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { PrcBaselineSource, PrcDataPoint, PrcLineItemType } from './prc-data-point';
+import { PRC_DISPLAY_FORMAT } from './program-recommended-costs-model';
+import { NgForm } from '@angular/forms';
+import { FundingSourceComponent } from '../funding-source/funding-source.component';
+import { Alert } from '../alert-billboard/alert';
 
 @Component({
   selector: 'app-program-recommended-costs',
@@ -25,7 +25,7 @@ import {Alert} from '../alert-billboard/alert';
 })
 export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
-  @ViewChild('prcForm', {static: false}) prcForm: NgForm;
+  @ViewChild('prcForm', { static: false }) prcForm: NgForm;
   @ViewChild(FundingSourceComponent) fsc: FundingSourceComponent;
   alerts: Alert[] = [];
 
@@ -142,7 +142,8 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   addFundingSource(): void {
-    if (this.editing && this.editing >= 0) {
+    this.logger.debug('editing:', this.editing);
+    if (this.editing >= 0) {
       const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[this.editing];
       this.logger.debug('Original source', edit);
       if (this.selectedSourceId !== edit.fundingSourceId) {
@@ -186,6 +187,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   editSource(i: number): void {
     const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
+    this.logger.debug('editing:', i, edit);
     this.editing = i;
     this.lineItem = this.getLineItem(edit);
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
@@ -340,7 +342,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    this.logger.debug(this.prcForm);
     this.alerts = [];
 
     if (this.prcForm.valid) {

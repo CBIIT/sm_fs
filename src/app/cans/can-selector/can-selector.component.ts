@@ -20,7 +20,7 @@ export class CanSelectorComponent implements OnInit {
 
   @Input() index = 0;
 
-  @Input() nciSourceFlag: string;
+  @Input() nciSourceFlag: string = '';
 
   @Input() readonly = false;
 
