@@ -12,7 +12,7 @@ import { FundingRequestErrorCodes } from './funding-request-error-codes';
 import { NGXLogger } from 'ngx-logger';
 import { ProgramRecommendedCostsModel } from '../../program-recommended-costs/program-recommended-costs-model';
 import { FundingSourceTypes } from './funding-source-types';
-import { FundingRequestTypes } from './funding-request-types';
+import { FundingRequestTypes, INITIAL_PAY_TYPES } from './funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
 import { PrcDataPoint } from '../../program-recommended-costs/prc-data-point';
 import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
@@ -341,7 +341,7 @@ export class RequestModel {
 
   loadRequestCans(): void {
     if (this.requestCans && this.requestCans.length > 0) {
-      return ;
+      return;
     }
 
     this.canControllerService.getRequestCansUsingGET(this.requestDto.frqId).subscribe(
@@ -349,8 +349,7 @@ export class RequestModel {
         if (result && result.length > 0) {
           this.requestCans = result;
           this.logger.debug('loaded requestCans from db ', result);
-        }
-        else {
+        } else {
           this.requestCans = [];
           const programCostModel = this.programRecommendedCostsModel;
           this.logger.debug('Program Cost Model ', programCostModel);
@@ -367,7 +366,7 @@ export class RequestModel {
               dto.approvedTc = dto.requestedTc;
               dto.approvedDc = dto.requestedDc;
               dto.approvedPctCut = lineItem0.percentCutTotalCalculated;
-              dto.requestedFutureYrs = lineItems.filter( li => li.recommendedTotal > 0 || li.recommendedDirect > 0).length - 1;
+              dto.requestedFutureYrs = lineItems.filter(li => li.recommendedTotal > 0 || li.recommendedDirect > 0).length - 1;
               dto.approvedFutureYrs = dto.requestedFutureYrs;
               this.requestCans.push(dto);
             }
@@ -401,5 +400,9 @@ export class RequestModel {
 
   isDiversitySupplement(): boolean {
     return Number(this.requestDto.frtId) === Number(FundingRequestTypes.DIVERSITY_SUPPLEMENT_INCLUDES_CURE_SUPPLEMENTS);
+  }
+
+  isInitialPay(): boolean {
+    return INITIAL_PAY_TYPES.includes(Number(this.requestDto.frtId));
   }
 }
