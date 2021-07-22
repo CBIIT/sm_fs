@@ -11,7 +11,7 @@ import { FundingRequestTypeRulesDto } from '@nci-cbiit/i2ecws-lib/model/fundingR
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
 import { ControlContainer, NgForm } from '@angular/forms';
-import { not } from 'rxjs/internal-compatibility';
+import { Options } from 'select2';
 
 
 @Component({
@@ -29,6 +29,7 @@ export class FundingRequestTypeComponent implements OnInit {
     { requestOrPlan: string; searchPool: string; requestType: string; }
     = { requestOrPlan: '', searchPool: '', requestType: '' };
   data: Array<Select2OptionData>;
+  options: Options;
   private _selectedValue: number = null;
 
   @Input()
@@ -75,6 +76,9 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.options = {
+      templateResult: this.templateResult.bind(this)
+    };
     this.searchFilter = this.searchFilterService.searchFilter;
 
     this.evoke(this.filter).subscribe(
@@ -93,9 +97,22 @@ export class FundingRequestTypeComponent implements OnInit {
       });
   }
 
+  templateResult(state: Select2OptionData): JQuery | string {
+    this.logger.info(state);
+    if (!state.id) {
+      return state.text;
+    }
+    if (state.additional?.hidden) {
+      this.logger.debug('hideme');
+      return '';
+    }
+
+    return state.text;
+  }
+
   prepareData(list: FundingRequestTypeRulesDto[]): void {
-    const results = new Array<Select2OptionData>();
-    const notTopLevel = new Array<number>();
+    const allParents = new Array<Select2OptionData>();
+    const intermediateParents = new Array<number>();
     const children = new Map<number, Select2OptionData[]>();
     let tmp: Select2OptionData;
     list.forEach(t => {
@@ -104,19 +121,20 @@ export class FundingRequestTypeComponent implements OnInit {
         text: t.requestName,
         children: undefined,
         disabled: false,
+        additional: { data: t },
       };
       if (!(t.parentFrtId) || t.parentCategoryFlag === 'Y') {
-        results.push(tmp);
+        allParents.push(tmp);
+        if (t.parentFrtId && t.parentCategoryFlag === 'Y') {
+          intermediateParents.push(t.id);
+        }
         const c = children.get(t.id);
         if (!c) {
           children.set(t.id, new Array<Select2OptionData>());
         }
       }
-      //if (t.parentFrtId) {
-      else {
-        if (t.parentCategoryFlag === 'Y') {
-          notTopLevel.push(t.id);
-        }
+      if (t.parentFrtId) {
+      // else {
         const c = children.get(t.parentFrtId);
         if (!c) {
           children.set(t.parentFrtId, [tmp]);
@@ -126,14 +144,19 @@ export class FundingRequestTypeComponent implements OnInit {
       }
     });
     this.data = new Array<Select2OptionData>();
-    results.forEach(r => {
+
+    allParents.forEach(r => {
       const c = children.get(Number(r.id));
       if (c && c.length > 0) {
         r.children = c;
       }
-      // (!notTopLevel.includes(Number(r.id))) {
+      // if (intermediateParents.includes(Number(r.id))) {
+      //   r.children?.forEach(c1 => {
+      //     c1.text = c1.text;
+      //     c1.additional = r.text + ' - ' + c1.text;
+      //   });
+      // }
       this.data.push(r);
-      //}
     });
   }
 

@@ -8,6 +8,7 @@
     [(ngModel)]="selectedValue"
     [allowClear]="true"
     [data]="data"
+    [options]="options"
     [ngClass]="{'is-invalid': (!fundingRequestType.valid && (fundingRequestType.touched || parentForm.submitted) || parentForm.errors?.mustSelectDiversitySupplement ) }"
     required
     appActiveInitialPayValidator
