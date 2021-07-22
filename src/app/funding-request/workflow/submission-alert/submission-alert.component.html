@@ -54,6 +54,10 @@
         The request <b>{{frqId}}</b>  has been placed on hold. The requester, current, 
         and previous approver(s) (if applicable) will be notified of your action.  
     </span>
+    <span *ngIf="action==='RELEASE'">
+        The request <b>{{frqId}}</b> has been released from the hold status. 
+        The current approver & designee(s) will be notified to process the request. 
+    </span>
     You can view the request details below or return to the 
     <a routerLink="/search">search</a>.
 </div>

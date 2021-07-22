@@ -42,6 +42,10 @@ export class WorkflowModalComponent implements OnInit {
       this.title = 'Hold Request';
       this.buttonText = 'Hold';
     }
+    else if (mode === 'RELEASE') {
+      this.title = 'Release Request from Hold';
+      this.buttonText = 'Release Hold';
+    }
     else {
       throw new Error(mode + ' is not supported in workflow modal');
     }
@@ -57,12 +61,14 @@ export class WorkflowModalComponent implements OnInit {
     dto.frqId = this.requestModel.requestDto.frqId;
     dto.comments = this.comments;
     dto.action =  WorkflowActionCode[this.mode];
-    this.invokeRestApi(dto).subscribe(
+    this.logger.debug('Modal submits workflow task dto ', dto);
+    this.fsWorkflowService.submitWorkflowUsingPOST(dto).subscribe(
+//    this.invokeRestApi(dto).subscribe(
       (result) => {
         this.modalRef.close(dto);
       },
       (error) => {
-        this.logger.error('calling ' + this.mode + ' service API failed with error ', error);
+        this.logger.error('SubmitWorkflow service API failed with error ', error);
       }
     );
   }
