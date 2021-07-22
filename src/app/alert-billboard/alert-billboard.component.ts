@@ -1,6 +1,8 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Alert} from './alert';
-import {NGXLogger} from 'ngx-logger';
+import { Component, Input, OnInit } from '@angular/core';
+import { Alert } from './alert';
+import { NGXLogger } from 'ngx-logger';
+
+// TODO: https://jasonwatmore.com/post/2019/07/05/angular-8-alert-toaster-notifications
 
 @Component({
   selector: 'app-alert-billboard',
