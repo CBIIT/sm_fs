@@ -31,7 +31,7 @@ export class WorkflowModalComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  openConfirmModal(mode: string): Promise<boolean> {
+  openConfirmModal(mode: string): Promise<WorkflowTaskDto> {
     this.mode = mode;
     this.comments = '';
     if (mode === 'WITHDRAW') {
@@ -45,16 +45,21 @@ export class WorkflowModalComponent implements OnInit {
     else {
       throw new Error(mode + ' is not supported in workflow modal');
     }
-    return new Promise<boolean>( (resolve, reject) => {
+    return new Promise<WorkflowTaskDto>( (resolve, reject) => {
       this.modalRef = this.modalService.open(this.modalContent);
       this.modalRef.result.then(resolve, reject);
     });
   }
 
   submit(): void {
-    this.invokeRestApi(this.mode).subscribe(
+    const dto: WorkflowTaskDto = {};
+    dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    dto.frqId = this.requestModel.requestDto.frqId;
+    dto.comments = this.comments;
+    dto.action =  WorkflowActionCode[this.mode];
+    this.invokeRestApi(dto).subscribe(
       (result) => {
-        this.modalRef.close(result);
+        this.modalRef.close(dto);
       },
       (error) => {
         this.logger.error('calling ' + this.mode + ' service API failed with error ', error);
@@ -62,19 +67,19 @@ export class WorkflowModalComponent implements OnInit {
     );
   }
 
-  invokeRestApi(mode: string): Observable<any> {
-    const dto: WorkflowTaskDto = {};
-    dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-    dto.frqId = this.requestModel.requestDto.frqId;
-    dto.comments = this.comments;
-    dto.action =  WorkflowActionCode[mode];
-    if (mode === 'WITHDRAW') {
+  invokeRestApi(dto: WorkflowTaskDto): Observable<any> {
+    // const dto: WorkflowTaskDto = {};
+    // dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    // dto.frqId = this.requestModel.requestDto.frqId;
+    // dto.comments = this.comments;
+    // dto.action =  WorkflowActionCode[mode];
+    if (dto.action === 'WITHDRAW') {
       return this.fsWorkflowService.withdrawRequestUsingPOST(dto);
-    } else if (mode === 'HOLD') {
+    } else if (dto.action === 'HOLD') {
       return this.fsWorkflowService.holdRequestUsingPOST(dto);
     }
     else {
-      throw new Error(mode + ' is not supported in funding request workflow');
+      throw new Error(dto.action + ' is not supported in funding request workflow');
     }
   }
 

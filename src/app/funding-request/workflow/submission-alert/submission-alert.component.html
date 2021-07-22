@@ -4,68 +4,58 @@
         The request <b>{{frqId}}</b> has been successfully approved and sent to
         <a href="mailto: {{approver.approverEmailAddress}}">
         {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
-        You can view the request details below or return to the 
-        <a routerLink="/search">search</a>.
     </span>
     <span *ngIf="action==='COMPLETE'">
-        Your request <b>{{frqId}}</b> has been successfully completed. You can view the 
-        request details below or return to the 
-        <a routerLink="/search">search</a>.
+        Your request <b>{{frqId}}</b> has been successfully completed. 
     </span>
     <span *ngIf="action==='APPROVE_ROUTE'">
         The request {{frqId}} has been successfully approved and routed to
         <a href="mailto: {{approver.approverEmailAddress}}">
         {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
-        You can view the request details below or return to the 
-        <a routerLink="/search">search</a>.
     </span>
     <span *ngIf="action==='SUBMIT'">
         Your request <b>{{frqId}}</b> has been successfully submitted and sent to
         <a href="mailto: {{approver.approverEmailAddress}}">
         {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
-        You can view the request details below or return to the 
-        <a routerLink="/search">search</a>.
     </span>
     <span *ngIf="action==='SUBMIT_APPROVE'">
         Your request <b>{{frqId}}</b> has been successfully submitted and approved.
         The request has been sent to <a href="mailto: {{approver.approverEmailAddress}}">
         {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
-        You can view the request details below or return to the 
-        <a routerLink="/search">search</a>.
     </span>
     <span *ngIf="action==='ROUTE_APPROVE'">
         The request <b>{{frqId}}</b> has been successfully routed to
         <a href="mailto: {{approver.approverEmailAddress}}">
         {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
-        You can view the request details below or return to the 
-        <a routerLink="/search">search</a>.
     </span>
     <span *ngIf="action==='REASSIGN'">
         The request <b>{{frqId}}</b> has been successfully reassigned to
         <a href="mailto: {{approver.approverEmailAddress}}">
         {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
-        You can view the request details below or return to the 
-        <a routerLink="/search">search</a>.
     </span>
     <span *ngIf="action==='REJECT'">
         The request {{frqId}} has been rejected. The requester and any previous approver(s)
         will be notified of your action.
-        You can view the request details below or return to the 
-        <a routerLink="/search">search</a>.
     </span>
     <span *ngIf="action==='RETURN'">
         The request <b>{{frqId}}</b> has been returned back to the PD for changes.
         The requesting PD and any previous approver(s) will be notified of your action.
-        You can view the request details below or return to the 
-        <a routerLink="/search">search</a>.
     </span>
     <span *ngIf="action==='DEFER'">
-        The request <b>{{frqId}}</b>  deferred and sent back to
+        The request <b>{{frqId}}</b>  has been successfully deferred and sent back to
         the DOC approver <a href="mailto: {{docApprover.approverEmailAddress}}">
         {{docApprover.approverFirstName + ' '+ docApprover.approverLastName}}</a> for review.
-        You can view the request details below or return to the 
-        <a routerLink="/search">search</a>.
     </span>
+    <span *ngIf="action==='WITHDRAW'">
+        The request <b>{{frqId}}</b>  has been withdrawn. The requester and any 
+        previous approver(s) (if applicable) will be notified of your action. 
+    </span>
+    <span *ngIf="action==='HOLD'">
+        The request <b>{{frqId}}</b>  has been placed on hold. The requester, current, 
+        and previous approver(s) (if applicable) will be notified of your action.  
+    </span>
+    You can view the request details below or return to the 
+    <a routerLink="/search">search</a>.
 </div>
 <div class="alert alert-danger" *ngIf="status === 'failure'">
     <b>Failed to submit request</b> {{errorMessage}}
@@ -126,6 +116,17 @@ Success! Your request <Display Request ID> has been successfully submitted and a
 The request has been sent to <Display the next scheduled approver's last, first name in 
 bolded text> for review. 
 You can view the request details below or return to the search. 
+
+Withdraw:
+Success! The request <Display Request ID> has been withdrawn. 
+The requester and any previous approver(s) (if applicable) will be notified of your action. 
+You can view the request details below or return to the search.
+
+Hold:
+Success! The request <Display Request ID> has been placed on hold. 
+The requester, current, and previous approver(s) (if applicable) will be notified of 
+your action. 
+You can view the request details below or return to the search.
 
 Clicking the search link in any of the success message, the system will navigate the user back to the previous search query page.
 Section Title: Request History: Refer to UI063 for the content and behavior of the request history table.
