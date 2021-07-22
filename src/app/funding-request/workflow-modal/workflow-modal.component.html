@@ -7,13 +7,14 @@
     </div>
     <div class="modal-body">
       <p *ngIf="mode==='WITHDRAW'">
-          Once you withdraw the request, an automated email will be sent to the requesting
-          PD, the Creator, and any previous approvers on this request.
+        Once you withdraw the funding request, an automated email will be sent to the 
+        requester and previous approver(s) (if applicable) notifying this action. 
+        The requester will have the option to edit and resubmit the request.
       </p>
       <p *ngIf="mode==='HOLD'">
-          Placing this request on hold will stop further processing of this request. An automated
-          email will be sent to the scheduled approvers and their designees to indicate that the 
-          request is placed on hold.
+        Placing this funding request on hold will stop further processing of this request. 
+        An automated email will be sent to the requester, current and previous approver(s) 
+        (if applicable) notifying this action.
       </p>
       <div class="form-group">
         <label for="wf-comments">Workflow Comments</label>
