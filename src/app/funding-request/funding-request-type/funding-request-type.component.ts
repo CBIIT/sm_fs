@@ -98,15 +98,13 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   templateResult(state: Select2OptionData): JQuery | string {
-    this.logger.info(state);
     if (!state.id) {
       return state.text;
     }
-    if (state.additional?.hidden) {
-      this.logger.debug('hideme');
-      return '';
+    if (state.additional?.nestedChild) {
     }
-
+    if (state.additional.nestedParent) {
+    }
     return state.text;
   }
 
@@ -133,8 +131,8 @@ export class FundingRequestTypeComponent implements OnInit {
           children.set(t.id, new Array<Select2OptionData>());
         }
       }
-      if (t.parentFrtId) {
-      // else {
+      if (t.parentFrtId) { // TODO: Nested optgroups in both places
+      // else { // TODO: nested optgroups only high-level (figure out sorting issues)
         const c = children.get(t.parentFrtId);
         if (!c) {
           children.set(t.parentFrtId, [tmp]);
@@ -143,6 +141,7 @@ export class FundingRequestTypeComponent implements OnInit {
         }
       }
     });
+
     this.data = new Array<Select2OptionData>();
 
     allParents.forEach(r => {
@@ -150,14 +149,22 @@ export class FundingRequestTypeComponent implements OnInit {
       if (c && c.length > 0) {
         r.children = c;
       }
-      // if (intermediateParents.includes(Number(r.id))) {
-      //   r.children?.forEach(c1 => {
-      //     c1.text = c1.text;
-      //     c1.additional = r.text + ' - ' + c1.text;
-      //   });
-      // }
+      if (intermediateParents.includes(Number(r.id))) {
+        r.additional.nestedChild = true;
+        r.additional.nestedParent = true;
+        children.get(Number(r.id))?.forEach(ch => {
+          ch.additional.nestedChild = true;
+        });
+      }
       this.data.push(r);
     });
+
+    // this.data.sort((r1, r2): number => {
+    //   if (r1.additional.data.parentId === r2.additional.data.parentId) {
+    //     return Number(r1.id) - Number(r2.id);
+    //   }
+    //   return Number(r1.additional.data.parentId) - Number(r2.additional.data.parentId);
+    // });
   }
 
   evoke(filter): any {
