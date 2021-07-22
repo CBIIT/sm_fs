@@ -16,17 +16,22 @@
         An automated email will be sent to the requester, current and previous approver(s) 
         (if applicable) notifying this action.
       </p>
+      <p *ngIf="mode==='RELEASE'">
+        Releasing this funding request from the "Hold" status will resume the processing 
+        of this request. An automated email will be sent to the current approver & 
+        designee(s) to process the request.
+      </p>
       <div class="form-group">
         <label for="wf-comments">Workflow Comments</label>
         <textarea [(ngModel)]="comments" id="wf-comments" class="form-control" rows="2"></textarea>
-        <span class="character-counter">{{comments.length}}/1000</span>
+        <span class="character-counter">{{comments.length}}/500</span>
       </div>
     </div>
     <div class="modal-footer">
       <button type="button"
               class="btn btn-primary"
               (click)="submit()"
-              [disabled]="!comments">
+              [disabled]="mode!=='RELEASE' && !comments">
               {{buttonText}}
       </button>
     </div>
