@@ -67,7 +67,8 @@ export class RequestModel {
     return newCriteria.requestType !== this.approverCriteria.requestType
       || newCriteria.cayCode !== this.approverCriteria.cayCode
       || newCriteria.fundingSources !== this.approverCriteria.fundingSources
-      || newCriteria.otherDocs !== this.approverCriteria.otherDocs;
+      || newCriteria.otherDocs !== this.approverCriteria.otherDocs
+      || newCriteria.loaCode !== this.approverCriteria.loaCode;
   }
 
   makeApproverCriteria(): any {
@@ -79,6 +80,7 @@ export class RequestModel {
     // fundingSources important in determining if approvers need to be regen.
     approverCriteria.fundingSources = fundingSources.join(',');
     approverCriteria.otherDocs = this.requestDto.financialInfoDto.otherDocText;
+    approverCriteria.loaCode = this.requestDto.loaCode;
     // from the create_main_approvers sp, it seems otherDocs has no effect on funding request approvers,
     // only affects funding plan approvers, needs double check with David and Subashini.
     return approverCriteria;
