@@ -1,13 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {RequestModel} from '../model/request/request-model';
-import {Router} from '@angular/router';
-import {FsRequestControllerService} from '@nci-cbiit/i2ecws-lib';
-import {Options} from 'select2';
-import {FundingSourceSynchronizerService} from './funding-source-synchronizer-service';
-import {openNewWindow} from '../utils/utils';
-import {NGXLogger} from 'ngx-logger';
-import {ControlContainer, FormGroup, NgForm} from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { RequestModel } from '../model/request/request-model';
+import { Router } from '@angular/router';
+import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
+import { Options } from 'select2';
+import { FundingSourceSynchronizerService } from './funding-source-synchronizer-service';
+import { openNewWindow } from '../utils/utils';
+import { NGXLogger } from 'ngx-logger';
+import { ControlContainer, FormGroup, NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-funding-source',
@@ -23,6 +23,8 @@ export class FundingSourceComponent implements OnInit {
   @Input() name = 'fundingSourceComponent';
   _selectedValue: number;
   options: Options;
+  private lastPd: number;
+  private lastCayCode: string;
 
   get selectedFundingSources(): Set<number> {
     return this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds;
@@ -58,25 +60,35 @@ export class FundingSourceComponent implements OnInit {
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.subscribe(restore => {
       this.selectedValue = restore;
     });
-    if (!this.requestModel.programRecommendedCostsModel.fundingSources
-      || this.requestModel.programRecommendedCostsModel.fundingSources.length === 0) {
-      this.fsRequestControllerService.getFundingSourcesUsingGET(
-        this.requestModel.requestDto.frtId,
-        this.requestModel.grant.fullGrantNum,
-        // TODO: Grant or current default FY?
-        // this.requestModel.grant.fy,
-        this.requestModel.requestDto.fy,
-        // TODO: are the funding sources the ones available to the requesting pd the user selected, or the user?
-        this.requestModel.requestDto.financialInfoDto.requestorNpnId,
-        this.requestModel.requestDto.financialInfoDto.requestorCayCode).subscribe(result => {
-        this.requestModel.programRecommendedCostsModel.fundingSources = result;
-      }, error => {
-        this.logger.error('HttpClient get request error for----- ' + error.message);
-      });
-    }
+    this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.subscribe(next => {
+      this.lastCayCode = next;
+      this.refreshFundingSources();
+    });
+    this.fundingSourceSynchronizerService.fundingSourceNewPDEmitter.subscribe(next => {
+      this.lastPd = next;
+      this.refreshFundingSources();
+    });
+    this.refreshFundingSources();
   }
 
-  // open the funding source help in the new window..
+  private refreshFundingSources(): void {
+    const cayCode = this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode;
+    // this.logger.debug('chosen:', cayCode);
+    // this.logger.debug('request model:', this.requestModel.requestDto.financialInfoDto.requestorCayCode);
+    // this.logger.debug('grant:', this.requestModel.grant.cayCode);
+    this.fsRequestControllerService.getFundingSourcesUsingGET(
+      this.requestModel.requestDto.frtId,
+      this.requestModel.grant.fullGrantNum,
+      this.requestModel.requestDto.fy,
+      this.requestModel.requestDto.financialInfoDto.requestorNpnId,
+      cayCode).subscribe(result => {
+      this.requestModel.programRecommendedCostsModel.fundingSources = result;
+    }, error => {
+      this.logger.error('HttpClient get request error for----- ' + error.message);
+    });
+  }
+
+// open the funding source help in the new window..
   openFsDetails(): boolean {
     // temporarily using # for the hashtrue file not found issue..
     const url = '/fs/#' + this.router.createUrlTree(['fundingSourceDetails']).toString();

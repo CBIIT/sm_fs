@@ -33,6 +33,7 @@ export class Step2Component implements OnInit {
     if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
+    this.logger.debug(this.requestModel.grant);
     this.requestModel.setStepLinkable(2, true);
   }
 

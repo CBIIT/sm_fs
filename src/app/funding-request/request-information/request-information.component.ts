@@ -1,19 +1,20 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {RequestModel} from '../../model/request/request-model';
-import {FsRequestControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
-import {isArray} from 'rxjs/internal-compatibility';
-import {NGXLogger} from 'ngx-logger';
-import {FundingRequestValidationService} from '../../model/request/funding-request-validation-service';
-import {FundingRequestTypes} from '../../model/request/funding-request-types';
-import {Alert} from '../../alert-billboard/alert';
-import {ControlContainer, NgForm} from '@angular/forms';
-import {CancerActivitiesDropdownComponent} from '@nci-cbiit/i2ecui-lib';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { RequestModel } from '../../model/request/request-model';
+import { FsRequestControllerService, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { isArray } from 'rxjs/internal-compatibility';
+import { NGXLogger } from 'ngx-logger';
+import { FundingRequestValidationService } from '../../model/request/funding-request-validation-service';
+import { FundingRequestTypes } from '../../model/request/funding-request-types';
+import { Alert } from '../../alert-billboard/alert';
+import { ControlContainer, NgForm } from '@angular/forms';
+import { CancerActivitiesDropdownComponent } from '@nci-cbiit/i2ecui-lib';
+import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
 
 @Component({
   selector: 'app-request-information',
   templateUrl: './request-information.component.html',
   styleUrls: ['./request-information.component.css'],
-  viewProviders: [{provide: ControlContainer, useExisting: NgForm}],
+  viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
 })
 export class RequestInformationComponent implements OnInit {
   @ViewChild(CancerActivitiesDropdownComponent) cayCode: CancerActivitiesDropdownComponent;
@@ -36,7 +37,7 @@ export class RequestInformationComponent implements OnInit {
         this.requestModel.requestDto.fy,
         // TODO: Selected PD or PD from Grant?
         this.requestModel.requestDto.financialInfoDto.requestorNpnId,
-        this.requestModel.requestDto.financialInfoDto.requestorCayCode).subscribe(result => {
+        this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode).subscribe(result => {
         this.requestModel.programRecommendedCostsModel.fundingSources = result;
       }, error => {
         this.logger.debug('HttpClient get request error for----- ' + error.message);
@@ -68,6 +69,7 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
       this.requestModel.requestDto.requestorCayCode = undefined;
     }
+    this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.next(this.requestModel.requestDto.financialInfoDto.requestorCayCode);
     this._selectedCayCode = value;
   }
 
@@ -84,11 +86,14 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
       this.cayCode.selectedValue = null;
     }
+    this.fundingSourceSynchronizerService.fundingSourceNewPDEmitter.next(this.requestModel.requestDto.requestorNpnId);
+
   }
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger,
               private fundingRequestValidationService: FundingRequestValidationService,
-              private fsRequestControllerService: FsRequestControllerService) {
+              private fsRequestControllerService: FsRequestControllerService,
+              private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
   }
 
   ngOnInit(): void {
