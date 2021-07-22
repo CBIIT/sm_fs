@@ -14,6 +14,7 @@
     appActiveInitialPayValidator
     [ngModelOptions]="{updateOn: 'change'}">
   </ng-select2>
+  <app-alert-billboard [alerts]="alerts"></app-alert-billboard>
   <div
     class="text-danger mt-1"
     *ngIf="fundingRequestType.errors?.required && (fundingRequestType.touched || parentForm.submitted)">
@@ -31,6 +32,7 @@
     grant per fiscal year. The other funding request ID is {{model.initialPay}}.
   </div>
 </div>
+
 
 
 

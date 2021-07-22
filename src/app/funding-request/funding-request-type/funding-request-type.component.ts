@@ -44,10 +44,12 @@ export class FundingRequestTypeComponent implements OnInit {
   };
 
   set selectedValue(value: number) {
+    this.logger.debug('selectedValue =', value);
     if (value && Number(value) === FundingRequestTypes.OTHER_PAY_COMPETING_ONLY) {
-      this.alerts.push(this.alert);
+      this.alerts = [this.alert];
+      // alert('WARNING: This option should be selected only if your request will not be using any NCI funds. Are you sure you want to continue?');
     } else {
-      this.alerts.splice(this.alerts.indexOf(this.alert), 1);
+      this.alerts = [];
     }
     this.model.requestDto.frtId = value;
     this.model.requestDto.financialInfoDto.requestTypeId = value;
@@ -132,7 +134,7 @@ export class FundingRequestTypeComponent implements OnInit {
         }
       }
       if (t.parentFrtId) { // TODO: Nested optgroups in both places
-      // else { // TODO: nested optgroups only high-level (figure out sorting issues)
+        // else { // TODO: nested optgroups only high-level (figure out sorting issues)
         const c = children.get(t.parentFrtId);
         if (!c) {
           children.set(t.parentFrtId, [tmp]);
