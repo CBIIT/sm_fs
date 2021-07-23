@@ -3,6 +3,7 @@ import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTr
 import { Observable } from 'rxjs';
 import { UserService } from '@nci-cbiit/i2ecui-lib';
 import { SecurityCredentials, GrantedAuthority } from '@nci-cbiit/i2ecws-lib';
+import { RequestModel } from '../model/request/request-model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,8 @@ export class AuthGuard implements CanActivate {
 
   constructor(
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private requestModel: RequestModel
   ) { }
 
   canActivate(
@@ -23,6 +25,8 @@ export class AuthGuard implements CanActivate {
 
             if (creds) {
               if (this.hasValidAuthority(creds.authorities)) {
+                this.requestModel?.reset();
+                this.requestModel?.programRecommendedCostsModel?.deepReset();
                 resolve(true);
               } else {
                 this.router.navigate(['/unauthorize']);

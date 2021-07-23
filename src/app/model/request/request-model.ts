@@ -214,8 +214,10 @@ export class RequestModel {
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
     this._requestType = undefined;
+    this._grant = undefined;
     this.stepLinkable = [false, false, false, false, false];
     this.mainApproverCreated = false;
+    this.pendingAlerts = [];
     this.programRecommendedCostsModel.reset();
     this.requestCans = undefined;
   }

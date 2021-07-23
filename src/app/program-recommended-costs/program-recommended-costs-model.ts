@@ -1,7 +1,7 @@
-import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {NGXLogger} from 'ngx-logger';
-import {PrcDataPoint} from './prc-data-point';
-import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { NGXLogger } from 'ngx-logger';
+import { PrcDataPoint } from './prc-data-point';
+import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 
 // @Injectable({
 //   providedIn: 'root'
@@ -25,14 +25,18 @@ export class ProgramRecommendedCostsModel {
 
   reset(): void {
     // this.logger.warn('Resetting program recommended costs model');
-    // this.fundingRequestType = undefined;
     this.prcLineItems = new Map<number, PrcDataPoint[]>();
-    // this._fundingSources = new Array<FundingRequestFundsSrcDto>();
-    // this._fundingSourcesMap = new Map<number, FundingRequestFundsSrcDto>();
     this._selectedFundingSourceIds = new Set<number>();
     this._selectedFundingSources = new Array<FundingRequestFundsSrcDto>();
-    // this._grantAwarded = undefined;
     this.deletedSources = [];
+  }
+
+  deepReset(): void {
+    this.reset();
+    this.fundingRequestType = undefined;
+    this._fundingSources = new Array<FundingRequestFundsSrcDto>();
+    this._fundingSourcesMap = new Map<number, FundingRequestFundsSrcDto>();
+    this.grantAwarded = undefined;
   }
 
   constructor(private logger: NGXLogger) {
