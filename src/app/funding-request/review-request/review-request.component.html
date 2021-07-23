@@ -34,8 +34,10 @@
     </span>
     <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('WITHDRAW')"
       *ngIf="withdrawVisible()">Withdraw</button>
-    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('HOLD')" *ngIf="putOnHoldVisible()">Hold</button>
-
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('HOLD')" 
+      *ngIf="putOnHoldVisible()">Hold</button>
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('RELEASE')" 
+      *ngIf="releaseFromHoldVisible()">Release Hold</button>
   </div>
 </div>
 

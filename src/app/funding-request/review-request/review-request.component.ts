@@ -34,9 +34,11 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   @ViewChild(WorkflowComponent) workflowComponent: WorkflowComponent;
   @ViewChild(UploadBudgetDocumentsComponent) uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
 
-  statusesCanWithdraw = ['SUBMITTED', 'ON HOLD', 'RFC'];
-  statusesCanOnHold = ['SUBMITTED'];
-  statusesCanSubmit = ['DRAFT', 'WITHDRAW', 'RFC'];
+  statusesCanWithdraw = [ 'SUBMITTED', 'ON HOLD', 'APPROVED', 'AWC', 'DEFER',
+                          'RELEASED', 'DELEGATED', 'ROUTED', 'REASSIGNED'];
+  statusesCanOnHold =   [ 'SUBMITTED', 'APPROVED', 'AWC', 'DEFER',
+                          'RELEASED', 'DELEGATED', 'ROUTED', 'REASSIGNED'];
+  statusesCanSubmit = ['DRAFT', 'WITHDRAWN', 'RFC'];
   terminalStatus = ['COMPLETED', 'REJECTED'];
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
@@ -265,7 +267,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
       });
     }
     this.logger.debug('Submit Request for: ', dto);
-    const nextApproverInChain = this.workflowModel.getNextApproverInChain();
+    // const nextApproverInChain = this.workflowModel.getNextApproverInChain();
     this.fsWorkflowControllerService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('Submit Request result: ', result);
@@ -305,11 +307,34 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   withdrawVisible(): boolean {
-    return (this.statusesCanWithdraw.indexOf(this.requestStatus) > -1) && this.userCanSubmit;
+    if (!this.statusesCanWithdraw.includes(this.requestStatus)) {
+      return false;
+    }
+    if (this.userCanSubmit) {
+      return  !this.workflowModel.approvedByFC;
+    }
+    else if (this.workflowModel.isDocApprover) {
+      return  this.workflowModel.approvedByDoc;
+    }
+    return false;
   }
 
   putOnHoldVisible(): boolean {
-    return (this.statusesCanOnHold.indexOf(this.requestStatus) > -1) && this.userCanSubmit;
+    if (!this.statusesCanOnHold.includes(this.requestStatus)) {
+      return false;
+    }
+    if (this.userCanSubmit) {
+      return  !this.workflowModel.approvedByFC;
+    }
+    else if (this.workflowModel.isDocApprover) {
+      return  this.workflowModel.approvedByDoc;
+    }
+    return false;
+  }
+
+  releaseFromHoldVisible(): boolean {
+    return (this.requestStatus === 'ON HOLD' &&
+           (this.userCanSubmit || this.workflowModel.isDocApprover));
   }
 
   submitVisible(): boolean {

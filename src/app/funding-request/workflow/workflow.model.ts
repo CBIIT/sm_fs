@@ -35,6 +35,10 @@ export class WorkflowModel {
   isFcNci = false;
   approvedScientifically = false;
   approvedByGM = false;
+  // 3 below properties are used for determining withdraw, hold button
+  approvedByFC = false;
+  isDocApprover = false;
+  approvedByDoc = false;
   scientificRoleCodes = ['DOC', 'DD', 'SPL'];
   financialRoleCodes = ['FCNCI', 'FCARC'];
   approvalActions = [WorkflowActionCode.APPROVE,
@@ -89,6 +93,20 @@ export class WorkflowModel {
     }
   }
 
+  private isUserOneOfThem(approver: FundingReqApproversDto): boolean {
+    const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    if (userId === approver.approverLdap) {
+        return true;
+    } else if (approver.designees && approver.designees.length > 0) {
+        const designees = approver.designees.map(d => d.delegateTo);
+        if (designees.indexOf(userId) > -1) {
+          return true;
+        }
+    }
+
+    return false;
+  }
+
   initialize(): void {
     this.nextApproverRoleCode = null;
     this.isUserNextInChain = false;
@@ -97,6 +115,8 @@ export class WorkflowModel {
     this.approvedScientifically = false;
     this.isGMApprover = false;
     this.approvedByGM = false;
+    this.approvedByFC = false;
+    this.approvedByDoc = false;
     this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
       (result) => {
         this.processApproversResult(result);
@@ -125,19 +145,11 @@ export class WorkflowModel {
     });
 
     this._docApprover = docList && docList.length > 0 ? docList[0] : {approverFirstName: 'Unknown'};
+    this.isDocApprover = this.isUserOneOfThem(this._docApprover);
 
     this.nextApprover = this._pendingApprovers && this._pendingApprovers.length > 0 ? this._pendingApprovers[0] : null;
     if (this.nextApprover) {
-      const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-      this.isUserNextInChain = false;
-      if (userId === this.nextApprover.approverLdap) {
-        this.isUserNextInChain = true;
-      } else if (this.nextApprover.designees && this.nextApprover.designees.length > 0) {
-        const designees = this.nextApprover.designees.map(d => d.delegateTo);
-        if (designees.indexOf(userId) > -1) {
-          this.isUserNextInChain = true;
-        }
-      }
+      this.isUserNextInChain = this.isUserOneOfThem(this.nextApprover);
 
       if (this.isUserNextInChain) {
         this.nextApproverRoleCode = this.nextApprover.roleCode ? this.nextApprover.roleCode : 'ADDITIONAL';
@@ -173,7 +185,12 @@ export class WorkflowModel {
         if (a.roleCode === 'GM' && a.responseCode === 'Y') {
           this.approvedByGM = true;
         }
-
+        if (this.financialRoleCodes.includes(a.roleCode) && a.responseCode === 'Y') {
+          this.approvedByFC = true;
+        }
+        if (a.roleCode === 'DOC' && a.responseCode === 'Y') {
+          this.approvedByDoc = true;
+        }
         if (this.approvedByGM && this.approvedScientifically) {
           break;
         }
@@ -197,7 +214,6 @@ export class WorkflowModel {
     });
 
   }
-
 
   prepareApproverListsForView(action: WorkflowActionCode): void {
     this.resetApproverLists();
@@ -329,7 +345,8 @@ export const ApprovingStatuses: string[] = [
   RequestStatus.APPROVED,
   RequestStatus.AWC,
   RequestStatus.ROUTED,
-  RequestStatus.DELEGATED
+  RequestStatus.DELEGATED,
+  RequestStatus.RELEASED
 ];
 
 export enum WorkflowActionCode {
