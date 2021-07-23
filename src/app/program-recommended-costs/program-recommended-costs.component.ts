@@ -81,7 +81,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.fundingSourceSynchronizerService?.fundingSourceSelectionEmitter?.unsubscribe();
+    // this.fundingSourceSynchronizerService?.fundingSourceSelectionEmitter?.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -97,6 +97,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     this.loadApplAwardPeriods();
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
+      this.logger.debug('new selected source:', selection);
       this.selectedSourceId = selection;
     });
   }
@@ -142,8 +143,8 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   addFundingSource(): void {
-    this.logger.debug('editing:', this.editing);
     if (this.editing >= 0) {
+      this.logger.debug('editing:', this.editing);
       const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[this.editing];
       this.logger.debug('Original source', edit);
       if (this.selectedSourceId !== edit.fundingSourceId) {
@@ -153,7 +154,10 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
           l.budgetId = undefined;
         });
       }
+    } else {
+      this.logger.debug('creating new budget for source', this.selectedSourceId);
     }
+
     if (this.requestModel.programRecommendedCostsModel.fundingSourcesMap.size === 0) {
       this.logger.error('Funding sources not initialized');
     }
@@ -338,6 +342,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     this.alerts = [];
+    this.logger.debug('onSubmit()', this.prcForm);
 
     if (this.prcForm.valid) {
       this.addFundingSource();

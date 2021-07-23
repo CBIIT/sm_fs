@@ -86,6 +86,7 @@ export class ProgramRecommendedCostsModel {
   }
 
   addFundingSourceById(id: number, dataPoints: Array<PrcDataPoint>): boolean {
+    this.logger.debug('add source for id', id, dataPoints);
     const source = this._fundingSourcesMap.get(Number(id));
     if (!source) {
       this.logger.warn('no source found in', this._fundingSourcesMap);

@@ -40,6 +40,7 @@ export class FundingSourceComponent implements OnInit {
 
   set selectedValue(value: number) {
     this._selectedValue = value;
+    this.logger.debug('emitting new selection', value);
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.next(value);
   }
 
