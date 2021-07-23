@@ -191,7 +191,7 @@ export class WorkflowModel {
         if (a.roleCode === 'DOC' && a.responseCode === 'Y') {
           this.approvedByDoc = true;
         }
-        if (this.approvedByGM && this.approvedScientifically) {
+        if (this.approvedByGM && this.approvedScientifically && this.approvedByFC && this.approvedByDoc) {
           break;
         }
       }

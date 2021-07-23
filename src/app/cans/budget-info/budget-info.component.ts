@@ -28,7 +28,6 @@ export class BudgetInfoComponent implements OnInit {
   @Input() readOnly = false;
   @Input() editing = false;
 
-
   get fundingRequestCans(): FundingRequestCanDto[] {
     return this.model.requestCans;
   }
@@ -51,6 +50,7 @@ export class BudgetInfoComponent implements OnInit {
 
   isFinancialApprover(): boolean {
     return this.workflowModel.isFinancialApprover;
+    this.workflowModel.approvedByFC
   }
 
   get defaultCans(): CanCcxDto[] {
