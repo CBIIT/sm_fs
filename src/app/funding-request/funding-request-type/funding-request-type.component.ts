@@ -40,7 +40,7 @@ export class FundingRequestTypeComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<number>();
   alert: Alert = {
     type: 'warning',
-    message: 'WARNING: This option should be selected only if your request will not be using any NCI funds. Are you sure you want to continue?'
+    message: 'WARNING: This option should be selected only if your request will not be using any NCI funds.'
   };
 
   set selectedValue(value: number) {
