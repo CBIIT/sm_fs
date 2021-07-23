@@ -52,6 +52,10 @@ export class BudgetInfoComponent implements OnInit {
     return this.workflowModel.isFinancialApprover;
   }
 
+  isApprovedFinancials(): boolean {
+    return this.workflowModel.approvedByFC;
+  }
+
   get defaultCans(): CanCcxDto[] {
     return this.canService.defaultCans;
   }
