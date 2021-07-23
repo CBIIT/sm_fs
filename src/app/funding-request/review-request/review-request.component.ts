@@ -4,7 +4,7 @@ import { RequestModel } from '../../model/request/request-model';
 import { AppPropertiesService } from '../../service/app-properties.service';
 import {
   FsRequestControllerService, FundingReqStatusHistoryDto,
-  NciPfrGrantQueryDto, FundingRequestDtoReq, DocumentsDto,
+  NciPfrGrantQueryDto, DocumentsDto,
   FundingReqApproversDto, FsWorkflowControllerService, FundingRequestPermDelDto,
   NciPerson, I2ERoles, WorkflowTaskDto
 } from '@nci-cbiit/i2ecws-lib';
@@ -12,13 +12,11 @@ import { AppUserSessionService } from 'src/app/service/app-user-session.service'
 import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { Subscription } from 'rxjs';
 import { DocumentService } from '../../service/document.service';
-import { saveAs } from 'file-saver';
-import { HttpResponse } from '@angular/common/http';
 import { NGXLogger } from 'ngx-logger';
 import { WorkflowModalComponent } from '../workflow-modal/workflow-modal.component';
 import { WorkflowActionCode, WorkflowModel } from '../workflow/workflow.model';
 import { WorkflowComponent } from '../workflow/workflow.component';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UploadBudgetDocumentsComponent } from '../../upload-budget-documents/upload-budget-documents.component';
 
 @Component({
@@ -38,7 +36,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
                           'RELEASED', 'DELEGATED', 'ROUTED', 'REASSIGNED'];
   statusesCanOnHold =   [ 'SUBMITTED', 'APPROVED', 'AWC', 'DEFER',
                           'RELEASED', 'DELEGATED', 'ROUTED', 'REASSIGNED'];
-  statusesCanSubmit = ['DRAFT', 'WITHDRAWN', 'RFC'];
+  statusesCanEditSubmit = ['DRAFT', 'WITHDRAWN', 'RFC'];
   terminalStatus = ['COMPLETED', 'REJECTED'];
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
@@ -50,7 +48,6 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   requestStatus: string;
   docDtos: DocumentsDto[];
   readonly = false;
-  readonlyStatuses = ['SUBMITTED', 'APPROVED', 'COMPLETED', 'REJECTED'];
   activeApprover: FundingReqApproversDto;
 
   userCanSubmit = false;
@@ -80,11 +77,9 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     private fsRequestService: FsRequestControllerService,
     private userSessionService: AppUserSessionService,
     private requestIntegrationService: FundingRequestIntegrationService,
-    private documentService: DocumentService,
     private changeDetection: ChangeDetectorRef,
     private logger: NGXLogger,
     private fsWorkflowControllerService: FsWorkflowControllerService,
-    private modalService: NgbModal,
     private workflowModel: WorkflowModel) {
   }
 
@@ -139,7 +134,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
 
     });
     this.isRequestEverSubmitted = submitted;
-    this.readonly = (this.userReadonly) || (this.readonlyStatuses.indexOf(this.requestStatus) > -1);
+    this.readonly = (this.userReadonly) || !(this.statusesCanEditSubmit.includes(this.requestStatus));
     if (this.readonly) {
       this.requestModel.disableStepLinks();
     } else {
@@ -310,10 +305,10 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     if (!this.statusesCanWithdraw.includes(this.requestStatus)) {
       return false;
     }
-    if (this.userCanSubmit) {
+    if (this.userCanSubmit) {  // user is PD
       return  !this.workflowModel.approvedByFC;
     }
-    else if (this.workflowModel.isDocApprover) {
+    else if (this.workflowModel.isDocApprover) {  // user is DOC approver
       return  this.workflowModel.approvedByDoc;
     }
     return false;
@@ -338,7 +333,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   submitVisible(): boolean {
-    return this.userCanSubmit && this.statusesCanSubmit.indexOf(this.requestStatus) > -1;
+    return this.userCanSubmit && this.statusesCanEditSubmit.includes(this.requestStatus);
   }
 
   deleteVisible(): boolean {
