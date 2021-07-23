@@ -110,6 +110,9 @@ export class Step2Component implements OnInit {
   }
 
   requestTypeSelected(): boolean {
+    if (!this.requestModel.requestDto.frtId) {
+      return false;
+    }
     return Number(this.requestModel.requestDto.frtId) &&
       !([FundingRequestTypes.SKIP, FundingRequestTypes.SKIP__NCI_RFA].includes(Number(this.requestModel.requestDto.frtId)));
   }

@@ -75,7 +75,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     return this.requestModel.programRecommendedCostsModel.grantAwarded;
   }
 
-  constructor(private requestModel: RequestModel, private propertiesService: AppPropertiesService,
+  constructor(public requestModel: RequestModel, private propertiesService: AppPropertiesService,
               private fsRequestControllerService: FsRequestControllerService, private logger: NGXLogger,
               private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
   }
