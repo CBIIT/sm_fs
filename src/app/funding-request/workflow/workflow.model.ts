@@ -232,6 +232,7 @@ export class WorkflowModel {
       approver.approverLdap = user.nciLdapCn;
       approver.approverFullName = user.fullName;
       approver.approverEmailAddress = user.emailAddress;
+      approver.designees = null;
       this.pendingApprovers[0] = approver;
       this.addedApproverMap.set(user.id, true);
       this.hasNewApprover = true;
