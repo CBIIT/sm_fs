@@ -81,7 +81,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.unsubscribe();
+    this.fundingSourceSynchronizerService?.fundingSourceSelectionEmitter?.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -231,11 +231,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     const saved = this.requestModel.requestDto.frqId ? true : false;
     const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i, saved);
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed);
-  }
-
-  isSkipRequest(): boolean {
-    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP) ||
-      Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.SKIP__NCI_RFA);
   }
 
   prepareLineItem(): void {
