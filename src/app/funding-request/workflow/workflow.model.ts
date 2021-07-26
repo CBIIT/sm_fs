@@ -1,6 +1,5 @@
-import { ConvertActionBindingResult } from '@angular/compiler/src/compiler_util/expression_converter';
 import { Injectable } from '@angular/core';
-import { FsWorkflowControllerService, FundingReqApproversDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
@@ -232,7 +231,7 @@ export class WorkflowModel {
       approver.approverLdap = user.nciLdapCn;
       approver.approverFullName = user.fullName;
       approver.approverEmailAddress = user.emailAddress;
-      approver.designees = null;
+      this.retrieveDesignees(approver);
       this.pendingApprovers[0] = approver;
       this.addedApproverMap.set(user.id, true);
       this.hasNewApprover = true;
@@ -247,12 +246,25 @@ export class WorkflowModel {
       approver.approverFullName = user.fullName;
       approver.approverEmailAddress = user.emailAddress;
       approver.assignerFullName = this.userSessionService.getLoggedOnUser().fullName;
+      this.retrieveDesignees(approver);
       this.additionalApprovers.push(approver);
       this.addedApproverMap.set(user.id, true);
       this.hasNewApprover = true;
       this.reorderApprovers();
       this.requestIntegrationService.approverListChangeEmitter.next();
     }
+  }
+
+  retrieveDesignees(approver: FundingReqApproversDto): void{
+    this.workflowControllerService.getApproverDesigneesUsingGET(approver.approverLdap).subscribe(
+      (result) => {
+        this.logger.debug('received designees', result);
+        approver.designees = result;
+      },
+      (errorResponse) => {
+        this.logger.error('retrieve designess failed, http response is', errorResponse);
+      }
+    );
   }
 
   deleteAdditionalApprover(index: number): void {
@@ -299,7 +311,7 @@ export class WorkflowModel {
   getDocApprover(): FundingReqApproversDto {
     return this._docApprover;
   }
-}
+} // end of WorkflowModel class
 
 export class WorkflowAction {
   action: WorkflowActionCode;
