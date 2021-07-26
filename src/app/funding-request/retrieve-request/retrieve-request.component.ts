@@ -25,11 +25,9 @@ export class RetrieveRequestComponent implements OnInit {
 
   ngOnInit(): void {
     this.frqId = this.route.snapshot.params.frqId;
-    // this.logger.debug('retrieving request frqId = ' + this.frqId);
     if (this.frqId) {
       this.requestService.retrieveFundingRequestUsingGET(this.frqId).subscribe(
         (result) => {
-          // this.logger.debug('retrieveFundingReuest returned ', JSON.stringify(result));
           this.requestModel.reset();
           this.requestModel.title = 'View Request Details for';
           this.requestModel.returnToRequestPageLink = true;
