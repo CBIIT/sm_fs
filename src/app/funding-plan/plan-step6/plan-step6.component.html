@@ -1,1 +1,368 @@
-<p>plan-step6 works!</p>
+<!-- BEGIN Funding Plan Information Section -->
+
+<div class="row">
+    <div class="col-12 d-flex">
+        <h2>Funding Plan Information</h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#fplan-info-collapse" role="button" aria-expanded="true" aria-controls="fplan-info-collapse"></a>
+    </div>
+    <div class="col-12 collapse show mt-2" id="fplan-info-collapse">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">RFA/PA #</th>
+                    <th scope="col">Concept ID</th>
+                    <th scope="col">RFA/PA Title</th>
+                    <th scope="col">Issue Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a href="#">PAR19-264</a>
+                    </td>
+                    <td>
+                        <a href="#">6572</a>
+                    </td>
+                    <td>Integrative Analysis of the Human Tumor Immune Microenvironment</td>
+                    <td>
+                        <div class="d-flex">
+                            <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="radioBasic">
+                                <label ngbButtonLabel class="btn-outline-secondary">
+                                    <input ngbButton type="radio" value="new" disabled>New
+                                </label>
+                                <label ngbButtonLabel class="btn-outline-secondary">
+                                    <input ngbButton type="radio" value="reissue" disabled>Reissue
+                                </label>
+                            </div>
+                            <input type="text" id="issue-type" style="width:7rem" class="form-control form-control-sm ml-2" readonly>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="row">
+
+            <div class="col-lg-2 col-sm-6">
+                <div class="form-group">
+                    <span class="like-label">Fundable Score&nbsp;Range</span>
+                    <span class="form-control-plaintext">23 &ndash; 26</span>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-sm-6">
+                <div class="form-group">
+                    <span class="like-label">Applications Recieved</span>
+                    <span class="form-control-plaintext">35</span>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-sm-6">
+                <div class="form-group">
+                    <span class="like-label">Applications Proposed for&nbsp;Funding</span>
+                    <span class="form-control-plaintext">6</span>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-sm-6">
+                <div class="form-group">
+                    <span class="like-label">Applications Skipped</span>
+                    <span class="form-control-plaintext">1</span>
+                </div>
+            </div>
+        
+            <div class="col-lg-2 col-sm-6">
+                <div class="form-group">
+                    <span class="like-label">Applications Not Considered for&nbsp;Funding</span>
+                    <span class="form-control-plaintext">1</span>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-sm-6">
+                <div class="form-group">
+                    <label for="award-date">Anticipated Award Date</label>
+                    <input type="text" class="form-control" id="award-date" ngbDatepicker>
+                </div>
+            </div>
+
+            <div class="col-xl-2 col-lg-4 col-sm-6">
+                <div class="form-group">
+                    <span class="like-label">Requesting PD</span>
+                    <span class="form-control-plaintext"><a href="#">Howcroft, Kevin</a></span>
+                </div>
+            </div>
+
+            <div class="col-xl-2 col-lg-4 col-sm-6">
+                <div class="form-group">
+                    <span class="like-label">Funding Approval</span>
+                    <span class="form-control-plaintext">ARC and NCI Funds Certifiers</span>
+                </div>
+            </div>
+
+            <div class="col-xl-2 col-lg-4 col-sm-6">
+                <div class="form-group">
+                    <span class="like-label">Final Scientific Levels of Authority (LOA)</span>
+                    <span class="form-control-plaintext">Scientific Program Leaders (SPL) committee</span>
+                </div>
+            </div>
+
+            <div class="col-xl-2 col-lg-4 col-sm-6">
+                <div class="form-group">
+                    <span class="like-label">Current Status</span>
+                    <span class="form-control-plaintext">Drafted by <a href="#">Doe, Jane</a></span>
+                </div>
+            </div>
+
+            <div class="col-xl-2 col-lg-4 col-sm-6">
+                <div class="form-group">
+                    <span class="like-label">Other DOC(s) Contributing Funds</span>
+                    <span class="form-control-plaintext">CRCHD</span>
+                </div>
+            </div>
+
+            <div class="col-xl-2 col-lg-4 col-sm-6">
+                <div class="form-group">
+                    <span class="like-label">CA</span>
+                    <span class="form-control-plaintext">Cancer Disparities</span>
+                </div>
+            </div>
+
+
+        </div><!-- END Row -->
+    </div><!-- END col-12 -->
+    <div class="col-12">
+        <hr>
+    </div>
+</div>
+
+<!-- END Funding Plan Information Section -->
+
+<!-- START Funding Information Section -->
+
+<div class="row">
+    <div class="col-12 d-flex">
+        <h2>Funding Information <span class="font-weight-light font-italic">(Optional)</span></h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#funding-info-collapse" role="button" aria-expanded="true" aria-controls="funding-info-collapse"></a>
+    </div>
+    <div class="col-12 collapse show" id="funding-info-collapse">
+        <div class="row">
+            <div class="col-lg-3 col-sm-6">
+                <div class="form-group">
+                    <label for="first-set-aside">Published 1<sup>st</sup> Year Set-Aside</label>
+                    <input readonly type="text" id="first-set-aside" class="form-control">
+                </div>
+            </div>
+            <div class="col-lg-auto col-sm-6">
+                <div class="form-group">
+                    <label for="all-set-aside">Total Published Set-Aside (All Years)</label>
+                    <input readonly type="text" id="all-set-aside" class="form-control">
+                </div>
+            </div>
+        
+            <div class="col-12 mt-3">
+                <h3>List of Funding Estimates for Each Out-Year</h3>
+            </div>
+        
+            <div class="col-lg-3 col-sm-6">
+                <div class="form-group">
+                    <label for="est-year-2">Year 2</label>
+                    <input readonly type="text" id="est-year-2" class="form-control">
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="form-group">
+                    <label for="est-year-3">Year 3</label>
+                    <input readonly type="text" id="est-year-3" class="form-control">
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="form-group">
+                    <label for="est-year-4">Year 4</label>
+                    <input readonly type="text" id="est-year-4" class="form-control">
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="form-group">
+                    <label for="est-year-5">Year 5</label>
+                    <input readonly type="text" id="est-year-5" class="form-control">
+                </div>
+            </div>
+        
+            <div class="col-12">
+                <ngb-alert type="primary" [dismissible]="false" class="workflow-comments mt-3">
+                    <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
+                    <div class="comment-content">
+                        <strong>Funding Comments</strong>
+                        <div>This was discussed with my DOC Director and CRHD Diversity Supplement Program Director.</div>
+                    </div>
+                </ngb-alert>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-12">
+        <hr>
+    </div>
+</div><!-- END Row -->
+
+<!-- END Funding Information Section -->
+
+<!-- START Applications Proposed for Funding Section -->
+<div class="row">
+    <div class="col-12 d-flex">
+        <h2>Applications Proposed for Funding</h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-proposed-collapse" role="button" aria-expanded="true" aria-controls="apps-proposed-collapse"></a>
+    </div>
+    <div class="col-12 collapse show mt-2" id="apps-proposed-collapse">
+        <p>Table goes here</p>
+    </div>
+    <div class="col-12">
+        <hr>
+    </div>
+</div>
+<!-- END Applications Proposed for Funding Section -->
+
+<!-- START Applications Not Considered for Funding Section -->
+<div class="row">
+    <div class="col-12 d-flex">
+        <h2>Applications Not Considered for Funding</h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-notcon-collapse" role="button" aria-expanded="true" aria-controls="apps-notcon-collapse"></a>
+    </div>
+    <div class="col-12 collapse show mt-2" id="apps-notcon-collapse">
+        <p>Table goes here</p>
+    </div>
+    <div class="col-12">
+        <hr>
+    </div>
+</div>
+<!-- END Applications Not Considered for Funding Section -->
+
+<!-- START Supporting Documents Section -->
+<div class="row">
+    <div class="col-12 d-flex">
+        <h2>Supporting Documents</h2>
+        <button type="button" class="btn btn-outline-primary ml-auto"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i> View Package</button>
+        <a class="collapse-toggle btn btn-link ml-1" data-toggle="collapse" href="#support-docs-collapse" role="button" aria-expanded="true" aria-controls="support-docs-collapse"></a>
+    </div>
+    <div class="col-12 collapse show mt-2" id="support-docs-collapse">
+        <div class="doc-card">
+            <span class="doc-name">Cover Page</span>
+            <span class="doc-desc">(Automatically Generated)</span>
+            <div class="doc-buttons">
+                <button type="button" class="btn btn-link btn-slim" title="View Document"><i class="far fa-eye" aria-hidden="true"></i></button>
+            </div>
+        </div>
+        <div class="doc-card">
+            <span class="doc-name">Scientific Rationale for Supporting RFA/PA</span>
+            <span class="doc-desc">rationale.docx</span>
+            <div class="doc-buttons">
+                <button type="button" class="btn btn-link btn-link-danger btn-slim" title="Delete Document"><i class="fas fa-trash" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-link btn-slim" title="View Document"><i class="far fa-eye" aria-hidden="true"></i></button>
+            </div>
+        </div>
+        <div class="doc-card">
+            <span class="doc-name">Justification for Exception Application(s)</span>
+            <span class="doc-desc">justification-exception.docx</span>
+            <div class="doc-buttons">
+                <button type="button" class="btn btn-link btn-link-danger btn-slim" title="Delete Document"><i class="fas fa-trash" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-link btn-slim" title="View Document"><i class="far fa-eye" aria-hidden="true"></i></button>
+            </div>
+        </div>
+        <div class="doc-card">
+            <span class="doc-name">Justification for Skipped Application(s)</span>
+            <span class="doc-desc">justification-skipped.docx</span>
+            <div class="doc-buttons">
+                <button type="button" class="btn btn-link btn-link-danger btn-slim" title="Delete Document"><i class="fas fa-trash" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-link btn-slim" title="View Document"><i class="far fa-eye" aria-hidden="true"></i></button>
+            </div>
+        </div>
+        <div class="doc-card">
+            <span class="doc-name">Summary Statement for Application(s) Proposed for Funding</span>
+            <span class="doc-desc">(Retrieved from IMPAC II)</span>
+            <div class="doc-buttons">
+                <button type="button" class="btn btn-link btn-slim" title="View Document"><i class="far fa-eye" aria-hidden="true"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <hr>
+    </div>
+</div>
+<!-- END Supporting Documents Section -->
+
+<!-- START Workflow Section -->
+<div class="row">
+    <div class="col-12 d-flex">
+        <h2>Workflow</h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#workflow-collapse" role="button" aria-expanded="true" aria-controls="workflow-collapse"></a>
+    </div>
+    <div class="col-12 collapse show" id="workflow-collapse">
+        <div class="row">
+
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="add-approvers">Add Approver(s) <span class="optional">(optional)</span></label>
+                    <ng-select2
+                        id="add-approvers"
+                        name="add-approvers"
+                        [allowClear]="true">
+                    </ng-select2>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <h3>Next Scheduled Approvers</h3>
+                <p>Table goes here</p>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group mb-1">
+                    <label for="workflow-comments">Workflow Comments <span class="optional">(optional)</span></label>
+                    <textarea id="workflow-comments" class="form-control" rows="2"></textarea>
+                    <span class="counter">XXXX/2000</span>
+                </div>
+            </div>
+        </div><!--END ROW-->
+    </div>
+    <div class="col-12">
+        <hr>
+    </div>
+</div>
+<!-- END Workflow Section -->
+
+<!-- START Buttons Section -->
+<div class="row">
+    <div class="col-12 d-flex mb-4">
+        <button type="button" class="btn btn-outline-secondary mr-auto">Previous</button>
+        <button type="button" class="btn btn-danger mr-2">Delete Plan</button>
+        <button type="button" class="btn btn-primary">Submit Plan</button>
+    </div>
+</div>
+<!-- END Buttons Section -->
+
+<!-- START Funding Plan History Section -->
+<div class="row">
+    <div class="col-12">
+        <hr>
+    </div>
+    <div class="col-12">
+        <h2>Funding Plan History</h2>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Action</th>
+                    <th scope="col">Workflow Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>MM/DD/YYYY HH:MM PM</td>
+                    <td>Draft by Kevin Howcroft</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- END Funding Plan History Section -->
