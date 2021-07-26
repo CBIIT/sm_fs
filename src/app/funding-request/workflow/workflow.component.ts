@@ -5,7 +5,6 @@ import { Subscription } from 'rxjs';
 import { Options } from 'select2';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
-import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { ApprovingStatuses, WorkflowAction, WorkflowActionCode, WorkflowModel } from './workflow.model';
 import { GmInfoComponent } from './gm-info/gm-info.component';
@@ -214,6 +213,14 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     }
 
     return false;
+  }
+
+  get commentsRequired(): boolean {
+    return this._selectedWorkflowAction?.commentsRequired;
+  }
+
+  get newApproverRequired(): boolean {
+    return this._selectedWorkflowAction?.newApproverRequired;
   }
 
   submitWorkflow(): void {
