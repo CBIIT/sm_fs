@@ -23,6 +23,7 @@ export class CanSelectorComponent implements OnInit {
   @Input() nciSourceFlag: string = '';
 
   @Input() readonly = false;
+  private lastProjectedCan: string;
 
   @Input()
   get selectedValue(): string {
@@ -56,7 +57,7 @@ export class CanSelectorComponent implements OnInit {
       this.canMap = new Map(result.map(c => [c.can, c]));
       this.data = new Array<Select2OptionData>();
       result.forEach(r => {
-        this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip });
+        this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip, additional: r });
       });
       // this.selectedValue = this._selectedValue;
     });
@@ -67,6 +68,8 @@ export class CanSelectorComponent implements OnInit {
     });
   }
 
+  // TODO: when projected CAN changes, we need to clear the selected CAN iff it was copied from the previous projected CAN
+  // See UI0068
   selectProjectedCan(): boolean {
     if (this.projectedCan && this.projectedCan.can && this.projectedCan.canDescrip) {
       this.selectedValue = this.projectedCan.can;
@@ -76,6 +79,9 @@ export class CanSelectorComponent implements OnInit {
   }
 
   updateProjectedCan(can: CanCcxDto): void {
+    if (this.projectedCan && this.selectedValue && this.projectedCan.can === this.selectedValue) {
+      this.selectedValue = null;
+    }
     this.projectedCan = can;
   }
 }
