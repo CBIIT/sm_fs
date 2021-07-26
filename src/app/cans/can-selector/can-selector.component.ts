@@ -47,7 +47,6 @@ export class CanSelectorComponent implements OnInit {
   }
 
   constructor(private canService: CanManagementServiceBus,
-              private requestModel: RequestModel,
               private logger: NGXLogger) {
   }
 
