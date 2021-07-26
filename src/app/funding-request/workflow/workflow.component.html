@@ -36,7 +36,7 @@
 
     <div class="col-md-6">
         <div class="form-group" *ngIf="showAddApprover || !readonly">
-            <label for="req-add-approvers">Add Approver(s) <span class="optional">(optional)</span></label>
+            <label for="req-add-approvers">Add Approver(s) <span class="optional" *ngIf="!newApproverRequired">(optional)</span></label>
             <ng-select2
                 id="req-add-approvers"
                 [(ngModel)]="selectedValue"
@@ -51,7 +51,7 @@
 
     <div class="col-12">
         <div class="form-group" *ngIf=" isApprover() || !readonly">
-            <label for="workflow-comments">Workflow Comments <span class="optional">(optional)</span></label>
+            <label for="workflow-comments">Workflow Comments <span class="optional" *ngIf="!commentsRequired">(optional)</span></label>
             <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments"></textarea>
             <span class="character-counter">{{comments.length}}/2000</span>
         </div>

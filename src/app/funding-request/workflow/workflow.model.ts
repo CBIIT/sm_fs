@@ -55,7 +55,7 @@ export class WorkflowModel {
     this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE, 'Approve', 'Approve', true, false, false));
     this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE_ROUTE, 'Approve and Route', 'Approve and Route', true, false, true));
     this.awa.push(new WorkflowAction(WorkflowActionCode.APPROVE_COMMENT, 'Approve with Comments', 'Approve', false, true, false, ['SPL', 'DD']));
-    this.awa.push(new WorkflowAction(WorkflowActionCode.REASSIGN, 'Reassign', 'Reassign', true, false, true));
+    this.awa.push(new WorkflowAction(WorkflowActionCode.REASSIGN, 'Reassign', 'Reassign', true, true, true));
     this.awa.push(new WorkflowAction(WorkflowActionCode.REJECT, 'Reject', 'Reject', true, true, false));
     this.awa.push(new WorkflowAction(WorkflowActionCode.ROUTE_APPROVE, 'Route Before Approving', 'Route', true, false, true));
     this.awa.push(new WorkflowAction(WorkflowActionCode.RETURN, 'Return to PD for Changes', 'Return', true, true, false, ['-GM']));
@@ -322,8 +322,13 @@ export class WorkflowAction {
   commentsRequired: boolean;
   newApproverRequired: boolean;
 
-  constructor(action: WorkflowActionCode, actionName: string, actionButtonText: string, allRoles: boolean,
-              commentsRequired: boolean, newApproverRequired: boolean, roles?: string[]) {
+  constructor(action: WorkflowActionCode,
+              actionName: string,
+              actionButtonText: string,
+              allRoles: boolean,
+              commentsRequired: boolean,
+              newApproverRequired: boolean,
+              roles?: string[]) {
     this.action = action;
     this.actionName = actionName;
     this.actionButtonText = actionButtonText;
