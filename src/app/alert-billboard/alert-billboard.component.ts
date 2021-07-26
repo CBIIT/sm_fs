@@ -20,10 +20,8 @@ export class AlertBillboardComponent implements OnInit {
   }
 
   deleteAlert(alert: Alert): void {
-    this.logger.debug('Deleting alert now', alert);
     let i = this.alerts.indexOf(alert);
     if (i === -1) {
-      this.logger.warn('Alert not found in queue');
       this.alerts.forEach((a, index) => {
         if (a.type === alert.type && a.message === alert.message) {
           console.log('found manually at index', index);

@@ -74,9 +74,6 @@ export class FundingSourceComponent implements OnInit {
 
   private refreshFundingSources(): void {
     const cayCode = this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode;
-    // this.logger.debug('chosen:', cayCode);
-    // this.logger.debug('request model:', this.requestModel.requestDto.financialInfoDto.requestorCayCode);
-    // this.logger.debug('grant:', this.requestModel.grant.cayCode);
     this.fsRequestControllerService.getFundingSourcesUsingGET(
       this.requestModel.requestDto.frtId,
       this.requestModel.grant.fullGrantNum,
