@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {FsRequestControllerService} from '@nci-cbiit/i2ecws-lib';
-import {NGXLogger} from 'ngx-logger';
-import {RequestModel} from 'src/app/model/request/request-model';
-import {AppUserSessionService} from 'src/app/service/app-user-session.service';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
+import { NGXLogger } from 'ngx-logger';
+import { RequestModel } from 'src/app/model/request/request-model';
+import { AppUserSessionService } from 'src/app/service/app-user-session.service';
+import { ConversionMechanisms } from '../../type4-conversion-mechanism/conversion-mechanisms';
 
 @Component({
   selector: 'app-retrieve-request',
@@ -40,11 +41,16 @@ export class RetrieveRequestComponent implements OnInit {
             this.requestModel.captureApproverCriteria();
           }
 
+          // TODO: We don't seem to be storing conversion mechanism anywhere, so this will most likely always be null
+          const conversionMech = ConversionMechanisms.includes(this.requestModel.conversionMechanism)
+            ? this.requestModel.conversionMechanism : null;
+
           this.requestService.getFundingSourcesUsingGET(this.requestModel.requestDto.frtId,
             this.requestModel.grant.fullGrantNum,
             this.requestModel.requestDto.financialInfoDto.fy,
             this.requestModel.requestDto.requestorNpnId,
-            this.requestModel.requestDto.requestorCayCode).subscribe(result1 => {
+            this.requestModel.requestDto.requestorCayCode,
+            conversionMech).subscribe(result1 => {
             this.requestModel.programRecommendedCostsModel.fundingSources = result1;
             this.requestModel.restoreLineItems();
           });
