@@ -9,6 +9,7 @@ import { Alert } from '../../alert-billboard/alert';
 import { ControlContainer, NgForm } from '@angular/forms';
 import { CancerActivitiesDropdownComponent } from '@nci-cbiit/i2ecui-lib';
 import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
+import { ConversionMechanisms } from '../../type4-conversion-mechanism/conversion-mechanisms';
 
 @Component({
   selector: 'app-request-information',
@@ -29,6 +30,9 @@ export class RequestInformationComponent implements OnInit {
   set selectedRequestType(value: number) {
 
     if (value) {
+      const conversionMech = ConversionMechanisms.includes(this.requestModel.conversionMechanism)
+        ? this.requestModel.conversionMechanism : null;
+
       this.fsRequestControllerService.getFundingSourcesUsingGET(
         value,
         this.requestModel.grant.fullGrantNum,
@@ -37,7 +41,8 @@ export class RequestInformationComponent implements OnInit {
         this.requestModel.requestDto.fy,
         // TODO: Selected PD or PD from Grant?
         this.requestModel.requestDto.financialInfoDto.requestorNpnId,
-        this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode).subscribe(result => {
+        this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode,
+        conversionMech).subscribe(result => {
         this.requestModel.programRecommendedCostsModel.fundingSources = result;
       }, error => {
         this.logger.debug('HttpClient get request error for----- ' + error.message);
