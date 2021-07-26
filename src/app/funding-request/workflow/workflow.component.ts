@@ -136,6 +136,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
     this.approverInitializationSubscription = this.requestIntegrationService.approverInitializationEmitter.subscribe(
       () => {
+        this.comments = '';
         this.workflowActions = this.workflowModel.getWorkflowList();
         this.logger.debug('workflow acitons = ', this.workflowActions);
       }

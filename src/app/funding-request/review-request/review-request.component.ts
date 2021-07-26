@@ -288,6 +288,7 @@ export class ReviewRequestComponent implements OnInit, OnDestroy, AfterViewInit 
     this.workflowModal.openConfirmModal(action).then(
       (result) => {
         this.logger.debug(action + ' API call returned successfully', result);
+        this.workflowModel.initialize();
         this.requestIntegrationService.requestSubmissionEmitter.next(result);
         if (action === 'WITHDRAW') {
           this.requestModel.enableStepLinks();
