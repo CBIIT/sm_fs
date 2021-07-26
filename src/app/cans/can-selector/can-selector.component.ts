@@ -1,6 +1,5 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { CanManagementServiceBus } from '../can-management-service-bus.service';
-import { RequestModel } from '../../model/request/request-model';
 import { NGXLogger } from 'ngx-logger';
 import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
 import { Select2OptionData } from 'ng-select2';

@@ -83,6 +83,12 @@ export class Step2Component implements OnInit {
         this.logger.debug(JSON.stringify(this.requestModel.requestDto));
         // always go to next step even if create approver fails. that's behavior before moving
         // create approvers here.
+        this.fsRequestControllerService.getRequestBudgetsUsingGET(result.frqId).subscribe(
+          result1 => {
+            this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos = result1;
+            this.requestModel.restoreLineItemIds();
+            this.logger.debug('loaded budgets', result);
+          });
         this.requestApproverService.checkCreateApprovers().finally(
           () => {
             if (navigate) {

@@ -790,16 +790,7 @@ export class Step3Component implements OnInit {
 
   prevStep(): void {
     this.requestModel.clearAlerts();
-    // if (!this.requestModel.programRecommendedCostsModel.prcLineItems) {
-    this.fsRequestControllerService.getRequestBudgetsUsingGET(this.requestModel.requestDto.frqId).subscribe(
-      result => {
-        this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos = result;
-        this.requestModel.restoreLineItemIds();
-        this.router.navigate(['/request/step2']);
-        this.logger.debug('loaded budgets', result);
-      });
-    // }
-    // this.router.navigate(['/request/step2']);
+    this.router.navigate(['/request/step2']);
   }
 
 }
