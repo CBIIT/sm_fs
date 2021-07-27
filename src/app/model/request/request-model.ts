@@ -256,7 +256,7 @@ export class RequestModel {
     if (isMoonshot && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
       Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestDto.frtId))) {
       // this.logger.debug('Setting final LOA to SPL Committee');
-      this.requestDto.loaId = 4;
+      this.requestDto.financialInfoDto.loaId = 4;
     }
 
 
