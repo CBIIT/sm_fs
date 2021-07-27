@@ -347,7 +347,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
   submitApprove(): boolean {
     return this.userCanSubmitApprove &&
-      this.requestStatus === 'DRAFT' &&
+ //     this.requestStatus === 'DRAFT' &&
       !this.workflowModel.hasNewApprover;
   }
 
