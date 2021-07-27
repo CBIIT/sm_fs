@@ -59,7 +59,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
   ncabRange: any = {};
   selectedPd: number;
   selectedRfaPa: string;
-  selectedCas: string[] = [];
+  selectedCas: string[] | string = [];
   i2Status: string;
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
@@ -277,7 +277,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
       this.searchCriteria.cayCodes = this.userSessionService.getUserCaCodes();
     }
     else {
-      this.searchCriteria.cayCodes = this.selectedCas;
+      this.searchCriteria.cayCodes = typeof this.selectedCas === 'string' ? [this.selectedCas] : this.selectedCas ;
     }
     this.gsfs.selectedPd = this.selectedPd;
     this.gsfs.searchWithin = this.searchWithin;

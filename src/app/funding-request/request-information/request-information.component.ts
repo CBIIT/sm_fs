@@ -10,6 +10,7 @@ import { ControlContainer, NgForm } from '@angular/forms';
 import { CancerActivitiesDropdownComponent } from '@nci-cbiit/i2ecui-lib';
 import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
 import { ConversionMechanisms } from '../../type4-conversion-mechanism/conversion-mechanisms';
+import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib/lib/services/pd-ca-integrator-service';
 
 @Component({
   selector: 'app-request-information',
@@ -56,14 +57,14 @@ export class RequestInformationComponent implements OnInit {
   // just a string, and even though _selectedCayCode is typed as a string[], if I try to assign it a string[]
   // value, it blows up at runtime.  Ditto the getter, which blows up at runtime if I try to return an array
   // of strings, but won't compile if I try to return a string.
-  _selectedCayCode: string[] = (this.requestModel.requestDto.financialInfoDto.requestorCayCode
+  _selectedCayCode: string[] | string = (this.requestModel.requestDto.financialInfoDto.requestorCayCode
     ? [this.requestModel.requestDto.financialInfoDto.requestorCayCode] : []);
 
-  get selectedCayCode(): string[] {
+  get selectedCayCode(): string[] | string {
     return this._selectedCayCode;
   }
 
-  set selectedCayCode(value: string[]) {
+  set selectedCayCode(value: string[] | string) {
     if (isArray(value) && value[0]) {
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = value[0];
       this.requestModel.requestDto.requestorCayCode = value[0];
@@ -102,7 +103,9 @@ export class RequestInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
   }
+
 
   get grant(): NciPfrGrantQueryDto {
     return this.requestModel.grant;
