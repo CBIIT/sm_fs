@@ -36,20 +36,20 @@
 
     <!-- START Advanced Filters -->
 
-    <div class="col-lg-6" [hidden]="!showAdvancedFilters">
+    <div class="col-lg-5" [hidden]="!showAdvancedFilters">
         <lib-pdname-dropdown  [(selectedValue)]="selectedPd" [broadcast]="true"></lib-pdname-dropdown>
     </div>
 
-    <div class="col-lg-3" [hidden]="!showAdvancedFilters">
+    <div class="col-lg-5" [hidden]="!showAdvancedFilters">
+        <lib-cancer-activities-dropdown  [(selectedValue)]="selectedCas" [syncWithPd]="true"></lib-cancer-activities-dropdown>
+    </div>
+
+    <div class="col-lg-4" [hidden]="!showAdvancedFilters">
         <lib-rfa-pa-dropdown [(selectedValue)]="selectedRfaPa"></lib-rfa-pa-dropdown>
     </div>
 
-    <div class="col-lg-3" [hidden]="!showAdvancedFilters">
+    <div class="col-lg-4" [hidden]="!showAdvancedFilters">
         <lib-ncab-daterange [(selectedValue)]="ncabRange"></lib-ncab-daterange>
-    </div>
-
-    <div class="col-lg-6" [hidden]="!showAdvancedFilters">
-        <lib-cancer-activities-dropdown  [(selectedValue)]="selectedCas" [syncWithPd]="true"></lib-cancer-activities-dropdown>
     </div>
 
     <!-- END Advanced Filters -->
