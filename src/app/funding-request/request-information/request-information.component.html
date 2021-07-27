@@ -38,7 +38,7 @@
   </div>
 
   <div class="col-md-4 col-lg-4">
-    <lib-pdname-dropdown [(selectedValue)]="selectedPd" label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
+    <lib-pdname-dropdown [synchWithMB]="true" [(selectedValue)]="selectedPd" label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
     <div
       class="text-danger mt-1"
       *ngIf="parentForm.errors?.pdNameRequired && (parentForm.submitted || parentForm.touched)">
