@@ -1,5 +1,5 @@
 <div class="form-group">
-  <label for="doc-select">Other NCI Doc(s) Contributing Funds <span class="optional">(optional)</span></label>
+  <label for="doc-select">Other NCI DOC(s) Contributing Funds <span class="optional">(optional)</span></label>
   <ng-select2
     id="doc-select"
     [(ngModel)]="selectedValue"
@@ -9,7 +9,7 @@
     <option *ngFor="let doc of availableDocs()" [value]="doc.abbreviation"> {{doc.abbreviation}}
       &mdash; {{doc.description}}</option>
   </ng-select2>
-  <small *ngIf="selectedDocsArr?.length > 0" class="form-text text-muted">Drag and drop to order.</small>
+  <small *ngIf="selectedDocsArr?.length > 1" class="form-text text-muted">Drag and drop to order.</small>
 </div>
 <div class="example-container">
   <div cdkDropList (cdkDropListDropped)="dropped($event)">

@@ -7,7 +7,7 @@ import { HttpResponse } from '@angular/common/http';
 import { saveAs } from 'file-saver';
 import { NGXLogger } from 'ngx-logger';
 import { BudgetInfoComponent } from '../cans/budget-info/budget-info.component';
-import { ReviewRequestComponent } from '../funding-request/review-request/review-request.component';
+import { Step4Component } from '../funding-request/step4/step4.component';
 
 @Component({
   selector: 'app-upload-budget-documents',

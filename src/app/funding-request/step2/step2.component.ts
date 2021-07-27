@@ -41,7 +41,7 @@ export class Step2Component implements OnInit {
   }
 
   saveAsDraft(): void {
-    this.saveFundingRequest('/request/review');
+    this.saveFundingRequest('/request/step4');
   }
 
   prevStep(): void {

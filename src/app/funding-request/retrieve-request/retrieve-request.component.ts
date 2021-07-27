@@ -67,7 +67,7 @@ export class RetrieveRequestComponent implements OnInit {
 
           this.requestModel.requestDto.financialInfoDto.fundingRequestId = this.requestModel.requestDto.frqId;
 
-          this.router.navigate(['/request/review']);
+          this.router.navigate(['/request/step4']);
         },
         (error) => {
           this.logger.error('retrieveFundingRequest failed ', error);
