@@ -5,7 +5,7 @@ import { DocumentService } from 'src/app/service/document.service';
 import { saveAs } from 'file-saver';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { ReviewRequestComponent } from '../review-request/review-request.component';
+import { Step4Component } from '../step4/step4.component';
 import { DocumentsDto } from '@nci-cbiit/i2ecws-lib';
 
 @Component({
@@ -16,12 +16,12 @@ import { DocumentsDto } from '@nci-cbiit/i2ecws-lib';
 export class SupportingDocsReadonlyComponent implements OnInit {
 
   closeResult: string;
-  private _parent: ReviewRequestComponent;
-  @Input() set parent(value: ReviewRequestComponent) {
+  private _parent: Step4Component;
+  @Input() set parent(value: Step4Component) {
     this._parent = value;
   }
 
-  get parent(): ReviewRequestComponent {
+  get parent(): Step4Component {
     return this._parent;
   }
 

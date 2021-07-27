@@ -1,14 +1,5 @@
 <div #submitResult></div>
-<div class="alert alert-success" role="alert" *ngIf="submissionResult && submissionResult.status === 'success'">
-  <h1>Success!</h1>
-  <b>Request #{{submissionResult.frqId}}</b> was sent to
-  <a href="mailto: {{submissionResult.approver.approverEmailAddress}}">{{submissionResult.approver.approverFullName}}</a> for review.
-  View the request below or return to the <a routerLink="/search">Search</a>.
-</div>
-<div class="alert alert-danger" *ngIf="submissionResult && submissionResult.status === 'failure'" >
-  <h1>Failed to submit request</h1>
-  {{submissionResult.errorMessage}}
-</div>
+<app-submission-alert></app-submission-alert>
 <app-alert-billboard [alerts]="model.pendingAlerts"></app-alert-billboard>
 <app-workflow-modal></app-workflow-modal>
 <app-grant-information></app-grant-information>
@@ -20,80 +11,14 @@
 <hr>
 
 <!-- START Supporting Docs -->
-
-<div class="row">
-
-  <div class="col-12 d-flex">
-    <h2>Supporting Docs</h2>
-    <button class="btn btn-outline-primary mr-2 ml-auto"><i class="far fa-file-pdf" aria-hidden="true"></i> View Package
-    </button>
-    <a class="collapse-toggle btn btn-link ml-1" data-toggle="collapse" href="#docs-collapse" role="button"
-      aria-expanded="true" aria-controls="docs-collapse"></a>
-  </div>
-
-  <div class="col-12 collapse show mt-2" id="docs-collapse">
-    <!-- <p>Supporting docs go here...</p> -->
-
-    <div class="drag-item drag-item-locked" tabindex="0">
-      <span class="doc-name"> Cover Page </span>
-      <span class="doc-desc">(Automatically Generated)</span>
-      <div class="ml-auto">
-        <button class="btn btn-link btn-slim ml-1" title="View" (click)="downloadCoverSheet()"><i class="fas fa-eye"
-            aria-hidden="true"></i></button>
-      </div>
-    </div>
-
-    <div *ngFor="let item of docDtos" tabindex="0">
-      <span class="doc-name">{{ item.docFilename }}</span>
-      <span *ngIf="item.docFilename !== 'Summary Statement'" class="doc-desc">(Added by <a
-          href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
-        {{item.createDate}})</span>
-
-      <div class="ml-auto">
-
-        <button class="btn btn-link btn-slim ml-1" title="View" (click)="downloadFile(item.id, item.docFilename)"><i
-            class="fas fa-eye" aria-hidden="true"></i></button>
-      </div>
-    </div>
-
-
-  </div>
-
-</div>
+<app-supporting-docs-readonly [parent]="self"></app-supporting-docs-readonly>
 
 <!-- END Supporting Docs -->
 
 <hr>
-
-<!-- START Workflow -->
-
-<div class="row">
-  <div class="col-12 d-flex">
-    <h2 id="workflow">Workflow</h2>
-    <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#workflow-collapse" role="button"
-      aria-expanded="true" aria-controls="workflow-collapse"></a>
-  </div>
-</div>
-
-<div class="row collapse show" id="workflow-collapse">
-
-  <div class="col-12">
-        <app-next-scheduled-approvers-request [readonly]="readonly" (activeApprover)="setActiveApprover($event)"></app-next-scheduled-approvers-request>
-  </div>
-
-
-  <div class="col-12">
-    <div class="form-group" *ngIf="!readonly">
-      <label for="workflow-comments">Workflow Comments <span class="optional">(optional)</span></label>
-      <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments"></textarea>
-      <span class="character-counter">{{comments.length}}/2000</span>
-    </div>
-  </div>
-
-</div>
-
-
-<!-- END Workflow -->
+<app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar" [workflowName]="workFlowAction"></app-upload-budget-documents>
+<app-budget-docs-readonly [hidden]="isDisplayBudgetDocsUploadVar" ></app-budget-docs-readonly>
+<app-workflow (actionEmitter)="actionType($event)" [readonly]="!submitVisible() || !submitEnabled() "></app-workflow>
 
 
 <hr>
@@ -101,14 +26,18 @@
   <div class="col-12 d-flex mb-4">
     <button class="btn btn-outline-secondary  mr-auto" (click)="prevStep()" *ngIf="!readonly">Previous</button>
     <button class="btn btn-danger mr-2" (click)="deleteRequest()" *ngIf="deleteVisible()">Delete Request</button>
-    <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled() ">Submit
-      Request</button>
+    <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled() ">
+      {{submitApprove()?'Submit & Approve':'Submit Request'}}
+    </button>
     <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
-      <button class="btn btn-primary" disabled>Submit Request</button>
+      <button class="btn btn-primary" disabled>{{submitApprove()?'Submit & Approve':'Submit Request'}}</button>
     </span>
-    <button class="btn btn-primary mr-2" (click)="submitWorkflow('WITHDRAW')" *ngIf="withdrawVisible()">Withdraw</button>
-    <button class="btn btn-primary mr-2" (click)="submitWorkflow('HOLD')" *ngIf="putOnHoldVisible()">Hold</button>
-
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('WITHDRAW')"
+      *ngIf="withdrawVisible()">Withdraw</button>
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('HOLD')" 
+      *ngIf="putOnHoldVisible()">Hold</button>
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('RELEASE')" 
+      *ngIf="releaseFromHoldVisible()">Release Hold</button>
   </div>
 </div>
 
@@ -120,3 +49,5 @@
     <app-request-history></app-request-history>
   </div>
 </div>
+
+

@@ -17,7 +17,7 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
     {step: 1, name: 'Select Grant', route: '/request/step1'},
     {step: 2, name: 'Request Info', route: '/request/step2'},
     {step: 3, name: 'Supporting Docs', route: '/request/step3'},
-    {step: 4, name: 'Review', route: '/request/step4 /request/review'}
+    {step: 4, name: 'Review', route: '/request/step4'}
   ];
 
   private routerSub: Subscription;

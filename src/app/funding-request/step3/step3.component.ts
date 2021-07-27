@@ -777,7 +777,7 @@ export class Step3Component implements OnInit {
         result => {
           this.requestModel.requestDto.includedDocs = result;
           this.logger.debug('Docs retrieved by doc order: ', result);
-          this.router.navigate(['/request/review']);
+          this.router.navigate(['/request/step4']);
         }, error => {
           this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
         }
