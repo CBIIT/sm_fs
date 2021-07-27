@@ -13,7 +13,6 @@ import { INITIAL_PAY_TYPES } from '../model/request/funding-request-types';
 export class ActiveInitialPayValidatorDirective implements AsyncValidator {
   constructor(private fsRequestService: FsRequestControllerService, private requestModel: RequestModel,
               private logger: NGXLogger) {
-    this.logger.info('construction');
   }
 
   validate(control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
