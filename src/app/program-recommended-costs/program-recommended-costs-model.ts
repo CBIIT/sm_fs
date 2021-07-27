@@ -73,11 +73,14 @@ export class ProgramRecommendedCostsModel {
 
   deleteFundingSourceByIndex(index: number, saved: boolean): number {
     const removed = this._selectedFundingSources[index];
+    this.logger.debug('delete funding source:', index, removed, saved);
     if (!removed) {
       this.logger.warn('No funding source found for removal at index ', index);
     } else {
       this._selectedFundingSources.splice(index, 1);
+      this.logger.debug(this.prcLineItems);
       this.prcLineItems.delete(removed.fundingSourceId);
+      this.logger.debug(this.prcLineItems);
     }
     if (saved) {
       this.deletedSources.push(removed.fundingSourceId);

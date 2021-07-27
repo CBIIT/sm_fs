@@ -242,6 +242,12 @@ export class RequestModel {
       }
       value.forEach(p => {
         temp = p.asBudget();
+        if (this.programRecommendedCostsModel.deletedSources.includes(p.budgetId)) {
+          this.logger.warn('deleted source', p.fundingSource.fundingSourceId, 'still has saved budgets');
+          temp.id = null;
+        }
+
+        this.logger.debug(temp);
         this.requestDto.financialInfoDto.fundingReqBudgetsDtos.push(temp);
       });
     });

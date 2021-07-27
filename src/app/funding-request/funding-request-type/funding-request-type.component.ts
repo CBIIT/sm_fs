@@ -44,7 +44,6 @@ export class FundingRequestTypeComponent implements OnInit {
   };
 
   set selectedValue(value: number) {
-    this.logger.debug('selectedValue =', value);
     if (value && Number(value) === FundingRequestTypes.OTHER_PAY_COMPETING_ONLY) {
       this.alerts = [this.alert];
       // alert('WARNING: This option should be selected only if your request will not be using any NCI funds. Are you sure you want to continue?');
@@ -55,9 +54,9 @@ export class FundingRequestTypeComponent implements OnInit {
     this.model.requestDto.financialInfoDto.requestTypeId = value;
     this.model.programRecommendedCostsModel.fundingRequestType = value;
     const valueChanged = this._selectedValue && (Number(value) !== Number(this._selectedValue));
-    if (valueChanged) {
-      this.logger.debug('funding request type changed from', this._selectedValue, 'to', value);
-    }
+    // if (valueChanged) {
+    //   this.logger.debug('funding request type changed from', this._selectedValue, 'to', value);
+    // }
 
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
@@ -105,16 +104,15 @@ export class FundingRequestTypeComponent implements OnInit {
       return state.text;
     }
     if (state.additional?.nestedChild) {
-      this.logger.debug('nested child', state);
+      // this.logger.debug('nested child', state);
     }
     if (state.additional.nestedParent) {
-      this.logger.debug('nested parent', state);
+      // this.logger.debug('nested parent', state);
     }
     return state.text;
   }
 
   templateSelection(state: Select2OptionData): JQuery | string {
-    this.logger.debug('templateSelection');
     if (!state.id) {
       return state.text;
     }
@@ -123,14 +121,12 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   prepareData(list: FundingRequestTypeRulesDto[]): void {
-    this.logger.warn(list);
     list.sort((r1, r2) => {
       if (Number(r1.parentFrtId) === Number(r2.parentFrtId)) {
         return Number(r1.id) - Number(r2.id);
       }
       return Number(r1.parentFrtId) - Number(r2.parentFrtId);
     });
-    this.logger.warn(list);
     const allParents = new Array<Select2OptionData>();
     const intermediateParents = new Array<number>();
     const children = new Map<number, Select2OptionData[]>();
@@ -181,14 +177,12 @@ export class FundingRequestTypeComponent implements OnInit {
       this.data.push(r);
     });
 
-    this.logger.warn(this.data);
     this.data = this.data.sort((r1, r2): number => {
       if (Number(r1.additional.data.parentId) === Number(r2.additional.data.parentId)) {
         return Number(r1.id) - Number(r2.id);
       }
       return Number(r1.additional.data.parentId) - Number(r2.additional.data.parentId);
     });
-    this.logger.warn(this.data);
   }
 
   evoke(filter): any {
