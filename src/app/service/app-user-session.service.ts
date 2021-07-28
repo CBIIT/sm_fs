@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { UserService } from '@nci-cbiit/i2ecui-lib';
-import { CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
+import { CancerActivitiesDto, CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
+import { checkIfGenericTypesAreUnbound } from '@angular/compiler-cli/src/ngtsc/typecheck/src/ts_util';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ export class AppUserSessionService {
 
   private loggedOnUser: NciPerson;
   private environment: string;
-  private userCancerActivities;
+  private userCancerActivities: CancerActivitiesDto[];
+  private isMbOnly = false;
 
   private roles: string[];
 
@@ -34,6 +36,7 @@ export class AppUserSessionService {
             (caresult) => {
               // this.logger.debug('User assigned cancer activities: ', caresult);
               this.userCancerActivities = caresult;
+              this.isMbOnly = (caresult && caresult.length === 1 && caresult[0].code === 'MB');
               resolve();
             },
             (caerror) => {
