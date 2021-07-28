@@ -391,8 +391,8 @@ export class Step3Component implements OnInit {
 
         this.baseTaskList = of(result);
         this.include = this.baseTaskList.pipe(
-          map(tasks => tasks.filter(task => task.included === 'Y' && 
-          !(task.docType === DocTypeConstants.JUSTIFICATION || task.docType === DocTypeConstants.TRANSITION_MEMO) ))
+          map(tasks => tasks.filter(task => task.included === 'Y' &&
+            !(task.docType === DocTypeConstants.JUSTIFICATION || task.docType === DocTypeConstants.TRANSITION_MEMO)))
         );
         this.exclude = this.baseTaskList.pipe(
           map(tasks => tasks.filter(task => task.included === 'N'))
@@ -424,6 +424,11 @@ export class Step3Component implements OnInit {
       this.justificationFileName = 'Justification '.concat(element.docFilename);
       // TODO: simple hack here to convert string to Date. Needs to be verified.
       this.justificationUploadedOn = new Date(element.createDate);
+
+      this.justificationEnteredByEmit.next(this.justificationEnteredBy);
+      this.justificationEnteredByEmailEmit.next(this.justificationEnteredByEmail);
+      this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'dd/MM/yyyy'));
+
       this.justificationId = element.id;
       if (element.id !== null) {
         this.justificationType = 'file';
@@ -444,6 +449,10 @@ export class Step3Component implements OnInit {
       // TODO: simple hack here to convert string to Date. Needs to be verified.
       this.transitionMemoUploadedOn = new Date(element.createDate);
       this.transitionMemoId = element.id;
+
+      this.transitionMemoEnteredByEmit.next(this.transitionMemoEnteredBy);
+      this.transitionMemoEnteredByEmailEmit.next(this.transitionMemoEnteredByEmail);
+      this.transitionMemoUploadedOnEmit.next(this.format(this.transitionMemoUploadedOn, 'dd/MM/yyyy'));
     }
 
   }

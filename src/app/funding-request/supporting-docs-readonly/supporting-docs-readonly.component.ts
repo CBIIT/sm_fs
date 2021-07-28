@@ -26,9 +26,11 @@ export class SupportingDocsReadonlyComponent implements OnInit {
   }
 
   justificationMissing = false;
+  transitionMemoMissing = false;
   justificationType = '';
   justificationText = '';
   docDtos: DocumentsDto[];
+  displayTansitionMemo: boolean = false;
 
   constructor(private documentService: DocumentService,
     private logger: NGXLogger,
@@ -37,9 +39,15 @@ export class SupportingDocsReadonlyComponent implements OnInit {
 
   ngOnInit(): void {
     this.justificationMissing = this.parent.justificationMissing;
+    this.transitionMemoMissing = this.parent.transitionMemoMissing;
     this.justificationType = this.parent.justificationType;
     this.justificationText = this.parent.justificationText;
     this.docDtos = this.parent.docDtos;
+
+    if (this.requestModel.requestDto.requestType === 'Pay Type 4' ||
+    (this.requestModel.conversionMechanism && this.requestModel.conversionMechanism !== null)) {
+       this.displayTansitionMemo = true;
+  }
 
   }
 
