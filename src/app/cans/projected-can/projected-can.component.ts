@@ -38,4 +38,8 @@ export class ProjectedCanComponent implements OnInit {
       this.canService.projectedCanEmitter.next({ index: this.index, can: result });
     });
   }
+
+  setCan(projectedCan: CanCcxDto): void {
+    // TODO: delete me?
+  }
 }

@@ -10,7 +10,6 @@ import { ControlContainer, NgForm } from '@angular/forms';
 import { CancerActivitiesDropdownComponent } from '@nci-cbiit/i2ecui-lib';
 import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
 import { ConversionMechanisms } from '../../type4-conversion-mechanism/conversion-mechanisms';
-import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib/lib/services/pd-ca-integrator-service';
 import { AppUserSessionService } from '../../service/app-user-session.service';
 
 @Component({
