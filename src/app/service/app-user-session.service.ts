@@ -12,7 +12,7 @@ export class AppUserSessionService {
   private loggedOnUser: NciPerson;
   private environment: string;
   private userCancerActivities: CancerActivitiesDto[];
-  private isMbOnly = false;
+  public isMbOnly = false;
 
   private roles: string[];
 

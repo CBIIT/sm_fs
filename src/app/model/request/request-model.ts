@@ -413,4 +413,11 @@ export class RequestModel {
   isInitialPay(): boolean {
     return INITIAL_PAY_TYPES.includes(Number(this.requestDto.frtId));
   }
+
+  isMbOnly(): boolean {
+    if (!this.grant) {
+      return false;
+    }
+    return this.grant.applTypeCode !== '3' && this.grant.adminPhsOrgCode === 'CA' && this.grant.doc !== 'CRCHD';
+  }
 }

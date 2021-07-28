@@ -11,6 +11,7 @@ import { CancerActivitiesDropdownComponent } from '@nci-cbiit/i2ecui-lib';
 import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
 import { ConversionMechanisms } from '../../type4-conversion-mechanism/conversion-mechanisms';
 import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib/lib/services/pd-ca-integrator-service';
+import { AppUserSessionService } from '../../service/app-user-session.service';
 
 @Component({
   selector: 'app-request-information',
@@ -21,6 +22,8 @@ import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib/lib/services/pd-ca-
 export class RequestInformationComponent implements OnInit {
   @ViewChild(CancerActivitiesDropdownComponent) cayCode: CancerActivitiesDropdownComponent;
   @Input() parentForm: NgForm;
+  isMbOnly = false;
+  pdCayCodes: string[] = [];
 
   myAlerts: Alert[] = [];
 
@@ -99,11 +102,17 @@ export class RequestInformationComponent implements OnInit {
   constructor(private requestModel: RequestModel, private logger: NGXLogger,
               private fundingRequestValidationService: FundingRequestValidationService,
               private fsRequestControllerService: FsRequestControllerService,
-              private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
+              private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
+              private appUserSessionService: AppUserSessionService) {
   }
 
   ngOnInit(): void {
-
+    this.logger.debug(this.appUserSessionService.isMbOnly);
+    this.logger.debug(this.requestModel.isMbOnly());
+    this.isMbOnly = this.appUserSessionService.isMbOnly && this.requestModel.isMbOnly();
+    if(this.isMbOnly) {
+      this.pdCayCodes = ['MB'];
+    }
   }
 
 
