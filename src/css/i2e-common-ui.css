@@ -23791,22 +23791,37 @@ label .optional, .like-label .optional {
   box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
 }
 
-/* line 131, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 133, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+.select2-container .select2-dropdown .select2-results li.parent {
+  font-weight: bold;
+}
+
+/* line 136, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+.select2-container .select2-dropdown .select2-results li.lvl2 {
+  padding-left: 1em;
+}
+
+/* line 139, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+.select2-container .select2-dropdown .select2-results li.lvl3 {
+  padding-left: 2em;
+}
+
+/* line 146, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-search--dropdown .select2-search__field {
   width: 98%;
 }
 
-/* line 140, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 155, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 select.is-invalid ~ span.select2-container .selection .select2-selection, select:invalid ~ span.select2-container .selection .select2-selection {
   border-color: #a60a3d;
 }
 
-/* line 144, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 159, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 select.is-invalid ~ span.select2-container.select2-container--focus .select2-selection, select:invalid ~ span.select2-container.select2-container--focus .select2-selection {
   box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.25);
 }
 
-/* line 152, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 167, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .input-group ng-select2 {
   position: relative;
   -ms-flex: 1 1 auto;
@@ -23815,33 +23830,33 @@ select.is-invalid ~ span.select2-container.select2-container--focus .select2-sel
   margin-bottom: 0;
 }
 
-/* line 159, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 174, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .input-group ng-select2:not(:first-of-type) .select2-container--default .select2-selection--single {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   margin-left: -1px;
 }
 
-/* line 166, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 181, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .input-group ng-select2:not(:last-of-type) .select2-container--default .select2-selection--single {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-/* line 173, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 188, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .input-group .input-group-text:not(:first-child) {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   margin-left: -1px;
 }
 
-/* line 178, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 193, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .input-group .input-group-text:not(:last-child) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-/* line 190, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 205, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input {
   position: absolute;
   margin-top: .3rem;
@@ -23850,17 +23865,17 @@ select.is-invalid ~ span.select2-container.select2-container--focus .select2-sel
   opacity: 0;
 }
 
-/* line 196, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 211, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input:hover {
   cursor: pointer;
 }
 
-/* line 200, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 215, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input ~ label:hover {
   cursor: pointer;
 }
 
-/* line 205, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 220, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input ~ label:before {
   font-family: 'Font Awesome 5 Pro';
   font-weight: 400;
@@ -23877,45 +23892,45 @@ select.is-invalid ~ span.select2-container.select2-container--focus .select2-sel
   transition: box-shadow 0.15s ease-in-out;
 }
 
-/* line 220, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 235, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input:checked ~ label:before {
   font-weight: 900;
   color: #0076a8;
 }
 
-/* line 224, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 239, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input:focus ~ label:before {
   box-shadow: 0 0 0 0.1rem rgba(0, 118, 168, 0.25), inset 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
 }
 
-/* line 227, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 242, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input:disabled ~ label:before {
   color: #63666a;
 }
 
-/* line 231, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 246, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="radio"] ~ label:before {
   content: '\f111';
   border-radius: 1rem;
   width: 1.1rem;
 }
 
-/* line 236, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 251, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="radio"]:checked ~ label:before {
   content: '\f192';
 }
 
-/* line 241, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 256, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="checkbox"] ~ label:before {
   content: '\f0c8';
 }
 
-/* line 244, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 259, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="checkbox"]:checked ~ label:before {
   content: '\f14a';
 }
 
-/* line 252, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 267, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check-inline input, .form-inline .form-check input {
   position: static;
   margin-top: 0;
@@ -23923,7 +23938,7 @@ select.is-invalid ~ span.select2-container.select2-container--focus .select2-sel
   margin-left: 0;
 }
 
-/* line 265, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 280, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container {
   display: flex;
   flex-direction: row;
@@ -23936,7 +23951,7 @@ select.is-invalid ~ span.select2-container.select2-container--focus .select2-sel
 }
 
 @media (min-width: 768px) {
-  /* line 265, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+  /* line 280, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
   .grant-number-container {
     padding-top: 0rem;
     border-color: transparent;
@@ -23945,22 +23960,22 @@ select.is-invalid ~ span.select2-container.select2-container--focus .select2-sel
   }
 }
 
-/* line 280, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 295, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container .form-group {
   margin-right: 10px;
 }
 
-/* line 282, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 297, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container .form-group label {
   font-weight: normal;
 }
 
-/* line 285, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 300, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container .form-group input {
   text-align: center;
 }
 
-/* line 289, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 304, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grant-number-legend {
   max-width: none;
   display: block;
@@ -23973,7 +23988,7 @@ select.is-invalid ~ span.select2-container.select2-container--focus .select2-sel
 }
 
 @media (min-width: 768px) {
-  /* line 300, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+  /* line 315, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
   .grant-number-container #grant-number-legend {
     width: auto;
     max-width: 4rem;
@@ -23983,32 +23998,32 @@ select.is-invalid ~ span.select2-container.select2-container--focus .select2-sel
   }
 }
 
-/* line 308, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 323, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grantNumberType {
   width: calc(1.5rem + 0.9rem);
 }
 
-/* line 311, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 326, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grantNumberIC, .grant-number-container #grantNumberYear {
   width: calc(1.5rem + (0.9rem * 2));
 }
 
-/* line 314, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 329, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grantNumberMech {
   width: calc(1.5rem + (0.9rem * 3));
 }
 
-/* line 317, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 332, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grantNumberSuffix {
   width: calc(1.5rem + (0.9rem * 4));
 }
 
-/* line 320, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 335, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container #grantNumberSerial {
   width: calc(1.5rem + (0.55rem * 6));
 }
 
-/* line 323, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 338, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container .btn-clear-fields {
   mask: url("../images/times-tag.svg");
   background: #63666a;
@@ -24021,7 +24036,7 @@ select.is-invalid ~ span.select2-container.select2-container--focus .select2-sel
   margin-bottom: 0.1rem;
 }
 
-/* line 333, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/* line 348, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .grant-number-container .btn-clear-fields:hover, .grant-number-container .btn-clear-fields:focus {
   background: #383d40;
 }
