@@ -3,15 +3,19 @@
         <app-alert-billboard [alerts]="model.pendingAlerts"></app-alert-billboard>
     </div>
 </div>
+
 <div class="row">
-
-
-    <div *ngIf="showValidations" class="alert alert-danger">
+    <div *ngIf="showValidations" class="col-lg-12 alert alert-danger">
         Your attempt to upload a file is incomplete. You must either clear the fields identified in red or complete the
         file upload to proceed.
 
-
     </div>
+</div>
+
+<div class="row">
+
+
+    
 
     <div class="col-lg-4" id="add-docs">
         <h2>Add Docs</h2>
@@ -111,6 +115,33 @@
                         <span class="doc-name">Justification</span>
                         <span class="doc-desc" [style.color]="'red'">Not Entered/Uploaded</span>
                     </div>
+
+                    <div *ngIf="displayTansitionMemo">
+                        <div *ngIf="transitionMemoUploaded | async" class="drag-item drag-item-locked" tabindex="0">
+
+                            <span class="doc-name">{{ transitionMemoFileName}}</span>
+                            <span class="doc-desc">(Added by <a
+                                    href="mailto: {{transitionMemoEnteredByEmailEmit | async}}">{{transitionMemoEnteredByEmit | async}}</a> on
+                                {{transitionMemoUploadedOnEmit | async}})</span>
+                            
+                            <div class="ml-auto">
+    
+                                
+                                <button class="btn btn-link btn-slim ml-1" title="View"
+                                    (click)="downloadFile(transitionMemoId, transitionMemoFileName)"><i class="fas fa-eye"
+                                        aria-hidden="true"></i></button>
+                                <button class="btn btn-link btn-slim ml-2 btn-delete" title="Delete"
+                                    (click)="deleteDoc(transitionMemoId, 'Transition Memo')"><i class="fas fa-trash" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+    
+                        <div *ngIf="!(transitionMemoUploaded | async)"
+                            class="drag-item drag-item-placeholder drag-item-locked" tabindex="0">
+                            <span class="doc-name">Transition Memo</span>
+                            <span class="doc-desc" [style.color]="'red'">Not Entered/Uploaded</span>
+                        </div>
+                    </div>
+                    
 
 
                     <div class="example-container" *ngFor="let lane of swimlanes">

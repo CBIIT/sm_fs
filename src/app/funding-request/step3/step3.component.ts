@@ -36,6 +36,8 @@ export class Step3Component implements OnInit {
   public _selectedDocType: string = '';
   public _docDescription: string = '';
   justificationUploaded?: Observable<boolean>;
+  transitionMemoUploaded?: Observable<boolean>;
+  displayTansitionMemo: boolean = false;
   disableJustification: boolean = false;
   disableFile: boolean = true;
   _docOrderDto: FundingRequestDocOrderDto = {};
@@ -55,7 +57,17 @@ export class Step3Component implements OnInit {
   justificationEnteredByEmit = new BehaviorSubject<string>(this.justificationEnteredBy);
   justificationEnteredByEmailEmit = new BehaviorSubject<string>(this.justificationEnteredByEmail);
   justificationUploadedOnEmit = new BehaviorSubject<string>(this.justificationUploadedOn.toString());
+
+  transitionMemoEnteredBy: string = '';
+  transitionMemoEnteredByEmail: string = '';
+  transitionMemoFileName: string = '';
+  transitionMemoUploadedOn: Date = new Date();
+  transitionMemoEnteredByEmit = new BehaviorSubject<string>(this.transitionMemoEnteredBy);
+  transitionMemoEnteredByEmailEmit = new BehaviorSubject<string>(this.transitionMemoEnteredByEmail);
+  transitionMemoUploadedOnEmit = new BehaviorSubject<string>(this.transitionMemoUploadedOn.toString());
+
   justificationId: number;
+  transitionMemoId: number;
   justificationText: string = '';
   _docType: CgRefCodesDto = {};
   closeResult: string;
@@ -139,6 +151,7 @@ export class Step3Component implements OnInit {
     if (this.requestModel.requestDto.requestType === 'Pay Type 4' ||
       (this.requestModel.conversionMechanism && this.requestModel.conversionMechanism !== null)) {
       this.pushDocType("Transition Memo");
+      this.displayTansitionMemo = true;
     }
   }
 
@@ -312,13 +325,17 @@ export class Step3Component implements OnInit {
           const result = event.body;
           this.logger.debug('Upload Doc: ', result);
 
-          if (result.docType !== 'Justification') {
+          if (!(result.docType === DocTypeConstants.JUSTIFICATION
+            || result.docType === DocTypeConstants.TRANSITION_MEMO)) {
             this.baseTaskList.subscribe(items => {
               this.swimlanes[0]['array'].push(result);
             });
           } else {
-            if (this._docDto.docType === 'Justification') {
+            if (this._docDto.docType === DocTypeConstants.JUSTIFICATION) {
               this.loadJustification(result);
+            }
+            if (this._docDto.docType === DocTypeConstants.TRANSITION_MEMO) {
+              this.loadTransitionMemo(result);
             }
           }
 
@@ -361,8 +378,12 @@ export class Step3Component implements OnInit {
     this.documentService.getFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
       result => {
         result.forEach(element => {
-          if (element.docType === 'Justification') {
+          if (element.docType === DocTypeConstants.JUSTIFICATION) {
             this.loadJustification(element);
+          }
+
+          if (element.docType === DocTypeConstants.TRANSITION_MEMO) {
+            this.loadTransitionMemo(element);
           }
 
           this.removeDocType(element.docType);
@@ -370,7 +391,8 @@ export class Step3Component implements OnInit {
 
         this.baseTaskList = of(result);
         this.include = this.baseTaskList.pipe(
-          map(tasks => tasks.filter(task => task.included === 'Y' && task.docType !== 'Justification'))
+          map(tasks => tasks.filter(task => task.included === 'Y' && 
+          !(task.docType === DocTypeConstants.JUSTIFICATION || task.docType === DocTypeConstants.TRANSITION_MEMO) ))
         );
         this.exclude = this.baseTaskList.pipe(
           map(tasks => tasks.filter(task => task.included === 'N'))
@@ -393,7 +415,7 @@ export class Step3Component implements OnInit {
 
   loadJustification(element: DocumentsDto) {
 
-    if (element.docType === 'Justification') {
+    if (element.docType === DocTypeConstants.JUSTIFICATION) {
       this.logger.debug('Loading Document type: ', element.docFilename);
       this.justificationUploaded = of(true);
 
@@ -406,6 +428,22 @@ export class Step3Component implements OnInit {
       if (element.id !== null) {
         this.justificationType = 'file';
       }
+    }
+
+  }
+
+  loadTransitionMemo(element: DocumentsDto) {
+
+    if (element.docType === DocTypeConstants.TRANSITION_MEMO) {
+      this.logger.debug('Loading Document type: ', element.docFilename);
+      this.transitionMemoUploaded = of(true);
+
+      this.transitionMemoEnteredBy = element.uploadByName;
+      this.transitionMemoEnteredByEmail = element.uploadByEmail;
+      this.transitionMemoFileName = 'Transition Memo '.concat(element.docFilename);
+      // TODO: simple hack here to convert string to Date. Needs to be verified.
+      this.transitionMemoUploadedOn = new Date(element.createDate);
+      this.transitionMemoId = element.id;
     }
 
   }
@@ -497,8 +535,11 @@ export class Step3Component implements OnInit {
           });
 
           this.pushDocType(docType);
-          if (docType == 'Justification') {
+          if (docType == DocTypeConstants.JUSTIFICATION) {
             this.justificationUploaded = of(false);
+          }
+          if (docType == DocTypeConstants.TRANSITION_MEMO) {
+            this.transitionMemoUploaded = of(false);
           }
 
         }
@@ -694,7 +735,7 @@ export class Step3Component implements OnInit {
       //this.uploadJustificationText('');
 
     } else {
-      this.deleteDoc(this.justificationId, 'Justification');
+      this.deleteDoc(this.justificationId, DocTypeConstants.JUSTIFICATION);
     }
   }
 
@@ -792,5 +833,11 @@ export class Step3Component implements OnInit {
     this.requestModel.clearAlerts();
     this.router.navigate(['/request/step2']);
   }
+
+}
+
+export enum DocTypeConstants {
+  JUSTIFICATION = 'Justification',
+  TRANSITION_MEMO = 'Transition Memo',
 
 }
