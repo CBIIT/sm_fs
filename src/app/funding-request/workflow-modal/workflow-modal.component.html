@@ -23,7 +23,7 @@
       </p>
       <div class="form-group">
         <label for="wf-comments">Workflow Comments</label>
-        <textarea [(ngModel)]="comments" id="wf-comments" class="form-control" rows="2"></textarea>
+        <textarea [(ngModel)]="comments" id="wf-comments" class="form-control" rows="2" maxlength="500"></textarea>
         <span class="character-counter">{{comments.length}}/500</span>
       </div>
     </div>
