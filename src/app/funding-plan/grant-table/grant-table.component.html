@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-12">
         <h2>Results</h2>
-        <p *ngIf="noResult">No results to display. Try applying a filter above and clicking "Search."</p>
+        <p *ngIf="noResult">No grants found to display.</p>
         <div [ngStyle]="{display:noResult?'none':'inline'}">
             <table id="grantDt" #grantDt class="dataTable row-border">
                 <thead>
