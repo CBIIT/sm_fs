@@ -318,26 +318,16 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     if (!this.statusesCanWithdraw.includes(this.requestStatus)) {
       return false;
     }
-    if (this.userCanSubmit) {  // user is PD
-      return  !this.workflowModel.approvedByFC;
-    }
-    else if (this.workflowModel.isDocApprover) {  // user is DOC approver
-      return  this.workflowModel.approvedByDoc;
-    }
-    return false;
+    return  (this.userCanSubmit && !this.workflowModel.approvedByFC) ||
+            (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc);
   }
 
   putOnHoldVisible(): boolean {
     if (!this.statusesCanOnHold.includes(this.requestStatus)) {
       return false;
     }
-    if (this.userCanSubmit) {
-      return  !this.workflowModel.approvedByFC;
-    }
-    else if (this.workflowModel.isDocApprover) {
-      return  this.workflowModel.approvedByDoc;
-    }
-    return false;
+    return  (this.userCanSubmit && !this.workflowModel.approvedByFC) ||
+            (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc);
   }
 
   releaseFromHoldVisible(): boolean {
