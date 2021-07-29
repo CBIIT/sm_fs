@@ -13,12 +13,20 @@ export class RequestInformationReadonlyComponent implements OnInit {
   loaMap: any;
   constructor(private requestModel: RequestModel) { }
 
+  otherDocs: string[];
+  isSkip: boolean;
+
   ngOnInit(): void {
     this.loaMap = new Map<string, string>()
-    .set("PD", "Program Director")
-    .set("DD", "NCI Director")
-    .set("SPL", "Scientific Program Leaders Committee")
-    .set("DAO", "Division/Office/Center Approver");
+    .set('PD', 'Program Director')
+    .set('DD', 'NCI Director')
+    .set('SPL', 'Scientific Program Leaders Committee')
+    .set('DAO', 'Division/Office/Center Approver');
+
+    if (this.requestModel.requestDto.financialInfoDto.otherDocText) {
+      this.otherDocs = this.requestModel.requestDto.financialInfoDto.otherDocText.split(',');
+    }
+    this.isSkip = this.requestModel.isSkip();
   }
 
   get grant(): NciPfrGrantQueryDto {
