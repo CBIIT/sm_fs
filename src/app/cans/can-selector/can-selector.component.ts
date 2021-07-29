@@ -34,6 +34,7 @@ export class CanSelectorComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<string>();
 
   get selectedCanData(): CanCcxDto {
+    this.logger.debug(this._selectedCanData);
     return this._selectedCanData ? this._selectedCanData : (this.canMap ? this.canMap.get(this._selectedValue) : null);
   }
 
@@ -52,7 +53,6 @@ export class CanSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.debug('selectedValue:', this.selectedValue, this._selectedValue);
     this.updateCans();
     if (!this.readonly) {
       this.canService.projectedCanEmitter.subscribe(next => {
@@ -78,6 +78,19 @@ export class CanSelectorComponent implements OnInit {
       this.logger.debug(this.canMap);
       if (this.initialCAN) {
         this.selectedValue = this.initialCAN.can;
+        this._selectedCanData = {
+          can: this.initialCAN.can,
+          canDescrip: this.initialCAN.canDescription,
+          canPhsOrgCode: this.initialCAN.phsOrgCode
+        };
+      }
+    }, error => {
+      if (this.initialCAN) {
+        this._selectedCanData = {
+          can: this.initialCAN.can,
+          canDescrip: this.initialCAN.canDescription,
+          canPhsOrgCode: this.initialCAN.phsOrgCode
+        };
       }
     });
     if (!this.readonly) {

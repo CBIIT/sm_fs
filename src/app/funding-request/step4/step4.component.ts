@@ -374,7 +374,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
         if (result) {
           if (!this.isTerminalStatus() && this.requestStatus !== 'ON HOLD') {
             for (const approver in result) {
-              if (this.isCurrentApprover(result[approver])) {
+              if (this.isCurrentApprover(result[approver]) || this.workflowModel.approvedByFC) {
                 if (result[approver].roleCode === 'FCARC' ||
                   result[approver].roleCode === 'FCNCI') {
                   this.logger.debug('user is funds approver');

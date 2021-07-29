@@ -138,7 +138,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       () => {
         this.comments = '';
         this.workflowActions = this.workflowModel.getWorkflowList();
-        this.logger.debug('workflow acitons = ', this.workflowActions);
+        this.logger.debug('workflow actions = ', this.workflowActions);
       }
     );
 

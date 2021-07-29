@@ -8,6 +8,8 @@ import { saveAs } from 'file-saver';
 import { NGXLogger } from 'ngx-logger';
 import { BudgetInfoComponent } from '../cans/budget-info/budget-info.component';
 import { Step4Component } from '../funding-request/step4/step4.component';
+import { WorkflowComponent } from '../funding-request/workflow/workflow.component';
+import { WorkflowModel } from '../funding-request/workflow/workflow.model';
 
 @Component({
   selector: 'app-upload-budget-documents',
@@ -27,9 +29,10 @@ export class UploadBudgetDocumentsComponent implements OnInit {
 
   _workflowName: string = '';
   disableDocType: boolean = true;
+
   @Input() set workflowName(value: string) {
     this._workflowName = value;
-    
+
     if (this._workflowName === 'APPROVE' ||
       this._workflowName === 'APPROVE_ROUTE' ||
       this._workflowName === 'ROUTE_APPROVE') {
@@ -77,13 +80,17 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   }
 
   constructor(private requestModel: RequestModel,
-    private documentService: DocumentService,
-    private logger: NGXLogger) {
+              private documentService: DocumentService,
+              private logger: NGXLogger,
+              private workflowModel: WorkflowModel) {
   }
 
   ngOnInit(): void {
 
     this.loadFiles();
+    if (!this.workflowModel.getWorkflowList() || this.workflowModel.getWorkflowList().length === 0) {
+      this.budgetInfoReadOnly = true;
+    }
   }
 
   loadFiles(): void {
@@ -98,7 +105,6 @@ export class UploadBudgetDocumentsComponent implements OnInit {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
   }
-
 
 
   selectFiles(event): void {
