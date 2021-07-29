@@ -20,6 +20,7 @@ import {DataTableDirective} from 'angular-datatables';
 import {ExistingRequestsCellRendererComponent} from './existing-requests-cell-renderer/existing-requests-cell-renderer.component';
 import {FundingRequestActionCellRendererComponent} from './funding-request-action-cell-renderer/funding-request-action-cell-renderer.component';
 import {CancerActivityCellRendererComponent} from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
+import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 
 @Component({
   selector: 'app-step1',
@@ -33,7 +34,8 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
               private propertiesService: AppPropertiesService,
               private userSessionService: AppUserSessionService,
               private loaderService: LoaderService,
-              private logger: NGXLogger) {
+              private logger: NGXLogger,
+              private navigationModel: NavigationStepModel) {
   }
 
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
@@ -221,9 +223,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
   }
 
   ngOnInit(): void {
-
- //   this.restoreSearchFilter();
-
+    this.navigationModel.showSteps = true;
   }
 
   ngOnDestroy(): void {
@@ -368,7 +368,6 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
   toDate(value): Date {
     return new Date(value.replace(/-/g, '/'));
   }
-
 
 }
 

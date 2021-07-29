@@ -4,12 +4,13 @@ import {Subscription} from 'rxjs';
 import {RequestModel} from '../model/request/request-model';
 import {SearchFilterService} from '../search/search-filter.service';
 import {GrantsSearchFilterService} from './grants-search/grants-search-filter.service';
+import { NavigationStepModel } from './step-indicator/navigation-step.model';
 
 @Component({
   selector: 'app-funding-request',
   templateUrl: './funding-request.component.html',
   styleUrls: ['./funding-request.component.css'],
-  providers: [GrantsSearchFilterService, SearchFilterService]
+  providers: [GrantsSearchFilterService, SearchFilterService, NavigationStepModel]
 })
 export class FundingRequestComponent implements OnInit, OnDestroy {
   activeStep = {step: 0, name: '', route: null};
@@ -24,7 +25,7 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
 
   model;
 
-  constructor(private route: ActivatedRoute,
+  constructor(private navigationModel: NavigationStepModel,
               private router: Router,
               private requestModel: RequestModel) {
   }
@@ -55,5 +56,9 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
         this.activeStep = step;
       }
     }
+  }
+
+  get showSteps(): boolean {
+    return this.navigationModel.showSteps;
   }
 }
