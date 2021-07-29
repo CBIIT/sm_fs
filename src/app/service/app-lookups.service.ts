@@ -7,16 +7,19 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class AppLookupsService {
 
-  private lookups: { CancerActivities: any, AnotherLookupMap: any }
-    = { CancerActivities: {}, AnotherLookupMap: {} };
+  private lookups: { CancerActivities: any, NciDocs: any }
+    = { CancerActivities: {}, NciDocs: {} };
 
   // for resolve and reject the promise
   private resolve: any;
   private reject: any;
   private cancerActivitiesLoaded = false;
-  private dummyLookupMapLoaded = false;
+  private nciDocsLoaded = false;
 
-  constructor(private cancerActivityController: CancerActivityControllerService, private logger: NGXLogger) {
+  constructor(
+    private cancerActivityController: CancerActivityControllerService,
+    private lookupController: LookupsControllerService,
+    private logger: NGXLogger) {
   }
 
   loadCancerActivities(): void {
@@ -31,14 +34,15 @@ export class AppLookupsService {
         this.tryResolve();
       },
       (error) => {
-        this.logger.error('Failed loading CanerActivities in AppLookupService for error, ', error);
+        this.logger.error('Failed to load CanerActivities in AppLookupService for error, ', error);
         this.doReject();
       }
     );
   }
 
   tryResolve(): void {
-    if (this.cancerActivitiesLoaded && this.dummyLookupMapLoaded) {
+    if (this.cancerActivitiesLoaded && this.nciDocsLoaded) {
+      this.logger.debug('AppLookupsService loading is done', this.lookups);
       this.resolve();
     }
   }
@@ -47,21 +51,32 @@ export class AppLookupsService {
     this.reject();
   }
 
-  loadDummyLookupMap(): void {
-    setTimeout(() => {
-      this.dummyLookupMapLoaded = true;
-      this.tryResolve();
-    }, 100);
+  loadNciDocs(): void {
+    this.lookupController.getNciDocsUsingGET().subscribe(
+      (result) => {
+        const nciDocs = {};
+        result.forEach((element) => {
+          nciDocs[element.abbreviation] = element.description;
+        });
+        this.lookups.NciDocs = nciDocs;
+        this.nciDocsLoaded = true;
+        this.tryResolve();
+      },
+      (error) => {
+        this.logger.error('Failed to load NciDocs in AppLookupService for error, ', error);
+        this.doReject();
+      }
+    );
   }
 
   initialize(): Promise<any> {
     return new Promise<void>((resolve, reject) => {
-      this.dummyLookupMapLoaded = false;
+      this.nciDocsLoaded = false;
       this.cancerActivitiesLoaded = false;
       this.resolve = resolve;
       this.reject = reject;
       this.loadCancerActivities();
-      this.loadDummyLookupMap();
+      this.loadNciDocs();
     });
   }
 
