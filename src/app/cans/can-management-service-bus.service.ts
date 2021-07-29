@@ -38,12 +38,11 @@ export class CanManagementServiceBus {
   }
 
   getProjectedCan(fseId: number, oefiaTypeId: number): Observable<CanCcxDto> {
-    // this.logger.debug('getProjectedCan(', this.requestModel.grant.applId, fseId, oefiaTypeId, this.requestModel.requestDto.frtId, ')');
     return this.canService.retrieveProjectedCanUsingGET(
       this.requestModel.grant.applId,
       fseId,
-      oefiaTypeId,
-      this.requestModel.requestDto.frtId);
+      this.requestModel.requestDto.frtId,
+      oefiaTypeId);
   }
 
   getOefiaCodes(): Observable<OefiaCodingDto[]> {
