@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { CanManagementServiceBus } from '../can-management-service-bus.service';
 import { NGXLogger } from 'ngx-logger';
-import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { Select2OptionData } from 'ng-select2';
 
 @Component({
@@ -18,10 +18,9 @@ export class CanSelectorComponent implements OnInit {
   data: Array<Select2OptionData>;
 
   @Input() index = 0;
-
   @Input() nciSourceFlag = '';
-
   @Input() readonly = false;
+  @Input() initialCAN: FundingRequestCanDto = null;
   private lastProjectedCan: string;
   private allCans = false;
 
@@ -53,12 +52,15 @@ export class CanSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.logger.debug('selectedValue:', this.selectedValue, this._selectedValue);
     this.updateCans();
-    this.canService.projectedCanEmitter.subscribe(next => {
-      if (Number(next.index) === Number(this.index)) {
-        this.updateProjectedCan(next.can);
-      }
-    });
+    if (!this.readonly) {
+      this.canService.projectedCanEmitter.subscribe(next => {
+        if (Number(next.index) === Number(this.index)) {
+          this.updateProjectedCan(next.can);
+        }
+      });
+    }
     this.uniqueId = 'all_cans' + String(this.index);
   }
 
@@ -71,13 +73,20 @@ export class CanSelectorComponent implements OnInit {
       result.forEach(r => {
         this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip, additional: r });
       });
-      // this.selectedValue = this._selectedValue;
-    });
-    this.canService.projectedCanEmitter.subscribe(next => {
-      if (Number(next.index) === Number(this.index)) {
-        this.updateProjectedCan(next.can);
+      this.logger.debug('selected can:', this.selectedValue);
+      this.logger.debug(this.data);
+      this.logger.debug(this.canMap);
+      if (this.initialCAN) {
+        this.selectedValue = this.initialCAN.can;
       }
     });
+    if (!this.readonly) {
+      this.canService.projectedCanEmitter.subscribe(next => {
+        if (Number(next.index) === Number(this.index)) {
+          this.updateProjectedCan(next.can);
+        }
+      });
+    }
   }
 
 // TODO: when projected CAN changes, we need to clear the selected CAN iff it was copied from the previous projected CAN

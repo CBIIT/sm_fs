@@ -16,6 +16,7 @@ export class OefiaTypesComponent implements OnInit {
   selectedOefiaType: { id: string; text: string };
   private _selectedValue: number;
   @Input() readonly = false;
+  @Input() octId = null;
 
   @Input()
   get selectedValue(): number {
@@ -51,7 +52,9 @@ export class OefiaTypesComponent implements OnInit {
       result.forEach(c => {
         this.data.push({ id: String(c.id), text: c.category });
       });
-      if (this._selectedValue) {
+      if (this.octId) {
+        this.selectedValue = this.octId;
+      } else if (this._selectedValue) {
         this.selectedValue = this._selectedValue;
       }
     });

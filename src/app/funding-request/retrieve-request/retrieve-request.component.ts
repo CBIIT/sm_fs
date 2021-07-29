@@ -5,6 +5,7 @@ import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { ConversionMechanisms } from '../../type4-conversion-mechanism/conversion-mechanisms';
+import { CanManagementServiceBus } from '../../cans/can-management-service-bus.service';
 
 @Component({
   selector: 'app-retrieve-request',
@@ -20,6 +21,7 @@ export class RetrieveRequestComponent implements OnInit {
               private requestModel: RequestModel,
               private requestService: FsRequestControllerService,
               private userSessionService: AppUserSessionService,
+              private canManagementService: CanManagementServiceBus,
               private logger: NGXLogger) {
   }
 
@@ -51,6 +53,10 @@ export class RetrieveRequestComponent implements OnInit {
             conversionMech).subscribe(result1 => {
             this.requestModel.programRecommendedCostsModel.fundingSources = result1;
             this.requestModel.restoreLineItems();
+          });
+
+          this.canManagementService.getRequestCans(this.requestModel.requestDto.frqId).subscribe(result2 => {
+            this.requestModel.requestCans = result2;
           });
 
           const selectedIds = new Set<number>();

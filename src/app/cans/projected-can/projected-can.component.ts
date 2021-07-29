@@ -13,6 +13,7 @@ export class ProjectedCanComponent implements OnInit {
   @Input() index = 0;
 
   @Input() fseId: number;
+  @Input() octId: number = null;
 
   projectedCan: CanCcxDto;
 
@@ -25,9 +26,14 @@ export class ProjectedCanComponent implements OnInit {
         this.updateProjectedCan(next.value);
       }
     });
+    this.logger.debug('fseId:', this.fseId);
+    if (this.octId) {
+      this.updateProjectedCan(this.octId);
+    }
   }
 
   updateProjectedCan(oefiaType: number): void {
+    this.logger.debug('updateProjectedCan', oefiaType);
     const source = Number(this.fseId);
     if (!oefiaType) {
       return;
@@ -35,6 +41,7 @@ export class ProjectedCanComponent implements OnInit {
 
     this.canService.getProjectedCan(source, oefiaType).subscribe(result => {
       this.projectedCan = result;
+      this.logger.debug(result);
       this.canService.projectedCanEmitter.next({ index: this.index, can: result });
     });
   }

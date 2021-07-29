@@ -22,8 +22,6 @@
           <th scope="col">
             <div class="d-flex">
               <span>Funds Approver Provided CAN</span>
-              <a href="javascript:void(0);" class="external-link ml-auto" data-toggle="modal" data-target="#CAN-modal">All
-                CANs</a>
             </div>
           </th>
         </tr>
@@ -34,13 +32,14 @@
           <td>{{ can.approvedDc | currency }} {{can.approvedPctCut | percentToggle}}</td>
           <td>{{ can.approvedTc | currency }} {{can.approvedPctCut | percentToggle}}</td>
           <td [hidden]="!(isFinancialApprover() && isFcNci())">
-            <app-oefia-types [index]="i" [selectedValue]="can.octId" [readonly]="true"></app-oefia-types>
+            <app-oefia-types [index]="i" [octId]="can.octId" [readonly]="true"></app-oefia-types>
           </td>
           <td>
-            <app-projected-can [index]="i" [fseId]="can.fseId"></app-projected-can>
+            <app-projected-can [index]="i" [fseId]="can.fseId" [octId]="can.octId"></app-projected-can>
           </td>
           <td>
             <app-can-selector [index]="i" [nciSourceFlag]="can.nciSourceFlag" [selectedValue]="can.can"
+                              [initialCAN]="can"
                               [readonly]="true"></app-can-selector>
             <div class="d-flex align-items-center">
 
