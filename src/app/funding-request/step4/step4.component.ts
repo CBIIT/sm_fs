@@ -64,6 +64,9 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
   userCanSubmitApprove = false;
 
+  budgetDocDtos: DocumentsDto[];
+  displayReadOnlyBudgetDocs = false;
+
   actionType(workFlowAction: string) {
     this._workFlowAction = workFlowAction;
   }
@@ -115,6 +118,11 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     this.checkUserRolesCas();
     this.checkDocs();
     this.isDisplayBudgetDocsUpload();
+
+    this.budgetDocDtos = this.requestModel.requestDto.budgetDocs;
+    if (this.budgetDocDtos.length > 0) {
+      this.displayReadOnlyBudgetDocs = true;
+    }
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
@@ -372,7 +380,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     this.fsWorkflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
       result => {
         if (result) {
-          if (!this.isTerminalStatus() && this.requestStatus !== 'ON HOLD') {
+          if (!this.isTerminalStatus() && this.requestModel.requestDto.requestStatusCode !== 'ON HOLD') {
             for (const approver in result) {
               if (this.isCurrentApprover(result[approver]) || this.workflowModel.approvedByFC) {
                 if (result[approver].roleCode === 'FCARC' ||
@@ -391,7 +399,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   isTerminalStatus(): boolean {
-    return (this.terminalStatus.indexOf(this.requestStatus) > -1);
+    return (this.terminalStatus.indexOf(this.requestModel.requestDto.requestStatusCode) > -1);
   }
 
   isCurrentApprover(approver: FundingReqApproversDto): boolean {
@@ -411,7 +419,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     if (designees) {
       const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
       for (const designee in designees) {
-        if (designees[designee].delegateTo.toLowerCase === userId.toLowerCase) {
+        if (designees[designee].delegateTo.toLowerCase() === userId.toLowerCase()) {
           return true;
         }
       }
