@@ -20,24 +20,26 @@ export class CreateTypeComponent implements OnInit {
   }
 
   @Output() selectedValueChange = new EventEmitter<string>();
+  @Input() readOnly = false;
 
   set selectedValue(value: string) {
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
+    this.requestModel.createType = value;
   }
 
-  constructor(private requestModel: RequestModel, private logger: NGXLogger) {
+  constructor(public requestModel: RequestModel, private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
     this.data = [
-      { id: '-1', text: '' },
-      { id: '1', text: 'Pre-Appl' },
+      { id: '', text: '' },
+      { id: 'Pre-Appl', text: 'Pre-Appl' },
       /*{ id: '2', text: 'Rollup' }*/
     ];
 
     if (!this.requestModel.isPayType4() && this.requestModel.isForGrantFY()) {
-      this.data.push({ id: '2', text: 'Rollup' });
+      this.data.push({ id: 'Rollup', text: 'Rollup' });
       const type = Number(this.requestModel.requestDto.frtId);
       if (this.requestModel.isForGrantFY() &&
         [
@@ -52,7 +54,7 @@ export class CreateTypeComponent implements OnInit {
           FundingRequestTypes.CO_FUND_A_NON_NCI_NON_COMPETING_GRANT__UP_TO_150000_DC_IN_A_BUDGET_PERIOD_AND_NOT_EXCEEDING_450000_FOR_ALL_YEARS
         ].includes(type)) {
         this.logger.debug('rollup');
-        this.selectedValue = '2';
+        this.selectedValue = 'Rollup';
       } else if (
         [
           FundingRequestTypes.GENERAL_ADMINISTRATIVE_SUPPLEMENTS_ADJUSTMENT_POST_AWARD,
@@ -89,10 +91,10 @@ export class CreateTypeComponent implements OnInit {
           FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS
         ].includes(type)) {
         this.logger.debug('pre-appl');
-        this.selectedValue = '1';
+        this.selectedValue = 'Pre-Appl';
       }
     } else {
-      this.selectedValue = '1';
+      this.selectedValue = 'Pre-Appl';
     }
   }
 

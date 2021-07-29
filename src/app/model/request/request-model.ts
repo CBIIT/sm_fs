@@ -25,6 +25,7 @@ import { getCurrentFiscalYear } from 'src/app/utils/utils';
 export class RequestModel {
 
   pendingAlerts: Alert[] = [];
+  createType: string;
 
   // Stores the grant selected in Step 1
   private _grant: NciPfrGrantQueryDto;

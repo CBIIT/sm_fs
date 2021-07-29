@@ -1,11 +1,19 @@
-<div class="form-group">
-  <!--    <label for="oefia-type">OEFIA Type</label>-->
-  <label for="create_type">Create Type</label>
+<ng-container *ngIf="readOnly; then read_only else editable;"></ng-container>
 
-  <ng-select2
-    id="create_type"
-    [allowClear]="false"
-    [data]="data"
-    [(ngModel)]="selectedValue">
-  </ng-select2>
-</div>
+<ng-template #editable>
+  <div class="form-group">
+    <!--    <label for="oefia-type">OEFIA Type</label>-->
+    <label for="create_type">Create Type</label>
+
+    <ng-select2
+      id="create_type"
+      [allowClear]="false"
+      [data]="data"
+      [(ngModel)]="selectedValue">
+    </ng-select2>
+  </div>
+</ng-template>
+
+<ng-template #read_only>
+  <div class="form-group"><p>Create Type: {{requestModel.createType}}</p></div>
+</ng-template>
