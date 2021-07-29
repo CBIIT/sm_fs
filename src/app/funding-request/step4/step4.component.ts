@@ -18,6 +18,7 @@ import { WorkflowActionCode, WorkflowModel } from '../workflow/workflow.model';
 import { WorkflowComponent } from '../workflow/workflow.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UploadBudgetDocumentsComponent } from '../../upload-budget-documents/upload-budget-documents.component';
+import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 
 @Component({
   selector: 'app-step4',
@@ -80,7 +81,8 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     private changeDetection: ChangeDetectorRef,
     private logger: NGXLogger,
     private fsWorkflowControllerService: FsWorkflowControllerService,
-    private workflowModel: WorkflowModel) {
+    private workflowModel: WorkflowModel,
+    private navigationModel: NavigationStepModel) {
   }
 
   ngAfterViewInit(): void {
@@ -137,8 +139,10 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     this.readonly = (this.userReadonly) || !(this.statusesCanEditSubmit.includes(this.requestStatus));
     if (this.readonly) {
       this.requestModel.disableStepLinks();
+      this.navigationModel.showSteps = false;
     } else {
       this.requestModel.enableStepLinks();
+      this.navigationModel.showSteps = true;
     }
     this.changeDetection.detectChanges();
   }
@@ -269,9 +273,9 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
         // this.submissionResult = { status: 'success', frqId: dto.frqId, approver: nextApproverInChain };
         this.workflowModel.initialize();
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
-        this.submitResultElement.nativeElement.scrollIntoView();
+ //       this.submitResultElement.nativeElement.scrollIntoView();
         this.readonly = true;
-        this.requestModel.disableStepLinks();
+ //       this.requestModel.disableStepLinks();
       },
       (error) => {
         this.logger.error('Failed when calling submitRequestUsingPOST', error);
@@ -290,9 +294,9 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
         this.logger.debug(action + ' API call returned successfully', result);
         this.workflowModel.initialize();
         this.requestIntegrationService.requestSubmissionEmitter.next(result);
-        if (action === 'WITHDRAW') {
-          this.requestModel.enableStepLinks();
-        }
+//         if (action === 'WITHDRAW') {
+//           this.requestModel.enableStepLinks();
+//         }
       }
     )
       .catch(
