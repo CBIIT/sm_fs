@@ -41,6 +41,7 @@ export class SubmissionAlertComponent implements OnInit, OnDestroy {
           this.status = 'success';
           this.action = dto.completeRequest ? 'COMPLETE' : dto.action;
           this.frqId = dto.frqId;
+          window.scrollTo(0, 0);
         }
     );
     this.requestSubmitFailureEventSubscriber = this.integrationService.requestSubmitFailureEmitter.subscribe(
@@ -49,6 +50,7 @@ export class SubmissionAlertComponent implements OnInit, OnDestroy {
           this.requestModel.clearAlerts();
           this.status = 'failure';
           this.errorMessage = message;
+          window.scrollTo(0, 0);
         }
     );
   }

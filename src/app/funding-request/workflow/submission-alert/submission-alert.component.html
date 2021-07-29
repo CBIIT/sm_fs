@@ -1,37 +1,37 @@
-<div class="alert alert-success" role="alert" *ngIf="status === 'success'">
+<div class="alert alert-success" role="alert" *ngIf="status === 'success'" id="submitMessage">
     <b>Success!</b>
     <span *ngIf="action==='APPROVE' || action==='APPROVE_COMMENT'">
         The request <b>{{frqId}}</b> has been successfully approved and sent to
-        <a href="mailto: {{approver.approverEmailAddress}}">
-        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a> for review.
+        <b><a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
     </span>
     <span *ngIf="action==='COMPLETE'">
         Your request <b>{{frqId}}</b> has been successfully completed. 
     </span>
     <span *ngIf="action==='APPROVE_ROUTE'">
         The request {{frqId}} has been successfully approved and routed to
-       <b><a href="mailto: {{approver.approverEmailAddress}}">
-        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a></b> for review.
+        <b><a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
     </span>
     <span *ngIf="action==='SUBMIT'">
         Your request <b>{{frqId}}</b> has been successfully submitted and sent to
         <b><a href="mailto: {{approver.approverEmailAddress}}">
-        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a></b> for review.
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
     </span>
     <span *ngIf="action==='SUBMIT_APPROVE'">
         Your request <b>{{frqId}}</b> has been successfully submitted and approved.
         The request has been sent to <b><a href="mailto: {{approver.approverEmailAddress}}">
-        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a></b> for review.
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
     </span>
     <span *ngIf="action==='ROUTE_APPROVE'">
         The request <b>{{frqId}}</b> has been successfully routed to
         <b><a href="mailto: {{approver.approverEmailAddress}}">
-        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a></b> for review.
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
     </span>
     <span *ngIf="action==='REASSIGN'">
         The request <b>{{frqId}}</b> has been successfully reassigned to
         <b><a href="mailto: {{approver.approverEmailAddress}}">
-        {{approver.approverFirstName + ' '+ approver.approverLastName}}</a></b> for review.
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
     </span>
     <span *ngIf="action==='REJECT'">
         The request {{frqId}} has been rejected. The requester and any previous approver(s)
@@ -44,7 +44,7 @@
     <span *ngIf="action==='DEFER'">
         The request <b>{{frqId}}</b>  has been successfully deferred and sent back to
         the DOC approver <b><a href="mailto: {{docApprover.approverEmailAddress}}">
-        {{docApprover.approverFirstName + ' '+ docApprover.approverLastName}}</a></b> for review.
+        {{docApprover.approverLastName + ', '+ docApprover.approverFirstName}}</a></b> for review.
     </span>
     <span *ngIf="action==='WITHDRAW'">
         The request <b>{{frqId}}</b>  has been withdrawn. The requester and any 
