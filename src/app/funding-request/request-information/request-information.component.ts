@@ -39,10 +39,7 @@ export class RequestInformationComponent implements OnInit {
       this.fsRequestControllerService.getFundingSourcesUsingGET(
         value,
         this.requestModel.grant.fullGrantNum,
-        // TODO: Which fiscal year do we use? From the grant or current default fy?
-        // this.requestModel.grant.fy,
         this.requestModel.requestDto.fy,
-        // TODO: Selected PD or PD from Grant?
         this.requestModel.requestDto.financialInfoDto.requestorNpnId,
         this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode,
         conversionMech).subscribe(result => {
@@ -67,6 +64,8 @@ export class RequestInformationComponent implements OnInit {
   }
 
   set selectedCayCode(value: string[] | string) {
+    // TODO: Evaluate whether to reset the program recommended costs model
+    // this.requestModel.programRecommendedCostsModel.reset();
     if (isArray(value) && value[0]) {
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = value[0];
       this.requestModel.requestDto.requestorCayCode = value[0];
@@ -86,6 +85,8 @@ export class RequestInformationComponent implements OnInit {
   }
 
   set selectedPd(value: number) {
+    // TODO: Evaluate whether to reset the program recommended costs model
+    // this.requestModel.programRecommendedCostsModel.reset();
     const valueChanged = this.requestModel.requestDto.requestorNpnId && (this.requestModel.requestDto.requestorNpnId !== value);
     this.requestModel.requestDto.requestorNpnId = value;
     this.requestModel.requestDto.financialInfoDto.requestorNpnId = value;
@@ -109,7 +110,7 @@ export class RequestInformationComponent implements OnInit {
     this.logger.debug(this.appUserSessionService.isMbOnly);
     this.logger.debug(this.requestModel.isMbOnly());
     this.isMbOnly = this.appUserSessionService.isMbOnly && this.requestModel.isMbOnly();
-    if(this.isMbOnly) {
+    if (this.isMbOnly) {
       this.pdCayCodes = ['MB'];
     }
   }
