@@ -70,11 +70,10 @@
       <h2>Budget Information</h2>
       <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#budget-info-collapse" role="button"
          aria-expanded="true" aria-controls="budget-info-collapse"></a>
-      <p>Please provide the CAN only if known at the time of approval.</p>
-
     </div>
 
     <div class="col-12 collapse show mt-2" id="budget-info-collapse">
+      <div><p>Please provide the CAN only if known at the time of approval.</p></div>
 
       <table class="table table-striped table-bordered budget-info-table">
         <thead>
@@ -109,7 +108,8 @@
                               [selectedValue]="can.can"></app-can-selector>
             <div class="d-flex align-items-center">
 
-              <button class="btn btn-link btn-slim" *ngIf="showCopyProjectedCan(i)" ngbTooltip="Copy NCI OEFIA Projected CAN" 
+              <button class="btn btn-link btn-slim" *ngIf="showCopyProjectedCan(i)"
+                      ngbTooltip="Copy NCI OEFIA Projected CAN"
                       (click)="copyProjectedCan(i)">
                 <i class="far fa-copy" aria-hidden="true"></i>
               </button>
