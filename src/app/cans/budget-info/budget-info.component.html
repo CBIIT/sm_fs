@@ -71,7 +71,9 @@
       <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#budget-info-collapse" role="button"
          aria-expanded="true" aria-controls="budget-info-collapse"></a>
     </div>
-
+    <div class="col-12" *ngIf="model.isAddFunds() && isFcNci()">
+      <app-create-type></app-create-type>
+    </div>
     <div class="col-12 collapse show mt-2" id="budget-info-collapse">
       <div><p>Please provide the CAN only if known at the time of approval.</p></div>
 
@@ -86,8 +88,8 @@
           <th scope="col">
             <div class="d-flex">
               <span>Funds Approver Provided CAN</span>
-              <a href="javascript:void(0);" class="external-link ml-auto" data-toggle="modal" data-target="#CAN-modal">All
-                CANs</a>
+              <!--              <a href="javascript:void(0);" class="external-link ml-auto" data-toggle="modal" data-target="#CAN-modal">All-->
+              <!--                CANs</a>-->
             </div>
           </th>
         </tr>
@@ -113,11 +115,13 @@
                       (click)="copyProjectedCan(i)">
                 <i class="far fa-copy" aria-hidden="true"></i>
               </button>
-              <span *ngIf="nonDefaultCan(i)" class="btn btn-link btn-slim btn-link-warning" title="Non-default CAN"
+              <span *ngIf="nonDefaultCan(i)" class="btn btn-link btn-slim btn-link-warning" title="Non-Default CAN"
+                    ngbTooltip="Non-Default CAN"
                     role="alert">
                 <i class="far fa-exclamation-circle" aria-hidden="true"></i>
               </span>
-              <span *ngIf="duplicateCan(i)" class="btn btn-link btn-slim btn-link-warning" title="Duplicate CANs"
+              <span *ngIf="duplicateCan(i)" class="btn btn-link btn-slim btn-link-warning" title="Duplicate CAN"
+                    ngbTooltip="Duplicate CAN"
                     role="alert">
                 <i class="far fa-exclamation-triangle" aria-hidden="true"></i>
               </span>

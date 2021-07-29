@@ -36,7 +36,7 @@ export class BudgetInfoComponent implements OnInit {
     this.model.requestCans = value;
   }
 
-  constructor(private logger: NGXLogger, private canService: CanManagementServiceBus, private model: RequestModel,
+  constructor(private logger: NGXLogger, private canService: CanManagementServiceBus, public model: RequestModel,
               private workflowModel: WorkflowModel) {
   }
 
@@ -122,6 +122,10 @@ export class BudgetInfoComponent implements OnInit {
 
   showCopyProjectedCan(i: number): boolean {
     const projectedCan: CanCcxDto = this.projectedCans?.get(i)?.projectedCan;
+    if (!projectedCan?.can || !projectedCan?.canDescrip) {
+      return false;
+    }
+
     return !!projectedCan;
   }
 }

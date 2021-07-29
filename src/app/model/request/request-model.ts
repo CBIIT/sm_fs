@@ -16,6 +16,8 @@ import { FundingRequestTypes, INITIAL_PAY_TYPES } from './funding-request-types'
 import { Alert } from '../../alert-billboard/alert';
 import { PrcDataPoint } from '../../program-recommended-costs/prc-data-point';
 import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
+import { getCurrentFiscalYear } from 'src/app/utils/utils';
+
 
 @Injectable({
   providedIn: 'root'
@@ -414,10 +416,27 @@ export class RequestModel {
     return INITIAL_PAY_TYPES.includes(Number(this.requestDto.frtId));
   }
 
+  isAddFunds(): boolean {
+    // TODO: Confirm and double check.  What about Type 4 or Skip?
+    return !this.isInitialPay() && !this.isSkip();
+  }
+
+  isPayType4(): boolean {
+    return Number(this.requestDto.frtId) === Number(FundingRequestTypes.PAY_TYPE_4);
+  }
+
   isMbOnly(): boolean {
     if (!this.grant) {
       return false;
     }
     return this.grant.applTypeCode !== '3' && this.grant.adminPhsOrgCode === 'CA' && this.grant.doc !== 'CRCHD';
+  }
+
+  isForCurrentFY(): boolean {
+    return this.requestDto.financialInfoDto.fy === getCurrentFiscalYear();
+  }
+
+  isForGrantFY(): boolean {
+    return this.requestDto.financialInfoDto.fy === this.grant.fy;
   }
 }

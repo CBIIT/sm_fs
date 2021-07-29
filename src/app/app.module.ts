@@ -91,6 +91,7 @@ import { SupportingDocsReadonlyComponent } from './funding-request/supporting-do
 import { PercentTogglePipe } from './pipes/percent-toggle-pipe';
 import { SubmissionAlertComponent } from './funding-request/workflow/submission-alert/submission-alert.component';
 import { BudgetDocsReadonlyComponent } from './funding-request/budget-docs-readonly/budget-docs-readonly.component';
+import { CreateTypeComponent } from './funding-request/create-type/create-type.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -191,6 +192,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     PercentTogglePipe,
     SubmissionAlertComponent,
     BudgetDocsReadonlyComponent,
+    CreateTypeComponent,
   ],
 
 

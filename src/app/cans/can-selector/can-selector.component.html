@@ -3,6 +3,12 @@
 <ng-template #edit>
   <div class="form-group">
     <!--    <label for="oefia-type">OEFIA Type</label>-->
+    <div class="d-flex">
+      <div class="form-check ml-auto d-flex">
+        <input type="checkbox" [id]="uniqueId" (change)="onCheckboxChange($event, index)">
+        <label [for]="uniqueId">All CANs</label>
+      </div>
+    </div>
     <ng-select2
       id="can"
       name="can"
@@ -15,6 +21,11 @@
 </ng-template>
 
 <ng-template #read_only>
-  <div class="form-group">{{ selectedCanData?.can }} | {{ selectedCanData?.canDescrip }}</div>
+  <div class="form-group"><a [routerLink]="" [ngbTooltip]="canTooltip" triggers="click:blur">{{ selectedCanData?.can }}</a> | {{ selectedCanData?.canDescrip }}</div>
+</ng-template>
+
+
+<ng-template #canTooltip><span class='institutionName'>{{selectedCanData.can}}</span><br>
+  <span class='institutionLocation'>{{selectedCanData.canDescrip}}</span>
 </ng-template>
 

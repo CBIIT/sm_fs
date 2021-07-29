@@ -19,10 +19,13 @@ export class CanSelectorComponent implements OnInit {
 
   @Input() index = 0;
 
-  @Input() nciSourceFlag: string = '';
+  @Input() nciSourceFlag = '';
 
   @Input() readonly = false;
   private lastProjectedCan: string;
+  private allCans = false;
+
+  uniqueId: string;
 
   @Input()
   get selectedValue(): string {
@@ -50,7 +53,18 @@ export class CanSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.canService.getCans(this.nciSourceFlag).subscribe(result => {
+    this.updateCans();
+    this.canService.projectedCanEmitter.subscribe(next => {
+      if (Number(next.index) === Number(this.index)) {
+        this.updateProjectedCan(next.can);
+      }
+    });
+    this.uniqueId = 'all_cans' + String(this.index);
+  }
+
+  private updateCans(): void {
+    const nciSource = this.allCans ? null : this.nciSourceFlag;
+    this.canService.getCans(nciSource).subscribe(result => {
       this.defaultCans = result;
       this.canMap = new Map(result.map(c => [c.can, c]));
       this.data = new Array<Select2OptionData>();
@@ -66,7 +80,7 @@ export class CanSelectorComponent implements OnInit {
     });
   }
 
-  // TODO: when projected CAN changes, we need to clear the selected CAN iff it was copied from the previous projected CAN
+// TODO: when projected CAN changes, we need to clear the selected CAN iff it was copied from the previous projected CAN
   // See UI0068
   selectProjectedCan(): boolean {
     if (this.projectedCan && this.projectedCan.can && this.projectedCan.canDescrip) {
@@ -81,5 +95,11 @@ export class CanSelectorComponent implements OnInit {
       this.selectedValue = null;
     }
     this.projectedCan = can;
+  }
+
+  onCheckboxChange(e: any, i: number): void {
+    this.logger.debug('toggle all cans for row', i);
+    this.allCans = e.target.checked;
+    this.updateCans();
   }
 }
