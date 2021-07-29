@@ -3,78 +3,78 @@
     <h2>RFA/PA(s)</h2>
   </div>
 </div>
-
-<div class="row">
-  
-  <div class="col-lg-3">
-    <div class="form-group">
-      <label for="rfa-pa-1">RFA/PA</label>
-      <lib-rfa-pa-dropdown id="rfa-pa-1"></lib-rfa-pa-dropdown>
-    </div>
-  </div>
-  <div class="col col-lg-5">
-    <div class="form-group">
-      <label for="ncab-dates-1">NCAB Dates</label>
-      <ng-select2
-        id="ncab-dates-1"
-        name="ncab-dates-1"
-        [allowClear]="true"
-        [options]="options"
-        multiple="true">
-      </ng-select2>
-    </div>
-  </div>
-  <div class="col-lg-2 col-sm-auto d-flex align-items-end mb-3">
-    <button type="button" class="btn btn-danger px-2 mr-2" title="Remove RFA/PA"><i class="fas fa-trash" aria-hidden="true"></i></button>
-  </div>
-  
   <!-- PLEASE NOTE: each new set of inputs needs to have unique ids for 508 compliance -->
-  
-  <div class="col-lg-3">
-    <div class="form-group">
-      <label for="rfa-pa-2">RFA/PA</label>
-      <lib-rfa-pa-dropdown id="rfa-pa-2"></lib-rfa-pa-dropdown>
+  <div class="row"  role="group" *ngFor="let rfa of searchCriteria.rfaPaEntries; index as i">
+    <div class="col-lg-3">
+      <div class="form-group">
+        <label [attr.for]="'rfaPa-' + i">RFA/PA</label>
+        <ng-select2
+          [attr.id]="'rfaPa-' + i"
+          name="rfa-pa"
+          [(ngModel)]="rfa.rfaPaNumber"
+          [allowClear]="true"
+          [data]="searchCriteria.availableRfaPas"
+          (valueChanged)="rfa.onRfaPaChangeSelection($event)">
+        </ng-select2>
+      </div>
     </div>
-  </div>
-  <div class="col col-lg-5">
-    <div class="form-group">
-      <label for="ncab-dates-2">NCAB Dates</label>
-      <ng-select2
-        id="ncab-dates-2"
-        name="ncab-dates-1"
-        [allowClear]="true"
-        [options]="options"
-        multiple="true">
-      </ng-select2>
+
+    <div class="col col-lg-5">
+      <div class="form-group">
+        <label [attr.for]="'ncab-dates-' + i">NCAB Dates</label>
+        <ng-select2
+          [attr.id]="'ncab-dates-' + i"
+          name="ncab-dates"
+          [allowClear]="false"
+          [options]="ncab_options"
+          [data]="rfa.availableNcabDates"
+          [(ngModel)]="rfa.selectedNcabDates"
+          (valueChanged)="rfa.onNcabChangeSelection($event)">
+        </ng-select2>
+        <div class="text-danger mt-1"
+          *ngIf="rfa.ncabErrors.length > 0">
+          <div *ngFor="let error of rfa.ncabErrors">
+            <b>Funding Plan {{error.planId}}</b> already exists for this RFA/PA on NCAB {{error.ncab}}
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="col-lg-2 col-sm-auto d-flex align-items-end mb-3">
-    <button type="button" class="btn btn-danger px-2 mr-2" title="Remove RFA/PA"><i class="fas fa-trash" aria-hidden="true"></i></button>
-    <button type="button" class="btn btn-primary px-2" title="Add RFA/PA"><i class="fas fa-plus" aria-hidden="true"></i></button>
-  </div>
-  
-  <div class="col-lg-2 d-flex justify-content-end align-items-end mb-3">
-    <button type="button" class="btn btn-outline-secondary mr-2">Clear</button>
-    <button type="button" class="btn btn-primary">Search</button>
-  </div>
-  
-  <div class="col-12">
+
+    <div class="col-lg-2 col-sm-auto d-flex align-items-end mb-3">
+      <button *ngIf="searchCriteria.rfaPaEntries.length > 1"
+              type="button" class="btn btn-danger px-2 mr-2" title="Remove RFA/PA" (click)="removeRfaPa(i)">
+        <i class="fas fa-trash" aria-hidden="true"></i>
+      </button>
+      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)"
+              type="button" class="btn btn-primary px-2" title="Add RFA/PA" (click)="appendRfaPa()">
+        <i class="fas fa-plus" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="col-lg-2 d-flex justify-content-end align-items-end mb-3">
+      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)" type="button" class="btn btn-outline-secondary mr-2">Clear</button>
+      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)" type="button" class="btn btn-primary">Search</button>
+    </div>
+
+  </div><!-- END Row -->
+  <div class="row col-12">
     <hr>
   </div>
-
-</div><!-- END Row -->
 
 <div class="row">
   <div class="col-12 d-flex">
     <h2>Results</h2>
     <button type="button" class="btn btn-primary ml-auto">Select Grants</button>
   </div>
-  
+</div>
+<div class="row">
   <div class="col-12">
     <p>No grants found to display.</p>
     <p>Table goes here.</p>
   </div>
-  
+</div>
+
+<div class="row">
   <div class="col-12 d-flex">
     <button type="button" class="btn btn-primary ml-auto">Select Grants</button>
   </div>
