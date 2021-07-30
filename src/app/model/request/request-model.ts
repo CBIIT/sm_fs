@@ -221,7 +221,7 @@ export class RequestModel {
     this.stepLinkable = [false, false, false, false, false];
     this.mainApproverCreated = false;
     this.pendingAlerts = [];
-    this.programRecommendedCostsModel.reset();
+    this.programRecommendedCostsModel.deepReset();
     this.requestCans = undefined;
   }
 

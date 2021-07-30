@@ -60,14 +60,14 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   transitionMemoMissing = false;
   isDisplayBudgetDocsUploadVar = false;
   closeResult: string;
-  _workFlowAction: string = '';
+  _workFlowAction = '';
 
   userCanSubmitApprove = false;
 
   budgetDocDtos: DocumentsDto[];
   displayReadOnlyBudgetDocs = false;
 
-  actionType(workFlowAction: string) {
+  actionType(workFlowAction: string): void {
     this._workFlowAction = workFlowAction;
   }
 
@@ -76,16 +76,16 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   constructor(private router: Router,
-    private requestModel: RequestModel,
-    private propertiesService: AppPropertiesService,
-    private fsRequestService: FsRequestControllerService,
-    private userSessionService: AppUserSessionService,
-    private requestIntegrationService: FundingRequestIntegrationService,
-    private changeDetection: ChangeDetectorRef,
-    private logger: NGXLogger,
-    private fsWorkflowControllerService: FsWorkflowControllerService,
-    private workflowModel: WorkflowModel,
-    private navigationModel: NavigationStepModel) {
+              private requestModel: RequestModel,
+              private propertiesService: AppPropertiesService,
+              private fsRequestService: FsRequestControllerService,
+              private userSessionService: AppUserSessionService,
+              private requestIntegrationService: FundingRequestIntegrationService,
+              private changeDetection: ChangeDetectorRef,
+              private logger: NGXLogger,
+              private fsWorkflowControllerService: FsWorkflowControllerService,
+              private workflowModel: WorkflowModel,
+              private navigationModel: NavigationStepModel) {
   }
 
   ngAfterViewInit(): void {
@@ -106,7 +106,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {
-    // this.logger.debug('Step4 requestModel: ', this.requestModel);
+    this.logger.debug('Step4 requestModel: ', this.requestModel.requestDto);
     this.requestModel.setStepLinkable(4, true);
     this.requestHistorySubscriber = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
       (historyResult) => {
@@ -375,7 +375,6 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
               if (this.isCurrentApprover(result[approver]) || this.workflowModel.approvedByFC) {
                 if (result[approver].roleCode === 'FCARC' ||
                   result[approver].roleCode === 'FCNCI') {
-                  this.logger.debug('user is funds approver');
                   this.isDisplayBudgetDocsUploadVar = true;
                   break;
                 }
