@@ -72,9 +72,6 @@ export class CanSelectorComponent implements OnInit {
       result.forEach(r => {
         this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip, additional: r });
       });
-      this.logger.debug('selected can:', this.selectedValue);
-      this.logger.debug(this.data);
-      this.logger.debug(this.canMap);
       if (this.initialCAN) {
         this.selectedValue = this.initialCAN.can;
         this._selectedCanData = {
@@ -101,8 +98,6 @@ export class CanSelectorComponent implements OnInit {
     }
   }
 
-// TODO: when projected CAN changes, we need to clear the selected CAN iff it was copied from the previous projected CAN
-  // See UI0068
   selectProjectedCan(): boolean {
     if (this.projectedCan && this.projectedCan.can && this.projectedCan.canDescrip) {
       this.selectedValue = this.projectedCan.can;
@@ -119,7 +114,6 @@ export class CanSelectorComponent implements OnInit {
   }
 
   onCheckboxChange(e: any, i: number): void {
-    this.logger.debug('toggle all cans for row', i);
     this.allCans = e.target.checked;
     this.updateCans();
   }
