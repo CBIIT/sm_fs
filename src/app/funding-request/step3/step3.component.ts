@@ -17,6 +17,7 @@ import { HttpResponse } from '@angular/common/http';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { formatDate } from '@angular/common';
+import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 
 export interface Swimlane {
   name: string;
@@ -122,6 +123,7 @@ export class Step3Component implements OnInit {
     private documentsControllerService: DocumentsControllerService,
     private userControllerService: UserControllerService,
     private modalService: NgbModal,
+    private navigationModel: NavigationStepModel,
     private logger: NGXLogger) {
 
   }
@@ -131,7 +133,7 @@ export class Step3Component implements OnInit {
     if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
-    this.requestModel.setStepLinkable(3, true);
+    this.navigationModel.setStepLinkable(3, true);
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
         this.DocTypes = of(result);

@@ -11,6 +11,7 @@ import { NgForm } from '@angular/forms';
 import { FundingSourceTypes } from '../../model/request/funding-source-types';
 import SubmitEvent = JQuery.SubmitEvent;
 import { RequestApproverService } from '../approver/approver.service';
+import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 
 @Component({
   selector: 'app-step2',
@@ -26,6 +27,7 @@ export class Step2Component implements OnInit {
   constructor(private router: Router, private requestModel: RequestModel,
               private requestApproverService: RequestApproverService,
               private fsRequestControllerService: FsRequestControllerService,
+              private navigationModel: NavigationStepModel,
               private logger: NGXLogger) {
   }
 
@@ -33,7 +35,7 @@ export class Step2Component implements OnInit {
     if (!this.requestModel.grant) {
       this.router.navigate(['/request']);
     }
-    this.requestModel.setStepLinkable(2, true);
+    this.navigationModel.setStepLinkable(2, true);
   }
 
   saveAndContinue(): void {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class NavigationStepModel {
-    private stepLinkable: boolean[];
+    private stepLinkable: boolean[] = [];
     showSteps = false;
 
     isStepLinkable(step: number): boolean {
@@ -13,23 +13,14 @@ export class NavigationStepModel {
         this.stepLinkable[step] = linkable;
     }
 
-    initForFR(): void{
-        this.stepLinkable = [false, false, false, false, false];
-    }
-
-    initForFP(): void {
-        this.stepLinkable = [false, false, false, false, false, false, false];
-    }
-
     disableStepLinks(): void {
-        if (this.setStepLinkable) {
-            this.stepLinkable.forEach(a => {a = true; });
-        }
+        this.stepLinkable = [];
     }
 
     enableStepLinks(): void {
-        if (this.setStepLinkable) {
-            this.stepLinkable.forEach(a => {a = false; });
+        // first 1 step is never linked.
+        for (let i = 2; i <= 6; i++) {
+            this.stepLinkable[i] = true;
         }
     }
 }

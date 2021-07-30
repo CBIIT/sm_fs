@@ -1,12 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { NavigationStepModel } from '../funding-request/step-indicator/navigation-step.model';
 import { PlanModel } from '../model/plan/plan-model';
 
 @Component({
   selector: 'app-funding-plan',
   templateUrl: './funding-plan.component.html',
-  styleUrls: ['./funding-plan.component.css']
+  styleUrls: ['./funding-plan.component.css'],
+  providers: [NavigationStepModel]
 })
 export class FundingPlanComponent implements OnInit, OnDestroy {
 
@@ -25,6 +27,7 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
   model;
 
   constructor(private router: Router,
+              private navigationModel: NavigationStepModel,
               private planModel: PlanModel) {
   }
 

@@ -48,8 +48,6 @@ export class RequestModel {
   mainApproverCreated = false;
   approverCriteria: any = {};
   requestCans: FundingRequestCanDto[];
-  // note, element 0 is not used, element 1 represents step1 and so on.
-  private stepLinkable = [false, false, false, false, false];
   initialPay: number;
   // "New Request " or "View Request Label"
   title = 'New Request';
@@ -203,13 +201,6 @@ export class RequestModel {
     return true;
   }
 
-  isStepLinkable(step: number): boolean {
-    return this.stepLinkable[step];
-  }
-
-  setStepLinkable(step: number, linkable: boolean): void {
-    this.stepLinkable[step] = linkable;
-  }
 
   reset(): void {
     // this.logger.warn('About to reset the request model');
@@ -218,19 +209,10 @@ export class RequestModel {
     this._requestDto.financialInfoDto = {};
     this._requestType = undefined;
     this._grant = undefined;
-    this.stepLinkable = [false, false, false, false, false];
     this.mainApproverCreated = false;
     this.pendingAlerts = [];
     this.programRecommendedCostsModel.deepReset();
     this.requestCans = undefined;
-  }
-
-  disableStepLinks(): void {
-    this.stepLinkable = [false, false, false, false, false];
-  }
-
-  enableStepLinks(): void {
-    this.stepLinkable = [false, false, true, true, true];
   }
 
   prepareBudgetsAndSetFinalLoa(): void {
