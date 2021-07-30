@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
-import { NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingRequestSkipDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingRequestTypes } from '../model/request/funding-request-types';
 
 @Component({
   selector: 'app-request-information-readonly',
@@ -15,6 +16,11 @@ export class RequestInformationReadonlyComponent implements OnInit {
 
   otherDocs: string[];
   isSkip: boolean;
+  type4Request: boolean;
+  diversityRequest: boolean;
+  newInvestigator: boolean;
+  supplementType: string;
+  skipRequests: FundingRequestSkipDto[];
 
   ngOnInit(): void {
     this.loaMap = new Map<string, string>()
@@ -27,6 +33,23 @@ export class RequestInformationReadonlyComponent implements OnInit {
       this.otherDocs = this.requestModel.requestDto.financialInfoDto.otherDocText.split(',');
     }
     this.isSkip = this.requestModel.isSkip();
+    this.type4Request = this.requestModel.requestDto?.financialInfoDto?.requestTypeId
+                        === FundingRequestTypes.PAY_TYPE_4;
+    this.diversityRequest = this.requestModel.requestDto?.financialInfoDto?.requestTypeId
+                            === FundingRequestTypes.DIVERSITY_SUPPLEMENT_INCLUDES_CURE_SUPPLEMENTS;
+    if (this.diversityRequest) {
+      if (this.requestModel.requestDto?.financialInfoDto?.supplementType === '1') {
+        this.supplementType = 'New';
+      }
+      else if (this.requestModel.requestDto?.financialInfoDto?.supplementType === '2') {
+        this.supplementType = 'Additional Year (Extension)';
+      }
+    }
+
+    if (this.isSkip) {
+      this.skipRequests = this.requestModel.requestDto.skipRequests;
+    }
+    console.log('blablabla', this);
   }
 
   get grant(): NciPfrGrantQueryDto {
