@@ -1,9 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterViewInit, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import { Options } from 'select2';
 import {Select2OptionData} from "ng-select2";
 import {FsPlanControllerService, FundingPlanRfaPaDto} from '@nci-cbiit/i2ecws-lib';
 import {NGXLogger} from "ngx-logger";
 import {FundingPlanNcabDto} from "@nci-cbiit/i2ecws-lib/model/fundingPlanNcabDto";
+import {Subject} from "rxjs";
+import {FullGrantNumberCellRendererComponent} from "../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component";
+import {CancerActivityCellRendererComponent} from "../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component";
+import {ExistingRequestsCellRendererComponent} from "../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component";
 
 class NcabError {
   constructor(planId: number, ncab: string) {
@@ -197,13 +201,21 @@ class FundingPlanGrantsSearchCriteria {
   templateUrl: './plan-step1.component.html',
   styleUrls: ['./plan-step1.component.css']
 })
-export class PlanStep1Component implements OnInit {
-  ncab_options: Options;
-  searchCriteria: FundingPlanGrantsSearchCriteria;
+export class PlanStep1Component implements OnInit, AfterViewInit {
 
   constructor(
     private fsPlanControllerService: FsPlanControllerService,
               private logger: NGXLogger) { }
+
+  @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
+  @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
+  @ViewChild('existingRequestsRenderer') existingRequestsRenderer: TemplateRef<ExistingRequestsCellRendererComponent>;
+
+  ncab_options: Options;
+  searchCriteria: FundingPlanGrantsSearchCriteria;
+
+  dtTrigger: Subject<any> = new Subject();
+  dtOptions: any = {};
 
   ngOnInit(): void {
     this.ncab_options = {
@@ -245,6 +257,114 @@ export class PlanStep1Component implements OnInit {
 
   }
 
+  ngAfterViewInit(): void {
+    this.dtOptions = {
+      pagingType: 'full_numbers',
+      pageLength: 25,
+      serverSide: true,
+      processing: true,
+      language: {
+        paginate: {
+          first: '<i class="far fa-chevron-double-left" title="First"></i>',
+          previous: '<i class="far fa-chevron-left" title="Previous"></i>',
+          next: '<i class="far fa-chevron-right" title="Next"></i>',
+          last: '<i class="far fa-chevron-double-right" Last="First"></i>'
+        }
+      },
+
+      ajax: (dataTablesParameters: any, callback) => {
+        callback({
+          recordTotal:0,
+          recordsFiltered: 0,
+          data: []
+        });
+      },
+
+      columns: [
+        {title: '', data: 'checkBox', className: 'all'}, //0
+        {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'}, //1
+        {title: 'PI', data: 'piFullName', render: ( data, type, row, meta ) => { //2
+            return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          }, className: 'all'},
+        {title: 'Project Title', data: 'projectTitle'}, //3
+        {title: 'RFA/PA', data: 'rfaPaNumber', render: ( data, type, row, meta ) => { //4
+            return '<a href="' + row.nihGuideAddr + '" target="blank" >' + data + '</a>';
+          }},
+        {title: 'I2 Status', data: 'applStatusGroupDescrip'}, //5
+        {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => { //6
+            return '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          }},
+        {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'}, //7
+        {title: 'FY', data: 'fy'}, //8
+        {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', render: ( data, type, row, meta) => { //9
+            return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
+          }},
+        {title: 'Pctl', data: 'irgPercentileNum'}, //10
+        {title: 'PriScr', data: 'priorityScoreNum'}, //11
+        {title: 'Budget Start Date', data: 'budgetStartDate'}, //12
+        {title: 'Existing Requests', data: 'requestCount', //13
+          ngTemplateRef: { ref: this.existingRequestsRenderer}, className: 'all'},
+        {data: null, defaultContent: ''}
+      ],
+      order: [[11, 'asc']],
+      responsive: {
+        details: {
+          type: 'column',
+          target: -1
+        }
+      },
+      columnDefs: [
+        {
+          className: 'control',
+          orderable: false,
+          targets: -1
+        },
+        {orderable: false, targets: 0 }, // check box
+        {responsivePriority: 1, targets: 1 }, // grant_num
+        {responsivePriority: 3, targets: 2 }, // pi
+        {responsivePriority: 4, targets: 9 }, // ncab
+        {responsivePriority: 5, targets: 8 }, // fy
+        {responsivePriority: 6, targets: 6 }, // pd
+        {responsivePriority: 7, targets: 7 }, // ca
+        {responsivePriority: 8, targets: 10 }, // pctl
+        {responsivePriority: 9, targets: 11 }, // priscr
+        {responsivePriority: 10, targets: 4 }, // rfa/pa
+        {responsivePriority: 11, targets: 13 }, // existing requests
+        {responsivePriority: 12, orderable: false, targets: 3 }, // project title
+        {responsivePriority: 13, targets: 5 }, // i2 status
+        {responsivePriority: 14, targets: 12 } // budget start date
+      ],
+      dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
+      buttons: [
+        {
+          extend: 'excel',
+          className: 'btn-excel',
+          titleAttr: 'Excel export',
+          text: 'Export',
+          filename: 'fs-fp-grants-search-result',
+          title: null,
+          header: true,
+          exportOptions: { columns: [ 1, 2, 3, 4 , 5 , 6, 7, 8, 9, 10, 11, 12, 13 ] }
+        }
+      ],
+      rowCallback: (row: Node, data: any[] | object, index: number) => {
+        // Fix for Excel output - I removed empty renderers in column definitions
+        // But now, I have to remove the first "text" child node to prevent it
+        // from rendering (angular datatables bug)
+        this.dtOptions.columns.forEach((column, ind) => {
+          if (column.ngTemplateRef) {
+            const cell = row.childNodes.item(ind);
+            if (cell.childNodes.length > 1) { // you have to leave at least one child node
+              $(cell.childNodes.item(0)).remove();
+            }
+          }
+        });
+      }
+    }
+
+    setTimeout(() => this.dtTrigger.next(), 0);
+  }
+
   removeRfaPa(index: number) {
     this.logger.debug('removeRfaPa ', index);
     this.searchCriteria.rfaPaEntries.splice(index, 1);
@@ -272,4 +392,9 @@ export class PlanStep1Component implements OnInit {
       alert('Validation successful.  To be continued...');
     }
   }
+
+  ngOnDestroy(): void {
+    this.dtTrigger.unsubscribe();
+  }
+
 }

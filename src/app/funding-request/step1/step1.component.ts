@@ -17,7 +17,7 @@ import { LoaderService } from 'src/app/service/loader-spinner.service';
 import { NGXLogger } from 'ngx-logger';
 import {FullGrantNumberCellRendererComponent} from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import {DataTableDirective} from 'angular-datatables';
-import {ExistingRequestsCellRendererComponent} from './existing-requests-cell-renderer/existing-requests-cell-renderer.component';
+import {ExistingRequestsCellRendererComponent} from '../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
 import {FundingRequestActionCellRendererComponent} from './funding-request-action-cell-renderer/funding-request-action-cell-renderer.component';
 import {CancerActivityCellRendererComponent} from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
@@ -138,7 +138,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
           }},
         {title: 'Pctl', data: 'irgPercentileNum'},
         {title: 'PriScr', data: 'priorityScoreNum'},
-        {title: 'Budjet Start Date', data: 'budgetStartDate'},
+        {title: 'Budget Start Date', data: 'budgetStartDate'},
         {title: 'Existing Requests', data: 'requestCount',
          ngTemplateRef: { ref: this.existingRequestsRenderer}, className: 'all'},
         {title: 'Action', data: null,  defaultContent: 'Select',

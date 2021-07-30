@@ -74,7 +74,7 @@ import { ProjectedCanComponent } from './cans/projected-can/projected-can.compon
 import { CanSelectorComponent } from './cans/can-selector/can-selector.component';
 import { FullGrantNumberCellRendererComponent } from './table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { CancerActivityCellRendererComponent } from './table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
-import { ExistingRequestsCellRendererComponent } from './funding-request/step1/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
+import { ExistingRequestsCellRendererComponent } from './table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
 import { FundingRequestActionCellRendererComponent } from './funding-request/step1/funding-request-action-cell-renderer/funding-request-action-cell-renderer.component';
 import { FundableScoreRangeComponent } from './funding-plan/fundable-score-range/fundable-score-range.component';
 import { GrantTableComponent } from './funding-plan/grant-table/grant-table.component';
@@ -134,7 +134,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     Step1Component,
     Step3Component,
     Step2Component,
-    Step4Component,    
+    Step4Component,
     FormatNcabDatePipe,
     CodeDescriptionPipe,
     MailtoFormatterPipe,

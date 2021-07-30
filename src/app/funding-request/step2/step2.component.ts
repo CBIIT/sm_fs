@@ -119,7 +119,7 @@ export class Step2Component implements OnInit {
     if (!this.requestModel.requestDto.frtId) {
       return false;
     }
-    return Number(this.requestModel.requestDto.frtId) &&
+    return !!this.requestModel.requestDto.frtId && Number(this.requestModel.requestDto.frtId) &&
       !([FundingRequestTypes.SKIP, FundingRequestTypes.SKIP__NCI_RFA].includes(Number(this.requestModel.requestDto.frtId)));
   }
 

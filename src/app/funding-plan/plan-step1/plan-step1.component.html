@@ -73,7 +73,7 @@
            *ngIf="rfa.ncabErrors.length > 0 || rfa.ncabErrRequired == true">
         <div *ngIf="rfa.ncabErrors.length > 0">
           <div *ngFor="let error of rfa.ncabErrors">
-            <b>Funding Plan {{error.planId}}</b> already exists for this RFA/PA on NCAB {{error.ncab}}
+            <b><span><a [routerLink]="'/plan/retrieve/' + error.planId">Funding Plan {{error.planId}}</a></span></b> already exists for this RFA/PA on NCAB {{error.ncab}}
           </div>
         </div>
         <div *ngIf="rfa.ncabErrRequired == true">NCAB is required</div>
@@ -96,7 +96,8 @@
 <div class="row">
   <div class="col-12">
     <p>No grants found to display.</p>
-    <p>Table goes here.</p>
+    <table id="grantDt" #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
+    </table>
   </div>
 </div>
 

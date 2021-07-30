@@ -27,7 +27,7 @@ export class RequestInformationComponent implements OnInit {
   myAlerts: Alert[] = [];
 
   get selectedRequestType(): number {
-    return this.requestModel.requestDto.financialInfoDto.requestTypeId;
+    return this.requestModel.requestDto.financialInfoDto.requestTypeId || null;
   }
 
   set selectedRequestType(value: number) {
