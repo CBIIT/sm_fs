@@ -21,7 +21,6 @@ export class CanSelectorComponent implements OnInit {
   @Input() nciSourceFlag = '';
   @Input() readonly = false;
   @Input() initialCAN: FundingRequestCanDto = null;
-  private lastProjectedCan: string;
   private allCans = false;
 
   uniqueId: string;
