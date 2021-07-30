@@ -54,7 +54,6 @@
               "./node_modules/datatables.net-buttons/js/buttons.html5.js",
               "./node_modules/datatables.net-buttons/js/buttons.print.js",
               "src/js/ngselect-autofocus.js"
-
             ]
           },
           "configurations": {
