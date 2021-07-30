@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import { RequestModel } from 'src/app/model/request/request-model';
+import { NavigationStepModel } from './navigation-step.model';
 
 @Component({
   selector: 'app-step-indicator',
@@ -10,14 +10,18 @@ export class StepIndicatorComponent implements OnInit {
   @Input() activeStep;
   @Input() steps: { step: number, name: string, route: string}[];
 
-  constructor(private requestModel: RequestModel) {
+  width = '25%';
+
+  constructor(private model: NavigationStepModel) {
   }
 
   ngOnInit(): void {
+    if (this.steps && this.steps.length > 0) {
+      this.width = 100 / this.steps.length + '%';
+    }
   }
 
   isStepLinkable(step: number): boolean {
-    // this.requestModel.clearAlerts();
-    return this.requestModel.isStepLinkable(step);
+    return this.model.isStepLinkable(step);
   }
 }

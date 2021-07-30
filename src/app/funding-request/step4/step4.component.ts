@@ -107,7 +107,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit(): void {
     this.logger.debug('Step4 requestModel: ', this.requestModel.requestDto);
-    this.requestModel.setStepLinkable(4, true);
+    this.navigationModel.setStepLinkable(4, true);
     this.requestHistorySubscriber = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
       (historyResult) => {
         this.parseRequestHistories(historyResult);
@@ -146,10 +146,10 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     this.isRequestEverSubmitted = submitted;
     this.readonly = (this.userReadonly) || !(this.statusesCanEditSubmit.includes(this.requestStatus));
     if (this.readonly) {
-      this.requestModel.disableStepLinks();
+      this.navigationModel.disableStepLinks();
       this.navigationModel.showSteps = false;
     } else {
-      this.requestModel.enableStepLinks();
+      this.navigationModel.enableStepLinks();
       this.navigationModel.showSteps = true;
     }
     this.changeDetection.detectChanges();

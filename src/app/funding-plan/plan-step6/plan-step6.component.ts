@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 
 @Component({
   selector: 'app-plan-step6',
@@ -7,9 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PlanStep6Component implements OnInit {
 
-  constructor() { }
+  constructor(private navigationModel: NavigationStepModel) { }
 
   ngOnInit(): void {
+    this.navigationModel.setStepLinkable(6, true);
   }
 
 }
