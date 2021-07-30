@@ -68,18 +68,18 @@
     </div>
   </div>
 
-  <div class="col-md-6 col-lg-4" *ngIf="!isSkip">
+  <div class="col-md-6 col-lg-4" *ngIf="!isSkip && otherDocs">
     <div class="form-group">
       <p class="like-label">Other DOC(s) Contributing Funds</p>
-      <p><a *ngFor="let doc of otherDocs" [routerLink]=""
+      <p><a *ngFor="let doc of otherDocs; let i = index " [routerLink]=""
             ngbTooltip="{{doc|codeDescription:'NciDocs'}}"
             triggers="click:blur" placement="top">
-            {{doc}}, </a>
+            {{i!==0?',':''}} {{doc}}</a>
       </p>
     </div>
   </div>
 
-  <div class="col-md-6 col-lg-4" *ngIf="!isSkip && type4Request">
+  <div class="col-md-6 col-lg-4" *ngIf="!isSkip && type4Request ">
     <div class="form-group">
       <p class="like-label">Conversion Grant Activity Code/Mechanism</p>
       <p>{{model.conversionMechanism}}</p>
@@ -89,7 +89,7 @@
   <div class="col-md-6 col-lg-4" *ngIf="!isSkip && diversityRequest">
     <div class="form-group">
       <p class="like-label">Type of Supplement</p>
-      <p>{{model.conversionMechanism}}</p>
+      <p>{{supplementType}}</p>
     </div>
   </div>
 
