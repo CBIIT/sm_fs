@@ -3,8 +3,19 @@
     <h2>RFA/PA(s)</h2>
   </div>
 </div>
+
+<div class="row" *ngIf="searchCriteria.errActivityCodes.length > 0">
+  <div class="col-12">
+    <ngb-alert type="danger" [dismissible]="false">
+      <div>Activity Code on one or more RFA/PAs are different:</div>
+      <div *ngFor="let err of searchCriteria.errActivityCodes" style="padding-left: 1rem;">{{err}}</div>
+    </ngb-alert>
+  </div>
+</div>
+
   <!-- PLEASE NOTE: each new set of inputs needs to have unique ids for 508 compliance -->
-  <div class="row"  role="group" *ngFor="let rfa of searchCriteria.rfaPaEntries; index as i">
+<div *ngFor="let rfa of searchCriteria.rfaPaEntries; index as i">
+  <div class="row"  role="group" >
     <div class="col-lg-3">
       <div class="form-group">
         <label [attr.for]="'rfaPa-' + i">RFA/PA</label>
@@ -14,7 +25,7 @@
           [(ngModel)]="rfa.rfaPaNumber"
           [allowClear]="true"
           [data]="searchCriteria.availableRfaPas"
-          (valueChanged)="rfa.onRfaPaChangeSelection($event)">
+          (ngModelChange)="rfa.onRfaPaChangeSelection($event)">
         </ng-select2>
       </div>
     </div>
@@ -31,12 +42,6 @@
           [(ngModel)]="rfa.selectedNcabDates"
           (valueChanged)="rfa.onNcabChangeSelection($event)">
         </ng-select2>
-        <div class="text-danger mt-1"
-          *ngIf="rfa.ncabErrors.length > 0">
-          <div *ngFor="let error of rfa.ncabErrors">
-            <b>Funding Plan {{error.planId}}</b> already exists for this RFA/PA on NCAB {{error.ncab}}
-          </div>
-        </div>
       </div>
     </div>
 
@@ -52,10 +57,31 @@
     </div>
 
     <div class="col-lg-2 d-flex justify-content-end align-items-end mb-3">
-      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)" type="button" class="btn btn-outline-secondary mr-2">Clear</button>
-      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)" type="button" class="btn btn-primary">Search</button>
+      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)" type="button" class="btn btn-outline-secondary mr-2" (click)="clear()">Clear</button>
+      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)" type="button" class="btn btn-primary" (click)="search()">Search</button>
     </div>
-
+  </div>
+  <div class="row" role="group" style="margin-top: -1rem;">
+    <div class="col-lg-3">
+      <div class="text-danger mt-1 form-group" *ngIf="rfa.rfaErrDuplcated == true || rfa.rfaErrRequired == true">
+        <div *ngIf="rfa.rfaErrDuplcated == true">Duplicated RFA/PA</div>
+        <div *ngIf="rfa.rfaErrRequired == true">RFA/PA is required</div>
+      </div>
+    </div>
+    <div class="col col-lg-5">
+      <div class="text-danger mt-1 form-group"
+           *ngIf="rfa.ncabErrors.length > 0 || rfa.ncabErrRequired == true">
+        <div *ngIf="rfa.ncabErrors.length > 0">
+          <div *ngFor="let error of rfa.ncabErrors">
+            <b>Funding Plan {{error.planId}}</b> already exists for this RFA/PA on NCAB {{error.ncab}}
+          </div>
+        </div>
+        <div *ngIf="rfa.ncabErrRequired == true">NCAB is required</div>
+      </div>
+    </div>
+    <div class="col-lg-2 col-sm-auto d-flex align-items-end mb-3"></div>
+    <div class="col-lg-2 d-flex justify-content-end align-items-end mb-3"></div>
+  </div>
   </div><!-- END Row -->
   <div class="row col-12">
     <hr>

@@ -23,6 +23,9 @@ class RfaPaEntry {
   availableNcabDates: Array<Select2OptionData> = [];
   parent: FundingPlanGrantsSearchCriteria;
   ncabErrors: Array<NcabError> = [];
+  rfaErrDuplcated: boolean = false;
+  rfaErrRequired: boolean = false;
+  ncabErrRequired: boolean = false;
 
   constructor(parent: FundingPlanGrantsSearchCriteria) {
     // The callback comes from the parent FundingPlanGrantsSearchCriteria instance to update
@@ -66,6 +69,9 @@ class RfaPaEntry {
         }
       }
     }
+    // reset 'ncab required' error
+    const id = this._getIndex();
+    this.parent.rfaPaEntries[id].ncabErrRequired = false;
   }
 
   _findNcabDto(ncab: string): FundingPlanNcabDto {
@@ -84,22 +90,103 @@ class RfaPaEntry {
 class FundingPlanGrantsSearchCriteria {
   rfaPaEntries: Array<RfaPaEntry> = [];
   ncabMap: Map<string, Array<Select2OptionData>>;
+  activityCodesMap: Map<string, string>;
   availableRfaPas: Array<Select2OptionData> = [];
+  errActivityCodes: Array<string> = [];
 
   constructor() {
     this.ncabMap = new Map<string, Array<Select2OptionData>>();
+    this.activityCodesMap = new Map<string, string>();
     this.rfaPaEntries.push(new RfaPaEntry(this))
   }
 
   public onChangeRfaPaEntry(rfaPa: string, index: number) : void {
     const entry = this.rfaPaEntries[index];
     entry.selectedNcabDates = [];
+    entry.rfaErrRequired = false;
+    entry.ncabErrRequired = false;
     if (this.ncabMap.has(rfaPa)) {
       console.debug('getNcabDates() - found ncab list for ', rfaPa);
       entry.availableNcabDates = this.ncabMap.get(rfaPa);
     } else {
       entry.availableNcabDates = [];
     }
+    this.validateForRfaPaDuplicate();
+    if (this.errActivityCodes.length > 0) {
+      this.validateForActivityCodes();
+    }
+  }
+
+  // Validate for duplication (from bottom to up)
+  public validateForRfaPaDuplicate() {
+    for (let i = this.rfaPaEntries.length - 1; i > 0; i--) {
+      const rfaPa = this.rfaPaEntries[i].rfaPaNumber;
+      let duplicated = false;
+      if (rfaPa && rfaPa.length > 0) {
+        for (let j = 0; j < i; j++) {
+          if (rfaPa === this.rfaPaEntries[j].rfaPaNumber) {
+            duplicated = true;
+            break;
+          }
+        }
+      }
+      this.rfaPaEntries[i].rfaErrDuplcated = duplicated;
+    }
+  }
+
+  // Validate for required fields
+  public validateForRequired() {
+    for (let entry of this.rfaPaEntries) {
+      if (!entry.rfaPaNumber || entry.rfaPaNumber.length == 0) {
+        entry.rfaErrRequired = true;
+      }
+      if (!entry.selectedNcabDates || entry.selectedNcabDates.length == 0) {
+        entry.ncabErrRequired = true;
+      }
+    }
+  }
+
+  // Validate for activity codes
+  public validateForActivityCodes() : boolean {
+    const valid = this._validateForActivityCodes();
+    const errs = [];
+    if (!valid) {
+      for (let entry of this.rfaPaEntries) {
+        if (entry.rfaPaNumber && entry.rfaPaNumber.length > 0) {
+          errs.push(entry.rfaPaNumber + ': ' + this.activityCodesMap.get(entry.rfaPaNumber));
+        }
+      }
+    }
+    this.errActivityCodes = errs;
+    return valid;
+  }
+
+  _validateForActivityCodes() : boolean {
+    for (let i = 0; i < this.rfaPaEntries.length - 1; i++) {
+      if (this.rfaPaEntries[i].rfaPaNumber && this.rfaPaEntries[i].rfaPaNumber.length > 0) {
+        const ac = this.activityCodesMap.get(this.rfaPaEntries[i].rfaPaNumber);
+        for (let j = i + 1; j < this.rfaPaEntries.length; j++) {
+          if (this.rfaPaEntries[j].rfaPaNumber && this.rfaPaEntries[j].rfaPaNumber.length > 0 &&
+            ac != this.activityCodesMap.get(this.rfaPaEntries[j].rfaPaNumber)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  // Check for errors
+  public isValid(): boolean {
+    for (let entry of this.rfaPaEntries) {
+      if (entry.rfaErrDuplcated || entry.rfaErrRequired || entry.ncabErrRequired || (entry.ncabErrors && entry.ncabErrors.length > 0)) {
+        return false;
+      }
+    }
+    if (this.errActivityCodes.length > 0) {
+      return false;
+    }
+    return true;
   }
 }
 
@@ -147,6 +234,7 @@ export class PlanStep1Component implements OnInit {
               });
             }
             this.searchCriteria.ncabMap.set(entry.rfaPaNumber, ncabTmp);
+            this.searchCriteria.activityCodesMap.set(entry.rfaPaNumber, entry.activityCodes);
           }
         }
         this.searchCriteria.availableRfaPas = tmp;
@@ -160,9 +248,28 @@ export class PlanStep1Component implements OnInit {
   removeRfaPa(index: number) {
     this.logger.debug('removeRfaPa ', index);
     this.searchCriteria.rfaPaEntries.splice(index, 1);
+    this.searchCriteria.validateForRfaPaDuplicate();
+    if (this.searchCriteria.errActivityCodes.length > 0) {
+      this.searchCriteria.validateForActivityCodes();
+    }
   }
 
   appendRfaPa() {
     this.searchCriteria.rfaPaEntries.push(new RfaPaEntry(this.searchCriteria));
+  }
+
+  clear() {
+    this.searchCriteria.rfaPaEntries = [];
+    this.searchCriteria.rfaPaEntries.push(new RfaPaEntry(this.searchCriteria));
+    this.searchCriteria.errActivityCodes = [];
+  }
+
+  search() {
+    this.searchCriteria.validateForRfaPaDuplicate();
+    this.searchCriteria.validateForRequired();
+    this.searchCriteria.validateForActivityCodes();
+    if (this.searchCriteria.isValid()) {
+      alert('Validation successful.  To be continued...');
+    }
   }
 }
