@@ -1,9 +1,10 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {RequestModel} from '../model/request/request-model';
-import {LookupsControllerService, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
-import {Options} from 'select2';
-import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
-import {NGXLogger} from 'ngx-logger';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { RequestModel } from '../model/request/request-model';
+import { LookupsControllerService } from '@nci-cbiit/i2ecws-lib';
+import { Options } from 'select2';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { NGXLogger } from 'ngx-logger';
+import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
 
 
 class DocData {
@@ -17,11 +18,16 @@ class DocData {
 @Component({
   selector: 'app-other-docs-contributing-funds',
   templateUrl: './other-docs-contributing-funds.component.html',
-  styleUrls: ['./other-docs-contributing-funds.component.css']
+  styleUrls: ['./other-docs-contributing-funds.component.css'],
 })
 export class OtherDocsContributingFundsComponent implements OnInit {
 
   selectedDocsArr: Array<DocData> = new Array<DocData>();
+  private _selectedValue: string;
+  private pdDoc: string;
+
+  public docs: Array<DocData> = new Array<DocData>();
+  public options: Options;
 
   @Input() label = 'Division/Office/Center (DOC)';
 
@@ -58,23 +64,32 @@ export class OtherDocsContributingFundsComponent implements OnInit {
     }
   }
 
-  private _selectedValue: string;
-
-  public docs: Array<DocData> = new Array<DocData>();
-  public options: Options;
-
-  constructor(private lookupsControllerService: LookupsControllerService, private requestModel: RequestModel, private logger: NGXLogger) {
+  constructor(
+    private lookupsControllerService: LookupsControllerService,
+    private requestModel: RequestModel,
+    private logger: NGXLogger,
+    private pdCaIntegratorSvc: PdCaIntegratorService) {
   }
 
   ngOnInit(): void {
     this.initializeDocs();
+    this.pdCaIntegratorSvc.docEmitter.subscribe(next => {
+      this.logger.debug('New DOC to ignore:', next);
+      if (next) {
+        this.pdDoc = next;
+        if (this.selectedDocsArr.map(d => d.abbreviation).includes(next)) {
+          this.deselect(next);
+        }
+      } else {
+        this.pdDoc = null;
+      }
+    });
   }
 
   initializeDocs(): void {
     this.options = {};
-    if (!this.docs) {
-      this.docs = new Array<DocData>();
-    }
+    this.docs = new Array<DocData>();
+
     const selectedDocs = this.requestModel.requestDto.financialInfoDto.otherDocText || '';
 
     this.lookupsControllerService.getNciDocsUsingGET().subscribe(
@@ -94,13 +109,14 @@ export class OtherDocsContributingFundsComponent implements OnInit {
             this.selectedValue = s;
           });
         }
+
       }, error => {
         console.error('HttpClient get request error for----- ' + error.message);
       });
   }
 
   availableDocs(): Array<DocData> {
-    return this.docs.filter(d => !d.selected);
+    return this.docs.filter(d => !d.selected && !(d.abbreviation === this.pdDoc));
   }
 
   selectedDocs(): Array<DocData> {
@@ -109,6 +125,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
 
   deselect(abbreviation: string): void {
+    this.logger.debug('remove', abbreviation);
     this.docs.forEach(d => {
       if (d.abbreviation === abbreviation) {
         d.selected = false;
