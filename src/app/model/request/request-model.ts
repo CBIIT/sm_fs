@@ -321,8 +321,6 @@ export class RequestModel {
       this.programRecommendedCostsModel.selectedFundingSources.push(source);
     });
 
-    // TODO: Consider sorting each line item by FY?
-    // add load/build requestCans because PCM is needed when building cans
     this.loadRequestCans();
     return true;
   }
