@@ -33,7 +33,6 @@ export class CanSelectorComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<string>();
 
   get selectedCanData(): CanCcxDto {
-    this.logger.debug(this._selectedCanData);
     return this._selectedCanData ? this._selectedCanData : (this.canMap ? this.canMap.get(this._selectedValue) : null);
   }
 

@@ -26,7 +26,6 @@ export class ProjectedCanComponent implements OnInit {
         this.updateProjectedCan(next.value);
       }
     });
-    this.logger.debug('fseId:', this.fseId);
     if (this.octId) {
       this.updateProjectedCan(this.octId);
     }
@@ -44,9 +43,5 @@ export class ProjectedCanComponent implements OnInit {
       this.logger.debug(result);
       this.canService.projectedCanEmitter.next({ index: this.index, can: result });
     });
-  }
-
-  setCan(projectedCan: CanCcxDto): void {
-    // TODO: delete me?
   }
 }

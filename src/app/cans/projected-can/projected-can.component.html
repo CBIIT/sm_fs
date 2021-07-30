@@ -2,4 +2,4 @@
   <span class='institutionLocation'>{{projectedCan.canDescrip}}</span>
 </ng-template>
 <span *ngIf="projectedCan?.can && projectedCan?.canDescrip">
-  <a [routerLink]="" (mouseenter)="setCan(projectedCan)" [ngbTooltip]="canTooltip" triggers="click:blur">{{projectedCan?.can}}</a> | {{projectedCan?.canDescrip}}</span>
+  <a [routerLink]="" [ngbTooltip]="canTooltip" triggers="click:blur">{{projectedCan?.can}}</a> | {{projectedCan?.canDescrip}}</span>
