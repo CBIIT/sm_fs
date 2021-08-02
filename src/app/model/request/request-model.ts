@@ -24,6 +24,7 @@ import { getCurrentFiscalYear } from 'src/app/utils/utils';
 })
 export class RequestModel {
 
+  private _supplementType: string;
   pendingAlerts: Alert[] = [];
   createType: string;
 
@@ -419,5 +420,25 @@ export class RequestModel {
 
   isForGrantFY(): boolean {
     return this.requestDto.financialInfoDto.fy === this.grant.fy;
+  }
+
+
+  get supplementType(): string {
+    return this._supplementType;
+  }
+
+  set supplementType(value: string) {
+    this._supplementType = value;
+
+    if (value === '1') {
+      this.requestDto.financialInfoDto.suppNewFlag = 'Y';
+      this.requestDto.financialInfoDto.suppAddYearFlag = 'N';
+    } else if (value === '2') {
+      this.requestDto.financialInfoDto.suppNewFlag = 'N';
+      this.requestDto.financialInfoDto.suppAddYearFlag = 'Y';
+    } else {
+      this.requestDto.financialInfoDto.suppNewFlag = undefined;
+      this.requestDto.financialInfoDto.suppAddYearFlag = undefined;
+    }
   }
 }
