@@ -128,10 +128,10 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
     let submitted = false;
     historyResult.forEach((item: FundingReqStatusHistoryDto) => {
-      const i = item.statusDescrip.search(/ by /gi);
-      if (i > 0) {
-        item.statusDescrip = item.statusDescrip.substring(0, i);
-      }
+      // const i = item.statusDescrip.search(/ by /gi);
+      // if (i > 0) {
+      //   item.statusDescrip = item.statusDescrip.substring(0, i);
+      // }
 
       if (item.statusCode === 'SUBMITTED') {
         submitted = true;
@@ -139,7 +139,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
       if (!item.endDate) {
         this.requestStatus = item.statusCode;
-        this.requestModel.requestDto.requestStatusName = item.statusDescrip + ' by ' + item.performedBy;
+        this.requestModel.requestDto.requestStatusName = item.statusDescrip;
       }
 
     });

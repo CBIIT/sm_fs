@@ -1,18 +1,15 @@
-
 <table id="requestHistory" class="table no-footer dtr-column dataTable row-border" role="grid">
     <thead>
     <tr>
         <th>Date</th>
         <th>Action</th>
-<!--        <th>Action</th>-->
         <th>Comments</th>
     </tr>
     </thead>
     <tbody>
     <tr *ngFor="let history of histories">
         <td>{{history.startDate}}</td>
-        <td>{{ history.statusDescrip }} by <span [innerHTML]="history | mailtoFormatter:'performedBy':'email':'Request History'"></span></td>
-<!--        <td>{{ history.statusDescrip }} by {{ history.performedBy }}</td>-->
+        <td>{{ history.statusShortDescrip }} by <span [innerHTML]="history | mailtoFormatter:'performedBy':'email':'Request History'"></span></td>
         <td>{{history.comments}}</td>
     </tr>
     </tbody>
