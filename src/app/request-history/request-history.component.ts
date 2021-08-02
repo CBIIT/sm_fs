@@ -1,9 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
 import { FsLookupControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { FundingRequestIntegrationService } from '../funding-request/integration/integration.service';
 import { Subscription } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
+import { PlanModel } from '../model/plan/plan-model';
 
 @Component({
   selector: 'app-request-history',
@@ -11,13 +12,15 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./request-history.component.css']
 })
 export class RequestHistoryComponent implements OnInit, OnDestroy {
+  @Input() requestOrPlan: 'REQUEST'|'PLAN' = 'REQUEST';
   histories: FundingReqStatusHistoryDto[];
   requestSubmissionEventSubscriber: Subscription;
 
   constructor(private requestModel: RequestModel,
-    private fsLookupControllerService: FsLookupControllerService,
-    private requestIntegrationService: FundingRequestIntegrationService,
-    private logger: NGXLogger) {
+              private planModel: PlanModel,
+              private fsLookupControllerService: FsLookupControllerService,
+              private requestIntegrationService: FundingRequestIntegrationService,
+              private logger: NGXLogger) {
   }
 
   ngOnDestroy(): void {
@@ -34,10 +37,22 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
   }
 
   loadHistory(): void {
-    if (this.requestModel.requestDto.frqId != null) {
+    if (this.requestOrPlan === 'REQUEST' && this.requestModel.requestDto.frqId != null) {
       this.fsLookupControllerService.getRequestHistoryUsingGET(this.requestModel.requestDto.frqId).subscribe(
         result => {
           this.histories = result;
+          this.logger.debug('request status history ', result);
+          this.requestIntegrationService.requestHistoryLoadEmitter.next(result);
+        },
+        error => {
+          this.logger.error('HttpClient get request error for----- ' + error.message);
+        });
+    }
+    else if (this.requestOrPlan === 'PLAN' && this.planModel != null) {
+      this.fsLookupControllerService.getPlanHistoryUsingGET(264).subscribe(
+        result => {
+          this.histories = result;
+          this.logger.debug('plan status history ', result);
           this.requestIntegrationService.requestHistoryLoadEmitter.next(result);
         },
         error => {
@@ -45,13 +60,4 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
         });
     }
   }
-
-  get grant(): NciPfrGrantQueryDto {
-    return this.requestModel.grant;
-  }
-
-  get model(): RequestModel {
-    return this.requestModel;
-  }
-
 }

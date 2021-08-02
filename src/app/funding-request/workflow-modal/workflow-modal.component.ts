@@ -73,21 +73,21 @@ export class WorkflowModalComponent implements OnInit {
     );
   }
 
-  invokeRestApi(dto: WorkflowTaskDto): Observable<any> {
-    // const dto: WorkflowTaskDto = {};
-    // dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-    // dto.frqId = this.requestModel.requestDto.frqId;
-    // dto.comments = this.comments;
-    // dto.action =  WorkflowActionCode[mode];
-    if (dto.action === 'WITHDRAW') {
-      return this.fsWorkflowService.withdrawRequestUsingPOST(dto);
-    } else if (dto.action === 'HOLD') {
-      return this.fsWorkflowService.holdRequestUsingPOST(dto);
-    }
-    else {
-      throw new Error(dto.action + ' is not supported in funding request workflow');
-    }
-  }
+  // invokeRestApi(dto: WorkflowTaskDto): Observable<any> {
+  //   // const dto: WorkflowTaskDto = {};
+  //   // dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+  //   // dto.frqId = this.requestModel.requestDto.frqId;
+  //   // dto.comments = this.comments;
+  //   // dto.action =  WorkflowActionCode[mode];
+  //   if (dto.action === 'WITHDRAW') {
+  //     return this.fsWorkflowService.withdrawRequestUsingPOST(dto);
+  //   } else if (dto.action === 'HOLD') {
+  //     return this.fsWorkflowService.holdRequestUsingPOST(dto);
+  //   }
+  //   else {
+  //     throw new Error(dto.action + ' is not supported in funding request workflow');
+  //   }
+  // }
 
 }
 

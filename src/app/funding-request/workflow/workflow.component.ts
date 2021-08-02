@@ -156,13 +156,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
     historyResult.forEach((item: FundingReqStatusHistoryDto) => {
       if (!item.endDate) {
-        const i = item.statusDescrip.search(/ by /gi);
-        if (i > 0) {
-          item.statusDescrip = item.statusDescrip.substring(0, i);
-        }
         this.requestStatus = item;
         this.approvingState = ApprovingStatuses.indexOf(this.requestStatus.statusCode) > -1;
-        this.logger.debug('requestStatus= ', item);
+        this.logger.debug('current requestStatus= ', item);
         return;
       }
     });
