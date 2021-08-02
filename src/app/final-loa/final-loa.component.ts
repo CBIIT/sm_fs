@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
 import { ControlContainer, NgForm } from '@angular/forms';
 import { Select2OptionData } from 'ng-select2';
@@ -10,6 +10,7 @@ import { Select2OptionData } from 'ng-select2';
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class FinalLoaComponent implements OnInit {
+  @Input() parentForm: NgForm;
   private _selectedValue: number;
   data: Array<Select2OptionData>;
 
