@@ -1,3 +1,10 @@
-<label for="new_investigator">Is this application from a New Investigator?<span class="optional">(optional)</span></label>
-<input type="radio" value="Y" name="newInvestigator" [(ngModel)]="model.requestDto.financialInfoDto.newInvestigatorFlag" > Yes
-<input type="radio" value="N" name="newInvestigator" [(ngModel)]="model.requestDto.financialInfoDto.newInvestigatorFlag" > No
+<label for="ni-select-1">Is this application from a New Investigator?<span class="optional">(optional)</span></label>
+
+<ng-select2
+  id="ni-select-1"
+  name="newInvestigator"
+  #newInvestigator="ngModel"
+  [(ngModel)]="model.requestDto.financialInfoDto.newInvestigatorFlag"
+  [allowClear]="false"
+  [data]="data">
+</ng-select2>
