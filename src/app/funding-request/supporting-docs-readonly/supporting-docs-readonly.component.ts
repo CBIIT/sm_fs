@@ -45,7 +45,7 @@ export class SupportingDocsReadonlyComponent implements OnInit {
     this.docDtos = this.parent.docDtos;
 
     if (this.requestModel.requestDto.requestType === 'Pay Type 4' ||
-    (this.requestModel.conversionMechanism && this.requestModel.conversionMechanism !== null)) {
+    (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== null)) {
        this.displayTansitionMemo = true;
   }
 

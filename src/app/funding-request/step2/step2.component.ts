@@ -73,6 +73,7 @@ export class Step2Component implements OnInit {
     this.requestModel.clearAlerts();
     // TODO: make sure model is properly constructed
     this.requestModel.prepareBudgetsAndSetFinalLoa();
+    this.requestModel.requestDto.financialInfoDto.conversionActivityCode = this.requestModel.requestDto.conversionActivityCode;
     this.logger.debug(JSON.stringify(this.requestModel.requestDto));
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {

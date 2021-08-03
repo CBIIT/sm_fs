@@ -35,8 +35,6 @@ export class RequestModel {
   private _requestDto: FundingRequestDtoReq;
   private _programRecommendedCostsModel: ProgramRecommendedCostsModel;
 
-  conversionMechanism: string;
-
   // Grant viewer URL for use in links
   private readonly _grantViewerUrl: string;
 

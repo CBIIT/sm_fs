@@ -4,7 +4,7 @@ import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
-import { ConversionMechanisms } from '../../type4-conversion-mechanism/conversion-mechanisms';
+import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
 import { CanManagementServiceBus } from '../../cans/can-management-service-bus.service';
 
 @Component({
@@ -49,15 +49,15 @@ export class RetrieveRequestComponent implements OnInit {
           }
 
           // TODO: We don't seem to be storing conversion mechanism anywhere, so this will most likely always be null
-          const conversionMech = ConversionMechanisms.includes(this.requestModel.conversionMechanism)
-            ? this.requestModel.conversionMechanism : null;
+          const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
+            ? this.requestModel.requestDto.conversionActivityCode : null;
 
           this.requestService.getFundingSourcesUsingGET(this.requestModel.requestDto.frtId,
             this.requestModel.grant.fullGrantNum,
             this.requestModel.requestDto.financialInfoDto.fy,
             this.requestModel.requestDto.requestorNpnId,
             this.requestModel.requestDto.requestorCayCode,
-            conversionMech).subscribe(result1 => {
+            conversionActivityCode).subscribe(result1 => {
             this.requestModel.programRecommendedCostsModel.fundingSources = result1;
             this.requestModel.restoreLineItems();
           });

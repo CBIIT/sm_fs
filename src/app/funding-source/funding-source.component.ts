@@ -8,7 +8,7 @@ import { FundingSourceSynchronizerService } from './funding-source-synchronizer-
 import { openNewWindow } from '../utils/utils';
 import { NGXLogger } from 'ngx-logger';
 import { ControlContainer, FormGroup, NgForm } from '@angular/forms';
-import { ConversionMechanisms } from '../type4-conversion-mechanism/conversion-mechanisms';
+import { ConversionActivityCodes } from '../type4-conversion-mechanism/conversion-activity-codes';
 
 @Component({
   selector: 'app-funding-source',
@@ -75,15 +75,15 @@ export class FundingSourceComponent implements OnInit {
 
   private refreshFundingSources(): void {
     const cayCode = this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode;
-    const conversionMech = ConversionMechanisms.includes(this.requestModel.conversionMechanism)
-      ? this.requestModel.conversionMechanism : null;
+    const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
+      ? this.requestModel.requestDto.conversionActivityCode : null;
     this.fsRequestControllerService.getFundingSourcesUsingGET(
       this.requestModel.requestDto.frtId,
       this.requestModel.grant.fullGrantNum,
       this.requestModel.requestDto.fy,
       this.requestModel.requestDto.financialInfoDto.requestorNpnId,
       cayCode,
-      conversionMech).subscribe(result => {
+      conversionActivityCode).subscribe(result => {
       this.requestModel.programRecommendedCostsModel.fundingSources = result;
     }, error => {
       this.logger.error('HttpClient get request error for----- ' + error.message);

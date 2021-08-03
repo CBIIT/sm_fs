@@ -1,4 +1,4 @@
-export const ConversionMechanismData = [
+export const ConversionActivityCodeData = [
   {id: '-1', text: ''},
   {id: 'No Change', text: 'No Change'},
   {id: 'UH3', text: 'UH3'},
@@ -7,4 +7,4 @@ export const ConversionMechanismData = [
   {id: 'R33', text: 'R33'},
 ];
 
-export const ConversionMechanisms = ['UH3', 'K00', 'R00', 'R33'];
+export const ConversionActivityCodes = ['UH3', 'K00', 'R00', 'R33'];
