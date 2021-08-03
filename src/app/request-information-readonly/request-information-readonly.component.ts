@@ -12,40 +12,48 @@ import { FundingRequestTypes } from '../model/request/funding-request-types';
 export class RequestInformationReadonlyComponent implements OnInit {
 
   loaMap: any;
-  constructor(private requestModel: RequestModel) { }
+
+  constructor(private requestModel: RequestModel) {
+  }
 
   otherDocs: string[];
   isSkip: boolean;
   type4Request: boolean;
   diversityRequest: boolean;
-  newInvestigator: boolean;
+  newInvestigator: string;
   supplementType: string;
   skipRequests: FundingRequestSkipDto[];
 
   ngOnInit(): void {
     this.loaMap = new Map<string, string>()
-    .set('PD', 'Program Director')
-    .set('DD', 'NCI Director')
-    .set('SPL', 'Scientific Program Leaders Committee')
-    .set('DAO', 'Division/Office/Center Approver');
+      .set('PD', 'Program Director')
+      .set('DD', 'NCI Director')
+      .set('SPL', 'Scientific Program Leaders Committee')
+      .set('DAO', 'Division/Office/Center Approver');
 
     if (this.requestModel.requestDto.financialInfoDto.otherDocText) {
       this.otherDocs = this.requestModel.requestDto.financialInfoDto.otherDocText.split(',');
     }
     this.isSkip = this.requestModel.isSkip();
     this.type4Request = this.requestModel.requestDto?.financialInfoDto?.requestTypeId
-                        === FundingRequestTypes.PAY_TYPE_4;
+      === FundingRequestTypes.PAY_TYPE_4;
     this.diversityRequest = this.requestModel.requestDto?.financialInfoDto?.requestTypeId
-                            === FundingRequestTypes.DIVERSITY_SUPPLEMENT_INCLUDES_CURE_SUPPLEMENTS;
+      === FundingRequestTypes.DIVERSITY_SUPPLEMENT_INCLUDES_CURE_SUPPLEMENTS;
     if (this.diversityRequest) {
-      if (this.requestModel.requestDto?.financialInfoDto?.supplementType === '1') {
+      if (this.requestModel.requestDto?.financialInfoDto?.suppNewFlag === 'Y') {
         this.supplementType = 'New';
-      }
-      else if (this.requestModel.requestDto?.financialInfoDto?.supplementType === '2') {
+      } else if (this.requestModel.requestDto?.financialInfoDto?.suppAddYearFlag === 'Y') {
         this.supplementType = 'Additional Year (Extension)';
       }
     }
 
+    this.newInvestigator = this.requestModel.requestDto.financialInfoDto.newInvestigatorFlag;
+    if (this.newInvestigator === 'true' || this.newInvestigator === 'Y') {
+      this.newInvestigator = 'Yes';
+    }
+    else {
+      this.newInvestigator = 'No';
+    }
     if (this.isSkip) {
       this.skipRequests = this.requestModel.requestDto.skipRequests;
     }

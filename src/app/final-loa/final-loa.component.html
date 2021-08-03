@@ -10,8 +10,14 @@
         name="finalLoa"
         #finalLoa="ngModel"
         [data]="data"
-        [(ngModel)]="selectedValue">
+        [(ngModel)]="selectedValue"
+        required>
       </ng-select2>
+      <div
+        class="text-danger mt-1"
+        *ngIf="finalLoa.errors?.required && (finalLoa.touched || parentForm?.submitted)">
+        Final scientific level of authority is required
+      </div>
     </div>
   </div>
 </div>

@@ -40,6 +40,13 @@ export class RetrieveRequestComponent implements OnInit {
             this.requestModel.mainApproverCreated = true;
             this.requestModel.captureApproverCriteria();
           }
+          this.requestModel.requestDto.financialInfoDto.suppAddYearFlag = this.requestModel.requestDto.divSuppAddYearFlag;
+          this.requestModel.requestDto.financialInfoDto.suppNewFlag = this.requestModel.requestDto.divSuppNewFlag;
+          if (this.requestModel.requestDto.divSuppAddYearFlag === 'Y') {
+            this.requestModel.supplementType = '2';
+          } else if (this.requestModel.requestDto.divSuppNewFlag === 'Y') {
+            this.requestModel.supplementType = '1';
+          }
 
           // TODO: We don't seem to be storing conversion mechanism anywhere, so this will most likely always be null
           const conversionMech = ConversionMechanisms.includes(this.requestModel.conversionMechanism)
