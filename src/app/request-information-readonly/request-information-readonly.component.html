@@ -68,7 +68,7 @@
     </div>
   </div>
 
-  <div class="col-md-6 col-lg-4" *ngIf="!isSkip && otherDocs">
+  <div class="col-md-6 col-lg-3" *ngIf="!isSkip && otherDocs">
     <div class="form-group">
       <p class="like-label">Other DOC(s) Contributing Funds</p>
       <p><a *ngFor="let doc of otherDocs; let i = index " [routerLink]=""
@@ -79,28 +79,28 @@
     </div>
   </div>
 
-  <div class="col-md-6 col-lg-4" *ngIf="!isSkip && type4Request ">
+  <div class="col-md-6 col-lg-3" *ngIf="!isSkip && type4Request ">
     <div class="form-group">
       <p class="like-label">Conversion Grant Activity Code/Mechanism</p>
       <p>{{model.requestDto.conversionActivityCode}}</p>
     </div>
   </div>
 
-  <div class="col-md-6 col-lg-4" *ngIf="!isSkip && diversityRequest">
+  <div class="col-md-6 col-lg-3" *ngIf="!isSkip && diversityRequest">
     <div class="form-group">
       <p class="like-label">Type of Supplement</p>
       <p>{{supplementType}}</p>
     </div>
   </div>
 
-  <div class="col-md-6 col-lg-4" *ngIf="!isSkip && newInvestigator">
+  <div class="col-md-6 col-lg-3" *ngIf="!isSkip && newInvestigator">
     <div class="form-group">
       <p class="like-label">New Investigator Application</p>
-      <p>{{'TBD'}}</p>
+      <p>{{newInvestigator}}</p>
     </div>
   </div>
 
-  <div class="col-md-6 col-lg-4" *ngIf="isSkip">
+  <div class="col-md-6 col-lg-3" *ngIf="isSkip">
     <div class="form-group">
       <p class="like-label">Skipped Request(s)</p>
       <p *ngFor="let sreq of skipRequests">{{sreq.skipFrqId}} {{sreq.skipFullGrantNum}} {{sreq.skipRequestCurrentStatus}}</p>

@@ -827,13 +827,21 @@ export class Step3Component implements OnInit {
     if (this.validate()) {
       this.documentsControllerService.loadDocumentsBySortOrderUsingGET(this.requestModel.requestDto.frqId).subscribe(
         result => {
+          this.documentsControllerService.loadExcludedDocumentsUsingGET(this.requestModel.requestDto.frqId).subscribe(
+            result => {
+              this.requestModel.requestDto.excludedDocs = result;
+              this.router.navigate(['/request/step4']);
+            }, error => {
+              this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
+            }
+          );
           this.requestModel.requestDto.includedDocs = result;
-          this.logger.debug('Docs retrieved by doc order: ', result);
-          this.router.navigate(['/request/step4']);
         }, error => {
           this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
         }
       );
+
+
     } else {
       this.showValidations = true;
     }
