@@ -20,7 +20,7 @@ export class RequestInformationReadonlyComponent implements OnInit {
   isSkip: boolean;
   type4Request: boolean;
   diversityRequest: boolean;
-  newInvestigator: boolean;
+  newInvestigator: string;
   supplementType: string;
   skipRequests: FundingRequestSkipDto[];
 
@@ -47,6 +47,13 @@ export class RequestInformationReadonlyComponent implements OnInit {
       }
     }
 
+    this.newInvestigator = this.requestModel.requestDto.financialInfoDto.newInvestigatorFlag;
+    if (this.newInvestigator === 'true' || this.newInvestigator === 'Y') {
+      this.newInvestigator = 'Yes';
+    }
+    else {
+      this.newInvestigator = 'No';
+    }
     if (this.isSkip) {
       this.skipRequests = this.requestModel.requestDto.skipRequests;
     }
