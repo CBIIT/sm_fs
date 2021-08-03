@@ -107,8 +107,6 @@ export class RequestInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.debug(this.appUserSessionService.isMbOnly);
-    this.logger.debug(this.requestModel.isMbOnly());
     this.isMbOnly = this.appUserSessionService.isMbOnly && this.requestModel.isMbOnly();
     if (this.isMbOnly) {
       this.pdCayCodes = ['MB'];

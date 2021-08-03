@@ -97,23 +97,28 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   templateResult(state: Select2OptionData): JQuery | string {
+    this.logger.debug('templateResult', state);
     if (!state.id) {
       return state.text;
     }
     if (state.additional?.nestedChild) {
-      // this.logger.debug('nested child', state);
+      const rest = $('<span class="lvl3">').text('' + state.text);
+      this.logger.debug(rest.clone().wrap('<div>').parent().html());
+      return rest;
     }
     if (state.additional.nestedParent) {
-      // this.logger.debug('nested parent', state);
+      const rest = $('<span class="lvl2 parent">').text('' + state.text);
+      this.logger.debug(rest.clone().wrap('<div>').parent().html());
+      return rest;
     }
     return state.text;
   }
 
   templateSelection(state: Select2OptionData): JQuery | string {
+    this.logger.debug('templateSelection', state);
     if (!state.id) {
       return state.text;
     }
-
     return state.text;
   }
 
@@ -165,7 +170,7 @@ export class FundingRequestTypeComponent implements OnInit {
         r.children = c;
       }
       if (intermediateParents.includes(Number(r.id))) {
-        r.additional.nestedChild = true;
+        // r.additional.nestedChild = true;
         r.additional.nestedParent = true;
         children.get(Number(r.id))?.forEach(ch => {
           ch.additional.nestedChild = true;
