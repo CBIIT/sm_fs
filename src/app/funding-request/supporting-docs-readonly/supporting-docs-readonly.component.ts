@@ -30,7 +30,9 @@ export class SupportingDocsReadonlyComponent implements OnInit {
   justificationType = '';
   justificationText = '';
   docDtos: DocumentsDto[];
+  excludedDocDtos: DocumentsDto[];
   displayTansitionMemo: boolean = false;
+  isSummaryIncluded = false;
 
   constructor(private documentService: DocumentService,
     private logger: NGXLogger,
@@ -43,6 +45,14 @@ export class SupportingDocsReadonlyComponent implements OnInit {
     this.justificationType = this.parent.justificationType;
     this.justificationText = this.parent.justificationText;
     this.docDtos = this.parent.docDtos;
+    this.excludedDocDtos = this.parent.excludedDocDtos;
+
+    for (const doc of this.docDtos) {
+      if (doc.docType === 'Summary Statement') {
+        this.isSummaryIncluded = true;
+        break;
+      }
+    }
 
     if (this.requestModel.requestDto.requestType === 'Pay Type 4' ||
     (this.requestModel.conversionMechanism && this.requestModel.conversionMechanism !== null)) {
