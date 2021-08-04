@@ -21,6 +21,7 @@ export class RequestInformationReadonlyComponent implements OnInit {
   type4Request: boolean;
   diversityRequest: boolean;
   newInvestigator: string;
+  showNewInvestigator: boolean;
   supplementType: string;
   skipRequests: FundingRequestSkipDto[];
 
@@ -47,12 +48,17 @@ export class RequestInformationReadonlyComponent implements OnInit {
       }
     }
 
+    this.showNewInvestigator = this.requestModel.grant.activityCode === 'R01'
+                               && ([1, 2].includes(Number(this.requestModel.grant.applTypeCode)));
     this.newInvestigator = this.requestModel.requestDto.financialInfoDto.newInvestigatorFlag;
     if (this.newInvestigator === 'true' || this.newInvestigator === 'Y') {
       this.newInvestigator = 'Yes';
     }
-    else {
+    else if (this.newInvestigator === 'false' || this.newInvestigator === 'N') {
       this.newInvestigator = 'No';
+    }
+    else {
+      this.newInvestigator = '';
     }
     if (this.isSkip) {
       this.skipRequests = this.requestModel.requestDto.skipRequests;
