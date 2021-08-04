@@ -46,7 +46,6 @@ export class FundingRequestTypeComponent implements OnInit {
   set selectedValue(value: number) {
     if (value && Number(value) === FundingRequestTypes.OTHER_PAY_COMPETING_ONLY) {
       this.alerts = [this.alert];
-      // alert('WARNING: This option should be selected only if your request will not be using any NCI funds. Are you sure you want to continue?');
     } else {
       this.alerts = [];
     }
@@ -97,17 +96,16 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   templateResult(state: Select2OptionData): JQuery | string {
-    this.logger.debug('templateResult', state);
     if (!state.id) {
       return state.text;
     }
     if (state.additional?.nestedChild) {
-      const rest = $('<span class="lvl3">').text('' + state.text);
+      const rest = $('<span class="lvl3" style="padding-left:2em;">').text(state.text);
       this.logger.debug(rest.clone().wrap('<div>').parent().html());
       return rest;
     }
     if (state.additional.nestedParent) {
-      const rest = $('<span class="lvl2 parent">').text('' + state.text);
+      const rest = $('<span class="lvl2 parent" style="padding-left:1em;">').text(state.text);
       this.logger.debug(rest.clone().wrap('<div>').parent().html());
       return rest;
     }
@@ -123,12 +121,16 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   prepareData(list: FundingRequestTypeRulesDto[]): void {
+    this.logger.debug('before');
+    this.logger.debug(list);
     list.sort((r1, r2) => {
       if (Number(r1.parentFrtId) === Number(r2.parentFrtId)) {
         return Number(r1.id) - Number(r2.id);
       }
       return Number(r1.parentFrtId) - Number(r2.parentFrtId);
     });
+    this.logger.debug('after');
+    this.logger.debug(list);
     const allParents = new Array<Select2OptionData>();
     const intermediateParents = new Array<number>();
     const children = new Map<number, Select2OptionData[]>();
@@ -163,6 +165,8 @@ export class FundingRequestTypeComponent implements OnInit {
     });
 
     this.data = new Array<Select2OptionData>();
+    this.logger.debug('all parent options (optgroups)');
+    this.logger.debug(allParents);
 
     allParents.forEach(r => {
       const c = children.get(Number(r.id));
