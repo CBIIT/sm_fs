@@ -12,7 +12,7 @@ import { FundingRequestErrorCodes } from './funding-request-error-codes';
 import { NGXLogger } from 'ngx-logger';
 import { ProgramRecommendedCostsModel } from '../../program-recommended-costs/program-recommended-costs-model';
 import { FundingSourceTypes } from './funding-source-types';
-import { FundingRequestTypes, INITIAL_PAY_TYPES } from './funding-request-types';
+import { FundingRequestTypes, INITIAL_PAY_TYPES, SKIP_TYPES } from './funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
 import { PrcDataPoint } from '../../program-recommended-costs/prc-data-point';
 import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
@@ -369,7 +369,7 @@ export class RequestModel {
   }
 
   isSkip(): boolean {
-    return [FundingRequestTypes.SKIP, FundingRequestTypes.SKIP__NCI_RFA].includes(Number(this.requestDto.frtId));
+    return SKIP_TYPES.includes(Number(this.requestDto.frtId));
   }
 
   isMoonshot(): boolean {

@@ -1,4 +1,4 @@
-import {FundingSourceTypes} from './funding-source-types';
+import { FundingSourceTypes } from './funding-source-types';
 
 export enum FundingRequestTypes {
   PAY_BY_EXCEPTION = 2,
@@ -84,6 +84,11 @@ export enum FundingRequestTypes {
   FUNDING_PLAN__NOT_SELECTABLE_FOR_FUNDING_PLAN = 1028,
   PAY_TYPE_4 = 1029
 }
+
+export const SKIP_TYPES = [
+  FundingRequestTypes.SKIP,
+  FundingRequestTypes.SKIP__NCI_RFA
+];
 
 // NOTE: we might not need to track all of these, just the parent type.
 export const INITIAL_PAY_TYPES = [
