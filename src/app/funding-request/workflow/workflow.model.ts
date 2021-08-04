@@ -112,6 +112,7 @@ export class WorkflowModel {
     this.lastInChain = false;
     this.isScientificApprover = false;
     this.approvedScientifically = false;
+    this.isFinancialApprover = false;
     this.isGMApprover = false;
     this.approvedByGM = false;
     this.approvedByFC = false;
@@ -193,6 +194,7 @@ export class WorkflowModel {
         if (this.approvedByGM && this.approvedScientifically && this.approvedByFC && this.approvedByDoc) {
           break;
         }
+        
       }
     }
 
