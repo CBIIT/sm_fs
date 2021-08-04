@@ -56,8 +56,6 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   public _docDto: DocumentsDto = {};
   maxFileSize = 10485760; // 10MB
   budgetDocDtos: Observable<DocumentsDto[]>;
-  budgetInfoReadOnly = false;
-
 
   get selectedDocType(): string {
     return this._selectedDocType;
@@ -88,9 +86,10 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   ngOnInit(): void {
 
     this.loadFiles();
-    if (!this.workflowModel.getWorkflowList() || this.workflowModel.getWorkflowList().length === 0) {
-      this.budgetInfoReadOnly = true;
-    }
+  }
+
+  get budgetInfoReadOnly() : boolean {
+    return !this.workflowModel.isFinancialApprover;
   }
 
   loadFiles(): void {
