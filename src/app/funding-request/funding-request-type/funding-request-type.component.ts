@@ -113,7 +113,6 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   templateSelection(state: Select2OptionData): JQuery | string {
-    this.logger.debug('templateSelection', state);
     if (!state.id) {
       return state.text;
     }

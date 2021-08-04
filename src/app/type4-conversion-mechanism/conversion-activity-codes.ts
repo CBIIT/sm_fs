@@ -1,6 +1,5 @@
 export const ConversionActivityCodeData = [
-  {id: '-1', text: ''},
-  {id: 'No Change', text: 'No Change'},
+  {id: 'NC', text: 'No Change'},
   {id: 'UH3', text: 'UH3'},
   {id: 'K00', text: 'K00'},
   {id: 'R00', text: 'R00'},
