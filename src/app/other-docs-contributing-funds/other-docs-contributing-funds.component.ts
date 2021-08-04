@@ -26,7 +26,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   private _selectedValue: string;
   private pdDoc: string;
 
-  public docs: Array<DocData> = new Array<DocData>();
+  public docs: Array<DocData> = new Array<DocData>()
   public options: Options;
 
   @Input() label = 'Division/Office/Center (DOC)';
@@ -52,7 +52,6 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   }
 
   private updateRequestModel(): void {
-    // TODO: Figure out which of these to use
     this.requestModel.requestDto.otherDocsText = this._selectedValue;
     this.requestModel.requestDto.financialInfoDto.otherDocText = this._selectedValue;
     if (this._selectedValue) {
@@ -74,7 +73,6 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   ngOnInit(): void {
     this.initializeDocs();
     this.pdCaIntegratorSvc.docEmitter.subscribe(next => {
-      this.logger.debug('New DOC to ignore:', next);
       if (next) {
         this.pdDoc = next;
         if (this.selectedDocsArr.map(d => d.abbreviation).includes(next)) {
@@ -125,7 +123,6 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
 
   deselect(abbreviation: string): void {
-    this.logger.debug('remove', abbreviation);
     this.docs.forEach(d => {
       if (d.abbreviation === abbreviation) {
         d.selected = false;
