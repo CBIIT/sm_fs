@@ -30,7 +30,6 @@ export class FinalLoaComponent implements OnInit {
 
   constructor(private _model: RequestModel) {
     this.data = [];
-    this.data.push({ id: '-1', text: '' });
     this.data.push({ id: '1', text: 'Program Director' });
     this.data.push({ id: '2', text: 'DOC Director' });
     this.data.push({ id: '3', text: 'NCI Director' });
