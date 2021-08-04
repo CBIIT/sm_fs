@@ -23,16 +23,24 @@ export class ProgramRecommendedCostsModel {
 
   deletedSources: number[] = [];
 
-  reset(): void {
-    // this.logger.warn('Resetting program recommended costs model');
+  // TODO - revisit this.
+  // When the user changes PD or some other trigger value, we reset the PRC model. However, we can't just clear the
+  // set of sources, we have to actively delete anything that's already been saved.
+  reset(saved: boolean): void {
     this.prcLineItems = new Map<number, PrcDataPoint[]>();
+    if (!saved) {
+      this.deletedSources = [];
+    } else {
+      this._selectedFundingSourceIds?.forEach(n => {
+        this.deletedSources.push(n);
+      });
+    }
     this._selectedFundingSourceIds = new Set<number>();
     this._selectedFundingSources = new Array<FundingRequestFundsSrcDto>();
-    this.deletedSources = [];
   }
 
-  deepReset(): void {
-    this.reset();
+  deepReset(saved: boolean): void {
+    this.reset(saved);
     this.fundingRequestType = undefined;
     this._fundingSources = new Array<FundingRequestFundsSrcDto>();
     this._fundingSourcesMap = new Map<number, FundingRequestFundsSrcDto>();

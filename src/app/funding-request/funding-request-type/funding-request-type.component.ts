@@ -61,7 +61,7 @@ export class FundingRequestTypeComponent implements OnInit {
     this.model.requestDto.financialInfoDto.requestTypeId = value;
     this.model.programRecommendedCostsModel.fundingRequestType = value;
     if (valueChanged) {
-      this.model.programRecommendedCostsModel.reset();
+      this.model.programRecommendedCostsModel.reset(this.model.requestDto.frqId ? true : false);
     }
   }
 

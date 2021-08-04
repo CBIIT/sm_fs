@@ -113,8 +113,6 @@ export class RequestModel {
 
 
   set grant(value: NciPfrGrantQueryDto) {
-    // TODO: map appropriate values from grant to requestDto
-    // TODO: remove duplication of values across various DTOs
     this._requestDto.applId = value.applId;
     if (!this._requestDto.financialInfoDto) {
       this._requestDto.financialInfoDto = {} as FinancialInfoDtoReq;
@@ -178,8 +176,6 @@ export class RequestModel {
       errors.push(FundingRequestErrorCodes.REQUEST_CAY_CODE_REQUIRED);
     }
 
-    // TODO: Double check this logic.  We probably only need one of these to be set.
-    // NOTE: pdNpnId is the PD on the underlying grant; requestorNpnId is the one chosen in step 2,
     if (!this.requestDto.pdNpnId || !this.requestDto.financialInfoDto.requestorNpnId) {
       errors.push(FundingRequestErrorCodes.REQUEST_PD_REQUIRED);
     }
@@ -196,13 +192,11 @@ export class RequestModel {
   }
 
   canSubmit(): boolean {
-    // TODO: implement validation rules here
     return true;
   }
 
 
   reset(): void {
-    // this.logger.warn('About to reset the request model');
     this.title = 'New Request';
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
@@ -210,7 +204,7 @@ export class RequestModel {
     this._grant = undefined;
     this.mainApproverCreated = false;
     this.pendingAlerts = [];
-    this.programRecommendedCostsModel.deepReset();
+    this.programRecommendedCostsModel.deepReset(this.requestDto.frqId ? true : false);
     this.requestCans = undefined;
   }
 

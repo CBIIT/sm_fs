@@ -26,7 +26,7 @@ export class AuthGuard implements CanActivate {
             if (creds) {
               if (this.hasValidAuthority(creds.authorities)) {
                 this.requestModel?.reset();
-                this.requestModel?.programRecommendedCostsModel?.deepReset();
+                this.requestModel?.programRecommendedCostsModel?.deepReset(false);
                 resolve(true);
               } else {
                 this.router.navigate(['/unauthorize']);
