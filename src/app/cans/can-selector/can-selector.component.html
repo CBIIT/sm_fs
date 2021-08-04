@@ -21,7 +21,9 @@
 </ng-template>
 
 <ng-template #read_only>
-  <a [routerLink]="" [ngbTooltip]="canTooltip" triggers="click:blur">{{ selectedCanData?.can }}</a> | {{ selectedCanData?.canDescrip }}
+  <span *ngIf="selectedCanData?.can">
+    <a [routerLink]="" [ngbTooltip]="canTooltip" triggers="click:blur">{{ selectedCanData?.can }}</a> | {{ selectedCanData?.canDescrip }}
+  </span>
 </ng-template>
 
 
