@@ -33,7 +33,6 @@ export class CreateTypeComponent implements OnInit {
 
   ngOnInit(): void {
     this.data = [
-      { id: '', text: '' },
       { id: 'Pre-Appl', text: 'Pre-Appl' },
       /*{ id: '2', text: 'Rollup' }*/
     ];

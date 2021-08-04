@@ -11,14 +11,13 @@ import {
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { Subscription } from 'rxjs';
-import { DocumentService } from '../../service/document.service';
 import { NGXLogger } from 'ngx-logger';
 import { WorkflowModalComponent } from '../workflow-modal/workflow-modal.component';
 import { WorkflowActionCode, WorkflowModel } from '../workflow/workflow.model';
 import { WorkflowComponent } from '../workflow/workflow.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UploadBudgetDocumentsComponent } from '../../upload-budget-documents/upload-budget-documents.component';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
+import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 
 @Component({
   selector: 'app-step4',
@@ -32,11 +31,12 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
   @ViewChild(WorkflowComponent) workflowComponent: WorkflowComponent;
   @ViewChild(UploadBudgetDocumentsComponent) uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
+  @ViewChild(BudgetInfoComponent) budgetInfoComponent: BudgetInfoComponent;
 
-  statusesCanWithdraw = [ 'SUBMITTED', 'ON HOLD', 'APPROVED', 'AWC', 'DEFER',
-                          'RELEASED', 'DELEGATED', 'ROUTED', 'REASSIGNED'];
-  statusesCanOnHold =   [ 'SUBMITTED', 'APPROVED', 'AWC', 'DEFER',
-                          'RELEASED', 'DELEGATED', 'ROUTED', 'REASSIGNED'];
+  statusesCanWithdraw = ['SUBMITTED', 'ON HOLD', 'APPROVED', 'AWC', 'DEFER',
+    'RELEASED', 'DELEGATED', 'ROUTED', 'REASSIGNED'];
+  statusesCanOnHold = ['SUBMITTED', 'APPROVED', 'AWC', 'DEFER',
+    'RELEASED', 'DELEGATED', 'ROUTED', 'REASSIGNED'];
   statusesCanEditSubmit = ['DRAFT', 'WITHDRAWN', 'RFC'];
   terminalStatus = ['COMPLETED', 'REJECTED'];
 
@@ -92,8 +92,8 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   ngAfterViewInit(): void {
     this.submitResultElement.nativeElement.scrollIntoView();
 
-    if (this.uploadBudgetDocumentsComponent?.budgetInfoComponent && this.workflowComponent) {
-      this.workflowComponent.budgetInfoComponent = this.uploadBudgetDocumentsComponent.budgetInfoComponent;
+    if (this.budgetInfoComponent && this.workflowComponent) {
+      this.workflowComponent.budgetInfoComponent = this.budgetInfoComponent;
     }
   }
 
@@ -283,9 +283,9 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
         // this.submissionResult = { status: 'success', frqId: dto.frqId, approver: nextApproverInChain };
         this.workflowModel.initialize();
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
- //       this.submitResultElement.nativeElement.scrollIntoView();
+        //       this.submitResultElement.nativeElement.scrollIntoView();
         this.readonly = true;
- //       this.requestModel.disableStepLinks();
+        //       this.requestModel.disableStepLinks();
       },
       (error) => {
         this.logger.error('Failed when calling submitRequestUsingPOST', error);
@@ -320,21 +320,21 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     if (!this.statusesCanWithdraw.includes(this.requestStatus)) {
       return false;
     }
-    return  (this.userCanSubmit && !this.workflowModel.approvedByFC) ||
-            (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc);
+    return (this.userCanSubmit && !this.workflowModel.approvedByFC) ||
+      (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc);
   }
 
   putOnHoldVisible(): boolean {
     if (!this.statusesCanOnHold.includes(this.requestStatus)) {
       return false;
     }
-    return  (this.userCanSubmit && !this.workflowModel.approvedByFC) ||
-            (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc);
+    return (this.userCanSubmit && !this.workflowModel.approvedByFC) ||
+      (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc);
   }
 
   releaseFromHoldVisible(): boolean {
     return (this.requestStatus === 'ON HOLD' &&
-           (this.userCanSubmit || this.workflowModel.isDocApprover));
+      (this.userCanSubmit || this.workflowModel.isDocApprover));
   }
 
   submitVisible(): boolean {
@@ -351,7 +351,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
   submitApprove(): boolean {
     return this.userCanSubmitApprove &&
- //     this.requestStatus === 'DRAFT' &&
+      //     this.requestStatus === 'DRAFT' &&
       !this.workflowModel.hasNewApprover;
   }
 
@@ -457,4 +457,16 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
+  budgetInfoReadOnly(): boolean {
+    // if the user is a financial approver and can take a workflow action, budget info is editable.
+    // otherwise, it is not editable.
+    if (this.workflowModel.isFinancialApprover && this.workflowModel.getWorkflowList()?.length !== 0) {
+      return false;
+    }
+    return true;
+  }
+
+  showBudgetInfo(): boolean {
+    return this.workflowModel.isFinancialApprover || this.workflowModel.approvedByFC;
+  }
 }

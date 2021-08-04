@@ -16,6 +16,7 @@
 <!-- END Supporting Docs -->
 
 <hr>
+<app-budget-info [hidden]="!showBudgetInfo()" [readOnly]="budgetInfoReadOnly()" [editing]="!budgetInfoReadOnly()"></app-budget-info>
 <app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar" [workflowName]="workFlowAction"></app-upload-budget-documents>
 <app-budget-docs-readonly [hidden]="isDisplayBudgetDocsUploadVar || !displayReadOnlyBudgetDocs" [parent]="self"></app-budget-docs-readonly>
 <app-workflow (actionEmitter)="actionType($event)" [readonly]="!submitVisible() || !submitEnabled() "></app-workflow>
@@ -34,9 +35,9 @@
     </span>
     <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('WITHDRAW')"
       *ngIf="withdrawVisible()">Withdraw</button>
-    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('HOLD')" 
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('HOLD')"
       *ngIf="putOnHoldVisible()">Hold</button>
-    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('RELEASE')" 
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('RELEASE')"
       *ngIf="releaseFromHoldVisible()">Release Hold</button>
   </div>
 </div>

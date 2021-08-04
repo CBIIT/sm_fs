@@ -7,8 +7,6 @@ import { HttpResponse } from '@angular/common/http';
 import { saveAs } from 'file-saver';
 import { NGXLogger } from 'ngx-logger';
 import { BudgetInfoComponent } from '../cans/budget-info/budget-info.component';
-import { Step4Component } from '../funding-request/step4/step4.component';
-import { WorkflowComponent } from '../funding-request/workflow/workflow.component';
 import { WorkflowModel } from '../funding-request/workflow/workflow.model';
 
 @Component({
@@ -25,7 +23,6 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   labelImport: ElementRef;
 
   @ViewChild(BudgetInfoComponent) budgetInfoComponent: BudgetInfoComponent;
-
 
   _workflowName: string = '';
   disableDocType: boolean = true;

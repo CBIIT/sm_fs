@@ -7,7 +7,7 @@
 
     <ng-select2
       id="create_type"
-      [allowClear]="false"
+      [allowClear]="true"
       [data]="data"
       [(ngModel)]="selectedValue">
     </ng-select2>
@@ -15,5 +15,5 @@
 </ng-template>
 
 <ng-template #read_only>
-  <div class="form-group"><p>Create Type: {{requestModel.createType}}</p></div>
+  <div *ngIf="requestModel.createType" class="form-group"><p>Create Type: {{requestModel.createType}}</p></div>
 </ng-template>
