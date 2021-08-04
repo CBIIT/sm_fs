@@ -85,6 +85,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.logger.debug(JSON.stringify(this.requestModel.programRecommendedCostsModel));
     this.lineItem = [];
     this.initialPay = INITIAL_PAY_TYPES.includes(Number(this.requestModel.requestDto.frtId));
     if (this.initialPay) {
@@ -97,15 +98,12 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     this.loadApplAwardPeriods();
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
-      this.logger.debug('new selected source:', selection);
       this.selectedSourceId = selection;
     });
   }
 
 
   private loadApplAwardPeriods(): void {
-    // this.logger.debug('loadApplAwardPeriods(', this.requestModel.grant.applId, ')');
-    // if (!this.requestModel.programRecommendedCostsModel.grantAwarded) {
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.programRecommendedCostsModel.grantAwarded = result;
       }, error => {

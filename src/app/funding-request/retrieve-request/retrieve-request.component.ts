@@ -48,7 +48,6 @@ export class RetrieveRequestComponent implements OnInit {
             this.requestModel.supplementType = '1';
           }
 
-          // TODO: We don't seem to be storing conversion mechanism anywhere, so this will most likely always be null
           const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
             ? this.requestModel.requestDto.conversionActivityCode : null;
 
@@ -58,6 +57,8 @@ export class RetrieveRequestComponent implements OnInit {
             this.requestModel.requestDto.requestorNpnId,
             this.requestModel.requestDto.requestorCayCode,
             conversionActivityCode).subscribe(result1 => {
+            this.logger.debug('fundingSources =>');
+            this.logger.debug(JSON.stringify(result1));
             this.requestModel.programRecommendedCostsModel.fundingSources = result1;
             this.requestModel.restoreLineItems();
           });
@@ -79,6 +80,8 @@ export class RetrieveRequestComponent implements OnInit {
           });
 
           this.requestModel.requestDto.financialInfoDto.fundingRequestId = this.requestModel.requestDto.frqId;
+          this.logger.debug('loaded request =>');
+          this.logger.debug(this.requestModel);
 
           this.router.navigate(['/request/step4']);
         },

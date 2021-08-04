@@ -257,17 +257,17 @@ export class RequestModel {
    *
    */
   restoreLineItems(): boolean {
-    // this.logger.info('restoring budget line items');
+    this.logger.info('restoring budget line items');
     if (!this.requestDto.financialInfoDto.fundingReqBudgetsDtos) {
-      // this.logger.warn('Budgets are required');
+      this.logger.warn('Budgets are required');
       return false;
     }
     if (!this.programRecommendedCostsModel.fundingSources || !this.programRecommendedCostsModel.fundingSourcesMap) {
-      // this.logger.warn('Funding sources are required');
+      this.logger.warn('Funding sources are required');
       return false;
     }
     if (!this.programRecommendedCostsModel.grantAwarded) {
-      // this.logger.warn('Grant awards are required');
+      this.logger.warn('Grant awards are required');
       return false;
     }
 
@@ -297,6 +297,8 @@ export class RequestModel {
     });
 
     this.loadRequestCans();
+    this.logger.debug('model after restoration =>');
+    this.logger.debug(JSON.stringify(this.programRecommendedCostsModel));
     return true;
   }
 
