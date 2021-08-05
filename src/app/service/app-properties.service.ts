@@ -12,9 +12,9 @@ export class AppPropertiesService {
   private appName: string;
 
   constructor(private lookupService: LookupsControllerService,
-    @Inject(PROPERTIES_APP_NAME) appName: string,
-    @Inject(PROPERTIES_OVERRIDE) overrideProperties: any,
-    private logger: NGXLogger) {
+              @Inject(PROPERTIES_APP_NAME) appName: string,
+              @Inject(PROPERTIES_OVERRIDE) overrideProperties: any,
+              private logger: NGXLogger) {
     this.appName = appName;
     this.overrideProperties = overrideProperties;
   }

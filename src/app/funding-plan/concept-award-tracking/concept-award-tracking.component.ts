@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { PlanModel } from '../../model/plan/plan-model';
 
 @Component({
   selector: 'app-concept-award-tracking',
@@ -7,7 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ConceptAwardTrackingComponent implements OnInit {
 
-  constructor() { }
+  // TODO: See FundingPlanFoasVw.cptId
+
+  constructor(public planModel: PlanModel) {
+  }
 
   ngOnInit(): void {
   }

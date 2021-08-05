@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingPlanDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
 
 @Injectable({
@@ -8,11 +8,16 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 export class PlanModel {
   grantViewerUrl: string;
   eGrantsUrl: string;
+  catsConceptUrl: string;
   allGrants: NciPfrGrantQueryDto[] = [];
   selectedGrants: NciPfrGrantQueryDto[] = [];
   unselectedGrants: NciPfrGrantQueryDto[] = [];
   skippedGrants: NciPfrGrantQueryDto[] = [];
   exceptionGrants: NciPfrGrantQueryDto[] = [];
+
+  fundingPlanDto: FundingPlanDto;
+
+  // TODO: Generate FundingPlanDto and FundingPlanFoasDto
 
   title = 'New Funding Plan';
 
@@ -20,6 +25,7 @@ export class PlanModel {
   constructor(propertiesService: AppPropertiesService) {
     this.grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
+    this.catsConceptUrl = propertiesService.getProperty('CONCEPT_ID_URL');
 
   }
 
