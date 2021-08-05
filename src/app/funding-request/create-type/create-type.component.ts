@@ -25,7 +25,7 @@ export class CreateTypeComponent implements OnInit {
   set selectedValue(value: string) {
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
-    this.requestModel.createType = value;
+    this.requestModel.requestDto.oefiaCreateCode = value;
   }
 
   constructor(public requestModel: RequestModel, private logger: NGXLogger) {
