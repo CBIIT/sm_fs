@@ -77,7 +77,7 @@
         <table id="grantDt" #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
           </table>
 <!--          Renderer templates -->
-          <ng-template #fullGrantNumberRenderer let-data="adtData" let-eGrantsUrl="eGrantsUrl" let-grantViewerUrl="grantViewerUrl">
+          <ng-template #fullGrantNumberRenderer let-data="adtData">
             <app-full-grant-number-cell-renderer [data]="data" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl"></app-full-grant-number-cell-renderer>
           </ng-template>
           <ng-template #cancerActivityRenderer let-data="adtData">

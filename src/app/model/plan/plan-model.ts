@@ -22,4 +22,12 @@ export class PlanModel {
     this.eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
 
   }
+
+  reset(): void {
+    this.allGrants = [];
+    this.selectedGrants = [];
+    this.unselectedGrants = [];
+    this.skippedGrants = [];
+    this.exceptionGrants = [];
+  }
 }
