@@ -327,6 +327,7 @@ export class RequestModel {
 
   loadRequestCans(): void {
     if (this.requestCans && this.requestCans.length > 0) {
+      this.logger.debug('Request cans already loaded', this.requestCans);
       return;
     }
 

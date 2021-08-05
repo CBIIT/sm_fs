@@ -32,8 +32,8 @@ export class ProjectedCanComponent implements OnInit {
   }
 
   updateProjectedCan(oefiaType: number): void {
-    this.logger.debug('updateProjectedCan', oefiaType);
     const source = Number(this.fseId);
+    this.logger.debug('updateProjectedCan', this.index, this.fseId, oefiaType);
     if (!oefiaType) {
       return;
     }

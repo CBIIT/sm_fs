@@ -37,6 +37,7 @@ export class OefiaTypesComponent implements OnInit {
     } else {
       this.selectedOefiaType = null;
     }
+    this.logger.debug('emitting new value', value);
     this.selectedValueChange.emit(value);
     this.canService.oefiaTypeEmitter.next({ index: this.index, value });
   }
@@ -52,11 +53,11 @@ export class OefiaTypesComponent implements OnInit {
       result.forEach(c => {
         this.data.push({ id: String(c.id), text: c.category });
       });
-      if (this.octId) {
-        this.selectedValue = this.octId;
-      } else if (this._selectedValue) {
-        this.selectedValue = this._selectedValue;
-      }
+      // if (this.octId) {
+      //   this.selectedValue = this.octId;
+      // } else if (this._selectedValue) {
+      //   this.selectedValue = this._selectedValue;
+      // }
     });
   }
 }

@@ -107,7 +107,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.programRecommendedCostsModel.grantAwarded = result;
       }, error => {
-        // TODO: properly handle errors here
         this.logger.error('HttpClient get request error for----- ' + error.message);
       }
     );
@@ -127,12 +126,10 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   showPiCosts(): boolean {
-    // TODO: the display will need to handle restoration of a future year
     return PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES.includes(Number(this.requestModel.requestDto.frtId));
   }
 
   showAwardedCosts(): boolean {
-    // TODO: the display will need to handle restoration of a future year
     return PRC_AWARDED_DIRECT_TOTAL_DISPLAY_TYPES.includes(Number(this.requestModel.requestDto.frtId));
   }
 
@@ -256,7 +253,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   displayFormat(): PRC_DISPLAY_FORMAT {
-    // TODO: Resolve display of Skip and Pay Type 4
     if (INITIAL_PAY_TYPES.includes(Number(this.requestModel.requestDto.frtId))) {
       return PRC_DISPLAY_FORMAT.INITIAL_PAY;
     } else if (Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.RESTORATION_OF_A_FUTURE_YEAR)) {

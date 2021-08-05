@@ -73,8 +73,6 @@ export class ProgramRecommendedCostsModel {
   set fundingSources(value: FundingRequestFundsSrcDto[]) {
     this._fundingSources = value;
     this._fundingSourcesMap = new Map(value.map(key => [key.fundingSourceId, key] as [number, FundingRequestFundsSrcDto]));
-    this.logger.debug('built funding source map =>');
-    this.logger.debug(JSON.stringify(this._fundingSourcesMap));
   }
 
   get fundingSourcesMap(): Map<number, FundingRequestFundsSrcDto> {
@@ -140,11 +138,14 @@ export class ProgramRecommendedCostsModel {
     const tmp = this.prcLineItems.get(Number(id));
     if (tmp?.length > this.grantAwarded.length) {
       this.logger.error('==========> more datapoints than grant years - data dump follows <==========');
+      this.logger.debug('tmp:', tmp.length, '> ga:', this.grantAwarded.length);
       this.logger.error('======> source id', id);
       this.logger.error('======> all sources');
       this.logger.error(JSON.stringify(this.selectedFundingSources));
       this.logger.error('======> line items map');
-      this.logger.error(JSON.stringify(this.prcLineItems));
+      this.prcLineItems.forEach((val, key) => {
+        this.logger.error(key, '::', val, '::', JSON.stringify(val));
+      });
       this.logger.error(JSON.stringify(tmp));
       this.logger.error('======> grant awards');
       this.logger.error(JSON.stringify(this.grantAwarded));

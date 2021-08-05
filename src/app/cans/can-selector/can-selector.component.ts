@@ -72,7 +72,7 @@ export class CanSelectorComponent implements OnInit {
         this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip, additional: r });
       });
       if (this.initialCAN) {
-        this.selectedValue = this.initialCAN.can;
+        // this.selectedValue = this.initialCAN.can;
         this._selectedCanData = {
           can: this.initialCAN.can,
           canDescrip: this.initialCAN.canDescription,

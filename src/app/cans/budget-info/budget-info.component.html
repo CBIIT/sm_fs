@@ -34,7 +34,7 @@
           <td>{{ can.approvedDc | currency }} {{can.approvedPctCut | percentToggle}}</td>
           <td>{{ can.approvedTc | currency }} {{can.approvedPctCut | percentToggle}}</td>
           <td [hidden]="!(isFinancialApprover() && isFcNci())">
-            <app-oefia-types [index]="i" [octId]="can.octId" [readonly]="true"></app-oefia-types>
+            <app-oefia-types [index]="i" [octId]="can.octId" [selectedValue]="can.octId" [readonly]="true"></app-oefia-types>
           </td>
           <td>
             <app-projected-can [index]="i" [fseId]="can.fseId" [octId]="can.octId"></app-projected-can>
