@@ -93,6 +93,7 @@ import { SubmissionAlertComponent } from './funding-request/workflow/submission-
 import { BudgetDocsReadonlyComponent } from './funding-request/budget-docs-readonly/budget-docs-readonly.component';
 import { CreateTypeComponent } from './funding-request/create-type/create-type.component';
 import { SelectGrantCheckboxCellRendererComponent } from './funding-plan/plan-step1/select-grant-checkbox-cell-renderer/select-grant-checkbox-cell-renderer.component';
+import { ConceptAwardTrackingComponent } from './funding-plan/concept-award-tracking/concept-award-tracking.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -195,6 +196,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     BudgetDocsReadonlyComponent,
     CreateTypeComponent,
     SelectGrantCheckboxCellRendererComponent,
+    ConceptAwardTrackingComponent,
   ],
 
 
