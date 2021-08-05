@@ -92,6 +92,7 @@ import { PercentTogglePipe } from './pipes/percent-toggle-pipe';
 import { SubmissionAlertComponent } from './funding-request/workflow/submission-alert/submission-alert.component';
 import { BudgetDocsReadonlyComponent } from './funding-request/budget-docs-readonly/budget-docs-readonly.component';
 import { CreateTypeComponent } from './funding-request/create-type/create-type.component';
+import { SelectGrantCheckboxCellRendererComponent } from './funding-plan/plan-step1/select-grant-checkbox-cell-renderer/select-grant-checkbox-cell-renderer.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -193,6 +194,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SubmissionAlertComponent,
     BudgetDocsReadonlyComponent,
     CreateTypeComponent,
+    SelectGrantCheckboxCellRendererComponent,
   ],
 
 

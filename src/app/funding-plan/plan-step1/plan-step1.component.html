@@ -90,7 +90,7 @@
 <div class="row">
   <div class="col-12 d-flex">
     <h2>Results</h2>
-    <button type="button" class="btn btn-primary ml-auto">Select Grants</button>
+    <button type="button" class="btn btn-primary ml-auto" (click)="selectGrants()">Select Grants</button>
   </div>
 </div>
 <div class="row">
@@ -98,6 +98,19 @@
     <p>No grants found to display.</p>
     <table id="grantDt" #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
     </table>
+    <!--          Renderer templates -->
+    <ng-template #selectGrantCheckboxRenderer let-data="adtData">
+      <app-select-grant-checkbox-cell-renderer [data]="data" (emitter)="onCaptureSelectedEvent($event)"></app-select-grant-checkbox-cell-renderer>
+    </ng-template>
+    <ng-template #fullGrantNumberRenderer let-data="adtData" >
+      <app-full-grant-number-cell-renderer [data]="data" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl"></app-full-grant-number-cell-renderer>
+    </ng-template>
+    <ng-template #cancerActivityRenderer let-data="adtData">
+      <app-cancer-activity-cell-renderer [data]="data"></app-cancer-activity-cell-renderer>
+    </ng-template>
+    <ng-template #existingRequestsRenderer let-data="adtData">
+      <app-existing-requests-cell-renderer [data]="data"></app-existing-requests-cell-renderer>
+    </ng-template>
   </div>
 </div>
 

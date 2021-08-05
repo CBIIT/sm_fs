@@ -1,13 +1,23 @@
 import {AfterViewInit, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import { Options } from 'select2';
 import {Select2OptionData} from "ng-select2";
-import {FsPlanControllerService, FundingPlanRfaPaDto} from '@nci-cbiit/i2ecws-lib';
+import {FsPlanControllerService, FundingPlanRfaPaDto, NciPfrGrantQueryDto, RfaPaNcabDate} from '@nci-cbiit/i2ecws-lib';
 import {NGXLogger} from "ngx-logger";
 import {FundingPlanNcabDto} from "@nci-cbiit/i2ecws-lib/model/fundingPlanNcabDto";
 import {Subject} from "rxjs";
 import {FullGrantNumberCellRendererComponent} from "../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component";
 import {CancerActivityCellRendererComponent} from "../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component";
 import {ExistingRequestsCellRendererComponent} from "../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component";
+import {PlanModel} from "../../model/plan/plan-model";
+import {FundingPlanGrantSearchCriteria} from "@nci-cbiit/i2ecws-lib/model/fundingPlanGrantSearchCriteria";
+import {GrantsSearchResultDatatableDto} from "@nci-cbiit/i2ecws-lib/model/grantsSearchResultDatatableDto";
+import {DataTableDirective} from "angular-datatables";
+import {SelectGrantCheckboxCellRendererComponent} from "./select-grant-checkbox-cell-renderer/select-grant-checkbox-cell-renderer.component";
+import {SelectGrantCheckboxEventType} from "./select-grant-checkbox-cell-renderer/select-grant-checkbox-event-type";
+
+interface NciPfrGrantQueryDtoEx extends NciPfrGrantQueryDto {
+  selected ?: boolean;
+}
 
 class NcabError {
   constructor(planId: number, ncab: string) {
@@ -25,14 +35,14 @@ class RfaPaEntry {
   selectedNcabDates: string[] | string = [];
   rfaPaNumber: string = '';
   availableNcabDates: Array<Select2OptionData> = [];
-  parent: FundingPlanGrantsSearchCriteria;
+  parent: FundingPlanGrantsSearchCriteriaUI;
   ncabErrors: Array<NcabError> = [];
   rfaErrDuplcated: boolean = false;
   rfaErrRequired: boolean = false;
   ncabErrRequired: boolean = false;
 
-  constructor(parent: FundingPlanGrantsSearchCriteria) {
-    // The callback comes from the parent FundingPlanGrantsSearchCriteria instance to update
+  constructor(parent: FundingPlanGrantsSearchCriteriaUI) {
+    // The callback comes from the parent FundingPlanGrantsSearchCriteriaUI instance to update
     // a list of available NCAB dates when Rfa Pa selection changed
     this.parent = parent;
     this.selectedNcabDates = [];
@@ -40,10 +50,18 @@ class RfaPaEntry {
     this.rfaPaNumber = '';
   }
 
+  getNcabDates(): Array<string> {
+    const ret = new Array<string>();
+    if (this.selectedNcabDates instanceof Array) {
+      for (const ncab of this.selectedNcabDates) {
+        ret.push(ncab);
+      }
+    }
+    return ret;
+  }
+
   onRfaPaChangeSelection($event: string | string[]): void {
     const id = this._getIndex();
-    console.log('On Change Selection value: ', $event)
-    console.log('On Change Selection id: ', id);
     const rfapa: string = ($event instanceof Array) ? $event[0] : $event;
     this.parent.onChangeRfaPaEntry(rfapa, id);
   }
@@ -91,7 +109,7 @@ class RfaPaEntry {
 /**
  * Data representation of search criteria view.
  */
-class FundingPlanGrantsSearchCriteria {
+class FundingPlanGrantsSearchCriteriaUI {
   rfaPaEntries: Array<RfaPaEntry> = [];
   ncabMap: Map<string, Array<Select2OptionData>>;
   activityCodesMap: Map<string, string>;
@@ -110,7 +128,6 @@ class FundingPlanGrantsSearchCriteria {
     entry.rfaErrRequired = false;
     entry.ncabErrRequired = false;
     if (this.ncabMap.has(rfaPa)) {
-      console.debug('getNcabDates() - found ncab list for ', rfaPa);
       entry.availableNcabDates = this.ncabMap.get(rfaPa);
     } else {
       entry.availableNcabDates = [];
@@ -205,17 +222,24 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
 
   constructor(
     private fsPlanControllerService: FsPlanControllerService,
+              private planModel: PlanModel,
               private logger: NGXLogger) { }
 
+  @ViewChild(DataTableDirective, {static: false}) dtElement: DataTableDirective;
+  @ViewChild('selectGrantCheckboxRenderer') selectGrantCheckboxRenderer: TemplateRef<SelectGrantCheckboxCellRendererComponent>;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
   @ViewChild('existingRequestsRenderer') existingRequestsRenderer: TemplateRef<ExistingRequestsCellRendererComponent>;
 
   ncab_options: Options;
-  searchCriteria: FundingPlanGrantsSearchCriteria;
+  searchCriteria: FundingPlanGrantsSearchCriteriaUI;
+
+  grantViewerUrl: string = this.planModel.grantViewerUrl;
+  eGrantsUrl: string = this.planModel.eGrantsUrl;
 
   dtTrigger: Subject<any> = new Subject();
   dtOptions: any = {};
+  dtData: Array<NciPfrGrantQueryDtoEx> = [];
 
   ngOnInit(): void {
     this.ncab_options = {
@@ -223,11 +247,11 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
       allowClear: false
     };
 
-    this.searchCriteria = new FundingPlanGrantsSearchCriteria();
-
+    this.searchCriteria = new FundingPlanGrantsSearchCriteriaUI();
+    this.logger.debug('About to subscribe to getRfaPaListUsingGET');
     this.fsPlanControllerService.getRfaPaListUsingGET().subscribe(
       (result: Array<FundingPlanRfaPaDto>) => {
-        console.debug('getRfaPaListUsingGET:', result);
+        this.logger.debug('getRfaPaListUsingGET:', result);
         const tmp: Array<Select2OptionData> = [];
         let index = 0;
         for (let entry of result) {
@@ -261,8 +285,6 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
     this.dtOptions = {
       pagingType: 'full_numbers',
       pageLength: 25,
-      serverSide: true,
-      processing: true,
       language: {
         paginate: {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
@@ -272,16 +294,9 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
         }
       },
 
-      ajax: (dataTablesParameters: any, callback) => {
-        callback({
-          recordTotal:0,
-          recordsFiltered: 0,
-          data: []
-        });
-      },
-
+      data: this.dtData,
       columns: [
-        {title: '', data: 'checkBox', className: 'all'}, //0
+        {title: 'Sel', data: 'selected', ngTemplateRef: { ref: this.selectGrantCheckboxRenderer}, className: 'all'}, //0
         {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'}, //1
         {title: 'PI', data: 'piFullName', render: ( data, type, row, meta ) => { //2
             return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
@@ -365,6 +380,16 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
     setTimeout(() => this.dtTrigger.next(), 0);
   }
 
+  onCaptureSelectedEvent(event: SelectGrantCheckboxEventType) {
+    this.logger.debug('onCaptureSelectedEvent', event);
+    for (let entry of this.dtData) {
+      if (entry.applId === event.applId) {
+        entry.selected = event.selected;
+        return;
+      }
+    }
+  }
+
   removeRfaPa(index: number) {
     this.logger.debug('removeRfaPa ', index);
     this.searchCriteria.rfaPaEntries.splice(index, 1);
@@ -389,7 +414,41 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
     this.searchCriteria.validateForRequired();
     this.searchCriteria.validateForActivityCodes();
     if (this.searchCriteria.isValid()) {
-      alert('Validation successful.  To be continued...');
+
+      const criteria: FundingPlanGrantSearchCriteria = {};
+      criteria.rfaPaNcabDates = new Array<RfaPaNcabDate>();
+      for (const rfa of this.searchCriteria.rfaPaEntries) {
+        criteria.rfaPaNcabDates.push({
+          rfaPaNumber: rfa.rfaPaNumber,
+          ncabDates: rfa.getNcabDates()
+        });
+      }
+      this.fsPlanControllerService.searchFundingPlanGrantsUsingPOST(criteria).subscribe(
+        (result: GrantsSearchResultDatatableDto) => {
+          this.dtData = result.data;
+          this.dtData.forEach((value) => {value.selected = false; })
+          this.dtOptions.data = this.dtData;
+
+//          this.dtTrigger.next();
+          if (this.dtElement.dtInstance) {
+            this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+              dtInstance.destroy();
+              this.dtTrigger.next();
+            });
+          }
+        },
+        error => {
+          this.logger.error('HttpClient get request error for----- ' + error.message);
+        });
+    }
+  }
+
+  selectGrants(): void {
+    this.logger.debug('selectGrants');
+    for (let entry of this.dtData) {
+      if (entry.selected) {
+        this.logger.debug('Selected grant ', entry.fullGrantNum);
+      }
     }
   }
 
