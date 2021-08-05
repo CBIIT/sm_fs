@@ -5,6 +5,7 @@
         <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#grants-mgmt-collapse" role="button" aria-expanded="true" aria-controls="grants-mgmt-collapse"></a>
     </div>
 </div>
+<form #gmform='ngForm'>
 <div class="row collapse show" id="grants-mgmt-collapse">
     <div class="col-lg-auto">
         <div class="form-group">
@@ -25,14 +26,21 @@
     <div class="col-lg-4">
         <div class="form-group">
             <label for="specialist">Specialist</label>
-            <span *ngIf="readonly">{{gmInfo.defaultSpecFullName}}</span>
-            <ng-select2 *ngIf="!readonly"
+            <span *ngIf="readonly; else specInput">{{gmInfo.defaultSpecFullName}}</span>
+            <ng-template #specInput>
+            <ng-select2 
                 id="default-specialist"
                 name="default-specialist"
                 [allowClear]="true"
                 [data] = "defaultSpecList"
                 [(ngModel)]= "gmInfo.defaultSpecFullName"
-            ></ng-select2>
+                #specFullName="ngModel"
+                required>
+            </ng-select2>
+            <div class="text-danger mt-1" *ngIf="(specFullName.errors?.required)">
+                Specialist is required
+            </div>
+            </ng-template>
         </div>
     </div>
     <div class="col">
@@ -52,4 +60,5 @@
         <hr>
     </div>
 </div>
+</form>
 <!-- END Grants Management Information -->
