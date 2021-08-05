@@ -240,6 +240,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
   dtTrigger: Subject<any> = new Subject();
   dtOptions: any = {};
   dtData: Array<NciPfrGrantQueryDtoEx> = [];
+  noSelectableGrants: boolean = false;
 
   ngOnInit(): void {
     this.ncab_options = {
@@ -426,7 +427,13 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
       this.fsPlanControllerService.searchFundingPlanGrantsUsingPOST(criteria).subscribe(
         (result: GrantsSearchResultDatatableDto) => {
           this.dtData = result.data;
-          this.dtData.forEach((value) => {value.selected = false; })
+          this.noSelectableGrants = true;
+          this.dtData.forEach((value) => {
+            value.selected = false;
+            if (!value.notSelectableReason || value.notSelectableReason.length == 0) {
+              this.noSelectableGrants = false;
+            }
+          });
           this.dtOptions.data = this.dtData;
 
 //          this.dtTrigger.next();

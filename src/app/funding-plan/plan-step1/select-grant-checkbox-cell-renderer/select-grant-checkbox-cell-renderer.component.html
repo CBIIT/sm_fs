@@ -1,1 +1,6 @@
-<input type="checkbox" [checked]="data.selected" (change)="onSelect($event)"/>
+<input *ngIf="!data.notSelectableReason || data.notSelectableReason.length == 0" type="checkbox" [checked]="data.selected" (change)="onSelect($event)"/>
+<div *ngIf="data.notSelectableReason && data.notSelectableReason.length > 0"class="grant-icons">
+  <a [routerLink]="" [ngbTooltip]="data.notSelectableReason" triggers="click:blur">
+    <i class='fa fa-comment-alt-lines' aria-hidden='true'></i>
+  </a>
+</div>
