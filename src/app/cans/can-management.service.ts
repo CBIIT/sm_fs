@@ -13,7 +13,7 @@ import { Observable, Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class CanManagementServiceBus {
+export class CanManagementService {
 
   oefiaTypeEmitter = new Subject<{ index: number; value: number }>();
   projectedCanEmitter = new Subject<{ index: number; can: CanCcxDto }>();

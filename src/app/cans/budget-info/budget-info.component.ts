@@ -6,7 +6,7 @@ import {
   QueryList
 } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
-import { CanManagementServiceBus } from '../can-management-service-bus.service';
+import { CanManagementService } from '../can-management.service';
 import { RequestModel } from '../../model/request/request-model';
 import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { OefiaTypesComponent } from '../oefia-types/oefia-types.component';
@@ -36,7 +36,7 @@ export class BudgetInfoComponent implements OnInit {
     this.model.requestCans = value;
   }
 
-  constructor(private logger: NGXLogger, private canService: CanManagementServiceBus, public model: RequestModel,
+  constructor(private logger: NGXLogger, private canService: CanManagementService, public model: RequestModel,
               private workflowModel: WorkflowModel) {
   }
 

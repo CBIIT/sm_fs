@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
-import { CanManagementServiceBus } from '../can-management-service-bus.service';
+import { CanManagementService } from '../can-management.service';
 import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
 
 @Component({
@@ -17,7 +17,7 @@ export class ProjectedCanComponent implements OnInit {
 
   projectedCan: CanCcxDto;
 
-  constructor(private logger: NGXLogger, private canService: CanManagementServiceBus) {
+  constructor(private logger: NGXLogger, private canService: CanManagementService) {
   }
 
   ngOnInit(): void {

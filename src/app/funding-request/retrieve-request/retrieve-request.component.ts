@@ -5,7 +5,7 @@ import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
-import { CanManagementServiceBus } from '../../cans/can-management-service-bus.service';
+import { CanManagementService } from '../../cans/can-management.service';
 
 @Component({
   selector: 'app-retrieve-request',
@@ -21,7 +21,7 @@ export class RetrieveRequestComponent implements OnInit {
               private requestModel: RequestModel,
               private requestService: FsRequestControllerService,
               private userSessionService: AppUserSessionService,
-              private canManagementService: CanManagementServiceBus,
+              private canManagementService: CanManagementService,
               private logger: NGXLogger) {
   }
 

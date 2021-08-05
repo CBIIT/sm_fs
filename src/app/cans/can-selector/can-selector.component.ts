@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { CanManagementServiceBus } from '../can-management-service-bus.service';
+import { CanManagementService } from '../can-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { Select2OptionData } from 'ng-select2';
@@ -46,7 +46,7 @@ export class CanSelectorComponent implements OnInit {
     this.selectedValueChange.emit(value);
   }
 
-  constructor(private canService: CanManagementServiceBus,
+  constructor(private canService: CanManagementService,
               private logger: NGXLogger) {
   }
 
