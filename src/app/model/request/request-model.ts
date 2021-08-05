@@ -327,7 +327,7 @@ export class RequestModel {
 
   loadRequestCans(): void {
     if (this.requestCans && this.requestCans.length > 0) {
-      this.logger.debug('Request cans already loaded', this.requestCans);
+      this.logger.debug('requestCans already loaded', this.requestCans);
       return;
     }
 
@@ -335,6 +335,7 @@ export class RequestModel {
       result => {
         if (result && result.length > 0) {
           this.requestCans = result;
+          this.requestCans.forEach( rc => rc.previousAfy = rc.approvedFutureYrs );
           this.logger.debug('loaded requestCans from db ', result);
         } else {
           this.requestCans = [];
@@ -358,6 +359,7 @@ export class RequestModel {
               this.requestCans.push(dto);
             }
           }
+          this.requestCans.forEach( rc => rc.previousAfy = rc.approvedFutureYrs );
           this.logger.debug('built requestCans from program_cost_model ', this.requestCans);
         }
       },

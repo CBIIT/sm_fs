@@ -39,7 +39,9 @@
                         #approvedFutureYrs="ngModel" 
                         name="approvedFutureYrs{{i}}"
                         required
-                        pattern="[0-9]*">
+                        pattern="[0-9]*"
+                        maxlength="2"
+                        [disabled]="inputDisabled">
                         <div class="text-danger mt-1" *ngIf="(approvedFutureYrs.errors?.pattern)">
                            Enter numeric value
                         </div>

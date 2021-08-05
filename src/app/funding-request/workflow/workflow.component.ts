@@ -11,6 +11,7 @@ import { GmInfoComponent } from './gm-info/gm-info.component';
 import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
 import { Alert } from 'src/app/alert-billboard/alert';
+import { validateLocaleAndSetLanguage } from 'typescript';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -34,6 +35,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   options: Options;
   comments = '';
   buttonLabel = 'Process Action';
+  addApproverLabel = '';
   // buttonDisabled = true;
   workflowActions: any[];
 
@@ -41,6 +43,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   showAddApprover = false;
   requestStatus: FundingReqStatusHistoryDto = {};
   approvingState = false;
+
+  validationError: any = {};
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
@@ -146,7 +150,10 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     );
 
     this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
-      () => addedApproverMap = this.workflowModel.addedApproverMap
+      () => { addedApproverMap = this.workflowModel.addedApproverMap;
+              this.alert = null;
+              this.isFormValid();
+      }
     );
 
     this.requestHistorySubscription = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
@@ -186,19 +193,24 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   set selectedWorkflowAction(action: WorkflowActionCode) {
+    this.alert = null;
+    this.validationError = {};
     this._selectedWorkflowAction = this.workflowModel.getWorkflowAction(action);
     if (!this._selectedWorkflowAction) {
       this.showAddApprover = false;
       this.buttonLabel = 'Process Action';
       return;
-
     }
 
     this.buttonLabel = this._selectedWorkflowAction.actionButtonText;
-    // this.buttonDisabled = this._selectedWorkflowAction.commentsRequired || this._selectedWorkflowAction.newApproverRequired;
-
+    this.addApproverLabel = this._selectedWorkflowAction.action === WorkflowActionCode.REASSIGN ? 'Select Approver' : 'Add Approver(s)';
     this.showAddApprover = this._selectedWorkflowAction.newApproverRequired;
     this.workflowModel.prepareApproverListsForView(this._selectedWorkflowAction.action);
+
+    if (this.approvedCostsComponent) {
+      this.approvedCostsComponent.resetForm(this._selectedWorkflowAction.action);
+    }
+
   }
 
   get buttonDisabled(): boolean {
@@ -206,11 +218,11 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       return true;
     }
 
-    if (this._selectedWorkflowAction.commentsRequired && (!this.comments || this.comments.length === 0)) {
-      return true;
-    } else if (this._selectedWorkflowAction.newApproverRequired && (!this.workflowModel.hasNewApprover)) {
-      return true;
-    }
+    // if (this._selectedWorkflowAction.commentsRequired && (!this.comments || this.comments.length === 0)) {
+    //   return true;
+    // } else if (this._selectedWorkflowAction.newApproverRequired && (!this.workflowModel.hasNewApprover)) {
+    //   return true;
+    // }
 
     return false;
   }
@@ -225,8 +237,17 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   submitWorkflow(): void {
     this.alert = null;
+    this.validationError = {};
+    let valid = true;
     if ((this.gmInfoComponent && !this.gmInfoComponent.isFormValid()) ||
-        (this.approvedCostsComponent && !this.approvedCostsComponent?.isFormValid())) {
+        (this.approvedCostsComponent && !this.approvedCostsComponent?.isFormValid()) ) {
+      valid = false;
+    }
+    if (! this.isFormValid()) {
+      valid = false;
+    }
+
+    if (!valid) {
       this.alert = {type: 'danger',
       message: 'Please correct the errors identified above.',
       title: ''};
@@ -285,6 +306,20 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.logger.error('submit workflow returned error', error);
       }
     );
+  }
+
+  isFormValid(): boolean {
+    let valid = true;
+    this.validationError = {};
+    if ( this._selectedWorkflowAction?.commentsRequired && !this.comments ) {
+      valid = false;
+      this.validationError.comments_missing = true;
+    }
+    if ( this._selectedWorkflowAction?.newApproverRequired && !this.workflowModel.hasNewApprover ) {
+      valid = false;
+      this.validationError.approver_missing = true;
+    }
+    return valid;
   }
 
 }

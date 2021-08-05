@@ -31,12 +31,15 @@
             [allowClear]="true"
             [data]="workflowActions">
             </ng-select2>
+            <div class="text-danger mt-1" *ngIf="(validationError?.action_missing)">
+                Action is required
+            </div>
         </div>
     </div>
 
     <div class="col-md-6">
         <div class="form-group" *ngIf="showAddApprover || !readonly">
-            <label for="req-add-approvers">Add Approver(s) <span class="optional" *ngIf="!newApproverRequired">(optional)</span></label>
+            <label for="req-add-approvers">{{addApproverLabel}} <span class="optional" *ngIf="!newApproverRequired">(optional)</span></label>
             <ng-select2
                 id="req-add-approvers"
                 [(ngModel)]="selectedValue"
@@ -44,17 +47,24 @@
                 [options]="options">
                 <option></option>
             </ng-select2>
+            <div class="text-danger mt-1" *ngIf="(validationError?.approver_missing)">
+                New approver is required
+            </div>
         </div>  
-    </div>
+</div>
 
     <app-approver-list [readonly]="readonly" class="w-100"></app-approver-list>
 
     <div class="col-12">
         <div class="form-group" *ngIf=" isApprover() || !readonly">
             <label for="workflow-comments">Workflow Comments <span class="optional" *ngIf="!commentsRequired">(optional)</span></label>
-            <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments"></textarea>
+            <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments" (input)="isFormValid()"></textarea>
+            <span class="text-danger mt-1" *ngIf="(validationError?.comments_missing)">
+                Comments are required
+            </span>
             <span class="character-counter">{{comments.length}}/2000</span>
         </div>
+        
     </div>
 
 </div><!-- END Row Collapse -->
