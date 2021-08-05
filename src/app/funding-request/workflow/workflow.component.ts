@@ -9,6 +9,8 @@ import { FundingRequestIntegrationService } from '../integration/integration.ser
 import { ApprovingStatuses, WorkflowAction, WorkflowActionCode, WorkflowModel } from './workflow.model';
 import { GmInfoComponent } from './gm-info/gm-info.component';
 import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
+import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
+import { Alert } from 'src/app/alert-billboard/alert';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -20,7 +22,7 @@ let addedApproverMap = new Map<number, any>();
 })
 export class WorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
-  // @ViewChild(ApprovedCostsComponent) approvedCostsComponent: ApprovedCostsComponent;
+  @ViewChild(ApprovedCostsComponent) approvedCostsComponent: ApprovedCostsComponent;
   @ViewChild(GmInfoComponent) gmInfoComponent: GmInfoComponent;
   @Output() actionEmitter = new EventEmitter<string>();
   budgetInfoComponent: BudgetInfoComponent;
@@ -35,6 +37,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   // buttonDisabled = true;
   workflowActions: any[];
 
+  alert: Alert;
   showAddApprover = false;
   requestStatus: FundingReqStatusHistoryDto = {};
   approvingState = false;
@@ -221,6 +224,14 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   submitWorkflow(): void {
+    this.alert = null;
+    if ((this.gmInfoComponent && !this.gmInfoComponent.isFormValid()) ||
+        (this.approvedCostsComponent && !this.approvedCostsComponent?.isFormValid())) {
+      this.alert = {type: 'danger',
+      message: 'Please correct the errors identified above.',
+      title: ''};
+      return;
+    }
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;

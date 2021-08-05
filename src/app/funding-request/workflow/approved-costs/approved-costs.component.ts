@@ -1,6 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { FsCanControllerService, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
+import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { WorkflowModel } from '../workflow.model';
 
@@ -11,64 +13,28 @@ import { WorkflowModel } from '../workflow.model';
 })
 export class ApprovedCostsComponent implements OnInit {
   @Input() approvingState = false;
+  @ViewChild('acform', {static: false}) acform: NgForm;
 
-  // cans: FundingRequestCanDto[];
+  initialPay: boolean;
 
-  constructor(private canControllerService: FsCanControllerService,
-              private requestModel: RequestModel,
+  constructor(private requestModel: RequestModel,
               private workflowModel: WorkflowModel,
               private logger: NGXLogger) { }
 
   ngOnInit(): void {
-  //  setTimeout(this.loadData.bind(this), 1000);
+    this.initialPay = INITIAL_PAY_TYPES.includes(this.requestModel.requestDto?.frtId);
+  //  setInterval(() => { this.logger.debug(this.acform); this.logger.debug('cans value', this.cans); }, 1000);
   }
 
   get cans(): FundingRequestCanDto[]{
     return this.requestModel.requestCans;
   }
-  // loadData(): void {
-  //     this.canControllerService.getRequestCansUsingGET(this.requestModel.requestDto.frqId).subscribe(
-  //     result => {
-  //       if (result && result.length > 0) {
-  //         this.cans = result;
-  //         this.logger.debug('f_r_can_t from db ', this.cans);
-  //       }
-  //       else {
-  //         this.cans = [];
-  //         const programCostModel = this.requestModel.programRecommendedCostsModel;
-  //         this.logger.debug('Program Cost Model ', programCostModel);
-  //         for (const fs of programCostModel.selectedFundingSources) {
-  //           const lineItems = programCostModel.getLineItemsForSourceId(fs.fundingSourceId);
-  //           if (lineItems.length > 0) {
-  //             const lineItem0 = lineItems[0];
-  //             const dto: FundingRequestCanDto = {};
-  //             dto.frqId = this.requestModel.requestDto.frqId;
-  //             dto.fseId = fs.fundingSourceId;
-  //             dto.fundingSourceName = fs.fundingSourceName;
-  //             dto.requestedTc = lineItem0.recommendedTotal;
-  //             dto.requestedDc = lineItem0.recommendedDirect;
-  //             dto.approvedTc = dto.requestedTc;
-  //             dto.approvedPctCut = lineItem0.percentCutTotalCalculated;
-  //             dto.requestedFutureYrs = lineItems.filter( li => li.recommendedTotal > 0 || li.recommendedDirect > 0).length - 1;
-  //             dto.approvedFutureYrs = dto.requestedFutureYrs;
-  //             this.cans.push(dto);
-  //           }
-  //         }
-  //         this.logger.debug('built f_r_can_t from program_cost_model ', this.cans);
-  //       }
-  //     },
-  //     error => {
-  //       this.logger.error('get request cans failed', error);
-  //     }
-  //   );
 
-  //     this.requestModel.requestCans = this.cans;
+  isFormValid(): boolean {
+    return this.acform?.valid;
+  }
 
-  // }
 
-  // getCans(): FundingRequestCanDto[] {
-  //   return this.cans;
-  // }
 
   get editable(): boolean {
     return this.workflowModel.isScientificApprover && this.approvingState;

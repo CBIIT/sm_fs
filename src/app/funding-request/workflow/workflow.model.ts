@@ -194,7 +194,6 @@ export class WorkflowModel {
         if (this.approvedByGM && this.approvedScientifically && this.approvedByFC && this.approvedByDoc) {
           break;
         }
-        
       }
     }
 
@@ -366,7 +365,8 @@ export const ApprovingStatuses: string[] = [
   RequestStatus.AWC,
   RequestStatus.ROUTED,
   RequestStatus.DELEGATED,
-  RequestStatus.RELEASED
+  RequestStatus.RELEASED,
+  RequestStatus.DEFER
 ];
 
 export enum WorkflowActionCode {

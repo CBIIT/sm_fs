@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { FsLookupControllerService, FsWorkflowControllerService, GmInfoDto } from '@nci-cbiit/i2ecws-lib';
 import { Select2OptionData } from 'ng-select2';
 import { NGXLogger } from 'ngx-logger';
@@ -12,6 +13,7 @@ import { WorkflowModel } from '../workflow.model';
 })
 export class GmInfoComponent implements OnInit {
   @Input() approvingState = false;
+  @ViewChild('gmform', {static: false}) gmform: NgForm;
 
   readonly = false;
   options: any = {};
@@ -49,7 +51,7 @@ export class GmInfoComponent implements OnInit {
               this.gmInfo = {};
             }
             this.gmInfo.frqId = this.requestModel.requestDto.frqId;
-            this.gmInfo.actionType = this.requestModel.requestDto.defaultActionType;
+            this.gmInfo.actionType = this.requestModel.requestDto.defaultActionType.toUpperCase();
           },
           error => {
             this.logger.error('getDefaultGmInfoUsingGET failed', error);
@@ -79,6 +81,10 @@ export class GmInfoComponent implements OnInit {
 
   get editable(): boolean {
     return this.workflowModel.isScientificApprover && this.approvingState;
+  }
+
+  isFormValid(): boolean {
+    return this.gmform?.valid;
   }
 
 }
