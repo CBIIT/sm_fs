@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { FundingPlanDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
+import {NciPfrGrantQueryDtoEx} from "./nci-pfr-grant-query-dto-ex";
+import {RfaPaNcabDate} from "@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate";
 
 @Injectable({
   providedIn: 'root'
@@ -9,11 +11,13 @@ export class PlanModel {
   grantViewerUrl: string;
   eGrantsUrl: string;
   catsConceptUrl: string;
-  allGrants: NciPfrGrantQueryDto[] = [];
+  // allGrants array include 'selected' boolean column with is set on step 1
+  allGrants: NciPfrGrantQueryDtoEx[] = [];
   selectedGrants: NciPfrGrantQueryDto[] = [];
   unselectedGrants: NciPfrGrantQueryDto[] = [];
   skippedGrants: NciPfrGrantQueryDto[] = [];
   exceptionGrants: NciPfrGrantQueryDto[] = [];
+  grantsSearchCriteria: Array<RfaPaNcabDate> = [];
 
   fundingPlanDto: FundingPlanDto;
 
@@ -35,5 +39,6 @@ export class PlanModel {
     this.unselectedGrants = [];
     this.skippedGrants = [];
     this.exceptionGrants = [];
+    this.grantsSearchCriteria = [];
   }
 }

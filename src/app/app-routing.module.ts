@@ -18,6 +18,7 @@ import { PlanStep3Component } from './funding-plan/plan-step3/plan-step3.compone
 import { PlanStep4Component } from './funding-plan/plan-step4/plan-step4.component';
 import { PlanStep5Component } from './funding-plan/plan-step5/plan-step5.component';
 import { PlanStep6Component } from './funding-plan/plan-step6/plan-step6.component';
+import {CanDeactivatePlanStep1} from "./funding-plan/plan-step1/can-deactivate-plan-step1";
 
 const routes: Routes = [
   {
@@ -26,7 +27,7 @@ const routes: Routes = [
       { path: 'search', component: SearchComponent, canActivate: [AuthGuard] },
       { path: 'plan', component: FundingPlanComponent, children: [
         {path: '', redirectTo: 'step1', pathMatch: 'full'},
-        {path: 'step1', component: PlanStep1Component, canActivate: [PdAuthGuard]},
+        {path: 'step1', component: PlanStep1Component, canDeactivate: [CanDeactivatePlanStep1], canActivate: [PdAuthGuard]},
         {path: 'step2', component: PlanStep2Component},
         {path: 'step3', component: PlanStep3Component},
         {path: 'step4', component: PlanStep4Component},

@@ -1,6 +1,9 @@
 <div class="row">
+  <div class="col-12 d-flex">
+    <h2 class="d-inline-block">RFA/PA/PAR(s)</h2>
+  </div>
   <div class="col-12">
-    <h2>RFA/PA(s)</h2>
+    <p>Note: Funding plan should be created only for RFA, PA, or PAR.</p>
   </div>
 </div>
 
@@ -18,7 +21,7 @@
   <div class="row"  role="group" >
     <div class="col-lg-3">
       <div class="form-group">
-        <label [attr.for]="'rfaPa-' + i">RFA/PA</label>
+        <label [attr.for]="'rfaPa-' + i">RFA/PA/PAR</label>
         <ng-select2
           [attr.id]="'rfaPa-' + i"
           name="rfa-pa"
@@ -73,7 +76,7 @@
            *ngIf="rfa.ncabErrors.length > 0 || rfa.ncabErrRequired == true">
         <div *ngIf="rfa.ncabErrors.length > 0">
           <div *ngFor="let error of rfa.ncabErrors">
-            <b><span><a [routerLink]="'/plan/retrieve/' + error.planId">Funding Plan {{error.planId}}</a></span></b> already exists for this RFA/PA on NCAB {{error.ncab}}
+            <b><span><a [routerLink]="'/plan/retrieve/' + error.fprId">Funding Plan {{error.fprId}}</a></span></b> is in the '{{error.currentPlanStatus}}' status for this RFA/PA on NCAB {{error.formattedCouncilMeetingDate}}.
           </div>
         </div>
         <div *ngIf="rfa.ncabErrRequired == true">NCAB is required</div>
@@ -90,7 +93,7 @@
 <div class="row mb-3">
   <div class="col-12 d-flex">
     <h2>Results</h2>
-    <button type="button" class="btn btn-primary ml-auto" (click)="selectGrants()">Select Grants</button>
+    <button type="button" id="selectGrantsTop" class="btn btn-primary ml-auto" [ngbTooltip]="cannotSelectGrantsTooltip" [disabled]="cannotSelectGrantsTooltip != null" (click)="selectGrants()">Select Grants</button>
   </div>
 </div>
 <div class="row">
@@ -121,7 +124,8 @@
 
 <div class="row">
   <div class="col-12 d-flex">
-    <button type="button" class="btn btn-primary ml-auto">Select Grants</button>
+    <button type="button" id="selectGrantsBottom" class="btn btn-primary ml-auto" [ngbTooltip]="cannotSelectGrantsTooltip" [disabled]="cannotSelectGrantsTooltip != null" (click)="selectGrants()">Select Grants</button>
+<!--    <button type="button" id="selectGrantsBottom" class="btn btn-primary ml-auto" [tooltip]="cannotSelectGrantsTooltip" [disabled]="cannotSelectGrantsTooltip != null && cannotSelectGrantsTooltip.length > 0" (click)="selectGrants()">Select Grants</button>-->
   </div>
 
 </div><!-- END Row -->

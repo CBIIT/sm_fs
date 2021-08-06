@@ -14,19 +14,9 @@ import {GrantsSearchResultDatatableDto} from "@nci-cbiit/i2ecws-lib/model/grants
 import {DataTableDirective} from "angular-datatables";
 import {SelectGrantCheckboxCellRendererComponent} from "./select-grant-checkbox-cell-renderer/select-grant-checkbox-cell-renderer.component";
 import {SelectGrantCheckboxEventType} from "./select-grant-checkbox-cell-renderer/select-grant-checkbox-event-type";
+import {NciPfrGrantQueryDtoEx} from "../../model/plan/nci-pfr-grant-query-dto-ex";
+import {Router} from "@angular/router";
 
-interface NciPfrGrantQueryDtoEx extends NciPfrGrantQueryDto {
-  selected ?: boolean;
-}
-
-class NcabError {
-  constructor(planId: number, ncab: string) {
-    this.planId = planId;
-    this.ncab = ncab;
-  }
-  planId: number;
-  ncab: string;
-}
 
 /**
  * Data representation of each row for Rfa Pa dropdown and NCAB dates dropdown
@@ -36,7 +26,7 @@ class RfaPaEntry {
   rfaPaNumber: string = '';
   availableNcabDates: Array<Select2OptionData> = [];
   parent: FundingPlanGrantsSearchCriteriaUI;
-  ncabErrors: Array<NcabError> = [];
+  ncabErrors: Array<FundingPlanNcabDto> = [];
   rfaErrDuplcated: boolean = false;
   rfaErrRequired: boolean = false;
   ncabErrRequired: boolean = false;
@@ -87,7 +77,7 @@ class RfaPaEntry {
             && dto.currentPlanStatus != 'COMPLETED'
             && dto.currentPlanStatus != 'REJECTED'
             && dto.currentPlanStatus != 'CANCELLED') {
-          this.ncabErrors.push(new NcabError(dto.fprId, dto.formattedCouncilMeetingDate));
+          this.ncabErrors.push(dto);
         }
       }
     }
@@ -220,8 +210,8 @@ class FundingPlanGrantsSearchCriteriaUI {
 })
 export class PlanStep1Component implements OnInit, AfterViewInit {
 
-  constructor(
-    private fsPlanControllerService: FsPlanControllerService,
+  constructor(private fsPlanControllerService: FsPlanControllerService,
+              private router: Router,
               private planModel: PlanModel,
               private logger: NGXLogger) { }
 
@@ -231,7 +221,17 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
   @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
   @ViewChild('existingRequestsRenderer') existingRequestsRenderer: TemplateRef<ExistingRequestsCellRendererComponent>;
 
+  // controls if user can switch to another view from the current one
+  canDeactivate: boolean = true;
+
+  // controls Select Grants button and it's tooltip depending on
+  // current grants selection
+  cannotSelectGrantsTooltip: string = null;
+
+  // Options for multiselectable NCAB dropdown
   ncab_options: Options;
+  // Internal Search Criteria data including selected and
+  // available data (lookups)
   searchCriteria: FundingPlanGrantsSearchCriteriaUI;
 
   grantViewerUrl: string = this.planModel.grantViewerUrl;
@@ -240,6 +240,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
   dtTrigger: Subject<any> = new Subject();
   dtOptions: any = {};
   dtData: Array<NciPfrGrantQueryDtoEx> = [];
+  // controls the error message shown after search if there are
+  // no grants eligible for selection
   noSelectableGrants: boolean = false;
 
   ngOnInit(): void {
@@ -249,6 +251,9 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
     };
 
     this.searchCriteria = new FundingPlanGrantsSearchCriteriaUI();
+    this._restoreFromModel();
+    this.grantSelectionTooltip();
+
     this.logger.debug('About to subscribe to getRfaPaListUsingGET');
     this.fsPlanControllerService.getRfaPaListUsingGET().subscribe(
       (result: Array<FundingPlanRfaPaDto>) => {
@@ -275,6 +280,9 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
           }
         }
         this.searchCriteria.availableRfaPas = tmp;
+        for (let entry of this.searchCriteria.rfaPaEntries) {
+          entry.onRfaPaChangeSelection(entry.rfaPaNumber);
+        }
       },
       error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
@@ -308,7 +316,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
           }},
         {title: 'I2 Status', data: 'applStatusGroupDescrip'}, //5
         {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => { //6
-            return '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+            return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }},
         {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'}, //7
         {title: 'FY', data: 'fy'}, //8
@@ -381,16 +389,70 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
     setTimeout(() => this.dtTrigger.next(), 0);
   }
 
+  /**
+   * Init searchCriteria and table data from planModel
+   * if it's not empty.
+   * Otherwise, initialize them
+   * @param grantsSearchCriteria
+   * @private
+   */
+  private _restoreFromModel() : void {
+    this.searchCriteria.rfaPaEntries = [];
+    if (this.planModel.grantsSearchCriteria != null && this.planModel.grantsSearchCriteria.length > 0) {
+      for (const criteria of this.planModel.grantsSearchCriteria) {
+        const entry: RfaPaEntry = new RfaPaEntry(this.searchCriteria);
+        entry.rfaPaNumber = criteria.rfaPaNumber;
+        this.searchCriteria.rfaPaEntries.push(entry);
+        entry.selectedNcabDates = criteria.ncabDates;
+      }
+    }
+    else {
+      this.searchCriteria.rfaPaEntries.push(new RfaPaEntry(this.searchCriteria));
+    }
+
+    //Restore or init table results data
+    if (this.planModel.allGrants != null && this.planModel.allGrants.length > 0) {
+      this.dtData = this.planModel.allGrants;
+    }
+    else{
+      this.dtData = [];
+    }
+  }
+
+  /**
+   * ACTION: click on select checkbox inside Results table
+   * Updates the appropriate entry in dtData and
+   * makes Select Grants button enabled/disabled depending on
+   * selection existence
+   */
   onCaptureSelectedEvent(event: SelectGrantCheckboxEventType) {
     this.logger.debug('onCaptureSelectedEvent', event);
     for (let entry of this.dtData) {
       if (entry.applId === event.applId) {
         entry.selected = event.selected;
-        return;
+        break;
       }
     }
+    this.grantSelectionTooltip();
   }
 
+  grantSelectionTooltip() : void {
+    let hasSelected: boolean = false;
+    if (this.dtData && this.dtData.length > 0) {
+      for (let entry of this.dtData) {
+        if (entry.selected) {
+          hasSelected = true;
+          break;
+        }
+      }
+    }
+    this.cannotSelectGrantsTooltip = (hasSelected) ? null : 'No grants selected for Funding Plan';
+  }
+
+  /**
+   * ACTION: click on Minus button to remove RFA/PA search Criteria line
+   *
+   */
   removeRfaPa(index: number) {
     this.logger.debug('removeRfaPa ', index);
     this.searchCriteria.rfaPaEntries.splice(index, 1);
@@ -400,16 +462,48 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * ACTION: click on Plus button to add RFA/PA search Criteria
+   *
+   */
   appendRfaPa() {
     this.searchCriteria.rfaPaEntries.push(new RfaPaEntry(this.searchCriteria));
   }
 
+  /**
+   * ACTION: click on Clear button
+   *
+   * Resets search criteria and results table
+   * Resets data model
+   * Disables SelectGrants button
+   */
   clear() {
     this.searchCriteria.rfaPaEntries = [];
     this.searchCriteria.rfaPaEntries.push(new RfaPaEntry(this.searchCriteria));
     this.searchCriteria.errActivityCodes = [];
+    this.canDeactivate = true;
+    this.noSelectableGrants = false;
+
+    // Reset results
+    this.dtData = [];
+    this.dtOptions.data = this.dtData;
+    if (this.dtElement.dtInstance) {
+      this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+        dtInstance.destroy();
+        this.dtTrigger.next();
+      });
+    }
+    this.resetModel();
+    this.grantSelectionTooltip();
   }
 
+  /**
+   * ACTION: click on Search button
+   *
+   * Invokes a grants search
+   * Resets
+   * and navigates to step 2
+   */
   search() {
     this.searchCriteria.validateForRfaPaDuplicate();
     this.searchCriteria.validateForRequired();
@@ -417,13 +511,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
     if (this.searchCriteria.isValid()) {
 
       const criteria: FundingPlanGrantSearchCriteria = {};
-      criteria.rfaPaNcabDates = new Array<RfaPaNcabDate>();
-      for (const rfa of this.searchCriteria.rfaPaEntries) {
-        criteria.rfaPaNcabDates.push({
-          rfaPaNumber: rfa.rfaPaNumber,
-          ncabDates: rfa.getNcabDates()
-        });
-      }
+      criteria.rfaPaNcabDates = this._convertToRfaPaNcabDates();
+
       this.fsPlanControllerService.searchFundingPlanGrantsUsingPOST(criteria).subscribe(
         (result: GrantsSearchResultDatatableDto) => {
           this.dtData = result.data;
@@ -436,7 +525,12 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
           });
           this.dtOptions.data = this.dtData;
 
-//          this.dtTrigger.next();
+          // RESET plan model on every search
+          // mark model dirty on every search
+          this.resetModel();
+          this.planModel.grantsSearchCriteria = this._convertToRfaPaNcabDates();
+          this.canDeactivate = false;
+
           if (this.dtElement.dtInstance) {
             this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
               dtInstance.destroy();
@@ -450,17 +544,48 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * ACTION: click on Search Grants button
+   *
+   * Saves the selection results in planModel
+   * and navigates to step 2
+   */
   selectGrants(): void {
-    this.logger.debug('selectGrants');
-    for (let entry of this.dtData) {
-      if (entry.selected) {
-        this.logger.debug('Selected grant ', entry.fullGrantNum);
+      this.logger.debug('selectGrants');
+      for (let entry of this.dtData) {
+        if (entry.selected) {
+          this.logger.debug('Selected grant ', entry.fullGrantNum);
+        }
       }
-    }
+      // save selections in planModel
+      this.planModel.allGrants = this.dtData;
+      this.canDeactivate = true;
+      this.router.navigate(['/plan/step2']);
+
   }
 
   ngOnDestroy(): void {
     this.dtTrigger.unsubscribe();
   }
 
+  resetModel() {
+    this.planModel.reset();
+  }
+
+  /**
+   * Extracts selected entries from SearchCriteria and
+   * and returns array of extracted entries
+   * @private
+   */
+
+  private _convertToRfaPaNcabDates() : Array<RfaPaNcabDate> {
+    const ret = new Array<RfaPaNcabDate>();
+    for (const rfa of this.searchCriteria.rfaPaEntries) {
+      ret.push({
+        rfaPaNumber: rfa.rfaPaNumber,
+        ncabDates: rfa.getNcabDates()
+      });
+    }
+    return ret;
+  }
 }
