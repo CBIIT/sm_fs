@@ -74,7 +74,7 @@
       <p><a *ngFor="let doc of otherDocs; let i = index " [routerLink]=""
             ngbTooltip="{{doc|codeDescription:'NciDocs'}}"
             triggers="click:blur" placement="top">
-            {{doc}}</a>
+            {{i!==0?',':''}} {{doc}}</a>
       </p>
     </div>
   </div>
@@ -93,7 +93,7 @@
     </div>
   </div>
 
-  <div class="col-md-6 col-lg-3" *ngIf="!isSkip && showNewInvestigator && newInvestigator != ''">
+  <div class="col-md-6 col-lg-3" *ngIf="!isSkip && showNewInvestigator">
     <div class="form-group">
       <p class="like-label">New Investigator Application</p>
       <p>{{newInvestigator}}</p>
