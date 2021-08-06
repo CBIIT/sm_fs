@@ -1,8 +1,9 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { FsWorkflowControllerService, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
-import { Observable } from 'rxjs';
+import { Alert } from 'src/app/alert-billboard/alert';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { WorkflowActionCode } from '../workflow/workflow.model';
@@ -14,7 +15,6 @@ import { WorkflowActionCode } from '../workflow/workflow.model';
 })
 
 export class WorkflowModalComponent implements OnInit {
-
   @ViewChild('workflowModal') private modalContent: TemplateRef<WorkflowModalComponent>;
   private modalRef: NgbModalRef;
 
@@ -22,7 +22,7 @@ export class WorkflowModalComponent implements OnInit {
   buttonText = '';
   title = '';
   comments = '';
-
+  alert: Alert;
   constructor(private modalService: NgbModal,
               private requestModel: RequestModel,
               private fsWorkflowService: FsWorkflowControllerService,
@@ -32,6 +32,7 @@ export class WorkflowModalComponent implements OnInit {
   ngOnInit(): void { }
 
   openConfirmModal(mode: string): Promise<WorkflowTaskDto> {
+    this.alert = null;
     this.mode = mode;
     this.comments = '';
     if (mode === 'WITHDRAW') {
@@ -55,7 +56,17 @@ export class WorkflowModalComponent implements OnInit {
     });
   }
 
-  submit(): void {
+  onSubmit(wfcForm: NgForm): void {
+    if (!wfcForm.valid) {
+      this.alert = {type: 'danger',
+      message: 'Please correct the error identified below.',
+      title: ''};
+      this.logger.debug('invalid form workflow modal alert=', this.alert);
+      return;
+    }
+    else {
+      this.alert = undefined;
+    }
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.frqId = this.requestModel.requestDto.frqId;

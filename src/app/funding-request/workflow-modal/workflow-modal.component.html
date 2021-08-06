@@ -1,4 +1,5 @@
 <ng-template #workflowModal let-modal>
+  <form #wfcForm="ngForm" (ngSubmit)="onSubmit(wfcForm)">
     <div class="modal-header">
       <span class="modal-title" id="modal-title-hold">{{ title }}</span>
       <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
@@ -6,6 +7,9 @@
       </button>
     </div>
     <div class="modal-body">
+      <div class="col-12"  *ngIf="alert">
+        <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
+      </div> 
       <p *ngIf="mode==='WITHDRAW'">
         Once you withdraw the funding request, an automated email will be sent to the 
         requester and previous approver(s) (if applicable) notifying this action. 
@@ -23,16 +27,23 @@
       </p>
       <div class="form-group">
         <label for="wf-comments">Workflow Comments</label>
-        <textarea [(ngModel)]="comments" id="wf-comments" class="form-control" rows="2" maxlength="500"></textarea>
+        <textarea 
+        [(ngModel)]="comments" 
+        id="wfcomments" 
+        name="wfcomments"
+        class="form-control" 
+        rows="2" 
+        maxlength="500"
+        [required] = "mode!=='RELEASE'" 
+        #wfcomments="ngModel"></textarea>
+        <span class="text-danger mt-1" *ngIf="(wfcomments.invalid) && (wfcomments.touched || wfcForm.submitted) ">
+          Approved Future Years is required
+        </span>
         <span class="character-counter">{{comments.length}}/500</span>
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button"
-              class="btn btn-primary"
-              (click)="submit()"
-              [disabled]="mode!=='RELEASE' && !comments">
-              {{buttonText}}
-      </button>
+      <input type="submit" class="btn btn-primary" value ="{{buttonText}}">
     </div>
+  </form>
   </ng-template>
