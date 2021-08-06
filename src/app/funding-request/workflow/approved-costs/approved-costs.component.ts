@@ -17,7 +17,7 @@ export class ApprovedCostsComponent implements OnInit {
   @ViewChild('acform', {static: false}) acform: NgForm;
 
   initialPay: boolean;
-  inputDisabled = true;
+  inputDisabled = false;
 
   constructor(private requestModel: RequestModel,
               private workflowModel: WorkflowModel,
@@ -37,15 +37,15 @@ export class ApprovedCostsComponent implements OnInit {
     return this.acform?.valid;
   }
 
-  resetForm(action: WorkflowActionCode): void {
-    if (this.workflowModel.isScientificApprover
-      && this.workflowModel.isApprovalAction(action) ) {
-      this.inputDisabled = false;
-    } else if (!this.inputDisabled){
-        this.requestModel.requestCans.forEach( rc => rc.approvedFutureYrs = rc.previousAfy );
-        this.inputDisabled = true;
-    }
-  }
+  // resetForm(action: WorkflowActionCode): void {
+  //   if (this.workflowModel.isScientificApprover
+  //     && this.workflowModel.isApprovalAction(action) ) {
+  //     this.inputDisabled = false;
+  //   } else if (!this.inputDisabled){
+  //       this.requestModel.requestCans.forEach( rc => rc.approvedFutureYrs = rc.previousAfy );
+  //       this.inputDisabled = true;
+  //   }
+  // }
 
   get editable(): boolean {
     return this.workflowModel.isScientificApprover && this.approvingState;

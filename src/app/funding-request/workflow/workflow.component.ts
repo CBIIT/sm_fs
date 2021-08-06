@@ -35,7 +35,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   options: Options;
   comments = '';
   buttonLabel = 'Process Action';
-  addApproverLabel = '';
+  addApproverLabel = 'Add Approver(s)';
   // buttonDisabled = true;
   workflowActions: any[];
 
@@ -207,9 +207,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.showAddApprover = this._selectedWorkflowAction.newApproverRequired;
     this.workflowModel.prepareApproverListsForView(this._selectedWorkflowAction.action);
 
-    if (this.approvedCostsComponent) {
-      this.approvedCostsComponent.resetForm(this._selectedWorkflowAction.action);
-    }
+    // if (this.approvedCostsComponent) {
+    //   this.approvedCostsComponent.resetForm(this._selectedWorkflowAction.action);
+    // }
 
   }
 
