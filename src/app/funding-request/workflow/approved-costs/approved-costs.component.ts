@@ -39,8 +39,7 @@ export class ApprovedCostsComponent implements OnInit {
 
   resetForm(action: WorkflowActionCode): void {
     if (this.workflowModel.isScientificApprover
-      && this.workflowModel.isApprovalAction(action)
-      && this.inputDisabled) {
+      && this.workflowModel.isApprovalAction(action) ) {
       this.inputDisabled = false;
     } else if (!this.inputDisabled){
         this.requestModel.requestCans.forEach( rc => rc.approvedFutureYrs = rc.previousAfy );
