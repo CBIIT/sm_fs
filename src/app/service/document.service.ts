@@ -85,5 +85,11 @@ export class DocumentService {
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
+  downloadTemplate(fprId: number,  templateType: string) {
+    var url = this.docUrl + '/funding-plans-word-template/' + fprId + '/' + templateType;
+    this.logger.debug('Funding Plan Cover Sheet URL:', url);
+    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
+  }
+
 
 }

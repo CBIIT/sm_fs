@@ -112,25 +112,34 @@
                     <div class="d-flex align-items-center">
                         <h3>Scientific Rationale for Supporting RFA/PA</h3>
                         <div class="doc-details">
-                            file-name.docx (Uploaded by <a href="#">Jane Doe</a> on MM/DD/YYYY)
+                            <span class="text-danger">(Document required, not uploaded)</span>
                         </div>
                         <div class="doc-buttons">
-                            <button class="btn btn-link btn-slim"><i class="far fa-eye"></i></button>
-                            <button class="btn btn-link btn-link-danger btn-slim"><i class="fas fa-trash"></i></button>
+                            <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i class="far fa-plus mr-1"
+                                    aria-hidden="true"></i> Add Document</button>
                         </div>
+                        <!-- <div class="doc-details">
+                file-name.docx (Uploaded by <a href="#">Jane Doe</a> on MM/DD/YYYY)
+            </div>
+            <div class="doc-buttons">
+                <button class="btn btn-link btn-slim"><i class="far fa-eye"></i></button>
+                <button class="btn btn-link btn-link-danger btn-slim"><i class="fas fa-trash"></i></button>
+            </div> -->
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
                     <div class="row">
                         <div class="col-lg-6">
                             <p><strong>Note:</strong> Approvals can be completed only if you provide all the information
-                                requested in this <a href="#">template</a>.</p>
+                                requested in this <a [routerLink]="[]" (click)="downloadTemplate('CR_FUNDING_PLAN_SCIENTIFIC_RPT')" >template</a>.</p>
                         </div>
                         <div class="col">
                             <div class="input-group">
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="sciRat-file-input">
-                                    <label class="custom-file-label" for="sciRat-file-input"></label>
+                                    <input type="file" class="custom-file-input" id="sciRat-file-input" #inputFile
+                                        accept=".doc,.docx,.xls,.xlsx,.pdf" (change)="selectFiles($event)">
+                                    <label class="custom-file-label" #labelImport for="sciRat-file-input">Choose
+                                        file</label>
                                 </div>
                             </div>
                         </div>
