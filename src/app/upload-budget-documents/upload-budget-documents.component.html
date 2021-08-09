@@ -9,20 +9,6 @@
     </div>
 
     <div class="col-lg-5">
-
-        <div class="form-group">
-            <label for="add-file">Choose File</label>
-            <div class="input-group">
-                <div class="custom-file">
-                    <input class="custom-file-input" id="add-file" #inputFile type="file"
-                        accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile" (change)="selectFiles($event)">
-                    <span class="custom-file-label" #labelImport for="add-file">Choose file</span>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div class="col-lg-5">
         <div class="form-group">
             <label for="type">Doc Type</label>
             <ng-select2 id="type" [(ngModel)]="selectedDocType" [allowClear]="true"
@@ -33,7 +19,18 @@
             </ng-select2>
         </div>
     </div>
-
+    <div class="col-lg-5">
+        <div class="form-group">
+            <label for="add-file">Choose File</label>
+            <div class="input-group">
+                <div class="custom-file">
+                    <input class="custom-file-input" id="add-file" #inputFile type="file"
+                        accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile" (change)="selectFiles($event)">
+                    <span class="custom-file-label" #labelImport for="add-file">Choose file</span>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="col-lg-2 d-flex align-items-end justify-content-end mb-3">
         <button class="btn btn-primary" [disabled]="!selectedFiles" (click)="uploadFiles()">Upload Doc</button>
     </div>
