@@ -405,6 +405,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
         this.searchCriteria.rfaPaEntries.push(entry);
         entry.selectedNcabDates = criteria.ncabDates;
       }
+      this.canDeactivate = false;
     }
     else {
       this.searchCriteria.rfaPaEntries.push(new RfaPaEntry(this.searchCriteria));
