@@ -37,7 +37,7 @@
         [required] = "mode!=='RELEASE'" 
         #wfcomments="ngModel"></textarea>
         <span class="text-danger mt-1" *ngIf="(wfcomments.invalid) && (wfcomments.touched || wfcForm.submitted) ">
-          Approved Future Years is required
+          Comments are required
         </span>
         <span class="character-counter">{{comments.length}}/500</span>
       </div>
