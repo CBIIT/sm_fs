@@ -94,6 +94,7 @@ import { BudgetDocsReadonlyComponent } from './funding-request/budget-docs-reado
 import { CreateTypeComponent } from './funding-request/create-type/create-type.component';
 import { SelectGrantCheckboxCellRendererComponent } from './funding-plan/plan-step1/select-grant-checkbox-cell-renderer/select-grant-checkbox-cell-renderer.component';
 import { ConceptAwardTrackingComponent } from './funding-plan/concept-award-tracking/concept-award-tracking.component';
+import { PlanCoverPageComponent } from './funding-plan/plan-step5/plan-cover-page/plan-cover-page.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -197,6 +198,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     CreateTypeComponent,
     SelectGrantCheckboxCellRendererComponent,
     ConceptAwardTrackingComponent,
+    PlanCoverPageComponent,
   ],
 
 

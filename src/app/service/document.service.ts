@@ -79,5 +79,11 @@ export class DocumentService {
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
+  downloadFPCoverSheet(fpId: number) {
+    var url = this.docUrl + '/funding-plans-cover-page/' + fpId;
+    this.logger.debug('Funding Plan Cover Sheet URL:', url);
+    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
+  }
+
 
 }
