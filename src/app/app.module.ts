@@ -95,6 +95,9 @@ import { CreateTypeComponent } from './funding-request/create-type/create-type.c
 import { SelectGrantCheckboxCellRendererComponent } from './funding-plan/plan-step1/select-grant-checkbox-cell-renderer/select-grant-checkbox-cell-renderer.component';
 import { ConceptAwardTrackingComponent } from './funding-plan/concept-award-tracking/concept-award-tracking.component';
 import { PlanCoverPageComponent } from './funding-plan/plan-step5/plan-cover-page/plan-cover-page.component';
+import { PlanScientificRationaleComponent } from './funding-plan/plan-step5/plan-scientific-rationale/plan-scientific-rationale.component';
+import { PlanExceptionAppsComponent } from './funding-plan/plan-step5/plan-exception-apps/plan-exception-apps.component';
+import { PlanSkippedAppsComponent } from './funding-plan/plan-step5/plan-skipped-apps/plan-skipped-apps.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -199,6 +202,9 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SelectGrantCheckboxCellRendererComponent,
     ConceptAwardTrackingComponent,
     PlanCoverPageComponent,
+    PlanScientificRationaleComponent,
+    PlanExceptionAppsComponent,
+    PlanSkippedAppsComponent,
   ],
 
 
