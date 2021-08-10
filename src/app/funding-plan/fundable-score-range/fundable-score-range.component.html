@@ -22,7 +22,7 @@
 <div class="row">
     <div class="col-12 mb-5">
         <h2>Applications Within Fundable Score Range</h2>
-        <app-grant-table [grantList]="withinRangeGrants"></app-grant-table>
+        <app-grant-table [grantList]="withinRangeGrants" [minScore]="minimumScore" [maxScore]="maximumScore"></app-grant-table>
     </div>
     <div class="col-12">
         <h2>Applications Outside Fundable Score Range</h2>
