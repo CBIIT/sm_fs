@@ -143,7 +143,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
     this.documentService.upload(file, this._docDto).subscribe(
       event => {
         if (event instanceof HttpResponse) {
-
+          this.workflowModel.budgetDocAdded = true;
           const result = event.body;
           this.logger.debug('Upload Doc: ', result);
           this.spliceDocType(result.docType);
