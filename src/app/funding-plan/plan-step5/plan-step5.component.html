@@ -128,7 +128,8 @@
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <app-plan-file-upload [templateType]="CR_FUNDING_PLAN_SCIENTIFIC_RPT"></app-plan-file-upload>
+                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
+                        [templateType]="CR_FUNDING_PLAN_SCIENTIFIC_RPT"></app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
                             <p>DataTable goes here.</p>
@@ -151,7 +152,8 @@
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <app-plan-file-upload [templateType]="CR_FUNDING_PLAN_EXCEPTION_JUST_RPT"></app-plan-file-upload>
+                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
+                        [templateType]="CR_FUNDING_PLAN_EXCEPTION_JUST_RPT"></app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
                             <p>DataTable goes here.</p>
@@ -174,7 +176,8 @@
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <app-plan-file-upload [templateType]="CR_FUNDING_PLAN_SKIP_JUST_RPT"></app-plan-file-upload>
+                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
+                        [templateType]="CR_FUNDING_PLAN_SKIP_JUST_RPT"></app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
                             <p>DataTable goes here.</p>
@@ -197,7 +200,8 @@
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <app-plan-file-upload [templateType]="Other"></app-plan-file-upload>
+                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)" [templateType]="Other">
+                    </app-plan-file-upload>
                 </ng-template>
             </ngb-panel>
 

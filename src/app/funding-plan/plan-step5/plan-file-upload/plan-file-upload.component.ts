@@ -1,5 +1,5 @@
 import { HttpResponse } from '@angular/common/http';
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { DocumentService } from 'src/app/service/document.service';
 import { saveAs } from 'file-saver';
@@ -18,6 +18,7 @@ export class PlanFileUploadComponent implements OnInit {
   @ViewChild('inputFile') inputFile: ElementRef;
   @ViewChild('labelImport') labelImport: ElementRef;
   @Input() templateType = "Other";
+  @Output() fileUploadEmitter = new EventEmitter<string>();
 
   public _docDto: DocumentsDto = {};
   maxFileSize = 10485760; // 10MB
@@ -40,7 +41,6 @@ export class PlanFileUploadComponent implements OnInit {
 
   downloadTemplate(templateType: string) {
     //TODO: Remove the hardcoded content once previous steps are implemented
-    console.log("templateType: " + templateType);
     this.documentService.downloadTemplate(513, templateType)
 
       //this.documentService.downloadTemplate(this.planModel.fundingPlanDto.fprId, templateTypes)
@@ -76,7 +76,7 @@ export class PlanFileUploadComponent implements OnInit {
         if (event instanceof HttpResponse) {
           const result = event.body;
           this.logger.debug('Upload Doc: ', result);
-          this.loadFiles();
+          this.fileUploadEmitter.emit("Emitting from child");
         }
       },
       err => {
