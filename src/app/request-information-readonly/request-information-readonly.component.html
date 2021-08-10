@@ -72,8 +72,14 @@
     <div class="form-group">
       <p class="like-label">Other DOC(s) Contributing Funds</p>
       <p>
-        <a *ngFor="let doc of otherDocs; let i = index" [routerLink]="" ngbTooltip="{{doc|codeDescription:'NciDocs'}}" triggers="click:blur" placement="top">
-          {{i!==0?',':''}} {{doc}}
+        <a
+          *ngFor="let doc of otherDocs; let first = first"
+          [routerLink]=""
+          ngbTooltip="{{doc|codeDescription:'NciDocs'}}"
+          triggers="click:blur" placement="top">
+          <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>
+          <ng-template #firstDoc>{{doc}}</ng-template>
+          <ng-template #notFirstDoc>, {{doc}}</ng-template>
         </a>
       </p>
     </div>
