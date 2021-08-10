@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from 'src/app/model/plan/plan-model';
@@ -11,7 +12,8 @@ import { PlanModel } from 'src/app/model/plan/plan-model';
 export class PlanStep4Component implements OnInit {
 
   constructor(private navigationModel: NavigationStepModel,
-              private planModel: PlanModel) { }
+              private planModel: PlanModel,
+              private router: Router) { }
 
   skipGrants: NciPfrGrantQueryDtoEx[];
   ncGrants: NciPfrGrantQueryDtoEx[];
@@ -31,6 +33,14 @@ export class PlanStep4Component implements OnInit {
       ( g.priorityScoreNum < this.planModel.minimumScore ||
         g.priorityScoreNum > this.planModel.maximumScore)
       );
+  }
+
+  saveContinue(): void {
+    this.router.navigate(['/plan/step5']);
+  }
+
+  previous(): void {
+    this.router.navigate(['/plan/step3']);
   }
 
 }

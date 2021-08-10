@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 
 @Component({
@@ -8,10 +9,19 @@ import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navi
 })
 export class PlanStep3Component implements OnInit {
 
-  constructor(private navigationModel: NavigationStepModel) { }
+  constructor(private navigationModel: NavigationStepModel,
+              private router: Router) { }
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(3, true);
+  }
+
+  saveContinue(): void {
+    this.router.navigate(['/plan/step4']);
+  }
+
+  previous(): void {
+    this.router.navigate(['/plan/step2']);
   }
 
 }
