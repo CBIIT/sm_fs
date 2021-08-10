@@ -128,25 +128,7 @@
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <p><strong>Note:</strong> Approvals can be completed only if you provide all the information
-                                requested in this <a [routerLink]="[]" (click)="downloadTemplate('CR_FUNDING_PLAN_SCIENTIFIC_RPT')" >template</a>.</p>
-                        </div>
-                        <div class="col">
-                            <div class="input-group">
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="sciRat-file-input" #inputFile
-                                        accept=".doc,.docx,.xls,.xlsx,.pdf" (change)="selectFiles($event)">
-                                    <label class="custom-file-label" #labelImport for="sciRat-file-input">Choose
-                                        file</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-auto">
-                            <button type="button" class="btn btn-primary">Upload</button>
-                        </div>
-                    </div>
+                    <app-plan-file-upload [templateType]="CR_FUNDING_PLAN_SCIENTIFIC_RPT"></app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
                             <p>DataTable goes here.</p>
@@ -169,23 +151,7 @@
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <p><strong>Note:</strong> Approvals can be completed only if you provide all the information
-                                requested in this <a href="#">template</a>.</p>
-                        </div>
-                        <div class="col">
-                            <div class="input-group">
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="justExc-file-input">
-                                    <label class="custom-file-label" for="justExc-file-input"></label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-auto">
-                            <button type="button" class="btn btn-primary">Upload</button>
-                        </div>
-                    </div>
+                    <app-plan-file-upload [templateType]="CR_FUNDING_PLAN_EXCEPTION_JUST_RPT"></app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
                             <p>DataTable goes here.</p>
@@ -208,23 +174,7 @@
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <p><strong>Note:</strong> Approvals can be completed only if you provide all the information
-                                requested in this <a href="#">template</a>.</p>
-                        </div>
-                        <div class="col">
-                            <div class="input-group">
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="justSkip-file-input">
-                                    <label class="custom-file-label" for="justSkip-file-input"></label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-auto">
-                            <button type="button" class="btn btn-primary">Upload</button>
-                        </div>
-                    </div>
+                    <app-plan-file-upload [templateType]="CR_FUNDING_PLAN_SKIP_JUST_RPT"></app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
                             <p>DataTable goes here.</p>
@@ -247,19 +197,7 @@
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <div class="row">
-                        <div class="col">
-                            <div class="input-group">
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="justSkip-file-input">
-                                    <label class="custom-file-label" for="justSkip-file-input"></label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-auto">
-                            <button type="button" class="btn btn-primary">Upload</button>
-                        </div>
-                    </div>
+                    <app-plan-file-upload [templateType]="Other"></app-plan-file-upload>
                 </ng-template>
             </ngb-panel>
 
