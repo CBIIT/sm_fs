@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
-import { FsWorkflowControllerService, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { FsWorkflowControllerService, FundingReqStatusHistoryDto, GmInfoDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { Options } from 'select2';
@@ -298,6 +298,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.workflowService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('submit workflow returned okay ', result);
+        if (dto.gmInfo) {
+          this.setGmInfoToRequestModel(dto.gmInfo);
+        }
         this.workflowModel.initialize();
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
@@ -306,6 +309,13 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.logger.error('submit workflow returned error', error);
       }
     );
+  }
+
+  setGmInfoToRequestModel(gmInfo: GmInfoDto): void {
+    this.requestModel.requestDto.actionType = gmInfo.actionType;
+    this.requestModel.requestDto.pfrSpecFullName = gmInfo.defaultSpecFullName;
+    this.requestModel.requestDto.pfrBkupSpecNpeId = gmInfo.bkupSpecNpeId;
+    this.requestModel.requestDto.pfrBkupSpecFullName = gmInfo.bkupSpecFullName;
   }
 
   isFormValid(): boolean {
