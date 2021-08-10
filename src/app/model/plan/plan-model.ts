@@ -18,6 +18,9 @@ export class PlanModel {
   skippedGrants: NciPfrGrantQueryDto[] = [];
   exceptionGrants: NciPfrGrantQueryDto[] = [];
   grantsSearchCriteria: Array<RfaPaNcabDate> = [];
+  // Data from Step 2
+  minimumScore: number;
+  maximumScore: number;
 
   fundingPlanDto: FundingPlanDto;
 
@@ -40,5 +43,7 @@ export class PlanModel {
     this.skippedGrants = [];
     this.exceptionGrants = [];
     this.grantsSearchCriteria = [];
+    this.minimumScore = 0;
+    this.maximumScore = 0;
   }
 }

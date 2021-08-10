@@ -9,7 +9,42 @@ import {PlanModel} from '../../model/plan/plan-model';
     styleUrls: ['./grant-table.component.css']
 })
 export class GrantTableComponent implements OnInit {
-    @Input() grantList: NciPfrGrantQueryDto[];
+
+  private _grantList: NciPfrGrantQueryDto[];
+  private _minScore: number;
+  private _maxScore: number;
+
+  get grantList(): NciPfrGrantQueryDto[] {
+    return this._grantList;
+  }
+
+  get minScore() : number {
+    return this._minScore;
+  }
+
+  get maxScore() : number {
+    return this._maxScore;
+  }
+
+  @Input()
+  set grantList(val: NciPfrGrantQueryDto[]) {
+    //TODO process event
+    this._grantList = val;
+  }
+
+  // Need min and max score to determine "Skip" and "Exception"
+  @Input()
+  set minScore(val: number) {
+    //TODO process event
+    this._minScore = val;
+  }
+
+  @Input()
+  set maxScore(val: number) {
+    //TODO process event
+    this._maxScore = val;
+  }
+
     tooltipGrant: NciPfrGrantQueryDto;
     grantViewerUrl = this.planModel.grantViewerUrl;
     eGrantsUrl = this.planModel.eGrantsUrl;

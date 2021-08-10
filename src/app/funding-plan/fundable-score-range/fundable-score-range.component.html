@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-12">
-        <h2>Select Fundable Score Range</h2>
+        <h2>Select Fundable Score Range 1</h2>
         <p class="text-muted text-sm">
             The fundable score range is the range of priority scores for applications being recommended for funding under this funding plan. It begins with the best scored application in this RFA/PA and should end with the priority score that is the "natural" cut-off for funding selections.
             <a href="javascript:void(0);" data-toggle="collapse" href="#readmore" role="button" aria-expanded="false" aria-controls="readmore">Read More</a>
@@ -10,9 +10,9 @@
         </p>
     </div>
     <div class="col-12 d-flex align-items-center">
-        <span><strong class="mr-1">30</strong> to</span>
-        <input id="score-max" type="text" class="form-control mx-2" style="width:4rem" aria-label="score range maximum">
-        <button type="button" class="btn btn-primary">Apply</button>
+        <span><strong class="mr-1">{{minimumScore}}</strong> to</span>
+        <input id="score-max" type="text" class="form-control mx-2" style="width:4rem" aria-label="score range maximum" [(ngModel)]="maximumScore">
+        <button type="button" class="btn btn-primary" (click)="onApplyMaximumScore()">Apply</button>
     </div>
     <div class="col-12">
         <hr>
@@ -22,11 +22,11 @@
 <div class="row">
     <div class="col-12 mb-5">
         <h2>Applications Within Fundable Score Range</h2>
-        <app-grant-table [grantList]="applicationsWithinRange()"></app-grant-table>
+        <app-grant-table [grantList]="withinRangeGrants"></app-grant-table>
     </div>
     <div class="col-12">
         <h2>Applications Outside Fundable Score Range</h2>
-        <app-grant-table [grantList]="applicationsOutsideRange()"></app-grant-table>
+        <app-grant-table [grantList]="outsideRangeGrants" [minScore]="minimumScore" [maxScore]="maximumScore"></app-grant-table>
     </div>
 </div>
 
@@ -35,7 +35,7 @@
         <hr>
     </div>
     <div class="col-12 d-flex">
-        <button type="button" class="btn btn-outline-secondary mr-auto">Previous</button>
-        <button type="button" class="btn btn-primary">Save and Continue</button>
+        <button type="button" class="btn btn-outline-secondary mr-auto" routerLink="/plan/step1">Previous</button>
+        <button type="button" class="btn btn-primary" (click)="onSaveAndContinue()">Save and Continue</button>
     </div>
 </div>
