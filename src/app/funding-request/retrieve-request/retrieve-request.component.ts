@@ -30,6 +30,7 @@ export class RetrieveRequestComponent implements OnInit {
     if (this.frqId) {
       this.requestService.retrieveFundingRequestUsingGET(this.frqId).subscribe(
         (result) => {
+          this.logger.warn(result);
           this.requestModel.reset();
           this.requestModel.title = 'View Request Details for';
           this.requestModel.returnToRequestPageLink = true;

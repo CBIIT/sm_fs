@@ -75,7 +75,7 @@
 
     <div class="col-12 collapse show mt-2" id="budget-info-collapse">
       <div><p>Please provide the CAN only if known at the time of approval.</p></div>
-      <div class="col-6" *ngIf="model.isAddFunds() && isFcNci()">
+      <div class="col-6" *ngIf="model.isAddFunds() && (isFcNci() || isFcArc())">
         <app-create-type></app-create-type>
       </div>
       <table class="table table-striped table-bordered budget-info-table">

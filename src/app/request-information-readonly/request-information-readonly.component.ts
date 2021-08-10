@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
 import { FundingRequestSkipDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { FundingRequestTypes } from '../model/request/funding-request-types';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-request-information-readonly',
@@ -11,9 +12,9 @@ import { FundingRequestTypes } from '../model/request/funding-request-types';
 
 export class RequestInformationReadonlyComponent implements OnInit {
 
-  loaMap: any;
+  loaMap: Map<string, string>;
 
-  constructor(private requestModel: RequestModel) {
+  constructor(private requestModel: RequestModel, private logger: NGXLogger) {
   }
 
   otherDocs: string[];
@@ -48,16 +49,20 @@ export class RequestInformationReadonlyComponent implements OnInit {
       }
     }
 
-    this.showNewInvestigator = this.requestModel.grant.activityCode === 'R01'
-                               && ([1, 2].includes(Number(this.requestModel.grant.applTypeCode)));
+    this.showNewInvestigator = this.requestModel.requestDto.financialInfoDto.newInvestigatorFlag
+      && this.requestModel.grant.activityCode === 'R01'
+      && ([1, 2].includes(Number(this.requestModel.grant.applTypeCode)));
     this.newInvestigator = this.requestModel.requestDto.financialInfoDto.newInvestigatorFlag;
-    if (this.newInvestigator === 'true' || this.newInvestigator === 'Y') {
+    if (this.newInvestigator === 'false' || this.newInvestigator === 'true') {
+      this.logger.error('New investigator flag is true or false - it should only be \'Y\' or \'N\'.')
+    }
+    this.logger.debug(this.newInvestigator);
+
+    if (this.newInvestigator === 'Y') {
       this.newInvestigator = 'Yes';
-    }
-    else if (this.newInvestigator === 'false' || this.newInvestigator === 'N') {
+    } else if (this.newInvestigator === 'N') {
       this.newInvestigator = 'No';
-    }
-    else {
+    } else {
       this.newInvestigator = '';
     }
     if (this.isSkip) {
