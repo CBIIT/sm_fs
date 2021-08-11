@@ -11,8 +11,13 @@
     </div>
     <div class="col-12 d-flex align-items-center">
         <span><strong class="mr-1">{{minimumScore}}</strong> to</span>
-        <input id="score-max" type="text" class="form-control mx-2" style="width:4rem" aria-label="score range maximum" [(ngModel)]="maximumScore">
+        <input id="score-max" type="text" class="form-control mx-2" style="width:4rem" aria-label="score range maximum" [(ngModel)]="maximumScore" (keyup)="onMaxScoreChange($event)" (keypress)="numberOnly($event)">
         <button type="button" class="btn btn-primary" (click)="onApplyMaximumScore()">Apply</button>
+    </div>
+    <div class="col-12 text-danger mt-1" *ngIf="errMaxScoreRequired || errMaxScoreRange == true || errMaxScoreNumeric == true">
+      <div *ngIf="errMaxScoreRequired">Error: Please provide the "To" score</div>
+      <div *ngIf="errMaxScoreRange">Error: "To" score cannot be less than the "From" score</div>
+      <div *ngIf="errMaxScoreNumeric">Error: "To" score must be a number</div>
     </div>
     <div class="col-12">
         <hr>

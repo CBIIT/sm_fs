@@ -1,6 +1,5 @@
 <div class="row">
     <div class="col-12">
-        <h2>Results</h2>
         <p *ngIf="noResult">No grants found to display.</p>
         <div [ngStyle]="{display:noResult?'none':'inline'}">
           <table #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
