@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
 import { NGXLogger } from 'ngx-logger';
 import { ControlContainer, NgForm } from '@angular/forms';
@@ -11,7 +11,9 @@ import { ConversionActivityCodeData } from './conversion-activity-codes';
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
 })
 export class Type4ConversionActivityCodeComponent implements OnInit {
-  label = 'Type 4 Conversion Mechanism';
+  @Input() parentForm: NgForm;
+
+  label = 'Conversion Grant Activity Code(s)/Mechanism(s)';
   conversionActivityCodes = ConversionActivityCodeData;
 
   get model(): RequestModel {
