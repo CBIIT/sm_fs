@@ -100,13 +100,13 @@ export class FundingRequestTypeComponent implements OnInit {
       return state.text;
     }
     if (state.additional?.nestedChild) {
-      const rest = $('<span class="lvl3" style="padding-left:2em;">').text(state.text);
-      this.logger.debug(rest.clone().wrap('<div>').parent().html());
+      const rest = $('<span class="lvl3" style="padding-left:1.2em;">').text(state.text);
+      // this.logger.debug(rest.clone().wrap('<div>').parent().html());
       return rest;
     }
     if (state.additional.nestedParent) {
-      const rest = $('<span class="lvl2 parent" style="padding-left:1em;">').text(state.text);
-      this.logger.debug(rest.clone().wrap('<div>').parent().html());
+      const rest = $('<span class="lvl2 parent" style="padding-left:.6em;">').text(state.text);
+      // this.logger.debug(rest.clone().wrap('<div>').parent().html());
       return rest;
     }
     return state.text;
@@ -120,18 +120,9 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   prepareData(list: FundingRequestTypeRulesDto[]): void {
-    this.logger.debug('before');
-    this.logger.debug(list);
-    list.sort((r1, r2) => {
-      if (Number(r1.parentFrtId) === Number(r2.parentFrtId)) {
-        return Number(r1.id) - Number(r2.id);
-      }
-      return Number(r1.parentFrtId) - Number(r2.parentFrtId);
-    });
-    this.logger.debug('after');
-    this.logger.debug(list);
     const allParents = new Array<Select2OptionData>();
     const intermediateParents = new Array<number>();
+    const nestedOptions = new Array<Select2OptionData>();
     const children = new Map<number, Select2OptionData[]>();
     let tmp: Select2OptionData;
     list.forEach(t => {
@@ -164,8 +155,6 @@ export class FundingRequestTypeComponent implements OnInit {
     });
 
     this.data = new Array<Select2OptionData>();
-    this.logger.debug('all parent options (optgroups)');
-    this.logger.debug(allParents);
 
     allParents.forEach(r => {
       const c = children.get(Number(r.id));
@@ -179,14 +168,24 @@ export class FundingRequestTypeComponent implements OnInit {
           ch.additional.nestedChild = true;
         });
       }
-      this.data.push(r);
+      if (!intermediateParents.includes(Number(r.id))) {
+        this.data.push(r);
+      } else {
+        nestedOptions.push(r);
+      }
     });
 
-    this.data = this.data.sort((r1, r2): number => {
-      if (Number(r1.additional.data.parentId) === Number(r2.additional.data.parentId)) {
-        return Number(r1.id) - Number(r2.id);
+    nestedOptions.forEach(n => {
+      const parentId = Number(n.additional.data.parentFrtId);
+      let tmpIndex: number;
+      this.data.forEach((p, index) => {
+        if (Number(p.id) === parentId) {
+          tmpIndex = index;
+        }
+      });
+      if (tmpIndex) {
+        this.data.splice(tmpIndex + 1, 0, n);
       }
-      return Number(r1.additional.data.parentId) - Number(r2.additional.data.parentId);
     });
   }
 
