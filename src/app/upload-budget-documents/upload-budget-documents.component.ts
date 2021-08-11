@@ -92,6 +92,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   loadFiles(): void {
     this.documentService.getFSBudgetFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
       result => {
+        this.requestModel.requestDto.budgetDocs = result;
         this.budgetDocDtos = of(result);
         result.forEach(element => {
 

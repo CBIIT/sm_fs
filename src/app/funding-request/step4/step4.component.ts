@@ -13,7 +13,7 @@ import { FundingRequestIntegrationService } from '../integration/integration.ser
 import { Subscription } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import { WorkflowModalComponent } from '../workflow-modal/workflow-modal.component';
-import { WorkflowActionCode, WorkflowModel } from '../workflow/workflow.model';
+import { ApprovingStatuses, WorkflowActionCode, WorkflowModel } from '../workflow/workflow.model';
 import { WorkflowComponent } from '../workflow/workflow.component';
 import { UploadBudgetDocumentsComponent } from '../../upload-budget-documents/upload-budget-documents.component';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
@@ -59,14 +59,18 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   justificationType = '';
   justificationText = '';
   transitionMemoMissing = false;
-  isDisplayBudgetDocsUploadVar = false;
+  // isDisplayBudgetDocsUploadVar = false;
   closeResult: string;
   _workFlowAction = '';
 
   userCanSubmitApprove = false;
 
-  budgetDocDtos: DocumentsDto[];
-  displayReadOnlyBudgetDocs = false;
+  // get budgetDocDtos(): DocumentsDto[] {
+  //   return this.requestModel.requestDto.budgetDocs;
+  // }
+  get displayReadOnlyBudgetDocs(): boolean {
+    return this.requestModel.requestDto.budgetDocs?.length > 0;
+  }
 
   actionType(workFlowAction: string): void {
     this._workFlowAction = workFlowAction;
@@ -119,12 +123,12 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     this.workflowModel.initialize();
     this.checkUserRolesCas();
     this.checkDocs();
-    this.isDisplayBudgetDocsUpload();
+    // this.isDisplayBudgetDocsUpload();
 
-    this.budgetDocDtos = this.requestModel.requestDto.budgetDocs;
-    if (this.budgetDocDtos.length > 0) {
-      this.displayReadOnlyBudgetDocs = true;
-    }
+    // this.budgetDocDtos = this.requestModel.requestDto.budgetDocs;
+    // if (this.budgetDocDtos.length > 0) {
+    //   this.displayReadOnlyBudgetDocs = true;
+    // }
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
@@ -367,90 +371,94 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-
-  isDisplayBudgetDocsUpload(): void {
-    this.fsWorkflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
-      result => {
-        if (result) {
-          if (!this.isTerminalStatus() && this.requestModel.requestDto.requestStatusCode !== 'ON HOLD') {
-            for (const approver in result) {
-              if (this.isCurrentApprover(result[approver]) || this.workflowModel.approvedByFC) {
-                if (result[approver].roleCode === 'FCARC' ||
-                  result[approver].roleCode === 'FCNCI') {
-                  this.isDisplayBudgetDocsUploadVar = true;
-                  break;
-                }
-              }
-            }
-          }
-        }
-      }, error => {
-        this.logger.error('HttpClient get request error for----- ' + error.message);
-      });
+  get isDisplayBudgetDocsUploadVar(): boolean {
+    return this.workflowModel.isFinancialApprover &&
+           ApprovingStatuses.includes(this.requestStatus);
   }
 
-  isTerminalStatus(): boolean {
-    return (this.terminalStatus.indexOf(this.requestModel.requestDto.requestStatusCode) > -1);
-  }
+  // isDisplayBudgetDocsUpload(): void {
+  //   this.fsWorkflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
+  //     result => {
+  //       if (result) {
+  //         if (!this.isTerminalStatus() && this.requestModel.requestDto.requestStatusCode !== 'ON HOLD') {
+  //           for (const approver in result) {
+  //             if (this.isCurrentApprover(result[approver]) || this.workflowModel.approvedByFC) {
+  //               if (result[approver].roleCode === 'FCARC' ||
+  //                 result[approver].roleCode === 'FCNCI') {
+  //                 this.isDisplayBudgetDocsUploadVar = true;
+  //                 break;
+  //               }
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }, error => {
+  //       this.logger.error('HttpClient get request error for----- ' + error.message);
+  //     });
+  // }
 
-  isCurrentApprover(approver: FundingReqApproversDto): boolean {
-    const loggedOnUser: NciPerson = this.userSessionService.getLoggedOnUser();
-    const userId = loggedOnUser.nihNetworkId;
-    if (approver.activeFlag === 'Y') {
-      if (approver.approverLdap.toLowerCase() === userId.toLowerCase() ||
-        this.isCurrentUserDesignee(approver.designees) ||
-        this.isUserPfrGmCommonApprover(approver, loggedOnUser)) {
-        return true;
-      }
-    }
-    return false;
-  }
+  // isTerminalStatus(): boolean {
+  //   return (this.terminalStatus.indexOf(this.requestModel.requestDto.requestStatusCode) > -1);
+  // }
 
-  isCurrentUserDesignee(designees: Array<FundingRequestPermDelDto>): boolean {
-    if (designees) {
-      const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-      for (const designee in designees) {
-        if (designees[designee].delegateTo.toLowerCase() === userId.toLowerCase()) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
+  // isCurrentApprover(approver: FundingReqApproversDto): boolean {
+  //   const loggedOnUser: NciPerson = this.userSessionService.getLoggedOnUser();
+  //   const userId = loggedOnUser.nihNetworkId;
+  //   if (approver.activeFlag === 'Y') {
+  //     if (approver.approverLdap.toLowerCase() === userId.toLowerCase() ||
+  //       this.isCurrentUserDesignee(approver.designees) ||
+  //       this.isUserPfrGmCommonApprover(approver, loggedOnUser)) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
-  isUserOEFIAFinacialAnalyst(approver: FundingReqApproversDto, loggedOnUser: NciPerson): boolean {
-    if (approver.roleCode === 'FCNCI' && this.hasOEFIARole(loggedOnUser)) {
-      return true;
-    }
-    return false;
-  }
+  // isCurrentUserDesignee(designees: Array<FundingRequestPermDelDto>): boolean {
+  //   if (designees) {
+  //     const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+  //     for (const designee in designees) {
+  //       if (designees[designee].delegateTo.toLowerCase() === userId.toLowerCase()) {
+  //         return true;
+  //       }
+  //     }
+  //   }
+  //   return false;
+  // }
 
-  hasOEFIARole(loggedOnUser: NciPerson): boolean {
-    const rolesList: I2ERoles[] = loggedOnUser.roles;
-    for (const role in rolesList) {
-      if (rolesList[role].roleCode === 'FA' && rolesList[role].orgAbbrev === 'OEFIA') {
-        return true;
-      }
-    }
-    return false;
-  }
+  // isUserOEFIAFinacialAnalyst(approver: FundingReqApproversDto, loggedOnUser: NciPerson): boolean {
+  //   if (approver.roleCode === 'FCNCI' && this.hasOEFIARole(loggedOnUser)) {
+  //     return true;
+  //   }
+  //   return false;
+  // }
 
-  isUserPfrGmCommonApprover(approver: FundingReqApproversDto, loggedOnUser: NciPerson): boolean {
-    if (approver.roleCode === 'GM' && this.hasPFRGMAPRRole(loggedOnUser)) {
-      return true;
-    }
-    return false;
-  }
+  // hasOEFIARole(loggedOnUser: NciPerson): boolean {
+  //   const rolesList: I2ERoles[] = loggedOnUser.roles;
+  //   for (const role in rolesList) {
+  //     if (rolesList[role].roleCode === 'FA' && rolesList[role].orgAbbrev === 'OEFIA') {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
-  hasPFRGMAPRRole(loggedOnUser: NciPerson): boolean {
-    const rolesList: I2ERoles[] = loggedOnUser.roles;
-    for (const role in rolesList) {
-      if (rolesList[role].roleCode === 'PFRGMAPR') {
-        return true;
-      }
-    }
-    return false;
-  }
+  // isUserPfrGmCommonApprover(approver: FundingReqApproversDto, loggedOnUser: NciPerson): boolean {
+  //   if (approver.roleCode === 'GM' && this.hasPFRGMAPRRole(loggedOnUser)) {
+  //     return true;
+  //   }
+  //   return false;
+  // }
+
+  // hasPFRGMAPRRole(loggedOnUser: NciPerson): boolean {
+  //   const rolesList: I2ERoles[] = loggedOnUser.roles;
+  //   for (const role in rolesList) {
+  //     if (rolesList[role].roleCode === 'PFRGMAPR') {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
   get self(): Step4Component {
     return this;
