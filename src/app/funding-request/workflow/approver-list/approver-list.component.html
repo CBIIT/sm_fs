@@ -20,7 +20,7 @@
     </table>
 </div>
 
-<div class="col-12">
+<div class="col-12" *ngIf="!terminalRequest">
     <h3 id="approver-table-label">Next Scheduled Approvers</h3>
     <table class="table table-striped table-bordered next-approvers-table" aria-describedby="approver-table-label">
         <thead>

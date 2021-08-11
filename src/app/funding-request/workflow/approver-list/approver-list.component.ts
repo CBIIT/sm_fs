@@ -16,6 +16,7 @@ import { FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
 
 export class ApproverListComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
+  @Input() terminalRequest = false;
 
   options: Options;
 
