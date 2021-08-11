@@ -99,11 +99,11 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
 
       ajax: (dataTablesParameters: any, callback) => {
         this.loaderService.show();
-        this.logger.debug('Funding Request search for: ', this.searchCriteria);
+        // this.logger.debug('Funding Request search for: ', this.searchCriteria);
         this.fsRequestControllerService.searchDtGrantsUsingPOST(
           Object.assign(dataTablesParameters, this.searchCriteria)).subscribe(
           result => {
-            this.logger.debug('Funding Request search result: ', result);
+            // this.logger.debug('Funding Request search result: ', result);
             this.grantList = result.data;
             this.gsfs.searched = true;
             callback({
@@ -340,7 +340,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
 
   // restore the search criteria when user navigates back to step1 from step2, step3 ...
   restoreSearchFilter(): void {
-    this.logger.debug('Restore search filter: ', this.gsfs, this.searchCriteria);
+    // this.logger.debug('Restore search filter: ', this.gsfs, this.searchCriteria);
   //  this.searchWithin = '';
     this.piName = this.searchCriteria.piName;
     this.fyRange = {fromFy: this.searchCriteria.fromFy, toFy: this.searchCriteria.toFy};
