@@ -3,14 +3,16 @@
     <table class="table table-striped table-bordered next-approvers-table" aria-describedby="approver-table-label">
         <thead>
             <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Official Role</th>
+                <th scope="col" style="width:4rem">Order</th>
+                <th scope="col" style="width:14rem" >Name</th>
+                <th scope="col" style="width:24rem" >Official Role</th>
                 <th scope="col">Approval Date</th>
                 <th scope="col">Approved By</th>
             </tr>
         </thead>
         <tbody pa >
             <tr *ngFor="let a of previousApprovers; let i = index">
+                <td><span [ngClass]="[ approverRoleName(a).includes('Additional Approver') ? 'order-icon' : 'fa fa-lock']" ></span>&nbsp;{{ a.orderNum}}</td>
                 <td><app-approver-name-renderer [approver]="a"></app-approver-name-renderer></td>
                 <td>{{ approverRoleName(a)}}</td>
                 <td>{{ a.responseDate }}</td>
@@ -26,8 +28,8 @@
         <thead>
             <tr>
                 <th scope="col" style="width:4rem">Order</th>
-                <th scope="col">Name</th>
-                <th scope="col">Official Role</th>
+                <th scope="col" style="width:14rem" >Name</th>
+                <th scope="col" style="width:24rem">Official Role</th>
                 <th scope="col">Designees</th>
             </tr>
         </thead>
@@ -59,7 +61,8 @@
         </ng-container>
         <ng-container na>
             <tr *ngFor="let a of pendingApprovers; let i = index">
-                <td><span class="fa fa-lock" *ngIf="!readonly"></span>&nbsp;{{ a.orderNum}}</td>
+                <td><span [ngClass]="[ approverRoleName(a).includes('Additional Approver') ? 'order-icon' : 'fa fa-lock']"    
+                     ></span>&nbsp;{{ a.orderNum}}</td>
                 <td><app-approver-name-renderer [approver]="a"></app-approver-name-renderer></td>
                 <td>{{approverRoleName(a)}}</td>
                 <td><span *ngFor="let d of a.designees">
