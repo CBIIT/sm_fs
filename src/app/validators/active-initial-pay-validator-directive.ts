@@ -4,7 +4,7 @@ import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { Observable } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
-import { INITIAL_PAY_TYPES } from '../model/request/funding-request-types';
+import { INITIAL_PAY_TYPES, SKIP_TYPES } from '../model/request/funding-request-types';
 
 @Directive({
   selector: '[appActiveInitialPayValidator]',
@@ -16,7 +16,7 @@ export class ActiveInitialPayValidatorDirective implements AsyncValidator {
   }
 
   validate(control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
-    const initialPayType = INITIAL_PAY_TYPES.includes(Number(control.value));
+    const initialPayType = INITIAL_PAY_TYPES.includes(Number(control.value)) || SKIP_TYPES.includes(Number(control.value));
     // this.logger.debug('value:', control.value, '-- request type:', this.requestModel.requestDto.frtId, '-- initialPay:',
     //   this.requestModel.isInitialPay(), initialPayType);
     if (isNaN(control.value) || !initialPayType) {
