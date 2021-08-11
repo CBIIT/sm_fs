@@ -20,6 +20,7 @@ export class NewInvestigatorComponent implements OnInit {
 
   ngOnInit(): void {
     this.data = [
+      { id: '', text: '' },
       { id: 'Y', text: 'Yes' },
       { id: 'N', text: 'No' }
     ];
