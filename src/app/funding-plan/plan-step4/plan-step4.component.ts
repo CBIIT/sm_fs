@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { NGXLogger } from 'ngx-logger';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from 'src/app/model/plan/plan-model';
@@ -12,14 +13,14 @@ import { PlanModel } from 'src/app/model/plan/plan-model';
 export class PlanStep4Component implements OnInit {
 
   constructor(private navigationModel: NavigationStepModel,
-              private planModel: PlanModel,
+              public planModel: PlanModel,
+              private logger: NGXLogger,
               private router: Router) {
-                this.model = planModel;
               }
 
   skipGrants: NciPfrGrantQueryDtoEx[];
   ncGrants: NciPfrGrantQueryDtoEx[];
-  model: PlanModel;
+//  model: PlanModel;
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(4, true);
@@ -29,6 +30,7 @@ export class PlanStep4Component implements OnInit {
       g.priorityScoreNum >= this.planModel.minimumScore &&
       g.priorityScoreNum <= this.planModel.maximumScore
     );
+    this.logger.debug('skip grants are ', this.skipGrants);
 
     this.ncGrants = this.planModel.allGrants.filter(g =>
       !g.selected &&
@@ -36,6 +38,7 @@ export class PlanStep4Component implements OnInit {
       ( g.priorityScoreNum < this.planModel.minimumScore ||
         g.priorityScoreNum > this.planModel.maximumScore)
       );
+    this.logger.debug('not considered grants are ', this.ncGrants);
   }
 
   saveContinue(): void {

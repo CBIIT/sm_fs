@@ -112,13 +112,13 @@
     <div class="col-12 collapse show mt-2" id="apps-notconsidered-collapse">
         <p *ngIf = "!ncGrants||ncGrants.length === 0; else ncelse">
             Nothing found to be displayed. All applications received for 
-            <span *ngFor = "let rfaNcCab of model.grantsSearchCriteria let j=index">
+            <span *ngFor = "let rfaNcCab of planModel.grantsSearchCriteria let j=index">
                 {{j!=0?'; ':''}}{{rfaNcCab.rfaPaNumber}} 
                 (<span *ngFor = "let ncCab of rfaNcCab.ncabDates, let i=index">
                     {{i!=0?', ':''}}{{ncCab | formatNcabDate }} 
                 </span>)
             </span> 
-            have been considered for funding"
+            have been considered for funding.
         </p>
         <ng-template #ncelse>
         <app-grant-table [grantList]="ncGrants"></app-grant-table>
