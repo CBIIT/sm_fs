@@ -47,17 +47,19 @@ export class SupportingDocsReadonlyComponent implements OnInit {
     this.docDtos = this.parent.docDtos;
     this.excludedDocDtos = this.parent.excludedDocDtos;
 
-    for (const doc of this.docDtos) {
-      if (doc.docType === 'Summary Statement') {
-        this.isSummaryIncluded = true;
-        break;
+    if (this.docDtos !== null) {
+      for (const doc of this.docDtos) {
+        if (doc.docType === 'Summary Statement') {
+          this.isSummaryIncluded = true;
+          break;
+        }
       }
     }
-
+   
     if (this.requestModel.requestDto.requestType === 'Pay Type 4' ||
-    (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== null)) {
-       this.displayTansitionMemo = true;
-  }
+      (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== null)) {
+      this.displayTansitionMemo = true;
+    }
 
   }
 
