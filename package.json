@@ -24,7 +24,7 @@
     "@angular/platform-browser-dynamic": "~11.1.0",
     "@angular/router": "^11.2.12",
     "@nci-cbiit/i2ecui-lib": "latest",
-    "@nci-cbiit/i2ecws-lib": "/Users/polonskyy/Work/GITHUB/sm_i2e_common_ws/i2ecws-rest-common/target/swagger/angular-client/dist",
+    "@nci-cbiit/i2ecws-lib": "latest",
     "@ng-bootstrap/ng-bootstrap": "^9.0.2",
     "@types/jquery": "^3.5.5",
     "@types/select2": "^4.0.53",
