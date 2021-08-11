@@ -14,7 +14,7 @@ import { Step4Component } from '../step4/step4.component';
 })
 export class BudgetDocsReadonlyComponent implements OnInit {
 
-  budgetDocDtos: DocumentsDto[];
+//  budgetDocDtos: DocumentsDto[];
   private _parent: Step4Component;
   @Input() set parent(value: Step4Component) {
     this._parent = value;
@@ -25,11 +25,11 @@ export class BudgetDocsReadonlyComponent implements OnInit {
   }
 
   constructor(private requestModel: RequestModel,
-    private documentService: DocumentService,
-    private logger: NGXLogger) { }
+              private documentService: DocumentService,
+              private logger: NGXLogger) { }
 
   ngOnInit(): void {
-    this.budgetDocDtos = this.parent.budgetDocDtos;
+  //  this.budgetDocDtos = this.parent.budgetDocDtos;
   }
 
   downloadFile(id: number, fileName: string): void {
@@ -42,6 +42,10 @@ export class BudgetDocsReadonlyComponent implements OnInit {
         }
       );
 
+  }
+
+  get budgetDocDtos(): DocumentsDto[]{
+    return this.requestModel.requestDto.budgetDocs;
   }
 
 }
