@@ -38,6 +38,9 @@ export class WorkflowModel {
   approvedByFC = false;
   isDocApprover = false;
   approvedByDoc = false;
+  // keep track whether budget doc was added during approval by FC to show warning message.
+  budgetDocAdded = false;
+
   scientificRoleCodes = ['DOC', 'DD', 'SPL'];
   financialRoleCodes = ['FCNCI', 'FCARC'];
   approvalActions = [WorkflowActionCode.APPROVE,
@@ -292,7 +295,7 @@ export class WorkflowModel {
     }
   }
 
-  // this is used by SubmitRequest method to show the next approver in the submission message.
+  // this is used by SubmitWorkflowRequest method to show the next approver in the submission message.
   getNextApproverInChain(): FundingReqApproversDto {
     if (this.oneApprover) {
       return this.oneApprover;
@@ -309,6 +312,8 @@ export class WorkflowModel {
     return this.approvalActions.indexOf(action) > -1;
   }
 
+  // this is used by SubmitWorkflowRequest method to show the DOC approver in the submission message
+  // in the case of DEFER
   getDocApprover(): FundingReqApproversDto {
     return this._docApprover;
   }

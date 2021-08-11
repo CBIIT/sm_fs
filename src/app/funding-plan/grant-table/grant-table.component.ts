@@ -1,35 +1,50 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
 import {AppPropertiesService} from '../../service/app-properties.service';
 import {PlanModel} from '../../model/plan/plan-model';
+import {DataTableDirective} from "angular-datatables";
+import {FullGrantNumberCellRendererComponent} from "../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component";
+import {CancerActivityCellRendererComponent} from "../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component";
+import {ExistingRequestsCellRendererComponent} from "../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component";
+import {NciPfrGrantQueryDtoEx} from "../../model/plan/nci-pfr-grant-query-dto-ex";
+import {Subject} from "rxjs";
 
 @Component({
-    selector: 'app-grant-table',
-    templateUrl: './grant-table.component.html',
-    styleUrls: ['./grant-table.component.css']
+  selector: 'app-grant-table',
+  templateUrl: './grant-table.component.html',
+  styleUrls: ['./grant-table.component.css']
 })
-export class GrantTableComponent implements OnInit {
+export class GrantTableComponent implements OnInit, AfterViewInit {
 
-  private _grantList: NciPfrGrantQueryDto[];
+  private _grantList: NciPfrGrantQueryDtoEx[] = [];
   private _minScore: number;
   private _maxScore: number;
 
-  get grantList(): NciPfrGrantQueryDto[] {
+  get grantList(): NciPfrGrantQueryDtoEx[] {
     return this._grantList;
   }
 
-  get minScore() : number {
+  get minScore(): number {
     return this._minScore;
   }
 
-  get maxScore() : number {
+  get maxScore(): number {
     return this._maxScore;
   }
 
   @Input()
-  set grantList(val: NciPfrGrantQueryDto[]) {
+  set grantList(val: NciPfrGrantQueryDtoEx[]) {
     //TODO process event
     this._grantList = val;
+    if (this.dtOptions) {
+      this.dtOptions.data = this._grantList;
+    }
+    if (this.dtElement && this.dtElement.dtInstance) {
+      this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+        dtInstance.destroy();
+        this.dtTrigger.next();
+      });
+    }
   }
 
   // Need min and max score to determine "Skip" and "Exception"
@@ -45,152 +60,119 @@ export class GrantTableComponent implements OnInit {
     this._maxScore = val;
   }
 
-    tooltipGrant: NciPfrGrantQueryDto;
-    grantViewerUrl = this.planModel.grantViewerUrl;
-    eGrantsUrl = this.planModel.eGrantsUrl;
+  grantViewerUrl: string = this.planModel.grantViewerUrl;
+  eGrantsUrl: string = this.planModel.eGrantsUrl;
 
-    constructor(private planModel: PlanModel) {
+  @ViewChild(DataTableDirective, {static: false}) dtElement: DataTableDirective;
+  @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
+  @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
+  @ViewChild('existingRequestsRenderer') existingRequestsRenderer: TemplateRef<ExistingRequestsCellRendererComponent>;
 
+  dtTrigger: Subject<any> = new Subject();
+  dtOptions: any = {};
+
+  constructor(private planModel: PlanModel) {
+  }
+
+  get noResult(): boolean {
+    return !this._grantList || this._grantList.length === 0;
+  }
+
+  ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+    this.dtOptions = {
+      paging: false,
+      data: this._grantList,
+      columns: [
+        {title: 'Grant Number', data: 'fullGrantNum', //0
+            ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'},
+        {title: 'PI', data: 'piFullName', //1
+            render: ( data, type, row, meta ) => {
+              return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+            },
+            className: 'all'},
+        {title: 'Project Title', data: 'projectTitle'}, //2
+        {title: 'RFA/PA', data: 'rfaPaNumber', //3
+            render: ( data, type, row, meta ) => {
+              return '<a href="' + row.nihGuideAddr + '" target="blank" >' + data + '</a>';
+            }},
+        {title: 'I2 Status', data: 'applStatusGroupDescrip'}, //4
+        {title: 'PD', data: 'pdFullName',  //5
+            render: ( data, type, row, meta ) => {
+              return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+            }},
+        {title: 'CA', data: 'cayCode', //6
+            ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'},
+        {title: 'FY', data: 'fy'}, //7
+        {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', //8
+            render: ( data, type, row, meta) => {
+              return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
+            }},
+        {title: 'Pctl', data: 'irgPercentileNum'}, //9
+        {title: 'PriScr', data: 'priorityScoreNum'}, //10
+        {title: 'Budget Start Date', data: 'budgetStartDate'}, //11
+        {title: 'Existing Requests', data: 'requestCount', //12
+            ngTemplateRef: { ref: this.existingRequestsRenderer}, className: 'all'},
+        {data: null, defaultContent: ''}
+      ],
+      order: [[10, 'asc']],
+      responsive: {
+        details: {
+          type: 'column',
+          target: -1
+        }
+      },
+      columnDefs: [
+        {
+          className: 'control',
+          orderable: false,
+          targets: -1
+        },
+        {responsivePriority: 1, targets: 0 }, // grant_num
+        {responsivePriority: 3, targets: 1 }, // pi
+        {responsivePriority: 4, targets: 8 }, // ncab
+        {responsivePriority: 5, targets: 7 }, // fy
+        {responsivePriority: 6, targets: 5 }, // pd
+        {responsivePriority: 7, targets: 6 }, // ca
+        {responsivePriority: 8, targets: 9 }, // pctl
+        {responsivePriority: 9, targets: 10 }, // priscr
+        {responsivePriority: 10, targets: 3 }, // rfa/pa
+        {responsivePriority: 11, targets: 12 }, // existing requests
+        {responsivePriority: 12, orderable: false, targets: 2 }, // project title
+        {responsivePriority: 13, targets: 4 }, // i2 status
+        {responsivePriority: 14, targets: 11 } // budget start date
+      ],
+      dom: '<"dt-controls"<"ml-auto"fB<"d-inline-block">>>rt<"dt-controls"<"mr-auto"i>>',
+      buttons: [
+        {
+          extend: 'excel',
+          className: 'btn-excel',
+          titleAttr: 'Excel export',
+          text: 'Export',
+          filename: 'fs-fp-grants-search-result',
+          title: null,
+          header: true,
+          exportOptions: { columns: [ 0, 1, 2, 3 , 4 , 5, 6, 7, 8, 9, 10, 11, 12 ] }
+        }
+      ],
+      rowCallback: (row: Node, data: any[] | object, index: number) => {
+        // Fix for Excel output - I removed empty renderers in column definitions
+        // But now, I have to remove the first "text" child node to prevent it
+        // from rendering (angular datatables bug)
+        this.dtOptions.columns.forEach((column, ind) => {
+          if (column.ngTemplateRef) {
+            const cell = row.childNodes.item(ind);
+            if (cell.childNodes.length > 1) { // you have to leave at least one child node
+              $(cell.childNodes.item(0)).remove();
+            }
+          }
+        });
+      }
     }
 
-    ngOnInit(): void {
-    }
-
-    setGrant(grant: NciPfrGrantQueryDto): void {
-        this.tooltipGrant = grant;
-    }
-
-    get noResult(): boolean {
-        return !this.grantList || this.grantList.length === 0;
-    }
-
-    // ngAfterViewInit(): void {
-    //     // this.initDatatable();
-    //     this.grantNumberComponent.grantNumberType = this.searchCriteria.grantType;
-    //     this.grantNumberComponent.grantNumberMech = this.searchCriteria.grantMech;
-    //     this.grantNumberComponent.grantNumberIC = this.searchCriteria.grantIc;
-    //     this.grantNumberComponent.grantNumberSerial = this.searchCriteria.grantSerial;
-    //     this.grantNumberComponent.grantNumberYear = this.searchCriteria.grantYear;
-    //     this.grantNumberComponent.grantNumberSuffix = this.searchCriteria.grantSuffix;
-    //
-    //     this.dtOptions = {
-    //         pagingType: 'full_numbers',
-    //         pageLength: 100,
-    //         serverSide: true,
-    //         processing: true,
-    //         language: {
-    //             paginate: {
-    //                 first: '<i class="far fa-chevron-double-left" title="First"></i>',
-    //                 previous: '<i class="far fa-chevron-left" title="Previous"></i>',
-    //                 next: '<i class="far fa-chevron-right" title="Next"></i>',
-    //                 last: '<i class="far fa-chevron-double-right" Last="First"></i>'
-    //             }
-    //         },
-    //
-    //         ajax: (dataTablesParameters: any, callback) => {
-    //             this.loaderService.show();
-    //             this.logger.debug('Funding Request search for: ', this.searchCriteria);
-    //             this.fsRequestControllerService.searchDtGrantsUsingPOST(
-    //               Object.assign(dataTablesParameters, this.searchCriteria)).subscribe(
-    //               result => {
-    //                   this.logger.debug('Funding Request search result: ', result);
-    //                   this.grantList = result.data;
-    //                   this.gsfs.searched = true;
-    //                   callback({
-    //                       recordsTotal: result.recordsTotal,
-    //                       recordsFiltered: result.recordsFiltered,
-    //                       data: result.data
-    //                   });
-    //                   this.loaderService.hide();
-    //               }, error => {
-    //                   this.loaderService.hide();
-    //                   this.logger.error('HttpClient get request error for----- ' + error.message);
-    //               });
-    //         },
-    //
-    //         columns: [
-    //             {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, render: () => '', className: 'all'},
-    //             {title: 'PI', data: 'piFullName', render: ( data, type, row, meta ) => {
-    //                     return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-    //                 }, className: 'all'},
-    //             {title: 'Project Title', data: 'projectTitle'},
-    //             {title: 'RFA/PA', data: 'rfaPaNumber'},
-    //             {title: 'I2 Status', data: 'applStatusGroupDescrip'},
-    //             {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
-    //                     return '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-    //                 }},
-    //             {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, render: () => '', className: 'all'},
-    //             {title: 'FY', data: 'fy'},
-    //             {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', render: ( data, type, row, meta) => {
-    //                     return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
-    //                 }},
-    //             {title: 'Pctl', data: 'irgPercentileNum'},
-    //             {title: 'PriScr', data: 'priorityScoreNum'},
-    //             {title: 'Budjet Start Date', data: 'budgetStartDate'},
-    //             {title: 'Existing Requests', data: 'requestCount', ngTemplateRef: { ref: this.existingRequestsRenderer}, render: () => '', className: 'all'},
-    //             {title: 'Action', data: null,  defaultContent: 'Select', ngTemplateRef: { ref: this.fundingRequestActionRenderer}, render: () => '', className: 'all'},
-    //             {data: null, defaultContent: ''}
-    //         ],
-    //         // columnDefs: [ { orderable: false, targets: -1 }],.
-    //         // responsive: true,
-    //
-    //         responsive: {
-    //             details: {
-    //                 type: 'column',
-    //                 target: -1
-    //             }
-    //         },
-    //         columnDefs: [
-    //             {
-    //                 className: 'control',
-    //                 orderable: false,
-    //                 targets: -1
-    //             },
-    //             {responsivePriority: 1, targets: 0 }, // grant_num
-    //             {responsivePriority: 2, targets: 13 }, // action
-    //             {responsivePriority: 3, targets: 1 }, // pi
-    //             {responsivePriority: 4, targets: 8 }, // ncab
-    //             {responsivePriority: 5, targets: 7 }, // fy
-    //             {responsivePriority: 6, targets: 5 }, // pd
-    //             {responsivePriority: 7, targets: 6 }, // ca
-    //             {responsivePriority: 8, targets: 9 }, // pctl
-    //             {responsivePriority: 9, targets: 10 }, // priscr
-    //             {responsivePriority: 10, targets: 3 }, // rfa/pa
-    //             {responsivePriority: 11, targets: 12 }, // existing requests
-    //             {responsivePriority: 12, targets: 2 }, // project title
-    //             {responsivePriority: 13, targets: 4 }, // i2 status
-    //             {responsivePriority: 14, targets: 11 } // budget start date
-    //         ],
-    //         // dom:  '<"table-controls"<""l><"ml-auto mr-2"B><""p>>' +
-    //         //       '<"row"<"col-12"tr>>' +
-    //         //       '<"table-controls"<""i><"ml-auto mr-2"B><""p>>',
-    //         // buttons: {
-    //         //     dom: {
-    //         //       button: {
-    //         //         tag: 'button',
-    //         //         className: 'btn btn-sm btn-outline-secondary'
-    //         //       }
-    //         //     },
-    //         dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
-    //         buttons: [
-    //             {
-    //                 extend: 'excel',
-    //                 className: 'btn-excel',
-    //                 titleAttr: 'Excel export',
-    //                 text: 'Export',
-    //                 filename: 'fs-grants-search-result',
-    //                 title: null,
-    //                 header: true,
-    //                 exportOptions: { columns: [ 0, 1, 2, 3, 4 , 5 , 6, 7, 8, 9, 10, 11, 12 ] }
-    //             }
-    //         ]
-    //         // },
-    //     };
-    //
-    //     this.search();
-    //     setTimeout(() => this.dtTrigger.next(), 0);
-    //
-    // }
-
+    setTimeout(() => this.dtTrigger.next(), 0);
+  }
 
 }

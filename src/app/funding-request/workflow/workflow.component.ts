@@ -11,7 +11,6 @@ import { GmInfoComponent } from './gm-info/gm-info.component';
 import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
 import { Alert } from 'src/app/alert-billboard/alert';
-import { validateLocaleAndSetLanguage } from 'typescript';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -280,6 +279,12 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         dto.requestCans = this.requestModel.requestCans;
         this.logger.debug('scientific approver:', dto.requestCans);
 //      dto.requestCans = this.approvedCostsComponent.getCans();
+    }
+
+    if (this.workflowModel.isFinancialApprover
+      && this.workflowModel.isApprovalAction(action)
+      && this.workflowModel.budgetDocAdded) {
+        alert('WARNING: If the uploaded budget document(s) are not in eGrants, please send the document(s) to the appropriate Grants Management Specialist to add it the grant file in eGrants.');
     }
 
     this.logger.debug(this.workflowModel.isApprovalAction(action));

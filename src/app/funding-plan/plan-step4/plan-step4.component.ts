@@ -13,10 +13,13 @@ export class PlanStep4Component implements OnInit {
 
   constructor(private navigationModel: NavigationStepModel,
               private planModel: PlanModel,
-              private router: Router) { }
+              private router: Router) {
+                this.model = planModel;
+              }
 
   skipGrants: NciPfrGrantQueryDtoEx[];
   ncGrants: NciPfrGrantQueryDtoEx[];
+  model: PlanModel;
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(4, true);

@@ -98,6 +98,7 @@ import { PlanCoverPageComponent } from './funding-plan/plan-step5/plan-cover-pag
 import { PlanScientificRationaleComponent } from './funding-plan/plan-step5/plan-scientific-rationale/plan-scientific-rationale.component';
 import { PlanExceptionAppsComponent } from './funding-plan/plan-step5/plan-exception-apps/plan-exception-apps.component';
 import { PlanSkippedAppsComponent } from './funding-plan/plan-step5/plan-skipped-apps/plan-skipped-apps.component';
+import { PlanFileUploadComponent } from './funding-plan/plan-step5/plan-file-upload/plan-file-upload.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -205,6 +206,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     PlanScientificRationaleComponent,
     PlanExceptionAppsComponent,
     PlanSkippedAppsComponent,
+    PlanFileUploadComponent,
   ],
 
 

@@ -1,0 +1,19 @@
+<div class="row">
+    <div *ngIf="templateType !== 'Other'" class="col-lg-6">
+        <p><strong>Note:</strong> Approvals can be completed only if you provide all the information
+            requested in this <a [routerLink]="[]" (click)="downloadTemplate(templateType)" >template</a>.</p>
+    </div>
+    <div class="col">
+        <div class="input-group">
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="file-input" #inputFile
+                    accept=".doc,.docx,.xls,.xlsx,.pdf" (change)="selectFiles($event)">
+                <label class="custom-file-label" #labelImport for="file-input">Choose
+                    file</label>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-auto">
+        <button type="button" class="btn btn-primary" [disabled]="!selectedFiles" (click)="uploadFiles()">Upload</button>
+    </div>
+</div>
