@@ -6,5 +6,11 @@
   #conversionMech="ngModel"
   [(ngModel)]="model.requestDto.conversionActivityCode"
   [allowClear]="true"
-  [data]="conversionActivityCodes">
+  [data]="conversionActivityCodes"
+  required>
 </ng-select2>
+<div
+  class="text-danger mt-1"
+  *ngIf="conversionMech.errors?.required && (conversionMech.touched || parentForm?.submitted)">
+  Converstion Grant Activity Code(s)/Mechanism(s) is required
+</div>
