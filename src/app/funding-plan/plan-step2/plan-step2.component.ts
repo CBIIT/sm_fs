@@ -11,7 +11,7 @@ export class PlanStep2Component implements OnInit {
   constructor(private navigationModel: NavigationStepModel) { }
 
   ngOnInit(): void {
-    this.navigationModel.setStepLinkable(2, true);
+    this.navigationModel.setStepLinkable(2, false);
   }
 
 }
