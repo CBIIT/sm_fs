@@ -14,7 +14,7 @@ import { ProgramRecommendedCostsModel } from '../../program-recommended-costs/pr
 import { FundingSourceTypes } from './funding-source-types';
 import { FundingRequestTypes, INITIAL_PAY_TYPES, SKIP_TYPES } from './funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
-import { PrcDataPoint } from '../../program-recommended-costs/prc-data-point';
+import { PrcBaselineSource, PrcDataPoint } from '../../program-recommended-costs/prc-data-point';
 import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 import { getCurrentFiscalYear } from 'src/app/utils/utils';
 
@@ -283,9 +283,14 @@ export class RequestModel {
         this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
       }
       const tmp = new PrcDataPoint();
-      tmp.fromBudget(b);
       tmp.grantAward = awardMap.get(b.supportYear);
       tmp.fundingSource = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
+      tmp.baselineDirect = this.isInitialPay() ? tmp.grantAward.requestAmount : tmp.grantAward.directAmount;
+      tmp.baselineTotal = this.isInitialPay() ? tmp.grantAward.requestTotalAmount : tmp.grantAward.totalAwarded;
+      tmp.baselineSource = this.isInitialPay() ? PrcBaselineSource.PI_REQUESTED : PrcBaselineSource.AWARDED;
+      // TODO: Start here if there's an issue with %cut displays - baselines need to be set first in order to get the correct calculation
+      tmp.fromBudget(b);
+
       lineItem.push(tmp);
       this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
     });
@@ -335,7 +340,7 @@ export class RequestModel {
       result => {
         if (result && result.length > 0) {
           this.requestCans = result;
-          this.requestCans.forEach( rc => rc.previousAfy = rc.approvedFutureYrs );
+          this.requestCans.forEach(rc => rc.previousAfy = rc.approvedFutureYrs);
           this.logger.debug('loaded requestCans from db ', result);
         } else {
           this.requestCans = [];
@@ -359,7 +364,7 @@ export class RequestModel {
               this.requestCans.push(dto);
             }
           }
-          this.requestCans.forEach( rc => rc.previousAfy = rc.approvedFutureYrs );
+          this.requestCans.forEach(rc => rc.previousAfy = rc.approvedFutureYrs);
           this.logger.debug('built requestCans from program_cost_model ', this.requestCans);
         }
       },

@@ -265,7 +265,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   getLineItem(f: FundingRequestFundsSrcDto): PrcDataPoint[] {
-    return this.requestModel.programRecommendedCostsModel.getLineItemsForSource(f);
+    const tmp = this.requestModel.programRecommendedCostsModel.getLineItemsForSource(f);
+    this.logger.info(JSON.stringify(f), tmp);
+    return tmp;
   }
 
   /**
