@@ -53,7 +53,7 @@
         </div>  
 </div>
 
-    <app-approver-list [readonly]="readonly" class="w-100"></app-approver-list>
+    <app-approver-list [readonly]="readonly" [terminalRequest]="terminalRequest" class="w-100"></app-approver-list>
 
     <div class="col-12">
         <div class="form-group" *ngIf=" isApprover() || !readonly">

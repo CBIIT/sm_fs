@@ -374,6 +374,12 @@ export const ApprovingStatuses: string[] = [
   RequestStatus.DEFER
 ];
 
+export const TerminalStatuses: string[] = [
+  RequestStatus.COMPLETED,
+  RequestStatus.REJECTED
+];
+
+
 export enum WorkflowActionCode {
   APPROVE = 'APPROVE',
   APPROVE_ROUTE = 'APPROVE_ROUTE',

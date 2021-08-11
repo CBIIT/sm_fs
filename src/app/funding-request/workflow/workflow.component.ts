@@ -6,7 +6,7 @@ import { Options } from 'select2';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
-import { ApprovingStatuses, WorkflowAction, WorkflowActionCode, WorkflowModel } from './workflow.model';
+import { ApprovingStatuses, TerminalStatuses, WorkflowAction, WorkflowActionCode, WorkflowModel } from './workflow.model';
 import { GmInfoComponent } from './gm-info/gm-info.component';
 import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
@@ -42,6 +42,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   showAddApprover = false;
   requestStatus: FundingReqStatusHistoryDto = {};
   approvingState = false;
+  terminalRequest = false;
 
   validationError: any = {};
 
@@ -166,7 +167,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     historyResult.forEach((item: FundingReqStatusHistoryDto) => {
       if (!item.endDate) {
         this.requestStatus = item;
-        this.approvingState = ApprovingStatuses.indexOf(this.requestStatus.statusCode) > -1;
+        this.approvingState = ApprovingStatuses.includes(this.requestStatus.statusCode);
+        this.terminalRequest = TerminalStatuses.includes(this.requestStatus.statusCode);
         this.logger.debug('current requestStatus= ', item);
         return;
       }
