@@ -20,18 +20,19 @@ export class ApprovedCostsComponent implements OnInit {
   inputDisabled = false;
 
   constructor(private requestModel: RequestModel,
-              private workflowModel: WorkflowModel,
+              public workflowModel: WorkflowModel,
               private logger: NGXLogger) { }
 
 
   ngOnInit(): void {
     this.initialPay = INITIAL_PAY_TYPES.includes(this.requestModel.requestDto?.frtId);
-  //  setInterval(() => { this.logger.debug(this.acform); this.logger.debug('cans value', this.cans); }, 1000);
+    setInterval(() => { this.logger.debug('cans value', this.requestModel.requestCans); }, 1000);
   }
 
-  get cans(): FundingRequestCanDto[]{
-    return this.requestModel.requestCans;
-  }
+  // get cans(): FundingRequestCanDto[]{
+  //   this.logger.debug('get cans() ', this.requestModel.requestCans);
+  //   return this.requestModel.requestCans;
+  // }
 
   isFormValid(): boolean {
     return this.acform?.valid;

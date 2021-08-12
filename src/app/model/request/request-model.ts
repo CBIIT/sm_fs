@@ -330,7 +330,7 @@ export class RequestModel {
     });
   }
 
-  loadRequestCans(): void {
+  loadRequestCans(): void { 
     if (this.requestCans && this.requestCans.length > 0) {
       this.logger.debug('requestCans already loaded', this.requestCans);
       return;
@@ -358,7 +358,8 @@ export class RequestModel {
               dto.requestedDc = lineItem0.recommendedDirect;
               dto.approvedTc = dto.requestedTc;
               dto.approvedDc = dto.requestedDc;
-              dto.approvedPctCut = lineItem0.percentCutTotalCalculated;
+              dto.dcPctCut = 100000 * lineItem0.percentCutDirectCalculated;
+              dto.tcPctCut = 100000 * lineItem0.percentCutTotalCalculated;
               dto.requestedFutureYrs = lineItems.filter(li => li.recommendedTotal > 0 || li.recommendedDirect > 0).length - 1;
               dto.approvedFutureYrs = dto.requestedFutureYrs;
               this.requestCans.push(dto);
