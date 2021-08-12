@@ -22,11 +22,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor=" let can of cans; let i = index;">
+                <tr *ngFor=" let can of requestModel.requestCans; let i = index;">
                     <td>{{can.fundingSourceName}}</td>
-                    <td>{{can.requestedDc | currency}} <span *ngIf="initialPay">({{can.approvedPctCut | percent}} cut)</span></td>
-                    <td>{{can.requestedTc | currency}} <span *ngIf="initialPay">({{can.approvedPctCut | percent}} cut)</span></td>
-                    <td>{{can.approvedTc | currency}}  <span *ngIf="initialPay">({{can.approvedPctCut | percent}} cut)</span></td>
+                    <td>{{can.requestedDc | currency}} <span *ngIf="initialPay">({{can.dcPctCut / 100000 | percent:'1.1-3'}} cut)</span></td>
+                    <td>{{can.requestedTc | currency}} <span *ngIf="initialPay">({{can.tcPctCut / 100000 | percent:'1.1-3'}} cut)</span></td>
+                    <td>{{can.approvedTc | currency}}  <span *ngIf="initialPay">({{can.tcPctCut / 100000 | percent:'1.1-3'}} cut)</span></td>
                     <td>{{can.requestedFutureYrs}}</td>
                     <td>
                     <div *ngIf="editable; else readonly">

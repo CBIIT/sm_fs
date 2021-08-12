@@ -99,6 +99,7 @@ import { PlanScientificRationaleComponent } from './funding-plan/plan-step5/plan
 import { PlanExceptionAppsComponent } from './funding-plan/plan-step5/plan-exception-apps/plan-exception-apps.component';
 import { PlanSkippedAppsComponent } from './funding-plan/plan-step5/plan-skipped-apps/plan-skipped-apps.component';
 import { PlanFileUploadComponent } from './funding-plan/plan-step5/plan-file-upload/plan-file-upload.component';
+import { PlanSummaryStatementComponent } from './funding-plan/plan-step5/plan-summary-statement/plan-summary-statement.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -207,6 +208,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     PlanExceptionAppsComponent,
     PlanSkippedAppsComponent,
     PlanFileUploadComponent,
+    PlanSummaryStatementComponent,
   ],
 
 

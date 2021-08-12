@@ -144,7 +144,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
       if (!item.endDate) {
         this.requestStatus = item.statusCode;
-        this.requestModel.requestDto.requestStatusName = item.statusDescrip;
+        this.requestModel.requestDto.requestStatusName = item.currentStatusDescrip;
       }
 
     });
