@@ -257,17 +257,13 @@ export class RequestModel {
    *
    */
   restoreLineItems(): boolean {
-    this.logger.info('restoring budget line items');
     if (!this.requestDto.financialInfoDto.fundingReqBudgetsDtos) {
-      this.logger.warn('Budgets are required');
       return false;
     }
     if (!this.programRecommendedCostsModel.fundingSources || !this.programRecommendedCostsModel.fundingSourcesMap) {
-      this.logger.warn('Funding sources are required');
       return false;
     }
     if (!this.programRecommendedCostsModel.grantAwarded) {
-      this.logger.warn('Grant awards are required');
       return false;
     }
 
@@ -302,8 +298,6 @@ export class RequestModel {
     });
 
     this.loadRequestCans();
-    this.logger.debug('model after restoration =>');
-    this.logger.debug(JSON.stringify(this.programRecommendedCostsModel));
     return true;
   }
 
@@ -311,11 +305,8 @@ export class RequestModel {
     if (!this.requestDto.financialInfoDto.fundingReqBudgetsDtos) {
       return;
     }
-    // this.logger.debug('Restoring line items from budgets', budgets);
     this.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
-      // this.logger.debug('budget', b);
       const source = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
-      // console.log('source', source);
 
       const lineItems = this.programRecommendedCostsModel.prcLineItems.get(source.fundingSourceId);
       if (lineItems) {
@@ -332,7 +323,6 @@ export class RequestModel {
 
   loadRequestCans(): void {
     if (this.requestCans && this.requestCans.length > 0) {
-      this.logger.debug('requestCans already loaded', this.requestCans);
       return;
     }
 
@@ -341,11 +331,9 @@ export class RequestModel {
         if (result && result.length > 0) {
           this.requestCans = result;
           this.requestCans.forEach(rc => rc.previousAfy = rc.approvedFutureYrs);
-          this.logger.debug('loaded requestCans from db ', result);
         } else {
           this.requestCans = [];
           const programCostModel = this.programRecommendedCostsModel;
-          this.logger.debug('Program Cost Model ', programCostModel);
           for (const fs of programCostModel.selectedFundingSources) {
             const lineItems = programCostModel.getLineItemsForSourceId(fs.fundingSourceId);
             if (lineItems.length > 0) {
@@ -365,7 +353,6 @@ export class RequestModel {
             }
           }
           this.requestCans.forEach(rc => rc.previousAfy = rc.approvedFutureYrs);
-          this.logger.debug('built requestCans from program_cost_model ', this.requestCans);
         }
       },
       error => {
