@@ -6,23 +6,37 @@
     <div class="d-flex">
       <div class="form-check ml-auto d-flex">
         <input type="checkbox" [id]="uniqueId" (change)="onCheckboxChange($event, index)">
-        <label [for]="uniqueId">All CANs</label>
+        <label [for]="uniqueId">Show All CANs</label>
       </div>
     </div>
-    <ng-select2
-      id="can"
-      name="can"
-      [allowClear]="true"
-      [data]="data"
-      [(ngModel)]="selectedValue">
-      <option></option>
-    </ng-select2>
+    <ng-container *ngIf="allCans; then showAll; else showDefault"></ng-container>
+    <ng-template #showDefault>
+      <ng-select2
+        id="can"
+        name="can"
+        [allowClear]="true"
+        [data]="data"
+        [(ngModel)]="selectedValue">
+        <option></option>
+      </ng-select2>
+    </ng-template>
+    <ng-template #showAll>
+      <ng-select2
+        id="can"
+        name="can"
+        [allowClear]="true"
+        [options]="searchOptions"
+        [(ngModel)]="selectedValue">
+        <option></option>
+      </ng-select2>
+    </ng-template>
   </div>
 </ng-template>
 
 <ng-template #read_only>
   <span *ngIf="selectedCanData?.can">
-    <a [routerLink]="" [ngbTooltip]="canTooltip" triggers="click:blur">{{ selectedCanData?.can }}</a> | {{ selectedCanData?.canDescrip }}
+    <a [routerLink]="" [ngbTooltip]="canTooltip"
+       triggers="click:blur">{{ selectedCanData?.can }}</a> | {{ selectedCanData?.canDescrip }}
   </span>
 </ng-template>
 
