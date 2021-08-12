@@ -19,8 +19,8 @@ export class ApprovedCostsComponent implements OnInit {
   initialPay: boolean;
   inputDisabled = false;
 
-  constructor(private requestModel: RequestModel,
-              public workflowModel: WorkflowModel,
+  constructor(public requestModel: RequestModel,
+              private workflowModel: WorkflowModel,
               private logger: NGXLogger) { }
 
 
