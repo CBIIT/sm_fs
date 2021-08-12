@@ -1,4 +1,7 @@
 <app-approved-costs *ngIf="showApprovedCosts()" [approvingState]="approvingState"></app-approved-costs>
+<ng-content>
+    
+</ng-content>
 <app-gm-info [hidden]="!showGmInfo()" [approvingState]="approvingState"></app-gm-info>
 <div class="row">
     <div class="col-12 d-flex">

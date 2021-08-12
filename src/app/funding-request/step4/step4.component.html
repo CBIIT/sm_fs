@@ -16,10 +16,12 @@
 <!-- END Supporting Docs -->
 
 <hr>
-<app-budget-info [hidden]="!showBudgetInfo()" [readOnly]="budgetInfoReadOnly()" [editing]="!budgetInfoReadOnly()"></app-budget-info>
-<app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar" [workflowName]="workFlowAction"></app-upload-budget-documents>
-<app-budget-docs-readonly [hidden]="isDisplayBudgetDocsUploadVar || !displayReadOnlyBudgetDocs" [parent]="self"></app-budget-docs-readonly>
-<app-workflow (actionEmitter)="actionType($event)" [readonly]="!submitVisible() || !submitEnabled() "></app-workflow>
+
+<app-workflow (actionEmitter)="actionType($event)" [readonly]="!submitVisible() || !submitEnabled() ">
+  <app-budget-info [hidden]="!showBudgetInfo()" [readOnly]="budgetInfoReadOnly()" [editing]="!budgetInfoReadOnly()"></app-budget-info>
+  <app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar" [workflowName]="workFlowAction"></app-upload-budget-documents>
+  <app-budget-docs-readonly [hidden]="isDisplayBudgetDocsUploadVar || !displayReadOnlyBudgetDocs" [parent]="self"></app-budget-docs-readonly>
+</app-workflow>
 
 
 <hr>
