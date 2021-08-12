@@ -62,6 +62,7 @@ export class CanSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.logger.info('Initial CAN:', this.initialCAN);
     const callback = this.storeData.bind(this);
     this.updateCans();
     if (!this.readonly) {
@@ -108,17 +109,9 @@ export class CanSelectorComponent implements OnInit {
         }
       }
     };
-    if (!this.readonly) {
-      this.canService.projectedCanEmitter.subscribe(next => {
-        if (Number(next.index) === Number(this.index)) {
-          this.updateProjectedCan(next.can);
-        }
-      });
-    }
   }
 
   private updateCans(): void {
-    this.logger.debug('nciSourceFlag:', this.nciSourceFlag);
     this.canService.getCans(this.nciSourceFlag).subscribe(result => {
       this.defaultCans = result;
       this.canMap = new Map(result.map(c => [c.can, c]));
@@ -127,6 +120,7 @@ export class CanSelectorComponent implements OnInit {
         this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip, additional: r });
       });
       if (this.initialCAN) {
+        this.handleMisingInitialCAN();
         // this.selectedValue = this.initialCAN.can;
         this._selectedCanData = {
           can: this.initialCAN.can,
@@ -136,6 +130,7 @@ export class CanSelectorComponent implements OnInit {
       }
     }, error => {
       if (this.initialCAN) {
+        this.handleMisingInitialCAN();
         this._selectedCanData = {
           can: this.initialCAN.can,
           canDescrip: this.initialCAN.canDescription,
@@ -143,6 +138,23 @@ export class CanSelectorComponent implements OnInit {
         };
       }
     });
+  }
+
+  private handleMisingInitialCAN(): void {
+    const tmp = this.canMap.get(this.initialCAN.can);
+    if (!tmp) {
+      this.data.push({
+        id: this.initialCAN.can,
+        text: this.initialCAN.can + ' | ' + this.initialCAN.canDescription,
+        additional: this.initialCAN
+      });
+
+      this.canMap.set(this.initialCAN.can, {
+        can: this.initialCAN.can,
+        canDescrip: this.initialCAN.canDescription,
+        canPhsOrgCode: this.initialCAN.phsOrgCode
+      });
+    }
   }
 
   selectProjectedCan(): boolean {
