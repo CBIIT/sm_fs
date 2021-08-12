@@ -98,7 +98,7 @@
     </div>
     <div class="col-12 mt-2">
 
-        <ngb-accordion [closeOthers]="true">
+        <ngb-accordion #a="ngbAccordion" [activeIds]="activeIds" [closeOthers]="true">
 
             <ngb-panel id="cover-panel">
                 <ng-template ngbPanelHeader>
@@ -109,23 +109,36 @@
 
             <ngb-panel id="sciRat-panel">
                 <ng-template ngbPanelHeader>
+
                     <div class="d-flex align-items-center">
                         <h3>Scientific Rationale for Supporting RFA/PA</h3>
-                        <div class="doc-details">
-                            <span class="text-danger">(Document required, not uploaded)</span>
+                        <div class="doc-details" *ngIf="isSciRatUploaded; else sciRatNotUploaded">
+                            {{sciRatDocDto.docFilename}} (Uploaded by <a
+                                href="mailto: {{sciRatDocDto.uploadByEmail}}">{{sciRatDocDto.uploadByName}}</a> on
+                            {{sciRatDocDto.createDate}}))
                         </div>
-                        <div class="doc-buttons">
-                            <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i class="far fa-plus mr-1"
-                                    aria-hidden="true"></i> Add Document</button>
+                        <ng-template #sciRatNotUploaded>
+                            <div class="doc-details">
+                                <span class="text-danger">(Document required, not uploaded)</span>
+                            </div>
+                        </ng-template>
+
+                        <div class="doc-buttons" *ngIf="isSciRatUploaded; else sciRatNotUploadedB">
+                            <button class="btn btn-link btn-slim"
+                                (click)="downloadFile(sciRatDocDto.id, sciRatDocDto.docFilename)"><i
+                                    class="far fa-eye"></i></button>
+                            <button class="btn btn-link btn-link-danger btn-slim"
+                                (click)="deleteDoc(sciRatDocDto.id, sciRatDocDto.docType)"><i
+                                    class="fas fa-trash"></i></button>
                         </div>
-                        <!-- <div class="doc-details">
-                file-name.docx (Uploaded by <a href="#">Jane Doe</a> on MM/DD/YYYY)
-            </div>
-            <div class="doc-buttons">
-                <button class="btn btn-link btn-slim"><i class="far fa-eye"></i></button>
-                <button class="btn btn-link btn-link-danger btn-slim"><i class="fas fa-trash"></i></button>
-            </div> -->
+                        <ng-template #sciRatNotUploadedB>
+                            <div class="doc-buttons">
+                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
+                                        class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
+                            </div>
+                        </ng-template>
                     </div>
+
                 </ng-template>
                 <ng-template ngbPanelContent>
                     <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
@@ -142,13 +155,31 @@
                 <ng-template ngbPanelHeader>
                     <div class="d-flex align-items-center">
                         <h3>Justification for Exception Application(s)</h3>
-                        <div class="doc-details">
-                            <span class="text-danger">(Document required, not uploaded)</span>
+                        <div class="doc-details" *ngIf="isExceptionsUploaded; else excNotUploaded">
+                            {{exceptionDocDto.docFilename}} (Uploaded by <a
+                                href="mailto: {{exceptionDocDto.uploadByEmail}}">{{exceptionDocDto.uploadByName}}</a> on
+                            {{exceptionDocDto.createDate}}))
                         </div>
-                        <div class="doc-buttons">
-                            <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i class="far fa-plus mr-1"
-                                    aria-hidden="true"></i> Add Document</button>
+                        <ng-template #excNotUploaded>
+                            <div class="doc-details">
+                                <span class="text-danger">(Document required, not uploaded)</span>
+                            </div>
+                        </ng-template>
+
+                        <div class="doc-buttons" *ngIf="isExceptionsUploaded; else excNotUploadedB">
+                            <button class="btn btn-link btn-slim"
+                                (click)="downloadFile(exceptionDocDto.id, exceptionDocDto.docFilename)"><i
+                                    class="far fa-eye"></i></button>
+                            <button class="btn btn-link btn-link-danger btn-slim"
+                                (click)="deleteDoc(exceptionDocDto.id, exceptionDocDto.docType)"><i
+                                    class="fas fa-trash"></i></button>
                         </div>
+                        <ng-template #excNotUploadedB>
+                            <div class="doc-buttons">
+                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
+                                        class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
+                            </div>
+                        </ng-template>
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
@@ -166,13 +197,31 @@
                 <ng-template ngbPanelHeader>
                     <div class="d-flex align-items-center">
                         <h3>Justification for Skipped Application(s)</h3>
-                        <div class="doc-details">
-                            <span class="text-danger">(Document required, not uploaded)</span>
+                        <div class="doc-details" *ngIf="isSkipUploaded; else skipNotUploaded">
+                            {{skipDocDto.docFilename}} (Uploaded by <a
+                                href="mailto: {{skipDocDto.uploadByEmail}}">{{skipDocDto.uploadByName}}</a> on
+                            {{skipDocDto.createDate}}))
                         </div>
-                        <div class="doc-buttons">
-                            <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i class="far fa-plus mr-1"
-                                    aria-hidden="true"></i> Add Document</button>
+                        <ng-template #skipNotUploaded>
+                            <div class="doc-details">
+                                <span class="text-danger">(Document required, not uploaded)</span>
+                            </div>
+                        </ng-template>
+
+                        <div class="doc-buttons" *ngIf="isSkipUploaded; else skipNotUploadedB">
+                            <button class="btn btn-link btn-slim"
+                                (click)="downloadFile(skipDocDto.id, skipDocDto.docFilename)"><i
+                                    class="far fa-eye"></i></button>
+                            <button class="btn btn-link btn-link-danger btn-slim"
+                                (click)="deleteDoc(skipDocDto.id, skipDocDto.docType)"><i
+                                    class="fas fa-trash"></i></button>
                         </div>
+                        <ng-template #skipNotUploadedB>
+                            <div class="doc-buttons">
+                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
+                                        class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
+                            </div>
+                        </ng-template>
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
@@ -190,13 +239,32 @@
                 <ng-template ngbPanelHeader>
                     <div class="d-flex align-items-center">
                         <h3>Other Document</h3>
-                        <div class="doc-details">
-                            (Optional)
+                                               <div class="doc-details" *ngIf="isOtherUploaded; else othNotUploaded">
+                            {{otherDocDto.docFilename}} (Uploaded by <a
+                                href="mailto: {{otherDocDto.uploadByEmail}}">{{otherDocDto.uploadByName}}</a> on
+                            {{otherDocDto.createDate}}))
                         </div>
-                        <div class="doc-buttons">
-                            <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i class="far fa-plus mr-1"
-                                    aria-hidden="true"></i> Add Document</button>
+                        <ng-template #othNotUploaded>
+                            <div class="doc-details">
+                                (Optional)
+                            </div>
+                        </ng-template>
+
+                        <div class="doc-buttons" *ngIf="isOtherUploaded; else othNotUploadedB">
+                            <button class="btn btn-link btn-slim"
+                                (click)="downloadFile(otherDocDto.id, otherDocDto.docFilename)"><i
+                                    class="far fa-eye"></i></button>
+                            <button class="btn btn-link btn-link-danger btn-slim"
+                                (click)="deleteDoc(otherDocDto.id, otherDocDto.docType)"><i
+                                    class="fas fa-trash"></i></button>
                         </div>
+                        <ng-template #othNotUploadedB>
+                            <div class="doc-buttons">
+                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
+                                        class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
+                            </div>
+                        </ng-template>
+
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
@@ -220,6 +288,8 @@
             </ngb-panel>
 
         </ngb-accordion>
+
+        <button #collapseAll [hidden]="true" (click)="activeIds=[]" >close all</button>
 
     </div>
     <div class="col-12">
