@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FundingPlanDtoReq, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
 import { NciPfrGrantQueryDtoEx } from './nci-pfr-grant-query-dto-ex';
 import { RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate';
@@ -22,7 +22,7 @@ export class PlanModel {
   minimumScore: number;
   maximumScore: number;
 
-  fundingPlanDto: FundingPlanDtoReq;
+  // fundingPlanDto: FundingPlanDtoReq;
 
 
   // TODO: Generate FundingPlanDto and FundingPlanFoasDto

@@ -57,8 +57,6 @@ export class RetrieveRequestComponent implements OnInit {
             this.requestModel.requestDto.requestorNpnId,
             this.requestModel.requestDto.requestorCayCode,
             conversionActivityCode).subscribe(result1 => {
-            this.logger.debug('fundingSources =>');
-            this.logger.debug(JSON.stringify(result1));
             this.requestModel.programRecommendedCostsModel.fundingSources = result1;
             this.requestModel.restoreLineItems();
           });
@@ -80,9 +78,6 @@ export class RetrieveRequestComponent implements OnInit {
           });
 
           this.requestModel.requestDto.financialInfoDto.fundingRequestId = this.requestModel.requestDto.frqId;
-          this.logger.debug('loaded request =>');
-          this.logger.debug(this.requestModel);
-
           this.router.navigate(['/request/step4']);
         },
         (error) => {

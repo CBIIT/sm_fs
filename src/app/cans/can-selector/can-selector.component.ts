@@ -4,6 +4,7 @@ import { NGXLogger } from 'ngx-logger';
 import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { Select2OptionData } from 'ng-select2';
 import { Options } from 'select2';
+import { RequestModel } from '../../model/request/request-model';
 
 @Component({
   selector: 'app-can-selector',
@@ -17,7 +18,8 @@ export class CanSelectorComponent implements OnInit {
   projectedCan: CanCcxDto;
   canMap: Map<string, CanCcxDto>;
   data: Array<Select2OptionData>;
-  searchOptions: Options;
+  allOptions: Options;
+  defaultOptions: Options;
 
 
   @Input() index = 0;
@@ -50,7 +52,8 @@ export class CanSelectorComponent implements OnInit {
   }
 
   constructor(private canService: CanManagementService,
-              private logger: NGXLogger) {
+              private logger: NGXLogger,
+              private model: RequestModel) {
   }
 
   storeData(data: any): void {
@@ -64,7 +67,7 @@ export class CanSelectorComponent implements OnInit {
   ngOnInit(): void {
     this.logger.info('Initial CAN:', this.initialCAN);
     const callback = this.storeData.bind(this);
-    this.updateCans();
+    // this.updateCans();
     if (!this.readonly) {
       this.canService.projectedCanEmitter.subscribe(next => {
         if (Number(next.index) === Number(this.index)) {
@@ -73,11 +76,14 @@ export class CanSelectorComponent implements OnInit {
       });
     }
     this.uniqueId = 'all_cans' + String(this.index);
-    this.searchOptions = {
+    const activityCodes = this.model.requestDto.activityCode;
+    const bmmCodes = this.model.requestDto.bmmCode;
+    const nciSource = this.nciSourceFlag;
+    this.allOptions = {
       allowClear: true,
       minimumInputLength: 2,
       closeOnSelect: true,
-      placeholder: 'Please enter 2 or more characters to search',
+      placeholder: '',
       language: {
         inputTooShort(): string {
           return '';
@@ -91,6 +97,44 @@ export class CanSelectorComponent implements OnInit {
           const query = {
             can: params.term,
             // nciSourceFlag: 'Y'
+          };
+
+          return query;
+        },
+        processResults(searchData): any {
+          callback(searchData);
+          return {
+            results: $.map(searchData, can => {
+              return {
+                id: can.can,
+                text: can.can + ' | ' + can.canDescrip,
+                additional: can
+              };
+            })
+          };
+        }
+      }
+    };
+    this.defaultOptions =  {
+      allowClear: true,
+      minimumInputLength: 2,
+      closeOnSelect: true,
+      placeholder: '',
+      language: {
+        inputTooShort(): string {
+          return '';
+        }
+      },
+      ajax: {
+        url: '/i2ecws/api/v1/fs/cans/',
+        delay: 500,
+        type: 'GET',
+        data(params): any {
+          const query = {
+            can: params.term,
+            activityCodes,
+            bmmCodes,
+            nciSourceFlag: nciSource
           };
 
           return query;
