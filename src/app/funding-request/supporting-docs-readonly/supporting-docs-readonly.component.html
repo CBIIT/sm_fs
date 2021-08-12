@@ -47,7 +47,7 @@
         </ng-template>
         <span
           *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayUserName"
-          class="doc-desc">(Retrieved form
+          class="doc-desc">(Retrieved from
           IMPAC II)</span>
         <ng-template #displayUserName>
           <span class="doc-desc">(Added by <a href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
@@ -70,7 +70,7 @@
     <h4>Excluded Content</h4>
     <div *ngIf="!isSummaryIncluded" class="drag-item" tabindex="0">
       <span class="doc-name">Summary Statement</span>
-      <span class="doc-desc">(Retrieved form IMPAC II)</span>
+      <span class="doc-desc">(Retrieved from IMPAC II)</span>
       <div class="ml-auto">
         <button class="btn btn-link btn-slim ml-1" title="View" (click)="downloadSummaryStatement()"><i
             class="fas fa-eye" aria-hidden="true"></i></button>
