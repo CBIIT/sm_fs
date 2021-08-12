@@ -62,9 +62,17 @@ export class CanSelectorComponent implements OnInit {
     this.uniqueId = 'all_cans' + String(this.index);
   }
 
+  private evoke(nciSource: string): any {
+    if (this.allCans) {
+      return this.canService.getAllCans(nciSource);
+    } else {
+      return this.canService.getCans(nciSource);
+    }
+  }
+
   private updateCans(): void {
-    const nciSource = this.allCans ? null : this.nciSourceFlag;
-    this.canService.getCans(nciSource).subscribe(result => {
+    const nciSource = this.nciSourceFlag;
+    this.evoke(nciSource).subscribe(result => {
       this.defaultCans = result;
       this.canMap = new Map(result.map(c => [c.can, c]));
       this.data = new Array<Select2OptionData>();

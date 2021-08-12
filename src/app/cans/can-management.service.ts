@@ -74,6 +74,14 @@ export class CanManagementService {
       nciSourceFlag);
   }
 
+  getAllCans(nciSourceFlag: string): Observable<CanCcxDto[]> {
+    return this.canService.getAllCansUsingGET(
+      this.requestModel.requestDto.activityCode,
+      this.requestModel.requestDto.bmmCode,
+      nciSourceFlag
+    );
+  }
+
   getRequestCans(frqId: number): Observable<FundingRequestCanDto[]> {
     const tmp = this.cachedRequestCans.get(frqId);
     if (tmp) {
