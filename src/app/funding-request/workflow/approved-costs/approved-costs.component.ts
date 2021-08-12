@@ -26,7 +26,6 @@ export class ApprovedCostsComponent implements OnInit {
 
   ngOnInit(): void {
     this.initialPay = INITIAL_PAY_TYPES.includes(this.requestModel.requestDto?.frtId);
-    setInterval(() => { this.logger.debug('cans value', this.requestModel.requestCans); }, 1000);
   }
 
   // get cans(): FundingRequestCanDto[]{
