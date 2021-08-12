@@ -1,33 +1,30 @@
-<div class="container col-md-12">
-    <div class="row">
-        <h2>Results</h2>
-    </div>
-    <div class="row">
-        <p *ngIf="!searchResult">No grants found to display.</p>
-         <table datatable [dtOptions]="dtOptions" class="row-border hover">
-            <thead>
-              <tr>
-                <th>Grant Number</th>
-                <th>PI Full Name</th>
-                <th>Org Name</th>
-              </tr>
-            </thead>
-            <tbody *ngIf="fundingRequests?.length != 0">
-              <tr *ngFor="let fundingRequest of fundingRequests">
-                <td>{{ fundingRequest.fullGrantNum }}</td>
-                <td>{{ fundingRequest.piFullName }}</td>
-                <td>{{ fundingRequest.orgName }}</td>
-              </tr>
-            </tbody>
-            <!-- <tbody *ngIf="fundingRequests?.length == 0">
+<!-- <div class="container col-md-12">
+  <div class="row">
+    <h2>Results</h2>
+  </div>
+  <div class="row">
+    <p *ngIf="!searchResult">No grants found to display.</p>
+    <table datatable [dtOptions]="dtOptions" class="row-border hover">
+      <thead>
+        <tr>
+          <th>Grant Number</th>
+          <th>PI Full Name</th>
+          <th>Org Name</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="fundingRequests?.length != 0">
+        <tr *ngFor="let fundingRequest of fundingRequests">
+          <td>{{ fundingRequest.fullGrantNum }}</td>
+          <td>{{ fundingRequest.piFullName }}</td>
+          <td>{{ fundingRequest.orgName }}</td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="fundingRequests?.length == 0">
               <tr>
                 <td colspan="3" class="no-data-available">No data!</td>
               </tr>
-            </tbody> -->
-          </table>
+            </tbody> 
+    </table>
 
-
-
-
-    </div>
-</div>
+  </div>
+</div> -->
