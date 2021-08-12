@@ -3,6 +3,7 @@ import { CanManagementService } from '../can-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { Select2OptionData } from 'ng-select2';
+import { Options } from 'select2';
 
 @Component({
   selector: 'app-can-selector',
@@ -16,12 +17,14 @@ export class CanSelectorComponent implements OnInit {
   projectedCan: CanCcxDto;
   canMap: Map<string, CanCcxDto>;
   data: Array<Select2OptionData>;
+  searchOptions: Options;
+
 
   @Input() index = 0;
   @Input() nciSourceFlag = '';
   @Input() readonly = false;
   @Input() initialCAN: FundingRequestCanDto = null;
-  private allCans = false;
+  public allCans = false;
 
   uniqueId: string;
 
@@ -50,7 +53,16 @@ export class CanSelectorComponent implements OnInit {
               private logger: NGXLogger) {
   }
 
+  storeData(data: any): void {
+    if (!data) {
+      return;
+    }
+    this.canMap = new Map(data.map(c => [c.can, c]));
+
+  }
+
   ngOnInit(): void {
+    const callback = this.storeData.bind(this);
     this.updateCans();
     if (!this.readonly) {
       this.canService.projectedCanEmitter.subscribe(next => {
@@ -60,19 +72,54 @@ export class CanSelectorComponent implements OnInit {
       });
     }
     this.uniqueId = 'all_cans' + String(this.index);
-  }
+    this.searchOptions = {
+      allowClear: true,
+      minimumInputLength: 2,
+      closeOnSelect: true,
+      placeholder: 'Please enter 2 or more characters to search',
+      language: {
+        inputTooShort(): string {
+          return '';
+        }
+      },
+      ajax: {
+        url: '/i2ecws/api/v1/fs/cans/all-cans/',
+        delay: 500,
+        type: 'GET',
+        data(params): any {
+          const query = {
+            can: params.term,
+            // nciSourceFlag: 'Y'
+          };
 
-  private evoke(nciSource: string): any {
-    if (this.allCans) {
-      return this.canService.getAllCans(nciSource);
-    } else {
-      return this.canService.getCans(nciSource);
+          return query;
+        },
+        processResults(searchData): any {
+          callback(searchData);
+          return {
+            results: $.map(searchData, can => {
+              return {
+                id: can.can,
+                text: can.can + ' | ' + can.canDescrip,
+                additional: can
+              };
+            })
+          };
+        }
+      }
+    };
+    if (!this.readonly) {
+      this.canService.projectedCanEmitter.subscribe(next => {
+        if (Number(next.index) === Number(this.index)) {
+          this.updateProjectedCan(next.can);
+        }
+      });
     }
   }
 
   private updateCans(): void {
-    const nciSource = this.nciSourceFlag;
-    this.evoke(nciSource).subscribe(result => {
+    this.logger.debug('nciSourceFlag:', this.nciSourceFlag);
+    this.canService.getCans(this.nciSourceFlag).subscribe(result => {
       this.defaultCans = result;
       this.canMap = new Map(result.map(c => [c.can, c]));
       this.data = new Array<Select2OptionData>();
@@ -96,13 +143,6 @@ export class CanSelectorComponent implements OnInit {
         };
       }
     });
-    if (!this.readonly) {
-      this.canService.projectedCanEmitter.subscribe(next => {
-        if (Number(next.index) === Number(this.index)) {
-          this.updateProjectedCan(next.can);
-        }
-      });
-    }
   }
 
   selectProjectedCan(): boolean {
@@ -122,6 +162,8 @@ export class CanSelectorComponent implements OnInit {
 
   onCheckboxChange(e: any, i: number): void {
     this.allCans = e.target.checked;
-    this.updateCans();
+    if (!this.allCans) {
+      this.updateCans();
+    }
   }
 }
