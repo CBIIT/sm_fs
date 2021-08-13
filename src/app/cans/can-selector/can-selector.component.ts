@@ -16,7 +16,6 @@ export class CanSelectorComponent implements OnInit {
   private _selectedCanData: CanCcxDto;
   defaultCans: CanCcxDto[];
   projectedCan: CanCcxDto;
-  // canMap: Map<string, CanCcxDto>;
   data: Array<Select2OptionData>;
   allOptions: Options;
   defaultOptions: Options;
@@ -39,7 +38,7 @@ export class CanSelectorComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<string>();
 
   get selectedCanData(): CanCcxDto {
-    return this._selectedCanData; // ? this._selectedCanData : (this.canMap ? this.canMap.get(this._selectedValue) : null);
+    return this._selectedCanData;
   }
 
   set selectedValue(value: string) {
@@ -73,7 +72,6 @@ export class CanSelectorComponent implements OnInit {
   }
 
   private initializeAjaxSettings(): void {
-    this.logger.debug('initialize ajax for selector component #', this.index);
     const init = this.initialCAN;
     const activityCodes = this.model.requestDto.activityCode;
     const bmmCodes = this.model.requestDto.bmmCode;
@@ -139,6 +137,7 @@ export class CanSelectorComponent implements OnInit {
         }
       }
     };
+
     this.defaultOptions = {
       allowClear: true,
       minimumInputLength: 3,
@@ -188,15 +187,11 @@ export class CanSelectorComponent implements OnInit {
   }
 
   private initializeDefaultCans(): void {
-    this.logger.debug('initialize default cans for selector #', this.index);
-    this.logger.debug('using initial can data:', this.initialCAN);
     this.canService.getCans(this.nciSourceFlag).subscribe(result => {
-      this.logger.debug(result);
       this.data = new Array<Select2OptionData>();
       result.forEach(r => {
         this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip, additional: r });
       });
-      this.logger.debug(this.index, this.data);
       if (this.initialCAN.can) {
         this.initializeSelectedCan();
       }
@@ -204,10 +199,8 @@ export class CanSelectorComponent implements OnInit {
   }
 
   private initializeSelectedCan(): void {
-    this.logger.debug('initializing selected CAN for selector #', this.index, this.initialCAN.can);
     const tmp = this.data.filter(e => e.id === this.initialCAN.can);
     if (!tmp || tmp.length === 0) {
-      this.logger.debug('CAN not found');
       this.data.push({
         id: this.initialCAN.can,
         text: this.initialCAN.can + ' | ' + this.initialCAN.canDescription,
@@ -233,8 +226,5 @@ export class CanSelectorComponent implements OnInit {
 
   onCheckboxChange(e: any, i: number): void {
     this.allCans = e.target.checked;
-    if (!this.allCans) {
-      // this.updateCans();
-    }
   }
 }
