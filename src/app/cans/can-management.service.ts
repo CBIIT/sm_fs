@@ -71,6 +71,7 @@ export class CanManagementService {
     return this.canService.getDefaultCansUsingGET(
       this.requestModel.requestDto.activityCode,
       this.requestModel.requestDto.bmmCode,
+      null,
       nciSourceFlag);
   }
 
@@ -78,6 +79,7 @@ export class CanManagementService {
     return this.canService.getAllCansUsingGET(
       this.requestModel.requestDto.activityCode,
       this.requestModel.requestDto.bmmCode,
+      null,
       nciSourceFlag
     );
   }
