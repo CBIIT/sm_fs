@@ -63,6 +63,7 @@ export class CanSelectorComponent implements OnInit {
     if (!this.readonly) {
       this.canService.projectedCanEmitter.subscribe(next => {
         if (Number(next.index) === Number(this.index)) {
+          this.logger.debug('gotProjectedCan', next.can);
           this.updateProjectedCan(next.can);
         }
       });
@@ -210,7 +211,17 @@ export class CanSelectorComponent implements OnInit {
   }
 
   selectProjectedCan(): boolean {
+    this.logger.debug('selectProjectedCan', this.projectedCan);
+
     if (this.projectedCan && this.projectedCan.can && this.projectedCan.canDescrip) {
+      const tmp = this.data.filter(e => e.id === this.projectedCan.can);
+      if (!tmp || tmp.length === 0) {
+        this.data.push({
+          id: this.projectedCan.can,
+          text: this.projectedCan.can + ' | ' + this.projectedCan.canDescrip,
+          additional: this.projectedCan
+        });
+      }
       this.selectedValue = this.projectedCan.can;
       return true;
     }
@@ -218,6 +229,7 @@ export class CanSelectorComponent implements OnInit {
   }
 
   updateProjectedCan(can: CanCcxDto): void {
+    this.logger.debug('updateProjecteCan', can);
     if (this.projectedCan && this.selectedValue && this.projectedCan.can === this.selectedValue) {
       this.selectedValue = null;
     }
