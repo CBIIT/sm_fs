@@ -109,6 +109,7 @@ export class BudgetInfoComponent implements OnInit {
     this.canSelectors.forEach((control) => {
       cans.push(control.selectedValue || '');
     });
+    this.logger.debug(cans);
     cans.forEach((c1, i1) => {
       cans.forEach((c2, i2) => {
         if (i1 !== i2 && c1 !== '') {

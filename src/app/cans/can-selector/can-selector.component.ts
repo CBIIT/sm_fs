@@ -20,6 +20,7 @@ export class CanSelectorComponent implements OnInit {
   data: Array<Select2OptionData>;
   allOptions: Options;
   defaultOptions: Options;
+  basicOptions: Options;
 
 
   @Input() index = 0;
@@ -72,10 +73,27 @@ export class CanSelectorComponent implements OnInit {
   }
 
   private initializeAjaxSettings(): void {
+    this.logger.debug('initialize ajax for selector component #', this.index);
     const init = this.initialCAN;
     const activityCodes = this.model.requestDto.activityCode;
     const bmmCodes = this.model.requestDto.bmmCode;
     const nciSource = this.nciSourceFlag;
+    const data = this.data;
+    this.logger.debug('data', data);
+
+    this.basicOptions = {
+      allowClear: true,
+      data,
+      initSelection(element, callback): any {
+        const c = {
+          id: init.can,
+          text: init.can + ' | ' + init.canDescription,
+          additional: init
+        };
+        callback(c);
+      },
+    };
+
     this.allOptions = {
       allowClear: true,
       minimumInputLength: 3,
@@ -85,6 +103,14 @@ export class CanSelectorComponent implements OnInit {
         inputTooShort(): string {
           return '';
         }
+      },
+      initSelection(element, callback): any {
+        const c = {
+          id: init.can,
+          text: init.can + ' | ' + init.canDescription,
+          additional: init
+        };
+        callback(c);
       },
       ajax: {
         url: '/i2ecws/api/v1/fs/cans/all-cans/',
@@ -117,6 +143,7 @@ export class CanSelectorComponent implements OnInit {
       allowClear: true,
       minimumInputLength: 3,
       closeOnSelect: true,
+      data,
       placeholder: '',
       language: {
         inputTooShort(): string {
@@ -129,7 +156,6 @@ export class CanSelectorComponent implements OnInit {
           text: init.can + ' | ' + init.canDescription,
           additional: init
         };
-        console.log(element, callback, init, c);
         callback(c);
       },
       ajax: {
@@ -162,48 +188,31 @@ export class CanSelectorComponent implements OnInit {
   }
 
   private initializeDefaultCans(): void {
+    this.logger.debug('initialize default cans for selector #', this.index);
+    this.logger.debug('using initial can data:', this.initialCAN);
     this.canService.getCans(this.nciSourceFlag).subscribe(result => {
-      this.defaultCans = result;
-      // this.canMap = new Map(result.map(c => [c.can, c]));
+      this.logger.debug(result);
       this.data = new Array<Select2OptionData>();
       result.forEach(r => {
         this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip, additional: r });
       });
-      if (this.initialCAN) {
-        this.handleMisingInitialCAN();
-        // this.selectedValue = this.initialCAN.can;
-        this._selectedCanData = {
-          can: this.initialCAN.can,
-          canDescrip: this.initialCAN.canDescription,
-          canPhsOrgCode: this.initialCAN.phsOrgCode
-        };
-      }
-    }, error => {
-      if (this.initialCAN) {
-        this.handleMisingInitialCAN();
-        this._selectedCanData = {
-          can: this.initialCAN.can,
-          canDescrip: this.initialCAN.canDescription,
-          canPhsOrgCode: this.initialCAN.phsOrgCode
-        };
+      this.logger.debug(this.index, this.data);
+      if (this.initialCAN.can) {
+        this.initializeSelectedCan();
       }
     });
   }
 
-  private handleMisingInitialCAN(): void {
+  private initializeSelectedCan(): void {
+    this.logger.debug('initializing selected CAN for selector #', this.index, this.initialCAN.can);
     const tmp = this.data.filter(e => e.id === this.initialCAN.can);
     if (!tmp || tmp.length === 0) {
+      this.logger.debug('CAN not found');
       this.data.push({
         id: this.initialCAN.can,
         text: this.initialCAN.can + ' | ' + this.initialCAN.canDescription,
         additional: this.initialCAN
       });
-
-      // this.canMap.set(this.initialCAN.can, {
-      //   can: this.initialCAN.can,
-      //   canDescrip: this.initialCAN.canDescription,
-      //   canPhsOrgCode: this.initialCAN.phsOrgCode
-      // });
     }
   }
 
