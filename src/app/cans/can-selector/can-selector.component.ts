@@ -59,9 +59,7 @@ export class CanSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.info('Initial CAN:', this.initialCAN);
-    const init = this.initialCAN;
-    // this.updateCans();
+    this.initializeDefaultCans();
     if (!this.readonly) {
       this.canService.projectedCanEmitter.subscribe(next => {
         if (Number(next.index) === Number(this.index)) {
@@ -70,6 +68,11 @@ export class CanSelectorComponent implements OnInit {
       });
     }
     this.uniqueId = 'all_cans' + String(this.index);
+    this.initializeAjaxSettings();
+  }
+
+  private initializeAjaxSettings(): void {
+    const init = this.initialCAN;
     const activityCodes = this.model.requestDto.activityCode;
     const bmmCodes = this.model.requestDto.bmmCode;
     const nciSource = this.nciSourceFlag;
@@ -123,7 +126,7 @@ export class CanSelectorComponent implements OnInit {
       initSelection(element, callback): any {
         const c = {
           id: init.can,
-          text: init.can  + ' | ' + init.canDescription,
+          text: init.can + ' | ' + init.canDescription,
           additional: init
         };
         console.log(element, callback, init, c);
@@ -158,7 +161,7 @@ export class CanSelectorComponent implements OnInit {
     };
   }
 
-  private updateCans(): void {
+  private initializeDefaultCans(): void {
     this.canService.getCans(this.nciSourceFlag).subscribe(result => {
       this.defaultCans = result;
       // this.canMap = new Map(result.map(c => [c.can, c]));
