@@ -316,6 +316,7 @@ export class Step3Component implements OnInit {
     this.isTypeSelected = false;
     this.showSuppApplications = false;
     this.disableAddDocButton = true;
+    this.showJustification = false;
 
   }
 
@@ -423,7 +424,7 @@ export class Step3Component implements OnInit {
 
       this.justificationEnteredBy = element.uploadByName;
       this.justificationEnteredByEmail = element.uploadByEmail;
-      this.justificationFileName = 'Justification '.concat(element.docFilename);
+      this.justificationFileName = element.docFilename;
       // TODO: simple hack here to convert string to Date. Needs to be verified.
       this.justificationUploadedOn = new Date(element.createDate);
 
@@ -447,7 +448,7 @@ export class Step3Component implements OnInit {
 
       this.transitionMemoEnteredBy = element.uploadByName;
       this.transitionMemoEnteredByEmail = element.uploadByEmail;
-      this.transitionMemoFileName = 'Transition Memo '.concat(element.docFilename);
+      this.transitionMemoFileName = element.docFilename;
       // TODO: simple hack here to convert string to Date. Needs to be verified.
       this.transitionMemoUploadedOn = new Date(element.createDate);
       this.transitionMemoId = element.id;

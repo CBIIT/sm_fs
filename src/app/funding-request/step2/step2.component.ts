@@ -39,11 +39,11 @@ export class Step2Component implements OnInit {
   }
 
   saveAndContinue(): void {
-    this.saveFundingRequest('/request/step3');
+    this.saveFundingRequest('/request/step3', false);
   }
 
   saveAsDraft(): void {
-    this.saveFundingRequest('/request/step4');
+    this.saveFundingRequest('/request/step4', true);
   }
 
   prevStep(): void {
@@ -62,7 +62,7 @@ export class Step2Component implements OnInit {
     return this.requestModel;
   }
 
-  saveFundingRequest(navigate: string): void {
+  saveFundingRequest(navigate: string, jumpToStep4: boolean): void {
     if (!this.isSaveable()) {
       this.model.pendingAlerts.push({
         type: 'danger',
@@ -78,11 +78,13 @@ export class Step2Component implements OnInit {
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
         this.requestModel.requestDto = result;
-        this.requestModel.pendingAlerts.push({
-          type: 'success',
-          message: 'You have successfully saved your request',
-          title: ''
-        });
+        if (jumpToStep4) {
+          this.requestModel.pendingAlerts.push({
+            type: 'success',
+            message: 'You have successfully saved your request',
+            title: ''
+          });
+        }
         this.logger.debug(JSON.stringify(this.requestModel.requestDto));
         // always go to next step even if create approver fails. that's behavior before moving
         // create approvers here.

@@ -49,13 +49,16 @@
                 <td><span class="order-icon" ngbTooltip="Drag & Drop to Order"></span>&nbsp;{{ a.orderNum}}</td>
                 <td><a href="mailto:{{a.approverEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverFullName }}</a></td>
                 <td>{{approverRoleName(a)}}</td>
-                <td><span *ngFor="let d of a.designees">
+                <td><div class="float-left"><span *ngFor="let d of a.designees">
                     <a href="mailto:{{d.delegateToEmailAddr}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{d.delegateToFullName}}</a><br/>
                     </span>
+                    </div>
+                    <div class="float-right">
                     <button class="btn btn-link btn-delete btn-slim" title="Delete" 
                     (click)="deleteAdditionalApprover(i)">
                     <i class="fas fa-trash" aria-hidden="true"></i>
                     </button>
+                    </div>
                 </td>
                 </tr>
         </ng-container>

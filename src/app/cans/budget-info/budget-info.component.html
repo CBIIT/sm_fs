@@ -32,8 +32,8 @@
         <tbody>
         <tr *ngFor="let can of fundingRequestCans; let i = index">
           <td>{{can.fundingSourceName}}</td>
-          <td>{{ can.approvedDc | currency }} {{can.dcPctCut / 100000 | percent:'1.1-3'}}</td>
-          <td>{{ can.approvedTc | currency }} {{can.tcPctCut / 100000 | percent:'1.1-3'}}</td>
+          <td>{{ can.approvedDc | currency }} <span *ngIf="initialPay">({{can.dcPctCut / 100000 | percent:'1.1-3'}} cut)</span></td>
+          <td>{{ can.approvedTc | currency }} <span *ngIf="initialPay">({{can.tcPctCut / 100000 | percent:'1.1-3'}} cut)</span></td>
           <td [hidden]="!(isFinancialApprover() && isFcNci())">
             <app-oefia-types [index]="i" [octId]="can.octId" [selectedValue]="can.octId"
                              [readonly]="true"></app-oefia-types>
@@ -100,8 +100,8 @@
         <tbody>
         <tr *ngFor="let can of fundingRequestCans; let i = index">
           <td>{{can.fundingSourceName}}</td>
-          <td>{{ can.approvedDc | currency }} {{can.dcPctCut / 100000 | percent:'1.1-3'}}</td>
-          <td>{{ can.approvedTc | currency }} {{can.tcPctCut / 100000 | percent:'1.1-3'}}</td>
+          <td>{{ can.approvedDc | currency }} <span *ngIf="initialPay">({{can.dcPctCut / 100000 | percent:'1.1-3'}} cut)</span></td>
+          <td>{{ can.approvedTc | currency }} <span *ngIf="initialPay">({{can.tcPctCut / 100000 | percent:'1.1-3'}} cut)</span></td>
           <td [hidden]="!(isFinancialApprover() && isFcNci())">
             <app-oefia-types [index]="i" [selectedValue]="can.octId || can.defaultOefiaTypeId"></app-oefia-types>
           </td>
