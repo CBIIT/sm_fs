@@ -13,6 +13,7 @@ import { OefiaTypesComponent } from '../oefia-types/oefia-types.component';
 import { CanSelectorComponent } from '../can-selector/can-selector.component';
 import { ProjectedCanComponent } from '../projected-can/projected-can.component';
 import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
+import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
 
 @Component({
   selector: 'app-budget-info',
@@ -27,6 +28,8 @@ export class BudgetInfoComponent implements OnInit {
 
   @Input() readOnly = false;
   @Input() editing = false;
+
+  initialPay: boolean;
 
   get fundingRequestCans(): FundingRequestCanDto[] {
     return this.model.requestCans;
@@ -74,6 +77,7 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.initialPay = INITIAL_PAY_TYPES.includes(this.model.requestDto?.frtId);
   }
 
   copyProjectedCan(i: number): void {
