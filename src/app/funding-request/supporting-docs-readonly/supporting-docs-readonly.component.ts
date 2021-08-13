@@ -33,6 +33,7 @@ export class SupportingDocsReadonlyComponent implements OnInit {
   excludedDocDtos: DocumentsDto[];
   displayTansitionMemo: boolean = false;
   isSummaryIncluded = false;
+  isDisplayExcludedContent = false;
 
   constructor(private documentService: DocumentService,
     private logger: NGXLogger,
@@ -55,10 +56,15 @@ export class SupportingDocsReadonlyComponent implements OnInit {
         }
       }
     }
-   
+
     if (this.requestModel.requestDto.requestType === 'Pay Type 4' ||
       (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== null)) {
       this.displayTansitionMemo = true;
+    }
+
+    if (!this.isSummaryIncluded ||
+      this.excludedDocDtos.length > 0) {
+      this.isDisplayExcludedContent = true;
     }
 
   }

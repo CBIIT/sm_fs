@@ -89,9 +89,9 @@
 
                     <div *ngIf="justificationUploaded | async" class="drag-item drag-item-locked" tabindex="0">
 
-                        <span class="doc-name">{{ justificationType === 'text' ? 'Justification' :
-                            justificationFileName}}</span>
-                        <span class="doc-desc">(Added by <a
+                        <span class="doc-name">Justification</span>
+                        <span class="doc-desc">({{ justificationType !== 'text' ? justificationFileName + ' - ' :
+                            ''}}Added by <a
                                 href="mailto: {{justificationEnteredByEmailEmit | async}}">{{justificationEnteredByEmit | async}}</a> on
                             {{justificationUploadedOnEmit | async}})</span>
                         
@@ -119,8 +119,8 @@
                     <div *ngIf="displayTansitionMemo">
                         <div *ngIf="transitionMemoUploaded | async" class="drag-item drag-item-locked" tabindex="0">
 
-                            <span class="doc-name">{{ transitionMemoFileName}}</span>
-                            <span class="doc-desc">(Added by <a
+                            <span class="doc-name">Transition Memo</span>
+                            <span class="doc-desc">({{ transitionMemoFileName}} - Added by <a
                                     href="mailto: {{transitionMemoEnteredByEmailEmit | async}}">{{transitionMemoEnteredByEmit | async}}</a> on
                                 {{transitionMemoUploadedOnEmit | async}})</span>
                             
@@ -154,26 +154,27 @@
                                     *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayFileNameFormat"
                                     class="doc-name">{{ item.docFilename }}</span>
                                 <ng-template #displayFileNameFormat>
-                                    <span class="doc-name">{{ item.docType + ' ' + item.docFilename }}</span>
+                                    <span class="doc-name">{{ item.docType }}</span>
                                 </ng-template>
                                 <span
                                     *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayUserName"
                                     class="doc-desc">(Retrieved from
                                     IMPAC II)</span>
                                 <ng-template #displayUserName>
-                                    <span class="doc-desc">(Added by <a
+                                    <span class="doc-desc">({{ item.docFilename }} - Added by <a
                                             href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
                                         {{item.createDate}})</span>
                                 </ng-template>
 
                                 <div class="ml-auto">
+                                    <button class="btn btn-link btn-slim ml-1" title="View"
+                                        (click)="downloadFile(item.id, item.docFilename)"><i class="fas fa-eye"
+                                            aria-hidden="true"></i></button>
                                     <button *ngIf="item.docFilename!=='Summary Statement'"
                                         class="btn btn-link btn-slim ml-2 btn-delete" title="Delete"
                                         (click)="deleteDoc(item.id, item.docType)"><i class="fas fa-trash"
                                             aria-hidden="true"></i></button>
-                                    <button class="btn btn-link btn-slim ml-1" title="View"
-                                        (click)="downloadFile(item.id, item.docFilename)"><i class="fas fa-eye"
-                                            aria-hidden="true"></i></button>
+                                    
                                 </div>
                             </div>
 
@@ -196,13 +197,13 @@
                                     *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayFileNameFormat"
                                     class="doc-name">{{ item.docFilename }}</span>
                                 <ng-template #displayFileNameFormat>
-                                    <span class="doc-name">{{ item.docType + ' ' + item.docFilename }}</span>
+                                    <span class="doc-name">{{ item.docType }}</span>
                                 </ng-template>
                                 <span
                                     *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'"
-                                    class="doc-desc">(Retrieved form
+                                    class="doc-desc">(Retrieved from
                                     IMPAC II)</span>
-                                <span *ngIf="item.docFilename !== 'Summary Statement'" class="doc-desc">(Added by <a
+                                <span *ngIf="item.docFilename !== 'Summary Statement'" class="doc-desc">({{item.docFilename }} - Added by <a
                                         href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
                                     {{item.createDate}})</span>
                                 <div class="ml-auto">
