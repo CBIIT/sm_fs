@@ -16,7 +16,7 @@ export class CanSelectorComponent implements OnInit {
   private _selectedCanData: CanCcxDto;
   defaultCans: CanCcxDto[];
   projectedCan: CanCcxDto;
-  canMap: Map<string, CanCcxDto>;
+  // canMap: Map<string, CanCcxDto>;
   data: Array<Select2OptionData>;
   allOptions: Options;
   defaultOptions: Options;
@@ -38,13 +38,15 @@ export class CanSelectorComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<string>();
 
   get selectedCanData(): CanCcxDto {
-    return this._selectedCanData ? this._selectedCanData : (this.canMap ? this.canMap.get(this._selectedValue) : null);
+    return this._selectedCanData; // ? this._selectedCanData : (this.canMap ? this.canMap.get(this._selectedValue) : null);
   }
 
   set selectedValue(value: string) {
     this._selectedValue = value;
-    if (value && this.canMap) {
-      this._selectedCanData = this.canMap.get(value);
+    if (value) {
+      this.canService.getCanDetails(value).subscribe(result => {
+        this._selectedCanData = result;
+      });
     } else {
       this._selectedCanData = null;
     }
@@ -56,17 +58,9 @@ export class CanSelectorComponent implements OnInit {
               private model: RequestModel) {
   }
 
-  storeData(data: any): void {
-    if (!data) {
-      return;
-    }
-    this.canMap = new Map(data.map(c => [c.can, c]));
-
-  }
-
   ngOnInit(): void {
     this.logger.info('Initial CAN:', this.initialCAN);
-    const callback = this.storeData.bind(this);
+    const init = this.initialCAN;
     // this.updateCans();
     if (!this.readonly) {
       this.canService.projectedCanEmitter.subscribe(next => {
@@ -81,7 +75,7 @@ export class CanSelectorComponent implements OnInit {
     const nciSource = this.nciSourceFlag;
     this.allOptions = {
       allowClear: true,
-      minimumInputLength: 2,
+      minimumInputLength: 3,
       closeOnSelect: true,
       placeholder: '',
       language: {
@@ -96,13 +90,14 @@ export class CanSelectorComponent implements OnInit {
         data(params): any {
           const query = {
             can: params.term,
-            // nciSourceFlag: 'Y'
+            activityCodes,
+            bmmCodes,
+            nciSourceFlag: nciSource
           };
 
           return query;
         },
         processResults(searchData): any {
-          callback(searchData);
           return {
             results: $.map(searchData, can => {
               return {
@@ -115,15 +110,24 @@ export class CanSelectorComponent implements OnInit {
         }
       }
     };
-    this.defaultOptions =  {
+    this.defaultOptions = {
       allowClear: true,
-      minimumInputLength: 2,
+      minimumInputLength: 3,
       closeOnSelect: true,
       placeholder: '',
       language: {
         inputTooShort(): string {
           return '';
         }
+      },
+      initSelection(element, callback): any {
+        const c = {
+          id: init.can,
+          text: init.can  + ' | ' + init.canDescription,
+          additional: init
+        };
+        console.log(element, callback, init, c);
+        callback(c);
       },
       ajax: {
         url: '/i2ecws/api/v1/fs/cans/',
@@ -140,7 +144,6 @@ export class CanSelectorComponent implements OnInit {
           return query;
         },
         processResults(searchData): any {
-          callback(searchData);
           return {
             results: $.map(searchData, can => {
               return {
@@ -158,7 +161,7 @@ export class CanSelectorComponent implements OnInit {
   private updateCans(): void {
     this.canService.getCans(this.nciSourceFlag).subscribe(result => {
       this.defaultCans = result;
-      this.canMap = new Map(result.map(c => [c.can, c]));
+      // this.canMap = new Map(result.map(c => [c.can, c]));
       this.data = new Array<Select2OptionData>();
       result.forEach(r => {
         this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip, additional: r });
@@ -185,19 +188,19 @@ export class CanSelectorComponent implements OnInit {
   }
 
   private handleMisingInitialCAN(): void {
-    const tmp = this.canMap.get(this.initialCAN.can);
-    if (!tmp) {
+    const tmp = this.data.filter(e => e.id === this.initialCAN.can);
+    if (!tmp || tmp.length === 0) {
       this.data.push({
         id: this.initialCAN.can,
         text: this.initialCAN.can + ' | ' + this.initialCAN.canDescription,
         additional: this.initialCAN
       });
 
-      this.canMap.set(this.initialCAN.can, {
-        can: this.initialCAN.can,
-        canDescrip: this.initialCAN.canDescription,
-        canPhsOrgCode: this.initialCAN.phsOrgCode
-      });
+      // this.canMap.set(this.initialCAN.can, {
+      //   can: this.initialCAN.can,
+      //   canDescrip: this.initialCAN.canDescription,
+      //   canPhsOrgCode: this.initialCAN.phsOrgCode
+      // });
     }
   }
 
@@ -219,7 +222,7 @@ export class CanSelectorComponent implements OnInit {
   onCheckboxChange(e: any, i: number): void {
     this.allCans = e.target.checked;
     if (!this.allCans) {
-      this.updateCans();
+      // this.updateCans();
     }
   }
 }

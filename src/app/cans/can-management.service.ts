@@ -129,4 +129,7 @@ export class CanManagementService {
     return true;
   }
 
+  getCanDetails(value: string): Observable<CanCcxDto> {
+    return this.canService.getCanDetailsUsingGET(value);
+  }
 }
