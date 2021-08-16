@@ -31,7 +31,7 @@ export class RequestInformationReadonlyComponent implements OnInit {
       .set('PD', 'Program Director')
       .set('DD', 'NCI Director')
       .set('SPL', 'Scientific Program Leaders Committee')
-      .set('DAO', 'Division/Office/Center Approver');
+      .set('DAO', 'Division/Office/Center (DOC) Approver');
 
     if (this.requestModel.requestDto.financialInfoDto.otherDocText) {
       this.otherDocs = this.requestModel.requestDto.financialInfoDto.otherDocText.split(',');
