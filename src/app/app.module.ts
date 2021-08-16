@@ -105,6 +105,7 @@ import { FundingPlanInformationComponent } from './funding-plan/funding-plan-inf
 import { PlanInfoIssueTypeComponent } from './funding-plan/plan-info-issue-type/plan-info-issue-type.component';
 import { FpGrantInformationComponent } from './funding-plan/fp-grant-information/fp-grant-information.component';
 import { FpDirectTotalCostComponent } from './funding-plan/fp-direct-total-cost/fp-direct-total-cost.component';
+import { FpFundingInformationComponent } from './funding-plan/fp-funding-information/fp-funding-information.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -219,6 +220,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     PlanInfoIssueTypeComponent,
     FpGrantInformationComponent,
     FpDirectTotalCostComponent,
+    FpFundingInformationComponent,
   ],
 
 

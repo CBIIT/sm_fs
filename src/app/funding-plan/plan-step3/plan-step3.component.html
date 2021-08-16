@@ -1,127 +1,82 @@
 <div class="row">
-    <div class="col-12">
-        <h2>General Information</h2>
-    </div>
-    <div class="col-lg-6">
-        <div class="row">
+  <div class="col-12">
+    <h2>General Information</h2>
+  </div>
+  <div class="col-lg-6">
+    <div class="row">
 
-            <div class="col-12">
-                <div class="form-group">
-                    <label for="fp-name">Funding Plan Name</label>
-                    <input type="text" id="fp-name" class="form-control">
-                </div>
-            </div>
+      <div class="col-12">
+        <div class="form-group">
+          <label for="fp-name">Funding Plan Name</label>
+          <input type="text" id="fp-name" class="form-control" maxlength="100">
+        </div>
+      </div>
 
-            <div class="col-lg-8">
-                <div class="form-group">
-                    <label for="requesting-pd">Requesting PD</label>
-                    <ng-select2
-                        id="requesting-pd"
-                        name="requesting-pd"
-                        [allowClear]="true"
-                        [options]="">
-                    </ng-select2>
-                </div>
-            </div>
+      <div class="col-lg-8">
+        <div class="form-group">
+          <lib-pdname-dropdown label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
+<!--          <div-->
+<!--            class="text-danger mt-1"-->
+<!--            *ngIf="parentForm.errors?.pdNameRequired && (parentForm.submitted || parentForm.touched)">-->
+<!--            PD is required-->
+<!--          </div>-->
+        </div>
+      </div>
 
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label for="ca">CA</label>
-                    <ng-select2
-                        id="ca"
-                        name="ca"
-                        [allowClear]="true"
-                        [options]="">
-                    </ng-select2>
-                </div>
-            </div>
+      <div class="col-lg-4">
+        <div class="form-group">
+          <lib-cancer-activities-dropdown [selectSingleOption]="true" [maxSelection]="1" [syncWithPd]="true" label="CA"></lib-cancer-activities-dropdown>
+<!--          <div-->
+<!--            class="text-danger mt-1"-->
+<!--            *ngIf="parentForm.errors?.cayCodeIsRequired && (parentForm.submitted || parentForm.touched)">-->
+<!--            Cancer activity is required-->
+<!--          </div>-->
+        </div>
+      </div>
 
-        </div><!-- END Row -->
-    </div>
+    </div><!-- END Row -->
+  </div>
 
-    <div class="col-lg-6">
-        <app-other-docs-contributing-funds></app-other-docs-contributing-funds>
-    </div>
+  <div class="col-lg-6">
+    <app-other-docs-contributing-funds></app-other-docs-contributing-funds>
+  </div>
 
-    <div class="col-12">
-        <hr>
-    </div>
+  <div class="col-12">
+    <hr>
+  </div>
 
 </div><!-- END Row -->
 
 <div class="row">
-    <app-funding-plan-information></app-funding-plan-information>
-    
-    <div class="col-12">
-        <hr>
-    </div>
+  <app-funding-plan-information></app-funding-plan-information>
+
+  <div class="col-12">
+    <hr>
+  </div>
 
 </div><!-- END Row -->
 
 <div class="row">
-    <div class="col-12">
-        <h2>Funding Information <span class="font-weight-light font-italic">(Optional)</span></h2>
-    </div>
-    <div class="col-lg-3 col-sm-6">
-        <div class="form-group">
-            <label for="first-set-aside">Published 1<sup>st</sup> Year Set-Aside</label>
-            <input type="text" id="first-set-aside" class="form-control">
-        </div>
-    </div>
-    <div class="col-lg-auto col-sm-6">
-        <div class="form-group">
-            <label for="all-set-aside">Total Published Set-Aside (All Years)</label>
-            <input type="text" id="all-set-aside" class="form-control">
-        </div>
-    </div>
-    
-    <div class="col-12 mt-3">
-        <h3>List of Funding Estimates for Each Out-Year</h3>
-    </div>
+  <app-fp-funding-information></app-fp-funding-information>
 
-    <div class="col-lg-3 col-sm-6">
-        <div class="form-group">
-            <label for="est-year-2">Year 2</label>
-            <input type="text" id="est-year-2" class="form-control">
-        </div>
-    </div>
-    <div class="col-lg-3 col-sm-6">
-        <div class="form-group">
-            <label for="est-year-3">Year 3</label>
-            <input type="text" id="est-year-3" class="form-control">
-        </div>
-    </div>
-    <div class="col-lg-3 col-sm-6">
-        <div class="form-group">
-            <label for="est-year-4">Year 4</label>
-            <input type="text" id="est-year-4" class="form-control">
-        </div>
-    </div>
-    <div class="col-lg-3 col-sm-6">
-        <div class="form-group">
-            <label for="est-year-5">Year 5</label>
-            <input type="text" id="est-year-5" class="form-control">
-        </div>
-    </div>
-
-    <div class="col-12">
-        <hr>
-    </div>
+  <div class="col-12">
+    <hr>
+  </div>
 </div><!-- END Row -->
 
 <div class="row">
-    <app-applications-proposed-for-funding></app-applications-proposed-for-funding>
-    
-    <div class="col-12">
-        <hr>
-    </div>
+  <app-applications-proposed-for-funding></app-applications-proposed-for-funding>
+
+  <div class="col-12">
+    <hr>
+  </div>
 
 </div><!-- END Row -->
 
 <div class="row">
-    <div class="col-12 d-flex">
-        <button type="button" class="btn btn-outline-secondary mr-auto" (click)="previous()">Previous</button>
-        <button type="button" class="btn btn-outline-primary mr-2">Save as Draft</button>
-        <button type="button" class="btn btn-primary" (click)="saveContinue()">Save and Continue</button>
-    </div>
+  <div class="col-12 d-flex">
+    <button type="button" class="btn btn-outline-secondary mr-auto" (click)="previous()">Previous</button>
+    <button type="button" class="btn btn-outline-primary mr-2">Save as Draft</button>
+    <button type="button" class="btn btn-primary" (click)="saveContinue()">Save and Continue</button>
+  </div>
 </div>
