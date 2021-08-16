@@ -1,11 +1,11 @@
-import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
-import {NciPfrGrantQueryDtoEx} from "../../model/plan/nci-pfr-grant-query-dto-ex";
-import {from} from "rxjs";
-import {Router} from "@angular/router";
-import {logger} from "codelyzer/util/logger";
+import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
+import { from } from 'rxjs';
+import { Router } from '@angular/router';
+import { logger } from 'codelyzer/util/logger';
 
 @Component({
   selector: 'app-fundable-score-range',
@@ -19,9 +19,9 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
 
   withinRangeGrants: NciPfrGrantQueryDto[];
   outsideRangeGrants: NciPfrGrantQueryDto[];
-  errMaxScoreRequired: boolean = false;
-  errMaxScoreRange: boolean = false;
-  errMaxScoreNumeric: boolean = false;
+  errMaxScoreRequired = false;
+  errMaxScoreRange = false;
+  errMaxScoreNumeric = false;
 
   // It stores scores that are used once apply button is clicked.
   // User can change the maximum score number and click "save and continue" without
@@ -69,7 +69,7 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private _resetView() {
+  private _resetView(): void {
     this.withinRangeGrants = [];
     this.outsideRangeGrants = [];
     this.modelMaximumScore = undefined;
@@ -78,7 +78,7 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
     this.errMaxScoreNumeric = false;
   }
 
-  onApplyMaximumScore() {
+  onApplyMaximumScore(): void {
     this._resetView();
     if (!this.maximumScore || this.maximumScore.toString() === '') {
       this.errMaxScoreRequired = true;
@@ -99,9 +99,9 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
       (!g.notSelectableReason || g.notSelectableReason.length == 0) && g.priorityScoreNum < this.minimumScore || g.priorityScoreNum > this.maximumScore);
   }
 
-  onSaveAndContinue() {
+  onSaveAndContinue(): void {
     if (!this.modelMaximumScore) {
-      alert("You must enter valid \"To\" valie and click Apply button to continue with next step");
+      alert('You must enter valid "To" value and click Apply button to continue with next step');
       return;
     }
     this.planModel.maximumScore = this.modelMaximumScore;
@@ -111,11 +111,11 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
   }
 
   // Reset validation messages
-  onMaxScoreChange($event: any) {
+  onMaxScoreChange($event: any): void {
     if (this.errMaxScoreRequired && $event.target.value.toString().length > 0) {
       this.errMaxScoreRequired = false;
     }
-    const parsed = parseInt($event.target.value)
+    const parsed = parseInt($event.target.value);
     if (this.errMaxScoreRange && !isNaN(parsed) && parsed >= this.minimumScore) {
       this.errMaxScoreRange = false;
     }
