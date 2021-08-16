@@ -6,6 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./applications-proposed-for-funding.component.css']
 })
 export class ApplicationsProposedForFundingComponent implements OnInit {
+  comments: string;
 
   constructor() { }
 
