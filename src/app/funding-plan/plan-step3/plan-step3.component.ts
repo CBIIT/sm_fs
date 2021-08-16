@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { NGXLogger } from 'ngx-logger';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-plan-step3',
@@ -9,6 +10,8 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./plan-step3.component.css']
 })
 export class PlanStep3Component implements OnInit {
+  @ViewChild('step3form', { static: false }) step3form: NgForm;
+
 
   constructor(private navigationModel: NavigationStepModel,
               private router: Router,
@@ -29,5 +32,6 @@ export class PlanStep3Component implements OnInit {
 
   onSubmit($event: any): void {
     this.logger.debug($event);
+    this.logger.debug(this.step3form);
   }
 }
