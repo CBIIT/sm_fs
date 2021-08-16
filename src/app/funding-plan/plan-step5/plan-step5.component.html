@@ -123,7 +123,7 @@
                             </div>
                         </ng-template>
 
-                        <div class="doc-buttons" *ngIf="isSciRatUploaded; else sciRatNotUploadedB">
+                        <div class="doc-buttons" *ngIf="isSciRatUploaded; else sciRatNotUploadedBtn">
                             <button class="btn btn-link btn-slim"
                                 (click)="downloadFile(sciRatDocDto.id, sciRatDocDto.docFilename)"><i
                                     class="far fa-eye"></i></button>
@@ -131,7 +131,7 @@
                                 (click)="deleteDoc(sciRatDocDto.id, sciRatDocDto.docType)"><i
                                     class="fas fa-trash"></i></button>
                         </div>
-                        <ng-template #sciRatNotUploadedB>
+                        <ng-template #sciRatNotUploadedBtn>
                             <div class="doc-buttons">
                                 <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
                                         class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
@@ -166,7 +166,7 @@
                             </div>
                         </ng-template>
 
-                        <div class="doc-buttons" *ngIf="isExceptionsUploaded; else excNotUploadedB">
+                        <div class="doc-buttons" *ngIf="isExceptionsUploaded; else excNotUploadedBtn">
                             <button class="btn btn-link btn-slim"
                                 (click)="downloadFile(exceptionDocDto.id, exceptionDocDto.docFilename)"><i
                                     class="far fa-eye"></i></button>
@@ -174,7 +174,7 @@
                                 (click)="deleteDoc(exceptionDocDto.id, exceptionDocDto.docType)"><i
                                     class="fas fa-trash"></i></button>
                         </div>
-                        <ng-template #excNotUploadedB>
+                        <ng-template #excNotUploadedBtn>
                             <div class="doc-buttons">
                                 <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
                                         class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
@@ -208,7 +208,7 @@
                             </div>
                         </ng-template>
 
-                        <div class="doc-buttons" *ngIf="isSkipUploaded; else skipNotUploadedB">
+                        <div class="doc-buttons" *ngIf="isSkipUploaded; else skipNotUploadedBtn">
                             <button class="btn btn-link btn-slim"
                                 (click)="downloadFile(skipDocDto.id, skipDocDto.docFilename)"><i
                                     class="far fa-eye"></i></button>
@@ -216,7 +216,7 @@
                                 (click)="deleteDoc(skipDocDto.id, skipDocDto.docType)"><i
                                     class="fas fa-trash"></i></button>
                         </div>
-                        <ng-template #skipNotUploadedB>
+                        <ng-template #skipNotUploadedBtn>
                             <div class="doc-buttons">
                                 <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
                                         class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
@@ -250,7 +250,7 @@
                             </div>
                         </ng-template>
 
-                        <div class="doc-buttons" *ngIf="isOtherUploaded; else othNotUploadedB">
+                        <div class="doc-buttons" *ngIf="isOtherUploaded; else othNotUploadedBtn">
                             <button class="btn btn-link btn-slim"
                                 (click)="downloadFile(otherDocDto.id, otherDocDto.docFilename)"><i
                                     class="far fa-eye"></i></button>
@@ -258,7 +258,7 @@
                                 (click)="deleteDoc(otherDocDto.id, otherDocDto.docType)"><i
                                     class="fas fa-trash"></i></button>
                         </div>
-                        <ng-template #othNotUploadedB>
+                        <ng-template #othNotUploadedBtn>
                             <div class="doc-buttons">
                                 <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
                                         class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
