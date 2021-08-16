@@ -36,8 +36,8 @@ const routes: Routes = [
         {path: 'retrieve/:fprId', component: RetrieveRequestComponent}
       ]},
       { path: 'request', component: FundingRequestComponent, children: [
-        {path: '', redirectTo: 'step1', pathMatch: 'full'},
-        {path: 'step1', component: Step1Component, canActivate: [PdAuthGuard]},
+        {path: '', redirectTo: 'step1/new', pathMatch: 'full'},
+        {path: 'step1/:new', component: Step1Component, canActivate: [PdAuthGuard]},
         {path: 'step2', component: Step2Component},
         {path: 'step3', component: Step3Component},
         {path: 'step4', component: Step4Component},

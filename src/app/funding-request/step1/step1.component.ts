@@ -21,6 +21,8 @@ import {ExistingRequestsCellRendererComponent} from '../../table-cell-renderers/
 import {FundingRequestActionCellRendererComponent} from './funding-request-action-cell-renderer/funding-request-action-cell-renderer.component';
 import {CancerActivityCellRendererComponent} from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
+import { ActivatedRoute } from '@angular/router';
+import { RequestModel } from 'src/app/model/request/request-model';
 
 @Component({
   selector: 'app-step1',
@@ -35,6 +37,8 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
               private userSessionService: AppUserSessionService,
               private loaderService: LoaderService,
               private logger: NGXLogger,
+              private route: ActivatedRoute,
+              private requestModel: RequestModel,
               private navigationModel: NavigationStepModel) {
   }
 
@@ -223,6 +227,10 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
   }
 
   ngOnInit(): void {
+    const isNewRequest = this.route.snapshot.params.new;
+    if (isNewRequest) {
+      this.requestModel.reset();
+    }
     this.navigationModel.showSteps = true;
   }
 
