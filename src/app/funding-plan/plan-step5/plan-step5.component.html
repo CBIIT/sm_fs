@@ -145,13 +145,13 @@
                         [templateType]="CR_FUNDING_PLAN_SCIENTIFIC_RPT"></app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
-                            <p>DataTable goes here.</p>
+                            <app-grant-table [grantList]="selectedGrants" [minScore]="model.minimumScore" [maxScore]="model.maximumScore"></app-grant-table>
                         </div>
                     </div>
                 </ng-template>
             </ngb-panel>
 
-            <ngb-panel id="justExc-panel">
+            <ngb-panel id="justExc-panel" *ngIf="exceptionGrants && exceptionGrants.length > 0">
                 <ng-template ngbPanelHeader>
                     <div class="d-flex align-items-center">
                         <h3>Justification for Exception Application(s)</h3>
@@ -187,13 +187,13 @@
                         [templateType]="CR_FUNDING_PLAN_EXCEPTION_JUST_RPT"></app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
-                            <p>DataTable goes here.</p>
+                            <app-grant-table [grantList]="exceptionGrants"></app-grant-table>
                         </div>
                     </div>
                 </ng-template>
             </ngb-panel>
 
-            <ngb-panel id="justSkip-panel">
+            <ngb-panel id="justSkip-panel" *ngIf="skipGrants && skipGrants.length > 0">
                 <ng-template ngbPanelHeader>
                     <div class="d-flex align-items-center">
                         <h3>Justification for Skipped Application(s)</h3>
@@ -229,7 +229,7 @@
                         [templateType]="CR_FUNDING_PLAN_SKIP_JUST_RPT"></app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
-                            <p>DataTable goes here.</p>
+                            <app-grant-table [grantList]="skipGrants"></app-grant-table>
                         </div>
                     </div>
                 </ng-template>
