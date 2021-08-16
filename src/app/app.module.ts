@@ -100,6 +100,11 @@ import { PlanExceptionAppsComponent } from './funding-plan/plan-step5/plan-excep
 import { PlanSkippedAppsComponent } from './funding-plan/plan-step5/plan-skipped-apps/plan-skipped-apps.component';
 import { PlanFileUploadComponent } from './funding-plan/plan-step5/plan-file-upload/plan-file-upload.component';
 import { PlanSummaryStatementComponent } from './funding-plan/plan-step5/plan-summary-statement/plan-summary-statement.component';
+import { ApplicationsProposedForFundingComponent } from './funding-plan/applications-proposed-for-funding/applications-proposed-for-funding.component';
+import { FundingPlanInformationComponent } from './funding-plan/funding-plan-information/funding-plan-information.component';
+import { PlanInfoIssueTypeComponent } from './funding-plan/plan-info-issue-type/plan-info-issue-type.component';
+import { FpGrantInformationComponent } from './funding-plan/fp-grant-information/fp-grant-information.component';
+import { FpDirectTotalCostComponent } from './funding-plan/fp-direct-total-cost/fp-direct-total-cost.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -209,6 +214,11 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     PlanSkippedAppsComponent,
     PlanFileUploadComponent,
     PlanSummaryStatementComponent,
+    ApplicationsProposedForFundingComponent,
+    FundingPlanInformationComponent,
+    PlanInfoIssueTypeComponent,
+    FpGrantInformationComponent,
+    FpDirectTotalCostComponent,
   ],
 
 
