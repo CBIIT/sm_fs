@@ -113,7 +113,7 @@
     </div>
   </div>
 
-  <div class="col-12">
+  <div class="col-12" *ngIf="!isSkip">
     <app-program-recommended-costs [readOnlyView]="true"></app-program-recommended-costs>
   </div>
 
