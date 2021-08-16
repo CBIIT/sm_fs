@@ -275,15 +275,7 @@
 
             <ngb-panel id="summary-panel">
                 <ng-template ngbPanelHeader>
-                    <div class="d-flex align-items-center">
-                        <h3>Summary Statement for Applications Proposed for Funding</h3>
-                        <div class="doc-details">
-                            (Retrieved from IMPAC II)
-                        </div>
-                        <div class="doc-buttons">
-                            <button class="btn btn-link btn-slim"><i class="far fa-eye"></i></button>
-                        </div>
-                    </div>
+                    <app-plan-summary-statement [grantList]="selectedGrants"></app-plan-summary-statement>
                 </ng-template>
             </ngb-panel>
 

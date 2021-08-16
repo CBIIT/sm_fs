@@ -91,5 +91,11 @@ export class DocumentService {
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
+  downloadFpSummaryStatement(applIds: number[]) {
+    var url = this.docViewerUrl + '/funding-plan-summary-statement?applIds=' + applIds;
+    this.logger.debug('Funding Plan Summary Statement URL:', url);
+    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
+  }
+
 
 }
