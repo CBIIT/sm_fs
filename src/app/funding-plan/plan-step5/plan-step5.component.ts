@@ -1,6 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { DocumentsDto } from '@nci-cbiit/i2ecws-lib';
+import { DocumentsDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { PlanModel } from 'src/app/model/plan/plan-model';
@@ -29,8 +29,15 @@ export class PlanStep5Component implements OnInit {
   skipDocDto: DocumentsDto = {};
   otherDocDto: DocumentsDto = {};
   activeIds: string[] = [];
+  selectedGrants: NciPfrGrantQueryDto[];
+  exceptionGrants: NciPfrGrantQueryDto[];
+  skipGrants: NciPfrGrantQueryDto[];
 
   @ViewChild('collapseAll') collapseAll: ElementRef<HTMLElement>;
+
+  get model(): PlanModel {
+    return this.planModel;
+  }
 
   constructor(private navigationModel: NavigationStepModel,
     private planModel: PlanModel,
@@ -39,8 +46,15 @@ export class PlanStep5Component implements OnInit {
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(5, true);
-
     this.loadFiles();
+
+    this.selectedGrants = this.planModel.allGrants.filter(g => g.selected);
+    this.exceptionGrants = this.planModel.allGrants.filter(g => g.selected &&
+      g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore);
+    this.skipGrants = this.planModel.allGrants.filter(g => !g.selected &&
+      (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
+      g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore
+    );
   }
 
   loadFiles(): void {
@@ -64,29 +78,7 @@ export class PlanStep5Component implements OnInit {
 
   checkUploadedDocs(): boolean {
     this.planDocDtos.forEach(element => {
-
       this.resetFlags(element.docType, true, element);
-
-      // if (element.docType === DocTypeConstants.JUSTIFICATION) {
-      //   this.isSciRatUploaded = true;
-      //   this.sciRatDocDto = element;
-      // }
-
-      // if (element.docType === DocTypeConstants.OTHER) {
-      //   this.isOtherUploaded = true;
-      //   this.otherDocDto = element;
-      // }
-
-      // if (element.docType === DocTypeConstants.SKIP_JUSTIFICATION) {
-      //   this.isSkiptUploaded = true;
-      //   this.skipDocDto = element;
-      // }
-
-      // if (element.docType === DocTypeConstants.EXCEPTION_JUSTIFICATION) {
-      //   this.isExceptionsUploaded = true;
-      //   this.exceptionDocDto = element;
-      // }
-
     });
     return false;
   }
