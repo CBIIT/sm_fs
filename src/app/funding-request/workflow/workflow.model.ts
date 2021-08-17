@@ -127,7 +127,7 @@ export class WorkflowModel {
         this.requestIntegrationService.approverInitializationEmitter.next();
       },
       (error) => {
-        this.logger.error('Error calling createRequestApprovers', error);
+        this.logger.error('Error calling getRequestApprovers', error);
       }
     );
   }
