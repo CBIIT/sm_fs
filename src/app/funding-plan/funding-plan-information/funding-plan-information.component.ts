@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate';
-import { CancerActivityControllerService } from '@nci-cbiit/i2ecws-lib';
+import { CancerActivityControllerService, RfaPaNoticesDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({
@@ -10,7 +10,7 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./funding-plan-information.component.css']
 })
 export class FundingPlanInformationComponent implements OnInit {
-  rfaDetails: any[];
+  rfaDetails: RfaPaNoticesDto[];
 
   constructor(public planModel: PlanModel,
               private rfaService: CancerActivityControllerService,
