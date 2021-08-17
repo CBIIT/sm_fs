@@ -24,21 +24,23 @@ export class PlanStep4Component implements OnInit {
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(4, true);
-    this.skipGrants = this.planModel.allGrants.filter(g =>
-      !g.selected &&
-      (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
-      g.priorityScoreNum >= this.planModel.minimumScore &&
-      g.priorityScoreNum <= this.planModel.maximumScore
-    );
-    this.logger.debug('skip grants are ', this.skipGrants);
 
-    this.ncGrants = this.planModel.allGrants.filter(g =>
-      !g.selected &&
-      (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
-      ( g.priorityScoreNum < this.planModel.minimumScore ||
-        g.priorityScoreNum > this.planModel.maximumScore)
+    setTimeout(() => {
+      this.skipGrants = this.planModel.allGrants.filter(g =>
+        !g.selected &&
+        (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
+        g.priorityScoreNum >= this.planModel.minimumScore &&
+        g.priorityScoreNum <= this.planModel.maximumScore
       );
-    this.logger.debug('not considered grants are ', this.ncGrants);
+      this.logger.debug('skip grants are ', this.skipGrants);
+      this.ncGrants = this.planModel.allGrants.filter(g =>
+        !g.selected &&
+        (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
+        ( g.priorityScoreNum < this.planModel.minimumScore ||
+          g.priorityScoreNum > this.planModel.maximumScore)
+        );
+      this.logger.debug('not considered grants are ', this.ncGrants);
+    }, 0);
   }
 
   saveContinue(): void {

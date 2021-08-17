@@ -110,7 +110,7 @@
         <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-notconsidered-collapse" role="button" aria-expanded="true" aria-controls="apps-notconsidered-collapse"></a>
     </div>
     <div class="col-12 collapse show mt-2" id="apps-notconsidered-collapse">
-        <p *ngIf = "!ncGrants||ncGrants.length === 0; else ncelse">
+        <p *ngIf="!ncGrants || ncGrants.length === 0">
             Nothing found to be displayed. All applications received for 
             <span *ngFor = "let rfaNcCab of planModel.grantsSearchCriteria let j=index">
                 {{j!=0?'; ':''}}{{rfaNcCab.rfaPaNumber}} 
@@ -120,9 +120,7 @@
             </span> 
             have been considered for funding.
         </p>
-        <ng-template #ncelse>
         <app-grant-table [grantList]="ncGrants"></app-grant-table>
-        </ng-template>
     </div>
     <div class="col-12">
         <hr>
