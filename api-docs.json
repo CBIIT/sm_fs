@@ -20229,11 +20229,17 @@
 				"bkupSpecFullName": {
 					"type": "string"
 				},
+				"bkupSpecEmail": {
+					"type": "string"
+				},
 				"bkupSpecNpeId": {
 					"type": "integer",
 					"format": "int32"
 				},
 				"defaultSpecFullName": {
+					"type": "string"
+				},
+				"defaultSpecEmail": {
 					"type": "string"
 				},
 				"frqId": {

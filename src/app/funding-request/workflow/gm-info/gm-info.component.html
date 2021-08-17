@@ -26,7 +26,8 @@
     <div class="col-lg-4">
         <div class="form-group">
             <label for="specialist">Specialist</label>
-            <span *ngIf="readonly; else specInput">{{gmInfo.defaultSpecFullName}}</span>
+            <span *ngIf="readonly; else specInput"><a
+                href="mailto: {{gmInfo.defaultSpecEmail}}">{{gmInfo.defaultSpecFullName}}</a></span>
             <ng-template #specInput>
             <ng-select2 
                 id="default-specialist"
@@ -45,8 +46,9 @@
     </div>
     <div class="col">
         <div class="form-group">
-            <label for="backup-specialist">Backup Specialist <span class="optional">(optional)</span></label>
-            <span *ngIf="readonly">{{gmInfo.bkupSpecFullName}}</span>
+            <label for="backup-specialist">Backup Specialist <span *ngIf="!readonly" class="optional">(optional)</span></label>
+            <span *ngIf="readonly"><a
+                href="mailto: {{gmInfo.bkupSpecEmail}}">{{gmInfo.bkupSpecFullName}}</a></span>
             <ng-select2 *ngIf="!readonly"
                 id="backup-specialist"
                 name="backup-specialist"
