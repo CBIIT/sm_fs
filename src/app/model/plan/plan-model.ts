@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingPlanDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
 import { NciPfrGrantQueryDtoEx } from './nci-pfr-grant-query-dto-ex';
 import { RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate';
@@ -13,16 +13,12 @@ export class PlanModel {
   catsConceptUrl: string;
   // allGrants array include 'selected' boolean column with is set on step 1
   allGrants: NciPfrGrantQueryDtoEx[] = [];
-  selectedGrants: NciPfrGrantQueryDto[] = [];
-  unselectedGrants: NciPfrGrantQueryDto[] = [];
-  skippedGrants: NciPfrGrantQueryDto[] = [];
-  exceptionGrants: NciPfrGrantQueryDto[] = [];
   grantsSearchCriteria: Array<RfaPaNcabDate> = [];
   // Data from Step 2
   minimumScore: number;
   maximumScore: number;
 
-  // fundingPlanDto: FundingPlanDtoReq;
+  fundingPlanDto: FundingPlanDto;
 
 
   // TODO: Generate FundingPlanDto and FundingPlanFoasDto
@@ -38,11 +34,8 @@ export class PlanModel {
   }
 
   reset(): void {
+    this.fundingPlanDto = {};
     this.allGrants = [];
-    this.selectedGrants = [];
-    this.unselectedGrants = [];
-    this.skippedGrants = [];
-    this.exceptionGrants = [];
     this.grantsSearchCriteria = [];
     this.minimumScore = 0;
     this.maximumScore = 0;
