@@ -11,6 +11,7 @@ import { CancerActivitiesDropdownComponent } from '@nci-cbiit/i2ecui-lib';
 import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
 import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
 import { AppUserSessionService } from '../../service/app-user-session.service';
+import { Type4SelectionService } from '../../type4-conversion-mechanism/type4-selection.service';
 
 @Component({
   selector: 'app-request-information',
@@ -36,22 +37,28 @@ export class RequestInformationComponent implements OnInit {
       const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
         ? this.requestModel.requestDto.conversionActivityCode : null;
 
-      this.fsRequestControllerService.getFundingSourcesUsingGET(
-        value,
-        this.requestModel.grant.fullGrantNum,
-        this.requestModel.requestDto.fy,
-        this.requestModel.requestDto.financialInfoDto.requestorNpnId,
-        this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode,
-        conversionActivityCode).subscribe(result => {
-        this.requestModel.programRecommendedCostsModel.fundingSources = result;
-      }, error => {
-        this.logger.debug('HttpClient get request error for----- ' + error.message);
-      });
+      this.refreshFundingSources(value, conversionActivityCode, this.requestModel.requestDto.financialInfoDto.requestorCayCode);
     }
   }
 
 
-  // TODO: this is just plain weird. The CA dropdown component selectedValue attribute is an array of strings,
+  private refreshFundingSources(requestType: number, conversionActivityCode: string, cayCode: string): void {
+    this.fsRequestControllerService.getFundingSourcesUsingGET(
+      requestType,
+      this.requestModel.grant.fullGrantNum,
+      this.requestModel.requestDto.fy,
+      this.requestModel.requestDto.financialInfoDto.requestorNpnId,
+      // TODO: Revisit this logic
+      cayCode || this.requestModel.grant.cayCode,
+      conversionActivityCode).subscribe(result => {
+      this.logger.debug(result);
+      this.requestModel.programRecommendedCostsModel.fundingSources = result;
+    }, error => {
+      this.logger.debug('HttpClient get request error for----- ' + error.message);
+    });
+  }
+
+// TODO: this is just plain weird. The CA dropdown component selectedValue attribute is an array of strings,
   // so the setter and getter here are typed as arrays of strings. However, the value passed to the setter is
   // just a string, and even though _selectedCayCode is typed as a string[], if I try to assign it a string[]
   // value, it blows up at runtime.  Ditto the getter, which blows up at runtime if I try to return an array
@@ -76,8 +83,15 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
       this.requestModel.requestDto.requestorCayCode = undefined;
     }
-    this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.next(this.requestModel.requestDto.financialInfoDto.requestorCayCode);
+    this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.next(
+      this.requestModel.requestDto.financialInfoDto.requestorCayCode);
     this._selectedCayCode = value;
+    const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
+      ? this.requestModel.requestDto.conversionActivityCode : null;
+    this.refreshFundingSources(
+      this.requestModel.requestDto.financialInfoDto.requestTypeId,
+      conversionActivityCode,
+      this.requestModel.requestDto.financialInfoDto.requestorCayCode);
   }
 
   get selectedPd(): number {
@@ -103,7 +117,8 @@ export class RequestInformationComponent implements OnInit {
               private fundingRequestValidationService: FundingRequestValidationService,
               private fsRequestControllerService: FsRequestControllerService,
               private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
-              private appUserSessionService: AppUserSessionService) {
+              private appUserSessionService: AppUserSessionService,
+              private type4SelectionService: Type4SelectionService) {
   }
 
   ngOnInit(): void {
@@ -111,6 +126,9 @@ export class RequestInformationComponent implements OnInit {
     if (this.isMbOnly) {
       this.pdCayCodes = ['MB'];
     }
+    this.type4SelectionService.Type4SelectionEmitter.subscribe(next => {
+      this.onType4Change(next);
+    });
   }
 
 
@@ -132,5 +150,17 @@ export class RequestInformationComponent implements OnInit {
 
   type4Selected(): boolean {
     return Number(this.selectedRequestType) === Number(FundingRequestTypes.PAY_TYPE_4);
+  }
+
+  onType4Change(value: string): void {
+    this.logger.debug(value, this.requestModel.requestDto.conversionActivityCode);
+    const conversionActivityCode = ConversionActivityCodes.includes(value) ? value : null;
+    if (this.requestModel.requestDto.financialInfoDto.requestTypeId) {
+      this.logger.debug('refresh request types', conversionActivityCode, this.requestModel.requestDto.financialInfoDto.requestTypeId);
+      this.refreshFundingSources(
+        this.requestModel.requestDto.financialInfoDto.requestTypeId,
+        value,
+        this.requestModel.requestDto.financialInfoDto.requestorCayCode);
+    }
   }
 }

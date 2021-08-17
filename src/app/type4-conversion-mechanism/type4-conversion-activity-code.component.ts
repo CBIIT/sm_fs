@@ -3,6 +3,7 @@ import { RequestModel } from '../model/request/request-model';
 import { NGXLogger } from 'ngx-logger';
 import { ControlContainer, NgForm } from '@angular/forms';
 import { ConversionActivityCodeData } from './conversion-activity-codes';
+import { Type4SelectionService } from './type4-selection.service';
 
 @Component({
   selector: 'app-type4-conversion-mechanism',
@@ -11,6 +12,18 @@ import { ConversionActivityCodeData } from './conversion-activity-codes';
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
 })
 export class Type4ConversionActivityCodeComponent implements OnInit {
+  private _selectedValue: string;
+
+  get selectedValue(): string {
+    return this.model.requestDto.conversionActivityCode;
+  }
+
+  set selectedValue(value: string) {
+    this.model.requestDto.conversionActivityCode = this.selectedValue;
+    this._selectedValue = value;
+    this.type4SelectionService.Type4SelectionEmitter.next(value);
+  }
+
   @Input() parentForm: NgForm;
 
   label = 'Conversion Grant Activity Code(s)/Mechanism(s)';
@@ -21,7 +34,8 @@ export class Type4ConversionActivityCodeComponent implements OnInit {
   }
 
   constructor(private requestModel: RequestModel,
-              private logger: NGXLogger) {
+              private logger: NGXLogger,
+              private type4SelectionService: Type4SelectionService) {
   }
 
   ngOnInit(): void {
