@@ -1,11 +1,12 @@
 <div class="d-flex">
-  <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="radioBasic">
+  <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="issueType" [(ngModel)]="issueType">
     <label ngbButtonLabel class="btn-outline-secondary">
-      <input ngbButton type="radio" [(ngModel)]="issueType" value="new" (change)="toggleDisplay('new')">New
+      <input ngbButton type="radio" [value]="'new'" (change)="toggleDisplay('new')">New
     </label>
     <label ngbButtonLabel class="btn-outline-secondary">
-      <input ngbButton type="radio" [(ngModel)]="issueType" value="reissue" (change)="toggleDisplay('reissue')">Reissue
+      <input ngbButton type="radio" [value]="'reissue'" (change)="toggleDisplay('reissue')">Reissue
     </label>
   </div>
-  <input type="text" id="issue-type" style="width:7rem" class="form-control form-control-sm ml-2">
+  <input type="text" id="issue-type" style="width:7rem" class="form-control form-control-sm ml-2"
+         [(ngModel)]="priorNotice">
 </div>

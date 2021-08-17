@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
-import { RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate';
 import { CancerActivityControllerService, RfaPaNoticesDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
