@@ -32,6 +32,7 @@ export class PlanStep5Component implements OnInit {
   selectedGrants: NciPfrGrantQueryDto[];
   exceptionGrants: NciPfrGrantQueryDto[];
   skipGrants: NciPfrGrantQueryDto[];
+  private applIds: number[] = [];
 
   @ViewChild('collapseAll') collapseAll: ElementRef<HTMLElement>;
 
@@ -128,6 +129,24 @@ export class PlanStep5Component implements OnInit {
         this.logger.error('Error while deleting the document');
       };
     }
+  }
+
+  downloadPackage() {
+    for (let i = 0; i < this.selectedGrants.length; i++) {
+      this.applIds.push(this.selectedGrants[i].applId);
+    }
+    //TODO: remove hardcoded content once previous steps are implemented
+    this.documentService.downLoadFpPackage(513,
+    //this.documentService.downLoadFpPackage(this.planModel.fundingPlanDto.fprId,
+      this.applIds)
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          saveAs(blob, 'Package.pdf');
+        }
+      ), error =>
+        this.logger.error('Error downloading the file'),
+      () => console.info('File downloaded successfully');
   }
 
 }

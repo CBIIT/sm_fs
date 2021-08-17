@@ -11,8 +11,6 @@ export class ConceptAwardTrackingComponent implements OnInit {
   @Input() cptId: number;
   url: string;
 
-  // TODO: See FundingPlanFoasVw.cptId
-
   constructor(public planModel: PlanModel,
               private logger: NGXLogger) {
     logger.debug(planModel.catsConceptUrl);

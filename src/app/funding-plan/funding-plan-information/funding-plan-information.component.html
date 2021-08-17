@@ -20,7 +20,7 @@
         </td>
         <td>{{ rfa.title }}</td>
         <td>
-          <app-plan-info-issue-type [rfaNumber]="rfa.noticeNumber"></app-plan-info-issue-type>
+          <app-plan-info-issue-type [rfaDetails]="rfa"></app-plan-info-issue-type>
         </td>
       </tr>
       </tbody>
@@ -32,35 +32,36 @@
   <div class="col-lg-2 col-sm-6">
     <div class="form-group">
       <label for="fundable-score-range">Fundable Score&nbsp;Range</label>
-      <input type="text" readonly class="form-control-plaintext" id="fundable-score-range" value="23 &ndash; 26">
+      <input type="text" readonly class="form-control-plaintext" id="fundable-score-range"
+             value="{{planModel.minimumScore}} &ndash; {{planModel.maximumScore}}">
     </div>
   </div>
 
   <div class="col-lg-2 col-sm-6">
     <div class="form-group">
-      <label for="apps-recieved">Applications Recieved</label>
-      <input type="text" readonly class="form-control-plaintext" id="apps-recieved" value="35">
+      <label for="apps-recieved">Applications Received</label>
+      <input type="text" readonly class="form-control-plaintext" id="apps-recieved" value="{{ applicationsReceived }}">
     </div>
   </div>
 
   <div class="col-lg-3 col-sm-6">
     <div class="form-group">
       <label for="apps-proposed">Applications Proposed for&nbsp;Funding</label>
-      <input type="text" readonly class="form-control-plaintext" id="apps-proposed" value="6">
+      <input type="text" readonly class="form-control-plaintext" id="apps-proposed" value="{{ applicationsSelected }}">
     </div>
   </div>
 
   <div class="col-lg-2 col-sm-6">
     <div class="form-group">
       <label for="apps-skipped">Applications Skipped</label>
-      <input type="text" readonly class="form-control-plaintext" id="apps-skipped" value="1">
+      <input type="text" readonly class="form-control-plaintext" id="apps-skipped" value="{{ applicationsSkipped }}">
     </div>
   </div>
 
   <div class="col-lg-3 col-sm-6">
     <div class="form-group">
       <label for="apps-not-considered">Applications Not Considered for&nbsp;Funding</label>
-      <input type="text" readonly class="form-control-plaintext" id="apps-not-considered" value="1">
+      <input type="text" readonly class="form-control-plaintext" id="apps-not-considered" value="{{ applicationsNotConsidered }}">
     </div>
   </div>
 

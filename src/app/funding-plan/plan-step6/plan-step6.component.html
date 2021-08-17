@@ -214,7 +214,7 @@
         <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-proposed-collapse" role="button" aria-expanded="true" aria-controls="apps-proposed-collapse"></a>
     </div>
     <div class="col-12 collapse show mt-2" id="apps-proposed-collapse">
-        <p>Table goes here</p>
+        <app-grant-table [grantList]="fundedGrants"></app-grant-table>
     </div>
     <div class="col-12">
         <hr>
@@ -229,7 +229,7 @@
         <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-notcon-collapse" role="button" aria-expanded="true" aria-controls="apps-notcon-collapse"></a>
     </div>
     <div class="col-12 collapse show mt-2" id="apps-notcon-collapse">
-        <p>Table goes here</p>
+        <app-grant-table [grantList]="unfundedGrants"></app-grant-table>
     </div>
     <div class="col-12">
         <hr>
