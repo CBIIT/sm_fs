@@ -103,6 +103,9 @@ import { PlanInfoIssueTypeComponent } from './funding-plan/plan-info-issue-type/
 import { FpGrantInformationComponent } from './funding-plan/fp-grant-information/fp-grant-information.component';
 import { FpDirectTotalCostComponent } from './funding-plan/fp-direct-total-cost/fp-direct-total-cost.component';
 import { FpFundingInformationComponent } from './funding-plan/fp-funding-information/fp-funding-information.component';
+import { ManageDesignationsComponent } from './manage-designations/manage-designations.component';
+import { DateInPastValidatorDirective } from './manage-designations/date-in-past.directive';
+import { EndDateBeforeStartValidatorDirective } from './manage-designations/end-date-before-start-validator.directive';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -215,6 +218,9 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FpGrantInformationComponent,
     FpDirectTotalCostComponent,
     FpFundingInformationComponent,
+    ManageDesignationsComponent,
+    DateInPastValidatorDirective,
+    EndDateBeforeStartValidatorDirective,
   ],
 
 

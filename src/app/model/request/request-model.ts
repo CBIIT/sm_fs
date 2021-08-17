@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import {
-  FinancialInfoDtoReq,
+  FinancialInfoDto,
   FsCanControllerService,
   FundingReqBudgetsDto,
   FundingRequestCanDto,
-  FundingRequestDtoReq,
+  FundingRequestDto,
   NciPfrGrantQueryDto
 } from '@nci-cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
@@ -32,7 +32,7 @@ export class RequestModel {
   private _grant: NciPfrGrantQueryDto;
 
   // Note that swagger generated two versions of the DTO, one for the request and one for the response.  But they are identical.
-  private _requestDto: FundingRequestDtoReq;
+  private _requestDto: FundingRequestDto;
   private _programRecommendedCostsModel: ProgramRecommendedCostsModel;
 
   // Grant viewer URL for use in links
@@ -99,11 +99,11 @@ export class RequestModel {
     this._requestType = value;
   }
 
-  get requestDto(): FundingRequestDtoReq {
+  get requestDto(): FundingRequestDto {
     return this._requestDto;
   }
 
-  set requestDto(value: FundingRequestDtoReq) {
+  set requestDto(value: FundingRequestDto) {
     this._requestDto = value;
   }
 
@@ -115,7 +115,7 @@ export class RequestModel {
   set grant(value: NciPfrGrantQueryDto) {
     this._requestDto.applId = value.applId;
     if (!this._requestDto.financialInfoDto) {
-      this._requestDto.financialInfoDto = {} as FinancialInfoDtoReq;
+      this._requestDto.financialInfoDto = {} as FinancialInfoDto;
     }
     this.requestDto.financialInfoDto.applId = value.applId;
 

@@ -1,0 +1,111 @@
+<div class="row mb-4">
+  <div class="col">
+    <h1>Manage Designations</h1>
+  </div>
+</div>
+<div class="row mb-2">
+  <div class="col-12 d-flex">
+    <h4 class="d-inline-block" id="new-designee-label">Add new Designee</h4>
+  </div>
+  <div class="col-12">
+    <p>Select designee(s) to act on your behalf for requests and funding plans for which you are the assigned approver. Click "Temporary" below and provide the "Start" and "End" dates if you would like to have your selected designee(s) take an action on your requests and funding plans only during specific dates.</p>
+  </div>
+</div>
+<div class="row form-group">
+  <div class="col-12 col-md-3">
+    <label for="tempOrPerm">Designee Type</label>
+    <div class="btn-group btn-group-toggle"
+         ngbRadioGroup name="radioBasic"
+         [(ngModel)]="dsTemporary"
+         id="tempOrPerm">
+      <label ngbButtonLabel class="btn-outline-secondary">
+        <input ngbButton type="radio" [value]="true" (click)="onTemporary()">Temporary
+      </label>
+      <label ngbButtonLabel class="btn-outline-secondary">
+        <input ngbButton type="radio" [value]="false" (click)="onPermanent()"> Permanent
+      </label>
+    </div>
+  </div>
+</div>
+<form (ngSubmit)="addDesignee()" #form="ngForm" [class.submitted]="form.submitted">
+  <div class="row" role="group" aria-labelledby="new-designee-label">
+    <div class="col-lg-3">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input id="name" type="text" class="form-control" ngModel name="name" #nameInput="ngModel" required>
+      </div>
+    </div>
+    <div class="col-lg-3" *ngIf="dsTemporary">
+      <div class="form-group">
+        <label for="startDate">Start Date</label>
+        <div class="input-group">
+          <input id="startDate" class="form-control" name="startDate" ngModel placeholder="mm/dd/yyyy"
+                 ngbDatepicker #d="ngbDatepicker" (click)="d.toggle()" [minDate]="minDate" required appDateInPast>
+          <div class="input-group-append">
+            <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d.toggle()" type="button">
+              <i class="fas fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3" *ngIf="dsTemporary">
+      <div class="form-group">
+        <label for="endDate">End Date</label>
+        <div class="input-group">
+          <input id="endDate" class="form-control" ngModel name="endDate" placeholder="mm/dd/yyyy"
+                 ngbDatepicker #d2="ngbDatepicker" (click)="d2.toggle()"  [minDate]="minDate" required
+                 [appEndDateBeforeStartValidator]="form.controls.startDate?.value">
+          <div class="input-group-append">
+            <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d2.toggle()" type="button">
+              <i class="fas fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-sm-auto d-flex align-items-end mb-3">
+      <button type="submit" class="btn btn-primary px-2" title="Add new Designee">
+        <i class="fas fa-plus" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+<!--  Validation errors row -->
+  <div class="row" role="group" style="margin-top: -0.5rem;">
+    <div class="col-lg-3">
+      <div *ngIf="nameInput.errors?.required && form.submitted"
+        class="text-danger mt-1">
+        Name is required
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div *ngIf="form.controls.startDate?.errors?.required && form.submitted" class="text-danger mt-1">
+        Start Date is required
+      </div>
+      <div *ngIf="form.controls.startDate?.errors?.ngbDate?.invalid && form.submitted" class="text-danger mt-1">
+        Start Date is invalid
+      </div>
+      <div *ngIf="form.controls.startDate?.errors?.dateInPast && form.submitted" class="text-danger mt-1">
+        Start Date cannot be in the past
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div *ngIf="form.controls.endDate?.errors?.required && form.submitted"
+        class="text-danger mt-1">
+        End Date is required
+      </div>
+      <div *ngIf="form.controls.endDate?.errors?.ngbDate?.invalid && form.submitted" class="text-danger mt-1">
+        End Date is invalid
+      </div>
+      <div *ngIf="form.controls.endDate?.errors?.dateBeforeStart && form.submitted" class="text-danger mt-1">
+        End date cannot be before the start date
+      </div>
+    </div>
+  </div>
+</form>
+<div class="row">
+  <div class="col-12">
+    <table id="designeeDt" #designeeDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
+    </table>
+  </div>
+</div>

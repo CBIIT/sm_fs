@@ -19,6 +19,7 @@ import { PlanStep4Component } from './funding-plan/plan-step4/plan-step4.compone
 import { PlanStep5Component } from './funding-plan/plan-step5/plan-step5.component';
 import { PlanStep6Component } from './funding-plan/plan-step6/plan-step6.component';
 import {CanDeactivatePlanStep1} from "./funding-plan/plan-step1/can-deactivate-plan-step1";
+import {ManageDesignationsComponent} from "./manage-designations/manage-designations.component";
 
 const routes: Routes = [
   {
@@ -44,7 +45,7 @@ const routes: Routes = [
         {path: 'retrieve/:frqId', component: RetrieveRequestComponent}
       ]},
       {path: 'fundingSourceDetails', component: FundingSourcesNamesComponent},
-
+      {path: 'manage', component: ManageDesignationsComponent}
     ]
   },
   { path: 'unauthorize', component: UnauthorizeComponent }

@@ -5,7 +5,7 @@ import { Options } from 'select2';
 import {
   CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
   FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto, DocumentsControllerService,
-  ApplAdminSuppRoutingsDto, UserControllerService, FundingRequestDtoReq
+  ApplAdminSuppRoutingsDto, UserControllerService, FundingRequestDto
 } from '@nci-cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request/request-model';
@@ -269,7 +269,7 @@ export class Step3Component implements OnInit {
   }
 
   uploadJustificationText(justification: string) {
-    let reqDto: FundingRequestDtoReq = {};
+    let reqDto: FundingRequestDto = {};
     reqDto.frqId = this.requestModel.requestDto.frqId;
     reqDto.justification = justification;
     this.fsRequestControllerService.updateJustificationUsingPUT(reqDto).subscribe(
