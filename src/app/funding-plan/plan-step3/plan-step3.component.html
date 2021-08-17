@@ -1,44 +1,39 @@
 <form #step3form="ngForm" (ngSubmit)="onSubmit($event)">
   <div class="row">
-    <div class="col-12">
+    <div class="col-lg-12">
       <h2>General Information</h2>
     </div>
+
     <div class="col-lg-6">
-      <div class="row">
-
-        <div class="col-12">
-          <div class="form-group">
-            <label for="fp-name">Funding Plan Name</label>
-            <input type="text" id="fp-name" class="form-control" maxlength="100">
-          </div>
-        </div>
-
-        <div class="col-lg-8">
-          <div class="form-group">
-            <lib-pdname-dropdown label="Requesting PD" [broadcast]="true"
-                                 [showInactiveToggle]="false"></lib-pdname-dropdown>
-            <!--          <div-->
-            <!--            class="text-danger mt-1"-->
-            <!--            *ngIf="parentForm.errors?.pdNameRequired && (parentForm.submitted || parentForm.touched)">-->
-            <!--            PD is required-->
-            <!--          </div>-->
-          </div>
-        </div>
-
-        <div class="col-lg-4">
-          <div class="form-group">
-            <lib-cancer-activities-dropdown [selectSingleOption]="true" [maxSelection]="1" [syncWithPd]="true"
-                                            label="CA"></lib-cancer-activities-dropdown>
-            <!--          <div-->
-            <!--            class="text-danger mt-1"-->
-            <!--            *ngIf="parentForm.errors?.cayCodeIsRequired && (parentForm.submitted || parentForm.touched)">-->
-            <!--            Cancer activity is required-->
-            <!--          </div>-->
-          </div>
-        </div>
-
-      </div><!-- END Row -->
+      <div class="form-group">
+        <label for="fp-name">Funding Plan Name</label>
+        <input type="text" id="fp-name" class="form-control" maxlength="100">
+      </div>
     </div>
+
+    <div class="col-lg-4">
+      <div class="form-group">
+        <lib-pdname-dropdown label="Requesting PD" [broadcast]="true"
+                             [showInactiveToggle]="false"></lib-pdname-dropdown>
+        <!--          <div-->
+        <!--            class="text-danger mt-1"-->
+        <!--            *ngIf="parentForm.errors?.pdNameRequired && (parentForm.submitted || parentForm.touched)">-->
+        <!--            PD is required-->
+        <!--          </div>-->
+      </div>
+    </div>
+    <div class="col-lg-2">
+      <div class="form-group">
+        <lib-cancer-activities-dropdown [selectSingleOption]="true" [maxSelection]="1" [syncWithPd]="true"
+                                        label="CA"></lib-cancer-activities-dropdown>
+        <!--          <div-->
+        <!--            class="text-danger mt-1"-->
+        <!--            *ngIf="parentForm.errors?.cayCodeIsRequired && (parentForm.submitted || parentForm.touched)">-->
+        <!--            Cancer activity is required-->
+        <!--          </div>-->
+      </div>
+    </div>
+
 
     <div class="col-lg-6">
       <app-other-docs-contributing-funds></app-other-docs-contributing-funds>
