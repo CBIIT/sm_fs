@@ -11,16 +11,16 @@
       </tr>
       </thead>
       <tbody>
-      <tr>
+      <tr *ngFor="let rfa of rfaDetails; let i = index;">
         <td>
-          <a href="#">PAR19-264</a>
+          <a href="{{rfa.nihGuideAddr}}">{{rfa.noticeNumber}}</a>
         </td>
         <td>
-          <app-concept-award-tracking></app-concept-award-tracking>
+          <app-concept-award-tracking [cptId]="rfa.cptId"></app-concept-award-tracking>
         </td>
-        <td>Integrative Analysis of the Human Tumor Immune Microenvironment</td>
+        <td>{{ rfa.title }}</td>
         <td>
-          <app-plan-info-issue-type></app-plan-info-issue-type>
+          <app-plan-info-issue-type [rfaNumber]="rfa.noticeNumber"></app-plan-info-issue-type>
         </td>
       </tr>
       </tbody>

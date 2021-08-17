@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-concept-award-tracking',
@@ -7,13 +8,18 @@ import { PlanModel } from '../../model/plan/plan-model';
   styleUrls: ['./concept-award-tracking.component.css']
 })
 export class ConceptAwardTrackingComponent implements OnInit {
+  @Input() cptId: number;
+  url: string;
 
   // TODO: See FundingPlanFoasVw.cptId
 
-  constructor(public planModel: PlanModel) {
+  constructor(public planModel: PlanModel,
+              private logger: NGXLogger) {
+    logger.debug(planModel.catsConceptUrl);
   }
 
   ngOnInit(): void {
+    this.url = this.planModel.catsConceptUrl + this.cptId;
   }
 
 }
