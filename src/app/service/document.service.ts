@@ -97,5 +97,11 @@ export class DocumentService {
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
+  downLoadFpPackage(fpId: number, applIds: number[]) {
+    var url = this.docUrl + '/funding-plan-view-package?fpId=' + fpId + '&applIds=' + applIds;
+    this.logger.debug('Funding Plan Package URL: ', url);
+    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' });
+  }
+
 
 }
