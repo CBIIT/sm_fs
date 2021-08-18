@@ -16,6 +16,7 @@ import { SelectGrantCheckboxCellRendererComponent } from './select-grant-checkbo
 import { SelectGrantCheckboxEventType } from './select-grant-checkbox-cell-renderer/select-grant-checkbox-event-type';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { Router } from '@angular/router';
+import { GrantsSearchFilterService } from '../../funding-request/grants-search/grants-search-filter.service';
 
 
 /**
@@ -73,10 +74,10 @@ class RfaPaEntry {
       for (const ncab of $event) {
         const dto: FundingPlanNcabDto = this._findNcabDto(ncab);
         if (dto != null
-            && dto.currentPlanStatus != null
-            && dto.currentPlanStatus != 'COMPLETED'
-            && dto.currentPlanStatus != 'REJECTED'
-            && dto.currentPlanStatus != 'CANCELLED') {
+          && dto.currentPlanStatus != null
+          && dto.currentPlanStatus != 'COMPLETED'
+          && dto.currentPlanStatus != 'REJECTED'
+          && dto.currentPlanStatus != 'CANCELLED') {
           this.ncabErrors.push(dto);
         }
       }
@@ -213,9 +214,11 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
   constructor(private fsPlanControllerService: FsPlanControllerService,
               private router: Router,
               private planModel: PlanModel,
-              private logger: NGXLogger) { }
+              private logger: NGXLogger,
+              private grantsSearchFilterService: GrantsSearchFilterService) {
+  }
 
-  @ViewChild(DataTableDirective, {static: false}) dtElement: DataTableDirective;
+  @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
   @ViewChild('selectGrantCheckboxRenderer') selectGrantCheckboxRenderer: TemplateRef<SelectGrantCheckboxCellRendererComponent>;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
@@ -249,6 +252,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
       multiple: true,
       allowClear: false
     };
+
+    this.planModel.fundingPlanDto.planFy = this.grantsSearchFilterService.currentFy;
 
     this.searchCriteria = new FundingPlanGrantsSearchCriteriaUI();
     this._restoreFromModel();
@@ -305,30 +310,45 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
 
       data: this.dtData,
       columns: [
-        {title: 'Sel', data: 'selected', ngTemplateRef: { ref: this.selectGrantCheckboxRenderer}, className: 'all'}, // 0
-        {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'}, // 1
-        {title: 'PI', data: 'piFullName', render: ( data, type, row, meta ) => { // 2
+        { title: 'Sel', data: 'selected', ngTemplateRef: { ref: this.selectGrantCheckboxRenderer }, className: 'all' }, // 0
+        {
+          title: 'Grant Number',
+          data: 'fullGrantNum',
+          ngTemplateRef: { ref: this.fullGrantNumberRenderer },
+          className: 'all'
+        }, // 1
+        {
+          title: 'PI', data: 'piFullName', render: (data, type, row, meta) => { // 2
             return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-          }, className: 'all'},
-        {title: 'Project Title', data: 'projectTitle'}, // 3
-        {title: 'RFA/PA', data: 'rfaPaNumber', render: ( data, type, row, meta ) => { // 4
+          }, className: 'all'
+        },
+        { title: 'Project Title', data: 'projectTitle' }, // 3
+        {
+          title: 'RFA/PA', data: 'rfaPaNumber', render: (data, type, row, meta) => { // 4
             return '<a href="' + row.nihGuideAddr + '" target="blank" >' + data + '</a>';
-          }},
-        {title: 'I2 Status', data: 'applStatusGroupDescrip'}, // 5
-        {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => { // 6
+          }
+        },
+        { title: 'I2 Status', data: 'applStatusGroupDescrip' }, // 5
+        {
+          title: 'PD', data: 'pdFullName', render: (data, type, row, meta) => { // 6
             return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-          }},
-        {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'}, // 7
-        {title: 'FY', data: 'fy'}, // 8
-        {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', render: ( data, type, row, meta) => { // 9
+          }
+        },
+        { title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer }, className: 'all' }, // 7
+        { title: 'FY', data: 'fy' }, // 8
+        {
+          title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', render: (data, type, row, meta) => { // 9
             return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
-          }},
-        {title: 'Pctl', data: 'irgPercentileNum'}, // 10
-        {title: 'PriScr', data: 'priorityScoreNum'}, // 11
-        {title: 'Budget Start Date', data: 'budgetStartDate'}, // 12
-        {title: 'Existing Requests', data: 'requestCount', // 13
-          ngTemplateRef: { ref: this.existingRequestsRenderer}, className: 'all'},
-        {data: null, defaultContent: ''}
+          }
+        },
+        { title: 'Pctl', data: 'irgPercentileNum' }, // 10
+        { title: 'PriScr', data: 'priorityScoreNum' }, // 11
+        { title: 'Budget Start Date', data: 'budgetStartDate' }, // 12
+        {
+          title: 'Existing Requests', data: 'requestCount', // 13
+          ngTemplateRef: { ref: this.existingRequestsRenderer }, className: 'all'
+        },
+        { data: null, defaultContent: '' }
       ],
       order: [[11, 'asc']],
       responsive: {
@@ -343,20 +363,20 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
           orderable: false,
           targets: -1
         },
-        {orderable: false, targets: 0 }, // check box
-        {responsivePriority: 1, targets: 1 }, // grant_num
-        {responsivePriority: 3, targets: 2 }, // pi
-        {responsivePriority: 4, targets: 9 }, // ncab
-        {responsivePriority: 5, targets: 8 }, // fy
-        {responsivePriority: 6, targets: 6 }, // pd
-        {responsivePriority: 7, targets: 7 }, // ca
-        {responsivePriority: 8, targets: 10 }, // pctl
-        {responsivePriority: 9, targets: 11 }, // priscr
-        {responsivePriority: 10, targets: 4 }, // rfa/pa
-        {responsivePriority: 11, targets: 13 }, // existing requests
-        {responsivePriority: 12, orderable: false, targets: 3 }, // project title
-        {responsivePriority: 13, targets: 5 }, // i2 status
-        {responsivePriority: 14, targets: 12 } // budget start date
+        { orderable: false, targets: 0 }, // check box
+        { responsivePriority: 1, targets: 1 }, // grant_num
+        { responsivePriority: 3, targets: 2 }, // pi
+        { responsivePriority: 4, targets: 9 }, // ncab
+        { responsivePriority: 5, targets: 8 }, // fy
+        { responsivePriority: 6, targets: 6 }, // pd
+        { responsivePriority: 7, targets: 7 }, // ca
+        { responsivePriority: 8, targets: 10 }, // pctl
+        { responsivePriority: 9, targets: 11 }, // priscr
+        { responsivePriority: 10, targets: 4 }, // rfa/pa
+        { responsivePriority: 11, targets: 13 }, // existing requests
+        { responsivePriority: 12, orderable: false, targets: 3 }, // project title
+        { responsivePriority: 13, targets: 5 }, // i2 status
+        { responsivePriority: 14, targets: 12 } // budget start date
       ],
       dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
       buttons: [
@@ -368,7 +388,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
           filename: 'fs-fp-grants-search-result',
           title: null,
           header: true,
-          exportOptions: { columns: [ 1, 2, 3, 4 , 5 , 6, 7, 8, 9, 10, 11, 12, 13 ] }
+          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] }
         }
       ],
       rowCallback: (row: Node, data: any[] | object, index: number) => {
@@ -406,16 +426,14 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
         entry.selectedNcabDates = criteria.ncabDates;
       }
       this.canDeactivate = false;
-    }
-    else {
+    } else {
       this.searchCriteria.rfaPaEntries.push(new RfaPaEntry(this.searchCriteria));
     }
 
     // Restore or init table results data
     if (this.planModel.allGrants != null && this.planModel.allGrants.length > 0) {
       this.dtData = this.planModel.allGrants;
-    }
-    else{
+    } else {
       this.dtData = [];
     }
   }
@@ -552,16 +570,16 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
    * and navigates to step 2
    */
   selectGrants(): void {
-      this.logger.debug('selectGrants');
-      for (const entry of this.dtData) {
-        if (entry.selected) {
-          this.logger.debug('Selected grant ', entry.fullGrantNum);
-        }
+    this.logger.debug('selectGrants');
+    for (const entry of this.dtData) {
+      if (entry.selected) {
+        this.logger.debug('Selected grant ', entry.fullGrantNum);
       }
-      // save selections in planModel
-      this.planModel.allGrants = this.dtData;
-      this.canDeactivate = true;
-      this.router.navigate(['/plan/step2']);
+    }
+    // save selections in planModel
+    this.planModel.allGrants = this.dtData;
+    this.canDeactivate = true;
+    this.router.navigate(['/plan/step2']);
 
   }
 
