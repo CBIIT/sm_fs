@@ -12,6 +12,17 @@ import { NGXLogger } from 'ngx-logger';
 export class SearchComponent implements OnInit {
   @ViewChild(SearchResultComponent) searchResultComponent: SearchResultComponent;
 
+  currentFY: string = '2021';
+  showOverview: boolean = true;
+  numAwaitingRequests: number = 0;
+  numMyRequests: number = 10;
+  numMyCARequests: number = 6;
+  numMyPortfolioRequests: number = 3;
+  numMyUnderReviewRequests: number = 4;
+  numAwaitingPlans: number = 5;
+  numMyPlans: number = 2;
+  numMyUnderReviewPlans: number = 0;
+
   constructor(private logger: NGXLogger) { }
 
   ngOnInit(): void {
@@ -28,4 +39,35 @@ export class SearchComponent implements OnInit {
     this.logger.debug("Search criteria: " + fsCritera);
   }
 
+  onAwaitingRequests() {
+
+  }
+
+  onMyRequests() {
+
+  }
+
+  onMyCARequests() {
+
+  }
+
+  onMyPortfolioRequests() {
+
+  }
+
+  onMyUnderReviewRequests() {
+
+  }
+
+  onAwaitingPlans() {
+
+  }
+
+  onMyPlans() {
+
+  }
+
+  onMyUnderReviewPlans() {
+
+  }
 }
