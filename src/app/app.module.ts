@@ -101,11 +101,12 @@ import { ApplicationsProposedForFundingComponent } from './funding-plan/applicat
 import { FundingPlanInformationComponent } from './funding-plan/funding-plan-information/funding-plan-information.component';
 import { PlanInfoIssueTypeComponent } from './funding-plan/plan-info-issue-type/plan-info-issue-type.component';
 import { FpGrantInformationComponent } from './funding-plan/fp-grant-information/fp-grant-information.component';
-import { FpDirectTotalCostComponent } from './funding-plan/fp-direct-total-cost/fp-direct-total-cost.component';
+import { FpProgramRecommendedCostsComponent } from './funding-plan/fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { FpFundingInformationComponent } from './funding-plan/fp-funding-information/fp-funding-information.component';
 import { ManageDesignationsComponent } from './manage-designations/manage-designations.component';
 import { DateInPastValidatorDirective } from './manage-designations/date-in-past.directive';
 import { EndDateBeforeStartValidatorDirective } from './manage-designations/end-date-before-start-validator.directive';
+import { RecommendedFutureYearsComponent } from './funding-plan/recommended-future-years/recommended-future-years.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -216,11 +217,12 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FundingPlanInformationComponent,
     PlanInfoIssueTypeComponent,
     FpGrantInformationComponent,
-    FpDirectTotalCostComponent,
+    FpProgramRecommendedCostsComponent,
     FpFundingInformationComponent,
     ManageDesignationsComponent,
     DateInPastValidatorDirective,
     EndDateBeforeStartValidatorDirective,
+    RecommendedFutureYearsComponent,
   ],
 
 

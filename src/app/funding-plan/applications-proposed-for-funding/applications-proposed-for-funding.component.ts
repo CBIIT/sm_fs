@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
+import { PlanModel } from '../../model/plan/plan-model';
+import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -6,9 +10,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./applications-proposed-for-funding.component.css']
 })
 export class ApplicationsProposedForFundingComponent implements OnInit {
+  @Input() parentForm: NgForm;
   comments: string;
+  listGrantsSelected: NciPfrGrantQueryDtoEx[];
 
-  constructor() { }
+
+  constructor(private logger: NGXLogger, private planModel: PlanModel) {
+    this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
+  }
 
   ngOnInit(): void {
   }

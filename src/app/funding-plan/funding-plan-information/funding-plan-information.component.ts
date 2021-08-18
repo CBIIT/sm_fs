@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { CancerActivityControllerService, RfaPaNoticesDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
+import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 
 @Component({
   selector: 'app-funding-plan-information',
@@ -10,10 +11,11 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class FundingPlanInformationComponent implements OnInit {
   rfaDetails: RfaPaNoticesDto[];
-  applicationsSelected: number;
-  applicationsReceived: number;
-  applicationsSkipped: number;
-  applicationsNotConsidered: number;
+  totalApplicationsSelected: number;
+  totalApplicationsReceived: number;
+  totalApplicationsSkipped: number;
+  totalApplicationsNotConsidered: number;
+  listGrantsSelected: NciPfrGrantQueryDtoEx[];
 
   constructor(public planModel: PlanModel,
               private rfaService: CancerActivityControllerService,
@@ -29,9 +31,11 @@ export class FundingPlanInformationComponent implements OnInit {
       });
     });
 
-    this.applicationsReceived = this.planModel.allGrants.length;
+    this.totalApplicationsReceived = this.planModel.allGrants.length;
 
-    this.applicationsSelected = this.planModel.allGrants.filter(g => g.selected).length;
+    this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
+
+    this.totalApplicationsSelected = this.listGrantsSelected.length;
 
     const withinRangeGrants = this.planModel.allGrants.filter(g =>
       (!g.notSelectableReason || g.notSelectableReason.length === 0)
@@ -40,7 +44,7 @@ export class FundingPlanInformationComponent implements OnInit {
 
     this.logger.debug(withinRangeGrants.filter(g => !g.selected).length);
 
-    this.applicationsSkipped = withinRangeGrants.filter(g => !g.selected).length;
+    this.totalApplicationsSkipped = withinRangeGrants.filter(g => !g.selected).length;
 
     // Total number of not selectable grants
     const totalNotSelectable = this.planModel.allGrants.filter(g => g.notSelectableReason?.length > 0).length;
@@ -50,7 +54,7 @@ export class FundingPlanInformationComponent implements OnInit {
       (!g.notSelectableReason || g.notSelectableReason.length === 0)
       && g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore);
 
-    this.applicationsNotConsidered = totalNotSelectable + outsideRangeGrants.filter(g => !g.selected).length;
+    this.totalApplicationsNotConsidered = totalNotSelectable + outsideRangeGrants.filter(g => !g.selected).length;
 
   }
 

@@ -5,19 +5,49 @@
     <p class="text-sm">The Standard Policy Reduction should be taken into consideration when determining the recommended
       dollar amounts for the funding selection plan. If you would like to include a waiver to the Standard Policy
       Reduction, please provide it as part of the justification. The current fiscal year's policy reductions can be
-      viewed
-      on the <a href="#" class="external-link">OEFIA web site</a>.</p>
+      viewed on the <a href="#" class="external-link">OEFIA web site</a>.</p>
   </div>
 
   <div class="col-12">
-    <p>Table goes here (pending)...</p>
+    <table class="table table-striped table-bordered">
+      <thead>
+      <tr>
+        <th colspan="2" scope="col">
+          Funding Source(s) (?)
+        </th>
+        <th scope="col">
+          <app-funding-source [parentForm]="parentForm"></app-funding-source>
+        </th>
+      </tr>
+      <tr>
+        <th scope="col">Grant Information</th>
+        <th scope="col">Recommended Future Years</th>
+        <th scope="col">Program Recommended Costs</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let grant of listGrantsSelected; let i = index;">
+        <td>
+          <app-fp-grant-information [index]="i" [grant]="grant"></app-fp-grant-information>
+        </td>
+        <td>
+          <app-recommended-future-years [index]="i"></app-recommended-future-years>
+        </td>
+        <td>
+          <app-fp-program-recommended-costs [index]="i"></app-fp-program-recommended-costs>
+        </td>
+
+      </tr>
+
+      </tbody>
+    </table>
   </div>
 
   <div class="col-12">
     <div class="form-group">
       <label for="funding-comments">Comments <span class="optional">(optional)</span></label>
       <textarea id="funding-comments" #funding_comments name="fundingComments" maxlength="1000" class="form-control"
-                rows="2" [(ngModel)]="comments" ></textarea>
+                rows="2" [(ngModel)]="comments"></textarea>
       <span class="character-counter">{{ funding_comments.value.length }}/1000</span>
     </div>
   </div>
