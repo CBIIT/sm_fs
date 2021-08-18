@@ -3,9 +3,7 @@ import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
-import { from } from 'rxjs';
 import { Router } from '@angular/router';
-import { logger } from 'codelyzer/util/logger';
 
 @Component({
   selector: 'app-fundable-score-range',

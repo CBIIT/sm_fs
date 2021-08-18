@@ -28,10 +28,10 @@ export class PlanSummaryStatementComponent implements OnInit {
       this.applIds.push(this.grantList[i].applId);
     }
     this.documentService.downloadFpSummaryStatement(this.applIds)
-    //this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
+    // this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          const blob = new Blob([response.body], { type: response.headers.get('content-type') });
           saveAs(blob, 'Summary Statement.pdf');
         }
       );

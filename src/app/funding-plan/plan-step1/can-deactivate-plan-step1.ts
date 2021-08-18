@@ -1,6 +1,6 @@
-import {CanDeactivate} from "@angular/router";
-import {PlanStep1Component} from "./plan-step1.component";
-import {Injectable} from "@angular/core";
+import { CanDeactivate } from '@angular/router';
+import { PlanStep1Component } from './plan-step1.component';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'

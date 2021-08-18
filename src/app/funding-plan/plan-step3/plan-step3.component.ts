@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { NGXLogger } from 'ngx-logger';
 import { NgForm } from '@angular/forms';
+import { PlanModel } from '../../model/plan/plan-model';
 
 @Component({
   selector: 'app-plan-step3',
@@ -15,7 +16,8 @@ export class PlanStep3Component implements OnInit {
 
   constructor(private navigationModel: NavigationStepModel,
               private router: Router,
-              private logger: NGXLogger) {
+              private logger: NGXLogger,
+              private planModel: PlanModel) {
   }
 
   ngOnInit(): void {

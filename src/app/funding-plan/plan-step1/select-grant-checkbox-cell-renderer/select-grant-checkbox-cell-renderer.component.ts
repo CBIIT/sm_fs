@@ -1,6 +1,6 @@
-import {Component, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {Subject} from "rxjs";
-import {SelectGrantCheckboxEventType} from "./select-grant-checkbox-event-type";
+import { Component, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Subject } from 'rxjs';
+import { SelectGrantCheckboxEventType } from './select-grant-checkbox-event-type';
 
 @Component({
   selector: 'app-select-grant-checkbox-cell-renderer',
@@ -12,7 +12,7 @@ export class SelectGrantCheckboxCellRendererComponent implements OnInit, OnDestr
   constructor() { }
 
   @Input()
-  data : any = {}
+  data: any = {};
 
   @Output()
   emitter = new Subject<SelectGrantCheckboxEventType>();

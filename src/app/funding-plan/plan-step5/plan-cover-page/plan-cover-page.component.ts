@@ -16,18 +16,18 @@ export class PlanCoverPageComponent implements OnInit {
   }
 
   constructor(private planModel: PlanModel,
-    private documentService: DocumentService) { }
+              private documentService: DocumentService) { }
 
   ngOnInit(): void {
   }
 
   downloadCoverSheet() {
-    //TODO: Remove the hardcoded content once previous steps are implemented
+    // TODO: Remove the hardcoded content once previous steps are implemented
     this.documentService.downloadFPCoverSheet(513)
-    //this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
+    // this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          const blob = new Blob([response.body], { type: response.headers.get('content-type') });
           saveAs(blob, 'Cover Page.pdf');
         }
       );

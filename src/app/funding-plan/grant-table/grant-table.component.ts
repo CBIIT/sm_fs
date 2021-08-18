@@ -1,13 +1,11 @@
-import {AfterViewInit, Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
-import {AppPropertiesService} from '../../service/app-properties.service';
-import {PlanModel} from '../../model/plan/plan-model';
-import {DataTableDirective} from "angular-datatables";
-import {FullGrantNumberCellRendererComponent} from "../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component";
-import {CancerActivityCellRendererComponent} from "../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component";
-import {ExistingRequestsCellRendererComponent} from "../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component";
-import {NciPfrGrantQueryDtoEx} from "../../model/plan/nci-pfr-grant-query-dto-ex";
-import {Subject} from "rxjs";
+import { AfterViewInit, Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { PlanModel } from '../../model/plan/plan-model';
+import { DataTableDirective } from 'angular-datatables';
+import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+import { CancerActivityCellRendererComponent } from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
+import { ExistingRequestsCellRendererComponent } from '../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
+import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-grant-table',
@@ -34,7 +32,7 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
 
   @Input()
   set grantList(val: NciPfrGrantQueryDtoEx[]) {
-    //TODO process event
+    // TODO process event
     this._grantList = val;
     if (this.dtOptions) {
       this.dtOptions.data = this._grantList;
@@ -50,13 +48,13 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
   // Need min and max score to determine "Skip" and "Exception"
   @Input()
   set minScore(val: number) {
-    //TODO process event
+    // TODO process event
     this._minScore = val;
   }
 
   @Input()
   set maxScore(val: number) {
-    //TODO process event
+    // TODO process event
     this._maxScore = val;
   }
 
@@ -86,34 +84,34 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
       paging: false,
       data: this._grantList,
       columns: [
-        {title: 'Grant Number', data: 'fullGrantNum', //0
+        {title: 'Grant Number', data: 'fullGrantNum', // 0
             ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'},
-        {title: 'PI', data: 'piFullName', //1
+        {title: 'PI', data: 'piFullName', // 1
             render: ( data, type, row, meta ) => {
               return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
             },
             className: 'all'},
-        {title: 'Project Title', data: 'projectTitle'}, //2
-        {title: 'RFA/PA', data: 'rfaPaNumber', //3
+        {title: 'Project Title', data: 'projectTitle'}, // 2
+        {title: 'RFA/PA', data: 'rfaPaNumber', // 3
             render: ( data, type, row, meta ) => {
               return '<a href="' + row.nihGuideAddr + '" target="blank" >' + data + '</a>';
             }},
-        {title: 'I2 Status', data: 'applStatusGroupDescrip'}, //4
-        {title: 'PD', data: 'pdFullName',  //5
+        {title: 'I2 Status', data: 'applStatusGroupDescrip'}, // 4
+        {title: 'PD', data: 'pdFullName',  // 5
             render: ( data, type, row, meta ) => {
               return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
             }},
-        {title: 'CA', data: 'cayCode', //6
+        {title: 'CA', data: 'cayCode', // 6
             ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'},
-        {title: 'FY', data: 'fy'}, //7
-        {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', //8
+        {title: 'FY', data: 'fy'}, // 7
+        {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', // 8
             render: ( data, type, row, meta) => {
               return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
             }},
-        {title: 'Pctl', data: 'irgPercentileNum'}, //9
-        {title: 'PriScr', data: 'priorityScoreNum'}, //10
-        {title: 'Budget Start Date', data: 'budgetStartDate'}, //11
-        {title: 'Existing Requests', data: 'requestCount', //12
+        {title: 'Pctl', data: 'irgPercentileNum'}, // 9
+        {title: 'PriScr', data: 'priorityScoreNum'}, // 10
+        {title: 'Budget Start Date', data: 'budgetStartDate'}, // 11
+        {title: 'Existing Requests', data: 'requestCount', // 12
             ngTemplateRef: { ref: this.existingRequestsRenderer}, className: 'all'},
         {data: null, defaultContent: ''}
       ],
@@ -170,7 +168,7 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
           }
         });
       }
-    }
+    };
 
     setTimeout(() => this.dtTrigger.next(), 0);
   }

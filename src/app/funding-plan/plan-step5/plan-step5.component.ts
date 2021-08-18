@@ -15,10 +15,10 @@ import { saveAs } from 'file-saver';
 })
 export class PlanStep5Component implements OnInit {
 
-  CR_FUNDING_PLAN_SCIENTIFIC_RPT = "CR_FUNDING_PLAN_SCIENTIFIC_RPT";
-  CR_FUNDING_PLAN_EXCEPTION_JUST_RPT = "CR_FUNDING_PLAN_EXCEPTION_JUST_RPT";
-  CR_FUNDING_PLAN_SKIP_JUST_RPT = "CR_FUNDING_PLAN_SKIP_JUST_RPT";
-  Other = "Other";
+  CR_FUNDING_PLAN_SCIENTIFIC_RPT = 'CR_FUNDING_PLAN_SCIENTIFIC_RPT';
+  CR_FUNDING_PLAN_EXCEPTION_JUST_RPT = 'CR_FUNDING_PLAN_EXCEPTION_JUST_RPT';
+  CR_FUNDING_PLAN_SKIP_JUST_RPT = 'CR_FUNDING_PLAN_SKIP_JUST_RPT';
+  Other = 'Other';
   planDocDtos: DocumentsDto[];
   isSciRatUploaded = false;
   isExceptionsUploaded = false;
@@ -41,9 +41,9 @@ export class PlanStep5Component implements OnInit {
   }
 
   constructor(private navigationModel: NavigationStepModel,
-    private planModel: PlanModel,
-    private documentService: DocumentService,
-    private logger: NGXLogger) { }
+              private planModel: PlanModel,
+              private documentService: DocumentService,
+              private logger: NGXLogger) { }
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(5, true);
@@ -59,9 +59,9 @@ export class PlanStep5Component implements OnInit {
   }
 
   loadFiles(): void {
-    //TODO: remove hardcoded content and use the appropriate endpoint
+    // TODO: remove hardcoded content and use the appropriate endpoint
     this.documentService.getFiles(513, 'PFRP').subscribe(
-      //this.documentService.getFSBudgetFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
+      // this.documentService.getFSBudgetFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
       result => {
         this.planDocDtos = result;
         this.checkUploadedDocs();
@@ -73,7 +73,7 @@ export class PlanStep5Component implements OnInit {
 
   reloadFiles(result: string): void {
     this.loadFiles();
-    let el: HTMLElement = this.collapseAll.nativeElement;
+    const el: HTMLElement = this.collapseAll.nativeElement;
     el.click();
   }
 
@@ -135,13 +135,13 @@ export class PlanStep5Component implements OnInit {
     for (let i = 0; i < this.selectedGrants.length; i++) {
       this.applIds.push(this.selectedGrants[i].applId);
     }
-    //TODO: remove hardcoded content once previous steps are implemented
+    // TODO: remove hardcoded content once previous steps are implemented
     this.documentService.downLoadFpPackage(513,
-    //this.documentService.downLoadFpPackage(this.planModel.fundingPlanDto.fprId,
+    // this.documentService.downLoadFpPackage(this.planModel.fundingPlanDto.fprId,
       this.applIds)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          const blob = new Blob([response.body], { type: response.headers.get('content-type') });
           saveAs(blob, 'Package.pdf');
         }
       ), error =>

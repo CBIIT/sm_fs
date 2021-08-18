@@ -17,7 +17,7 @@ export class PlanFileUploadComponent implements OnInit {
   selectedFiles: FileList;
   @ViewChild('inputFile') inputFile: ElementRef;
   @ViewChild('labelImport') labelImport: ElementRef;
-  @Input() templateType = "Other";
+  @Input() templateType = 'Other';
   @Output() fileUploadEmitter = new EventEmitter<string>();
 
   public _docDto: DocumentsDto = {};
@@ -25,8 +25,8 @@ export class PlanFileUploadComponent implements OnInit {
   planDocDtos: Observable<DocumentsDto[]>;
 
   constructor(private planModel: PlanModel,
-    private documentService: DocumentService,
-    private logger: NGXLogger) { }
+              private documentService: DocumentService,
+              private logger: NGXLogger) { }
 
   ngOnInit(): void {
   }
@@ -40,13 +40,13 @@ export class PlanFileUploadComponent implements OnInit {
   }
 
   downloadTemplate(templateType: string) {
-    //TODO: Remove the hardcoded content once previous steps are implemented
+    // TODO: Remove the hardcoded content once previous steps are implemented
     this.documentService.downloadTemplate(513, templateType)
 
-      //this.documentService.downloadTemplate(this.planModel.fundingPlanDto.fprId, templateTypes)
+      // this.documentService.downloadTemplate(this.planModel.fundingPlanDto.fprId, templateTypes)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          const blob = new Blob([response.body], { type: response.headers.get('content-type') });
           saveAs(blob, 'template.doc');
         }
       );
@@ -55,9 +55,9 @@ export class PlanFileUploadComponent implements OnInit {
   uploadFiles(): void {
     for (let i = 0; i < this.selectedFiles.length; i++) {
       this._docDto.docType = this.getPlanDocType();
-      //TODO: Remove hardcoded content
-      //this._docDto.keyId = this.planModel.fundingPlanDto.fprId;
-      this._docDto.keyId = 513
+      // TODO: Remove hardcoded content
+      // this._docDto.keyId = this.planModel.fundingPlanDto.fprId;
+      this._docDto.keyId = 513;
       this._docDto.keyType = 'PFRP';
       this._docDto.docDescription = '';
       if (this.selectedFiles[i].size <= this.maxFileSize) {
@@ -76,7 +76,7 @@ export class PlanFileUploadComponent implements OnInit {
         if (event instanceof HttpResponse) {
           const result = event.body;
           this.logger.debug('Upload Doc: ', result);
-          this.fileUploadEmitter.emit("Emitting from child");
+          this.fileUploadEmitter.emit('Emitting from child');
         }
       },
       err => {
@@ -85,9 +85,9 @@ export class PlanFileUploadComponent implements OnInit {
   }
 
   loadFiles(): void {
-    //TODO: remove hardcoded content and use the appropriate endpoint
+    // TODO: remove hardcoded content and use the appropriate endpoint
     this.documentService.getFiles(513, 'PFRP').subscribe(
-      //this.documentService.getFSBudgetFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
+      // this.documentService.getFSBudgetFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
       result => {
         this.planDocDtos = of(result);
 
@@ -98,13 +98,13 @@ export class PlanFileUploadComponent implements OnInit {
 
   getPlanDocType(): string {
     if (this.templateType === 'CR_FUNDING_PLAN_SCIENTIFIC_RPT') {
-      return "Justification";
+      return 'Justification';
     } else if (this.templateType === 'CR_FUNDING_PLAN_EXCEPTION_JUST_RPT') {
-      return "ExceptionJustification";
+      return 'ExceptionJustification';
     } else if (this.templateType === 'CR_FUNDING_PLAN_SKIP_JUST_RPT') {
-      return "SkipJustification";
+      return 'SkipJustification';
     }
-    return "Other";
+    return 'Other';
   }
 
   reset(): void {
