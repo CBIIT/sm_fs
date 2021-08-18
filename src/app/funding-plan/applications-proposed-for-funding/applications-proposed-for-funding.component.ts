@@ -3,6 +3,7 @@ import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { NgForm } from '@angular/forms';
+import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -15,11 +16,15 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
 
 
-  constructor(private logger: NGXLogger, private planModel: PlanModel) {
+  constructor(private logger: NGXLogger, private planModel: PlanModel,
+              private planCoordinatorService: PlanCoordinatorService) {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
   }
 
   ngOnInit(): void {
+    this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
+      this.logger.debug('new values for funding source selection:', next);
+    });
   }
 
 }

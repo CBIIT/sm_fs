@@ -4,6 +4,8 @@ import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navi
 import { NGXLogger } from 'ngx-logger';
 import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
+import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
+import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 
 @Component({
   selector: 'app-plan-step3',
@@ -12,16 +14,34 @@ import { PlanModel } from '../../model/plan/plan-model';
 })
 export class PlanStep3Component implements OnInit {
   @ViewChild('step3form', { static: false }) step3form: NgForm;
+  private pd: number;
+  private cayCode: string;
+  private doc: string;
 
 
   constructor(private navigationModel: NavigationStepModel,
               private router: Router,
               private logger: NGXLogger,
-              private planModel: PlanModel) {
+              private planModel: PlanModel,
+              private pdCaIntegratorService: PdCaIntegratorService,
+              private planCoordinatorService: PlanCoordinatorService) {
   }
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(3, true);
+    this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
+      this.pd = next;
+      this.logger.debug('new pd selected', next);
+      this.planCoordinatorService.fundingSourceValuesEmitter.next({pd: this.pd, ca: this.cayCode});
+    });
+    this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
+      this.cayCode = typeof next === 'string' ? next : next[0];
+      this.logger.debug('new ca selected', next);
+      this.planCoordinatorService.fundingSourceValuesEmitter.next({pd: this.pd, ca: this.cayCode});
+    });
+    this.pdCaIntegratorService.docEmitter.subscribe(next => {
+      this.doc = next;
+    });
   }
 
   saveContinue(): void {
