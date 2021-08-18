@@ -3,6 +3,7 @@ import { FundingPlanDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
 import { NciPfrGrantQueryDtoEx } from './nci-pfr-grant-query-dto-ex';
 import { RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class PlanModel {
   minimumScore: number;
   maximumScore: number;
 
-  fundingPlanDto: FundingPlanDto;
+  fundingPlanDto: FundingPlanDto = {};
 
 
   // TODO: Generate FundingPlanDto and FundingPlanFoasDto
@@ -26,7 +27,8 @@ export class PlanModel {
   title = 'New Funding Plan';
 
 
-  constructor(propertiesService: AppPropertiesService) {
+  constructor(propertiesService: AppPropertiesService,
+              private logger: NGXLogger) {
     this.grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this.catsConceptUrl = propertiesService.getProperty('CONCEPT_ID_URL');
@@ -34,6 +36,7 @@ export class PlanModel {
   }
 
   reset(): void {
+    this.logger.warn('resetting plan model');
     this.fundingPlanDto = {};
     this.allGrants = [];
     this.grantsSearchCriteria = [];

@@ -22,9 +22,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
-      this.logger.debug('new values for funding source selection:', next);
-    });
+
   }
 
 }

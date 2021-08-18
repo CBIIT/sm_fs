@@ -17,6 +17,7 @@ import { SelectGrantCheckboxEventType } from './select-grant-checkbox-cell-rende
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { Router } from '@angular/router';
 import { GrantsSearchFilterService } from '../../funding-request/grants-search/grants-search-filter.service';
+import { getCurrentFiscalYear } from '../../utils/utils';
 
 
 /**
@@ -214,8 +215,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
   constructor(private fsPlanControllerService: FsPlanControllerService,
               private router: Router,
               private planModel: PlanModel,
-              private logger: NGXLogger,
-              private grantsSearchFilterService: GrantsSearchFilterService) {
+              private logger: NGXLogger) {
   }
 
   @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
@@ -252,8 +252,6 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
       multiple: true,
       allowClear: false
     };
-
-    this.planModel.fundingPlanDto.planFy = this.grantsSearchFilterService.currentFy;
 
     this.searchCriteria = new FundingPlanGrantsSearchCriteriaUI();
     this._restoreFromModel();
@@ -579,6 +577,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
     // save selections in planModel
     this.planModel.allGrants = this.dtData;
     this.canDeactivate = true;
+    this.planModel.fundingPlanDto.planFy = getCurrentFiscalYear();
+    this.logger.debug(this.planModel.fundingPlanDto.planFy, getCurrentFiscalYear());
     this.router.navigate(['/plan/step2']);
 
   }
