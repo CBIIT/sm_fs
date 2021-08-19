@@ -18,7 +18,8 @@ export class PlanStep4Component implements OnInit {
               private router: Router) {
               }
 
-  skipGrants: NciPfrGrantQueryDtoEx[];
+
+  skGrants: NciPfrGrantQueryDtoEx[];
   ncGrants: NciPfrGrantQueryDtoEx[];
 //  model: PlanModel;
 
@@ -26,21 +27,18 @@ export class PlanStep4Component implements OnInit {
     this.navigationModel.setStepLinkable(4, true);
 
     setTimeout(() => {
-      this.skipGrants = this.planModel.allGrants.filter(g =>
-        !g.selected &&
+      this.skGrants = this.planModel.allGrants.filter( g =>
+        ( !g.selected &&
         (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
         g.priorityScoreNum >= this.planModel.minimumScore &&
-        g.priorityScoreNum <= this.planModel.maximumScore
-      );
-      this.logger.debug('skip grants are ', this.skipGrants);
+        g.priorityScoreNum <= this.planModel.maximumScore) );
+      this.logger.debug('skip grants are ', this.skGrants);
       this.ncGrants = this.planModel.allGrants.filter(g =>
-        !g.selected &&
-        (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
-        ( g.priorityScoreNum < this.planModel.minimumScore ||
-          g.priorityScoreNum > this.planModel.maximumScore)
-        );
+        (g.notSelectableReason && g.notSelectableReason.length > 0) ||
+        (( g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)
+        && !g.selected ) );
       this.logger.debug('not considered grants are ', this.ncGrants);
-    }, 0);
+   }, 0);
   }
 
   saveContinue(): void {

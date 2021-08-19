@@ -12,8 +12,8 @@ import { PlanModel } from 'src/app/model/plan/plan-model';
 })
 export class PlanStep6Component implements OnInit {
 
-  fundedGrants: NciPfrGrantQueryDtoEx[];
-  unfundedGrants: NciPfrGrantQueryDtoEx[];
+  grantsSkipped: NciPfrGrantQueryDtoEx[];
+  grantsNotConsidered: NciPfrGrantQueryDtoEx[];
 
   constructor(private navigationModel: NavigationStepModel,
               public planModel: PlanModel,
@@ -23,13 +23,18 @@ export class PlanStep6Component implements OnInit {
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(6, true);
 
-    this.fundedGrants = this.planModel.allGrants.filter(g => g.selected);
-    this.logger.debug('funded grants are ', this.fundedGrants);
+    this.grantsSkipped = this.planModel.allGrants.filter( g =>
+      ( !g.selected &&
+      (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
+      g.priorityScoreNum >= this.planModel.minimumScore &&
+      g.priorityScoreNum <= this.planModel.maximumScore) );
+    this.logger.debug('funded grants are ', this.grantsSkipped);
 
-    this.unfundedGrants = this.planModel.allGrants.filter(g =>
-      !g.selected &&
-      (!g.notSelectableReason || g.notSelectableReason.length === 0));
-    this.logger.debug('unfunded grants are ', this.unfundedGrants);
+    this.grantsNotConsidered = this.planModel.allGrants.filter(g =>
+      (g.notSelectableReason && g.notSelectableReason.length > 0) ||
+      (( g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)
+      && !g.selected ) );
+    this.logger.debug('unfunded grants are ', this.grantsNotConsidered);
 
   }
 

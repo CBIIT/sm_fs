@@ -214,22 +214,35 @@
         <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-proposed-collapse" role="button" aria-expanded="true" aria-controls="apps-proposed-collapse"></a>
     </div>
     <div class="col-12 collapse show mt-2" id="apps-proposed-collapse">
-        <app-grant-table [grantList]="fundedGrants"></app-grant-table>
+        Read Only Version of "Applications Proposed for Funding" from Step 3 will go here.
     </div>
     <div class="col-12">
         <hr>
     </div>
 </div>
 <!-- END Applications Proposed for Funding Section -->
-
+<!-- START Applications Skipped Section -->
+<div class="row">
+    <div class="col-12 d-flex">
+        <h2>Application(s) Skipped:</h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-skipped-collapse" role="button" aria-expanded="true" aria-controls="apps-skipped-collapse"></a>
+    </div>
+    <div class="col-12 collapse show mt-2" id="apps-skipped-collapse">
+        <app-grant-table [grantList]="grantsSkipped"></app-grant-table>
+    </div>
+    <div class="col-12">
+        <hr>
+    </div>
+</div>
+<!-- END Applications Skipped for Funding Section -->
 <!-- START Applications Not Considered for Funding Section -->
 <div class="row">
     <div class="col-12 d-flex">
-        <h2>Applications Not Considered for Funding</h2>
+        <h2>Application(s) Not Considered for Funding:</h2>
         <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-notcon-collapse" role="button" aria-expanded="true" aria-controls="apps-notcon-collapse"></a>
     </div>
     <div class="col-12 collapse show mt-2" id="apps-notcon-collapse">
-        <app-grant-table [grantList]="unfundedGrants"></app-grant-table>
+        <app-grant-table [grantList]="grantsNotConsidered"></app-grant-table>
     </div>
     <div class="col-12">
         <hr>

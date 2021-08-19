@@ -305,9 +305,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.workflowService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('submit workflow returned okay ', result);
-        if (dto.gmInfo) {
-          this.setGmInfoToRequestModel(dto.gmInfo);
-        }
+        // if (dto.gmInfo) {
+        //   this.setGmInfoToRequestModel(dto.gmInfo);
+        // }
         this.workflowModel.initialize();
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
@@ -318,12 +318,12 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     );
   }
 
-  setGmInfoToRequestModel(gmInfo: GmInfoDto): void {
-    this.requestModel.requestDto.actionType = gmInfo.actionType;
-    this.requestModel.requestDto.pfrSpecFullName = gmInfo.defaultSpecFullName;
-    this.requestModel.requestDto.pfrBkupSpecNpeId = gmInfo.bkupSpecNpeId;
-    this.requestModel.requestDto.pfrBkupSpecFullName = gmInfo.bkupSpecFullName;
-  }
+  // setGmInfoToRequestModel(gmInfo: GmInfoDto): void {
+  //   this.requestModel.requestDto.actionType = gmInfo.actionType;
+  //   this.requestModel.requestDto.pfrSpecFullName = gmInfo.defaultSpecFullName;
+  //   this.requestModel.requestDto.pfrBkupSpecNpeId = gmInfo.bkupSpecNpeId;
+  //   this.requestModel.requestDto.pfrBkupSpecFullName = gmInfo.bkupSpecFullName;
+  // }
 
   isFormValid(): boolean {
     let valid = true;
