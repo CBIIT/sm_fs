@@ -67,8 +67,7 @@ class RfaPaEntry {
     return -1;
   }
 
-  onNcabChangeSelection($event: string | string[]) {
-    console.log('On Change NCAB Selection value: ', $event);
+  onNcabChangeSelection($event: string | string[]): void {
     // validation
     this.ncabErrors = [];
     if ($event instanceof Array) {
@@ -257,10 +256,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
     this._restoreFromModel();
     this.grantSelectionTooltip();
 
-    this.logger.debug('About to subscribe to getRfaPaListUsingGET');
     this.fsPlanControllerService.getRfaPaListUsingGET().subscribe(
       (result: Array<FundingPlanRfaPaDto>) => {
-        this.logger.debug('getRfaPaListUsingGET:', result);
         const tmp: Array<Select2OptionData> = [];
         let index = 0;
         for (const entry of result) {
@@ -443,7 +440,6 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
    * selection existence
    */
   onCaptureSelectedEvent(event: SelectGrantCheckboxEventType) {
-    this.logger.debug('onCaptureSelectedEvent', event);
     for (const entry of this.dtData) {
       if (entry.applId === event.applId) {
         entry.selected = event.selected;
@@ -470,8 +466,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
    * ACTION: click on Minus button to remove RFA/PA search Criteria line
    *
    */
-  removeRfaPa(index: number) {
-    this.logger.debug('removeRfaPa ', index);
+  removeRfaPa(index: number): void {
     this.searchCriteria.rfaPaEntries.splice(index, 1);
     this.searchCriteria.validateForRfaPaDuplicate();
     if (this.searchCriteria.errActivityCodes.length > 0) {
@@ -483,7 +478,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
    * ACTION: click on Plus button to add RFA/PA search Criteria
    *
    */
-  appendRfaPa() {
+  appendRfaPa(): void {
     this.searchCriteria.rfaPaEntries.push(new RfaPaEntry(this.searchCriteria));
   }
 
@@ -494,7 +489,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
    * Resets data model
    * Disables SelectGrants button
    */
-  clear() {
+  clear(): void {
     this.searchCriteria.rfaPaEntries = [];
     this.searchCriteria.rfaPaEntries.push(new RfaPaEntry(this.searchCriteria));
     this.searchCriteria.errActivityCodes = [];
@@ -521,7 +516,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
    * Resets
    * and navigates to step 2
    */
-  search() {
+  search(): void {
     this.searchCriteria.validateForRfaPaDuplicate();
     this.searchCriteria.validateForRequired();
     this.searchCriteria.validateForActivityCodes();
@@ -568,17 +563,14 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
    * and navigates to step 2
    */
   selectGrants(): void {
-    this.logger.debug('selectGrants');
     for (const entry of this.dtData) {
       if (entry.selected) {
-        this.logger.debug('Selected grant ', entry.fullGrantNum);
       }
     }
     // save selections in planModel
     this.planModel.allGrants = this.dtData;
     this.canDeactivate = true;
     this.planModel.fundingPlanDto.planFy = getCurrentFiscalYear();
-    this.logger.debug(this.planModel.fundingPlanDto.planFy, getCurrentFiscalYear());
     this.router.navigate(['/plan/step2']);
 
   }
@@ -587,7 +579,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
     this.dtTrigger.unsubscribe();
   }
 
-  resetModel() {
+  resetModel(): void {
     this.planModel.reset();
   }
 

@@ -13,7 +13,6 @@ export class ConceptAwardTrackingComponent implements OnInit {
 
   constructor(public planModel: PlanModel,
               private logger: NGXLogger) {
-    logger.debug(planModel.catsConceptUrl);
   }
 
   ngOnInit(): void {

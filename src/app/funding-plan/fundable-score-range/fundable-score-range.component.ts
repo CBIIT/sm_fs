@@ -50,8 +50,6 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
         }
       });
 
-      this.logger.debug('From=', fromScore, ' To=', toScore);
-
       this.minimumScore = fromScore;
       this.maximumScore = toScore;
     }

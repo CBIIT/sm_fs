@@ -4,6 +4,7 @@ import { NGXLogger } from 'ngx-logger';
 import { FsPlanControllerService } from '@nci-cbiit/i2ecws-lib';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import { PlanModel } from '../../model/plan/plan-model';
+import { getCurrentFiscalYear } from '../../utils/utils';
 
 @Component({
   selector: 'app-fp-funding-source',
@@ -12,7 +13,7 @@ import { PlanModel } from '../../model/plan/plan-model';
 })
 export class FpFundingSourceComponent implements OnInit {
   data: Select2OptionData[] = [];
-  selectedValue: string;
+  selectedValue: string = null;
   fy: number;
   rfaPaNumber: string;
   allRfaPaNumbers: string[];
@@ -21,17 +22,17 @@ export class FpFundingSourceComponent implements OnInit {
               private planControllerService: FsPlanControllerService,
               private planCoordinatorService: PlanCoordinatorService,
               private planModel: PlanModel) {
-    this.logger.debug('plan fiscal year', this.planModel.fundingPlanDto.planFy);
   }
 
   ngOnInit(): void {
     this.allRfaPaNumbers = [];
-    this.fy = this.planModel.fundingPlanDto.planFy;
-    this.logger.debug('fiscal year:', this.fy);
+    this.fy = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
     this.planModel.grantsSearchCriteria.forEach(r => {
       this.allRfaPaNumbers.push(r.rfaPaNumber);
     });
+    // this.logger.debug('allRfaPaNumbers', this.allRfaPaNumbers);
     this.rfaPaNumber = this.allRfaPaNumbers[0];
+    // this.logger.debug('selected rfaPaNumber:', this.rfaPaNumber);
     this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
       this.refreshSources(next.pd, next.ca);
     });
@@ -41,14 +42,18 @@ export class FpFundingSourceComponent implements OnInit {
     if (!pd || !ca) {
       return;
     }
+    if (!this.rfaPaNumber) {
+      this.logger.error('No rfaPaNumber available. Not refreshing sources');
+      // tslint:disable-next-line:no-console
+      console.trace('missing rfaPaNumber');
+      return;
+    }
     const tmp: Select2OptionData[] = [];
     this.planControllerService.getFundingPlanFundingSourcesUsingGET(ca, this.fy, pd, this.rfaPaNumber).subscribe(result => {
-      this.logger.debug(result);
       result.forEach(s => {
         tmp.push({ id: String(s.fundingSourceId), text: s.fundingSourceName });
       });
       this.data = tmp;
-      this.logger.debug(this.data);
     });
   }
 }

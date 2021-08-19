@@ -29,6 +29,7 @@ export class PlanModel {
 
   constructor(propertiesService: AppPropertiesService,
               private logger: NGXLogger) {
+    // TODO: static properties should be set at app level and shared somehow
     this.grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this.catsConceptUrl = propertiesService.getProperty('CONCEPT_ID_URL');
@@ -36,7 +37,6 @@ export class PlanModel {
   }
 
   reset(): void {
-    this.logger.warn('resetting plan model');
     this.fundingPlanDto = {};
     this.allGrants = [];
     this.grantsSearchCriteria = [];

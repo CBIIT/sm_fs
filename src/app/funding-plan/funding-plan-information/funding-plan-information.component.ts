@@ -26,7 +26,6 @@ export class FundingPlanInformationComponent implements OnInit {
     this.rfaDetails = [];
     this.planModel.grantsSearchCriteria.forEach(rfa => {
       this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
-        this.logger.debug(next);
         this.rfaDetails.push(next);
       });
     });
@@ -40,23 +39,17 @@ export class FundingPlanInformationComponent implements OnInit {
     const withinRangeGrants = this.planModel.allGrants.filter(g =>
       (!g.notSelectableReason || g.notSelectableReason.length === 0)
       && g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore);
-    this.logger.debug('within range:', withinRangeGrants);
-
-    this.logger.debug(withinRangeGrants.filter(g => !g.selected).length);
 
     this.totalApplicationsSkipped = withinRangeGrants.filter(g => !g.selected).length;
 
     // Total number of not selectable grants
     const totalNotSelectable = this.planModel.allGrants.filter(g => g.notSelectableReason?.length > 0).length;
-    this.logger.debug('not selectable', totalNotSelectable);
 
     const outsideRangeGrants = this.planModel.allGrants.filter(g =>
       (!g.notSelectableReason || g.notSelectableReason.length === 0)
       && g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore);
 
     this.totalApplicationsNotConsidered = totalNotSelectable + outsideRangeGrants.filter(g => !g.selected).length;
-
   }
-
 
 }

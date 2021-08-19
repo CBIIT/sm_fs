@@ -28,16 +28,13 @@ export class PlanStep3Component implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.debug('Plan fiscal year', this.planModel.fundingPlanDto.planFy);
     this.navigationModel.setStepLinkable(3, true);
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
       this.pd = next;
-      this.logger.debug('new pd selected', next);
       this.planCoordinatorService.fundingSourceValuesEmitter.next({ pd: this.pd, ca: this.cayCode });
     });
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
       this.cayCode = typeof next === 'string' ? next : next[0];
-      this.logger.debug('new ca selected', next);
       this.planCoordinatorService.fundingSourceValuesEmitter.next({ pd: this.pd, ca: this.cayCode });
     });
     this.pdCaIntegratorService.docEmitter.subscribe(next => {
