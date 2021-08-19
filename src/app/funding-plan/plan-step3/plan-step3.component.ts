@@ -17,6 +17,7 @@ export class PlanStep3Component implements OnInit {
   private pd: number;
   private cayCode: string;
   private doc: string;
+  planName: string;
 
 
   constructor(private navigationModel: NavigationStepModel,

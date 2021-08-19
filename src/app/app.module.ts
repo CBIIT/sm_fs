@@ -108,6 +108,7 @@ import { DateInPastValidatorDirective } from './manage-designations/date-in-past
 import { EndDateBeforeStartValidatorDirective } from './manage-designations/end-date-before-start-validator.directive';
 import { RecommendedFutureYearsComponent } from './funding-plan/recommended-future-years/recommended-future-years.component';
 import { FpFundingSourceComponent } from './funding-plan/fp-funding-source/fp-funding-source.component';
+import { FundingInformationValidatorDirective } from './validators/funding-information-validator.directive';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -225,6 +226,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     EndDateBeforeStartValidatorDirective,
     RecommendedFutureYearsComponent,
     FpFundingSourceComponent,
+    FundingInformationValidatorDirective,
   ],
 
 

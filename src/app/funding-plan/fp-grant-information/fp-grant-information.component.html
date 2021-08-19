@@ -1,1 +1,113 @@
-<p>{{grant.fullGrantNum}}</p>
+<ng-template #InstituteTooltip><span class='institutionName'>{{grant.orgName}}</span><br>
+  <span class='institutionLocation'>{{grant.institutionCity}},&nbsp;{{grant.institutionState}}</span>
+</ng-template>
+<!--<div class="row">-->
+<!--  <div class="col-12 d-flex">-->
+<!--    <h2>Grant Information</h2>-->
+<!--    <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#grant-info-collapse" role="button" aria-expanded="true" aria-controls="grant-info-collapse"></a>-->
+<!--  </div>-->
+<!--</div>-->
+<div *ngIf="skip"><img src="images/grant-skip.png" alt="SKIP" width="31" height="16"></div>
+<div *ngIf="exception"><img src="images/grant-exception.png" alt="EXCEPTION" width="56" height="16"></div>
+<div class="row collapse show mt-2" id="grant-info-collapse">
+
+  <div class="col-lg-3">
+    <div class="form-group">
+      <p class="like-label">Grant Number</p>
+      <p>
+        <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
+        <span class="grant-icons ml-2">
+                    <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants">
+                        <span class="egrants-icon"></span>
+                    </a>
+                    <a [routerLink]="" [ngbTooltip]="InstituteTooltip" triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
+                </span>
+      </p>
+    </div>
+  </div>
+
+  <div class="col-lg-2">
+    <div class="form-group">
+      <p class="like-label">PI Name</p>
+      <p><span [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail': 'PI/PD name':'fullGrantNum': 'lastName'"></span></p>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="form-group">
+      <p class="like-label">Project Title</p>
+      <p>{{ grant.projectTitle }}</p>
+    </div>
+  </div>
+
+  <div class="col-lg-3">
+    <div class="form-group">
+      <p class="like-label">RFA/PA/PAR</p>
+      <p>{{ grant.rfaPaNumber }}</p>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-2">
+    <div class="form-group">
+      <p class="like-label">Cancer Activity</p>
+      <p><a [routerLink]="" ngbTooltip="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="click:blur" placement="top">{{grant.cayCode}}</a></p>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-2">
+    <div class="form-group">
+      <p class="like-label">DOC</p>
+      <p>{{ grant.doc }}</p>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-2">
+    <div class="form-group">
+      <p class="like-label">Grant FY</p>
+      <p>{{ grant.fy }}</p>
+    </div>
+  </div>
+
+  <div class="col-lg-3">
+    <div class="form-group">
+      <p class="like-label">Thrust Information</p>
+      <p>{{ grant.thtCode }}</p>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="form-group">
+      <p class="like-label">Budget Start Date</p>
+      <p>{{ grant.budgetStartDate }}</p>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-2">
+    <div class="form-group">
+      <p class="like-label">NCAB</p>
+      <p>{{ grant.councilMeetingDate|formatNcabDate }}</p>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-2">
+    <div class="form-group">
+      <p class="like-label">Score</p>
+      <p>{{ grant.priorityScoreNum | formatScorePctl }}</p>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-2">
+    <div class="form-group">
+      <p class="like-label">Percentile</p>
+      <p>{{ grant.irgPercentileNum | formatScorePctl }}</p>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-2">
+    <div class="form-group">
+      <p class="like-label">SPL Committee Meeting Date</p>
+      <p> {{ '--' }}</p>
+    </div>
+  </div>
+
+</div><!-- END Row -->
