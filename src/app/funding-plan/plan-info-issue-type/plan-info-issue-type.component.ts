@@ -29,5 +29,10 @@ export class PlanInfoIssueTypeComponent implements OnInit {
 
   toggleDisplay(value: string): void {
     this.issueType = value;
+    if(this.issueType === 'reissue') {
+      this.priorNotice = this.rfaDetails.priorNoticeNumber;
+    } else {
+      this.priorNotice = '';
+    }
   }
 }
