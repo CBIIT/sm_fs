@@ -43,7 +43,6 @@ export class PlanStep3Component implements OnInit {
   }
 
   saveContinue(): void {
-    this.router.navigate(['/plan/step4']);
   }
 
   previous(): void {
@@ -53,5 +52,8 @@ export class PlanStep3Component implements OnInit {
   onSubmit($event: any): void {
     this.logger.debug($event);
     this.logger.debug(this.step3form);
+    if (this.step3form.valid) {
+      this.router.navigate(['/plan/step4']);
+    }
   }
 }

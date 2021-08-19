@@ -8,6 +8,12 @@ import { NgForm } from '@angular/forms';
 })
 export class FpFundingInformationComponent implements OnInit {
   @Input() parentForm: NgForm;
+  firstYearSetAside: number = null;
+  totalSetAside: number = null;
+  outYear2: number = null;
+  outYear3: number = null;
+  outYear4: number = null;
+  outYear5: number = null;
 
   constructor() {
   }

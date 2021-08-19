@@ -1,4 +1,6 @@
-<form #step3form="ngForm" (ngSubmit)="onSubmit($event)" [class.submitted]="step3form.submitted" appPdNameRequired>
+<form #step3form="ngForm" (ngSubmit)="onSubmit($event)" [class.submitted]="step3form.submitted" a
+      ppPdNameRequired
+      appCancerActivityRequired>
   <div class="row">
     <div class="col-lg-12">
       <h2>General Information</h2>
@@ -36,11 +38,11 @@
           [broadcast]="true"
           required>
         </lib-cancer-activities-dropdown>
-        <!--          <div-->
-        <!--            class="text-danger mt-1"-->
-        <!--            *ngIf="parentForm.errors?.cayCodeIsRequired && (parentForm.submitted || parentForm.touched)">-->
-        <!--            Cancer activity is required-->
-        <!--          </div>-->
+        <div
+          class="text-danger mt-1"
+          *ngIf="step3form.errors?.cayCodeIsRequired && (step3form.submitted || step3form.touched)">
+          Cancer activity is required
+        </div>
       </div>
     </div>
 
