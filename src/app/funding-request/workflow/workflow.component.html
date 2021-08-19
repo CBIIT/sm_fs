@@ -2,7 +2,7 @@
 <ng-content>
     
 </ng-content>
-<app-gm-info [hidden]="!showGmInfo()" [approvingState]="approvingState"></app-gm-info>
+<app-gm-info *ngIf="showGmInfo()" [approvingState]="approvingState"></app-gm-info>
 <div class="row">
     <div class="col-12 d-flex">
       <h2 id="workflow">Workflow</h2>

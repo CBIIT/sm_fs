@@ -33,8 +33,8 @@
                 id="default-specialist"
                 name="default-specialist"
                 [allowClear]="true"
-                [data] = "defaultSpecList"
-                [(ngModel)]= "gmInfo.defaultSpecFullName"
+                [data] = "specialists"
+                [(ngModel)]= "gmInfo.defaultSpecNpeId"
                 #specFullName="ngModel"
                 required>
             </ng-select2>
@@ -53,7 +53,7 @@
                 id="backup-specialist"
                 name="backup-specialist"
                 [allowClear]="true"
-                [data] = "bkupSpecList"
+                [data] = "specialists"
                 [(ngModel)]="gmInfo.bkupSpecNpeId">
             </ng-select2>
         </div>

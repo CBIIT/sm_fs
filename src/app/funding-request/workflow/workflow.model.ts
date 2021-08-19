@@ -110,16 +110,6 @@ export class WorkflowModel {
   }
 
   initialize(): void {
-    this.nextApproverRoleCode = null;
-    this.isUserNextInChain = false;
-    this.lastInChain = false;
-    this.isScientificApprover = false;
-    this.approvedScientifically = false;
-    this.isFinancialApprover = false;
-    this.isGMApprover = false;
-    this.approvedByGM = false;
-    this.approvedByFC = false;
-    this.approvedByDoc = false;
     this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
       (result) => {
         this.processApproversResult(result);
@@ -133,6 +123,18 @@ export class WorkflowModel {
   }
 
   processApproversResult(result: FundingReqApproversDto[]): void {
+    // reset all flags;
+    this.nextApproverRoleCode = '';
+    this.isUserNextInChain = false;
+    this.lastInChain = false;
+    this.isScientificApprover = false;
+    this.approvedScientifically = false;
+    this.isFinancialApprover = false;
+    this.isGMApprover = false;
+    this.approvedByGM = false;
+    this.approvedByFC = false;
+    this.approvedByDoc = false;
+
     this._allApprovers = result;
 
     this._pendingApprovers = result.filter((approver) => {
