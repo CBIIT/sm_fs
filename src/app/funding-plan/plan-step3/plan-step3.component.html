@@ -13,8 +13,12 @@
 
     <div class="col-lg-4">
       <div class="form-group">
-        <lib-pdname-dropdown label="Requesting PD" [broadcast]="true" [syncWithCa]="false"
-                             [showInactiveToggle]="false"></lib-pdname-dropdown>
+        <lib-pdname-dropdown
+          label="Requesting PD"
+          [broadcast]="true"
+          [syncWithCa]="false"
+          [showInactiveToggle]="false">
+        </lib-pdname-dropdown>
         <div
           class="text-danger mt-1"
           *ngIf="step3form.errors?.pdNameRequired && (step3form.submitted || step3form.touched)">
@@ -24,8 +28,14 @@
     </div>
     <div class="col-lg-2">
       <div class="form-group">
-        <lib-cancer-activities-dropdown [selectSingleOption]="true" [maxSelection]="1" [syncWithPd]="true"
-                                        label="CA" [broadcast]="true"></lib-cancer-activities-dropdown>
+        <lib-cancer-activities-dropdown
+          [selectSingleOption]="true"
+          [maxSelection]="1"
+          [syncWithPd]="true"
+          label="CA"
+          [broadcast]="true"
+          required>
+        </lib-cancer-activities-dropdown>
         <!--          <div-->
         <!--            class="text-danger mt-1"-->
         <!--            *ngIf="parentForm.errors?.cayCodeIsRequired && (parentForm.submitted || parentForm.touched)">-->
@@ -45,10 +55,10 @@
 
   </div><!-- END Row -->
 
-  <app-funding-plan-information></app-funding-plan-information>
+  <app-funding-plan-information [parentForm]="step3form"></app-funding-plan-information>
 
 
-  <app-fp-funding-information></app-fp-funding-information>
+  <app-fp-funding-information [parentForm]="step3form"></app-fp-funding-information>
 
 
   <app-applications-proposed-for-funding [parentForm]="step3form"></app-applications-proposed-for-funding>
@@ -58,7 +68,7 @@
     <div class="col-12 d-flex">
       <button type="button" class="btn btn-outline-secondary mr-auto" (click)="previous()">Previous</button>
       <button type="button" class="btn btn-outline-primary mr-2">Save as Draft</button>
-      <button type="button" class="btn btn-primary" (click)="saveContinue()">Save and Continue</button>
+      <button type="submit" class="btn btn-primary" (click)="saveContinue()">Save and Continue</button>
     </div>
   </div>
 </form>
