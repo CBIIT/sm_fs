@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
+import { FsWorkflowControllerService, FundingReqApproversDto, I2ERoles } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
@@ -106,6 +106,25 @@ export class WorkflowModel {
         }
     }
 
+    // User with 'PFRGMAPPR' role can do GM approve for all requests;
+    if (approver.roleCode === 'GM' && this.userSessionService.hasRole('PFRGMAPR')) {
+      return true;
+    }
+    // User with 'FA' for 'OEFIA' can do FCNCI approval for all requests;
+    if (approver.roleCode === 'FCNCI' && this.hasOEFIARole()) {
+      return true;
+    }
+
+    return false;
+  }
+
+  hasOEFIARole(): boolean {
+    const rolesList: I2ERoles[] = this.userSessionService.getLoggedOnUser().roles;
+    for (const role of rolesList) {
+      if (role.roleCode === 'FA' && role.orgAbbrev === 'OEFIA') {
+        return true;
+      }
+    }
     return false;
   }
 
