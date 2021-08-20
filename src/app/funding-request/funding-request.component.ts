@@ -52,7 +52,7 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
 
     // when direct access using url
     for (const step of this.steps) {
-      if (step.route.indexOf(this.router.url) > -1) {
+      if (this.router.url.indexOf(step.route) > -1) {
         this.activeStep = step;
       }
     }

@@ -1,24 +1,147 @@
-<!-- <div class="col-12 col-md-3 form-group">
-    <label for="requestOrPlan">Search For</label>
-    <br>
-    <div class="btn-group btn-group-toggle"
-        ngbRadioGroup name="radioBasic"
-        [(ngModel)]="searchFilter.requestOrPlan"
-        id="requestOrPlan">
-        <label ngbButtonLabel class="btn-primary">
-            <input ngbButton type="radio" value="Request"> Request
+<div class="row mb-2">
+  <div class="col-12 d-flex">
+    <h2 class="d-inline-block" id="overview-label">Filters</h2>
+    <a [routerLink]="" (click)="showAdvanced = !showAdvanced" class="ml-auto"
+       [ngClass]="{'show-advance':!showAdvanced, 'hide-advance':showAdvanced}"></a>
+  </div>
+</div>
+<form #searchForm="ngForm">
+  <div class="row form-group">
+    <div class="col-3 col-md-3">
+      <label for="searchType">Search for</label>
+      <div class="btn-group btn-group-toggle"
+           ngbRadioGroup name="radioBasic"
+           [(ngModel)]="typeSearch"
+           id="searchType"
+           style="display: inline;"
+      >
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input ngbButton type="radio" value="0">Requests
         </label>
-        <label ngbButtonLabel class="btn-primary">
-            <input ngbButton type="radio" value="Plan"> Plan
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input ngbButton type="radio" value="1">Plans
         </label>
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input ngbButton type="radio" value="2">Grants
+        </label>
+      </div>
     </div>
-    <br>
+    <div class="col-5 col-md-5">
+      <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
+    </div>
+    <div class="col-3 col-md-3">
+      <lib-fy-range [minYear]="2001" [maxYear]="2025" [(selectedValue)]="fyRange"></lib-fy-range>
+    </div>
+  </div>
+  <div class="row form-group" [hidden]="typeSearch != '0'">
+    <div class="col-4 col-md-4">
+<!--      TODO - this component cannot be used here as it ties to RequestModel
+                 I placed it here only temporary for layout
+-->
+      <app-funding-request-type [parentForm]="searchForm"></app-funding-request-type>
+    </div>
+    <div class="form-group col-4 col-md-4">
+      <label for="request-status-select">Request Type</label>
+      <ng-select2
+        id="request-status-select"
+        name="fundingRequestStatus"
+        ngModel
+        #fundingRequestStatus="ngModel"
+        [allowClear]="true"
+        [data]="requestTypeList">
+      </ng-select2>
+    </div>
+  </div>
+  <div class="row form-group" [hidden]="typeSearch != '1'">
+    <div class="form-group col-4 col-md-4">
+      <label for="plan-status-select">Plan Status</label>
+      <ng-select2
+        id="plan-status-select"
+        name="fundingPlanStatus"
+        ngModel
+        #fundingPlanStatus="ngModel"
+        [allowClear]="true"
+        [data]="requestTypeList"
+      >
+      </ng-select2>
+    </div>
+    <div class="col-4 col-md-4">
+      <lib-rfa-pa-dropdown></lib-rfa-pa-dropdown>
+    </div>
+    <div class="col-3 col-md-3">
+      <lib-ncab-daterange></lib-ncab-daterange>
+    </div>
+  </div>
+  <div [hidden]="!showAdvanced" class="mt-n2">
+    <hr>
+    <div class="row form-group">
+      <div class="col-md-4 col-lg-4">
+        <lib-pdname-dropdown label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
+      </div>
+      <div class="col-md-4 col-lg-4 form-group">
+          <label for="requesting-doc">Requesting DOC</label>
+          <input type="text" id="requesting-doc" name="requestingDoc" ngModel class="form-control">
+      </div>
+    </div>
+    <div class="row form-group">
+      <div class="col-md-4 col-lg-4 form-group">
+          <label for="funding-sources">Funding Source(s)</label>
+          <input type="text" id="funding-sources" name="fundingSources" ngModel class="form-control">
+      </div>
+      <div class="col-md-4 col-lg-4 form-group">
+          <label for="request-id" *ngIf="typeSearch === '0'">Request ID</label>
+          <label for="request-id" *ngIf="typeSearch === '1'">Plan ID</label>
+          <input type="text" id="request-id" name="id" ngModel class="form-control">
+      </div>
+    </div>
+    <div class="row form-group">
+      <div class="col-md-4 col-lg-4 form-group">
+          <label for="pi-name">PI Name</label>
+          <input type="text" id="pi-name" name="piName" ngModel class="form-control">
+      </div>
+      <div class="col-md-4 col-lg-4 form-group">
+          <label for="institution-name">Institution Name</label>
+          <input type="text" id="institution-name" name="institutionName" ngModel class="form-control">
+      </div>
+    </div>
+    <div class="row form-group">
+      <div class="col-md-4 col-lg-4">
+        <lib-pdname-dropdown label="PD Name" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
+      </div>
+      <div class="col-md-4 col-lg-4 form-group">
+        <label for="doc">DOC</label>
+        <input type="text" id="doc" name="doc" ngModel class="form-control">
+      </div>
+    </div>
+  </div>
+  <div class="row form-group">
+    <div class="col-lg-11 d-flex justify-content-end align-items-end">
+      <button type="button" class="btn btn-outline-secondary mr-2" (click)="clear()">Clear</button>
+      <button type="button" class="btn btn-primary" (click)="search()">Search</button>
+    </div>
+  </div>
+</form>
+<!-- <div class="col-12 col-md-3 form-group">
+  <label for="requestOrPlan">Search For</label>
+  <br>
+  <div class="btn-group btn-group-toggle"
+      ngbRadioGroup name="radioBasic"
+      [(ngModel)]="searchFilter.requestOrPlan"
+      id="requestOrPlan">
+      <label ngbButtonLabel class="btn-primary">
+          <input ngbButton type="radio" value="Request"> Request
+      </label>
+      <label ngbButtonLabel class="btn-primary">
+          <input ngbButton type="radio" value="Plan"> Plan
+      </label>
+  </div>
+  <br>
 </div>
 <div class="col-12 col-md-3 form-group">
 <app-search-pool></app-search-pool>
-  <form #xyz="ngForm">
+<form #xyz="ngForm">
 <app-funding-request-type [parentForm]="xyz" [filter]="false" *ngIf="isSearchingRequest()"></app-funding-request-type>
-  </form>
+</form>
 <lib-rfa-pa-dropdown  *ngIf="!isSearchingRequest()"></lib-rfa-pa-dropdown>
 <lib-fy-range [minYear]="2001" [maxYear]="2025" ></lib-fy-range>
 <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>

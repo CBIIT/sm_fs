@@ -14,12 +14,24 @@ import { NGXLogger } from 'ngx-logger';
 export class SearchFilterComponent implements OnInit {
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
   @Output() callSearch = new EventEmitter<SearchCriteria>();
+  @Output() searchType = new EventEmitter<string>()
   public searchFilter: SearchCriteria;
+
+  showAdvanced: boolean = false;
+
+  private _typeSearch: string = '0';
+
+  set typeSearch(value: string) {
+    this._typeSearch = value;
+    this.searchType.emit(value);
+  }
+  get typeSearch() { return this._typeSearch; }
 
   constructor(private searchFilterService: SearchFilterService, private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
+    this.typeSearch = '0';
     this.searchFilter = this.searchFilterService.searchFilter;
   }
 
@@ -29,6 +41,11 @@ export class SearchFilterComponent implements OnInit {
   }
 
   // TODO: this method is apparently unused.  Can it be deleted?
+  typeSearchModel: any = '0';
+  fyRange: any = {};
+  //TODO - get this list from the server
+  requestTypeList: [];
+
   fyRangeChanged(event: { fromFy: number, toFy: number }): void {
     this.searchFilter.fyRange = event;
   }
@@ -42,4 +59,11 @@ export class SearchFilterComponent implements OnInit {
     this.callSearch.emit(this.searchFilter);
   }
 
+  clear() {
+
+  }
+
+  search() {
+
+  }
 }

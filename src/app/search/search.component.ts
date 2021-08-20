@@ -12,6 +12,7 @@ import { NGXLogger } from 'ngx-logger';
 export class SearchComponent implements OnInit {
   @ViewChild(SearchResultComponent) searchResultComponent: SearchResultComponent;
 
+  labelSearch: string = 'Requests';
   currentFY: string = '2021';
   showOverview: boolean = true;
   numAwaitingRequests: number = 0;
@@ -69,5 +70,9 @@ export class SearchComponent implements OnInit {
 
   onMyUnderReviewPlans() {
 
+  }
+
+  onSearchType($event: string) {
+    this.labelSearch = $event === '0' ? 'Requests' : ($event === '1' ? 'Plans' : 'Grants');
   }
 }

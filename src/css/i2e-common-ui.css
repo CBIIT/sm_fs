@@ -23672,7 +23672,7 @@ label .optional, .like-label .optional {
 }
 
 /* line 41, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.select2-container {
+.select2 {
   width: 100% !important;
 }
 

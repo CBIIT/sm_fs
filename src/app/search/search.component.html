@@ -1,13 +1,13 @@
 <div class="row mb-2">
   <div class="col">
-    <h1>Search for Existing Requests</h1>
+    <h1>Search for Existing {{labelSearch}}</h1>
   </div>
 </div>
 <div class="row mb-2">
   <div class="col-12 d-flex">
     <h2 class="d-inline-block" id="overview-label">Overview <span style="font-weight: normal">&mdash;  FY {{currentFY}}</span></h2>
     <a [routerLink]="" (click)="showOverview = !showOverview" class="ml-auto"
-       [ngClass]="{'show-advance':!showOverview, 'hide-overview':showOverview}"></a>
+       [ngClass]="{'show-overview':!showOverview, 'hide-overview':showOverview}"></a>
   </div>
 </div>
 <div [hidden]="!showOverview" class="mb-4">
@@ -67,7 +67,12 @@
       </div>
     </div>
   </div>
+  <hr/>
 </div>
-<app-open-request></app-open-request>
-<app-search-filter (callSearch)="doSearch($event)"></app-search-filter>
+<app-search-filter (callSearch)="doSearch($event)"
+                   (searchType)="onSearchType($event)">
+</app-search-filter>
 <app-search-result></app-search-result>
+<hr/>
+<app-open-request></app-open-request>
+<hr/>
