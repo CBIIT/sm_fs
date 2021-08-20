@@ -10,10 +10,15 @@
     <div class="col-lg-auto">
         <div class="form-group">
             <span class="like-label" id="action-type-desc">Action Type</span>
-            <span *ngIf="readonly">{{gmInfo.actionType}}</span>
-            <div class="btn-group btn-group-toggle" *ngIf="!readonly"
-                ngbRadioGroup name="radioBasic" [(ngModel)]="gmInfo.actionType" 
-                aria-describedby="action-type-desc">
+            <span *ngIf="readonly; else actionInput">{{gmInfo.actionType}}</span>
+            <ng-template #actionInput>
+            <div class="btn-group btn-group-toggle"
+                ngbRadioGroup 
+                name="radioBasic" 
+                [(ngModel)]="gmInfo.actionType" 
+                aria-describedby="action-type-desc"
+                #actionType="ngModel"
+                [required]="isApprovalAction">
                 <label ngbButtonLabel class="btn-outline-secondary">
                   <input ngbButton type="radio" value="AWARD">Award
                 </label>
@@ -21,6 +26,10 @@
                   <input ngbButton type="radio" value="REVISION">Revision
                 </label>
             </div>
+            <div class="text-danger mt-1" *ngIf="(actionType.errors?.required)">
+                Action Type is required
+            </div>
+            </ng-template>
         </div>
     </div>
     <div class="col-lg-4">
@@ -36,7 +45,7 @@
                 [data] = "specialists"
                 [(ngModel)]= "gmInfo.defaultSpecNpeId"
                 #specFullName="ngModel"
-                required>
+                [required]="isApprovalAction">
             </ng-select2>
             <div class="text-danger mt-1" *ngIf="(specFullName.errors?.required)">
                 Specialist is required

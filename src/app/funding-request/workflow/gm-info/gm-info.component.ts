@@ -24,6 +24,8 @@ export class GmInfoComponent implements OnInit, OnDestroy {
   specialists: Select2OptionData[];
   requestSubcription: Subscription;
 
+  isApprovalAction = false;
+
   constructor(private workflowService: FsWorkflowControllerService,
               private requestModel: RequestModel,
               private workflowModel: WorkflowModel,
@@ -50,12 +52,10 @@ export class GmInfoComponent implements OnInit, OnDestroy {
           this.logger.debug('getGmActiveSpecialistsUsingGET returned', result);
           this.specialists = result.map( (data) =>
           ({id: String(data.specNpeId), text: data.specCode + ' ' + data.specFullName}));
-          this.logger.debug(' specialists for drop down ', this.specialists);
           this.specialistMap = result.reduce((map, specialist) => {
             map.set(specialist.specNpeId, specialist);
             return map;
           }, this.specialistMap);
-          this.logger.debug(' specialists map ', this.specialistMap);
           // this.defaultSpecList = result.map( (data) =>
           // ({id: data.specCode + ' ' + data.specFullName, text: data.specCode + ' ' + data.specFullName}));
         }
