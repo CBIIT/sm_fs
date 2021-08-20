@@ -46,9 +46,9 @@
   <div class="col-12">
     <div class="form-group">
       <label for="funding-comments">Comments <span class="optional">(optional)</span></label>
-      <textarea id="funding-comments" #funding_comments name="fundingComments" maxlength="1000" class="form-control"
+      <textarea id="funding-comments" #funding_comments name="fundingComments" maxlength="2000" class="form-control"
                 rows="2" [(ngModel)]="comments"></textarea>
-      <span class="character-counter">{{ funding_comments.value.length }}/1000</span>
+      <span class="character-counter">{{ funding_comments.value.length }}/2000</span>
     </div>
   </div>
 

@@ -11,25 +11,34 @@
 <div *ngIf="exception"><img src="images/grant-exception.png" alt="EXCEPTION" width="56" height="16"></div>
 <div class="row collapse show mt-2" id="grant-info-collapse">
 
-  <div class="col-lg-3">
+  <div class="col-lg-4">
     <div class="form-group">
       <p class="like-label">Grant Number</p>
       <p>
         <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
         <span class="grant-icons ml-2">
-                    <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants">
-                        <span class="egrants-icon"></span>
-                    </a>
-                    <a [routerLink]="" [ngbTooltip]="InstituteTooltip" triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
-                </span>
+          <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants">
+            <span class="egrants-icon"></span>
+          </a>
+          <a [routerLink]="" [ngbTooltip]="InstituteTooltip" triggers="click:blur">
+            <i class='fa fa-university' aria-hidden='true'></i>
+          </a>
+        </span>
       </p>
     </div>
   </div>
 
-  <div class="col-lg-2">
+  <div class="col-lg-4">
     <div class="form-group">
-      <p class="like-label">PI Name</p>
-      <p><span [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail': 'PI/PD name':'fullGrantNum': 'lastName'"></span></p>
+      <p class="like-label">PI Requested Direct Cost</p>
+      <p>{{ '$$$' }}</p>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="form-group">
+      <p class="like-label">PI Requested Total Cost</p>
+      <p>{{ '$$$' }}</p>
     </div>
   </div>
 
@@ -40,73 +49,32 @@
     </div>
   </div>
 
-  <div class="col-lg-3">
+  <div class="col-lg-2">
     <div class="form-group">
       <p class="like-label">RFA/PA/PAR</p>
-      <p>{{ grant.rfaPaNumber }}</p>
+      <p><a href="{{ grant.nihGuideAddr }}">{{ grant.rfaPaNumber }}</a></p>
     </div>
   </div>
 
-  <div class="col-sm-6 col-lg-2">
-    <div class="form-group">
-      <p class="like-label">Cancer Activity</p>
-      <p><a [routerLink]="" ngbTooltip="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="click:blur" placement="top">{{grant.cayCode}}</a></p>
-    </div>
-  </div>
-
-  <div class="col-sm-6 col-lg-2">
-    <div class="form-group">
-      <p class="like-label">DOC</p>
-      <p>{{ grant.doc }}</p>
-    </div>
-  </div>
-
-  <div class="col-sm-6 col-lg-2">
-    <div class="form-group">
-      <p class="like-label">Grant FY</p>
-      <p>{{ grant.fy }}</p>
-    </div>
-  </div>
-
-  <div class="col-lg-3">
-    <div class="form-group">
-      <p class="like-label">Thrust Information</p>
-      <p>{{ grant.thtCode }}</p>
-    </div>
-  </div>
-
-  <div class="col-sm-6 col-lg-3">
-    <div class="form-group">
-      <p class="like-label">Budget Start Date</p>
-      <p>{{ grant.budgetStartDate }}</p>
-    </div>
-  </div>
-
-  <div class="col-sm-6 col-lg-2">
-    <div class="form-group">
-      <p class="like-label">NCAB</p>
-      <p>{{ grant.councilMeetingDate|formatNcabDate }}</p>
-    </div>
-  </div>
-
-  <div class="col-sm-6 col-lg-2">
+   <div class="col-lg-2">
     <div class="form-group">
       <p class="like-label">Score</p>
       <p>{{ grant.priorityScoreNum | formatScorePctl }}</p>
     </div>
   </div>
 
-  <div class="col-sm-6 col-lg-2">
+  <div class="col-lg-2">
     <div class="form-group">
-      <p class="like-label">Percentile</p>
-      <p>{{ grant.irgPercentileNum | formatScorePctl }}</p>
+      <p class="like-label">PI Name</p>
+      <p><span
+        [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail': 'PI/PD name':'fullGrantNum': 'lastName'"></span></p>
     </div>
   </div>
 
-  <div class="col-sm-6 col-lg-2">
+  <div class="col-lg-2">
     <div class="form-group">
-      <p class="like-label">SPL Committee Meeting Date</p>
-      <p> {{ '--' }}</p>
+      <p class="like-label">NCAB Date</p>
+      <p>{{ grant.councilMeetingDate|formatNcabDate }}</p>
     </div>
   </div>
 
