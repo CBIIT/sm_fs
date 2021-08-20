@@ -7,6 +7,7 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class FpProgramRecommendedCostsComponent implements OnInit {
   @Input() index: number;
+  displayType: string;
 
   constructor() {
   }
@@ -14,4 +15,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  toggleDisplay(value: string): void {
+    this.displayType = value;
+  }
 }

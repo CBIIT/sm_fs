@@ -1,1 +1,33 @@
-<p>fp-direct-total-cost works!</p>
+<div class="d-flex">
+  <label>Enter&nbsp;</label>
+  <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="displayType" [(ngModel)]="displayType">
+    <label ngbButtonLabel class="btn-outline-secondary">
+      <input ngbButton type="radio" [value]="'dollar'" (change)="toggleDisplay('dollar')">Dollar
+    </label>
+    <label ngbButtonLabel class="btn-outline-secondary">
+      <input ngbButton type="radio" [value]="'percent'" (change)="toggleDisplay('percent')">% Cut
+    </label>
+    <span>(?)</span>
+  </div>
+</div>
+<ng-container *ngIf="displayType === 'percent'; then percentCut else dollarValues"></ng-container>
+
+<ng-template #percentCut>
+  <div class="d-flex">
+    <label>% Cut</label>
+    <input type="text">
+  </div>
+  <div class="d-flex">
+  </div>
+</ng-template>
+<ng-template #dollarValues>
+  <div class="d-flex">
+    <label>$</label>
+    <input type="text">
+    <input type="text">
+  </div>
+  <div class="d-flex">
+  </div>
+</ng-template>
+
+

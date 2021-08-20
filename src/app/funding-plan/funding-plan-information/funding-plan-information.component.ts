@@ -25,11 +25,17 @@ export class FundingPlanInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const guideAddr = new Map<string, string>();
+    this.planModel.allGrants.forEach(g => {
+      this.logger.debug(g.rfaPaNumber, g.nihGuideAddr);
+      guideAddr.set(g.rfaPaNumber, g.nihGuideAddr);
+    });
     this.rfaDetails = [];
     this.planModel.grantsSearchCriteria.forEach(rfa => {
-      this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
-        this.rfaDetails.push(next);
-      });
+      this.rfaDetails.push({noticeNumber: rfa.rfaPaNumber, nihGuideAddr: guideAddr.get(rfa.rfaPaNumber)});
+      // this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
+      //   this.rfaDetails.push(next);
+      // });
     });
 
     this.totalApplicationsReceived = this.planModel.allGrants.length;
