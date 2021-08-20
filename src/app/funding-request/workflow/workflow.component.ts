@@ -67,7 +67,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   onActionChange(value: string): void {
     this.actionEmitter.emit(value);
-    this.gmInfoComponent.isApprovalAction = this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
+    if (this.gmInfoComponent) {
+      this.gmInfoComponent.isApprovalAction = this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
+    }
   }
 
   constructor(private requestIntegrationService: FundingRequestIntegrationService,
@@ -186,8 +188,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   showGmInfo(): boolean {
-    return this.workflowModel.approvedByGM ||
-      (this.workflowModel.isGMApprover && this.approvingState);
+    return !this.requestModel.isSkip() && ( this.workflowModel.approvedByGM ||
+      (this.workflowModel.isGMApprover && this.approvingState) );
   }
 
   get selectedWorkflowAction(): WorkflowActionCode {
@@ -278,7 +280,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     }
     // set approved costs cans if scientific approver;
     if (this.workflowModel.isScientificApprover
-      && this.workflowModel.isApprovalAction(action)) {
+      && this.workflowModel.isApprovalAction(action)
+      && !this.requestModel.isSkip() ) {
         dto.requestCans = this.requestModel.requestCans;
         this.logger.debug('scientific approver:', dto.requestCans);
 //      dto.requestCans = this.approvedCostsComponent.getCans();
@@ -298,8 +301,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     }
 
     if (this.workflowModel.isGMApprover
-      && this.workflowModel.isApprovalAction(action)) {
-      dto.gmInfo = this.gmInfoComponent.getGmInfo();
+      && this.workflowModel.isApprovalAction(action)
+      && !this.requestModel.isSkip() ) {
+      dto.gmInfo = this.gmInfoComponent?.getGmInfo();
     }
 
     this.logger.debug('workflow dto for submission is ', dto);
