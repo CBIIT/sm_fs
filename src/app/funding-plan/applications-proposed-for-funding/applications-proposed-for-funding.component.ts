@@ -4,8 +4,6 @@ import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { NgForm } from '@angular/forms';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
-import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
-import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',

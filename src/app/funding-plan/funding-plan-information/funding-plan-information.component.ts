@@ -32,10 +32,10 @@ export class FundingPlanInformationComponent implements OnInit {
     });
     this.rfaDetails = [];
     this.planModel.grantsSearchCriteria.forEach(rfa => {
-      this.rfaDetails.push({noticeNumber: rfa.rfaPaNumber, nihGuideAddr: guideAddr.get(rfa.rfaPaNumber)});
-      // this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
-      //   this.rfaDetails.push(next);
-      // });
+      // this.rfaDetails.push({noticeNumber: rfa.rfaPaNumber, nihGuideAddr: guideAddr.get(rfa.rfaPaNumber)});
+      this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
+        this.rfaDetails.push(next);
+      });
     });
 
     this.totalApplicationsReceived = this.planModel.allGrants.length;
