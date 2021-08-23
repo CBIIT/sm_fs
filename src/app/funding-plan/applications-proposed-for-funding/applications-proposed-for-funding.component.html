@@ -1,63 +1,69 @@
 <div class="row">
-  <div class="col-12">
+  <ng-container *ngIf="true then singleSource else multiSource"></ng-container>
+  <ng-template #singleSource>
+    <div class="col-12">
 
-    <h2>Applications Proposed for Funding</h2>
+      <h2>Applications Proposed for Funding</h2>
 
-    <p><small>The Standard Policy Reduction should be taken into consideration when determining the recommended dollar
-      amounts for the funding selection plan. If you would like to include a waiver to the Standard Policy Reduction,
-      please provide it as part of the justification. The current fiscal year's policy reductions can be viewed on the
-      <a href="#" class="external-link">OEFIA web site</a>.</small></p>
+      <p><small>The Standard Policy Reduction should be taken into consideration when determining the recommended dollar
+        amounts for the funding selection plan. If you would like to include a waiver to the Standard Policy Reduction,
+        please provide it as part of the justification. The current fiscal year's policy reductions can be viewed on the
+        <a href="#" class="external-link">OEFIA web site</a>.</small></p>
 
-    <div class="d-flex mb-2">
-      <button type="button" class="btn btn-primary ml-auto" data-toggle="modal" data-target="#add-FS-modal"><i
-        class="fas fa-plus mr-1" aria-hidden="true"></i> Add Funding Source
-      </button>
+      <div class="d-flex mb-2">
+        <button type="button" class="btn btn-primary ml-auto" data-toggle="modal" data-target="#add-FS-modal"><i
+          class="fas fa-plus mr-1" aria-hidden="true"></i> Add Funding Source
+        </button>
+      </div>
+
+      <table class="table table-bordered table-striped app-funding-table">
+        <thead>
+        <tr>
+          <th scope="col">Grant Information</th>
+          <th scope="col">
+            <label for="FundSrc-1">
+              Funding Source
+              <a href="#"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
+            </label>
+            <app-fp-funding-source></app-fp-funding-source>
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let grant of listGrantsSelected; let i = index;">
+          <td>
+            <app-fp-grant-information [index]="i" [grant]="grant"></app-fp-grant-information>
+          </td>
+          <td>
+            <app-fp-program-recommended-costs [index]="i"></app-fp-program-recommended-costs>
+          </td>
+
+        </tr>
+
+        </tbody>
+        <tfoot>
+        <tr>
+          <td scope="row"><strong>Total Recommended Costs</strong></td>
+          <td>
+            <div class="form-row">
+              <div class="col-lg-6">
+                <span class="like-label">Direct Cost</span>
+                <span>$0.00</span>
+              </div>
+              <div class="col-lg-6">
+                <span class="like-label">Total Cost</span>
+                <span>$0.00</span>
+              </div>
+            </div>
+          </td>
+        </tr>
+        </tfoot>
+      </table>
     </div>
-
-    <table class="table table-bordered table-striped app-funding-table">
-      <thead>
-      <tr>
-        <th scope="col">Grant Information</th>
-        <th scope="col">
-          <label for="FundSrc-1">
-            Funding Source
-            <a href="#"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
-          </label>
-          <app-fp-funding-source></app-fp-funding-source>
-        </th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let grant of listGrantsSelected; let i = index;">
-        <td>
-          <app-fp-grant-information [index]="i" [grant]="grant"></app-fp-grant-information>
-        </td>
-        <td>
-          <app-fp-program-recommended-costs [index]="i"></app-fp-program-recommended-costs>
-        </td>
-
-      </tr>
-
-      </tbody>
-      <tfoot>
-      <tr>
-        <td scope="row"><strong>Total Recommended Costs</strong></td>
-        <td>
-          <div class="form-row">
-            <div class="col-lg-6">
-              <span class="like-label">Direct Cost</span>
-              <span>$0.00</span>
-            </div>
-            <div class="col-lg-6">
-              <span class="like-label">Total Cost</span>
-              <span>$0.00</span>
-            </div>
-          </div>
-        </td>
-      </tr>
-      </tfoot>
-    </table>
-  </div>
+  </ng-template>
+  <ng-template #multiSource>
+    <p>Multiple source table goes here...</p>
+  </ng-template>
 
   <div class="col-12">
     <div class="form-group">
@@ -71,7 +77,6 @@
   <div class="col-12">
     <hr>
   </div>
-
 </div>
 
 

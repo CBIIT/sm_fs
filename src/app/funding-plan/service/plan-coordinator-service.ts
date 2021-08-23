@@ -6,4 +6,5 @@ import { Subject } from 'rxjs';
 })
 export class PlanCoordinatorService {
   fundingSourceValuesEmitter = new Subject<{ pd: number, ca: string }>();
+  grantInfoCostEmitter = new Subject<{index: number, dc: number, tc: number}>();
 }
