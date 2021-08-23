@@ -1,81 +1,79 @@
 <ng-template #InstituteTooltip><span class='institutionName'>{{grant.orgName}}</span><br>
   <span class='institutionLocation'>{{grant.institutionCity}},&nbsp;{{grant.institutionState}}</span>
 </ng-template>
-<!--<div class="row">-->
-<!--  <div class="col-12 d-flex">-->
-<!--    <h2>Grant Information</h2>-->
-<!--    <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#grant-info-collapse" role="button" aria-expanded="true" aria-controls="grant-info-collapse"></a>-->
-<!--  </div>-->
-<!--</div>-->
-<div *ngIf="skip"><img src="images/grant-skip.png" alt="SKIP" width="31" height="16"></div>
-<div *ngIf="exception"><img src="images/grant-exception.png" alt="EXCEPTION" width="56" height="16"></div>
-<div class="row collapse show mt-2" id="grant-info-collapse">
 
-  <div class="col-lg-4">
-    <div class="form-group">
-      <p class="like-label">Grant Number</p>
-      <p>
-        <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
-        <span class="grant-icons ml-2">
+<div *ngIf="exception"><img src="images/grant-exception.png" alt="EXCEPTION" width="56" height="16"></div>
+<div class="grant-info-wrapper">
+
+  <a class="btn btn-link grant-info-toggle-btn" data-toggle="collapse" href="#row-collapse-1" role="button" aria-expanded="true" aria-controls="row-collapse-1" ngbTooltip="Collapse Grant Information" placement="top"></a>
+
+  <div class="grant-info-row">
+    <div class="grant-info-col">
+      <span class="like-label mb-0">Grant Number</span>
+      <div class="d-flex align-items-center">
+        <a href="{{model.grantViewerUrl+grant.applId}}">{{grant.fullGrantNum}}</a>
+        <div class="grant-icons ml-1">
           <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants">
             <span class="egrants-icon"></span>
           </a>
           <a [routerLink]="" [ngbTooltip]="InstituteTooltip" triggers="click:blur">
             <i class='fa fa-university' aria-hidden='true'></i>
           </a>
-        </span>
-      </p>
+        </div>
+      </div>
     </div>
+
+    <div class="grant-info-col">
+      <span class="like-label mb-0">PI</span>
+      <span [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail': 'PI/PD name':'fullGrantNum': 'lastName'"></span>
+    </div>
+
   </div>
 
-  <div class="col-lg-4">
-    <div class="form-group">
-      <p class="like-label">PI Requested Direct Cost</p>
-      <p>{{ '$$$' }}</p>
+  <div class="grant-info-row">
+
+    <div class="grant-info-col">
+      <span class="like-label mb-0">PI Requested&nbsp;DC</span>
+      <span>{{ '$100,000' }}</span>
     </div>
+
+    <div class="grant-info-col">
+      <span class="like-label mb-0">PI Requested&nbsp;TC</span>
+      <span>{{ '$550,000' }}</span>
+    </div>
+
+    <div class="grant-info-col">
+      <label for="rec-fy-3">Recomm. Future Years</label>
+      <app-recommended-future-years id="rec-fy-3"></app-recommended-future-years>
+    </div>
+
   </div>
 
-  <div class="col-lg-4">
-    <div class="form-group">
-      <p class="like-label">PI Requested Total Cost</p>
-      <p>{{ '$$$' }}</p>
+  <div class="collapse show" id="row-collapse-1">
+
+    <div class="grant-info-row">
+
+      <div class="grant-info-col">
+        <span class="like-label mb-0">Project Title</span>
+        <span>{{ grant.projectTitle }}</span>
+      </div>
+
+      <div class="grant-info-col">
+        <span class="like-label mb-0">RFA/PA</span>
+        <span><a href="{{ grant.nihGuideAddr }}">{{ grant.rfaPaNumber }}</a></span>
+      </div>
+
+      <div class="grant-info-col">
+        <span class="like-label mb-0">Score</span>
+        <span>{{ grant.priorityScoreNum | formatScorePctl }}</span>
+      </div>
+
+      <div class="grant-info-col">
+        <span class="like-label mb-0">NCAB Date</span>
+        <span>{{ grant.councilMeetingDate|formatNcabDate }}</span>
+      </div>
     </div>
+
   </div>
 
-  <div class="col-lg-4">
-    <div class="form-group">
-      <p class="like-label">Project Title</p>
-      <p>{{ grant.projectTitle }}</p>
-    </div>
-  </div>
-
-  <div class="col-lg-2">
-    <div class="form-group">
-      <p class="like-label">RFA/PA/PAR</p>
-      <p><a href="{{ grant.nihGuideAddr }}">{{ grant.rfaPaNumber }}</a></p>
-    </div>
-  </div>
-
-   <div class="col-lg-2">
-    <div class="form-group">
-      <p class="like-label">Score</p>
-      <p>{{ grant.priorityScoreNum | formatScorePctl }}</p>
-    </div>
-  </div>
-
-  <div class="col-lg-2">
-    <div class="form-group">
-      <p class="like-label">PI Name</p>
-      <p><span
-        [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail': 'PI/PD name':'fullGrantNum': 'lastName'"></span></p>
-    </div>
-  </div>
-
-  <div class="col-lg-2">
-    <div class="form-group">
-      <p class="like-label">NCAB Date</p>
-      <p>{{ grant.councilMeetingDate|formatNcabDate }}</p>
-    </div>
-  </div>
-
-</div><!-- END Row -->
+</div>
