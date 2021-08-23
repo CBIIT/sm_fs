@@ -5,15 +5,14 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 import {
   FsRequestControllerService, FundingReqStatusHistoryDto,
   NciPfrGrantQueryDto, DocumentsDto,
-  FundingReqApproversDto, FsWorkflowControllerService, FundingRequestPermDelDto,
-  NciPerson, I2ERoles, WorkflowTaskDto
+  FundingReqApproversDto, FsWorkflowControllerService, WorkflowTaskDto
 } from '@nci-cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { Subscription } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import { WorkflowModalComponent } from '../workflow-modal/workflow-modal.component';
-import { ApprovingStatuses, WorkflowActionCode, WorkflowModel } from '../workflow/workflow.model';
+import { ApprovingStatuses, RequestStatus, WorkflowActionCode, WorkflowModel } from '../workflow/workflow.model';
 import { WorkflowComponent } from '../workflow/workflow.component';
 import { UploadBudgetDocumentsComponent } from '../../upload-budget-documents/upload-budget-documents.component';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
@@ -331,8 +330,9 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   releaseFromHoldVisible(): boolean {
-    return (this.requestStatus === 'ON HOLD' &&
-      (this.userCanSubmit || this.workflowModel.isDocApprover));
+    return this.requestStatus === 'ON HOLD' &&
+    ((this.userCanSubmit && !this.workflowModel.approvedByFC) ||
+    (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc));
   }
 
   submitVisible(): boolean {
@@ -470,5 +470,9 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
   showBudgetInfo(): boolean {
     return this.workflowModel.isFinancialApprover || this.workflowModel.approvedByFC;
+  }
+
+  hideWorkflow(): boolean {
+    return this.requestStatus === RequestStatus.REJECTED;
   }
 }

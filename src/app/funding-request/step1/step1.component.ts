@@ -129,7 +129,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
           }, className: 'all'},
         {title: 'Project Title', data: 'projectTitle'},
         {title: 'RFA/PA', data: 'rfaPaNumber', render: ( data, type, row, meta ) => {
-          return '<a href="' + row.nihGuideAddr + '" target="blank" >' + data + '</a>';
+          return (!data || data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="blank" >' + data + '</a>';
         }},
         {title: 'I2 Status', data: 'applStatusGroupDescrip'},
         {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
