@@ -24,9 +24,9 @@
             <tbody>
                 <tr *ngFor=" let can of requestModel.requestCans; let i = index;">
                     <td>{{can.fundingSourceName}}</td>
-                    <td>{{can.requestedDc | currency}} <span *ngIf="initialPay">({{can.dcPctCut / 100000 | percent:'1.0-2'}} cut)</span></td>
-                    <td>{{can.requestedTc | currency}} <span *ngIf="initialPay">({{can.tcPctCut / 100000 | percent:'1.0-2'}} cut)</span></td>
-                    <td>{{can.approvedTc | currency}}  <span *ngIf="initialPay">({{can.tcPctCut / 100000 | percent:'1.0-2'}} cut)</span></td>
+                    <td>{{can.requestedDc | currency}} {{can.tcPctCut / 100000 | percentCut:initialPay}}</td>
+                    <td>{{can.requestedTc | currency}} {{can.tcPctCut / 100000 | percentCut:initialPay}}</td>
+                    <td>{{can.approvedTc | currency}}  {{can.tcPctCut / 100000 | percentCut:initialPay}}</td>
                     <td>{{can.requestedFutureYrs}}</td>
                     <td>
                     <div *ngIf="editable; else readonly">

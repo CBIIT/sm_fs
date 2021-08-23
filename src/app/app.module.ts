@@ -109,6 +109,8 @@ import { EndDateBeforeStartValidatorDirective } from './manage-designations/end-
 import { RecommendedFutureYearsComponent } from './funding-plan/recommended-future-years/recommended-future-years.component';
 import { FpFundingSourceComponent } from './funding-plan/fp-funding-source/fp-funding-source.component';
 import { FundingInformationValidatorDirective } from './validators/funding-information-validator.directive';
+import { PercentCutPipe } from './pipes/percent-cut.pipe';
+import { PercentPipe } from '@angular/common';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -227,6 +229,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     RecommendedFutureYearsComponent,
     FpFundingSourceComponent,
     FundingInformationValidatorDirective,
+    PercentCutPipe,
   ],
 
 
@@ -246,7 +249,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
       enableSourceMaps: true
     })
   ],
-  providers: [RequestModel, PlanModel, LoaderService,
+  providers: [RequestModel, PlanModel, LoaderService, PercentPipe,
     { provide: BASE_PATH, useValue: '/i2ecws' },
     { provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS' },
     { provide: PROPERTIES_OVERRIDE, useValue: environment },
