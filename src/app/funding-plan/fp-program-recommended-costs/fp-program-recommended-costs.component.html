@@ -1,32 +1,94 @@
-<div class="d-flex">
-  <label>Enter&nbsp;</label>
-  <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="displayType" [(ngModel)]="displayType">
-    <label ngbButtonLabel class="btn-outline-secondary">
-      <input ngbButton type="radio" [value]="'dollar'" (change)="toggleDisplay('dollar')">Dollar
-    </label>
-    <label ngbButtonLabel class="btn-outline-secondary">
-      <input ngbButton type="radio" [value]="'percent'" (change)="toggleDisplay('percent')">% Cut
-    </label>
-    <span>(?)</span>
-  </div>
+<div class="btn-group btn-group-toggle btn-group-sm btn-group-block mb-2" ngbRadioGroup name="displayType"
+     [(ngModel)]="displayType">
+  <label ngbButtonLabel class="btn-outline-secondary">
+    <input ngbButton type="radio" [value]="'dollar'" (change)="toggleDisplay('dollar')">Dollar
+  </label>
+  <label ngbButtonLabel class="btn-outline-secondary">
+    <input ngbButton type="radio" [value]="'percent'" (change)="toggleDisplay('percent')">% Cut
+  </label>
 </div>
+
 <ng-container *ngIf="displayType === 'percent'; then percentCut else dollarValues"></ng-container>
 
-<ng-template #percentCut>
-  <div class="d-flex">
-    <label>% Cut</label>
-    <input type="text">
+<ng-template #dollarValues>
+  <div class="form-row">
+    <div class="form-group col-6 mb-2">
+      <label for="DC-1">Direct Cost</label>
+      <div class="input-group input-group-sm">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="DC-prepend-1">$</span>
+        </div>
+        <input type="text" class="form-control" id="DC-1" aria-describedby="DC-prepend-1">
+      </div>
+    </div>
+    <div class="form-group col-6 mb-2">
+      <label for="TC-1">Total Cost</label>
+      <div class="input-group input-group-sm">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="TC-prepend-1">$</span>
+        </div>
+        <input type="text" class="form-control" id="TC-1" aria-describedby="TC-prepend-1">
+      </div>
+    </div>
   </div>
-  <div class="d-flex">
+
+  <div class="form-row">
+    <div class="col-6">
+      <div class="input-group input-group-sm input-group-readonly">
+        <input type="text" class="form-control text-right" id="TC-1" aria-label="Direct Cost Percent Cut" readonly
+               disabled>
+        <div class="input-group-append">
+          <span class="input-group-text" id="TC-append-1">% Cut</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6">
+      <div class="input-group input-group-sm input-group-readonly">
+        <input type="text" class="form-control text-right" id="TC-1" aria-label="Total Cost Percent Cut" readonly
+               disabled>
+        <div class="input-group-append">
+          <span class="input-group-text" id="TC-append-1">% Cut</span>
+        </div>
+      </div>
+    </div>
   </div>
 </ng-template>
-<ng-template #dollarValues>
-  <div class="d-flex">
-    <label>$</label>
-    <input type="text">
-    <input type="text">
+
+<ng-template #percentCut>
+  <div class="form-row">
+    <div class="form-group col-6 mb-2">
+      <label for="DC-1">Direct Cost</label>
+      <div class="input-group input-group-sm input-group-readonly">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="DC-prepend-1">$</span>
+        </div>
+        <input type="text" class="form-control" id="DC-1" aria-describedby="DC-prepend-1" readonly disabled
+               value="100,000.00">
+      </div>
+    </div>
+    <div class="form-group col-6 mb-2">
+      <label for="TC-1">Total Cost</label>
+      <div class="input-group input-group-sm input-group-readonly">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="TC-prepend-1">$</span>
+        </div>
+        <input type="text" class="form-control" id="TC-1" aria-describedby="TC-prepend-1" readonly disabled
+               value="100,000.00">
+      </div>
+    </div>
   </div>
-  <div class="d-flex">
+
+  <div class="form-row">
+    <div class="col">
+      <div class="input-group input-group-sm">
+        <input type="text" class="form-control text-right" id="TC-1" aria-label="Direct Cost Percent Cut" value="80">
+        <div class="input-group-append">
+          <span class="input-group-text" id="TC-append-1">% Cut</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 </ng-template>
 
