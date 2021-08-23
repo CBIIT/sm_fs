@@ -12,6 +12,7 @@ export class FpGrantInformationComponent implements OnInit {
   @Input() index: number;
   skip = false;
   exception = false;
+  @Input() isModal = false;
 
   constructor(public model: PlanModel) {
   }
