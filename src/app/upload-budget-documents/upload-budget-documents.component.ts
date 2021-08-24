@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { of, Observable } from 'rxjs';
 import { DocumentsDto } from '@nci-cbiit/i2ecws-lib';
 import { RequestModel } from '../model/request/request-model';
+import { PlanModel } from 'src/app/model/plan/plan-model';
 import { DocumentService } from '../service/document.service';
 import { HttpResponse } from '@angular/common/http';
 import { saveAs } from 'file-saver';
@@ -78,12 +79,14 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   constructor(private requestModel: RequestModel,
               private documentService: DocumentService,
               private logger: NGXLogger,
-              private workflowModel: WorkflowModel) {
+              private workflowModel: WorkflowModel,
+              private planModel: PlanModel) {
   }
 
   ngOnInit(): void {
 
     this.loadFiles();
+     
   }
 
   get budgetInfoReadOnly() : boolean {
@@ -91,19 +94,35 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   }
 
   loadFiles(): void {
-    this.documentService.getFSBudgetFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
-      result => {
-        this.requestModel.requestDto.budgetDocs = result;
-        this.budgetDocDtos = of(result);
-        result.forEach(element => {
 
-          this.spliceDocType(element.docType);
+    if (this.requestOrPlan === 'REQUEST') {
+
+      this.documentService.getFSBudgetFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
+        result => {
+          this.requestModel.requestDto.budgetDocs = result;
+          this.budgetDocDtos = of(result);
+          result.forEach(element => {
+  
+            this.spliceDocType(element.docType);
+          });
+        }, error => {
+          this.logger.error('HttpClient get request error for----- ' + error.message);
         });
-      }, error => {
-        this.logger.error('HttpClient get request error for----- ' + error.message);
-      });
+    } else {
+      this.documentService.getFSBudgetFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
+        result => {
+          this.planModel.fundingPlanDto.budgetDocs = result;
+          this.budgetDocDtos = of(result);
+          result.forEach(element => {
+  
+            this.spliceDocType(element.docType);
+          });
+        }, error => {
+          this.logger.error('HttpClient get request error for----- ' + error.message);
+        });
+    }
+    
   }
-
 
   selectFiles(event): void {
     const files: FileList = event.target.files;
@@ -128,11 +147,13 @@ export class UploadBudgetDocumentsComponent implements OnInit {
     for (let i = 0; i < this.selectedFiles.length; i++) {
       this._docDto.docDescription = this.docDescription;
       this._docDto.docType = this.selectedDocType;
-      this._docDto.keyId = this.requestModel.requestDto.frqId;
+      
       if (this.requestOrPlan === 'REQUEST') {
         this._docDto.keyType = 'PFR';
+        this._docDto.keyId = this.requestModel.requestDto.frqId;
       } else {
         this._docDto.keyType = 'PFRP';
+        this._docDto.keyId = this.planModel.fundingPlanDto.fprId;
       }
       
       if (this.selectedFiles[i].size <= this.maxFileSize) {
