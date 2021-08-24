@@ -2,13 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
+import { WorkflowModel } from 'src/app/funding-request/workflow/workflow.model';
 import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 
 @Component({
   selector: 'app-plan-step6',
   templateUrl: './plan-step6.component.html',
-  styleUrls: ['./plan-step6.component.css']
+  styleUrls: ['./plan-step6.component.css'],
+  providers: [WorkflowModel]
 })
 export class PlanStep6Component implements OnInit {
 

@@ -304,43 +304,7 @@
 <!-- END Supporting Documents Section -->
 
 <!-- START Workflow Section -->
-<div class="row">
-    <div class="col-12 d-flex">
-        <h2>Workflow</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#workflow-collapse" role="button" aria-expanded="true" aria-controls="workflow-collapse"></a>
-    </div>
-    <div class="col-12 collapse show" id="workflow-collapse">
-        <div class="row">
-
-            <div class="col-lg-6">
-                <div class="form-group">
-                    <label for="add-approvers">Add Approver(s) <span class="optional">(optional)</span></label>
-                    <ng-select2
-                        id="add-approvers"
-                        name="add-approvers"
-                        [allowClear]="true">
-                    </ng-select2>
-                </div>
-            </div>
-
-            <div class="col-12">
-                <h4>Next Scheduled Approvers</h4>
-                <p>Table goes here</p>
-            </div>
-
-            <div class="col-12">
-                <div class="form-group mb-1">
-                    <label for="workflow-comments">Workflow Comments <span class="optional">(optional)</span></label>
-                    <textarea id="workflow-comments" class="form-control" rows="2"></textarea>
-                    <span class="counter">XXXX/2000</span>
-                </div>
-            </div>
-        </div><!--END ROW-->
-    </div>
-    <div class="col-12">
-        <hr>
-    </div>
-</div>
+<app-plan-workflow></app-plan-workflow>
 <!-- END Workflow Section -->
 
 <!-- START Buttons Section -->

@@ -1,8 +1,9 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { FsWorkflowControllerService, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanWorkflowControllerService, FsWorkflowControllerService, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
+import { Observable } from 'rxjs';
 import { Alert } from 'src/app/alert-billboard/alert';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
@@ -15,6 +16,7 @@ import { WorkflowActionCode } from '../workflow/workflow.model';
 })
 
 export class WorkflowModalComponent implements OnInit {
+  @Input() requestOrPlan: 'REQUEST'|'PLAN' = 'REQUEST';
   @ViewChild('workflowModal') private modalContent: TemplateRef<WorkflowModalComponent>;
   private modalRef: NgbModalRef;
 
@@ -26,6 +28,7 @@ export class WorkflowModalComponent implements OnInit {
   constructor(private modalService: NgbModal,
               private requestModel: RequestModel,
               private fsWorkflowService: FsWorkflowControllerService,
+              private fsPlanWorkflowService: FsPlanWorkflowControllerService,
               private userSessionService: AppUserSessionService,
               private logger: NGXLogger) { }
 
@@ -73,8 +76,8 @@ export class WorkflowModalComponent implements OnInit {
     dto.comments = this.comments;
     dto.action =  WorkflowActionCode[this.mode];
     this.logger.debug('Modal submits workflow task dto ', dto);
-    this.fsWorkflowService.submitWorkflowUsingPOST(dto).subscribe(
-//    this.invokeRestApi(dto).subscribe(
+//    this.fsWorkflowService.submitWorkflowUsingPOST(dto).subscribe(
+    this.invokeRestApi(dto).subscribe(
       (result) => {
         this.modalRef.close(dto);
       },
@@ -84,21 +87,13 @@ export class WorkflowModalComponent implements OnInit {
     );
   }
 
-  // invokeRestApi(dto: WorkflowTaskDto): Observable<any> {
-  //   // const dto: WorkflowTaskDto = {};
-  //   // dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-  //   // dto.frqId = this.requestModel.requestDto.frqId;
-  //   // dto.comments = this.comments;
-  //   // dto.action =  WorkflowActionCode[mode];
-  //   if (dto.action === 'WITHDRAW') {
-  //     return this.fsWorkflowService.withdrawRequestUsingPOST(dto);
-  //   } else if (dto.action === 'HOLD') {
-  //     return this.fsWorkflowService.holdRequestUsingPOST(dto);
-  //   }
-  //   else {
-  //     throw new Error(dto.action + ' is not supported in funding request workflow');
-  //   }
-  // }
+  invokeRestApi(dto: WorkflowTaskDto): Observable<any> {
+    if (this.requestOrPlan === 'REQUEST') {
+      return this.fsWorkflowService.submitWorkflowUsingPOST(dto);
+    } else {
+      return this.fsPlanWorkflowService.submitPlanWorkflowUsingPOST(dto);
+    }
+  }
 
 }
 

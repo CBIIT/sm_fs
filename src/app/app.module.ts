@@ -111,6 +111,7 @@ import { FpFundingSourceComponent } from './funding-plan/fp-funding-source/fp-fu
 import { FundingInformationValidatorDirective } from './validators/funding-information-validator.directive';
 import { PercentCutPipe } from './pipes/percent-cut.pipe';
 import { PercentPipe } from '@angular/common';
+import { PlanWorkflowComponent } from './funding-plan/fp-workflow/plan-workflow.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -230,6 +231,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FpFundingSourceComponent,
     FundingInformationValidatorDirective,
     PercentCutPipe,
+    PlanWorkflowComponent
   ],
 
 
