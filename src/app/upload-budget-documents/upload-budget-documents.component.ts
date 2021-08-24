@@ -23,26 +23,27 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   labelImport: ElementRef;
 
   @ViewChild(BudgetInfoComponent) budgetInfoComponent: BudgetInfoComponent;
+  @Input() requestOrPlan: 'REQUEST'|'PLAN' = 'REQUEST';
 
-  _workflowName: string = '';
-  disableDocType: boolean = true;
+  // _workflowName: string = '';
+  // disableDocType: boolean = true;
 
-  @Input() set workflowName(value: string) {
-    this._workflowName = value;
+  // @Input() set workflowName(value: string) {
+  //   this._workflowName = value;
 
-    if (this._workflowName === 'APPROVE' ||
-      this._workflowName === 'APPROVE_ROUTE' ||
-      this._workflowName === 'ROUTE_APPROVE') {
-      this.disableDocType = false;
-    } else {
-      this.disableDocType = true;
-    }
+  //   if (this._workflowName === 'APPROVE' ||
+  //     this._workflowName === 'APPROVE_ROUTE' ||
+  //     this._workflowName === 'ROUTE_APPROVE') {
+  //     this.disableDocType = false;
+  //   } else {
+  //     this.disableDocType = true;
+  //   }
 
-  }
+  // }
 
-  get workflowName(): string {
-    return this._workflowName;
-  }
+  // get workflowName(): string {
+  //   return this._workflowName;
+  // }
 
   public _selectedDocType = '';
   disableFile = true;
@@ -128,7 +129,12 @@ export class UploadBudgetDocumentsComponent implements OnInit {
       this._docDto.docDescription = this.docDescription;
       this._docDto.docType = this.selectedDocType;
       this._docDto.keyId = this.requestModel.requestDto.frqId;
-      this._docDto.keyType = 'PFR';
+      if (this.requestOrPlan === 'REQUEST') {
+        this._docDto.keyType = 'PFR';
+      } else {
+        this._docDto.keyType = 'PFRP';
+      }
+      
       if (this.selectedFiles[i].size <= this.maxFileSize) {
         this.upload(this.selectedFiles[i]);
       } else {

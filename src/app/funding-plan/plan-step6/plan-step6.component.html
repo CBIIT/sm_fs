@@ -228,6 +228,9 @@
 </div>
 <!-- END Supporting Documents Section -->
 
+<app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar" requestOrPlan="PLAN"></app-upload-budget-documents>
+<app-budget-docs-readonly [hidden]="isDisplayBudgetDocsUploadVar || !displayReadOnlyBudgetDocs"></app-budget-docs-readonly>
+
 <!-- START Workflow Section -->
 <app-plan-workflow></app-plan-workflow>
 <!-- END Workflow Section -->
