@@ -9,12 +9,15 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class FpProgramRecommendedCostsComponent implements OnInit {
   @Input() index: number;
+  baselineDirectCost: number;
+  baselineTotalCost: number;
   directCost: number;
   totalCost: number;
   percentCut: number;
   directCostCalculated: number;
   totalCostCalculated: number;
-  percentCutCalculated: number;
+  dcPercentCutCalculated: number;
+  tcPercentCutCalculated: number;
   displayType: string;
 
   constructor(private planCoordinatorService: PlanCoordinatorService, private logger: NGXLogger) {
@@ -23,14 +26,35 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   ngOnInit(): void {
     this.planCoordinatorService.grantInfoCostEmitter.subscribe(next => {
       if (next.index === this.index) {
-        this.logger.debug('new values received: ', next);
-        this.directCost = next.dc;
-        this.totalCost = next.tc;
+        this.baselineDirectCost = next.dc;
+        this.baselineTotalCost = next.tc;
       }
     });
   }
 
   toggleDisplay(value: string): void {
     this.displayType = value;
+  }
+
+  // NOTE: assuming they're entering percent cut as a whole number
+  recalculate(): void {
+    this.logger.debug('recalculate:', this.displayType);
+
+    if (this.displayType === 'percent') {
+      if (!!this.percentCut) {
+        this.directCostCalculated = this.baselineDirectCost * (1 - (this.percentCut / 100));
+        this.totalCostCalculated = this.baselineTotalCost * (1 - (this.percentCut / 100));
+      }
+    } else {
+      if (!!this.directCost) {
+        this.dcPercentCutCalculated = (this.baselineDirectCost - this.directCost) / this.baselineDirectCost;
+        this.logger.debug(this.dcPercentCutCalculated);
+      }
+
+      if (!!this.totalCost) {
+        this.tcPercentCutCalculated = (this.baselineTotalCost - this.totalCost) / this.baselineTotalCost;
+      }
+    }
+
   }
 }

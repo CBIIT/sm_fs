@@ -2,7 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from '../../model/plan/plan-model';
 import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
-import { skip } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
@@ -32,7 +31,6 @@ export class FpGrantInformationComponent implements OnInit {
     this.exception = this.isException();
 
     this.requestService.getApplPeriodsUsingGET(this.grant.applId).subscribe(result => {
-      this.logger.debug(result);
       this.piDirect = 0;
       this.piTotal = 0;
       this.grantAwards = result;

@@ -48,11 +48,11 @@
             <div class="form-row">
               <div class="col-lg-6">
                 <span class="like-label">Direct Cost</span>
-                <span>$0.00</span>
+                <span>{{ sourceSumDirectCost() | currency }}</span>
               </div>
               <div class="col-lg-6">
                 <span class="like-label">Total Cost</span>
-                <span>$0.00</span>
+                <span>{{ sourceSumTotalCost() | currency }}</span>
               </div>
             </div>
           </td>

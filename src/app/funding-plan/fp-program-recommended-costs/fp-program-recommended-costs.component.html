@@ -12,7 +12,7 @@
 <ng-template #blank></ng-template>
 
 <ng-template #typeSelected>
-<ng-container *ngIf="displayType === 'percent'; then percentCut else dollarValues"></ng-container>
+<ng-container *ngIf="displayType === 'percent'; then percentCutVw else dollarValues"></ng-container>
 </ng-template>
 
 <ng-template #dollarValues>
@@ -23,7 +23,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text" id="DC-prepend-1">$</span>
         </div>
-        <input type="text" class="form-control" id="DC-1" aria-describedby="DC-prepend-1">
+        <input type="text" class="form-control" id="DC-1" aria-describedby="DC-prepend-1" (change)="recalculate()" [(ngModel)]="directCost">
       </div>
     </div>
     <div class="form-group col-6 mb-2">
@@ -32,7 +32,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text" id="TC-prepend-1">$</span>
         </div>
-        <input type="text" class="form-control" id="TC-1" aria-describedby="TC-prepend-1">
+        <input type="text" class="form-control" id="TC-1" aria-describedby="TC-prepend-1" (change)="recalculate()" [(ngModel)]="totalCost">
       </div>
     </div>
   </div>
@@ -41,7 +41,7 @@
     <div class="col-6">
       <div class="input-group input-group-sm input-group-readonly">
         <input type="text" class="form-control text-right" id="TC-1" aria-label="Direct Cost Percent Cut" readonly
-               disabled>
+               disabled [value]="dcPercentCutCalculated | percent: '1.0-2'">
         <div class="input-group-append">
           <span class="input-group-text" id="TC-append-1">% Cut</span>
         </div>
@@ -51,7 +51,7 @@
     <div class="col-6">
       <div class="input-group input-group-sm input-group-readonly">
         <input type="text" class="form-control text-right" id="TC-1" aria-label="Total Cost Percent Cut" readonly
-               disabled>
+               disabled [value]="tcPercentCutCalculated | percent: '1.0-2'">
         <div class="input-group-append">
           <span class="input-group-text" id="TC-append-1">% Cut</span>
         </div>
@@ -60,7 +60,7 @@
   </div>
 </ng-template>
 
-<ng-template #percentCut>
+<ng-template #percentCutVw>
   <div class="form-row">
     <div class="form-group col-6 mb-2">
       <label for="DC-1">Direct Cost</label>
@@ -68,7 +68,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text" id="DC-prepend-1">$</span>
         </div>
-        <input type="text" class="form-control" id="DC-1" aria-describedby="DC-prepend-1" readonly disabled>
+        <input type="text" class="form-control" id="DC-1" aria-describedby="DC-prepend-1" readonly disabled [value]="directCostCalculated | currency">
       </div>
     </div>
     <div class="form-group col-6 mb-2">
@@ -77,7 +77,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text" id="TC-prepend-1">$</span>
         </div>
-        <input type="text" class="form-control" id="TC-1" aria-describedby="TC-prepend-1" readonly disabled>
+        <input type="text" class="form-control" id="TC-1" aria-describedby="TC-prepend-1" readonly disabled [value]="totalCostCalculated | currency">
       </div>
     </div>
   </div>
@@ -85,7 +85,7 @@
   <div class="form-row">
     <div class="col">
       <div class="input-group input-group-sm">
-        <input type="text" class="form-control text-right" id="TC-1" aria-label="Direct Cost Percent Cut">
+        <input type="text" class="form-control text-right" id="TC-1" aria-label="Direct Cost Percent Cut" (change)="recalculate()" [(ngModel)]="percentCut">
         <div class="input-group-append">
           <span class="input-group-text" id="TC-append-1">% Cut</span>
         </div>
