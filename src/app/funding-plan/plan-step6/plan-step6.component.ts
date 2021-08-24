@@ -179,6 +179,16 @@ export class PlanStep6Component implements OnInit {
     // }
   }
 
+  get isDisplayBudgetDocsUploadVar(): boolean {
+    // return this.workflowModel.isFinancialApprover &&
+    //        ApprovingStatuses.includes(this.requestStatus);
+    //TODO: Remove hardcoded content once actual implementation is completed
+    return true;
+  }
+
+  get displayReadOnlyBudgetDocs(): boolean {
+    return this.planModel.fundingPlanDto.budgetDocs?.length > 0;
+  }
 
 }
 
