@@ -15,6 +15,7 @@ import { FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
 })
 
 export class ApproverListComponent implements OnInit, OnDestroy {
+  @Input() requestOrPlan: 'REQUEST'|'PLAN' = 'REQUEST';
   @Input() readonly = false;
   @Input() terminalRequest = false;
 
@@ -26,6 +27,7 @@ export class ApproverListComponent implements OnInit, OnDestroy {
   oneApprover: FundingReqApproversDto;
 
   approverChangeSubscription: Subscription;
+  emailSubject: string;
 
   constructor(public requestModel: RequestModel,
               private workflowModel: WorkflowModel,
@@ -51,6 +53,13 @@ export class ApproverListComponent implements OnInit, OnDestroy {
         this.changeDetection.detectChanges();
       }
     );
+
+    if (this.requestOrPlan === 'REQUEST') {
+      this.emailSubject = this.requestModel?.grant?.fullGrantNum + ' - ' + this.requestModel?.grant?.lastName;
+    }
+    else {
+      this.emailSubject = 'Funding Plan Email';
+    }
 
   }
 

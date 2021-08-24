@@ -141,6 +141,18 @@ export class WorkflowModel {
     );
   }
 
+  initializeForPlan(planId: number): void {
+    this.workflowControllerService.getRequestApproversUsingGET(planId).subscribe(
+      (result) => {
+        this.processApproversResult(result);
+        this.requestIntegrationService.approverInitializationEmitter.next();
+      },
+      (error) => {
+        this.logger.error('Error calling getRequestApprovers', error);
+      }
+    );
+  }
+
   processApproversResult(result: FundingReqApproversDto[]): void {
     // reset all flags;
     this.nextApproverRoleCode = '';
@@ -306,13 +318,17 @@ export class WorkflowModel {
     if (this.oneApprover) {
       orderNum++;
     }
-    for (const a of this.additionalApprovers) {
-      orderNum++;
-      a.orderNum = orderNum;
+    if (this.addAdditionalApprover) {
+      for (const a of this.additionalApprovers) {
+        orderNum++;
+        a.orderNum = orderNum;
+      }
     }
-    for (const a of this.pendingApprovers) {
-      orderNum++;
-      a.orderNum = orderNum;
+    if (this.pendingApprovers) {
+      for (const a of this.pendingApprovers) {
+        orderNum++;
+        a.orderNum = orderNum;
+      }
     }
   }
 

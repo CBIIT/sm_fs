@@ -13,6 +13,6 @@ export class PercentTogglePipe implements PipeTransform {
       return '';
     }
 
-    return '(' + value + '% cut)';
+    return '(' + value + '% Cut)';
   }
 }

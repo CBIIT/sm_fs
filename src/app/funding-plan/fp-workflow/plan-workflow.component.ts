@@ -164,6 +164,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     historyResult.forEach((item: FundingReqStatusHistoryDto) => {
       if (!item.endDate) {
         this.requestStatus = item;
+        this.requestStatus = {statusCode: 'DRAFT'};
         this.approvingState = ApprovingStatuses.includes(this.requestStatus.statusCode);
         this.terminalRequest = TerminalStatuses.includes(this.requestStatus.statusCode);
         this.logger.debug('current requestStatus= ', item);

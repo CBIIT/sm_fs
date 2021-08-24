@@ -12,7 +12,7 @@
         <div class="form-group">
             <label for="type">Doc Type</label>
             <ng-select2 id="type" [(ngModel)]="selectedDocType" [allowClear]="true"
-                (ngModelChange)="onDocTypeChange($event)" [disabled]="disableDocType">
+                (ngModelChange)="onDocTypeChange($event)" >
                 <option></option>
                 <option *ngFor="let docType of docTypes | async" [value]="docType"> {{docType}}
                 </option>
