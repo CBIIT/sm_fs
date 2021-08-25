@@ -29,7 +29,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
           sum = sum + Number(control.directCostCalculated);
         }
       } else {
-        this.logger.debug(isNaN(control.directCost), sum);
         if (!isNaN(control.directCost)) {
           sum = sum + Number(control.directCost);
         }
