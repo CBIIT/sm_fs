@@ -43,6 +43,9 @@ export class RequestInformationComponent implements OnInit {
 
 
   private refreshFundingSources(requestType: number, conversionActivityCode: string, cayCode: string): void {
+    if (!requestType || !cayCode) {
+      this.logger.info('Not refreshing funding sources: missing type or cayCode');
+    }
     this.fsRequestControllerService.getFundingSourcesUsingGET(
       requestType,
       this.requestModel.grant.fullGrantNum,
