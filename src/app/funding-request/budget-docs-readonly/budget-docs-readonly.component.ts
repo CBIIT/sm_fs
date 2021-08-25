@@ -6,6 +6,9 @@ import { RequestModel } from 'src/app/model/request/request-model';
 import { DocumentService } from 'src/app/service/document.service';
 import { saveAs } from 'file-saver';
 import { Step4Component } from '../step4/step4.component';
+import { Subscription } from 'rxjs';
+import { FundingRequestIntegrationService } from '../integration/integration.service';
+import { PlanModel } from 'src/app/model/plan/plan-model';
 
 @Component({
   selector: 'app-budget-docs-readonly',
@@ -14,7 +17,7 @@ import { Step4Component } from '../step4/step4.component';
 })
 export class BudgetDocsReadonlyComponent implements OnInit {
 
-//  budgetDocDtos: DocumentsDto[];
+  //  budgetDocDtos: DocumentsDto[];
   private _parent: Step4Component;
   @Input() set parent(value: Step4Component) {
     this._parent = value;
@@ -24,12 +27,42 @@ export class BudgetDocsReadonlyComponent implements OnInit {
     return this._parent;
   }
 
+  requestSubmissionEventSubscriber: Subscription;
+  @Input() requestOrPlan: 'REQUEST' | 'PLAN' = 'REQUEST';
+
   constructor(private requestModel: RequestModel,
-              private documentService: DocumentService,
-              private logger: NGXLogger) { }
+    private documentService: DocumentService,
+    private requestIntegrationService: FundingRequestIntegrationService,
+    private logger: NGXLogger,
+    private planModel: PlanModel) { }
 
   ngOnInit(): void {
-  //  this.budgetDocDtos = this.parent.budgetDocDtos;
+    //  this.budgetDocDtos = this.parent.budgetDocDtos;
+
+    this.requestSubmissionEventSubscriber = this.requestIntegrationService.requestSubmissionEmitter.subscribe(
+      () => { this.loadFiles(); }
+    );
+  }
+
+  loadFiles(): void {
+
+    if (this.requestOrPlan === 'REQUEST') {
+
+      this.documentService.getFSBudgetFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
+        result => {
+          this.requestModel.requestDto.budgetDocs = result;
+        }, error => {
+          this.logger.error('HttpClient get request error for----- ' + error.message);
+        });
+    } else {
+      this.documentService.getFSBudgetFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
+        result => {
+          this.planModel.fundingPlanDto.budgetDocs = result;
+        }, error => {
+          this.logger.error('HttpClient get request error for----- ' + error.message);
+        });
+    }
+
   }
 
   downloadFile(id: number, fileName: string): void {
@@ -44,7 +77,7 @@ export class BudgetDocsReadonlyComponent implements OnInit {
 
   }
 
-  get budgetDocDtos(): DocumentsDto[]{
+  get budgetDocDtos(): DocumentsDto[] {
     return this.requestModel.requestDto.budgetDocs;
   }
 
