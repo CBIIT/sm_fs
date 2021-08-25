@@ -1,11 +1,12 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { DocumentsDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { DocumentsControllerService, DocumentsDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { DocumentService } from 'src/app/service/document.service';
 import { saveAs } from 'file-saver';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -43,7 +44,9 @@ export class PlanStep5Component implements OnInit {
   constructor(private navigationModel: NavigationStepModel,
               private planModel: PlanModel,
               private documentService: DocumentService,
-              private logger: NGXLogger) { }
+              private logger: NGXLogger,
+              private router: Router,
+              private documentsControllerService: DocumentsControllerService) { }
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(5, true);
@@ -147,6 +150,26 @@ export class PlanStep5Component implements OnInit {
       ), error =>
         this.logger.error('Error downloading the file'),
       () => console.info('File downloaded successfully');
+  }
+
+  nextStep(): void {
+
+    this.documentsControllerService.loadDocumentsUsingGET(513, "PFRP").subscribe(
+    //this.documentsControllerService.loadDocumentsUsingGET(this.planModel.fundingPlanDto.fprId, "PFRP").subscribe(
+      result => {
+        this.planModel.fundingPlanDto.documents = result;
+        this.router.navigate(['/plan/step6']);
+      }, error => {
+        this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
+      }
+    );
+    
+
+  }
+
+  prevStep(): void {
+    //this.planModel.clearAlerts();
+    this.router.navigate(['/plan/step4']);
   }
 
 }
