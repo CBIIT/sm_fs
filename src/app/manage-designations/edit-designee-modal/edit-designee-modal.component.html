@@ -1,0 +1,86 @@
+<form #editForm="ngForm" (ngSubmit)="onSubmit(editForm)" [class.submitted]="editForm.submitted">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Edit Designee</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row mb-4">
+      <div class="col-6">
+        <label for="name">Name</label>
+        <a id="name" href="mailto:{{data.delegateToEmailAddr}}">{{data.delegateToFullName}}</a>
+      </div>
+      <div class="col-6">
+        <label for="org">Organization</label>
+        <div id="org">{{data.currentNedOrg}}</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="form-group">
+          <label for="startDate">Start Date</label>
+          <div class="input-group">
+            <input id="startDate" class="form-control" name="startDate" ngModel placeholder="mm/dd/yyyy"
+                   ngbDatepicker #d="ngbDatepicker" (click)="d.toggle()" [minDate]="minDate" required appDateInPast [disabled]="startDateReadOnly">
+            <div class="input-group-append">
+              <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d.toggle()" type="button" [disabled]="startDateReadOnly">
+                <i class="fas fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="form-group">
+          <label for="endDate">End Date</label>
+          <div class="input-group">
+            <input id="endDate" class="form-control" ngModel name="endDate" placeholder="mm/dd/yyyy"
+                   ngbDatepicker #d2="ngbDatepicker" (click)="d2.toggle()"  [minDate]="minDate" required
+                   [appEndDateBeforeStartValidator]="editForm.controls.startDate?.value">
+            <div class="input-group-append">
+              <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d2.toggle()" type="button">
+                <i class="fas fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--  Validation errors row -->
+    <div class="row" role="group" style="margin-top: -0.5rem;">
+      <div class="col-6">
+      <div *ngIf="!startDateReadOnly">
+        <div *ngIf="editForm.controls.startDate?.errors?.required && editForm.submitted" class="text-danger mt-1">
+          Start Date is required
+        </div>
+        <div *ngIf="editForm.controls.startDate?.errors?.ngbDate?.invalid && editForm.submitted" class="text-danger mt-1">
+          Start Date is invalid
+        </div>
+        <div *ngIf="editForm.controls.startDate?.errors?.dateInPast && editForm.submitted" class="text-danger mt-1">
+          Start Date cannot be in the past
+        </div>
+      </div>
+      </div>
+      <div class="col-6">
+        <div *ngIf="editForm.controls.endDate?.errors?.required && editForm.submitted"
+             class="text-danger mt-1">
+          End Date is required
+        </div>
+        <div *ngIf="editForm.controls.endDate?.errors?.ngbDate?.invalid && editForm.submitted" class="text-danger mt-1">
+          End Date is invalid
+        </div>
+        <div *ngIf="editForm.controls.endDate?.errors?.ngbDate?.minDate && editForm.submitted" class="text-danger mt-1">
+          End Date cannot be in the past
+        </div>
+        <div *ngIf="editForm.controls.endDate?.errors?.dateBeforeStart && editForm.submitted" class="text-danger mt-1">
+          End date cannot be before the start date
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Close</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>

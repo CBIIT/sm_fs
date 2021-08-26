@@ -113,6 +113,9 @@ import { PercentCutPipe } from './pipes/percent-cut.pipe';
 import { PercentPipe } from '@angular/common';
 import { PlanWorkflowComponent } from './funding-plan/fp-workflow/plan-workflow.component';
 import { PlanSupportingDocsReadonlyComponent } from './funding-plan/plan-step6/plan-supporting-docs-readonly/plan-supporting-docs-readonly.component';
+import { DesigneeCellRendererComponent } from './manage-designations/designee-cell-renderer/designee-cell-renderer.component';
+import { DesigneeActionCellRendererComponent } from './manage-designations/designee-action-cell-renderer/designee-action-cell-renderer.component';
+import { EditDesigneeModalComponent } from './manage-designations/edit-designee-modal/edit-designee-modal.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -233,7 +236,11 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FundingInformationValidatorDirective,
     PercentCutPipe,
     PlanWorkflowComponent,
-    PlanSupportingDocsReadonlyComponent
+    PlanSupportingDocsReadonlyComponent,
+    PlanWorkflowComponent,
+    DesigneeCellRendererComponent,
+    DesigneeActionCellRendererComponent,
+    EditDesigneeModalComponent,
   ],
 
 

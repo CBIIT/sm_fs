@@ -7,7 +7,7 @@ import {NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct} from "@ng-bootstr
 @Injectable()
 export class DatepickerAdapter extends NgbDateAdapter<string> {
 
-  readonly DELIMITER = '-';
+  readonly DELIMITER = '/';
 
   fromModel(value: string | null): NgbDateStruct | null {
     if (value) {

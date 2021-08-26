@@ -115,3 +115,10 @@
     </table>
   </div>
 </div>
+<!--          Renderer templates -->
+<ng-template #designeeRenderer let-data="adtData">
+  <app-designee-cell-renderer [data]="data"></app-designee-cell-renderer>
+</ng-template>
+<ng-template #actionDesigneeRenderer let-data="adtData">
+  <app-designee-action-cell-renderer [data]="data" (editEmitter)="onEditDesignee($event)"></app-designee-action-cell-renderer>
+</ng-template>

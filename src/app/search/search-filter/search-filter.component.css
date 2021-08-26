@@ -1,4 +1,4 @@
-a.show-advance:before {
+a.show-advance:before, a.show-filters:before {
   content: '\f055';
   font-family: 'Font Awesome 5 Pro';
   display: inline-block;
@@ -15,7 +15,16 @@ a.show-advance:after {
   margin-left: .2rem;
 }
 
-a.hide-advance:before {
+a.show-filters:after {
+  content: 'Show Filters';
+  font-family: "Noto Sans", sans-serif;
+  display: inline-block;
+  font-weight: regular;
+  color: #0076a8;
+  margin-left: .2rem;
+}
+
+a.hide-advance:before, a.hide-filters:before {
   content: '\f056';
   font-family: 'Font Awesome 5 Pro';
   display: inline-block;
@@ -25,6 +34,15 @@ a.hide-advance:before {
 
 a.hide-advance:after {
   content: 'Hide Advanced Filters';
+  font-family: "Noto Sans", sans-serif;
+  display: inline-block;
+  font-weight: regular;
+  color: #0076a8;
+  margin-left: .2rem;
+}
+
+a.hide-filters:after {
+  content: 'Hide Filters';
   font-family: "Noto Sans", sans-serif;
   display: inline-block;
   font-weight: regular;

@@ -17,7 +17,6 @@ export class EndDateBeforeStartValidatorDirective implements Validator {
   validate(control: AbstractControl): ValidationErrors {
 
     const value: NgbDate = NgbDate.from(control.value);
-    this.logger.debug('validateValue=', value, control, this.startValue);
     if (value != null && this.startValue != null && value.before(this.startValue)) {
       return { dateBeforeStart: true };
     }
