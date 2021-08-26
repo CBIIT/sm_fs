@@ -37,11 +37,11 @@
     <!-- START Advanced Filters -->
 
     <div class="col-lg-5" [hidden]="!showAdvancedFilters">
-        <lib-pdname-dropdown  [(selectedValue)]="selectedPd" [broadcast]="true"></lib-pdname-dropdown>
+        <lib-pdname-dropdown [syncWithCa]="true" [(selectedValue)]="selectedPd" [broadcast]="true"></lib-pdname-dropdown>
     </div>
 
     <div class="col-lg-5" [hidden]="!showAdvancedFilters">
-        <lib-cancer-activities-dropdown  [(selectedValue)]="selectedCas" [syncWithPd]="true"></lib-cancer-activities-dropdown>
+        <lib-cancer-activities-dropdown  [(selectedValue)]="selectedCas" [broadcast]="true" [syncWithPd]="true"></lib-cancer-activities-dropdown>
     </div>
 
     <div class="col-lg-4" [hidden]="!showAdvancedFilters">
