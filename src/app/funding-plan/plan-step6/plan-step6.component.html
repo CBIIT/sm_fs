@@ -177,56 +177,7 @@
 <!-- END Applications Not Considered for Funding Section -->
 
 <!-- START Supporting Documents Section -->
-<div class="row">
-    <div class="col-12 d-flex">
-        <h2>Supporting Documents</h2>
-        <button type="button" class="btn btn-outline-primary ml-auto"><i class="far fa-file-pdf mr-1" aria-hidden="true"></i> View Package</button>
-        <a class="collapse-toggle btn btn-link ml-1" data-toggle="collapse" href="#support-docs-collapse" role="button" aria-expanded="true" aria-controls="support-docs-collapse"></a>
-    </div>
-    <div class="col-12 collapse show mt-2" id="support-docs-collapse">
-        <div class="doc-card">
-            <span class="doc-name">Cover Page</span>
-            <span class="doc-desc">(Automatically Generated)</span>
-            <div class="doc-buttons">
-                <button type="button" class="btn btn-link btn-slim" title="View Document"><i class="far fa-eye" aria-hidden="true"></i></button>
-            </div>
-        </div>
-        <div class="doc-card">
-            <span class="doc-name">Scientific Rationale for Supporting RFA/PA</span>
-            <span class="doc-desc">rationale.docx</span>
-            <div class="doc-buttons">
-                <button type="button" class="btn btn-link btn-link-danger btn-slim" title="Delete Document"><i class="fas fa-trash" aria-hidden="true"></i></button>
-                <button type="button" class="btn btn-link btn-slim" title="View Document"><i class="far fa-eye" aria-hidden="true"></i></button>
-            </div>
-        </div>
-        <div class="doc-card">
-            <span class="doc-name">Justification for Exception Application(s)</span>
-            <span class="doc-desc">justification-exception.docx</span>
-            <div class="doc-buttons">
-                <button type="button" class="btn btn-link btn-link-danger btn-slim" title="Delete Document"><i class="fas fa-trash" aria-hidden="true"></i></button>
-                <button type="button" class="btn btn-link btn-slim" title="View Document"><i class="far fa-eye" aria-hidden="true"></i></button>
-            </div>
-        </div>
-        <div class="doc-card">
-            <span class="doc-name">Justification for Skipped Application(s)</span>
-            <span class="doc-desc">justification-skipped.docx</span>
-            <div class="doc-buttons">
-                <button type="button" class="btn btn-link btn-link-danger btn-slim" title="Delete Document"><i class="fas fa-trash" aria-hidden="true"></i></button>
-                <button type="button" class="btn btn-link btn-slim" title="View Document"><i class="far fa-eye" aria-hidden="true"></i></button>
-            </div>
-        </div>
-        <div class="doc-card">
-            <span class="doc-name">Summary Statement for Application(s) Proposed for Funding</span>
-            <span class="doc-desc">(Retrieved from IMPAC II)</span>
-            <div class="doc-buttons">
-                <button type="button" class="btn btn-link btn-slim" title="View Document"><i class="far fa-eye" aria-hidden="true"></i></button>
-            </div>
-        </div>
-    </div>
-    <div class="col-12">
-        <hr>
-    </div>
-</div>
+<app-plan-supporting-docs-readonly></app-plan-supporting-docs-readonly>
 <!-- END Supporting Documents Section -->
 
 <app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar" requestOrPlan="PLAN"></app-upload-budget-documents>
