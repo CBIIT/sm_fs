@@ -1,11 +1,11 @@
 <div class="row mb-2">
   <div class="col-12 d-flex">
     <h2 class="d-inline-block" id="overview-label">Filters</h2>
-    <a [routerLink]="" (click)="showAdvanced = !showAdvanced" class="ml-auto"
-       [ngClass]="{'show-advance':!showAdvanced, 'hide-advance':showAdvanced}"></a>
+    <a [routerLink]="" (click)="showFilters = !showFilters; showAdvanced = false;" class="ml-auto"
+       [ngClass]="{'show-filters':!showFilters, 'hide-filters':showFilters}"></a>
   </div>
 </div>
-<form #searchForm="ngForm">
+<form #searchForm="ngForm" [hidden]="!showFilters">
   <div class="row form-group">
     <div class="col-3 col-md-3">
       <label for="searchType">Search for</label>
@@ -72,8 +72,14 @@
       <lib-ncab-daterange></lib-ncab-daterange>
     </div>
   </div>
-  <div [hidden]="!showAdvanced" class="mt-n2">
-    <hr>
+  <div class="row">
+    <div class="col-12 d-flex">
+      <a [routerLink]="" (click)="showAdvanced = !showAdvanced" class="ml-auto"
+         [ngClass]="{'show-advance':!showAdvanced, 'hide-advance':showAdvanced}"></a>
+    </div>
+    <div class="col-12 d-flex"><hr></div>
+  </div>
+  <div [hidden]="!showAdvanced || !showFilters" class="mt-n2">
     <div class="row form-group">
       <div class="col-md-4 col-lg-4">
         <lib-pdname-dropdown label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>

@@ -17,6 +17,7 @@ export class SearchFilterComponent implements OnInit {
   @Output() searchType = new EventEmitter<string>()
   public searchFilter: SearchCriteria;
 
+  showFilters: boolean = false;
   showAdvanced: boolean = false;
 
   private _typeSearch: string = '0';
