@@ -1,4 +1,5 @@
 <!-- BEGIN Funding Plan Information Section -->
+<app-workflow-modal requestOrPlan="PLAN"></app-workflow-modal>
 <app-funding-plan-information></app-funding-plan-information>
 <div class="row">
     <div class="col-12 collapse show mt-2" id="fplan-info-collapse">
@@ -238,9 +239,20 @@
 <!-- START Buttons Section -->
 <div class="row">
     <div class="col-12 d-flex mb-4">
-        <button type="button" class="btn btn-outline-secondary mr-auto">Previous</button>
-        <button type="button" class="btn btn-danger mr-2">Delete Plan</button>
-        <button type="button" class="btn btn-primary">Submit Plan</button>
+        <button class="btn btn-outline-secondary  mr-auto" (click)="prevStep()" *ngIf="!readonly">Previous</button>
+        <button class="btn btn-danger mr-2" (click)="deleteRequest()" *ngIf="deleteVisible()">Delete Request</button>
+        <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled() ">
+          Submit Plan
+        </button>
+        <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
+          <button class="btn btn-primary" disabled>Submit Plan</button>
+        </span>
+        <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('WITHDRAW')"
+          *ngIf="withdrawVisible()">Withdraw</button>
+        <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('HOLD')"
+          *ngIf="putOnHoldVisible()">Hold</button>
+        <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('RELEASE')"
+          *ngIf="releaseFromHoldVisible()">Release Hold</button>  
     </div>
 </div>
 <!-- END Buttons Section -->

@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { DocumentsDto, FundingReqApproversDto, FundingReqStatusHistoryDto } from '@nci-cbiit/i2ecws-lib';
+import { DocumentsDto, FsPlanWorkflowControllerService, FundingReqApproversDto, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
-import { WorkflowModel } from 'src/app/funding-request/workflow/workflow.model';
+import { WorkflowModalComponent } from 'src/app/funding-request/workflow-modal/workflow-modal.component';
+import { WorkflowActionCode, WorkflowModel } from 'src/app/funding-request/workflow/workflow.model';
 import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { AppPropertiesService } from 'src/app/service/app-properties.service';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
+import { PlanWorkflowComponent } from '../fp-workflow/plan-workflow.component';
 
 @Component({
   selector: 'app-plan-step6',
@@ -18,6 +20,8 @@ import { AppUserSessionService } from 'src/app/service/app-user-session.service'
   providers: [WorkflowModel]
 })
 export class PlanStep6Component implements OnInit {
+  @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
+  @ViewChild(PlanWorkflowComponent) workflowComponent: PlanWorkflowComponent;
 
   grantsSkipped: NciPfrGrantQueryDtoEx[];
   grantsNotConsidered: NciPfrGrantQueryDtoEx[];
@@ -52,10 +56,13 @@ export class PlanStep6Component implements OnInit {
   closeResult: string;
   _workFlowAction = '';
 
+  private fprId: number;
+
   constructor(private navigationModel: NavigationStepModel,
               private propertiesService: AppPropertiesService,
               private userSessionService: AppUserSessionService,
               private requestIntegrationService: FundingRequestIntegrationService,
+              private fsPlanWorkflowControllerService: FsPlanWorkflowControllerService,
               public planModel: PlanModel,
               private workflowModel: WorkflowModel,
               private logger: NGXLogger,
@@ -63,7 +70,7 @@ export class PlanStep6Component implements OnInit {
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(6, true);
-
+    this.fprId = this.planModel.fundingPlanDto.fprId;
     this.requestHistorySubscriber = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
       (historyResult) => {
         this.parseRequestHistories(historyResult);
@@ -182,13 +189,127 @@ export class PlanStep6Component implements OnInit {
   get isDisplayBudgetDocsUploadVar(): boolean {
     // return this.workflowModel.isFinancialApprover &&
     //        ApprovingStatuses.includes(this.requestStatus);
-    //TODO: Remove hardcoded content once actual implementation is completed
+    // TODO: Remove hardcoded content once actual implementation is completed
     return true;
   }
 
   get displayReadOnlyBudgetDocs(): boolean {
     return this.planModel.fundingPlanDto.budgetDocs?.length > 0;
   }
+
+  prevStep(): void {
+    this.router.navigate(['/plan/step5']);
+  }
+
+  submitWithdrawHold(action: string): void {
+    this.workflowModal.openConfirmModal(action).then(
+      (result) => {
+        this.logger.debug(action + ' API call returned successfully', result);
+        this.workflowModel.initializeForPlan(this.fprId);
+        this.requestIntegrationService.requestSubmissionEmitter.next(result);
+      }
+    )
+      .catch(
+        (reason) => {
+          this.logger.debug('user dismissed workflow confirmation modal without proceed', reason);
+        }
+      );
+  }
+
+  withdrawVisible(): boolean {
+    if (!this.statusesCanWithdraw.includes(this.requestStatus)) {
+      return false;
+    }
+    return (this.userCanSubmit && !this.workflowModel.approvedByFC) ||
+      (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc);
+  }
+
+  putOnHoldVisible(): boolean {
+    if (!this.statusesCanOnHold.includes(this.requestStatus)) {
+      return false;
+    }
+    return (this.userCanSubmit && !this.workflowModel.approvedByFC) ||
+      (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc);
+  }
+
+  releaseFromHoldVisible(): boolean {
+    return this.requestStatus === 'ON HOLD' &&
+    ((this.userCanSubmit && !this.workflowModel.approvedByFC) ||
+    (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc));
+  }
+
+  submitVisible(): boolean {
+    return this.userCanSubmit && this.statusesCanEditSubmit.includes(this.requestStatus);
+  }
+
+  deleteVisible(): boolean {
+    return this.userCanDelete && !this.isRequestEverSubmitted;
+  }
+
+  submitEnabled(): boolean {
+    return !this.justificationMissing && !this.transitionMemoMissing;
+  }
+
+  submitDisableTooltip(): string {
+    if (this.justificationMissing && this.transitionMemoMissing) {
+      return 'You must upload Justification and Transition Memo to submit this request.';
+    } else if (this.justificationMissing) {
+      return 'You must upload Justification to submit this request.';
+    } else if (this.transitionMemoMissing) {
+      return 'You must upload Transition Memo to submit this request.';
+    } else {
+      return '';
+    }
+  }
+
+  deleteRequest(): void {
+    if (confirm('Are you sure you want to delete this request?')) {
+      this.logger.debug('Call deleteRequest API for FRQ ID: ', this.fprId);
+      this.fsPlanWorkflowControllerService.deletePlanApproversUsingGET(this.fprId).subscribe(
+        result => {
+          this.logger.debug('Funding plan was deleted: ', result);
+          this.planModel.reset();
+          this.router.navigate(['/search']);
+        },
+        error => {
+          this.logger.error('Error when calling delelteRequest API ', error);
+        }
+      );
+    }
+  }
+
+  submitRequest(): void {
+    const dto: WorkflowTaskDto = {};
+    dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    dto.frqId = this.fprId;
+    dto.action = WorkflowActionCode.SUBMIT;
+    dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
+//    dto.certCode = this.planModel.fundingPlanDto.certCode;
+    dto.comments = this.workflowComponent.comments;
+    if (this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0) {
+      dto.additionalApproverList = this.workflowModel.additionalApprovers.map(a => {
+        return a.approverLdap;
+      });
+    }
+    this.logger.debug('Submit Request for: ', dto);
+    // const nextApproverInChain = this.workflowModel.getNextApproverInChain();
+    this.fsPlanWorkflowControllerService.submitPlanWorkflowUsingPOST(dto).subscribe(
+      (result) => {
+        this.logger.debug('Submit Request result: ', result);
+        this.workflowModel.initializeForPlan(this.fprId);
+        this.requestIntegrationService.requestSubmissionEmitter.next(dto);
+//        this.readonly = true;
+      },
+      (error) => {
+        this.logger.error('Failed when calling submitRequestUsingPOST', error);
+        if (error.error) {
+          this.requestIntegrationService.requestSubmitFailureEmitter.next(error.error.errorMessage);
+//        this.submitResultElement.nativeElement.scrollIntoView();
+        }
+      });
+  }
+
+
 
 }
 
