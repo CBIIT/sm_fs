@@ -5,6 +5,8 @@ import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-
 import { NgForm } from '@angular/forms';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import { FpProgramRecommendedCostsComponent } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
+import { Router } from '@angular/router';
+import { openNewWindow } from '../../utils/utils';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -57,9 +59,29 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     return sum;
   }
 
+  // open the funding source help in the new window..
+  openFsDetails(): boolean {
+    // temporarily using # for the hashtrue file not found issue..
+    const url = '/fs/#' + this.router.createUrlTree(['fundingSourceDetails']).toString();
+    // storaing the funding sources details for popup window.. removing the object in the component once retrieved
+    localStorage.setItem('fundingSources', JSON.stringify(this.availableFundingSources()));
+    openNewWindow(url, 'fundingSourceDetails');
+    return false;
+  }
 
+  availableFundingSources(): void {
+    /*if (!this.fundingSources) {
+      return [];
+    }
+    return this.fundingSources.filter(f => {
+      return !this.selectedFundingSources.has(Number(f.fundingSourceId));
+    });*/
+    return null;
+  }
+  
   constructor(private logger: NGXLogger, private planModel: PlanModel,
-              private planCoordinatorService: PlanCoordinatorService) {
+              private planCoordinatorService: PlanCoordinatorService,
+              private router: Router) {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
 
   }

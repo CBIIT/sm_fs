@@ -13,7 +13,7 @@
       <tbody>
       <tr *ngFor="let rfa of rfaDetails; let i = index;">
         <td>
-          <a href="{{rfa.nihGuideAddr}}">{{rfa.noticeNumber}}</a>
+          <a href="{{rfa.nihGuideAddr}}" target="_blank">{{rfa.noticeNumber}}</a>
         </td>
         <td>
           <app-concept-award-tracking [cptId]="rfa.cptId"></app-concept-award-tracking>

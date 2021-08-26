@@ -94,7 +94,7 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
         {title: 'Project Title', data: 'projectTitle'}, // 2
         {title: 'RFA/PA', data: 'rfaPaNumber', // 3
             render: ( data, type, row, meta ) => {
-              return '<a href="' + row.nihGuideAddr + '" target="blank" >' + data + '</a>';
+              return '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
             }},
         {title: 'I2 Status', data: 'applStatusGroupDescrip'}, // 4
         {title: 'PD', data: 'pdFullName',  // 5

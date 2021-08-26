@@ -320,7 +320,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit {
         { title: 'Project Title', data: 'projectTitle' }, // 3
         {
           title: 'RFA/PA', data: 'rfaPaNumber', render: (data, type, row, meta) => { // 4
-            return '<a href="' + row.nihGuideAddr + '" target="blank" >' + data + '</a>';
+            return '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
           }
         },
         { title: 'I2 Status', data: 'applStatusGroupDescrip' }, // 5

@@ -15,7 +15,7 @@
     <div class="grant-info-col">
       <span class="like-label mb-0">Grant Number</span>
       <div class="d-flex align-items-center">
-        <a href="{{model.grantViewerUrl+grant.applId}}">{{grant.fullGrantNum}}</a>
+        <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
         <div class="grant-icons ml-1">
           <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants">
             <span class="egrants-icon"></span>
@@ -64,7 +64,7 @@
 
       <div class="grant-info-col">
         <span class="like-label mb-0">RFA/PA</span>
-        <span><a href="{{ grant.nihGuideAddr }}">{{ grant.rfaPaNumber }}</a></span>
+        <span><a href="{{ grant.nihGuideAddr }}" target="_blank">{{ grant.rfaPaNumber }}</a></span>
       </div>
 
       <div class="grant-info-col">
@@ -90,7 +90,7 @@
       <div class="grant-info-col">
         <span class="like-label mb-0">Grant Number</span>
         <div class="d-flex align-items-center">
-          <a href="{{model.grantViewerUrl+grant.applId}}">{{grant.fullGrantNum}}</a>
+          <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
           <div class="grant-icons ml-1">
             <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants">
               <span class="egrants-icon"></span>
@@ -130,7 +130,7 @@
 
         <div class="grant-info-col">
           <span class="like-label mb-0">RFA/PA</span>
-          <span><a href="{{ grant.nihGuideAddr }}">{{ grant.rfaPaNumber }}</a></span>
+          <span><a href="{{ grant.nihGuideAddr }}" target="_blank">{{ grant.rfaPaNumber }}</a></span>
         </div>
 
         <div class="grant-info-col">
