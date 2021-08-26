@@ -6,7 +6,7 @@ import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
 import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
-import { FsPlanControllerService } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanControllerService, FundingPlanFoasDto } from '@nci-cbiit/i2ecws-lib';
 import { OtherDocsContributingFundsComponent } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
@@ -101,7 +101,53 @@ export class PlanStep3Component implements OnInit {
     this.planModel.fundingPlanDto.fundingEstYr4Amt = this.fpFundingInfoComponent.outYear4;
     this.planModel.fundingPlanDto.fundingEstYr5Amt = this.fpFundingInfoComponent.outYear5;
 
+
     this.planModel.fundingPlanDto.comments = this.applicationsProposedForFunding.comments;
+    this.planModel.fundingPlanDto.fpFinancialInformation = {};
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
+    this.applicationsProposedForFunding.grantList.forEach((item, index) => {
+      this.logger.debug(index, item);
+    });
+
+    const bmmCodes: string[] = [];
+    const activityCodes: string[] = [];
+    this.applicationsProposedForFunding.listGrantsSelected.forEach(g => {
+      if (!activityCodes.includes(g.activityCode)) {
+        if (!!g.activityCode) {
+          activityCodes.push(g.activityCode);
+        }
+      }
+      if (!bmmCodes.includes(g.bmmCode)) {
+        if (!!g.bmmCode) {
+          bmmCodes.push(g.bmmCode);
+        }
+      }
+    });
+
+    this.planModel.fundingPlanDto.bmmCodeList = bmmCodes.join();
+
+    const councilDates: Map<string, string> =
+      new Map(this.planModel.grantsSearchCriteria.map(val => [val.rfaPaNumber, val.ncabDates.join()]));
+
+    this.planModel.fundingPlanDto.fundingPlanFoas = [];
+    this.fpInfoComponent.planFoaDetails.forEach(item => {
+      const tmp: FundingPlanFoasDto = {};
+      tmp.activityCodeList = activityCodes.join();
+      tmp.issueType = item.issueType;
+      tmp.nihGuideAddr = item.rfaDetails.nihGuideAddr;
+      tmp.rfaPaNumber = item.rfaDetails.noticeNumber;
+      tmp.cptId = item.rfaDetails.cptId;
+      tmp.prevRfaPaNumber = item.rfaDetails.priorNoticeNumber;
+      tmp.title = item.rfaDetails.title;
+      tmp.councilMeetingDateList = councilDates.get(item.rfaDetails.noticeNumber);
+      this.planModel.fundingPlanDto.fundingPlanFoas.push(tmp);
+    });
+
+    this.planModel.fundingPlanDto.multipleRfaPaFlag = this.planModel.grantsSearchCriteria.length > 1 ? 'Y' : 'N';
+    this.planModel.fundingPlanDto.fundableRangeFrom = this.planModel.minimumScore;
+    this.planModel.fundingPlanDto.fundableRangeTo = this.planModel.maximumScore;
+
+    this.logger.info(JSON.stringify(this.planModel.fundingPlanDto));
 
   }
 }
