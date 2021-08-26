@@ -1,9 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { CancerActivityControllerService, RfaPaNoticesDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { NgForm } from '@angular/forms';
+import { PlanInfoIssueTypeComponent } from '../plan-info-issue-type/plan-info-issue-type.component';
 
 @Component({
   selector: 'app-funding-plan-information',
@@ -11,6 +12,7 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./funding-plan-information.component.css']
 })
 export class FundingPlanInformationComponent implements OnInit {
+  @ViewChildren(PlanInfoIssueTypeComponent) planFoaDetails: QueryList<PlanInfoIssueTypeComponent>;
   @Input() parentForm: NgForm;
   rfaDetails: RfaPaNoticesDto[];
   totalApplicationsSelected: number;

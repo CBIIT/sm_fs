@@ -7,6 +7,7 @@ import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import { FpProgramRecommendedCostsComponent } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { Router } from '@angular/router';
 import { openNewWindow } from '../../utils/utils';
+import { FpGrantInformationComponent } from '../fp-grant-information/fp-grant-information.component';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -16,6 +17,7 @@ import { openNewWindow } from '../../utils/utils';
 export class ApplicationsProposedForFundingComponent implements OnInit {
   @Input() parentForm: NgForm;
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
+  @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   listSelectedSources: string[];
@@ -24,6 +26,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     if (!this.prcList) {
       return 0;
     }
+    // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
     let sum = 0;
     this.prcList.forEach(control => {
       if (control.displayType === 'percent') {
@@ -31,7 +34,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
           sum = sum + Number(control.directCostCalculated);
         }
       } else {
-        this.logger.debug(isNaN(control.directCost), sum);
         if (!isNaN(control.directCost)) {
           sum = sum + Number(control.directCost);
         }
@@ -44,6 +46,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     if (!this.prcList) {
       return 0;
     }
+    // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
     let sum = 0;
     this.prcList.forEach(control => {
       if (control.displayType === 'percent') {
@@ -79,7 +82,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     });*/
     return null;
   }
-  
+
   constructor(private logger: NGXLogger, private planModel: PlanModel,
               private planCoordinatorService: PlanCoordinatorService,
               private router: Router) {
