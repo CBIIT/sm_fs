@@ -124,6 +124,20 @@ export class PlanSupportingDocsReadonlyComponent implements OnInit {
       );
   }
 
+  downloadSummaryStatement() {
+    for (let i = 0; i < this.selectedGrants.length; i++) {
+      this.applIds.push(this.selectedGrants[i].applId);
+    }
+    this.documentService.downloadFpSummaryStatement(this.applIds)
+    // this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          const blob = new Blob([response.body], { type: response.headers.get('content-type') });
+          saveAs(blob, 'Summary Statement.pdf');
+        }
+      );
+  }
+
 }
 
 export enum DocTypeConstants {
