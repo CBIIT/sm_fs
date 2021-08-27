@@ -11,6 +11,7 @@ import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dt
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { AppPropertiesService } from 'src/app/service/app-properties.service';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
+import { PlanApproverService } from '../approver/plan-approver.service';
 import { PlanWorkflowComponent } from '../fp-workflow/plan-workflow.component';
 
 @Component({
@@ -65,6 +66,7 @@ export class PlanStep6Component implements OnInit {
               private fsPlanWorkflowControllerService: FsPlanWorkflowControllerService,
               public planModel: PlanModel,
               private workflowModel: WorkflowModel,
+              private planApproverService: PlanApproverService,
               private logger: NGXLogger,
               private router: Router) { }
 
@@ -89,7 +91,11 @@ export class PlanStep6Component implements OnInit {
       (( g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)
       && !g.selected ) );
     this.logger.debug('unfunded grants are ', this.grantsNotConsidered);
-    this.workflowModel.initializeForPlan(this.fprId);
+    this.planApproverService.checkCreateApprovers().then( () => {
+      this.logger.debug('Approvers are created ');
+      this.workflowModel.initializeForPlan(this.fprId);
+      }
+      );
     this.logger.debug('Step6 OnInit Plan Model ', this.planModel);
     this.checkUserRolesCas();
     this.checkDocs();

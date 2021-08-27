@@ -25,7 +25,8 @@ export class PlanModel {
   // TODO: Generate FundingPlanDto and FundingPlanFoasDto
 
   title = 'New Funding Plan';
-
+  mainApproversCreated = false;
+  approverCriteria: any;
 
   constructor(propertiesService: AppPropertiesService,
               private logger: NGXLogger) {
@@ -43,4 +44,43 @@ export class PlanModel {
     this.minimumScore = 0;
     this.maximumScore = 0;
   }
+
+  isMainApproversRegenNeeded(): boolean {
+    // always regen for now. needs to figure out the criteria used for plan approvers.
+    return true;
+//    return this.mainApproversCreated && this.approverCriteriaChanged();
+  }
+
+  private approverCriteriaChanged(): boolean {
+    const newCriteria = this.makeApproverCriteria();
+    // this.logger.debug('new approver criteria ', newCriteria);
+    // this.logger.debug('prior approver criteria ', this.approverCriteria);
+    return newCriteria.requestType !== this.approverCriteria.requestType
+      || newCriteria.cayCode !== this.approverCriteria.cayCode
+      || newCriteria.fundingSources !== this.approverCriteria.fundingSources
+      || newCriteria.otherDocs !== this.approverCriteria.otherDocs
+      || newCriteria.loaCode !== this.approverCriteria.loaCode;
+  }
+
+  private makeApproverCriteria(): any {
+    // const approverCriteria: any = {};
+    // approverCriteria.requestType = this.fundingPlanDto.financialInfoDto.requestTypeId;
+    // approverCriteria.cayCode = this.requestDto.financialInfoDto.requestorCayCode;
+    // const fundingSources = Array.from(this._programRecommendedCostsModel.selectedFundingSourceIds);
+    // // fundingSources.sort(); commented for now to make the order of
+    // // fundingSources important in determining if approvers need to be regen.
+    // approverCriteria.fundingSources = fundingSources.join(',');
+    // approverCriteria.otherDocs = this.requestDto.financialInfoDto.otherDocText;
+    // approverCriteria.loaCode = this.requestDto.loaCode;
+    // // from the create_main_approvers sp, it seems otherDocs has no effect on funding request approvers,
+    // // only affects funding plan approvers, needs double check with David and Subashini.
+    // return approverCriteria;
+    return null;
+  }
+
+  markMainApproversCreated(): void {
+    this.approverCriteria = this.makeApproverCriteria();
+    this.mainApproversCreated = true;
+  }
+
 }
