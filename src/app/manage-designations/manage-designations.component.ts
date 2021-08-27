@@ -19,6 +19,7 @@ import {DesigneeActionCellRendererComponent} from "./designee-action-cell-render
 import {EditDesigneeModalComponent} from "./edit-designee-modal/edit-designee-modal.component";
 import {FundingRequestPermDelDto} from "@nci-cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
 import {Options} from "select2";
+import {Select2OptionData} from "ng-select2";
 
 @Component({
   selector: 'app-manage-designations',
@@ -51,6 +52,17 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit {
   dtOptions: any = {};
   dtData: FundingRequestPermDelDto[] = [];
   nameSelect2Options: Options;
+  ng2Data: Select2OptionData[] = [];
+  ng2Options: Options = {
+    minimumInputLength: 2,
+    closeOnSelect: true,
+    placeholder: 'Enter Last Name, First Name',
+    language: {
+      inputTooShort(): string {
+        return '';
+      }
+    }
+  }
 
   ngOnInit(): void {
 
@@ -65,19 +77,40 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit {
         }
       },
       ajax: {
-        url: '/i2ecws/api/v1/fs/lookup//funding-request/approvers/',
+        url: '/i2ecws/api/v1/fs/cans/',
         delay: 500,
-        type: 'POST',
+        type: 'GET',
+        // data(params): any {
+        //   return { 'term': params.term }
+        // },
         data(params): any {
-          return { 'term': params.term }
+          const query = {
+            can: params.term,
+            bmmCodes: '',
+            activityCodes: '',
+            nciSourceFlag: ''
+          };
+
+          return query;
         },
-        processResults: this.select2processResults.bind(this),
+        processResults: this.select2processResults1.bind(this),
         //TODO - error handling
         error: (error) => { console.error(error); alert(error.responseText)}
       }
     };
   }
 
+  private select2processResults1(data: any): any {
+    return {
+      results: $.map(data, can => {
+        return {
+          id: can.can,
+          text: can.can + ' | ' + can.canDescrip,
+          additional: can
+        };
+      })
+    };
+  }
   private select2processResults(data: any): any {
     console.debug('Results', data);
     const results = $.map(data , entry => {
