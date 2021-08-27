@@ -19,7 +19,12 @@ export class FundingPlanInformationComponent implements OnInit {
   totalApplicationsReceived: number;
   totalApplicationsSkipped: number;
   totalApplicationsNotConsidered: number;
-  listGrantsSelected: NciPfrGrantQueryDtoEx[];
+  listApplicationsSelected: NciPfrGrantQueryDtoEx[];
+  listApplicationsSkipped: NciPfrGrantQueryDtoEx[];
+  listApplicationsNotConsidered: NciPfrGrantQueryDtoEx[];
+  listApplicationsNotSelectable: NciPfrGrantQueryDtoEx[];
+  listApplicationsOutsideRange: NciPfrGrantQueryDtoEx[];
+
 
   constructor(public planModel: PlanModel,
               private rfaService: CancerActivityControllerService,
@@ -27,14 +32,8 @@ export class FundingPlanInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const guideAddr = new Map<string, string>();
-    this.planModel.allGrants.forEach(g => {
-      this.logger.debug(g.rfaPaNumber, g.nihGuideAddr);
-      guideAddr.set(g.rfaPaNumber, g.nihGuideAddr);
-    });
     this.rfaDetails = [];
     this.planModel.grantsSearchCriteria.forEach(rfa => {
-      // this.rfaDetails.push({noticeNumber: rfa.rfaPaNumber, nihGuideAddr: guideAddr.get(rfa.rfaPaNumber)});
       this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
         this.rfaDetails.push(next);
       });
@@ -42,24 +41,30 @@ export class FundingPlanInformationComponent implements OnInit {
 
     this.totalApplicationsReceived = this.planModel.allGrants.length;
 
-    this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
+    this.listApplicationsSelected = this.planModel.allGrants.filter(g => g.selected);
 
-    this.totalApplicationsSelected = this.listGrantsSelected.length;
+    this.totalApplicationsSelected = this.listApplicationsSelected.length;
 
     const withinRangeGrants = this.planModel.allGrants.filter(g =>
       (!g.notSelectableReason || g.notSelectableReason.length === 0)
       && g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore);
 
-    this.totalApplicationsSkipped = withinRangeGrants.filter(g => !g.selected).length;
+    this.listApplicationsSkipped = withinRangeGrants.filter(g => !g.selected);
+    this.totalApplicationsSkipped = this.listApplicationsSkipped.length;
 
     // Total number of not selectable grants
-    const totalNotSelectable = this.planModel.allGrants.filter(g => g.notSelectableReason?.length > 0).length;
+    this.listApplicationsNotSelectable = this.planModel.allGrants.filter(g => g.notSelectableReason?.length > 0);
 
-    const outsideRangeGrants = this.planModel.allGrants.filter(g =>
+    this.listApplicationsOutsideRange = this.planModel.allGrants.filter(g =>
       (!g.notSelectableReason || g.notSelectableReason.length === 0)
       && g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore);
 
-    this.totalApplicationsNotConsidered = totalNotSelectable + outsideRangeGrants.filter(g => !g.selected).length;
+    this.totalApplicationsNotConsidered = this.listApplicationsNotSelectable.length
+      + this.listApplicationsOutsideRange.filter(g => !g.selected).length;
+
+    this.listApplicationsNotConsidered = [];
+    this.listApplicationsNotConsidered.concat(this.listApplicationsNotSelectable)
+      .concat(this.listApplicationsOutsideRange.filter(g => !g.selected));
   }
 
 }

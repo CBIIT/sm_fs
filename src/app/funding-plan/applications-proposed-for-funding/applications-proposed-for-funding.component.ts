@@ -8,6 +8,7 @@ import { FpProgramRecommendedCostsComponent } from '../fp-program-recommended-co
 import { Router } from '@angular/router';
 import { openNewWindow } from '../../utils/utils';
 import { FpGrantInformationComponent } from '../fp-grant-information/fp-grant-information.component';
+import { FpFundingSourceComponent } from '../fp-funding-source/fp-funding-source.component';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -18,6 +19,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   @Input() parentForm: NgForm;
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
   @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
+  @ViewChildren(FpFundingSourceComponent) fundingSources: QueryList<FpFundingSourceComponent>;
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   listSelectedSources: string[];
@@ -67,7 +69,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   openFsDetails(): boolean {
     // temporarily using # for the hashtrue file not found issue..
     const url = '/fs/#' + this.router.createUrlTree(['fundingSourceDetails']).toString();
-    // storaing the funding sources details for popup window.. removing the object in the component once retrieved
+    // storing the funding sources details for popup window.. removing the object in the component once retrieved
     localStorage.setItem('fundingSources', JSON.stringify(this.availableFundingSources()));
     openNewWindow(url, 'fundingSourceDetails');
     return false;

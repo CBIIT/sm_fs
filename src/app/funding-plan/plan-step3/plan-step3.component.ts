@@ -101,7 +101,6 @@ export class PlanStep3Component implements OnInit {
     this.planModel.fundingPlanDto.fundingEstYr4Amt = this.fpFundingInfoComponent.outYear4;
     this.planModel.fundingPlanDto.fundingEstYr5Amt = this.fpFundingInfoComponent.outYear5;
 
-
     this.planModel.fundingPlanDto.comments = this.applicationsProposedForFunding.comments;
     this.planModel.fundingPlanDto.fpFinancialInformation = {};
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
