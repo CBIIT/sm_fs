@@ -77,40 +77,19 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit {
         }
       },
       ajax: {
-        url: '/i2ecws/api/v1/fs/cans/',
+        url: '/i2ecws/api/v1/fs/lookup//funding-request/approvers/',
         delay: 500,
         type: 'GET',
-        // data(params): any {
-        //   return { 'term': params.term }
-        // },
         data(params): any {
-          const query = {
-            can: params.term,
-            bmmCodes: '',
-            activityCodes: '',
-            nciSourceFlag: ''
-          };
-
-          return query;
+          return { 'term': params.term }
         },
-        processResults: this.select2processResults1.bind(this),
+        processResults: this.select2processResults.bind(this),
         //TODO - error handling
         error: (error) => { console.error(error); alert(error.responseText)}
       }
     };
   }
 
-  private select2processResults1(data: any): any {
-    return {
-      results: $.map(data, can => {
-        return {
-          id: can.can,
-          text: can.can + ' | ' + can.canDescrip,
-          additional: can
-        };
-      })
-    };
-  }
   private select2processResults(data: any): any {
     console.debug('Results', data);
     const results = $.map(data , entry => {
