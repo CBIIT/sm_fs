@@ -270,15 +270,15 @@ export class PlanStep6Component implements OnInit {
 
   deleteRequest(): void {
     if (confirm('Are you sure you want to delete this request?')) {
-      this.logger.debug('Call deleteRequest API for FRQ ID: ', this.fprId);
-      this.fsPlanWorkflowControllerService.deletePlanApproversUsingGET(this.fprId).subscribe(
+      this.logger.debug('Call deletePlan API for FprId=' + this.fprId);
+      this.fsPlanWorkflowControllerService.deletePlanUsingDELETE(this.fprId).subscribe(
         result => {
           this.logger.debug('Funding plan was deleted: ', result);
           this.planModel.reset();
           this.router.navigate(['/search']);
         },
         error => {
-          this.logger.error('Error when calling delelteRequest API ', error);
+          this.logger.error('Error when calling deletePlan API ', error);
         }
       );
     }
