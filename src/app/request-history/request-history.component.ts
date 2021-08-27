@@ -49,7 +49,7 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
         });
     }
     else if (this.requestOrPlan === 'PLAN' && this.planModel != null) {
-      this.fsLookupControllerService.getPlanHistoryUsingGET(264).subscribe(
+      this.fsLookupControllerService.getPlanHistoryUsingGET(this.planModel.fundingPlanDto.fprId).subscribe(
         result => {
           this.histories = result;
           this.logger.debug('plan status history ', result);

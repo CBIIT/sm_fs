@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FsWorkflowControllerService, FundingReqApproversDto, I2ERoles } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanWorkflowControllerService, FsWorkflowControllerService, FundingReqApproversDto, I2ERoles } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
@@ -51,6 +51,7 @@ export class WorkflowModel {
     public requestModel: RequestModel,
     private userSessionService: AppUserSessionService,
     private workflowControllerService: FsWorkflowControllerService,
+    private planWorkflowControllerService: FsPlanWorkflowControllerService,
     private requestIntegrationService: FundingRequestIntegrationService,
     private logger: NGXLogger
   ) {
@@ -142,7 +143,7 @@ export class WorkflowModel {
   }
 
   initializeForPlan(planId: number): void {
-    this.workflowControllerService.getRequestApproversUsingGET(planId).subscribe(
+    this.planWorkflowControllerService.getPlanApproversUsingGET(planId).subscribe(
       (result) => {
         this.processApproversResult(result);
         this.requestIntegrationService.approverInitializationEmitter.next();
