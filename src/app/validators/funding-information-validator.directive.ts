@@ -13,7 +13,7 @@ export class FundingInformationValidatorDirective implements Validator {
   }
 
   validate(control: AbstractControl): ValidationErrors | null {
-    this.logger.debug(control);
+    // this.logger.debug(control);
     return null;
   }
 

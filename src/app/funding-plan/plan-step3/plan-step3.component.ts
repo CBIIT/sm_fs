@@ -6,7 +6,7 @@ import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
 import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
-import { FsPlanControllerService, FundingPlanFoasDto } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanControllerService, FsRequestControllerService, FundingPlanFoasDto } from '@nci-cbiit/i2ecws-lib';
 import { OtherDocsContributingFundsComponent } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
@@ -36,7 +36,7 @@ export class PlanStep3Component implements OnInit {
               private planModel: PlanModel,
               private pdCaIntegratorService: PdCaIntegratorService,
               private planCoordinatorService: PlanCoordinatorService,
-              private fsPlanControllerServices: FsPlanControllerService) {
+              private fsPlanControllerService: FsPlanControllerService) {
   }
 
   ngOnInit(): void {
@@ -62,17 +62,15 @@ export class PlanStep3Component implements OnInit {
   }
 
   onSubmit($event: any): void {
-    this.logger.debug($event);
-    this.logger.debug(this.step3form);
     if (this.step3form.valid) {
       this.buildPlanModel();
-      this.fsPlanControllerServices.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
-        this.logger.debug('Saved plan model: ', JSON.stringify(result));
-        this.planModel.fundingPlanDto = result;
-        this.router.navigate(['/plan/step4']);
-      }, error => {
-        this.logger.warn(error);
-      });
+      // this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
+      //   this.logger.debug('Saved plan model: ', JSON.stringify(result));
+      //   this.planModel.fundingPlanDto = result;
+      //   this.router.navigate(['/plan/step4']);
+      // }, error => {
+      //   this.logger.warn(error);
+      // });
     }
   }
 
@@ -102,10 +100,21 @@ export class PlanStep3Component implements OnInit {
     this.planModel.fundingPlanDto.fundingEstYr5Amt = this.fpFundingInfoComponent.outYear5;
 
     this.planModel.fundingPlanDto.comments = this.applicationsProposedForFunding.comments;
+
     this.planModel.fundingPlanDto.fpFinancialInformation = {};
+    this.planModel.fundingPlanDto.fpFinancialInformation.fiscalYear = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests = [];
+    this.applicationsProposedForFunding.fundingSources.forEach((item, index) => {
+      this.logger.debug('=====>', index, item);
+      this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(item.sourceDetails());
+    });
     this.applicationsProposedForFunding.grantList.forEach((item, index) => {
-      this.logger.debug(index, item);
+      // TODO: Build FP grant list: skip, exception, not selected
+      this.logger.debug('<=====>', index, item);
+    });
+    this.applicationsProposedForFunding.prcList.forEach((item, index) => {
+      this.logger.debug('<=====', index, item);
     });
 
     const bmmCodes: string[] = [];

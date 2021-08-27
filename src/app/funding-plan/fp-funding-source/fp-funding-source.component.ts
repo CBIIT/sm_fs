@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Select2OptionData } from 'ng-select2';
 import { NGXLogger } from 'ngx-logger';
 import { FsPlanControllerService } from '@nci-cbiit/i2ecws-lib';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import { PlanModel } from '../../model/plan/plan-model';
 import { getCurrentFiscalYear } from '../../utils/utils';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
 @Component({
   selector: 'app-fp-funding-source',
@@ -12,16 +13,25 @@ import { getCurrentFiscalYear } from '../../utils/utils';
   styleUrls: ['./fp-funding-source.component.css']
 })
 export class FpFundingSourceComponent implements OnInit {
+  @Input() index: number;
   data: Select2OptionData[] = [];
-  selectedValue: string = null;
+  selectedValue: number = null;
   fy: number;
   rfaPaNumber: string;
   allRfaPaNumbers: string[];
+  fundingSourceDetailsMap: Map<number, FundingRequestFundsSrcDto>;
 
   constructor(private logger: NGXLogger,
               private planControllerService: FsPlanControllerService,
               private planCoordinatorService: PlanCoordinatorService,
               private planModel: PlanModel) {
+  }
+
+  sourceDetails(): FundingRequestFundsSrcDto {
+    if (this.selectedValue) {
+      return this.fundingSourceDetailsMap.get(Number(this.selectedValue));
+    }
+    return null;
   }
 
   ngOnInit(): void {
@@ -50,6 +60,7 @@ export class FpFundingSourceComponent implements OnInit {
     }
     const tmp: Select2OptionData[] = [];
     this.planControllerService.getFundingPlanFundingSourcesUsingGET(ca, this.fy, pd, this.rfaPaNumber).subscribe(result => {
+      this.fundingSourceDetailsMap = new Map(result.map(item => [item.fundingSourceId, item]));
       result.forEach(s => {
         tmp.push({ id: String(s.fundingSourceId), text: s.fundingSourceName });
       });

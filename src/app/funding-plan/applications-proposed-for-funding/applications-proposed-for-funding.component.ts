@@ -23,41 +23,47 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   listSelectedSources: string[];
+  includeModal = false;
 
-  sourceSumDirectCost(): number {
+
+  sourceSumDirectCost(sourceIndex: number): number {
     if (!this.prcList) {
       return 0;
     }
     // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
     let sum = 0;
     this.prcList.forEach(control => {
-      if (control.displayType === 'percent') {
-        if (!isNaN(control.directCostCalculated)) {
-          sum = sum + Number(control.directCostCalculated);
-        }
-      } else {
-        if (!isNaN(control.directCost)) {
-          sum = sum + Number(control.directCost);
+      if (control.sourceIndex === sourceIndex) {
+        if (control.displayType === 'percent') {
+          if (!isNaN(control.directCostCalculated)) {
+            sum = sum + Number(control.directCostCalculated);
+          }
+        } else {
+          if (!isNaN(control.directCost)) {
+            sum = sum + Number(control.directCost);
+          }
         }
       }
     });
     return sum;
   }
 
-  sourceSumTotalCost(): number {
+  sourceSumTotalCost(sourceIndex: number): number {
     if (!this.prcList) {
       return 0;
     }
     // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
     let sum = 0;
     this.prcList.forEach(control => {
-      if (control.displayType === 'percent') {
-        if (!isNaN(control.totalCostCalculated)) {
-          sum = sum + Number(control.totalCostCalculated);
-        }
-      } else {
-        if (!isNaN(control.totalCost)) {
-          sum = sum + Number(control.totalCost);
+      if (control.sourceIndex === sourceIndex) {
+        if (control.displayType === 'percent') {
+          if (!isNaN(control.totalCostCalculated)) {
+            sum = sum + Number(control.totalCostCalculated);
+          }
+        } else {
+          if (!isNaN(control.totalCost)) {
+            sum = sum + Number(control.totalCost);
+          }
         }
       }
     });

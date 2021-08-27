@@ -15,7 +15,8 @@ import { RecommendedFutureYearsComponent } from '../recommended-future-years/rec
 export class FpGrantInformationComponent implements OnInit {
   @ViewChild(RecommendedFutureYearsComponent) recommendedFutureYearsComponent: RecommendedFutureYearsComponent;
   @Input() grant: NciPfrGrantQueryDtoEx;
-  @Input() index: number;
+  @Input() grantIndex: number;
+  @Input() sourceIndex: number;
 
   skip = false;
   exception = false;
@@ -53,7 +54,7 @@ export class FpGrantInformationComponent implements OnInit {
       //     this.piTotal += Number(ga.requestTotalAmount);
       //   }
       // });
-      this.planCoordinatorService.grantInfoCostEmitter.next({ index: this.index, dc: this.piDirect, tc: this.piTotal });
+      this.planCoordinatorService.grantInfoCostEmitter.next({ index: this.grantIndex, dc: this.piDirect, tc: this.piTotal });
     });
   }
 

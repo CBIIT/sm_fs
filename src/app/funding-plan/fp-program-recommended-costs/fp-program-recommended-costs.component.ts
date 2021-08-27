@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import { NGXLogger } from 'ngx-logger';
+import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 
 @Component({
   selector: 'app-fp-program-recommended-costs',
@@ -8,7 +9,9 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./fp-program-recommended-costs.component.css']
 })
 export class FpProgramRecommendedCostsComponent implements OnInit {
-  @Input() index: number;
+  @Input() grantIndex: number;
+  @Input() sourceIndex: number;
+  @Input() grant: NciPfrGrantQueryDtoEx;
   baselineDirectCost: number;
   baselineTotalCost: number;
   directCost: number;
@@ -24,8 +27,9 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // TODO: get this from the grant?
     this.planCoordinatorService.grantInfoCostEmitter.subscribe(next => {
-      if (next.index === this.index) {
+      if (next.index === this.grantIndex) {
         this.baselineDirectCost = next.dc;
         this.baselineTotalCost = next.tc;
       }
@@ -38,7 +42,6 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   // NOTE: assuming they're entering percent cut as a whole number
   recalculate(): void {
-    this.logger.debug('recalculate:', this.displayType);
 
     if (this.displayType === 'percent') {
       if (!!this.percentCut) {
