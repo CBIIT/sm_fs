@@ -24,7 +24,7 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
 
   private routerSub: Subscription;
 
-  model;
+  model: PlanModel;
 
   constructor(private router: Router,
               private navigationModel: NavigationStepModel,

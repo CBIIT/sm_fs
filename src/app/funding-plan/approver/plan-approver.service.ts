@@ -14,33 +14,33 @@ export class PlanApproverService {
 
   checkCreateApprovers(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-    // if (!this.planModel.mainApproverCreated) {
-    //   this.createMainApprovers(resolve, reject);
-    // }
-    // else if (this.planModel.recreateMainApproverNeeded) {
-    //   this.logger.debug('needs to recreate main approvers because of changes in funding request');
-    //   this.planService.deletePlanApproversUsingGET(this.planModel.minimumScore).subscribe(
-    //     () => {
-    //       this.planModel.mainApproverCreated = false;
-    //       this.createMainApprovers(resolve, reject);
-    //     },
-    //     (error) => {
-    //       this.logger.error('deleteRequestApprovers failed ', error);
-    //       reject(error); }
-    //   );
-    // }
-    // else {
-    //   resolve();
-    // }
+    if (!this.planModel.mainApproversCreated) {
+      this.createMainApprovers(resolve, reject);
+    }
+    else if (this.planModel.isMainApproversRegenNeeded()) {
+      this.logger.debug('needs to recreate main approvers because of changes in funding request');
+      this.planService.deletePlanApproversUsingGET(this.planModel.minimumScore).subscribe(
+        () => {
+          this.planModel.mainApproversCreated = false;
+          this.createMainApprovers(resolve, reject);
+        },
+        (error) => {
+          this.logger.error('deleteRequestApprovers failed ', error);
+          reject(error); }
+      );
+    }
+    else {
+      resolve();
+    }
     });
   }
 
-  createMainApprovers(resolve: any, reject: any): void {
+  private createMainApprovers(resolve: any, reject: any): void {
     // TO-DO, need to used the real fprId and requestorNpeId in the planModel.
-    const workflowDto = { fprId: this.planModel.minimumScore, requestorNpeId: this.planModel.minimumScore};
+    const workflowDto = { fprId: this.planModel.fundingPlanDto.fprId, requestorNpeId: this.planModel.fundingPlanDto.requestorNpeId};
     this.planService.createPlanApproversUsingPOST(workflowDto).subscribe(
       (result) => {
-////        this.planModel.captureApproverCriteria();
+        this.planModel.markMainApproversCreated();
         this.logger.debug('Main approvers are created: ', result);
         resolve();
       },
