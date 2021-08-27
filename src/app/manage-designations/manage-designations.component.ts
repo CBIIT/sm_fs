@@ -77,7 +77,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit {
         }
       },
       ajax: {
-        url: '/i2ecws/api/v1/fs/lookup//funding-request/approvers/',
+        url: '/i2ecws/api/v1/fs/lookup/funding-request/approvers/',
         delay: 500,
         type: 'GET',
         data(params): any {
