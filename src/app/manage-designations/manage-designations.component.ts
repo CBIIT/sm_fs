@@ -18,6 +18,7 @@ import {DesigneeCellRendererComponent} from "./designee-cell-renderer/designee-c
 import {DesigneeActionCellRendererComponent} from "./designee-action-cell-renderer/designee-action-cell-renderer.component";
 import {EditDesigneeModalComponent} from "./edit-designee-modal/edit-designee-modal.component";
 import {FundingRequestPermDelDto} from "@nci-cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
+import {Options} from "select2";
 
 @Component({
   selector: 'app-manage-designations',
@@ -49,8 +50,58 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit {
   dtTrigger: Subject<any> = new Subject();
   dtOptions: any = {};
   dtData: FundingRequestPermDelDto[] = [];
+  nameSelect2Options: Options;
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+
+    this.nameSelect2Options = {
+      allowClear: true,
+      minimumInputLength: 2,
+      closeOnSelect: true,
+      placeholder: 'Enter Last Name, First Name',
+      language: {
+        inputTooShort(): string {
+          return '';
+        }
+      },
+      ajax: {
+        url: '/i2ecws/api/v1/fs/lookup//funding-request/approvers/',
+        delay: 500,
+        type: 'POST',
+        data(params): any {
+          return { 'term': params.term }
+        },
+        processResults: this.select2processResults.bind(this),
+        //TODO - error handling
+        error: (error) => { console.error(error); alert(error.responseText)}
+      }
+    };
+  }
+
+  private select2processResults(data: any): any {
+    console.debug('Results', data);
+    const results = $.map(data , entry => {
+      return {
+        id: entry.nciLdapCn,
+        text: entry.fullNameLdap,
+        additional: entry
+      };
+    });
+    return {
+      // Filter already selected designee from the list
+      results: results.filter((entry) => {
+        for (let dtEntry of this.dtData) {
+          if (dtEntry.delegateTo === entry.id) {
+            return false;
+          }
+        }
+        return true;
+      })
+    };
+  }
+
+
+
   ngAfterViewInit(): void {
     this.dtOptions = {
       paging: false,
