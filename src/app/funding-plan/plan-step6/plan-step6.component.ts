@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DocumentsDto, FsPlanWorkflowControllerService, FundingReqApproversDto, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
@@ -68,6 +68,7 @@ export class PlanStep6Component implements OnInit {
               private workflowModel: WorkflowModel,
               private planApproverService: PlanApproverService,
               private logger: NGXLogger,
+              private changeDetection: ChangeDetectorRef,
               private router: Router) { }
 
   ngOnInit(): void {
@@ -105,16 +106,13 @@ export class PlanStep6Component implements OnInit {
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
     let submitted = false;
     historyResult.forEach((item: FundingReqStatusHistoryDto) => {
-
       if (item.statusCode === 'SUBMITTED') {
         submitted = true;
       }
-
       if (!item.endDate) {
         this.requestStatus = item.statusCode;
         this.planModel.fundingPlanDto.planStatusName = item.currentStatusDescrip;
       }
-
     });
     this.isRequestEverSubmitted = submitted;
     this.readonly = (this.userReadonly) || !(this.statusesCanEditSubmit.includes(this.requestStatus));
@@ -125,7 +123,8 @@ export class PlanStep6Component implements OnInit {
       this.navigationModel.enableStepLinks();
       this.navigationModel.showSteps = true;
     }
-  //  this.changeDetection.detectChanges();
+    this.logger.debug('After parsing status history ', this);
+    this.changeDetection.detectChanges();
   }
 
   checkUserRolesCas(): void {
@@ -288,7 +287,7 @@ export class PlanStep6Component implements OnInit {
   submitRequest(): void {
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-    dto.frqId = this.fprId;
+    dto.fprId = this.fprId;
     dto.action = WorkflowActionCode.SUBMIT;
     dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
 //    dto.certCode = this.planModel.fundingPlanDto.certCode;
@@ -298,7 +297,7 @@ export class PlanStep6Component implements OnInit {
         return a.approverLdap;
       });
     }
-    this.logger.debug('Submit Request for: ', dto);
+    this.logger.debug('Submit Funding Plan, workflowDto is ', dto);
     // const nextApproverInChain = this.workflowModel.getNextApproverInChain();
     this.fsPlanWorkflowControllerService.submitPlanWorkflowUsingPOST(dto).subscribe(
       (result) => {
