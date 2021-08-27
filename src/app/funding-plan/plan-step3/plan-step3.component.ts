@@ -6,12 +6,13 @@ import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
 import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
-import { FsPlanControllerService, FsRequestControllerService, FundingPlanFoasDto } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanControllerService, FundingPlanFoasDto } from '@nci-cbiit/i2ecws-lib';
 import { OtherDocsContributingFundsComponent } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
 import { FpFundingInformationComponent } from '../fp-funding-information/fp-funding-information.component';
 import { ApplicationsProposedForFundingComponent } from '../applications-proposed-for-funding/applications-proposed-for-funding.component';
+import { FundingRequestTypes } from '../../model/request/funding-request-types';
 
 @Component({
   selector: 'app-plan-step3',
@@ -64,13 +65,13 @@ export class PlanStep3Component implements OnInit {
   onSubmit($event: any): void {
     if (this.step3form.valid) {
       this.buildPlanModel();
-      // this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
-      //   this.logger.debug('Saved plan model: ', JSON.stringify(result));
-      //   this.planModel.fundingPlanDto = result;
-      //   this.router.navigate(['/plan/step4']);
-      // }, error => {
-      //   this.logger.warn(error);
-      // });
+      this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
+        this.logger.debug('Saved plan model: ', JSON.stringify(result));
+        this.planModel.fundingPlanDto = result;
+        this.router.navigate(['/plan/step4']);
+      }, error => {
+        this.logger.warn(error);
+      });
     }
   }
 
@@ -108,6 +109,48 @@ export class PlanStep3Component implements OnInit {
     this.applicationsProposedForFunding.fundingSources.forEach((item, index) => {
       this.logger.debug('=====>', index, item);
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(item.sourceDetails());
+    });
+
+    this.fpInfoComponent.listApplicationsNotSelectable.forEach(g => {
+      this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
+        {
+          applId: g.applId,
+          frtId: FundingRequestTypes.FUNDING_PLAN__NOT_SELECTABLE_FOR_FUNDING_PLAN,
+          notSelectableReason: g.notSelectableReason
+        }
+      );
+    });
+
+    this.fpInfoComponent.listApplicationsSkipped.forEach(g => {
+      this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
+        {
+          applId: g.applId,
+          frtId: FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_SKIP,
+          notSelectableReason: g.notSelectableReason
+        }
+      );
+    });
+
+    this.fpInfoComponent.listApplicationsWithinRange.filter(i => i.selected).forEach(g => {
+      this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
+        {
+          applId: g.applId,
+          frtId: FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE,
+          notSelectableReason: g.notSelectableReason
+        }
+      );
+    });
+
+    this.fpInfoComponent.listApplicationsOutsideRange.forEach(g => {
+      const type = (g.selected ? FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION
+        : FundingRequestTypes.FUNDING_PLAN__NOT_PROPOSED_AND_OUTSIDE_FUNDING_PLAN_SCORE_RANGE);
+      this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
+        {
+          applId: g.applId,
+          frtId: type,
+          notSelectableReason: g.notSelectableReason
+        }
+      );
     });
     this.applicationsProposedForFunding.grantList.forEach((item, index) => {
       // TODO: Build FP grant list: skip, exception, not selected

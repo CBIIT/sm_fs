@@ -24,6 +24,7 @@ export class FundingPlanInformationComponent implements OnInit {
   listApplicationsNotConsidered: NciPfrGrantQueryDtoEx[];
   listApplicationsNotSelectable: NciPfrGrantQueryDtoEx[];
   listApplicationsOutsideRange: NciPfrGrantQueryDtoEx[];
+  listApplicationsWithinRange: NciPfrGrantQueryDtoEx[];
 
 
   constructor(public planModel: PlanModel,
@@ -45,11 +46,11 @@ export class FundingPlanInformationComponent implements OnInit {
 
     this.totalApplicationsSelected = this.listApplicationsSelected.length;
 
-    const withinRangeGrants = this.planModel.allGrants.filter(g =>
+    this.listApplicationsWithinRange = this.planModel.allGrants.filter(g =>
       (!g.notSelectableReason || g.notSelectableReason.length === 0)
       && g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore);
 
-    this.listApplicationsSkipped = withinRangeGrants.filter(g => !g.selected);
+    this.listApplicationsSkipped = this.listApplicationsWithinRange.filter(g => !g.selected);
     this.totalApplicationsSkipped = this.listApplicationsSkipped.length;
 
     // Total number of not selectable grants
