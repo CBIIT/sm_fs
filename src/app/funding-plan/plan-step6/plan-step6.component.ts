@@ -13,6 +13,7 @@ import { AppPropertiesService } from 'src/app/service/app-properties.service';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { PlanApproverService } from '../approver/plan-approver.service';
 import { PlanWorkflowComponent } from '../fp-workflow/plan-workflow.component';
+import { DocTypeConstants } from './plan-supporting-docs-readonly/plan-supporting-docs-readonly.component';
 
 @Component({
   selector: 'app-plan-step6',
@@ -49,13 +50,9 @@ export class PlanStep6Component implements OnInit {
   userCanSubmit = false;
   userCanDelete = false;
   userReadonly = true;
-  justificationMissing = false;
-  justificationType = '';
-  justificationText = '';
-  transitionMemoMissing = false;
-  // isDisplayBudgetDocsUploadVar = false;
   closeResult: string;
   _workFlowAction = '';
+  docChecker: FundingPlanDocChecker;
 
   private fprId: number;
 
@@ -99,8 +96,7 @@ export class PlanStep6Component implements OnInit {
       );
     this.logger.debug('Step6 OnInit Plan Model ', this.planModel);
     this.checkUserRolesCas();
-    this.checkDocs();
-
+    this.docChecker = new FundingPlanDocChecker(this.planModel);
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
@@ -160,36 +156,6 @@ export class PlanStep6Component implements OnInit {
       this.userReadonly = true;
       return;
     }
-  }
-
-  checkDocs(): void {
-    // this.justificationMissing = true;
-    // this.transitionMemoMissing = false;
-    // if (this.requestModel.requestDto.justification
-    //   && this.requestModel.requestDto.justification.length > 0) {
-    //   this.justificationMissing = false;
-    //   this.justificationType = 'text';
-    //   this.justificationText = this.requestModel.requestDto.justification;
-    // } else if (this.docDtos && this.docDtos.length > 0) {
-    //   for (const doc of this.docDtos) {
-    //     if (doc.docType === 'Justification') {
-    //       this.justificationMissing = false;
-    //       break;
-    //     }
-    //   }
-    // }
-
-    // if (this.requestModel.requestDto.requestType.indexOf('Pay Type 4') > -1) {
-    //   this.transitionMemoMissing = true;
-    //   if (this.docDtos && this.docDtos.length > 0) {
-    //     for (const doc of this.docDtos) {
-    //       if (doc.docType === 'Transition Memo') {
-    //         this.transitionMemoMissing = false;
-    //         break;
-    //       }
-    //     }
-    //   }
-    // }
   }
 
   get isDisplayBudgetDocsUploadVar(): boolean {
@@ -253,19 +219,11 @@ export class PlanStep6Component implements OnInit {
   }
 
   submitEnabled(): boolean {
-    return !this.justificationMissing && !this.transitionMemoMissing;
+    return !this.docChecker.docMissing;
   }
 
   submitDisableTooltip(): string {
-    if (this.justificationMissing && this.transitionMemoMissing) {
-      return 'You must upload Justification and Transition Memo to submit this request.';
-    } else if (this.justificationMissing) {
-      return 'You must upload Justification to submit this request.';
-    } else if (this.transitionMemoMissing) {
-      return 'You must upload Transition Memo to submit this request.';
-    } else {
-      return '';
-    }
+    return this.docChecker.tooltipText;
   }
 
   deleteRequest(): void {
@@ -314,9 +272,75 @@ export class PlanStep6Component implements OnInit {
         }
       });
   }
+}
 
+class FundingPlanDocChecker {
+  docMissing: boolean;
+  tooltipText: string;
 
+  private requiredDocs: any[] = [
+    {docType: DocTypeConstants.JUSTIFICATION, tooltip: 'Scientific Rationale'},
+    {docType: DocTypeConstants.EXCEPTION_JUSTIFICATION, tooltip: 'Exception Justification'},
+    {docType: DocTypeConstants.SKIP_JUSTIFICATION, tooltip: 'Skipped Justification'}
+  ];
 
+  private missingTooltips: string[];
+  private planModel: PlanModel;
+
+  constructor(planModel: PlanModel) {
+    this.missingTooltips = [];
+    this.planModel = planModel;
+    this.requiredDocs.forEach( rd => {
+      if ( this.applTypeExists(rd.docType) && this.docNotFound(rd.docType)) {
+        this.missingTooltips.push(rd.tooltip);
+      }
+    });
+
+    this.docMissing = this.missingTooltips.length > 0;
+    if (this.docMissing) {
+      for (let i = 0; i < this.missingTooltips.length; i++) {
+        if (i === 0) {
+          this.tooltipText = this.missingTooltips[i];
+        }
+        else if ( i === this.missingTooltips.length - 1) {
+          this.tooltipText += ' and ' + this.missingTooltips[i];
+        }
+        else {
+          this.tooltipText += ', ' + this.missingTooltips[i];
+        }
+      }
+      this.tooltipText = 'You must upload ' + this.tooltipText + ' to submit this Plan';
+    }
+  }
+
+  private docNotFound(docType: string): boolean {
+    const docs = this.planModel.fundingPlanDto.documents;
+    if (!docs) {
+      return true;
+    }
+    else {
+      return docs.filter( doc => doc.docType === docType).length === 0;
+    }
+  }
+
+  private applTypeExists(docType: string): boolean {
+    if (docType === DocTypeConstants.JUSTIFICATION) {
+      return this.planModel.allGrants.filter( g => g.selected).length > 0;
+    }
+    else if (docType === DocTypeConstants.EXCEPTION_JUSTIFICATION) {
+      return  this.planModel.allGrants.filter(g => g.selected &&
+        (g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)).length > 0;
+    }
+    else if (docType === DocTypeConstants.SKIP_JUSTIFICATION) {
+      return this.planModel.allGrants.filter(g => !g.selected &&
+        (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
+        g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore
+        ).length > 0;
+    }
+    else {
+      return false;
+    }
+  }
 }
 
 /*
