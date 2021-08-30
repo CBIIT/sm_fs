@@ -117,7 +117,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       ajax: {
         url: '/i2ecws/api/v1/fs/lookup/funding-request/approvers/',
         delay: 500,
-        type: 'POST',
+        type: 'GET',
         data(params): any {
           return {
             term: params.term
