@@ -13,6 +13,9 @@ import { FundingPlanInformationComponent } from '../funding-plan-information/fun
 import { FpFundingInformationComponent } from '../fp-funding-information/fp-funding-information.component';
 import { ApplicationsProposedForFundingComponent } from '../applications-proposed-for-funding/applications-proposed-for-funding.component';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib/model/fundingReqBudgetsDto';
+import { AppUserSessionService } from '../../service/app-user-session.service';
 
 @Component({
   selector: 'app-plan-step3',
@@ -37,7 +40,8 @@ export class PlanStep3Component implements OnInit {
               private planModel: PlanModel,
               private pdCaIntegratorService: PdCaIntegratorService,
               private planCoordinatorService: PlanCoordinatorService,
-              private fsPlanControllerService: FsPlanControllerService) {
+              private fsPlanControllerService: FsPlanControllerService,
+              private userSessionService: AppUserSessionService,) {
   }
 
   ngOnInit(): void {
@@ -106,9 +110,11 @@ export class PlanStep3Component implements OnInit {
     this.planModel.fundingPlanDto.fpFinancialInformation.fiscalYear = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests = [];
+
+    const fundingSourceDetails: Map<number, FundingRequestFundsSrcDto> = new Map<number, FundingRequestFundsSrcDto>();
     this.applicationsProposedForFunding.fundingSources.forEach((item, index) => {
-      this.logger.debug('=====>', index, item);
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(item.sourceDetails());
+      fundingSourceDetails.set(index, item.sourceDetails());
     });
 
     this.fpInfoComponent.listApplicationsNotSelectable.forEach(g => {
@@ -116,7 +122,8 @@ export class PlanStep3Component implements OnInit {
         {
           applId: g.applId,
           frtId: FundingRequestTypes.FUNDING_PLAN__NOT_SELECTABLE_FOR_FUNDING_PLAN,
-          notSelectableReason: g.notSelectableReason
+          notSelectableReason: g.notSelectableReason,
+          financialInfoDto: {}
         }
       );
     });
@@ -126,7 +133,8 @@ export class PlanStep3Component implements OnInit {
         {
           applId: g.applId,
           frtId: FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_SKIP,
-          notSelectableReason: g.notSelectableReason
+          notSelectableReason: g.notSelectableReason,
+          financialInfoDto: {}
         }
       );
     });
@@ -136,7 +144,8 @@ export class PlanStep3Component implements OnInit {
         {
           applId: g.applId,
           frtId: FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE,
-          notSelectableReason: g.notSelectableReason
+          notSelectableReason: g.notSelectableReason,
+          financialInfoDto: {}
         }
       );
     });
@@ -148,16 +157,46 @@ export class PlanStep3Component implements OnInit {
         {
           applId: g.applId,
           frtId: type,
-          notSelectableReason: g.notSelectableReason
+          notSelectableReason: g.notSelectableReason,
+          financialInfoDto: {}
         }
       );
     });
-    this.applicationsProposedForFunding.grantList.forEach((item, index) => {
-      // TODO: Build FP grant list: skip, exception, not selected
-      this.logger.debug('<=====>', index, item);
-    });
+    // Build a list of raw data for the request budgets, grouped by applid
+    const budgetMap: Map<number, FundingReqBudgetsDto[]> = new Map<number, FundingReqBudgetsDto[]>();
     this.applicationsProposedForFunding.prcList.forEach((item, index) => {
       this.logger.debug('<=====', index, item);
+      const source = fundingSourceDetails.get(item.sourceIndex);
+      if (!source) {
+        this.logger.error('no source found at index', item.sourceIndex);
+      } else {
+        let directCost: number;
+        let totalCost: number;
+
+        if (item.displayType === 'percent') {
+          directCost = item.directCostCalculated;
+          totalCost = item.totalCostCalculated;
+        } else {
+          directCost = item.directCost;
+          totalCost = item.directCost;
+        }
+        let budgets = budgetMap.get(item.grant.applId) as FundingReqBudgetsDto[];
+        if (!budgets) {
+          budgets = [];
+        }
+        budgets.push({
+          fseId: source.fundingSourceId,
+          name: source.fundingSourceName,
+          supportYear: 1,
+          dcRecAmt: directCost,
+          tcRecAmt: totalCost,
+        });
+        budgetMap.set(item.grant.applId, budgets);
+      }
+    });
+
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(i => {
+      i.financialInfoDto.fundingReqBudgetsDtos = budgetMap.get(i.applId);
     });
 
     const bmmCodes: string[] = [];
@@ -197,6 +236,8 @@ export class PlanStep3Component implements OnInit {
     this.planModel.fundingPlanDto.multipleRfaPaFlag = this.planModel.grantsSearchCriteria.length > 1 ? 'Y' : 'N';
     this.planModel.fundingPlanDto.fundableRangeFrom = this.planModel.minimumScore;
     this.planModel.fundingPlanDto.fundableRangeTo = this.planModel.maximumScore;
+
+    this.planModel.fundingPlanDto.requestorLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
 
     this.logger.info(JSON.stringify(this.planModel.fundingPlanDto));
 
