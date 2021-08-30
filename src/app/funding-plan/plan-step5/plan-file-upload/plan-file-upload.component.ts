@@ -41,7 +41,7 @@ export class PlanFileUploadComponent implements OnInit {
 
   downloadTemplate(templateType: string) {
 
-    this.documentService.downloadTemplate(this.planModel.fundingPlanDto.fprId, templateTypes)
+    this.documentService.downloadTemplate(this.planModel.fundingPlanDto.fprId, templateType)
       .subscribe(
         (response: HttpResponse<Blob>) => {
           const blob = new Blob([response.body], { type: response.headers.get('content-type') });
