@@ -97,9 +97,7 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-12">
-    <p *ngIf="!dtData || dtData.length == 0">No grants found to display.</p>
-
+  <div class="col-12">   
     <ngb-alert *ngIf="dtData && dtData.length > 0 && noSelectableGrants" type="danger" [dismissible]="false">
       <div>The RFA/PA number(s) for the selected NCAB Date(s) has no selectable grants.</div>
     </ngb-alert>
