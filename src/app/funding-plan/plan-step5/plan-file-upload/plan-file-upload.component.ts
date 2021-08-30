@@ -25,8 +25,8 @@ export class PlanFileUploadComponent implements OnInit {
   planDocDtos: Observable<DocumentsDto[]>;
 
   constructor(private planModel: PlanModel,
-              private documentService: DocumentService,
-              private logger: NGXLogger) { }
+    private documentService: DocumentService,
+    private logger: NGXLogger) { }
 
   ngOnInit(): void {
   }
@@ -40,14 +40,12 @@ export class PlanFileUploadComponent implements OnInit {
   }
 
   downloadTemplate(templateType: string) {
-    // TODO: Remove the hardcoded content once previous steps are implemented
-    this.documentService.downloadTemplate(513, templateType)
 
-      // this.documentService.downloadTemplate(this.planModel.fundingPlanDto.fprId, templateTypes)
+    this.documentService.downloadTemplate(this.planModel.fundingPlanDto.fprId, templateTypes)
       .subscribe(
         (response: HttpResponse<Blob>) => {
           const blob = new Blob([response.body], { type: response.headers.get('content-type') });
-          saveAs(blob, 'template.doc');
+          saveAs(blob, templateType + '.doc');
         }
       );
   }
@@ -55,9 +53,7 @@ export class PlanFileUploadComponent implements OnInit {
   uploadFiles(): void {
     for (let i = 0; i < this.selectedFiles.length; i++) {
       this._docDto.docType = this.getPlanDocType();
-      // TODO: Remove hardcoded content
-      // this._docDto.keyId = this.planModel.fundingPlanDto.fprId;
-      this._docDto.keyId = 513;
+      this._docDto.keyId = this.planModel.fundingPlanDto.fprId;
       this._docDto.keyType = 'PFRP';
       this._docDto.docDescription = '';
       if (this.selectedFiles[i].size <= this.maxFileSize) {
@@ -85,9 +81,7 @@ export class PlanFileUploadComponent implements OnInit {
   }
 
   loadFiles(): void {
-    // TODO: remove hardcoded content and use the appropriate endpoint
-    this.documentService.getFiles(513, 'PFRP').subscribe(
-      // this.documentService.getFSBudgetFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
+    this.documentService.getFSBudgetFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
       result => {
         this.planDocDtos = of(result);
 

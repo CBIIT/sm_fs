@@ -87,9 +87,7 @@ export class PlanSupportingDocsReadonlyComponent implements OnInit {
     for (let i = 0; i < this.selectedGrants.length; i++) {
       this.applIds.push(this.selectedGrants[i].applId);
     }
-    // TODO: remove hardcoded content once previous steps are implemented
-    this.documentService.downLoadFpPackage(513,
-    // this.documentService.downLoadFpPackage(this.planModel.fundingPlanDto.fprId,
+    this.documentService.downLoadFpPackage(this.planModel.fundingPlanDto.fprId,
       this.applIds)
       .subscribe(
         (response: HttpResponse<Blob>) => {
@@ -102,9 +100,7 @@ export class PlanSupportingDocsReadonlyComponent implements OnInit {
   }
 
   downloadCoverSheet() {
-    // TODO: Remove the hardcoded content once previous steps are implemented
-    this.documentService.downloadFPCoverSheet(513)
-    // this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
+    this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
           const blob = new Blob([response.body], { type: response.headers.get('content-type') });
@@ -129,7 +125,7 @@ export class PlanSupportingDocsReadonlyComponent implements OnInit {
       this.applIds.push(this.selectedGrants[i].applId);
     }
     this.documentService.downloadFpSummaryStatement(this.applIds)
-    // this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
+      // this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
           const blob = new Blob([response.body], { type: response.headers.get('content-type') });

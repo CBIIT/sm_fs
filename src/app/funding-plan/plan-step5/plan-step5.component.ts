@@ -42,11 +42,11 @@ export class PlanStep5Component implements OnInit {
   }
 
   constructor(private navigationModel: NavigationStepModel,
-              private planModel: PlanModel,
-              private documentService: DocumentService,
-              private logger: NGXLogger,
-              private router: Router,
-              private documentsControllerService: DocumentsControllerService) { }
+    private planModel: PlanModel,
+    private documentService: DocumentService,
+    private logger: NGXLogger,
+    private router: Router,
+    private documentsControllerService: DocumentsControllerService) { }
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(5, true);
@@ -62,9 +62,8 @@ export class PlanStep5Component implements OnInit {
   }
 
   loadFiles(): void {
-    // TODO: remove hardcoded content and use the appropriate endpoint
-    this.documentService.getFiles(513, 'PFRP').subscribe(
-      // this.documentService.getFSBudgetFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
+
+    this.documentService.getFSBudgetFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
       result => {
         this.planDocDtos = result;
         this.checkUploadedDocs();
@@ -138,9 +137,9 @@ export class PlanStep5Component implements OnInit {
     for (let i = 0; i < this.selectedGrants.length; i++) {
       this.applIds.push(this.selectedGrants[i].applId);
     }
-    // TODO: remove hardcoded content once previous steps are implemented
-    this.documentService.downLoadFpPackage(513,
-    // this.documentService.downLoadFpPackage(this.planModel.fundingPlanDto.fprId,
+
+
+    this.documentService.downLoadFpPackage(this.planModel.fundingPlanDto.fprId,
       this.applIds)
       .subscribe(
         (response: HttpResponse<Blob>) => {
@@ -154,8 +153,8 @@ export class PlanStep5Component implements OnInit {
 
   nextStep(): void {
 
-    this.documentsControllerService.loadDocumentsUsingGET(513, "PFRP").subscribe(
-    //this.documentsControllerService.loadDocumentsUsingGET(this.planModel.fundingPlanDto.fprId, "PFRP").subscribe(
+
+    this.documentsControllerService.loadDocumentsUsingGET(this.planModel.fundingPlanDto.fprId, "PFRP").subscribe(
       result => {
         this.planModel.fundingPlanDto.documents = result;
         this.router.navigate(['/plan/step6']);
@@ -163,7 +162,7 @@ export class PlanStep5Component implements OnInit {
         this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
       }
     );
-    
+
 
   }
 
