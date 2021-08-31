@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanControllerService, FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
 import { CanManagementService } from '../../cans/can-management.service';
+import { PlanModel } from 'src/app/model/plan/plan-model';
 
 @Component({
   selector: 'app-retrieve-plan',
@@ -18,8 +19,8 @@ export class RetrievePlanComponent implements OnInit {
 
   constructor(private router: Router,
               private route: ActivatedRoute,
-              private requestModel: RequestModel,
-              private requestService: FsRequestControllerService,
+              private planModel: PlanModel,
+              private planService: FsPlanControllerService,
               private userSessionService: AppUserSessionService,
               private canManagementService: CanManagementService,
               private logger: NGXLogger) {
@@ -28,60 +29,25 @@ export class RetrievePlanComponent implements OnInit {
   ngOnInit(): void {
     this.fprId = this.route.snapshot.params.fprId;
     if (this.fprId) {
-      this.requestService.retrieveFundingRequestUsingGET(this.fprId).subscribe(
+      this.planService.retrieveFundingPlanUsingGET(this.fprId).subscribe(
         (result) => {
-          this.requestModel.reset();
-          this.requestModel.title = 'View Request Details for';
-          this.requestModel.returnToRequestPageLink = true;
-          this.requestModel.requestDto = result.requestDto;
-          this.requestModel.grant = result.grantDto;
-          this.requestModel.requestDto.financialInfoDto.requestorNpnId = this.requestModel.requestDto.requestorNpnId;
-          if (this.requestModel.requestDto.scheduledApprovers && this.requestModel.requestDto.scheduledApprovers.length > 0) {
-            this.requestModel.mainApproverCreated = true;
-            this.requestModel.captureApproverCriteria();
+          this.planModel.reset();
+          this.planModel.title = 'View Funding Plan Details for';
+        //  this.planModel.returnToRequestPageLink = true;
+          this.planModel.fundingPlanDto = result.FundingPlanDto;
+          this.planModel.allGrants = result.AllGrants;
+          this.planModel.minimumScore = this.planModel.fundingPlanDto.fundableRangeFrom;
+          this.planModel.maximumScore = this.planModel.fundingPlanDto.fundableRangeTo;
+          const selectedApplIds: number[] = result.SelectedApplIds;
+
+          if (selectedApplIds && this.planModel.allGrants) {
+              this.planModel.allGrants.forEach( g => g.selected = selectedApplIds.includes(g.applId));
           }
-          this.requestModel.requestDto.financialInfoDto.suppAddYearFlag = this.requestModel.requestDto.divSuppAddYearFlag;
-          this.requestModel.requestDto.financialInfoDto.suppNewFlag = this.requestModel.requestDto.divSuppNewFlag;
-          if (this.requestModel.requestDto.divSuppAddYearFlag === 'Y') {
-            this.requestModel.supplementType = '2';
-          } else if (this.requestModel.requestDto.divSuppNewFlag === 'Y') {
-            this.requestModel.supplementType = '1';
-          }
-
-          const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
-            ? this.requestModel.requestDto.conversionActivityCode : null;
-
-          this.requestService.getFundingSourcesUsingGET(this.requestModel.requestDto.frtId,
-            this.requestModel.grant.fullGrantNum,
-            this.requestModel.requestDto.financialInfoDto.fy,
-            this.requestModel.requestDto.requestorNpnId,
-            this.requestModel.requestDto.requestorCayCode,
-            conversionActivityCode).subscribe(result1 => {
-            this.requestModel.programRecommendedCostsModel.fundingSources = result1;
-            this.requestModel.restoreLineItems();
-          });
-
-          this.canManagementService.getRequestCans(this.requestModel.requestDto.frqId).subscribe(result2 => {
-            this.requestModel.requestCans = result2;
-          });
-
-          const selectedIds = new Set<number>();
-          this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
-            selectedIds.add(b.fseId);
-          });
-
-          this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds = selectedIds;
-
-          this.requestService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result2 => {
-            this.requestModel.programRecommendedCostsModel.grantAwarded = result2;
-            this.requestModel.restoreLineItems();
-          });
-
-          this.requestModel.requestDto.financialInfoDto.fundingRequestId = this.requestModel.requestDto.frqId;
-          this.router.navigate(['/request/step4']);
+          this.logger.debug('retrieved planModel ', this.planModel);
+          this.router.navigate(['/plan/step6']);
         },
         (error) => {
-          this.logger.error('retrieveFundingRequest failed ', error);
+          this.logger.error('retrieveFundingPlan failed ', error);
           this.error = 'not found';
         }
       );
