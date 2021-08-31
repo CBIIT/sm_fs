@@ -63,18 +63,19 @@ export class PlanModel {
   }
 
   private makeApproverCriteria(): any {
-    // const approverCriteria: any = {};
-    // approverCriteria.requestType = this.fundingPlanDto.financialInfoDto.requestTypeId;
-    // approverCriteria.cayCode = this.requestDto.financialInfoDto.requestorCayCode;
-    // const fundingSources = Array.from(this._programRecommendedCostsModel.selectedFundingSourceIds);
-    // // fundingSources.sort(); commented for now to make the order of
-    // // fundingSources important in determining if approvers need to be regen.
+    const approverCriteria: any = {};
+  //  approverCriteria.requestType = this.fundingPlanDto.financialInfoDto.requestTypeId;
+    approverCriteria.cayCode = this.fundingPlanDto.cayCode;
+    approverCriteria.doc = this.fundingPlanDto.requestorDoc;
+    // const fundingSources = Array.from(this.fundingPlanDto.fundingPlanFoas.map());
+    // fundingSources.sort(); commented for now to make the order of
+    // fundingSources important in determining if approvers need to be regen.
     // approverCriteria.fundingSources = fundingSources.join(',');
-    // approverCriteria.otherDocs = this.requestDto.financialInfoDto.otherDocText;
-    // approverCriteria.loaCode = this.requestDto.loaCode;
-    // // from the create_main_approvers sp, it seems otherDocs has no effect on funding request approvers,
-    // // only affects funding plan approvers, needs double check with David and Subashini.
-    // return approverCriteria;
+    approverCriteria.otherDocs = this.fundingPlanDto.otherContributingDocs;
+    approverCriteria.loaCode = this.fundingPlanDto.loaCode;
+    // from the create_main_approvers sp, it seems otherDocs has no effect on funding request approvers,
+    // only affects funding plan approvers, needs double check with David and Subashini.
+    return approverCriteria;
     return null;
   }
 

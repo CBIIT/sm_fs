@@ -19,7 +19,7 @@ export class PlanApproverService {
     }
     else if (this.planModel.isMainApproversRegenNeeded()) {
       this.logger.debug('needs to recreate main approvers because of changes in funding request');
-      this.planService.deletePlanApproversUsingGET(this.planModel.minimumScore).subscribe(
+      this.planService.deletePlanApproversUsingGET(this.planModel.fundingPlanDto.fprId).subscribe(
         () => {
           this.planModel.mainApproversCreated = false;
           this.createMainApprovers(resolve, reject);

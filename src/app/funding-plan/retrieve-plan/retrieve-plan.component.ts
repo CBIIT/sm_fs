@@ -38,6 +38,7 @@ export class RetrievePlanComponent implements OnInit {
           this.planModel.allGrants = result.AllGrants;
           this.planModel.minimumScore = this.planModel.fundingPlanDto.fundableRangeFrom;
           this.planModel.maximumScore = this.planModel.fundingPlanDto.fundableRangeTo;
+          this.planModel.markMainApproversCreated();
           const selectedApplIds: number[] = result.SelectedApplIds;
 
           if (selectedApplIds && this.planModel.allGrants) {
