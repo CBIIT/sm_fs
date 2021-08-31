@@ -116,6 +116,7 @@ import { PlanSupportingDocsReadonlyComponent } from './funding-plan/plan-step6/p
 import { DesigneeCellRendererComponent } from './manage-designations/designee-cell-renderer/designee-cell-renderer.component';
 import { DesigneeActionCellRendererComponent } from './manage-designations/designee-action-cell-renderer/designee-action-cell-renderer.component';
 import { EditDesigneeModalComponent } from './manage-designations/edit-designee-modal/edit-designee-modal.component';
+import { RetrievePlanComponent } from './funding-plan/retrieve-plan/retrieve-plan.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -241,6 +242,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     DesigneeCellRendererComponent,
     DesigneeActionCellRendererComponent,
     EditDesigneeModalComponent,
+    RetrievePlanComponent
   ],
 
 

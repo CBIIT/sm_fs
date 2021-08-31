@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { WorkflowModalComponent } from 'src/app/funding-request/workflow-modal/workflow-modal.component';
-import { WorkflowActionCode, WorkflowModel } from 'src/app/funding-request/workflow/workflow.model';
+import { RequestStatus, WorkflowActionCode, WorkflowModel } from 'src/app/funding-request/workflow/workflow.model';
 import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { AppPropertiesService } from 'src/app/service/app-properties.service';
@@ -271,6 +271,10 @@ export class PlanStep6Component implements OnInit {
 //        this.submitResultElement.nativeElement.scrollIntoView();
         }
       });
+  }
+
+  hideWorkflow(): boolean {
+    return this.requestStatus === RequestStatus.REJECTED;
   }
 }
 

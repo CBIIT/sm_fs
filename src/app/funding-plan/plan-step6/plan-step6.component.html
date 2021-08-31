@@ -184,7 +184,8 @@
 <app-budget-docs-readonly [hidden]="isDisplayBudgetDocsUploadVar || !displayReadOnlyBudgetDocs" requestOrPlan="PLAN"></app-budget-docs-readonly>
 
 <!-- START Workflow Section -->
-<app-plan-workflow></app-plan-workflow>
+<app-plan-workflow [readonly]="!submitVisible() || !submitEnabled()"
+[hidden]="hideWorkflow()"></app-plan-workflow>
 <!-- END Workflow Section -->
 
 <!-- START Buttons Section -->

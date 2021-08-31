@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 export class OpenRequestComponent implements OnInit {
 
   frqId: number;
-  fpId: number;
+  fprId: number;
 
   constructor(private router: Router) { }
 
@@ -20,7 +20,7 @@ export class OpenRequestComponent implements OnInit {
     this.router.navigate(['request/retrieve', this.frqId]);
   }
 
-  openByFpId(): void {
-    this.router.navigate(['plan/retrieve', this.fpId]);
+  openByFprId(): void {
+    this.router.navigate(['plan/retrieve', this.fprId]);
   }
 }
