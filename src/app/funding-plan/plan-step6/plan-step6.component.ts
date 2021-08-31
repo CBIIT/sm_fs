@@ -89,11 +89,11 @@ export class PlanStep6Component implements OnInit {
       (( g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)
       && !g.selected ) );
     this.logger.debug('unfunded grants are ', this.grantsNotConsidered);
-    this.planApproverService.checkCreateApprovers().then( () => {
-      this.logger.debug('Approvers are created ');
-      this.workflowModel.initializeForPlan(this.fprId);
-      }
-      );
+    // this.planApproverService.checkCreateApprovers().then( () => {
+    //   this.logger.debug('Approvers are created ');
+    this.workflowModel.initializeForPlan(this.fprId);
+      // }
+      // );
     this.logger.debug('Step6 OnInit Plan Model ', this.planModel);
     this.checkUserRolesCas();
     this.docChecker = new FundingPlanDocChecker(this.planModel);
