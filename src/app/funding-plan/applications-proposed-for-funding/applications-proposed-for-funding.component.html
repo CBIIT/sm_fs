@@ -5,59 +5,61 @@
 
       <h2>Applications Proposed for Funding</h2>
 
-      <p><small>The Standard Policy Reduction should be taken into consideration when determining the recommended dollar
-        amounts for the funding selection plan. If you would like to include a waiver to the Standard Policy Reduction,
-        please provide it as part of the justification. The current fiscal year's policy reductions can be viewed on the
-        <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information" target="_blank"
-             class="external-link">OEFIA web site</a>.</small></p>
+      <p><small>Please note that the Standard Policy Reduction should be taken into consideration when determining the
+          recommended dollar amounts for the request. If you would like to include a waiver to the Standard Policy
+          Reduction, please provide it as part of the justification. The current fiscal year's policy reductions can be
+          viewed on the <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information" target="_blank"
+            class="external-link">OEFIA web site</a>.</small></p>
 
       <div class="d-flex mb-2">
         <button type="button" class="btn btn-primary ml-auto" data-toggle="modal" data-target="#add-FS-modal"><i
-          class="fas fa-plus mr-1" aria-hidden="true"></i> Add Funding Source
+            class="fas fa-plus mr-1" aria-hidden="true"></i> Add Funding Source
         </button>
       </div>
 
       <table class="table table-bordered table-striped app-funding-table">
         <thead>
-        <tr>
-          <th scope="col">Grant Information</th>
-          <th scope="col">
-            <label for="FundSrc-1">
-              Funding Source
-              <a href="#"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
-            </label>
-            <app-fp-funding-source [parentForm]="parentForm" [index]="0"></app-fp-funding-source>
-          </th>
-        </tr>
+          <tr>
+            <th scope="col">Grant Information</th>
+            <th scope="col">
+              <label for="FundSrc-1">
+                Funding Source
+                <a href="#"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
+              </label>
+              <app-fp-funding-source [parentForm]="parentForm" [index]="0"></app-fp-funding-source>
+            </th>
+          </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let grant of listGrantsSelected; let i = index;">
-          <td>
-            <app-fp-grant-information [parentForm]="parentForm" [grantIndex]="i" [grant]="grant" [sourceIndex]="0"></app-fp-grant-information>
-          </td>
-          <td>
-            <app-fp-program-recommended-costs [parentForm]="parentForm" [grantIndex]="i" [grant]="grant" [sourceIndex]="0"></app-fp-program-recommended-costs>
-          </td>
+          <tr *ngFor="let grant of listGrantsSelected; let i = index;">
+            <td>
+              <app-fp-grant-information [parentForm]="parentForm" [grantIndex]="i" [grant]="grant" [sourceIndex]="0">
+              </app-fp-grant-information>
+            </td>
+            <td>
+              <app-fp-program-recommended-costs [parentForm]="parentForm" [grantIndex]="i" [grant]="grant"
+                [sourceIndex]="0"></app-fp-program-recommended-costs>
+            </td>
 
-        </tr>
+          </tr>
 
         </tbody>
         <tfoot>
-        <tr>
-          <td scope="row"><strong>Total Recommended Costs</strong></td>
-          <td>
-            <div class="form-row">
-              <div class="col-lg-6">
-                <span class="like-label">Direct Cost</span>
-                <span>{{ sourceSumDirectCost(0) | currency }}</span>
+          <tr>
+            <td scope="row"><strong>Total Recommended Costs</strong></td>
+            <td>
+              <div class="form-row">
+                <div class="col-lg-6">
+                  <span class="like-label">Direct Cost</span>
+                  <span>{{ sourceSumDirectCost(0) | currency }}</span>
+                </div>
+                <div class="col-lg-6">
+                  <span class="like-label">Total Cost</span>
+                  <span>{{ sourceSumTotalCost(0) | currency }}</span>
+                </div>
               </div>
-              <div class="col-lg-6">
-                <span class="like-label">Total Cost</span>
-                <span>{{ sourceSumTotalCost(0) | currency }}</span>
-              </div>
-            </div>
-          </td>
-        </tr>
+            </td>
+          </tr>
         </tfoot>
       </table>
     </div>
@@ -70,7 +72,7 @@
     <div class="form-group">
       <label for="funding-comments">Comments <span class="optional">(optional)</span></label>
       <textarea id="funding-comments" #funding_comments name="fundingComments" maxlength="2000" class="form-control"
-                rows="2" [(ngModel)]="comments"></textarea>
+        rows="2" [(ngModel)]="comments"></textarea>
       <span class="character-counter">{{ funding_comments.value.length }}/2000</span>
     </div>
   </div>
@@ -81,8 +83,8 @@
 </div>
 
 
-<div *ngIf="includeModal" class="modal fade" id="add-FS-modal" tabindex="-1" role="dialog" aria-labelledby="add-FS-modal-title"
-     aria-hidden="true">
+<div *ngIf="includeModal" class="modal fade" id="add-FS-modal" tabindex="-1" role="dialog"
+  aria-labelledby="add-FS-modal-title" aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -96,46 +98,46 @@
 
         <table class="table table-bordered table-striped app-funding-table">
           <thead>
-          <tr>
-            <th scope="col">Grant Information</th>
-            <th scope="col">
-              <label for="FundSrc-1">
-                Funding Source
+            <tr>
+              <th scope="col">Grant Information</th>
+              <th scope="col">
+                <label for="FundSrc-1">
+                  Funding Source
                   <a href="#" (click)="openFsDetails()"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
-              </label>
-              <app-fp-funding-source></app-fp-funding-source>
-            </th>
-          </tr>
+                </label>
+                <app-fp-funding-source></app-fp-funding-source>
+              </th>
+            </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let grant of listGrantsSelected; let i = index;">
-            <td>
-              <app-fp-grant-information [isModal]="true" [grantIndex]="i" [grant]="grant"></app-fp-grant-information>
-            </td>
-            <td>
-              <app-fp-program-recommended-costs [grantIndex]="i"></app-fp-program-recommended-costs>
-            </td>
+            <tr *ngFor="let grant of listGrantsSelected; let i = index;">
+              <td>
+                <app-fp-grant-information [isModal]="true" [grantIndex]="i" [grant]="grant"></app-fp-grant-information>
+              </td>
+              <td>
+                <app-fp-program-recommended-costs [grantIndex]="i"></app-fp-program-recommended-costs>
+              </td>
 
-          </tr>
+            </tr>
 
           </tbody>
 
           <tfoot>
-          <tr>
-            <td scope="row"><strong>Total Recommended Costs</strong></td>
-            <td>
-              <div class="form-row">
-                <div class="col-lg-6">
-                  <span class="like-label">Direct Cost</span>
-                  <span>$0.00</span>
+            <tr>
+              <td scope="row"><strong>Total Recommended Costs</strong></td>
+              <td>
+                <div class="form-row">
+                  <div class="col-lg-6">
+                    <span class="like-label">Direct Cost</span>
+                    <span>$0.00</span>
+                  </div>
+                  <div class="col-lg-6">
+                    <span class="like-label">Total Cost</span>
+                    <span>$0.00</span>
+                  </div>
                 </div>
-                <div class="col-lg-6">
-                  <span class="like-label">Total Cost</span>
-                  <span>$0.00</span>
-                </div>
-              </div>
-            </td>
-          </tr>
+              </td>
+            </tr>
           </tfoot>
 
         </table>
