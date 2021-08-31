@@ -15,7 +15,7 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
   activeStep = {step: 0, name: '', route: null, screenName: ''};
   steps = [
     {step: 1, name: 'Select Grants', route: '/plan/step1', screenName: 'Select Grants'},
-    {step: 2, name: 'Fundable Score', route: '/plan/step2', screenName: 'Score Range'},
+    {step: 2, name: 'Fundable Score', route: '/plan/step2', screenName: 'Fundable Score'},
     {step: 3, name: 'Plan Info', route: '/plan/step3', screenName: 'Provide Basic Info'    },
     {step: 4, name: 'Non-Funded Apps', route: '/plan/step4', screenName: 'Review Applications NOT Considered for Funding'},
     {step: 5, name: 'Supporting Docs', route: '/plan/step5', screenName: 'Supporting Docs'},
