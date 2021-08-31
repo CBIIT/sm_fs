@@ -63,7 +63,7 @@ export class PlanStep5Component implements OnInit {
 
   loadFiles(): void {
 
-    this.documentService.getFSBudgetFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
+    this.documentService.getFiles(this.planModel.fundingPlanDto.fprId, 'PFRP').subscribe(
       result => {
         this.planDocDtos = result;
         this.checkUploadedDocs();

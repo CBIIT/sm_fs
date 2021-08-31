@@ -16,6 +16,7 @@ import { FundingRequestTypes } from '../../model/request/funding-request-types';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib/model/fundingReqBudgetsDto';
 import { AppUserSessionService } from '../../service/app-user-session.service';
+import { PlanApproverService } from '../approver/plan-approver.service';
 
 @Component({
   selector: 'app-plan-step3',
@@ -42,7 +43,8 @@ export class PlanStep3Component implements OnInit {
               private pdCaIntegratorService: PdCaIntegratorService,
               private planCoordinatorService: PlanCoordinatorService,
               private fsPlanControllerService: FsPlanControllerService,
-              private userSessionService: AppUserSessionService,) {
+              private planApproverService: PlanApproverService,
+              private userSessionService: AppUserSessionService) {
   }
 
   ngOnInit(): void {
@@ -73,13 +75,14 @@ export class PlanStep3Component implements OnInit {
   }
 
   onSubmit($event: any): void {
-    this.logger.debug('next step: ', this.nextStep);
     if (this.step3form.valid) {
       this.buildPlanModel();
       this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
         this.logger.debug('Saved plan model: ', JSON.stringify(result));
         this.planModel.fundingPlanDto = result;
-        this.router.navigate([this.nextStep]);
+        this.planApproverService.checkCreateApprovers().finally(
+          () => this.router.navigate([this.nextStep]) );
+//        this.router.navigate(['/plan/step4']);
       }, error => {
         this.logger.warn(error);
       });

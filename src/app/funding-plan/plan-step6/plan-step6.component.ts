@@ -89,11 +89,11 @@ export class PlanStep6Component implements OnInit {
       (( g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)
       && !g.selected ) );
     this.logger.debug('unfunded grants are ', this.grantsNotConsidered);
-    this.planApproverService.checkCreateApprovers().then( () => {
-      this.logger.debug('Approvers are created ');
-      this.workflowModel.initializeForPlan(this.fprId);
-      }
-      );
+    // this.planApproverService.checkCreateApprovers().then( () => {
+    //   this.logger.debug('Approvers are created ');
+    this.workflowModel.initializeForPlan(this.fprId);
+      // }
+      // );
     this.logger.debug('Step6 OnInit Plan Model ', this.planModel);
     this.checkUserRolesCas();
     this.docChecker = new FundingPlanDocChecker(this.planModel);
@@ -189,6 +189,7 @@ export class PlanStep6Component implements OnInit {
   }
 
   withdrawVisible(): boolean {
+    return false; // Hide until Sprint 6
     if (!this.statusesCanWithdraw.includes(this.requestStatus)) {
       return false;
     }
@@ -197,6 +198,7 @@ export class PlanStep6Component implements OnInit {
   }
 
   putOnHoldVisible(): boolean {
+    return false;  // Hide until Sprint 6
     if (!this.statusesCanOnHold.includes(this.requestStatus)) {
       return false;
     }
@@ -205,6 +207,7 @@ export class PlanStep6Component implements OnInit {
   }
 
   releaseFromHoldVisible(): boolean {
+    return false;   // Hide until Sprint 6
     return this.requestStatus === 'ON HOLD' &&
     ((this.userCanSubmit && !this.workflowModel.approvedByFC) ||
     (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc));
@@ -227,7 +230,7 @@ export class PlanStep6Component implements OnInit {
   }
 
   deleteRequest(): void {
-    if (confirm('Are you sure you want to delete this request?')) {
+    if (confirm('Are you sure you want to delete this funding plan?')) {
       this.logger.debug('Call deletePlan API for FprId=' + this.fprId);
       this.fsPlanWorkflowControllerService.deletePlanUsingDELETE(this.fprId).subscribe(
         result => {
