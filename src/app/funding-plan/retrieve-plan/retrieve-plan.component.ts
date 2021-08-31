@@ -1,11 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FsPlanControllerService, FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanControllerService } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
-import { RequestModel } from 'src/app/model/request/request-model';
-import { AppUserSessionService } from 'src/app/service/app-user-session.service';
-import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
-import { CanManagementService } from '../../cans/can-management.service';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 
 @Component({
@@ -21,8 +17,6 @@ export class RetrievePlanComponent implements OnInit {
               private route: ActivatedRoute,
               private planModel: PlanModel,
               private planService: FsPlanControllerService,
-              private userSessionService: AppUserSessionService,
-              private canManagementService: CanManagementService,
               private logger: NGXLogger) {
   }
 
