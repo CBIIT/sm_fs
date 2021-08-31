@@ -10,6 +10,7 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class PlanModel {
   grantViewerUrl: string;
+  yourgrantsUrl: string;
   eGrantsUrl: string;
   catsConceptUrl: string;
   // allGrants array include 'selected' boolean column with is set on step 1
@@ -32,6 +33,7 @@ export class PlanModel {
               private logger: NGXLogger) {
     // TODO: static properties should be set at app level and shared somehow
     this.grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
+    this.yourgrantsUrl =  propertiesService.getProperty('URL_YOURGRANTS');
     this.eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this.catsConceptUrl = propertiesService.getProperty('CONCEPT_ID_URL');
 
