@@ -3,7 +3,7 @@
     <h2 class="d-inline-block">RFA/PA/PAR(s)</h2>
   </div>
   <div class="col-12">
-    <p>Note: Funding plan should be created only for RFA, PA, or PAR.</p>
+    <p class="font-italic">Note: Funding plan should be created only for RFA, PA, or PAR.</p>
   </div>
 </div>
 
@@ -21,7 +21,7 @@
   <div class="row"  role="group" >
     <div class="col-lg-3">
       <div class="form-group">
-        <label [attr.for]="'rfaPa-' + i">RFA/PA/PAR</label>
+        <label [attr.for]="'rfaPa-' + i">RFA/PA Number</label>
         <ng-select2
           [attr.id]="'rfaPa-' + i"
           name="rfa-pa"
@@ -35,7 +35,7 @@
 
     <div class="col col-lg-5">
       <div class="form-group">
-        <label [attr.for]="'ncab-dates-' + i">NCAB Dates</label>
+        <label [attr.for]="'ncab-dates-' + i">NCAB Date(s)</label>
         <ng-select2
           [attr.id]="'ncab-dates-' + i"
           name="ncab-dates"
