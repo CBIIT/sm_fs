@@ -6,13 +6,16 @@ import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import { PlanModel } from '../../model/plan/plan-model';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { ControlContainer, NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-fp-funding-source',
   templateUrl: './fp-funding-source.component.html',
-  styleUrls: ['./fp-funding-source.component.css']
+  styleUrls: ['./fp-funding-source.component.css'],
+  viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class FpFundingSourceComponent implements OnInit {
+  @Input() parentForm: NgForm;
   @Input() index: number;
   data: Select2OptionData[] = [];
   selectedValue: number = null;

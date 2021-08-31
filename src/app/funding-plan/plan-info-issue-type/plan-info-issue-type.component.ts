@@ -2,14 +2,17 @@ import { Component, Input, OnInit } from '@angular/core';
 import { RfaPaNoticesDto } from '@nci-cbiit/i2ecws-lib';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
+import { ControlContainer, NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-plan-info-issue-type',
   templateUrl: './plan-info-issue-type.component.html',
-  styleUrls: ['./plan-info-issue-type.component.css']
+  styleUrls: ['./plan-info-issue-type.component.css'],
+  viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class PlanInfoIssueTypeComponent implements OnInit {
   @Input() rfaDetails: RfaPaNoticesDto;
+  @Input() parentForm: NgForm;
   issueType: string;
   priorNotice: string;
 

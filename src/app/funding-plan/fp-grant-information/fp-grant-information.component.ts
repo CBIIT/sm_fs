@@ -6,17 +6,20 @@ import { NGXLogger } from 'ngx-logger';
 import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import { RecommendedFutureYearsComponent } from '../recommended-future-years/recommended-future-years.component';
+import { ControlContainer, NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-fp-grant-information',
   templateUrl: './fp-grant-information.component.html',
-  styleUrls: ['./fp-grant-information.component.css']
+  styleUrls: ['./fp-grant-information.component.css'],
+  viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class FpGrantInformationComponent implements OnInit {
   @ViewChild(RecommendedFutureYearsComponent) recommendedFutureYearsComponent: RecommendedFutureYearsComponent;
   @Input() grant: NciPfrGrantQueryDtoEx;
   @Input() grantIndex: number;
   @Input() sourceIndex: number;
+  @Input() parentForm: NgForm;
 
   skip = false;
   exception = false;

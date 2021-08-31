@@ -2,16 +2,19 @@ import { Component, Input, OnInit } from '@angular/core';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
+import { ControlContainer, NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-fp-program-recommended-costs',
   templateUrl: './fp-program-recommended-costs.component.html',
-  styleUrls: ['./fp-program-recommended-costs.component.css']
+  styleUrls: ['./fp-program-recommended-costs.component.css'],
+  viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class FpProgramRecommendedCostsComponent implements OnInit {
   @Input() grantIndex: number;
   @Input() sourceIndex: number;
   @Input() grant: NciPfrGrantQueryDtoEx;
+  @Input() parentForm: NgForm;
   baselineDirectCost: number;
   baselineTotalCost: number;
   directCost: number;
@@ -51,7 +54,6 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     } else {
       if (!!this.directCost) {
         this.dcPercentCutCalculated = (this.baselineDirectCost - this.directCost) / this.baselineDirectCost;
-        this.logger.debug(this.dcPercentCutCalculated);
       }
 
       if (!!this.totalCost) {
@@ -59,5 +61,9 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       }
     }
 
+  }
+
+  uniqueId(prefix: string): string {
+    return prefix + String(this.grantIndex);
   }
 }

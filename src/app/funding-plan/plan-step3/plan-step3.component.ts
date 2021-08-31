@@ -33,6 +33,7 @@ export class PlanStep3Component implements OnInit {
   private cayCode: string;
   private doc: string;
   planName: string;
+  private nextStep: string;
 
   constructor(private navigationModel: NavigationStepModel,
               private router: Router,
@@ -60,6 +61,11 @@ export class PlanStep3Component implements OnInit {
   }
 
   saveContinue(): void {
+    this.nextStep = '/plan/step4';
+  }
+
+  saveAsDraft(): void {
+    this.nextStep = '/plan/step6';
   }
 
   previous(): void {
@@ -67,15 +73,18 @@ export class PlanStep3Component implements OnInit {
   }
 
   onSubmit($event: any): void {
+    this.logger.debug('next step: ', this.nextStep);
     if (this.step3form.valid) {
       this.buildPlanModel();
       this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
         this.logger.debug('Saved plan model: ', JSON.stringify(result));
         this.planModel.fundingPlanDto = result;
-        this.router.navigate(['/plan/step4']);
+        this.router.navigate([this.nextStep]);
       }, error => {
         this.logger.warn(error);
       });
+    } else {
+      this.logger.debug(this.step3form);
     }
   }
 

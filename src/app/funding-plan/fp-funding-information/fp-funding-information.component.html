@@ -5,15 +5,29 @@
   <div class="col-lg-3 col-sm-6">
     <div class="form-group">
       <label for="first-set-aside">Published 1<sup>st</sup> Year Set-Aside</label>
-      <input type="text" id="first-set-aside" class="form-control" [(ngModel)]="firstYearSetAside" pattern="[0-9]*"
-             [appMinMaxValidator]="{min: 0, max: 999999999}">
+      <input
+        type="text"
+        id="first-set-aside"
+        class="form-control"
+        [(ngModel)]="firstYearSetAside"
+        name="firstYearSetAside"
+        #year1SetAside=ngModel
+        pattern="[0-9]*"
+        [appMinMaxValidator]="{min: 0, max: 999999999}">
     </div>
   </div>
   <div class="col-lg-auto col-sm-6">
     <div class="form-group">
       <label for="all-set-aside">Total Published Set-Aside (All Years)</label>
-      <input type="text" id="all-set-aside" class="form-control" [(ngModel)]="totalSetAside" pattern="[0-9]*"
-             [appMinMaxValidator]="{min: 0, max: 999999999}">
+      <input
+        type="text"
+        id="all-set-aside"
+        class="form-control"
+        [(ngModel)]="totalSetAside"
+        name="totalSetAside"
+        #overallSetAside=ngModel
+        pattern="[0-9]*"
+        [appMinMaxValidator]="{min: 0, max: 9999999999}">
     </div>
   </div>
 </div>
@@ -26,29 +40,48 @@
   <div class="col-lg-3 col-sm-6">
     <div class="form-group">
       <label for="est-year-2">Year 2</label>
-      <input type="text" id="est-year-2" class="form-control" [(ngModel)]="outYear2" pattern="[0-9]*"
-             [appMinMaxValidator]="{min: 0, max: 999999999}">
+      <input
+        type="text"
+        id="est-year-2"
+        class="form-control"
+        [(ngModel)]="outYear2"
+        pattern="[0-9]*"
+        [appMinMaxValidator]="{min: 0, max: 999999999}">
     </div>
   </div>
   <div class="col-lg-3 col-sm-6">
     <div class="form-group">
       <label for="est-year-3">Year 3</label>
-      <input type="text" id="est-year-3" class="form-control"[(ngModel)]="outYear3" pattern="[0-9]*"
-             [appMinMaxValidator]="{min: 0, max: 999999999}">
+      <input
+        type="text"
+        id="est-year-3"
+        class="form-control"
+        [(ngModel)]="outYear3"
+        pattern="[0-9]*"
+        [appMinMaxValidator]="{min: 0, max: 999999999}">
     </div>
   </div>
   <div class="col-lg-3 col-sm-6">
     <div class="form-group">
       <label for="est-year-4">Year 4</label>
-      <input type="text" id="est-year-4" class="form-control"[(ngModel)]="outYear4" pattern="[0-9]*"
-             [appMinMaxValidator]="{min: 0, max: 999999999}">
+      <input
+        type="text" id="est-year-4"
+        class="form-control"
+        [(ngModel)]="outYear4"
+        pattern="[0-9]*"
+        [appMinMaxValidator]="{min: 0, max: 999999999}">
     </div>
   </div>
   <div class="col-lg-3 col-sm-6">
     <div class="form-group">
       <label for="est-year-5">Year 5</label>
-      <input type="text" id="est-year-5" class="form-control"[(ngModel)]="outYear5" pattern="[0-9]*"
-             [appMinMaxValidator]="{min: 0, max: 999999999}">
+      <input
+        type="text"
+        id="est-year-5"
+        class="form-control"
+        [(ngModel)]="outYear5"
+        pattern="[0-9]*"
+        [appMinMaxValidator]="{min: 0, max: 999999999}">
     </div>
   </div>
   <div class="col-12">

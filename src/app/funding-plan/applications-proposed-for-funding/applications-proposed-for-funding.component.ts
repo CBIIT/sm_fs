@@ -2,7 +2,7 @@ import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core
 import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
-import { NgForm } from '@angular/forms';
+import { ControlContainer, NgForm } from '@angular/forms';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import { FpProgramRecommendedCostsComponent } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { Router } from '@angular/router';
@@ -13,7 +13,8 @@ import { FpFundingSourceComponent } from '../fp-funding-source/fp-funding-source
 @Component({
   selector: 'app-applications-proposed-for-funding',
   templateUrl: './applications-proposed-for-funding.component.html',
-  styleUrls: ['./applications-proposed-for-funding.component.css']
+  styleUrls: ['./applications-proposed-for-funding.component.css'],
+  viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class ApplicationsProposedForFundingComponent implements OnInit {
   @Input() parentForm: NgForm;
@@ -24,7 +25,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   listSelectedSources: string[];
   includeModal = false;
-
 
   sourceSumDirectCost(sourceIndex: number): number {
     if (!this.prcList) {

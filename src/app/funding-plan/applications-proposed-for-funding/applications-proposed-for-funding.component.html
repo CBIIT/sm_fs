@@ -26,17 +26,17 @@
               Funding Source
               <a href="#"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
             </label>
-            <app-fp-funding-source [index]="0"></app-fp-funding-source>
+            <app-fp-funding-source [parentForm]="parentForm" [index]="0"></app-fp-funding-source>
           </th>
         </tr>
         </thead>
         <tbody>
         <tr *ngFor="let grant of listGrantsSelected; let i = index;">
           <td>
-            <app-fp-grant-information [grantIndex]="i" [grant]="grant" [sourceIndex]="0"></app-fp-grant-information>
+            <app-fp-grant-information [parentForm]="parentForm" [grantIndex]="i" [grant]="grant" [sourceIndex]="0"></app-fp-grant-information>
           </td>
           <td>
-            <app-fp-program-recommended-costs [grantIndex]="i" [grant]="grant" [sourceIndex]="0"></app-fp-program-recommended-costs>
+            <app-fp-program-recommended-costs [parentForm]="parentForm" [grantIndex]="i" [grant]="grant" [sourceIndex]="0"></app-fp-program-recommended-costs>
           </td>
 
         </tr>
