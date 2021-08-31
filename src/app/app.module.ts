@@ -117,6 +117,8 @@ import { DesigneeCellRendererComponent } from './manage-designations/designee-ce
 import { DesigneeActionCellRendererComponent } from './manage-designations/designee-action-cell-renderer/designee-action-cell-renderer.component';
 import { EditDesigneeModalComponent } from './manage-designations/edit-designee-modal/edit-designee-modal.component';
 import { RetrievePlanComponent } from './funding-plan/retrieve-plan/retrieve-plan.component';
+import { RfaReissueValidatorDirective } from './validators/rfa-reissue-validator.directive';
+import { FpSetAsideValidatorDirective } from './validators/fp-set-aside-validator.directive';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -242,7 +244,9 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     DesigneeCellRendererComponent,
     DesigneeActionCellRendererComponent,
     EditDesigneeModalComponent,
-    RetrievePlanComponent
+    RetrievePlanComponent,
+    RfaReissueValidatorDirective,
+    FpSetAsideValidatorDirective
   ],
 
 

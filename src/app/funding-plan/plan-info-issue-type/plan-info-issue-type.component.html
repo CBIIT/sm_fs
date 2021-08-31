@@ -7,6 +7,13 @@
       <input ngbButton type="radio" [value]="'reissue'" (change)="toggleDisplay('reissue')">Reissue
     </label>
   </div>
-  <input type="text" id="issue-type" style="width:7rem" class="form-control form-control-sm ml-2"
-         [(ngModel)]="priorNotice" [hidden]="issueType === 'new'">
+  <input
+    type="text"
+    id="issue-type"
+    style="width:7rem"
+    class="form-control form-control-sm ml-2"
+    [(ngModel)]="priorNotice"
+    [hidden]="issueType === 'new'"
+    name="priorNotice"
+    #priorNoticeValue>
 </div>
