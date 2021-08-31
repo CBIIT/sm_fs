@@ -230,7 +230,7 @@ export class PlanStep6Component implements OnInit {
   }
 
   deleteRequest(): void {
-    if (confirm('Are you sure you want to delete this request?')) {
+    if (confirm('Are you sure you want to delete this funding plan?')) {
       this.logger.debug('Call deletePlan API for FprId=' + this.fprId);
       this.fsPlanWorkflowControllerService.deletePlanUsingDELETE(this.fprId).subscribe(
         result => {
