@@ -13,6 +13,7 @@ import { ControlContainer, NgForm } from '@angular/forms';
 export class PlanInfoIssueTypeComponent implements OnInit {
   @Input() rfaDetails: RfaPaNoticesDto;
   @Input() parentForm: NgForm;
+  @Input() index: number;
   issueType: string;
   priorNotice: string;
 
@@ -32,10 +33,15 @@ export class PlanInfoIssueTypeComponent implements OnInit {
 
   toggleDisplay(value: string): void {
     this.issueType = value;
-    if(this.issueType === 'reissue') {
+    if (this.issueType === 'reissue') {
       this.priorNotice = this.rfaDetails.priorNoticeNumber;
     } else {
       this.priorNotice = '';
     }
+  }
+
+  uniqueId(prefix: string): string {
+    return prefix + this.rfaDetails.noticeNumber;
+
   }
 }

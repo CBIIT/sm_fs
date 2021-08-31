@@ -13,10 +13,15 @@ export class RfaReissueValidatorDirective implements Validator {
   }
 
   validate(control: AbstractControl): ValidationErrors | null {
-    const issueType = control.get('issueType');
-    const priorNotice = control.get('priorNotice');
+    const issueType = control.get('issueType')?.value;
+    const priorNotice = control.get('priorNotice')?.value;
+    const issueRfa = control.get('issueRfa')?.value;
     this.logger.info('issueType:', issueType);
     this.logger.info('priorNotice:', priorNotice);
+    this.logger.info('issueRFA:', issueRfa);
+    if (!issueType || !priorNotice) {
+      return null;
+    }
     return undefined;
   }
 

@@ -1,5 +1,6 @@
+<ng-container [ngModelGroup]="rfaDetails.noticeNumber" #identifier="ngModelGroup">
 <div class="d-flex">
-  <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="issueType" [(ngModel)]="issueType">
+  <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup [name]="issueType" [(ngModel)]="issueType">
     <label ngbButtonLabel class="btn-outline-secondary">
       <input ngbButton type="radio" [value]="'new'" (change)="toggleDisplay('new')">New
     </label>
@@ -7,6 +8,7 @@
       <input ngbButton type="radio" [value]="'reissue'" (change)="toggleDisplay('reissue')">Reissue
     </label>
   </div>
+  <input type="hidden" [value]="rfaDetails.noticeNumber" name="issueRfa">
   <input
     type="text"
     id="issue-type"
@@ -14,6 +16,7 @@
     class="form-control form-control-sm ml-2"
     [(ngModel)]="priorNotice"
     [hidden]="issueType === 'new'"
-    name="priorNotice"
+    [name]="priorNotice"
     #priorNoticeValue>
 </div>
+</ng-container>
