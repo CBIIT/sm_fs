@@ -11,9 +11,19 @@
         class="form-control"
         [(ngModel)]="firstYearSetAside"
         name="firstYearSetAside"
-        #year1SetAside=ngModel
+        #year1SetAside="ngModel"
         pattern="[0-9]*"
         [appMinMaxValidator]="{min: 0, max: 999999999}">
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="year1SetAside.errors?.pattern && (parentForm.submitted || year1SetAside.touched)">
+      Enter a numeric value
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="year1SetAside.errors?.min || year1SetAside.errors?.max && (parentForm.submitted || year1SetAside.touched)">
+      Enter a number between 0 and 999,999,999
     </div>
   </div>
   <div class="col-lg-auto col-sm-6">
@@ -25,9 +35,29 @@
         class="form-control"
         [(ngModel)]="totalSetAside"
         name="totalSetAside"
-        #overallSetAside=ngModel
+        #overallSetAside="ngModel"
         pattern="[0-9]*"
         [appMinMaxValidator]="{min: 0, max: 9999999999}">
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="overallSetAside.errors?.pattern && (parentForm.submitted || overallSetAside.touched)">
+      Enter a numeric value
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="overallSetAside.errors?.min || year1SetAside.errors?.max && (parentForm.submitted || overallSetAside.touched)">
+      Enter a number between 0 and 9,999,999,999
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="parentForm.errors?.totalSetAsideLessThanFirstYear && (parentForm.submitted || overallSetAside.touched)">
+      Error: Total Published set-aside must be greater than or equal to the Published 1st year set-aside.
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="parentForm.errors?.totalSetAsideLessThanOutYear && (parentForm.submitted || overallSetAside.touched)">
+      Error: Total Published set-aside must be greater than or equal to the funding estimate for any year.
     </div>
   </div>
 </div>
@@ -46,8 +76,19 @@
         class="form-control"
         [(ngModel)]="outYear2"
         name="outYear2"
+        #year2="ngModel"
         pattern="[0-9]*"
         [appMinMaxValidator]="{min: 0, max: 999999999}">
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="year2.errors?.pattern && (parentForm.submitted || year2.touched)">
+      Enter a numeric value
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="year2.errors?.min || year2.errors?.max && (parentForm.submitted || year2.touched)">
+      Enter a value between 0 and 999,999,999
     </div>
   </div>
   <div class="col-lg-3 col-sm-6">
@@ -59,8 +100,19 @@
         class="form-control"
         [(ngModel)]="outYear3"
         name="outYear3"
+        #year3="ngModel"
         pattern="[0-9]*"
         [appMinMaxValidator]="{min: 0, max: 999999999}">
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="year3.errors?.pattern && (parentForm.submitted || year3.touched)">
+      Enter a numeric value
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="year3.errors?.min || year3.errors?.max && (parentForm.submitted || year3.touched)">
+      Enter a value between 0 and 999,999,999
     </div>
   </div>
   <div class="col-lg-3 col-sm-6">
@@ -71,8 +123,19 @@
         class="form-control"
         [(ngModel)]="outYear4"
         name="outYear4"
+        #year4="ngModel"
         pattern="[0-9]*"
         [appMinMaxValidator]="{min: 0, max: 999999999}">
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="year4.errors?.pattern && (parentForm.submitted || year4.touched)">
+      Enter a numeric value
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="year4.errors?.min || year4.errors?.max && (parentForm.submitted || year4.touched)">
+      Enter a value between 0 and 999,999,999
     </div>
   </div>
   <div class="col-lg-3 col-sm-6">
@@ -84,8 +147,19 @@
         class="form-control"
         [(ngModel)]="outYear5"
         name="outYear5"
+        #year5="ngModel"
         pattern="[0-9]*"
         [appMinMaxValidator]="{min: 0, max: 999999999}">
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="year5.errors?.pattern && (parentForm.submitted || year5.touched)">
+      Enter a numeric value
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="year5.errors?.min || year5.errors?.max && (parentForm.submitted || year5.touched)">
+      Enter a value between 0 and 999,999,999
     </div>
   </div>
   <div class="col-12">
