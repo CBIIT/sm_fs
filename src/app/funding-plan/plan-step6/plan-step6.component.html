@@ -1,66 +1,6 @@
 <!-- BEGIN Funding Plan Information Section -->
 <app-workflow-modal requestOrPlan="PLAN"></app-workflow-modal>
-<app-funding-plan-information></app-funding-plan-information>
-<div class="row">
-    <div class="col-12 collapse show mt-2" id="fplan-info-collapse">
-        <div class="row">
-            <div class="col-lg-2 col-sm-6">
-                <div class="form-group">
-                    <label for="award-date">Anticipated Award Date</label>
-                    <input type="text" class="form-control" id="award-date" ngbDatepicker>
-                </div>
-            </div>
-
-            <div class="col-xl-2 col-lg-4 col-sm-6">
-                <div class="form-group">
-                    <span class="like-label">Requesting PD</span>
-                    <span class="form-control-plaintext"><a href="#">Howcroft, Kevin</a></span>
-                </div>
-            </div>
-
-            <div class="col-xl-2 col-lg-4 col-sm-6">
-                <div class="form-group">
-                    <span class="like-label">Funding Approval</span>
-                    <span class="form-control-plaintext">ARC and NCI Funds Certifiers</span>
-                </div>
-            </div>
-
-            <div class="col-xl-2 col-lg-4 col-sm-6">
-                <div class="form-group">
-                    <span class="like-label">Final Scientific Levels of Authority (LOA)</span>
-                    <span class="form-control-plaintext">Scientific Program Leaders (SPL) committee</span>
-                </div>
-            </div>
-
-            <div class="col-xl-2 col-lg-4 col-sm-6">
-                <div class="form-group">
-                    <span class="like-label">Current Status</span>
-                    <span class="form-control-plaintext">Drafted by <a href="#">Doe, Jane</a></span>
-                </div>
-            </div>
-
-            <div class="col-xl-2 col-lg-4 col-sm-6">
-                <div class="form-group">
-                    <span class="like-label">Other DOC(s) Contributing Funds</span>
-                    <span class="form-control-plaintext">CRCHD</span>
-                </div>
-            </div>
-
-            <div class="col-xl-2 col-lg-4 col-sm-6">
-                <div class="form-group">
-                    <span class="like-label">Requesting PD's Cancer Activity</span>
-                    <span class="form-control-plaintext">Cancer Disparities</span>
-                </div>
-            </div>
-
-
-        </div><!-- END Row -->
-    </div><!-- END col-12 -->
-    <div class="col-12">
-        <hr>
-    </div>
-</div>
-
+<app-funding-plan-information [showAdditionalInfo]="true"></app-funding-plan-information>
 <!-- END Funding Plan Information Section -->
 
 <!-- START Funding Information Section -->
