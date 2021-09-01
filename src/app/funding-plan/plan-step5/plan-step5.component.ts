@@ -34,6 +34,7 @@ export class PlanStep5Component implements OnInit {
   exceptionGrants: NciPfrGrantQueryDto[];
   skipGrants: NciPfrGrantQueryDto[];
   private applIds: number[] = [];
+  public btnLabel = 'Expand All';
 
   @ViewChild('collapseAll') collapseAll: ElementRef<HTMLElement>;
 
@@ -137,8 +138,6 @@ export class PlanStep5Component implements OnInit {
     for (let i = 0; i < this.selectedGrants.length; i++) {
       this.applIds.push(this.selectedGrants[i].applId);
     }
-
-
     this.documentService.downLoadFpPackage(this.planModel.fundingPlanDto.fprId,
       this.applIds)
       .subscribe(
@@ -149,6 +148,17 @@ export class PlanStep5Component implements OnInit {
       ), error =>
         this.logger.error('Error downloading the file'),
       () => console.info('File downloaded successfully');
+  }
+
+  openAll() {
+    
+    if (this.btnLabel === 'Expand All') {
+      this.btnLabel = 'Collapse All';
+      this.activeIds = ['sciRat-panel', 'justExc-panel', 'justSkip-panel', 'other-panel'];
+    } else {
+      this.btnLabel = 'Expand All';
+      this.activeIds = [];
+    }
   }
 
   nextStep(): void {

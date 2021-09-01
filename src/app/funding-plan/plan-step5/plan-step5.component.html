@@ -10,12 +10,14 @@
 <div class="row" id="submission-package">
     <div class="col-12 d-flex align-items-center">
         <h2>Submission Package</h2>
-        <button type="button" class="btn btn-sm ml-auto btn-outline-primary" (click)="downloadPackage()"><i class="far fa-file-pdf mr-1"
-                aria-hidden="true"></i> View Package</button>
+
+        <button type="button" class="btn btn-sm ml-auto btn-outline-primary" (click)="openAll()">{{btnLabel}}</button>
+        <button type="button" class="btn btn-sm ml-auto btn-outline-primary" (click)="downloadPackage()"><i
+                class="far fa-file-pdf mr-1" aria-hidden="true"></i> View Package</button>
     </div>
     <div class="col-12 mt-2">
 
-        <ngb-accordion #a="ngbAccordion" [activeIds]="activeIds" [closeOthers]="true">
+        <ngb-accordion #a="ngbAccordion" [activeIds]="activeIds">
 
             <ngb-panel id="cover-panel">
                 <ng-template ngbPanelHeader>
@@ -28,7 +30,8 @@
                 <ng-template ngbPanelHeader>
 
                     <div class="d-flex align-items-center">
-                        <h3>Scientific Rationale for Supporting RFA/PA (AND) Justification for Each Proposed Application</h3>
+                        <h3>Scientific Rationale for Supporting RFA/PA (AND) Justification for Each Proposed Application
+                        </h3>
                         <div class="doc-details" *ngIf="isSciRatUploaded; else sciRatNotUploaded">
                             {{sciRatDocDto.docFilename}} (Uploaded by <a
                                 href="mailto: {{sciRatDocDto.uploadByEmail}}">{{sciRatDocDto.uploadByName}}</a> on
@@ -62,7 +65,8 @@
                         [templateType]="CR_FUNDING_PLAN_SCIENTIFIC_RPT"></app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
-                            <app-grant-table [grantList]="selectedGrants" [minScore]="model.minimumScore" [maxScore]="model.maximumScore"></app-grant-table>
+                            <app-grant-table [grantList]="selectedGrants" [minScore]="model.minimumScore"
+                                [maxScore]="model.maximumScore"></app-grant-table>
                         </div>
                     </div>
                 </ng-template>
@@ -156,7 +160,7 @@
                 <ng-template ngbPanelHeader>
                     <div class="d-flex align-items-center">
                         <h3>Other Document</h3>
-                                               <div class="doc-details" *ngIf="isOtherUploaded; else othNotUploaded">
+                        <div class="doc-details" *ngIf="isOtherUploaded; else othNotUploaded">
                             {{otherDocDto.docFilename}} (Uploaded by <a
                                 href="mailto: {{otherDocDto.uploadByEmail}}">{{otherDocDto.uploadByName}}</a> on
                             {{otherDocDto.createDate}}))
@@ -198,7 +202,7 @@
 
         </ngb-accordion>
 
-        <button #collapseAll [hidden]="true" (click)="activeIds=[]" >close all</button>
+        <button #collapseAll [hidden]="true" (click)="activeIds=[]">close all</button>
 
     </div>
     <div class="col-12">
