@@ -15,6 +15,8 @@ import { PlanInfoIssueTypeComponent } from '../plan-info-issue-type/plan-info-is
 export class FundingPlanInformationComponent implements OnInit {
   @ViewChildren(PlanInfoIssueTypeComponent) planFoaDetails: QueryList<PlanInfoIssueTypeComponent>;
   @Input() parentForm: NgForm;
+  @Input() showAdditionalInfo = false;
+
   rfaDetails: RfaPaNoticesDto[];
   totalApplicationsSelected: number;
   totalApplicationsReceived: number;
@@ -26,6 +28,7 @@ export class FundingPlanInformationComponent implements OnInit {
   listApplicationsNotSelectable: NciPfrGrantQueryDtoEx[];
   listApplicationsOutsideRange: NciPfrGrantQueryDtoEx[];
   listApplicationsWithinRange: NciPfrGrantQueryDtoEx[];
+  otherDocs: string[];
 
 
   constructor(public planModel: PlanModel,
@@ -67,6 +70,11 @@ export class FundingPlanInformationComponent implements OnInit {
     this.listApplicationsNotConsidered = [];
     this.listApplicationsNotConsidered.concat(this.listApplicationsNotSelectable)
       .concat(this.listApplicationsOutsideRange.filter(g => !g.selected));
+
+    if (this.planModel.fundingPlanDto.otherContributingDocs) {
+        this.otherDocs = this.planModel.fundingPlanDto.otherContributingDocs.split(',');
+    }
+
   }
 
 }
