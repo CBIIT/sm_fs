@@ -1,6 +1,6 @@
-<ng-container [ngModelGroup]="rfaDetails.noticeNumber" #identifier="ngModelGroup">
+<ng-container [ngModelGroup]="rfaDetails.noticeNumber">
 <div class="d-flex">
-  <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup [name]="issueType" [(ngModel)]="issueType">
+  <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup [name]="'issueType'" [(ngModel)]="issueType" [disabled]="readOnly">
     <label ngbButtonLabel class="btn-outline-secondary">
       <input ngbButton type="radio" [value]="'new'" (change)="toggleDisplay('new')">New
     </label>
@@ -8,15 +8,21 @@
       <input ngbButton type="radio" [value]="'reissue'" (change)="toggleDisplay('reissue')">Reissue
     </label>
   </div>
-  <input type="hidden" [value]="rfaDetails.noticeNumber" name="issueRfa">
   <input
     type="text"
-    id="issue-type"
+    [id]="'notice-' + index"
     style="width:7rem"
     class="form-control form-control-sm ml-2"
     [(ngModel)]="priorNotice"
     [hidden]="issueType === 'new'"
-    [name]="priorNotice"
-    #priorNoticeValue>
+    name="priorNotice"
+    [disabled]="readOnly"
+    #priorNoticeValue="ngModel">
+</div>
+<div
+  class="text-danger mt-1"
+  *ngIf="(parentForm.submitted || priorNoticeValue.touched) && !isValid()">
+  Previous RFA/PA/PAR number is required.
+  <input type="hidden" [ngModel]="scratch" [name]="rfaDetails.noticeNumber" required>
 </div>
 </ng-container>

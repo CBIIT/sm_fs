@@ -1,8 +1,9 @@
 <!-- BEGIN Funding Plan Information Section -->
 
 <!--<div class="row">-->
-    <app-funding-plan-information></app-funding-plan-information>
-
+<form #parentForm="ngForm">
+    <app-funding-plan-information [readOnly} [parentForm]="parentForm"></app-funding-plan-information>
+</form>
 <!--    <div class="col-12 d-flex">-->
 <!--        <h2>Funding Plan Information</h2>-->
 <!--        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#fplan-info-collapse" role="button" aria-expanded="true" aria-controls="fplan-info-collapse"></a>-->

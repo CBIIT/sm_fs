@@ -15,6 +15,7 @@ import { PlanInfoIssueTypeComponent } from '../plan-info-issue-type/plan-info-is
 export class FundingPlanInformationComponent implements OnInit {
   @ViewChildren(PlanInfoIssueTypeComponent) planFoaDetails: QueryList<PlanInfoIssueTypeComponent>;
   @Input() parentForm: NgForm;
+  @Input() readOnly = false;
   rfaDetails: RfaPaNoticesDto[];
   totalApplicationsSelected: number;
   totalApplicationsReceived: number;
