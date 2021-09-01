@@ -28,14 +28,13 @@ export class ProjectedCanComponent implements OnInit {
     });
     if (this.octId) {
       this.updateProjectedCan(this.octId);
+    } else {
+      this.updateProjectedCan(null);
     }
   }
 
   updateProjectedCan(oefiaType: number): void {
     const source = Number(this.fseId);
-    if (!oefiaType) {
-      return;
-    }
 
     this.canService.getProjectedCan(source, oefiaType).subscribe(result => {
       this.projectedCan = result;

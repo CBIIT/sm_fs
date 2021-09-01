@@ -106,7 +106,7 @@
             <app-oefia-types [index]="i" [selectedValue]="can.octId || can.defaultOefiaTypeId"></app-oefia-types>
           </td>
           <td>
-            <app-projected-can [index]="i" [fseId]="can.fseId"></app-projected-can>
+            <app-projected-can [index]="i" [fseId]="can.fseId" [octId]="can.octId || can.defaultOefiaTypeId"></app-projected-can>
           </td>
           <td>
             <app-can-selector [index]="i" [nciSourceFlag]="can.nciSourceFlag" [selectedValue]="can.can"
