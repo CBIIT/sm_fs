@@ -25,7 +25,7 @@ export class PlanModel {
 
   // TODO: Generate FundingPlanDto and FundingPlanFoasDto
 
-  title = 'New Funding Plan';
+  title = 'New Plan';
   mainApproversCreated = false;
   approverCriteria: any;
 
