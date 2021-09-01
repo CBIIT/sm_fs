@@ -66,4 +66,72 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   uniqueId(prefix: string): string {
     return prefix + String(this.grantIndex);
   }
+
+  isDirectCostNumeric(): boolean {
+    return !isNaN(this.getDirectCost());
+  }
+
+  isTotalCostNumeric(): boolean {
+    return !isNaN(this.getTotalCost());
+  }
+
+  isDirectCostInRange(): boolean {
+    if (this.isDirectCostNumeric()) {
+      const d = this.getDirectCost();
+      return d >= 0 && d <= 999999999;
+    }
+    return false;
+  }
+
+  isTotalCostInRange(): boolean {
+    if (this.isTotalCostNumeric()) {
+      const d = this.getTotalCost();
+      return d >= 0 && d <= 999999999;
+    }
+    return false;
+  }
+
+  isTotalGreaterThanDirect(): boolean {
+    return this.isTotalCostNumeric() && this.isDirectCostNumeric() && this.getDirectCost() <= this.getTotalCost();
+  }
+
+  isDollarValid(): boolean {
+    return this.isDirectCostNumeric() && this.isTotalCostInRange() && this.isTotalGreaterThanDirect();
+  }
+
+  isPercentNumeric(): boolean {
+    return !isNaN(this.getPercentCut());
+  }
+
+  isPercentInRange(): boolean {
+    if (this.isPercentNumeric()) {
+      const p = this.getPercentCut();
+      return p >= 0 && p <= 100;
+    }
+    return false;
+  }
+
+  isPercentValid(): boolean {
+    return this.isPercentInRange();
+  }
+
+  getPercentCut(): number {
+    return this.percentCut;
+  }
+
+  getDirectCost(): number {
+    if (this.displayType === 'percent') {
+      return this.directCostCalculated;
+    } else {
+      return this.directCost;
+    }
+  }
+
+  getTotalCost(): number {
+    if (this.displayType === 'percent') {
+      return this.totalCostCalculated;
+    } else {
+      return this.totalCost;
+    }
+  }
 }

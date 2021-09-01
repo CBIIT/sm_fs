@@ -18,6 +18,7 @@ import { FpFundingSourceComponent } from '../fp-funding-source/fp-funding-source
 })
 export class ApplicationsProposedForFundingComponent implements OnInit {
   @Input() parentForm: NgForm;
+  @Input() readOnly = false;
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
   @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
   @ViewChildren(FpFundingSourceComponent) fundingSources: QueryList<FpFundingSourceComponent>;

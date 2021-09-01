@@ -83,6 +83,9 @@
       </div>
     </div>
   </div>
+  <div>
+    errors go here
+  </div>
 </ng-template>
 
 <ng-template #percentCutVw>
@@ -131,13 +134,18 @@
           [attr.aria-label]="'percent_cut'"
           (change)="recalculate()"
           name="percentCut"
-          [(ngModel)]="percentCut">
+          [(ngModel)]="percentCut"
+          #pcInput="ngModel">
         <div class="input-group-append">
           <span class="input-group-text" [id]="'PC-append-' + grantIndex + '_'">% Cut</span>
         </div>
       </div>
     </div>
-
+  </div>
+  <div
+    class="text-danger mt-1"
+    *ngIf="(parentForm.submitted || pcInput.touched) && !isPercentValid()">
+    Enter a numeric value between 0 and 100
   </div>
 </ng-template>
 
