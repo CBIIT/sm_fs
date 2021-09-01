@@ -26,8 +26,8 @@ export class DesigneeActionCellRendererComponent implements OnInit {
   canReactivate: boolean = false;
 
   ngOnInit(): void {
-    this.editable = !(this.data.newNedOrg || this.data.newClassification || this.data.inactiveNedDate || this.data.inactiveI2eDate);
-    // this.editable = !(this.data.newNedOrg || this.data.newClassification || this.data.inactiveNedDate || this.data.inactiveI2eDate) && !!this.data.delegateToDate;
+    // this.editable = !(this.data.newNedOrg || this.data.newClassification || this.data.inactiveNedDate || this.data.inactiveI2eDate);
+    this.editable = !(this.data.newNedOrg || this.data.newClassification || this.data.inactiveNedDate || this.data.inactiveI2eDate) && !!this.data.delegateToDate;
     this.canReactivate = this.data.newNedOrg && !(this.data.newClassification || this.data.inactiveNedDate && this.data.inactiveI2eDate);
   }
 

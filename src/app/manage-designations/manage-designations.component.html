@@ -123,5 +123,6 @@
   <app-designee-cell-renderer [data]="data"></app-designee-cell-renderer>
 </ng-template>
 <ng-template #actionDesigneeRenderer let-data="adtData">
-  <app-designee-action-cell-renderer [data]="data" (editEmitter)="onEditDesignee($event)"></app-designee-action-cell-renderer>
+  <app-designee-action-cell-renderer [data]="data" (editEmitter)="onEditDesignee($event)" (deleteEmitter)="onDeleteDesignee($event)" (reactivateEmitter)="onReactiveDesignee($event)">
+  </app-designee-action-cell-renderer>
 </ng-template>

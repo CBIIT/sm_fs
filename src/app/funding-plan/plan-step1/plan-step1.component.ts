@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import { Options } from 'select2';
 import { Select2OptionData } from 'ng-select2';
 import { FsPlanControllerService, FundingPlanRfaPaDto, RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib';
@@ -209,7 +209,7 @@ class FundingPlanGrantsSearchCriteriaUI {
   templateUrl: './plan-step1.component.html',
   styleUrls: ['./plan-step1.component.css']
 })
-export class PlanStep1Component implements OnInit, AfterViewInit {
+export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private fsPlanControllerService: FsPlanControllerService,
               private router: Router,

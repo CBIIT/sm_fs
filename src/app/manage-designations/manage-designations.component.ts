@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {
   NgbCalendar,
   NgbDate,
@@ -29,7 +29,7 @@ import {Select2OptionData} from "ng-select2";
     {provide: NgbDateParserFormatter, useClass: DatepickerFormatter}
   ]
 })
-export class ManageDesignationsComponent implements OnInit, AfterViewInit {
+export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private logger: NGXLogger,
               private calendar: NgbCalendar,
@@ -77,7 +77,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit {
         }
       },
       ajax: {
-        url: '/i2ecws/api/v1/fs/lookup/funding-request/approvers/',
+        url: '/i2ecws/api/v1/fs/lookup/funding-request/available-designees/',
         delay: 500,
         type: 'GET',
         data(params): any {
@@ -95,7 +95,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit {
     const results = $.map(data , entry => {
       return {
         id: entry.nciLdapCn,
-        text: entry.fullNameLdap,
+        text: entry.fullName + ((entry.nedOrgPath && entry.nedOrgPath.length > 0) ? ' [' + entry.nedOrgPath + ']' : ''),
         additional: entry
       };
     });
@@ -118,20 +118,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit {
     this.dtOptions = {
       paging: false,
       language: { emptyTable: 'No designees selected'},
-      ajax: (dataTablesParameters: any, callback) => {
-        this.designeeService.getAllApproverDesigneesUsingGET(this.userSessionService.getLoggedOnUser().nihNetworkId).subscribe(
-          result => {
-            this.logger.debug('Get designees for user: ', result);
-            this.dtData = result;
-            callback({
-              recordsTotal: result.length,
-              recordsFiltered: result.length,
-              data: result
-            });
-          }, error => {
-            this.logger.error('HttpClient get request error for----- ' + error.message);
-          });
-      },
+      data: this.dtData,
       columns: [
         {title: 'Designee', data: 'delegateToFullName', ngTemplateRef: { ref: this.designeeRenderer }}, //0
         {title: 'Organization Name', data: 'currentNedOrg'}, //1
@@ -159,12 +146,71 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit {
       }
     }
     setTimeout(() => this.dtTrigger.next(), 0);
+    setTimeout(() => this.initDesigneeList(), 10);
+  }
+
+  ngOnDestroy(): void {
+    this.dtTrigger.unsubscribe();
+  }
+
+  initDesigneeList() {
+    this.designeeService.getAllApproverDesigneesUsingGET(this.userSessionService.getLoggedOnUser().nihNetworkId).subscribe(
+      (result: Array<FundingRequestPermDelDto>) => {
+        this.logger.debug('Get designees for user: ', result);
+        this.dtData = result;
+        this.dtOptions.data = this.dtData;
+
+        if (this.dtElement && this.dtElement.dtInstance) {
+          this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+            dtInstance.destroy();
+          });
+          this.dtTrigger.next();
+        }
+
+      }, error => {
+        this.logger.error('HttpClient get request error for----- ' + error.message);
+      });
+  }
+
+
+  updateDesigneeTable(data: FundingRequestPermDelDto[]) {
+    this.logger.debug('Get designees for user: ', data);
+    this.dtData = data;
+    this.dtOptions.data = this.dtData;
+
+    if (this.dtElement && this.dtElement.dtInstance) {
+      this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+        dtInstance.destroy();
+        this.dtTrigger.next();
+      });
+    }
   }
 
   addDesignee() {
     console.debug('The form is ', this.newDesigneeForm.valid);
     this.logger.debug(this.newDesigneeForm.value);
-//    this.logger.debug('Added:', this.startDate, this.endDate);
+    if (!this.newDesigneeForm.valid) {
+      return;
+    }
+    const fromDate: string = (this.newDesigneeForm.value.startDate) ?
+      String(this.newDesigneeForm.value.startDate.month).padStart(2, '0') + '/' +
+      String(this.newDesigneeForm.value.startDate.day).padStart(2, '0') + '/' +
+      String(this.newDesigneeForm.value.startDate.year).padStart(4, '0')
+      : null;
+    const toDate: string = (this.newDesigneeForm.value.endDate) ?
+      String(this.newDesigneeForm.value.endDate.month).padStart(2, '0') + '/' +
+      String(this.newDesigneeForm.value.endDate.day).padStart(2, '0') + '/' +
+      String(this.newDesigneeForm.value.endDate.year).padStart(4, '0')
+      : null;
+    this.designeeService.createDesigneeUsingPOST(
+      fromDate, toDate, this.userSessionService.getLoggedOnUser().nihNetworkId, this.newDesigneeForm.value.name).subscribe(
+      result => {
+        this.updateDesigneeTable(result);
+      },
+      error => {
+        this.logger.error('HttpClient get request error for----- ' + error.message);
+      }
+    )
   }
 
   onPermanent() {
@@ -192,5 +238,27 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit {
         break;
       }
     }
+  }
+
+  onDeleteDesignee($event: number) {
+    this.designeeService.deleteDesigneeUsingDELETE($event).subscribe(
+      result => {
+        this.updateDesigneeTable(result);
+      },
+      error => {
+        this.logger.error('HttpClient delete designee request error for----- ' + error.message);
+      }
+    )
+  }
+
+  onReactiveDesignee($event: number) {
+    this.designeeService.activateDesigneeUsingPUT($event).subscribe(
+      result => {
+        this.updateDesigneeTable(result);
+      },
+      error => {
+        this.logger.error('HttpClient put designee request error for----- ' + error.message);
+      }
+    )
   }
 }
