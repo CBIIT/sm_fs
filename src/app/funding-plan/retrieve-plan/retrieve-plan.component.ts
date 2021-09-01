@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FsPlanControllerService } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
+import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 
 @Component({
@@ -38,6 +39,10 @@ export class RetrievePlanComponent implements OnInit {
           if (selectedApplIds && this.planModel.allGrants) {
               this.planModel.allGrants.forEach( g => g.selected = selectedApplIds.includes(g.applId));
           }
+
+          if (this.planModel.allGrants) {
+            this.planModel.allGrants.forEach( g => this.addRfaNcabToSearchCriteria(g));
+          }
           this.logger.debug('retrieved planModel ', this.planModel);
           this.router.navigate(['/plan/step6']);
         },
@@ -50,6 +55,18 @@ export class RetrievePlanComponent implements OnInit {
       this.error = 'not found';
     }
 
+  }
+
+  addRfaNcabToSearchCriteria(g: NciPfrGrantQueryDtoEx): void {
+      for (const rfaNcab of this.planModel.grantsSearchCriteria) {
+        if (rfaNcab.rfaPaNumber === g.rfaPaNumber) {
+          if (!rfaNcab.ncabDates.includes(g.councilMeetingDate)) {
+            rfaNcab.ncabDates.push(g.councilMeetingDate);
+          }
+          return;
+        }
+      }
+      this.planModel.grantsSearchCriteria.push({rfaPaNumber: g.rfaPaNumber, ncabDates: [g.councilMeetingDate]});
   }
 
 }
