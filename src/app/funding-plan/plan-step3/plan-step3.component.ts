@@ -60,6 +60,7 @@ export class PlanStep3Component implements OnInit {
     this.pdCaIntegratorService.docEmitter.subscribe(next => {
       this.doc = next;
     });
+    this.planName = this.planModel.fundingPlanDto.planName;
   }
 
   saveContinue(): void {
@@ -82,7 +83,6 @@ export class PlanStep3Component implements OnInit {
         this.planModel.fundingPlanDto = result;
         this.planApproverService.checkCreateApprovers().finally(
           () => this.router.navigate([this.nextStep]) );
-//        this.router.navigate(['/plan/step4']);
       }, error => {
         this.logger.warn(error);
       });

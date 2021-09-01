@@ -92,7 +92,7 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
     this.withinRangeGrants = this.planModel.allGrants.filter(g =>
       (!g.notSelectableReason || g.notSelectableReason.length === 0) && g.priorityScoreNum >= this.minimumScore && g.priorityScoreNum <= this.maximumScore);
     this.outsideRangeGrants = this.planModel.allGrants.filter(g =>
-      (!g.notSelectableReason || g.notSelectableReason.length === 0) && g.priorityScoreNum < this.minimumScore || g.priorityScoreNum > this.maximumScore);
+      (!g.notSelectableReason || g.notSelectableReason.length === 0) && (g.priorityScoreNum < this.minimumScore || g.priorityScoreNum > this.maximumScore));
   }
 
   onSaveAndContinue(): void {

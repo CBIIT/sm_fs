@@ -14,8 +14,11 @@ export class PlanInfoIssueTypeComponent implements OnInit {
   @Input() rfaDetails: RfaPaNoticesDto;
   @Input() parentForm: NgForm;
   @Input() index: number;
+  @Input() readOnly = false;
+
   issueType: string;
   priorNotice: string;
+  scratch: string = null;
 
   constructor(private planModel: PlanModel,
               private logger: NGXLogger) {
@@ -40,8 +43,10 @@ export class PlanInfoIssueTypeComponent implements OnInit {
     }
   }
 
-  uniqueId(prefix: string): string {
-    return prefix + this.rfaDetails.noticeNumber;
-
+  isValid(): boolean {
+    if (this.issueType === 'new' || (this.issueType === 'reissue' && !!this.priorNotice)) {
+      return true;
+    }
+    return false;
   }
 }

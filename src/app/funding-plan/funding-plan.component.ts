@@ -19,7 +19,7 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
     {step: 3, name: 'Plan Info', route: '/plan/step3', screenName: 'Plan Info'},
     {step: 4, name: 'Non-Funded Apps', route: '/plan/step4', screenName: 'Review Applications NOT Considered for Funding'},
     {step: 5, name: 'Supporting Docs', route: '/plan/step5', screenName: 'Supporting Docs'},
-    {step: 6, name: 'Final Review', route: '/plan/step6', screenName: 'Review'}
+    {step: 6, name: 'Review', route: '/plan/step6', screenName: 'Review'}
   ];
 
   private routerSub: Subscription;
@@ -57,5 +57,9 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
         this.activeStep = step;
       }
     }
+  }
+
+  get showSteps(): boolean {
+    return this.navigationModel.showSteps;
   }
 }

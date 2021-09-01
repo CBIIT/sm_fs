@@ -16,7 +16,7 @@
             application marked as Exception or Skip. </p>
     </div>
     <div class="col-12 d-flex align-items-center">
-        <span>From <strong class="mr-1">{{minimumScore}}</strong> to</span>
+        <span>From <strong class="mr-1">{{minimumScore}}</strong> To</span>
         <input id="score-max" type="text" class="form-control mx-2" style="width:4rem" aria-label="score range maximum"
             [(ngModel)]="maximumScore" (keyup)="onMaxScoreChange($event)" (keypress)="numberOnly($event)">
         <button type="button" class="btn btn-primary" (click)="onApplyMaximumScore()">Apply</button>
