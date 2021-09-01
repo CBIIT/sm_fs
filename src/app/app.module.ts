@@ -119,6 +119,7 @@ import { EditDesigneeModalComponent } from './manage-designations/edit-designee-
 import { RetrievePlanComponent } from './funding-plan/retrieve-plan/retrieve-plan.component';
 import { RfaReissueValidatorDirective } from './validators/rfa-reissue-validator.directive';
 import { FpSetAsideValidatorDirective } from './validators/fp-set-aside-validator.directive';
+import { PlanSubmissionAlertComponent } from './funding-plan/fp-workflow/plan-submission-alert/plan-submission-alert.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -241,6 +242,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     PlanWorkflowComponent,
     PlanSupportingDocsReadonlyComponent,
     PlanWorkflowComponent,
+    PlanSubmissionAlertComponent,
     DesigneeCellRendererComponent,
     DesigneeActionCellRendererComponent,
     EditDesigneeModalComponent,

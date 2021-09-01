@@ -58,4 +58,8 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  get showSteps(): boolean {
+    return this.navigationModel.showSteps;
+  }
 }
