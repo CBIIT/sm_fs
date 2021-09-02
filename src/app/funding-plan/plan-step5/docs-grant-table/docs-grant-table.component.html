@@ -1,0 +1,19 @@
+<div class="row">
+    <div class="col-12">
+        <p *ngIf="noResult">No grants found to display.</p>
+        <div [ngStyle]="{display:noResult?'none':'inline'}">
+          <table #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
+          </table>
+          <!--          Renderer templates -->
+          <ng-template #fullGrantNumberRenderer let-data="adtData" >
+            <app-full-grant-number-cell-renderer [data]="data" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl" [minScore]="minScore" [maxScore]="maxScore"></app-full-grant-number-cell-renderer>
+          </ng-template>
+          <ng-template #cancerActivityRenderer let-data="adtData">
+            <app-cancer-activity-cell-renderer [data]="data"></app-cancer-activity-cell-renderer>
+          </ng-template>
+          <ng-template #existingRequestsRenderer let-data="adtData">
+            <app-existing-requests-cell-renderer [data]="data"></app-existing-requests-cell-renderer>
+          </ng-template>
+        </div>
+    </div>
+</div>

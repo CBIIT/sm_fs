@@ -35,7 +35,7 @@ export class PlanStep5Component implements OnInit {
   skipGrants: NciPfrGrantQueryDto[];
   private applIds: number[] = [];
   public btnLabel = 'Expand All';
-  
+
   @ViewChild('collapseAll') collapseAll: ElementRef<HTMLElement>;
 
   get model(): PlanModel {
@@ -164,28 +164,27 @@ export class PlanStep5Component implements OnInit {
     if (this.exceptionGrants.length > 0 && !this.isExceptionsUploaded) {
       this.changeLabel('excNotUploadedBtnId');
     }
-    
+
     if (this.skipGrants.length > 0 && !this.isSkipUploaded) {
       this.changeLabel('skipNotUploadedBtnId');
     }
-    
+
     this.changeLabel('othNotUploadedBtnId');
   }
 
   changeLabel(idName: string) {
     let body = document.getElementById(idName);
     if (body.classList.contains("fa-plus")) {
-            let body = document.getElementById(idName);
+      let body = document.getElementById(idName);
       body.classList.remove("fa-plus");
       body.classList.add("fa-minus");
-      body.innerText='Hide Add Document'
+      body.innerText = 'Hide Add Document'
     } else {
-      
       body.classList.remove("fa-minus");
       body.classList.add("fa-plus");
-      body.innerText='Add Document'
+      body.innerText = 'Add Document'
     }
-    
+
   }
 
   nextStep(): void {

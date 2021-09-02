@@ -122,6 +122,7 @@ import { FpSetAsideValidatorDirective } from './validators/fp-set-aside-validato
 import { PlanSubmissionAlertComponent } from './funding-plan/plan-step6/plan-submission-alert/plan-submission-alert.component';
 import { PlanWarningComponent } from './funding-plan/plan-step6/plan-warning/plan-warning.component';
 import { ActiveFundingPlanValidatorDirective } from './validators/active-funding-plan-validator.directive';
+import { DocsGrantTableComponent } from './funding-plan/plan-step5/docs-grant-table/docs-grant-table.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -252,7 +253,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     RfaReissueValidatorDirective,
     FpSetAsideValidatorDirective,
     PlanWarningComponent,
-    ActiveFundingPlanValidatorDirective
+    ActiveFundingPlanValidatorDirective,
+    DocsGrantTableComponent
   ],
 
 
