@@ -278,6 +278,14 @@ export class PlanStep6Component implements OnInit {
     }
   }
 
+  get noSkipResult(): boolean {
+    return !this.grantsSkipped || this.grantsSkipped.length === 0;
+  }
+
+  get noAppNotFundingResult(): boolean {
+    return !this.grantsNotConsidered || this.grantsNotConsidered.length === 0;
+  }
+
   submitRequest(): void {
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;

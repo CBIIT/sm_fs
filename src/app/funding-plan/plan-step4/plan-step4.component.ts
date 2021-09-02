@@ -49,4 +49,11 @@ export class PlanStep4Component implements OnInit {
     this.router.navigate(['/plan/step3']);
   }
 
+  get noSkipResult(): boolean {
+    return !this.skGrants || this.skGrants.length === 0;
+  }
+
+  get noAppNotFundingResult(): boolean {
+    return !this.ncGrants || this.ncGrants.length === 0;
+  }
 }
