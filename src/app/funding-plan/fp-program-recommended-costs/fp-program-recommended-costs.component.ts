@@ -25,6 +25,8 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   dcPercentCutCalculated: number;
   tcPercentCutCalculated: number;
   displayType: string;
+  // Dummy ngModel attribute for hidden error fields
+  dummy: string = null;
 
   constructor(private planCoordinatorService: PlanCoordinatorService, private logger: NGXLogger) {
   }
@@ -93,10 +95,6 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   isTotalGreaterThanDirect(): boolean {
     return this.isTotalCostNumeric() && this.isDirectCostNumeric() && this.getDirectCost() <= this.getTotalCost();
-  }
-
-  isDollarValid(): boolean {
-    return this.isDirectCostNumeric() && this.isTotalCostInRange() && this.isTotalGreaterThanDirect();
   }
 
   isPercentNumeric(): boolean {

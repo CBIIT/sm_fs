@@ -30,6 +30,7 @@
           [attr.aria-describedby]="'DC-prepend-' + grantIndex + '_' + sourceIndex"
           (change)="recalculate()"
           name="directCost"
+          #dcInput="ngModel"
           [(ngModel)]="directCost">
       </div>
     </div>
@@ -45,12 +46,12 @@
           [id]="'TC-' + grantIndex + '_' + sourceIndex"
           aria-describedby="TC-prepend-1"
           name="totalCost"
+          #tcInput="ngModel"
           (change)="recalculate()"
           [(ngModel)]="totalCost">
       </div>
     </div>
   </div>
-
   <div class="form-row">
     <div class="col-6">
       <div class="input-group input-group-sm input-group-readonly">
@@ -66,7 +67,6 @@
         </div>
       </div>
     </div>
-
     <div class="col-6">
       <div class="input-group input-group-sm input-group-readonly">
         <input
@@ -83,8 +83,23 @@
       </div>
     </div>
   </div>
-  <div>
-    errors go here
+  <div
+    class="text-danger mt-1"
+    *ngIf="(parentForm.submitted || dcInput.touched) && !isDirectCostInRange()">
+    Direct cost must be a numeric value between 0 and 999,999,999
+    <input type="hidden" [ngModel]="dummy" [name]="'DC-' + grantIndex + '_' + sourceIndex" required>
+  </div>
+  <div
+    class="text-danger mt-1"
+    *ngIf="(parentForm.submitted || tcInput.touched) && !isTotalCostInRange()">
+    Total cost must be a numeric value between 0 and 999,999,999
+    <input type="hidden" [ngModel]="dummy" [name]="'TC-' + grantIndex + '_' + sourceIndex" required>
+  </div>
+  <div
+    class="text-danger mt-1"
+    *ngIf="(parentForm.submitted || dcInput.touched || tcInput.touched) && !isTotalGreaterThanDirect()">
+    Total cost must greater than or equal to direct cost
+    <input type="hidden" [ngModel]="dummy" [name]="'TC2-' + grantIndex + '_' + sourceIndex" required>
   </div>
 </ng-template>
 
@@ -146,6 +161,7 @@
     class="text-danger mt-1"
     *ngIf="(parentForm.submitted || pcInput.touched) && !isPercentValid()">
     Enter a numeric value between 0 and 100
+    <input type="hidden" [ngModel]="dummy" [name]="'PC-' + grantIndex + '_' + sourceIndex" required>
   </div>
 </ng-template>
 

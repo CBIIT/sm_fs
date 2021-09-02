@@ -32,7 +32,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let grant of listGrantsSelected; let i = index;" [ngModelGroup]="grant.applId">
+        <tr *ngFor="let grant of listGrantsSelected; let i = index;" [ngModelGroup]="grant.fullGrantNum">
           <td>
             <app-fp-grant-information
               [parentForm]="parentForm"
