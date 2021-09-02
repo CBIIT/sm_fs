@@ -1,90 +1,7 @@
 <!-- BEGIN Funding Plan Information Section -->
 
-<div class="row">
-    <div class="col-12 d-flex">
-        <h2>Funding Plan Information</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#fplan-info-collapse" role="button"
-            aria-expanded="true" aria-controls="fplan-info-collapse"></a>
-    </div>
-    <div class="col-12 collapse show mt-2" id="fplan-info-collapse">
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th scope="col">RFA/PA/PAR</th>
-                    <th scope="col">Concept ID</th>
-                    <th scope="col">RFA/PA/PAR Title</th>
-                    <th scope="col">Issue Type</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <a href="#">PAR19-264</a>
-                    </td>
-                    <td>
-                        <a href="#">6572</a>
-                    </td>
-                    <td>Integrative Analysis of the Human Tumor Immune Microenvironment</td>
-                    <td>
-                        <div class="d-flex">
-                            <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="radioBasic">
-                                <label ngbButtonLabel class="btn-outline-secondary">
-                                    <input ngbButton type="radio" value="new" disabled>New
-                                </label>
-                                <label ngbButtonLabel class="btn-outline-secondary">
-                                    <input ngbButton type="radio" value="reissue" disabled>Reissue
-                                </label>
-                            </div>
-                            <input type="text" id="issue-type" style="width:7rem"
-                                class="form-control form-control-sm ml-2" readonly>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+<app-funding-plan-information></app-funding-plan-information>
 
-        <div class="row">
-            <div class="col-lg-2 col-sm-6">
-                <div class="form-group">
-                    <label for="fundable-score-range">Fundable Score&nbsp;Range</label>
-                    <input type="text" readonly class="form-control-plaintext" id="fundable-score-range"
-                        value="23 &ndash; 26">
-                </div>
-            </div>
-
-            <div class="col-lg-2 col-sm-6">
-                <div class="form-group">
-                    <label for="apps-recieved">Applications Recieved</label>
-                    <input type="text" readonly class="form-control-plaintext" id="apps-recieved" value="35">
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-sm-6">
-                <div class="form-group">
-                    <label for="apps-proposed">Applications Proposed for&nbsp;Funding</label>
-                    <input type="text" readonly class="form-control-plaintext" id="apps-proposed" value="6">
-                </div>
-            </div>
-
-            <div class="col-lg-2 col-sm-6">
-                <div class="form-group">
-                    <label for="apps-skipped">Applications Skipped</label>
-                    <input type="text" readonly class="form-control-plaintext" id="apps-skipped" value="1">
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-sm-6">
-                <div class="form-group">
-                    <label for="apps-not-considered">Applications Not Considered for&nbsp;Funding</label>
-                    <input type="text" readonly class="form-control-plaintext" id="apps-not-considered" value="1">
-                </div>
-            </div>
-        </div><!-- END Row -->
-    </div><!-- END col-12 -->
-    <div class="col-12">
-        <hr>
-    </div>
-</div>
 
 <!-- END Funding Plan Information Section -->
 
@@ -93,12 +10,14 @@
 <div class="row" id="submission-package">
     <div class="col-12 d-flex align-items-center">
         <h2>Submission Package</h2>
-        <button type="button" class="btn btn-sm ml-auto btn-outline-primary" (click)="downloadPackage()"><i class="far fa-file-pdf mr-1"
-                aria-hidden="true"></i> View Package</button>
+
+        <button type="button" class="btn btn-sm ml-auto btn-outline-primary" (click)="openAll()">{{btnLabel}}</button>
+        <button type="button" class="btn btn-sm ml-auto btn-outline-primary" (click)="downloadPackage()"><i
+                class="far fa-file-pdf mr-1" aria-hidden="true"></i> View Package</button>
     </div>
     <div class="col-12 mt-2">
 
-        <ngb-accordion #a="ngbAccordion" [activeIds]="activeIds" [closeOthers]="true">
+        <ngb-accordion #a="ngbAccordion" [activeIds]="activeIds">
 
             <ngb-panel id="cover-panel">
                 <ng-template ngbPanelHeader>
@@ -111,7 +30,8 @@
                 <ng-template ngbPanelHeader>
 
                     <div class="d-flex align-items-center">
-                        <h3>Scientific Rationale for Supporting RFA/PA (AND) Justification for Each Proposed Application</h3>
+                        <h3>Scientific Rationale for Supporting RFA/PA (AND) Justification for Each Proposed Application
+                        </h3>
                         <div class="doc-details" *ngIf="isSciRatUploaded; else sciRatNotUploaded">
                             {{sciRatDocDto.docFilename}} (Uploaded by <a
                                 href="mailto: {{sciRatDocDto.uploadByEmail}}">{{sciRatDocDto.uploadByName}}</a> on
@@ -145,7 +65,8 @@
                         [templateType]="CR_FUNDING_PLAN_SCIENTIFIC_RPT"></app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
-                            <app-grant-table [grantList]="selectedGrants" [minScore]="model.minimumScore" [maxScore]="model.maximumScore"></app-grant-table>
+                            <app-grant-table [grantList]="selectedGrants" [minScore]="model.minimumScore"
+                                [maxScore]="model.maximumScore"></app-grant-table>
                         </div>
                     </div>
                 </ng-template>
@@ -239,7 +160,7 @@
                 <ng-template ngbPanelHeader>
                     <div class="d-flex align-items-center">
                         <h3>Other Document</h3>
-                                               <div class="doc-details" *ngIf="isOtherUploaded; else othNotUploaded">
+                        <div class="doc-details" *ngIf="isOtherUploaded; else othNotUploaded">
                             {{otherDocDto.docFilename}} (Uploaded by <a
                                 href="mailto: {{otherDocDto.uploadByEmail}}">{{otherDocDto.uploadByName}}</a> on
                             {{otherDocDto.createDate}}))
@@ -281,7 +202,7 @@
 
         </ngb-accordion>
 
-        <button #collapseAll [hidden]="true" (click)="activeIds=[]" >close all</button>
+        <button #collapseAll [hidden]="true" (click)="activeIds=[]">close all</button>
 
     </div>
     <div class="col-12">

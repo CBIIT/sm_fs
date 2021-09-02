@@ -1,0 +1,66 @@
+<div class="alert alert-success" role="alert" *ngIf="status === 'success'" id="submitMessage">
+    <b>Success!</b>
+    <span *ngIf="action==='APPROVE' || action==='APPROVE_COMMENT'">
+        The funding plan <b>{{fprId}}</b> has been successfully approved and sent to
+        <b><a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
+    </span>
+    <span *ngIf="action==='COMPLETE'">
+        Your funding plan <b>{{fprId}}</b> has been successfully completed. 
+    </span>
+    <span *ngIf="action==='APPROVE_ROUTE'">
+        The funding plan {{fprId}} has been successfully approved and routed to
+        <b><a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
+    </span>
+    <span *ngIf="action==='SUBMIT'">
+        Your funding plan <b>{{fprId}}</b> has been successfully submitted and sent to
+        <b><a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
+    </span>
+    <span *ngIf="action==='SUBMIT_APPROVE'">
+        Your funding plan <b>{{fprId}}</b> has been successfully submitted and approved.
+        The funding plan has been sent to <b><a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
+    </span>
+    <span *ngIf="action==='ROUTE_APPROVE'">
+        The funding plan <b>{{fprId}}</b> has been successfully routed to
+        <b><a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
+    </span>
+    <span *ngIf="action==='REASSIGN'">
+        The funding plan <b>{{fprId}}</b> has been successfully reassigned to
+        <b><a href="mailto: {{approver.approverEmailAddress}}">
+        {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
+    </span>
+    <span *ngIf="action==='REJECT'">
+        The funding plan {{fprId}} has been rejected. The requester and any previous approver(s)
+        will be notified of your action.
+    </span>
+    <span *ngIf="action==='RETURN'">
+        The funding plan <b>{{fprId}}</b> has been returned back to the PD for changes.
+        The requesting PD and any previous approver(s) will be notified of your action.
+    </span>
+    <span *ngIf="action==='DEFER'">
+        The funding plan <b>{{fprId}}</b>  has been successfully deferred and sent back to
+        the DOC approver <b><a href="mailto: {{docApprover.approverEmailAddress}}">
+        {{docApprover.approverLastName + ', '+ docApprover.approverFirstName}}</a></b> for review.
+    </span>
+    <span *ngIf="action==='WITHDRAW'">
+        The funding plan <b>{{fprId}}</b>  has been withdrawn. The requester and any 
+        previous approver(s) (if applicable) will be notified of your action. 
+    </span>
+    <span *ngIf="action==='HOLD'">
+        The funding plan <b>{{fprId}}</b>  has been placed on hold. The requester, current, 
+        and previous approver(s) (if applicable) will be notified of your action.  
+    </span>
+    <span *ngIf="action==='RELEASE'">
+        The funding plan <b>{{fprId}}</b> has been released from the hold status. 
+        The current approver & designee(s) will be notified to process the funding plan. 
+    </span>
+    You can view the funding plan details below or return to the 
+    <a routerLink="/search">search</a>.
+</div>
+<div class="alert alert-danger" *ngIf="status === 'failure'">
+    <b>Failed to submit funding plan</b> {{errorMessage}}
+</div>
