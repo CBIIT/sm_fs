@@ -17,6 +17,7 @@ import { ControlContainer, NgForm } from '@angular/forms';
 export class FpFundingSourceComponent implements OnInit {
   @Input() parentForm: NgForm;
   @Input() index: number;
+  dummy: string = null;
   data: Select2OptionData[] = [];
   selectedValue: number = null;
   fy: number;

@@ -1,5 +1,13 @@
 <ng-select2
   [allowClear]="true"
   [data]="data"
-  [(ngModel)]="selectedValue">
+  [(ngModel)]="selectedValue"
+  [name]="'f_source_' + index"
+  #fsourceSelect="ngModel">
 </ng-select2>
+<div
+  class="text-danger mt-1"
+  *ngIf="(parentForm.submitted || fsourceSelect.touched) && !selectedValue">
+  Funding source is required
+  <input type="hidden" [ngModel]="dummy" [name]="'f_source_error_' + index" required>
+</div>

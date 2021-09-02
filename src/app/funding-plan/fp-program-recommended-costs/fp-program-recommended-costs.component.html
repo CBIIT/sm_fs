@@ -98,7 +98,7 @@
   <div
     class="text-danger mt-1"
     *ngIf="(parentForm.submitted || dcInput.touched || tcInput.touched) && !isTotalGreaterThanDirect()">
-    Total cost must greater than or equal to direct cost
+    Total cost must be greater than or equal to direct cost
     <input type="hidden" [ngModel]="dummy" [name]="'TC2-' + grantIndex + '_' + sourceIndex" required>
   </div>
 </ng-template>
