@@ -1,4 +1,4 @@
-<div class="row float-right">
+<div class="row float-right" *ngIf="activeStep.step === 1">
     <div class="col">
         <a href="{{model.yourgrantsUrl}}" target="yourgrant">Your Grants</a>
     </div>
@@ -6,7 +6,8 @@
 <div>
     <div class="row">
         <div class="col">
-            <h1>{{model.title}} <span *ngIf="model.fundingPlanDto?.fprId"># {{model.fundingPlanDto.fprId}}</span> &mdash; Step {{activeStep.step}}: {{activeStep.screenName}}</h1>
+            <h1>{{model.title}} <span *ngIf="model.fundingPlanDto?.fprId"># {{model.fundingPlanDto.fprId}}</span>
+                &mdash; Step {{activeStep.step}}: {{activeStep.screenName}}</h1>
         </div>
     </div>
     <div class="row justify-content-center mb-2">
@@ -14,7 +15,5 @@
             <app-step-indicator [steps]="steps" [activeStep]="activeStep" [hidden]="!showSteps"></app-step-indicator>
         </div>
     </div>
-
     <router-outlet></router-outlet>
-
 </div>
