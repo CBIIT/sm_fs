@@ -254,7 +254,9 @@ export class PlanStep3Component implements OnInit {
     this.planModel.fundingPlanDto.fundableRangeFrom = this.planModel.minimumScore;
     this.planModel.fundingPlanDto.fundableRangeTo = this.planModel.maximumScore;
 
+    // TODO: This next line is wrong.  This is the ldapId of the requesting PD, not the creator of the plan
     this.planModel.fundingPlanDto.requestorLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+    this.planModel.fundingPlanDto.planCreateUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
 
     this.logger.info(JSON.stringify(this.planModel.fundingPlanDto));
 
