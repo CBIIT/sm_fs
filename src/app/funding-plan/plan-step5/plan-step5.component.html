@@ -53,8 +53,9 @@
                         </div>
                         <ng-template #sciRatNotUploadedBtn>
                             <div class="doc-buttons">
-                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
-                                        class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
+                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"
+                                    (click)="changeLabel('sciRatNotUploadedBtnId')"><i id='sciRatNotUploadedBtnId'
+                                        class="far fa-plus mr-1" aria-hidden="true">Add Document</i></button>
                             </div>
                         </ng-template>
                     </div>
@@ -97,8 +98,9 @@
                         </div>
                         <ng-template #excNotUploadedBtn>
                             <div class="doc-buttons">
-                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
-                                        class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
+                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"
+                                    (click)="changeLabel('excNotUploadedBtnId')"><i id='excNotUploadedBtnId'
+                                        class="far fa-plus mr-1" aria-hidden="true">Add Document</i></button>
                             </div>
                         </ng-template>
                     </div>
@@ -139,8 +141,9 @@
                         </div>
                         <ng-template #skipNotUploadedBtn>
                             <div class="doc-buttons">
-                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
-                                        class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
+                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"
+                                    (click)="changeLabel('skipNotUploadedBtnId')"><i id='skipNotUploadedBtnId'
+                                        class="far fa-plus mr-1" aria-hidden="true">Add Document</i></button>
                             </div>
                         </ng-template>
                     </div>
@@ -181,8 +184,9 @@
                         </div>
                         <ng-template #othNotUploadedBtn>
                             <div class="doc-buttons">
-                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"><i
-                                        class="far fa-plus mr-1" aria-hidden="true"></i> Add Document</button>
+                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"
+                                    (click)="changeLabel('othNotUploadedBtnId')"><i id='othNotUploadedBtnId'
+                                        class="far fa-plus mr-1" aria-hidden="true">Add Document</i> </button>
                             </div>
                         </ng-template>
 
