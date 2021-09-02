@@ -18,6 +18,7 @@ import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-
 import { Router } from '@angular/router';
 import { GrantsSearchFilterService } from '../../funding-request/grants-search/grants-search-filter.service';
 import { getCurrentFiscalYear } from '../../utils/utils';
+import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 
 
 /**
@@ -214,7 +215,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
   constructor(private fsPlanControllerService: FsPlanControllerService,
               private router: Router,
               private planModel: PlanModel,
-              private logger: NGXLogger) {
+              private logger: NGXLogger,
+              private navigationModel: NavigationStepModel) {
   }
 
   @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
@@ -247,6 +249,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
   noSelectableGrants = false;
 
   ngOnInit(): void {
+    this.navigationModel.showSteps = true;
+    this.navigationModel.setStepLinkable(1, true);
     this.ncab_options = {
       multiple: true,
       allowClear: false
