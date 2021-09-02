@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
+import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 import { WorkflowModel } from 'src/app/funding-request/workflow/workflow.model';
-import { RequestModel } from 'src/app/model/request/request-model';
 
 @Component({
   selector: 'app-plan-submission-alert',
@@ -20,6 +20,7 @@ export class PlanSubmissionAlertComponent implements OnInit, OnDestroy {
   errorMessage: string;
 
   constructor(private workflowModel: WorkflowModel,
+              private logger: NGXLogger,
               private integrationService: FundingRequestIntegrationService) {
   }
 
@@ -41,6 +42,7 @@ export class PlanSubmissionAlertComponent implements OnInit, OnDestroy {
           this.action = dto.completeRequest ? 'COMPLETE' : dto.action;
           this.fprId = dto.fprId;
           window.scrollTo(0, 0);
+//          this.logger.debug('plan submit success alert component ', this);
         }
     );
     this.requestSubmitFailureEventSubscriber = this.integrationService.requestSubmitFailureEmitter.subscribe(
@@ -50,6 +52,7 @@ export class PlanSubmissionAlertComponent implements OnInit, OnDestroy {
           this.status = 'failure';
           this.errorMessage = message;
           window.scrollTo(0, 0);
+//          this.logger.debug('plan submit failed alert component ', this);
         }
     );
   }

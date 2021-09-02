@@ -1,5 +1,8 @@
 <!-- BEGIN Funding Plan Information Section -->
 <app-plan-submission-alert></app-plan-submission-alert>
+<app-plan-warning [inFlightProposed]="inFlightProposed" 
+                  [inFlightSkipped]="inFlightSkipped"
+                  [docChecker]="docChecker"></app-plan-warning>
 <app-workflow-modal requestOrPlan="PLAN"></app-workflow-modal>
 <app-funding-plan-information [showAdditionalInfo]="true"></app-funding-plan-information>
 <!-- END Funding Plan Information Section -->
@@ -149,12 +152,12 @@
     </div>
 </div>
 <!-- END Buttons Section -->
-
+<!--<button class="btn btn-primary mr-2" (click)="test()">Test Something</button>  -->
 <!-- START Funding Plan History Section -->
 <div class="row">
     <div class="col-12">
       <h2>Funding Plan History</h2>
       <app-request-history requestOrPlan="PLAN"></app-request-history>
     </div>
-  </div>
+</div>
 <!-- END Funding Plan History Section -->

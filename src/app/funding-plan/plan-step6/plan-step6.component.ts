@@ -1,6 +1,8 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { DocumentsDto, FsPlanWorkflowControllerService, FundingReqApproversDto, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { DocumentsDto, FsPlanControllerService, FsPlanWorkflowControllerService,
+  FundingReqApproversDto, FundingReqStatusHistoryDto,
+  FundingRequestQueryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
@@ -11,7 +13,6 @@ import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dt
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { AppPropertiesService } from 'src/app/service/app-properties.service';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
-import { PlanApproverService } from '../approver/plan-approver.service';
 import { PlanWorkflowComponent } from '../fp-workflow/plan-workflow.component';
 import { DocTypeConstants } from './plan-supporting-docs-readonly/plan-supporting-docs-readonly.component';
 
@@ -25,8 +26,11 @@ export class PlanStep6Component implements OnInit {
   @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
   @ViewChild(PlanWorkflowComponent) workflowComponent: PlanWorkflowComponent;
 
-  grantsSkipped: NciPfrGrantQueryDtoEx[];
-  grantsNotConsidered: NciPfrGrantQueryDtoEx[];
+  grantsSkipped: NciPfrGrantQueryDtoEx[] = [];
+  grantsNotConsidered: NciPfrGrantQueryDtoEx[] = [];
+
+  inFlightProposed: FundingRequestQueryDto[];
+  inFlightSkipped: FundingRequestQueryDto[];
 
   statusesCanWithdraw = ['SUBMITTED', 'ON HOLD', 'APPROVED', 'AWC', 'DEFER',
     'RELEASED', 'DELEGATED', 'ROUTED', 'REASSIGNED'];
@@ -61,9 +65,9 @@ export class PlanStep6Component implements OnInit {
               private userSessionService: AppUserSessionService,
               private requestIntegrationService: FundingRequestIntegrationService,
               private fsPlanWorkflowControllerService: FsPlanWorkflowControllerService,
+              private fsPlanControllerService: FsPlanControllerService,
               public planModel: PlanModel,
               private workflowModel: WorkflowModel,
-              private planApproverService: PlanApproverService,
               private logger: NGXLogger,
               private changeDetection: ChangeDetectorRef,
               private router: Router) { }
@@ -97,6 +101,35 @@ export class PlanStep6Component implements OnInit {
     this.logger.debug('Step6 OnInit Plan Model ', this.planModel);
     this.checkUserRolesCas();
     this.docChecker = new FundingPlanDocChecker(this.planModel);
+    this.checkInFlightPfr();
+  }
+
+  checkInFlightPfr(): void {
+    this.fsPlanControllerService.getInFlightPFRsUsingGET(this.fprId).subscribe(
+      result => {
+        result.forEach( r => {
+          if (this.isSkip(r)) {
+            this.inFlightSkipped.push(r);
+          }
+          else {
+            this.inFlightProposed.push(r);
+          }
+        }
+        );
+      },
+      error => {
+        this.logger.error('calling getInFlightPFR failed ', error);
+      }
+    );
+  }
+
+  isSkip(r: FundingRequestQueryDto): boolean {
+    if (this.grantsSkipped && this.grantsSkipped.length > 0) {
+      for (const g of this.grantsSkipped) {
+        if (g.applId === r.applId) { return true; }
+      }
+    }
+    return false;
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
@@ -276,14 +309,24 @@ export class PlanStep6Component implements OnInit {
       });
   }
 
+  // test(): void {
+  //   const dto: WorkflowTaskDto = {};
+  //   dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+  //   dto.fprId = this.fprId;
+  //   dto.action = WorkflowActionCode.SUBMIT;
+  //   dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
+  //   this.requestIntegrationService.requestSubmissionEmitter.next(dto);
+  // }
+
   hideWorkflow(): boolean {
     return this.requestStatus === RequestStatus.REJECTED;
   }
 }
 
-class FundingPlanDocChecker {
+export class FundingPlanDocChecker {
   docMissing: boolean;
   tooltipText: string;
+  warningText: string;
 
   private requiredDocs: any[] = [
     {docType: DocTypeConstants.JUSTIFICATION, tooltip: 'Scientific Rationale'},
@@ -316,6 +359,7 @@ class FundingPlanDocChecker {
           this.tooltipText += ', ' + this.missingTooltips[i];
         }
       }
+      this.warningText = this.tooltipText + (this.missingTooltips.length > 1 ? ' have ' : ' has ');
       this.tooltipText = 'You must upload ' + this.tooltipText + ' to submit this Plan';
     }
   }
