@@ -121,6 +121,7 @@ import { RfaReissueValidatorDirective } from './validators/rfa-reissue-validator
 import { FpSetAsideValidatorDirective } from './validators/fp-set-aside-validator.directive';
 import { PlanSubmissionAlertComponent } from './funding-plan/plan-step6/plan-submission-alert/plan-submission-alert.component';
 import { PlanWarningComponent } from './funding-plan/plan-step6/plan-warning/plan-warning.component';
+import { ActiveFundingPlanValidatorDirective } from './validators/active-funding-plan-validator.directive';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -250,7 +251,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     RetrievePlanComponent,
     RfaReissueValidatorDirective,
     FpSetAsideValidatorDirective,
-    PlanWarningComponent
+    PlanWarningComponent,
+    ActiveFundingPlanValidatorDirective
   ],
 
 
