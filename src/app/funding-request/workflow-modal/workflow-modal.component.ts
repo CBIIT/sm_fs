@@ -5,6 +5,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { Alert } from 'src/app/alert-billboard/alert';
+import { PlanModel } from 'src/app/model/plan/plan-model';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { WorkflowActionCode } from '../workflow/workflow.model';
@@ -27,6 +28,7 @@ export class WorkflowModalComponent implements OnInit {
   alert: Alert;
   constructor(private modalService: NgbModal,
               private requestModel: RequestModel,
+              private planModel: PlanModel,
               private fsWorkflowService: FsWorkflowControllerService,
               private fsPlanWorkflowService: FsPlanWorkflowControllerService,
               private userSessionService: AppUserSessionService,
@@ -72,7 +74,12 @@ export class WorkflowModalComponent implements OnInit {
     }
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-    dto.frqId = this.requestModel.requestDto.frqId;
+    if (this.requestOrPlan === 'REQUEST') {
+      dto.frqId = this.requestModel.requestDto.frqId;
+    }
+    else {
+      dto.fprId = this.planModel.fundingPlanDto.fprId;
+    }
     dto.comments = this.comments;
     dto.action =  WorkflowActionCode[this.mode];
     this.logger.debug('Modal submits workflow task dto ', dto);

@@ -298,7 +298,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         // if (dto.gmInfo) {
         //   this.setGmInfoToRequestModel(dto.gmInfo);
         // }
-        this.workflowModel.initialize();
+        this.workflowModel.initializeForPlan(dto.fprId);
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
       },

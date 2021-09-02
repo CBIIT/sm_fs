@@ -222,7 +222,6 @@ export class PlanStep6Component implements OnInit {
   }
 
   withdrawVisible(): boolean {
-    return false; // Hide until Sprint 6
     if (!this.statusesCanWithdraw.includes(this.requestStatus)) {
       return false;
     }
@@ -231,7 +230,6 @@ export class PlanStep6Component implements OnInit {
   }
 
   putOnHoldVisible(): boolean {
-    return false;  // Hide until Sprint 6
     if (!this.statusesCanOnHold.includes(this.requestStatus)) {
       return false;
     }
@@ -240,7 +238,6 @@ export class PlanStep6Component implements OnInit {
   }
 
   releaseFromHoldVisible(): boolean {
-    return false;   // Hide until Sprint 6
     return this.requestStatus === 'ON HOLD' &&
     ((this.userCanSubmit && !this.workflowModel.approvedByFC) ||
     (this.workflowModel.isDocApprover && this.workflowModel.approvedByDoc));
