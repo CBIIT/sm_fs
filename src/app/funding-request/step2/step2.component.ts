@@ -47,9 +47,10 @@ export class Step2Component implements OnInit {
   }
 
   prevStep(): void {
+    this.logger.debug('previous()');
     // TODO - alert for unsaved changes?
     if (this.step2Form.dirty && confirm('Unsaved changes will be lost if you continue.')) {
-      this.router.navigate(['/request/step1']);
+      this.router.navigate(['/request/step1/new']);
     }
 
   }
