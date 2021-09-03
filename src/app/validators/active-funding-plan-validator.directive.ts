@@ -22,11 +22,21 @@ export class ActiveFundingPlanValidatorDirective implements AsyncValidator {
     if (isNaN(control.value) || !initialPayType) {
       return new Promise(resolve => {
         // this.logger.debug('null');
-        this.requestModel.initialPay = undefined;
+        this.requestModel.fundingPlanId = undefined;
         resolve(null);
       });
     }
-    return undefined;
+    return new Promise(resolve => {
+      this.fsRequestService.checkIsFundedByFundingPlanUsingGET(this.requestModel.grant.applId).subscribe(result => {
+        if (isNaN(result) || Number(result) === 0) {
+          this.requestModel.initialPay = undefined;
+          resolve(null);
+        } else {
+          this.requestModel.fundingPlanId = Number(result) !== 0 ? result : undefined;
+          resolve({ fundedByFundingPlan: true });
+        }
+      });
+    });
   }
 
 }

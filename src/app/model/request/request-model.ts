@@ -53,6 +53,7 @@ export class RequestModel {
 
   // Boolean value to show th return to RequestQuery page link
   returnToRequestPageLink = false;
+  fundingPlanId: number;
 
   get recreateMainApproverNeeded(): boolean {
     // need to have logic to determine something changed in request that

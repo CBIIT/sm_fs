@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FsLookupControllerService } from '@nci-cbiit/i2ecws-lib';
+import { FsLookupControllerService, FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import 'select2';
 import { SearchFilterService } from '../../search/search-filter.service';
 import { UserService } from '@nci-cbiit/i2ecui-lib';
@@ -8,7 +8,7 @@ import { openNewWindow } from 'src/app/utils/utils';
 import { NGXLogger } from 'ngx-logger';
 import { Select2OptionData } from 'ng-select2';
 import { FundingRequestTypeRulesDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestTypeRulesDto';
-import { FundingRequestTypes } from '../../model/request/funding-request-types';
+import { FundingRequestTypes, INITIAL_PAY_TYPES } from '../../model/request/funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
 import { ControlContainer, NgForm } from '@angular/forms';
 import { Options } from 'select2';
@@ -38,14 +38,35 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   @Output() selectedValueChange = new EventEmitter<number>();
-  alert: Alert = {
+  otherPayAlert: Alert = {
     type: 'warning',
     message: 'WARNING: This option should be selected only if your request will not be using any NCI funds.'
   };
 
   set selectedValue(value: number) {
-    if (value && Number(value) === FundingRequestTypes.OTHER_PAY_COMPETING_ONLY) {
-      this.alerts = [this.alert];
+    // NOTE: using push() to add alerts causes issues because this method gets called more than once.  if we solve that
+    // problem, we can use the more natural approach of just pushing alerts into the queue.
+    if (value) {
+      let otherPay = false;
+      if (Number(value) === FundingRequestTypes.OTHER_PAY_COMPETING_ONLY) {
+        this.alerts = [this.otherPayAlert];
+        otherPay = true;
+      }
+      if (INITIAL_PAY_TYPES.includes(Number(value))) {
+        this.fsRequestControllerService.checkIsFundedByFundingPlanUsingGET(this.model.grant.applId).subscribe(result => {
+          if (!!result && result !== 0) {
+            const fundedAlert: Alert = {
+              type: 'warning',
+              message: 'WARNING: This grant application is selected for funding in funding plan #' + result
+            };
+            if (otherPay) {
+              this.alerts = [this.otherPayAlert, fundedAlert];
+            } else {
+              this.alerts = [fundedAlert];
+            }
+          }
+        });
+      }
     } else {
       this.alerts = [];
     }
@@ -69,7 +90,8 @@ export class FundingRequestTypeComponent implements OnInit {
               private searchFilterService: SearchFilterService,
               private userService: UserService,
               public model: RequestModel,
-              private logger: NGXLogger) {
+              private logger: NGXLogger,
+              private fsRequestControllerService: FsRequestControllerService) {
   }
 
   ngOnInit(): void {

@@ -12,7 +12,6 @@
     [ngClass]="{'is-invalid': (!fundingRequestType.valid && (fundingRequestType.touched || parentForm.submitted) || parentForm.errors?.mustSelectDiversitySupplement ) }"
     required
     appActiveInitialPayValidator
-    appActiveFundingPlanValidator
     [ngModelOptions]="{updateOn: 'change'}">
   </ng-select2>
   <app-alert-billboard [alerts]="alerts"></app-alert-billboard>
