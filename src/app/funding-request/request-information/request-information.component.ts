@@ -43,6 +43,7 @@ export class RequestInformationComponent implements OnInit {
 
 
   private refreshFundingSources(requestType: number, conversionActivityCode: string, cayCode: string): void {
+    this.logger.debug('refreshFundingSources', requestType, conversionActivityCode, cayCode);
     if (!requestType || !cayCode) {
       this.logger.info('Not refreshing funding sources: missing type or cayCode');
     }
@@ -91,6 +92,7 @@ export class RequestInformationComponent implements OnInit {
     this._selectedCayCode = value;
     const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
       ? this.requestModel.requestDto.conversionActivityCode : null;
+    this.logger.debug('conversionActivityCode after changing cayCode: ', conversionActivityCode);
     this.refreshFundingSources(
       this.requestModel.requestDto.financialInfoDto.requestTypeId,
       conversionActivityCode,
@@ -156,10 +158,10 @@ export class RequestInformationComponent implements OnInit {
   }
 
   onType4Change(value: string): void {
-    this.logger.debug(value, this.requestModel.requestDto.conversionActivityCode);
+    this.logger.debug('conversionMech change event:', value, this.requestModel.requestDto.conversionActivityCode);
     const conversionActivityCode = ConversionActivityCodes.includes(value) ? value : null;
     if (this.requestModel.requestDto.financialInfoDto.requestTypeId) {
-      this.logger.debug('refresh request types', conversionActivityCode, this.requestModel.requestDto.financialInfoDto.requestTypeId);
+      this.logger.debug('refresh funding sources', conversionActivityCode, this.requestModel.requestDto.financialInfoDto.requestTypeId);
       this.refreshFundingSources(
         this.requestModel.requestDto.financialInfoDto.requestTypeId,
         value,
