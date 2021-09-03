@@ -47,11 +47,11 @@
         {{docApprover.approverLastName + ', '+ docApprover.approverFirstName}}</a></b> for review.
     </span>
     <span *ngIf="action==='WITHDRAW'">
-        The funding plan <b>{{fprId}}</b>  has been withdrawn. The requester and any 
+        The funding plan <b>{{fprId}}</b> has been withdrawn. The requester and any 
         previous approver(s) (if applicable) will be notified of your action. 
     </span>
     <span *ngIf="action==='HOLD'">
-        The funding plan <b>{{fprId}}</b>  has been placed on hold. The requester, current, 
+        The funding plan <b>{{fprId}}</b> has been placed on hold. The requester, current, 
         and previous approver(s) (if applicable) will be notified of your action.  
     </span>
     <span *ngIf="action==='RELEASE'">

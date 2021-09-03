@@ -40,20 +40,39 @@ export class WorkflowModalComponent implements OnInit {
     this.alert = null;
     this.mode = mode;
     this.comments = '';
-    if (mode === 'WITHDRAW') {
-      this.title = 'Withdraw Request';
-      this.buttonText = 'Withdraw';
-    }
-    else if (mode === 'HOLD') {
-      this.title = 'Hold Request';
-      this.buttonText = 'Hold';
-    }
-    else if (mode === 'RELEASE') {
-      this.title = 'Release Request from Hold';
-      this.buttonText = 'Release Hold';
+    if (this.requestOrPlan === 'REQUEST') {
+      if (mode === 'WITHDRAW') {
+        this.title = 'Withdraw Request';
+        this.buttonText = 'Withdraw';
+      }
+      else if (mode === 'HOLD') {
+        this.title = 'Hold Request';
+        this.buttonText = 'Hold';
+      }
+      else if (mode === 'RELEASE') {
+        this.title = 'Release Request from Hold';
+        this.buttonText = 'Release Hold';
+      }
+      else {
+        throw new Error(mode + ' is not supported in workflow modal for Funding Request');
+      }
     }
     else {
-      throw new Error(mode + ' is not supported in workflow modal');
+      if (mode === 'WITHDRAW') {
+        this.title = 'Withdraw Plan';
+        this.buttonText = 'Withdraw';
+      }
+      else if (mode === 'HOLD') {
+        this.title = 'Hold Plan';
+        this.buttonText = 'Hold';
+      }
+      else if (mode === 'RELEASE') {
+        this.title = 'Release Funding Plan from Hold';
+        this.buttonText = 'Release Hold';
+      }
+      else {
+        throw new Error(mode + ' is not supported in workflow modal for funding plan.');
+      }
     }
     return new Promise<WorkflowTaskDto>( (resolve, reject) => {
       this.modalRef = this.modalService.open(this.modalContent);

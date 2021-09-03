@@ -10,23 +10,38 @@
       <div class="col-12"  *ngIf="alert">
         <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
       </div> 
-      <p *ngIf="mode==='WITHDRAW'">
+      <p *ngIf="requestOrPlan === 'REQUEST' && mode==='WITHDRAW'">
         Once you withdraw the funding request, an automated email will be sent to the 
         requester and previous approver(s) (if applicable) notifying this action. 
         The requester will have the option to edit and resubmit the request.
       </p>
-      <p *ngIf="mode==='HOLD'">
+      <p *ngIf="requestOrPlan === 'REQUEST' && mode==='HOLD'">
         Placing this funding request on hold will stop further processing of this request. 
         An automated email will be sent to the requester, current and previous approver(s) 
         (if applicable) notifying this action.
       </p>
-      <p *ngIf="mode==='RELEASE'">
+      <p *ngIf="requestOrPlan === 'REQUEST' && mode==='RELEASE'">
         Releasing this funding request from the "Hold" status will resume the processing 
         of this request. An automated email will be sent to the current approver & 
         designee(s) to process the request.
       </p>
+      <p *ngIf="requestOrPlan === 'PLAN' && mode==='WITHDRAW'">
+        Once you withdraw the funding plan, an automated email will be sent to the 
+        requester and previous approver(s) (if applicable) notifying this action. 
+        The requester will have the option to edit and resubmit the funding plan.
+      </p>
+      <p *ngIf="requestOrPlan === 'PLAN' && mode==='HOLD'">
+        Placing this funding plan on hold will stop further processing of this 
+        funding plan. An automated email will be sent to the requester, current and 
+        previous approver(s) (if applicable) notifying this action.
+      </p>
+      <p *ngIf="requestOrPlan === 'PLAN' && mode==='RELEASE'">
+        Releasing this funding plan from the "Hold" status will resume the processing 
+        of this funding plan. An automated email will be sent to the current approver & 
+        designee(s) to process the funding plan.
+      </p>
       <div class="form-group">
-        <label for="wf-comments">Workflow Comments</label>
+        <label for="wf-comments">Comments</label>
         <textarea 
         [(ngModel)]="comments" 
         id="wfcomments" 
