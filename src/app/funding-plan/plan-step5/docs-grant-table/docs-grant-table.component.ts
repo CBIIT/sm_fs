@@ -96,23 +96,14 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
             render: ( data, type, row, meta ) => {
               return '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
             }},
-        // {title: 'I2 Status', data: 'applStatusGroupDescrip'}, // 4
-        // {title: 'PD', data: 'pdFullName',  // 5
-        //     render: ( data, type, row, meta ) => {
-        //       return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-        //     }},
-        // {title: 'CA', data: 'cayCode', // 6
-        //     ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'},
-        // {title: 'FY', data: 'fy'}, // 7
+        
         {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', // 8
             render: ( data, type, row, meta) => {
               return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
             }},
-        //{title: 'Pctl', data: 'irgPercentileNum'}, // 9
+       
         {title: 'Pri Scr', data: 'priorityScoreNum'}, // 10
-        // {title: 'Budget Start Date', data: 'budgetStartDate'}, // 11
-        // {title: 'Existing Requests', data: 'requestCount', // 12
-        //     ngTemplateRef: { ref: this.existingRequestsRenderer}, className: 'all'},
+       
         {data: null, defaultContent: ''}
       ],
       order: [[5, 'asc']],
@@ -128,19 +119,7 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
           orderable: false,
           targets: -1
         },
-        // {responsivePriority: 1, targets: 0 }, // grant_num
-        // {responsivePriority: 3, targets: 1 }, // pi
-        // {responsivePriority: 4, targets: 8 }, // ncab
-        // {responsivePriority: 5, targets: 7 }, // fy
-        // {responsivePriority: 6, targets: 5 }, // pd
-        // {responsivePriority: 7, targets: 6 }, // ca
-        // {responsivePriority: 8, targets: 9 }, // pctl
-        // {responsivePriority: 9, targets: 10 }, // priscr
-        // {responsivePriority: 10, targets: 3 }, // rfa/pa
-        // {responsivePriority: 11, targets: 12 }, // existing requests
-        // {responsivePriority: 12, orderable: false, targets: 2 }, // project title
-        // {responsivePriority: 13, targets: 4 }, // i2 status
-        // {responsivePriority: 14, targets: 11 } // budget start date
+        
       ],
       dom: '<"dt-controls"<"ml-auto"fB<"d-inline-block">>>rt<"dt-controls"<"mr-auto"i>>',
       buttons: [
@@ -156,9 +135,7 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
         }
       ],
       rowCallback: (row: Node, data: any[] | object, index: number) => {
-        // Fix for Excel output - I removed empty renderers in column definitions
-        // But now, I have to remove the first "text" child node to prevent it
-        // from rendering (angular datatables bug)
+       
         this.dtOptions.columns.forEach((column, ind) => {
           if (column.ngTemplateRef) {
             const cell = row.childNodes.item(ind);

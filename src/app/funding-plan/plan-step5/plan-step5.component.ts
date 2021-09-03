@@ -55,7 +55,7 @@ export class PlanStep5Component implements OnInit {
 
     this.selectedGrants = this.planModel.allGrants.filter(g => g.selected);
     this.exceptionGrants = this.planModel.allGrants.filter(g => g.selected &&
-      g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore);
+      (g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore));
     this.skipGrants = this.planModel.allGrants.filter(g => !g.selected &&
       (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
       g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore
