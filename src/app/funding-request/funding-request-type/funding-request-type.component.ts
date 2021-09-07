@@ -30,6 +30,12 @@ export class FundingRequestTypeComponent implements OnInit {
     = { requestOrPlan: '', searchPool: '', requestType: '' };
   data: Array<Select2OptionData>;
   options: Options;
+  clearableTypes = [
+    FundingRequestTypes.SKIP,
+    FundingRequestTypes.SKIP__NCI_RFA,
+    FundingRequestTypes.PAY_TYPE_4,
+    FundingRequestTypes.RESTORATION_OF_A_FUTURE_YEAR
+  ];
   private _selectedValue: number = null;
 
   @Input()
@@ -69,6 +75,12 @@ export class FundingRequestTypeComponent implements OnInit {
       }
     } else {
       this.alerts = [];
+    }
+    // If we are changing to or from one of the clearable request types, we need to blow away the entire
+    // PRC model
+    if (this.clearableTypes.includes(value) || this.clearableTypes.includes(this._selectedValue)) {
+      this.logger.warn('About to do something totally drastic: blowing away PRC model');
+      this.model.programRecommendedCostsModel.deepReset(!!this.model.requestDto.frqId);
     }
     this.model.requestDto.frtId = value;
     this.model.requestDto.financialInfoDto.requestTypeId = value;

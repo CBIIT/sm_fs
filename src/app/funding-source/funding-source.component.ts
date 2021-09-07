@@ -77,7 +77,9 @@ export class FundingSourceComponent implements OnInit {
     const cayCode = this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode;
     const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
       ? this.requestModel.requestDto.conversionActivityCode : null;
-    this.logger.debug('refreshFundingSources', this.requestModel.requestDto.frtId, conversionActivityCode, cayCode);
+    this.logger.debug('refreshFundingSources: type =', this.requestModel.requestDto.frtId,
+      ', conversionMech =', conversionActivityCode,
+      ', cayCode =', cayCode);
     this.fsRequestControllerService.getFundingSourcesUsingGET(
       this.requestModel.requestDto.frtId,
       this.requestModel.grant.fullGrantNum,

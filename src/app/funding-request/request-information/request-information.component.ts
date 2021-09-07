@@ -58,7 +58,6 @@ export class RequestInformationComponent implements OnInit {
       // TODO: Revisit this logic
       cayCode || this.requestModel.grant.cayCode,
       conversionActivityCode).subscribe(result => {
-      this.logger.debug(result);
       this.requestModel.programRecommendedCostsModel.fundingSources = result;
     }, error => {
       this.logger.debug('HttpClient get request error for----- ' + error.message);
