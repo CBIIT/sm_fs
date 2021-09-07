@@ -19,8 +19,8 @@ export class Type4ConversionActivityCodeComponent implements OnInit {
   }
 
   set selectedValue(value: string) {
-    this.model.requestDto.conversionActivityCode = this.selectedValue;
     this._selectedValue = value;
+    this.model.requestDto.conversionActivityCode = value;
     this.type4SelectionService.Type4SelectionEmitter.next(value);
   }
 
