@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { WorkflowModalComponent } from 'src/app/funding-request/workflow-modal/workflow-modal.component';
-import { RequestStatus, WorkflowActionCode, WorkflowModel } from 'src/app/funding-request/workflow/workflow.model';
+import { ApprovingStatuses, RequestStatus, WorkflowActionCode, WorkflowModel } from 'src/app/funding-request/workflow/workflow.model';
 import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { AppPropertiesService } from 'src/app/service/app-properties.service';
@@ -193,10 +193,8 @@ export class PlanStep6Component implements OnInit {
   }
 
   get isDisplayBudgetDocsUploadVar(): boolean {
-    // return this.workflowModel.isFinancialApprover &&
-    //        ApprovingStatuses.includes(this.requestStatus);
-    // TODO: Remove hardcoded content once actual implementation is completed
-    return true;
+       return this.workflowModel.isFinancialApprover &&
+           ApprovingStatuses.includes(this.requestStatus); 
   }
 
   get displayReadOnlyBudgetDocs(): boolean {
