@@ -9,6 +9,8 @@ import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.componen
 import { Alert } from 'src/app/alert-billboard/alert';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 import { PlanModel } from 'src/app/model/plan/plan-model';
+import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { DatepickerFormatter } from 'src/app/datepicker/datepicker-adapter-formatter';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -16,7 +18,10 @@ let addedApproverMap = new Map<number, any>();
 @Component({
   selector: 'app-plan-workflow',
   templateUrl: './plan-workflow.component.html',
-  styleUrls: ['./plan-workflow.component.css']
+  styleUrls: ['./plan-workflow.component.css'],
+  providers: [
+    {provide: NgbDateParserFormatter, useClass: DatepickerFormatter}
+  ]
 })
 export class PlanWorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
@@ -39,6 +44,8 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   requestStatus: FundingReqStatusHistoryDto = {};
   approvingState = false;
   terminalRequest = false;
+  showSplMeetingDate = false;
+  splMeetingDate: string;
 
   validationError: any = {};
 

@@ -40,6 +40,7 @@ export class WorkflowModel {
   approvedByDoc = false;
   // keep track whether budget doc was added during approval by FC to show warning message.
   budgetDocAdded = false;
+  isSplApprover = false;
 
   scientificRoleCodes = ['DOC', 'DD', 'SPL'];
   financialRoleCodes = ['FCNCI', 'FCARC'];
@@ -133,7 +134,6 @@ export class WorkflowModel {
     this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
       (result) => {
         this.processApproversResult(result);
-        this.requestModel.captureApproverCriteria();
         this.requestIntegrationService.approverInitializationEmitter.next();
       },
       (error) => {
@@ -166,6 +166,7 @@ export class WorkflowModel {
     this.approvedByGM = false;
     this.approvedByFC = false;
     this.approvedByDoc = false;
+    this.isSplApprover = false;
 
     this._allApprovers = result;
 
@@ -209,6 +210,10 @@ export class WorkflowModel {
 
         if (this.nextApproverRoleCode === 'GM') {
           this.isGMApprover = true;
+        }
+
+        if (this.nextApproverRoleCode === 'SPL') {
+          this.isSplApprover = true;
         }
       }
 

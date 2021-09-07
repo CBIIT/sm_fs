@@ -49,8 +49,27 @@
                 New approver is required
             </div>
         </div>  
-</div>
-
+    </div>
+    <div class="col-md-4" *ngIf="showSplMeetingDate">
+        <div class="form-group">
+          <label for="startDate">SPL Committee Meeting Approval Date</label>
+          <div class="input-group">
+            <input id="splMeetingDate" class="form-control" 
+                   name="splMeetingDate" [(ngModel)]="splMeetingDate" 
+                   placeholder="mm/dd/yyyy"
+                   ngbDatepicker #d="ngbDatepicker" 
+                   (click)="d.toggle()">
+            <div class="input-group-append">
+              <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d.toggle()" type="button">
+                <i class="fas fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div class="text-danger mt-1" *ngIf="(validationError?.splMeetingDate_missing)">
+            SPL Committee Meeting Approval Date is required
+        </div>
+        </div>
+    </div>
     <app-approver-list [readonly]="readonly" [terminalRequest]="terminalRequest" class="w-100"></app-approver-list>
 
     <div class="col-12">
