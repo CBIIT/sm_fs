@@ -3,6 +3,22 @@
     <h1>Manage Designations</h1>
   </div>
 </div>
+<div class="row" *ngIf="errInactiveDesignees">
+  <div class="col-12">
+    <ngb-alert type="danger" [dismissible]="false">
+        <span><a [routerLink]="" class="mr-1">
+          <i class='fa fa-user-slash' aria-hidden='true' style="color: red;"></i>
+        </a>One or more of your designees are <strong>inactive</strong> and <strong>need to be removed</strong>.</span>
+    </ngb-alert>
+  </div>
+</div>
+<div class="row" *ngIf="successManageDesigneesMsg.length > 0">
+  <div class="col-12">
+    <ngb-alert type="success" [dismissible]="true" (closed)="successManageDesigneesMsg = ''">
+      <span><b>{{successManageDesigneesMsg}}</b> <i> An automated email has been sent to - <a href="mailto:{{successDesignee.delegateToEmailAddr}}">{{successDesignee.delegateToFullName}}</a> - notifying this action.</i></span>
+    </ngb-alert>
+  </div>
+</div>
 <div class="row mb-2">
   <div class="col-12 d-flex">
     <h4 class="d-inline-block" id="new-designee-label">Add new Designee</h4>
@@ -27,7 +43,7 @@
     </div>
   </div>
 </div>
-<form (ngSubmit)="addDesignee()" #form="ngForm" [class.submitted]="form.submitted">
+<form (ngSubmit)="addDesignee()" #form="ngForm" [class.submitted]="form.submitted" appEndDateBeforeStartValidator>
   <div class="row" role="group" aria-labelledby="new-designee-label">
     <div class="col-lg-3">
       <div class="form-group">
@@ -64,7 +80,7 @@
         <div class="input-group">
           <input id="endDate" class="form-control" ngModel name="endDate" placeholder="mm/dd/yyyy"
                  ngbDatepicker #d2="ngbDatepicker" (click)="d2.toggle()"  [minDate]="minDate" required
-                 [appEndDateBeforeStartValidator]="form.controls.startDate?.value">
+                 >
           <div class="input-group-append">
             <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d2.toggle()" type="button">
               <i class="fas fa-calendar" aria-hidden="true"></i>
@@ -106,7 +122,7 @@
       <div *ngIf="form.controls.endDate?.errors?.ngbDate?.invalid && form.submitted" class="text-danger mt-1">
         End Date is invalid
       </div>
-      <div *ngIf="form.controls.endDate?.errors?.dateBeforeStart && form.submitted" class="text-danger mt-1">
+      <div *ngIf="form.errors?.dateBeforeStart && form.submitted" class="text-danger mt-1">
         End date cannot be before the start date
       </div>
     </div>

@@ -1,0 +1,19 @@
+<form #confirmForm="ngForm" (ngSubmit)="onSubmit(confirmForm)">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Confirm</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-12">
+        <span>Are you sure you want to delete <a href="mailto:{{data.delegateToEmailAddr}}">{{data.delegateToFullName}}</a> from your designation profile?</span>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="submit" class="btn btn-primary">Delete</button>
+  </div>
+</form>

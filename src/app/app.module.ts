@@ -123,6 +123,7 @@ import { PlanSubmissionAlertComponent } from './funding-plan/plan-step6/plan-sub
 import { PlanWarningComponent } from './funding-plan/plan-step6/plan-warning/plan-warning.component';
 import { ActiveFundingPlanValidatorDirective } from './validators/active-funding-plan-validator.directive';
 import { DocsGrantTableComponent } from './funding-plan/plan-step5/docs-grant-table/docs-grant-table.component';
+import { ConfirmDeleteModalComponent } from './manage-designations/confirm-delete-modal/confirm-delete-modal.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -254,7 +255,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FpSetAsideValidatorDirective,
     PlanWarningComponent,
     ActiveFundingPlanValidatorDirective,
-    DocsGrantTableComponent
+    DocsGrantTableComponent,
+    ConfirmDeleteModalComponent
   ],
 
 

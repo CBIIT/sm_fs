@@ -20,6 +20,7 @@ import {EditDesigneeModalComponent} from "./edit-designee-modal/edit-designee-mo
 import {FundingRequestPermDelDto} from "@nci-cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
 import {Options} from "select2";
 import {Select2OptionData} from "ng-select2";
+import {ConfirmDeleteModalComponent} from "./confirm-delete-modal/confirm-delete-modal.component";
 
 @Component({
   selector: 'app-manage-designations',
@@ -63,6 +64,10 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       }
     }
   }
+
+  errInactiveDesignees: boolean = false;
+  successManageDesigneesMsg: string = '';
+  successDesignee: FundingRequestPermDelDto;
 
   ngOnInit(): void {
 
@@ -159,6 +164,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
         this.logger.debug('Get designees for user: ', result);
         this.dtData = result;
         this.dtOptions.data = this.dtData;
+        this.updateErrInactiveDesignees(result);
 
         if (this.dtElement && this.dtElement.dtInstance) {
           this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
@@ -177,12 +183,22 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
     this.logger.debug('Get designees for user: ', data);
     this.dtData = data;
     this.dtOptions.data = this.dtData;
+    this.updateErrInactiveDesignees(data);
 
     if (this.dtElement && this.dtElement.dtInstance) {
       this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
         dtInstance.destroy();
         this.dtTrigger.next();
       });
+    }
+  }
+
+  updateErrInactiveDesignees(data) {
+    for (const entry of data) {
+      if (entry.newNedOrg || entry.newClassification || entry.inactiveNedDate || entry.inactiveI2eDate) {
+        this.errInactiveDesignees = true;
+        return;
+      }
     }
   }
 
@@ -202,10 +218,18 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       String(this.newDesigneeForm.value.endDate.day).padStart(2, '0') + '/' +
       String(this.newDesigneeForm.value.endDate.year).padStart(4, '0')
       : null;
+    const designeeTo = this.newDesigneeForm.value.name;
     this.designeeService.createDesigneeUsingPOST(
-      fromDate, toDate, this.userSessionService.getLoggedOnUser().nihNetworkId, this.newDesigneeForm.value.name).subscribe(
+      fromDate, toDate, this.userSessionService.getLoggedOnUser().nihNetworkId, designeeTo).subscribe(
       result => {
         this.updateDesigneeTable(result);
+        this.successManageDesigneesMsg = 'Designee has been added successfully.';
+        for (const entry of result) {
+          if (entry.delegateTo === designeeTo) {
+            this.successDesignee = entry;
+            break;
+          }
+        }
       },
       error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
@@ -232,8 +256,23 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       if (entry.id === $event) {
         const modalRef = this.modalService.open(EditDesigneeModalComponent, { size: "lg"});
         modalRef.componentInstance.data = entry;
-        modalRef.result.then((result: any) => {
-          console.debug('Result: ', result);
+        modalRef.result.then((updatedData: any) => {
+          console.debug('Result: ', updatedData);
+          this.designeeService.updateDesigneeUsingPUT(updatedData.startDate, updatedData.endDate, updatedData.id).subscribe(
+            result => {
+              this.updateDesigneeTable(result);
+              this.successManageDesigneesMsg = 'Designation date(s) have been updated successfully.';
+              for (const entry of result) {
+                if (entry.id === updatedData.id) {
+                  this.successDesignee = entry;
+                  break;
+                }
+              }
+            },
+            error => {
+              this.logger.error('HttpClient edit designee request error for----- ' + error.message);
+            }
+          )
         }).finally(() => console.debug('Finally closing dialog'));
         break;
       }
@@ -241,24 +280,46 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
   }
 
   onDeleteDesignee($event: number) {
-    this.designeeService.deleteDesigneeUsingDELETE($event).subscribe(
-      result => {
-        this.updateDesigneeTable(result);
-      },
-      error => {
-        this.logger.error('HttpClient delete designee request error for----- ' + error.message);
-      }
-    )
+    const entry = this._getEntryById($event);
+    if (entry) {
+      const modalRef = this.modalService.open(ConfirmDeleteModalComponent);
+      modalRef.componentInstance.data = entry;
+      modalRef.result.then((updatedData: any) => {
+        console.debug('Result: ', updatedData);
+        this.designeeService.deleteDesigneeUsingDELETE($event).subscribe(
+          result => {
+            this.updateDesigneeTable(result);
+
+            this.successManageDesigneesMsg = 'Designee has been deleted successfully.';
+            this.successDesignee = entry;
+          },
+          error => {
+            this.logger.error('HttpClient delete designee request error for----- ' + error.message);
+          }
+        )
+      }).finally(() => console.debug('Finally closing dialog'));
+    }
   }
 
   onReactiveDesignee($event: number) {
     this.designeeService.activateDesigneeUsingPUT($event).subscribe(
       result => {
         this.updateDesigneeTable(result);
+        this.successManageDesigneesMsg = 'Designee has been activated successfully.';
+        this.successDesignee = this._getEntryById($event);
       },
       error => {
         this.logger.error('HttpClient put designee request error for----- ' + error.message);
       }
     )
+  }
+
+  private _getEntryById (id: number) : FundingRequestPermDelDto {
+    for (let entry of this.dtData) {
+      if (entry.id === id) {
+        return entry;
+      }
+    }
+    return null;
   }
 }
