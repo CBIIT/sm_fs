@@ -164,7 +164,7 @@ export class RequestInformationComponent implements OnInit {
     if (this.requestModel.requestDto.financialInfoDto.requestTypeId) {
       this.refreshFundingSources(
         this.requestModel.requestDto.financialInfoDto.requestTypeId,
-        value,
+        conversionActivityCode,
         this.requestModel.requestDto.financialInfoDto.requestorCayCode);
     }
   }

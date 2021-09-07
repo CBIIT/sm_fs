@@ -73,6 +73,32 @@ export class ProgramRecommendedCostsModel {
   set fundingSources(value: FundingRequestFundsSrcDto[]) {
     this._fundingSources = value;
     this._fundingSourcesMap = new Map(value.map(key => [key.fundingSourceId, key] as [number, FundingRequestFundsSrcDto]));
+    if (!this._selectedFundingSources) {
+      return;
+    }
+    this.deleteUnselectableSources();
+  }
+
+  deleteUnselectableSources(): void {
+    const deleteSources: number[] = [];
+    this._selectedFundingSources.forEach((f, index) => {
+      if (!this._fundingSourcesMap.get(f.fundingSourceId)) {
+        deleteSources.push(index);
+      }
+    });
+    if (deleteSources.length === 0) {
+      return;
+    }
+    deleteSources.sort((a, b) => {
+      return b - a;
+    });
+
+    deleteSources.forEach(i => {
+      // NOTE: we can't tell from here whether the source has been saved or not, so just in case, we will try to
+      // officially delete it later.
+      this.deleteFundingSourceByIndex(i, true);
+    });
+
   }
 
   get fundingSourcesMap(): Map<number, FundingRequestFundsSrcDto> {
