@@ -93,7 +93,6 @@ export class Step2Component implements OnInit {
           result1 => {
             this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos = result1;
             this.requestModel.restoreLineItemIds();
-            this.logger.debug('loaded budgets', result);
           });
         this.requestApproverService.checkCreateApprovers().finally(
           () => {
