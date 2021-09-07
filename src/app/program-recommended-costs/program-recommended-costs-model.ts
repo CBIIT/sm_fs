@@ -96,7 +96,10 @@ export class ProgramRecommendedCostsModel {
     deleteSources.forEach(i => {
       // NOTE: we can't tell from here whether the source has been saved or not, so just in case, we will try to
       // officially delete it later.
-      this.deleteFundingSourceByIndex(i, true);
+      const sourceId = this.deleteFundingSourceByIndex(i, true);
+      if (sourceId !== -1) {
+        this.selectedFundingSourceIds.delete(sourceId);
+      }
     });
 
   }
