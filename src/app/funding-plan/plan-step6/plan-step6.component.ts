@@ -194,7 +194,7 @@ export class PlanStep6Component implements OnInit {
 
   get isDisplayBudgetDocsUploadVar(): boolean {
        return this.workflowModel.isFinancialApprover &&
-           ApprovingStatuses.includes(this.requestStatus); 
+           ApprovingStatuses.includes(this.requestStatus);
   }
 
   get displayReadOnlyBudgetDocs(): boolean {

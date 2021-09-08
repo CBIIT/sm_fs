@@ -11,6 +11,7 @@ import { FundingRequestIntegrationService } from 'src/app/funding-request/integr
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { DatepickerFormatter } from 'src/app/datepicker/datepicker-adapter-formatter';
+import { DatePipe } from '@angular/common';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -20,7 +21,8 @@ let addedApproverMap = new Map<number, any>();
   templateUrl: './plan-workflow.component.html',
   styleUrls: ['./plan-workflow.component.css'],
   providers: [
-    {provide: NgbDateParserFormatter, useClass: DatepickerFormatter}
+    {provide: NgbDateParserFormatter, useClass: DatepickerFormatter},
+    DatePipe
   ]
 })
 export class PlanWorkflowComponent implements OnInit, OnDestroy {
@@ -44,7 +46,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   requestStatus: FundingReqStatusHistoryDto = {};
   approvingState = false;
   terminalRequest = false;
-  showSplMeetingDate = false;
+//  showSplMeetingDate = false;
   splMeetingDate: string;
 
   validationError: any = {};
@@ -77,6 +79,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
               private userSessionService: AppUserSessionService,
               private planModel: PlanModel,
               private workflowModel: WorkflowModel,
+              private datePipe: DatePipe,
               private logger: NGXLogger) {
   }
 
@@ -171,7 +174,6 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     historyResult.forEach((item: FundingReqStatusHistoryDto) => {
       if (!item.endDate) {
         this.requestStatus = item;
-        this.requestStatus = {statusCode: 'DRAFT'};
         this.approvingState = ApprovingStatuses.includes(this.requestStatus.statusCode);
         this.terminalRequest = TerminalStatuses.includes(this.requestStatus.statusCode);
         this.logger.debug('current requestStatus= ', item);
@@ -183,11 +185,6 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   isApprover(): boolean {
     return this.workflowModel.isUserNextInChain && this.approvingState;
   }
-
-  // showApprovedCosts(): boolean {
-  //   return !this.requestModel.isSkip() && (this.workflowModel.approvedScientifically ||
-  //     (this.workflowModel.isScientificApprover && this.approvingState));
-  // }
 
   // showGmInfo(): boolean {
   //   return !this.requestModel.isSkip() && ( this.workflowModel.approvedByGM ||
@@ -219,7 +216,6 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     if (!this._selectedWorkflowAction) {
       return true;
     }
-
     return false;
   }
 
@@ -229,6 +225,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   get newApproverRequired(): boolean {
     return this._selectedWorkflowAction?.newApproverRequired;
+  }
+
+  get showSplMeetingDate(): boolean {
+    return this.workflowModel.isSplApprover && this.approvingState;
   }
 
   submitWorkflow(): void {
@@ -270,27 +270,19 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         dto.completeRequest = true;
       }
     }
-//     // set approved costs cans if scientific approver;
-//     if (this.workflowModel.isScientificApprover
-//       && this.workflowModel.isApprovalAction(action)
-//       && !this.requestModel.isSkip() ) {
-//         dto.requestCans = this.requestModel.requestCans;
-//         this.logger.debug('scientific approver:', dto.requestCans);
-// //      dto.requestCans = this.approvedCostsComponent.getCans();
-//     }
+    // set SPL meeting date for SPL approver;
+    if (this.workflowModel.isSplApprover
+      && this.workflowModel.isApprovalAction(action)
+      && this.splMeetingDate ) {
+//        dto.splMeetingDate = this.datePipe.transform(new Date(this.splMeetingDate));
+        this.logger.debug('SPL approver, spl meeting date=' + this.splMeetingDate);
+    }
 
     if (this.workflowModel.isFinancialApprover
       && this.workflowModel.isApprovalAction(action)
       && this.workflowModel.budgetDocAdded) {
         alert('WARNING: If the uploaded budget document(s) are not in eGrants, please send the document(s) to the appropriate Grants Management Specialist to add it the grant file in eGrants.');
     }
-
-    // this.logger.debug(this.workflowModel.isApprovalAction(action));
-    // this.logger.debug(this.budgetInfoComponent?.editing);
-    // // if (this.workflowModel.isApprovalAction(action) && this.budgetInfoComponent?.editing) {
-    // //   this.budgetInfoComponent.refreshRequestCans();
-    // //   dto.requestCans = this.requestModel.requestCans;
-    // // }
 
     // if (this.workflowModel.isGMApprover
     //   && this.workflowModel.isApprovalAction(action)
@@ -315,13 +307,6 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     );
   }
 
-  // setGmInfoToRequestModel(gmInfo: GmInfoDto): void {
-  //   this.requestModel.requestDto.actionType = gmInfo.actionType;
-  //   this.requestModel.requestDto.pfrSpecFullName = gmInfo.defaultSpecFullName;
-  //   this.requestModel.requestDto.pfrBkupSpecNpeId = gmInfo.bkupSpecNpeId;
-  //   this.requestModel.requestDto.pfrBkupSpecFullName = gmInfo.bkupSpecFullName;
-  // }
-
   isFormValid(): boolean {
     let valid = true;
     this.validationError = {};
@@ -333,6 +318,17 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       valid = false;
       this.validationError.approver_missing = true;
     }
+
+    if (this.showSplMeetingDate && this.workflowModel.isApprovalAction(this.selectedWorkflowAction)) {
+      if (!this.splMeetingDate) {
+        this.validationError.splMeetingDate_missing = true;
+        valid = false;
+      }
+      else {
+
+      }
+    }
+
     return valid;
   }
 
