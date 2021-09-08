@@ -46,13 +46,16 @@ export class PlanSubmissionAlertComponent implements OnInit, OnDestroy {
         }
     );
     this.requestSubmitFailureEventSubscriber = this.integrationService.requestSubmitFailureEmitter.subscribe(
-      (message) =>
+      (errorResponse) =>
         {
-//          this.requestModel.clearAlerts();
           this.status = 'failure';
-          this.errorMessage = message;
+          if (errorResponse.error?.errorMessage) {
+            this.errorMessage = errorResponse.error.errorMessage;
+          }
+          else {
+            this.errorMessage = errorResponse.message;
+          }
           window.scrollTo(0, 0);
-//          this.logger.debug('plan submit failed alert component ', this);
         }
     );
   }

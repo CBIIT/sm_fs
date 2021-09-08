@@ -9,7 +9,7 @@ import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.componen
 import { Alert } from 'src/app/alert-billboard/alert';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 import { PlanModel } from 'src/app/model/plan/plan-model';
-import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DatepickerFormatter } from 'src/app/datepicker/datepicker-adapter-formatter';
 import { DatePipe } from '@angular/common';
 
@@ -47,7 +47,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   approvingState = false;
   terminalRequest = false;
 //  showSplMeetingDate = false;
-  splMeetingDate: string;
+  splMeetingDate: NgbDateStruct;
 
   validationError: any = {};
 
@@ -274,7 +274,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     if (this.workflowModel.isSplApprover
       && this.workflowModel.isApprovalAction(action)
       && this.splMeetingDate ) {
-//        dto.splMeetingDate = this.datePipe.transform(new Date(this.splMeetingDate));
+        dto.splMeetingDate =
+        String(this.splMeetingDate.month).padStart(2, '0') + '/' +
+        String(this.splMeetingDate.day).padStart(2, '0') + '/' +
+        String(this.splMeetingDate.year).padStart(4, '0');
         this.logger.debug('SPL approver, spl meeting date=' + this.splMeetingDate);
     }
 
@@ -303,6 +306,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       },
       (error) => {
         this.logger.error('submit workflow returned error', error);
+        this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       }
     );
   }

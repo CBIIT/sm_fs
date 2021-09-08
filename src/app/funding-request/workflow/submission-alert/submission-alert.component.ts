@@ -45,13 +45,17 @@ export class SubmissionAlertComponent implements OnInit, OnDestroy {
         }
     );
     this.requestSubmitFailureEventSubscriber = this.integrationService.requestSubmitFailureEmitter.subscribe(
-      (message) =>
-        {
-          this.requestModel.clearAlerts();
-          this.status = 'failure';
-          this.errorMessage = message;
-          window.scrollTo(0, 0);
+      (errorResponse) =>
+      {
+        this.status = 'failure';
+        if (errorResponse.error?.errorMessage) {
+          this.errorMessage = errorResponse.error.errorMessage;
         }
+        else {
+          this.errorMessage = errorResponse.message;
+        }
+        window.scrollTo(0, 0);
+      }
     );
   }
 

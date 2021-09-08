@@ -1,3 +1,4 @@
+import { HttpResponse } from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import { FundingReqApproversDto, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import {Subject} from 'rxjs';
@@ -6,7 +7,7 @@ import {Subject} from 'rxjs';
 export class FundingRequestIntegrationService {
   requestHistoryLoadEmitter = new Subject<FundingReqStatusHistoryDto[]>();
   requestSubmissionEmitter = new Subject<WorkflowTaskDto>();
-  requestSubmitFailureEmitter = new Subject<string>();
+  requestSubmitFailureEmitter = new Subject<any>();
   approverInitializationEmitter = new Subject<void>();
   approverListChangeEmitter = new Subject<void>();
   activeApproverEmitter = new Subject<FundingReqApproversDto>();
