@@ -57,7 +57,8 @@
             <input id="splMeetingDate" class="form-control" 
                    name="splMeetingDate" [(ngModel)]="splMeetingDate" 
                    placeholder="mm/dd/yyyy"
-                   ngbDatepicker #d="ngbDatepicker" 
+                   ngbDatepicker #d="ngbDatepicker" [maxDate]="maxDate"
+                   (dateSelect)="onSplMeetingDateSelect($event)" 
                    (click)="d.toggle()">
             <div class="input-group-append">
               <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d.toggle()" type="button">
@@ -67,7 +68,10 @@
           </div>
           <div class="text-danger mt-1" *ngIf="(validationError?.splMeetingDate_missing)">
             SPL Committee Meeting Approval Date is required
-        </div>
+          </div>
+          <div class="text-danger mt-1" *ngIf="(validationError?.splMeetingDate_future)">
+            SPL Committee Meeting Approval Date should be current or in the past 
+          </div>
         </div>
     </div>
     <app-approver-list [readonly]="readonly" [terminalRequest]="terminalRequest" class="w-100"></app-approver-list>

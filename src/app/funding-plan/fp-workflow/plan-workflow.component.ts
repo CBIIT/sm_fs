@@ -9,9 +9,8 @@ import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.componen
 import { Alert } from 'src/app/alert-billboard/alert';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 import { PlanModel } from 'src/app/model/plan/plan-model';
-import { NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DatepickerFormatter } from 'src/app/datepicker/datepicker-adapter-formatter';
-import { DatePipe } from '@angular/common';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -21,9 +20,8 @@ let addedApproverMap = new Map<number, any>();
   templateUrl: './plan-workflow.component.html',
   styleUrls: ['./plan-workflow.component.css'],
   providers: [
-    {provide: NgbDateParserFormatter, useClass: DatepickerFormatter},
-    DatePipe
-  ]
+    {provide: NgbDateParserFormatter, useClass: DatepickerFormatter}
+    ]
 })
 export class PlanWorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
@@ -48,6 +46,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   terminalRequest = false;
 //  showSplMeetingDate = false;
   splMeetingDate: NgbDateStruct;
+  maxDate: NgbDate = this.calendar.getToday();
 
   validationError: any = {};
 
@@ -79,7 +78,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
               private userSessionService: AppUserSessionService,
               private planModel: PlanModel,
               private workflowModel: WorkflowModel,
-              private datePipe: DatePipe,
+              private calendar: NgbCalendar,
               private logger: NGXLogger) {
   }
 
@@ -231,6 +230,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     return this.workflowModel.isSplApprover && this.approvingState;
   }
 
+  onSplMeetingDateSelect($event: any): void {
+    this.isFormValid();
+  }
+
   submitWorkflow(): void {
     this.alert = null;
     this.validationError = {};
@@ -329,10 +332,13 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         valid = false;
       }
       else {
-
+        const today: NgbDate = this.calendar.getToday();
+        if (today.before(this.splMeetingDate)) {
+            this.validationError.splMeetingDate_future = true;
+            valid = false;
+        }
       }
     }
-
     return valid;
   }
 
