@@ -124,6 +124,7 @@ import { PlanWarningComponent } from './funding-plan/plan-step6/plan-warning/pla
 import { ActiveFundingPlanValidatorDirective } from './validators/active-funding-plan-validator.directive';
 import { DocsGrantTableComponent } from './funding-plan/plan-step5/docs-grant-table/docs-grant-table.component';
 import { ConfirmDeleteModalComponent } from './manage-designations/confirm-delete-modal/confirm-delete-modal.component';
+import { CanSearchComponent } from './shared/can-search/can-search.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -256,7 +257,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     PlanWarningComponent,
     ActiveFundingPlanValidatorDirective,
     DocsGrantTableComponent,
-    ConfirmDeleteModalComponent
+    ConfirmDeleteModalComponent,
+    CanSearchComponent
   ],
 
 
