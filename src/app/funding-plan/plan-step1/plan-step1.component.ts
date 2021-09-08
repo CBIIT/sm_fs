@@ -373,7 +373,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         { responsivePriority: 9, targets: 11 }, // priscr
         { responsivePriority: 10, targets: 4 }, // rfa/pa
         { responsivePriority: 11, targets: 13 }, // existing requests
-        { responsivePriority: 12, orderable: false, targets: 3 }, // project title
+        { responsivePriority: 12, targets: 3 }, // project title
         { responsivePriority: 13, targets: 5 }, // i2 status
         { responsivePriority: 14, targets: 12 } // budget start date
       ],
