@@ -252,30 +252,28 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
   }
 
   onEditDesignee($event: number) {
-    for (let entry of this.dtData) {
-      if (entry.id === $event) {
-        const modalRef = this.modalService.open(EditDesigneeModalComponent, { size: "lg"});
-        modalRef.componentInstance.data = entry;
-        modalRef.result.then((updatedData: any) => {
-          console.debug('Result: ', updatedData);
-          this.designeeService.updateDesigneeUsingPUT(updatedData.startDate, updatedData.endDate, updatedData.id).subscribe(
-            result => {
-              this.updateDesigneeTable(result);
-              this.successManageDesigneesMsg = 'Designation date(s) have been updated successfully.';
-              for (const entry of result) {
-                if (entry.id === updatedData.id) {
-                  this.successDesignee = entry;
-                  break;
-                }
+    const entry = this._getEntryById($event);
+    if (entry) {
+      const modalRef = this.modalService.open(EditDesigneeModalComponent, { size: "lg"});
+      modalRef.componentInstance.data = entry;
+      modalRef.result.then((updatedData: any) => {
+        console.debug('Result: ', updatedData);
+        this.designeeService.updateDesigneeUsingPUT(updatedData.startDate, updatedData.endDate, updatedData.id).subscribe(
+          result => {
+            this.updateDesigneeTable(result);
+            this.successManageDesigneesMsg = 'Designation date(s) have been updated successfully.';
+            for (const entry of result) {
+              if (entry.id === updatedData.id) {
+                this.successDesignee = entry;
+                break;
               }
-            },
-            error => {
-              this.logger.error('HttpClient edit designee request error for----- ' + error.message);
             }
-          )
-        }).finally(() => console.debug('Finally closing dialog'));
-        break;
-      }
+          },
+          error => {
+            this.logger.error('HttpClient edit designee request error for----- ' + error.message);
+          }
+        )
+      }).finally(() => console.debug('Finally closing dialog'));
     }
   }
 

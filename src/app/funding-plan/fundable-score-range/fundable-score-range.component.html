@@ -32,7 +32,7 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row" [hidden]="!hasScoreBeenCalculated">
     <div class="col-12 mb-5">
         <h2>Applications Within Fundable Score Range</h2>
         <app-grant-table [grantList]="withinRangeGrants" [minScore]="minimumScore" [maxScore]="modelMaximumScore">
@@ -46,7 +46,7 @@
 </div>
 
 <div class="row">
-    <div class="col-12">
+    <div class="col-12" [hidden]="!hasScoreBeenCalculated">
         <hr>
     </div>
     <div class="col-12 d-flex">
