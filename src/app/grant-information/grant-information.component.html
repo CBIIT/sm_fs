@@ -112,7 +112,7 @@
     <div class="col-sm-6 col-lg-2">
         <div class="form-group">
             <p class="like-label">SPL Committee Meeting Date</p>
-            <p> {{ '--' }}</p>
+            <p> {{ model.requestDto.splApprovedDate | date: 'shortDate' }}</p>
         </div>
     </div>
 
