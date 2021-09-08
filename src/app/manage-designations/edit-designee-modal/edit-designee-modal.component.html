@@ -1,4 +1,4 @@
-<form #editForm="ngForm" (ngSubmit)="onSubmit(editForm)" [class.submitted]="editForm.submitted">
+<form #editForm="ngForm" (ngSubmit)="onSubmit(editForm)" [class.submitted]="editForm.submitted" appEndDateBeforeStartValidator>
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">Edit Designee</h4>
     <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
@@ -37,7 +37,7 @@
           <div class="input-group">
             <input id="endDate" class="form-control" ngModel name="endDate" placeholder="mm/dd/yyyy"
                    ngbDatepicker #d2="ngbDatepicker" (click)="d2.toggle()"  [minDate]="minDate" required
-                   [appEndDateBeforeStartValidator]="editForm.controls.startDate?.value">
+                   >
             <div class="input-group-append">
               <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d2.toggle()" type="button">
                 <i class="fas fa-calendar" aria-hidden="true"></i>
@@ -73,7 +73,7 @@
         <div *ngIf="editForm.controls.endDate?.errors?.ngbDate?.minDate && editForm.submitted" class="text-danger mt-1">
           End Date cannot be in the past
         </div>
-        <div *ngIf="editForm.controls.endDate?.errors?.dateBeforeStart && editForm.submitted" class="text-danger mt-1">
+        <div *ngIf="editForm.errors?.dateBeforeStart && editForm.submitted" class="text-danger mt-1">
           End date cannot be before the start date
         </div>
       </div>
@@ -81,6 +81,6 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Close</button>
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary" [disabled]="editForm.pristine">Save</button>
   </div>
 </form>

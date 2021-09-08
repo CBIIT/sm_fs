@@ -36,6 +36,7 @@ export class EditDesigneeModalComponent implements OnInit, AfterViewInit {
   onSubmit(editForm: NgForm) {
     console.debug(editForm);
     if (editForm.valid) {
+      editForm.value.id = this.data.id;
       this.modal.close(editForm.value);
     }
   }
