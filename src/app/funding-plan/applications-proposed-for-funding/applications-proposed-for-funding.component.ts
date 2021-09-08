@@ -25,7 +25,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   listSelectedSources: string[];
-  includeModal = false;
 
   sourceSumDirectCost(sourceIndex: number): number {
     if (!this.prcList) {
@@ -101,5 +100,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   ngOnInit(): void {
 
+  }
+
+  onModalSubmit($event: any): void {
+    this.logger.debug('submit: ', $event, this.parentForm);
   }
 }
