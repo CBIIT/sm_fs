@@ -31,7 +31,7 @@
                 <ng-template ngbPanelHeader>
 
                     <div class="d-flex align-items-center">
-                        <h3>Scientific Rationale for Supporting RFA/PA (AND) Justification for Each Proposed Application
+                        <h3>Scientific Rationale for Supporting the RFA/PA (and) Justification for Each Proposed Application
                         </h3>
                         <div class="doc-details" *ngIf="isSciRatUploaded; else sciRatNotUploaded">
                             {{sciRatDocDto.docFilename}} (Uploaded by <a
@@ -164,7 +164,7 @@
             <ngb-panel id="other-panel">
                 <ng-template ngbPanelHeader>
                     <div class="d-flex align-items-center">
-                        <h3>Other Document</h3>
+                        <h3>Other Supporting Document</h3>
                         <div class="doc-details" *ngIf="isOtherUploaded; else othNotUploaded">
                             {{otherDocDto.docFilename}} (Uploaded by <a
                                 href="mailto: {{otherDocDto.uploadByEmail}}">{{otherDocDto.uploadByName}}</a> on
