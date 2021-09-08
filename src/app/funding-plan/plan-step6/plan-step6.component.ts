@@ -306,10 +306,7 @@ export class PlanStep6Component implements OnInit {
       },
       (error) => {
         this.logger.error('Failed when calling submitRequestUsingPOST', error);
-        if (error.error) {
-          this.requestIntegrationService.requestSubmitFailureEmitter.next(error.error.errorMessage);
-//        this.submitResultElement.nativeElement.scrollIntoView();
-        }
+        this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       });
   }
 

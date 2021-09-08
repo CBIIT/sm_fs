@@ -277,21 +277,13 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     this.fsWorkflowControllerService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('Submit Request result: ', result);
-        // this.submissionResult = { status: 'success', frqId: dto.frqId, approver: nextApproverInChain };
         this.workflowModel.initialize();
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
-        //       this.submitResultElement.nativeElement.scrollIntoView();
         this.readonly = true;
-        //       this.requestModel.disableStepLinks();
       },
       (error) => {
         this.logger.error('Failed when calling submitRequestUsingPOST', error);
-        // this.submissionResult = { status: 'failure' };
-        if (error.error) {
-          // this.submissionResult.errorMessage = error.error.errorMessage;
-          this.requestIntegrationService.requestSubmitFailureEmitter.next(error.error.errorMessage);
-        }
-        this.submitResultElement.nativeElement.scrollIntoView();
+        this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       });
   }
 
@@ -301,9 +293,6 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
         this.logger.debug(action + ' API call returned successfully', result);
         this.workflowModel.initialize();
         this.requestIntegrationService.requestSubmissionEmitter.next(result);
-//         if (action === 'WITHDRAW') {
-//           this.requestModel.enableStepLinks();
-//         }
       }
     )
       .catch(

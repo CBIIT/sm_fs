@@ -310,15 +310,13 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.workflowService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('submit workflow returned okay ', result);
-        // if (dto.gmInfo) {
-        //   this.setGmInfoToRequestModel(dto.gmInfo);
-        // }
         this.workflowModel.initialize();
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
       },
       (error) => {
         this.logger.error('submit workflow returned error', error);
+        this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       }
     );
   }
