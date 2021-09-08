@@ -73,6 +73,7 @@ export class BudgetInfoComponent implements OnInit {
       const oefiaType = this.oefiaTypes?.get(index)?.selectedValue;
       c.octId = c.oefiaTypeId = !isNaN(oefiaType) ? (Number(oefiaType) !== 0 ? Number(oefiaType) : null) : null;
       c.oefiaCreateCode = this.model.requestDto.oefiaCreateCode;
+      this.logger.debug('prepared CAN:', c);
     });
   }
 

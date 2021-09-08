@@ -166,7 +166,8 @@ export class Step2Component implements OnInit {
   }
 
   showNewInvestigator(): boolean {
-    return this.requestModel.grant.activityCode === 'R01' && ([1, 2].includes(Number(this.requestModel.grant.applTypeCode)));
+    // return this.requestModel.grant.activityCode === 'R01' && ([1, 2].includes(Number(this.requestModel.grant.applTypeCode)));
+    return false;
   }
 
   showFinalLOA(): boolean {

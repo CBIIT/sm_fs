@@ -20,7 +20,8 @@
           <th scope="col">Funding Source</th>
           <th scope="col">Approved Direct Cost</th>
           <th scope="col">Approved Total Cost</th>
-          <th scope="col" [hidden]="!(isFinancialApprover() && isFcNci())">OEFIA Coding</th>
+          <th scope="col">Create Type</th>
+          <th scope="col">OEFIA Coding</th>
           <th scope="col">NCI OEFIA Projected CAN</th>
           <th scope="col">
             <div class="d-flex">
@@ -34,7 +35,8 @@
           <td>{{can.fundingSourceName}}</td>
           <td>{{ can.approvedDc | currency }} {{can.dcPctCut / 100000 | percentCut:initialPay}}</td>
           <td>{{ can.approvedTc | currency }} {{can.tcPctCut / 100000 | percentCut:initialPay}}</td>
-          <td [hidden]="!(isFinancialApprover() && isFcNci())">
+          <td>{{ can.oefiaCreateCode }}</td>
+          <td>
             <app-oefia-types [index]="i" [octId]="can.octId" [selectedValue]="can.octId"
                              [readonly]="true"></app-oefia-types>
           </td>

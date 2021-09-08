@@ -13,7 +13,7 @@
 </div>
 <div class="example-container">
   <div cdkDropList (cdkDropListDropped)="dropped($event)">
-    <div class="drag-item" ngbTooltip="Drag & Drop to Order" placement="top-left" cdkDrag *ngFor="let doc of selectedDocsArr">
+    <div class="drag-item" [ngbTooltip]="tooltip()" placement="top-left" cdkDrag *ngFor="let doc of selectedDocsArr">
       <span>{{ doc.abbreviation }} &mdash; {{ doc.description }}</span>
       <div class="ml-auto">
         <button class="btn btn-link btn-delete btn-slim" title="Delete" (click)="deselect(doc.abbreviation)">

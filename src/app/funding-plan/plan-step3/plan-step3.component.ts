@@ -140,6 +140,7 @@ export class PlanStep3Component implements OnInit {
           applId: g.applId,
           frtId: FundingRequestTypes.FUNDING_PLAN__NOT_SELECTABLE_FOR_FUNDING_PLAN,
           notSelectableReason: g.notSelectableReason,
+          nihGuideAddr: '',
           financialInfoDto: {}
         }
       );
@@ -151,6 +152,7 @@ export class PlanStep3Component implements OnInit {
           applId: g.applId,
           frtId: FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_SKIP,
           notSelectableReason: g.notSelectableReason,
+          nihGuideAddr: '',
           financialInfoDto: {}
         }
       );
@@ -162,6 +164,7 @@ export class PlanStep3Component implements OnInit {
           applId: g.applId,
           frtId: FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE,
           notSelectableReason: g.notSelectableReason,
+          nihGuideAddr: '',
           financialInfoDto: {}
         }
       );
@@ -175,6 +178,7 @@ export class PlanStep3Component implements OnInit {
           applId: g.applId,
           frtId: type,
           notSelectableReason: g.notSelectableReason,
+          nihGuideAddr: '',
           financialInfoDto: {}
         }
       );

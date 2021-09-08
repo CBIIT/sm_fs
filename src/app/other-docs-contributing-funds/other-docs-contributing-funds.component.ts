@@ -157,4 +157,11 @@ export class OtherDocsContributingFundsComponent implements OnInit {
     this.updateRequestModel();
     this.selectedValueChange.emit(this.getSelectionString());
   }
+
+  tooltip(): string {
+    if (this.selectedDocsArr?.length > 1) {
+      return 'Drag & Drop to Order';
+    }
+    return null;
+  }
 }
