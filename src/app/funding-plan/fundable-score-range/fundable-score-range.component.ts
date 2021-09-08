@@ -21,6 +21,8 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
   errMaxScoreRange = false;
   errMaxScoreNumeric = false;
 
+  hasScoreBeenCalculated: boolean = false;
+
   // It stores scores that are used once apply button is clicked.
   // User can change the maximum score number and click "save and continue" without
   // clicking "Apply" - in this case the last "applied" max score
@@ -72,6 +74,7 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
     this.errMaxScoreRequired = false;
     this.errMaxScoreRange = false;
     this.errMaxScoreNumeric = false;
+    this.hasScoreBeenCalculated = false;
   }
 
   onApplyMaximumScore(): void {
@@ -88,6 +91,7 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
       this.errMaxScoreRange = true;
       return;
     }
+    this.hasScoreBeenCalculated = true;
     this.modelMaximumScore = this.maximumScore;  // prepare for planModel
     this.withinRangeGrants = this.planModel.allGrants.filter(g =>
       (!g.notSelectableReason || g.notSelectableReason.length === 0) && g.priorityScoreNum >= this.minimumScore && g.priorityScoreNum <= this.maximumScore);
