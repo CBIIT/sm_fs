@@ -138,7 +138,7 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
         {responsivePriority: 9, targets: 10 }, // priscr
         {responsivePriority: 10, targets: 3 }, // rfa/pa
         {responsivePriority: 11, targets: 12 }, // existing requests
-        {responsivePriority: 12, orderable: false, targets: 2 }, // project title
+        {responsivePriority: 12, targets: 2 }, // project title
         {responsivePriority: 13, targets: 4 }, // i2 status
         {responsivePriority: 14, targets: 11 } // budget start date
       ],
