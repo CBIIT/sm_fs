@@ -277,10 +277,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     if (this.workflowModel.isSplApprover
       && this.workflowModel.isApprovalAction(action)
       && this.splMeetingDate ) {
-        dto.splMeetingDate =
-        String(this.splMeetingDate.month).padStart(2, '0') + '/' +
-        String(this.splMeetingDate.day).padStart(2, '0') + '/' +
-        String(this.splMeetingDate.year).padStart(4, '0');
+        // dto.splMeetingDate =
+        // String(this.splMeetingDate.month).padStart(2, '0') + '/' +
+        // String(this.splMeetingDate.day).padStart(2, '0') + '/' +
+        // String(this.splMeetingDate.year).padStart(4, '0');
         this.logger.debug('SPL approver, spl meeting date=' + this.splMeetingDate);
     }
 

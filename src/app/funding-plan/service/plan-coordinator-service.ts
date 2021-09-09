@@ -11,6 +11,8 @@ import { NGXLogger } from 'ngx-logger';
 export class PlanCoordinatorService {
   fundingSourceValuesEmitter = new Subject<{ pd: number, ca: string }>();
   grantInfoCostEmitter = new Subject<{ index: number, dc: number, tc: number }>();
+  fundingSourceSelectionEmitter = new Subject<{ index: number, source: number }>();
+  private _selectedSources: Map<number, number> = new Map<number, number>();
 
   inflightPFRs: Map<number, number> = new Map<number, number>();
 
@@ -24,6 +26,33 @@ export class PlanCoordinatorService {
     private planModel: PlanModel,
     private fsRequestService: FsRequestControllerService,
     private logger: NGXLogger) {
+  }
+
+  trackSelectedSources(index: number, sourceId: number): void {
+    // TODO: only track non-null
+
+    if (!!sourceId) {
+      this._selectedSources.set(index, sourceId);
+    } else {
+      this._selectedSources.delete(index);
+    }
+    this.logger.debug('trackSelectedSources():', index, sourceId, this._selectedSources.size);
+  }
+
+  get selectedSourceCount(): number {
+    return this._selectedSources.size;
+  }
+
+  getRestrictedSources(index: number): number[] {
+    this.logger.debug('checking restricted sources for #', index);
+    const result: number[] = [] as number[];
+    this._selectedSources.forEach((value, key) => {
+      if (key !== index) {
+        result.push(Number(value));
+      }
+    });
+    this.logger.debug('restricted sources:', result);
+    return result;
   }
 
   checkInFlightPFRs(payload: { applId: number, frtId: number } []): void {

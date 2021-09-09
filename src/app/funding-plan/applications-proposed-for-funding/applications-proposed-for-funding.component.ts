@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
@@ -22,9 +22,26 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
   @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
   @ViewChildren(FpFundingSourceComponent) fundingSources: QueryList<FpFundingSourceComponent>;
+  @ViewChild('modalFpFundingSource') modalFpFundingSource: FpFundingSourceComponent;
+  @ViewChild('modalFpGrantInformation') modalFpGrantInformation: FpGrantInformationComponent;
+  @ViewChild('modalFpRecommendedCosts') modalFpRecommendedCosts: FpProgramRecommendedCostsComponent;
+
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   listSelectedSources: string[];
+
+  get sourceIndex(): number {
+    this.logger.debug('getSourceIndex():', this.planCoordinatorService.selectedSourceCount);
+    return this.planCoordinatorService.selectedSourceCount;
+  }
+
+  grantSumDirectCost(): number {
+    return 0;
+  }
+
+  grantSumTotalCost(): number {
+    return 0;
+  }
 
   sourceSumDirectCost(sourceIndex: number): number {
     if (!this.prcList) {
@@ -104,5 +121,19 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   onModalSubmit($event: any): void {
     this.logger.debug('submit: ', $event, this.parentForm);
+  }
+
+  onAddFundingSource(): void {
+    this.logger.debug('onAddFundingSource()', this.sourceIndex);
+    this.modalFpFundingSource.index = this.sourceIndex;
+    this.modalFpFundingSource.filterData();
+    this.modalFpRecommendedCosts.sourceIndex = this.sourceIndex;
+    this.modalFpGrantInformation.sourceIndex = this.sourceIndex;
+  }
+
+  canAddFundingSource(): boolean {
+    // At least one source provided already (and valid?)
+
+    return this.planCoordinatorService.selectedSourceCount !== 0 && this.planCoordinatorService.selectedSourceCount < 3;
   }
 }

@@ -15,11 +15,13 @@ import { ControlContainer, NgForm } from '@angular/forms';
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class FpFundingSourceComponent implements OnInit {
+
   @Input() parentForm: NgForm;
   @Input() index: number;
   dummy: string = null;
   data: Select2OptionData[] = [];
-  selectedValue: number = null;
+  allSources: Select2OptionData[] = [];
+  private _selectedValue: number = null;
   fy: number;
   rfaPaNumber: string;
   allRfaPaNumbers: string[];
@@ -31,9 +33,20 @@ export class FpFundingSourceComponent implements OnInit {
               private planModel: PlanModel) {
   }
 
+
+  get selectedValue(): number {
+    return this._selectedValue;
+  }
+
+  set selectedValue(value: number) {
+    this._selectedValue = value;
+    this.planCoordinatorService.fundingSourceSelectionEmitter.next({ index: this.index, source: value });
+    this.planCoordinatorService.trackSelectedSources(this.index, value)
+  }
+
   sourceDetails(): FundingRequestFundsSrcDto {
-    if (this.selectedValue) {
-      return this.fundingSourceDetailsMap.get(Number(this.selectedValue));
+    if (this._selectedValue) {
+      return this.fundingSourceDetailsMap.get(Number(this._selectedValue));
     }
     return null;
   }
@@ -68,7 +81,12 @@ export class FpFundingSourceComponent implements OnInit {
       result.forEach(s => {
         tmp.push({ id: String(s.fundingSourceId), text: s.fundingSourceName });
       });
-      this.data = tmp;
+      this.allSources = tmp;
+      this.filterData();
     });
+  }
+
+  filterData(): void {
+    this.data = this.allSources.filter(x => !this.planCoordinatorService.getRestrictedSources(this.index).includes(Number(x.id)));
   }
 }
