@@ -121,6 +121,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   onModalSubmit($event: any): void {
     this.logger.debug('submit: ', $event, this.parentForm);
+    this.logger.debug(this.modalFpFundingSource, this.modalFpRecommendedCosts);
   }
 
   onAddFundingSource(): void {
