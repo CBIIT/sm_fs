@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ControlContainer, NgForm } from '@angular/forms';
+import { PlanModel } from '../../model/plan/plan-model';
 
 @Component({
   selector: 'app-fp-funding-information',
@@ -16,10 +17,17 @@ export class FpFundingInformationComponent implements OnInit {
   outYear4: number = null;
   outYear5: number = null;
 
-  constructor() {
+  constructor(
+    private planModel: PlanModel) {
   }
 
   ngOnInit(): void {
+    this.firstYearSetAside = this.planModel.fundingPlanDto.pubYr1SetAsideAmt;
+    this.totalSetAside = this.planModel.fundingPlanDto.totalPubSetAsideAmt;
+    this.outYear2 = this.planModel.fundingPlanDto.fundingEstYr2Amt;
+    this.outYear3 = this.planModel.fundingPlanDto.fundingEstYr3Amt;
+    this.outYear4 = this.planModel.fundingPlanDto.fundingEstYr4Amt;
+    this.outYear5 = this.planModel.fundingPlanDto.fundingEstYr5Amt;
   }
 
 }
