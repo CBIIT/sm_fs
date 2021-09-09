@@ -92,7 +92,7 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
             },
             className: 'all'},
         {title: 'Project Title', data: 'projectTitle'}, // 2
-        {title: 'RFA/PA/PAR', data: 'rfaPaNumber', // 3
+        {title: 'FOA', data: 'rfaPaNumber', // 3
             render: ( data, type, row, meta ) => {
               return '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
             }},

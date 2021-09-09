@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-12 d-flex">
-    <h2 class="d-inline-block">RFA/PA/PAR(s)</h2>
+    <h2 class="d-inline-block">FOA(s)</h2>
   </div>
   <div class="col-12">
     <p class="font-italic">Note: Funding plan should be created only for RFA, PA, or PAR.</p>
@@ -10,7 +10,7 @@
 <div class="row" *ngIf="searchCriteria.errActivityCodes.length > 0">
   <div class="col-12">
     <ngb-alert type="danger" [dismissible]="false">
-      <div>Activity Code on one or more RFA/PAs are different:</div>
+      <div>Activity Code on one or more FOAs are different:</div>
       <div *ngFor="let err of searchCriteria.errActivityCodes" style="padding-left: 1rem;">{{err}}</div>
     </ngb-alert>
   </div>
@@ -21,7 +21,7 @@
   <div class="row"  role="group" >
     <div class="col-lg-3">
       <div class="form-group">
-        <label [attr.for]="'rfaPa-' + i">RFA/PA Number</label>
+        <label [attr.for]="'rfaPa-' + i">FOA Number</label>
         <ng-select2
           [attr.id]="'rfaPa-' + i"
           name="rfa-pa"
@@ -50,11 +50,11 @@
 
     <div class="col-lg-2 col-sm-auto d-flex align-items-end mb-3">
       <button *ngIf="searchCriteria.rfaPaEntries.length > 1"
-              type="button" class="btn btn-danger px-2 mr-2" title="Remove RFA/PA" (click)="removeRfaPa(i)">
+              type="button" class="btn btn-danger px-2 mr-2" title="Remove FOA" (click)="removeRfaPa(i)">
         <i class="fas fa-trash" aria-hidden="true"></i>
       </button>
       <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)"
-              type="button" class="btn btn-primary px-2" title="Add RFA/PA" (click)="appendRfaPa()">
+              type="button" class="btn btn-primary px-2" title="Add FOA" (click)="appendRfaPa()">
         <i class="fas fa-plus" aria-hidden="true"></i>
       </button>
     </div>
@@ -67,8 +67,8 @@
   <div class="row" role="group" style="margin-top: -1rem;">
     <div class="col-lg-3">
       <div class="text-danger mt-1 form-group" *ngIf="rfa.rfaErrDuplcated == true || rfa.rfaErrRequired == true">
-        <div *ngIf="rfa.rfaErrDuplcated == true">Duplicated RFA/PA</div>
-        <div *ngIf="rfa.rfaErrRequired == true">RFA/PA is required</div>
+        <div *ngIf="rfa.rfaErrDuplcated == true">Duplicated FOA</div>
+        <div *ngIf="rfa.rfaErrRequired == true">FOA is required</div>
       </div>
     </div>
     <div class="col col-lg-5">
@@ -76,7 +76,7 @@
            *ngIf="rfa.ncabErrors.length > 0 || rfa.ncabErrRequired == true">
         <div *ngIf="rfa.ncabErrors.length > 0">
           <div *ngFor="let error of rfa.ncabErrors">
-            <b><span><a [routerLink]="'/plan/retrieve/' + error.fprId">Funding Plan {{error.fprId}}</a></span></b> is in the '{{error.currentPlanStatus}}' status for this RFA/PA on NCAB {{error.formattedCouncilMeetingDate}}.
+            <b><span><a [routerLink]="'/plan/retrieve/' + error.fprId">Funding Plan {{error.fprId}}</a></span></b> is in the '{{error.currentPlanStatus}}' status for this FOA on NCAB {{error.formattedCouncilMeetingDate}}.
           </div>
         </div>
         <div *ngIf="rfa.ncabErrRequired == true">NCAB is required</div>
@@ -97,9 +97,12 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-12">   
+  <div class="col-12">
     <ngb-alert *ngIf="dtData && dtData.length > 0 && noSelectableGrants" type="danger" [dismissible]="false">
-      <div>The RFA/PA number(s) for the selected NCAB Date(s) has no selectable grants.</div>
+      <div>The FOA number(s) for the selected NCAB Date(s) has no selectable grants.</div>
+    </ngb-alert>
+    <ngb-alert *ngIf="dtData && dtData.length > 0 && noSelectableGrantsWarining" type="warning" [dismissible]="true" (closed)="noSelectableGrantsWarining = ''">
+      <div [innerHTML]="noSelectableGrantsWarining"></div>
     </ngb-alert>
 
     <table id="grantDt" #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">

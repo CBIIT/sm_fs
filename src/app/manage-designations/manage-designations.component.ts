@@ -107,6 +107,9 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
     return {
       // Filter already selected designee from the list
       results: results.filter((entry) => {
+        if (this.userSessionService.getLoggedOnUser().nihNetworkId === entry.id) {
+          return false;
+        }
         for (let dtEntry of this.dtData) {
           if (dtEntry.delegateTo === entry.id) {
             return false;
