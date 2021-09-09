@@ -135,11 +135,25 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     }
   }
 
+  getDirectCostPercentCut(): number {
+    if (this.displayType === 'percent') {
+      return this.percentCut;
+    }
+    return this.dcPercentCutCalculated;
+  }
+
   getTotalCost(): number {
     if (this.displayType === 'percent') {
       return this.totalCostCalculated;
     } else {
       return this.totalCost;
     }
+  }
+
+  getTotalCostPercentCut(): number {
+    if (this.displayType === 'percent') {
+      return this.percentCut;
+    }
+    return this.tcPercentCutCalculated;
   }
 }
