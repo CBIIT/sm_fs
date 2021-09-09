@@ -128,7 +128,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
             return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }, className: 'all'},
         {title: 'Project Title', data: 'projectTitle'},
-        {title: 'RFA/PA', data: 'rfaPaNumber', render: ( data, type, row, meta ) => {
+        {title: 'FOA', data: 'rfaPaNumber', render: ( data, type, row, meta ) => {
           return (!data || data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
         }},
         {title: 'I2 Status', data: 'applStatusGroupDescrip'},
@@ -173,7 +173,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         {responsivePriority: 7, targets: 6 }, // ca
         {responsivePriority: 8, targets: 9 }, // pctl
         {responsivePriority: 9, targets: 10 }, // priscr
-        {responsivePriority: 10, targets: 3 }, // rfa/pa
+        {responsivePriority: 10, targets: 3 }, // FOA
         {responsivePriority: 11, targets: 12 }, // existing requests
         {responsivePriority: 12, targets: 2 }, // project title
         {responsivePriority: 13, targets: 4 }, // i2 status

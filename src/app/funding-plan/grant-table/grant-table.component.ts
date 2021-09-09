@@ -92,7 +92,7 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
             },
             className: 'all'},
         {title: 'Project Title', data: 'projectTitle'}, // 2
-        {title: 'RFA/PA', data: 'rfaPaNumber', // 3
+        {title: 'FOA', data: 'rfaPaNumber', // 3
             render: ( data, type, row, meta ) => {
               return '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
             }},
@@ -136,7 +136,7 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
         {responsivePriority: 7, targets: 6 }, // ca
         {responsivePriority: 8, targets: 9 }, // pctl
         {responsivePriority: 9, targets: 10 }, // priscr
-        {responsivePriority: 10, targets: 3 }, // rfa/pa
+        {responsivePriority: 10, targets: 3 }, // FOA
         {responsivePriority: 11, targets: 12 }, // existing requests
         {responsivePriority: 12, targets: 2 }, // project title
         {responsivePriority: 13, targets: 4 }, // i2 status

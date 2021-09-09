@@ -22,7 +22,7 @@
 <div
   class="text-danger mt-1"
   *ngIf="(parentForm.submitted || priorNoticeValue.touched) && !isValid()">
-  Previous RFA/PA/PAR number is required.
+  Previous FOA number is required.
   <input type="hidden" [ngModel]="scratch" [name]="rfaDetails.noticeNumber" required>
 </div>
 </ng-container>

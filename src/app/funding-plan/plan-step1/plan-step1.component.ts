@@ -323,7 +323,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         },
         { title: 'Project Title', data: 'projectTitle' }, // 3
         {
-          title: 'RFA/PA', data: 'rfaPaNumber', render: (data, type, row, meta) => { // 4
+          title: 'FOA', data: 'rfaPaNumber', render: (data, type, row, meta) => { // 4
             return '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
           }
         },
@@ -371,7 +371,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         { responsivePriority: 7, targets: 7 }, // ca
         { responsivePriority: 8, targets: 10 }, // pctl
         { responsivePriority: 9, targets: 11 }, // priscr
-        { responsivePriority: 10, targets: 4 }, // rfa/pa
+        { responsivePriority: 10, targets: 4 }, // FOA
         { responsivePriority: 11, targets: 13 }, // existing requests
         { responsivePriority: 12, targets: 3 }, // project title
         { responsivePriority: 13, targets: 5 }, // i2 status
@@ -467,7 +467,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * ACTION: click on Minus button to remove RFA/PA search Criteria line
+   * ACTION: click on Minus button to remove FOA search Criteria line
    *
    */
   removeRfaPa(index: number): void {
@@ -479,7 +479,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * ACTION: click on Plus button to add RFA/PA search Criteria
+   * ACTION: click on Plus button to add FOA search Criteria
    *
    */
   appendRfaPa(): void {
