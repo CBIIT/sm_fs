@@ -4,6 +4,7 @@ import { PlanModel } from '../../model/plan/plan-model';
 import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
 import { NGXLogger } from 'ngx-logger';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ import { NGXLogger } from 'ngx-logger';
 export class PlanCoordinatorService {
   fundingSourceValuesEmitter = new Subject<{ pd: number, ca: string }>();
   grantInfoCostEmitter = new Subject<{ index: number, dc: number, tc: number }>();
-  fundingSourceSelectionEmitter = new Subject<{ index: number, source: number }>();
+  fundingSourceSelectionEmitter = new Subject<{ index: number, source: FundingRequestFundsSrcDto }>();
   private _selectedSources: Map<number, number> = new Map<number, number>();
 
   inflightPFRs: Map<number, number> = new Map<number, number>();

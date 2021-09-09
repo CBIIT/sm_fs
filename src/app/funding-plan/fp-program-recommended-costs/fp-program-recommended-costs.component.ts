@@ -3,6 +3,7 @@ import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ControlContainer, NgForm } from '@angular/forms';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
 @Component({
   selector: 'app-fp-program-recommended-costs',
@@ -27,8 +28,11 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   displayType: string;
   // Dummy ngModel attribute for hidden error fields
   dummy: string = null;
+  private mySourceDetails: FundingRequestFundsSrcDto;
 
-  constructor(private planCoordinatorService: PlanCoordinatorService, private logger: NGXLogger) {
+  constructor(
+    private planCoordinatorService: PlanCoordinatorService,
+    private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
@@ -37,6 +41,12 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       if (next.index === this.grantIndex) {
         this.baselineDirectCost = next.dc;
         this.baselineTotalCost = next.tc;
+      }
+    });
+
+    this.planCoordinatorService.fundingSourceSelectionEmitter.subscribe(next => {
+      if (next.index === this.sourceIndex) {
+        this.mySourceDetails = next.source;
       }
     });
   }

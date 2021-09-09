@@ -29,6 +29,8 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   public docs: Array<DocData> = new Array<DocData>()
   public options: Options;
 
+  @Input() preSelectedDocs = '';
+
   @Input() label = 'Division/Office/Center (DOC)';
 
   @Input()
@@ -88,7 +90,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
     this.options = {};
     this.docs = new Array<DocData>();
 
-    const selectedDocs = this.requestModel.requestDto.financialInfoDto.otherDocText || '';
+    const selectedDocs = this.preSelectedDocs || '';
 
     this.lookupsControllerService.getNciDocsUsingGET().subscribe(
       result => {

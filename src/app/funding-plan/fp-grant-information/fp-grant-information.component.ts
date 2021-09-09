@@ -7,6 +7,7 @@ import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import { RecommendedFutureYearsComponent } from '../recommended-future-years/recommended-future-years.component';
 import { ControlContainer, NgForm } from '@angular/forms';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
 @Component({
   selector: 'app-fp-grant-information',
@@ -27,9 +28,13 @@ export class FpGrantInformationComponent implements OnInit {
   grantAwards: GrantAwardedDto[];
   piDirect: number;
   piTotal: number;
+  private mySourceDetails: FundingRequestFundsSrcDto;
 
-  constructor(public model: PlanModel, private logger: NGXLogger, private requestService: FsRequestControllerService,
-              private planCoordinatorService: PlanCoordinatorService) {
+  constructor(
+    public model: PlanModel,
+    private logger: NGXLogger,
+    private requestService: FsRequestControllerService,
+    private planCoordinatorService: PlanCoordinatorService) {
   }
 
   ngOnInit(): void {
@@ -57,7 +62,16 @@ export class FpGrantInformationComponent implements OnInit {
       //     this.piTotal += Number(ga.requestTotalAmount);
       //   }
       // });
-      this.planCoordinatorService.grantInfoCostEmitter.next({ index: this.grantIndex, dc: this.piDirect, tc: this.piTotal });
+      this.planCoordinatorService.grantInfoCostEmitter.next({
+        index: this.grantIndex,
+        dc: this.piDirect,
+        tc: this.piTotal
+      });
+    });
+    this.planCoordinatorService.fundingSourceSelectionEmitter.subscribe(next => {
+      if (next.index === this.sourceIndex) {
+        this.mySourceDetails = next.source;
+      }
     });
   }
 

@@ -39,7 +39,7 @@ export class PlanStep3Component implements OnInit {
   constructor(private navigationModel: NavigationStepModel,
               private router: Router,
               private logger: NGXLogger,
-              private planModel: PlanModel,
+              public planModel: PlanModel,
               private pdCaIntegratorService: PdCaIntegratorService,
               private planCoordinatorService: PlanCoordinatorService,
               private fsPlanControllerService: FsPlanControllerService,
@@ -84,7 +84,7 @@ export class PlanStep3Component implements OnInit {
 
         this.planCoordinatorService.checkInFlightPFRs(
           this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(s => {
-            return {applId: s.applId, frtId: s.frtId};
+            return { applId: s.applId, frtId: s.frtId };
           }));
         this.planApproverService.checkCreateApprovers().finally(
           () => this.router.navigate([this.nextStep]));

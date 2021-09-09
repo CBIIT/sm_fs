@@ -24,7 +24,8 @@ export class Step2Component implements OnInit {
 
   alerts: Alert[] = [];
 
-  constructor(private router: Router, private requestModel: RequestModel,
+  constructor(private router: Router,
+              public requestModel: RequestModel,
               private requestApproverService: RequestApproverService,
               private fsRequestControllerService: FsRequestControllerService,
               private navigationModel: NavigationStepModel,

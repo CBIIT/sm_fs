@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
-import { CancerActivityControllerService, RfaPaNoticesDto } from '@nci-cbiit/i2ecws-lib';
+import { CancerActivityControllerService, FundingPlanFoasDto, RfaPaNoticesDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ControlContainer, NgForm } from '@angular/forms';
@@ -38,12 +38,7 @@ export class FundingPlanInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rfaDetails = [];
-    this.planModel.grantsSearchCriteria.forEach(rfa => {
-      this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
-        this.rfaDetails.push(next);
-      });
-    });
+    this.restoreSavedFoaData();
 
     this.totalApplicationsReceived = this.planModel.allGrants.length;
 
@@ -73,9 +68,24 @@ export class FundingPlanInformationComponent implements OnInit {
       .concat(this.listApplicationsOutsideRange.filter(g => !g.selected));
 
     if (this.planModel.fundingPlanDto.otherContributingDocs) {
-        this.otherDocs = this.planModel.fundingPlanDto.otherContributingDocs.split(',');
+      this.otherDocs = this.planModel.fundingPlanDto.otherContributingDocs.split(',');
     }
 
   }
 
+  private restoreSavedFoaData(): void {
+    const details:
+      Map<string, FundingPlanFoasDto> =
+      new Map(this.planModel?.fundingPlanDto?.fundingPlanFoas?.map(f => [f.rfaPaNumber, f]));
+    this.rfaDetails = [];
+    this.planModel.grantsSearchCriteria.forEach(rfa => {
+      this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
+        const detail = details.get(rfa.rfaPaNumber);
+        if (!!detail) {
+          next.priorNoticeNumber = detail.prevRfaPaNumber;
+        }
+        this.rfaDetails.push(next);
+      });
+    });
+  }
 }

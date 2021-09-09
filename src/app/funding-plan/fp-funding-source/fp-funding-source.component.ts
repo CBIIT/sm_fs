@@ -40,8 +40,11 @@ export class FpFundingSourceComponent implements OnInit {
 
   set selectedValue(value: number) {
     this._selectedValue = value;
-    this.planCoordinatorService.fundingSourceSelectionEmitter.next({ index: this.index, source: value });
-    this.planCoordinatorService.trackSelectedSources(this.index, value)
+    this.planCoordinatorService.fundingSourceSelectionEmitter.next({
+        index: this.index,
+        source: this.fundingSourceDetailsMap.get(Number(value))
+      });
+    this.planCoordinatorService.trackSelectedSources(this.index, value);
   }
 
   sourceDetails(): FundingRequestFundsSrcDto {
