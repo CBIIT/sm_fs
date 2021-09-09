@@ -3,26 +3,27 @@
     <h2>Funding Plan Information</h2>
     <table class="table table-striped table-bordered">
       <thead>
-      <tr>
-        <th scope="col">RFA/PA/PAR</th>
-        <th scope="col">Concept ID</th>
-        <th scope="col">RFA/PA/PAR Title</th>
-        <th scope="col">Issue Type</th>
-      </tr>
+        <tr>
+          <th scope="col">RFA/PA/PAR</th>
+          <th scope="col">Concept ID</th>
+          <th scope="col">RFA/PA/PAR Title</th>
+          <th scope="col">Issue Type</th>
+        </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let rfa of rfaDetails; let i = index;">
-        <td>
-          <a href="{{rfa.nihGuideAddr}}" target="_blank">{{rfa.noticeNumber}}</a>
-        </td>
-        <td>
-          <app-concept-award-tracking [cptId]="rfa.cptId"></app-concept-award-tracking>
-        </td>
-        <td>{{ rfa.title }}</td>
-        <td>
-          <app-plan-info-issue-type [readOnly]="readOnly" [index]="i" [parentForm]="parentForm" [rfaDetails]="rfa"></app-plan-info-issue-type>
-        </td>
-      </tr>
+        <tr *ngFor="let rfa of rfaDetails; let i = index;">
+          <td>
+            <a href="{{rfa.nihGuideAddr}}" target="_blank">{{rfa.noticeNumber}}</a>
+          </td>
+          <td>
+            <app-concept-award-tracking [cptId]="rfa.cptId"></app-concept-award-tracking>
+          </td>
+          <td>{{ rfa.title }}</td>
+          <td>
+            <app-plan-info-issue-type [readOnly]="readOnly" [index]="i" [parentForm]="parentForm" [rfaDetails]="rfa">
+            </app-plan-info-issue-type>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -30,96 +31,94 @@
 <div class="row">
   <div class="col-lg-2 col-sm-6">
     <div class="form-group">
-      <label for="fundable-score-range">Fundable Score&nbsp;Range</label>
+      <label for="fundable-score-range">Fundable Score Range</label>
       <input type="text" readonly class="form-control-plaintext" id="fundable-score-range"
-             value="{{planModel.minimumScore}} &ndash; {{planModel.maximumScore}}">
+        value="{{planModel.minimumScore}} &ndash; {{planModel.maximumScore}}">
     </div>
   </div>
 
   <div class="col-lg-2 col-sm-6">
     <div class="form-group">
       <label for="apps-recieved">Applications Received</label>
-      <input type="text" readonly class="form-control-plaintext" id="apps-recieved" value="{{ totalApplicationsReceived }}">
+      <input type="text" readonly class="form-control-plaintext" id="apps-recieved"
+        value="{{ totalApplicationsReceived }}">
     </div>
   </div>
 
   <div class="col-lg-3 col-sm-6">
     <div class="form-group">
-      <label for="apps-proposed">Applications Proposed for&nbsp;Funding</label>
-      <input type="text" readonly class="form-control-plaintext" id="apps-proposed" value="{{ totalApplicationsSelected }}">
+      <label for="apps-proposed">Applications Proposed for Funding</label>
+      <input type="text" readonly class="form-control-plaintext" id="apps-proposed"
+        value="{{ totalApplicationsSelected }}">
     </div>
   </div>
 
   <div class="col-lg-2 col-sm-6">
     <div class="form-group">
       <label for="apps-skipped">Applications Skipped</label>
-      <input type="text" readonly class="form-control-plaintext" id="apps-skipped" value="{{ totalApplicationsSkipped }}">
+      <input type="text" readonly class="form-control-plaintext" id="apps-skipped"
+        value="{{ totalApplicationsSkipped }}">
     </div>
   </div>
 
   <div class="col-lg-3 col-sm-6">
     <div class="form-group">
-      <label for="apps-not-considered">Applications Not Considered for&nbsp;Funding</label>
-      <input type="text" readonly class="form-control-plaintext" id="apps-not-considered" value="{{ totalApplicationsNotConsidered }}">
+      <label for="apps-not-considered">Applications Not Considered for Funding</label>
+      <input type="text" readonly class="form-control-plaintext" id="apps-not-considered"
+        value="{{ totalApplicationsNotConsidered }}">
     </div>
   </div>
-<ng-container *ngIf="showAdditionalInfo">
-  <div class="col-lg-2 col-sm-6">
-              </div>
-  
-              <div class="col-xl-2 col-lg-4 col-sm-6">
-                  <div class="form-group">
-                      <span class="like-label">Requesting PD</span>
-                      <span class="form-control-plaintext"><a href="mailto:{{planModel.fundingPlanDto.requestorEmailAddress}}">{{planModel.fundingPlanDto.requestorPdFullName}}</a></span>
-                  </div>
-              </div>
-  
-              <div class="col-xl-2 col-lg-4 col-sm-6">
-                  <div class="form-group">
-                      <span class="like-label">Funding Approval</span>
-                      <span class="form-control-plaintext">ARC and NCI Funds Certifiers</span>
-                  </div>
-              </div>
-  
-              <div class="col-xl-2 col-lg-4 col-sm-6">
-                  <div class="form-group">
-                      <span class="like-label">Final Scientific Levels of Authority (LOA)</span>
-                      <span class="form-control-plaintext">Scientific Program Leaders (SPL) committee</span>
-                  </div>
-              </div>
-  
-              <div class="col-xl-2 col-lg-4 col-sm-6">
-                  <div class="form-group">
-                      <span class="like-label">Current Status</span>
-                      <span class="form-control-plaintext">{{planModel.fundingPlanDto.planStatusName}}</span>
-                  </div>
-              </div>
-  
-              <div class="col-xl-2 col-lg-4 col-sm-6">
-                  <div class="form-group">
-                      <span class="like-label">Other DOC(s) Contributing Funds</span>
-                      <p>
-                        <a
-                          *ngFor="let doc of otherDocs; let first = first"
-                          [routerLink]=""
-                          ngbTooltip="{{doc|codeDescription:'NciDocs'}}"
-                          triggers="click:blur" placement="top">
-                          <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>
-                          <ng-template #firstDoc>{{doc}}</ng-template>
-                          <ng-template #notFirstDoc>, {{doc}}</ng-template>
-                        </a>
-                      </p>
-                  </div>
-              </div>
-  
-              <div class="col-xl-2 col-lg-4 col-sm-6">
-                  <div class="form-group">
-                      <span class="like-label">Requesting PD's Cancer Activity</span>
-                      <p><a [routerLink]=""
-                        ngbTooltip="{{planModel.fundingPlanDto.cayCode|codeDescription:'CancerActivities'}}"
-                        triggers="click:blur" placement="top">{{planModel.fundingPlanDto.cayCode}}</a></p>
-                              </div>
-              </div>  
+  <ng-container *ngIf="showAdditionalInfo">
+    <div class="col-xl-2 col-lg-4 col-sm-6">
+      <div class="form-group">
+        <span class="like-label">Requesting PD</span>
+        <span class="form-control-plaintext"><a
+            href="mailto:{{planModel.fundingPlanDto.requestorEmailAddress}}">{{planModel.fundingPlanDto.requestorPdFullName}}</a></span>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-sm-6">
+      <div class="form-group">
+        <span class="like-label">Funding Approval</span>
+        <span class="form-control-plaintext">ARC and NCI Funds Certifiers</span>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-sm-6">
+      <div class="form-group">
+        <span class="like-label">Final Scientific Levels of Authority (LOA)</span>
+        <span class="form-control-plaintext">Scientific Program Leaders (SPL) committee</span>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-sm-6">
+      <div class="form-group">
+        <span class="like-label">Current Status</span>
+        <span class="form-control-plaintext">{{planModel.fundingPlanDto.planStatusName}}</span>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-sm-6">
+      <div class="form-group">
+        <span class="like-label">Other DOC(s) Contributing Funds</span>
+        <p>
+          <a *ngFor="let doc of otherDocs; let first = first" [routerLink]=""
+            ngbTooltip="{{doc|codeDescription:'NciDocs'}}" triggers="click:blur" placement="top">
+            <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>
+            <ng-template #firstDoc>{{doc}}</ng-template>
+            <ng-template #notFirstDoc>, {{doc}}</ng-template>
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-sm-6">
+      <div class="form-group">
+        <span class="like-label">Requesting PD's Cancer Activity</span>
+        <p><a [routerLink]="" ngbTooltip="{{planModel.fundingPlanDto.cayCode|codeDescription:'CancerActivities'}}"
+            triggers="click:blur" placement="top">{{planModel.fundingPlanDto.cayCode}}</a></p>
+      </div>
+    </div>
   </ng-container>
 
   <div class="col-12">
