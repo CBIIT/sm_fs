@@ -124,6 +124,11 @@ class FundingPlanGrantsSearchCriteriaUI {
     } else {
       entry.availableNcabDates = [];
     }
+    if (entry.availableNcabDates.length == 1) {
+      const selected = [];
+      selected.push(entry.availableNcabDates[0].id);
+      setTimeout(() => entry.selectedNcabDates = selected, 0);
+    }
     this.validateForRfaPaDuplicate();
     if (this.errActivityCodes.length > 0) {
       this.validateForActivityCodes();
@@ -247,6 +252,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
   // controls the error message shown after search if there are
   // no grants eligible for selection
   noSelectableGrants = false;
+  noSelectableGrantsWarining: string = '';
 
   ngOnInit(): void {
     this.navigationModel.showSteps = true;
@@ -499,6 +505,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
     this.searchCriteria.errActivityCodes = [];
     this.canDeactivate = true;
     this.noSelectableGrants = false;
+    this.noSelectableGrantsWarining = '';
 
     // Reset results
     this.dtData = [];
@@ -527,24 +534,18 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
     if (this.searchCriteria.isValid()) {
 
       const criteria: FundingPlanGrantSearchCriteria = {};
-      criteria.rfaPaNcabDates = this._convertToRfaPaNcabDates();
+      criteria.rfaPaNcabDates = this._cloneToRfaPaNcabDates();
 
       this.fsPlanControllerService.searchFundingPlanGrantsUsingPOST(criteria).subscribe(
         (result: GrantsSearchResultDatatableDto) => {
           this.dtData = result.data;
-          this.noSelectableGrants = true;
-          this.dtData.forEach((value) => {
-            value.selected = false;
-            if (!value.notSelectableReason || value.notSelectableReason.length == 0) {
-              this.noSelectableGrants = false;
-            }
-          });
+          this._calculateNotSelectableRfaPasFlags(result.data);
           this.dtOptions.data = this.dtData;
 
           // RESET plan model on every search
           // mark model dirty on every search
           this.resetModel();
-          this.planModel.grantsSearchCriteria = this._convertToRfaPaNcabDates();
+          this.planModel.grantsSearchCriteria = this._cloneToRfaPaNcabDates();
           this.canDeactivate = false;
 
           if (this.dtElement.dtInstance) {
@@ -593,14 +594,60 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
    * @private
    */
 
-  private _convertToRfaPaNcabDates(): Array<RfaPaNcabDate> {
+  private _cloneToRfaPaNcabDates(): Array<RfaPaNcabDate> {
     const ret = new Array<RfaPaNcabDate>();
     for (const rfa of this.searchCriteria.rfaPaEntries) {
       ret.push({
         rfaPaNumber: rfa.rfaPaNumber,
-        ncabDates: rfa.getNcabDates()
+        ncabDates: Object.assign([], rfa.getNcabDates())
       });
     }
     return ret;
+  }
+
+  private _calculateNotSelectableRfaPasFlags(data: Array<NciPfrGrantQueryDtoEx>) {
+    const rfaList: Array<RfaPaNcabDate> = this._cloneToRfaPaNcabDates();
+    this.noSelectableGrants = true;
+
+    data.forEach((value) => {
+      value.selected = false;
+      if (!value.notSelectableReason || value.notSelectableReason.length == 0) { // can be selected
+        this.noSelectableGrants = false;
+        let i = rfaList.length;
+        while (i--) {
+          if (rfaList[i].rfaPaNumber === value.rfaPaNumber) {
+            let j = rfaList[i].ncabDates.length;
+            while (j--) {
+              if (rfaList[i].ncabDates[j] === value.councilMeetingDate) {
+                rfaList[i].ncabDates.splice(j, 1);
+              }
+            }
+            if (rfaList[i].ncabDates.length == 0) {
+              rfaList.splice(i, 1);
+            }
+          }
+        }
+      }
+    });
+    this.noSelectableGrantsWarining = '';
+    if (!this.noSelectableGrants) {
+      for (const rfa of rfaList) {
+        for (const ncab of rfa.ncabDates) {
+          if (this.noSelectableGrantsWarining.length > 0) {
+            this.noSelectableGrantsWarining += '<br>';
+          }
+          this.noSelectableGrantsWarining += 'Warning: No selectable grant applications exists for <b>' + rfa.rfaPaNumber + '</b> for <b>' + this._getFormattedNcab(rfa.rfaPaNumber, ncab, data) + '</b>';
+        }
+      }
+    }
+  }
+
+  private _getFormattedNcab(rfapa: string, ncab: string, data: Array<NciPfrGrantQueryDtoEx>) : string {
+    for (const entry of data) {
+      if (entry.rfaPaNumber === rfapa && entry.councilMeetingDate === ncab) {
+        return entry.formattedCouncilMeetingDate;
+      }
+    }
+    return ncab;
   }
 }
