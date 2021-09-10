@@ -25,7 +25,11 @@ export class PlanInfoIssueTypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.rfaDetails.prevRfaPaNumber) {
+    if (!!this.rfaDetails.issueType) {
+      this.issueType = this.rfaDetails.issueType;
+      this.priorNotice = this.rfaDetails.prevRfaPaNumber;
+      this.logger.debug('restoring: ', this.issueType, this.priorNotice);
+    } else if (this.rfaDetails.prevRfaPaNumber) {
       this.priorNotice = this.rfaDetails.prevRfaPaNumber;
       this.issueType = 'reissue';
     } else {
