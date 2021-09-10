@@ -31,7 +31,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   listSelectedSources: string[];
 
   get sourceIndex(): number {
-    this.logger.debug('getSourceIndex():', this.planCoordinatorService.selectedSourceCount);
+    // this.logger.debug('getSourceIndex():', this.planCoordinatorService.selectedSourceCount);
     return this.planCoordinatorService.selectedSourceCount;
   }
 

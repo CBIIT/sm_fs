@@ -1,124 +1,67 @@
 <!-- BEGIN Funding Plan Information Section -->
 <app-plan-submission-alert></app-plan-submission-alert>
-<app-plan-warning [inFlightProposed]="inFlightProposed" 
+<app-plan-warning [inFlightProposed]="inFlightProposed"
                   [inFlightSkipped]="inFlightSkipped"
                   [docChecker]="docChecker"></app-plan-warning>
 <app-workflow-modal requestOrPlan="PLAN"></app-workflow-modal>
 <form #parentForm="ngForm">
-    <app-funding-plan-information [readOnly]="true" [parentForm]="parentForm" [showAdditionalInfo]="true"></app-funding-plan-information>
+  <app-funding-plan-information [readOnly]="true" [parentForm]="parentForm"
+                                [showAdditionalInfo]="true"></app-funding-plan-information>
 </form>
 <!-- END Funding Plan Information Section -->
 
 <!-- START Funding Information Section -->
 
-<div class="row">
-    <div class="col-12 d-flex">
-        <h2>Funding Information <span class="font-weight-light font-italic">(Optional)</span></h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#funding-info-collapse" role="button" aria-expanded="true" aria-controls="funding-info-collapse"></a>
-    </div>
-    <div class="col-12 collapse show" id="funding-info-collapse">
-        <div class="row">
-            <div class="col-lg-3 col-sm-6">
-                <div class="form-group">
-                    <label for="first-set-aside">Published 1<sup>st</sup> Year Set-Aside ($)</label>
-                    <input readonly type="text" id="first-set-aside" class="form-control">
-                </div>
-            </div>
-            <div class="col-lg-auto col-sm-6">
-                <div class="form-group">
-                    <label for="all-set-aside">Total Published Set-Aside (All Years) ($)</label>
-                    <input readonly type="text" id="all-set-aside" class="form-control">
-                </div>
-            </div>
-        
-            <div class="col-12 mt-3">
-                <h3>List of Funding Estimates for Each Out-Year</h3>
-            </div>
-        
-            <div class="col-lg-3 col-sm-6">
-                <div class="form-group">
-                    <label for="est-year-2">Year 2 ($)</label>
-                    <input readonly type="text" id="est-year-2" class="form-control">
-                </div>
-            </div>
-            <div class="col-lg-3 col-sm-6">
-                <div class="form-group">
-                    <label for="est-year-3">Year 3 ($)</label>
-                    <input readonly type="text" id="est-year-3" class="form-control">
-                </div>
-            </div>
-            <div class="col-lg-3 col-sm-6">
-                <div class="form-group">
-                    <label for="est-year-4">Year 4 ($)</label>
-                    <input readonly type="text" id="est-year-4" class="form-control">
-                </div>
-            </div>
-            <div class="col-lg-3 col-sm-6">
-                <div class="form-group">
-                    <label for="est-year-5">Year 5 ($)</label>
-                    <input readonly type="text" id="est-year-5" class="form-control">
-                </div>
-            </div>
-        
-            <div class="col-12">
-                <ngb-alert type="primary" [dismissible]="false" class="workflow-comments mt-3">
-                    <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
-                    <div class="comment-content">
-                        <strong>Funding Comments</strong>
-                        <div>This was discussed with my DOC Director and CRHD Diversity Supplement Program Director.</div>
-                    </div>
-                </ngb-alert>
-            </div>
-
-        </div>
-    </div>
-    <div class="col-12">
-        <hr>
-    </div>
-</div><!-- END Row -->
+<form #dummyForm="ngForm">
+  <app-fp-funding-information [parentForm]="dummyForm" [readOnly]="true"></app-fp-funding-information>
+</form>
+<!-- END Row -->
 
 <!-- END Funding Information Section -->
 
 <!-- START Applications Proposed for Funding Section -->
 <div class="row">
-    <div class="col-12 d-flex">
-        <h2>Applications Proposed for Funding</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-proposed-collapse" role="button" aria-expanded="true" aria-controls="apps-proposed-collapse"></a>
-    </div>
-    <div class="col-12 collapse show mt-2" id="apps-proposed-collapse">
-        Read Only Version of "Applications Proposed for Funding" from Step 3 will go here.
-    </div>
-    <div class="col-12">
-        <hr>
-    </div>
+  <div class="col-12 d-flex">
+    <h2>Applications Proposed for Funding</h2>
+    <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-proposed-collapse" role="button"
+       aria-expanded="true" aria-controls="apps-proposed-collapse"></a>
+  </div>
+  <div class="col-12 collapse show mt-2" id="apps-proposed-collapse">
+    Read Only Version of "Applications Proposed for Funding" from Step 3 will go here.
+  </div>
+  <div class="col-12">
+    <hr>
+  </div>
 </div>
 <!-- END Applications Proposed for Funding Section -->
 <!-- START Applications Skipped Section -->
 <div class="row" *ngIf="!noSkipResult">
-    <div class="col-12 d-flex">
-        <h2>Application(s) Skipped:</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-skipped-collapse" role="button" aria-expanded="true" aria-controls="apps-skipped-collapse"></a>
-    </div>
-    <div class="col-12 collapse show mt-2" id="apps-skipped-collapse">
-        <app-grant-table [grantList]="grantsSkipped"></app-grant-table>
-    </div>
-    <div class="col-12">
-        <hr>
-    </div>
+  <div class="col-12 d-flex">
+    <h2>Application(s) Skipped:</h2>
+    <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-skipped-collapse" role="button"
+       aria-expanded="true" aria-controls="apps-skipped-collapse"></a>
+  </div>
+  <div class="col-12 collapse show mt-2" id="apps-skipped-collapse">
+    <app-grant-table [grantList]="grantsSkipped"></app-grant-table>
+  </div>
+  <div class="col-12">
+    <hr>
+  </div>
 </div>
 <!-- END Applications Skipped for Funding Section -->
 <!-- START Applications Not Considered for Funding Section -->
 <div class="row" *ngIf="!noAppNotFundingResult">
-    <div class="col-12 d-flex">
-        <h2>Application(s) Not Considered for Funding:</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-notcon-collapse" role="button" aria-expanded="true" aria-controls="apps-notcon-collapse"></a>
-    </div>
-    <div class="col-12 collapse show mt-2" id="apps-notcon-collapse">
-        <app-grant-table [grantList]="grantsNotConsidered"></app-grant-table>
-    </div>
-    <div class="col-12">
-        <hr>
-    </div>
+  <div class="col-12 d-flex">
+    <h2>Application(s) Not Considered for Funding:</h2>
+    <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-notcon-collapse" role="button"
+       aria-expanded="true" aria-controls="apps-notcon-collapse"></a>
+  </div>
+  <div class="col-12 collapse show mt-2" id="apps-notcon-collapse">
+    <app-grant-table [grantList]="grantsNotConsidered"></app-grant-table>
+  </div>
+  <div class="col-12">
+    <hr>
+  </div>
 </div>
 <!-- END Applications Not Considered for Funding Section -->
 
@@ -126,40 +69,45 @@
 <app-plan-supporting-docs-readonly></app-plan-supporting-docs-readonly>
 <!-- END Supporting Documents Section -->
 
-<app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar" requestOrPlan="PLAN"></app-upload-budget-documents>
-<app-budget-docs-readonly [hidden]="isDisplayBudgetDocsUploadVar || !displayReadOnlyBudgetDocs" requestOrPlan="PLAN"></app-budget-docs-readonly>
+<app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar"
+                             requestOrPlan="PLAN"></app-upload-budget-documents>
+<app-budget-docs-readonly [hidden]="isDisplayBudgetDocsUploadVar || !displayReadOnlyBudgetDocs"
+                          requestOrPlan="PLAN"></app-budget-docs-readonly>
 
 <!-- START Workflow Section -->
 <app-plan-workflow [readonly]="!submitVisible() || !submitEnabled()"
-[hidden]="hideWorkflow()"></app-plan-workflow>
+                   [hidden]="hideWorkflow()"></app-plan-workflow>
 <!-- END Workflow Section -->
 
 <!-- START Buttons Section -->
 <div class="row">
-    <div class="col-12 d-flex mb-4">
-        <button class="btn btn-outline-secondary  mr-auto" (click)="prevStep()" *ngIf="!readonly">Previous</button>
-        <button class="btn btn-danger mr-2" (click)="deleteRequest()" *ngIf="deleteVisible()">Delete Request</button>
-        <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled() ">
-          Submit Plan
-        </button>
-        <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
+  <div class="col-12 d-flex mb-4">
+    <button class="btn btn-outline-secondary  mr-auto" (click)="prevStep()" *ngIf="!readonly">Previous</button>
+    <button class="btn btn-danger mr-2" (click)="deleteRequest()" *ngIf="deleteVisible()">Delete Request</button>
+    <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled() ">
+      Submit Plan
+    </button>
+    <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
           <button class="btn btn-primary" disabled>Submit Plan</button>
         </span>
-        <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('WITHDRAW')"
-          *ngIf="withdrawVisible()">Withdraw</button>
-        <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('HOLD')"
-          *ngIf="putOnHoldVisible()">Hold</button>
-        <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('RELEASE')"
-          *ngIf="releaseFromHoldVisible()">Release Hold</button>  
-    </div>
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('WITHDRAW')"
+            *ngIf="withdrawVisible()">Withdraw
+    </button>
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('HOLD')"
+            *ngIf="putOnHoldVisible()">Hold
+    </button>
+    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('RELEASE')"
+            *ngIf="releaseFromHoldVisible()">Release Hold
+    </button>
+  </div>
 </div>
 <!-- END Buttons Section -->
 <!--<button class="btn btn-primary mr-2" (click)="test()">Test Something</button>  -->
 <!-- START Funding Plan History Section -->
 <div class="row">
-    <div class="col-12">
-      <h2>Funding Plan History</h2>
-      <app-request-history requestOrPlan="PLAN"></app-request-history>
-    </div>
+  <div class="col-12">
+    <h2>Funding Plan History</h2>
+    <app-request-history requestOrPlan="PLAN"></app-request-history>
+  </div>
 </div>
 <!-- END Funding Plan History Section -->

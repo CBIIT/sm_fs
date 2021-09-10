@@ -10,6 +10,8 @@ import { PlanModel } from '../../model/plan/plan-model';
 })
 export class FpFundingInformationComponent implements OnInit {
   @Input() parentForm: NgForm;
+  @Input() readOnly = false;
+  @Input() collapse = false;
   firstYearSetAside: number = null;
   totalSetAside: number = null;
   outYear2: number = null;
