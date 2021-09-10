@@ -35,7 +35,6 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   comments = '';
   buttonLabel = 'Process Action';
   addApproverLabel = 'Add Approver(s)';
-  // buttonDisabled = true;
   workflowActions: any[];
 
   alert: Alert;
@@ -166,6 +165,12 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     );
   }
 
+  get showBudgetDocWarning(): boolean {
+    return this.workflowModel.isFinancialApprover
+    && this.workflowModel.isApprovalAction(this._selectedWorkflowAction?.action)
+    && this.workflowModel.budgetDocAdded;
+  }
+
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
     historyResult.forEach((item: FundingReqStatusHistoryDto) => {
       if (!item.endDate) {
@@ -285,12 +290,6 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         dto.requestCans = this.requestModel.requestCans;
         this.logger.debug('scientific approver:', dto.requestCans);
 //      dto.requestCans = this.approvedCostsComponent.getCans();
-    }
-
-    if (this.workflowModel.isFinancialApprover
-      && this.workflowModel.isApprovalAction(action)
-      && this.workflowModel.budgetDocAdded) {
-        alert('WARNING: If the uploaded budget document(s) are not in eGrants, please send the document(s) to the appropriate Grants Management Specialist to add it the grant file in eGrants.');
     }
 
     this.logger.debug(this.workflowModel.isApprovalAction(action));

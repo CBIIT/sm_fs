@@ -54,7 +54,14 @@
                 New approver is required
             </div>
         </div>  
-</div>
+    </div>
+    <div class="col-12"  *ngIf="showBudgetDocWarning">
+        <ngb-alert type="warning" [dismissible]="false">
+            <b>WARNING:</b> If the uploaded budget document(s) are not in eGrants, 
+            please send the document(s) to the appropriate Grants Management Specialist to 
+            add it the grant file in eGrants.
+        </ngb-alert>
+    </div> 
 
     <app-approver-list [readonly]="readonly" [terminalRequest]="terminalRequest" class="w-100"></app-approver-list>
 
