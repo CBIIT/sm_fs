@@ -6,7 +6,12 @@ import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
 import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
-import { FsPlanControllerService, FundingPlanFoasDto, FundingSourceCanDto } from '@nci-cbiit/i2ecws-lib';
+import {
+  FsPlanControllerService,
+  FundingPlanFoasDto,
+  FundingRequestCanDto,
+  FundingSourceCanDto
+} from '@nci-cbiit/i2ecws-lib';
 import { OtherDocsContributingFundsComponent } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
@@ -136,6 +141,13 @@ export class PlanStep3Component implements OnInit {
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests = [];
 
+    const futureYears: Map<number, number> = new Map<number, number>();
+    this.applicationsProposedForFunding.grantList.forEach(item => {
+      const applId = item.grant.applId;
+      const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue;
+      futureYears.set(applId, recommendedFutureYears);
+    });
+
     const fundingSourceDetails: Map<number, FundingRequestFundsSrcDto> = new Map<number, FundingRequestFundsSrcDto>();
     this.applicationsProposedForFunding.fundingSources.forEach((item, index) => {
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(item.sourceDetails());
@@ -193,7 +205,7 @@ export class PlanStep3Component implements OnInit {
     });
     // Build a list of raw data for the request budgets, grouped by applid
     const budgetMap: Map<number, FundingReqBudgetsDto[]> = new Map<number, FundingReqBudgetsDto[]>();
-    const canMap: Map<number, FundingSourceCanDto[]> = new Map<number, FundingSourceCanDto[]>();
+    const canMap: Map<number, FundingRequestCanDto[]> = new Map<number, FundingRequestCanDto[]>();
     this.applicationsProposedForFunding.prcList.forEach((item, index) => {
       this.logger.debug('<=====', index, item);
       const source = fundingSourceDetails.get(item.sourceIndex);
@@ -209,7 +221,7 @@ export class PlanStep3Component implements OnInit {
         if (!budgets) {
           budgets = [];
         }
-        let cans = canMap.get(item.grant.applId) as FundingSourceCanDto[];
+        let cans = canMap.get(item.grant.applId) as FundingRequestCanDto[];
         if (!cans) {
           cans = [];
         }
@@ -221,7 +233,9 @@ export class PlanStep3Component implements OnInit {
           tcRecAmt: totalCost,
         });
         cans.push({
-          approvedAmount: totalCost,
+          approvedDc: directCost,
+          approvedTc: totalCost,
+          approvedFutureYrs: futureYears.get(item.grant.applId),
           fseId: source.fundingSourceId,
           fundingSourceName: source.fundingSourceName
         });
@@ -232,6 +246,7 @@ export class PlanStep3Component implements OnInit {
 
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(i => {
       i.financialInfoDto.fundingReqBudgetsDtos = budgetMap.get(i.applId);
+      i.financialInfoDto.fundingRequestCans = canMap.get(i.applId);
     });
 
     const bmmCodes: string[] = [];
