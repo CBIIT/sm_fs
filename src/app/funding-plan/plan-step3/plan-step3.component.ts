@@ -6,7 +6,7 @@ import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
 import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
 import { PlanCoordinatorService } from '../service/plan-coordinator-service';
-import { FsPlanControllerService, FundingPlanFoasDto } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanControllerService, FundingPlanFoasDto, FundingSourceCanDto } from '@nci-cbiit/i2ecws-lib';
 import { OtherDocsContributingFundsComponent } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
@@ -193,6 +193,7 @@ export class PlanStep3Component implements OnInit {
     });
     // Build a list of raw data for the request budgets, grouped by applid
     const budgetMap: Map<number, FundingReqBudgetsDto[]> = new Map<number, FundingReqBudgetsDto[]>();
+    const canMap: Map<number, FundingSourceCanDto[]> = new Map<number, FundingSourceCanDto[]>();
     this.applicationsProposedForFunding.prcList.forEach((item, index) => {
       this.logger.debug('<=====', index, item);
       const source = fundingSourceDetails.get(item.sourceIndex);
@@ -201,17 +202,16 @@ export class PlanStep3Component implements OnInit {
       } else {
         let directCost: number;
         let totalCost: number;
+        directCost = item.getDirectCost();
+        totalCost = item.getTotalCost();
 
-        if (item.displayType === 'percent') {
-          directCost = item.directCostCalculated;
-          totalCost = item.totalCostCalculated;
-        } else {
-          directCost = item.directCost;
-          totalCost = item.directCost;
-        }
         let budgets = budgetMap.get(item.grant.applId) as FundingReqBudgetsDto[];
         if (!budgets) {
           budgets = [];
+        }
+        let cans = canMap.get(item.grant.applId) as FundingSourceCanDto[];
+        if (!cans) {
+          cans = [];
         }
         budgets.push({
           fseId: source.fundingSourceId,
@@ -220,7 +220,13 @@ export class PlanStep3Component implements OnInit {
           dcRecAmt: directCost,
           tcRecAmt: totalCost,
         });
+        cans.push({
+          approvedAmount: totalCost,
+          fseId: source.fundingSourceId,
+          fundingSourceName: source.fundingSourceName
+        });
         budgetMap.set(item.grant.applId, budgets);
+        canMap.set(item.grant.applId, cans);
       }
     });
 
