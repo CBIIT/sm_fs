@@ -74,7 +74,7 @@ export class FundingPlanInformationComponent implements OnInit {
   }
 
   private restoreSavedFoaData(): void {
-    if (!!this.planModel?.fundingPlanDto?.fundingPlanFoas) {
+    if (!!this.planModel?.fundingPlanDto?.fundingPlanFoas && this.planModel.fundingPlanDto.fundingPlanFoas.length > 0) {
       this.fundingPlanFoas = this.planModel.fundingPlanDto.fundingPlanFoas;
       this.fundingPlanFoas.forEach(foa => {
         this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(foa.rfaPaNumber).subscribe(next => {
