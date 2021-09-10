@@ -92,6 +92,7 @@ export class FundingPlanInformationComponent implements OnInit {
           tmp.cptId = next.cptId;
           tmp.title = next.title;
           tmp.nihGuideAddr = next.nihGuideAddr;
+          this.fundingPlanFoas.push(tmp);
         });
       });
     }
