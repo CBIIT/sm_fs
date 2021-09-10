@@ -1,5 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
-import { FsPlanWorkflowControllerService, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanControllerService, FsPlanWorkflowControllerService,
+  FundingReqStatusHistoryDto, FundingRequestQueryDto,
+  WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { Options } from 'select2';
@@ -11,6 +13,8 @@ import { FundingRequestIntegrationService } from 'src/app/funding-request/integr
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DatepickerFormatter } from 'src/app/datepicker/datepicker-adapter-formatter';
+import { Router } from '@angular/router';
+import { AppPropertiesService } from 'src/app/service/app-properties.service';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -44,11 +48,13 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   requestStatus: FundingReqStatusHistoryDto = {};
   approvingState = false;
   terminalRequest = false;
-//  showSplMeetingDate = false;
   splMeetingDate: NgbDateStruct;
   maxDate: NgbDate = this.calendar.getToday();
 
   validationError: any = {};
+  completedPfrs: FundingRequestQueryDto[];
+  workflowStuckBy: 'ByCompletedPfrs';
+  grantViewerUrl: string;
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
@@ -75,10 +81,13 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   constructor(private requestIntegrationService: FundingRequestIntegrationService,
               private workflowService: FsPlanWorkflowControllerService,
+              private planService: FsPlanControllerService,
+              private propertiesService: AppPropertiesService,
               private userSessionService: AppUserSessionService,
               private planModel: PlanModel,
               private workflowModel: WorkflowModel,
               private calendar: NgbCalendar,
+              private router: Router,
               private logger: NGXLogger) {
   }
 
@@ -151,6 +160,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       () => {
         this.comments = '';
         this.workflowActions = this.workflowModel.getWorkflowList();
+        this.fetchCompletedPfr();
         this.logger.debug('workflow actions = ', this.workflowActions);
       }
     );
@@ -158,6 +168,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
       () => { addedApproverMap = this.workflowModel.addedApproverMap;
               this.alert = null;
+              this.checkIfStuck();
               this.isFormValid();
       }
     );
@@ -167,6 +178,21 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         this.parseRequestHistories(historyResult);
       }
     );
+
+    this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+
+  }
+
+  fetchCompletedPfr(): void {
+    if (this.workflowModel.isUserNextInChain && this.workflowModel.lastInChain) {
+      this.planService.getCompletedPFRsUsingGET(this.planModel.fundingPlanDto.fprId).subscribe(
+//      this.planService.getCompletedPFRsUsingGET(124).subscribe(
+        result => this.completedPfrs = result,
+        error => {
+          this.logger.error('calling getCompletedPFRsUsingGET failed ', error);
+        }
+      );
+    }
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
@@ -236,8 +262,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   submitWorkflow(): void {
     this.alert = null;
-    this.validationError = {};
     let valid = true;
+    if (this.workflowStuckBy) {
+      return;
+    }
     // if ((this.gmInfoComponent && !this.gmInfoComponent.isFormValid()) ||
     //     (this.approvedCostsComponent && !this.approvedCostsComponent?.isFormValid()) ) {
     //   valid = false;
@@ -277,10 +305,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     if (this.workflowModel.isSplApprover
       && this.workflowModel.isApprovalAction(action)
       && this.splMeetingDate ) {
-        // dto.splMeetingDate =
-        // String(this.splMeetingDate.month).padStart(2, '0') + '/' +
-        // String(this.splMeetingDate.day).padStart(2, '0') + '/' +
-        // String(this.splMeetingDate.year).padStart(4, '0');
+        dto.splMeetingDate =
+        String(this.splMeetingDate.month).padStart(2, '0') + '/' +
+        String(this.splMeetingDate.day).padStart(2, '0') + '/' +
+        String(this.splMeetingDate.year).padStart(4, '0');
         this.logger.debug('SPL approver, spl meeting date=' + this.splMeetingDate);
     }
 
@@ -314,9 +342,31 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     );
   }
 
+  checkIfStuck(): void {
+    if ( (this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE ||
+      this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE_COMMENT ) &&
+      this.approvingState &&
+      this.workflowModel.lastInChain &&
+      this.completedPfrs &&
+      this.completedPfrs.length > 0) {
+        this.workflowStuckBy = 'ByCompletedPfrs';
+      }
+      else {
+        this.workflowStuckBy = null;
+      }
+  }
+
+  retrieveRequest(frqId: number): void{
+    this.router.navigate(['/request/retrieve', frqId]);
+  }
+
+
   isFormValid(): boolean {
-    let valid = true;
     this.validationError = {};
+    if (this.workflowStuckBy) {
+      return false;
+    }
+    let valid = true;
     if ( this._selectedWorkflowAction?.commentsRequired && !this.comments ) {
       valid = false;
       this.validationError.comments_missing = true;
