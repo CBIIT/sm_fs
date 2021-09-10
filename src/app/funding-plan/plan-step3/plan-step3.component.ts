@@ -30,9 +30,9 @@ export class PlanStep3Component implements OnInit {
   @ViewChild(FpFundingInformationComponent) fpFundingInfoComponent: FpFundingInformationComponent;
   @ViewChild(ApplicationsProposedForFundingComponent) applicationsProposedForFunding: ApplicationsProposedForFundingComponent;
 
-  private pdNpnId: number;
-  private cayCode: string;
-  private doc: string;
+  pdNpnId: number;
+  cayCode: string;
+  doc: string;
   planName: string;
   private nextStep: string;
 
@@ -50,17 +50,21 @@ export class PlanStep3Component implements OnInit {
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(3, true);
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
-      this.pdNpnId = next;
+      // this.pdNpnId = next;
       this.planCoordinatorService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
     });
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
-      this.cayCode = typeof next === 'string' ? next : next[0];
+      // this.cayCode = typeof next === 'string' ? next : next[0];
       this.planCoordinatorService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
     });
     this.pdCaIntegratorService.docEmitter.subscribe(next => {
       this.doc = next;
     });
+
+    this.logger.debug('init:', this.planModel.fundingPlanDto.planName, this.planModel.fundingPlanDto.requestorNpnId, this.planModel.fundingPlanDto.cayCode);
     this.planName = this.planModel.fundingPlanDto.planName;
+    this.pdNpnId = this.planModel.fundingPlanDto.requestorNpnId;
+    this.cayCode = this.planModel.fundingPlanDto.cayCode;
   }
 
   saveContinue(): void {

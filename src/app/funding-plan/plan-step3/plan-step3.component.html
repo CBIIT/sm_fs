@@ -36,6 +36,8 @@
         <lib-pdname-dropdown
           label="Requesting PD"
           [broadcast]="true"
+          [(ngModel)]="pdNpnId"
+          [(selectedValue)]="pdNpnId"
           [syncWithCa]="false"
           [showInactiveToggle]="false">
         </lib-pdname-dropdown>
@@ -51,6 +53,8 @@
         <lib-cancer-activities-dropdown
           [selectSingleOption]="true"
           [maxSelection]="1"
+          [(ngModel)]="cayCode"
+          [(selectedValue)]="cayCode"
           [syncWithPd]="true"
           label="Requesting PD's Cancer Activities"
           [broadcast]="true"

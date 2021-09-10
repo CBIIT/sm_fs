@@ -37,7 +37,7 @@ export class PlanCoordinatorService {
     } else {
       this._selectedSources.delete(index);
     }
-    this.logger.debug('trackSelectedSources():', index, sourceId, this._selectedSources.size);
+    // this.logger.debug('trackSelectedSources():', index, sourceId, this._selectedSources.size);
   }
 
   get selectedSourceCount(): number {
@@ -45,14 +45,14 @@ export class PlanCoordinatorService {
   }
 
   getRestrictedSources(index: number): number[] {
-    this.logger.debug('checking restricted sources for #', index);
+    // this.logger.debug('checking restricted sources for #', index);
     const result: number[] = [] as number[];
     this._selectedSources.forEach((value, key) => {
       if (key !== index) {
         result.push(Number(value));
       }
     });
-    this.logger.debug('restricted sources:', result);
+    // this.logger.debug('restricted sources:', result);
     return result;
   }
 
