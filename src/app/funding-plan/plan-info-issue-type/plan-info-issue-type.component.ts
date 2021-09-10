@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { RfaPaNoticesDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingPlanFoasDto, RfaPaNoticesDto } from '@nci-cbiit/i2ecws-lib';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { ControlContainer, NgForm } from '@angular/forms';
@@ -11,7 +11,7 @@ import { ControlContainer, NgForm } from '@angular/forms';
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class PlanInfoIssueTypeComponent implements OnInit {
-  @Input() rfaDetails: RfaPaNoticesDto;
+  @Input() rfaDetails: FundingPlanFoasDto;
   @Input() parentForm: NgForm;
   @Input() index: number;
   @Input() readOnly = false;
@@ -25,8 +25,8 @@ export class PlanInfoIssueTypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.rfaDetails.priorNoticeNumber) {
-      this.priorNotice = this.rfaDetails.priorNoticeNumber;
+    if (this.rfaDetails.prevRfaPaNumber) {
+      this.priorNotice = this.rfaDetails.prevRfaPaNumber;
       this.issueType = 'reissue';
     } else {
       this.issueType = 'new';
@@ -37,7 +37,7 @@ export class PlanInfoIssueTypeComponent implements OnInit {
   toggleDisplay(value: string): void {
     this.issueType = value;
     if (this.issueType === 'reissue') {
-      this.priorNotice = this.rfaDetails.priorNoticeNumber;
+      this.priorNotice = this.rfaDetails.prevRfaPaNumber;
     } else {
       this.priorNotice = '';
     }

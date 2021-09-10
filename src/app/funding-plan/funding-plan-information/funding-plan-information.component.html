@@ -11,9 +11,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let rfa of rfaDetails; let i = index;">
+        <tr *ngFor="let rfa of fundingPlanFoas; let i = index;">
           <td>
-            <a href="{{rfa.nihGuideAddr}}" target="_blank">{{rfa.noticeNumber}}</a>
+            <a href="{{rfa.nihGuideAddr}}" target="_blank">{{rfa.rfaPaNumber}}</a>
           </td>
           <td>
             <app-concept-award-tracking [cptId]="rfa.cptId"></app-concept-award-tracking>

@@ -1,6 +1,6 @@
-<ng-container [ngModelGroup]="rfaDetails.noticeNumber">
+<ng-container [ngModelGroup]="rfaDetails.rfaPaNumber">
 <div class="d-flex">
-  <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup [name]="'issueType'" [(ngModel)]="issueType" [disabled]="readOnly">
+  <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="issueType" [(ngModel)]="issueType" [disabled]="readOnly">
     <label ngbButtonLabel class="btn-outline-secondary">
       <input ngbButton type="radio" [value]="'new'" (change)="toggleDisplay('new')">New
     </label>
@@ -23,6 +23,6 @@
   class="text-danger mt-1"
   *ngIf="(parentForm.submitted || priorNoticeValue.touched) && !isValid()">
   Previous FOA number is required.
-  <input type="hidden" [ngModel]="scratch" [name]="rfaDetails.noticeNumber" required>
+  <input type="hidden" [ngModel]="scratch" [name]="rfaDetails.rfaPaNumber" required>
 </div>
 </ng-container>

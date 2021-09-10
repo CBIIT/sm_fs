@@ -18,7 +18,7 @@ export class FundingPlanInformationComponent implements OnInit {
   @Input() readOnly = false;
   @Input() showAdditionalInfo = false;
 
-  rfaDetails: RfaPaNoticesDto[];
+  fundingPlanFoas: FundingPlanFoasDto[];
   totalApplicationsSelected: number;
   totalApplicationsReceived: number;
   totalApplicationsSkipped: number;
@@ -74,18 +74,26 @@ export class FundingPlanInformationComponent implements OnInit {
   }
 
   private restoreSavedFoaData(): void {
-    const details:
-      Map<string, FundingPlanFoasDto> =
-      new Map(this.planModel?.fundingPlanDto?.fundingPlanFoas?.map(f => [f.rfaPaNumber, f]));
-    this.rfaDetails = [];
-    this.planModel.grantsSearchCriteria.forEach(rfa => {
-      this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
-        const detail = details.get(rfa.rfaPaNumber);
-        if (!!detail) {
-          next.priorNoticeNumber = detail.prevRfaPaNumber;
-        }
-        this.rfaDetails.push(next);
+    if (!!this.planModel?.fundingPlanDto?.fundingPlanFoas) {
+      this.fundingPlanFoas = this.planModel.fundingPlanDto.fundingPlanFoas;
+      this.fundingPlanFoas.forEach(foa => {
+        this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(foa.rfaPaNumber).subscribe(next => {
+          foa.nihGuideAddr = next.nihGuideAddr;
+          foa.cptId = next.cptId;
+        });
       });
-    });
+    } else {
+      this.fundingPlanFoas = [];
+      this.planModel.grantsSearchCriteria.forEach(rfa => {
+        this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
+          const tmp: FundingPlanFoasDto = {} as FundingPlanFoasDto;
+          tmp.rfaPaNumber = next.noticeNumber;
+          tmp.prevRfaPaNumber = next.priorNoticeNumber;
+          tmp.cptId = next.cptId;
+          tmp.title = next.title;
+          tmp.nihGuideAddr = next.nihGuideAddr;
+        });
+      });
+    }
   }
 }
