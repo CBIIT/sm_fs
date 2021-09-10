@@ -8167,7 +8167,7 @@
         ]
       }
     },
-    "/i2ecws/api/v1/fs/lookup/foa-url/{foa}": {
+    "/api/v1/fs/lookup/foa-url/{foa}": {
       "get": {
         "tags": [
           "fs-lookup-controller"
