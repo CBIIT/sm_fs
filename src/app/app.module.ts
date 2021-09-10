@@ -125,7 +125,7 @@ import { ActiveFundingPlanValidatorDirective } from './validators/active-funding
 import { DocsGrantTableComponent } from './funding-plan/plan-step5/docs-grant-table/docs-grant-table.component';
 import { ConfirmDeleteModalComponent } from './manage-designations/confirm-delete-modal/confirm-delete-modal.component';
 import { CanSearchComponent } from './shared/can-search/can-search.component';
-import { FormatNiEsiFlagPipe } from './pipes/format-Ni-Esi-flag.pipe';
+import { FormatNiEsiFlagPipe } from './pipes/format-ni-esi-flag-format.pipe';
 import { ApplicationsProposedForFundingReadonlyComponent } from './funding-plan/applications-proposed-for-funding-readonly/applications-proposed-for-funding-readonly.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
