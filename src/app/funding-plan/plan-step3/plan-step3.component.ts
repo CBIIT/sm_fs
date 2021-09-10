@@ -36,6 +36,10 @@ export class PlanStep3Component implements OnInit {
   planName: string;
   private nextStep: string;
 
+  get cayCodeArr(): string[] {
+    return [this.cayCode];
+  }
+
   constructor(private navigationModel: NavigationStepModel,
               private router: Router,
               private logger: NGXLogger,
