@@ -48,7 +48,11 @@
 
     <div class="grant-info-col">
       <label for="rec-fy-3">Recommended Future Years</label>
+      <ng-container *ngIf="readOnly then static else dropdown"></ng-container>
+      <ng-template #dropdown>
       <app-recommended-future-years id="rec-fy-3"></app-recommended-future-years>
+      </ng-template>
+      <ng-template #static><span>4</span></ng-template>
     </div>
 
   </div>

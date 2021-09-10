@@ -21,6 +21,7 @@ export class FpGrantInformationComponent implements OnInit {
   @Input() grantIndex: number;
   @Input() sourceIndex: number;
   @Input() parentForm: NgForm;
+  @Input() readOnly = false;
 
   skip = false;
   exception = false;

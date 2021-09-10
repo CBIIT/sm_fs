@@ -35,9 +35,13 @@ export class RetrievePlanComponent implements OnInit {
           this.planModel.maximumScore = this.planModel.fundingPlanDto.fundableRangeTo;
           this.planModel.markMainApproversCreated();
           const selectedApplIds: number[] = result.SelectedApplIds;
+          this.logger.debug('selected applIds:', selectedApplIds);
 
           if (selectedApplIds && this.planModel.allGrants) {
-              this.planModel.allGrants.forEach( g => g.selected = selectedApplIds.includes(g.applId));
+              this.planModel.allGrants.forEach( g => {
+                g.selected = selectedApplIds.includes(Number(g.applId));
+                this.logger.debug(g);
+              });
           }
 
           if (this.planModel.allGrants) {

@@ -87,7 +87,7 @@ export class PlanStep6Component implements OnInit {
       (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
       g.priorityScoreNum >= this.planModel.minimumScore &&
       g.priorityScoreNum <= this.planModel.maximumScore) );
-    this.logger.debug('funded grants are ', this.grantsSkipped);
+    this.logger.debug('skipped grants are ', this.grantsSkipped);
 
     this.grantsNotConsidered = this.planModel.allGrants.filter(g =>
       (g.notSelectableReason && g.notSelectableReason.length > 0) ||
