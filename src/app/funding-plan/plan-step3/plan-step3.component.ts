@@ -254,11 +254,11 @@ export class PlanStep3Component implements OnInit {
       tmp.activityCodeList = activityCodes.join();
       tmp.issueType = item.issueType;
       tmp.nihGuideAddr = item.rfaDetails.nihGuideAddr;
-      tmp.rfaPaNumber = item.rfaDetails.noticeNumber;
+      tmp.rfaPaNumber = item.rfaDetails.rfaPaNumber;
       tmp.cptId = item.rfaDetails.cptId;
-      tmp.prevRfaPaNumber = item.rfaDetails.priorNoticeNumber;
+      tmp.prevRfaPaNumber = item.rfaDetails.prevRfaPaNumber;
       tmp.title = item.rfaDetails.title;
-      tmp.councilMeetingDateList = councilDates.get(item.rfaDetails.noticeNumber);
+      tmp.councilMeetingDateList = councilDates.get(item.rfaDetails.rfaPaNumber);
       this.planModel.fundingPlanDto.fundingPlanFoas.push(tmp);
     });
 
