@@ -74,6 +74,16 @@
           </div>
         </div>
     </div>
+    <div class="col-12"  *ngIf="workflowStuckBy">
+        <ng-container *ngIf="workflowStuckBy === 'ByCompletedPfrs'"> 
+        <ngb-alert type="danger" [dismissible]="false" *ngFor="let r of completedPfrs">
+            The grant application <a href="{{grantViewerUrl+r.applId}}" target="yourgrant">{{r.fullGrantNum}}</a> 
+            that is proposed for funding in this plan also has an existing “Initial Pay” 
+            <a (click)="retrieveRequest(r.frqId)">{{r.frqId}}</a> in {{r.requestFy}}. 
+            Please ensure that you take appropriate workflow action either on this plan or on the request.
+        </ngb-alert>
+        </ng-container>
+    </div> 
     <app-approver-list [readonly]="readonly" [terminalRequest]="terminalRequest" class="w-100"></app-approver-list>
 
     <div class="col-12">
@@ -92,7 +102,7 @@
 
 <div class="row">  
     <div class="col-12"  *ngIf="alert">
-        <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
+            <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
     </div> 
     <div class="col-12 d-flex mb-4" *ngIf="isApprover()">
         <button class="btn btn-primary ml-auto" (click)="submitWorkflow()" [disabled]="buttonDisabled">{{buttonLabel}}</button>
