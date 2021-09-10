@@ -99,7 +99,7 @@
 <div class="row">
   <div class="col-12">
     <ngb-alert *ngIf="dtData && dtData.length > 0 && noSelectableGrants" type="danger" [dismissible]="false">
-      <div>The FOA number(s) for the selected NCAB Date(s) has no selectable grants.</div>
+      <div>The FOA(s) for the selected NCAB(s) have no selectable grant applications.</div>
     </ngb-alert>
     <ngb-alert *ngIf="dtData && dtData.length > 0 && noSelectableGrantsWarining" type="warning" [dismissible]="true" (closed)="noSelectableGrantsWarining = ''">
       <div [innerHTML]="noSelectableGrantsWarining"></div>
