@@ -125,7 +125,7 @@ import { ActiveFundingPlanValidatorDirective } from './validators/active-funding
 import { DocsGrantTableComponent } from './funding-plan/plan-step5/docs-grant-table/docs-grant-table.component';
 import { ConfirmDeleteModalComponent } from './manage-designations/confirm-delete-modal/confirm-delete-modal.component';
 import { CanSearchComponent } from './shared/can-search/can-search.component';
-
+import { FormatNiEsiFlagPipe } from './pipes/format-Ni-Esi-flag.pipe';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -258,7 +258,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     ActiveFundingPlanValidatorDirective,
     DocsGrantTableComponent,
     ConfirmDeleteModalComponent,
-    CanSearchComponent
+    CanSearchComponent,
+    FormatNiEsiFlagPipe
   ],
 
 
