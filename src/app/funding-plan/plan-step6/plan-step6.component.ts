@@ -56,7 +56,6 @@ export class PlanStep6Component implements OnInit {
   userCanDelete = false;
   userReadonly = true;
   closeResult: string;
-  _workFlowAction = '';
   docChecker: FundingPlanDocChecker;
 
   private fprId: number;
@@ -321,6 +320,10 @@ export class PlanStep6Component implements OnInit {
 
   hideWorkflow(): boolean {
     return this.requestStatus === RequestStatus.REJECTED;
+  }
+
+  isDirty(): boolean {
+    return (this.workflowComponent?.isDirty());
   }
 }
 
