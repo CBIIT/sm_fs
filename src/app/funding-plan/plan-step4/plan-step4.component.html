@@ -116,10 +116,9 @@
         <p *ngIf="!ncGrants || ncGrants.length === 0">
             Nothing found to be displayed. All applications received for this FOA to NCAB 
             <span *ngFor = "let rfaNcCab of planModel.grantsSearchCriteria let j=index">
-                {{j!=0?'; ':''}}{{rfaNcCab.rfaPaNumber}} 
-                (<span *ngFor = "let ncCab of rfaNcCab.ncabDates, let i=index">
+                <span *ngFor = "let ncCab of rfaNcCab.ncabDates, let i=index">
                     {{i!=0?', ':''}}{{ncCab | formatNcabDate }} 
-                </span>)
+                </span>
             </span> 
             have been considered for funding.
         </p>
