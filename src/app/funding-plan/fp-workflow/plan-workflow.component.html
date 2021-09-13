@@ -77,10 +77,10 @@
     <div class="col-12"  *ngIf="workflowStuckBy">
         <ng-container *ngIf="workflowStuckBy === 'ByCompletedPfrs'"> 
         <ngb-alert type="danger" [dismissible]="false" *ngFor="let r of completedPfrs">
-            The grant application <a href="{{grantViewerUrl+r.applId}}" target="yourgrant">{{r.fullGrantNum}}</a> 
-            that is proposed for funding in this plan also has an existing “Initial Pay” 
-            <a (click)="retrieveRequest(r.frqId)">{{r.frqId}}</a> in {{r.requestFy}}. 
-            Please ensure that you take appropriate workflow action either on this plan or on the request.
+            This Funding Plan has a Grant application <a href="{{grantViewerUrl+r.applId}}" target="yourgrant">{{r.fullGrantNum}}</a> 
+            that also has a completed "Initial Pay" PFR 
+            <a (click)="retrieveRequest(r.frqId)">{{r.frqId}}</a> in FY {{r.requestFy}}. 
+            The selected action cannot be processed.
         </ngb-alert>
         </ng-container>
     </div> 
