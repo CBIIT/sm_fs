@@ -35,19 +35,17 @@ export class RetrievePlanComponent implements OnInit {
           this.planModel.maximumScore = this.planModel.fundingPlanDto.fundableRangeTo;
           this.planModel.markMainApproversCreated();
           const selectedApplIds: number[] = result.SelectedApplIds;
-          this.logger.debug('selected applIds:', selectedApplIds);
 
           if (selectedApplIds && this.planModel.allGrants) {
               this.planModel.allGrants.forEach( g => {
                 g.selected = selectedApplIds.includes(Number(g.applId));
-                this.logger.debug(g);
               });
           }
 
           if (this.planModel.allGrants) {
             this.planModel.allGrants.forEach( g => this.addRfaNcabToSearchCriteria(g));
           }
-          this.logger.debug('retrieved planModel ', this.planModel);
+          this.logger.debug('retrieved plan:', JSON.stringify(this.planModel.fundingPlanDto));
           this.router.navigate(['/plan/step6']);
         },
         (error) => {

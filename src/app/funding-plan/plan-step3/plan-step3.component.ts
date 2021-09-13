@@ -143,9 +143,13 @@ export class PlanStep3Component implements OnInit {
 
     const futureYears: Map<number, number> = new Map<number, number>();
     this.applicationsProposedForFunding.grantList.forEach(item => {
-      const applId = item.grant.applId;
-      const recommendedFutureYears: number = item.recommendedFutureYearsComponent?.selectedValue;
-      futureYears.set(applId, recommendedFutureYears);
+      this.logger.debug('grant thing ==>', item);
+      if(!!item.recommendedFutureYearsComponent) {
+        const applId = item.grant.applId;
+        const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue || 0;
+        this.logger.debug('Retrieved values (applId, recommendedFutureYears) =>', applId, recommendedFutureYears);
+        futureYears.set(applId, recommendedFutureYears);
+      }
     });
 
     const fundingSourceDetails: Map<number, FundingRequestFundsSrcDto> = new Map<number, FundingRequestFundsSrcDto>();
@@ -277,7 +281,7 @@ export class PlanStep3Component implements OnInit {
       tmp.nihGuideAddr = item.rfaDetails.nihGuideAddr;
       tmp.rfaPaNumber = item.rfaDetails.rfaPaNumber;
       tmp.cptId = item.rfaDetails.cptId;
-      tmp.prevRfaPaNumber = item.rfaDetails.prevRfaPaNumber;
+      tmp.prevRfaPaNumber = item.priorNotice;
       tmp.title = item.rfaDetails.title;
       tmp.councilMeetingDateList = councilDates.get(item.rfaDetails.rfaPaNumber);
       this.planModel.fundingPlanDto.fundingPlanFoas.push(tmp);
