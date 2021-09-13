@@ -73,6 +73,6 @@ export class SearchComponent implements OnInit {
   }
 
   onSearchType($event: string) {
-    this.labelSearch = $event === '0' ? 'Requests' : ($event === '1' ? 'Plans' : 'Grants');
+    this.labelSearch = $event === 'FR' ? 'Requests' : ($event === 'FP' ? 'Plans' : ($event === 'PL' ? 'Paylists' :  'Grants'));
   }
 }

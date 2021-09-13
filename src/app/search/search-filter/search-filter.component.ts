@@ -4,6 +4,7 @@ import { FundSelectSearchCriteriaRes } from '@nci-cbiit/i2ecws-lib';
 import { SearchCriteria } from '../search-criteria';
 import { SearchFilterService } from '../search-filter.service';
 import { NGXLogger } from 'ngx-logger';
+import {AppUserSessionService} from "../../service/app-user-session.service";
 
 @Component({
   selector: 'app-search-filter',
@@ -17,10 +18,11 @@ export class SearchFilterComponent implements OnInit {
   @Output() searchType = new EventEmitter<string>()
   public searchFilter: SearchCriteria;
 
-  showFilters: boolean = false;
   showAdvanced: boolean = false;
 
-  private _typeSearch: string = '0';
+  canSearchForPaylists: boolean;
+
+  private _typeSearch: string = 'FR';
 
   set typeSearch(value: string) {
     this._typeSearch = value;
@@ -28,11 +30,15 @@ export class SearchFilterComponent implements OnInit {
   }
   get typeSearch() { return this._typeSearch; }
 
-  constructor(private searchFilterService: SearchFilterService, private logger: NGXLogger) {
+  constructor(private searchFilterService: SearchFilterService,
+              private userSessionService: AppUserSessionService,
+              private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
-    this.typeSearch = '0';
+    this.typeSearch = 'FR';
+    this.canSearchForPaylists = this.userSessionService.hasRole('GMBRCHF') ||
+                                this.userSessionService.hasRole('OEFIACRT');
     this.searchFilter = this.searchFilterService.searchFilter;
   }
 

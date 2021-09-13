@@ -50,3 +50,8 @@ a.hide-filters:after {
   margin-left: .2rem;
 }
 
+.text-divider{margin: 0 0 1.5em 0; line-height: 0; text-align: left;}
+.text-divider span{background-color: #ffffff;}
+.text-divider:before{ content: " "; display: block; border-top: 1px solid #c1c2c9; border-bottom: 1px solid #f7f7f7;}
+
+
