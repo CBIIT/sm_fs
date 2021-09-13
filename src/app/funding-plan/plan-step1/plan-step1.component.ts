@@ -269,6 +269,9 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
     this.fsPlanControllerService.getRfaPaListUsingGET().subscribe(
       (result: Array<FundingPlanRfaPaDto>) => {
         const tmp: Array<Select2OptionData> = [];
+
+        const currentFprId = this.planModel.fundingPlanDto?.fprId;
+
         let index = 0;
         for (const entry of result) {
           index = index + 1;
@@ -279,6 +282,11 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
             });
             const ncabTmp: Array<Select2OptionData> = [];
             for (const ncabEntry of entry.ncabs) {
+              // remove the reference to the current FPRId if exist
+              if (currentFprId && ncabEntry.fprId === currentFprId) {
+                ncabEntry.fprId = null;
+                ncabEntry.currentPlanStatus = null;
+              }
               ncabTmp.push({
                 id: ncabEntry.councilMeetingDate,
                 text: ncabEntry.formattedCouncilMeetingDate,
