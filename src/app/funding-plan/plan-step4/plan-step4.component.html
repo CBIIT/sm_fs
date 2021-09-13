@@ -123,7 +123,9 @@
             </span> 
             have been considered for funding.
         </p>
-        <app-grant-table [grantList]="ncGrants"></app-grant-table>
+        <p *ngIf="ncGrants.length > 0">
+            <app-grant-table [grantList]="ncGrants"></app-grant-table>
+        </p>
     </div>
     <div class="col-12">
         <hr>
