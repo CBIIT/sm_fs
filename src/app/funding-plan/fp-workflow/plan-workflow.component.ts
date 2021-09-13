@@ -28,6 +28,7 @@ let addedApproverMap = new Map<number, any>();
     ]
 })
 export class PlanWorkflowComponent implements OnInit, OnDestroy {
+
   @Input() readonly = false;
   @Output() actionEmitter = new EventEmitter<string>();
   budgetInfoComponent: BudgetInfoComponent;
@@ -58,6 +59,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
+  private _dirty = false;
 
   set selectedValue(value: number) {
     this._selectedValue = value;
@@ -76,6 +78,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   }
 
   onActionChange(value: string): void {
+    this._dirty = true;
     this.actionEmitter.emit(value);
   }
 
@@ -392,4 +395,12 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     return valid;
   }
 
+  isDirty(): boolean {
+    return this._dirty || this.workflowModel.hasNewApprover;
+  }
+
+  onCommentsInput(): void {
+    this._dirty = true;
+    this.isFormValid();
+  }
 }

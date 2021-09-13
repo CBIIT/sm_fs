@@ -89,7 +89,7 @@
     <div class="col-12">
         <div class="form-group" *ngIf=" isApprover() || !readonly">
             <label for="workflow-comments">Workflow Comments <span class="optional" *ngIf="!commentsRequired">(optional)</span></label>
-            <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments" (input)="isFormValid()"></textarea>
+            <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments" (input)="onCommentsInput()"></textarea>
             <span class="text-danger mt-1" *ngIf="(validationError?.comments_missing)">
                 Comments are required
             </span>

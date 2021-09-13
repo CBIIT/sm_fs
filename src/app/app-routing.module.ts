@@ -21,6 +21,7 @@ import { PlanStep6Component } from './funding-plan/plan-step6/plan-step6.compone
 import {CanDeactivatePlanStep1} from './funding-plan/plan-step1/can-deactivate-plan-step1';
 import {ManageDesignationsComponent} from './manage-designations/manage-designations.component';
 import { RetrievePlanComponent } from './funding-plan/retrieve-plan/retrieve-plan.component';
+import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate-plan-step6';
 
 const routes: Routes = [
   {
@@ -34,7 +35,7 @@ const routes: Routes = [
         {path: 'step3', component: PlanStep3Component},
         {path: 'step4', component: PlanStep4Component},
         {path: 'step5', component: PlanStep5Component},
-        {path: 'step6', component: PlanStep6Component},
+        {path: 'step6', component: PlanStep6Component, canDeactivate: [CanDeactivatePlanStep6]},
         {path: 'retrieve/:fprId', component: RetrievePlanComponent}
       ]},
       { path: 'request', component: FundingRequestComponent, children: [
