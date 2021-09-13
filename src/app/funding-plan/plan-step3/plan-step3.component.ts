@@ -144,7 +144,7 @@ export class PlanStep3Component implements OnInit {
     const futureYears: Map<number, number> = new Map<number, number>();
     this.applicationsProposedForFunding.grantList.forEach(item => {
       this.logger.debug('grant thing ==>', item);
-      if(!!item.recommendedFutureYearsComponent) {
+      if (!!item.recommendedFutureYearsComponent) {
         const applId = item.grant.applId;
         const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue || 0;
         this.logger.debug('Retrieved values (applId, recommendedFutureYears) =>', applId, recommendedFutureYears);
@@ -218,8 +218,14 @@ export class PlanStep3Component implements OnInit {
       } else {
         let directCost: number;
         let totalCost: number;
+        let percentCut: number | null;
         directCost = item.getDirectCost();
         totalCost = item.getTotalCost();
+        if (item.displayType === 'percent') {
+          percentCut = item.getPercentCut();
+        } else {
+          percentCut = null;
+        }
 
         let budgets = budgetMap.get(item.grant.applId) as FundingReqBudgetsDto[];
         if (!budgets) {
@@ -239,6 +245,8 @@ export class PlanStep3Component implements OnInit {
         cans.push({
           approvedDc: directCost,
           approvedTc: totalCost,
+          dcPctCut: percentCut,
+          tcPctCut: percentCut,
           approvedFutureYrs: futureYears.get(item.grant.applId),
           fseId: source.fundingSourceId,
           fundingSourceName: source.fundingSourceName
