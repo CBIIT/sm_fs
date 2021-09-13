@@ -60,9 +60,9 @@ export class FpFundingSourceComponent implements OnInit {
     this.planModel.grantsSearchCriteria.forEach(r => {
       this.allRfaPaNumbers.push(r.rfaPaNumber);
     });
-    // this.logger.debug('allRfaPaNumbers', this.allRfaPaNumbers);
+    this.logger.debug('allRfaPaNumbers', this.allRfaPaNumbers);
     this.rfaPaNumber = this.allRfaPaNumbers[0];
-    // this.logger.debug('selected rfaPaNumber:', this.rfaPaNumber);
+    this.logger.debug('selected rfaPaNumber:', this.rfaPaNumber);
     this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
       this.refreshSources(next.pd, next.ca);
     });
@@ -73,9 +73,9 @@ export class FpFundingSourceComponent implements OnInit {
       return;
     }
     if (!this.rfaPaNumber) {
-      this.logger.error('No rfaPaNumber available. Not refreshing sources');
+      this.logger.info('No rfaPaNumber available. Not refreshing sources');
       // tslint:disable-next-line:no-console
-      console.trace('missing rfaPaNumber');
+      // console.trace('missing rfaPaNumber');
       return;
     }
     const tmp: Select2OptionData[] = [];

@@ -144,7 +144,7 @@ export class PlanStep3Component implements OnInit {
     const futureYears: Map<number, number> = new Map<number, number>();
     this.applicationsProposedForFunding.grantList.forEach(item => {
       const applId = item.grant.applId;
-      const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue;
+      const recommendedFutureYears: number = item.recommendedFutureYearsComponent?.selectedValue;
       futureYears.set(applId, recommendedFutureYears);
     });
 
