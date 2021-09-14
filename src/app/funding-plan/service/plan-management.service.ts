@@ -18,6 +18,8 @@ export class PlanManagementService {
 
   private budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
   private canMap: Map<number, Map<number, FundingRequestCanDto>>;
+  private percentSelectionTracker: Map<number, boolean> = new Map<number, boolean>();
+
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
 
   inflightPFRs: Map<number, number> = new Map<number, number>();
@@ -47,6 +49,14 @@ export class PlanManagementService {
     this.buildPlanModel();
   }
 
+  setPercentSelected(applId: number, selected: boolean): void {
+    this.percentSelectionTracker.set(applId, selected);
+  }
+
+  isPercentSelected(applId: number): boolean {
+    return this.percentSelectionTracker.get(applId) || false;
+  }
+
   buildPlanModel(): void {
     this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
     this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
@@ -61,6 +71,26 @@ export class PlanManagementService {
     this.logger.debug('cans', this.canMap);
     this.logger.debug('funding sources', this.planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources);
   }
+
+  pushBudget(applId: number, fseId: number, budget: FundingReqBudgetsDto): void {
+    if (!this.budgetMap) {
+      this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
+    }
+    const tmp = new Map<number, FundingReqBudgetsDto>();
+    tmp.set(fseId, budget);
+    this.budgetMap.set(applId, tmp);
+
+  }
+
+  pushCan(applId: number, fseId: number, can: FundingRequestCanDto): void {
+    if (!this.canMap) {
+      this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
+    }
+    const tmp = new Map<number, FundingRequestCanDto>();
+    tmp.set(fseId, can);
+    this.canMap.set(applId, tmp);
+  }
+
 
   // NOTE: this is for the purpose of restricting selections for the second and third funding sources
   trackSelectedSources(index: number, sourceId: number): void {

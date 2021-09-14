@@ -29,7 +29,7 @@
           [id]="'DC-' + grantIndex + '_' + sourceIndex"
           [attr.aria-describedby]="'DC-prepend-' + grantIndex + '_' + sourceIndex"
           (change)="recalculate()"
-          name="directCost"
+          [name]="'directCost_' + grantIndex + '_' + sourceIndex"
           #dcInput="ngModel"
           [(ngModel)]="directCost">
       </div>
@@ -45,7 +45,7 @@
           class="form-control"
           [id]="'TC-' + grantIndex + '_' + sourceIndex"
           aria-describedby="TC-prepend-1"
-          name="totalCost"
+          [name]="'totalCost_' + grantIndex + '_' + sourceIndex"
           #tcInput="ngModel"
           (change)="recalculate()"
           [(ngModel)]="totalCost">
@@ -112,6 +112,7 @@
           <span class="input-group-text" [id]="'DC-prepend-' + grantIndex + '_' + sourceIndex">$</span>
         </div>
         <input
+          name="readonly"
           type="text"
           class="form-control"
           [id]="'DC-' + grantIndex + '_' + sourceIndex"
@@ -128,6 +129,7 @@
           <span class="input-group-text" [id]="'TC-prepend-' + grantIndex + '_' + sourceIndex">$</span>
         </div>
         <input
+          name="readonly"
           type="text"
           class="form-control"
           [id]="'TC-' + grantIndex + '_' + sourceIndex"
@@ -148,7 +150,7 @@
           [id]="'PC-' + grantIndex + '_' + sourceIndex"
           [attr.aria-label]="'percent_cut'"
           (change)="recalculate()"
-          name="percentCut"
+          [name]="'percentCut_' + grantIndex + '_' + sourceIndex"
           [(ngModel)]="percentCut"
           #pcInput="ngModel">
         <div class="input-group-append">
