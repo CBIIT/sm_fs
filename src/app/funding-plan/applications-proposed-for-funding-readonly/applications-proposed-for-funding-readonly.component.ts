@@ -30,18 +30,41 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
 
   directCostPercentCut(applId: number, fseId: number): number {
     this.logger.debug('return direct cost percent cut for grant', applId, 'and source', fseId);
-    return 0;
+    return this.planCoordinatorService.directCostPercentCut(applId, fseId) / 100;
   }
 
   totalCost(applId: number, fseId: number): number {
     this.logger.debug('return total cost for grant', applId, 'and source', fseId);
     return this.planCoordinatorService.totalCost(applId, fseId);
-    return 0;
   }
 
   totalCostPercentCut(applId: number, fseId: number): number {
     this.logger.debug('return total cost percent cut for grant', applId, 'and source', fseId);
-    return 0;
+    return this.planCoordinatorService.totalCostPercentCut(applId, fseId) / 100;
+  }
+
+  sourceDirectTotal(fseId: number): number {
+    return this.planCoordinatorService.sourceDirectTotal(fseId);
+  }
+
+  sourceTotalTotal(fseId: number): number {
+    return this.planCoordinatorService.sourceTotalTotal(fseId);
+  }
+
+  getGrantDirectTotal(applId: number): number {
+    return this.planCoordinatorService.requestDirectTotal(applId);
+  }
+
+  getGrantTotalTotal(applId: number): number {
+    return this.planCoordinatorService.requestTotalTotal(applId);
+  }
+
+  grandTotalDirect(): number {
+    return this.planCoordinatorService.grandTotalDirect();
+  }
+
+  grandTotalTotal(): number {
+    return this.planCoordinatorService.grandTotalTotal();
   }
 }
 

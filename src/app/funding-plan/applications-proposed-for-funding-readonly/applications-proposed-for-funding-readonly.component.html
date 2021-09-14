@@ -36,13 +36,13 @@
             <td>
               <strong>Direct</strong><br/>
               {{ directCost(grant.applId, source.fundingSourceId) | currency }} <br/>
-              {{ directCostPercentCut(grant.applId, source.fundingSourceId) | percentCut }}
+              {{ directCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
             </td>
 
             <td>
               <strong>Total</strong><br/>
               {{ totalCost(grant.applId, source.fundingSourceId) | currency }} <br/>
-              {{ totalCostPercentCut(grant.applId, source.fundingSourceId) | percentCut }}
+              {{ totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
             </td>
             </ng-container>
 
@@ -68,12 +68,12 @@
             <ng-container *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources; let sourceIndex = index">
             <td>
               <strong>Direct</strong><br/>
-              {{ 'Direct total for source' +  source.fundingSourceId}}
+              {{ sourceDirectTotal(source.fundingSourceId) | currency}}
             </td>
 
             <td>
               <strong>Total</strong><br/>
-              {{ 'Total total for source' +  source.fundingSourceId}}
+              {{ sourceTotalTotal(source.fundingSourceId) | currency }}
             </td>
             </ng-container>
 
