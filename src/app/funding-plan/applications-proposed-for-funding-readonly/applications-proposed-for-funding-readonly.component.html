@@ -49,12 +49,12 @@
             <ng-container *ngIf="planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.length > 1">
             <td>
               <strong>Direct</strong><br/>
-              {{ 'Direct total for grant ' + grant.applId }}
+              {{ requestTotalDirect(grant.applId) }}
             </td>
 
             <td>
               <strong>Total</strong><br/>
-              {{ 'Total total for grant ' + grant.applId }}
+              {{ requestTotalTotal(grant.applId) }}
             </td>
             </ng-container>
 
@@ -80,12 +80,12 @@
             <ng-container *ngIf="planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.length > 1">
             <td>
               <strong>Direct</strong><br/>
-              {{ 'Total direct for all sources all grants'}}
+              {{ grandTotalDirect() }}
             </td>
 
             <td>
               <strong>Total</strong><br/>
-              {{ 'Total total for all sources all grants'}}
+              {{ grandTotalTotal() }}
             </td>
             </ng-container>
           </tr>

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { PlanCoordinatorService } from '../service/plan-coordinator-service';
+import { PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ControlContainer, NgForm } from '@angular/forms';
@@ -31,7 +31,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   private mySourceDetails: FundingRequestFundsSrcDto;
 
   constructor(
-    private planCoordinatorService: PlanCoordinatorService,
+    private planCoordinatorService: PlanManagementService,
     private logger: NGXLogger) {
   }
 

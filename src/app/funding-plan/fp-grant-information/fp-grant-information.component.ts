@@ -4,7 +4,7 @@ import { PlanModel } from '../../model/plan/plan-model';
 import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
 import { NGXLogger } from 'ngx-logger';
 import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
-import { PlanCoordinatorService } from '../service/plan-coordinator-service';
+import { PlanManagementService } from '../service/plan-management.service';
 import { RecommendedFutureYearsComponent } from '../recommended-future-years/recommended-future-years.component';
 import { ControlContainer, NgForm } from '@angular/forms';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
@@ -30,6 +30,7 @@ export class FpGrantInformationComponent implements OnInit {
   piDirect: number;
   piTotal: number;
   private mySourceDetails: FundingRequestFundsSrcDto;
+
   recommendedFutureYears(): any {
     return this.planCoordinatorService.getRecommendedFutureYears(this.grant.applId);
   }
@@ -38,7 +39,7 @@ export class FpGrantInformationComponent implements OnInit {
     public model: PlanModel,
     private logger: NGXLogger,
     private requestService: FsRequestControllerService,
-    private planCoordinatorService: PlanCoordinatorService) {
+    private planCoordinatorService: PlanManagementService) {
   }
 
   ngOnInit(): void {

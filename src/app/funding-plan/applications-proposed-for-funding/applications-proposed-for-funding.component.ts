@@ -3,13 +3,14 @@ import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ControlContainer, NgForm } from '@angular/forms';
-import { PlanCoordinatorService } from '../service/plan-coordinator-service';
+import { PlanManagementService } from '../service/plan-management.service';
 import { FpProgramRecommendedCostsComponent } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { Router } from '@angular/router';
 import { openNewWindow } from '../../utils/utils';
 import { FpGrantInformationComponent } from '../fp-grant-information/fp-grant-information.component';
 import { FpFundingSourceComponent } from '../fp-funding-source/fp-funding-source.component';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -30,6 +31,16 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   listSelectedSources: FundingRequestFundsSrcDto[];
+  private _budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
+
+  get budgetMap(): Map<number, Map<number, FundingReqBudgetsDto>> {
+    return this._budgetMap;
+  }
+
+  set budgetMap(value: Map<number, Map<number, FundingReqBudgetsDto>>) {
+    this._budgetMap = value;
+  }
+
 
   get getNextSourceIndex(): number {
     // this.logger.debug('getSourceIndex():', this.planCoordinatorService.selectedSourceCount);
@@ -146,8 +157,8 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   constructor(private logger: NGXLogger,
-              private planModel: PlanModel,
-              private planCoordinatorService: PlanCoordinatorService,
+              public planModel: PlanModel,
+              public planCoordinatorService: PlanManagementService,
               private router: Router) {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
 
@@ -168,6 +179,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     this.logger.debug('source: ', this.fundingSources.get(0));
     this.logger.debug('grant info:', this.grantList.get(0));
     this.logger.debug('prc:', this.prcList.get(0));
+    this.grantList.forEach(item => {
+      this.planCoordinatorService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent.selectedValue);
+    });
     this.modalFpFundingSource.index = this.getNextSourceIndex;
     this.modalFpFundingSource.filterData();
     this.modalFpRecommendedCosts.sourceIndex = this.getNextSourceIndex;

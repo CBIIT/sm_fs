@@ -10,7 +10,7 @@ import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-
 @Injectable({
   providedIn: 'root'
 })
-export class PlanCoordinatorService {
+export class PlanManagementService {
   fundingSourceValuesEmitter = new Subject<{ pd: number, ca: string }>();
   grantInfoCostEmitter = new Subject<{ index: number, applId?: number, dc: number, tc: number }>();
   fundingSourceSelectionEmitter = new Subject<{ index: number, source: FundingRequestFundsSrcDto }>();
@@ -21,12 +21,15 @@ export class PlanCoordinatorService {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
 
   inflightPFRs: Map<number, number> = new Map<number, number>();
+
   private fundedPlanTypes: FundingRequestTypes[] = [
     FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION,
     FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_SKIP,
     FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE
   ];
+
   private grantValues: Map<number, { index: number, applId?: number, dc: number, tc: number }>;
+  private localRfy: Map<number, number>;
 
   constructor(
     private planModel: PlanModel,
@@ -59,6 +62,7 @@ export class PlanCoordinatorService {
     this.logger.debug('funding sources', this.planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources);
   }
 
+  // NOTE: this is for the purpose of restricting selections for the second and third funding sources
   trackSelectedSources(index: number, sourceId: number): void {
     // TODO: only track non-null
 
@@ -100,7 +104,19 @@ export class PlanCoordinatorService {
     });
   }
 
+  setRecommendedFutureYears(applId: number, rfy: number): void {
+    if (!this.localRfy) {
+      this.localRfy = new Map<number, number>();
+    }
+    if (applId && rfy) {
+      this.localRfy.set(applId, rfy);
+    }
+  }
+
   getRecommendedFutureYears(applId: number): number {
+    if (!isNaN(this.localRfy?.get(applId))) {
+      return this.localRfy.get(applId);
+    }
     const cans = this.canMap.get(Number(applId));
     let result = 0;
     if (!!cans) {
@@ -108,6 +124,7 @@ export class PlanCoordinatorService {
         result = c.approvedFutureYrs;
       });
     }
+    this.setRecommendedFutureYears(applId, result);
     this.logger.debug('RFY for can', applId, '=', result);
     return result;
   }

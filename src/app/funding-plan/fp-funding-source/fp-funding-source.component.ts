@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Select2OptionData } from 'ng-select2';
 import { NGXLogger } from 'ngx-logger';
 import { FsPlanControllerService } from '@nci-cbiit/i2ecws-lib';
-import { PlanCoordinatorService } from '../service/plan-coordinator-service';
+import { PlanManagementService } from '../service/plan-management.service';
 import { PlanModel } from '../../model/plan/plan-model';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
@@ -29,7 +29,7 @@ export class FpFundingSourceComponent implements OnInit {
 
   constructor(private logger: NGXLogger,
               private planControllerService: FsPlanControllerService,
-              private planCoordinatorService: PlanCoordinatorService,
+              private planCoordinatorService: PlanManagementService,
               private planModel: PlanModel) {
   }
 

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
-import { PlanCoordinatorService } from '../service/plan-coordinator-service';
+import { PlanManagementService } from '../service/plan-management.service';
 
 @Component({
   selector: 'app-applications-proposed-for-funding-readonly',
@@ -13,7 +13,7 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
 
   constructor(public planModel: PlanModel,
-              private planCoordinatorService: PlanCoordinatorService,
+              private planCoordinatorService: PlanManagementService,
               private logger: NGXLogger) {
   }
 
@@ -51,20 +51,20 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
     return this.planCoordinatorService.sourceTotalTotal(fseId);
   }
 
-  getGrantDirectTotal(applId: number): number {
-    return this.planCoordinatorService.requestDirectTotal(applId);
-  }
-
-  getGrantTotalTotal(applId: number): number {
-    return this.planCoordinatorService.requestTotalTotal(applId);
-  }
-
   grandTotalDirect(): number {
     return this.planCoordinatorService.grandTotalDirect();
   }
 
   grandTotalTotal(): number {
     return this.planCoordinatorService.grandTotalTotal();
+  }
+
+  requestTotalDirect(applId: number): number {
+    return this.planCoordinatorService.requestDirectTotal(applId);
+  }
+
+  requestTotalTotal(applId: number): number {
+    return this.planCoordinatorService.requestTotalTotal(applId);
   }
 }
 

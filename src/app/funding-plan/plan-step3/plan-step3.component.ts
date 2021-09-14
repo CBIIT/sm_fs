@@ -5,7 +5,7 @@ import { NGXLogger } from 'ngx-logger';
 import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
 import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
-import { PlanCoordinatorService } from '../service/plan-coordinator-service';
+import { PlanManagementService } from '../service/plan-management.service';
 import {
   FsPlanControllerService,
   FundingPlanFoasDto,
@@ -49,7 +49,7 @@ export class PlanStep3Component implements OnInit {
               private logger: NGXLogger,
               public planModel: PlanModel,
               private pdCaIntegratorService: PdCaIntegratorService,
-              private planCoordinatorService: PlanCoordinatorService,
+              private planCoordinatorService: PlanManagementService,
               private fsPlanControllerService: FsPlanControllerService,
               private planApproverService: PlanApproverService,
               private userSessionService: AppUserSessionService) {
