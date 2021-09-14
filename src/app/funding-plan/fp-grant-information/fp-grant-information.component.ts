@@ -68,6 +68,7 @@ export class FpGrantInformationComponent implements OnInit {
       // });
       this.planCoordinatorService.grantInfoCostEmitter.next({
         index: this.grantIndex,
+        applId: this.grant.applId,
         dc: this.piDirect,
         tc: this.piTotal
       });

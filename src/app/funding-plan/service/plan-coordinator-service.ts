@@ -12,7 +12,7 @@ import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-
 })
 export class PlanCoordinatorService {
   fundingSourceValuesEmitter = new Subject<{ pd: number, ca: string }>();
-  grantInfoCostEmitter = new Subject<{ index: number, dc: number, tc: number }>();
+  grantInfoCostEmitter = new Subject<{ index: number, applId?: number, dc: number, tc: number }>();
   fundingSourceSelectionEmitter = new Subject<{ index: number, source: FundingRequestFundsSrcDto }>();
   private _selectedSources: Map<number, number> = new Map<number, number>();
 
@@ -26,12 +26,20 @@ export class PlanCoordinatorService {
     FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_SKIP,
     FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE
   ];
+  private grantValues: Map<number, { index: number, applId?: number, dc: number, tc: number }>;
 
   constructor(
     private planModel: PlanModel,
     private fsRequestService: FsRequestControllerService,
     private logger: NGXLogger) {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
+    this.grantValues = new Map<number, { index: number, applId?: number, dc: number, tc: number }>();
+    this.grantInfoCostEmitter.subscribe(v => {
+      this.logger.debug('saving grant values', v);
+      if (!!v.applId) {
+        this.grantValues.set(v.applId, v);
+      }
+    });
 
     this.buildPlanModel();
   }
@@ -108,12 +116,117 @@ export class PlanCoordinatorService {
     return this.getBudget(applId, fseId)?.dcRecAmt || 0;
   }
 
+  directCostPercentCut(applId: number, fseId: number): number {
+    this.logger.debug('dc can ===> ', this.getCan(applId, fseId)?.dcPctCut);
+
+    if (this.getCan(applId, fseId)?.dcPctCut) {
+      return this.getCan(applId, fseId).dcPctCut;
+    }
+    const dc = this.getBudget(applId, fseId)?.dcRecAmt;
+    const grantTotal = this.getGrantCostInfo(applId)?.dc;
+    if (dc && grantTotal && grantTotal !== 0) {
+      return (dc / grantTotal) * 100;
+    }
+    return 0;
+  }
+
   totalCost(applId: number, fseId: number): number {
     return this.getBudget(applId, fseId)?.tcRecAmt || 0;
+  }
+
+  totalCostPercentCut(applId: number, fseId: number): number {
+    this.logger.debug('tc can ===> ', this.getCan(applId, fseId)?.tcPctCut);
+    if (this.getCan(applId, fseId)?.tcPctCut) {
+      return this.getCan(applId, fseId).tcPctCut;
+    }
+    const tc = this.getBudget(applId, fseId)?.tcRecAmt;
+    const grantTotal = this.getGrantCostInfo(applId)?.tc;
+    if (tc && grantTotal && grantTotal !== 0) {
+      return (tc / grantTotal) * 100;
+    }
+    return 0;
   }
 
   getBudget(applId: number, fseId: number): FundingReqBudgetsDto | null {
     const res = this.budgetMap.get(applId)?.get(fseId);
     return !!res ? res : null;
+  }
+
+  getCan(applId: number, fseId: number): FundingRequestCanDto | null {
+    const can = this.canMap.get(applId)?.get(fseId);
+    return !!can ? can : null;
+  }
+
+  getGrantCostInfo(applId: number): { dc: number, tc: number } | null {
+    const gc = this.grantValues.get(applId);
+    if (!!gc) {
+      const res = {
+        dc: gc.dc,
+        tc: gc.tc
+      };
+      this.logger.debug('returning cost for applid', applId, '==', res);
+      return res;
+    }
+    return null;
+  }
+
+  sourceDirectTotal(fseId: number): number {
+    let sum = 0;
+    this.budgetMap?.forEach(v => {
+      v.forEach(b => {
+        if (b.fseId === fseId) {
+          sum += b.dcRecAmt;
+        }
+      });
+    });
+    return sum;
+  }
+
+  sourceTotalTotal(fseId: number): number {
+    let sum = 0;
+    this.budgetMap?.forEach(v => {
+      v.forEach(b => {
+        if (b.fseId === fseId) {
+          sum += b.tcRecAmt;
+        }
+      });
+    });
+    return sum;
+  }
+
+  requestDirectTotal(applId: number): number {
+    let sum = 0;
+    this.budgetMap.get(applId)?.forEach(b => {
+      sum += b.dcRecAmt;
+    });
+    return sum;
+  }
+
+  requestTotalTotal(applId: number): number {
+    let sum = 0;
+    this.budgetMap.get(applId)?.forEach(b => {
+      sum += b.tcRecAmt;
+    });
+    return sum;
+  }
+
+  grandTotalDirect(): number {
+    let sum = 0;
+    this.budgetMap.forEach(v => {
+      v.forEach(b => {
+        sum += b.dcRecAmt;
+      });
+    });
+    return sum;
+  }
+
+  grandTotalTotal(): number {
+    let sum = 0;
+    this.budgetMap.forEach(v => {
+      v.forEach(b => {
+        sum += b.tcRecAmt;
+      });
+    });
+    return sum;
   }
 }
