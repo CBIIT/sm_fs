@@ -28,19 +28,55 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
-  listSelectedSources: string[];
+  listSelectedSources: number[];
 
   get sourceIndex(): number {
     // this.logger.debug('getSourceIndex():', this.planCoordinatorService.selectedSourceCount);
     return this.planCoordinatorService.selectedSourceCount;
   }
 
-  grantSumDirectCost(): number {
-    return 0;
+  grantSumDirectCost(grantIndex: number): number {
+    if (!this.prcList) {
+      return 0;
+    }
+    // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
+    let sum = 0;
+    this.prcList.forEach(control => {
+      if (control.grantIndex === grantIndex) {
+        if (control.displayType === 'percent') {
+          if (!isNaN(control.directCostCalculated)) {
+            sum = sum + Number(control.directCostCalculated);
+          }
+        } else {
+          if (!isNaN(control.directCost)) {
+            sum = sum + Number(control.directCost);
+          }
+        }
+      }
+    });
+    return sum;
   }
 
-  grantSumTotalCost(): number {
-    return 0;
+  grantSumTotalCost(grantIndex: number): number {
+    if (!this.prcList) {
+      return 0;
+    }
+    // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
+    let sum = 0;
+    this.prcList.forEach(control => {
+      if (control.grantIndex === grantIndex) {
+        if (control.displayType === 'percent') {
+          if (!isNaN(control.totalCostCalculated)) {
+            sum = sum + Number(control.totalCostCalculated);
+          }
+        } else {
+          if (!isNaN(control.totalCost)) {
+            sum = sum + Number(control.totalCost);
+          }
+        }
+      }
+    });
+    return sum;
   }
 
   sourceSumDirectCost(sourceIndex: number): number {
@@ -108,7 +144,8 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     return null;
   }
 
-  constructor(private logger: NGXLogger, private planModel: PlanModel,
+  constructor(private logger: NGXLogger,
+              private planModel: PlanModel,
               private planCoordinatorService: PlanCoordinatorService,
               private router: Router) {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
@@ -116,6 +153,8 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.logger.debug('Total grants selected', this.listGrantsSelected.length);
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests
 
   }
 

@@ -70,10 +70,11 @@ export class PlanStep3Component implements OnInit {
       this.doc = next;
     });
 
-    this.logger.debug('init:', this.planModel.fundingPlanDto.planName, this.planModel.fundingPlanDto.requestorNpnId, this.planModel.fundingPlanDto.cayCode);
     this.planName = this.planModel.fundingPlanDto.planName;
     this.pdNpnId = this.planModel.fundingPlanDto.requestorNpnId;
     this.cayCode = this.planModel.fundingPlanDto.cayCode;
+
+    this.logger.debug('step 3 plan data', JSON.stringify(this.planModel.fundingPlanDto));
   }
 
   saveContinue(): void {
@@ -249,6 +250,8 @@ export class PlanStep3Component implements OnInit {
           tcPctCut: percentCut,
           approvedFutureYrs: futureYears.get(item.grant.applId),
           fseId: source.fundingSourceId,
+          defaultOefiaTypeId: source.octId,
+          nciSourceFlag: source.nciSourceFlag,
           fundingSourceName: source.fundingSourceName
         });
         budgetMap.set(item.grant.applId, budgets);
