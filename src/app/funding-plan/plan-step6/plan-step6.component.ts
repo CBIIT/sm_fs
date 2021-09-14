@@ -332,7 +332,7 @@ export class FundingPlanDocChecker {
   tooltipText: string;
   warningText: string;
 
-  private requiredDocs: any[] = [
+  private docTypes: any[] = [
     {docType: DocTypeConstants.JUSTIFICATION, tooltip: 'Scientific Rationale'},
     {docType: DocTypeConstants.EXCEPTION_JUSTIFICATION, tooltip: 'Exception Justification'},
     {docType: DocTypeConstants.SKIP_JUSTIFICATION, tooltip: 'Skipped Justification'}
@@ -344,8 +344,8 @@ export class FundingPlanDocChecker {
   constructor(planModel: PlanModel) {
     this.missingTooltips = [];
     this.planModel = planModel;
-    this.requiredDocs.forEach( rd => {
-      if ( this.applTypeExists(rd.docType) && this.docNotFound(rd.docType)) {
+    this.docTypes.forEach( rd => {
+      if ( this.docTypeRequired(rd.docType) && this.docNotFound(rd.docType)) {
         this.missingTooltips.push(rd.tooltip);
       }
     });
@@ -378,7 +378,7 @@ export class FundingPlanDocChecker {
     }
   }
 
-  private applTypeExists(docType: string): boolean {
+  private docTypeRequired(docType: string): boolean {
     if (docType === DocTypeConstants.JUSTIFICATION) {
       return this.planModel.allGrants.filter( g => g.selected).length > 0;
     }
