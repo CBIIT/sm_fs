@@ -336,19 +336,19 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         }, // 1
         {
           title: 'PI', data: 'piFullName', render: (data, type, row, meta) => { // 2
-            return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+            return (!data || data == null) ? '' : '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }, className: 'all'
         },
         { title: 'Project Title', data: 'projectTitle' }, // 3
         {
           title: 'FOA', data: 'rfaPaNumber', render: (data, type, row, meta) => { // 4
-            return '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
+            return (!data || data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
           }
         },
         { title: 'I2 Status', data: 'applStatusGroupDescrip' }, // 5
         {
           title: 'PD', data: 'pdFullName', render: (data, type, row, meta) => { // 6
-            return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+            return (!data || data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }
         },
         { title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer }, className: 'all' }, // 7
