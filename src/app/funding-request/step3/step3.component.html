@@ -135,7 +135,7 @@
                             </div>
                         </div>
     
-                        <div *ngIf="!(transitionMemoUploaded | async)"
+                        <div *ngIf="(!(transitionMemoUploaded | async)) && isTransitionMemoRequired"
                             class="drag-item drag-item-placeholder drag-item-locked" tabindex="0">
                             <span class="doc-name">Transition Memo</span>
                             <span class="doc-desc" [style.color]="'red'">Required, Not entered/Uploaded</span>
