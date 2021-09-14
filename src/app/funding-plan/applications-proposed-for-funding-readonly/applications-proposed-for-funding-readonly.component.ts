@@ -25,7 +25,7 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
 
   directCost(applId: number, fseId: number): number {
     this.logger.debug('return direct cost for grant', applId, 'and source', fseId);
-    return 0;
+    return this.planCoordinatorService.directCost(applId, fseId);
   }
 
   directCostPercentCut(applId: number, fseId: number): number {
@@ -35,6 +35,7 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
 
   totalCost(applId: number, fseId: number): number {
     this.logger.debug('return total cost for grant', applId, 'and source', fseId);
+    return this.planCoordinatorService.totalCost(applId, fseId);
     return 0;
   }
 
@@ -42,8 +43,5 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
     this.logger.debug('return total cost percent cut for grant', applId, 'and source', fseId);
     return 0;
   }
-
-  recommendedFutureYears(applId: number): number {
-    return 4;
-  }
 }
+

@@ -103,4 +103,17 @@ export class PlanCoordinatorService {
     this.logger.debug('RFY for can', applId, '=', result);
     return result;
   }
+
+  directCost(applId: number, fseId: number): number {
+    return this.getBudget(applId, fseId)?.dcRecAmt || 0;
+  }
+
+  totalCost(applId: number, fseId: number): number {
+    return this.getBudget(applId, fseId)?.tcRecAmt || 0;
+  }
+
+  getBudget(applId: number, fseId: number): FundingReqBudgetsDto | null {
+    const res = this.budgetMap.get(applId)?.get(fseId);
+    return !!res ? res : null;
+  }
 }
