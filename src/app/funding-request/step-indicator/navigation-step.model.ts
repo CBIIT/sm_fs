@@ -13,13 +13,16 @@ export class NavigationStepModel {
         this.stepLinkable[step] = linkable;
     }
 
-    disableStepLinks(): void {
-        this.stepLinkable = [];
+    disableStepLinks(start?: number, end?: number): void {
+        for (let i = start ? start : 1;
+            i <= (end ? end : 6); i++) {
+            this.stepLinkable[i] = false;
+        }
     }
 
-    enableStepLinks(): void {
-        // first 1 step is never linked.
-        for (let i = 2; i <= 6; i++) {
+    enableStepLinks(start?: number, end?: number): void {
+        for (let i = start ? start : 1;
+            i <= (end ? end : 6 ); i++) {
             this.stepLinkable[i] = true;
         }
     }

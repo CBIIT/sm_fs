@@ -4,6 +4,7 @@ import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { Router } from '@angular/router';
+import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 
 @Component({
   selector: 'app-fundable-score-range',
@@ -31,6 +32,7 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
 
   constructor(private logger: NGXLogger,
               private router: Router,
+              private navigationModel: NavigationStepModel,
               private planModel: PlanModel) {
   }
 
@@ -93,6 +95,11 @@ export class FundableScoreRangeComponent implements OnInit, AfterViewInit {
     }
     this.hasScoreBeenCalculated = true;
     this.modelMaximumScore = this.maximumScore;  // prepare for planModel
+    if (this.modelMaximumScore !== this.planModel.maximumScore) {
+      // when new score is applied, disable links to other steps to force the user use
+      // save and continue to navigate.
+      this.navigationModel.disableStepLinks(3, 6);
+    }
     this.withinRangeGrants = this.planModel.allGrants.filter(g =>
       (!g.notSelectableReason || g.notSelectableReason.length === 0) && g.priorityScoreNum >= this.minimumScore && g.priorityScoreNum <= this.maximumScore);
     this.outsideRangeGrants = this.planModel.allGrants.filter(g =>

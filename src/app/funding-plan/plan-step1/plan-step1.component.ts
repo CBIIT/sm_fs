@@ -469,6 +469,9 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     this.grantSelectionTooltip();
+    // when grants selection is changed, disable links to other steps to force the use of
+    // save and continue to navigate.
+    this.navigationModel.disableStepLinks(2, 6);
   }
 
   grantSelectionTooltip(): void {
