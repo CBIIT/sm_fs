@@ -39,6 +39,7 @@ export class Step3Component implements OnInit {
   justificationUploaded?: Observable<boolean>;
   transitionMemoUploaded?: Observable<boolean>;
   displayTansitionMemo: boolean = false;
+  isTransitionMemoRequired: boolean = false;
   disableJustification: boolean = false;
   disableFile: boolean = true;
   _docOrderDto: FundingRequestDocOrderDto = {};
@@ -137,8 +138,8 @@ export class Step3Component implements OnInit {
     this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
       result => {
         this.DocTypes = of(result);
-        this.loadJustificationText();
         this.addTransitionMemo();
+        this.loadJustificationText();
         this.loadFiles();
         this.isSupplementAction()
         this.loadSuppApps();
@@ -154,11 +155,14 @@ export class Step3Component implements OnInit {
       (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== null)) {
       this.pushDocType("Transition Memo");
       this.displayTansitionMemo = true;
-    }
+       if(this.requestModel.requestDto.conversionActivityCode!=='NC'){
+         this.isTransitionMemoRequired = true;
+       }
   }
+}
 
   loadJustificationText() {
-    if (this.requestModel.requestDto.justification !== null) {
+    if (this.requestModel.requestDto.justification && this.requestModel.requestDto.justification !== null) {
 
       this.userControllerService.findByNpnIdUsingGET(this.requestModel.requestDto.justificationCreateNpnId).subscribe(
         result => {

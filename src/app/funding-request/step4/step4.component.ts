@@ -214,7 +214,9 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    if (this.requestModel.requestDto.requestType.indexOf('Pay Type 4') > -1) {
+    if (this.requestModel.requestDto.requestType.indexOf('Pay Type 4') > -1 &&
+    (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== null 
+      && this.requestModel.requestDto.conversionActivityCode!=='NC'))  {
       this.transitionMemoMissing = true;
       if (this.docDtos && this.docDtos.length > 0) {
         for (const doc of this.docDtos) {
