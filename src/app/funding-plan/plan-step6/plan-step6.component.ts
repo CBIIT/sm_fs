@@ -105,6 +105,8 @@ export class PlanStep6Component implements OnInit {
   }
 
   checkInFlightPfr(): void {
+    this.inFlightSkipped = [];
+    this.inFlightProposed = [];
     this.fsPlanControllerService.getInFlightPFRsUsingGET(this.fprId).subscribe(
       result => {
         result.forEach( r => {
