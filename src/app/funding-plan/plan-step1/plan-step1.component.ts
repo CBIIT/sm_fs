@@ -56,7 +56,12 @@ class RfaPaEntry {
   onRfaPaChangeSelection($event: string | string[]): void {
     const id = this._getIndex();
     const rfapa: string = ($event instanceof Array) ? $event[0] : $event;
-    this.parent.onChangeRfaPaEntry(rfapa, id);
+    const selectedNcabs = this.parent.onChangeRfaPaEntry(rfapa, id);
+    setTimeout(() => {
+      console.log('*** change to selected ', selectedNcabs)
+      this.selectedNcabDates = selectedNcabs;
+      this.onNcabChangeSelection(selectedNcabs);
+    }, 0);
   }
 
   _getIndex(): number {
@@ -114,9 +119,9 @@ class FundingPlanGrantsSearchCriteriaUI {
     this.rfaPaEntries.push(new RfaPaEntry(this));
   }
 
-  public onChangeRfaPaEntry(rfaPa: string, index: number): void {
+  public onChangeRfaPaEntry(rfaPa: string, index: number): string[] {
+    let selected: string[] = [];
     const entry = this.rfaPaEntries[index];
-    entry.selectedNcabDates = [];
     entry.rfaErrRequired = false;
     entry.ncabErrRequired = false;
     if (this.ncabMap.has(rfaPa)) {
@@ -125,14 +130,13 @@ class FundingPlanGrantsSearchCriteriaUI {
       entry.availableNcabDates = [];
     }
     if (entry.availableNcabDates.length == 1) {
-      const selected = [];
       selected.push(entry.availableNcabDates[0].id);
-      setTimeout(() => entry.selectedNcabDates = selected, 0);
     }
     this.validateForRfaPaDuplicate();
     if (this.errActivityCodes.length > 0) {
       this.validateForActivityCodes();
     }
+    return selected;
   }
 
   // Validate for duplication (from bottom to up)
