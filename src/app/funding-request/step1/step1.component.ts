@@ -125,7 +125,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
       columns: [
         {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'},
         {title: 'PI', data: 'piFullName', render: ( data, type, row, meta ) => {
-            return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+            return (!data || data == null) ? '' : '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }, className: 'all'},
         {title: 'Project Title', data: 'projectTitle'},
         {title: 'FOA', data: 'rfaPaNumber', render: ( data, type, row, meta ) => {
@@ -133,7 +133,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         }},
         {title: 'I2 Status', data: 'applStatusGroupDescrip'},
         {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
-            return '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          return (!data || data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }},
         {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'},
         {title: 'FY', data: 'fy'},
