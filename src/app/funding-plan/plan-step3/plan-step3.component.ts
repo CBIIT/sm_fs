@@ -9,8 +9,7 @@ import { PlanCoordinatorService } from '../service/plan-coordinator-service';
 import {
   FsPlanControllerService,
   FundingPlanFoasDto,
-  FundingRequestCanDto,
-  FundingSourceCanDto
+  FundingRequestCanDto
 } from '@nci-cbiit/i2ecws-lib';
 import { OtherDocsContributingFundsComponent } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { getCurrentFiscalYear } from '../../utils/utils';
@@ -155,8 +154,10 @@ export class PlanStep3Component implements OnInit {
 
     const fundingSourceDetails: Map<number, FundingRequestFundsSrcDto> = new Map<number, FundingRequestFundsSrcDto>();
     this.applicationsProposedForFunding.fundingSources.forEach((item, index) => {
-      this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(item.sourceDetails());
-      fundingSourceDetails.set(index, item.sourceDetails());
+      if (!!item.sourceDetails()) {
+        this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(item.sourceDetails());
+        fundingSourceDetails.set(index, item.sourceDetails());
+      }
     });
 
     this.fpInfoComponent.listApplicationsNotSelectable.forEach(g => {
@@ -212,11 +213,9 @@ export class PlanStep3Component implements OnInit {
     const budgetMap: Map<number, FundingReqBudgetsDto[]> = new Map<number, FundingReqBudgetsDto[]>();
     const canMap: Map<number, FundingRequestCanDto[]> = new Map<number, FundingRequestCanDto[]>();
     this.applicationsProposedForFunding.prcList.forEach((item, index) => {
-      this.logger.debug('<=====', index, item);
+      this.logger.debug('<=====', index, item.sourceIndex, item.grantIndex);
       const source = fundingSourceDetails.get(item.sourceIndex);
-      if (!source) {
-        this.logger.error('no source found at index', item.sourceIndex);
-      } else {
+      if (!!source) {
         let directCost: number;
         let totalCost: number;
         let percentCut: number | null;

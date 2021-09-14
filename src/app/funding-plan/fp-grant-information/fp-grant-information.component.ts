@@ -30,6 +30,9 @@ export class FpGrantInformationComponent implements OnInit {
   piDirect: number;
   piTotal: number;
   private mySourceDetails: FundingRequestFundsSrcDto;
+  recommendedFutureYears(): any {
+    return this.planCoordinatorService.getRecommendedFutureYears(this.grant.applId);
+  }
 
   constructor(
     public model: PlanModel,

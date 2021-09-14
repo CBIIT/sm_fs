@@ -10,30 +10,21 @@
           <thead>
           <tr>
             <th scope="col">Grant Information</th>
-            <th colspan="2">
+            <th *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources" colspan="2">
               <div class="d-flex align-items-center">
-                <span>DCB Discretionary RPG Funds</span>
+                <span>{{ source.fundingSourceName }}</span>
               </div>
             </th>
-            <th colspan="2">
-              <div class="d-flex align-items-center">
-                <span>Pool RPG Funds</span>
-              </div>
-            </th>
-            <th colspan="2">
-              <div class="d-flex align-items-center">
-                <span>Another One</span>
-              </div>
-            </th>
-            <th scope="col" colspan="2">Total Recommended Costs</th>
+
+            <th *ngIf="planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.length > 1" scope="col" colspan="2">Total Recommended Costs</th>
           </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let grant of listGrantsSelected; let i = index;">
+          <tr *ngFor="let grant of listGrantsSelected; let grantIndex = index;">
             <td>
               <app-fp-grant-information
                 [parentForm]="dummy"
-                [grantIndex]="i"
+                [grantIndex]="grantIndex"
                 [grant]="grant"
                 [readOnly]="true"
                 [sourceIndex]="0">
@@ -41,51 +32,31 @@
             </td>
             <!-- ======================================== START GRANT INFO WRAPPER ======================================== -->
 
+            <ng-container *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources; let sourceIndex = index">
             <td>
               <strong>Direct</strong><br/>
-              $1,000,000.00<br/>
-              80% Cut
+              {{ directCost(grant.applId, source.fundingSourceId) | currency }} <br/>
+              {{ directCostPercentCut(grant.applId, source.fundingSourceId) | percentCut }}
             </td>
 
             <td>
               <strong>Total</strong><br/>
-              $1,000,000.00<br/>
-              80% Cut
+              {{ totalCost(grant.applId, source.fundingSourceId) | currency }} <br/>
+              {{ totalCostPercentCut(grant.applId, source.fundingSourceId) | percentCut }}
             </td>
+            </ng-container>
 
+            <ng-container *ngIf="planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.length > 1">
             <td>
               <strong>Direct</strong><br/>
-              $1,000,000.00<br/>
-              80% Cut
+              {{ 'Direct total for grant ' + grant.applId }}
             </td>
 
             <td>
               <strong>Total</strong><br/>
-              $1,000,000.00<br/>
-              80% Cut
+              {{ 'Total total for grant ' + grant.applId }}
             </td>
-
-            <td>
-              <strong>Direct</strong><br/>
-              $1,000,000.00<br/>
-              80% Cut
-            </td>
-
-            <td>
-              <strong>Total</strong><br/>
-              $1,000,000.00<br/>
-              80% Cut
-            </td>
-
-            <td>
-              <strong>Direct</strong><br/>
-              $1,000,000.00
-            </td>
-
-            <td>
-              <strong>Total</strong><br/>
-              $1,000,000.00
-            </td>
+            </ng-container>
 
           </tr>
 
@@ -94,44 +65,29 @@
           <tfoot>
           <tr>
             <td scope="row"><strong>Total Recommended Costs</strong></td>
+            <ng-container *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources; let sourceIndex = index">
             <td>
               <strong>Direct</strong><br/>
-              $1,000,000.00
+              {{ 'Direct total for source' +  source.fundingSourceId}}
             </td>
 
             <td>
               <strong>Total</strong><br/>
-              $1,000,000.00
+              {{ 'Total total for source' +  source.fundingSourceId}}
             </td>
+            </ng-container>
 
+            <ng-container *ngIf="planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.length > 1">
             <td>
               <strong>Direct</strong><br/>
-              $1,000,000.00
+              {{ 'Total direct for all sources all grants'}}
             </td>
 
             <td>
               <strong>Total</strong><br/>
-              $1,000,000.00
+              {{ 'Total total for all sources all grants'}}
             </td>
-
-            <td>
-              <strong>Direct</strong><br/>
-              $1,000,000.00
-            </td>
-
-            <td>
-              <strong>Total</strong><br/>
-              $1,000,000.00
-            </td>
-            <td>
-              <strong>Direct</strong><br/>
-              $1,000,000.00
-            </td>
-
-            <td>
-              <strong>Total</strong><br/>
-              $1,000,000.00
-            </td>
+            </ng-container>
           </tr>
           </tfoot>
 

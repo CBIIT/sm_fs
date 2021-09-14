@@ -30,6 +30,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   listSelectedSources: number[];
 
+
   get sourceIndex(): number {
     // this.logger.debug('getSourceIndex():', this.planCoordinatorService.selectedSourceCount);
     return this.planCoordinatorService.selectedSourceCount;
@@ -154,7 +155,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   ngOnInit(): void {
     this.logger.debug('Total grants selected', this.listGrantsSelected.length);
-    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests
 
   }
 
