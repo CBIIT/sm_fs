@@ -94,7 +94,7 @@ export class PlanStep3Component implements OnInit {
       this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
         this.logger.debug('Saved plan model: ', JSON.stringify(result));
         this.planModel.fundingPlanDto = result;
-
+        this.planCoordinatorService.buildPlanModel();
         this.planCoordinatorService.checkInFlightPFRs(
           this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(s => {
             return { applId: s.applId, frtId: s.frtId };
