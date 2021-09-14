@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { openNewWindow } from '../../utils/utils';
 import { FpGrantInformationComponent } from '../fp-grant-information/fp-grant-information.component';
 import { FpFundingSourceComponent } from '../fp-funding-source/fp-funding-source.component';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -28,10 +29,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
-  listSelectedSources: number[];
+  listSelectedSources: FundingRequestFundsSrcDto[];
 
-
-  get sourceIndex(): number {
+  get getNextSourceIndex(): number {
     // this.logger.debug('getSourceIndex():', this.planCoordinatorService.selectedSourceCount);
     return this.planCoordinatorService.selectedSourceCount;
   }
@@ -164,16 +164,31 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   onAddFundingSource(): void {
-    this.logger.debug('onAddFundingSource()', this.sourceIndex);
-    this.modalFpFundingSource.index = this.sourceIndex;
+    this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
+    this.logger.debug('source: ', this.fundingSources.get(0));
+    this.logger.debug('grant info:', this.grantList.get(0));
+    this.logger.debug('prc:', this.prcList.get(0));
+    this.modalFpFundingSource.index = this.getNextSourceIndex;
     this.modalFpFundingSource.filterData();
-    this.modalFpRecommendedCosts.sourceIndex = this.sourceIndex;
-    this.modalFpGrantInformation.sourceIndex = this.sourceIndex;
+    this.modalFpRecommendedCosts.sourceIndex = this.getNextSourceIndex;
+    this.modalFpGrantInformation.sourceIndex = this.getNextSourceIndex;
   }
 
   canAddFundingSource(): boolean {
     // At least one source provided already (and valid?)
 
     return this.planCoordinatorService.selectedSourceCount !== 0 && this.planCoordinatorService.selectedSourceCount < 3;
+  }
+
+  isSingleSource(): boolean {
+    return this.planCoordinatorService.selectedSourceCount <= 1;
+  }
+
+  editSource(sourceIndex: number): void {
+    this.logger.debug('editSource(', sourceIndex, ')');
+  }
+
+  deleteSource(sourceIndex: number): void {
+    this.logger.debug('deleteSource(', sourceIndex, ')');
   }
 }

@@ -1,5 +1,5 @@
 <div class="row">
-  <ng-container *ngIf="true then singleSource else multiSource"></ng-container>
+  <ng-container *ngIf="isSingleSource() then singleSource else multiSource"></ng-container>
   <ng-template #singleSource>
     <div class="col-12">
 
@@ -97,10 +97,10 @@
           <thead>
           <tr>
             <th scope="col">Grant Information</th>
-            <th colspan="2">
+            <th *ngFor="let source of listSelectedSources; let sourceIndex = index" colspan="2">
               <div class="d-flex align-items-center">
-                <span>DCB Discretionary RPG Funds</span>
-                <button type="button" class="btn btn-sm btn-slim btn-link ml-2" ngbTooltip="Edit" placement="left">
+                <span>{{ source.fundingSourceName }}</span>
+                <button type="button" class="btn btn-sm btn-slim btn-link ml-2" (click)="editSource(sourceIndex)" ngbTooltip="Edit" placement="left">
                   <i class="fas fa-pencil" aria-hidden="true"></i>
                 </button>
                 <button type="button" class="btn btn-sm btn-slim btn-link btn-link-danger ml-1" ngbTooltip="Remove" placement="left">
@@ -490,7 +490,7 @@
                 <app-fp-funding-source
                     #modalFpFundingSource
                     [parentForm]="modalForm"
-                    [index]="sourceIndex">
+                    [index]="getNextSourceIndex">
                 </app-fp-funding-source>
               </th>
             </tr>
@@ -501,7 +501,7 @@
                 <app-fp-grant-information
                     #modalFpGrantInformation
                     [isModal]="true"
-                    [sourceIndex]="sourceIndex"
+                    [sourceIndex]="getNextSourceIndex"
                     [grantIndex]="i"
                     [grant]="grant">
                 </app-fp-grant-information>
@@ -509,7 +509,7 @@
               <td>
                 <app-fp-program-recommended-costs
                     #modalFpRecommendedCosts
-                    [sourceIndex]="sourceIndex"
+                    [sourceIndex]="getNextSourceIndex"
                     [grantIndex]="i">
                 </app-fp-program-recommended-costs>
               </td>

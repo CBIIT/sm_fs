@@ -56,7 +56,7 @@ export class PlanCoordinatorService {
     });
     this.logger.debug('budgets', this.budgetMap);
     this.logger.debug('cans', this.canMap);
-    this.logger.debug('funding sources', this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources);
+    this.logger.debug('funding sources', this.planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources);
   }
 
   trackSelectedSources(index: number, sourceId: number): void {
