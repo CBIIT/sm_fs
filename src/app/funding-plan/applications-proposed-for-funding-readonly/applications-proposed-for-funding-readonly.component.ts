@@ -26,7 +26,7 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
   }
 
   directCostPercentCut(applId: number, fseId: number): number {
-    return this.planCoordinatorService.directCostPercentCut(applId, fseId) / 100;
+    return this.planCoordinatorService.directCostPercentCut(applId, fseId);
   }
 
   totalCost(applId: number, fseId: number): number {
@@ -34,7 +34,7 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
   }
 
   totalCostPercentCut(applId: number, fseId: number): number {
-    return this.planCoordinatorService.totalCostPercentCut(applId, fseId) / 100;
+    return this.planCoordinatorService.totalCostPercentCut(applId, fseId);
   }
 
   sourceDirectTotal(fseId: number): number {

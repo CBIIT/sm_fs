@@ -162,12 +162,12 @@
             <ng-container *ngIf="listSelectedSources?.length > 1">
               <td>
                 <strong>Direct</strong><br/>
-                {{ planCoordinatorService.requestDirectTotal(grant.applId) }}
+                {{ planCoordinatorService.requestDirectTotal(grant.applId) | currency}}
               </td>
 
               <td>
                 <strong>Total</strong><br/>
-                {{ planCoordinatorService.requestTotalTotal(grant.applId) }}
+                {{ planCoordinatorService.requestTotalTotal(grant.applId) | currency }}
               </td>
             </ng-container>
 
@@ -193,12 +193,12 @@
             <ng-container *ngIf="listSelectedSources?.length > 1">
               <td>
                 <strong>Direct</strong><br/>
-                {{ planCoordinatorService.grandTotalDirect() }}
+                {{ planCoordinatorService.grandTotalDirect() | currency}}
               </td>
 
               <td>
                 <strong>Total</strong><br/>
-                {{ planCoordinatorService.grandTotalTotal() }}
+                {{ planCoordinatorService.grandTotalTotal() | currency }}
               </td>
             </ng-container>
           </tr>
