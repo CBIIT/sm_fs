@@ -18,28 +18,22 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.debug('all grants:', this.planModel.allGrants);
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
-    this.logger.debug('selected grants:', this.listGrantsSelected);
   }
 
   directCost(applId: number, fseId: number): number {
-    this.logger.debug('return direct cost for grant', applId, 'and source', fseId);
     return this.planCoordinatorService.directCost(applId, fseId);
   }
 
   directCostPercentCut(applId: number, fseId: number): number {
-    this.logger.debug('return direct cost percent cut for grant', applId, 'and source', fseId);
     return this.planCoordinatorService.directCostPercentCut(applId, fseId) / 100;
   }
 
   totalCost(applId: number, fseId: number): number {
-    this.logger.debug('return total cost for grant', applId, 'and source', fseId);
     return this.planCoordinatorService.totalCost(applId, fseId);
   }
 
   totalCostPercentCut(applId: number, fseId: number): number {
-    this.logger.debug('return total cost percent cut for grant', applId, 'and source', fseId);
     return this.planCoordinatorService.totalCostPercentCut(applId, fseId) / 100;
   }
 
