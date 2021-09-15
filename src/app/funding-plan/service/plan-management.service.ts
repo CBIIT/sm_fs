@@ -80,12 +80,12 @@ export class PlanManagementService {
       this.budgetMap.set(Number(r.applId), buds);
       this.canMap.set(Number(r.applId), cans);
     });
-    this.logger.debug('budgets', this.budgetMap);
-    this.logger.debug('cans', this.canMap);
-    this.logger.debug('funding sources', this.planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources);
+    // this.logger.debug('budgets', this.budgetMap);
+    // this.logger.debug('cans', this.canMap);
+    // this.logger.debug('funding sources', this.planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources);
     this._selectedSourcesMap =
       new Map(this.planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.map(s => [s.fundingSourceId, s]));
-    this.logger.debug('source map', this.selectedSourcesMap);
+    // this.logger.debug('source map', this.selectedSourcesMap);
     this._listSelectedSources = Array.from(this._selectedSourcesMap.values());
   }
 
@@ -141,11 +141,11 @@ export class PlanManagementService {
   checkInFlightPFRs(payload: { applId: number, frtId: number } []): void {
     payload.forEach(r => {
       if (this.fundedPlanTypes.includes(r.frtId)) {
-        this.logger.debug('checking in flight PFRs for applid:', r.applId, '====> type:', r.frtId);
+        // this.logger.debug('checking in flight PFRs for applid:', r.applId, '====> type:', r.frtId);
         this.fsRequestService.checkInitialPayUsingGET(r.applId, r.frtId).subscribe(result => {
           if (!isNaN(result) && Number(result) > 0) {
             this.inflightPFRs.set(r.applId, result);
-            this.logger.debug('in flight PFR found for applId:', r.applId, ':', result);
+            // this.logger.debug('in flight PFR found for applId:', r.applId, ':', result);
           }
         });
       }
@@ -226,7 +226,6 @@ export class PlanManagementService {
         dc: gc.dc,
         tc: gc.tc
       };
-      this.logger.debug('returning cost for applid', applId, '==', res);
       return res;
     }
     return null;

@@ -52,14 +52,19 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     });
 
     if (!this.grant || this.sourceIndex === -1) {
+      this.logger.warn('Eject - no grant or source index');
       return;
     }
     this.initializeValuesForEdit();
   }
 
   private initializeValuesForEdit(): void {
-    this.logger.debug('grant', this.grantIndex, this.grant);
+    this.logger.debug('initialize PRC values', this.grantIndex, this.sourceIndex);
+    if (this.sourceIndex < 0 || this.sourceIndex > 2) {
+      return;
+    }
     if (!this.fseId && !!this.planCoordinatorService.listSelectedSources) {
+      this.logger.debug('load fseId from plan service');
       const src = this.planCoordinatorService.listSelectedSources[this.sourceIndex];
       if (src) {
         this.fseId = src.fundingSourceId;
@@ -71,18 +76,21 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     this.logger.debug('budget', bud);
     this.logger.debug('can', can);
 
-    if (can && !isNaN(can.dcPctCut)) {
+    if (can && !isNaN(can.dcPctCut) && can.dcPctCut != null) {
       this.percentCut = can.dcPctCut;
       this.displayType = 'percent';
+      this.logger.debug('setting display to "percent" with value', this.percentCut);
     } else if (bud) {
       this.directCost = bud.dcRecAmt;
       this.totalCost = bud.tcRecAmt;
       this.displayType = 'dollar';
+      this.logger.debug('setting display to "dollar"');
     }
     this.recalculate();
   }
 
-  toggleDisplay(value: string): void {
+  toggleDisplay(value: string, grantIndex: number, sourceIndex: number): void {
+    this.logger.debug('toggle display', value, this.grantIndex, grantIndex, this.sourceIndex, sourceIndex);
     this.displayType = value;
   }
 
