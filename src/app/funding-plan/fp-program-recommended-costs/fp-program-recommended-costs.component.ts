@@ -11,6 +11,14 @@ import { ControlContainer, NgForm } from '@angular/forms';
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class FpProgramRecommendedCostsComponent implements OnInit {
+  get displayType(): string {
+    return this._displayType;
+  }
+
+  set displayType(value: string) {
+    this.logger.debug('set displayType', value, this.grantIndex, this.sourceIndex);
+    this._displayType = value;
+  }
   @Input() grantIndex: number;
   @Input() sourceIndex: number;
   @Input() grant: NciPfrGrantQueryDtoEx;
@@ -24,7 +32,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   totalCostCalculated: number;
   dcPercentCutCalculated: number;
   tcPercentCutCalculated: number;
-  displayType: string;
+  private _displayType: string;
   // Dummy ngModel attribute for hidden error fields
   dummy: string = null;
   private fseId: number;
@@ -77,29 +85,31 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
     if (can && !isNaN(can.dcPctCut) && can.dcPctCut != null) {
       this.percentCut = can.dcPctCut;
-      this.toggleDisplay('percent', this.grantIndex, this.sourceIndex);
+      this.displayType = 'percent';
+      // this.toggleDisplay('percent', this.grantIndex, this.sourceIndex);
       this.logger.debug('setting display to "percent" with value', this.percentCut);
     } else if (bud) {
       this.directCost = bud.dcRecAmt;
       this.totalCost = bud.tcRecAmt;
-      this.toggleDisplay('dollar', this.grantIndex, this.sourceIndex);
+      this.displayType = 'dollar';
+      // this.toggleDisplay('dollar', this.grantIndex, this.sourceIndex);
       this.logger.debug('setting display to "dollar"');
     }
     this.recalculate();
   }
 
   toggleDisplay(value: string, grantIndex: number, sourceIndex: number): void {
-    if (!value || this.grantIndex !== grantIndex || this.sourceIndex !== sourceIndex) {
-      return;
-    }
-    this.logger.debug('toggle display', value, this.grantIndex, this.sourceIndex);
-    this.displayType = value;
+    // if (!value || this.grantIndex !== grantIndex || this.sourceIndex !== sourceIndex) {
+    //   return;
+    // }
+    // this.logger.debug('toggle display', value, this.grantIndex, this.sourceIndex);
+    // this._displayType = value;
   }
 
   // NOTE: assuming they're entering percent cut as a whole number
   recalculate(): void {
 
-    if (this.displayType === 'percent') {
+    if (this._displayType === 'percent') {
       if (!!this.percentCut) {
         this.directCostCalculated = this.baselineDirectCost * (1 - (this.percentCut / 100));
         this.totalCostCalculated = this.baselineTotalCost * (1 - (this.percentCut / 100));
@@ -169,7 +179,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   getDirectCost(): number {
-    if (this.displayType === 'percent') {
+    if (this._displayType === 'percent') {
       return this.directCostCalculated;
     } else {
       return this.directCost;
@@ -177,14 +187,14 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   getDirectCostPercentCut(): number {
-    if (this.displayType === 'percent') {
+    if (this._displayType === 'percent') {
       return this.percentCut;
     }
     return this.dcPercentCutCalculated;
   }
 
   getTotalCost(): number {
-    if (this.displayType === 'percent') {
+    if (this._displayType === 'percent') {
       return this.totalCostCalculated;
     } else {
       return this.totalCost;
@@ -192,7 +202,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   getTotalCostPercentCut(): number {
-    if (this.displayType === 'percent') {
+    if (this._displayType === 'percent') {
       return this.percentCut;
     }
     return this.tcPercentCutCalculated;

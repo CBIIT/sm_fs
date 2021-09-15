@@ -1,170 +1,184 @@
-<div class="btn-group btn-group-toggle btn-group-sm btn-group-block mb-2" ngbRadioGroup name="displayType"
-     [(ngModel)]="displayType">
-  <label ngbButtonLabel class="btn-outline-secondary">
-    <input ngbButton type="radio" [value]="'dollar'" (change)="toggleDisplay('dollar', grantIndex, sourceIndex)">Dollar
-  </label>
-  <label ngbButtonLabel class="btn-outline-secondary">
-    <input ngbButton type="radio" [value]="'percent'" (change)="toggleDisplay('percent', grantIndex, sourceIndex)">% Cut
-  </label>
-</div>
-<ng-container *ngIf="!!displayType then typeSelected else blank"></ng-container>
-
-<ng-template #blank></ng-template>
-
-<ng-template #typeSelected>
-  <ng-container *ngIf="displayType === 'percent'; then percentCutVw else dollarValues"></ng-container>
-</ng-template>
-
-<ng-template #dollarValues>
-  <div class="form-row">
-    <div class="form-group col-6 mb-2">
-      <label [attr.for]="'DC-' + grantIndex + '_' + sourceIndex">Direct Cost</label>
-      <div class="input-group input-group-sm">
-        <div class="input-group-prepend">
-          <span class="input-group-text" [id]="'DC-prepend-' + grantIndex + '_' + sourceIndex">$</span>
-        </div>
-        <input
-          type="text"
-          class="form-control"
-          [id]="'DC-' + grantIndex + '_' + sourceIndex"
-          [attr.aria-describedby]="'DC-prepend-' + grantIndex + '_' + sourceIndex"
-          (change)="recalculate()"
-          [name]="'directCost_' + grantIndex + '_' + sourceIndex"
-          #dcInput="ngModel"
-          [(ngModel)]="directCost">
-      </div>
-    </div>
-    <div class="form-group col-6 mb-2">
-      <label [attr.for]="'TC-' + grantIndex + '_' + sourceIndex">Total Cost</label>
-      <div class="input-group input-group-sm">
-        <div class="input-group-prepend">
-          <span class="input-group-text" [id]="'TC-prepend' + grantIndex + '_' + sourceIndex">$</span>
-        </div>
-        <input
-          type="text"
-          class="form-control"
-          [id]="'TC-' + grantIndex + '_' + sourceIndex"
-          aria-describedby="TC-prepend-1"
-          [name]="'totalCost_' + grantIndex + '_' + sourceIndex"
-          #tcInput="ngModel"
-          (change)="recalculate()"
-          [(ngModel)]="totalCost">
-      </div>
-    </div>
-  </div>
-  <div class="form-row">
-    <div class="col-6">
-      <div class="input-group input-group-sm input-group-readonly">
-        <input
-          type="text"
-          class="form-control text-right"
-          [id]="'DC-PC-' + grantIndex + '_' + sourceIndex"
-          aria-label="Direct Cost Percent Cut"
-          readonly
-          disabled [value]="dcPercentCutCalculated | percent: '1.0-2'">
-        <div class="input-group-append">
-          <span class="input-group-text" [id]="'DC-PC-append' + grantIndex + '_' + sourceIndex">% Cut</span>
-        </div>
-      </div>
-    </div>
-    <div class="col-6">
-      <div class="input-group input-group-sm input-group-readonly">
-        <input
-          type="text"
-          class="form-control text-right"
-          [id]="'TC-PC-' + grantIndex + '_' + sourceIndex"
-          aria-label="Total Cost Percent Cut"
-          readonly
-          disabled
-          [value]="tcPercentCutCalculated | percent: '1.0-2'">
-        <div class="input-group-append">
-          <span class="input-group-text" [id]="'TC-PC-append' + grantIndex + '_' + sourceIndex">% Cut</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div
-    class="text-danger mt-1"
-    *ngIf="(parentForm.submitted || dcInput.touched) && !isDirectCostInRange()">
-    Direct cost must be a numeric value between 0 and 999,999,999
-    <input type="hidden" [ngModel]="dummy" [name]="'DC-' + grantIndex + '_' + sourceIndex" required>
-  </div>
-  <div
-    class="text-danger mt-1"
-    *ngIf="(parentForm.submitted || tcInput.touched) && !isTotalCostInRange()">
-    Total cost must be a numeric value between 0 and 999,999,999
-    <input type="hidden" [ngModel]="dummy" [name]="'TC-' + grantIndex + '_' + sourceIndex" required>
-  </div>
-  <div
-    class="text-danger mt-1"
-    *ngIf="(parentForm.submitted || dcInput.touched || tcInput.touched) && !isTotalGreaterThanDirect()">
-    Total cost must be greater than or equal to direct cost
-    <input type="hidden" [ngModel]="dummy" [name]="'TC2-' + grantIndex + '_' + sourceIndex" required>
-  </div>
-</ng-template>
-
-<ng-template #percentCutVw>
-  <div class="form-row">
-    <div class="form-group col-6 mb-2">
-      <label [attr.for]="'DC-' + grantIndex + '_' + sourceIndex">Direct Cost</label>
-      <div class="input-group input-group-sm input-group-readonly">
-        <div class="input-group-prepend">
-          <span class="input-group-text" [id]="'DC-prepend-' + grantIndex + '_' + sourceIndex">$</span>
-        </div>
-        <input
-          name="readonly"
-          type="text"
-          class="form-control"
-          [id]="'DC-' + grantIndex + '_' + sourceIndex"
-          [attr.aria-describedby]="'DC-prepend-' + grantIndex + '_' + sourceIndex"
-          readonly
-          disabled
-          [value]="directCostCalculated | currency">
-      </div>
-    </div>
-    <div class="form-group col-6 mb-2">
-      <label [attr.for]="'TC-' + grantIndex + '_' + sourceIndex">Total Cost</label>
-      <div class="input-group input-group-sm input-group-readonly">
-        <div class="input-group-prepend">
-          <span class="input-group-text" [id]="'TC-prepend-' + grantIndex + '_' + sourceIndex">$</span>
-        </div>
-        <input
-          name="readonly"
-          type="text"
-          class="form-control"
-          [id]="'TC-' + grantIndex + '_' + sourceIndex"
-          [attr.aria-describedby]="'TC-prepend-' + grantIndex + '_' + sourceIndex"
-          readonly
-          disabled
-          [value]="totalCostCalculated | currency">
-      </div>
-    </div>
+<ng-container [ngModelGroup]="'prc_' + grantIndex + '_' + sourceIndex">
+  <div class="btn-group btn-group-toggle btn-group-sm btn-group-block mb-2" ngbRadioGroup name="displayType"
+       [(ngModel)]="displayType">
+    <label ngbButtonLabel class="btn-outline-secondary">
+      <input
+        [id]="'dollar_' + grantIndex + '_' + sourceIndex"
+        name="dollar"
+        ngbButton
+        type="radio"
+        value="dollar"
+        (change)="toggleDisplay('dollar', grantIndex, sourceIndex)">Dollar
+    </label>
+    <label ngbButtonLabel class="btn-outline-secondary">
+      <input
+        [id]="'percent_' + grantIndex + '_' + sourceIndex"
+        name="percent"
+        ngbButton
+        type="radio"
+        value="percent"
+        (change)="toggleDisplay('percent', grantIndex, sourceIndex)">% Cut
+    </label>
   </div>
 
-  <div class="form-row">
-    <div class="col">
-      <div class="input-group input-group-sm">
-        <input
-          type="text"
-          class="form-control text-right"
-          [id]="'PC-' + grantIndex + '_' + sourceIndex"
-          [attr.aria-label]="'percent_cut'"
-          (change)="recalculate()"
-          [name]="'percentCut_' + grantIndex + '_' + sourceIndex"
-          [(ngModel)]="percentCut"
-          #pcInput="ngModel">
-        <div class="input-group-append">
-          <span class="input-group-text" [id]="'PC-append-' + grantIndex + '_'">% Cut</span>
+  <ng-container *ngIf="!!displayType then typeSelected else blank"></ng-container>
+
+  <ng-template #blank></ng-template>
+
+  <ng-template #typeSelected>
+    <ng-container *ngIf="displayType === 'percent'; then percentCutVw else dollarValues"></ng-container>
+  </ng-template>
+
+  <ng-template #dollarValues>
+    <div class="form-row">
+      <div class="form-group col-6 mb-2">
+        <label [attr.for]="'DC-' + grantIndex + '_' + sourceIndex">Direct Cost</label>
+        <div class="input-group input-group-sm">
+          <div class="input-group-prepend">
+            <span class="input-group-text" [id]="'DC-prepend-' + grantIndex + '_' + sourceIndex">$</span>
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            [id]="'DC-' + grantIndex + '_' + sourceIndex"
+            [attr.aria-describedby]="'DC-prepend-' + grantIndex + '_' + sourceIndex"
+            (change)="recalculate()"
+            [name]="'directCost_' + grantIndex + '_' + sourceIndex"
+            #dcInput="ngModel"
+            [(ngModel)]="directCost">
+        </div>
+      </div>
+      <div class="form-group col-6 mb-2">
+        <label [attr.for]="'TC-' + grantIndex + '_' + sourceIndex">Total Cost</label>
+        <div class="input-group input-group-sm">
+          <div class="input-group-prepend">
+            <span class="input-group-text" [id]="'TC-prepend' + grantIndex + '_' + sourceIndex">$</span>
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            [id]="'TC-' + grantIndex + '_' + sourceIndex"
+            aria-describedby="TC-prepend-1"
+            [name]="'totalCost_' + grantIndex + '_' + sourceIndex"
+            #tcInput="ngModel"
+            (change)="recalculate()"
+            [(ngModel)]="totalCost">
         </div>
       </div>
     </div>
-  </div>
-  <div
-    class="text-danger mt-1"
-    *ngIf="(parentForm.submitted || pcInput.touched) && !isPercentValid()">
-    Enter a numeric value between 0 and 100
-    <input type="hidden" [ngModel]="dummy" [name]="'PC-' + grantIndex + '_' + sourceIndex" required>
-  </div>
-</ng-template>
+    <div class="form-row">
+      <div class="col-6">
+        <div class="input-group input-group-sm input-group-readonly">
+          <input
+            type="text"
+            class="form-control text-right"
+            [id]="'DC-PC-' + grantIndex + '_' + sourceIndex"
+            aria-label="Direct Cost Percent Cut"
+            readonly
+            disabled [value]="dcPercentCutCalculated | percent: '1.0-2'">
+          <div class="input-group-append">
+            <span class="input-group-text" [id]="'DC-PC-append' + grantIndex + '_' + sourceIndex">% Cut</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="input-group input-group-sm input-group-readonly">
+          <input
+            type="text"
+            class="form-control text-right"
+            [id]="'TC-PC-' + grantIndex + '_' + sourceIndex"
+            aria-label="Total Cost Percent Cut"
+            readonly
+            disabled
+            [value]="tcPercentCutCalculated | percent: '1.0-2'">
+          <div class="input-group-append">
+            <span class="input-group-text" [id]="'TC-PC-append' + grantIndex + '_' + sourceIndex">% Cut</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="(parentForm.submitted || dcInput.touched) && !isDirectCostInRange()">
+      Direct cost must be a numeric value between 0 and 999,999,999
+      <input type="hidden" [ngModel]="dummy" [name]="'DC-' + grantIndex + '_' + sourceIndex" required>
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="(parentForm.submitted || tcInput.touched) && !isTotalCostInRange()">
+      Total cost must be a numeric value between 0 and 999,999,999
+      <input type="hidden" [ngModel]="dummy" [name]="'TC-' + grantIndex + '_' + sourceIndex" required>
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="(parentForm.submitted || dcInput.touched || tcInput.touched) && !isTotalGreaterThanDirect()">
+      Total cost must be greater than or equal to direct cost
+      <input type="hidden" [ngModel]="dummy" [name]="'TC2-' + grantIndex + '_' + sourceIndex" required>
+    </div>
+  </ng-template>
 
+  <ng-template #percentCutVw>
+    <div class="form-row">
+      <div class="form-group col-6 mb-2">
+        <label [attr.for]="'DC-' + grantIndex + '_' + sourceIndex">Direct Cost</label>
+        <div class="input-group input-group-sm input-group-readonly">
+          <div class="input-group-prepend">
+            <span class="input-group-text" [id]="'DC-prepend-' + grantIndex + '_' + sourceIndex">$</span>
+          </div>
+          <input
+            name="readonly"
+            type="text"
+            class="form-control"
+            [id]="'DC-' + grantIndex + '_' + sourceIndex"
+            [attr.aria-describedby]="'DC-prepend-' + grantIndex + '_' + sourceIndex"
+            readonly
+            disabled
+            [value]="directCostCalculated | currency">
+        </div>
+      </div>
+      <div class="form-group col-6 mb-2">
+        <label [attr.for]="'TC-' + grantIndex + '_' + sourceIndex">Total Cost</label>
+        <div class="input-group input-group-sm input-group-readonly">
+          <div class="input-group-prepend">
+            <span class="input-group-text" [id]="'TC-prepend-' + grantIndex + '_' + sourceIndex">$</span>
+          </div>
+          <input
+            name="readonly"
+            type="text"
+            class="form-control"
+            [id]="'TC-' + grantIndex + '_' + sourceIndex"
+            [attr.aria-describedby]="'TC-prepend-' + grantIndex + '_' + sourceIndex"
+            readonly
+            disabled
+            [value]="totalCostCalculated | currency">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="col">
+        <div class="input-group input-group-sm">
+          <input
+            type="text"
+            class="form-control text-right"
+            [id]="'PC-' + grantIndex + '_' + sourceIndex"
+            [attr.aria-label]="'percent_cut'"
+            (change)="recalculate()"
+            [name]="'percentCut_' + grantIndex + '_' + sourceIndex"
+            [(ngModel)]="percentCut"
+            #pcInput="ngModel">
+          <div class="input-group-append">
+            <span class="input-group-text" [id]="'PC-append-' + grantIndex + '_'">% Cut</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="(parentForm.submitted || pcInput.touched) && !isPercentValid()">
+      Enter a numeric value between 0 and 100
+      <input type="hidden" [ngModel]="dummy" [name]="'PC-' + grantIndex + '_' + sourceIndex" required>
+    </div>
+  </ng-template>
+</ng-container>
 
