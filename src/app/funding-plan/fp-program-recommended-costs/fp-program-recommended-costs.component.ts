@@ -41,6 +41,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       if (next.index === this.grantIndex) {
         this.baselineDirectCost = next.dc;
         this.baselineTotalCost = next.tc;
+        this.initializeValuesForEdit();
       }
     });
 
@@ -49,8 +50,36 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
         this.fseId = next.source;
       }
     });
-    // this.logger.debug('grant', this.grantIndex, this.grant);
-    // this.logger.debug('source', this.sourceIndex, this.fseId, this.planCoordinatorService.selectedSourceCount);
+
+    if (!this.grant || this.sourceIndex === -1) {
+      return;
+    }
+    this.initializeValuesForEdit();
+  }
+
+  private initializeValuesForEdit(): void {
+    this.logger.debug('grant', this.grantIndex, this.grant);
+    if (!this.fseId && !!this.planCoordinatorService.listSelectedSources) {
+      const src = this.planCoordinatorService.listSelectedSources[this.sourceIndex];
+      if (src) {
+        this.fseId = src.fundingSourceId;
+      }
+    }
+    const bud = this.planCoordinatorService.getBudget(this.grant.applId, this.fseId);
+    const can = this.planCoordinatorService.getCan(this.grant.applId, this.fseId);
+    this.logger.debug('source', this.sourceIndex, this.fseId, this.planCoordinatorService.listSelectedSources[this.sourceIndex]);
+    this.logger.debug('budget', bud);
+    this.logger.debug('can', can);
+
+    this.displayType = 'dollar';
+    if (can && !isNaN(can.dcPctCut)) {
+      this.percentCut = can.dcPctCut;
+      this.displayType = 'percent';
+    } else if (bud) {
+      this.directCost = bud.dcRecAmt;
+      this.totalCost = bud.tcRecAmt;
+    }
+    this.recalculate();
   }
 
   toggleDisplay(value: string): void {

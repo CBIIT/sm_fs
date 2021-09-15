@@ -111,7 +111,7 @@ export class PlanManagementService {
   // NOTE: this is for the purpose of restricting selections for the second and third funding sources
   trackSelectedSources(index: number, sourceId: number): void {
     // TODO: only track non-null
-    this.logger.debug('track selected sources', index, sourceId);
+    // this.logger.debug('track selected sources', index, sourceId);
 
     if (!!sourceId) {
       this._selectedSources.set(index, sourceId);
