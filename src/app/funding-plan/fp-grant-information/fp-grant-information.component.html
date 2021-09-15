@@ -50,7 +50,7 @@
       <label for="rec-fy-3">Recommended Future Years</label>
       <ng-container *ngIf="readOnly then static else dropdown"></ng-container>
       <ng-template #dropdown>
-      <app-recommended-future-years id="rec-fy-3"></app-recommended-future-years>
+      <app-recommended-future-years [applId]="grant.applId" id="rec-fy-3"></app-recommended-future-years>
       </ng-template>
       <ng-template #static><span>{{ recommendedFutureYears() }}</span></ng-template>
     </div>

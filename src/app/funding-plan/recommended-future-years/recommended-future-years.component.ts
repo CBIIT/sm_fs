@@ -1,6 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Select2OptionData } from 'ng-select2';
 import { PlanModel } from '../../model/plan/plan-model';
+import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
+import { PlanManagementService } from '../service/plan-management.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-recommended-future-years',
@@ -9,6 +12,7 @@ import { PlanModel } from '../../model/plan/plan-model';
 })
 export class RecommendedFutureYearsComponent implements OnInit {
   @Input() index: number;
+  @Input() applId: number;
   selectedValue: number;
   data: Select2OptionData[] = [
     { id: '0', text: '0' },
@@ -19,10 +23,16 @@ export class RecommendedFutureYearsComponent implements OnInit {
     { id: '5', text: '5' },
   ];
 
-  constructor(private planModel: PlanModel) {
+  constructor(
+    private planService: PlanManagementService,
+    private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
+    if (!!this.applId) {
+      this.logger.debug('initializing recommended future years for applId', this.applId);
+      this.selectedValue = this.planService.getRecommendedFutureYears(Number(this.applId));
+    }
   }
 
 }
