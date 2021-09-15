@@ -1,13 +1,13 @@
 <div class="alert alert-warning" *ngFor="let r of inFlightProposed">
     <b>WARNING:</b> The grant application <a href="{{grantViewerUrl+r.applId}}" target="yourgrant">{{r.fullGrantNum}}</a> 
     that is proposed for funding in this plan also has an existing “Initial Pay” PFR
-    <a (click)="retrieveRequest(r.frqId)">{{r.frqId}}</a> in {{r.requestFy}}. 
+    <a routerLink="/request/retrieve/{{r.frqId}}">{{r.frqId}}</a> in {{r.requestFy}}. 
     Please ensure that you take appropriate workflow action either on this plan or on the request.
 </div>
 <div class="alert alert-warning"  *ngFor="let r of inFlightSkipped">
     <b>WARNING:</b> The grant application <a href="{{grantViewerUrl+r.applId}}" target="yourgrant">{{r.fullGrantNum}}</a> 
     that is skipped in this plan also has an existing “Initial Pay” PFR 
-    <a (click)="retrieveRequest(r.frqId)">{{r.frqId}}</a> in {{r.requestFy}}. 
+    <a routerLink="/request/retrieve/{{r.frqId}}">{{r.frqId}}</a> in {{r.requestFy}}. 
     Please ensure that you take appropriate workflow action either on this plan or on the request.
 </div>
 <div class="alert alert-warning" *ngIf="docChecker?.docMissing">
