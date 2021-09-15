@@ -213,7 +213,6 @@ export class PlanStep3Component implements OnInit {
     const budgetMap: Map<number, FundingReqBudgetsDto[]> = new Map<number, FundingReqBudgetsDto[]>();
     const canMap: Map<number, FundingRequestCanDto[]> = new Map<number, FundingRequestCanDto[]>();
     this.applicationsProposedForFunding.prcList.forEach((item, index) => {
-      this.logger.debug('<=====', index, item.sourceIndex, item.grantIndex);
       const source = fundingSourceDetails.get(item.sourceIndex);
       if (!!source) {
         let directCost: number;
@@ -236,6 +235,7 @@ export class PlanStep3Component implements OnInit {
           cans = [];
         }
         budgets.push({
+          id: this.planCoordinatorService.getBudget(item.grant.applId, source.fundingSourceId)?.id || null,
           fseId: source.fundingSourceId,
           name: source.fundingSourceName,
           supportYear: 1,
@@ -243,6 +243,7 @@ export class PlanStep3Component implements OnInit {
           tcRecAmt: totalCost,
         });
         cans.push({
+          id: this.planCoordinatorService.getCan(item.grant.applId, source.fundingSourceId)?.id || null,
           approvedDc: directCost,
           approvedTc: totalCost,
           dcPctCut: percentCut,
@@ -304,6 +305,8 @@ export class PlanStep3Component implements OnInit {
     // TODO: This next line is wrong.  This is the ldapId of the requesting PD, not the creator of the plan
     this.planModel.fundingPlanDto.requestorLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     this.planModel.fundingPlanDto.planCreateUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+
+    // TODO: list of deleted sources
 
     this.logger.info(JSON.stringify(this.planModel.fundingPlanDto));
 

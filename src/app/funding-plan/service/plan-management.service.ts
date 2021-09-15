@@ -188,7 +188,7 @@ export class PlanManagementService {
     const dc = this.getBudget(applId, fseId)?.dcRecAmt;
     const grantTotal = this.getGrantCostInfo(applId)?.dc;
     if (dc && grantTotal && grantTotal !== 0) {
-      return (dc / grantTotal) * 100;
+      return (1 - (dc / grantTotal)) * 100;
     }
     return 0;
   }
@@ -204,7 +204,7 @@ export class PlanManagementService {
     const tc = this.getBudget(applId, fseId)?.tcRecAmt;
     const grantTotal = this.getGrantCostInfo(applId)?.tc;
     if (tc && grantTotal && grantTotal !== 0) {
-      return (tc / grantTotal) * 100;
+      return (1 - (tc / grantTotal)) * 100;
     }
     return 0;
   }
