@@ -71,13 +71,13 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     this.logger.debug('budget', bud);
     this.logger.debug('can', can);
 
-    this.displayType = 'dollar';
     if (can && !isNaN(can.dcPctCut)) {
       this.percentCut = can.dcPctCut;
       this.displayType = 'percent';
     } else if (bud) {
       this.directCost = bud.dcRecAmt;
       this.totalCost = bud.tcRecAmt;
+      this.displayType = 'dollar';
     }
     this.recalculate();
   }
