@@ -29,7 +29,6 @@ export class FpGrantInformationComponent implements OnInit {
   grantAwards: GrantAwardedDto[];
   piDirect: number;
   piTotal: number;
-  private mySourceDetails: FundingRequestFundsSrcDto;
 
   recommendedFutureYears(): any {
     return this.planCoordinatorService.getRecommendedFutureYears(this.grant.applId);
@@ -73,11 +72,6 @@ export class FpGrantInformationComponent implements OnInit {
         dc: this.piDirect,
         tc: this.piTotal
       });
-    });
-    this.planCoordinatorService.fundingSourceSelectionEmitter.subscribe(next => {
-      if (next.index === this.sourceIndex) {
-        this.mySourceDetails = next.source;
-      }
     });
   }
 

@@ -28,7 +28,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   displayType: string;
   // Dummy ngModel attribute for hidden error fields
   dummy: string = null;
-  private mySourceDetails: FundingRequestFundsSrcDto;
+  private fseId: number;
 
   constructor(
     private planCoordinatorService: PlanManagementService,
@@ -46,9 +46,11 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
     this.planCoordinatorService.fundingSourceSelectionEmitter.subscribe(next => {
       if (next.index === this.sourceIndex) {
-        this.mySourceDetails = next.source;
+        this.fseId = next.source;
       }
     });
+    // this.logger.debug('grant', this.grantIndex, this.grant);
+    // this.logger.debug('source', this.sourceIndex, this.fseId, this.planCoordinatorService.selectedSourceCount);
   }
 
   toggleDisplay(value: string): void {

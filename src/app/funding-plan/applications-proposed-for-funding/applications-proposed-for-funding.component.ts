@@ -19,6 +19,7 @@ import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib';
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class ApplicationsProposedForFundingComponent implements OnInit {
+
   @Input() parentForm: NgForm;
   @Input() readOnly = false;
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
@@ -30,8 +31,20 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
-  listSelectedSources: FundingRequestFundsSrcDto[];
   private _budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
+
+  constructor(private logger: NGXLogger,
+              public planModel: PlanModel,
+              public planCoordinatorService: PlanManagementService,
+              private router: Router) {
+    this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
+
+  }
+
+  ngOnInit(): void {
+    this.logger.debug('Total grants selected', this.listGrantsSelected.length);
+
+  }
 
   get budgetMap(): Map<number, Map<number, FundingReqBudgetsDto>> {
     return this._budgetMap;
@@ -41,6 +54,13 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     this._budgetMap = value;
   }
 
+  get listSelectedSources(): FundingRequestFundsSrcDto[] {
+    return this.planCoordinatorService.listSelectedSources;
+  }
+
+  set listSelectedSources(value: FundingRequestFundsSrcDto[]) {
+    this.planCoordinatorService.listSelectedSources = value;
+  }
 
   get getNextSourceIndex(): number {
     // this.logger.debug('getSourceIndex():', this.planCoordinatorService.selectedSourceCount);
@@ -156,18 +176,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     return null;
   }
 
-  constructor(private logger: NGXLogger,
-              public planModel: PlanModel,
-              public planCoordinatorService: PlanManagementService,
-              private router: Router) {
-    this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
 
-  }
-
-  ngOnInit(): void {
-    this.logger.debug('Total grants selected', this.listGrantsSelected.length);
-
-  }
 
   onModalSubmit($event: any): void {
     this.logger.debug('submit: ', $event, this.parentForm);
@@ -195,7 +204,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   isSingleSource(): boolean {
-    return this.planCoordinatorService.selectedSourceCount <= 1;
+    return this.planCoordinatorService.listSelectedSources?.length <= 1;
   }
 
   editSource(sourceIndex: number): void {

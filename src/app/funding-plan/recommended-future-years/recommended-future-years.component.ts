@@ -30,7 +30,7 @@ export class RecommendedFutureYearsComponent implements OnInit {
 
   ngOnInit(): void {
     if (!!this.applId) {
-      this.logger.debug('initializing recommended future years for applId', this.applId);
+      // this.logger.debug('initializing recommended future years for applId', this.applId);
       this.selectedValue = this.planService.getRecommendedFutureYears(Number(this.applId));
     }
   }

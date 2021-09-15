@@ -39,11 +39,14 @@ export class FpFundingSourceComponent implements OnInit {
   }
 
   set selectedValue(value: number) {
+    if (this.index === -1) {
+      return;
+    }
     this._selectedValue = value;
     this.planCoordinatorService.fundingSourceSelectionEmitter.next({
-        index: this.index,
-        source: this.fundingSourceDetailsMap.get(Number(value))
-      });
+      index: this.index,
+      source: Number(value)
+    });
     this.planCoordinatorService.trackSelectedSources(this.index, value);
   }
 
@@ -55,17 +58,23 @@ export class FpFundingSourceComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.logger.debug('initialize ', this.index);
     this.allRfaPaNumbers = [];
     this.fy = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
     this.planModel.grantsSearchCriteria.forEach(r => {
       this.allRfaPaNumbers.push(r.rfaPaNumber);
     });
-    this.logger.debug('allRfaPaNumbers', this.allRfaPaNumbers);
     this.rfaPaNumber = this.allRfaPaNumbers[0];
-    this.logger.debug('selected rfaPaNumber:', this.rfaPaNumber);
     this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
       this.refreshSources(next.pd, next.ca);
     });
+
+    if (this.planCoordinatorService.listSelectedSources) {
+      const src = this.planCoordinatorService.listSelectedSources[this.index];
+
+      this.logger.debug('initial source', this.index, src);
+      this.selectedValue = Number(src.fundingSourceId);
+    }
   }
 
   private refreshSources(pd: number, ca: string): void {

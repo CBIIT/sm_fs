@@ -11,9 +11,13 @@ import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-
   providedIn: 'root'
 })
 export class PlanManagementService {
+
+
   fundingSourceValuesEmitter = new Subject<{ pd: number, ca: string }>();
   grantInfoCostEmitter = new Subject<{ index: number, applId?: number, dc: number, tc: number }>();
-  fundingSourceSelectionEmitter = new Subject<{ index: number, source: FundingRequestFundsSrcDto }>();
+  fundingSourceSelectionEmitter = new Subject<{ index: number, source: number }>();
+  private _listSelectedSources: FundingRequestFundsSrcDto[];
+
   private _selectedSources: Map<number, number> = new Map<number, number>();
 
   private budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
@@ -32,6 +36,7 @@ export class PlanManagementService {
 
   private grantValues: Map<number, { index: number, applId?: number, dc: number, tc: number }>;
   private localRfy: Map<number, number>;
+  private _selectedSourcesMap: Map<number, FundingRequestFundsSrcDto>;
 
   constructor(
     private planModel: PlanModel,
@@ -40,13 +45,21 @@ export class PlanManagementService {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
     this.grantValues = new Map<number, { index: number, applId?: number, dc: number, tc: number }>();
     this.grantInfoCostEmitter.subscribe(v => {
-      this.logger.debug('saving grant values', v);
+      // this.logger.debug('saving grant values', v);
       if (!!v.applId) {
         this.grantValues.set(v.applId, v);
       }
     });
 
     this.buildPlanModel();
+  }
+
+  get listSelectedSources(): FundingRequestFundsSrcDto[] {
+    return this._listSelectedSources;
+  }
+
+  set listSelectedSources(value: FundingRequestFundsSrcDto[]) {
+    this._listSelectedSources = value;
   }
 
   setPercentSelected(applId: number, selected: boolean): void {
@@ -61,7 +74,7 @@ export class PlanManagementService {
     this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
     this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
-      this.logger.debug('=========> ', r.applId);
+      // this.logger.debug('=========> ', r.applId);
       const buds = new Map(r.financialInfoDto.fundingReqBudgetsDtos.map(b => [b.fseId, b]));
       const cans = new Map(r.financialInfoDto.fundingRequestCans.map(c => [c.fseId, c]));
       this.budgetMap.set(Number(r.applId), buds);
@@ -70,6 +83,10 @@ export class PlanManagementService {
     this.logger.debug('budgets', this.budgetMap);
     this.logger.debug('cans', this.canMap);
     this.logger.debug('funding sources', this.planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources);
+    this._selectedSourcesMap =
+      new Map(this.planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.map(s => [s.fundingSourceId, s]));
+    this.logger.debug('source map', this.selectedSourcesMap);
+    this._listSelectedSources = Array.from(this._selectedSourcesMap.values());
   }
 
   pushBudget(applId: number, fseId: number, budget: FundingReqBudgetsDto): void {
@@ -91,10 +108,10 @@ export class PlanManagementService {
     this.canMap.set(applId, tmp);
   }
 
-
   // NOTE: this is for the purpose of restricting selections for the second and third funding sources
   trackSelectedSources(index: number, sourceId: number): void {
     // TODO: only track non-null
+    this.logger.debug('track selected sources', index, sourceId);
 
     if (!!sourceId) {
       this._selectedSources.set(index, sourceId);
@@ -107,6 +124,7 @@ export class PlanManagementService {
   get selectedSourceCount(): number {
     return this._selectedSources.size;
   }
+
 
   getRestrictedSources(index: number): number[] {
     // this.logger.debug('checking restricted sources for #', index);
@@ -155,7 +173,7 @@ export class PlanManagementService {
       });
     }
     this.setRecommendedFutureYears(applId, result);
-    this.logger.debug('RFY for can', applId, '=', result);
+    // this.logger.debug('RFY for can', applId, '=', result);
     return result;
   }
 
@@ -164,8 +182,6 @@ export class PlanManagementService {
   }
 
   directCostPercentCut(applId: number, fseId: number): number {
-    this.logger.debug('dc can ===> ', this.getCan(applId, fseId)?.dcPctCut);
-
     if (this.getCan(applId, fseId)?.dcPctCut) {
       return this.getCan(applId, fseId).dcPctCut;
     }
@@ -182,7 +198,6 @@ export class PlanManagementService {
   }
 
   totalCostPercentCut(applId: number, fseId: number): number {
-    this.logger.debug('tc can ===> ', this.getCan(applId, fseId)?.tcPctCut);
     if (this.getCan(applId, fseId)?.tcPctCut) {
       return this.getCan(applId, fseId).tcPctCut;
     }
@@ -275,5 +290,13 @@ export class PlanManagementService {
       });
     });
     return sum;
+  }
+
+  get selectedSourcesMap(): Map<number, FundingRequestFundsSrcDto> {
+    return this._selectedSourcesMap;
+  }
+
+  set selectedSourcesMap(value: Map<number, FundingRequestFundsSrcDto>) {
+    this._selectedSourcesMap = value;
   }
 }
