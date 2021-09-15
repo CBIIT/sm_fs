@@ -3,7 +3,6 @@ import { PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ControlContainer, NgForm } from '@angular/forms';
-import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
 @Component({
   selector: 'app-fp-program-recommended-costs',
@@ -78,19 +77,22 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
     if (can && !isNaN(can.dcPctCut) && can.dcPctCut != null) {
       this.percentCut = can.dcPctCut;
-      this.displayType = 'percent';
+      this.toggleDisplay('percent', this.grantIndex, this.sourceIndex);
       this.logger.debug('setting display to "percent" with value', this.percentCut);
     } else if (bud) {
       this.directCost = bud.dcRecAmt;
       this.totalCost = bud.tcRecAmt;
-      this.displayType = 'dollar';
+      this.toggleDisplay('dollar', this.grantIndex, this.sourceIndex);
       this.logger.debug('setting display to "dollar"');
     }
     this.recalculate();
   }
 
   toggleDisplay(value: string, grantIndex: number, sourceIndex: number): void {
-    this.logger.debug('toggle display', value, this.grantIndex, grantIndex, this.sourceIndex, sourceIndex);
+    if (!value || this.grantIndex !== grantIndex || this.sourceIndex !== sourceIndex) {
+      return;
+    }
+    this.logger.debug('toggle display', value, this.grantIndex, this.sourceIndex);
     this.displayType = value;
   }
 
