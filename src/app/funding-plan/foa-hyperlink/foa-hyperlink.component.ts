@@ -26,13 +26,13 @@ export class FoaHyperlinkComponent implements OnInit {
       } else {
         this.lookupService.getNihGuideAddrUsingGET(this.foaNumber).subscribe(res => {
           if (res && res.nihGuideAddr) {
-            this.logger.debug(res);
             this.nihGuideAddr = res.nihGuideAddr;
           } else {
             this.nihGuideAddr = '#';
           }
         }, error => {
-          this.logger.error(JSON.stringify(error));
+          this.logger.error(JSON.stringify(error))
+          this.nihGuideAddr = '#';
         });
       }
     });

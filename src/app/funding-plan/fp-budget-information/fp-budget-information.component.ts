@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
+import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 
 @Component({
   selector: 'app-fp-budget-information',
@@ -8,13 +9,22 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./fp-budget-information.component.css']
 })
 export class FpBudgetInformationComponent implements OnInit {
+  listGrantsSelected: NciPfrGrantQueryDtoEx[];
+
 
   constructor(
     public planModel: PlanModel,
     private logger: NGXLogger) { }
 
   ngOnInit(): void {
-    this.logger.debug('planModel', this.planModel);
+    this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
+
+    // this.logger.debug('planModel', this.planModel);
+    this.planModel?.fundingPlanDto?.fpFinancialInformation?.fundingRequests?.forEach(r => {
+      r.financialInfoDto?.fundingRequestCans?.forEach(c => {
+        this.logger.debug('source, default type, type', c.fseId, c.oefiaTypeId, c.octId);
+      });
+    });
   }
 
 }

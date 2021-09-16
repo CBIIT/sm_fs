@@ -6,7 +6,7 @@
        aria-expanded="true" aria-controls="budget-info-collapse-ro"></a>
   </div>
   <div class="col-12 collapse show mt-2" id="budget-info-collapse-ro">
-  <p>Add CAN Number(s):</p>
+  <h4>Add CAN Number(s):</h4>
     <table class="table table-striped table-bordered budget-info-table">
       <thead>
       <tr>
@@ -18,7 +18,7 @@
       <tbody>
       <tr *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources; let i = index">
         <td>{{ source.fundingSourceName }}</td>
-        <td>{{ source.octId }}</td>
+        <td><app-oefia-types [index]="i" [selectedValue]="source.octId"></app-oefia-types></td>
         <td>[actions]</td>
       </tr>
       </tbody>
@@ -38,8 +38,14 @@
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let grant of planModel.fundingPlanDto.fpFinancialInformation.fundingRequests">
-        <td>{{grant.fullGrantNum}}</td>
+      <tr *ngFor="let grant of listGrantsSelected">
+        <td>
+          <app-full-grant-number-cell-renderer
+            [data]="grant"
+            [eGrantsUrl]="planModel.eGrantsUrl"
+            [grantViewerUrl]="planModel.grantViewerUrl">
+          </app-full-grant-number-cell-renderer>
+        </td>
         <td>{{100000 | currency}}</td>
         <td>{{120000 | currency}}</td>
         <td>Projected CAN</td>
