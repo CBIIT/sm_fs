@@ -37,7 +37,7 @@
   <ng-template #static>
     <div class="d-flex">
       <label *ngIf="issueType==='new'">New</label>
-      <label *ngIf="issueType==='reissue'">Previous FOA: {{ priorNotice }}</label>
+      <label *ngIf="issueType==='reissue'">Previous FOA: <app-foa-hyperlink [foaNumber]="priorNotice"></app-foa-hyperlink></label>
     </div>
   </ng-template>
 </ng-container>

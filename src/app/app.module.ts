@@ -128,6 +128,7 @@ import { CanSearchComponent } from './shared/can-search/can-search.component';
 import { FormatNiEsiFlagPipe } from './pipes/format-ni-esi-flag-format.pipe';
 import { ApplicationsProposedForFundingReadonlyComponent } from './funding-plan/applications-proposed-for-funding-readonly/applications-proposed-for-funding-readonly.component';
 import { FpBudgetInformationComponent } from './funding-plan/fp-budget-information/fp-budget-information.component';
+import { FoaHyperlinkComponent } from './funding-plan/foa-hyperlink/foa-hyperlink.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -263,7 +264,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     CanSearchComponent,
     FormatNiEsiFlagPipe,
     ApplicationsProposedForFundingReadonlyComponent,
-    FpBudgetInformationComponent
+    FpBudgetInformationComponent,
+    FoaHyperlinkComponent
   ],
 
 

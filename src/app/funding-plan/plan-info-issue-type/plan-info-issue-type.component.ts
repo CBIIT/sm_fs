@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FundingPlanFoasDto, RfaPaNoticesDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingPlanFoasDto } from '@nci-cbiit/i2ecws-lib';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { ControlContainer, NgForm } from '@angular/forms';
