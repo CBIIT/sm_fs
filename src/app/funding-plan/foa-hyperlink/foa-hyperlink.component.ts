@@ -25,9 +25,9 @@ export class FoaHyperlinkComponent implements OnInit {
         this.nihGuideAddr = result.nihGuideAddr;
       } else {
         this.lookupService.getNihGuideAddrUsingGET(this.foaNumber).subscribe(res => {
-          if (res) {
+          if (res && res.nihGuideAddr) {
             this.logger.debug(res);
-            this.nihGuideAddr = res;
+            this.nihGuideAddr = res.nihGuideAddr;
           } else {
             this.nihGuideAddr = '#';
           }
