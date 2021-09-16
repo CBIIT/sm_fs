@@ -57,6 +57,10 @@
 <app-plan-supporting-docs-readonly></app-plan-supporting-docs-readonly>
 <!-- END Supporting Documents Section -->
 
+<!-- START Budget Information Section -->
+<app-fp-budget-information></app-fp-budget-information>
+<!-- END Budget Information Section -->
+
 <app-upload-budget-documents [hidden]="!isDisplayBudgetDocsUploadVar"
                              requestOrPlan="PLAN"></app-upload-budget-documents>
 <app-budget-docs-readonly [hidden]="isDisplayBudgetDocsUploadVar || !displayReadOnlyBudgetDocs"
