@@ -53,4 +53,8 @@ export class PlanInfoIssueTypeComponent implements OnInit {
     }
     return false;
   }
+
+  lengthTooLong(): boolean {
+    return this.priorNotice?.length > 13;
+  }
 }

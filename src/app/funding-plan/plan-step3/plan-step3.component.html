@@ -28,6 +28,11 @@
           *ngIf="fundingPlanName.errors?.required && (step3form.submitted || step3form.touched)">
           Funding Plan Name is required
         </div>
+        <div
+          class="text-danger mt-1"
+          *ngIf="fundingPlanName.errors?.maxlength && (step3form.submitted || step3form.touched)">
+          Funding Plan Name can be at most 100 characters
+        </div>
       </div>
     </div>
 

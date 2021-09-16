@@ -25,4 +25,10 @@
   Previous FOA number is required.
   <input type="hidden" [ngModel]="scratch" [name]="rfaDetails.rfaPaNumber" required>
 </div>
+  <div
+    class="text-danger mt-1"
+    *ngIf="(parentForm.submitted || priorNoticeValue.touched) && lengthTooLong()">
+    Previous FOA number can be at most 13 characters.
+    <input type="hidden" [ngModel]="scratch" [name]="rfaDetails.rfaPaNumber" required>
+  </div>
 </ng-container>

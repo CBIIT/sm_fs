@@ -226,6 +226,7 @@
 </div>
 
 
+<ng-container [ngModelGroup]="'fp_source_modal'">
 <div class="modal fade" id="add-FS-modal" tabindex="-1" role="dialog"
      aria-labelledby="add-FS-modal-title" aria-hidden="true">
   <form #modalForm="ngForm" (ngSubmit)="onModalSubmit($event)">
@@ -315,3 +316,4 @@
     </div>
   </form>
 </div>
+</ng-container>
