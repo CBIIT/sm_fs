@@ -22,6 +22,7 @@ export class PlanModel {
 
   fundingPlanDto: FundingPlanDto = {};
 
+  documentSnapshot: ModelSnapshot;
 
   // TODO: Generate FundingPlanDto and FundingPlanFoasDto
 
@@ -45,6 +46,7 @@ export class PlanModel {
     this.grantsSearchCriteria = [];
     this.minimumScore = 0;
     this.maximumScore = 0;
+    this.takeDocumentSnapshot();
   }
 
   isMainApproversRegenNeeded(): boolean {
@@ -86,4 +88,40 @@ export class PlanModel {
     this.mainApproversCreated = true;
   }
 
+  private buildModelSnapshot(): ModelSnapshot {
+    const snapshot: ModelSnapshot = new ModelSnapshot();
+    const searchCriteria: Array<RfaPaNcabDate> = JSON.parse(JSON.stringify(this.grantsSearchCriteria));
+    searchCriteria.sort((a, b) => a.rfaPaNumber.localeCompare(b.rfaPaNumber));
+    searchCriteria.forEach( a => a.ncabDates.sort());
+    snapshot.rfqNcabs = searchCriteria.map(a => '^' + a.rfaPaNumber + '#' + a.ncabDates.join('+')).join(',');
+    snapshot.scoreRange = this.minimumScore + '-' + this.maximumScore;
+    snapshot.selectedGrants =
+      this.allGrants.filter( g => g.selected).map( g => g.applId).join(',');
+    return snapshot;
+  }
+
+  documentSnapshotChanged(): boolean {
+    const newSnapshot = this.buildModelSnapshot();
+    // this.logger.debug('old documentSnapshot ', JSON.stringify(this.documentSnapshot));
+    // this.logger.debug('new documentSnapshot ', JSON.stringify(newSnapshot));
+    if (newSnapshot.rfqNcabs !== this.documentSnapshot?.rfqNcabs
+        || newSnapshot.selectedGrants !== this.documentSnapshot?.selectedGrants
+        || newSnapshot.scoreRange !== this.documentSnapshot?.scoreRange) {
+          return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  takeDocumentSnapshot(): void {
+    this.documentSnapshot = this.buildModelSnapshot();
+  }
+
+}
+
+class ModelSnapshot {
+  rfqNcabs: string;
+  selectedGrants: string;
+  scoreRange: string;
 }

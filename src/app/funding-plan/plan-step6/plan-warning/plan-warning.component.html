@@ -15,3 +15,7 @@
     You can submit this plan only after providing the required supporting document(s) 
     in Step 5: "Supporting Docs".
 </div>
+<div class="alert alert-warning" *ngIf="docChecker?.planChangedAfterUpload">
+    <b>WARNING: </b> This funding plan has been updated after uploading the supporting documents. 
+    Please verify and re-upload justification document(s), as necessary.
+</div>
