@@ -76,6 +76,7 @@ export class PlanStep5Component implements OnInit {
 
   reloadFiles(result: string): void {
     this.loadFiles();
+    this.planModel.takeDocumentSnapshot();
     const el: HTMLElement = this.collapseAll.nativeElement;
     el.click();
   }

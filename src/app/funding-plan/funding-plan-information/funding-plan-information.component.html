@@ -82,14 +82,14 @@
     <div class="col-xl-2 col-lg-4 col-sm-6">
       <div class="form-group">
         <span class="like-label">Funding Approval</span>
-        <span class="form-control-plaintext">ARC and NCI Funds Certifiers</span>
+        <span class="form-control-plaintext">{{planModel.fundingPlanDto.fundsCertificationCode}}</span>
       </div>
     </div>
 
     <div class="col-xl-2 col-lg-4 col-sm-6">
       <div class="form-group">
         <span class="like-label">Final Scientific Levels of Authority (LOA)</span>
-        <span class="form-control-plaintext">Scientific Program Leaders (SPL) committee</span>
+        <span class="form-control-plaintext">{{ loaMap.get(planModel.fundingPlanDto.loaCode) }}</span>
       </div>
     </div>
 

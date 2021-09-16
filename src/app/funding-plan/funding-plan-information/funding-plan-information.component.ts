@@ -32,6 +32,7 @@ export class FundingPlanInformationComponent implements OnInit {
   listApplicationsWithinRange: NciPfrGrantQueryDtoEx[];
   otherDocs: string[];
 
+  loaMap: Map<string, string>;
 
   constructor(public planModel: PlanModel,
               private rfaService: CancerActivityControllerService,
@@ -39,9 +40,16 @@ export class FundingPlanInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loaMap = new Map<string, string>()
+      .set('PD', 'Program Director')
+      .set('DD', 'NCI Director')
+      .set('SPL', 'Scientific Program Leaders Committee')
+      .set('DAO', 'Division/Office/Center (DOC) Approver');
+      
     if(this.showPlanName === undefined) {
       this.showPlanName = this.showAdditionalInfo;
     }
+
     this.restoreSavedFoaData();
 
     this.totalApplicationsReceived = this.planModel.allGrants.length;
