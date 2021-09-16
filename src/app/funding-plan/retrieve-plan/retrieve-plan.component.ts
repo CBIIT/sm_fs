@@ -45,6 +45,7 @@ export class RetrievePlanComponent implements OnInit {
           if (this.planModel.allGrants) {
             this.planModel.allGrants.forEach( g => this.addRfaNcabToSearchCriteria(g));
           }
+          this.planModel.takeDocumentSnapshot();
           this.logger.debug('retrieved plan:', JSON.stringify(this.planModel.fundingPlanDto));
           this.router.navigate(['/plan/step6']);
         },

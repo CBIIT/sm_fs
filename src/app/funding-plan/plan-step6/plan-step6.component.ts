@@ -333,6 +333,7 @@ export class FundingPlanDocChecker {
   docMissing: boolean;
   tooltipText: string;
   warningText: string;
+  planChangedAfterUpload: boolean;
 
   private docTypes: any[] = [
     {docType: DocTypeConstants.JUSTIFICATION, tooltip: 'Scientific Rationale'},
@@ -346,8 +347,14 @@ export class FundingPlanDocChecker {
   constructor(planModel: PlanModel) {
     this.missingTooltips = [];
     this.planModel = planModel;
+    let justificationUploaded = false;
     this.docTypes.forEach( rd => {
-      if ( this.docTypeRequired(rd.docType) && this.docNotFound(rd.docType)) {
+      const docMissing = this.docNotFound(rd.docType);
+      const docRequired = this.docTypeRequired(rd.docType);
+      if (docRequired && !docMissing) {
+        justificationUploaded = true;
+      }
+      if ( docRequired && docMissing) {
         this.missingTooltips.push(rd.tooltip);
       }
     });
@@ -358,7 +365,7 @@ export class FundingPlanDocChecker {
         if (i === 0) {
           this.tooltipText = this.missingTooltips[i];
         }
-        else if ( i === this.missingTooltips.length - 1) {
+        else if ( this.missingTooltips.length > 1 && i === (this.missingTooltips.length - 1)) {
           this.tooltipText += ' and ' + this.missingTooltips[i];
         }
         else {
@@ -368,6 +375,7 @@ export class FundingPlanDocChecker {
       this.warningText = this.tooltipText + (this.missingTooltips.length > 1 ? ' have ' : ' has ');
       this.tooltipText = 'You must upload ' + this.tooltipText + ' to submit this Plan';
     }
+    this.planChangedAfterUpload = justificationUploaded && this.planModel.documentSnapshotChanged();
   }
 
   private docNotFound(docType: string): boolean {
