@@ -17,6 +17,7 @@ export class FundingPlanInformationComponent implements OnInit {
   @Input() parentForm: NgForm;
   @Input() readOnly = false;
   @Input() showAdditionalInfo = false;
+  @Input() showTitle: boolean;
 
   fundingPlanFoas: FundingPlanFoasDto[];
   totalApplicationsSelected: number;
@@ -38,6 +39,9 @@ export class FundingPlanInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if(this.showTitle === undefined) {
+      this.showTitle = this.showAdditionalInfo;
+    }
     this.restoreSavedFoaData();
 
     this.totalApplicationsReceived = this.planModel.allGrants.length;
