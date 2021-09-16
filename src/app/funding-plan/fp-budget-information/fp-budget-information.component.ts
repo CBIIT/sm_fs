@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { PlanModel } from '../../model/plan/plan-model';
 
 @Component({
   selector: 'app-fp-budget-information',
@@ -7,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FpBudgetInformationComponent implements OnInit {
 
-  constructor() { }
+  constructor(public planModel: PlanModel) { }
 
   ngOnInit(): void {
   }
