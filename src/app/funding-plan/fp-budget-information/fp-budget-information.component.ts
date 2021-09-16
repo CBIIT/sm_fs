@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
+import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-fp-budget-information',
@@ -14,7 +15,8 @@ export class FpBudgetInformationComponent implements OnInit {
 
   constructor(
     public planModel: PlanModel,
-    private logger: NGXLogger) { }
+    private logger: NGXLogger,
+    private requestService: FsRequestControllerService) { }
 
   ngOnInit(): void {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);

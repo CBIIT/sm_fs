@@ -38,7 +38,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let grant of listGrantsSelected">
+      <tr *ngFor="let grant of listGrantsSelected; let grantIndex = index">
         <td>
           <app-full-grant-number-cell-renderer
             [data]="grant"
@@ -46,8 +46,8 @@
             [grantViewerUrl]="planModel.grantViewerUrl">
           </app-full-grant-number-cell-renderer>
         </td>
-        <td>{{100000 | currency}}</td>
-        <td>{{120000 | currency}}</td>
+        <td><app-grant-cost-calculator mode="approvedDirect" [grant]="grant"></app-grant-cost-calculator></td>
+        <td><app-grant-cost-calculator mode="approvedTotal" [grant]="grant"></app-grant-cost-calculator></td>
         <td>Projected CAN</td>
         <td>Provided CAN</td>
       </tr>
