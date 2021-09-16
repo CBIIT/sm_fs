@@ -1,34 +1,43 @@
 <ng-container [ngModelGroup]="rfaDetails.rfaPaNumber">
-<div class="d-flex">
-  <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="issueType" [(ngModel)]="issueType" [disabled]="readOnly">
-    <label ngbButtonLabel class="btn-outline-secondary">
-      <input name="new" ngbButton type="radio" value="new" (change)="toggleDisplay('new')">New
-    </label>
-    <label ngbButtonLabel class="btn-outline-secondary">
-      <input name="reissue" ngbButton type="radio" value="reissue" (change)="toggleDisplay('reissue')">Reissue
-    </label>
-  </div>
-  <input
-    type="text"
-    [id]="'notice-' + index"
-    style="width:7rem"
-    class="form-control form-control-sm ml-2"
-    [(ngModel)]="priorNotice"
-    [hidden]="issueType === 'new'"
-    name="priorNotice"
-    [disabled]="readOnly"
-    #priorNoticeValue="ngModel">
-</div>
-<div
-  class="text-danger mt-1"
-  *ngIf="(parentForm.submitted || priorNoticeValue.touched) && !isValid()">
-  Previous FOA number is required.
-  <input type="hidden" [ngModel]="scratch" [name]="rfaDetails.rfaPaNumber" required>
-</div>
-  <div
-    class="text-danger mt-1"
-    *ngIf="(parentForm.submitted || priorNoticeValue.touched) && lengthTooLong()">
-    Previous FOA number can be at most 13 characters.
-    <input type="hidden" [ngModel]="scratch" [name]="rfaDetails.rfaPaNumber" required>
-  </div>
+  <ng-container *ngIf="readOnly then static else dynamic"></ng-container>
+  <ng-template #dynamic>
+    <div class="d-flex">
+      <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="issueType" [(ngModel)]="issueType">
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input name="new" ngbButton type="radio" value="new" (change)="toggleDisplay('new')">New
+        </label>
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input name="reissue" ngbButton type="radio" value="reissue" (change)="toggleDisplay('reissue')">Reissue
+        </label>
+      </div>
+      <input
+        type="text"
+        [id]="'notice-' + index"
+        style="width:7rem"
+        class="form-control form-control-sm ml-2"
+        [(ngModel)]="priorNotice"
+        [hidden]="issueType === 'new'"
+        name="priorNotice"
+        [disabled]="readOnly"
+        #priorNoticeValue="ngModel">
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="(parentForm.submitted || priorNoticeValue.touched) && !isValid()">
+      Previous FOA number is required.
+      <input type="hidden" [ngModel]="scratch" [name]="rfaDetails.rfaPaNumber" required>
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="(parentForm.submitted || priorNoticeValue.touched) && lengthTooLong()">
+      Previous FOA number can be at most 13 characters.
+      <input type="hidden" [ngModel]="scratch" [name]="rfaDetails.rfaPaNumber" required>
+    </div>
+  </ng-template>
+  <ng-template #static>
+    <div class="d-flex">
+      <label *ngIf="issueType==='new'">New</label>
+      <label *ngIf="issueType==='reissue'">Previous FOA: {{ priorNotice }}</label>
+    </div>
+  </ng-template>
 </ng-container>
