@@ -1,7 +1,8 @@
 <!-- BEGIN Funding Plan Information Section -->
 
 <form #parentForm="ngForm">
-    <app-funding-plan-information [showPlanName]="true" [readOnly]="true" [parentForm]="parentForm"></app-funding-plan-information>
+    <app-funding-plan-information [showPlanName]="true" [readOnly]="true" [parentForm]="parentForm">
+    </app-funding-plan-information>
 </form>
 
 <!-- END Funding Plan Information Section -->
@@ -11,10 +12,12 @@
 <div class="row" id="submission-package">
     <div class="col-12 d-flex align-items-center">
         <h2>Submission Package</h2>
-
-        <button type="button" class="btn btn-sm ml-auto btn-outline-primary" (click)="openAll()">{{btnLabel}}</button>
+    </div>
+    <div class="col-12 d-flex align-items-center">
+        <a href="#" (click)="openAll()">{{btnLabel}}</a>
         <button type="button" class="btn btn-sm ml-auto btn-outline-primary" (click)="downloadPackage()"><i
                 class="far fa-file-pdf mr-1" aria-hidden="true"></i> View Package</button>
+
     </div>
     <div class="col-12 mt-2">
 
@@ -31,7 +34,8 @@
                 <ng-template ngbPanelHeader>
 
                     <div class="d-flex align-items-center">
-                        <h3>Scientific Rationale for Supporting the FOA (and) Justification for Each Proposed Application
+                        <h3>Scientific Rationale for Supporting the FOA (and) Justification for Each Proposed
+                            Application
                         </h3>
                         <div class="doc-details" *ngIf="isSciRatUploaded; else sciRatNotUploaded">
                             {{sciRatDocDto.docFilename}} (Uploaded by <a
@@ -69,7 +73,8 @@
                         <div class="col-12">
                             <!-- <app-grant-table [grantList]="selectedGrants" [minScore]="model.minimumScore"
                                 [maxScore]="model.maximumScore"></app-grant-table> -->
-                            <app-applications-proposed-for-funding-readonly></app-applications-proposed-for-funding-readonly>
+                            <app-applications-proposed-for-funding-readonly>
+                            </app-applications-proposed-for-funding-readonly>
                         </div>
                     </div>
                 </ng-template>
