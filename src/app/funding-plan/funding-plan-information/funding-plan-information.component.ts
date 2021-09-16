@@ -17,7 +17,7 @@ export class FundingPlanInformationComponent implements OnInit {
   @Input() parentForm: NgForm;
   @Input() readOnly = false;
   @Input() showAdditionalInfo = false;
-  @Input() showTitle: boolean;
+  @Input() showPlanName: boolean;
 
   fundingPlanFoas: FundingPlanFoasDto[];
   totalApplicationsSelected: number;
@@ -46,9 +46,10 @@ export class FundingPlanInformationComponent implements OnInit {
       .set('SPL', 'Scientific Program Leaders Committee')
       .set('DAO', 'Division/Office/Center (DOC) Approver');
       
-    if(this.showTitle === undefined) {
-      this.showTitle = this.showAdditionalInfo;
+    if(this.showPlanName === undefined) {
+      this.showPlanName = this.showAdditionalInfo;
     }
+
     this.restoreSavedFoaData();
 
     this.totalApplicationsReceived = this.planModel.allGrants.length;

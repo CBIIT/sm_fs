@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { PlanModel } from '../../model/plan/plan-model';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-fp-budget-information',
@@ -7,9 +9,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FpBudgetInformationComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    public planModel: PlanModel,
+    private logger: NGXLogger) { }
 
   ngOnInit(): void {
+    this.logger.debug('planModel', this.planModel);
   }
 
 }
