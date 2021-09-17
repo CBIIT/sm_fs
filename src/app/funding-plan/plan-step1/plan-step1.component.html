@@ -28,7 +28,7 @@
           [(ngModel)]="rfa.rfaPaNumber"
           [allowClear]="true"
           [data]="searchCriteria.availableRfaPas"
-          (ngModelChange)="rfa.onRfaPaChangeSelection($event)">
+          (ngModelChange)="onRfaPaChangeSelection($event)">
         </ng-select2>
       </div>
     </div>
