@@ -231,6 +231,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       fromDate, toDate, this.userSessionService.getLoggedOnUser().nihNetworkId, designeeTo).subscribe(
       result => {
         this.updateDesigneeTable(result);
+        this.newDesigneeForm.resetForm();
         this.successManageDesigneesMsg = 'Designee has been added successfully.';
         for (const entry of result) {
           if (entry.delegateTo === designeeTo) {
@@ -295,7 +296,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
         this.designeeService.deleteDesigneeUsingDELETE($event).subscribe(
           result => {
             this.updateDesigneeTable(result);
-
+            this.newDesigneeForm.resetForm();
             this.successManageDesigneesMsg = 'Designee has been deleted successfully.';
             this.successDesignee = entry;
           },
