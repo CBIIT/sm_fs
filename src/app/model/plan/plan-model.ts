@@ -21,6 +21,7 @@ export class PlanModel {
   maximumScore: number;
 
   fundingPlanDto: FundingPlanDto = {};
+  grantAward
 
   documentSnapshot: ModelSnapshot;
 

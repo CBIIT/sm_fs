@@ -4,6 +4,7 @@ import { FsPlanControllerService } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from 'src/app/model/plan/plan-model';
+import { PlanManagementService } from '../service/plan-management.service';
 
 @Component({
   selector: 'app-retrieve-plan',
@@ -17,6 +18,7 @@ export class RetrievePlanComponent implements OnInit {
   constructor(private router: Router,
               private route: ActivatedRoute,
               private planModel: PlanModel,
+              private planManagementService: PlanManagementService,
               private planService: FsPlanControllerService,
               private logger: NGXLogger) {
   }
@@ -47,6 +49,9 @@ export class RetrievePlanComponent implements OnInit {
           }
           this.planModel.takeDocumentSnapshot();
           this.logger.debug('retrieved plan:', JSON.stringify(this.planModel.fundingPlanDto));
+          this.planManagementService.buildPlanModel();
+          this.planManagementService.buildGrantCostModel();
+          this.planManagementService.buildOefiaTypeMaps();
           this.router.navigate(['/plan/step6']);
         },
         (error) => {

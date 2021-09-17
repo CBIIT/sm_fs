@@ -37,6 +37,9 @@ export class PlanManagementService {
   private grantValues: Map<number, { index: number, applId?: number, dc: number, tc: number }>;
   private localRfy: Map<number, number>;
   private _selectedSourcesMap: Map<number, FundingRequestFundsSrcDto>;
+  grantCosts: GrantCostPayload[];
+  private defaultOefiaTypeMap: Map<number, number>;
+  private selectedOefiaTypeMap: Map<number, number>;
 
   constructor(
     private planModel: PlanModel,
@@ -298,4 +301,83 @@ export class PlanManagementService {
   set selectedSourcesMap(value: Map<number, FundingRequestFundsSrcDto>) {
     this._selectedSourcesMap = value;
   }
+
+  buildGrantCostModel(): void {
+    this.grantCosts = [];
+    let piDirect: number;
+    let piTotal: number;
+    let awardedTotal: number;
+    let awardedDirect: number;
+
+    this.planModel.allGrants.filter(g => g.selected).forEach(grant => {
+      // this.logger.debug('grant: ', grant.applId);
+      this.fsRequestService.getApplPeriodsUsingGET(grant.applId).subscribe(result => {
+        // this.logger.debug('results =>', result);
+        if (result && result.length > 0) {
+          piDirect = Number(result[0].requestAmount);
+          piTotal = Number(result[0].requestTotalAmount);
+          awardedTotal = Number(result[0].totalAwarded);
+          awardedDirect = Number(result[0].directAmount);
+        } else {
+          this.logger.error('No grant awards found for applid', grant.applId);
+          piDirect = 0;
+          piTotal = 0;
+          awardedDirect = 0;
+          awardedTotal = 0;
+        }
+
+        this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.filter(r => r.frtId === 1024 || r.frtId === 1026).forEach(req => {
+          if (req.applId === grant.applId) {
+            req.financialInfoDto.fundingRequestCans.forEach(can => {
+              this.grantCosts.push({
+                applId: grant.applId,
+                fseId: can.fseId,
+                fundingSourceName: can.fundingSourceName,
+                approvedDirect: can.approvedDc,
+                approvedTotal: can.approvedTc,
+                requestedDirect: piDirect,
+                requestedTotal: piTotal,
+                totalPercentCut: this.calculatePercentCut(can.approvedTc, piTotal),
+                directPercentCut: this.calculatePercentCut(can.approvedDc, piDirect),
+              });
+            });
+          }
+        });
+      });
+    });
+    this.logger.debug('grantCosts', this.grantCosts);
+  }
+
+  buildOefiaTypeMaps(): void {
+    this.defaultOefiaTypeMap = new Map<number, number>();
+    this.selectedOefiaTypeMap = new Map<number, number>();
+    this.planModel?.fundingPlanDto?.fpFinancialInformation?.fundingRequests?.forEach(r => {
+      r.financialInfoDto?.fundingRequestCans?.forEach(c => {
+        this.defaultOefiaTypeMap.set(c.fseId, c.oefiaTypeId);
+        this.selectedOefiaTypeMap.set(c.fseId, c.octId);
+      });
+    });
+  }
+
+
+  private calculatePercentCut(approved: number, total: number): number | null {
+    // this.logger.debug('calculatePercentCut', approved, total);
+    if (isNaN(approved) || isNaN(total)) {
+      return null;
+    }
+
+    return (1 - (approved / total));
+  }
+}
+
+export interface GrantCostPayload {
+  applId: number;
+  fseId: number;
+  fundingSourceName: string;
+  approvedDirect: number;
+  approvedTotal: number;
+  requestedDirect: number;
+  requestedTotal: number;
+  directPercentCut: number;
+  totalPercentCut: number;
 }

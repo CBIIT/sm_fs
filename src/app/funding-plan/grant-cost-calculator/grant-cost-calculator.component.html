@@ -1,9 +1,0 @@
-<span *ngFor="let g of grantCosts">
-<ng-container *ngIf="mode === 'approvedTotal'">
-  <div>{{ g.fundingSourceName }} {{ g.approvedTotal | currency }}</div>
-</ng-container>
-<ng-container *ngIf="mode === 'approvedDirect'">
-  <div>{{ g.fundingSourceName }} {{ g.approvedDirect | currency }}</div>
-</ng-container>
-</span>
-

@@ -21,12 +21,7 @@ export class FpBudgetInformationComponent implements OnInit {
   ngOnInit(): void {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
 
-    // this.logger.debug('planModel', this.planModel);
-    this.planModel?.fundingPlanDto?.fpFinancialInformation?.fundingRequests?.forEach(r => {
-      r.financialInfoDto?.fundingRequestCans?.forEach(c => {
-        this.logger.debug('source, default type, type', c.fseId, c.oefiaTypeId, c.octId);
-      });
-    });
+
   }
 
 }

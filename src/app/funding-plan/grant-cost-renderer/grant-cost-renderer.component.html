@@ -1,0 +1,10 @@
+<span *ngFor="let g of grantCosts">
+  {{ g[mode] }}
+<ng-container *ngIf="mode === 'approvedTotal'">
+  <div>{{ g.fundingSourceName }} {{ g.approvedTotal | currency }} ({{ g.totalPercentCut | percent }})</div>
+</ng-container>
+<ng-container *ngIf="mode === 'approvedDirect'">
+  <div>{{ g.fundingSourceName }} {{ g.approvedDirect | currency }} ({{ g.directPercentCut | percent }})</div>
+</ng-container>
+</span>
+
