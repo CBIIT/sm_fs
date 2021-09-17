@@ -561,6 +561,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
     }
     this.resetModel();
     this.grantSelectionTooltip();
+    this.navigationModel.disableStepLinks(2, 6);
   }
 
   /**
@@ -584,6 +585,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
           this.dtData = result.data;
           this._calculateNotSelectableRfaPasFlags(result.data);
           this.grantSelectionTooltip();
+          this.navigationModel.disableStepLinks(2, 6); // disable steps after new search
           this.dtOptions.data = this.dtData;
 
           // RESET plan model on every search

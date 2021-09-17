@@ -90,7 +90,12 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
         },
         processResults: this.select2processResults.bind(this),
         //TODO - error handling
-        error: (error) => { console.error(error); alert(error.responseText)}
+        error: (error) => {
+          if (error.responseText) {  // response is undefined if ajax call was aborted
+            console.error(error);
+            alert(error.responseText)
+          }
+        }
       }
     };
   }
