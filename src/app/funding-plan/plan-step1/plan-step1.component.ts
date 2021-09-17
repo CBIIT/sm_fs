@@ -26,6 +26,7 @@ import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navi
  */
 class RfaPaEntry {
   selectedNcabDates: string[] | string = [];
+  delayedSelectedNcabs:  string[] | string = null;
   rfaPaNumber = '';
   availableNcabDates: Array<Select2OptionData> = [];
   parent: FundingPlanGrantsSearchCriteriaUI;
@@ -53,31 +54,27 @@ class RfaPaEntry {
     return ret;
   }
 
-  onRfaPaChangeSelection($event: string | string[]): void {
-    const id = this._getIndex();
-    const rfapa: string = ($event instanceof Array) ? $event[0] : $event;
-    const selectedNcabs = this.parent.onChangeRfaPaEntry(rfapa, id);
-    setTimeout(() => {
-      console.log('*** change to selected ', selectedNcabs)
-      this.selectedNcabDates = selectedNcabs;
-      this.onNcabChangeSelection(selectedNcabs);
-    }, 0);
-  }
-
-  _getIndex(): number {
-    for (let i = 0; i < this.parent.rfaPaEntries.length; i++) {
-      if (this === this.parent.rfaPaEntries[i]) {
-        return i;
-      }
-    }
-    return -1;
-  }
 
   onNcabChangeSelection($event: string | string[]): void {
     // validation
+    //console.log('*** on ncab change selection ', this.rfaPaNumber, $event);
+    if (this.delayedSelectedNcabs) {
+      setTimeout(() => {
+        //console.log('*** on ncab change DELAYED selection ', this.rfaPaNumber, this.delayedSelectedNcabs);
+        this.selectedNcabDates = this.delayedSelectedNcabs;
+        this.delayedSelectedNcabs = null;
+        this._checkNcabForErrors(this.selectedNcabDates);
+      }, 200);
+      return;
+    }
+    // reset 'ncab required' error
+    this._checkNcabForErrors($event);
+  }
+
+  _checkNcabForErrors(selected: string | string[]): void {
     this.ncabErrors = [];
-    if ($event instanceof Array) {
-      for (const ncab of $event) {
+    if (selected instanceof Array) {
+      for (const ncab of selected) {
         const dto: FundingPlanNcabDto = this._findNcabDto(ncab);
         if (dto != null
           && dto.currentPlanStatus != null
@@ -88,9 +85,7 @@ class RfaPaEntry {
         }
       }
     }
-    // reset 'ncab required' error
-    const id = this._getIndex();
-    this.parent.rfaPaEntries[id].ncabErrRequired = false;
+    this.ncabErrRequired = false;
   }
 
   _findNcabDto(ncab: string): FundingPlanNcabDto {
@@ -120,23 +115,32 @@ class FundingPlanGrantsSearchCriteriaUI {
   }
 
   public onChangeRfaPaEntry(rfaPa: string, index: number): string[] {
-    let selected: string[] = [];
     const entry = this.rfaPaEntries[index];
+    //console.log('*** parent - on change rfa pa entry ', rfaPa, entry.selectedNcabDates);
     entry.rfaErrRequired = false;
     entry.ncabErrRequired = false;
     if (this.ncabMap.has(rfaPa)) {
+      if (this.ncabMap.get(rfaPa) && this.ncabMap.get(rfaPa).length == 1) {
+        const selected: string[] = [];
+        selected.push(this.ncabMap.get(rfaPa)[0].id);
+        entry.delayedSelectedNcabs = selected;
+      }
+      else if (entry.delayedSelectedNcabs === null) {
+        entry.delayedSelectedNcabs = [];
+      }
       entry.availableNcabDates = this.ncabMap.get(rfaPa);
     } else {
       entry.availableNcabDates = [];
+      entry.delayedSelectedNcabs = [];
     }
-    if (entry.availableNcabDates.length == 1) {
-      selected.push(entry.availableNcabDates[0].id);
-    }
+    // if (entry.availableNcabDates.length == 1) {
+    //   selected.push(entry.availableNcabDates[0].id);
+    // }
     this.validateForRfaPaDuplicate();
     if (this.errActivityCodes.length > 0) {
       this.validateForActivityCodes();
     }
-    return selected;
+    return [];
   }
 
   // Validate for duplication (from bottom to up)
@@ -183,6 +187,14 @@ class FundingPlanGrantsSearchCriteriaUI {
     return valid;
   }
 
+  public getIndex(rfapa: string): number {
+    for (let i = 0; i < this.rfaPaEntries.length; i++) {
+      if (rfapa === this.rfaPaEntries[i].rfaPaNumber) {
+        return i;
+      }
+    }
+    return -1;
+  }
   _validateForActivityCodes(): boolean {
     for (let i = 0; i < this.rfaPaEntries.length - 1; i++) {
       if (this.rfaPaEntries[i].rfaPaNumber && this.rfaPaEntries[i].rfaPaNumber.length > 0) {
@@ -303,7 +315,11 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         }
         this.searchCriteria.availableRfaPas = tmp;
         for (const entry of this.searchCriteria.rfaPaEntries) {
-          entry.onRfaPaChangeSelection(entry.rfaPaNumber);
+          if (this.searchCriteria.ncabMap.has(entry.rfaPaNumber)) {
+            entry.availableNcabDates = this.searchCriteria.ncabMap.get(entry.rfaPaNumber);
+          } else {
+            entry.availableNcabDates = [];
+          }
         }
       },
       error => {
@@ -315,7 +331,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.dtOptions = {
       pagingType: 'full_numbers',
-      pageLength: 25,
+      pageLength: 100,
       language: {
         paginate: {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
@@ -427,6 +443,17 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
+   * User/system selects FOA numer from the drop down
+   * @param $event
+   */
+  onRfaPaChangeSelection($event: string | string[]): void {
+    const rfapa: string = ($event instanceof Array) ? $event[0] : $event;
+    const id = this.searchCriteria.getIndex(rfapa);
+    //console.log('*** on rfa pa change selection ', $event, this.searchCriteria.rfaPaEntries[id].selectedNcabDates);
+    const selectedNcabs = this.searchCriteria.onChangeRfaPaEntry(rfapa, id);
+  }
+
+  /**
    * Init searchCriteria and table data from planModel
    * if it's not empty.
    * Otherwise, initialize them
@@ -440,7 +467,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         const entry: RfaPaEntry = new RfaPaEntry(this.searchCriteria);
         entry.rfaPaNumber = criteria.rfaPaNumber;
         this.searchCriteria.rfaPaEntries.push(entry);
-        entry.selectedNcabDates = criteria.ncabDates;
+        entry.delayedSelectedNcabs = criteria.ncabDates;
+        this.logger.debug('_restoreFromModel', entry.selectedNcabDates);
       }
       this.canDeactivate = false;
     } else {
@@ -533,6 +561,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
     }
     this.resetModel();
     this.grantSelectionTooltip();
+    this.navigationModel.disableStepLinks(2, 6);
   }
 
   /**
@@ -555,6 +584,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         (result: GrantsSearchResultDatatableDto) => {
           this.dtData = result.data;
           this._calculateNotSelectableRfaPasFlags(result.data);
+          this.grantSelectionTooltip();
+          this.navigationModel.disableStepLinks(2, 6); // disable steps after new search
           this.dtOptions.data = this.dtData;
 
           // RESET plan model on every search
