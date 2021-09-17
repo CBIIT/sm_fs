@@ -1,0 +1,43 @@
+<ng-container *ngIf="readonly; then read_only else edit;"></ng-container>
+
+<ng-template #edit>
+  <div class="form-group">
+    <!--    <label for="oefia-type">OEFIA Type</label>-->
+    <div class="d-flex">
+      <div class="form-check ml-auto d-flex">
+        <input type="checkbox" [id]="uniqueId" (change)="onCheckboxChange($event, index)">
+        <label [for]="uniqueId">Show All CANs</label>
+      </div>
+    </div>
+    <ng-container *ngIf="allCans; then showAll; else showDefault"></ng-container>
+    <ng-template #showDefault>
+      <ng-select2
+        name="can"
+        [data]="data"
+        [(ngModel)]="selectedValue">
+        <option></option>
+      </ng-select2>
+    </ng-template>
+    <ng-template #showAll>
+      <ng-select2
+        name="can"
+        [options]="allOptions"
+        [(ngModel)]="selectedValue">
+        <option></option>
+      </ng-select2>
+    </ng-template>
+  </div>
+</ng-template>
+
+<ng-template #read_only>
+  <span *ngIf="selectedCanData?.can">
+    <a [routerLink]="" [ngbTooltip]="canTooltip"
+       triggers="click:blur">{{ selectedCanData?.can }}</a> | {{ selectedCanData?.canDescrip }}
+  </span>
+</ng-template>
+
+
+<ng-template #canTooltip><span class='institutionName'>{{selectedCanData.canPhsOrgCode}}</span><br>
+  <span class='institutionLocation'>{{selectedCanData.canDescrip}}</span>
+</ng-template>
+

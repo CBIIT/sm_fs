@@ -332,6 +332,7 @@ export class PlanManagementService {
               this.grantCosts.push({
                 applId: grant.applId,
                 fseId: can.fseId,
+                nciSourceFlag: can.nciSourceFlag,
                 fundingSourceName: can.fundingSourceName,
                 approvedDirect: can.approvedDc,
                 approvedTotal: can.approvedTc,
@@ -387,4 +388,5 @@ export interface GrantCostPayload {
   activityCodes: string;
   bmmCodes: string;
   frtId: number;
+  nciSourceFlag?: string;
 }

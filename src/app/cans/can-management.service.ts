@@ -24,12 +24,15 @@ export class CanManagementService {
   grantCans: Array<FundingRequestGrantCanDto>;
   oefiaCodes: Array<OefiaCodingDto>;
   cachedRequestCans: Map<number, FundingRequestCanDto[]> = new Map();
+  activeCanCache: Map<string, CanCcxDto[]> = new Map<string, CanCcxDto[]>();
 
 
   constructor(private logger: NGXLogger, private canService: FsCanControllerService,
               private requestModel: RequestModel) {
     this.refreshCans();
     this.refreshOefiaCodes();
+    this.getActiveCans('', 'Y');
+    this.getActiveCans('', 'N');
   }
 
   refreshCans(): void {
@@ -118,6 +121,26 @@ export class CanManagementService {
       this.logger.error(error);
     });
     return true;
+  }
+
+
+  getActiveCans(can: string, nciSource: string): Observable<CanCcxDto[]> {
+    if (!can) {
+      can = '';
+    }
+    const tmp = this.activeCanCache.get(can + '_' + nciSource);
+    if (tmp) {
+      return new Observable(subscriber => {
+        subscriber.next(tmp);
+      });
+    }
+    this.logger.warn('getActiveCans from API', can, nciSource);
+    const fn = this.canService.getActiveCansUsingGET(can, nciSource);
+    fn.subscribe(result => {
+      this.activeCanCache.set(can + '_' + nciSource, result);
+    });
+
+    return fn;
   }
 
   refreshGrantCans(): boolean {

@@ -21,7 +21,7 @@
         <td>{{ source.fundingSourceName }}</td>
         <td><app-oefia-types [index]="i" [selectedValue]="source.octId"></app-oefia-types></td>
         <td><app-projected-can [fseId]="source.fundingSourceId"></app-projected-can></td>
-        <td><app-can-selector></app-can-selector></td>
+        <td><app-fp-can-selector [nciSourceFlag]="source.nciSourceFlag"></app-fp-can-selector></td>
       </tr>
       </tbody>
     </table>
