@@ -12,6 +12,9 @@ import { RequestModel } from '../../model/request/request-model';
   styleUrls: ['./can-selector.component.css']
 })
 export class CanSelectorComponent implements OnInit {
+  @Input() applId: number;
+  @Input() bmmCodes: string;
+  @Input() activityCodes: string;
   private _selectedValue: string;
   private _selectedCanData: CanCcxDto;
   defaultCans: CanCcxDto[];
@@ -69,13 +72,19 @@ export class CanSelectorComponent implements OnInit {
       });
     }
     this.uniqueId = 'all_cans' + String(this.index);
+    if(!this.bmmCodes) {
+      this.bmmCodes = this.model.requestDto?.bmmCode;
+    }
+    if(!this.activityCodes) {
+      this.activityCodes = this.model.requestDto?.activityCode;
+    }
     this.initializeAjaxSettings();
   }
 
   private initializeAjaxSettings(): void {
     const init = this.initialCAN;
-    const activityCodes = this.model.requestDto.activityCode;
-    const bmmCodes = this.model.requestDto.bmmCode;
+    const activityCodes = this.activityCodes;
+    const bmmCodes = this.bmmCodes;
     const nciSource = this.nciSourceFlag;
     const data = this.data;
     this.logger.debug('data', data);

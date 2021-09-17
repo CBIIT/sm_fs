@@ -37,11 +37,14 @@ export class CanManagementService {
     this.refreshGrantCans();
   }
 
-  getProjectedCan(fseId: number, oefiaTypeId: number): Observable<CanCcxDto> {
+  getProjectedCan(fseId: number, oefiaTypeId: number, frtId: number, applId?: number): Observable<CanCcxDto> {
+    if (!applId) {
+      applId = this.requestModel.grant.applId;
+    }
     return this.canService.retrieveProjectedCanUsingGET(
-      this.requestModel.grant.applId,
+      applId,
       fseId,
-      this.requestModel.requestDto.frtId,
+      frtId,
       oefiaTypeId);
   }
 

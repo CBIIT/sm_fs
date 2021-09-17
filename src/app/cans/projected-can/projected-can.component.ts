@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { CanManagementService } from '../can-management.service';
 import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
+import { RequestModel } from '../../model/request/request-model';
 
 @Component({
   selector: 'app-projected-can',
@@ -14,10 +15,12 @@ export class ProjectedCanComponent implements OnInit {
 
   @Input() fseId: number;
   @Input() octId: number = null;
+  @Input() frtId: number;
+  @Input() applId: number;
 
   projectedCan: CanCcxDto;
 
-  constructor(private logger: NGXLogger, private canService: CanManagementService) {
+  constructor(private logger: NGXLogger, private canService: CanManagementService, private requestModel: RequestModel) {
   }
 
   ngOnInit(): void {
@@ -31,12 +34,15 @@ export class ProjectedCanComponent implements OnInit {
     } else {
       this.updateProjectedCan(null);
     }
+    if (!this.frtId) {
+      this.frtId = this.requestModel.requestDto.frtId;
+    }
   }
 
   updateProjectedCan(oefiaType: number): void {
     const source = Number(this.fseId);
 
-    this.canService.getProjectedCan(source, oefiaType).subscribe(result => {
+    this.canService.getProjectedCan(source, oefiaType, this.frtId, this.applId).subscribe(result => {
       this.projectedCan = result;
       this.logger.debug(result);
       this.canService.projectedCanEmitter.next({ index: this.index, can: result });

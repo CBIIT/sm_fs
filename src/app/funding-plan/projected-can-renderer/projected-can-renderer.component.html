@@ -1,4 +1,4 @@
 <span *ngFor="let g of grantCosts; let first = first">
   <hr *ngIf="!first">
-  <div><app-projected-can></app-projected-can></div>
+  <div><app-projected-can [fseId]="g.fseId" [frtId]="g.frtId" [applId]="g.applId"></app-projected-can></div>
 </span>

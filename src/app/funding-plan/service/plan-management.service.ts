@@ -337,6 +337,9 @@ export class PlanManagementService {
                 approvedTotal: can.approvedTc,
                 requestedDirect: piDirect,
                 requestedTotal: piTotal,
+                bmmCodes: req.bmmCode,
+                activityCodes: req.activityCode,
+                frtId: req.frtId,
                 totalPercentCut: this.calculatePercentCut(can.approvedTc, piTotal),
                 directPercentCut: this.calculatePercentCut(can.approvedDc, piDirect),
               });
@@ -381,4 +384,7 @@ export interface GrantCostPayload {
   directPercentCut: number;
   totalPercentCut: number;
   selectedCAN?: number;
+  activityCodes: string;
+  bmmCodes: string;
+  frtId: number;
 }
