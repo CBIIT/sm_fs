@@ -134,6 +134,7 @@ import { FundingSourceRendererComponent } from './funding-plan/funding-source-re
 import { ProjectedCanRendererComponent } from './funding-plan/projected-can-renderer/projected-can-renderer.component';
 import { CanSelectorRendererComponent } from './funding-plan/can-selector-renderer/can-selector-renderer.component';
 import { FpCanSelectorComponent } from './funding-plan/fp-can-selector/fp-can-selector.component';
+import { FpGrantManagementComponent } from './funding-plan/fp-workflow/fp-grant-management/fp-grant-management.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -275,7 +276,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FundingSourceRendererComponent,
     ProjectedCanRendererComponent,
     CanSelectorRendererComponent,
-    FpCanSelectorComponent
+    FpCanSelectorComponent,
+    FpGrantManagementComponent
   ],
 
 

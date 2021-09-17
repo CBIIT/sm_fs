@@ -15,6 +15,7 @@ import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct } from '@ng
 import { DatepickerFormatter } from 'src/app/datepicker/datepicker-adapter-formatter';
 import { Router } from '@angular/router';
 import { AppPropertiesService } from 'src/app/service/app-properties.service';
+import { FpGrantManagementComponent } from './fp-grant-management/fp-grant-management.component';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -31,6 +32,8 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   @Input() readonly = false;
   @Output() actionEmitter = new EventEmitter<string>();
+  @ViewChild(FpGrantManagementComponent) gmComponent: FpGrantManagementComponent;
+
   budgetInfoComponent: BudgetInfoComponent;
 
   approverInitializationSubscription: Subscription;
@@ -80,6 +83,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   onActionChange(value: string): void {
     this._dirty = true;
     this.actionEmitter.emit(value);
+    if (this.gmComponent) {
+      this.gmComponent.isApprovalAction = this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
+    }
   }
 
   constructor(private requestIntegrationService: FundingRequestIntegrationService,
@@ -214,10 +220,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     return this.workflowModel.isUserNextInChain && this.approvingState;
   }
 
-  // showGmInfo(): boolean {
-  //   return !this.requestModel.isSkip() && ( this.workflowModel.approvedByGM ||
-  //     (this.workflowModel.isGMApprover && this.approvingState) );
-  // }
+  showGmInfo(): boolean {
+    return this.workflowModel.approvedByGM ||
+           (this.workflowModel.isGMApprover && this.approvingState);
+  }
 
   get selectedWorkflowAction(): WorkflowActionCode {
     return (this._selectedWorkflowAction) ? this._selectedWorkflowAction.action : null;
@@ -269,10 +275,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     if (this.workflowStuckBy) {
       return;
     }
-    // if ((this.gmInfoComponent && !this.gmInfoComponent.isFormValid()) ||
-    //     (this.approvedCostsComponent && !this.approvedCostsComponent?.isFormValid()) ) {
-    //   valid = false;
-    // }
+    if (this.gmComponent && !this.gmComponent.isFormValid()) {
+      valid = false;
+    }
     if (! this.isFormValid()) {
       valid = false;
     }
@@ -321,19 +326,15 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         alert('WARNING: If the uploaded budget document(s) are not in eGrants, please send the document(s) to the appropriate Grants Management Specialist to add it the grant file in eGrants.');
     }
 
-    // if (this.workflowModel.isGMApprover
-    //   && this.workflowModel.isApprovalAction(action)
-    //   && !this.requestModel.isSkip() ) {
-    //   dto.gmInfo = this.gmInfoComponent?.getGmInfo();
-    // }
+    if ( // this.workflowModel.isGMApprover &&
+        this.workflowModel.isApprovalAction(action) ) {
+      dto.planGmInfo = this.gmComponent?.getGmInfos();
+    }
 
     this.logger.debug('workflow dto for submission is ', dto);
     this.workflowService.submitPlanWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('submit workflow returned okay ', result);
-        // if (dto.gmInfo) {
-        //   this.setGmInfoToRequestModel(dto.gmInfo);
-        // }
         this.workflowModel.initializeForPlan(dto.fprId);
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
@@ -396,7 +397,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   }
 
   isDirty(): boolean {
-    return this._dirty || this.workflowModel.hasNewApprover;
+    return this._dirty || this.workflowModel.hasNewApprover || this.gmComponent?.isFormDirty();
   }
 
   onCommentsInput(): void {

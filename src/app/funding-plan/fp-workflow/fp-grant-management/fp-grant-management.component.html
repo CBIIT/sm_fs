@@ -1,0 +1,129 @@
+<!-- START Grants Management Information -->
+<div class="row">
+    <div class="col-12 d-flex">
+        <h2>Grants Management</h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#grants-mgmt-collapse" role="button" aria-expanded="true" aria-controls="grants-mgmt-collapse"></a>
+    </div>
+</div>
+<div class="row collapse show" id="grants-mgmt-collapse">
+    <div class="col-12 form-group">
+        <span class="like-label" id="action-type-desc">Action Type</span>
+        <span>Award</span>
+    </div>
+    <div class="col-12">
+        <form #gmform='ngForm'>
+            <table class="table table-striped table-bordered" id="gm-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Grant Number</th>
+                        <th scope="col">Primary Specialist</th>
+                        <th scope="col">Back-up Specialist</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor=" let grant of proposedGrants; let i = index;">
+                        <td>
+                            <app-full-grant-number-cell-renderer [data]="grant" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl"></app-full-grant-number-cell-renderer>
+                        </td>
+                        <td>
+                        <div *ngIf="editable; else readonly">
+                            <ng-select2 
+                            id="specialist{{i}}"
+                            name="specialist{{i}}"
+                            [allowClear]="true"
+                            [data] = "specialists"
+                            [(ngModel)]= "grant.pfrSpecNpeId"
+                            #specialist="ngModel"
+                            [required]="isApprovalAction">
+                            </ng-select2>
+                            <div class="text-danger mt-1" *ngIf="(specialist.errors?.required)">
+                                Specialist is required
+                            </div>
+                        </div>
+                        <ng-template #readonly>
+                            <a href="mailto: {{grant.pfrSpecEmailAddress}}">{{grant.pfrSpecFullName}}</a>
+                        </ng-template>
+                        </td>
+                        <td>
+                            <div *ngIf="editable; else readonly2">
+                            <ng-select2
+                                id="backup-specialist{{i}}"
+                                name="backup-specialist{{i}}"
+                                [allowClear]="true"
+                                [data] = "specialists"
+                                [(ngModel)]="grant.pfrBkupSpecNpeId">
+                            </ng-select2>
+                            </div>
+                            <ng-template #readonly2>
+                                <a href="mailto: {{grant.pfrBkupSpecEmailAddress}}">{{grant.pfrBkupSpecFullName}}</a>
+                            </ng-template>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </form>    
+            </div>
+ <!--       <div class="form-group">
+            <span class="like-label" id="action-type-desc">Action Type</span>
+            <span *ngIf="readonly; else actionInput">{{gmInfo.actionType}}</span>
+            <ng-template #actionInput>
+            <div class="btn-group btn-group-toggle"
+                ngbRadioGroup 
+                name="radioBasic" 
+                [(ngModel)]="gmInfo.actionType" 
+                aria-describedby="action-type-desc"
+                #actionType="ngModel"
+                [required]="isApprovalAction">
+                <label ngbButtonLabel class="btn-outline-secondary">
+                  <input ngbButton type="radio" value="AWARD">Award
+                </label>
+                <label ngbButtonLabel class="btn-outline-secondary">
+                  <input ngbButton type="radio" value="REVISION">Revision
+                </label>
+            </div>
+            <div class="text-danger mt-1" *ngIf="(actionType.errors?.required)">
+                Action Type is required
+            </div>
+            </ng-template>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="form-group">
+            <label for="specialist">Specialist</label>
+            <span *ngIf="readonly; else specInput"><a
+                href="mailto: {{gmInfo.defaultSpecEmail}}">{{gmInfo.defaultSpecFullName}}</a></span>
+            <ng-template #specInput>
+            <ng-select2 
+                id="default-specialist"
+                name="default-specialist"
+                [allowClear]="true"
+                [data] = "specialists"
+                [(ngModel)]= "gmInfo.defaultSpecNpeId"
+                #specFullName="ngModel"
+                [required]="isApprovalAction">
+            </ng-select2>
+            <div class="text-danger mt-1" *ngIf="(specFullName.errors?.required)">
+                Specialist is required
+            </div>
+            </ng-template>
+        </div>
+    </div>
+    <div class="col">
+        <div class="form-group">
+            <label for="backup-specialist">Backup Specialist <span *ngIf="!readonly" class="optional">(optional)</span></label>
+            <span *ngIf="readonly"><a
+                href="mailto: {{gmInfo.bkupSpecEmail}}">{{gmInfo.bkupSpecFullName}}</a></span>
+            <ng-select2 *ngIf="!readonly"
+                id="backup-specialist"
+                name="backup-specialist"
+                [allowClear]="true"
+                [data] = "specialists"
+                [(ngModel)]="gmInfo.bkupSpecNpeId">
+            </ng-select2>
+        </div>
+    </div> -->
+    <div class="col-12">
+        <hr>
+    </div>
+</div>
+<!-- END Grants Management Information -->
