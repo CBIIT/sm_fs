@@ -130,6 +130,9 @@ import { ApplicationsProposedForFundingReadonlyComponent } from './funding-plan/
 import { FpBudgetInformationComponent } from './funding-plan/fp-budget-information/fp-budget-information.component';
 import { FoaHyperlinkComponent } from './funding-plan/foa-hyperlink/foa-hyperlink.component';
 import { GrantCostRendererComponent } from './funding-plan/grant-cost-renderer/grant-cost-renderer.component';
+import { FundingSourceRendererComponent } from './funding-plan/funding-source-renderer/funding-source-renderer.component';
+import { ProjectedCanRendererComponent } from './funding-plan/projected-can-renderer/projected-can-renderer.component';
+import { CanSelectorRendererComponent } from './funding-plan/can-selector-renderer/can-selector-renderer.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -267,7 +270,10 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     ApplicationsProposedForFundingReadonlyComponent,
     FpBudgetInformationComponent,
     FoaHyperlinkComponent,
-    GrantCostRendererComponent
+    GrantCostRendererComponent,
+    FundingSourceRendererComponent,
+    ProjectedCanRendererComponent,
+    CanSelectorRendererComponent
   ],
 
 

@@ -12,7 +12,6 @@ import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 export class FpBudgetInformationComponent implements OnInit {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
 
-
   constructor(
     public planModel: PlanModel,
     private logger: NGXLogger,

@@ -380,4 +380,5 @@ export interface GrantCostPayload {
   requestedTotal: number;
   directPercentCut: number;
   totalPercentCut: number;
+  selectedCAN?: number;
 }

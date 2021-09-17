@@ -21,7 +21,7 @@
         <td>{{ source.fundingSourceName }}</td>
         <td><app-oefia-types [index]="i" [selectedValue]="source.octId"></app-oefia-types></td>
         <td><app-projected-can></app-projected-can></td>
-        <td>[actions]</td>
+        <td><app-can-selector></app-can-selector></td>
       </tr>
       </tbody>
     </table>
@@ -49,11 +49,11 @@
             [grantViewerUrl]="planModel.grantViewerUrl">
           </app-full-grant-number-cell-renderer>
         </td>
-        <td></td>
+        <td><app-funding-source-renderer [grant]="grant"></app-funding-source-renderer></td>
         <td><app-grant-cost-renderer mode="approvedDirect" [grant]="grant"></app-grant-cost-renderer></td>
         <td><app-grant-cost-renderer mode="approvedTotal" [grant]="grant"></app-grant-cost-renderer></td>
-        <td>Projected CAN</td>
-        <td>Provided CAN</td>
+        <td><app-projected-can-renderer [grant]="grant"></app-projected-can-renderer></td>
+        <td><app-can-selector-renderer [grant]="grant"></app-can-selector-renderer></td>
       </tr>
       </tbody>
     </table>
