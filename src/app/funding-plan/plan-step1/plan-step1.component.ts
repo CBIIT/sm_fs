@@ -331,7 +331,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.dtOptions = {
       pagingType: 'full_numbers',
-      pageLength: 25,
+      pageLength: 100,
       language: {
         paginate: {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
