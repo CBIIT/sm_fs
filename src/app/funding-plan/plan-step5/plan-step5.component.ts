@@ -35,6 +35,9 @@ export class PlanStep5Component implements OnInit {
   skipGrants: NciPfrGrantQueryDto[];
   private applIds: number[] = [];
   public btnLabel = 'Expand All';
+  showValidations: boolean = false;
+  isFileSelected: boolean = false;
+  selectedFiles: FileList;
 
   @ViewChild('collapseAll') collapseAll: ElementRef<HTMLElement>;
 
@@ -79,6 +82,11 @@ export class PlanStep5Component implements OnInit {
     this.planModel.takeDocumentSnapshot();
     const el: HTMLElement = this.collapseAll.nativeElement;
     el.click();
+    this.showValidations = false;
+  }
+
+  selectFiles(fileSelected: FileList) {
+    this.selectedFiles = fileSelected;
   }
 
   checkUploadedDocs(): boolean {
@@ -188,17 +196,29 @@ export class PlanStep5Component implements OnInit {
 
   }
 
+  validate(): boolean {
+    if (this.selectedFiles && this.selectedFiles !== null) {
+      return false;
+    }
+    return true;
+  }
+
   nextStep(): void {
 
+    if (this.validate()) {
+      this.documentsControllerService.loadDocumentsUsingGET(this.planModel.fundingPlanDto.fprId, "PFRP").subscribe(
+        result => {
+          this.planModel.fundingPlanDto.documents = result;
+          this.router.navigate(['/plan/step6']);
+        }, error => {
+          this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
+        }
+      );
+    } else {
+      this.showValidations = true;
+    }
 
-    this.documentsControllerService.loadDocumentsUsingGET(this.planModel.fundingPlanDto.fprId, "PFRP").subscribe(
-      result => {
-        this.planModel.fundingPlanDto.documents = result;
-        this.router.navigate(['/plan/step6']);
-      }, error => {
-        this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
-      }
-    );
+    
 
 
   }

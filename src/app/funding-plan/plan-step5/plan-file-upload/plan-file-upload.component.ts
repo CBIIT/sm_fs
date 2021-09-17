@@ -19,6 +19,7 @@ export class PlanFileUploadComponent implements OnInit {
   @ViewChild('labelImport') labelImport: ElementRef;
   @Input() templateType = 'Other';
   @Output() fileUploadEmitter = new EventEmitter<string>();
+  @Output() fileSelectEmitter = new EventEmitter<FileList>();
 
   public _docDto: DocumentsDto = {};
   maxFileSize = 10485760; // 10MB
@@ -37,6 +38,7 @@ export class PlanFileUploadComponent implements OnInit {
       .map(f => f.name)
       .join(', ');
     this.selectedFiles = event.target.files;
+    this.fileSelectEmitter.emit(this.selectedFiles);
   }
 
   downloadTemplate(templateType: string) {
@@ -73,6 +75,7 @@ export class PlanFileUploadComponent implements OnInit {
           const result = event.body;
           this.logger.debug('Upload Doc: ', result);
           this.fileUploadEmitter.emit('Emitting from child');
+          this.fileSelectEmitter.emit();
         }
       },
       err => {
