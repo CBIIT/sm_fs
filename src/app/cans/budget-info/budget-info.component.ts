@@ -59,6 +59,7 @@ export class BudgetInfoComponent implements OnInit {
     return this.workflowModel.approvedByFC;
   }
 
+  // TODO: evaluate for deletion
   get defaultCans(): CanCcxDto[] {
     return this.canService.defaultCans;
   }

@@ -9,30 +9,29 @@ import {
 } from '@nci-cbiit/i2ecws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { Observable, Subject } from 'rxjs';
+import { Select2OptionData } from 'ng-select2';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CanManagementService {
 
-  oefiaTypeEmitter = new Subject<{ index: number; value: number }>();
-  projectedCanEmitter = new Subject<{ index: number; can: CanCcxDto }>();
-  selectedCanEmitter = new Subject<{ index: number; can: CanCcxDto }>();
+  oefiaTypeEmitter = new Subject<{ index: number; value: number; fseId?: number }>();
+  projectedCanEmitter = new Subject<{ index: number; can: CanCcxDto; fseId?: number }>();
+  selectedCanEmitter = new Subject<{ index: number; can: CanCcxDto; fseId?: number }>();
 
   nciSourceFlag: string = null;
+  // TODO: evaluate for deletion
   defaultCans: Array<CanCcxDto>;
   grantCans: Array<FundingRequestGrantCanDto>;
   oefiaCodes: Array<OefiaCodingDto>;
   cachedRequestCans: Map<number, FundingRequestCanDto[]> = new Map();
   activeCanCache: Map<string, CanCcxDto[]> = new Map<string, CanCcxDto[]>();
 
-
   constructor(private logger: NGXLogger, private canService: FsCanControllerService,
               private requestModel: RequestModel) {
     this.refreshCans();
     this.refreshOefiaCodes();
-    this.getActiveCans('', 'Y');
-    this.getActiveCans('', 'N');
   }
 
   refreshCans(): void {
@@ -42,7 +41,14 @@ export class CanManagementService {
 
   getProjectedCan(fseId: number, oefiaTypeId: number, frtId: number, applId?: number): Observable<CanCcxDto> {
     if (!applId) {
-      applId = this.requestModel.grant.applId;
+      applId = this.requestModel?.grant?.applId;
+    }
+    if (!applId) {
+      this.logger.warn('no applId provided: can\'t load projected can');
+      return new Observable(subscriber => {
+        subscriber.next(null);
+        subscriber.complete();
+      });
     }
     return this.canService.retrieveProjectedCanUsingGET(
       applId,
@@ -81,15 +87,6 @@ export class CanManagementService {
       nciSourceFlag);
   }
 
-  getAllCans(nciSourceFlag: string): Observable<CanCcxDto[]> {
-    return this.canService.getAllCansUsingGET(
-      this.requestModel.requestDto.activityCode,
-      this.requestModel.requestDto.bmmCode,
-      null,
-      nciSourceFlag
-    );
-  }
-
   getRequestCans(frqId: number): Observable<FundingRequestCanDto[]> {
     const tmp = this.cachedRequestCans.get(frqId);
     if (tmp) {
@@ -124,23 +121,8 @@ export class CanManagementService {
   }
 
 
-  getActiveCans(can: string, nciSource: string): Observable<CanCcxDto[]> {
-    if (!can) {
-      can = '';
-    }
-    const tmp = this.activeCanCache.get(can + '_' + nciSource);
-    if (tmp) {
-      return new Observable(subscriber => {
-        subscriber.next(tmp);
-      });
-    }
-    this.logger.warn('getActiveCans from API', can, nciSource);
-    const fn = this.canService.getActiveCansUsingGET(can, nciSource);
-    fn.subscribe(result => {
-      this.activeCanCache.set(can + '_' + nciSource, result);
-    });
-
-    return fn;
+  getPlanDefaultCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
+    return this.canService.getDefaultCansUsingGET(activityCodes, bmmCodes, can, nciSource);
   }
 
   refreshGrantCans(): boolean {

@@ -6,22 +6,40 @@
        aria-expanded="true" aria-controls="budget-info-collapse-ro"></a>
   </div>
   <div class="col-12 collapse show mt-2" id="budget-info-collapse-ro">
-  <h4>Add CAN Number(s):</h4>
+    <h4>Add CAN Number(s):</h4>
     <table class="table table-striped table-bordered budget-info-table">
       <thead>
       <tr>
         <th scope="col">Funding Source</th>
         <th scope="col">OEFIA Coding</th>
-        <th scope="col">OEFIA Projected CAN</th>
         <th scope="col">CAN Action(s)</th>
       </tr>
       </thead>
       <tbody>
       <tr *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources; let i = index">
         <td>{{ source.fundingSourceName }}</td>
-        <td><app-oefia-types [index]="i" [selectedValue]="source.octId"></app-oefia-types></td>
-        <td><app-projected-can [fseId]="source.fundingSourceId"></app-projected-can></td>
-        <td><app-fp-can-selector [nciSourceFlag]="source.nciSourceFlag"></app-fp-can-selector></td>
+        <td>
+          <app-oefia-types [fseId]="source.fundingSourceId" [index]="i" [selectedValue]="source.octId"></app-oefia-types>
+        </td>
+        <td>
+<!--          <app-projected-can [fseId]="source.fundingSourceId"></app-projected-can>-->
+
+<!--          <app-fp-can-selector [nciSourceFlag]="source.nciSourceFlag"></app-fp-can-selector>-->
+          <div class="d-flex align-items-center">
+            <button class="btn btn-link btn-slim" *ngIf="true"
+                    ngbTooltip="Copy NCI OEFIA Projected CAN">
+              <i class="far fa-copy" aria-hidden="true"></i>
+            </button>
+            <button class="btn btn-link btn-slim" *ngIf="true"
+                    ngbTooltip="Search NCI OEFIA Projected CAN">
+              <i class="far fa-air-freshener" aria-hidden="true"></i>
+            </button>
+            <button class="btn btn-link btn-slim" *ngIf="true"
+                    ngbTooltip="Delete NCI OEFIA Projected CAN">
+              <i class="far fa-trash" aria-hidden="true"></i>
+            </button>
+          </div>
+        </td>
       </tr>
       </tbody>
     </table>
@@ -49,11 +67,21 @@
             [grantViewerUrl]="planModel.grantViewerUrl">
           </app-full-grant-number-cell-renderer>
         </td>
-        <td><app-funding-source-renderer [grant]="grant"></app-funding-source-renderer></td>
-        <td><app-grant-cost-renderer mode="approvedDirect" [grant]="grant"></app-grant-cost-renderer></td>
-        <td><app-grant-cost-renderer mode="approvedTotal" [grant]="grant"></app-grant-cost-renderer></td>
-        <td><app-projected-can-renderer [grant]="grant"></app-projected-can-renderer></td>
-        <td><app-can-selector-renderer [grant]="grant"></app-can-selector-renderer></td>
+        <td>
+          <app-funding-source-renderer [grant]="grant"></app-funding-source-renderer>
+        </td>
+        <td>
+          <app-grant-cost-renderer mode="approvedDirect" [grant]="grant"></app-grant-cost-renderer>
+        </td>
+        <td>
+          <app-grant-cost-renderer mode="approvedTotal" [grant]="grant"></app-grant-cost-renderer>
+        </td>
+        <td>
+          <app-projected-can-renderer [grantIndex]="grantIndex" [grant]="grant"></app-projected-can-renderer>
+        </td>
+        <td>
+          <app-can-selector-renderer [grant]="grant"></app-can-selector-renderer>
+        </td>
       </tr>
       </tbody>
     </table>

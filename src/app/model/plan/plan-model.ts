@@ -35,7 +35,7 @@ export class PlanModel {
               private logger: NGXLogger) {
     // TODO: static properties should be set at app level and shared somehow
     this.grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
-    this.yourgrantsUrl =  propertiesService.getProperty('URL_YOURGRANTS');
+    this.yourgrantsUrl = propertiesService.getProperty('URL_YOURGRANTS');
     this.eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this.catsConceptUrl = propertiesService.getProperty('CONCEPT_ID_URL');
 
@@ -69,7 +69,7 @@ export class PlanModel {
 
   private makeApproverCriteria(): any {
     const approverCriteria: any = {};
-  //  approverCriteria.requestType = this.fundingPlanDto.financialInfoDto.requestTypeId;
+    //  approverCriteria.requestType = this.fundingPlanDto.financialInfoDto.requestTypeId;
     approverCriteria.cayCode = this.fundingPlanDto.cayCode;
     approverCriteria.doc = this.fundingPlanDto.requestorDoc;
     // const fundingSources = Array.from(this.fundingPlanDto.fundingPlanFoas.map());
@@ -93,11 +93,11 @@ export class PlanModel {
     const snapshot: ModelSnapshot = new ModelSnapshot();
     const searchCriteria: Array<RfaPaNcabDate> = JSON.parse(JSON.stringify(this.grantsSearchCriteria));
     searchCriteria.sort((a, b) => a.rfaPaNumber.localeCompare(b.rfaPaNumber));
-    searchCriteria.forEach( a => a.ncabDates.sort());
+    searchCriteria.forEach(a => a.ncabDates.sort());
     snapshot.rfqNcabs = searchCriteria.map(a => '^' + a.rfaPaNumber + '#' + a.ncabDates.join('+')).join(',');
     snapshot.scoreRange = this.minimumScore + '-' + this.maximumScore;
     snapshot.selectedGrants =
-      this.allGrants.filter( g => g.selected).map( g => g.applId).join(',');
+      this.allGrants.filter(g => g.selected).map(g => g.applId).join(',');
     return snapshot;
   }
 
@@ -106,17 +106,24 @@ export class PlanModel {
     // this.logger.debug('old documentSnapshot ', JSON.stringify(this.documentSnapshot));
     // this.logger.debug('new documentSnapshot ', JSON.stringify(newSnapshot));
     if (newSnapshot.rfqNcabs !== this.documentSnapshot?.rfqNcabs
-        || newSnapshot.selectedGrants !== this.documentSnapshot?.selectedGrants
-        || newSnapshot.scoreRange !== this.documentSnapshot?.scoreRange) {
-          return true;
-    }
-    else {
+      || newSnapshot.selectedGrants !== this.documentSnapshot?.selectedGrants
+      || newSnapshot.scoreRange !== this.documentSnapshot?.scoreRange) {
+      return true;
+    } else {
       return false;
     }
   }
 
   takeDocumentSnapshot(): void {
     this.documentSnapshot = this.buildModelSnapshot();
+  }
+
+  get bmmCodeList(): string {
+    return this.allGrants?.filter(g => g.selected).map(g => g.bmmCode).join(',');
+  }
+
+  get activityCodeList(): string {
+    return this.fundingPlanDto?.fundingPlanFoas[0]?.activityCodeList || '';
   }
 
 }

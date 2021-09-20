@@ -21,6 +21,7 @@ import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRe
 import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib/model/fundingReqBudgetsDto';
 import { AppUserSessionService } from '../../service/app-user-session.service';
 import { PlanApproverService } from '../approver/plan-approver.service';
+import { CanManagementService } from '../../cans/can-management.service';
 
 @Component({
   selector: 'app-plan-step3',
@@ -52,6 +53,7 @@ export class PlanStep3Component implements OnInit {
               private planCoordinatorService: PlanManagementService,
               private fsPlanControllerService: FsPlanControllerService,
               private planApproverService: PlanApproverService,
+              private canManagementService: CanManagementService,
               private userSessionService: AppUserSessionService) {
   }
 

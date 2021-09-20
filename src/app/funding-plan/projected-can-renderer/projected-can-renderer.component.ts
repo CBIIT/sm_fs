@@ -10,6 +10,7 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class ProjectedCanRendererComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
+  @Input() grantIndex: number;
 
   constructor(
     private planManagementService: PlanManagementService,

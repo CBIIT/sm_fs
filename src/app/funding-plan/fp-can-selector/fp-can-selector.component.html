@@ -1,36 +1,5 @@
-<ng-container *ngIf="readonly; then read_only else edit;"></ng-container>
-
-<ng-template #edit>
-  <div class="form-group">
-    <ng-container *ngIf="allCans; then showAll; else showDefault"></ng-container>
-    <ng-template #showDefault>
-      <ng-select2
-        name="can"
-        [data]="data"
-        [(ngModel)]="selectedValue">
-        <option></option>
-      </ng-select2>
-    </ng-template>
-    <ng-template #showAll>
-      <ng-select2
-        name="can"
-        [options]="allOptions"
-        [(ngModel)]="selectedValue">
-        <option></option>
-      </ng-select2>
-    </ng-template>
-  </div>
+<ng-template #canTooltip><span class='institutionName'>{{projectedCan.canPhsOrgCode}}</span><br>
+  <span class='institutionLocation'>{{projectedCan.canDescrip}}</span>
 </ng-template>
-
-<ng-template #read_only>
-  <span *ngIf="selectedCanData?.can">
-    <a [routerLink]="" [ngbTooltip]="canTooltip"
-       triggers="click:blur">{{ selectedCanData?.can }}</a> | {{ selectedCanData?.canDescrip }}
-  </span>
-</ng-template>
-
-
-<ng-template #canTooltip><span class='institutionName'>{{selectedCanData.canPhsOrgCode}}</span><br>
-  <span class='institutionLocation'>{{selectedCanData.canDescrip}}</span>
-</ng-template>
-
+<span *ngIf="projectedCan?.can && projectedCan?.canDescrip">
+  <a [routerLink]="" [ngbTooltip]="canTooltip" triggers="click:blur">{{projectedCan?.can}}</a> | {{projectedCan?.canDescrip}}</span>

@@ -12,6 +12,7 @@ import { Select2OptionData } from 'ng-select2';
 })
 export class OefiaTypesComponent implements OnInit {
   @Input() index = 0;
+  @Input() fseId: number;
   oefiaCodes: OefiaCodingDto[];
   selectedOefiaType: { id: string; text: string };
   private _selectedValue: number;
@@ -38,7 +39,8 @@ export class OefiaTypesComponent implements OnInit {
       this.selectedOefiaType = null;
     }
     this.selectedValueChange.emit(value);
-    this.canService.oefiaTypeEmitter.next({ index: this.index, value });
+    this.logger.debug('selectedValueChange:', this.index, value, this.fseId);
+    this.canService.oefiaTypeEmitter.next({ index: this.index, value, fseId: this.fseId });
   }
 
   constructor(private logger: NGXLogger, private canService: CanManagementService) {

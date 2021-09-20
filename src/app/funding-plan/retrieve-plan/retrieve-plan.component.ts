@@ -5,6 +5,7 @@ import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { PlanManagementService } from '../service/plan-management.service';
+import { CanManagementService } from '../../cans/can-management.service';
 
 @Component({
   selector: 'app-retrieve-plan',
@@ -20,6 +21,7 @@ export class RetrievePlanComponent implements OnInit {
               private planModel: PlanModel,
               private planManagementService: PlanManagementService,
               private planService: FsPlanControllerService,
+              private canMangementService: CanManagementService,
               private logger: NGXLogger) {
   }
 
@@ -30,7 +32,7 @@ export class RetrievePlanComponent implements OnInit {
         (result) => {
           this.planModel.reset();
           this.planModel.title = 'View Funding Plan Details for';
-        //  this.planModel.returnToRequestPageLink = true;
+          //  this.planModel.returnToRequestPageLink = true;
           this.planModel.fundingPlanDto = result.FundingPlanDto;
           this.planModel.allGrants = result.AllGrants;
           this.planModel.minimumScore = this.planModel.fundingPlanDto.fundableRangeFrom;
@@ -39,13 +41,13 @@ export class RetrievePlanComponent implements OnInit {
           const selectedApplIds: number[] = result.SelectedApplIds;
 
           if (selectedApplIds && this.planModel.allGrants) {
-              this.planModel.allGrants.forEach( g => {
-                g.selected = selectedApplIds.includes(Number(g.applId));
-              });
+            this.planModel.allGrants.forEach(g => {
+              g.selected = selectedApplIds.includes(Number(g.applId));
+            });
           }
 
           if (this.planModel.allGrants) {
-            this.planModel.allGrants.forEach( g => this.addRfaNcabToSearchCriteria(g));
+            this.planModel.allGrants.forEach(g => this.addRfaNcabToSearchCriteria(g));
           }
           this.planModel.takeDocumentSnapshot();
           this.logger.debug('retrieved plan:', JSON.stringify(this.planModel.fundingPlanDto));
@@ -66,15 +68,15 @@ export class RetrievePlanComponent implements OnInit {
   }
 
   addRfaNcabToSearchCriteria(g: NciPfrGrantQueryDtoEx): void {
-      for (const rfaNcab of this.planModel.grantsSearchCriteria) {
-        if (rfaNcab.rfaPaNumber === g.rfaPaNumber) {
-          if (!rfaNcab.ncabDates.includes(g.councilMeetingDate)) {
-            rfaNcab.ncabDates.push(g.councilMeetingDate);
-          }
-          return;
+    for (const rfaNcab of this.planModel.grantsSearchCriteria) {
+      if (rfaNcab.rfaPaNumber === g.rfaPaNumber) {
+        if (!rfaNcab.ncabDates.includes(g.councilMeetingDate)) {
+          rfaNcab.ncabDates.push(g.councilMeetingDate);
         }
+        return;
       }
-      this.planModel.grantsSearchCriteria.push({rfaPaNumber: g.rfaPaNumber, ncabDates: [g.councilMeetingDate]});
+    }
+    this.planModel.grantsSearchCriteria.push({ rfaPaNumber: g.rfaPaNumber, ncabDates: [g.councilMeetingDate] });
   }
 
 }
