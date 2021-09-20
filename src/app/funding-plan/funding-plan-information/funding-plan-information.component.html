@@ -35,7 +35,7 @@
     <div class="form-group">
       <label for="fundable-score-range">Fundable Score Range</label>
       <input name="darwin" type="text" readonly class="form-control-plaintext" id="fundable-score-range"
-             value="{{planModel.minimumScore}} &ndash; {{planModel.maximumScore}}">
+        value="{{planModel.minimumScore}} &ndash; {{planModel.maximumScore}}">
     </div>
   </div>
 
@@ -43,7 +43,7 @@
     <div class="form-group">
       <label for="apps-recieved">Applications Received</label>
       <input name="rasputin" type="text" readonly class="form-control-plaintext" id="apps-recieved"
-             value="{{ totalApplicationsReceived }}">
+        value="{{ totalApplicationsReceived }}">
     </div>
   </div>
 
@@ -51,7 +51,7 @@
     <div class="form-group">
       <label for="apps-proposed">Applications Proposed for Funding</label>
       <input name="arthur" type="text" readonly class="form-control-plaintext" id="apps-proposed"
-             value="{{ totalApplicationsSelected }}">
+        value="{{ totalApplicationsSelected }}">
     </div>
   </div>
 
@@ -59,7 +59,7 @@
     <div class="form-group">
       <label for="apps-skipped">Applications Skipped</label>
       <input name="broccoli" type="text" readonly class="form-control-plaintext" id="apps-skipped"
-             value="{{ totalApplicationsSkipped }}">
+        value="{{ totalApplicationsSkipped }}">
     </div>
   </div>
 
@@ -67,7 +67,7 @@
     <div class="form-group">
       <label for="apps-not-considered">Applications Not Considered for Funding</label>
       <input name="betty" type="text" readonly class="form-control-plaintext" id="apps-not-considered"
-             value="{{ totalApplicationsNotConsidered }}">
+        value="{{ totalApplicationsNotConsidered }}">
     </div>
   </div>
 
@@ -76,7 +76,7 @@
       <div class="form-group">
         <span class="like-label">Requesting PD</span>
         <span class="form-control-plaintext"><a
-          href="mailto:{{planModel.fundingPlanDto.requestorEmailAddress}}">{{planModel.fundingPlanDto.requestorPdFullName}}</a></span>
+            href="mailto:{{planModel.fundingPlanDto.requestorEmailAddress}}">{{planModel.fundingPlanDto.requestorPdFullName}}</a></span>
       </div>
     </div>
 
@@ -106,7 +106,7 @@
         <span class="like-label">Other DOC(s) Contributing Funds</span>
         <p>
           <a *ngFor="let doc of otherDocs; let first = first" [routerLink]=""
-             ngbTooltip="{{doc|codeDescription:'NciDocs'}}" triggers="click:blur" placement="top">
+            ngbTooltip="{{doc|codeDescription:'NciDocs'}}" triggers="click:blur" placement="top">
             <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>
             <ng-template #firstDoc>{{doc}}</ng-template>
             <ng-template #notFirstDoc>, {{doc}}</ng-template>
@@ -119,7 +119,7 @@
       <div class="form-group">
         <span class="like-label">Requesting PD's Cancer Activity</span>
         <p><a [routerLink]="" ngbTooltip="{{planModel.fundingPlanDto.cayCode|codeDescription:'CancerActivities'}}"
-              triggers="click:blur" placement="top">{{planModel.fundingPlanDto.cayCode}}</a></p>
+            triggers="click:blur" placement="top">{{planModel.fundingPlanDto.cayCode}}</a></p>
       </div>
     </div>
   </ng-container>

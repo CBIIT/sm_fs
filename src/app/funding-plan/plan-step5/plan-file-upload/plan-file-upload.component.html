@@ -1,6 +1,6 @@
 <div class="row">
     <div *ngIf="templateType !== 'Other'; else otherNote" class="col-lg-6">
-        <p><strong>Note:</strong> Approvals can be completed only if you provide all the information
+        <p>Approvals can be completed only if you provide all the information
             requested in this <a [routerLink]="[]" (click)="downloadTemplate(templateType)" >template</a>.
             You may upload Microsoft Word, Microsoft Excel, or Adobe Acrobat document(s) only.
                 Note: If you upload MS Excel, make sure it contains only one worksheet per file in order to have it
