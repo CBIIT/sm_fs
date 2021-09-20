@@ -56,7 +56,7 @@ export class FpBudgetInformationComponent implements OnInit {
   searchForCANs(nciSourceFlag: string): void {
     this.logger.debug('searchForCANs()', nciSourceFlag);
     // TODO: set up modal with proper data
-    this.canSearchModalComponent.title = `Search for CANs; nciSource=${nciSourceFlag}`;
+    this.canSearchModalComponent.title = `Search for CANs`;
     this.canSearchModalComponent.open();
 
   }
