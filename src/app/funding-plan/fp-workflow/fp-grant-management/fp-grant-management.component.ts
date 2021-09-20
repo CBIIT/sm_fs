@@ -109,7 +109,6 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
   }
 
   get editable(): boolean {
-    return this.workflowModel.isUserNextInChain && this.approvingState;
     return (this.workflowModel.isGMApprover && this.approvingState);
   }
 
