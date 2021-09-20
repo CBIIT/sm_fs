@@ -1,5 +1,4 @@
 <ng-template #canSearchModal let-modal>
-  <form #canSearchForm="ngForm" (ngSubmit)="onSubmit(canSearchForm)">
   <div class="modal-header">
     <span class="modal-title" id="modal-title-hold">{{ title }}</span>
     <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
@@ -30,7 +29,6 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-primary">Close</button>
+    <button type="button" class="btn btn-primary" (click)="modal.dismiss('close click')">Close</button>
   </div>
-</form>
 </ng-template>

@@ -6,6 +6,7 @@ import { CanCcxDto, FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
+import { WorkflowModalComponent } from '../../funding-request/workflow-modal/workflow-modal.component';
 
 @Component({
   selector: 'app-fp-budget-information',
@@ -13,7 +14,8 @@ import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-
   styleUrls: ['./fp-budget-information.component.css']
 })
 export class FpBudgetInformationComponent implements OnInit {
-  @ViewChild('canSearchModal') private modalContent: TemplateRef<CanSearchModalComponent>;
+  @ViewChild(CanSearchModalComponent) canSearchModalComponent: CanSearchModalComponent;
+
 
 
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
@@ -53,13 +55,10 @@ export class FpBudgetInformationComponent implements OnInit {
 
   searchForCANs(nciSourceFlag: string): void {
     this.logger.debug('searchForCANs()', nciSourceFlag);
-    const modalRef = this.modalService.open(this.modalContent, {size: 'lg'});
-    this.logger.debug(modalRef.componentInstance);
-    modalRef.result.then(result => {
-      this.logger.debug(result);
-    }).finally(() => {
-      this.logger.debug('close dialog');
-    });
+    // TODO: set up modal with proper data
+    this.canSearchModalComponent.title = `Search for CANs; nciSource=${nciSourceFlag}`;
+    this.canSearchModalComponent.open();
+
   }
 
   deleteSelectedCAN(fundingSourceId: number): void {
