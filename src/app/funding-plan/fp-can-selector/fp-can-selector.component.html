@@ -1,5 +1,5 @@
-<ng-template #canTooltip><span class='institutionName'>{{projectedCan.canPhsOrgCode}}</span><br>
-  <span class='institutionLocation'>{{projectedCan.canDescrip}}</span>
+<ng-template #canTooltip><span class='institutionName'>{{selectedCAN.canPhsOrgCode}}</span><br>
+  <span class='institutionLocation'>{{selectedCAN.canDescrip}}</span>
 </ng-template>
-<span *ngIf="projectedCan?.can && projectedCan?.canDescrip">
-  <a [routerLink]="" [ngbTooltip]="canTooltip" triggers="click:blur">{{projectedCan?.can}}</a> | {{projectedCan?.canDescrip}}</span>
+<span *ngIf="selectedCAN?.can && selectedCAN?.canDescrip">
+  <a [routerLink]="" [ngbTooltip]="canTooltip" triggers="click:blur">{{selectedCAN?.can}}</a> | {{selectedCAN?.canDescrip}}</span>

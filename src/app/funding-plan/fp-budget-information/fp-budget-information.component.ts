@@ -13,6 +13,7 @@ import { CanManagementService } from '../../cans/can-management.service';
 export class FpBudgetInformationComponent implements OnInit {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
+  projectedApplIdCans: Map<number, Map<number, CanCcxDto>> = new Map<number, Map<number, CanCcxDto>>();
 
   constructor(
     public planModel: PlanModel,
@@ -28,8 +29,29 @@ export class FpBudgetInformationComponent implements OnInit {
       this.logger.debug('new projected CAN:', next);
       if (next.fseId) {
         this.projectedCans.set(next.fseId, next.can);
+        if (next.applId) {
+          const tmp = new Map<number, CanCcxDto>();
+          tmp.set(next.applId, next.can);
+          this.projectedApplIdCans.set(next.fseId, tmp);
+        }
       }
     });
   }
 
+  copyProjectedCAN(fundingSourceId: number): void {
+    this.logger.debug('copyProjectedCAN(', fundingSourceId, ')');
+    const can = this.projectedCans.get(Number(fundingSourceId));
+    this.logger.debug('projectedCAN for source', fundingSourceId, '=', can);
+    this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can });
+  }
+
+  searchForCANs(nciSourceFlag: string): void {
+    this.logger.debug('searchForCANs()');
+  }
+
+  deleteSelectedCAN(fundingSourceId: number): void {
+    this.logger.debug('deleteSelectedCAN(', fundingSourceId, ')');
+    this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can: null });
+
+  }
 }

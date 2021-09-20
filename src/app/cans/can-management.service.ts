@@ -16,9 +16,12 @@ import { Select2OptionData } from 'ng-select2';
 })
 export class CanManagementService {
 
+  // Used by OEFIA type component to broadcast a new value
   oefiaTypeEmitter = new Subject<{ index: number; value: number; fseId?: number }>();
-  projectedCanEmitter = new Subject<{ index: number; can: CanCcxDto; fseId?: number }>();
-  selectedCanEmitter = new Subject<{ index: number; can: CanCcxDto; fseId?: number }>();
+  // Used by the projected CAN component to broadcast an updated CAN after new OEFIA type chosen
+  projectedCanEmitter = new Subject<{ index: number; can: CanCcxDto; fseId?: number; applId?: number }>();
+  // Instructs all listeners to update their CAN to the selected value if fseId matches
+  selectCANEmitter = new Subject<{ fseId: number; can: CanCcxDto; applId?: number }>();
 
   nciSourceFlag: string = null;
   // TODO: evaluate for deletion

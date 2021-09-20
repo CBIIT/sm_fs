@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { GrantCostPayload, PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
+import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-projected-can-renderer',
@@ -10,7 +11,9 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class ProjectedCanRendererComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
-  @Input() grantIndex: number;
+  @Input() projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
+  @Input() projectedApplIdCans: Map<number, Map<number, CanCcxDto>> = new Map<number, Map<number, CanCcxDto>>();
+
 
   constructor(
     private planManagementService: PlanManagementService,

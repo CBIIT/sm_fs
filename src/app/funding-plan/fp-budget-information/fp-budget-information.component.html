@@ -26,16 +26,25 @@
 
 <!--          <app-fp-can-selector [nciSourceFlag]="source.nciSourceFlag"></app-fp-can-selector>-->
           <div class="d-flex align-items-center">
-            <button class="btn btn-link btn-slim" *ngIf="true"
-                    ngbTooltip="Copy NCI OEFIA Projected CAN">
+            <button
+              *ngIf="true"
+              (click)="copyProjectedCAN(source.fundingSourceId)"
+              class="btn btn-link btn-slim"
+              ngbTooltip="Copy NCI OEFIA Projected CAN">
               <i class="far fa-copy" aria-hidden="true"></i>
             </button>
-            <button class="btn btn-link btn-slim" *ngIf="true"
-                    ngbTooltip="Search NCI OEFIA Projected CAN">
+            <button
+              *ngIf="true"
+              (click)="searchForCANs(source.nciSourceFlag)"
+              class="btn btn-link btn-slim"
+              ngbTooltip="Search NCI OEFIA Projected CAN">
               <i class="far fa-air-freshener" aria-hidden="true"></i>
             </button>
-            <button class="btn btn-link btn-slim" *ngIf="true"
-                    ngbTooltip="Delete NCI OEFIA Projected CAN">
+            <button
+              *ngIf="true"
+              (click)="deleteSelectedCAN(source.fundingSourceId)"
+              class="btn btn-link btn-slim"
+              ngbTooltip="Delete NCI OEFIA Projected CAN">
               <i class="far fa-trash" aria-hidden="true"></i>
             </button>
           </div>
@@ -77,10 +86,18 @@
           <app-grant-cost-renderer mode="approvedTotal" [grant]="grant"></app-grant-cost-renderer>
         </td>
         <td>
-          <app-projected-can-renderer [grantIndex]="grantIndex" [grant]="grant"></app-projected-can-renderer>
+          <app-projected-can-renderer
+            [projectedCans]="projectedCans"
+            [projectedApplIdCans]="projectedApplIdCans"
+            [grant]="grant">
+          </app-projected-can-renderer>
         </td>
         <td>
-          <app-can-selector-renderer [grant]="grant"></app-can-selector-renderer>
+          <app-can-selector-renderer
+            [projectedCans]="projectedCans"
+            [projectedApplIdCans]="projectedApplIdCans"
+            [grant]="grant">
+          </app-can-selector-renderer>
         </td>
       </tr>
       </tbody>

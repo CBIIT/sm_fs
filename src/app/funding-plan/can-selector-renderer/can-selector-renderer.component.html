@@ -1,4 +1,4 @@
-<span *ngFor="let g of grantCosts; let first = first">
+<span *ngFor="let g of grantCosts; let first = first; let i = index;">
   <hr *ngIf="!first">
   <div>
     <app-fp-can-selector
@@ -9,17 +9,42 @@
     </app-fp-can-selector>
   </div>
  <div class="d-flex align-items-center">
-  <button class="btn btn-link btn-slim" *ngIf="true"
-          ngbTooltip="Copy NCI OEFIA Projected CAN">
+  <button
+    *ngIf="canCopyProjectedCan(g.applId, g.fseId, i)"
+    (click)="copyProjectedCAN(g.applId, g.fseId, i)"
+    class="btn btn-link btn-slim"
+    ngbTooltip="Copy NCI OEFIA Projected CAN">
     <i class="far fa-copy" aria-hidden="true"></i>
   </button>
-  <button class="btn btn-link btn-slim" *ngIf="true"
-          ngbTooltip="Search NCI OEFIA Projected CAN">
+  <button
+    *ngIf="true"
+    (click)="searchCAN(g.applId, g.fseId, i)"
+    class="btn btn-link btn-slim"
+    ngbTooltip="Search NCI OEFIA Projected CAN">
     <i class="far fa-air-freshener" aria-hidden="true"></i>
   </button>
-  <button class="btn btn-link btn-slim" *ngIf="true"
-          ngbTooltip="Delete NCI OEFIA Projected CAN">
+  <button
+    *ngIf="canDeleteCAN(g.applId, g.fseId, i)"
+    (click)="deleteCAN(g.applId, g.fseId, i)"
+    class="btn btn-link btn-slim"
+    ngbTooltip="Delete NCI OEFIA Projected CAN">
     <i class="far fa-trash" aria-hidden="true"></i>
   </button>
+ <span
+   *ngIf="nonDefaultCAN(g.applId, g.fseId, i)"
+   class="btn btn-link btn-slim btn-link-warning"
+   title="Non-Default CAN"
+   ngbTooltip="Non-Default CAN"
+   role="alert">
+   <i class="far fa-exclamation-circle" aria-hidden="true"></i>
+ </span>
+ <span
+   *ngIf="duplicateCAN(g.applId, g.fseId, i)"
+   class="btn btn-link btn-slim btn-link-warning"
+   title="Duplicate CAN"
+   ngbTooltip="Duplicate CAN"
+   role="alert">
+   <i class="far fa-exclamation-triangle" aria-hidden="true"></i>
+ </span>
 </div>
 </span>
