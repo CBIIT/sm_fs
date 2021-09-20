@@ -23,6 +23,7 @@ import {CancerActivityCellRendererComponent} from '../../table-cell-renderers/ca
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 import { ActivatedRoute } from '@angular/router';
 import { RequestModel } from 'src/app/model/request/request-model';
+import {NgForm} from "@angular/forms";
 
 @Component({
   selector: 'app-step1',
@@ -49,6 +50,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
   @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
   @ViewChild('existingRequestsRenderer') existingRequestsRenderer: TemplateRef<ExistingRequestsCellRendererComponent>;
   @ViewChild('fundingRequestActionRenderer') fundingRequestActionRenderer: TemplateRef<FundingRequestActionCellRendererComponent>;
+  @ViewChild('searchForm') searchForm: NgForm;
 
   dataTable: any;
 
@@ -80,12 +82,6 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
 
   ngAfterViewInit(): void {
     // this.initDatatable();
-    this.grantNumberComponent.grantNumberType = this.searchCriteria.grantType;
-    this.grantNumberComponent.grantNumberMech = this.searchCriteria.grantMech;
-    this.grantNumberComponent.grantNumberIC = this.searchCriteria.grantIc;
-    this.grantNumberComponent.grantNumberSerial = this.searchCriteria.grantSerial;
-    this.grantNumberComponent.grantNumberYear = this.searchCriteria.grantYear;
-    this.grantNumberComponent.grantNumberSuffix = this.searchCriteria.grantSuffix;
 
     this.dtOptions = {
       pagingType: 'full_numbers',
@@ -217,8 +213,20 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
       }      // },
     };
 
-    this.search();
-    setTimeout(() => this.dtTrigger.next(), 0);
+    setTimeout(() => {
+      this.searchForm.form.patchValue({
+        grantNumber: {
+          grantNumberType: this.searchCriteria.grantType,
+          grantNumberMech: this.searchCriteria.grantMech,
+          grantNumberIC: this.searchCriteria.grantIc,
+          grantNumberSerial: this.searchCriteria.grantSerial,
+          grantNumberYear: this.searchCriteria.grantYear,
+          grantNumberSuffix: this.searchCriteria.grantSuffix
+        }
+      });
+      this.search();
+      this.dtTrigger.next();
+    }, 0);
 
   }
 
@@ -254,7 +262,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     if (this.searchWithin) {
       return true;
     }
-    if (this.grantNumberComponent && this.grantNumberComponent.grantNumberIC && this.grantNumberComponent.grantNumberSerial) {
+    if (this.searchForm.form.value.grantNumber && this.searchForm.form.value.grantNumber.grantNumberIC && this.searchForm.form.value.grantNumber.grantNumberSerial) {
       return true;
     }
     return false;
@@ -308,12 +316,12 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     this.searchCriteria.piName = this.piName;
 
     this.searchCriteria.rfaPa = this.selectedRfaPa;
-    this.searchCriteria.grantType = this.toString(this.grantNumberComponent.grantNumberType);
-    this.searchCriteria.grantMech = this.toString(this.grantNumberComponent.grantNumberMech);
-    this.searchCriteria.grantIc = this.toString(this.grantNumberComponent.grantNumberIC);
-    this.searchCriteria.grantSerial = this.toString(this.grantNumberComponent.grantNumberSerial);
-    this.searchCriteria.grantYear = this.toString(this.grantNumberComponent.grantNumberYear);
-    this.searchCriteria.grantSuffix = this.toString(this.grantNumberComponent.grantNumberSuffix);
+    this.searchCriteria.grantType = this.searchForm.value.grantNumber.grantNumberType
+    this.searchCriteria.grantMech = this.searchForm.value.grantNumber.grantNumberMech;
+    this.searchCriteria.grantIc = this.searchForm.value.grantNumber.grantNumberIC;
+    this.searchCriteria.grantSerial = this.searchForm.value.grantNumber.grantNumberSerial;
+    this.searchCriteria.grantYear = this.searchForm.value.grantNumber.grantNumberYear;
+    this.searchCriteria.grantSuffix = this.searchForm.value.grantNumber.grantNumberSuffix;
 
     if (this.dtElement.dtInstance) {
       this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
@@ -338,12 +346,16 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     this.selectedCas = [];
     this.i2Status = '';
 
-    this.grantNumberComponent.grantNumberType = '';
-    this.grantNumberComponent.grantNumberMech = '';
-    this.grantNumberComponent.grantNumberIC = '';
-    this.grantNumberComponent.grantNumberSerial = '';
-    this.grantNumberComponent.grantNumberYear = '';
-    this.grantNumberComponent.grantNumberSuffix = '';
+    this.searchForm.form.patchValue({
+      grantNumber: {
+        grantNumberType: '',
+        grantNumberMech: '',
+        grantNumberIC: '',
+        grantNumberSerial: '',
+        grantNumberYear: '',
+        grantNumberSuffix: ''
+      }
+    });
   }
 
   // restore the search criteria when user navigates back to step1 from step2, step3 ...

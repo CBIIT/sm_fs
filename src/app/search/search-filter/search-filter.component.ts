@@ -5,6 +5,7 @@ import { SearchCriteria } from '../search-criteria';
 import { SearchFilterService } from '../search-filter.service';
 import { NGXLogger } from 'ngx-logger';
 import {AppUserSessionService} from "../../service/app-user-session.service";
+import {NgForm} from "@angular/forms";
 
 @Component({
   selector: 'app-search-filter',
@@ -14,6 +15,8 @@ import {AppUserSessionService} from "../../service/app-user-session.service";
 })
 export class SearchFilterComponent implements OnInit {
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
+  @ViewChild('searchForm') searchForm: NgForm;
+
   @Output() callSearch = new EventEmitter<SearchCriteria>();
   @Output() searchType = new EventEmitter<string>()
   public searchFilter: SearchCriteria;
@@ -71,6 +74,6 @@ export class SearchFilterComponent implements OnInit {
   }
 
   search() {
-
+    this.logger.debug(this.searchForm.value);
   }
 }
