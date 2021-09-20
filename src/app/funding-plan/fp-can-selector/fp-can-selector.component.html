@@ -2,13 +2,6 @@
 
 <ng-template #edit>
   <div class="form-group">
-    <!--    <label for="oefia-type">OEFIA Type</label>-->
-    <div class="d-flex">
-      <div class="form-check ml-auto d-flex">
-        <input type="checkbox" [id]="uniqueId" (change)="onCheckboxChange($event, index)">
-        <label [for]="uniqueId">Show All CANs</label>
-      </div>
-    </div>
     <ng-container *ngIf="allCans; then showAll; else showDefault"></ng-container>
     <ng-template #showDefault>
       <ng-select2
