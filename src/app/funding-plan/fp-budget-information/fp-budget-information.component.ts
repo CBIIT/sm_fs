@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { CanCcxDto, FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
 
 @Component({
   selector: 'app-fp-budget-information',
@@ -11,11 +13,15 @@ import { CanManagementService } from '../../cans/can-management.service';
   styleUrls: ['./fp-budget-information.component.css']
 })
 export class FpBudgetInformationComponent implements OnInit {
+  @ViewChild('canSearchModal') private modalContent: TemplateRef<CanSearchModalComponent>;
+
+
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   projectedApplIdCans: Map<number, Map<number, CanCcxDto>> = new Map<number, Map<number, CanCcxDto>>();
 
   constructor(
+    private modalService: NgbModal,
     public planModel: PlanModel,
     private logger: NGXLogger,
     private requestService: FsRequestControllerService,
@@ -46,7 +52,14 @@ export class FpBudgetInformationComponent implements OnInit {
   }
 
   searchForCANs(nciSourceFlag: string): void {
-    this.logger.debug('searchForCANs()');
+    this.logger.debug('searchForCANs()', nciSourceFlag);
+    const modalRef = this.modalService.open(this.modalContent, {size: 'lg'});
+    this.logger.debug(modalRef.componentInstance);
+    modalRef.result.then(result => {
+      this.logger.debug(result);
+    }).finally(() => {
+      this.logger.debug('close dialog');
+    });
   }
 
   deleteSelectedCAN(fundingSourceId: number): void {

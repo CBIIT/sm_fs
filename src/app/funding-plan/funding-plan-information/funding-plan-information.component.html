@@ -1,30 +1,31 @@
 <div class="row">
   <div class="col-12">
     <h2>Funding Plan Information</h2>
-    <div *ngIf="showPlanName"><label>Funding Plan Name: {{ planModel.fundingPlanDto.planName }}</label></div>
     <table class="table table-striped table-bordered">
       <thead>
-        <tr>
-          <th scope="col">FOA</th>
-          <th scope="col">Concept ID</th>
-          <th scope="col">FOA Title</th>
-          <th scope="col">Issue Type</th>
-        </tr>
+      <tr>
+        <th *ngIf="showPlanName" scope="col">Funding Plan Name</th>
+        <th scope="col">FOA</th>
+        <th scope="col">Concept ID</th>
+        <th scope="col">FOA Title</th>
+        <th scope="col">Issue Type</th>
+      </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let rfa of fundingPlanFoas; let i = index;">
-          <td>
-            <a href="{{rfa.nihGuideAddr}}" target="_blank">{{rfa.rfaPaNumber}}</a>
-          </td>
-          <td>
-            <app-concept-award-tracking [cptId]="rfa.cptId"></app-concept-award-tracking>
-          </td>
-          <td>{{ rfa.title }}</td>
-          <td>
-            <app-plan-info-issue-type [readOnly]="readOnly" [index]="i" [parentForm]="parentForm" [rfaDetails]="rfa">
-            </app-plan-info-issue-type>
-          </td>
-        </tr>
+      <tr *ngFor="let rfa of fundingPlanFoas; let i = index; let first = first">
+        <td *ngIf="showPlanName"><ng-container *ngIf="first">{{planModel.fundingPlanDto.planName}}</ng-container></td>
+        <td>
+          <a href="{{rfa.nihGuideAddr}}" target="_blank">{{rfa.rfaPaNumber}}</a>
+        </td>
+        <td>
+          <app-concept-award-tracking [cptId]="rfa.cptId"></app-concept-award-tracking>
+        </td>
+        <td>{{ rfa.title }}</td>
+        <td>
+          <app-plan-info-issue-type [readOnly]="readOnly" [index]="i" [parentForm]="parentForm" [rfaDetails]="rfa">
+          </app-plan-info-issue-type>
+        </td>
+      </tr>
       </tbody>
     </table>
   </div>
@@ -34,7 +35,7 @@
     <div class="form-group">
       <label for="fundable-score-range">Fundable Score Range</label>
       <input name="darwin" type="text" readonly class="form-control-plaintext" id="fundable-score-range"
-        value="{{planModel.minimumScore}} &ndash; {{planModel.maximumScore}}">
+             value="{{planModel.minimumScore}} &ndash; {{planModel.maximumScore}}">
     </div>
   </div>
 
@@ -42,7 +43,7 @@
     <div class="form-group">
       <label for="apps-recieved">Applications Received</label>
       <input name="rasputin" type="text" readonly class="form-control-plaintext" id="apps-recieved"
-        value="{{ totalApplicationsReceived }}">
+             value="{{ totalApplicationsReceived }}">
     </div>
   </div>
 
@@ -50,7 +51,7 @@
     <div class="form-group">
       <label for="apps-proposed">Applications Proposed for Funding</label>
       <input name="arthur" type="text" readonly class="form-control-plaintext" id="apps-proposed"
-        value="{{ totalApplicationsSelected }}">
+             value="{{ totalApplicationsSelected }}">
     </div>
   </div>
 
@@ -58,7 +59,7 @@
     <div class="form-group">
       <label for="apps-skipped">Applications Skipped</label>
       <input name="broccoli" type="text" readonly class="form-control-plaintext" id="apps-skipped"
-        value="{{ totalApplicationsSkipped }}">
+             value="{{ totalApplicationsSkipped }}">
     </div>
   </div>
 
@@ -66,7 +67,7 @@
     <div class="form-group">
       <label for="apps-not-considered">Applications Not Considered for Funding</label>
       <input name="betty" type="text" readonly class="form-control-plaintext" id="apps-not-considered"
-        value="{{ totalApplicationsNotConsidered }}">
+             value="{{ totalApplicationsNotConsidered }}">
     </div>
   </div>
 
@@ -75,7 +76,7 @@
       <div class="form-group">
         <span class="like-label">Requesting PD</span>
         <span class="form-control-plaintext"><a
-            href="mailto:{{planModel.fundingPlanDto.requestorEmailAddress}}">{{planModel.fundingPlanDto.requestorPdFullName}}</a></span>
+          href="mailto:{{planModel.fundingPlanDto.requestorEmailAddress}}">{{planModel.fundingPlanDto.requestorPdFullName}}</a></span>
       </div>
     </div>
 
@@ -105,7 +106,7 @@
         <span class="like-label">Other DOC(s) Contributing Funds</span>
         <p>
           <a *ngFor="let doc of otherDocs; let first = first" [routerLink]=""
-            ngbTooltip="{{doc|codeDescription:'NciDocs'}}" triggers="click:blur" placement="top">
+             ngbTooltip="{{doc|codeDescription:'NciDocs'}}" triggers="click:blur" placement="top">
             <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>
             <ng-template #firstDoc>{{doc}}</ng-template>
             <ng-template #notFirstDoc>, {{doc}}</ng-template>
@@ -118,7 +119,7 @@
       <div class="form-group">
         <span class="like-label">Requesting PD's Cancer Activity</span>
         <p><a [routerLink]="" ngbTooltip="{{planModel.fundingPlanDto.cayCode|codeDescription:'CancerActivities'}}"
-            triggers="click:blur" placement="top">{{planModel.fundingPlanDto.cayCode}}</a></p>
+              triggers="click:blur" placement="top">{{planModel.fundingPlanDto.cayCode}}</a></p>
       </div>
     </div>
   </ng-container>
