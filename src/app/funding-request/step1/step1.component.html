@@ -8,7 +8,7 @@
         <p>Search by <strong>at least one</strong> of the following criteria: <strong>Search Within</strong> or <strong>IC and Serial Number</strong> or <strong>Fiscal year</strong>.</p>
     </div>
 </div>
-<form>
+<form #searchForm="ngForm" [class.submitted]="searchForm.submitted" >
 <div class="row" role="group" aria-labelledby="filters-label">
 
     <div class="col-lg-4">
@@ -16,7 +16,7 @@
     </div>
 
     <div class="col-lg-8">
-        <lib-grantnumber-search-criteria></lib-grantnumber-search-criteria>
+        <lib-grantnumber-search-criteria [form]="searchForm"></lib-grantnumber-search-criteria>
     </div>
 
     <div class="col-lg-3">
