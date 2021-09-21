@@ -13,7 +13,7 @@
       <thead>
       <tr>
         <th scope="col">Funding Source</th>
-        <th scope="col">OEFIA Coding</th>
+        <th [hidden]="!(isFinancialApprover() && isFcNci())" scope="col">OEFIA Coding</th>
         <th scope="col">CAN Action(s)</th>
       </tr>
       </thead>
@@ -21,7 +21,7 @@
       <tr *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources; let i = index">
         <td>{{ source.fundingSourceName }}</td>
         <td>
-          <app-oefia-types [fseId]="source.fundingSourceId" [index]="i" [selectedValue]="source.octId"></app-oefia-types>
+          <app-oefia-types [hidden]="!(isFinancialApprover() && isFcNci())" [fseId]="source.fundingSourceId" [index]="i" [selectedValue]="source.octId"></app-oefia-types>
         </td>
         <td>
 <!--          <app-fp-can-selector [fseId]="source.fundingSourceId" [applId]="-1"></app-fp-can-selector>-->

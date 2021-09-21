@@ -38,6 +38,7 @@ export class FpProjectedCanComponent implements OnInit {
   private updateProjectedCan(oefiaTypeId: number): void {
     this.canManagementService.getProjectedCan(this.fseId, oefiaTypeId, this.frtId, this.applId).subscribe(result => {
       this.projectedCan = result;
+      this.logger.debug('new projected CAN for', this.fseId, this.applId, result);
       this.canManagementService.projectedCanEmitter.next({ index: this.index, can: result, fseId: this.fseId, applId: this.applId });
     });
   }

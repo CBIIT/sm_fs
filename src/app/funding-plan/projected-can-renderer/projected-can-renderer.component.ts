@@ -12,8 +12,7 @@ import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
 export class ProjectedCanRendererComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
   @Input() projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
-  @Input() projectedApplIdCans: Map<number, Map<number, CanCcxDto>> = new Map<number, Map<number, CanCcxDto>>();
-
+  @Input() projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
 
   constructor(
     private planManagementService: PlanManagementService,

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FundingPlanDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto, FundingPlanDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
 import { NciPfrGrantQueryDtoEx } from './nci-pfr-grant-query-dto-ex';
 import { RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate';
@@ -21,7 +21,8 @@ export class PlanModel {
   maximumScore: number;
 
   fundingPlanDto: FundingPlanDto = {};
-  grantAward
+  selectedApplIdCans: Map<number, Map<number, CanCcxDto>> = new Map<number, Map<number, CanCcxDto>>();
+
 
   documentSnapshot: ModelSnapshot;
 
@@ -131,6 +132,16 @@ export class PlanModel {
     return this.fundingPlanDto?.fundingPlanFoas[0]?.activityCodeList || '';
   }
 
+
+  saveSelectedCAN(fseId: number, applId: number, can): void {
+    if(!this.selectedApplIdCans) {
+      this.selectedApplIdCans = new Map<number, Map<number, CanCcxDto>>();
+    }
+
+    const tmp = this.selectedApplIdCans.get(fseId) || new Map<number, CanCcxDto>();
+    tmp.set(applId, can);
+    this.selectedApplIdCans.set(fseId, tmp);
+  }
 }
 
 class ModelSnapshot {

@@ -327,6 +327,10 @@ export class PlanStep6Component implements OnInit {
   isDirty(): boolean {
     return (this.workflowComponent?.isDirty());
   }
+
+  showBudgetInformation(): boolean {
+    return this.workflowModel.isFinancialApprover || this.workflowModel.approvedByFC;
+  }
 }
 
 export class FundingPlanDocChecker {

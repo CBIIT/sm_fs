@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
@@ -6,38 +6,39 @@ import { CanCcxDto, FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
+import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 
 @Component({
   selector: 'app-fp-budget-information',
   templateUrl: './fp-budget-information.component.html',
   styleUrls: ['./fp-budget-information.component.css']
 })
-export class FpBudgetInformationComponent implements OnInit {
+export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   @ViewChild(CanSearchModalComponent) canSearchModalComponent: CanSearchModalComponent;
-
 
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
-  projectedApplIdCans: Map<number, Map<number, CanCcxDto>> = new Map<number, Map<number, CanCcxDto>>();
+  projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
 
   constructor(
     private modalService: NgbModal,
     public planModel: PlanModel,
     private logger: NGXLogger,
     private requestService: FsRequestControllerService,
-    private canManagementService: CanManagementService) {
+    private canManagementService: CanManagementService,
+    private workflowModel: WorkflowModel) {
   }
 
   ngOnInit(): void {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
 
     this.canManagementService.projectedCanEmitter.subscribe(next => {
+      this.logger.debug('projected CAN:', next);
       if (next.fseId) {
         this.projectedCans.set(next.fseId, next.can);
         if (next.applId) {
-          const tmp = new Map<number, CanCcxDto>();
-          tmp.set(next.applId, next.can);
-          this.projectedApplIdCans.set(next.fseId, tmp);
+          const key = String(next.fseId) + '-' + String(next.applId);
+          this.projectedApplIdCans.set(key, next.can);
         }
       }
     });
@@ -68,6 +69,14 @@ export class FpBudgetInformationComponent implements OnInit {
 
   }
 
+  isFcNci(): boolean {
+    return this.workflowModel.isFcNci;
+  }
+
+  isFinancialApprover(): boolean {
+    return this.workflowModel.isFinancialApprover;
+  }
+
   deleteSelectedCAN(fundingSourceId: number): void {
     this.logger.debug('deleteSelectedCAN(', fundingSourceId, ')');
     this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can: null });
@@ -75,6 +84,37 @@ export class FpBudgetInformationComponent implements OnInit {
   }
 
   canCopyProjectedCan(fundingSourceId: number): boolean {
+    if (!this.projectedCans.get(fundingSourceId)?.can) {
+      return false;
+    }
     return true;
+  }
+
+  buildUpdatedCANDataModel(): void {
+    let c: CanCcxDto;
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
+      req.financialInfoDto.fundingRequestCans.forEach(can => {
+        c = this.planModel.selectedApplIdCans.get(can.fseId)?.get(req.applId);
+        if (c) {
+          can.can = c.can;
+          can.canDescription = c.canDescrip;
+          can.phsOrgCode = c.canPhsOrgCode;
+        }
+      });
+    });
+
+  }
+
+  ngAfterViewInit(): void {
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
+      req.financialInfoDto.fundingRequestCans.forEach(can => {
+        if (can.can) {
+          this.canManagementService.getCanDetails(can.can).subscribe(result => {
+            this.canManagementService.selectCANEmitter.next({ fseId: can.fseId, can: result, applId: req.applId });
+          });
+        }
+      });
+    });
+
   }
 }

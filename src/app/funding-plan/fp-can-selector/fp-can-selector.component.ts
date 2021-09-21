@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { NGXLogger } from 'ngx-logger';
+import { PlanModel } from '../../model/plan/plan-model';
 
 @Component({
   selector: 'app-fp-can-selector',
@@ -16,6 +17,7 @@ export class FpCanSelectorComponent implements OnInit {
   selectedCAN: CanCcxDto;
 
   constructor(private canManagementService: CanManagementService,
+              private planModel: PlanModel,
               private logger: NGXLogger) {
   }
 
@@ -23,6 +25,7 @@ export class FpCanSelectorComponent implements OnInit {
     this.canManagementService.selectCANEmitter.subscribe(next => {
       if ((!next.applId || (Number(this.applId) === Number(next.applId))) && Number(next.fseId) === Number(this.fseId)) {
         this.selectedCAN = next.can;
+        this.planModel.saveSelectedCAN(this.fseId, this.applId, next.can);
       }
     });
   }
