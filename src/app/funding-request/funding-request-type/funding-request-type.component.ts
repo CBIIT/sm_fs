@@ -60,10 +60,12 @@ export class FundingRequestTypeComponent implements OnInit {
       }
       if (INITIAL_PAY_TYPES.includes(Number(value))) {
         this.fsRequestControllerService.checkIsFundedByFundingPlanUsingGET(this.model.grant.applId).subscribe(result => {
-          if (!!result && result !== 0) {
+          if (!!result) {
             const fundedAlert: Alert = {
               type: 'warning',
-              message: 'WARNING: This grant application is selected for funding in funding plan #' + result
+              message: 'WARNING: This Grant Application is part of Funding Plan <a href="/#/plan/retrieve/' + result.fprId +
+                       '">' + result.fprId + '</a> in FY ' + result.planFy + '. If you continue creating this PFR, ' +
+                       'you will be allowed to complete the approval process either on this request or the plan.'
             };
             if (otherPay) {
               this.alerts = [this.otherPayAlert, fundedAlert];
