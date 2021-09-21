@@ -73,7 +73,9 @@ export class FpFundingSourceComponent implements OnInit {
       const src = this.planCoordinatorService.listSelectedSources[this.index];
 
       this.logger.debug('initial source', this.index, src);
-      this.selectedValue = Number(src.fundingSourceId);
+      if (src) {
+        this.selectedValue = Number(src.fundingSourceId);
+      }
     }
   }
 

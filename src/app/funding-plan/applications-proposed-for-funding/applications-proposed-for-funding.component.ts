@@ -179,9 +179,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   onAddFundingSource(): void {
     this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
-    this.logger.debug('source: ', this.fundingSources.get(0));
-    this.logger.debug('grant info:', this.grantList.get(0));
-    this.logger.debug('prc:', this.prcList.get(0));
+    // this.logger.debug('source: ', this.fundingSources.get(0));
+    // this.logger.debug('grant info:', this.grantList.get(0));
+    // this.logger.debug('prc:', this.prcList.get(0));
     this.grantList.forEach(item => {
       this.planCoordinatorService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent.selectedValue);
     });

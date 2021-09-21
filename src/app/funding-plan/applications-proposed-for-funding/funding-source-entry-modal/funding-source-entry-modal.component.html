@@ -1,0 +1,85 @@
+<ng-template #fsEntryModal let-modal>
+  <form #modalForm="ngForm" (ngSubmit)="onModalSubmit()">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title-hold">{{ title }}</span>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- START Modal Body -->
+
+      <table class="table table-bordered table-striped app-funding-table">
+        <thead>
+        <tr>
+          <th scope="col">Grant Information</th>
+          <th scope="col">
+            <label for="modalFundingSource">
+              Funding Source
+              <a href="#" (click)="openFsDetails()"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
+            </label>
+            <app-fp-funding-source
+              id="modalFundingSource"
+              name="modalFundingSource"
+              #modalFpFundingSource
+              [parentForm]="modalForm"
+              [index]="-1">
+            </app-fp-funding-source>
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let grant of listGrantsSelected; let i = index;">
+          <td>
+            <app-fp-grant-information
+              name="modalGrantInformation"
+              [parentForm]="modalForm"
+              #modalFpGrantInformation
+              [isModal]="true"
+              [sourceIndex]="-1"
+              [grantIndex]="i"
+              [grant]="grant">
+            </app-fp-grant-information>
+          </td>
+          <td>
+            <app-fp-program-recommended-costs
+              name="modalRecommendedCosts"
+              [parentForm]="modalForm"
+              #modalFpRecommendedCosts
+              [sourceIndex]="-1"
+              [grantIndex]="i">
+            </app-fp-program-recommended-costs>
+          </td>
+
+        </tr>
+
+        </tbody>
+
+        <tfoot>
+        <tr>
+          <td scope="row"><strong>Total Recommended Costs</strong></td>
+          <td>
+            <div class="form-row">
+              <div class="col-lg-6">
+                <span class="like-label">Direct Cost</span>
+                <span>{{ sumDirectCost() | currency }}</span>
+              </div>
+              <div class="col-lg-6">
+                <span class="like-label">Total Cost</span>
+                <span>{{ sumTotalCost() | currency }}</span>
+              </div>
+            </div>
+          </td>
+        </tr>
+        </tfoot>
+
+      </table>
+
+      <!-- END Modal Body-->
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary mr-auto" (click)="modal.close('cancel')">Cancel</button>
+      <button type="submit" class="btn btn-primary" data-dismiss="modal">Add Funding Source</button>
+    </div>
+  </form>
+</ng-template>
