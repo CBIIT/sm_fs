@@ -10,7 +10,7 @@
     [data]="data"
     [options]="options"
     [ngClass]="{'is-invalid': (!fundingRequestType.valid && (fundingRequestType.touched || parentForm.submitted) || parentForm.errors?.mustSelectDiversitySupplement ) }"
-    required
+    [required]="required"
     appActiveInitialPayValidator
     [ngModelOptions]="{updateOn: 'change'}">
   </ng-select2>

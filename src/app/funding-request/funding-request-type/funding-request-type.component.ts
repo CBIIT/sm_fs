@@ -22,6 +22,7 @@ import { Options } from 'select2';
 })
 export class FundingRequestTypeComponent implements OnInit {
   @Input() filter: boolean;
+  @Input() required: boolean;
   @Input() parentForm: NgForm;
   alerts: Alert[] = [];
   public requestTypes: FundingRequestTypeRulesDto[] = [];

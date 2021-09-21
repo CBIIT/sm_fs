@@ -1,0 +1,31 @@
+<div role="group" class="form-group" aria-labelledby="fy-range-label" ngModelGroup="fyRange">
+  <span class="like-label" id="fy-range-label">FY Range</span>
+  <div class="input-group" role="group" aria-labelledby="fy-range-label">
+    <label for="fromFy" class="sr-only">Fiscal Year Start Date</label> <!-- Screen Reader Only -->
+    <ng-select2
+      id="fromFy"
+      name="fromFy"
+      ngModel
+      [allowClear]="true"
+      [ngClass]="{inputerror:form.controls.fyRange?.errors?.isFyRangeError}"
+      (ngModelChange)="onYearSelect($event)">
+      <option></option>
+      <option *ngFor="let year of years" [value]="year" > {{year}}</option>
+    </ng-select2>
+    <span class="input-group-text">to</span>
+    <label for="toFy" class="sr-only">Fiscal Year End Date</label> <!-- Screen Reader Only -->
+    <ng-select2
+      id="toFy"
+      name="toFy"
+      ngModel
+      [allowClear]="true"
+      [ngClass]="{inputerror:form.controls.fyRange?.errors?.isFyRangeError}"
+      (ngModelChange)="onYearSelect($event)">
+      <option value=""></option>
+      <option *ngFor="let year of years" [value]="year" > {{year}}</option>
+    </ng-select2>
+  </div>
+</div>
+<div class="fyrange-error">
+  <div *ngIf="form.controls.fyRange?.errors?.isFyRangeError">From Year cannot be greater then To Year.</div>
+</div>
