@@ -1,0 +1,33 @@
+.fyrange-error {
+  display:block;
+  margin-top:-.75rem;
+  margin-bottom:.5rem;
+}
+.fyrange-error div {
+  color:#a60a3d;
+  display:block;
+  margin-bottom:.25rem;
+}
+/*.inputerror{*/
+/*  border-color: #a60a3d !important;*/
+/*  box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.25);*/
+/*}*/
+
+/*ng-select2.inputerror ::ng-deep > span.select2-container > span.selection > span.select2-selection.select2-selection--single {*/
+/*  border-color: #a60a3d !important;*/
+/*  box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.25) !important;*/
+/*}*/
+
+/* line 160, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+/*ng-select2.inputerror select ~ span.select2-container.select2-container--focus .select2-selection, select:invalid ~ span.select2-container.select2-container--focus .select2-selection {*/
+/*  box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.25);*/
+/*}*/
+
+ng-select2.inputerror ::ng-deep select ~ span.select2-container .selection .select2-selection, select:invalid ~ span.select2-container .selection .select2-selection {
+  border-color: #a60a3d;
+}
+
+/* line 160, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
+ng-select2.inputerror ::ng-deep select ~ span.select2-container.select2-container--focus .select2-selection {
+  box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.25);
+}

@@ -74,6 +74,7 @@ export class SearchFilterComponent implements OnInit {
   }
 
   search() {
-    this.logger.debug(this.searchForm.value);
+    this.logger.debug("check the form on search", this.searchForm.valid);
+    this.logger.debug(this.searchForm);
   }
 }
