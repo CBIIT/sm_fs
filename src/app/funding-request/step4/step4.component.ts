@@ -47,8 +47,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   //   = { status: '' };
   requestStatus: string;
   docDtos: DocumentsDto[];
-  excludedDocDtos: DocumentsDto[];
-  readonly = false;
+   readonly = false;
   activeApprover: FundingReqApproversDto;
 
   userCanSubmit = false;
@@ -117,8 +116,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
       }
     );
     this.docDtos = this.requestModel.requestDto.includedDocs;
-    this.excludedDocDtos = this.requestModel.requestDto.excludedDocs;
-    this.workflowModel.initialize();
+        this.workflowModel.initialize();
     this.checkUserRolesCas();
     this.checkDocs();
     // this.isDisplayBudgetDocsUpload();

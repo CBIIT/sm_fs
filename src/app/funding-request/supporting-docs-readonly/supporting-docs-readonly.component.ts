@@ -30,11 +30,9 @@ export class SupportingDocsReadonlyComponent implements OnInit {
   justificationType = '';
   justificationText = '';
   docDtos: DocumentsDto[];
-  excludedDocDtos: DocumentsDto[];
-  displayTansitionMemo: boolean = false;
+    displayTansitionMemo: boolean = false;
   isSummaryIncluded = false;
-  isDisplayExcludedContent = false;
-
+  
   constructor(private documentService: DocumentService,
     private logger: NGXLogger,
     private modalService: NgbModal,
@@ -46,25 +44,10 @@ export class SupportingDocsReadonlyComponent implements OnInit {
     this.justificationType = this.parent.justificationType;
     this.justificationText = this.parent.justificationText;
     this.docDtos = this.parent.docDtos;
-    this.excludedDocDtos = this.parent.excludedDocDtos;
-
-    if (this.docDtos !== null) {
-      for (const doc of this.docDtos) {
-        if (doc.docType === 'Summary Statement') {
-          this.isSummaryIncluded = true;
-          break;
-        }
-      }
-    }
 
     if (this.requestModel.requestDto.requestType === 'Pay Type 4' ||
       (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== null)) {
       this.displayTansitionMemo = true;
-    }
-
-    if (!this.isSummaryIncluded ||
-      this.excludedDocDtos.length > 0) {
-      this.isDisplayExcludedContent = true;
     }
 
   }
