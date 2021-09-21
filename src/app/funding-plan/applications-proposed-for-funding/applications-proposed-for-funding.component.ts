@@ -11,6 +11,7 @@ import { FpGrantInformationComponent } from '../fp-grant-information/fp-grant-in
 import { FpFundingSourceComponent } from '../fp-funding-source/fp-funding-source.component';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingSourceEntryModalComponent } from './funding-source-entry-modal/funding-source-entry-modal.component';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -20,14 +21,14 @@ import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib';
 })
 export class ApplicationsProposedForFundingComponent implements OnInit {
 
+  @ViewChild(FundingSourceEntryModalComponent) fundingSourceEntryModalComponent: FundingSourceEntryModalComponent;
+
   @Input() parentForm: NgForm;
   @Input() readOnly = false;
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
   @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
   @ViewChildren(FpFundingSourceComponent) fundingSources: QueryList<FpFundingSourceComponent>;
-  @ViewChild('modalFpFundingSource') modalFpFundingSource: FpFundingSourceComponent;
-  @ViewChild('modalFpGrantInformation') modalFpGrantInformation: FpGrantInformationComponent;
-  @ViewChild('modalFpRecommendedCosts') modalFpRecommendedCosts: FpProgramRecommendedCostsComponent;
+
 
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
@@ -176,13 +177,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     return null;
   }
 
-
-
-  onModalSubmit($event: any): void {
-    this.logger.debug('submit: ', $event, this.parentForm);
-    this.logger.debug(this.modalFpFundingSource, this.modalFpRecommendedCosts);
-  }
-
   onAddFundingSource(): void {
     this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
     this.logger.debug('source: ', this.fundingSources.get(0));
@@ -191,10 +185,15 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     this.grantList.forEach(item => {
       this.planCoordinatorService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent.selectedValue);
     });
-    this.modalFpFundingSource.index = this.getNextSourceIndex;
-    this.modalFpFundingSource.filterData();
-    this.modalFpRecommendedCosts.sourceIndex = this.getNextSourceIndex;
-    this.modalFpGrantInformation.sourceIndex = this.getNextSourceIndex;
+
+    this.fundingSourceEntryModalComponent.open().then((result) => {
+      this.logger.debug('Got result', result);
+      if (result) {
+      }
+    }).catch((reason) => {
+      this.logger.warn(reason);
+    });
+
   }
 
   canAddFundingSource(): boolean {
