@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
@@ -6,6 +6,7 @@ import { CanCcxDto, FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
+import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 
 @Component({
   selector: 'app-fp-budget-information',
@@ -14,7 +15,6 @@ import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-
 })
 export class FpBudgetInformationComponent implements OnInit {
   @ViewChild(CanSearchModalComponent) canSearchModalComponent: CanSearchModalComponent;
-
 
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
@@ -25,7 +25,8 @@ export class FpBudgetInformationComponent implements OnInit {
     public planModel: PlanModel,
     private logger: NGXLogger,
     private requestService: FsRequestControllerService,
-    private canManagementService: CanManagementService) {
+    private canManagementService: CanManagementService,
+    private workflowModel: WorkflowModel) {
   }
 
   ngOnInit(): void {
@@ -68,6 +69,14 @@ export class FpBudgetInformationComponent implements OnInit {
 
   }
 
+  isFcNci(): boolean {
+    return this.workflowModel.isFcNci;
+  }
+
+  isFinancialApprover(): boolean {
+    return this.workflowModel.isFinancialApprover;
+  }
+
   deleteSelectedCAN(fundingSourceId: number): void {
     this.logger.debug('deleteSelectedCAN(', fundingSourceId, ')');
     this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can: null });
@@ -79,5 +88,20 @@ export class FpBudgetInformationComponent implements OnInit {
       return false;
     }
     return true;
+  }
+
+  buildUpdatedCANDataModel(): void {
+    let c: CanCcxDto;
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
+      req.financialInfoDto.fundingRequestCans.forEach(can => {
+        c = this.planModel.selectedApplIdCans.get(can.fseId)?.get(req.applId);
+        if (c) {
+          can.can = c.can;
+          can.canDescription = c.canDescrip;
+          can.phsOrgCode = c.canPhsOrgCode;
+        }
+      });
+    });
+
   }
 }

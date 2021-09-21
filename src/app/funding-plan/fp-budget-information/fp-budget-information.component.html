@@ -13,7 +13,7 @@
       <thead>
       <tr>
         <th scope="col">Funding Source</th>
-        <th scope="col">OEFIA Coding</th>
+        <th [hidden]="!(isFinancialApprover() && isFcNci())" scope="col">OEFIA Coding</th>
         <th scope="col">CAN Action(s)</th>
       </tr>
       </thead>
