@@ -4,10 +4,8 @@
   <hr *ngIf="!first">
   <div>
     <app-fp-can-selector
-      [bmmCodes]="g.bmmCodes"
-      [activityCodes]="g.activityCodes"
       [applId]="g.applId"
-      [nciSourceFlag]="g.nciSourceFlag">
+      [fseId]="g.fseId">
     </app-fp-can-selector>
   </div>
  <div class="d-flex align-items-center">
@@ -19,8 +17,7 @@
     <i class="far fa-copy" aria-hidden="true"></i>
   </button>
   <button
-    *ngIf="true"
-    (click)="searchCAN(g.applId, g.fseId, i)"
+    (click)="searchCAN(g.applId, g.fseId, g.nciSourceFlag)"
     class="btn btn-link btn-slim"
     ngbTooltip="Search NCI OEFIA Projected CAN">
     <i class="far fa-search" aria-hidden="true"></i>

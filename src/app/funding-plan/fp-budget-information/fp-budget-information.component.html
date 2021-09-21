@@ -24,10 +24,10 @@
           <app-oefia-types [fseId]="source.fundingSourceId" [index]="i" [selectedValue]="source.octId"></app-oefia-types>
         </td>
         <td>
-          <app-fp-can-selector [fseId]="source.fundingSourceId" [applId]="-1"></app-fp-can-selector>
+<!--          <app-fp-can-selector [fseId]="source.fundingSourceId" [applId]="-1"></app-fp-can-selector>-->
           <div class="d-flex align-items-center">
             <button
-              *ngIf="true"
+              *ngIf="canCopyProjectedCan(source.fundingSourceId)"
               (click)="copyProjectedCAN(source.fundingSourceId)"
               class="btn btn-link btn-slim"
               ngbTooltip="Copy NCI OEFIA Projected CAN">

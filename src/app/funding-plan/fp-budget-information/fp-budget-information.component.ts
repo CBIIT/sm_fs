@@ -51,7 +51,6 @@ export class FpBudgetInformationComponent implements OnInit {
   }
 
   searchForCANs(fseId: number, nciSourceFlag: string): void {
-    this.logger.debug('searchForCANs()', nciSourceFlag);
     // TODO: set up modal with proper data
     this.canSearchModalComponent.title = `Search for CANs`;
     this.canSearchModalComponent.nciSourceFlag = nciSourceFlag;
@@ -60,8 +59,8 @@ export class FpBudgetInformationComponent implements OnInit {
     this.canSearchModalComponent.prepare();
     this.canSearchModalComponent.open().then((result) => {
       this.logger.debug('Got CAN', result);
-      if(result) {
-        this.canManagementService.selectCANEmitter.next({fseId, can: result, applId: -1});
+      if (result) {
+        this.canManagementService.selectCANEmitter.next({ fseId, can: result });
       }
     }).catch((reason) => {
       this.logger.warn(reason);
@@ -73,5 +72,9 @@ export class FpBudgetInformationComponent implements OnInit {
     this.logger.debug('deleteSelectedCAN(', fundingSourceId, ')');
     this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can: null });
 
+  }
+
+  canCopyProjectedCan(fundingSourceId: number): boolean {
+    return true;
   }
 }

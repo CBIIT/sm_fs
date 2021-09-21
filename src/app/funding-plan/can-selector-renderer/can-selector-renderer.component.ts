@@ -5,6 +5,7 @@ import { NGXLogger } from 'ngx-logger';
 import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
+import { PlanModel } from '../../model/plan/plan-model';
 
 @Component({
   selector: 'app-can-selector-renderer',
@@ -21,6 +22,7 @@ export class CanSelectorRendererComponent implements OnInit {
   constructor(
     private planManagementService: PlanManagementService,
     private canManagementService: CanManagementService,
+    private planModel: PlanModel,
     private logger: NGXLogger) {
   }
 
@@ -47,8 +49,20 @@ export class CanSelectorRendererComponent implements OnInit {
 
   }
 
-  searchCAN(applId: number, fseId: number, index: number): void {
-
+  searchCAN(applId: number, fseId: number, nciSourceFlag: string): void {
+    this.canSearchModalComponent.title = `Search for CANs`;
+    this.canSearchModalComponent.nciSourceFlag = nciSourceFlag;
+    this.canSearchModalComponent.bmmCodes = this.planModel.bmmCodeList;
+    this.canSearchModalComponent.activityCodes = this.planModel.activityCodeList;
+    this.canSearchModalComponent.prepare();
+    this.canSearchModalComponent.open().then((result) => {
+      this.logger.debug('Got CAN', result);
+      if (result) {
+        this.canManagementService.selectCANEmitter.next({ fseId, can: result, applId });
+      }
+    }).catch((reason) => {
+      this.logger.warn(reason);
+    });
   }
 
   deleteCAN(applId: number, fseId: number, index: number): void {
