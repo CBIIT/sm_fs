@@ -75,6 +75,9 @@ export class FpBudgetInformationComponent implements OnInit {
   }
 
   canCopyProjectedCan(fundingSourceId: number): boolean {
+    if (!this.projectedCans.get(fundingSourceId)?.can) {
+      return false;
+    }
     return true;
   }
 }
