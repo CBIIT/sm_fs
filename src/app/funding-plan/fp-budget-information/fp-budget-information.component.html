@@ -21,7 +21,7 @@
       <tr *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources; let i = index">
         <td>{{ source.fundingSourceName }}</td>
         <td>
-          <app-oefia-types [fseId]="source.fundingSourceId" [index]="i" [selectedValue]="source.octId"></app-oefia-types>
+          <app-oefia-types [hidden]="!(isFinancialApprover() && isFcNci())" [fseId]="source.fundingSourceId" [index]="i" [selectedValue]="source.octId"></app-oefia-types>
         </td>
         <td>
 <!--          <app-fp-can-selector [fseId]="source.fundingSourceId" [applId]="-1"></app-fp-can-selector>-->

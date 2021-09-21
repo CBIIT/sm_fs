@@ -17,7 +17,7 @@ export class CanSelectorRendererComponent implements OnInit {
 
   @Input() grant: NciPfrGrantQueryDtoEx;
   @Input() projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
-  @Input() projectedApplIdCans: Map<number, Map<number, CanCcxDto>> = new Map<number, Map<number, CanCcxDto>>();
+  @Input() projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
 
   constructor(
     private planManagementService: PlanManagementService,
@@ -42,7 +42,10 @@ export class CanSelectorRendererComponent implements OnInit {
   }
 
   copyProjectedCAN(applId: number, fseId: number, index: number): void {
-    const can = this.projectedApplIdCans?.get(fseId)?.get(applId);
+    const key = String(fseId) + '-' + String(applId);
+
+    const can = this.projectedApplIdCans?.get(key);
+    this.logger.debug('copy projected can', applId, fseId, can);
     if (can) {
       this.canManagementService.selectCANEmitter.next({ fseId, can, applId });
     }
@@ -70,6 +73,12 @@ export class CanSelectorRendererComponent implements OnInit {
   }
 
   canCopyProjectedCan(applId: number, fseId: number, index: number): boolean {
+    const key = String(fseId) + '-' + String(applId);
+
+    if (!this.projectedApplIdCans?.get(key)?.can) {
+      return false;
+      this.logger.debug('bad data =>', applId, fseId);
+    }
     return true;
   }
 
