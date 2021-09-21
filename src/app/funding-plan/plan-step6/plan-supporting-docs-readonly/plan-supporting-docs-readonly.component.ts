@@ -100,7 +100,7 @@ export class PlanSupportingDocsReadonlyComponent implements OnInit {
   }
 
   downloadCoverSheet() {
-    this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
+    this.documentService.downloadFPCoverSheet(this.planModel.fundingPlanDto.fprId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
           const blob = new Blob([response.body], { type: response.headers.get('content-type') });
