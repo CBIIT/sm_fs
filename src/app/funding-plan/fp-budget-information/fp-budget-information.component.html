@@ -24,6 +24,7 @@
           <app-oefia-types [fseId]="source.fundingSourceId" [index]="i" [selectedValue]="source.octId"></app-oefia-types>
         </td>
         <td>
+          <app-fp-can-selector [fseId]="source.fundingSourceId" [applId]="-1"></app-fp-can-selector>
           <div class="d-flex align-items-center">
             <button
               *ngIf="true"
@@ -34,10 +35,10 @@
             </button>
             <button
               *ngIf="true"
-              (click)="searchForCANs(source.nciSourceFlag)"
+              (click)="searchForCANs(source.fundingSourceId, source.nciSourceFlag)"
               class="btn btn-link btn-slim"
               ngbTooltip="Search NCI OEFIA Projected CAN">
-              <i class="far fa-air-freshener" aria-hidden="true"></i>
+              <i class="far fa-search" aria-hidden="true"></i>
             </button>
             <button
               *ngIf="true"

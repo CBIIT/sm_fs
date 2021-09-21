@@ -1,3 +1,5 @@
+<app-can-search-modal></app-can-search-modal>
+
 <span *ngFor="let g of grantCosts; let first = first; let i = index;">
   <hr *ngIf="!first">
   <div>
@@ -21,7 +23,7 @@
     (click)="searchCAN(g.applId, g.fseId, i)"
     class="btn btn-link btn-slim"
     ngbTooltip="Search NCI OEFIA Projected CAN">
-    <i class="far fa-air-freshener" aria-hidden="true"></i>
+    <i class="far fa-search" aria-hidden="true"></i>
   </button>
   <button
     *ngIf="canDeleteCAN(g.applId, g.fseId, i)"

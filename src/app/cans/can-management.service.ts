@@ -124,8 +124,12 @@ export class CanManagementService {
   }
 
 
-  getPlanDefaultCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
+  searchDefaultCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
     return this.canService.getDefaultCansUsingGET(activityCodes, bmmCodes, can, nciSource);
+  }
+
+  searchAllCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
+    return this.canService.getAllCansUsingGET(activityCodes, bmmCodes, can, nciSource);
   }
 
   refreshGrantCans(): boolean {

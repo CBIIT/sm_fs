@@ -10,11 +10,8 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class FpCanSelectorComponent implements OnInit {
   @Input() applId: number;
-  @Input() bmmCodes: string;
-  @Input() activityCodes: string;
   @Input() fseId: number;
   @Input() index = 0;
-  @Input() nciSourceFlag = '';
   @Input() readonly = false;
   selectedCAN: CanCcxDto;
 

@@ -7,9 +7,20 @@
   </div>
   <div class="modal-body">
     <div class="form-group">
-      <input type="text" [(ngModel)]="searchTerm">
-      <button type="button" class="btn btn-primary" (click)="search()">Search</button>
-      <button type="button" class="btn btn-primary" (click)="reset()">Reset</button>
+      <div class="d-flex">
+        <label for="search_term">CAN #</label>
+        <input id="search_term" type="text" [(ngModel)]="canSearchTerm">
+      </div>
+      <div class="d-flex">
+        <button type="button" class="btn btn-primary" (click)="search()">Search</button>
+        <button type="button" class="btn btn-secondary" (click)="reset()">Reset</button>
+      </div>
+      <div class="d-flex">
+        <div class="form-check ml-auto d-flex">
+          <input id="show_all_checkbox" type="checkbox" [(ngModel)]="showAll">
+          <label for="show_all_checkbox">Show All</label>
+        </div>
+      </div>
       <table class="table table-striped table-bordered budget-info-table">
         <thead>
         <tr>
@@ -20,7 +31,7 @@
         </thead>
         <tbody>
         <tr *ngFor="let c of canData">
-          <td>{{c.can}}</td>
+          <td><a href="#" (click)="select($event, c)">{{c.can}}</a></td>
           <td>{{c.canPhsOrgCode}}</td>
           <td>{{c.canDescrip}}</td>
         </tr>

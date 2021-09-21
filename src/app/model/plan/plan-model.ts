@@ -119,7 +119,12 @@ export class PlanModel {
   }
 
   get bmmCodeList(): string {
-    return this.allGrants?.filter(g => g.selected).map(g => g.bmmCode).join(',');
+    const tmp = new Set(this.allGrants?.filter(g => g.selected).map(g => g.bmmCode));
+    const arr: string[] = [];
+    tmp.forEach(t => {
+      arr.push(t);
+    });
+    return arr.join(',');
   }
 
   get activityCodeList(): string {

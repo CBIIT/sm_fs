@@ -39,7 +39,6 @@ export class OefiaTypesComponent implements OnInit {
       this.selectedOefiaType = null;
     }
     this.selectedValueChange.emit(value);
-    this.logger.debug('selectedValueChange:', this.index, value, this.fseId);
     this.canService.oefiaTypeEmitter.next({ index: this.index, value, fseId: this.fseId });
   }
 

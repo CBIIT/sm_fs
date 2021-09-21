@@ -6,7 +6,6 @@ import { CanCcxDto, FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
-import { WorkflowModalComponent } from '../../funding-request/workflow-modal/workflow-modal.component';
 
 @Component({
   selector: 'app-fp-budget-information',
@@ -15,7 +14,6 @@ import { WorkflowModalComponent } from '../../funding-request/workflow-modal/wor
 })
 export class FpBudgetInformationComponent implements OnInit {
   @ViewChild(CanSearchModalComponent) canSearchModalComponent: CanSearchModalComponent;
-
 
 
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
@@ -34,7 +32,6 @@ export class FpBudgetInformationComponent implements OnInit {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
 
     this.canManagementService.projectedCanEmitter.subscribe(next => {
-      this.logger.debug('new projected CAN:', next);
       if (next.fseId) {
         this.projectedCans.set(next.fseId, next.can);
         if (next.applId) {
@@ -53,11 +50,22 @@ export class FpBudgetInformationComponent implements OnInit {
     this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can });
   }
 
-  searchForCANs(nciSourceFlag: string): void {
+  searchForCANs(fseId: number, nciSourceFlag: string): void {
     this.logger.debug('searchForCANs()', nciSourceFlag);
     // TODO: set up modal with proper data
     this.canSearchModalComponent.title = `Search for CANs`;
-    this.canSearchModalComponent.open();
+    this.canSearchModalComponent.nciSourceFlag = nciSourceFlag;
+    this.canSearchModalComponent.bmmCodes = this.planModel.bmmCodeList;
+    this.canSearchModalComponent.activityCodes = this.planModel.activityCodeList;
+    this.canSearchModalComponent.prepare();
+    this.canSearchModalComponent.open().then((result) => {
+      this.logger.debug('Got CAN', result);
+      if(result) {
+        this.canManagementService.selectCANEmitter.next({fseId, can: result, applId: -1});
+      }
+    }).catch((reason) => {
+      this.logger.warn(reason);
+    });
 
   }
 
