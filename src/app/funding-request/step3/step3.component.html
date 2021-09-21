@@ -74,8 +74,7 @@
         <ng-container cdkDropListGroup>
             <div class='wrapper'>
                 <h2>Submission Package</h2>
-                <h4>Included Content</h4>
-
+                
                 <div class="drop-well mb-3">
 
                     <div class="drag-item drag-item-locked" tabindex="0">
@@ -183,42 +182,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class='wrapper'>
-
-                <h4>Excluded Content</h4>
-                <div class="example-container" *ngFor="let lane of swimlanes">
-                    <div *ngIf="lane.name === 'Excluded Content'">
-
-                        <div id="excludedId" class="drop-well min-height-5" cdkDropList [cdkDropListData]="lane.array"
-                            (cdkDropListDropped)="drop($event)">
-                            <div class="drag-item" ngbTooltip="Drag & Drop to Order" placement="top-left" cdkDrag *ngFor='let item of lane.array' tabindex="0">
-                                <span
-                                    *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'; else displayFileNameFormat"
-                                    class="doc-name">{{ item.docFilename }}</span>
-                                <ng-template #displayFileNameFormat>
-                                    <span class="doc-name">{{ item.docType }}</span>
-                                </ng-template>
-                                <span
-                                    *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application'"
-                                    class="doc-desc">(Retrieved from
-                                    IMPAC II)</span>
-                                <span *ngIf="item.docFilename !== 'Summary Statement'" class="doc-desc">({{item.docFilename }} - Added by <a
-                                        href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
-                                    {{item.createDate}})</span>
-                                <div class="ml-auto">
-
-                                    <button class="btn btn-link btn-slim ml-1" title="View"
-                                        (click)="downloadFile(item.id, item.docFilename)"><i class="fas fa-eye"
-                                            aria-hidden="true"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
         </ng-container>
     </div>
 </div>

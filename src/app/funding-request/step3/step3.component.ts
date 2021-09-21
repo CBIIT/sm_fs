@@ -48,7 +48,6 @@ export class Step3Component implements OnInit {
   showSuppApplications: boolean = false;
   baseTaskList: Observable<DocumentsDto[]>;
   include: Observable<DocumentsDto[]>;
-  exclude: Observable<DocumentsDto[]>;
   swimlanes: Swimlane[] = [];
   selectedFiles: FileList;
   justificationType: string = '';
@@ -83,6 +82,7 @@ export class Step3Component implements OnInit {
   isTypeSelected: boolean = false;
   applAdminSuppRoutingsDtos: ApplAdminSuppRoutingsDto[] = [];
   disableAddDocButton: boolean = true;
+  isSSDocOrderCreated: boolean = false;
 
 
   @ViewChild('inputFile')
@@ -155,11 +155,11 @@ export class Step3Component implements OnInit {
       (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== null)) {
       this.pushDocType("Transition Memo");
       this.displayTansitionMemo = true;
-       if(this.requestModel.requestDto.conversionActivityCode!=='NC'){
-         this.isTransitionMemoRequired = true;
-       }
+      if (this.requestModel.requestDto.conversionActivityCode !== 'NC') {
+        this.isTransitionMemoRequired = true;
+      }
+    }
   }
-}
 
   loadJustificationText() {
     if (this.requestModel.requestDto.justification && this.requestModel.requestDto.justification !== null) {
@@ -393,31 +393,44 @@ export class Step3Component implements OnInit {
             this.loadTransitionMemo(element);
           }
 
+          if (element.docType === DocTypeConstants.SUMMARY_STATEMENT &&
+            element.fsSSUploaded === 'Y') {
+            this.isSSDocOrderCreated = true;
+          }
+
           this.removeDocType(element.docType);
         });
+
+        this.createSSDocOrder();
 
         this.baseTaskList = of(result);
         this.include = this.baseTaskList.pipe(
           map(tasks => tasks.filter(task => task.included === 'Y' &&
             !(task.docType === DocTypeConstants.JUSTIFICATION || task.docType === DocTypeConstants.TRANSITION_MEMO)))
         );
-        this.exclude = this.baseTaskList.pipe(
-          map(tasks => tasks.filter(task => task.included === 'N'))
-        );
+
 
         this.include.subscribe(data => {
           this.logger.debug('Included data: ' + data);
           this.swimlanes.push({ name: 'Included Content', array: data });
         });
-        this.exclude.subscribe(data => {
-          this.logger.debug('Excluded data: ' + data);
-          this.swimlanes.push({ name: 'Excluded Content', array: data });
-        });
+
 
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
 
+  }
+
+  private createSSDocOrder() {
+    if (!this.isSSDocOrderCreated) {
+      let docDto: DocumentsDto = {};
+      docDto.docType = DocTypeConstants.SUMMARY_STATEMENT;
+      docDto.keyId = this.requestModel.requestDto.frqId;
+      docDto.keyType = 'PFR';
+      this.insertDocOrder(docDto);
+
+    }
   }
 
   loadJustification(element: DocumentsDto) {
@@ -429,7 +442,6 @@ export class Step3Component implements OnInit {
       this.justificationEnteredBy = element.uploadByName;
       this.justificationEnteredByEmail = element.uploadByEmail;
       this.justificationFileName = element.docFilename;
-      // TODO: simple hack here to convert string to Date. Needs to be verified.
       this.justificationUploadedOn = new Date(element.createDate);
 
       this.justificationEnteredByEmit.next(this.justificationEnteredBy);
@@ -453,7 +465,6 @@ export class Step3Component implements OnInit {
       this.transitionMemoEnteredBy = element.uploadByName;
       this.transitionMemoEnteredByEmail = element.uploadByEmail;
       this.transitionMemoFileName = element.docFilename;
-      // TODO: simple hack here to convert string to Date. Needs to be verified.
       this.transitionMemoUploadedOn = new Date(element.createDate);
       this.transitionMemoId = element.id;
 
@@ -832,14 +843,7 @@ export class Step3Component implements OnInit {
     if (this.validate()) {
       this.documentsControllerService.loadDocumentsBySortOrderUsingGET(this.requestModel.requestDto.frqId).subscribe(
         result => {
-          this.documentsControllerService.loadExcludedDocumentsUsingGET(this.requestModel.requestDto.frqId).subscribe(
-            result => {
-              this.requestModel.requestDto.excludedDocs = result;
-              this.router.navigate(['/request/step4']);
-            }, error => {
-              this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
-            }
-          );
+          this.router.navigate(['/request/step4']);
           this.requestModel.requestDto.includedDocs = result;
         }, error => {
           this.logger.error('Error occured while retrieving docs by DOC ORDER----- ' + error.message);
@@ -863,5 +867,6 @@ export class Step3Component implements OnInit {
 export enum DocTypeConstants {
   JUSTIFICATION = 'Justification',
   TRANSITION_MEMO = 'Transition Memo',
+  SUMMARY_STATEMENT = 'Summary Statement',
 
 }
