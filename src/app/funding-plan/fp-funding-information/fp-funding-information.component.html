@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-12 d-flex">
-    <h2>Funding Information <span class="font-weight-light font-italic">(Optional)</span></h2>
+    <h2>Funding Information <span *ngIf="!readOnly" class="font-weight-light font-italic">(Optional)</span></h2>
     <a *ngIf="collapse" class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse"
        href="#funding-info-collapse" role="button"
        aria-expanded="true" aria-controls="funding-info-collapse"></a>
