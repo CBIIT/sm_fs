@@ -90,20 +90,7 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     return true;
   }
 
-  buildUpdatedCANDataModel(): void {
-    let c: CanCcxDto;
-    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
-      req.financialInfoDto.fundingRequestCans.forEach(can => {
-        c = this.planModel.selectedApplIdCans.get(can.fseId)?.get(req.applId);
-        if (c) {
-          can.can = c.can;
-          can.canDescription = c.canDescrip;
-          can.phsOrgCode = c.canPhsOrgCode;
-        }
-      });
-    });
 
-  }
 
   ngAfterViewInit(): void {
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {

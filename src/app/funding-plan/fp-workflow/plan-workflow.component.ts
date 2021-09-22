@@ -1,12 +1,20 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
-import { FsPlanControllerService, FsPlanWorkflowControllerService,
+import {
+  FsPlanControllerService, FsPlanWorkflowControllerService,
   FundingReqStatusHistoryDto, FundingRequestQueryDto,
-  WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+  WorkflowTaskDto
+} from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { Options } from 'select2';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
-import { ApprovingStatuses, TerminalStatuses, WorkflowAction, WorkflowActionCode, WorkflowModel } from 'src/app/funding-request/workflow/workflow.model';
+import {
+  ApprovingStatuses,
+  TerminalStatuses,
+  WorkflowAction,
+  WorkflowActionCode,
+  WorkflowModel
+} from 'src/app/funding-request/workflow/workflow.model';
 import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 import { Alert } from 'src/app/alert-billboard/alert';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
@@ -25,8 +33,8 @@ let addedApproverMap = new Map<number, any>();
   templateUrl: './plan-workflow.component.html',
   styleUrls: ['./plan-workflow.component.css'],
   providers: [
-    {provide: NgbDateParserFormatter, useClass: DatepickerFormatter}
-    ]
+    { provide: NgbDateParserFormatter, useClass: DatepickerFormatter }
+  ]
 })
 export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
@@ -175,10 +183,11 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     );
 
     this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
-      () => { addedApproverMap = this.workflowModel.addedApproverMap;
-              this.alert = null;
-              this.checkIfStuck();
-              this.isFormValid();
+      () => {
+        addedApproverMap = this.workflowModel.addedApproverMap;
+        this.alert = null;
+        this.checkIfStuck();
+        this.isFormValid();
       }
     );
 
@@ -222,7 +231,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   showGmInfo(): boolean {
     return this.workflowModel.approvedByGM ||
-           (this.workflowModel.isGMApprover && this.approvingState);
+      (this.workflowModel.isGMApprover && this.approvingState);
   }
 
   get selectedWorkflowAction(): WorkflowActionCode {
@@ -278,14 +287,16 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     if (this.gmComponent && !this.gmComponent.isFormValid()) {
       valid = false;
     }
-    if (! this.isFormValid()) {
+    if (!this.isFormValid()) {
       valid = false;
     }
 
     if (!valid) {
-      this.alert = {type: 'danger',
-      message: 'Please correct the errors identified above.',
-      title: ''};
+      this.alert = {
+        type: 'danger',
+        message: 'Please correct the errors identified above.',
+        title: ''
+      };
       return;
     }
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
@@ -312,22 +323,27 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     // set SPL meeting date for SPL approver;
     if (this.workflowModel.isSplApprover
       && this.workflowModel.isApprovalAction(action)
-      && this.splMeetingDate ) {
-        dto.splMeetingDate =
+      && this.splMeetingDate) {
+      dto.splMeetingDate =
         String(this.splMeetingDate.month).padStart(2, '0') + '/' +
         String(this.splMeetingDate.day).padStart(2, '0') + '/' +
         String(this.splMeetingDate.year).padStart(4, '0');
-        this.logger.debug('SPL approver, spl meeting date=' + this.splMeetingDate);
+      this.logger.debug('SPL approver, spl meeting date=' + this.splMeetingDate);
     }
 
-    if (this.workflowModel.isFinancialApprover
-      && this.workflowModel.isApprovalAction(action)
-      && this.workflowModel.budgetDocAdded) {
+    if (this.workflowModel.isFinancialApprover && this.workflowModel.isApprovalAction(action)) {
+      // Get updated CAN data if necessary
+      const updatedCANs = this.planModel.buildUpdatedCANDataModel();
+      if (updatedCANs?.length > 0) {
+        dto.requestCans = updatedCANs;
+      }
+      if (this.workflowModel.budgetDocAdded) {
         alert('WARNING: If the uploaded budget document(s) are not in eGrants, please send the document(s) to the appropriate Grants Management Specialist to add it the grant file in eGrants.');
+      }
     }
 
     if ( // this.workflowModel.isGMApprover &&
-        this.workflowModel.isApprovalAction(action) ) {
+      this.workflowModel.isApprovalAction(action)) {
       dto.planGmInfo = this.gmComponent?.getGmInfos();
     }
 
@@ -347,20 +363,19 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   }
 
   checkIfStuck(): void {
-    if ( (this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE ||
-      this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE_COMMENT ) &&
+    if ((this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE ||
+        this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE_COMMENT) &&
       this.approvingState &&
       this.workflowModel.lastInChain &&
       this.completedPfrs &&
       this.completedPfrs.length > 0) {
-        this.workflowStuckBy = 'ByCompletedPfrs';
-      }
-      else {
-        this.workflowStuckBy = null;
-      }
+      this.workflowStuckBy = 'ByCompletedPfrs';
+    } else {
+      this.workflowStuckBy = null;
+    }
   }
 
-  retrieveRequest(frqId: number): void{
+  retrieveRequest(frqId: number): void {
     this.router.navigate(['/request/retrieve', frqId]);
   }
 
@@ -371,11 +386,11 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       return false;
     }
     let valid = true;
-    if ( this._selectedWorkflowAction?.commentsRequired && !this.comments ) {
+    if (this._selectedWorkflowAction?.commentsRequired && !this.comments) {
       valid = false;
       this.validationError.comments_missing = true;
     }
-    if ( this._selectedWorkflowAction?.newApproverRequired && !this.workflowModel.hasNewApprover ) {
+    if (this._selectedWorkflowAction?.newApproverRequired && !this.workflowModel.hasNewApprover) {
       valid = false;
       this.validationError.approver_missing = true;
     }
@@ -384,12 +399,11 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       if (!this.splMeetingDate) {
         this.validationError.splMeetingDate_missing = true;
         valid = false;
-      }
-      else {
+      } else {
         const today: NgbDate = this.calendar.getToday();
         if (today.before(this.splMeetingDate)) {
-            this.validationError.splMeetingDate_future = true;
-            valid = false;
+          this.validationError.splMeetingDate_future = true;
+          valid = false;
         }
       }
     }

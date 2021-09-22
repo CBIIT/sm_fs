@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanCcxDto, FundingPlanDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto, FundingPlanDto, FundingRequestCanDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
 import { NciPfrGrantQueryDtoEx } from './nci-pfr-grant-query-dto-ex';
 import { RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate';
@@ -141,6 +141,23 @@ export class PlanModel {
     const tmp = this.selectedApplIdCans.get(fseId) || new Map<number, CanCcxDto>();
     tmp.set(applId, can);
     this.selectedApplIdCans.set(fseId, tmp);
+  }
+
+  buildUpdatedCANDataModel(): FundingRequestCanDto[] {
+    let c: CanCcxDto;
+    const result: FundingRequestCanDto[] = [];
+    this.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
+      req.financialInfoDto.fundingRequestCans.forEach(can => {
+        c = this.selectedApplIdCans.get(can.fseId)?.get(req.applId);
+        if (c) {
+          can.can = c.can;
+          can.canDescription = c.canDescrip;
+          can.phsOrgCode = c.canPhsOrgCode;
+        }
+        result.push(can);
+      });
+    });
+    return result;
   }
 }
 
