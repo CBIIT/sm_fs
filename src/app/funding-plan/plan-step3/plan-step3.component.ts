@@ -216,6 +216,7 @@ export class PlanStep3Component implements OnInit {
     // Build a list of raw data for the request budgets, grouped by applid
     const budgetMap: Map<number, FundingReqBudgetsDto[]> = new Map<number, FundingReqBudgetsDto[]>();
     const canMap: Map<number, FundingRequestCanDto[]> = new Map<number, FundingRequestCanDto[]>();
+    let totalRecommendedAmount = 0;
     this.applicationsProposedForFunding.prcList.forEach((item, index) => {
       this.logger.debug('prc item', index, item);
       const source = fundingSourceDetails.get(item.sourceIndex);
@@ -229,6 +230,10 @@ export class PlanStep3Component implements OnInit {
           percentCut = item.getPercentCut();
         } else {
           percentCut = null;
+        }
+
+        if(!isNaN(totalCost)) {
+          totalRecommendedAmount = Number(totalRecommendedAmount) + Number(totalCost);
         }
 
         let budgets = budgetMap.get(item.grant.applId) as FundingReqBudgetsDto[];
@@ -263,6 +268,7 @@ export class PlanStep3Component implements OnInit {
         canMap.set(item.grant.applId, cans);
       }
     });
+    this.planModel.fundingPlanDto.totalRecommendedAmt = totalRecommendedAmount;
 
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(i => {
       i.financialInfoDto.fundingReqBudgetsDtos = budgetMap.get(i.applId);
