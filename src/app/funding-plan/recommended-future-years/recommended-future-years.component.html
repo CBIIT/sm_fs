@@ -1,2 +1,7 @@
-<ng-select2 [data]="data" [(ngModel)]="selectedValue" [name]="'recommendedFutureYears_' + index">
+<ng-select2
+  [allowClear]="true"
+  [data]="data"
+  [(ngModel)]="selectedValue"
+  [name]="'recommendedFutureYears_' + index">
+  <option></option>
 </ng-select2>

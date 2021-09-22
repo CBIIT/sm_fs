@@ -44,6 +44,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   ngOnInit(): void {
     this.logger.debug('Total grants selected', this.listGrantsSelected.length);
+    this.comments = this.planModel.fundingPlanDto.comments;
 
   }
 

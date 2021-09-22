@@ -169,7 +169,7 @@ export class PlanManagementService {
       return this.localRfy.get(applId);
     }
     const cans = this.canMap.get(Number(applId));
-    let result = 0;
+    let result: number = null;
     if (!!cans) {
       cans.forEach((c, s) => {
         result = c.approvedFutureYrs;
