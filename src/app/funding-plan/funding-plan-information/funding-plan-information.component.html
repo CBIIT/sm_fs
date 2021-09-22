@@ -7,7 +7,7 @@
         <th *ngIf="showPlanName" scope="col">Funding Plan Name</th>
         <th scope="col">FOA</th>
         <th scope="col">Concept ID</th>
-        <th scope="col">FOA Title</th>
+        <th scope="col">Title</th>
         <th scope="col">Issue Type</th>
       </tr>
       </thead>
@@ -84,6 +84,14 @@
 
     <div class="col-xl-2 col-lg-4 col-sm-6">
       <div class="form-group">
+        <span class="like-label">Requesting PD's Cancer Activity</span>
+        <p><a [routerLink]="" ngbTooltip="{{planModel.fundingPlanDto.cayCode|codeDescription:'CancerActivities'}}"
+              triggers="click:blur" placement="top">{{planModel.fundingPlanDto.cayCode}}</a></p>
+      </div>
+    </div>
+    
+    <div class="col-xl-2 col-lg-4 col-sm-6">
+      <div class="form-group">
         <span class="like-label">Funding Approval</span>
         <span class="form-control-plaintext">{{planModel.fundingPlanDto.fundsCertificationCode}}</span>
       </div>
@@ -91,7 +99,7 @@
 
     <div class="col-xl-2 col-lg-4 col-sm-6">
       <div class="form-group">
-        <span class="like-label">Final Scientific Levels of Authority (LOA)</span>
+        <span class="like-label">Final Scientific LOA</span>
         <span class="form-control-plaintext">{{ loaMap.get(planModel.fundingPlanDto.loaCode) }}</span>
       </div>
     </div>
@@ -123,14 +131,7 @@
         <span class="form-control-plaintext">{{planModel.fundingPlanDto.splMeetingDate}}</span>
       </div>
     </div>
-
-    <div class="col-xl-2 col-lg-4 col-sm-6">
-      <div class="form-group">
-        <span class="like-label">Requesting PD's Cancer Activity</span>
-        <p><a [routerLink]="" ngbTooltip="{{planModel.fundingPlanDto.cayCode|codeDescription:'CancerActivities'}}"
-              triggers="click:blur" placement="top">{{planModel.fundingPlanDto.cayCode}}</a></p>
-      </div>
-    </div>
+    
   </ng-container>
 
   <div class="col-12">

@@ -53,7 +53,12 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-2">
+
+    <div class="col-lg-6">
+      <app-other-docs-contributing-funds [preSelectedDocs]="planModel?.fundingPlanDto?.otherContributingDocs"></app-other-docs-contributing-funds>
+    </div>
+    
+    <div class="col-lg-4">
       <div class="form-group">
         <lib-cancer-activities-dropdown
           [selectSingleOption]="true"
@@ -71,11 +76,6 @@
           Requesting PD's Cancer Activity is required
         </div>
       </div>
-    </div>
-
-
-    <div class="col-lg-6">
-      <app-other-docs-contributing-funds [preSelectedDocs]="planModel?.fundingPlanDto?.otherContributingDocs"></app-other-docs-contributing-funds>
     </div>
 
     <div class="col-12">
