@@ -31,7 +31,7 @@ export class RetrievePlanComponent implements OnInit {
       this.planService.retrieveFundingPlanUsingGET(this.fprId).subscribe(
         (result) => {
           this.planModel.reset();
-          this.planModel.title = 'View Funding Plan Details for';
+          this.planModel.title = 'View Plan Details for';
           //  this.planModel.returnToRequestPageLink = true;
           this.planModel.fundingPlanDto = result.FundingPlanDto;
           this.planModel.allGrants = result.AllGrants;
