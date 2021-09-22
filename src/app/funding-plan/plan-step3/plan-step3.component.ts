@@ -224,15 +224,21 @@ export class PlanStep3Component implements OnInit {
         let directCost: number;
         let totalCost: number;
         let percentCut: number | null;
+        let dcPercentCut: number;
+        let tcPercentCut: number;
         directCost = item.getDirectCost();
         totalCost = item.getTotalCost();
         if (item.displayType === 'percent') {
           percentCut = item.getPercentCut();
+          dcPercentCut = percentCut;
+          tcPercentCut = percentCut;
         } else {
           percentCut = null;
+          dcPercentCut = item.getDirectCostPercentCut();
+          tcPercentCut = item.getTotalCostPercentCut();
         }
 
-        if(!isNaN(totalCost)) {
+        if (!isNaN(totalCost)) {
           totalRecommendedAmount = Number(totalRecommendedAmount) + Number(totalCost);
         }
 
@@ -256,8 +262,8 @@ export class PlanStep3Component implements OnInit {
           id: this.planCoordinatorService.getCan(item.grant.applId, source.fundingSourceId)?.id || null,
           approvedDc: directCost,
           approvedTc: totalCost,
-          dcPctCut: percentCut,
-          tcPctCut: percentCut,
+          dcPctCut: dcPercentCut,
+          tcPctCut: tcPercentCut,
           approvedFutureYrs: futureYears.get(item.grant.applId),
           fseId: source.fundingSourceId,
           defaultOefiaTypeId: source.octId,

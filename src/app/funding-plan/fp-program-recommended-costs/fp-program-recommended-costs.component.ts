@@ -84,7 +84,8 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     this.logger.debug('budget', bud);
     this.logger.debug('can', can);
 
-    if (can && !isNaN(can.dcPctCut) && can.dcPctCut != null) {
+    // TODO: this logic might need revisiting.
+    if (can && !isNaN(can.dcPctCut) && !isNaN(can.tcPctCut) && can.dcPctCut === can.tcPctCut) {
       this.percentCut = can.dcPctCut;
       this.displayType = 'percent';
       // this.toggleDisplay('percent', this.grantIndex, this.sourceIndex);
