@@ -1,18 +1,24 @@
-import {Directive} from '@angular/core';
-import {AbstractControl, NG_VALIDATORS, ValidationErrors, Validator} from '@angular/forms';
-import {FundingRequestTypes} from '../model/request/funding-request-types';
-import {isArray} from 'rxjs/internal-compatibility';
+import { Directive, Input } from '@angular/core';
+import { AbstractControl, NG_VALIDATORS, ValidationErrors, Validator } from '@angular/forms';
+import { FundingRequestTypes } from '../model/request/funding-request-types';
+import { isArray } from 'rxjs/internal-compatibility';
+import { NGXLogger } from 'ngx-logger';
 
 @Directive({
   selector: '[appDiversitySupplementValidator]',
-  providers: [{provide: NG_VALIDATORS, useExisting: DiversitySupplementValidatorDirective, multi: true}]
+  providers: [{ provide: NG_VALIDATORS, useExisting: DiversitySupplementValidatorDirective, multi: true }]
 })
 export class DiversitySupplementValidatorDirective implements Validator {
+  @Input('appDiversitySupplementValidator') grantDoc: string;
 
-  constructor() {
+  constructor(private logger: NGXLogger) {
   }
 
   validate(control: AbstractControl): ValidationErrors | null {
+    this.logger.debug('grantDoc:', this.grantDoc);
+    if (this.grantDoc === 'CRCHD') {
+      return null;
+    }
     const cayCode = control.get('cancerActivities');
     const requestType = control.get('fundingRequestType');
 
@@ -37,7 +43,7 @@ export class DiversitySupplementValidatorDirective implements Validator {
       return null;
     }
 
-    return {mustSelectDiversitySupplement: true};
+    return { mustSelectDiversitySupplement: true };
   }
 
 }
