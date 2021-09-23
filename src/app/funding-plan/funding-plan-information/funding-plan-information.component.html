@@ -32,7 +32,7 @@
     </table>
   </div>
 </div>
-<div class="row">
+<div class="row d-flex justify-content-between">
   <div class="col-lg-2 col-sm-6">
     <div class="form-group">
       <label for="fundable-score-range">Fundable Score Range</label>
@@ -49,7 +49,7 @@
     </div>
   </div>
 
-  <div class="col-lg-3 col-sm-6">
+  <div class="col-lg-2 col-sm-6">
     <div class="form-group">
       <label for="apps-proposed">Applications Proposed for Funding</label>
       <input name="arthur" type="text" readonly class="form-control-plaintext" id="apps-proposed"
@@ -65,7 +65,7 @@
     </div>
   </div>
 
-  <div class="col-lg-3 col-sm-6">
+  <div class="col-lg-2 col-sm-6">
     <div class="form-group">
       <label for="apps-not-considered">Applications NOT Considered for Funding</label>
       <input name="betty" type="text" readonly class="form-control-plaintext" id="apps-not-considered"
@@ -73,6 +73,15 @@
     </div>
   </div>
 
+  <div class="col-lg-2 col-sm-6" *ngIf="planModel.fundingPlanDto.splMeetingDate">
+    <div class="form-group">
+      <label for="spl-meeting-date">SPL Committee Meeting Approval Date</label>
+      <input name="betty" type="text" readonly class="form-control-plaintext" id="spl-meeting-date"
+             value="{{ planModel.fundingPlanDto.splMeetingDate |  date:'MM/dd/yyyy' }}">
+    </div>
+  </div>
+</div>
+<div class="row">
   <ng-container *ngIf="showAdditionalInfo">
     <div class="col-xl-2 col-lg-4 col-sm-6">
       <div class="form-group">
@@ -81,7 +90,6 @@
           href="mailto:{{planModel.fundingPlanDto.requestorEmailAddress}}">{{planModel.fundingPlanDto.requestorPdFullName}}</a></span>
       </div>
     </div>
-
     <div class="col-xl-2 col-lg-4 col-sm-6">
       <div class="form-group">
         <span class="like-label">Requesting PD's Cancer Activity</span>
@@ -124,16 +132,7 @@
         </p>
       </div>
     </div>
-
-    <div *ngIf="planModel.fundingPlanDto.splMeetingDate" class="col-xl-2 col-lg-4 col-sm-6">
-      <div class="form-group">
-        <span class="like-label">SPL Committee Meeting Approval Date</span>
-        <span class="form-control-plaintext">{{planModel.fundingPlanDto.splMeetingDate}}</span>
-      </div>
-    </div>
-    
   </ng-container>
-
   <div class="col-12">
     <hr>
   </div>

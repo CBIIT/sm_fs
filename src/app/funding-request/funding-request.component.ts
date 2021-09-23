@@ -5,6 +5,7 @@ import {RequestModel} from '../model/request/request-model';
 import {SearchFilterService} from '../search/search-filter.service';
 import {GrantsSearchFilterService} from './grants-search/grants-search-filter.service';
 import { NavigationStepModel } from './step-indicator/navigation-step.model';
+import { Step4Component } from './step4/step4.component';
 
 @Component({
   selector: 'app-funding-request',
@@ -23,7 +24,8 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
 
   private routerSub: Subscription;
 
-  model;
+  model: RequestModel;
+  stepComponent: any;
 
   constructor(private navigationModel: NavigationStepModel,
               private router: Router,
@@ -60,5 +62,24 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
 
   get showSteps(): boolean {
     return this.navigationModel.showSteps;
+  }
+
+  onActivate(componentRef): void {
+    this.stepComponent = componentRef;
+  }
+
+  showGoToWorkflowButton(): boolean {
+    if (this.stepComponent && this.stepComponent instanceof Step4Component) {
+      return this.stepComponent.showGoToWorkflowButton();
+    }
+    else {
+      return false;
+    }
+  }
+
+  goToWorkflow(): void {
+    if (this.stepComponent && this.stepComponent instanceof Step4Component) {
+      this.stepComponent.goToWorkflow();
+    }
   }
 }

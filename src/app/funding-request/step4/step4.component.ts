@@ -116,7 +116,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
       }
     );
     this.docDtos = this.requestModel.requestDto.includedDocs;
-        this.workflowModel.initialize();
+    this.workflowModel.initialize();
     this.checkUserRolesCas();
     this.checkDocs();
     // this.isDisplayBudgetDocsUpload();
@@ -213,8 +213,9 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     }
 
     if (this.requestModel.requestDto.requestType.indexOf('Pay Type 4') > -1 &&
-    (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== null 
-      && this.requestModel.requestDto.conversionActivityCode!=='NC'))  {
+    (this.requestModel.requestDto.conversionActivityCode
+      && this.requestModel.requestDto.conversionActivityCode !== null
+      && this.requestModel.requestDto.conversionActivityCode !== 'NC'))  {
       this.transitionMemoMissing = true;
       if (this.docDtos && this.docDtos.length > 0) {
         for (const doc of this.docDtos) {
@@ -463,5 +464,28 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
   hideWorkflow(): boolean {
     return this.requestStatus === RequestStatus.REJECTED;
+  }
+
+  goToWorkflow(): void {
+    if (this.workflowModel.isFinancialApprover) {
+      const el = document.getElementById('workflow-budget-info');
+      el.scrollIntoView();
+    }
+    else if (this.workflowModel.isGMApprover) {
+      const el = document.getElementById('workflow-grant-management');
+      el.scrollIntoView();
+    }
+    else if (this.workflowModel.isScientificApprover) {
+      const el = document.getElementById('workflow-approved-cost');
+      el.scrollIntoView();
+    }
+    else {
+      const el = document.getElementById('workflow-section');
+      el.scrollIntoView();
+    }
+  }
+
+  showGoToWorkflowButton(): boolean {
+    return (this.workflowComponent?.isApprover());
   }
 }

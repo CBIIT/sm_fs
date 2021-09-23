@@ -1,11 +1,15 @@
-<app-approved-costs *ngIf="showApprovedCosts()" [approvingState]="approvingState"></app-approved-costs>
+<app-approved-costs *ngIf="showApprovedCosts()" 
+    [approvingState]="approvingState" id="workflow-approved-cost">
+</app-approved-costs>
 <ng-content>
     
 </ng-content>
-<app-gm-info *ngIf="showGmInfo()" [approvingState]="approvingState"></app-gm-info>
+<app-gm-info *ngIf="showGmInfo()" 
+    [approvingState]="approvingState" id="workflow-grant-management">
+</app-gm-info>
 <div class="row">
     <div class="col-12 d-flex">
-      <h2 id="workflow">Workflow</h2>
+      <h2 id="workflow-section">Workflow</h2>
       <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#workflow-collapse" role="button"
         aria-expanded="true" aria-controls="workflow-collapse"></a>
     </div>
