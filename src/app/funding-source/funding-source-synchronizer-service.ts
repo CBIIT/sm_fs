@@ -14,4 +14,5 @@ export class FundingSourceSynchronizerService {
   fundingSourceRestoreSelectionEmitter = new Subject<number>();
   fundingSourceNewCayCodeEmitter = new Subject<string>();
   fundingSourceNewPDEmitter = new Subject<number>();
+  percentSelectedEmitter = new Subject<{fseId: number, selected: boolean}>();
 }

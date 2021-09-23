@@ -42,6 +42,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   private editing: number;
   @Input() readOnlyView = false;
   public modalSourceId: number;
+  private percentCutUsed: boolean;
+  private percentCutSourceId: number;
+  locked: boolean;
 
   get selectedFundingSources(): FundingRequestFundsSrcDto[] {
     return this.requestModel.programRecommendedCostsModel.selectedFundingSources;
@@ -75,9 +78,12 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     return this.requestModel.programRecommendedCostsModel.grantAwarded;
   }
 
-  constructor(public requestModel: RequestModel, private propertiesService: AppPropertiesService,
-              private fsRequestControllerService: FsRequestControllerService, private logger: NGXLogger,
-              private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
+  constructor(
+    public requestModel: RequestModel,
+    private propertiesService: AppPropertiesService,
+    private fsRequestControllerService: FsRequestControllerService,
+    private logger: NGXLogger,
+    private fundingSourceSynchronizerService: FundingSourceSynchronizerService) {
   }
 
   ngOnDestroy(): void {
@@ -98,6 +104,16 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.subscribe(selection => {
       this.selectedSourceId = selection;
+    });
+    this.fundingSourceSynchronizerService.percentSelectedEmitter.subscribe(next => {
+      this.logger.debug(next);
+      if (next.selected) {
+        this.percentCutUsed = next.selected;
+        this.percentCutSourceId = next.fseId;
+      } else {
+        this.percentCutUsed = null;
+        this.percentCutSourceId = null;
+      }
     });
   }
 
@@ -158,7 +174,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
     this.lineItem.forEach(l => {
       const tmp: PrcDataPoint = new PrcDataPoint();
-      tmp.type = l.type;
+      tmp.type = this.showDollar ? PrcLineItemType.COST_BASIS : PrcLineItemType.PERCENT_CUT;
       tmp.baselineTotal = l.baselineTotal;
       tmp.baselineDirect = l.baselineDirect;
       tmp.baselineSource = l.baselineSource;
@@ -171,6 +187,23 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       tmp.percentCut = l.percentCut;
 
       liClone.push(tmp);
+      if (tmp.type === PrcLineItemType.PERCENT_CUT) {
+        this.logger.debug('Percent cut selected for source', this.selectedSourceId);
+        this.fundingSourceSynchronizerService.percentSelectedEmitter.next({
+          fseId: this.selectedSourceId,
+          selected: true
+        });
+      } else {
+        this.logger.debug(this.selectedSourceId, this.percentCutSourceId);
+        if (Number(this.selectedSourceId) === Number(this.percentCutSourceId)) {
+          this.logger.debug('Percent cut deselected for source', this.selectedSourceId);
+          this.fundingSourceSynchronizerService.percentSelectedEmitter.next({
+            fseId: this.selectedSourceId,
+            selected: false
+          });
+        }
+      }
+
     });
 
     this.requestModel.programRecommendedCostsModel.addFundingSourceById(this.selectedSourceId, liClone);
@@ -182,7 +215,15 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   editSource(i: number): void {
+    this.locked = false;
     const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
+    if (this.percentCutUsed && Number(edit.fundingSourceId) !== Number(this.percentCutSourceId)) {
+      this.logger.warn('Percent cut already used and not by me.');
+      this.locked = true;
+      this.showDollar = true;
+      this.showPercent = false;
+    }
+
     this.editing = i;
     this.lineItem = this.getLineItem(edit);
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
@@ -219,6 +260,10 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       const saved = this.requestModel.requestDto.frqId ? true : false;
       const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i, saved);
       this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed);
+      this.logger.debug(removed, this.percentCutSourceId);
+      if (Number(removed) === Number(this.percentCutSourceId)) {
+        this.fundingSourceSynchronizerService.percentSelectedEmitter.next({ fseId: removed, selected: false });
+      }
     }
   }
 
@@ -229,6 +274,14 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   prepareLineItem(): void {
+    this.locked = false;
+    this.logger.debug('Percent cut already used', this.percentCutUsed);
+    this.logger.debug('Source id', this.percentCutSourceId);
+    if (this.percentCutUsed) {
+      this.locked = true;
+      this.showDollar = true;
+      this.showPercent = false;
+    }
     this.lineItem = new Array<PrcDataPoint>();
     this.grantAwarded.forEach(ga => {
       const tmp = new PrcDataPoint();
@@ -240,7 +293,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
         tmp.baselineTotal = ga.requestTotalAmount;
       } else {
         tmp.baselineSource = PrcBaselineSource.AWARDED;
-        tmp.type = PrcLineItemType.PERCENT_CUT;
+        tmp.type = PrcLineItemType.COST_BASIS;
         tmp.baselineDirect = ga.directAmount;
         tmp.baselineTotal = ga.totalAwarded;
       }

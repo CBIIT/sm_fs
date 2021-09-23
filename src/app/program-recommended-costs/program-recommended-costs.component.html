@@ -505,7 +505,7 @@
                       <div class="form-row">
                         <div class="col left-label"></div>
                         <div class="col-sm-auto">
-                          <div class="btn-group btn-group-toggle" ngbRadioGroup name="value" *ngIf="initialPay">
+                          <div class="btn-group btn-group-toggle" ngbRadioGroup name="value" *ngIf="initialPay && !locked">
                             <label ngbButtonLabel class="btn-outline-secondary active">
                               <input ngbButton type="radio" value="dollar">Dollar
                             </label>
@@ -539,7 +539,7 @@
                             [appMinMaxValidator]="{min: 0, max: 999999999}"
                             required>
                         </div>
-                        <div class="col-sm-auto right-label" *ngIf="initialPay">
+                        <div class="col-sm-auto right-label" *ngIf="initialPay && !locked">
                           <span id="dc-dollar-percent">{{ li.percentCutDirectCalculated | percentCut:true}}</span>
                         </div>
                         <div
@@ -578,7 +578,7 @@
                             [appMinMaxValidator]="{min: 0, max: 999999999}"
                             required>
                         </div>
-                        <div class="col-sm-auto right-label" *ngIf="initialPay">
+                        <div class="col-sm-auto right-label" *ngIf="initialPay && !locked">
                           <span id="tc-dollar-percent">{{ li.percentCutTotalCalculated | percentCut:true }}</span>
                         </div>
                         <div
@@ -643,7 +643,6 @@
                   </td>
 
                 </tr>
-
                 <tr *ngIf="showPercent && !isRestoration()">
                   <td></td>
                   <td *ngFor="let li of lineItem; let i = index; let first = first; let last = last">
@@ -651,7 +650,7 @@
                       <div class="form-row">
                         <div class="col left-label"></div>
                         <div class="col-sm-auto">
-                          <div class="btn-group btn-group-toggle" ngbRadioGroup name="value" *ngIf="initialPay">
+                          <div class="btn-group btn-group-toggle" ngbRadioGroup name="value" *ngIf="initialPay && !locked">
                             <label ngbButtonLabel class="btn-outline-secondary">
                               <input ngbButton type="radio" (change)="toggleCostDisplay('dollar')" value="dollar">Dollar
                             </label>
