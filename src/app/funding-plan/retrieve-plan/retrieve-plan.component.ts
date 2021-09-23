@@ -32,7 +32,7 @@ export class RetrievePlanComponent implements OnInit {
         (result) => {
           this.planModel.reset();
           this.planModel.title = 'View Plan Details for';
-          //  this.planModel.returnToRequestPageLink = true;
+          this.planModel.returnToSearchLink = true;
           this.planModel.fundingPlanDto = result.FundingPlanDto;
           this.planModel.allGrants = result.AllGrants;
           this.planModel.minimumScore = this.planModel.fundingPlanDto.fundableRangeFrom;

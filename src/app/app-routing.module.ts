@@ -29,8 +29,8 @@ const routes: Routes = [
       { path: '', redirectTo: '/search', pathMatch: 'full' },
       { path: 'search', component: SearchComponent, canActivate: [AuthGuard] },
       { path: 'plan', component: FundingPlanComponent, children: [
-        {path: '', redirectTo: 'step1', pathMatch: 'full'},
-        {path: 'step1', component: PlanStep1Component, canDeactivate: [CanDeactivatePlanStep1], canActivate: [PdAuthGuard]},
+        {path: '', redirectTo: 'step1/new', pathMatch: 'full'},
+        {path: 'step1/:new', component: PlanStep1Component, canDeactivate: [CanDeactivatePlanStep1], canActivate: [PdAuthGuard]},
         {path: 'step2', component: PlanStep2Component},
         {path: 'step3', component: PlanStep3Component},
         {path: 'step4', component: PlanStep4Component},
