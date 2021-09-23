@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FsLookupControllerService, FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import 'select2';
-import { SearchFilterService } from '../../search/search-filter.service';
 import { UserService } from '@nci-cbiit/i2ecui-lib';
 import { RequestModel } from '../../model/request/request-model';
 import { openNewWindow } from 'src/app/utils/utils';
@@ -26,9 +25,6 @@ export class FundingRequestTypeComponent implements OnInit {
   @Input() parentForm: NgForm;
   alerts: Alert[] = [];
   public requestTypes: FundingRequestTypeRulesDto[] = [];
-  public searchFilter:
-    { requestOrPlan: string; searchPool: string; requestType: string; }
-    = { requestOrPlan: '', searchPool: '', requestType: '' };
   data: Array<Select2OptionData>;
   options: Options;
   clearableTypes = [
@@ -92,7 +88,6 @@ export class FundingRequestTypeComponent implements OnInit {
 
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
-    this.searchFilter.requestType = String(value);
     this.model.requestDto.frtId = value;
     this.model.requestDto.financialInfoDto.requestTypeId = value;
     this.model.programRecommendedCostsModel.fundingRequestType = value;
@@ -102,7 +97,6 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   constructor(private fsLookupControllerService: FsLookupControllerService,
-              private searchFilterService: SearchFilterService,
               private userService: UserService,
               public model: RequestModel,
               private logger: NGXLogger,
@@ -114,7 +108,6 @@ export class FundingRequestTypeComponent implements OnInit {
       templateResult: this.templateResult.bind(this),
       templateSelection: this.templateSelection.bind(this)
     };
-    this.searchFilter = this.searchFilterService.searchFilter;
 
     this.evoke(this.filter).subscribe(
       result => {

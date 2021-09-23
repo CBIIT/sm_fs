@@ -1,7 +1,15 @@
 export interface SearchCriteria {
-  requestOrPlan: 'Request' | 'Plan';
-  searchPool: string;
-  requestType: string;
-  rfaPa: string;
-  fyRange: { fromFy: number, toFy: number };
+  searchType?: string;
+  rfaPa?: string;
+  fundingRequestStatus?: string[],
+  fundingRequestType?: string,
+  fyRange?: { fromFy: number, toFy: number };
+  grantNumber?: {
+    grantNumberType: string,
+    grantNumberIC: string,
+    grantNumberMech: string,
+    grantNumberSerial: string,
+    grantNumberSuffix: string,
+    grantNumberYear: string
+  }
 }

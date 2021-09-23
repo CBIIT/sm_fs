@@ -10,7 +10,7 @@
     <div class="col-3 col-md-3">
       <label for="searchType">Search for</label>
       <div class="btn-group btn-group-toggle"
-           ngbRadioGroup name="radioBasic"
+           ngbRadioGroup name="searchType"
            [(ngModel)]="typeSearch"
            id="searchType"
            style="display: inline;"
@@ -51,7 +51,8 @@
         ngModel
         #fundingRequestStatus="ngModel"
         [allowClear]="true"
-        [data]="requestTypeList">
+        [options]="requestStatusOptions"
+        [data]="requestStatusList">
       </ng-select2>
     </div>
   </div>
@@ -64,7 +65,7 @@
         ngModel
         #fundingPlanStatus="ngModel"
         [allowClear]="true"
-        [data]="requestTypeList"
+        [data]="requestStatusList"
       >
       </ng-select2>
     </div>

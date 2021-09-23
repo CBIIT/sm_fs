@@ -2,7 +2,6 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {RequestModel} from '../model/request/request-model';
-import {SearchFilterService} from '../search/search-filter.service';
 import {GrantsSearchFilterService} from './grants-search/grants-search-filter.service';
 import { NavigationStepModel } from './step-indicator/navigation-step.model';
 import { Step4Component } from './step4/step4.component';
@@ -11,7 +10,7 @@ import { Step4Component } from './step4/step4.component';
   selector: 'app-funding-request',
   templateUrl: './funding-request.component.html',
   styleUrls: ['./funding-request.component.css'],
-  providers: [GrantsSearchFilterService, SearchFilterService, NavigationStepModel]
+  providers: [GrantsSearchFilterService, NavigationStepModel]
 })
 export class FundingRequestComponent implements OnInit, OnDestroy {
   activeStep = {step: 0, name: '', route: null};
