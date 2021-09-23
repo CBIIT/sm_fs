@@ -71,11 +71,9 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
 
   showGoToWorkflowButton(): boolean {
     if (this.stepComponent && this.stepComponent instanceof PlanStep6Component) {
-      console.log('scrolling to workflow');
       return this.stepComponent.showGoToWorkflowButton();
     }
     else {
-      console.log('no scrolling to workflow');
       return false;
     }
   }

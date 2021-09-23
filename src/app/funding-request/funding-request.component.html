@@ -1,8 +1,12 @@
 <div>
   <a  *ngIf="model.returnToRequestPageLink" href="#" class="btn btn-sm btn-link btn-back"  ><i class="far fa-arrow-left fa-sm mr-1" aria-hidden="true"></i>Return to Request Query Page</a>
     <div class="row">
-        <div class="col">
-            <h1>{{model.title}} <span *ngIf="model.requestDto?.frqId"># {{model.requestDto?.frqId}}</span> &mdash; Step {{activeStep.step}}: {{activeStep.name}}</h1>
+        <div class="col-lg-10">
+            <h1>{{model.title}} <span *ngIf="model.requestDto?.frqId"># {{model.requestDto?.frqId}}</span>
+            <span [hidden]="!showSteps">&mdash; Step {{activeStep.step}}: {{activeStep.name}}</span></h1>
+        </div>
+        <div class="col-lg-2">
+            <button class="btn btn-primary btn-sm" (click)="goToWorkflow()" *ngIf="showGoToWorkflowButton()"><i class="fas fa-arrow-to-bottom"></i> Go to Workflow</button>
         </div>
     </div>
     <div class="row justify-content-center mb-3">
@@ -11,6 +15,6 @@
         </div>
     </div>
 
-    <router-outlet></router-outlet>
+    <router-outlet (activate)="onActivate($event)"></router-outlet>
 
 </div>
