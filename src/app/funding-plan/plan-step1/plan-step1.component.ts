@@ -15,7 +15,7 @@ import { DataTableDirective } from 'angular-datatables';
 import { SelectGrantCheckboxCellRendererComponent } from './select-grant-checkbox-cell-renderer/select-grant-checkbox-cell-renderer.component';
 import { SelectGrantCheckboxEventType } from './select-grant-checkbox-cell-renderer/select-grant-checkbox-event-type';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { GrantsSearchFilterService } from '../../funding-request/grants-search/grants-search-filter.service';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
@@ -235,6 +235,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private fsPlanControllerService: FsPlanControllerService,
               private router: Router,
+              private route: ActivatedRoute,
               private planModel: PlanModel,
               private logger: NGXLogger,
               private navigationModel: NavigationStepModel) {
@@ -271,6 +272,11 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
   noSelectableGrantsWarining: string = '';
 
   ngOnInit(): void {
+    const isNewRequest = this.route.snapshot.params.new;
+    if (isNewRequest) {
+      this.planModel.reset();
+    }
+
     this.navigationModel.showSteps = true;
     this.navigationModel.setStepLinkable(1, true);
     this.ncab_options = {

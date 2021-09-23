@@ -27,10 +27,11 @@ export class PlanModel {
   documentSnapshot: ModelSnapshot;
 
   // TODO: Generate FundingPlanDto and FundingPlanFoasDto
-
   title = 'New Plan';
   mainApproversCreated = false;
   approverCriteria: any;
+  // controls whether to dispay return to search at the top of step6.
+  returnToSearchLink = false;
 
   constructor(propertiesService: AppPropertiesService,
               private logger: NGXLogger) {
@@ -48,6 +49,8 @@ export class PlanModel {
     this.grantsSearchCriteria = [];
     this.minimumScore = 0;
     this.maximumScore = 0;
+    this.returnToSearchLink = false;
+    this.title = 'New Plan';
     this.takeDocumentSnapshot();
   }
 

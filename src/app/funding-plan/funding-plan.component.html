@@ -4,6 +4,7 @@
     </div>
 </div>
 <div>
+    <a  *ngIf="model.returnToSearchLink" href="#" class="btn btn-sm btn-link btn-back"  ><i class="far fa-arrow-left fa-sm mr-1" aria-hidden="true"></i>Return to Plan Query Page</a>
     <div class="row">
         <div class="col">
             <h1>{{model.title}} <span *ngIf="model.fundingPlanDto?.fprId"># {{model.fundingPlanDto.fprId}}</span>
