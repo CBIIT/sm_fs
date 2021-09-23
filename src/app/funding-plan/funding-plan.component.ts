@@ -3,6 +3,8 @@ import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NavigationStepModel } from '../funding-request/step-indicator/navigation-step.model';
 import { PlanModel } from '../model/plan/plan-model';
+import { PlanStep5Component } from './plan-step5/plan-step5.component';
+import { PlanStep6Component } from './plan-step6/plan-step6.component';
 
 @Component({
   selector: 'app-funding-plan',
@@ -25,7 +27,7 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
   private routerSub: Subscription;
 
   model: PlanModel;
-
+  stepComponent: any;
   constructor(private router: Router,
               private navigationModel: NavigationStepModel,
               private planModel: PlanModel) {
@@ -61,5 +63,26 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
 
   get showSteps(): boolean {
     return this.navigationModel.showSteps;
+  }
+
+  onActivate(componentRef): void {
+    this.stepComponent = componentRef;
+  }
+
+  showGoToWorkflowButton(): boolean {
+    if (this.stepComponent && this.stepComponent instanceof PlanStep6Component) {
+      console.log('scrolling to workflow');
+      return this.stepComponent.showGoToWorkflowButton();
+    }
+    else {
+      console.log('no scrolling to workflow');
+      return false;
+    }
+  }
+
+  goToWorkflow(): void {
+    if (this.stepComponent && this.stepComponent instanceof PlanStep6Component) {
+      this.stepComponent.goToWorkflow();
+    }
   }
 }

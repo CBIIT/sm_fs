@@ -331,6 +331,25 @@ export class PlanStep6Component implements OnInit {
   showBudgetInformation(): boolean {
     return this.workflowModel.isFinancialApprover || this.workflowModel.approvedByFC;
   }
+
+  goToWorkflow(): void {
+    if (this.workflowModel.isFinancialApprover) {
+      const el = document.getElementById('workflow-budget-info');
+      el.scrollIntoView();
+    }
+    else if (this.workflowModel.isGMApprover) {
+      const el = document.getElementById('workflow-grant-management');
+      el.scrollIntoView();
+    }
+    else {
+      const el = document.getElementById('workflow-section');
+      el.scrollIntoView();
+    }
+  }
+
+  showGoToWorkflowButton(): boolean {
+    return (this.workflowComponent?.isApprover());
+  }
 }
 
 export class FundingPlanDocChecker {
