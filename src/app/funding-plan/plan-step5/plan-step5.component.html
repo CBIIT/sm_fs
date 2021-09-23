@@ -19,7 +19,7 @@
         <h2>Submission Package</h2>
     </div>
     <div class="col-12 d-flex align-items-center">
-        <a href="#" (click)="openAll()">{{btnLabel}}</a>
+        <button type="button" class="btn btn-link" (click)="openAll()">{{btnLabel}}</button>
         <button type="button" class="btn btn-sm ml-auto btn-outline-primary" (click)="downloadPackage()"><i
                 class="far fa-file-pdf mr-1" aria-hidden="true"></i> View Package</button>
 
@@ -72,8 +72,9 @@
 
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)" (fileSelectEmitter)="selectFiles($event)"
-                        [templateType]="CR_FUNDING_PLAN_SCIENTIFIC_RPT"></app-plan-file-upload>
+                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
+                        (fileSelectEmitter)="selectFiles($event)" [templateType]="CR_FUNDING_PLAN_SCIENTIFIC_RPT">
+                    </app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
                             <!-- <app-grant-table [grantList]="selectedGrants" [minScore]="model.minimumScore"
@@ -118,8 +119,9 @@
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)" (fileSelectEmitter)="selectFiles($event)"
-                        [templateType]="CR_FUNDING_PLAN_EXCEPTION_JUST_RPT"></app-plan-file-upload>
+                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
+                        (fileSelectEmitter)="selectFiles($event)" [templateType]="CR_FUNDING_PLAN_EXCEPTION_JUST_RPT">
+                    </app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
                             <app-docs-grant-table [grantList]="exceptionGrants"></app-docs-grant-table>
@@ -161,8 +163,9 @@
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)" (fileSelectEmitter)="selectFiles($event)"
-                        [templateType]="CR_FUNDING_PLAN_SKIP_JUST_RPT"></app-plan-file-upload>
+                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
+                        (fileSelectEmitter)="selectFiles($event)" [templateType]="CR_FUNDING_PLAN_SKIP_JUST_RPT">
+                    </app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
                             <app-docs-grant-table [grantList]="skipGrants"></app-docs-grant-table>
@@ -205,7 +208,8 @@
                     </div>
                 </ng-template>
                 <ng-template ngbPanelContent>
-                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)" (fileSelectEmitter)="selectFiles($event)" [templateType]="Other">
+                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
+                        (fileSelectEmitter)="selectFiles($event)" [templateType]="Other">
                     </app-plan-file-upload>
                 </ng-template>
             </ngb-panel>
