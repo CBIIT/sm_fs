@@ -271,7 +271,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   }
 
   get showSplMeetingDate(): boolean {
-    return this.workflowModel.isSplApprover && this.approvingState;
+    return this.workflowModel.isSplApprover && this.workflowModel.isApprovalAction(this._selectedWorkflowAction?.action);
   }
 
   onSplMeetingDateSelect($event: any): void {
@@ -342,7 +342,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       }
     }
 
-    if ( // this.workflowModel.isGMApprover &&
+    if ( this.workflowModel.isGMApprover &&
       this.workflowModel.isApprovalAction(action)) {
       dto.planGmInfo = this.gmComponent?.getGmInfos();
     }
@@ -352,6 +352,12 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       (result) => {
         this.logger.debug('submit workflow returned okay ', result);
         this.workflowModel.initializeForPlan(dto.fprId);
+        if (this.workflowModel.isSplApprover
+          && this.workflowModel.isApprovalAction(action)
+          && this.splMeetingDate) {
+            this.planModel.fundingPlanDto.splMeetingDate = new Date(dto.splMeetingDate);
+            this.logger.debug('set SplMeetingDate to planModel ' + this.planModel.fundingPlanDto.splMeetingDate);
+        }
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
       },
