@@ -6,9 +6,13 @@
 <div>
     <a  *ngIf="model.returnToSearchLink" href="#" class="btn btn-sm btn-link btn-back"  ><i class="far fa-arrow-left fa-sm mr-1" aria-hidden="true"></i>Return to Plan Query Page</a>
     <div class="row">
-        <div class="col">
+        <div class="col-lg-10">
             <h1>{{model.title}} <span *ngIf="model.fundingPlanDto?.fprId"># {{model.fundingPlanDto.fprId}}</span>
-                &mdash; Step {{activeStep.step}}: {{activeStep.screenName}}</h1>
+            <span [hidden]="!showSteps"> &mdash; Step {{activeStep.step}}: {{activeStep.screenName}}</span>
+            </h1> 
+        </div>
+        <div class="col-lg-2">
+            <button class="btn btn-primary btn-sm" (click)="goToWorkflow()" *ngIf="showGoToWorkflowButton()"><i class="fas fa-arrow-to-bottom"></i> Go to Workflow</button>
         </div>
     </div>
     <div class="row justify-content-center mb-2">
@@ -16,5 +20,5 @@
             <app-step-indicator [steps]="steps" [activeStep]="activeStep" [hidden]="!showSteps"></app-step-indicator>
         </div>
     </div>
-    <router-outlet></router-outlet>
+    <router-outlet (activate)="onActivate($event)"></router-outlet>
 </div>
