@@ -1,6 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { DocumentsControllerService, DocumentsDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { DocumentsControllerService, DocumentsDto, NciPfrGrantQueryDto, FsPlanControllerService, GrantsSkippedPreviouslyDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { PlanModel } from 'src/app/model/plan/plan-model';
@@ -38,6 +38,7 @@ export class PlanStep5Component implements OnInit {
   showValidations: boolean = false;
   isFileSelected: boolean = false;
   selectedFiles: FileList;
+  grantsSkippedPreviouslyDto: GrantsSkippedPreviouslyDto = {};
 
   @ViewChild('collapseAll') collapseAll: ElementRef<HTMLElement>;
 
@@ -50,7 +51,8 @@ export class PlanStep5Component implements OnInit {
     private documentService: DocumentService,
     private logger: NGXLogger,
     private router: Router,
-    private documentsControllerService: DocumentsControllerService) { }
+    private documentsControllerService: DocumentsControllerService,
+    private planControllerService: FsPlanControllerService) { }
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(5, true);
@@ -63,6 +65,20 @@ export class PlanStep5Component implements OnInit {
       (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
       g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore
     );
+
+    this.retrievePreviouslySkippedGrants();
+  }
+
+  private retrievePreviouslySkippedGrants() {
+    for (let i = 0; i < this.selectedGrants.length; i++) {
+      this.applIds.push(this.selectedGrants[i].applId);
+    }
+    this.planControllerService.retrievePreviouslySkippedGrantsUsingGET(this.applIds).subscribe(
+      result => {
+        this.grantsSkippedPreviouslyDto = result;
+      }, error => {
+        this.logger.error('HttpClient get request error for----- ' + error.message);
+      });
   }
 
   loadFiles(): void {
@@ -218,7 +234,7 @@ export class PlanStep5Component implements OnInit {
       this.showValidations = true;
     }
 
-    
+
 
 
   }

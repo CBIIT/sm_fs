@@ -45,7 +45,7 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
     this.routerSub = this.router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {
         for (const step of this.steps) {
-          if (step.route.indexOf (val.urlAfterRedirects ) > -1 ) {
+          if (val.urlAfterRedirects.includes(step.route)) {
             this.activeStep = step;
             break;
           }
@@ -55,7 +55,7 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
 
     // when direct access using url
     for (const step of this.steps) {
-      if (step.route.indexOf(this.router.url) > -1) {
+      if (this.router.url.includes(step.route)) {
         this.activeStep = step;
       }
     }

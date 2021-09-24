@@ -272,8 +272,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
   noSelectableGrantsWarining: string = '';
 
   ngOnInit(): void {
-    const isNewRequest = this.route.snapshot.params.new;
-    if (isNewRequest) {
+    const isNewPlan = this.route.snapshot.params.new;
+    if (isNewPlan) {
       this.planModel.reset();
     }
 

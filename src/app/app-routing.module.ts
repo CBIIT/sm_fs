@@ -30,6 +30,7 @@ const routes: Routes = [
       { path: 'search', component: SearchComponent, canActivate: [AuthGuard] },
       { path: 'plan', component: FundingPlanComponent, children: [
         {path: '', redirectTo: 'step1/new', pathMatch: 'full'},
+        {path: 'step1', redirectTo: 'step1/', pathMatch: 'full'},
         {path: 'step1/:new', component: PlanStep1Component, canDeactivate: [CanDeactivatePlanStep1], canActivate: [PdAuthGuard]},
         {path: 'step2', component: PlanStep2Component},
         {path: 'step3', component: PlanStep3Component},
@@ -40,6 +41,7 @@ const routes: Routes = [
       ]},
       { path: 'request', component: FundingRequestComponent, children: [
         {path: '', redirectTo: 'step1/new', pathMatch: 'full'},
+        {path: 'step1', redirectTo: 'step1/', pathMatch: 'full'},
         {path: 'step1/:new', component: Step1Component, canActivate: [PdAuthGuard]},
         {path: 'step2', component: Step2Component},
         {path: 'step3', component: Step3Component},

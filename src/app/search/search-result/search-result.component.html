@@ -1,30 +1,24 @@
-<!-- <div class="container col-md-12">
   <div class="row">
-    <h2>Results</h2>
+    <div class="col-12">
+      <h2>Results</h2>
+      <p *ngIf="!fundingRequests || fundingRequests.length === 0">No results to display. Try applying a filter above and clicking "Search".</p>
+    </div>
   </div>
   <div class="row">
-    <p *ngIf="!searchResult">No grants found to display.</p>
-    <table datatable [dtOptions]="dtOptions" class="row-border hover">
-      <thead>
-        <tr>
-          <th>Grant Number</th>
-          <th>PI Full Name</th>
-          <th>Org Name</th>
-        </tr>
-      </thead>
-      <tbody *ngIf="fundingRequests?.length != 0">
-        <tr *ngFor="let fundingRequest of fundingRequests">
-          <td>{{ fundingRequest.fullGrantNum }}</td>
-          <td>{{ fundingRequest.piFullName }}</td>
-          <td>{{ fundingRequest.orgName }}</td>
-        </tr>
-      </tbody>
-      <tbody *ngIf="fundingRequests?.length == 0">
-              <tr>
-                <td colspan="3" class="no-data-available">No data!</td>
-              </tr>
-            </tbody> 
-    </table>
-
+    <div class="col-12">
+      <div [ngStyle]="{display:noResult?'none':'inline'}">
+        <table id="frDt" #frDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
+        </table>
+        <!--          Renderer templates -->
+        <ng-template #selectFundingRequestCheckboxRenderer let-data="adtData">
+          <app-select-grant-checkbox-cell-renderer [data]="data" (emitter)="onCaptureSelectedEvent($event)"></app-select-grant-checkbox-cell-renderer>
+        </ng-template>
+        <ng-template #fullGrantNumberRenderer let-data="adtData">
+          <app-full-grant-number-cell-renderer [data]="data" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl"></app-full-grant-number-cell-renderer>
+        </ng-template>
+        <ng-template #cancerActivityRenderer let-data="adtData">
+          <app-cancer-activity-cell-renderer [data]="data"></app-cancer-activity-cell-renderer>
+        </ng-template>
+      </div>
+    </div>
   </div>
-</div> -->

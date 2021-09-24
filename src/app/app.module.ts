@@ -139,6 +139,7 @@ import { FpProjectedCanComponent } from './funding-plan/fp-projected-can/fp-proj
 import { CanSearchModalComponent } from './cans/can-search-modal/can-search-modal.component';
 import { FundingSourceEntryModalComponent } from './funding-plan/applications-proposed-for-funding/funding-source-entry-modal/funding-source-entry-modal.component';
 import { SearchFyrangeComponent } from './search/search-filter/search-fyrange/search-fyrange.component';
+import { SelectFundingRequestCheckboxCellRendererComponent } from './search/search-result/select-funding-request-checkbox-cell-renderer/select-funding-request-checkbox-cell-renderer.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -285,7 +286,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FpProjectedCanComponent,
     CanSearchModalComponent,
     FundingSourceEntryModalComponent,
-    SearchFyrangeComponent
+    SearchFyrangeComponent,
+    SelectFundingRequestCheckboxCellRendererComponent
   ],
 
 

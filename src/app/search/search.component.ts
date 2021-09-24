@@ -29,15 +29,22 @@ export class SearchComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  doSearch(event: SearchCriteria) {
+  doSearch(sc: SearchCriteria) {
     let fsCritera: FundSelectSearchCriteriaRes = {};
-    fsCritera.fyFrom = event.fyRange.fromFy;
-    fsCritera.fyTo = event.fyRange.toFy;
-    fsCritera.requestType = [event.requestType];
-    fsCritera.rfaPaNumber = [event.rfaPa];
+    fsCritera.fyFrom = sc.fyRange?.fromFy;
+    fsCritera.fyTo = sc.fyRange?.toFy;
+    fsCritera.requestType = [sc.fundingRequestType];
+    fsCritera.statusCodes = sc.fundingRequestStatus;
+    // fsCritera.rfaPaNumber = [sc.rfaPa];
+    fsCritera.grantIc = sc.grantNumber?.grantNumberIC;
+    fsCritera.grantMech = sc.grantNumber?.grantNumberMech;
+    fsCritera.grantSerial = sc.grantNumber?.grantNumberSerial;
+    fsCritera.grantSuffix = sc.grantNumber?.grantNumberSuffix;
+    fsCritera.grantType = sc.grantNumber?.grantNumberType;
+    fsCritera.grantYear = sc.grantNumber?.grantNumberYear;
 
+    this.logger.debug("Search criteria in component: ", fsCritera);
     this.searchResultComponent.doSearch(fsCritera);
-    this.logger.debug("Search criteria: " + fsCritera);
   }
 
   onAwaitingRequests() {

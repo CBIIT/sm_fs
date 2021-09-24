@@ -211,6 +211,9 @@ export class PlanStep6Component implements OnInit {
       (result) => {
         this.logger.debug(action + ' API call returned successfully', result);
         this.workflowModel.initializeForPlan(this.fprId);
+        if (result.action === WorkflowActionCode.WITHDRAW) {
+          this.planModel.fundingPlanDto.splMeetingDate = undefined;
+        }
         this.requestIntegrationService.requestSubmissionEmitter.next(result);
       }
     )
@@ -289,7 +292,6 @@ export class PlanStep6Component implements OnInit {
     dto.fprId = this.fprId;
     dto.action = WorkflowActionCode.SUBMIT;
     dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
-//    dto.certCode = this.planModel.fundingPlanDto.certCode;
     dto.comments = this.workflowComponent.comments;
     if (this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0) {
       dto.additionalApproverList = this.workflowModel.additionalApprovers.map(a => {
@@ -303,7 +305,6 @@ export class PlanStep6Component implements OnInit {
         this.logger.debug('Submit Request result: ', result);
         this.workflowModel.initializeForPlan(this.fprId);
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
-//        this.readonly = true;
       },
       (error) => {
         this.logger.error('Failed when calling submitRequestUsingPOST', error);

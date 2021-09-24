@@ -72,13 +72,37 @@
 
                 </ng-template>
                 <ng-template ngbPanelContent>
+                    <div class="row">
+                        <div *ngIf="grantsSkippedPreviouslyDto.previouslySkippedinPlan"
+                            class="col-12 alert alert-warning">
+                            WARNING: You have selected the following application(s) that were skipped in the prior
+                            completed funding plan.
+                            Note that justification must address the reason for funding a previously skipped
+                            application.
+                            <div *ngFor="let skippedPlan of grantsSkippedPreviouslyDto.prevFundingPlanGrants">
+                                <b><span>{{skippedPlan.fullGrantNum}}</span></b> has been skipped in the Funding Plan ID
+                                <b><span><a
+                                            [routerLink]="'/plan/retrieve/' + skippedPlan.fprId">{{skippedPlan.fprId}}</a></span></b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div *ngIf="grantsSkippedPreviouslyDto.previouslySkippedinRequest"
+                            class="col-12 alert alert-warning">
+                            WARNING: You have selected the following application(s) that has a skip request.
+                            Note that justification must address the reason for funding a previously skipped
+                            application.
+                            <div *ngFor="let skippedRequest of grantsSkippedPreviouslyDto.prevFundingRequests">
+                                <b><span>{{skippedRequest.fullGrantNum}}</span></b> has a Skip Request ID <b><span><a
+                                            [routerLink]="'/request/retrieve/' + skippedRequest.frqId">{{skippedRequest.frqId}}</a></span></b>
+                            </div>
+                        </div>
+                    </div>
                     <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
                         (fileSelectEmitter)="selectFiles($event)" [templateType]="CR_FUNDING_PLAN_SCIENTIFIC_RPT">
                     </app-plan-file-upload>
                     <div class="row">
                         <div class="col-12">
-                            <!-- <app-grant-table [grantList]="selectedGrants" [minScore]="model.minimumScore"
-                                [maxScore]="model.maximumScore"></app-grant-table> -->
                             <app-applications-proposed-for-funding-readonly>
                             </app-applications-proposed-for-funding-readonly>
                         </div>
