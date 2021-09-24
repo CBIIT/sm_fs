@@ -17,6 +17,7 @@ import { PRC_DISPLAY_FORMAT } from './program-recommended-costs-model';
 import { NgForm } from '@angular/forms';
 import { FundingSourceComponent } from '../funding-source/funding-source.component';
 import { Alert } from '../alert-billboard/alert';
+import { Select2OptionData } from 'ng-select2';
 
 @Component({
   selector: 'app-program-recommended-costs',
@@ -25,9 +26,19 @@ import { Alert } from '../alert-billboard/alert';
 })
 export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
+
   @ViewChild('prcForm', { static: false }) prcForm: NgForm;
   @ViewChild(FundingSourceComponent) fsc: FundingSourceComponent;
   alerts: Alert[] = [];
+  recommendedFutureYearsData: Select2OptionData[] = [
+    { id: '0', text: '0' },
+    { id: '1', text: '1' },
+    { id: '2', text: '2' },
+    { id: '3', text: '3' },
+    { id: '4', text: '4' },
+    { id: '5', text: '5' },
+  ];
+  recommendedFutureYears: number;
 
   _selectedDocs: string;
   initialPay: boolean;
@@ -45,6 +56,19 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   private percentCutUsed: boolean;
   private percentCutSourceId: number;
   locked: boolean;
+
+  get dataTarget(): string {
+    if (Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.PAY_TYPE_4)) {
+      // return 'add-fsource-modal-pay-type4';
+      return 'add-fsource-modal';
+    } else {
+      return 'add-fsource-modal';
+    }
+  }
+
+  get isPayType4(): boolean {
+    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.PAY_TYPE_4);
+  }
 
   get selectedFundingSources(): FundingRequestFundsSrcDto[] {
     return this.requestModel.programRecommendedCostsModel.selectedFundingSources;
@@ -401,6 +425,18 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
         title: ''
       };
       this.alerts.push(alert);
+    }
+  }
+
+  prepareType4LineItem(): void {
+    this.logger.debug('recommended future years', this.recommendedFutureYears);
+    this.lineItem = new Array<PrcDataPoint>();
+    if (!!this.recommendedFutureYears) {
+      for (let i = 0; i < Number(this.recommendedFutureYears) + 1; i++) {
+        const tmp = new PrcDataPoint();
+        tmp.grantAward = {year: i};
+        this.lineItem.push(tmp);
+      }
     }
   }
 }

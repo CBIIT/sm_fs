@@ -15,7 +15,6 @@ export class DiversitySupplementValidatorDirective implements Validator {
   }
 
   validate(control: AbstractControl): ValidationErrors | null {
-    this.logger.debug('grantDoc:', this.grantDoc);
     if (this.grantDoc === 'CRCHD') {
       return null;
     }
