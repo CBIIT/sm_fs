@@ -171,9 +171,11 @@ export class Step2Component implements OnInit {
     return false;
   }
 
+  // TODO: Per FS-772 we also show final LOA for pay type 4
   showFinalLOA(): boolean {
-    return !this.isMoonshot() && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
-      Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestModel.requestDto.frtId));
+    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.PAY_TYPE_4)
+      || (!this.isMoonshot() && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
+        Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestModel.requestDto.frtId)));
   }
 
   isMoonshot(): boolean {
