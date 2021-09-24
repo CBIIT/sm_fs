@@ -41,7 +41,7 @@
             <div class="col">
                 <label for="add-file" class="sr-only">Choose File</label>
                 <input [ngClass]="[ isFileSelected ? 'has-error' : '']" id="add-file" #inputFile type="file"
-                    accept=".doc,.docx,.xls,.xlsx,.pdf" [disabled]="disableFile" (change)="selectFiles($event)">
+                    accept=".doc,.docx,.xls,.xlsx,.pdf,.rtf" [disabled]="disableFile" (change)="selectFiles($event)">
             </div>
             <div class="col-sm-auto">
                 <button class="btn btn-primary ml-auto" [disabled]="disableAddDocButton" (click)="uploadFiles()">Add
