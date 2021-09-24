@@ -63,8 +63,6 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
   // search criteria
   piName: string;
   searchWithin: string;
-  fyRange: any = {};
-  ncabRange: any = {};
   selectedPd: number;
   selectedRfaPa: string;
   selectedCas: string[] | string = [];
@@ -222,6 +220,14 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
           grantNumberSerial: this.searchCriteria.grantSerial,
           grantNumberYear: this.searchCriteria.grantYear,
           grantNumberSuffix: this.searchCriteria.grantSuffix
+        },
+        fyRange: {
+          fromFy: this.searchCriteria.fromFy,
+          toFy: this.searchCriteria.toFy
+        },
+        ncabRange: {
+          fromNcab: this.searchCriteria.fromCouncilMeetingDate,
+          toNcab: this.searchCriteria.toCouncileMeetingDate
         }
       });
       this.search();
@@ -256,12 +262,14 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
   }
 
   validFilter(): boolean {
-    if (this.fyRange.fromFy && this.fyRange.toFy ) {
-      return true;
-    }
     if (this.searchWithin) {
       return true;
     }
+    
+    if (this.searchForm.form.value.fyRange.fromFy && this.searchForm.form.value.fyRange.toFy ) {
+      return true;
+    }
+
     if (this.searchForm.form.value.grantNumber && this.searchForm.form.value.grantNumber.grantNumberIC && this.searchForm.form.value.grantNumber.grantNumberSerial) {
       return true;
     }
@@ -282,6 +290,10 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
 
   search(): void {
 
+    if (!this.searchForm.valid) {
+      return;
+    }
+    
     if (this.searchWithin === 'mypf') {
       this.searchCriteria.pdNpnId =  this.userSessionService.getLoggedOnUser().npnId + '';
     }
@@ -297,21 +309,10 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     }
     this.gsfs.selectedPd = this.selectedPd;
     this.gsfs.searchWithin = this.searchWithin;
-    this.searchCriteria.fromFy = this.fyRange.fromFy;
-    this.searchCriteria.toFy = this.fyRange.toFy;
-    if (this.searchCriteria.toFy && this.searchCriteria.fromFy
-      && this.searchCriteria.toFy < this.searchCriteria.fromFy) {
-        alert('Invalid FY date range provided.');
-        return;
-    }
-    this.searchCriteria.fromCouncilMeetingDate = this.ncabRange.fromNcab;
-    this.searchCriteria.toCouncileMeetingDate = this.ncabRange.toNcab;
-    if (this.searchCriteria.fromCouncilMeetingDate && this.searchCriteria.toCouncileMeetingDate
-      && this.searchCriteria.toCouncileMeetingDate < this.searchCriteria.fromCouncilMeetingDate) {
-        alert('Invalid NCAB date range provided.');
-        return;
-    }
-
+    this.searchCriteria.fromFy = this.searchForm.form.value.fyRange.fromFy;
+    this.searchCriteria.toFy = this.searchForm.form.value.fyRange.toFy;
+    this.searchCriteria.fromCouncilMeetingDate = this.searchForm.form.value.ncabRange.fromNcab;
+    this.searchCriteria.toCouncileMeetingDate = this.searchForm.form.value.ncabRange.toNcab;
     this.searchCriteria.applStatusGroupCode = this.i2Status;
     this.searchCriteria.piName = this.piName;
 
@@ -338,9 +339,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
 
   clear(): void {
     this.searchWithin = this.gsfs.defaultSearchWithin;
-    this.fyRange = {fromFy: this.gsfs.currentFy - 1, toFy: this.gsfs.currentFy};
     this.piName = '';
-    this.ncabRange = {fromNcab: '', toNcab: ''};
     this.selectedPd = null;
     this.selectedRfaPa = '';
     this.selectedCas = [];
@@ -354,6 +353,14 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         grantNumberSerial: '',
         grantNumberYear: '',
         grantNumberSuffix: ''
+      },
+      fyRange: {
+        fromFy: this.gsfs.currentFy - 1,
+        toFy: this.gsfs.currentFy
+      },
+      ncabRange: {
+        fromNcab: '',
+        toNcab: ''
       }
     });
   }
@@ -363,14 +370,11 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     // this.logger.debug('Restore search filter: ', this.gsfs, this.searchCriteria);
   //  this.searchWithin = '';
     this.piName = this.searchCriteria.piName;
-    this.fyRange = {fromFy: this.searchCriteria.fromFy, toFy: this.searchCriteria.toFy};
-    this.ncabRange = {fromNcab: this.searchCriteria.fromCouncilMeetingDate, toNcab: this.searchCriteria.toCouncileMeetingDate};
     this.selectedPd = this.gsfs.selectedPd;
     this.searchWithin = this.gsfs.searchWithin;
     this.selectedRfaPa = this.searchCriteria.rfaPa;
     this.selectedCas = this.searchCriteria.cayCodes;
     this.i2Status = this.searchCriteria.applStatusGroupCode;
-
   }
 
   showHideAdvanced(): void {
