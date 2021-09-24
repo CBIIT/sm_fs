@@ -234,8 +234,8 @@ export class PlanStep3Component implements OnInit {
           tcPercentCut = percentCut;
         } else {
           percentCut = null;
-          dcPercentCut = item.getDirectCostPercentCut();
-          tcPercentCut = item.getTotalCostPercentCut();
+          dcPercentCut = Number(item.getDirectCostPercentCut()) * 100;
+          tcPercentCut = Number(item.getTotalCostPercentCut()) * 100;
         }
 
         if (!isNaN(totalCost)) {
