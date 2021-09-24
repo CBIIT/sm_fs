@@ -358,6 +358,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
             this.planModel.fundingPlanDto.splMeetingDate = new Date(dto.splMeetingDate);
             this.logger.debug('set SplMeetingDate to planModel ' + this.planModel.fundingPlanDto.splMeetingDate);
         }
+        else if (dto.action === WorkflowActionCode.RETURN) {
+          this.planModel.fundingPlanDto.splMeetingDate = undefined;
+        }
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
       },
