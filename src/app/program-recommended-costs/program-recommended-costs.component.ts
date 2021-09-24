@@ -222,10 +222,14 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       this.locked = true;
       this.showDollar = true;
       this.showPercent = false;
+    } else if (this.percentCutUsed && Number(edit.fundingSourceId) === Number(this.percentCutSourceId)) {
+      this.showPercent = true;
+      this.showDollar = false;
     }
 
     this.editing = i;
     this.lineItem = this.getLineItem(edit);
+    this.logger.debug(this.lineItem.map(l => l.type));
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     // @ts-ignore
