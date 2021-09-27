@@ -1,51 +1,57 @@
-import { Component, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
+import {Component, OnInit, Output, ViewChild, EventEmitter, AfterViewInit} from '@angular/core';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
-import { FundSelectSearchCriteriaRes } from '@nci-cbiit/i2ecws-lib';
+import { FundSelectSearchCriteria } from '@nci-cbiit/i2ecws-lib';
 import { SearchCriteria } from '../search-criteria';
 import { NGXLogger } from 'ngx-logger';
 import {AppUserSessionService} from "../../service/app-user-session.service";
 import {NgForm} from "@angular/forms";
 import {Select2OptionData} from "ng-select2";
 import {Options} from "select2";
+import {SearchModel} from "../model/search-model";
 
 @Component({
   selector: 'app-search-filter',
   templateUrl: './search-filter.component.html',
   styleUrls: ['./search-filter.component.css']
 })
-export class SearchFilterComponent implements OnInit {
+export class SearchFilterComponent implements OnInit, AfterViewInit {
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
   @ViewChild('searchForm') searchForm: NgForm;
 
   @Output() callSearch = new EventEmitter<SearchCriteria>();
-  @Output() searchType = new EventEmitter<string>()
+  @Output() searchTypeEm = new EventEmitter<string>()
   public searchFilter: SearchCriteria;
 
   showAdvanced: boolean = false;
 
   canSearchForPaylists: boolean;
 
-  private _typeSearch: string = 'FR';
+  private _searchType: string = 'FR';
 
-  set typeSearch(value: string) {
-    this._typeSearch = value;
-    this.searchType.emit(value);
+  set searchType(value: string) {
+    this._searchType = value;
+    this.searchTypeEm.emit(value);
   }
-  get typeSearch() { return this._typeSearch; }
+  get searchType() { return this._searchType; }
 
   constructor(private userSessionService: AppUserSessionService,
+              private searchModel: SearchModel,
               private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
-    this.typeSearch = 'FR';
+    this.searchType = this.searchModel.searchType;
+    this.searchFilter = this.searchModel.searchCriteria;
     this.canSearchForPaylists = this.userSessionService.hasRole('GMBRCHF') ||
                                 this.userSessionService.hasRole('OEFIACRT');
   }
 
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.searchForm.form.patchValue(this.searchFilter);
+    }, 0);
+  }
 
-  // TODO: this method is apparently unused.  Can it be deleted?
-  typeSearchModel: any = '0';
   fyRange: any = {};
   //TODO - get this list from the server
   requestTypeList: Array<Select2OptionData> = [];
@@ -60,46 +66,31 @@ export class SearchFilterComponent implements OnInit {
     { id: 'RFC', text: 'Returned To PD For Changes'},
     { id: 'WITHDRAWN', text: 'Withdrawn'}
   ] ;
-  /*
-  APPROVED
-  AWC
-  CANCELLED
-  COMPLETED
-  DEFER
-  DELEGATED
-  DRAFT
-  ON HOLD
-  REASSIGNED
-  REJECTED
-  RELEASED
-  RFC
-  ROUTED
-  SUBMITTED
-  WITHDRAWN
-   */
+
   requestStatusOptions: Options = {
     multiple: true,
     allowClear: true
   };
 
-  doSearch(): void {
-    this.logger.debug('Search Filter: ', this.searchFilter);
-    this.callSearch.emit(this.searchFilter);
-  }
-
   clear() {
-
+   this.searchFilter = {};
+   this.searchForm.resetForm();
   }
 
-  search() {
-    this.logger.debug("check the form on search", this.searchForm.valid);
-    this.logger.debug(this.searchForm);
-    if (this.searchForm.valid) {
-      const sc: SearchCriteria = {};
-      Object.assign(sc, this.searchForm.form.value);
-      sc.fundingRequestStatus = this._populateRequestStatus(sc.fundingRequestStatus);
-      this.logger.debug('search criteria:', sc);
-      this.callSearch.emit(sc);
+  search(form: NgForm) {
+    this.logger.debug("check the form on search", form.valid);
+    this.logger.debug(form, form.form.value);
+    if (form.valid) {
+      this.searchFilter = {};
+      Object.assign(this.searchFilter, form.form.value);
+      this.searchModel.searchCriteria = this.searchFilter;
+      this.searchModel.searchType = this.searchType;
+
+      const sf: SearchCriteria = {}
+      Object.assign(sf, form.form.value);
+      sf.fundingRequestStatus = this._populateRequestStatus(this.searchFilter.fundingRequestStatus);
+      this.logger.debug('search criteria:', sf);
+      this.callSearch.emit(sf);
     }
   }
 

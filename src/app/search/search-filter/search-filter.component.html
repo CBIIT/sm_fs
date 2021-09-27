@@ -5,13 +5,13 @@
        [ngClass]="{'show-advance':!showAdvanced, 'hide-advance':showAdvanced}"></a>
   </div>
 </div>
-<form #searchForm="ngForm">
+<form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
   <div class="row form-group">
     <div class="col-3 col-md-3">
       <label for="searchType">Search for</label>
       <div class="btn-group btn-group-toggle"
            ngbRadioGroup name="searchType"
-           [(ngModel)]="typeSearch"
+           [(ngModel)]="searchType"
            id="searchType"
            style="display: inline;"
       >
@@ -36,7 +36,7 @@
       <lib-fy-range [minYear]="2001" [maxYear]="2025" [form]="searchForm"></lib-fy-range>
     </div>
   </div>
-  <div class="row form-group" [hidden]="typeSearch != 'FR'">
+  <div class="row form-group" [hidden]="searchType != 'FR'">
     <div class="col-6 col-md-6">
 <!--      TODO - this component cannot be used here as it ties to RequestModel
                  I placed it here only temporary for layout
@@ -56,7 +56,7 @@
       </ng-select2>
     </div>
   </div>
-  <div class="row form-group" [hidden]="typeSearch != 'FP'">
+  <div class="row form-group" [hidden]="searchType != 'FP'">
     <div class="form-group col-4 col-md-4">
       <label for="plan-status-select">Plan Status</label>
       <ng-select2
@@ -73,7 +73,7 @@
       <lib-rfa-pa-dropdown></lib-rfa-pa-dropdown>
     </div>
     <div class="col-3 col-md-3 ml-auto">
-      <lib-ncab-daterange></lib-ncab-daterange>
+      <lib-ncab-daterange [form]="searchForm"></lib-ncab-daterange>
     </div>
   </div>
   <div [hidden]="!showAdvanced" class="mt-n2">
@@ -95,8 +95,8 @@
           <input type="text" id="funding-sources" name="fundingSources" ngModel class="form-control">
       </div>
       <div class="col-md-6 col-lg-6 form-group">
-          <label for="request-id" *ngIf="typeSearch === 'FR'">Request ID</label>
-          <label for="request-id" *ngIf="typeSearch === 'FP'">Plan ID</label>
+          <label for="request-id" *ngIf="searchType === 'FR'">Request ID</label>
+          <label for="request-id" *ngIf="searchType === 'FP'">Plan ID</label>
           <input type="text" id="request-id" name="id" ngModel class="form-control">
       </div>
     </div>
@@ -129,7 +129,7 @@
   <div class="row form-group">
     <div class="col-lg-12 d-flex justify-content-end align-items-end">
       <button type="button" class="btn btn-outline-secondary mr-2" (click)="clear()">Clear</button>
-      <button type="button" class="btn btn-primary" (click)="search()">Search</button>
+      <button type="submit" class="btn btn-primary">Search</button>
     </div>
   </div>
 </form>

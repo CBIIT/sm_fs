@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SearchCriteria } from './search-criteria';
 import { SearchResultComponent } from './search-result/search-result.component';
-import { FundSelectSearchCriteriaRes } from '@nci-cbiit/i2ecws-lib';
+import { FundSelectSearchCriteria } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({
@@ -30,7 +30,7 @@ export class SearchComponent implements OnInit {
   }
 
   doSearch(sc: SearchCriteria) {
-    let fsCritera: FundSelectSearchCriteriaRes = {};
+    let fsCritera: FundSelectSearchCriteria = {};
     fsCritera.fyFrom = sc.fyRange?.fromFy;
     fsCritera.fyTo = sc.fyRange?.toFy;
     fsCritera.requestType = [sc.fundingRequestType];
@@ -79,7 +79,7 @@ export class SearchComponent implements OnInit {
 
   }
 
-  onSearchType($event: string) {
-    this.labelSearch = $event === 'FR' ? 'Requests' : ($event === 'FP' ? 'Plans' : ($event === 'PL' ? 'Paylists' :  'Grants'));
+  onSearchType(type: string) {
+    this.labelSearch = type === 'FR' ? 'Requests' : (type === 'FP' ? 'Plans' : (type === 'PL' ? 'Paylists' :  'Grants'));
   }
 }

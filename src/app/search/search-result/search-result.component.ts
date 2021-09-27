@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import { FundSelectSearchCriteriaRes, FsSearchControllerService, FundingRequestQueryDatatableDto, FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { FundSelectSearchCriteria, FsSearchControllerService, FundingRequestQueryDatatableDto, FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import {Subject} from "rxjs";
 import {AppPropertiesService} from "../../service/app-properties.service";
@@ -8,6 +8,7 @@ import {DataTableDirective} from "angular-datatables";
 import {FullGrantNumberCellRendererComponent} from "../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component";
 import {CancerActivityCellRendererComponent} from "../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component";
 import {SelectFundingRequestCheckboxCellRendererComponent} from "./select-funding-request-checkbox-cell-renderer/select-funding-request-checkbox-cell-renderer.component";
+import {SearchFundingRequestActionCellRendererComponent} from "./search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component";
 
 class DataTablesResponse {
   data: any[];
@@ -32,6 +33,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('selectFundingRequestCheckboxRenderer') selectFundingRequestCheckboxRenderer: TemplateRef<SelectFundingRequestCheckboxCellRendererComponent>;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
+  @ViewChild('searchFundingRequestActionRenderer') searchFundingRequestActionRenderer: TemplateRef<SearchFundingRequestActionCellRendererComponent>;
 
   // dtOptions: DataTables.Settings = {};
   dtOptions: any = {};
@@ -40,7 +42,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   eGrantsUrl: string = this.propertiesService.getProperty('EGRANTS_URL');
 
   fundingRequests: FundingRequestQueryDto[];
-  searchCriteria: FundSelectSearchCriteriaRes;
+  searchCriteria: FundSelectSearchCriteria;
   params: any;
 
   searchResult;
@@ -52,7 +54,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       pagingType: 'full_numbers',
       pageLength: 100,
       serverSide: true,
-      processing: true,
+      processing: false,
       language: {
         paginate: {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
@@ -74,9 +76,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.loaderService.show();
         this.searchCriteria.params = dataTablesParameters;
+        this.logger.debug('Search parameters:', this.searchCriteria);
         this.fsSearchControllerService.searchFundingRequestsUsingPOST(
           this.searchCriteria).subscribe(
           result => {
+            this._populateSelectedIntoResults(result.data);
             // this.logger.debug('Search Funding Requests result: ', result);
             this.fundingRequests = result.data;
             this.noResult = result.recordsTotal <= 0;
@@ -92,31 +96,31 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       columns: [
         {title: 'Sel', data: 'selected', orderable: false, ngTemplateRef: { ref: this.selectFundingRequestCheckboxRenderer }, className: 'all' }, // 0
-        {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'},
+        {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'}, // 1
         {title: 'PI', data: 'piFullName', render: ( data, type, row, meta ) => {
             return (!data || data == null) ? '' : '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-          }, className: 'all'},
-        {title: 'Project Title', data: 'projectTitle'},
-        {title: 'I2 Status', data: 'applStatusGroupDescrip'},
+          }, className: 'all'}, // 2
+        {title: 'Project Title', data: 'projectTitle'}, // 3
+        {title: 'I2 Status', data: 'applStatusGroupDescrip'}, // 4
         {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
             return (!data || data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-          }},
-        {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'},
-        {title: 'FY', data: 'fy'},
-        {title: 'Request ID', data: 'requestId'},
-        {title: 'Request Name', data: 'requestName'},
-        {title: 'Request Type', data: 'requestType'},
+          }}, // 5
+        {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'}, // 6
+        {title: 'FY', data: 'fy'}, // 7
+        {title: 'Request ID', data: 'frqId'}, // 8
+        {title: 'Request Name', data: 'requestName'}, // 9
+        {title: 'Request Type', data: 'requestType'}, // 10
         {title: 'Requesting DOC Approver', data: 'approverFullName', render: ( data, type, row, meta ) => {
             return (!data || data == null) ? '' : '<a href="mailto:' + row.approverEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-          }},
-        {title: 'Final LOA', data: 'finalLoa'},
-        {title: 'Funding Approvals', data: 'fundingApprovals'},
-        {title: 'Status', data: 'statusDescrip'},
-        {title: 'Last Action Date', data: 'lastActionDate'},
+          }}, // 11
+        {title: 'Final LOA', data: 'loaName'}, // 12
+        {title: 'Funding Approvals', data: 'fundsCertificationCode'}, // 13
+        {title: 'Status', data: 'currentStatusDescrip'}, // 14
+        {title: 'Last Action Date', data: 'requestStatusDate'}, // 15
         {
           title: 'Action', data: null, defaultContent: 'Select'
-          // ,ngTemplateRef: { ref: this.fundingRequestActionRenderer}, className: 'all'},
-        },
+          ,ngTemplateRef: { ref: this.searchFundingRequestActionRenderer}, className: 'all'
+        }, // 16
         {data: null, defaultContent: ''}
 
       ],
@@ -132,7 +136,22 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           className: 'control',
           orderable: false,
           targets: -1
-        }
+        },
+        {responsivePriority: 1, targets: 1 }, // grant_num
+        {responsivePriority: 2, targets: 16 }, // action
+        {responsivePriority: 3, targets: 2 }, // pi
+        {responsivePriority: 5, targets: 7 }, // fy
+        {responsivePriority: 6, targets: 5 }, // pd
+        {responsivePriority: 7, targets: 6 }, // ca
+        {responsivePriority: 8, targets: 14 }, // status
+        {responsivePriority: 9, targets: 10 }, // request type
+        {responsivePriority: 10, targets: 8 }, // reuest id
+        {responsivePriority: 11, targets: 9 }, // request name
+        {responsivePriority: 12, targets: 12 }, // final loa
+        {responsivePriority: 13, targets: 11 }, // requesting doc approver
+        {responsivePriority: 13, targets: 13 }, // funding approvals
+        {responsivePriority: 13, targets: 4 }, // i2 status
+        {responsivePriority: 14, targets: 3 } // project title
       ],
       dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
       buttons: [
@@ -175,9 +194,9 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dtTrigger.unsubscribe();
   }
 
-  doSearch(criteria: FundSelectSearchCriteriaRes): void {
+  doSearch(criteria: FundSelectSearchCriteria): void {
     this.searchCriteria = criteria;
-
+    this.noResult = false;
     if (this.dtElement.dtInstance) {
       this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
         dtInstance.destroy();
@@ -188,5 +207,13 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onCaptureSelectedEvent($event: any) {
 
+  }
+
+  private _populateSelectedIntoResults(data: Array<any>): void {
+    if (data) {
+      for (const entry of data) {
+        entry.selected = false;
+      }
+    }
   }
 }
