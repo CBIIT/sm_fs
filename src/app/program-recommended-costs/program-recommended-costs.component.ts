@@ -39,6 +39,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     { id: '5', text: '5' },
   ];
   recommendedFutureYears: number;
+  maxRecommendedFutureYears: number;
 
   _selectedDocs: string;
   initialPay: boolean;
@@ -100,6 +101,13 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   get grantAwarded(): Array<GrantAwardedDto> {
     return this.requestModel.programRecommendedCostsModel.grantAwarded;
+  }
+
+  get currentGrantYear(): number {
+    if (!!this.requestModel?.programRecommendedCostsModel?.grantAwarded) {
+      return this.requestModel.programRecommendedCostsModel.grantAwarded[0].year;
+    }
+    return null;
   }
 
   constructor(
@@ -430,11 +438,17 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   prepareType4LineItem(): void {
     this.logger.debug('recommended future years', this.recommendedFutureYears);
+    if(!this.maxRecommendedFutureYears) {
+      this.maxRecommendedFutureYears = 0;
+    }
+    this.maxRecommendedFutureYears =
+      (this.recommendedFutureYears > this.maxRecommendedFutureYears) ? this.recommendedFutureYears : this.maxRecommendedFutureYears;
+    this.logger.debug('max recommended future years');
     this.lineItem = new Array<PrcDataPoint>();
     if (!!this.recommendedFutureYears) {
       for (let i = 0; i < Number(this.recommendedFutureYears) + 1; i++) {
         const tmp = new PrcDataPoint();
-        tmp.grantAward = {year: i};
+        tmp.grantAward = { year: i + this.currentGrantYear };
         this.lineItem.push(tmp);
       }
     }
