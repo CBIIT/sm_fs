@@ -167,7 +167,12 @@
         <table class="table table-striped prc-table mb-0">
           <ng-container *ngIf="isPayType4 then payType4Head else defaultHead"></ng-container>
           <ng-template #payType4Head>
-            <thead></thead>
+            <thead>
+              <tr *ngIf="selectedFundingSources?.length > 0">
+                <th scope="row">Fiscal Year</th>
+                <th scope="col" *ngFor="let fy of type4FiscalYears"><span class="read-only-th">{{ fy }}</span></th>
+              </tr>
+            </thead>
           </ng-template>
           <ng-template #defaultHead>
           <thead>
@@ -266,7 +271,7 @@
           </tr>
           <tr *ngIf="selectedFundingSources.length > 1">
             <td><span class="like-label">Recommended Costs</span></td>
-            <td *ngFor="let li of grantAwarded; let i = index; let first = first; let last = last;">
+            <td *ngFor="let li of summaryRow; let i = index; let first = first;">
               <div class="form-row">
                 <div class="col-6 font-weight-bold">
                   Direct ($)
@@ -794,7 +799,7 @@
                         <div class="form-row">
                           <div class="col left-label"></div>
                           <div class="col-sm-auto">
-                            <span class="read-only-th">{{ i }}</span>
+                            <span class="read-only-th">{{ i + currentGrantYear }}</span>
                           </div>
                         </div>
                       </div>

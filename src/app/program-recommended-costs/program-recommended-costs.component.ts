@@ -39,7 +39,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     { id: '5', text: '5' },
   ];
   recommendedFutureYears: number;
-  maxRecommendedFutureYears: number;
 
   _selectedDocs: string;
   initialPay: boolean;
@@ -350,7 +349,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   getLineItem(f: FundingRequestFundsSrcDto): PrcDataPoint[] {
-    const tmp = this.requestModel.programRecommendedCostsModel.getLineItemsForSource(f);
+    const tmp = this.requestModel.programRecommendedCostsModel.getLineItemsForSource(f, !this.isPayType4);
     return tmp;
   }
 
@@ -388,7 +387,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   grandTotal(i: number): number {
     let result = 0;
     this.selectedFundingSources.forEach(s => {
-      result += Number(this.getLineItem(s)[i].recommendedTotal || 0);
+      result += Number(this.getLineItem(s)[i]?.recommendedTotal || 0);
     });
     return result;
   }
@@ -396,7 +395,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   grandTotalDirect(i: number): number {
     let result = 0;
     this.selectedFundingSources.forEach(s => {
-      result += Number(this.getLineItem(s)[i].recommendedDirect || 0);
+      result += Number(this.getLineItem(s)[i]?.recommendedDirect || 0);
     });
     return result;
   }
@@ -436,13 +435,33 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     }
   }
 
+  get summaryRow(): number[] {
+    if (this.isPayType4) {
+      return this.type4FiscalYears;
+    }
+    return this.grantAwarded.map(g => g.year);
+  }
+
+  get type4FiscalYears(): number[] {
+    const result = [];
+    let max = 0;
+
+    this.selectedFundingSources.forEach(f => {
+      const l = this.getLineItem(f)?.length || 0;
+      if (l > max) {
+        max = l;
+      }
+    });
+
+    for (let i = 0; i < max; i++) {
+      result.push(i + this.currentGrantYear);
+    }
+
+    return result;
+  }
+
   prepareType4LineItem(): void {
     this.logger.debug('recommended future years', this.recommendedFutureYears);
-    if(!this.maxRecommendedFutureYears) {
-      this.maxRecommendedFutureYears = 0;
-    }
-    this.maxRecommendedFutureYears =
-      (this.recommendedFutureYears > this.maxRecommendedFutureYears) ? this.recommendedFutureYears : this.maxRecommendedFutureYears;
     this.logger.debug('max recommended future years');
     this.lineItem = new Array<PrcDataPoint>();
     if (!!this.recommendedFutureYears) {
@@ -452,5 +471,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
         this.lineItem.push(tmp);
       }
     }
+
+
   }
 }

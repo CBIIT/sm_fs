@@ -2,6 +2,7 @@ import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRe
 import { NGXLogger } from 'ngx-logger';
 import { PrcDataPoint } from './prc-data-point';
 import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
+import { FundingRequestTypes } from '../model/request/funding-request-types';
 
 // @Injectable({
 //   providedIn: 'root'
@@ -159,13 +160,13 @@ export class ProgramRecommendedCostsModel {
   }
 
   // This will only be useful on the main table, since the modal doesn't have a funding source yet
-  getLineItemsForSource(src: FundingRequestFundsSrcDto): PrcDataPoint[] {
-    return this.getLineItemsForSourceId(Number(src.fundingSourceId));
+  getLineItemsForSource(src: FundingRequestFundsSrcDto, truncate: boolean): PrcDataPoint[] {
+    return this.getLineItemsForSourceId(Number(src.fundingSourceId), truncate);
   }
 
-  getLineItemsForSourceId(id: number): PrcDataPoint[] {
+  getLineItemsForSourceId(id: number, truncate: boolean): PrcDataPoint[] {
     const tmp = this.prcLineItems.get(Number(id));
-    if (tmp?.length > this.grantAwarded.length) {
+    if (truncate && tmp?.length > this.grantAwarded.length) {
       this.logger.error('==========> more datapoints than grant years - data dump follows <==========');
       this.logger.debug('tmp:', tmp.length, '> ga:', this.grantAwarded.length);
       this.logger.error('======> source id', id);
