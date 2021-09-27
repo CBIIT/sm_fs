@@ -6,7 +6,7 @@
   </div>
   <div class="row">
     <div class="col-12">
-      <div [ngStyle]="{display:noResult?'none':'inline'}">
+      <div [hidden]="noResult">
         <table id="frDt" #frDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
         </table>
         <!--          Renderer templates -->
@@ -18,6 +18,9 @@
         </ng-template>
         <ng-template #cancerActivityRenderer let-data="adtData">
           <app-cancer-activity-cell-renderer [data]="data"></app-cancer-activity-cell-renderer>
+        </ng-template>
+        <ng-template #searchFundingRequestActionRenderer let-data="adtData">
+          <app-search-funding-request-action-cell-renderer [data]="data"></app-search-funding-request-action-cell-renderer>
         </ng-template>
       </div>
     </div>
