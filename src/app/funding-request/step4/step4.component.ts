@@ -119,12 +119,21 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     this.workflowModel.initialize();
     this.checkUserRolesCas();
     this.checkDocs();
+    this.isDocsStepCompleted();
     // this.isDisplayBudgetDocsUpload();
 
     // this.budgetDocDtos = this.requestModel.requestDto.budgetDocs;
     // if (this.budgetDocDtos.length > 0) {
     //   this.displayReadOnlyBudgetDocs = true;
     // }
+  }
+
+  private isDocsStepCompleted() {
+    if (!this.justificationMissing && !this.transitionMemoMissing) {
+      this.navigationModel.setStepComplete(3, true);
+    } else {
+      this.navigationModel.setStepComplete(3, false);
+    }
   }
 
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
