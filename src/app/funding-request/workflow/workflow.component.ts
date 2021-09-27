@@ -11,6 +11,7 @@ import { GmInfoComponent } from './gm-info/gm-info.component';
 import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
 import { Alert } from 'src/app/alert-billboard/alert';
+import { WorkflowWarningModalComponent } from './warning-modal/workflow-warning-modal.component';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -24,6 +25,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
   @ViewChild(ApprovedCostsComponent) approvedCostsComponent: ApprovedCostsComponent;
   @ViewChild(GmInfoComponent) gmInfoComponent: GmInfoComponent;
+  @ViewChild(WorkflowWarningModalComponent) workflowWarningModalComponent: WorkflowWarningModalComponent;
   @Output() actionEmitter = new EventEmitter<string>();
   budgetInfoComponent: BudgetInfoComponent;
 
@@ -262,6 +264,13 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       title: ''};
       return;
     }
+
+    // this.workflowWarningModalComponent.openConfirmModal(['MISSING_CAN']).then( () => {
+    //   this.logger.debug('warning modal closed with yes ');
+    // }).catch(() => {
+    //   this.logger.debug('warning modal closed with dismiss ');
+    // });
+    // return;
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;

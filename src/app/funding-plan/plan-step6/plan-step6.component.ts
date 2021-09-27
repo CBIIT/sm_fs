@@ -101,7 +101,16 @@ export class PlanStep6Component implements OnInit {
     this.logger.debug('Step6 OnInit Plan Model ', this.planModel);
     this.checkUserRolesCas();
     this.docChecker = new FundingPlanDocChecker(this.planModel);
+    this.isDocsStepCompleted();
     this.checkInFlightPfr();
+  }
+
+  private isDocsStepCompleted() {
+    if (this.docChecker.docMissing) {
+      this.navigationModel.setStepComplete(5, false);
+    } else {
+      this.navigationModel.setStepComplete(5, true);
+    }
   }
 
   checkInFlightPfr(): void {

@@ -24,4 +24,8 @@ export class StepIndicatorComponent implements OnInit {
   isStepLinkable(step: number): boolean {
     return this.model.isStepLinkable(step);
   }
+
+  isStepComplete(step: number): boolean {
+    return this.model.isStepComplete(step);
+  }
 }
