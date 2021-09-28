@@ -259,6 +259,10 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
     this.editing = i;
     this.lineItem = this.getLineItem(edit);
+    this.logger.debug(this.lineItem, this.lineItem?.length);
+    if (this.isPayType4) {
+      this.recommendedFutureYears = this.lineItem?.length - 1;
+    }
     this.logger.debug(this.lineItem.map(l => l.type));
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
