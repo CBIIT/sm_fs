@@ -232,6 +232,7 @@ export class PlanStep5Component implements OnInit {
       );
     } else {
       this.showValidations = true;
+      window.scroll(0,0);
     }
 
 
