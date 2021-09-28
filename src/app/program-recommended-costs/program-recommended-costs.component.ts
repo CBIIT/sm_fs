@@ -25,6 +25,14 @@ import { Select2OptionData } from 'ng-select2';
   styleUrls: ['./program-recommended-costs.component.css']
 })
 export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
+  get recommendedFutureYears(): number {
+    return this._recommendedFutureYears;
+  }
+
+  set recommendedFutureYears(value: number) {
+    this.logger.debug('setRecommendedFutureYears(', value, ')');
+    this._recommendedFutureYears = value;
+  }
 
 
   @ViewChild('prcForm', { static: false }) prcForm: NgForm;
@@ -38,7 +46,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     { id: '4', text: '4' },
     { id: '5', text: '5' },
   ];
-  recommendedFutureYears: number;
+  private _recommendedFutureYears: number;
 
   _selectedDocs: string;
   initialPay: boolean;
@@ -241,7 +249,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     $('#add-fsource-modal').modal('hide');
     this.selectedSourceId = undefined;
     this.fsc.selectedValue = undefined;
-    this.recommendedFutureYears = undefined;
+    this._recommendedFutureYears = null;
   }
 
   editSource(i: number): void {
@@ -261,7 +269,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     this.lineItem = this.getLineItem(edit);
     this.logger.debug(this.lineItem, this.lineItem?.length);
     if (this.isPayType4) {
-      this.recommendedFutureYears = this.lineItem?.length - 1;
+      this._recommendedFutureYears = this.lineItem?.length - 1;
     }
     this.logger.debug(this.lineItem.map(l => l.type));
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
@@ -295,6 +303,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   deleteSource(i: number): void {
     if (confirm('Are you sure you want to delete this row?')) {
+      this.editing = undefined;
       const saved = this.requestModel.requestDto.frqId ? true : false;
       const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i, saved);
       this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed);
@@ -312,13 +321,17 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   prepareLineItem(): void {
+    this.logger.debug('prepareLineItem()');
     this.locked = false;
-    this.logger.debug('Percent cut already used', this.percentCutUsed);
-    this.logger.debug('Source id', this.percentCutSourceId);
     if (this.percentCutUsed) {
       this.locked = true;
       this.showDollar = true;
       this.showPercent = false;
+    }
+    if (this.isPayType4) {
+      this.lineItem = null;
+      this.recommendedFutureYears = null;
+      return;
     }
     this.lineItem = new Array<PrcDataPoint>();
     this.grantAwarded.forEach(ga => {
@@ -365,6 +378,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   cleanUpSources(): void {
     this.editing = undefined;
     this.selectedSourceId = undefined;
+    this._recommendedFutureYears = null;
     this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(s => {
       this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(s.fundingSourceId);
     });
@@ -464,11 +478,12 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   prepareType4LineItem(): void {
-    this.logger.debug('recommended future years', this.recommendedFutureYears);
-    this.logger.debug('max recommended future years');
+    if (this.lineItem?.length > 0) {
+      this.logger.warn('Replacing existing data:', this.lineItem);
+    }
     this.lineItem = new Array<PrcDataPoint>();
-    if (!!this.recommendedFutureYears) {
-      for (let i = 0; i < Number(this.recommendedFutureYears) + 1; i++) {
+    if (!!this._recommendedFutureYears) {
+      for (let i = 0; i < Number(this._recommendedFutureYears) + 1; i++) {
         const tmp = new PrcDataPoint();
         tmp.grantAward = { year: i + this.currentGrantYear };
         this.lineItem.push(tmp);
