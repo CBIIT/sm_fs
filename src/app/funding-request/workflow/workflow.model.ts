@@ -272,7 +272,7 @@ export class WorkflowModel {
       const approver: FundingReqApproversDto = JSON.parse(JSON.stringify(this.pendingApprovers[0]));
       approver.approverNpnId = user.id;
       approver.approverLdap = user.nciLdapCn;
-      approver.approverFullName = user.fullName;
+      approver.approverFullName = user.firstName + ' ' + user.lastName;
       approver.approverEmailAddress = user.emailAddress;
       this.retrieveDesignees(approver);
       this.pendingApprovers[0] = approver;
@@ -286,7 +286,7 @@ export class WorkflowModel {
       const approver: FundingReqApproversDto = {};
       approver.approverNpnId = user.id;
       approver.approverLdap = user.nciLdapCn;
-      approver.approverFullName = user.fullName;
+      approver.approverFullName = user.firstName + ' ' + user.lastName;
       approver.approverEmailAddress = user.emailAddress;
       approver.assignerFullName = this.userSessionService.getLoggedOnUser().fullName;
       this.retrieveDesignees(approver);

@@ -164,7 +164,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
             results: $.map(data2, user => {
               return {
                 id: user.id,
-                text: user.fullName,
+                text: user.fullName + ' [' + user.parentOrgPath + ']',
                 user
               };
             })
