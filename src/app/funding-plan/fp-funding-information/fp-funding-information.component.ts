@@ -32,4 +32,7 @@ export class FpFundingInformationComponent implements OnInit {
     this.outYear5 = this.planModel.fundingPlanDto.fundingEstYr5Amt;
   }
 
+  get firstYearTotalCalculated(): number {
+    return 0;
+  }
 }
