@@ -1,4 +1,44 @@
 <ng-container *ngIf="readOnlyView; then readonly else edit"></ng-container>
+
+<!-- Header templates for Pay Type 4 and other types -->
+<ng-template #payType4Head>
+  <thead>
+  <tr *ngIf="selectedFundingSources?.length > 0">
+    <th scope="row">Fiscal Year</th>
+    <th scope="col" *ngFor="let fy of type4FiscalYears"><span class="read-only-th">{{ fy }}</span></th>
+  </tr>
+  </thead>
+</ng-template>
+<ng-template #defaultHead>
+  <thead>
+  <tr>
+    <th scope="row">Fiscal Year</th>
+    <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.year }}</span></th>
+  </tr>
+  <tr *ngIf="showPiCosts()">
+    <th scope="row">PI Requested Direct Cost</th>
+    <th scope="col" *ngFor="let ga of grantAwarded"><span
+      class="read-only-th">{{ ga.requestAmount | currency }}</span></th>
+  </tr>
+  <tr *ngIf="showPiCosts()">
+    <th scope="row">PI Requested Total Cost</th>
+    <th scope="col" *ngFor="let ga of grantAwarded"><span
+      class="read-only-th">{{ ga.requestTotalAmount | currency }}</span></th>
+  </tr>
+  <tr *ngIf="showAwardedCosts()">
+    <th scope="row">Awarded Direct Cost</th>
+    <th scope="col" *ngFor="let ga of grantAwarded"><span
+      class="read-only-th">{{ ga.directAmount | currency }}</span></th>
+  </tr>
+  <tr *ngIf="showAwardedCosts()">
+    <th scope="row">Awarded Total Cost</th>
+    <th scope="col" *ngFor="let ga of grantAwarded"><span
+      class="read-only-th">{{ ga.totalAwarded | currency }}</span></th>
+  </tr>
+  </thead>
+</ng-template>
+<!-- end of header templates -->
+
 <!--
   Read-only version of the PRC table for Step 4.  The header is pretty much the same as the editable version and
   probably should be extracted and reused.
@@ -13,33 +53,8 @@
     <div class="col-12">
       <div class="table-responsive">
         <table class="table table-striped prc-table mb-0">
-          <thead>
-          <tr>
-            <th scope="row">Fiscal Year</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.year }}</span></th>
-          </tr>
-          <tr *ngIf="showPiCosts()">
-            <th scope="row">PI Requested Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.requestAmount | currency }}</span></th>
-          </tr>
-          <tr *ngIf="showPiCosts()">
-            <th scope="row">PI Requested Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.requestTotalAmount | currency }}</span></th>
-          </tr>
-          <tr *ngIf="showAwardedCosts()">
-            <th scope="row">Awarded Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.directAmount | currency }}</span>
-            </th>
-          </tr>
-          <tr *ngIf="showAwardedCosts()">
-            <th scope="row">Awarded Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.totalAwarded | currency }}</span></th>
-          </tr>
-          </thead>
+          <ng-container *ngIf="isPayType4 then payType4Head else defaultHead"></ng-container>
+
           <tbody>
           <tr *ngFor="let f of selectedFundingSources; let i = index;">
             <td>
@@ -146,11 +161,8 @@
   Main editable table on Step 2
 -->
 <ng-template #edit>
-
   <hr>
-
   <div class="row">
-
     <div class="col-12">
       <h2>Program Recommended Costs</h2>
       <div *ngIf="!requestModel.isSkip()">
@@ -168,32 +180,7 @@
     <div class="col-12">
       <div class="table-responsive">
         <table class="table table-striped prc-table mb-0">
-          <thead>
-          <tr>
-            <th scope="row">Fiscal Year</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.year }}</span></th>
-          </tr>
-          <tr *ngIf="showPiCosts()">
-            <th scope="row">PI Requested Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.requestAmount | currency }}</span></th>
-          </tr>
-          <tr *ngIf="showPiCosts()">
-            <th scope="row">PI Requested Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.requestTotalAmount | currency }}</span></th>
-          </tr>
-          <tr *ngIf="showAwardedCosts()">
-            <th scope="row">Awarded Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.directAmount | currency }}</span></th>
-          </tr>
-          <tr *ngIf="showAwardedCosts()">
-            <th scope="row">Awarded Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.totalAwarded | currency }}</span></th>
-          </tr>
-          </thead>
+          <ng-container *ngIf="isPayType4 then payType4Head else defaultHead"></ng-container>
           <tbody>
           <tr *ngFor="let f of selectedFundingSources; let i = index;">
             <td>
@@ -263,7 +250,7 @@
           </tr>
           <tr *ngIf="selectedFundingSources.length > 1">
             <td><span class="like-label">Recommended Costs</span></td>
-            <td *ngFor="let li of grantAwarded; let i = index; let first = first; let last = last;">
+            <td *ngFor="let li of summaryRow; let i = index; let first = first;">
               <div class="form-row">
                 <div class="col-6 font-weight-bold">
                   Direct ($)
@@ -297,6 +284,9 @@
   </div>
 
 
+  <!-- ============================================================================================================= -->
+  <!-- Add funding source modal                                                                                      -->
+  <!-- ============================================================================================================= -->
   <form #prcForm="ngForm" (ngSubmit)="onSubmit()" appFundingSourceCostValidator>
     <div class="modal fade" id="add-fsource-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
@@ -778,7 +768,7 @@
             </ng-template>
             <ng-template #pay_type_4>
 
-              <div class="table-responsive" *ngIf="!!recommendedFutureYears">
+              <div class="table-responsive" *ngIf="recommendedFutureYears >= 0">
                 <table class="table prc-table mb-0">
                   <thead>
                   <tr>
@@ -788,7 +778,7 @@
                         <div class="form-row">
                           <div class="col left-label"></div>
                           <div class="col-sm-auto">
-                            <span class="read-only-th">{{ i }}</span>
+                            <span class="read-only-th">{{ i + currentGrantYear }}</span>
                           </div>
                         </div>
                       </div>
@@ -800,7 +790,136 @@
                     </th>
                   </tr>
                   </thead>
-                  <tbody></tbody>
+                  <tbody>
+                  <tr>
+                    <td><label>Program Recommended Costs</label></td>
+                    <td *ngFor="let li of lineItem; let i = index; let first = first; let last = last" scope="col">
+                      <div class="fsource-fy1-form mb-2" *ngIf="first; else notFirst;">
+                      </div>
+
+                      <div class="fsource-fy1-form mb-2" *ngIf="first;">
+                        <div class="form-row form-inline">
+                          <div class="col left-label">
+                            <label for="dc-dollar">Direct Cost</label>
+                          </div>
+                          <div class="col-sm-auto">
+                            <input
+                              type="text"
+                              class="form-control funds-input"
+                              name="recommendedDirect"
+                              #recommendedDirect="ngModel"
+                              [(ngModel)]="li.recommendedDirect"
+                              id="dc-dollar"
+                              aria-describedby="dc-dollar-percent"
+                              pattern="[0-9]*"
+                              [appMinMaxValidator]="{min: 0, max: 999999999}"
+                              required>
+                          </div>
+                          <div class="col-sm-auto right-label" *ngIf="initialPay && !locked">
+                            <span id="dc-dollar-percent">{{ li.percentCutDirectCalculated | percentCut:true}}</span>
+                          </div>
+                          <div
+                            class="text-danger mt-1"
+                            *ngIf="(recommendedDirect.errors?.min || recommendedDirect.errors?.max) && (recommendedDirect.touched || prcForm.submitted)">
+                            Enter a value between 0 and 999,999,999
+                          </div>
+                          <div
+                            class="text-danger mt-1"
+                            *ngIf="recommendedDirect.errors?.pattern && (recommendedDirect.touched || prcForm.submitted)">
+                            Enter numeric value
+                          </div>
+                          <div
+                            class="text-danger mt-1"
+                            *ngIf="recommendedDirect.errors?.required && (recommendedDirect.touched || prcForm.submitted)">
+                            Direct cost is required
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="fsource-fy1-form" *ngIf="first">
+                        <div class="form-row form-inline">
+                          <div class="col left-label">
+                            <label for="tc-dollar2">Total Cost</label>
+                          </div>
+                          <div class="col-sm-auto">
+                            <input
+                              type="text"
+                              class="form-control funds-input"
+                              name="recommendedTotal"
+                              #recommendedTotal="ngModel"
+                              id="tc-dollar2"
+                              [(ngModel)]="li.recommendedTotal"
+                              aria-describedby="tc-dollar-percent"
+                              pattern="[0-9]*"
+                              [appMinMaxValidator]="{min: 0, max: 999999999}"
+                              required>
+                          </div>
+                          <div class="col-sm-auto right-label" *ngIf="initialPay && !locked">
+                            <span id="tc-dollar-percent">{{ li.percentCutTotalCalculated | percentCut:true }}</span>
+                          </div>
+                          <div
+                            class="text-danger mt-1"
+                            *ngIf="(recommendedTotal.errors?.min || recommendedTotal.errors?.max) && (recommendedTotal.touched || prcForm.submitted)">
+                            Enter a value between 0 and 999,999,999
+                          </div>
+                          <div
+                            class="text-danger mt-1"
+                            *ngIf="recommendedTotal.errors?.required && (recommendedTotal.touched || prcForm.submitted)">
+                            Total Cost is required
+                          </div>
+                          <div
+                            class="text-danger mt-1"
+                            *ngIf="prcForm.errors?.totalCostLessThanDirectCost && (recommendedTotal.touched || prcForm.submitted)">
+                            Total Cost must be equal to or greater than the Direct Cost
+                          </div>
+                          <div
+                            class="text-danger mt-1"
+                            *ngIf="recommendedTotal.errors?.pattern && (recommendedTotal.touched || prcForm.submitted)">
+                            Enter numeric value
+                          </div>
+                        </div>
+                      </div>
+                      <div class="fsource-fy1-form" *ngIf="first && lineItem.length > 1">
+                        <div class="form-row form-inline">
+                          <div class="col-sm-auto">
+                            <button type="button"
+                                    class="btn btn-outline-secondary mt-2"
+                                    [disabled]="li.recommendedDirect === undefined"
+                                    (click)="propagate()">
+                              Copy FY1 DC to Future Years
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <ng-template #notFirst>
+                        <div class="d-flex">
+                          <input type="text"
+                                 class="form-control funds-input ml-auto"
+                                 id="tc-dollar3"
+                                 name="recommendedDirect[{{i}}]"
+                                 #recommendedDirectX="ngModel"
+                                 aria-label="direct cost"
+                                 [(ngModel)]="li.recommendedDirect"
+                                 aria-describedby="tc-dollar-percent"
+                                 [appMinMaxValidator]="{min: 0, max: 999999999}"
+                                 pattern="[0-9]*">
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="(recommendedDirectX.errors?.min || recommendedDirectX.errors?.max) && (recommendedDirectX.touched || prcForm.submitted)">
+                          Enter a value between 0 and 999,999,999
+                        </div>
+                        <div
+                          class="text-danger mt-1"
+                          *ngIf="recommendedDirectX.errors?.pattern && (recommendedDirectX.touched || prcForm.submitted)">
+                          Enter numeric value
+                        </div>
+                      </ng-template>
+
+                    </td>
+
+                  </tr>
+                  </tbody>
                 </table>
               </div>
             </ng-template>

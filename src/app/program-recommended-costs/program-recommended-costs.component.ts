@@ -102,6 +102,13 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     return this.requestModel.programRecommendedCostsModel.grantAwarded;
   }
 
+  get currentGrantYear(): number {
+    if (!!this.requestModel?.programRecommendedCostsModel?.grantAwarded) {
+      return this.requestModel.programRecommendedCostsModel.grantAwarded[0].year;
+    }
+    return null;
+  }
+
   constructor(
     public requestModel: RequestModel,
     private propertiesService: AppPropertiesService,
@@ -212,13 +219,11 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
       liClone.push(tmp);
       if (tmp.type === PrcLineItemType.PERCENT_CUT) {
-        this.logger.debug('Percent cut selected for source', this.selectedSourceId);
         this.fundingSourceSynchronizerService.percentSelectedEmitter.next({
           fseId: this.selectedSourceId,
           selected: true
         });
       } else {
-        this.logger.debug(this.selectedSourceId, this.percentCutSourceId);
         if (Number(this.selectedSourceId) === Number(this.percentCutSourceId)) {
           this.logger.debug('Percent cut deselected for source', this.selectedSourceId);
           this.fundingSourceSynchronizerService.percentSelectedEmitter.next({
@@ -236,6 +241,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     $('#add-fsource-modal').modal('hide');
     this.selectedSourceId = undefined;
     this.fsc.selectedValue = undefined;
+    this.recommendedFutureYears = undefined;
   }
 
   editSource(i: number): void {
@@ -253,6 +259,10 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
     this.editing = i;
     this.lineItem = this.getLineItem(edit);
+    this.logger.debug(this.lineItem, this.lineItem?.length);
+    if (this.isPayType4) {
+      this.recommendedFutureYears = this.lineItem?.length - 1;
+    }
     this.logger.debug(this.lineItem.map(l => l.type));
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
@@ -342,7 +352,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   getLineItem(f: FundingRequestFundsSrcDto): PrcDataPoint[] {
-    const tmp = this.requestModel.programRecommendedCostsModel.getLineItemsForSource(f);
+    const tmp = this.requestModel.programRecommendedCostsModel.getLineItemsForSource(f, !this.isPayType4);
     return tmp;
   }
 
@@ -380,7 +390,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   grandTotal(i: number): number {
     let result = 0;
     this.selectedFundingSources.forEach(s => {
-      result += Number(this.getLineItem(s)[i].recommendedTotal || 0);
+      result += Number(this.getLineItem(s)[i]?.recommendedTotal || 0);
     });
     return result;
   }
@@ -388,7 +398,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   grandTotalDirect(i: number): number {
     let result = 0;
     this.selectedFundingSources.forEach(s => {
-      result += Number(this.getLineItem(s)[i].recommendedDirect || 0);
+      result += Number(this.getLineItem(s)[i]?.recommendedDirect || 0);
     });
     return result;
   }
@@ -428,15 +438,43 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     }
   }
 
+  get summaryRow(): number[] {
+    if (this.isPayType4) {
+      return this.type4FiscalYears;
+    }
+    return this.grantAwarded.map(g => g.year);
+  }
+
+  get type4FiscalYears(): number[] {
+    const result = [];
+    let max = 0;
+
+    this.selectedFundingSources.forEach(f => {
+      const l = this.getLineItem(f)?.length || 0;
+      if (l > max) {
+        max = l;
+      }
+    });
+
+    for (let i = 0; i < max; i++) {
+      result.push(i + this.currentGrantYear);
+    }
+
+    return result;
+  }
+
   prepareType4LineItem(): void {
     this.logger.debug('recommended future years', this.recommendedFutureYears);
+    this.logger.debug('max recommended future years');
     this.lineItem = new Array<PrcDataPoint>();
     if (!!this.recommendedFutureYears) {
       for (let i = 0; i < Number(this.recommendedFutureYears) + 1; i++) {
         const tmp = new PrcDataPoint();
-        tmp.grantAward = {year: i};
+        tmp.grantAward = { year: i + this.currentGrantYear };
         this.lineItem.push(tmp);
       }
     }
+
+
   }
 }

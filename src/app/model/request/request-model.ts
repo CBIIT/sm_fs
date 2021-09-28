@@ -280,7 +280,7 @@ export class RequestModel {
         this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
       }
       const tmp = new PrcDataPoint();
-      tmp.grantAward = awardMap.get(b.supportYear);
+      tmp.grantAward = this.isPayType4() ? {year: b.supportYear} as GrantAwardedDto : awardMap.get(b.supportYear);
       tmp.fundingSource = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
       tmp.baselineDirect = this.isInitialPay() ? tmp.grantAward.requestAmount : tmp.grantAward.directAmount;
       tmp.baselineTotal = this.isInitialPay() ? tmp.grantAward.requestTotalAmount : tmp.grantAward.totalAwarded;
@@ -336,7 +336,7 @@ export class RequestModel {
           this.requestCans = [];
           const programCostModel = this.programRecommendedCostsModel;
           for (const fs of programCostModel.selectedFundingSources) {
-            const lineItems = programCostModel.getLineItemsForSourceId(fs.fundingSourceId);
+            const lineItems = programCostModel.getLineItemsForSourceId(fs.fundingSourceId, !this.isPayType4());
             if (lineItems.length > 0) {
               const lineItem0 = lineItems[0];
               const dto: FundingRequestCanDto = {};
