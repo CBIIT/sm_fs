@@ -1,16 +1,19 @@
 <ng-container [ngModelGroup]="rfaDetails.rfaPaNumber">
   <ng-container *ngIf="readOnly then static else dynamic"></ng-container>
   <ng-template #dynamic>
-    <div class="d-flex">
+    <div class="col_2">
       <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="issueType" [(ngModel)]="issueType">
         <label ngbButtonLabel class="btn-outline-secondary">
           <input name="new" ngbButton type="radio" value="new" (change)="toggleDisplay('new')">New
         </label>
         <label ngbButtonLabel class="btn-outline-secondary">
-          <input name="reissue" ngbButton type="radio" value="reissue" (change)="toggleDisplay('reissue')">Reissue
-        </label>
+          <input name="reissue" ngbButton type="radio" value="reissue" (change)="toggleDisplay('reissue')">Reissue          
+        </label> 
       </div>
-      <input
+      <div class="col_2" *ngIf="issueType==='reissue'">
+        <br><i>Previous FOA: </i>
+      </div>
+    <input
         type="text"
         [id]="'notice-' + index"
         style="width:7rem"
@@ -39,7 +42,7 @@
       <label *ngIf="issueType==='new'">New</label>
       <label *ngIf="issueType==='reissue'">Reissue</label>
     </div>
-    <div>
+    <div *ngIf="issueType==='reissue'">
       <i>Previous FOA: <app-foa-hyperlink [foaNumber]="priorNotice"></app-foa-hyperlink></i>
     </div>
   </ng-template>
