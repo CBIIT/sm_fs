@@ -1,4 +1,44 @@
 <ng-container *ngIf="readOnlyView; then readonly else edit"></ng-container>
+
+<!-- Header templates for Pay Type 4 and other types -->
+<ng-template #payType4Head>
+  <thead>
+  <tr *ngIf="selectedFundingSources?.length > 0">
+    <th scope="row">Fiscal Year</th>
+    <th scope="col" *ngFor="let fy of type4FiscalYears"><span class="read-only-th">{{ fy }}</span></th>
+  </tr>
+  </thead>
+</ng-template>
+<ng-template #defaultHead>
+  <thead>
+  <tr>
+    <th scope="row">Fiscal Year</th>
+    <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.year }}</span></th>
+  </tr>
+  <tr *ngIf="showPiCosts()">
+    <th scope="row">PI Requested Direct Cost</th>
+    <th scope="col" *ngFor="let ga of grantAwarded"><span
+      class="read-only-th">{{ ga.requestAmount | currency }}</span></th>
+  </tr>
+  <tr *ngIf="showPiCosts()">
+    <th scope="row">PI Requested Total Cost</th>
+    <th scope="col" *ngFor="let ga of grantAwarded"><span
+      class="read-only-th">{{ ga.requestTotalAmount | currency }}</span></th>
+  </tr>
+  <tr *ngIf="showAwardedCosts()">
+    <th scope="row">Awarded Direct Cost</th>
+    <th scope="col" *ngFor="let ga of grantAwarded"><span
+      class="read-only-th">{{ ga.directAmount | currency }}</span></th>
+  </tr>
+  <tr *ngIf="showAwardedCosts()">
+    <th scope="row">Awarded Total Cost</th>
+    <th scope="col" *ngFor="let ga of grantAwarded"><span
+      class="read-only-th">{{ ga.totalAwarded | currency }}</span></th>
+  </tr>
+  </thead>
+</ng-template>
+<!-- end of header templates -->
+
 <!--
   Read-only version of the PRC table for Step 4.  The header is pretty much the same as the editable version and
   probably should be extracted and reused.
@@ -13,33 +53,8 @@
     <div class="col-12">
       <div class="table-responsive">
         <table class="table table-striped prc-table mb-0">
-          <thead>
-          <tr>
-            <th scope="row">Fiscal Year</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.year }}</span></th>
-          </tr>
-          <tr *ngIf="showPiCosts()">
-            <th scope="row">PI Requested Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.requestAmount | currency }}</span></th>
-          </tr>
-          <tr *ngIf="showPiCosts()">
-            <th scope="row">PI Requested Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.requestTotalAmount | currency }}</span></th>
-          </tr>
-          <tr *ngIf="showAwardedCosts()">
-            <th scope="row">Awarded Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.directAmount | currency }}</span>
-            </th>
-          </tr>
-          <tr *ngIf="showAwardedCosts()">
-            <th scope="row">Awarded Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.totalAwarded | currency }}</span></th>
-          </tr>
-          </thead>
+          <ng-container *ngIf="isPayType4 then payType4Head else defaultHead"></ng-container>
+
           <tbody>
           <tr *ngFor="let f of selectedFundingSources; let i = index;">
             <td>
@@ -166,42 +181,6 @@
       <div class="table-responsive">
         <table class="table table-striped prc-table mb-0">
           <ng-container *ngIf="isPayType4 then payType4Head else defaultHead"></ng-container>
-          <ng-template #payType4Head>
-            <thead>
-              <tr *ngIf="selectedFundingSources?.length > 0">
-                <th scope="row">Fiscal Year</th>
-                <th scope="col" *ngFor="let fy of type4FiscalYears"><span class="read-only-th">{{ fy }}</span></th>
-              </tr>
-            </thead>
-          </ng-template>
-          <ng-template #defaultHead>
-          <thead>
-          <tr>
-            <th scope="row">Fiscal Year</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.year }}</span></th>
-          </tr>
-          <tr *ngIf="showPiCosts()">
-            <th scope="row">PI Requested Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.requestAmount | currency }}</span></th>
-          </tr>
-          <tr *ngIf="showPiCosts()">
-            <th scope="row">PI Requested Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.requestTotalAmount | currency }}</span></th>
-          </tr>
-          <tr *ngIf="showAwardedCosts()">
-            <th scope="row">Awarded Direct Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.directAmount | currency }}</span></th>
-          </tr>
-          <tr *ngIf="showAwardedCosts()">
-            <th scope="row">Awarded Total Cost</th>
-            <th scope="col" *ngFor="let ga of grantAwarded"><span
-              class="read-only-th">{{ ga.totalAwarded | currency }}</span></th>
-          </tr>
-          </thead>
-          </ng-template>
           <tbody>
           <tr *ngFor="let f of selectedFundingSources; let i = index;">
             <td>

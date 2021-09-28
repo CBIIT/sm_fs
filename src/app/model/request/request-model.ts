@@ -280,7 +280,7 @@ export class RequestModel {
         this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
       }
       const tmp = new PrcDataPoint();
-      tmp.grantAward = awardMap.get(b.supportYear);
+      tmp.grantAward = this.isPayType4() ? {year: b.supportYear} as GrantAwardedDto : awardMap.get(b.supportYear);
       tmp.fundingSource = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
       tmp.baselineDirect = this.isInitialPay() ? tmp.grantAward.requestAmount : tmp.grantAward.directAmount;
       tmp.baselineTotal = this.isInitialPay() ? tmp.grantAward.requestTotalAmount : tmp.grantAward.totalAwarded;

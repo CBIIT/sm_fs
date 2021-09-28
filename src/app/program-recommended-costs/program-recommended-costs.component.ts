@@ -219,13 +219,11 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
       liClone.push(tmp);
       if (tmp.type === PrcLineItemType.PERCENT_CUT) {
-        this.logger.debug('Percent cut selected for source', this.selectedSourceId);
         this.fundingSourceSynchronizerService.percentSelectedEmitter.next({
           fseId: this.selectedSourceId,
           selected: true
         });
       } else {
-        this.logger.debug(this.selectedSourceId, this.percentCutSourceId);
         if (Number(this.selectedSourceId) === Number(this.percentCutSourceId)) {
           this.logger.debug('Percent cut deselected for source', this.selectedSourceId);
           this.fundingSourceSynchronizerService.percentSelectedEmitter.next({
@@ -243,6 +241,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     $('#add-fsource-modal').modal('hide');
     this.selectedSourceId = undefined;
     this.fsc.selectedValue = undefined;
+    this.recommendedFutureYears = undefined;
   }
 
   editSource(i: number): void {
