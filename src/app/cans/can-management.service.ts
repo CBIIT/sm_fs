@@ -46,8 +46,7 @@ export class CanManagementService {
     if (!applId) {
       applId = this.requestModel?.grant?.applId;
     }
-    if (!applId) {
-      this.logger.warn('no applId provided: can\'t load projected can');
+    if (!applId || !frtId) {
       return new Observable(subscriber => {
         subscriber.next(null);
         subscriber.complete();
