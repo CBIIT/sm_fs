@@ -55,6 +55,9 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   public _docDto: DocumentsDto = {};
   maxFileSize = 10485760; // 10MB
   budgetDocDtos: Observable<DocumentsDto[]>;
+  showValidations: boolean = false;
+  isFileSelected: boolean = false;
+  isTypeSelected: boolean = false;
 
   get selectedDocType(): string {
     return this._selectedDocType;
@@ -200,6 +203,9 @@ export class UploadBudgetDocumentsComponent implements OnInit {
     this.selectedDocType = '';
     this.docDescription = '';
     this.disableFile = true;
+    this.showValidations = false;
+    this.isFileSelected = false;
+    this.isTypeSelected = false;
   }
 
   downloadFile(id: number, fileName: string): void {
@@ -240,6 +246,22 @@ export class UploadBudgetDocumentsComponent implements OnInit {
         element.push(docType);
       }
     });
+  }
+
+  isFromValid(): boolean {
+
+    if (this.inputFile.nativeElement.value !== '') {
+      this.isFileSelected = true;
+    }
+    if (this.selectedDocType !== '') {
+      this.isTypeSelected = true;
+    }
+    if (this.isFileSelected || this.isTypeSelected) {
+      this.showValidations = true;
+      return false;
+    }
+    
+    return true;
   }
 
 }

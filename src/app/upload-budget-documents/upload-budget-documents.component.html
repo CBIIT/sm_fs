@@ -1,4 +1,11 @@
 <div class="row">
+    <div *ngIf="showValidations" class="col-lg-12 alert alert-danger">
+        Your attempt to upload a file is incomplete. You must either clear the fields identified in red or complete the
+        file upload to proceed.
+
+    </div>
+</div>
+<div class="row">
     <div class="col-12">
         <h3>Budget Documents (optional)</h3>
         <p><small class="text-muted">You may upload Microsoft Word, Microsoft Excel, or Adobe Acrobat document(s) only.
@@ -12,7 +19,7 @@
         <div class="form-group">
             <label for="type">Doc Type</label>
             <ng-select2 id="type" [(ngModel)]="selectedDocType" [allowClear]="true"
-                (ngModelChange)="onDocTypeChange($event)" >
+                (ngModelChange)="onDocTypeChange($event)">
                 <option></option>
                 <option *ngFor="let docType of docTypes | async" [value]="docType"> {{docType}}
                 </option>

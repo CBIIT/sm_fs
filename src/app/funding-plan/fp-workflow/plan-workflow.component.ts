@@ -24,6 +24,7 @@ import { DatepickerFormatter } from 'src/app/datepicker/datepicker-adapter-forma
 import { Router } from '@angular/router';
 import { AppPropertiesService } from 'src/app/service/app-properties.service';
 import { FpGrantManagementComponent } from './fp-grant-management/fp-grant-management.component';
+import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -43,6 +44,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   @ViewChild(FpGrantManagementComponent) gmComponent: FpGrantManagementComponent;
 
   budgetInfoComponent: BudgetInfoComponent;
+  uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
 
   approverInitializationSubscription: Subscription;
   approverChangeSubscription: Subscription;
@@ -97,15 +99,15 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   }
 
   constructor(private requestIntegrationService: FundingRequestIntegrationService,
-              private workflowService: FsPlanWorkflowControllerService,
-              private planService: FsPlanControllerService,
-              private propertiesService: AppPropertiesService,
-              private userSessionService: AppUserSessionService,
-              private planModel: PlanModel,
-              private workflowModel: WorkflowModel,
-              private calendar: NgbCalendar,
-              private router: Router,
-              private logger: NGXLogger) {
+    private workflowService: FsPlanWorkflowControllerService,
+    private planService: FsPlanControllerService,
+    private propertiesService: AppPropertiesService,
+    private userSessionService: AppUserSessionService,
+    private planModel: PlanModel,
+    private workflowModel: WorkflowModel,
+    private calendar: NgbCalendar,
+    private router: Router,
+    private logger: NGXLogger) {
   }
 
   ngOnDestroy(): void {
@@ -204,7 +206,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   fetchCompletedPfr(): void {
     if (this.workflowModel.isUserNextInChain && this.workflowModel.lastInChain) {
       this.planService.getCompletedPFRsUsingGET(this.planModel.fundingPlanDto.fprId).subscribe(
-//      this.planService.getCompletedPFRsUsingGET(124).subscribe(
+        //      this.planService.getCompletedPFRsUsingGET(124).subscribe(
         result => this.completedPfrs = result,
         error => {
           this.logger.error('calling getCompletedPFRsUsingGET failed ', error);
@@ -284,7 +286,8 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     if (this.workflowStuckBy) {
       return;
     }
-    if (this.gmComponent && !this.gmComponent.isFormValid()) {
+    if ((this.gmComponent && !this.gmComponent.isFormValid()) ||
+      (this.uploadBudgetDocumentsComponent && !this.uploadBudgetDocumentsComponent.isFromValid())) {
       valid = false;
     }
     if (!this.isFormValid()) {
@@ -342,7 +345,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       }
     }
 
-    if ( this.workflowModel.isGMApprover &&
+    if (this.workflowModel.isGMApprover &&
       this.workflowModel.isApprovalAction(action)) {
       dto.planGmInfo = this.gmComponent?.getGmInfos();
     }
@@ -355,8 +358,8 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         if (this.workflowModel.isSplApprover
           && this.workflowModel.isApprovalAction(action)
           && this.splMeetingDate) {
-            this.planModel.fundingPlanDto.splMeetingDate = new Date(dto.splMeetingDate);
-            this.logger.debug('set SplMeetingDate to planModel ' + this.planModel.fundingPlanDto.splMeetingDate);
+          this.planModel.fundingPlanDto.splMeetingDate = new Date(dto.splMeetingDate);
+          this.logger.debug('set SplMeetingDate to planModel ' + this.planModel.fundingPlanDto.splMeetingDate);
         }
         else if (dto.action === WorkflowActionCode.RETURN) {
           this.planModel.fundingPlanDto.splMeetingDate = undefined;
@@ -373,7 +376,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   checkIfStuck(): void {
     if ((this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE ||
-        this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE_COMMENT) &&
+      this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE_COMMENT) &&
       this.approvingState &&
       this.workflowModel.lastInChain &&
       this.completedPfrs &&

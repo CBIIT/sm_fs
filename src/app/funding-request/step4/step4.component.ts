@@ -97,6 +97,10 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     if (this.budgetInfoComponent && this.workflowComponent) {
       this.workflowComponent.budgetInfoComponent = this.budgetInfoComponent;
     }
+
+    if (this.uploadBudgetDocumentsComponent && this.workflowComponent) {
+      this.workflowComponent.uploadBudgetDocumentsComponent = this.uploadBudgetDocumentsComponent;
+    }
   }
 
   ngOnDestroy(): void {

@@ -12,6 +12,7 @@ import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.componen
 import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
 import { Alert } from 'src/app/alert-billboard/alert';
 import { WorkflowWarningModalComponent } from './warning-modal/workflow-warning-modal.component';
+import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -28,6 +29,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   @ViewChild(WorkflowWarningModalComponent) workflowWarningModalComponent: WorkflowWarningModalComponent;
   @Output() actionEmitter = new EventEmitter<string>();
   budgetInfoComponent: BudgetInfoComponent;
+  uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
 
   approverInitializationSubscription: Subscription;
   approverChangeSubscription: Subscription;
@@ -251,7 +253,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.validationError = {};
     let valid = true;
     if ((this.gmInfoComponent && !this.gmInfoComponent.isFormValid()) ||
-        (this.approvedCostsComponent && !this.approvedCostsComponent?.isFormValid()) ) {
+        (this.approvedCostsComponent && !this.approvedCostsComponent?.isFormValid()) ||
+        (this.uploadBudgetDocumentsComponent && !this.uploadBudgetDocumentsComponent.isFromValid()) ) {
       valid = false;
     }
     if (! this.isFormValid()) {

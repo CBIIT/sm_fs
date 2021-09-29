@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DocumentsDto, FsPlanControllerService, FsPlanWorkflowControllerService,
   FundingReqApproversDto, FundingReqStatusHistoryDto,
@@ -16,6 +16,7 @@ import { AppUserSessionService } from 'src/app/service/app-user-session.service'
 import { PlanWorkflowComponent } from '../fp-workflow/plan-workflow.component';
 import { NgForm } from '@angular/forms';
 import { DocTypeConstants } from './plan-supporting-docs-readonly/plan-supporting-docs-readonly.component';
+import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
 
 @Component({
   selector: 'app-plan-step6',
@@ -23,9 +24,10 @@ import { DocTypeConstants } from './plan-supporting-docs-readonly/plan-supportin
   styleUrls: ['./plan-step6.component.css'],
   providers: [WorkflowModel]
 })
-export class PlanStep6Component implements OnInit {
+export class PlanStep6Component implements OnInit, AfterViewInit {
   @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
   @ViewChild(PlanWorkflowComponent) workflowComponent: PlanWorkflowComponent;
+  @ViewChild(UploadBudgetDocumentsComponent) uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
 
   grantsSkipped: NciPfrGrantQueryDtoEx[] = [];
   grantsNotConsidered: NciPfrGrantQueryDtoEx[] = [];
@@ -71,6 +73,13 @@ export class PlanStep6Component implements OnInit {
               private logger: NGXLogger,
               private changeDetection: ChangeDetectorRef,
               private router: Router) { }
+
+
+  ngAfterViewInit(): void {
+    if (this.uploadBudgetDocumentsComponent && this.workflowComponent) {
+      this.workflowComponent.uploadBudgetDocumentsComponent = this.uploadBudgetDocumentsComponent;
+    }
+  }
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(6, true);
