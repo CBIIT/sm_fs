@@ -3,7 +3,7 @@
 <!-- Header templates for Pay Type 4 and other types -->
 <ng-template #payType4Head>
   <thead>
-  <tr *ngIf="selectedFundingSources?.length > 0">
+  <tr *ngIf="selectedFundingSources && selectedFundingSources.length > 0">
     <th scope="row">Fiscal Year</th>
     <th scope="col" *ngFor="let fy of type4FiscalYears"><span class="read-only-th">{{ fy }}</span></th>
   </tr>

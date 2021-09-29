@@ -463,7 +463,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     const result = [];
     let max = 0;
 
-    this.selectedFundingSources.forEach(f => {
+    this.selectedFundingSources?.forEach(f => {
       const l = this.getLineItem(f)?.length || 0;
       if (l > max) {
         max = l;
