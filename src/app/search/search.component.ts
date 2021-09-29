@@ -33,7 +33,7 @@ export class SearchComponent implements OnInit {
     let fsCritera: FundSelectSearchCriteria = {};
     fsCritera.fyFrom = sc.fyRange?.fromFy;
     fsCritera.fyTo = sc.fyRange?.toFy;
-    fsCritera.requestType = [sc.fundingRequestType];
+    fsCritera.requestType = sc.frTypes;
     fsCritera.statusCodes = sc.fundingRequestStatus;
     // fsCritera.rfaPaNumber = [sc.rfaPa];
     fsCritera.grantIc = sc.grantNumber?.grantNumberIC;

@@ -1,0 +1,27 @@
+<div class="form-group">
+  <label for="funding-request-type-select">Request Type <a href="#" (click)="openPdfDoc()">
+    <i class="fas fa-question-circle more-info"></i></a></label>
+  <ng-select2
+    id="funding-request-type-select"
+    name="fundingRequestType"
+    #fundingRequestType="ngModel"
+    ngModel
+    [allowClear]="true"
+    [data]="data"
+    [options]="options"
+    [ngClass]="{'is-invalid': (!fundingRequestType.valid && (fundingRequestType.touched || (parentForm && parentForm.submitted)))}"
+    [required]="required"
+    [ngModelOptions]="{updateOn: 'change'}"
+    (ngModelChange)="onSelect($event)">
+  </ng-select2>
+  <div
+    class="text-danger mt-1"
+    *ngIf="fundingRequestType.errors?.required && (fundingRequestType.touched || (parentForm && parentForm.submitted))">
+    Request type is required
+  </div>
+  <input type="hidden" name="frTypes" ngModel #frTypes="ngModel">
+</div>
+
+
+
+

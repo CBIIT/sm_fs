@@ -141,6 +141,7 @@ import { FundingSourceEntryModalComponent } from './funding-plan/applications-pr
 import { SelectFundingRequestCheckboxCellRendererComponent } from './search/search-result/select-funding-request-checkbox-cell-renderer/select-funding-request-checkbox-cell-renderer.component';
 import { SearchFundingRequestActionCellRendererComponent } from './search/search-result/search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component';
 import { WorkflowWarningModalComponent } from './funding-request/workflow/warning-modal/workflow-warning-modal.component';
+import { AppSearchFundingRequestTypeComponent } from './search/lib-funding-request-type/app-search-funding-request-type.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -289,7 +290,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FundingSourceEntryModalComponent,
     SelectFundingRequestCheckboxCellRendererComponent,
     SearchFundingRequestActionCellRendererComponent,
-    WorkflowWarningModalComponent
+    WorkflowWarningModalComponent,
+    AppSearchFundingRequestTypeComponent
   ],
 
 
