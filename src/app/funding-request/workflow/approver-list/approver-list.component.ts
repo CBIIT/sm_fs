@@ -79,4 +79,8 @@ export class ApproverListComponent implements OnInit, OnDestroy {
     return value.roleName ? value.roleName : 'Additional Approver (Added by ' + value.assignerFullName + ')';
   }
 
+  showActionColumn(): boolean {
+    return this.additionalApprovers && this.additionalApprovers.length > 0;
+  }
+
 }

@@ -31,6 +31,7 @@
                 <th scope="col" style="width:14rem" >Name</th>
                 <th scope="col" style="width:24rem">Official Role</th>
                 <th scope="col">Designees</th>
+                <th scope="col" *ngIf="showActionColumn()">Action</th>
             </tr>
         </thead>
         <tbody cdkDropList (cdkDropListDropped)="dropped($event)">
@@ -42,6 +43,7 @@
                 <td><span *ngFor="let d of oneApprover.designees">
                     <a href="mailto:{{d.delegateToEmailAddr}}?subject={{emailSubject}}">{{d.delegateToFullName}}</a><br/>
                     </span></td>
+                <td *ngIf="showActionColumn()"></td>
                 </tr>
         </ng-container>
         <ng-container aa class="drag-boundary">
@@ -53,7 +55,8 @@
                     <a href="mailto:{{d.delegateToEmailAddr}}?subject={{emailSubject}}">{{d.delegateToFullName}}</a><br/>
                     </span>
                     </div>
-                    <div class="float-right">
+                </td>
+                <td><div class="float-right">
                     <button class="btn btn-link btn-delete btn-slim" title="Delete" 
                     (click)="deleteAdditionalApprover(i)">
                     <i class="fas fa-trash" aria-hidden="true"></i>
@@ -71,6 +74,7 @@
                 <td><span *ngFor="let d of a.designees">
                 <a href="mailto:{{d.delegateToEmailAddr}}?subject={{emailSubject}}">{{d.delegateToFullName}}</a><br/>
                 </span></td>
+                <td *ngIf="showActionColumn()"></td>
             </tr>
         </ng-container>
     </tbody>
