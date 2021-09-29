@@ -18,10 +18,10 @@
  * in the Program Recommended Costs table will have a collection of data points, one for each award year.
  *
  */
-import {FundingRequestFundsSrcDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {GrantAwardedDto} from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
-import {isNumeric} from 'rxjs/internal-compatibility';
-import {FundingReqBudgetsDto} from '@nci-cbiit/i2ecws-lib';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
+import { isNumeric } from 'rxjs/internal-compatibility';
+import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib';
 
 export enum PrcLineItemType {
   PERCENT_CUT,
@@ -94,6 +94,9 @@ export class PrcDataPoint {
 
 
   asBudget(): FundingReqBudgetsDto {
+    if (!this.fundingSource) {
+      return null;
+    }
     const result: FundingReqBudgetsDto = {};
     result.dcRecAmt = this._recommendedDirect;
     result.tcRecAmt = this._recommendedTotal;

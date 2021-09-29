@@ -244,6 +244,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     });
 
     this.requestModel.programRecommendedCostsModel.addFundingSourceById(this.selectedSourceId, liClone);
+    if (this.isPayType4) {
+      this.requestModel.programRecommendedCostsModel.padJaggedLineItems();
+    }
     this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(this.selectedSourceId);
     // @ts-ignore
     $('#add-fsource-modal').modal('hide');

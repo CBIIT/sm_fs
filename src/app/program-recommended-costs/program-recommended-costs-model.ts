@@ -145,6 +145,22 @@ export class ProgramRecommendedCostsModel {
     return true;
   }
 
+  padJaggedLineItems(): void {
+    let maxLength = 0;
+    this.selectedFundingSources.forEach(s => {
+      if (this.getLineItemsForSource(s, false)?.length > maxLength) {
+        maxLength = this.getLineItemsForSource(s, false).length;
+      }
+    });
+    let data: PrcDataPoint[];
+    this.selectedFundingSources.forEach(s => {
+      data = this.getLineItemsForSource(s, false);
+      while (data.length < maxLength) {
+        data.push(new PrcDataPoint());
+      }
+    });
+  }
+
   isSelected(source: FundingRequestFundsSrcDto): boolean {
     if (!this._selectedFundingSources || this._selectedFundingSources.length === 0) {
       return false;
