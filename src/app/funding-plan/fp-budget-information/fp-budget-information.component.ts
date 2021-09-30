@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
-import { CanCcxDto, FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto, FsRequestControllerService, FundingRequestCanDisplayDto } from '@nci-cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
@@ -19,6 +19,8 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
+  fundingSourceCanViewMatrix: Map<number, any>;
+  private canDisplayMatrix: Map<number, FundingRequestCanDisplayDto>;
 
   constructor(
     private modalService: NgbModal,
@@ -41,6 +43,12 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
           this.projectedApplIdCans.set(key, next.can);
         }
       }
+    });
+
+    const fseIds: number[] = this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.map(s => s.fundingSourceId);
+    this.canManagementService.getFundingRequestCanDisplays(fseIds).subscribe(result => {
+      this.logger.debug('CAN display matrix:', result);
+      this.canDisplayMatrix = new Map(result.map(c => [c.fseId, c]));
     });
   }
 

@@ -2,7 +2,7 @@ import { Injectable, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import {
   CanCcxDto,
-  FsCanControllerService,
+  FsCanControllerService, FundingRequestCanDisplayDto,
   FundingRequestCanDto,
   FundingRequestGrantCanDto,
   OefiaCodingDto
@@ -40,6 +40,10 @@ export class CanManagementService {
   refreshCans(): void {
     this.refreshDefaultCans();
     this.refreshGrantCans();
+  }
+
+  getFundingRequestCanDisplays(fseIds: number[]): Observable<FundingRequestCanDisplayDto[]> {
+    return this.canService.getFundingRequestCanDisplaysUsingGET(fseIds);
   }
 
   getProjectedCan(fseId: number, oefiaTypeId: number, frtId: number, applId?: number): Observable<CanCcxDto> {
