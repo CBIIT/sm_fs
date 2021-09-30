@@ -15,6 +15,7 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
   @Input() requestOrPlan: 'REQUEST'|'PLAN' = 'REQUEST';
   histories: FundingReqStatusHistoryDto[];
   requestSubmissionEventSubscriber: Subscription;
+  title: string;
 
   constructor(private requestModel: RequestModel,
               private planModel: PlanModel,
@@ -30,6 +31,7 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.title = this.requestOrPlan === 'REQUEST' ? 'Request History' : 'Funding Plan History';
     this.loadHistory();
     this.requestSubmissionEventSubscriber = this.requestIntegrationService.requestSubmissionEmitter.subscribe(
       () => { this.loadHistory(); }

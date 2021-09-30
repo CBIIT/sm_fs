@@ -1,17 +1,26 @@
-<table id="requestHistory" class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th scope="col">Date</th>
-            <th scope="col">Action</th>
-            <th scope="col">Comments</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let history of histories">
-            <td>{{history.startDate}}</td>
-            <td>{{ history.statusShortDescrip }} by <span [innerHTML]="history | mailtoFormatter:'performedBy':'email':'Request History'"></span></td>
-            <td>{{history.comments}}</td>
-        </tr>
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-12 d-flex">
+      <h2>{{title}}</h2>
+      <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#request-plan-history-collapse" role="button"
+        aria-expanded="true" aria-controls="request-plan-history-collapse"></a>
+    </div>
+    <div class="col-12 collapse show" id="request-plan-history-collapse">
+    <table id="requestHistory" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Action</th>
+                <th scope="col">Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let history of histories">
+                <td>{{history.startDate}}</td>
+                <td>{{ history.statusShortDescrip }} by <span [innerHTML]="history | mailtoFormatter:'performedBy':'email':'Request History'"></span></td>
+                <td>{{history.comments}}</td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+</div>
 
