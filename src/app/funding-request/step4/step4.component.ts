@@ -132,7 +132,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     // }
   }
 
-  private isDocsStepCompleted() {
+  private isDocsStepCompleted(): void {
     if (!this.justificationMissing && !this.transitionMemoMissing) {
       this.navigationModel.setStepComplete(3, true);
     } else {
