@@ -116,9 +116,7 @@ export class ProgramRecommendedCostsModel {
       this.logger.warn('No funding source found for removal at index ', index);
     } else {
       this._selectedFundingSources.splice(index, 1);
-      this.logger.debug(this.prcLineItems);
       this.prcLineItems.delete(removed.fundingSourceId);
-      this.logger.debug(this.prcLineItems);
     }
     if (saved) {
       this.deletedSources.push(removed.fundingSourceId);
@@ -127,7 +125,6 @@ export class ProgramRecommendedCostsModel {
   }
 
   addFundingSourceById(id: number, dataPoints: Array<PrcDataPoint>): boolean {
-    this.logger.debug('add source for id', id, dataPoints);
     const source = this._fundingSourcesMap.get(Number(id));
     if (!source) {
       this.logger.warn('no source found in', this._fundingSourcesMap);
@@ -146,6 +143,7 @@ export class ProgramRecommendedCostsModel {
   }
 
   padJaggedLineItems(): void {
+    this.truncateNullLineItems();
     let maxLength = 0;
     this.selectedFundingSources.forEach(s => {
       if (this.getLineItemsForSource(s, false)?.length > maxLength) {
@@ -158,6 +156,15 @@ export class ProgramRecommendedCostsModel {
       while (data.length < maxLength) {
         data.push(new PrcDataPoint());
       }
+    });
+  }
+
+  truncateNullLineItems(): void {
+    let li: PrcDataPoint[];
+    this.selectedFundingSources.forEach(s => {
+      li = this.getLineItemsForSource(s, false);
+      li = li.filter(dp => !!dp.grantAward);
+      this.prcLineItems.set(Number(s.fundingSourceId), li);
     });
   }
 

@@ -314,6 +314,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
       if (Number(removed) === Number(this.percentCutSourceId)) {
         this.fundingSourceSynchronizerService.percentSelectedEmitter.next({ fseId: removed, selected: false });
       }
+      if (this.isPayType4) {
+        this.requestModel.programRecommendedCostsModel.padJaggedLineItems();
+      }
     }
   }
 
