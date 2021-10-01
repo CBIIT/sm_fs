@@ -1,13 +1,13 @@
   <div class="row">
     <div class="col-12">
-      <h2>Results {{(filterTypeLabel && !noResult) ? '- ' + filterTypeLabel : ''}}</h2>
+      <h2>Results {{(filterTypeLabel && (!noFundingRequestResult || !noFundingPlanResult)) ? '- ' + filterTypeLabel : ''}}</h2>
       <p *ngIf="!fundingRequests || fundingRequests.length === 0">No results to display. Try applying a filter above and clicking "Search".</p>
     </div>
   </div>
   <div class="row">
     <div class="col-12">
-      <div [hidden]="noResult">
-        <table id="frDt" #frDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
+      <div [hidden]="noFundingRequestResult" style="width: 100%">
+        <table id="frDt" #frDt datatable [dtOptions]="dtFundingRequestOptions" [dtTrigger]="dtFundingRequestTrigger" class="row-border hover" style="width: 100%">
         </table>
         <!--          Renderer templates -->
         <ng-template #selectFundingRequestCheckboxRenderer let-data="adtData">
@@ -23,5 +23,16 @@
           <app-search-funding-request-action-cell-renderer [data]="data"></app-search-funding-request-action-cell-renderer>
         </ng-template>
       </div>
+    </div>
+    <div [hidden]="noFundingPlanResult" style="width: 100%">
+      <table id="fpDt" #fpDt datatable [dtOptions]="dtFundingPlanOptions" [dtTrigger]="dtFundingPlanTrigger" class="row-border hover" style="width: 100%">
+      </table>
+      <!--          Renderer templates -->
+      <ng-template #selectFundingPlanCheckboxRenderer let-data="adtData">
+        <app-select-grant-checkbox-cell-renderer [data]="data" (emitter)="onCaptureSelectedEvent($event)"></app-select-grant-checkbox-cell-renderer>
+      </ng-template>
+      <ng-template #searchFundingPlanActionRenderer let-data="adtData">
+        <app-search-funding-request-action-cell-renderer [data]="data"></app-search-funding-request-action-cell-renderer>
+      </ng-template>
     </div>
   </div>
