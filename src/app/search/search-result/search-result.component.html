@@ -1,7 +1,7 @@
   <div class="row">
     <div class="col-12">
-      <h2>Results {{(filterTypeLabel && (!noFundingRequestResult || !noFundingPlanResult)) ? '- ' + filterTypeLabel : ''}}</h2>
-      <p *ngIf="!fundingRequests || fundingRequests.length === 0">No results to display. Try applying a filter above and clicking "Search".</p>
+      <h2>Results {{(filterTypeLabel && !(noFundingRequestResult && noFundingPlanResult)) ? '- ' + filterTypeLabel : ''}}</h2>
+      <p *ngIf="noFundingRequestResult && noFundingPlanResult">No results to display. Try applying a filter above and clicking "Search".</p>
     </div>
   </div>
   <div class="row"  [hidden]="noFundingRequestResult">

@@ -175,7 +175,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {responsivePriority: 13, targets: 4 }, // i2 status
         {responsivePriority: 14, targets: 3 } // project title
       ],
-      dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
+      dom: '<"dt-controls dt-top"l<"ml-4"i><"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
       buttons: [
         {
           extend: 'excel',
@@ -248,7 +248,6 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.dtElements.forEach((dtEl: DataTableDirective) => {
                   if (dtEl.dtInstance) {
                     dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
-                      console.log('dtElement - columns - adjust');
                       dtInstance.columns.adjust();
                     });
                   }
@@ -260,19 +259,19 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       columns: [
         {title: 'Sel', data: 'selected', orderable: false, ngTemplateRef: { ref: this.selectFundingRequestCheckboxRenderer }, className: 'all' }, // 0
-        {title: 'RFA/PA info - Number / Title / NCAB / Issue Type', data: 'fpFoasList', orderable: false,
+        {title: 'FOA information', data: 'fpFoasList', orderable: false,
           ngTemplateRef: { ref: this.searchFundingPlanFoasRenderer },className: 'all'}, // 1
         {title: 'Plan ID', data: 'fprId'}, // 2
         {title: 'Plan Name', data: 'planName'}, // 3
         {title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: ( data, type, row, meta ) => {
             return (!data || data == null) ? '' : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + data + '</a>';
           }}, // 4
-        {title: 'Requesting DOC Approver', data: 'comments', render: ( data, type, row, meta ) => { //TODO
+        {title: 'Requesting DOC Approver', data: 'requestorDoc', render: ( data, type, row, meta ) => { //TODO
             return (!data || data == null) ? '' : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + data + '</a>';
           }}, // 5
         {title: 'Final LOA', data: 'loaName'}, // 6
         {title: 'Funding Approvals', data: 'fundsCertificationCode'}, // 7
-        {title: 'Program Recomm. Direct Costs', data: 'totalRecommendedAmt'}, // 8  //TODO
+        {title: 'Program Recomm. Direct Costs', data: 'directRecommendedAmt'}, // 8  //TODO
         {title: 'Program Recomm. Total Costs', data: 'totalRecommendedAmt'}, // 9
         {title: 'Status', data: 'planStatus'}, // 10
         {title: 'Last Action Date', data: 'planStatusDate'}, // 11
@@ -283,7 +282,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {data: null, defaultContent: ''}
 
       ],
-      // order: [[8, 'asc']],
+      order: [[3, 'asc']],
       responsive: {
         details: {
           type: 'column',
@@ -309,7 +308,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {responsivePriority: 12, targets: 9 }, // program recomm. Total Costs
         {responsivePriority: 13, targets: 8 } // program recomm. Direct Costs
       ],
-      dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
+      dom: '<"dt-controls dt-top"l<"ml-4"i><"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
       buttons: [
         {
           extend: 'excel',
@@ -355,12 +354,10 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noFundingRequestResult = false;
     this.filterTypeLabel = filterTypeLabel;
     this.dtElements.forEach((dtEl: DataTableDirective) => {
-      console.log('dtElement', dtEl);
       if (dtEl.dtInstance) {
         dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
           dtInstance.clear();
           if (dtEl.dtTrigger === this.dtFundingRequestTrigger) {
-            console.log('FR dtInstance', dtInstance);
             setTimeout(() => this.dtFundingRequestTrigger.next(), 0);
           }
         });
@@ -375,12 +372,10 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filterTypeLabel = filterTypeLabel;
 
     this.dtElements.forEach((dtEl: DataTableDirective) => {
-      console.log('dtElement', dtEl);
       if (dtEl.dtInstance) {
         dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
           dtInstance.clear();
           if (dtEl.dtTrigger === this.dtFundingPlanTrigger) {
-            console.log('FP dtInstance', dtInstance);
             setTimeout(() => this.dtFundingPlanTrigger.next(), 0);
           }
         });

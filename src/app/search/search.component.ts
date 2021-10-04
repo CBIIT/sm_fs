@@ -90,7 +90,7 @@ export class SearchComponent implements OnInit {
         fsCritera.requestingDoc.push(sc.requestingDoc);
       }
 
-      // fsCritera.rfaPaNumber = [sc.rfaPa];
+      fsCritera.rfaPaNumber = [sc.rfaPa];
       fsCritera.grantIc = sc.grantNumber?.grantNumberIC;
       fsCritera.grantMech = sc.grantNumber?.grantNumberMech;
       fsCritera.grantSerial = sc.grantNumber?.grantNumberSerial;
