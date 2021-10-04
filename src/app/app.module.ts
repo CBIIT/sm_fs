@@ -142,6 +142,7 @@ import { SelectFundingRequestCheckboxCellRendererComponent } from './search/sear
 import { SearchFundingRequestActionCellRendererComponent } from './search/search-result/search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component';
 import { WorkflowWarningModalComponent } from './funding-request/workflow/warning-modal/workflow-warning-modal.component';
 import { AppSearchFundingRequestTypeComponent } from './search/lib-funding-request-type/app-search-funding-request-type.component';
+import { FpMultiSourceValidatorDirective } from './validators/fp-multi-source-validator.directive';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -291,7 +292,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SelectFundingRequestCheckboxCellRendererComponent,
     SearchFundingRequestActionCellRendererComponent,
     WorkflowWarningModalComponent,
-    AppSearchFundingRequestTypeComponent
+    AppSearchFundingRequestTypeComponent,
+    FpMultiSourceValidatorDirective
   ],
 
 
