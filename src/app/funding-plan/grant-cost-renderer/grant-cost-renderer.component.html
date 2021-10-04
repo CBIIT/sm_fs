@@ -1,11 +1,11 @@
 <span *ngFor="let g of grantCosts; let first = first;">
 <ng-container *ngIf="mode === 'approvedTotal'">
   <hr *ngIf="!first">
-  <div>{{ g.approvedTotal | currency }} ({{ g.totalPercentCut | percent }})</div>
+  <div>{{ g.approvedTotal | currency }} ({{ g.totalPercentCut | percent }} Cut)</div>
 </ng-container>
 <ng-container *ngIf="mode === 'approvedDirect'">
   <hr *ngIf="!first">
-  <div>{{ g.approvedDirect | currency }} ({{ g.directPercentCut | percent }})</div>
+  <div>{{ g.approvedDirect | currency }} ({{ g.directPercentCut | percent }} Cut)</div>
 </ng-container>
 </span>
 
