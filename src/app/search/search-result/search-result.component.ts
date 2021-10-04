@@ -244,6 +244,16 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
               data: result.data
             });
             this.loaderService.hide();
+            setTimeout(() => {  // FIXED ISSUE WITH TABLE RESIZING
+                this.dtElements.forEach((dtEl: DataTableDirective) => {
+                  if (dtEl.dtInstance) {
+                    dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
+                      console.log('dtElement - columns - adjust');
+                      dtInstance.columns.adjust();
+                    });
+                  }
+                });
+            }, 0)
           }, error => {
             this.logger.error('HttpClient get request error for----- ' + error.message);
           });
