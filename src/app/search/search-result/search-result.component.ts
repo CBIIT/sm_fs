@@ -10,6 +10,7 @@ import {CancerActivityCellRendererComponent} from "../../table-cell-renderers/ca
 import {SelectFundingRequestCheckboxCellRendererComponent} from "./select-funding-request-checkbox-cell-renderer/select-funding-request-checkbox-cell-renderer.component";
 import {SearchFundingRequestActionCellRendererComponent} from "./search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component";
 import {FundingPlanQueryDto} from "@nci-cbiit/i2ecws-lib/model/fundingPlanQueryDto";
+import {SearchFundingPlanFoasCellRendererComponent} from "./search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component";
 
 class DataTablesResponse {
   data: any[];
@@ -35,6 +36,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('selectFundingRequestCheckboxRenderer') selectFundingRequestCheckboxRenderer: TemplateRef<SelectFundingRequestCheckboxCellRendererComponent>;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
+  @ViewChild('searchFundingPlanFoasRenderer') searchFundingPlanFoasRenderer: TemplateRef<SearchFundingPlanFoasCellRendererComponent>;
   @ViewChild('searchFundingRequestActionRenderer') searchFundingRequestActionRenderer: TemplateRef<SearchFundingRequestActionCellRendererComponent>;
 
   @ViewChild('selectFundingPlanCheckboxRenderer') selectFundingPlanCheckboxRenderer: TemplateRef<SelectFundingRequestCheckboxCellRendererComponent>;
@@ -248,7 +250,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       columns: [
         {title: 'Sel', data: 'selected', orderable: false, ngTemplateRef: { ref: this.selectFundingRequestCheckboxRenderer }, className: 'all' }, // 0
-        {title: 'RFA/PA info - Number / Title / NCAB / Issue Type', data: 'comments', className: 'all'}, // 1
+        {title: 'RFA/PA info - Number / Title / NCAB / Issue Type', data: 'fpFoasList', orderable: false,
+          ngTemplateRef: { ref: this.searchFundingPlanFoasRenderer },className: 'all'}, // 1
         {title: 'Plan ID', data: 'fprId'}, // 2
         {title: 'Plan Name', data: 'planName'}, // 3
         {title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: ( data, type, row, meta ) => {
@@ -258,9 +261,9 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
             return (!data || data == null) ? '' : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + data + '</a>';
           }}, // 5
         {title: 'Final LOA', data: 'loaName'}, // 6
-        {title: 'Funding Approvals', data: 'comments'}, // 7  //TODO
-        {title: 'Program Recomm. Direct Costs', data: 'comments'}, // 8  //TODO
-        {title: 'Program Recomm. Total Costs', data: 'comments'}, // 9  //TODO
+        {title: 'Funding Approvals', data: 'fundsCertificationCode'}, // 7
+        {title: 'Program Recomm. Direct Costs', data: 'totalRecommendedAmt'}, // 8  //TODO
+        {title: 'Program Recomm. Total Costs', data: 'totalRecommendedAmt'}, // 9
         {title: 'Status', data: 'planStatus'}, // 10
         {title: 'Last Action Date', data: 'planStatusDate'}, // 11
         {
