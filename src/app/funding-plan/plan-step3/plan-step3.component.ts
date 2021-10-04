@@ -217,6 +217,7 @@ export class PlanStep3Component implements OnInit {
     const budgetMap: Map<number, FundingReqBudgetsDto[]> = new Map<number, FundingReqBudgetsDto[]>();
     const canMap: Map<number, FundingRequestCanDto[]> = new Map<number, FundingRequestCanDto[]>();
     let totalRecommendedAmount = 0;
+    let directRecommendedAmount = 0;
     this.applicationsProposedForFunding.prcList.forEach((item, index) => {
       this.logger.debug('prc item', index, item);
       const source = fundingSourceDetails.get(item.sourceIndex);
@@ -240,6 +241,9 @@ export class PlanStep3Component implements OnInit {
 
         if (!isNaN(totalCost)) {
           totalRecommendedAmount = Number(totalRecommendedAmount) + Number(totalCost);
+        }
+        if (!isNaN(directCost)) {
+          directRecommendedAmount = Number(directRecommendedAmount) + Number(directCost);
         }
 
         let budgets = budgetMap.get(item.grant.applId) as FundingReqBudgetsDto[];
