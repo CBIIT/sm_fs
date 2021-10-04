@@ -33,6 +33,6 @@ export class FpFundingInformationComponent implements OnInit {
   }
 
   get firstYearTotalCalculated(): number {
-    return 0;
+    return this.planModel.fundingPlanDto.totalRecommendedAmt;
   }
 }
