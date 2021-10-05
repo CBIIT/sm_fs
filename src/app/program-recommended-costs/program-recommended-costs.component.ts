@@ -269,12 +269,11 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     }
 
     this.editing = i;
-    this.lineItem = this.getLineItem(edit);
+    this.lineItem = this.getLineItem(edit).filter(dp => !!dp.grantAward);
     this.logger.debug(this.lineItem, this.lineItem?.length);
     if (this.isPayType4) {
       this._recommendedFutureYears = this.lineItem?.length - 1;
     }
-    this.logger.debug(this.lineItem.map(l => l.type));
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     // @ts-ignore
@@ -388,6 +387,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(s => {
       this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(s.fundingSourceId);
     });
+    if(this.isPayType4) {
+      this.requestModel.programRecommendedCostsModel.padJaggedLineItems();
+    }
   }
 
   canSave(): boolean {
