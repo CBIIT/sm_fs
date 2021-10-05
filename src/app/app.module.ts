@@ -295,8 +295,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SearchFundingRequestActionCellRendererComponent,
     WorkflowWarningModalComponent,
     AppSearchFundingRequestTypeComponent,
-    SearchFundingPlanFoasCellRendererComponent
-    FpMultiSourceValidatorDirective
+    SearchFundingPlanFoasCellRendererComponent,
+    FpMultiSourceValidatorDirective,
     AppSearchRfaPaDropdownComponent
   ],
 
