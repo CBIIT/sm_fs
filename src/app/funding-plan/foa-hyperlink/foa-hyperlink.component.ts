@@ -20,22 +20,24 @@ export class FoaHyperlinkComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(this.foaNumber).subscribe(result => {
-      if (result?.nihGuideAddr) {
-        this.nihGuideAddr = result.nihGuideAddr;
-      } else {
-        this.lookupService.getNihGuideAddrUsingGET(this.foaNumber).subscribe(res => {
-          if (res && res.nihGuideAddr) {
-            this.nihGuideAddr = res.nihGuideAddr;
-          } else {
+    if (!!this.foaNumber) {
+      this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(this.foaNumber).subscribe(result => {
+        if (result?.nihGuideAddr) {
+          this.nihGuideAddr = result.nihGuideAddr;
+        } else {
+          this.lookupService.getNihGuideAddrUsingGET(this.foaNumber).subscribe(res => {
+            if (res && res.nihGuideAddr) {
+              this.nihGuideAddr = res.nihGuideAddr;
+            } else {
+              this.nihGuideAddr = '#';
+            }
+          }, error => {
+            this.logger.error(JSON.stringify(error));
             this.nihGuideAddr = '#';
-          }
-        }, error => {
-          this.logger.error(JSON.stringify(error))
-          this.nihGuideAddr = '#';
-        });
-      }
-    });
+          });
+        }
+      });
+    }
 
   }
 
