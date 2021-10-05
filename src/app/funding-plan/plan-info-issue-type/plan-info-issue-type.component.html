@@ -22,11 +22,12 @@
         [hidden]="issueType === 'new'"
         name="priorNotice"
         [disabled]="readOnly"
-        #priorNoticeValue="ngModel">
+        #priorNoticeValue="ngModel"
+        required>
     </div>
     <div
       class="text-danger mt-1"
-      *ngIf="(parentForm.submitted || priorNoticeValue.touched) && !isValid()">
+      *ngIf="(parentForm.submitted || priorNoticeValue.touched) && priorNoticeValue.errors?.required">
       Previous FOA number is required.
       <input type="hidden" [ngModel]="scratch" [name]="rfaDetails.rfaPaNumber" required>
     </div>
