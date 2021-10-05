@@ -91,8 +91,7 @@
     </div>
     <div class="row form-group">
       <div class="col-md-6 col-lg-6 form-group">
-          <label for="funding-sources">Funding Source(s)</label>
-          <input type="text" id="funding-sources" name="fundingSources" ngModel class="form-control">
+        <app-search-funding-source [form]="searchForm"></app-search-funding-source>
       </div>
       <div class="col-md-6 col-lg-6 form-group">
           <label for="request-id" *ngIf="searchType === 'FR'">Request ID</label>

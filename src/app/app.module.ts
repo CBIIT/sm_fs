@@ -146,6 +146,7 @@ import { SearchFundingPlanFoasCellRendererComponent } from './search/search-resu
 import { FpMultiSourceValidatorDirective } from './validators/fp-multi-source-validator.directive';
 import { SearchRfaPaDropdownComponent } from './search/search-filter/search-rfa-pa-dropdown/search-rfa-pa-dropdown.component';
 import { SearchFundingRequestDocComponent } from './search/search-filter/search-funding-request-doc/search-funding-request-doc.component';
+import { SearchFundingSourceComponent } from './search/search-filter/search-funding-source/search-funding-source.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -299,7 +300,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SearchFundingPlanFoasCellRendererComponent,
     FpMultiSourceValidatorDirective,
     SearchRfaPaDropdownComponent,
-    SearchFundingRequestDocComponent
+    SearchFundingRequestDocComponent,
+    SearchFundingSourceComponent
   ],
 
 
