@@ -86,8 +86,7 @@
         <lib-pdname-dropdown label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
       </div>
       <div class="col-md-6 col-lg-6 form-group">
-          <label for="requesting-doc">Requesting DOC</label>
-          <input type="text" id="requesting-doc" name="requestingDoc" ngModel class="form-control">
+        <app-search-funding-request-doc [form]="searchForm"></app-search-funding-request-doc>
       </div>
     </div>
     <div class="row form-group">

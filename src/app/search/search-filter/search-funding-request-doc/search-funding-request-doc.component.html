@@ -1,0 +1,25 @@
+<div class="form-group">
+  <label [for]="name ? name : 'funding-request-doc-select'">Requesting Doc</label>
+  <ng-select2
+    [id]="name ? name : 'funding-request-doc-select'"
+    [name]="name ? name : 'requestingDoc'"
+    #fundingRequestDoc="ngModel"
+    ngModel
+    [allowClear]="true"
+    [data]="data"
+    [options]="options"
+    [ngClass]="{'is-invalid': (!fundingRequestDoc.valid && (fundingRequestDoc.touched || (form && form.submitted)))}"
+    [required]="required"
+    [ngModelOptions]="{updateOn: 'change'}"
+    >
+  </ng-select2>
+  <div
+    class="text-danger mt-1"
+    *ngIf="fundingRequestDoc.errors?.required && (fundingRequestDoc.touched || (form && form.submitted))">
+    Requesting DOC is required
+  </div>
+</div>
+
+
+
+

@@ -141,10 +141,11 @@ import { FundingSourceEntryModalComponent } from './funding-plan/applications-pr
 import { SelectFundingRequestCheckboxCellRendererComponent } from './search/search-result/select-funding-request-checkbox-cell-renderer/select-funding-request-checkbox-cell-renderer.component';
 import { SearchFundingRequestActionCellRendererComponent } from './search/search-result/search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component';
 import { WorkflowWarningModalComponent } from './funding-request/workflow/warning-modal/workflow-warning-modal.component';
-import { AppSearchFundingRequestTypeComponent } from './search/app-search-funding-request-type/app-search-funding-request-type.component';
+import { SearchFundingRequestTypeComponent } from './search/search-filter/search-funding-request-type/search-funding-request-type.component';
 import { SearchFundingPlanFoasCellRendererComponent } from './search/search-result/search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component';
 import { FpMultiSourceValidatorDirective } from './validators/fp-multi-source-validator.directive';
-import { AppSearchRfaPaDropdownComponent } from './search/app-search-rfa-pa-dropdown/app-search-rfa-pa-dropdown.component';
+import { SearchRfaPaDropdownComponent } from './search/search-filter/search-rfa-pa-dropdown/search-rfa-pa-dropdown.component';
+import { SearchFundingRequestDocComponent } from './search/search-filter/search-funding-request-doc/search-funding-request-doc.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -294,10 +295,11 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SelectFundingRequestCheckboxCellRendererComponent,
     SearchFundingRequestActionCellRendererComponent,
     WorkflowWarningModalComponent,
-    AppSearchFundingRequestTypeComponent,
+    SearchFundingRequestTypeComponent,
     SearchFundingPlanFoasCellRendererComponent,
     FpMultiSourceValidatorDirective,
-    AppSearchRfaPaDropdownComponent
+    SearchRfaPaDropdownComponent,
+    SearchFundingRequestDocComponent
   ],
 
 

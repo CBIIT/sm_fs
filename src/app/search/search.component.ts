@@ -63,6 +63,10 @@ export class SearchComponent implements OnInit {
       fsCritera.grantSuffix = sc.grantNumber?.grantNumberSuffix;
       fsCritera.grantType = sc.grantNumber?.grantNumberType;
       fsCritera.grantYear = sc.grantNumber?.grantNumberYear;
+      fsCritera.requestingDoc = [];
+      if (sc.requestingDoc) {
+        fsCritera.requestingDoc.push(sc.requestingDoc);
+      }
 
       this.logger.debug("Search Funding Requests criteria in component: ", fsCritera);
       this.searchResultComponent.doFundingRequestSearch(fsCritera,

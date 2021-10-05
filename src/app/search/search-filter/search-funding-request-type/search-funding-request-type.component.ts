@@ -3,17 +3,17 @@ import {ControlContainer, NgForm, NgModel} from "@angular/forms";
 import {Select2OptionData} from "ng-select2";
 import {Options} from "select2";
 import {NGXLogger} from "ngx-logger";
-import {openNewWindow} from "../../utils/utils";
+import {openNewWindow} from "../../../utils/utils";
 import {FsLookupControllerService} from "@nci-cbiit/i2ecws-lib";
 import {SearchFundingRequestTypesDto} from "@nci-cbiit/i2ecws-lib/model/searchFundingRequestTypesDto";
 
 @Component({
   selector: 'app-search-funding-request-type',
-  templateUrl: './app-search-funding-request-type.component.html',
-  styleUrls: ['./app-search-funding-request-type.component.css'],
+  templateUrl: './search-funding-request-type.component.html',
+  styleUrls: ['./search-funding-request-type.component.css'],
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
 })
-export class AppSearchFundingRequestTypeComponent implements OnInit, AfterViewInit {
+export class SearchFundingRequestTypeComponent implements OnInit, AfterViewInit {
 
   @Input() required: boolean;
   @Input() parentForm: NgForm; // optional parent form to validate on submit

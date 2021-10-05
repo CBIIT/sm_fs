@@ -5,11 +5,11 @@ import {Select2OptionData} from "ng-select2";
 
 @Component({
   selector: 'app-search-rfa-pa-dropdown',
-  templateUrl: './app-search-rfa-pa-dropdown.component.html',
-  styleUrls: ['./app-search-rfa-pa-dropdown.component.css'],
+  templateUrl: './search-rfa-pa-dropdown.component.html',
+  styleUrls: ['./search-rfa-pa-dropdown.component.css'],
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
 })
-export class AppSearchRfaPaDropdownComponent implements OnInit {
+export class SearchRfaPaDropdownComponent implements OnInit {
 
   constructor(private caService: CancerActivityControllerService) { }
 
