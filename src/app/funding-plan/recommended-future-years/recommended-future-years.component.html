@@ -1,4 +1,4 @@
-<span [ngModelGroup]="applId">
+<span [ngModelGroup]="'' + applId">
 <ng-select2
   [allowClear]="true"
   [data]="data"
@@ -8,9 +8,9 @@
   [required]="required">
   <option></option>
 </ng-select2>
+</span>
 <div
   class="text-danger mt-1"
   *ngIf="rfy.errors?.required && (parentForm.submitted || rfy.touched)">
   Recommended Future Years is required
 </div>
-</span>
