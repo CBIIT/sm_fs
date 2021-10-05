@@ -43,7 +43,8 @@
             (change)="recalculate()"
             [name]="'directCost_' + grantIndex + '_' + sourceIndex"
             #dcInput="ngModel"
-            [(ngModel)]="directCost">
+            [(ngModel)]="directCost"
+            required>
         </div>
       </div>
       <div class="form-group col-6 mb-2">
@@ -60,7 +61,8 @@
             [name]="'totalCost_' + grantIndex + '_' + sourceIndex"
             #tcInput="ngModel"
             (change)="recalculate()"
-            [(ngModel)]="totalCost">
+            [(ngModel)]="totalCost"
+            required>
         </div>
       </div>
     </div>
@@ -94,6 +96,16 @@
           </div>
         </div>
       </div>
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="(parentForm.submitted || dcInput.touched) && dcInput.errors?.required">
+      Direct cost is required
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="(parentForm.submitted || tcInput.touched) && tcInput.errors?.required">
+      Total cost is required
     </div>
     <div
       class="text-danger mt-1"
@@ -164,12 +176,18 @@
             (change)="recalculate()"
             [name]="'percentCut_' + grantIndex + '_' + sourceIndex"
             [(ngModel)]="percentCut"
-            #pcInput="ngModel">
+            #pcInput="ngModel"
+            required>
           <div class="input-group-append">
             <span class="input-group-text" [id]="'PC-append-' + grantIndex + '_'">% Cut</span>
           </div>
         </div>
       </div>
+    </div>
+    <div
+      class="text-danger mt-1"
+      *ngIf="(parentForm.submitted || pcInput.touched) && pcInput.errors?.required">
+      Percent cut is required
     </div>
     <div
       class="text-danger mt-1"
