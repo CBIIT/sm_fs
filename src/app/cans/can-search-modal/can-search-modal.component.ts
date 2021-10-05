@@ -33,14 +33,16 @@ export class CanSearchModalComponent implements OnInit {
   }
 
   search(): void {
-    if (this.showAll) {
-      this.canManagementService.searchAllCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
-        this.canData = result;
-      });
-    } else {
-      this.canManagementService.searchDefaultCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
-        this.canData = result;
-      });
+    if (!!this.bmmCodes && !!this.activityCodes) {
+      if (this.showAll) {
+        this.canManagementService.searchAllCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
+          this.canData = result;
+        });
+      } else {
+        this.canManagementService.searchDefaultCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
+          this.canData = result;
+        });
+      }
     }
   }
 
@@ -59,7 +61,7 @@ export class CanSearchModalComponent implements OnInit {
   }
 
   open(): Promise<CanCcxDto> {
-    return new Promise<CanCcxDto>( (resolve, reject) => {
+    return new Promise<CanCcxDto>((resolve, reject) => {
       this.modalRef = this.modalService.open(this.modalContent, { size: 'lg' });
       this.modalRef.result.then(resolve, reject);
     });
