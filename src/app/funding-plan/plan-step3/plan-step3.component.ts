@@ -279,6 +279,7 @@ export class PlanStep3Component implements OnInit {
       }
     });
     this.planModel.fundingPlanDto.totalRecommendedAmt = totalRecommendedAmount;
+    this.planModel.fundingPlanDto.directRecommendedAmt = directRecommendedAmount;
 
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(i => {
       i.financialInfoDto.fundingReqBudgetsDtos = budgetMap.get(i.applId);

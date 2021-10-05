@@ -38,13 +38,13 @@
             <td>
               <strong>Direct</strong><br/>
               {{ directCost(grant.applId, source.fundingSourceId) | currency }} <br/>
-              {{ directCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
+              {{ directCostPercentCut(grant.applId, source.fundingSourceId) | percent }} Cut
             </td>
 
             <td>
               <strong>Total</strong><br/>
               {{ totalCost(grant.applId, source.fundingSourceId) | currency }} <br/>
-              {{ totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
+              {{ totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }} Cut
             </td>
             </ng-container>
 
