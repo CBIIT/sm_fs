@@ -303,6 +303,7 @@ export class PlanStep3Component implements OnInit {
 
     this.planModel.fundingPlanDto.bmmCodeList = bmmCodes.join();
 
+    // TODO: transform ncabDates from YYYYMM to MM/YYYY format for saving
     const councilDates: Map<string, string> =
       new Map(this.planModel.grantsSearchCriteria.map(val => [val.rfaPaNumber, val.ncabDates.join()]));
 
