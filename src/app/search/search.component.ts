@@ -73,9 +73,7 @@ export class SearchComponent implements OnInit {
       fsCritera.fyFrom = sc.fyRange?.fromFy;
       fsCritera.fyTo = sc.fyRange?.toFy;
       fsCritera.fsStatus = [];
-      if (sc.fundingPlanStatus) {
-        fsCritera.fsStatus.push(sc.fundingPlanStatus);
-      }
+      fsCritera.fsStatus = sc.fundingPlanStatus;
       fsCritera.fundingSource = [];
       if (sc.fundingSources) {
         fsCritera.fsStatus.push(sc.fundingSources);
@@ -89,8 +87,9 @@ export class SearchComponent implements OnInit {
       if (sc.requestingDoc) {
         fsCritera.requestingDoc.push(sc.requestingDoc);
       }
-
-      fsCritera.rfaPaNumber = [sc.rfaPa];
+      if (sc.rfaPa && sc.rfaPa.length > 0) {
+        fsCritera.rfaPaNumber = [sc.rfaPa];
+      }
       fsCritera.grantIc = sc.grantNumber?.grantNumberIC;
       fsCritera.grantMech = sc.grantNumber?.grantNumberMech;
       fsCritera.grantSerial = sc.grantNumber?.grantNumberSerial;
