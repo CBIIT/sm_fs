@@ -1,7 +1,16 @@
+<span [ngModelGroup]="applId">
 <ng-select2
   [allowClear]="true"
   [data]="data"
   [(ngModel)]="selectedValue"
-  [name]="'recommendedFutureYears_' + index">
+  [name]="'recommendedFutureYears_' + index"
+  #rfy="ngModel"
+  [required]="required">
   <option></option>
 </ng-select2>
+<div
+  class="text-danger mt-1"
+  *ngIf="rfy.errors?.required && (parentForm.submitted || rfy.touched)">
+  Recommended Future Years is required
+</div>
+</span>

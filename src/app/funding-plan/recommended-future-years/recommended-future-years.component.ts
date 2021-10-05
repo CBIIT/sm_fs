@@ -4,15 +4,20 @@ import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
+import { ControlContainer, NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-recommended-future-years',
   templateUrl: './recommended-future-years.component.html',
-  styleUrls: ['./recommended-future-years.component.css']
+  styleUrls: ['./recommended-future-years.component.css'],
+  viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class RecommendedFutureYearsComponent implements OnInit {
   @Input() index: number;
   @Input() applId: number;
+  @Input() required = false;
+  @Input() parentForm: NgForm;
+
   selectedValue: number;
   data: Select2OptionData[] = [
     { id: '0', text: '0' },
@@ -24,13 +29,11 @@ export class RecommendedFutureYearsComponent implements OnInit {
   ];
 
   constructor(
-    private planService: PlanManagementService,
-    private logger: NGXLogger) {
+    private planService: PlanManagementService) {
   }
 
   ngOnInit(): void {
     if (!!this.applId) {
-      // this.logger.debug('initializing recommended future years for applId', this.applId);
       this.selectedValue = this.planService.getRecommendedFutureYears(Number(this.applId));
     }
   }
