@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanCcxDto, FundingPlanDto, FundingRequestCanDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto, FundingPlanDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
 import { NciPfrGrantQueryDtoEx } from './nci-pfr-grant-query-dto-ex';
 import { RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate';
@@ -21,7 +21,7 @@ export class PlanModel {
   maximumScore: number;
 
   fundingPlanDto: FundingPlanDto = {};
-  selectedApplIdCans: Map<number, Map<number, CanCcxDto>> = new Map<number, Map<number, CanCcxDto>>();
+  selectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
 
 
   documentSnapshot: ModelSnapshot;
@@ -85,7 +85,6 @@ export class PlanModel {
     // from the create_main_approvers sp, it seems otherDocs has no effect on funding request approvers,
     // only affects funding plan approvers, needs double check with David and Subashini.
     return approverCriteria;
-    return null;
   }
 
   markMainApproversCreated(): void {
@@ -109,13 +108,9 @@ export class PlanModel {
     const newSnapshot = this.buildModelSnapshot();
     // this.logger.debug('old documentSnapshot ', JSON.stringify(this.documentSnapshot));
     // this.logger.debug('new documentSnapshot ', JSON.stringify(newSnapshot));
-    if (newSnapshot.rfqNcabs !== this.documentSnapshot?.rfqNcabs
+    return newSnapshot.rfqNcabs !== this.documentSnapshot?.rfqNcabs
       || newSnapshot.selectedGrants !== this.documentSnapshot?.selectedGrants
-      || newSnapshot.scoreRange !== this.documentSnapshot?.scoreRange) {
-      return true;
-    } else {
-      return false;
-    }
+      || newSnapshot.scoreRange !== this.documentSnapshot?.scoreRange;
   }
 
   takeDocumentSnapshot(): void {
@@ -135,15 +130,18 @@ export class PlanModel {
     return this.fundingPlanDto?.fundingPlanFoas[0]?.activityCodeList || '';
   }
 
+  getSelectedCan(fseId: number, applId: number): CanCcxDto {
+    const key = String(fseId) + '-' + String(applId);
+    return this.selectedApplIdCans.get(key);
+  }
 
-  saveSelectedCAN(fseId: number, applId: number, can): void {
-    if(!this.selectedApplIdCans) {
-      this.selectedApplIdCans = new Map<number, Map<number, CanCcxDto>>();
+  saveSelectedCAN(fseId: number, applId: number, can: CanCcxDto): void {
+    if (!this.selectedApplIdCans) {
+      this.selectedApplIdCans = new Map<string, CanCcxDto>();
     }
+    const key = String(fseId) + '-' + String(applId);
 
-    const tmp = this.selectedApplIdCans.get(fseId) || new Map<number, CanCcxDto>();
-    tmp.set(applId, can);
-    this.selectedApplIdCans.set(fseId, tmp);
+    this.selectedApplIdCans.set(key, can);
   }
 
   buildUpdatedCANDataModel(): FundingRequestCanDto[] {
@@ -151,7 +149,9 @@ export class PlanModel {
     const result: FundingRequestCanDto[] = [];
     this.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
       req.financialInfoDto.fundingRequestCans.forEach(can => {
-        c = this.selectedApplIdCans.get(can.fseId)?.get(req.applId);
+        const key = String(can.fseId) + '-' + String(req.applId);
+
+        c = this.selectedApplIdCans.get(key);
         if (c) {
           can.can = c.can;
           can.canDescription = c.canDescrip;

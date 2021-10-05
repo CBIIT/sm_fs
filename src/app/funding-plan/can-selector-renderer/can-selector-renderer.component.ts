@@ -18,6 +18,7 @@ export class CanSelectorRendererComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
   @Input() projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   @Input() projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
+  fundingSources: number[];
 
   constructor(
     private planManagementService: PlanManagementService,
@@ -27,17 +28,47 @@ export class CanSelectorRendererComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.fundingSources = this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.map(f => f.fundingSourceId);
+    this.logger.debug('Funding sources: ', this.fundingSources);
   }
 
   get grantCosts(): GrantCostPayload[] {
     return this.planManagementService.grantCosts.filter(g => g.applId === this.grant.applId);
   }
 
-  nonDefaultCAN(applId: number, fseId: number, index: number): void {
+  nonDefaultCAN(applId: number, fseId: number, index: number): boolean {
+    const key = String(fseId) + '-' + String(applId);
+    const projectedCan = this.projectedApplIdCans?.get(key);
+    if (!projectedCan?.can) {
+      return false;
+    }
+    const selectedCan = this.planModel.selectedApplIdCans.get(key);
+    if (!selectedCan?.can) {
+      return false;
+    }
 
+    return selectedCan.can !== projectedCan.can;
   }
 
-  duplicateCAN(applId: number, fseId: number, index: number): void {
+  duplicateCAN(applId: number, fseId: number, index: number): boolean {
+    const key = String(fseId) + '-' + String(applId);
+    const targetCAN = this.projectedApplIdCans?.get(key);
+    let result = false;
+    if (!targetCAN?.can) {
+      return false;
+    }
+
+    this.fundingSources.forEach(sourceId => {
+      if (Number(sourceId) !== Number(fseId)) {
+        const key2 = String(sourceId) + '-' + String(applId);
+        const can = this.projectedApplIdCans?.get(key2);
+        if (!!can?.can) {
+          result = can.can === targetCAN.can;
+        }
+      }
+    });
+
+    return result;
 
   }
 
