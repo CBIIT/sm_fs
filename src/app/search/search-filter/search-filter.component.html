@@ -51,7 +51,7 @@
         ngModel
         #fundingRequestStatus="ngModel"
         [allowClear]="true"
-        [options]="requestStatusOptions"
+        [options]="statusOptions"
         [data]="requestStatusList">
       </ng-select2>
     </div>
@@ -65,6 +65,7 @@
         ngModel
         #fundingPlanStatus="ngModel"
         [allowClear]="true"
+        [options]="statusOptions"
         [data]="requestStatusList"
       >
       </ng-select2>

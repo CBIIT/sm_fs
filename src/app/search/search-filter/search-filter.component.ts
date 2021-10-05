@@ -67,7 +67,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     { id: 'WITHDRAWN', text: 'Withdrawn'}
   ] ;
 
-  requestStatusOptions: Options = {
+  statusOptions: Options = {
     multiple: true,
     allowClear: true
   };
@@ -88,13 +88,14 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
 
       const sf: SearchCriteria = {}
       Object.assign(sf, form.form.value);
-      sf.fundingRequestStatus = this._populateRequestStatus(this.searchFilter.fundingRequestStatus);
+      sf.fundingRequestStatus = this._populateStatus(this.searchFilter.fundingRequestStatus);
+      sf.fundingPlanStatus = this._populateStatus(this.searchFilter.fundingPlanStatus);
       this.logger.debug('search criteria:', sf);
       this.callSearch.emit(sf);
     }
   }
 
-  private _populateRequestStatus(formStatuses: string[]): string[] {
+  private _populateStatus(formStatuses: string[]): string[] {
     const rss = [];
     if (formStatuses) {
       for (const s of formStatuses) {

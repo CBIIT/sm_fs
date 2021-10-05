@@ -12,7 +12,7 @@ export interface SearchCriteria {
     grantNumberSuffix: string,
     grantNumberYear: string
   };
-  fundingPlanStatus?: string; //TODO - switch to array
+  fundingPlanStatus?: string[];
   fundingSources?: string;
   institutionName?: string;
   ncabRange?: { fromNcab: string, toNcab: string };
