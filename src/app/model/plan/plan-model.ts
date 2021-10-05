@@ -4,6 +4,7 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 import { NciPfrGrantQueryDtoEx } from './nci-pfr-grant-query-dto-ex';
 import { RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate';
 import { NGXLogger } from 'ngx-logger';
+import { Alert } from 'src/app/alert-billboard/alert';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,7 @@ export class PlanModel {
   approverCriteria: any;
   // controls whether to dispay return to search at the top of step6.
   returnToSearchLink = false;
+  pendingAlerts: Alert[] = [];
 
   constructor(propertiesService: AppPropertiesService,
               private logger: NGXLogger) {
@@ -51,6 +53,7 @@ export class PlanModel {
     this.maximumScore = 0;
     this.returnToSearchLink = false;
     this.title = 'New Plan';
+    this.pendingAlerts = [];
     this.takeDocumentSnapshot();
   }
 
@@ -161,6 +164,10 @@ export class PlanModel {
       });
     });
     return result;
+  }
+
+  clearAlerts(): void {
+    this.pendingAlerts = [];
   }
 }
 

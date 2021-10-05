@@ -16,8 +16,12 @@ export class CanDeactivatePlanStep6 implements CanDeactivate<PlanStep6Component>
   canDeactivate(component: PlanStep6Component): boolean {
     if (component.isDirty()) {
       const ret = confirm('Unsaved changes will be lost if you continue.');
+      if (ret) {
+        component.clearAlerts();
+      }
       return ret;
     }
+    component.clearAlerts();
     return true;
   }
 }
