@@ -25124,7 +25124,7 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
 
 /* line 45, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .prc-table tbody tr td {
-  text-align: center;
+  text-align: right; 
 }
 
 /* line 47, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
