@@ -25731,3 +25731,33 @@ td .grant-icons {
 .force-text-center{
   padding-left: 6em;
 }
+
+.no-drag-auto-number {
+  border-radius: 0.25rem;
+  padding: .5rem 1rem;
+  display: flex;
+  align-items: center;
+  border: 1px solid #a3a6ad;
+  width: 100%;
+  margin-bottom: .5rem;
+  background: #fff;
+  counter-increment: par-num;
+}
+.no-drag-auto-number::before {
+  content: counter(par-num) " . ";
+  padding-right: 4px;
+  font-weight: bold;
+  display: inline-block;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.no-drag-auto-number .doc-name {
+  font-weight: bold;
+  margin-right: .5rem;
+}
+
+/* line 145, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
+.no-drag-auto-number.doc-desc {
+  font-style: italic;
+}

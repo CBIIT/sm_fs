@@ -12,7 +12,7 @@
   <div class="col-12 collapse show mt-2" id="docs-collapse">
     <!-- <p>Supporting docs go here...</p> -->
 
-    <div class="drag-item drag-item-locked" tabindex="0">
+    <div class="no-drag-auto-number" tabindex="0">
       <span class="doc-name"> Cover Page </span>
       <span class="doc-desc">(Automatically Generated)</span>
       <div class="ml-auto">
@@ -21,13 +21,13 @@
       </div>
     </div>
 
-    <div *ngIf="justificationMissing" class="drag-item drag-item-placeholder drag-item-locked" tabindex="0">
+    <div *ngIf="justificationMissing" class="no-drag-auto-number" tabindex="0">
       <span class="doc-name">Justification</span>
       <span class="doc-desc" [style.color]="'red'">Required, Not entered/Uploaded</span>
     </div>
 
     <div *ngIf="displayTansitionMemo">
-      <div *ngIf="transitionMemoMissing" class="drag-item drag-item-placeholder drag-item-locked" tabindex="0">
+      <div *ngIf="transitionMemoMissing" class="no-drag-auto-number" tabindex="0">
         <span class="doc-name">Transition Memo</span>
         <span class="doc-desc" [style.color]="'red'">Required, Not entered/Uploaded</span>
       </div>
@@ -36,7 +36,7 @@
 
     <div *ngFor="let item of docDtos">
       <div
-        [ngClass]="[ item.docType === 'Justification' || item.docType === 'Transition Memo' ? 'drag-item drag-item-locked' : 'drag-item']"
+        [ngClass]="[ item.docType === 'Justification' || item.docType === 'Transition Memo' ? 'no-drag-auto-number' : 'no-drag-auto-number']"
         tabindex="0">
         <span
           *ngIf="item.docFilename === 'Summary Statement' || item.docFilename === 'Supplement Application' || item.docFilename === 'Justification'; else displayFileNameFormat"
