@@ -99,15 +99,15 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   }
 
   constructor(private requestIntegrationService: FundingRequestIntegrationService,
-    private workflowService: FsPlanWorkflowControllerService,
-    private planService: FsPlanControllerService,
-    private propertiesService: AppPropertiesService,
-    private userSessionService: AppUserSessionService,
-    private planModel: PlanModel,
-    private workflowModel: WorkflowModel,
-    private calendar: NgbCalendar,
-    private router: Router,
-    private logger: NGXLogger) {
+              private workflowService: FsPlanWorkflowControllerService,
+              private planService: FsPlanControllerService,
+              private propertiesService: AppPropertiesService,
+              private userSessionService: AppUserSessionService,
+              private planModel: PlanModel,
+              private workflowModel: WorkflowModel,
+              private calendar: NgbCalendar,
+              private router: Router,
+              private logger: NGXLogger) {
   }
 
   ngOnDestroy(): void {

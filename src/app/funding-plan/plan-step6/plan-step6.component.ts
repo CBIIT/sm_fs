@@ -79,6 +79,10 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
     if (this.uploadBudgetDocumentsComponent && this.workflowComponent) {
       this.workflowComponent.uploadBudgetDocumentsComponent = this.uploadBudgetDocumentsComponent;
     }
+    if (this.planModel.pendingAlerts.length > 0) {
+        const el = document.getElementById('funding-plan-page-top');
+        el.scrollIntoView();
+    }
   }
 
   ngOnInit(): void {
