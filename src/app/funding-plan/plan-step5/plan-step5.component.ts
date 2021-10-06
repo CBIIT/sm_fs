@@ -106,9 +106,13 @@ export class PlanStep5Component implements OnInit {
   }
 
   checkUploadedDocs(): boolean {
-    this.planDocDtos.forEach(element => {
-      this.resetFlags(element.docType, true, element);
-    });
+
+    if (this.planDocDtos !== null) {
+      this.planDocDtos.forEach(element => {
+        this.resetFlags(element.docType, true, element);
+      });
+    }
+
     return false;
   }
 
@@ -232,7 +236,7 @@ export class PlanStep5Component implements OnInit {
       );
     } else {
       this.showValidations = true;
-      window.scroll(0,0);
+      window.scroll(0, 0);
     }
 
 
