@@ -69,7 +69,7 @@
   </div>
   <hr/>
 </div>
-<app-search-filter (callSearch)="doSearch($event)"
+<app-search-filter [action]="action" (callSearch)="doSearch($event)"
                    (searchTypeEm)="onSearchType($event)">
 </app-search-filter>
 <app-search-result></app-search-result>

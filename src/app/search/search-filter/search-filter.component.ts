@@ -1,4 +1,4 @@
-import {Component, OnInit, Output, ViewChild, EventEmitter, AfterViewInit} from '@angular/core';
+import {Component, OnInit, Output, ViewChild, EventEmitter, AfterViewInit, Input} from '@angular/core';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
 import { FundSelectSearchCriteria } from '@nci-cbiit/i2ecws-lib';
 import { SearchCriteria } from '../search-criteria';
@@ -18,9 +18,13 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
   @ViewChild('searchForm') searchForm: NgForm;
 
+  @Input() action: string;
+
   @Output() callSearch = new EventEmitter<SearchCriteria>();
   @Output() searchTypeEm = new EventEmitter<string>()
+
   public searchFilter: SearchCriteria;
+
 
   showAdvanced: boolean = false;
 
@@ -50,6 +54,10 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     setTimeout(() => {
       this.searchForm.form.patchValue(this.searchFilter);
+      // next tick
+      if (this.action) {
+        setTimeout(() => this.search(this.searchForm), 0);
+      }
     }, 0);
   }
 

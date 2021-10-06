@@ -20,7 +20,7 @@
           <app-cancer-activity-cell-renderer [data]="data"></app-cancer-activity-cell-renderer>
         </ng-template>
         <ng-template #searchFundingRequestActionRenderer let-data="adtData">
-          <app-search-funding-request-action-cell-renderer [data]="data"></app-search-funding-request-action-cell-renderer>
+          <app-search-funding-request-action-cell-renderer [data]="data" (emitter)="onOpenFundingRequest($event)"></app-search-funding-request-action-cell-renderer>
         </ng-template>
       </div>
     </div>
@@ -35,7 +35,7 @@
           <app-select-grant-checkbox-cell-renderer [data]="data" (emitter)="onCaptureSelectedEvent($event)"></app-select-grant-checkbox-cell-renderer>
         </ng-template>
         <ng-template #searchFundingPlanActionRenderer let-data="adtData">
-          <app-search-funding-request-action-cell-renderer [data]="data"></app-search-funding-request-action-cell-renderer>
+          <app-search-funding-request-action-cell-renderer [data]="data" (emitter)="onOpenFundingPlan($event)"></app-search-funding-request-action-cell-renderer>
         </ng-template>
         <ng-template #searchFundingPlanFoasRenderer let-data="adtData">
           <app-search-funding-plan-foas-cell-renderer [data]="data"></app-search-funding-plan-foas-cell-renderer>
