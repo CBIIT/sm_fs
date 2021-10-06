@@ -104,7 +104,15 @@ export class PlanStep3Component implements OnInit {
             return { applId: s.applId, frtId: s.frtId };
           }));
         this.planApproverService.checkCreateApprovers().finally(
-          () => this.router.navigate([this.nextStep]));
+          () => {
+            if (this.nextStep === '/plan/step6') {
+              this.planModel.pendingAlerts.push({
+                type: 'success',
+                message: 'You have successfully saved your request',
+                title: ''
+              });
+            }
+            this.router.navigate([this.nextStep]); });
       }, error => {
         this.logger.warn(error);
       });

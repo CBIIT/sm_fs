@@ -1,5 +1,6 @@
 <!-- BEGIN Funding Plan Information Section -->
 <app-plan-submission-alert></app-plan-submission-alert>
+<app-alert-billboard [alerts]="planModel.pendingAlerts"></app-alert-billboard>
 <app-plan-warning [inFlightProposed]="inFlightProposed"
                   [inFlightSkipped]="inFlightSkipped"
                   [docChecker]="docChecker"></app-plan-warning>

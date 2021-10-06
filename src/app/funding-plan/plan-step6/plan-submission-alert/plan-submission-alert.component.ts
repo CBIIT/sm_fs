@@ -4,6 +4,7 @@ import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 import { WorkflowModel } from 'src/app/funding-request/workflow/workflow.model';
+import { PlanModel } from 'src/app/model/plan/plan-model';
 
 @Component({
   selector: 'app-plan-submission-alert',
@@ -21,6 +22,7 @@ export class PlanSubmissionAlertComponent implements OnInit, OnDestroy {
 
   constructor(private workflowModel: WorkflowModel,
               private logger: NGXLogger,
+              private planModel: PlanModel,
               private integrationService: FundingRequestIntegrationService) {
   }
 
@@ -37,7 +39,7 @@ export class PlanSubmissionAlertComponent implements OnInit, OnDestroy {
     this.requestSubmissionEventSubscriber = this.integrationService.requestSubmissionEmitter.subscribe(
       (dto) =>
         {
-//          this.requestModel.clearAlerts();
+          this.planModel.clearAlerts();
           this.status = 'success';
           this.action = dto.completeRequest ? 'COMPLETE' : dto.action;
           this.fprId = dto.fprId;
@@ -48,6 +50,7 @@ export class PlanSubmissionAlertComponent implements OnInit, OnDestroy {
     this.requestSubmitFailureEventSubscriber = this.integrationService.requestSubmitFailureEmitter.subscribe(
       (errorResponse) =>
         {
+          this.planModel.clearAlerts();
           this.status = 'failure';
           if (errorResponse.error?.errorMessage) {
             this.errorMessage = errorResponse.error.errorMessage;

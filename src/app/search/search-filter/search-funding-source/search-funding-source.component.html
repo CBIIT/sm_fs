@@ -1,0 +1,25 @@
+<div class="form-group">
+  <label [for]="name ? name : 'funding-source-select'">Funding Source</label>
+  <ng-select2
+    [id]="name ? name : 'funding-source-select'"
+    [name]="name ? name : 'fundingSources'"
+    #fundingSource="ngModel"
+    ngModel
+    [allowClear]="true"
+    [data]="data"
+    [options]="options"
+    [ngClass]="{'is-invalid': (!fundingSource.valid && (fundingSource.touched || (form && form.submitted)))}"
+    [required]="required"
+    [ngModelOptions]="{updateOn: 'change'}"
+  >
+  </ng-select2>
+  <div
+    class="text-danger mt-1"
+    *ngIf="fundingSource.errors?.required && (fundingSource.touched || (form && form.submitted))">
+    Funding Source is required
+  </div>
+</div>
+
+
+
+

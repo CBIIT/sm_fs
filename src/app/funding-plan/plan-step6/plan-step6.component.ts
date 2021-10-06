@@ -114,7 +114,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
     this.checkInFlightPfr();
   }
 
-  private isDocsStepCompleted() {
+  private isDocsStepCompleted(): void {
     if (this.docChecker.docMissing) {
       this.navigationModel.setStepComplete(5, false);
     } else {
@@ -345,6 +345,10 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
 
   isDirty(): boolean {
     return (this.workflowComponent?.isDirty());
+  }
+
+  clearAlerts(): void {
+    this.planModel.clearAlerts();
   }
 
   showBudgetInformation(): boolean {

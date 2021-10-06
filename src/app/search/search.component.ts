@@ -63,6 +63,14 @@ export class SearchComponent implements OnInit {
       fsCritera.grantSuffix = sc.grantNumber?.grantNumberSuffix;
       fsCritera.grantType = sc.grantNumber?.grantNumberType;
       fsCritera.grantYear = sc.grantNumber?.grantNumberYear;
+      fsCritera.requestingDoc = [];
+      if (sc.requestingDoc) {
+        fsCritera.requestingDoc.push(sc.requestingDoc);
+      }
+      fsCritera.fundingSource = [];
+      if (sc.fundingSources) {
+        fsCritera.fundingSource.push(sc.fundingSources);
+      }
 
       this.logger.debug("Search Funding Requests criteria in component: ", fsCritera);
       this.searchResultComponent.doFundingRequestSearch(fsCritera,
@@ -72,11 +80,10 @@ export class SearchComponent implements OnInit {
       const fsCritera: FundSelectSearchCriteria = {};
       fsCritera.fyFrom = sc.fyRange?.fromFy;
       fsCritera.fyTo = sc.fyRange?.toFy;
-      fsCritera.fsStatus = [];
       fsCritera.fsStatus = sc.fundingPlanStatus;
       fsCritera.fundingSource = [];
       if (sc.fundingSources) {
-        fsCritera.fsStatus.push(sc.fundingSources);
+        fsCritera.fundingSource.push(sc.fundingSources);
       }
       fsCritera.institution = sc.institutionName;
       fsCritera.ncabFrom = sc.ncabRange?.fromNcab;
