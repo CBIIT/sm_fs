@@ -32,9 +32,9 @@
         </thead>
         <tbody>
         <tr *ngFor="let can of fundingRequestCans; let i = index">
-          <td>{{can.fundingSourceName}}</td>
-          <td>{{ can.approvedDc | currency }} {{can.dcPctCut / 100000 | percentCut:initialPay}}</td>
-          <td>{{ can.approvedTc | currency }} {{can.tcPctCut / 100000 | percentCut:initialPay}}</td>
+          <td>{{ can.fundingSourceName }}</td>
+          <td>{{ can.approvedDc | currency }} {{ can.dcPctCut / 100000 | percentCut:initialPay }}</td>
+          <td>{{ can.approvedTc | currency }} {{ can.tcPctCut / 100000 | percentCut:initialPay }}</td>
           <td>{{ can.oefiaCreateCode }}</td>
           <td>
             <app-oefia-types [index]="i" [octId]="can.octId" [selectedValue]="can.octId"

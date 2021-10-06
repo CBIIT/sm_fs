@@ -31,8 +31,10 @@ export class CanManagementService {
   cachedRequestCans: Map<number, FundingRequestCanDto[]> = new Map();
   activeCanCache: Map<string, CanCcxDto[]> = new Map<string, CanCcxDto[]>();
 
-  constructor(private logger: NGXLogger, private canService: FsCanControllerService,
-              private requestModel: RequestModel) {
+  constructor(
+    private logger: NGXLogger, 
+    private canService: FsCanControllerService,          
+    private requestModel: RequestModel) {
     this.refreshCans();
     this.refreshOefiaCodes();
   }
