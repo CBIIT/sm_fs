@@ -309,8 +309,9 @@ export class PlanManagementService {
     let awardedTotal: number;
     let awardedDirect: number;
 
+    this.logger.debug(JSON.stringify(this.planModel));
+
     this.planModel.allGrants.filter(g => g.selected).forEach(grant => {
-      // this.logger.debug('grant: ', grant.applId);
       this.fsRequestService.getApplPeriodsUsingGET(grant.applId).subscribe(result => {
         // this.logger.debug('results =>', result);
         if (result && result.length > 0) {
@@ -327,7 +328,7 @@ export class PlanManagementService {
         }
 
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.filter(r => r.frtId === 1024 || r.frtId === 1026).forEach(req => {
-          if (req.applId === grant.applId) {
+          if (Number(req.applId) === Number(grant.applId)) {
             req.financialInfoDto.fundingRequestCans.forEach(can => {
               this.grantCosts.push({
                 applId: grant.applId,

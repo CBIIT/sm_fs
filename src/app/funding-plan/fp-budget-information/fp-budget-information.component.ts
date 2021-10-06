@@ -19,7 +19,6 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
-  fundingSourceCanViewMatrix: Map<number, any>;
   private canDisplayMatrix: Map<number, FundingRequestCanDisplayDto>;
 
   constructor(
@@ -35,11 +34,11 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
 
     this.canManagementService.projectedCanEmitter.subscribe(next => {
-      this.logger.debug('projected CAN:', next);
+      // this.logger.debug('projected CAN:', next);
       if (next.fseId) {
         this.projectedCans.set(next.fseId, next.can);
         if (next.applId) {
-          const key = String(next.fseId) + '-' + String(next.applId);
+          const key = String(next.fseId) + '_' + String(next.applId);
           this.projectedApplIdCans.set(key, next.can);
         }
       }
