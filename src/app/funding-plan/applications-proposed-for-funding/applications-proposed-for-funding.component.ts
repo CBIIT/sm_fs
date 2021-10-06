@@ -30,6 +30,8 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   @ViewChildren(FpFundingSourceComponent) fundingSources: QueryList<FpFundingSourceComponent>;
 
 
+  availableFundingSources: FundingRequestFundsSrcDto[];
+
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   private _budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
@@ -45,6 +47,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   ngOnInit(): void {
     this.logger.debug('Total grants selected', this.listGrantsSelected.length);
     this.comments = this.planModel.fundingPlanDto.comments;
+    this.planCoordinatorService.fundingSourceListEmitter.subscribe(next => {
+      this.availableFundingSources = next;
+    });
 
   }
 
@@ -163,19 +168,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     // temporarily using # for the hashtrue file not found issue..
     const url = '/fs/#' + this.router.createUrlTree(['fundingSourceDetails']).toString();
     // storing the funding sources details for popup window.. removing the object in the component once retrieved
-    localStorage.setItem('fundingSources', JSON.stringify(this.availableFundingSources()));
+    localStorage.setItem('fundingSources', JSON.stringify(this.availableFundingSources));
     openNewWindow(url, 'fundingSourceDetails');
     return false;
-  }
-
-  availableFundingSources(): void {
-    /*if (!this.fundingSources) {
-      return [];
-    }
-    return this.fundingSources.filter(f => {
-      return !this.selectedFundingSources.has(Number(f.fundingSourceId));
-    });*/
-    return null;
   }
 
   onAddFundingSource(): void {
@@ -213,10 +208,5 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   deleteSource(sourceIndex: number): void {
     this.logger.debug('deleteSource(', sourceIndex, ')');
-  }
-
-  showFundingSourceInfo(event): void {
-    this.logger.debug(event);
-    event.preventDefault();
   }
 }

@@ -31,7 +31,7 @@
             <hr>
             <label [attr.for]="'FundSrc- + index'">
               Funding Source
-              <a href="#" (click)="showFundingSourceInfo($event)"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
+              <a href="#" (click)="openFsDetails()"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
             </label>
             <app-fp-funding-source [parentForm]="parentForm" [index]="0"></app-fp-funding-source>
           </th>

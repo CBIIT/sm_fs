@@ -58,7 +58,6 @@ export class FpFundingSourceComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.debug('initialize ', this.index);
     this.allRfaPaNumbers = [];
     this.fy = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
     this.planModel.grantsSearchCriteria.forEach(r => {
@@ -91,6 +90,7 @@ export class FpFundingSourceComponent implements OnInit {
     }
     const tmp: Select2OptionData[] = [];
     this.planControllerService.getFundingPlanFundingSourcesUsingGET(ca, this.fy, pd, this.rfaPaNumber).subscribe(result => {
+      this.planCoordinatorService.fundingSourceListEmitter.next(result);
       this.fundingSourceDetailsMap = new Map(result.map(item => [item.fundingSourceId, item]));
       result.forEach(s => {
         tmp.push({ id: String(s.fundingSourceId), text: s.fundingSourceName });
