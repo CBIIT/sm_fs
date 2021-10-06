@@ -76,6 +76,10 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
 
   }
 
+  isFcArc(): boolean {
+    return this.workflowModel.isFcArc;
+  }
+
   isFcNci(): boolean {
     return this.workflowModel.isFcNci;
   }
