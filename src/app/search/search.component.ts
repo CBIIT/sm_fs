@@ -71,6 +71,9 @@ export class SearchComponent implements OnInit {
       if (sc.fundingSources) {
         fsCritera.fundingSource.push(sc.fundingSources);
       }
+      if (sc.id && sc.id.length > 0 && !isNaN(+sc.id)) {
+        fsCritera.requestId = [Number(sc.id)];
+      }
 
       this.logger.debug("Search Funding Requests criteria in component: ", fsCritera);
       this.searchResultComponent.doFundingRequestSearch(fsCritera,
@@ -96,6 +99,9 @@ export class SearchComponent implements OnInit {
       }
       if (sc.rfaPa && sc.rfaPa.length > 0) {
         fsCritera.rfaPaNumber = [sc.rfaPa];
+      }
+      if (sc.id && sc.id.length > 0 && !isNaN(+sc.id)) {
+        fsCritera.planId = [Number(sc.id)];
       }
       fsCritera.grantIc = sc.grantNumber?.grantNumberIC;
       fsCritera.grantMech = sc.grantNumber?.grantNumberMech;
