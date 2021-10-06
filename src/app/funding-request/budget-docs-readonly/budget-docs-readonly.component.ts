@@ -39,9 +39,11 @@ export class BudgetDocsReadonlyComponent implements OnInit {
   ngOnInit(): void {
     //  this.budgetDocDtos = this.parent.budgetDocDtos;
 
-    this.requestSubmissionEventSubscriber = this.requestIntegrationService.requestSubmissionEmitter.subscribe(
-      () => { this.loadFiles(); }
-    );
+    // this.requestSubmissionEventSubscriber = this.requestIntegrationService.requestSubmissionEmitter.subscribe(
+    //   () => { this.loadFiles(); }
+    // );
+
+    this.loadFiles();
   }
 
   loadFiles(): void {
@@ -78,7 +80,12 @@ export class BudgetDocsReadonlyComponent implements OnInit {
   }
 
   get budgetDocDtos(): DocumentsDto[] {
-    return this.requestModel.requestDto.budgetDocs;
+    if (this.requestOrPlan === 'REQUEST') {
+      return this.requestModel.requestDto.budgetDocs;
+    } else {
+      return this.planModel.fundingPlanDto.budgetDocs;
+    }
+
   }
 
 }
