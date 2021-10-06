@@ -13,6 +13,8 @@
           <tr>
             <th scope="col">Grant Information</th>
             <th *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources" colspan="2">
+              <label>Program Recommended Costs</label>
+              <hr>
               <div class="d-flex align-items-center">
                 <span>{{ source.fundingSourceName }}</span>
               </div>
