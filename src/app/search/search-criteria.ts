@@ -17,7 +17,9 @@ export interface SearchCriteria {
   fundingSources?: string;
   institutionName?: string;
   ncabRange?: { fromNcab: string, toNcab: string };
+  doc?: string;
   requestingDoc?: string;
+  requestingPd?: string;
   piName?: string;
   pdName?: string;
 }

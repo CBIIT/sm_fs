@@ -2,7 +2,8 @@
   <div class="col-12 d-flex">
     <h2 class="d-inline-block" id="overview-label">Filters</h2>
     <a [routerLink]="" (click)="showAdvanced = !showAdvanced" class="ml-auto"
-       [ngClass]="{'show-advance':!showAdvanced, 'hide-advance':showAdvanced}"></a>
+       [ngClass]="{'show-advance':!showAdvanced, 'hide-advance':showAdvanced}"
+       [hidden]="!searchType"></a>
   </div>
 </div>
 <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
@@ -29,10 +30,10 @@
         </label>
       </div>
     </div>
-    <div class="col-6 col-md-6">
+    <div class="col-6 col-md-6" [hidden]="!searchType">
       <lib-grantnumber-search-criteria [form]="searchForm"></lib-grantnumber-search-criteria>
     </div>
-    <div class="col-3 col-md-3 ml-auto">
+    <div class="col-3 col-md-3 ml-auto" [hidden]="!searchType">
       <lib-fy-range [minYear]="2001" [maxYear]="2025" [form]="searchForm"></lib-fy-range>
     </div>
   </div>
@@ -83,10 +84,10 @@
         <h5 class="text-divider"> <span><strong>Request&nbsp;</strong></span></h5>
       </div>
       <div class="col-md-6 col-lg-6">
-        <lib-pdname-dropdown label="Requesting PD" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
+        <lib-pdname-dropdown label="Requesting PD" name="requestingPd" [showInactiveToggle]="true"></lib-pdname-dropdown>
       </div>
       <div class="col-md-6 col-lg-6 form-group">
-        <app-search-funding-request-doc [form]="searchForm"></app-search-funding-request-doc>
+        <app-search-funding-request-doc name="requestingDoc"  label="Requesting Doc" [form]="searchForm"></app-search-funding-request-doc>
       </div>
     </div>
     <div class="row form-group">
@@ -117,17 +118,16 @@
         <h5 class="text-divider"> <span><strong>Other&nbsp;</strong></span></h5>
       </div>
       <div class="col-md-6 col-lg-6">
-        <lib-pdname-dropdown label="PD Name" [broadcast]="true" [showInactiveToggle]="false"></lib-pdname-dropdown>
+        <lib-pdname-dropdown label="PD Name" name="pdName" [showInactiveToggle]="true"></lib-pdname-dropdown>
       </div>
       <div class="col-md-6 col-lg-6 form-group">
-        <label for="doc">DOC</label>
-        <input type="text" id="doc" name="doc" ngModel class="form-control">
+        <app-search-funding-request-doc name="doc" label="DOC" [form]="searchForm"></app-search-funding-request-doc>
       </div>
     </div>
   </div>
   <div class="row form-group">
     <div class="col-lg-12 d-flex justify-content-end align-items-end">
-      <button type="button" class="btn btn-outline-secondary mr-2" (click)="clear()">Clear</button>
+      <button type="button" class="btn btn-outline-secondary mr-2" (click)="clear()">Reset</button>
       <button type="submit" class="btn btn-primary">Search</button>
     </div>
   </div>

@@ -63,17 +63,29 @@ export class SearchComponent implements OnInit {
       fsCritera.grantSuffix = sc.grantNumber?.grantNumberSuffix;
       fsCritera.grantType = sc.grantNumber?.grantNumberType;
       fsCritera.grantYear = sc.grantNumber?.grantNumberYear;
-      fsCritera.requestingDoc = [];
-      if (sc.requestingDoc) {
-        fsCritera.requestingDoc.push(sc.requestingDoc);
+      if (sc.requestingDoc && sc.requestingDoc.length > 0) {
+        fsCritera.requestingDoc = [sc.requestingDoc];
       }
-      fsCritera.fundingSource = [];
-      if (sc.fundingSources) {
-        fsCritera.fundingSource.push(sc.fundingSources);
+      if (sc.doc && sc.doc.length > 0) {
+        fsCritera.doc = [sc.doc];
+      }
+      if (sc.fundingSources && sc.fundingSources.length > 0) {
+        fsCritera.fundingSource = [sc.fundingSources];
       }
       if (sc.id && sc.id.length > 0 && !isNaN(+sc.id)) {
         fsCritera.requestId = [Number(sc.id)];
       }
+      if (sc.pdName && !isNaN(+sc.pdName)) {
+        fsCritera.pdNpnId = Number(sc.pdName);
+      }
+      if (sc.requestingPd && !isNaN(+sc.requestingPd)) {
+        fsCritera.requestingPdNpnId = Number(sc.requestingPd);
+      }
+
+
+      fsCritera.piName = sc.piName;
+      fsCritera.institution = sc.institutionName;
+
 
       this.logger.debug("Search Funding Requests criteria in component: ", fsCritera);
       this.searchResultComponent.doFundingRequestSearch(fsCritera,
@@ -84,18 +96,19 @@ export class SearchComponent implements OnInit {
       fsCritera.fyFrom = sc.fyRange?.fromFy;
       fsCritera.fyTo = sc.fyRange?.toFy;
       fsCritera.fsStatus = sc.fundingPlanStatus;
-      fsCritera.fundingSource = [];
-      if (sc.fundingSources) {
-        fsCritera.fundingSource.push(sc.fundingSources);
-      }
       fsCritera.institution = sc.institutionName;
       fsCritera.ncabFrom = sc.ncabRange?.fromNcab;
       fsCritera.ncabTo = sc.ncabRange?.toNcab;
-      fsCritera.pdNpnId = Number(sc.pdName);
       fsCritera.piName = sc.piName;
       fsCritera.requestingDoc = [];
-      if (sc.requestingDoc) {
-        fsCritera.requestingDoc.push(sc.requestingDoc);
+      if (sc.requestingDoc && sc.requestingDoc.length > 0) {
+        fsCritera.requestingDoc = [sc.requestingDoc];
+      }
+      if (sc.doc && sc.doc.length > 0) {
+        fsCritera.doc = [sc.doc];
+      }
+      if (sc.fundingSources && sc.fundingSources.length > 0) {
+        fsCritera.fundingSource = [sc.fundingSources];
       }
       if (sc.rfaPa && sc.rfaPa.length > 0) {
         fsCritera.rfaPaNumber = [sc.rfaPa];
@@ -109,6 +122,13 @@ export class SearchComponent implements OnInit {
       fsCritera.grantSuffix = sc.grantNumber?.grantNumberSuffix;
       fsCritera.grantType = sc.grantNumber?.grantNumberType;
       fsCritera.grantYear = sc.grantNumber?.grantNumberYear;
+
+      if (sc.pdName && !isNaN(+sc.pdName)) {
+        fsCritera.pdNpnId = Number(sc.pdName);
+      }
+      if (sc.requestingPd && !isNaN(+sc.requestingPd)) {
+        fsCritera.requestingPdNpnId = Number(sc.requestingPd);
+      }
 
       this.logger.debug("Search Funding Plans criteria in component: ", fsCritera);
       this.searchResultComponent.doFundingPlanSearch(fsCritera,

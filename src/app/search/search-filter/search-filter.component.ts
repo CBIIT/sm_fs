@@ -30,6 +30,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
 
   set searchType(value: string) {
     this._searchType = value;
+    this.logger.debug('Search Type set to <' + value + '>');
     this.searchTypeEm.emit(value);
   }
   get searchType() { return this._searchType; }
@@ -74,6 +75,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
 
   clear() {
    this.searchFilter = {};
+   this.showAdvanced = false;
    this.searchForm.resetForm();
   }
 

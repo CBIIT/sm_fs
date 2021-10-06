@@ -1,8 +1,8 @@
 <div class="form-group">
-  <label [for]="name ? name : 'funding-request-doc-select'">Requesting Doc</label>
+  <label [for]="name">{{label}}</label>
   <ng-select2
-    [id]="name ? name : 'funding-request-doc-select'"
-    [name]="name ? name : 'requestingDoc'"
+    [id]="name"
+    [name]="name"
     #fundingRequestDoc="ngModel"
     ngModel
     [allowClear]="true"

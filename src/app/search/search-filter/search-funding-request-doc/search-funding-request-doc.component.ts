@@ -14,9 +14,10 @@ import {openNewWindow} from "../../../utils/utils";
 })
 export class SearchFundingRequestDocComponent implements OnInit {
 
-  @Input() required: boolean;
+  @Input() required: boolean = false;
   @Input() form: NgForm; // optional parent form to validate on submit
-  @Input() name: string; // optional control name (default is 'funding-request-doc-select')
+  @Input() label: string = 'Doc';
+  @Input() name: string = 'funding-request-doc-select'; // optional control name (default is 'funding-request-doc-select')
 
   @ViewChild('fundingRequestDoc') frTypeControl: NgModel
 
