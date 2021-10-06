@@ -7,7 +7,6 @@ import { DocumentService } from 'src/app/service/document.service';
 import { saveAs } from 'file-saver';
 import { Step4Component } from '../step4/step4.component';
 import { Subscription } from 'rxjs';
-import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 
 @Component({
@@ -17,7 +16,6 @@ import { PlanModel } from 'src/app/model/plan/plan-model';
 })
 export class BudgetDocsReadonlyComponent implements OnInit {
 
-  //  budgetDocDtos: DocumentsDto[];
   private _parent: Step4Component;
   @Input() set parent(value: Step4Component) {
     this._parent = value;
@@ -32,17 +30,10 @@ export class BudgetDocsReadonlyComponent implements OnInit {
 
   constructor(private requestModel: RequestModel,
     private documentService: DocumentService,
-    private requestIntegrationService: FundingRequestIntegrationService,
     private logger: NGXLogger,
     private planModel: PlanModel) { }
 
   ngOnInit(): void {
-    //  this.budgetDocDtos = this.parent.budgetDocDtos;
-
-    // this.requestSubmissionEventSubscriber = this.requestIntegrationService.requestSubmissionEmitter.subscribe(
-    //   () => { this.loadFiles(); }
-    // );
-
     this.loadFiles();
   }
 
