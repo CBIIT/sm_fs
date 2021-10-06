@@ -22,6 +22,7 @@ import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib/model/fundingReqBudg
 import { AppUserSessionService } from '../../service/app-user-session.service';
 import { PlanApproverService } from '../approver/plan-approver.service';
 import { CanManagementService } from '../../cans/can-management.service';
+import { Alert } from '../../alert-billboard/alert';
 
 @Component({
   selector: 'app-plan-step3',
@@ -40,6 +41,7 @@ export class PlanStep3Component implements OnInit {
   doc: string;
   planName: string;
   private nextStep: string;
+  alerts: Alert[];
 
   get cayCodeArr(): string[] {
     return [this.cayCode];
@@ -91,34 +93,53 @@ export class PlanStep3Component implements OnInit {
   }
 
   onSubmit($event: any): void {
+    this.alerts = null;
+    this.logger.debug($event);
     if (this.step3form.valid) {
       this.buildPlanModel();
-      this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
-        this.logger.debug('Saved plan model: ', JSON.stringify(result));
-        this.planModel.fundingPlanDto = result;
-        this.planCoordinatorService.buildPlanModel();
-        this.planCoordinatorService.buildGrantCostModel();
-        this.planCoordinatorService.buildGrantCostModel();
-        this.planCoordinatorService.checkInFlightPFRs(
-          this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(s => {
-            return { applId: s.applId, frtId: s.frtId };
-          }));
-        this.planApproverService.checkCreateApprovers().finally(
-          () => {
-            if (this.nextStep === '/plan/step6') {
-              this.planModel.pendingAlerts.push({
-                type: 'success',
-                message: 'You have successfully saved your request',
-                title: ''
-              });
-            }
-            this.router.navigate([this.nextStep]); });
-      }, error => {
-        this.logger.warn(error);
-      });
+      if (!isNaN(this.planModel.fundingPlanDto.pubYr1SetAsideAmt) && !isNaN(this.planModel.fundingPlanDto.totalRecommendedAmt)
+        && Number(this.planModel.fundingPlanDto.pubYr1SetAsideAmt) !== Number(this.planModel.fundingPlanDto.totalRecommendedAmt)) {
+        if (confirm('WARNING: The Program Recommended Total Cost (1st year) in this funding plan does not match the Published 1st year Set-Aside dollar amount. Do you want to proceed with submission?')) {
+          this.saveFundingPlan();
+        }
+      } else {
+        this.saveFundingPlan();
+      }
     } else {
-      this.logger.debug(this.step3form);
+      // push an alert here
+      this.alerts = [{
+        type: 'danger',
+        message: 'Please correct the errors identified below.',
+        title: ''
+      }];
     }
+  }
+
+  private saveFundingPlan(): void {
+    this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
+      this.logger.debug('Saved plan model: ', JSON.stringify(result));
+      this.planModel.fundingPlanDto = result;
+      this.planCoordinatorService.buildPlanModel();
+      this.planCoordinatorService.buildGrantCostModel();
+      this.planCoordinatorService.buildGrantCostModel();
+      this.planCoordinatorService.checkInFlightPFRs(
+        this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(s => {
+          return { applId: s.applId, frtId: s.frtId };
+        }));
+      this.planApproverService.checkCreateApprovers().finally(
+        () => {
+          if (this.nextStep === '/plan/step6') {
+            this.planModel.pendingAlerts.push({
+              type: 'success',
+              message: 'You have successfully saved your request',
+              title: ''
+            });
+          }
+          this.router.navigate([this.nextStep]);
+        });
+    }, error => {
+      this.logger.warn(error);
+    });
   }
 
   buildPlanModel(): void {
