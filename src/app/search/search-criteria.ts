@@ -1,5 +1,6 @@
 export interface SearchCriteria {
   searchType?: string;
+  id?: string;
   rfaPa?: string;
   fundingRequestStatus?: string[],
   frTypes?: string[];
