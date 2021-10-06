@@ -214,4 +214,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   deleteSource(sourceIndex: number): void {
     this.logger.debug('deleteSource(', sourceIndex, ')');
   }
+
+  showFundingSourceInfo(event): void {
+    this.logger.debug(event);
+    event.preventDefault();
+  }
 }

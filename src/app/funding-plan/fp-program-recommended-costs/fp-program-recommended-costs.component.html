@@ -21,7 +21,15 @@
 
   <ng-container *ngIf="!!displayType then typeSelected else blank"></ng-container>
 
-  <ng-template #blank></ng-template>
+  <ng-template #blank>
+    <div
+      class="text-danger mt-1"
+      *ngIf="parentForm.submitted">
+      Please enter direct and total cost or percent cut for each selected application
+      <input type="hidden" [ngModel]="dummy" name="noData" required>
+    </div>
+
+  </ng-template>
 
   <ng-template #typeSelected>
     <ng-container *ngIf="displayType === 'percent'; then percentCutVw else dollarValues"></ng-container>

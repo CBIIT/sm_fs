@@ -23,7 +23,7 @@
         name="priorNotice"
         [disabled]="readOnly"
         #priorNoticeValue="ngModel"
-        required>
+        [required]="issueType === 'reissue'">
     </div>
     <div
       class="text-danger mt-1"
