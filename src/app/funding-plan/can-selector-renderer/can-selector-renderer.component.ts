@@ -35,6 +35,7 @@ export class CanSelectorRendererComponent implements OnInit {
 
   ngOnInit(): void {
     this.fundingSources = this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.map(f => f.fundingSourceId);
+    this.defaultCanMap = new Map<string, string[]>();
     this.grantCosts.forEach(gc => {
       this.canManagementService.searchDefaultCans(
         '',
@@ -63,9 +64,10 @@ export class CanSelectorRendererComponent implements OnInit {
     //   // this.logger.debug('no projected CAN');
     //   return false;
     // }
-    const canOptions = this.defaultCanMap.get(key);
+    const canOptions = this.defaultCanMap?.get(key);
     if(!canOptions || canOptions.length === 0) {
-      this.logger.warn('No default CAN numbers to check');
+      this.logger.warn('No default CAN numbers to check')
+      return false;
     }
     const selectedCan = this.planModel.selectedApplIdCans.get(key);
     if (!selectedCan?.can) {
@@ -73,6 +75,7 @@ export class CanSelectorRendererComponent implements OnInit {
       return false;
     }
     this.logger.debug('CAN values', selectedCan.can);
+
     return !canOptions.includes(selectedCan.can);
   }
 
@@ -156,6 +159,7 @@ export class CanSelectorRendererComponent implements OnInit {
   canEnter(fseId: number): boolean {
     const displayMatrix = this.canManagementService.canDisplayMatrix?.get(fseId);
     if (!displayMatrix) {
+      this.logger.warn('no can matrix for fseId:', fseId);
       return false;
     }
     // this.logger.debug('ARC enters  : ', displayMatrix.arcEnters);
