@@ -17,6 +17,7 @@ import { PlanWorkflowComponent } from '../fp-workflow/plan-workflow.component';
 import { NgForm } from '@angular/forms';
 import { DocTypeConstants } from './plan-supporting-docs-readonly/plan-supporting-docs-readonly.component';
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
+import { CanManagementService } from '../../cans/can-management.service';
 
 @Component({
   selector: 'app-plan-step6',
@@ -69,6 +70,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
               private fsPlanWorkflowControllerService: FsPlanWorkflowControllerService,
               private fsPlanControllerService: FsPlanControllerService,
               public planModel: PlanModel,
+              private canManagementService: CanManagementService,
               private workflowModel: WorkflowModel,
               private logger: NGXLogger,
               private changeDetection: ChangeDetectorRef,
@@ -99,23 +101,24 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
       (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
       g.priorityScoreNum >= this.planModel.minimumScore &&
       g.priorityScoreNum <= this.planModel.maximumScore) );
-    this.logger.debug('skipped grants are ', this.grantsSkipped);
+    // this.logger.debug('skipped grants are ', this.grantsSkipped);
 
     this.grantsNotConsidered = this.planModel.allGrants.filter(g =>
       (g.notSelectableReason && g.notSelectableReason.length > 0) ||
       (( g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)
       && !g.selected ) );
-    this.logger.debug('unfunded grants are ', this.grantsNotConsidered);
+    // this.logger.debug('unfunded grants are ', this.grantsNotConsidered);
     // this.planApproverService.checkCreateApprovers().then( () => {
     //   this.logger.debug('Approvers are created ');
     this.workflowModel.initializeForPlan(this.fprId);
       // }
       // );
-    this.logger.debug('Step6 OnInit Plan Model ', this.planModel);
+    // this.logger.debug('Step6 OnInit Plan Model ', this.planModel);
     this.checkUserRolesCas();
     this.docChecker = new FundingPlanDocChecker(this.planModel);
     this.isDocsStepCompleted();
     this.checkInFlightPfr();
+    this.canManagementService.initializeCANDisplayMatrix();
   }
 
   private isDocsStepCompleted(): void {
