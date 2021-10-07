@@ -55,7 +55,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.searchForm.form.patchValue(this.searchFilter);
       // next tick
-      if (this.action) {
+      if (this.action === 'immediate') {
         setTimeout(() => this.search(this.searchForm), 0);
       }
     }, 0);
