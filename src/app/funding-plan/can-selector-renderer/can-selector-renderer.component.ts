@@ -23,6 +23,7 @@ export class CanSelectorRendererComponent implements OnInit {
   @Input() readOnly = false;
 
   fundingSources: number[];
+  private defaultCanMap: Map<string, string[]>;
 
   constructor(
     private planManagementService: PlanManagementService,
@@ -34,6 +35,19 @@ export class CanSelectorRendererComponent implements OnInit {
 
   ngOnInit(): void {
     this.fundingSources = this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.map(f => f.fundingSourceId);
+    this.grantCosts.forEach(gc => {
+      this.canManagementService.searchDefaultCans(
+        '',
+        gc.bmmCodes,
+        gc.activityCodes,
+        gc.nciSourceFlag).subscribe(result => {
+        const key = String(gc.fseId) + '-' + String(gc.applId);
+
+        this.logger.debug('default CANs', key, result.map(r => r.can));
+        this.defaultCanMap.set(key, result.map(r => r.can));
+      });
+    });
+
     // this.logger.debug('Funding sources: ', this.fundingSources);
   }
 
@@ -44,18 +58,22 @@ export class CanSelectorRendererComponent implements OnInit {
   nonDefaultCAN(applId: number, fseId: number, index: number): boolean {
     const key = String(fseId) + '-' + String(applId);
     // this.logger.debug('Checking non-default CAN for', key);
-    const projectedCan = this.projectedApplIdCans?.get(key);
-    if (!projectedCan?.can) {
-      // this.logger.debug('no projected CAN');
-      return false;
+    // const projectedCan = this.projectedApplIdCans?.get(key);
+    // if (!projectedCan?.can) {
+    //   // this.logger.debug('no projected CAN');
+    //   return false;
+    // }
+    const canOptions = this.defaultCanMap.get(key);
+    if(!canOptions || canOptions.length === 0) {
+      this.logger.warn('No default CAN numbers to check');
     }
     const selectedCan = this.planModel.selectedApplIdCans.get(key);
     if (!selectedCan?.can) {
-      // this.logger.debug('no selected CAN');
+      this.logger.debug('no selected CAN');
       return false;
     }
-    this.logger.debug('CAN values', selectedCan.can, projectedCan.can);
-    return selectedCan.can !== projectedCan.can;
+    this.logger.debug('CAN values', selectedCan.can);
+    return !canOptions.includes(selectedCan.can);
   }
 
   duplicateCAN(applId: number, fseId: number, index: number): boolean {
