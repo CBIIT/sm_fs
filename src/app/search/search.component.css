@@ -58,3 +58,8 @@ div.overview {
 div.overview > span {
   float: right;
 }
+
+button:disabled {
+  background-color: gray;
+  border : gray;
+}

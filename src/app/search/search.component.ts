@@ -27,6 +27,10 @@ export class SearchComponent implements OnInit, AfterViewInit {
   numAwaitingPlans: number ;
   numMyPlans: number ;
   numMyUnderReviewPlans: number ;
+  isPd : boolean;
+  isPa : boolean;
+  hasPaylineRoles : boolean;
+  hasCancerActivities : boolean;
   dashboardDatafilterList: any;
   dashboardDatafilterMap: Map<string, FundSearchDashboardDataDto>;
    fsFilterCriteria: FundSelectSearchCriteria = {};
@@ -41,6 +45,10 @@ export class SearchComponent implements OnInit, AfterViewInit {
             ) { }
 
   ngOnInit(): void {
+
+    this.isPd = this.userSessionService.isPD();
+    this.isPa = this.userSessionService.isPA();
+    this.hasPaylineRoles = this.userSessionService.hasRole('OEFIACRT') ||  this.userSessionService.hasRole('DES');
 
     this.currentFY = getCurrentFiscalYear();
     this.fsSearchController.getSearchDashboardDataUsingGET().subscribe(
@@ -237,23 +245,27 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.searchModel.searchType = 'awaitfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_FUNDING_PLAN_AWAITING_RESPONSE
-  //  this.searchResultComponent.doSearch(this.fsFilterCriteria);
-  }
+    this.searchResultComponent.doFundingRequestSearch(this.fsFilterCriteria,
+      FilterTypeLabels.FILTER_FUNDING_PLAN_AWAITING_RESPONSE);  }
 
   onMyPlans() {
     this.searchModel.searchType = 'myfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_MY_FUNDING_PLAN;
-   // this.searchResultComponent.doSearch(this.fsFilterCriteria);
-  }
+    this.searchResultComponent.doFundingRequestSearch(this.fsFilterCriteria,
+      FilterTypeLabels.FILTER_MY_FUNDING_PLAN);  }
 
   onMyUnderReviewPlans() {
     this.searchModel.searchType = 'myreviewfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_FUNDING_PLAN_UNDER_REVIEW;
-  //  this.searchResultComponent.doSearch(this.fsFilterCriteria);
+    this.searchResultComponent.doFundingRequestSearch(this.fsFilterCriteria,
+      FilterTypeLabels.FILTER_FUNDING_PLAN_UNDER_REVIEW);
   }
 
+  viewPaylines(){
+
+  }
 
   onSearchType(type: string) {
     this.labelSearch = type === 'FR' ? 'Requests' : (type === 'FP' ? 'Plans' : (type === 'PL' ? 'Paylists' :  'Grants'));
@@ -274,8 +286,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.numMyPlans = dashboardData.get(FilterTypes.FILTER_MY_FUNDING_PLAN).countFilterType;
     this.numMyUnderReviewPlans = dashboardData.get(FilterTypes.FILTER_FUNDING_PLAN_UNDER_REVIEW).countFilterType;
     this.numAwaitingPlans = dashboardData.get(FilterTypes.FILTER_FUNDING_PLAN_AWAITING_RESPONSE).countFilterType;
-    console.log(this.numAwaitingRequests);
-
+    this.hasCancerActivities = dashboardData.get(FilterTypes.FILTER_CANCER_ACTIVITIES).canDisplayFilerType;
   }
 
   filterTypeLabels = FilterTypeLabels;
