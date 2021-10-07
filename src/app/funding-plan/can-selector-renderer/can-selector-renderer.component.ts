@@ -6,6 +6,8 @@ import { CanCcxDto, FundingRequestCanDisplayDto } from '@nci-cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
 import { PlanModel } from '../../model/plan/plan-model';
+import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
+
 
 @Component({
   selector: 'app-can-selector-renderer',
@@ -26,6 +28,7 @@ export class CanSelectorRendererComponent implements OnInit {
     private planManagementService: PlanManagementService,
     private canManagementService: CanManagementService,
     private planModel: PlanModel,
+    private workflowModel: WorkflowModel,
     private logger: NGXLogger) {
   }
 
@@ -128,7 +131,32 @@ export class CanSelectorRendererComponent implements OnInit {
   }
 
   canSearchCan(applId: number, fseId: number): boolean {
-    return true;
+    return this.canEnter(fseId) && !this.readOnly;
+  }
 
+  /* Applicable for ARC and NCI financial approvers in edit mode; readonly display will be determined elsewhere */
+  canEnter(fseId: number): boolean {
+    const displayMatrix = this.canManagementService.canDisplayMatrix?.get(fseId);
+    if (!displayMatrix) {
+      return false;
+    }
+    // this.logger.debug('ARC enters  : ', displayMatrix.arcEnters);
+    // this.logger.debug('OEFIA enters: ', displayMatrix.oefiaEnters);
+    if ((this.isFcArc() && displayMatrix.arcEnters === 'Y') || (this.isFcNci() && displayMatrix.oefiaEnters === 'Y')) {
+      return true;
+    }
+    return false;
+  }
+
+  isFcArc(): boolean {
+    return this.workflowModel.isFcArc;
+  }
+
+  isFcNci(): boolean {
+    return this.workflowModel.isFcNci;
+  }
+
+  isFinancialApprover(): boolean {
+    return this.workflowModel.isFinancialApprover;
   }
 }

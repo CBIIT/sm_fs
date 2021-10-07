@@ -79,8 +79,8 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     if (!displayMatrix) {
       return false;
     }
-    this.logger.debug('ARC enters  : ', displayMatrix.arcEnters);
-    this.logger.debug('OEFIA enters: ', displayMatrix.oefiaEnters);
+    // this.logger.debug('ARC enters  : ', displayMatrix.arcEnters);
+    // this.logger.debug('OEFIA enters: ', displayMatrix.oefiaEnters);
     if ((this.isFcArc() && displayMatrix.arcEnters === 'Y') || (this.isFcNci() && displayMatrix.oefiaEnters === 'Y')) {
       return true;
     }
