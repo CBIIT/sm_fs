@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import { SearchCriteria } from './search-criteria';
 import { SearchResultComponent } from './search-result/search-result.component';
 import { FundSearchDashboardDataDto , FundSelectSearchCriteria , FsSearchControllerService } from '@nci-cbiit/i2ecws-lib';
@@ -6,13 +6,14 @@ import { NGXLogger } from 'ngx-logger';
 import { getCurrentFiscalYear } from 'src/app/utils/utils';
 import {AppUserSessionService} from "../service/app-user-session.service";
 import {ActivatedRoute} from "@angular/router";
+import {SearchModel} from "./model/search-model";
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.css']
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, AfterViewInit {
   @ViewChild(SearchResultComponent) searchResultComponent: SearchResultComponent;
 
   labelSearch: string = 'Requests';
@@ -34,6 +35,7 @@ export class SearchComponent implements OnInit {
 
   constructor(private logger: NGXLogger,
               private route: ActivatedRoute,
+              private searchModel: SearchModel,
               private userSessionService: AppUserSessionService,
               private fsSearchController:FsSearchControllerService
             ) { }
@@ -49,13 +51,58 @@ export class SearchComponent implements OnInit {
         console.error('HttpClient get request error for----- ' + error.message);
       });
 
-    const action = this.route.snapshot.params.action;
+    let action = this.route.snapshot.params.action;
     if (action) {
-      if (action === 'immediate') {
-        this.action = action;
-      }
-    }
+      setTimeout(() => {
+        if (action == 'immediate') {
+          // this is a return link from the FR or FP view
+          // check the searchType from the search model
+          // and replace 'immediate' with one of the saved dashboard action type
+          if (this.searchModel.searchType &&
+               this.searchModel.searchType != 'FR' &&
+               this.searchModel.searchType != 'FP' &&
+               this.searchModel.searchType != 'PL' &&
+               this.searchModel.searchType != 'R') {
+            action = this.searchModel.searchType; // replace action 'immediate' with one of the dashboard types
+          }
+        }
 
+        switch (action) {
+          case 'immediate':
+            // this is a return link from the FR or FP view
+            // check the searchType from the return code
+            this.action = action;
+            break;
+          case 'awaitfr':
+            this.onAwaitingRequests();
+            break;
+          case 'myfr':
+            this.onMyRequests();
+            break;
+          case 'mycafr':
+            this.onMyCARequests();
+            break;
+          case 'myportfoliofr':
+            this.onMyPortfolioRequests();
+            break;
+          case 'myreviewfr':
+            this.onMyUnderReviewRequests();
+            break;
+          case 'awaitfp':
+            this.onAwaitingPlans();
+            break;
+          case 'myfp':
+            this.onMyPlans();
+            break;
+          case 'myreviewfp':
+            this.onMyUnderReviewPlans();
+            break;
+        }
+      }, 0);
+    }
+  }
+
+  ngAfterViewInit() {
   }
 
   doSearch(sc: SearchCriteria) {
@@ -146,6 +193,7 @@ export class SearchComponent implements OnInit {
   }
 
   onAwaitingRequests() {
+    this.searchModel.searchType = 'awaitfr';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_REQUEST_AWAITING_RESPONSE;
     this.searchResultComponent.doFundingRequestSearch(this.fsFilterCriteria,
@@ -153,6 +201,7 @@ export class SearchComponent implements OnInit {
   }
 
   onMyRequests() {
+    this.searchModel.searchType = 'myfr';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_MYREQUEST;
     this.searchResultComponent.doFundingRequestSearch(this.fsFilterCriteria,
@@ -160,6 +209,7 @@ export class SearchComponent implements OnInit {
   }
 
   onMyCARequests() {
+    this.searchModel.searchType = 'mycafr';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.myCancerActivities = this.userSessionService.getUserCaCodes();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_CANCER_ACTIVITIES;
@@ -168,6 +218,7 @@ export class SearchComponent implements OnInit {
   }
 
   onMyPortfolioRequests() {
+    this.searchModel.searchType = 'myportfoliofr';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_PORTFOLIO;
     this.searchResultComponent.doFundingRequestSearch(this.fsFilterCriteria,
@@ -175,6 +226,7 @@ export class SearchComponent implements OnInit {
   }
 
   onMyUnderReviewRequests() {
+    this.searchModel.searchType = 'myreviewfr';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_REQUEST_UNDER_REVIEW;
     this.searchResultComponent.doFundingRequestSearch(this.fsFilterCriteria,
@@ -182,18 +234,21 @@ export class SearchComponent implements OnInit {
   }
 
   onAwaitingPlans() {
+    this.searchModel.searchType = 'awaitfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_FUNDING_PLAN_AWAITING_RESPONSE
   //  this.searchResultComponent.doSearch(this.fsFilterCriteria);
   }
 
   onMyPlans() {
+    this.searchModel.searchType = 'myfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_MY_FUNDING_PLAN;
    // this.searchResultComponent.doSearch(this.fsFilterCriteria);
   }
 
   onMyUnderReviewPlans() {
+    this.searchModel.searchType = 'myreviewfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_FUNDING_PLAN_UNDER_REVIEW;
   //  this.searchResultComponent.doSearch(this.fsFilterCriteria);
