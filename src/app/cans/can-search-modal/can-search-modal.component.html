@@ -29,7 +29,7 @@
           <th scope="col">CAN Description</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody style="overflow-y: scroll;">
         <tr *ngFor="let c of canData">
           <td><a href="#" (click)="select($event, c)">{{c.can}}</a></td>
           <td>{{c.canPhsOrgCode}}</td>
