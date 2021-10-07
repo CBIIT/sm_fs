@@ -5,6 +5,7 @@ import { FundSearchDashboardDataDto , FundSelectSearchCriteria , FsSearchControl
 import { NGXLogger } from 'ngx-logger';
 import { getCurrentFiscalYear } from 'src/app/utils/utils';
 import {AppUserSessionService} from "../service/app-user-session.service";
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-search',
@@ -29,8 +30,10 @@ export class SearchComponent implements OnInit {
   dashboardDatafilterMap: Map<string, FundSearchDashboardDataDto>;
    fsFilterCriteria: FundSelectSearchCriteria = {};
 
+   action: string;
 
   constructor(private logger: NGXLogger,
+              private route: ActivatedRoute,
               private userSessionService: AppUserSessionService,
               private fsSearchController:FsSearchControllerService
             ) { }
@@ -46,6 +49,12 @@ export class SearchComponent implements OnInit {
         console.error('HttpClient get request error for----- ' + error.message);
       });
 
+    const action = this.route.snapshot.params.action;
+    if (action) {
+      if (action === 'immediate') {
+        this.action = action;
+      }
+    }
 
   }
 

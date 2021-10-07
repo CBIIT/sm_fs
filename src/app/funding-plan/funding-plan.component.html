@@ -4,12 +4,12 @@
     </div>
 </div>
 <div>
-    <a  *ngIf="model.returnToSearchLink" href="#" class="btn btn-sm btn-link btn-back"  ><i class="far fa-arrow-left fa-sm mr-1" aria-hidden="true"></i>Return to Plan Query Page</a>
+    <a  *ngIf="model.returnToSearchLink" routerLink="/search/immediate" class="btn btn-sm btn-link btn-back"  ><i class="far fa-arrow-left fa-sm mr-1" aria-hidden="true"></i>Return to Plan Query Page</a>
     <div class="row" id="funding-plan-page-top">
         <div class="col-lg-10">
             <h1>{{model.title}} <span *ngIf="model.fundingPlanDto?.fprId"># {{model.fundingPlanDto.fprId}}</span>
             <span [hidden]="!showSteps"> &mdash; Step {{activeStep.step}}: {{activeStep.screenName}}</span>
-            </h1> 
+            </h1>
         </div>
         <div class="col-lg-2">
             <button class="btn btn-primary btn-sm" (click)="goToWorkflow()" *ngIf="showGoToWorkflowButton()"><i class="fas fa-arrow-to-bottom"></i> Go to Workflow</button>

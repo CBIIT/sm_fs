@@ -11,6 +11,7 @@ import {SelectFundingRequestCheckboxCellRendererComponent} from "./select-fundin
 import {SearchFundingRequestActionCellRendererComponent} from "./search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component";
 import {FundingPlanQueryDto} from "@nci-cbiit/i2ecws-lib/model/fundingPlanQueryDto";
 import {SearchFundingPlanFoasCellRendererComponent} from "./search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component";
+import {Router} from "@angular/router";
 
 class DataTablesResponse {
   data: any[];
@@ -29,6 +30,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private fsSearchControllerService: FsSearchControllerService,
               private propertiesService: AppPropertiesService,
               private loaderService: LoaderService,
+              private router: Router,
               private logger: NGXLogger) { }
 
   @ViewChildren(DataTableDirective) dtElements: QueryList<DataTableDirective>;
@@ -56,8 +58,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   fundingPlans: FundingPlanQueryDto[];
   searchCriteria: FundSelectSearchCriteria;
 
-  noFundingRequestResult: boolean;
-  noFundingPlanResult: boolean;
+  noFundingRequestResult: boolean = true;
+  noFundingPlanResult: boolean = true;
   filterTypeLabel: string;
 
   ngOnInit(): void {
@@ -277,7 +279,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {title: 'Last Action Date', data: 'planStatusDate'}, // 11
         {
           title: 'Action', data: null, defaultContent: 'Select'
-          ,ngTemplateRef: { ref: this.searchFundingRequestActionRenderer}, className: 'all'
+          ,ngTemplateRef: { ref: this.searchFundingPlanActionRenderer}, className: 'all'
         }, // 12
         {data: null, defaultContent: ''}
 
@@ -336,10 +338,10 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     };
 
-    setTimeout(() => {
-      this.dtFundingRequestTrigger.next();
-      this.dtFundingPlanTrigger.next();
-    }, 0);
+    // setTimeout(() => {
+    //   this.dtFundingRequestTrigger.next();
+    //   this.dtFundingPlanTrigger.next();
+    // }, 0);
   }
 
 
@@ -353,16 +355,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noFundingPlanResult = true;
     this.noFundingRequestResult = false;
     this.filterTypeLabel = filterTypeLabel;
-    this.dtElements.forEach((dtEl: DataTableDirective) => {
-      if (dtEl.dtInstance) {
-        dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
-          dtInstance.clear();
-          if (dtEl.dtTrigger === this.dtFundingRequestTrigger) {
-            setTimeout(() => this.dtFundingRequestTrigger.next(), 0);
-          }
-        });
-      }
-    });
+    this._triggerDtInstance(this.dtFundingRequestTrigger);
   }
 
   doFundingPlanSearch(criteria: FundSelectSearchCriteria, filterTypeLabel: string): void {
@@ -370,17 +363,29 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noFundingRequestResult = true;
     this.noFundingPlanResult = false;
     this.filterTypeLabel = filterTypeLabel;
+    this._triggerDtInstance(this.dtFundingPlanTrigger);
+  }
 
+  _triggerDtInstance(trigger: Subject<any>): void {
     this.dtElements.forEach((dtEl: DataTableDirective) => {
-      if (dtEl.dtInstance) {
+      if (dtEl.dtTrigger === trigger) {
+        if (dtEl.dtInstance) {
+          dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
+            dtInstance.clear();
+            setTimeout(() => trigger.next(), 0);
+          });
+        }
+        else {
+          trigger.next();
+        }
+      }
+      else if (dtEl.dtInstance) {
         dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
           dtInstance.clear();
-          if (dtEl.dtTrigger === this.dtFundingPlanTrigger) {
-            setTimeout(() => this.dtFundingPlanTrigger.next(), 0);
-          }
         });
       }
     });
+
   }
 
   onCaptureSelectedEvent($event: any) {
@@ -393,5 +398,14 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         entry.selected = false;
       }
     }
+  }
+
+  onOpenFundingRequest($event: any) {
+    this.router.navigate(['request/retrieve', $event.frqId]);
+  }
+
+  onOpenFundingPlan($event: any) {
+    this.router.navigate(['plan/retrieve', $event.fprId]);
+
   }
 }
