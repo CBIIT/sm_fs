@@ -35,14 +35,14 @@
               <i class="far fa-copy" aria-hidden="true"></i>
             </button>
             <button
-              *ngIf="true"
+              *ngIf="canSearchForCAN(source.fundingSourceId)"
               (click)="searchForCANs(source.fundingSourceId, source.nciSourceFlag)"
               class="btn btn-link btn-slim"
               ngbTooltip="Search and select from active CANs">
               <i class="far fa-search" aria-hidden="true"></i>
             </button>
             <button
-              *ngIf="true"
+              *ngIf="canDeleteCAN(source.fundingSourceId)"
               (click)="deleteSelectedCAN(source.fundingSourceId)"
               class="btn btn-link btn-slim ml-2 btn-delete"
               ngbTooltip="Delete Provided CAN">

@@ -11,22 +11,17 @@ import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-
   providedIn: 'root'
 })
 export class PlanManagementService {
-
-
   fundingSourceValuesEmitter = new Subject<{ pd: number, ca: string }>();
   fundingSourceListEmitter = new Subject<FundingRequestFundsSrcDto[]>();
   grantInfoCostEmitter = new Subject<{ index: number, applId?: number, dc: number, tc: number }>();
   fundingSourceSelectionEmitter = new Subject<{ index: number, source: number }>();
+
   private _listSelectedSources: FundingRequestFundsSrcDto[];
-
   private _selectedSources: Map<number, number> = new Map<number, number>();
-
   private budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
   private canMap: Map<number, Map<number, FundingRequestCanDto>>;
   private percentSelectionTracker: Map<number, boolean> = new Map<number, boolean>();
-
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
-
   inflightPFRs: Map<number, number> = new Map<number, number>();
 
   private fundedPlanTypes: FundingRequestTypes[] = [

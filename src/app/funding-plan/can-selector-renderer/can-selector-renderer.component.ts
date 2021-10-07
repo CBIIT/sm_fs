@@ -2,7 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { GrantCostPayload, PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
-import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto, FundingRequestCanDisplayDto } from '@nci-cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
 import { PlanModel } from '../../model/plan/plan-model';
@@ -18,6 +18,7 @@ export class CanSelectorRendererComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
   @Input() projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   @Input() projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
+
   fundingSources: number[];
 
   constructor(

@@ -10,6 +10,7 @@ import {
 import { RequestModel } from '../model/request/request-model';
 import { Observable, Subject } from 'rxjs';
 import { Select2OptionData } from 'ng-select2';
+import { PlanModel } from '../model/plan/plan-model';
 
 @Injectable({
   providedIn: 'root'
@@ -30,11 +31,14 @@ export class CanManagementService {
   oefiaCodes: Array<OefiaCodingDto>;
   cachedRequestCans: Map<number, FundingRequestCanDto[]> = new Map();
   activeCanCache: Map<string, CanCcxDto[]> = new Map<string, CanCcxDto[]>();
+  canDisplayMatrix: Map<number, FundingRequestCanDisplayDto>;
+
 
   constructor(
-    private logger: NGXLogger, 
-    private canService: FsCanControllerService,          
-    private requestModel: RequestModel) {
+    private logger: NGXLogger,
+    private canService: FsCanControllerService,
+    private requestModel: RequestModel,
+    private planModel: PlanModel) {
     this.refreshCans();
     this.refreshOefiaCodes();
   }
@@ -42,6 +46,17 @@ export class CanManagementService {
   refreshCans(): void {
     this.refreshDefaultCans();
     this.refreshGrantCans();
+  }
+
+  initializeCANDisplayMatrix(): void {
+    const fseIds: number[] = this.planModel?.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.map(s => s.fundingSourceId);
+    if (!fseIds || fseIds.length === 0) {
+      return;
+    }
+    this.getFundingRequestCanDisplays(fseIds).subscribe(result => {
+      this.logger.debug('CAN display matrix:', result);
+      this.canDisplayMatrix = new Map(result.map(c => [c.fseId, c]));
+    });
   }
 
   getFundingRequestCanDisplays(fseIds: number[]): Observable<FundingRequestCanDisplayDto[]> {

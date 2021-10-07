@@ -19,7 +19,6 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
-  private canDisplayMatrix: Map<number, FundingRequestCanDisplayDto>;
 
   constructor(
     private modalService: NgbModal,
@@ -44,17 +43,39 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
       }
     });
 
-    const fseIds: number[] = this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.map(s => s.fundingSourceId);
-    this.canManagementService.getFundingRequestCanDisplays(fseIds).subscribe(result => {
-      this.logger.debug('CAN display matrix:', result);
-      this.canDisplayMatrix = new Map(result.map(c => [c.fseId, c]));
-    });
+
+  }
+
+  /* Applicable for ARC and NCI financial approvers in edit mode; readonly display will be determined elsewhere */
+  canSee(fseId: number): boolean {
+    const displayMatrix = this.canManagementService.canDisplayMatrix.get(fseId);
+    if (!displayMatrix) {
+      return false;
+    }
+    this.logger.debug('ARC sees  : ', displayMatrix.arcSees);
+    this.logger.debug('OEFIA sees: ', displayMatrix.oefiaSees);
+    if ((this.isFcArc() && displayMatrix.arcSees === 'Y') || (this.isFcNci() && displayMatrix.oefiaSees === 'Y')) {
+      return true;
+    }
+    return false;
+  }
+
+  /* Applicable for ARC and NCI financial approvers in edit mode; readonly display will be determined elsewhere */
+  canEnter(fseId: number): boolean {
+    const displayMatrix = this.canManagementService.canDisplayMatrix?.get(fseId);
+    if (!displayMatrix) {
+      return false;
+    }
+    this.logger.debug('ARC enters  : ', displayMatrix.arcEnters);
+    this.logger.debug('OEFIA enters: ', displayMatrix.oefiaEnters);
+    if ((this.isFcArc() && displayMatrix.arcEnters === 'Y') || (this.isFcNci() && displayMatrix.oefiaEnters === 'Y')) {
+      return true;
+    }
+    return false;
   }
 
   copyProjectedCAN(fundingSourceId: number): void {
-    this.logger.debug('copyProjectedCAN(', fundingSourceId, ')');
     const can = this.projectedCans.get(Number(fundingSourceId));
-    this.logger.debug('projectedCAN for source', fundingSourceId, '=', can);
     this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can });
   }
 
@@ -89,7 +110,6 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   }
 
   deleteSelectedCAN(fundingSourceId: number): void {
-    this.logger.debug('deleteSelectedCAN(', fundingSourceId, ')');
     this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can: null });
 
   }
@@ -100,7 +120,6 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     }
     return true;
   }
-
 
 
   ngAfterViewInit(): void {
@@ -114,5 +133,13 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
       });
     });
 
+  }
+
+  canSearchForCAN(fundingSourceId: number): boolean {
+    return this.canEnter(fundingSourceId);
+  }
+
+  canDeleteCAN(fundingSourceId: number): boolean {
+    return this.canEnter(fundingSourceId);
   }
 }
