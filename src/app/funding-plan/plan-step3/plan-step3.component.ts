@@ -287,7 +287,7 @@ export class PlanStep3Component implements OnInit {
           id: this.planCoordinatorService.getBudget(item.grant.applId, source.fundingSourceId)?.id || null,
           fseId: source.fundingSourceId,
           name: source.fundingSourceName,
-          supportYear: 1,
+          supportYear: item.grant.supportYear,
           dcRecAmt: directCost,
           tcRecAmt: totalCost,
         });
