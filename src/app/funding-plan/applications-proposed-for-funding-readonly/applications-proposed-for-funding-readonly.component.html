@@ -5,9 +5,8 @@
       <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apffreadonly-collapse" role="button"
       aria-expanded="true" aria-controls="apffreadonly-collapse"></a>
     </div>
-    <div  class="col-12 mb-5collapse show" id="apffreadonly-collapse">
+    <div  class="col-12 collapse show" id="apffreadonly-collapse">
       <div class="table-responsive">
-
         <table class="table table-bordered table-striped app-funding-table multiple-FS">
           <thead>
           <tr>
@@ -98,7 +97,14 @@
         </table>
 
       </div>
-
+      <div *ngIf=(planModel.fundingPlanDto.comments)>
+        <ngb-alert type="primary" [dismissible]="false" class="workflow-comments mt-3">
+          <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
+          <div class="comment-content">
+            <div class="comment-details">{{ planModel.fundingPlanDto.comments }}</div>
+          </div>
+        </ngb-alert>
+      </div>
     </div>
     <div class="col-12">
       <hr>
