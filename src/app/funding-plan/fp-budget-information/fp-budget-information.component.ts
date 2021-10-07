@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
@@ -16,9 +16,12 @@ import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   @ViewChild(CanSearchModalComponent) canSearchModalComponent: CanSearchModalComponent;
 
+  @Input() readOnly = false;
+
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
+
 
   constructor(
     private modalService: NgbModal,
@@ -33,11 +36,11 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
 
     this.canManagementService.projectedCanEmitter.subscribe(next => {
-      // this.logger.debug('projected CAN:', next);
+      this.logger.debug('projected CAN:', next);
       if (next.fseId) {
         this.projectedCans.set(next.fseId, next.can);
         if (next.applId) {
-          const key = String(next.fseId) + '_' + String(next.applId);
+          const key = String(next.fseId) + '-' + String(next.applId);
           this.projectedApplIdCans.set(key, next.can);
         }
       }
@@ -52,12 +55,20 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     if (!displayMatrix) {
       return false;
     }
-    this.logger.debug('ARC sees  : ', displayMatrix.arcSees);
-    this.logger.debug('OEFIA sees: ', displayMatrix.oefiaSees);
+    // this.logger.debug('ARC sees  : ', displayMatrix.arcSees);
+    // this.logger.debug('OEFIA sees: ', displayMatrix.oefiaSees);
     if ((this.isFcArc() && displayMatrix.arcSees === 'Y') || (this.isFcNci() && displayMatrix.oefiaSees === 'Y')) {
       return true;
     }
     return false;
+  }
+
+  canSeeAtLeastOneCAN(): boolean {
+    let result = false;
+    for (const key of this.canManagementService.canDisplayMatrix.keys()) {
+      result = this.canSee(key);
+    }
+    return result;
   }
 
   /* Applicable for ARC and NCI financial approvers in edit mode; readonly display will be determined elsewhere */
@@ -66,12 +77,20 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     if (!displayMatrix) {
       return false;
     }
-    this.logger.debug('ARC enters  : ', displayMatrix.arcEnters);
-    this.logger.debug('OEFIA enters: ', displayMatrix.oefiaEnters);
+    // this.logger.debug('ARC enters  : ', displayMatrix.arcEnters);
+    // this.logger.debug('OEFIA enters: ', displayMatrix.oefiaEnters);
     if ((this.isFcArc() && displayMatrix.arcEnters === 'Y') || (this.isFcNci() && displayMatrix.oefiaEnters === 'Y')) {
       return true;
     }
     return false;
+  }
+
+  canEnterAtLeastOneCAN(): boolean {
+    let result = false;
+    for (const key of this.canManagementService.canDisplayMatrix.keys()) {
+      result = this.canEnter(key);
+    }
+    return result;
   }
 
   copyProjectedCAN(fundingSourceId: number): void {
@@ -115,7 +134,7 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   }
 
   canCopyProjectedCan(fundingSourceId: number): boolean {
-    if (!this.projectedCans.get(fundingSourceId)?.can) {
+    if (!this.projectedCans.get(fundingSourceId)?.can || this.readOnly) {
       return false;
     }
     return true;
@@ -136,10 +155,10 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   }
 
   canSearchForCAN(fundingSourceId: number): boolean {
-    return this.canEnter(fundingSourceId);
+    return this.canEnter(fundingSourceId) && !this.readOnly;
   }
 
   canDeleteCAN(fundingSourceId: number): boolean {
-    return this.canEnter(fundingSourceId);
+    return this.canEnter(fundingSourceId) && !this.readOnly;
   }
 }

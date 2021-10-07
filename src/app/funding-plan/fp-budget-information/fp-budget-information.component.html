@@ -7,8 +7,9 @@
        role="button"
        aria-expanded="true" aria-controls="budget-info-collapse-ro"></a>
   </div>
+  <ng-template *ngIf="(isFcArc() && canEnterAtLeastOneCAN()) || isFcNci()">
   <div class="col-12 collapse show mt-2" id="budget-info-collapse-ro">
-    <div><p>Please provide the CAN only if known at the time of approval.</p></div>
+    <div *ngIf="isFcArc()"><p>Please provide the CAN only if known at the time of approval.</p></div>
 
     <h4>Add CAN Number(s):</h4>
     <table class="table table-striped table-bordered budget-info-table">
@@ -54,6 +55,7 @@
       </tbody>
     </table>
   </div>
+  </ng-template>
 </div>
 <div class="row">
   <div class="col-12 collapse show mt-2" id="budget-info-collapse-ro">

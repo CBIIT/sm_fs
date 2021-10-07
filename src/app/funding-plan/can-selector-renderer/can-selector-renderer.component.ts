@@ -18,6 +18,7 @@ export class CanSelectorRendererComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
   @Input() projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   @Input() projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
+  @Input() readOnly = false;
 
   fundingSources: number[];
 
@@ -39,16 +40,19 @@ export class CanSelectorRendererComponent implements OnInit {
 
   nonDefaultCAN(applId: number, fseId: number, index: number): boolean {
     const key = String(fseId) + '-' + String(applId);
+    this.logger.debug('Checking non-default CAN for', key);
     const projectedCan = this.projectedApplIdCans?.get(key);
     if (!projectedCan?.can) {
+      this.logger.debug('no projected CAN');
       return false;
     }
     const selectedCan = this.planModel.selectedApplIdCans.get(key);
     if (!selectedCan?.can) {
+      this.logger.debug('no selected CAN');
       return false;
     }
-
-    return selectedCan.can !== projectedCan.can;
+    this.logger.debug('CAN values', selectedCan.can, projectedCan.can);
+    return selectedCan.can != projectedCan.can;
   }
 
   duplicateCAN(applId: number, fseId: number, index: number): boolean {
@@ -107,7 +111,7 @@ export class CanSelectorRendererComponent implements OnInit {
   canCopyProjectedCan(applId: number, fseId: number, index: number): boolean {
     const key = String(fseId) + '-' + String(applId);
 
-    if (!this.projectedApplIdCans?.get(key)?.can) {
+    if (!this.projectedApplIdCans?.get(key)?.can || this.readOnly) {
       return false;
       this.logger.debug('bad data =>', applId, fseId);
     }
@@ -115,6 +119,16 @@ export class CanSelectorRendererComponent implements OnInit {
   }
 
   canDeleteCAN(applId: number, fseId: number, index: number): boolean {
+    const key = String(fseId) + '-' + String(applId);
+    const selectedCan = this.planModel.selectedApplIdCans.get(key);
+    if (!selectedCan?.can || this.readOnly) {
+      return false;
+    }
     return true;
+  }
+
+  canSearchCan(applId: number, fseId: number): boolean {
+    return true;
+
   }
 }

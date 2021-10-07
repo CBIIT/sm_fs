@@ -17,6 +17,7 @@
     <i class="far fa-copy" aria-hidden="true"></i>
   </button>
   <button
+    *ngIf="canSearchCan(g.applId, g.fseId)"
     (click)="searchCAN(g.applId, g.fseId, g.nciSourceFlag)"
     class="btn btn-link btn-slim"
     ngbTooltip="Search and select from active CANs">
