@@ -93,13 +93,20 @@
 <div class="row mb-3">
   <div class="col-12">
     <h2>Results</h2>
-    <p><small class="text-muted">To apply sorting order to multiple columns, hold down the Shift key and click the header of
-      each additional column that you want to sort.</small></p>
-    <button type="button" id="selectGrantsTop" class="btn btn-primary ml-auto" [ngbTooltip]="cannotSelectGrantsTooltip"
-      [disabled]="cannotSelectGrantsTooltip != null" (click)="selectGrants()">Select Grants</button>
+    <div class="d-flex">
+      <p *ngIf="!(dtData.length == 0)"><small class="text-muted">To apply sorting order to multiple columns, hold down the Shift key and click the header of
+                                                                 each additional column that you want to sort.</small></p>
+      <p *ngIf="(dtData.length == 0)">No grants found to display.</p>
+      <button [hidden]="(dtData.length == 0)" type="button" id="selectGrantsTop" class="btn btn-primary ml-auto"
+              [ngbTooltip]="cannotSelectGrantsTooltip"
+              [disabled]="cannotSelectGrantsTooltip != null" (click)="selectGrants()">Select Grants
+      </button>
+    </div>
+  </div>
+  <div class="col-12 d-flex" >
   </div>
 </div>
-<div class="row">
+<div class="row" [hidden]="(dtData.length == 0)">
   <div class="col-12">
     <ngb-alert *ngIf="dtData && dtData.length > 0 && noSelectableGrants" type="danger" [dismissible]="false">
       <div>The FOA(s) for the selected NCAB(s) have no selectable grant applications.</div>
@@ -126,7 +133,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" [hidden]="(dtData.length == 0)">
   <div class="col-12 d-flex">
     <button type="button" id="selectGrantsBottom" class="btn btn-primary ml-auto" [ngbTooltip]="cannotSelectGrantsTooltip" [disabled]="cannotSelectGrantsTooltip != null" (click)="selectGrants()">Select Grants</button>
 <!--    <button type="button" id="selectGrantsBottom" class="btn btn-primary ml-auto" [tooltip]="cannotSelectGrantsTooltip" [disabled]="cannotSelectGrantsTooltip != null && cannotSelectGrantsTooltip.length > 0" (click)="selectGrants()">Select Grants</button>-->
