@@ -333,7 +333,8 @@ export class Step3Component implements OnInit {
           this.logger.debug('Upload Doc: ', result);
 
           if (!(result.docType === DocTypeConstants.JUSTIFICATION
-            || result.docType === DocTypeConstants.TRANSITION_MEMO)) {
+            || (result.docType === DocTypeConstants.TRANSITION_MEMO &&
+              this.isTransitionMemoRequired))) {
             this.baseTaskList.subscribe(items => {
               this.swimlanes[0]['array'].push(result);
             });
@@ -389,7 +390,8 @@ export class Step3Component implements OnInit {
             this.loadJustification(element);
           }
 
-          if (element.docType === DocTypeConstants.TRANSITION_MEMO) {
+          if (element.docType === DocTypeConstants.TRANSITION_MEMO &&
+            this.isTransitionMemoRequired) {
             this.loadTransitionMemo(element);
           }
 
@@ -406,7 +408,9 @@ export class Step3Component implements OnInit {
         this.baseTaskList = of(result);
         this.include = this.baseTaskList.pipe(
           map(tasks => tasks.filter(task => task.included === 'Y' &&
-            !(task.docType === DocTypeConstants.JUSTIFICATION || task.docType === DocTypeConstants.TRANSITION_MEMO)))
+            !(task.docType === DocTypeConstants.JUSTIFICATION ||
+              (task.docType === DocTypeConstants.TRANSITION_MEMO &&
+                this.isTransitionMemoRequired))))
         );
 
 
