@@ -7,11 +7,13 @@ import { getCurrentFiscalYear } from 'src/app/utils/utils';
 import {AppUserSessionService} from "../service/app-user-session.service";
 import {ActivatedRoute} from "@angular/router";
 import {SearchModel} from "./model/search-model";
+import { BatchApproveService } from './batch-approve/batch-approve.service';
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.css']
+  styleUrls: ['./search.component.css'],
+  providers: [BatchApproveService]
 })
 export class SearchComponent implements OnInit, AfterViewInit {
   @ViewChild(SearchResultComponent) searchResultComponent: SearchResultComponent;
@@ -41,7 +43,8 @@ export class SearchComponent implements OnInit, AfterViewInit {
               private route: ActivatedRoute,
               private searchModel: SearchModel,
               private userSessionService: AppUserSessionService,
-              private fsSearchController:FsSearchControllerService
+              private fsSearchController: FsSearchControllerService,
+              private batchApproveService: BatchApproveService
             ) { }
 
   ngOnInit(): void {
@@ -58,11 +61,11 @@ export class SearchComponent implements OnInit, AfterViewInit {
       }, error => {
         console.error('HttpClient get request error for----- ' + error.message);
       });
-
+    this.batchApproveService.initialize();
     let action = this.route.snapshot.params.action;
     if (action) {
       setTimeout(() => {
-        if (action == 'immediate') {
+        if (action === 'immediate') {
           // this is a return link from the FR or FP view
           // check the searchType from the search model
           // and replace 'immediate' with one of the saved dashboard action type
