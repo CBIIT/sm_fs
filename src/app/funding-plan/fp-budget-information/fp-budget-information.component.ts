@@ -36,7 +36,7 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
 
     this.canManagementService.projectedCanEmitter.subscribe(next => {
-      this.logger.debug('projected CAN:', next);
+      // this.logger.debug('projected CAN:', next);
       if (next.fseId) {
         this.projectedCans.set(next.fseId, next.can);
         if (next.applId) {
@@ -66,7 +66,9 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   canSeeAtLeastOneCAN(): boolean {
     let result = false;
     for (const key of this.canManagementService.canDisplayMatrix.keys()) {
-      result = this.canSee(key);
+      if (this.canSee(key)) {
+        result = true;
+      }
     }
     return result;
   }
@@ -77,8 +79,8 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     if (!displayMatrix) {
       return false;
     }
-    // this.logger.debug('ARC enters  : ', displayMatrix.arcEnters);
-    // this.logger.debug('OEFIA enters: ', displayMatrix.oefiaEnters);
+    this.logger.debug('ARC enters  : ', displayMatrix.arcEnters);
+    this.logger.debug('OEFIA enters: ', displayMatrix.oefiaEnters);
     if ((this.isFcArc() && displayMatrix.arcEnters === 'Y') || (this.isFcNci() && displayMatrix.oefiaEnters === 'Y')) {
       return true;
     }
@@ -86,10 +88,14 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   }
 
   canEnterAtLeastOneCAN(): boolean {
+    this.logger.debug('user is ARC:', this.isFcArc());
     let result = false;
     for (const key of this.canManagementService.canDisplayMatrix.keys()) {
-      result = this.canEnter(key);
+      if (this.canEnter(key)) {
+        result = true;
+      }
     }
+    this.logger.debug('can enter at least one: ', result)
     return result;
   }
 

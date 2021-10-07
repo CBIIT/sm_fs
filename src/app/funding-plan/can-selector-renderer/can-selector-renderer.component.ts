@@ -31,7 +31,7 @@ export class CanSelectorRendererComponent implements OnInit {
 
   ngOnInit(): void {
     this.fundingSources = this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.map(f => f.fundingSourceId);
-    this.logger.debug('Funding sources: ', this.fundingSources);
+    // this.logger.debug('Funding sources: ', this.fundingSources);
   }
 
   get grantCosts(): GrantCostPayload[] {
@@ -40,19 +40,19 @@ export class CanSelectorRendererComponent implements OnInit {
 
   nonDefaultCAN(applId: number, fseId: number, index: number): boolean {
     const key = String(fseId) + '-' + String(applId);
-    this.logger.debug('Checking non-default CAN for', key);
+    // this.logger.debug('Checking non-default CAN for', key);
     const projectedCan = this.projectedApplIdCans?.get(key);
     if (!projectedCan?.can) {
-      this.logger.debug('no projected CAN');
+      // this.logger.debug('no projected CAN');
       return false;
     }
     const selectedCan = this.planModel.selectedApplIdCans.get(key);
     if (!selectedCan?.can) {
-      this.logger.debug('no selected CAN');
+      // this.logger.debug('no selected CAN');
       return false;
     }
     this.logger.debug('CAN values', selectedCan.can, projectedCan.can);
-    return selectedCan.can != projectedCan.can;
+    return selectedCan.can !== projectedCan.can;
   }
 
   duplicateCAN(applId: number, fseId: number, index: number): boolean {
@@ -81,7 +81,7 @@ export class CanSelectorRendererComponent implements OnInit {
     const key = String(fseId) + '-' + String(applId);
 
     const can = this.projectedApplIdCans?.get(key);
-    this.logger.debug('copy projected can', applId, fseId, can);
+    // this.logger.debug('copy projected can', applId, fseId, can);
     if (can) {
       this.canManagementService.selectCANEmitter.next({ fseId, can, applId });
     }
