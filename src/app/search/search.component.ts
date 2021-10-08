@@ -1,8 +1,9 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import { SearchCriteria } from './search-criteria';
 import { SearchResultComponent } from './search-result/search-result.component';
-import { FundSearchDashboardDataDto , FundSelectSearchCriteria , FsSearchControllerService } from '@nci-cbiit/i2ecws-lib';
+import { FundSearchDashboardDataDto , FundSelectSearchCriteria , FsSearchControllerService  } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
+import { GwbLinksService } from '@nci-cbiit/i2ecui-lib';
 import { getCurrentFiscalYear } from 'src/app/utils/utils';
 import {AppUserSessionService} from "../service/app-user-session.service";
 import {ActivatedRoute} from "@angular/router";
@@ -29,6 +30,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   numAwaitingPlans: number ;
   numMyPlans: number ;
   numMyUnderReviewPlans: number ;
+  numMyPaylines : number;
   isPd : boolean;
   isPa : boolean;
   hasPaylineRoles : boolean;
@@ -36,6 +38,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   dashboardDatafilterList: any;
   dashboardDatafilterMap: Map<string, FundSearchDashboardDataDto>;
    fsFilterCriteria: FundSelectSearchCriteria = {};
+   paylistDashboardUrl : string;
 
    action: string;
 
@@ -44,7 +47,8 @@ export class SearchComponent implements OnInit, AfterViewInit {
               private searchModel: SearchModel,
               private userSessionService: AppUserSessionService,
               private fsSearchController: FsSearchControllerService,
-              private batchApproveService: BatchApproveService
+              private batchApproveService: BatchApproveService,
+              private gwbLinksService: GwbLinksService
             ) { }
 
   ngOnInit(): void {
@@ -54,6 +58,8 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.hasPaylineRoles = this.userSessionService.hasRole('OEFIACRT') ||  this.userSessionService.hasRole('DES');
 
     this.currentFY = getCurrentFiscalYear();
+    this.paylistDashboardUrl =  this.gwbLinksService.getProperty('Paylist')+ '#side-nav-paylists';
+
     this.fsSearchController.getSearchDashboardDataUsingGET().subscribe(
       result => {
         this.dashboardDatafilterMap = new Map(result.map(item => [item.fitlerType, item]));
@@ -248,26 +254,22 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.searchModel.searchType = 'awaitfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_FUNDING_PLAN_AWAITING_RESPONSE
-    this.searchResultComponent.doFundingRequestSearch(this.fsFilterCriteria,
+    this.searchResultComponent.doFundingPlanSearch(this.fsFilterCriteria,
       FilterTypeLabels.FILTER_FUNDING_PLAN_AWAITING_RESPONSE);  }
 
   onMyPlans() {
     this.searchModel.searchType = 'myfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_MY_FUNDING_PLAN;
-    this.searchResultComponent.doFundingRequestSearch(this.fsFilterCriteria,
+    this.searchResultComponent.doFundingPlanSearch(this.fsFilterCriteria,
       FilterTypeLabels.FILTER_MY_FUNDING_PLAN);  }
 
   onMyUnderReviewPlans() {
     this.searchModel.searchType = 'myreviewfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_FUNDING_PLAN_UNDER_REVIEW;
-    this.searchResultComponent.doFundingRequestSearch(this.fsFilterCriteria,
+    this.searchResultComponent.doFundingPlanSearch(this.fsFilterCriteria,
       FilterTypeLabels.FILTER_FUNDING_PLAN_UNDER_REVIEW);
-  }
-
-  viewPaylines(){
-
   }
 
   onSearchType(type: string) {
@@ -290,6 +292,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.numMyUnderReviewPlans = dashboardData.get(FilterTypes.FILTER_FUNDING_PLAN_UNDER_REVIEW).countFilterType;
     this.numAwaitingPlans = dashboardData.get(FilterTypes.FILTER_FUNDING_PLAN_AWAITING_RESPONSE).countFilterType;
     this.hasCancerActivities = dashboardData.get(FilterTypes.FILTER_CANCER_ACTIVITIES).canDisplayFilerType;
+    this.numMyPaylines = dashboardData.get(FilterTypes.FILTER_PAYLINE).countFilterType;
   }
 
   filterTypeLabels = FilterTypeLabels;
@@ -302,7 +305,7 @@ export enum FilterTypes {
    FILTER_REQUEST_UNDER_REVIEW = "My Requests Under Review",
    FILTER_FUNDING_PLAN_AWAITING_RESPONSE = "Funding Plans Awaiting My Response",
    FILTER_MY_FUNDING_PLAN = "My Funding Plans",
-   FILTER_PAYLINE = "=My Paylines",
+   FILTER_PAYLINE = "My Paylines",
    FILTER_FUNDING_PLAN_UNDER_REVIEW = "My Funding Plans Under Review"
 }
 
