@@ -62,6 +62,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   noFundingPlanResult: boolean = true;
   filterTypeLabel: string;
 
+  selectedRows: Map<number, any> = new Map<number, any>();
+
   ngOnInit(): void {
   }
 
@@ -97,7 +99,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         this.fsSearchControllerService.searchFundingRequestsUsingPOST(
           this.searchCriteria).subscribe(
           result => {
-            this._populateSelectedIntoResults(result.data);
+            this._populateSelectedIntoResults('frqId', result.data);
             // this.logger.debug('Search Funding Requests result: ', result);
             this.fundingRequests = result.data;
             this.noFundingRequestResult = result.recordsTotal <= 0;
@@ -236,7 +238,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         this.fsSearchControllerService.searchFundingPlansUsingPOST(
           this.searchCriteria).subscribe(
           result => {
-            this._populateSelectedIntoResults(result.data);
+            this._populateSelectedIntoResults('fprId', result.data);
             // this.logger.debug('Search Funding Requests result: ', result);
             this.fundingPlans = result.data;
             this.noFundingPlanResult = result.recordsTotal <= 0;
@@ -260,7 +262,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           });
       },
       columns: [
-        {title: 'Sel', data: 'selected', orderable: false, ngTemplateRef: { ref: this.selectFundingRequestCheckboxRenderer }, className: 'all' }, // 0
+        {title: 'Sel', data: 'selected', orderable: false, ngTemplateRef: { ref: this.selectFundingPlanCheckboxRenderer }, className: 'all' }, // 0
         {title: 'FOA information', data: 'fpFoasList', orderable: false,
           ngTemplateRef: { ref: this.searchFundingPlanFoasRenderer },className: 'all'}, // 1
         {title: 'Plan ID', data: 'fprId'}, // 2
@@ -338,10 +340,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     };
 
-    // setTimeout(() => {
-    //   this.dtFundingRequestTrigger.next();
-    //   this.dtFundingPlanTrigger.next();
-    // }, 0);
+    this.selectedRows.clear();
   }
 
 
@@ -355,6 +354,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noFundingPlanResult = true;
     this.noFundingRequestResult = false;
     this.filterTypeLabel = filterTypeLabel;
+    this.selectedRows.clear();
     this._triggerDtInstance(this.dtFundingRequestTrigger);
   }
 
@@ -363,6 +363,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noFundingRequestResult = true;
     this.noFundingPlanResult = false;
     this.filterTypeLabel = filterTypeLabel;
+    this.selectedRows.clear();
     this._triggerDtInstance(this.dtFundingPlanTrigger);
   }
 
@@ -388,14 +389,34 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   }
 
-  onCaptureSelectedEvent($event: any) {
-
+  onCaptureFRSelectedEvent($event: any) {
+    if ($event.frqId) {
+      if ($event.selected) {
+        this.selectedRows.set($event.frqId, $event);
+      }
+      else {
+        this.selectedRows.delete($event.frqId);
+      }
+      console.debug('onCaptureFRSelectedEvent', this.selectedRows);
+    }
   }
 
-  private _populateSelectedIntoResults(data: Array<any>): void {
+  onCaptureFPSelectedEvent($event: any) {
+    if ($event.fprId) {
+      if ($event.selected) {
+        this.selectedRows.set($event.fprId, $event);
+      }
+      else {
+        this.selectedRows.delete($event.fprId);
+      }
+      console.debug('onCaptureFPSelectedEvent', this.selectedRows);
+    }
+  }
+
+  private _populateSelectedIntoResults(id: string, data: Array<any>): void {
     if (data) {
       for (const entry of data) {
-        entry.selected = false;
+        entry.selected = this.selectedRows.has(entry[id]);
       }
     }
   }

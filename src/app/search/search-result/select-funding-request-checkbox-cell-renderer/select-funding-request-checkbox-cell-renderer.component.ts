@@ -13,23 +13,21 @@ export class SelectFundingRequestCheckboxCellRendererComponent implements OnInit
 
   @Input()
   data: any = {};
+  @Input()
+  id: string = '';
 
   @Output()
-  emitter = new Subject<SelectGrantCheckboxEventType>();
+  emitter = new Subject<any>();
 
   ngOnInit(): void {
   }
 
   onSelect($event: any) {
-    this.data.selector = $event.target.checked;
-    this.emitter.next({
-      applId: this.data.frqId,
-      selected: $event.target.checked
-    });
+    this.data.selected = $event.target.checked;
+    this.emitter.next(this.data);
   }
 
   ngOnDestroy() {
     this.emitter.unsubscribe();
-    // console.debug('ngOnDestroy', this.data);
   }
 }
