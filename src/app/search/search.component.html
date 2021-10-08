@@ -73,11 +73,6 @@
         </div>
       </div>
     </div>
-    <div *ngIf= "hasPaylineRoles">
-      <button class="btn btn-light" style="width: 100%" (click)="onMyUnderReviewRequests()" [disabled]="numMyUnderReviewRequests == 0">
-        <div class="overview">Paylines <span>View</span></div>
-      </button>
-    </div>
   </div>
   </ng-template>
   <hr/>
@@ -102,8 +97,8 @@
           <div>Awaiting My Response</div></button>
   </div>
   &nbsp;&nbsp;&nbsp;
-      <div  *ngIf= "hasPaylineRoles" class="">    <button class="btn btn-info" style="width: 100%; height: 100%"  [disabled]="numAwaitingPlans == 0">
-        <div>Paylines Awaiting Certification</div></button>
+      <div  *ngIf= "hasPaylineRoles && numMyPaylines>0" >    
+        <a href="{{paylistDashboardUrl}}" class="button btn btn-info"> <div>Paylines Awaiting Certification </div></a>
 </div>
   
 </div>

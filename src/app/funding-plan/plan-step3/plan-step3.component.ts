@@ -112,6 +112,8 @@ export class PlanStep3Component implements OnInit {
         message: 'Please correct the errors identified below.',
         title: ''
       }];
+
+      window.scroll(0, 0);
     }
   }
 

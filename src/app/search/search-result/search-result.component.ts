@@ -277,7 +277,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {title: 'Funding Approvals', data: 'fundsCertificationCode'}, // 7
         {title: 'Program Recomm. Direct Costs', data: 'directRecommendedAmt'}, // 8  //TODO
         {title: 'Program Recomm. Total Costs', data: 'totalRecommendedAmt'}, // 9
-        {title: 'Status', data: 'planStatusName'}, // 10
+        {title: 'Status', data: 'currentStatusDescrip'}, // 10
         {title: 'Last Action Date', data: 'planStatusDate'}, // 11
         {
           title: 'Action', data: null, defaultContent: 'Select'

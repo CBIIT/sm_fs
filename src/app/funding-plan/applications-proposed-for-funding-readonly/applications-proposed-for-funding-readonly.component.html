@@ -97,6 +97,7 @@
         </table>
 
       </div>
+      <div>Showing 1 to {{listGrantsSelected.length}} of {{listGrantsSelected.length}} entries</div>
       <div *ngIf=(planModel.fundingPlanDto.comments)>
         <ngb-alert type="primary" [dismissible]="false" class="workflow-comments mt-3">
           <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
@@ -105,6 +106,7 @@
           </div>
         </ngb-alert>
       </div>
+      
     </div>
     <div class="col-12">
       <hr>
