@@ -3,7 +3,7 @@
     <h2 class="d-inline-block" id="overview-label">Filters</h2>
     <a [routerLink]="" (click)="showAdvanced = !showAdvanced" class="ml-auto"
        [ngClass]="{'show-advance':!showAdvanced, 'hide-advance':showAdvanced}"
-       [hidden]="!searchType"></a>
+       [hidden]="!(searchType === 'FR' || searchType === 'FP')"></a>
   </div>
 </div>
 <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
@@ -30,18 +30,28 @@
         </label>
       </div>
     </div>
+
     <div class="col-6 col-md-6" [hidden]="!searchType">
       <lib-grantnumber-search-criteria [form]="searchForm"></lib-grantnumber-search-criteria>
     </div>
-    <div class="col-3 col-md-3 ml-auto" [hidden]="!searchType">
+    <div class="col-3 col-md-3 ml-auto" [hidden]="!(searchType === 'FR' || searchType === 'FP' || searchType === 'G')">
       <lib-fy-range [minYear]="2001" [maxYear]="2025" [form]="searchForm"></lib-fy-range>
     </div>
+    <div class="col-3 col-md-3" [hidden]="!(searchType === 'PL')">
+      <div class="row">
+        <div class="col-6">
+          <label for="fy">Fiscal Year</label>
+          <input type="text" id="fy" name="fy" ngModel class="form-control">
+        </div>
+        <div class="col-6">
+          <label for="ncab">NCAB</label>
+          <input type="text" id="ncab" name="ncab" ngModel class="form-control">
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="row form-group" [hidden]="searchType != 'FR'">
+  <div class="row form-group" [hidden]="!(searchType === 'FR')">
     <div class="col-6 col-md-6">
-<!--      TODO - this component cannot be used here as it ties to RequestModel
-                 I placed it here only temporary for layout
--->
       <app-search-funding-request-type [parentForm]="searchForm"></app-search-funding-request-type>
     </div>
     <div class="form-group col-6 col-md-6">
@@ -57,7 +67,7 @@
       </ng-select2>
     </div>
   </div>
-  <div class="row form-group" [hidden]="searchType != 'FP'">
+  <div class="row form-group" [hidden]="!(searchType === 'FP')">
     <div class="form-group col-4 col-md-4">
       <label for="plan-status-select">Plan Status</label>
       <ng-select2
@@ -78,53 +88,104 @@
       <lib-ncab-daterange [form]="searchForm"></lib-ncab-daterange>
     </div>
   </div>
-  <div [hidden]="!showAdvanced" class="mt-n2">
-    <div class="row form-group">
-      <div class="col-md-12 col-lg-12">
-        <h5 class="text-divider"> <span><strong>Request&nbsp;</strong></span></h5>
-      </div>
-      <div class="col-md-6 col-lg-6">
-        <lib-pdname-dropdown label="Requesting PD" name="requestingPd" [showInactiveToggle]="true"></lib-pdname-dropdown>
-      </div>
-      <div class="col-md-6 col-lg-6 form-group">
-        <app-search-funding-request-doc name="requestingDoc"  label="Requesting Doc" [form]="searchForm"></app-search-funding-request-doc>
-      </div>
+
+  <!-- Advanced part OR controls related to Grants search -->
+  <div class="row" [hidden]="!showAdvanced">
+    <div class="col-md-12 col-lg-12" [hidden]="searchType != 'FR'">
+      <h5 class="text-divider"> <span><strong>Request&nbsp;</strong></span></h5>
     </div>
-    <div class="row form-group">
-      <div class="col-md-6 col-lg-6 form-group">
-        <app-search-funding-source [form]="searchForm"></app-search-funding-source>
-      </div>
-      <div class="col-md-6 col-lg-6 form-group">
-          <label for="request-id" *ngIf="searchType === 'FR'">Request ID</label>
-          <label for="request-id" *ngIf="searchType === 'FP'">Plan ID</label>
-          <input type="text" id="request-id" name="id" ngModel class="form-control">
-      </div>
-    </div>
-    <div class="row form-group">
-      <div class="col-md-12 col-lg-12">
-        <h5 class="text-divider"> <span><strong>Principal Investigator&nbsp;</strong></span></h5>
-      </div>
-      <div class="col-md-6 col-lg-6 form-group">
-          <label for="pi-name">PI Name</label>
-          <input type="text" id="pi-name" name="piName" ngModel class="form-control">
-      </div>
-      <div class="col-md-6 col-lg-6 form-group">
-          <label for="institution-name">Institution Name</label>
-          <input type="text" id="institution-name" name="institutionName" ngModel class="form-control">
-      </div>
-    </div>
-    <div class="row form-group">
-      <div class="col-md-12 col-lg-12">
-        <h5 class="text-divider"> <span><strong>Other&nbsp;</strong></span></h5>
-      </div>
-      <div class="col-md-6 col-lg-6">
-        <lib-pdname-dropdown label="PD Name" name="pdName" [showInactiveToggle]="true"></lib-pdname-dropdown>
-      </div>
-      <div class="col-md-6 col-lg-6 form-group">
-        <app-search-funding-request-doc name="doc" label="DOC" [form]="searchForm"></app-search-funding-request-doc>
-      </div>
+    <div class="col-md-12 col-lg-12" [hidden]="searchType != 'FP'">
+      <h5 class="text-divider"> <span><strong>Plan&nbsp;</strong></span></h5>
     </div>
   </div>
+  <div class="row" [hidden]="!showAdvanced || (searchType != 'FR' && searchType != 'FP')">
+    <div class="col-md-6 col-lg-6">
+      <lib-pdname-dropdown label="Requesting PD" name="requestingPd" [showInactiveToggle]="true"></lib-pdname-dropdown>
+    </div>
+    <div class="col-md-6 col-lg-6 form-group">
+      <app-search-funding-request-doc name="requestingDoc"  label="Requesting Doc" [form]="searchForm"></app-search-funding-request-doc>
+    </div>
+  </div>
+  <div class="row"  [hidden]="!showAdvanced || (searchType != 'FR' && searchType != 'FP')">
+    <div class="col-md-6 col-lg-6 form-group">
+      <app-search-funding-source [form]="searchForm"></app-search-funding-source>
+    </div>
+    <div class="col-md-6 col-lg-6 form-group">
+        <label for="id">{{(searchType === 'FR') ? 'Request ID' : 'Plan ID'}}</label>
+        <input type="text" id="id" name="id" ngModel class="form-control">
+    </div>
+  </div>
+  <div class="row" [hidden]="!showAdvanced || (searchType != 'FR' && searchType != 'FP')">
+    <div class="col-md-12 col-lg-12">
+      <h5 class="text-divider"> <span><strong>Principal Investigator&nbsp;</strong></span></h5>
+    </div>
+  </div>
+  <div class="row form-group" [hidden]="!((showAdvanced && (searchType === 'FR' || searchType === 'FP') || (searchType === 'G')))">
+    <!-- Visible for FR (in advnced mode), FP (in advnced mode), G -->
+    <div class="col-md-6 col-lg-6 form-group">
+        <label for="pi-name">PI Name</label>
+        <input type="text" id="pi-name" name="piName" ngModel class="form-control">
+    </div>
+    <!-- Visible for FR, FP in advanced mode -->
+    <div class="col-md-6 col-lg-6 form-group" [hidden]="!(showAdvanced && (searchType === 'FR' || searchType === 'FP'))">
+        <label for="institution-name">Institution Name</label>
+        <input type="text" id="institution-name" name="institutionName" ngModel class="form-control">
+    </div>
+    <!-- Visible for G -->
+    <div class="col-md-6 col-lg-6 form-group" [hidden]="searchType != 'G'">
+        <label for="i2status">I2 Status</label>
+        <input type="text" id="i2status" name="i2status" ngModel class="form-control">
+    </div>
+  </div>
+
+  <!-- Other section for FR and FP -->
+  <div class="row" [hidden]="!(showAdvanced && (searchType === 'FR' || searchType === 'FP'))">
+    <div class="col-md-12 col-lg-12">
+      <h5 class="text-divider"> <span><strong>Other&nbsp;</strong></span></h5>
+    </div>
+    <div class="col-md-6 col-lg-6">
+      <lib-pdname-dropdown label="PD Name" name="pdName" [showInactiveToggle]="true"></lib-pdname-dropdown>
+    </div>
+    <div class="col-md-6 col-lg-6 form-group">
+      <app-search-funding-request-doc name="doc" label="DOC" [form]="searchForm"></app-search-funding-request-doc>
+    </div>
+  </div>
+
+  <!-- Fields for PL -->
+  <div class="row form-group" [hidden]="!(searchType === 'PL')">
+    <div class="col-md-6 col-lg-6">
+      <label for="pldoc">Division/Office/Center (DOC)</label>
+      <input type="text" id="pldoc" name="pldoc" ngModel class="form-control">
+    </div>
+    <div class="col-md-6 col-lg-6">
+      <label for="cost-center">Cost Center</label>
+      <input type="text" id="cost-center" name="costCenter" ngModel class="form-control">
+    </div>
+  </div>
+
+  <div class="row form-group" [hidden]="!(searchType === 'PL')">
+    <div class="col-md-6 col-lg-6">
+      <label for="budget-mech">Budget Mechanism</label>
+      <input type="text" id="budget-mech" name="budgetMech" ngModel class="form-control">
+    </div>
+    <div class="col-md-6 col-lg-6">
+      <label for="pl-type">Paylist Type</label>
+      <input type="text" id="pl-type" name="plType" ngModel class="form-control">
+    </div>
+  </div>
+
+  <div class="row form-group" [hidden]="!(searchType === 'PL')">
+    <div class="col-md-6 col-lg-6">
+      <label for="pl-status">Paylist Status</label>
+      <input type="text" id="pl-status" name="plStatus" ngModel class="form-control">
+    </div>
+    <div class="col-md-6 col-lg-6">
+      <label for="pl-ca">Cancer Activity (CA)</label>
+      <input type="text" id="pl-ca" name="plCa" ngModel class="form-control">
+    </div>
+  </div>
+
+  <!-- Form buttons -->
   <div class="row form-group">
     <div class="col-lg-12 d-flex justify-content-end align-items-end">
       <button type="button" class="btn btn-outline-secondary mr-2" (click)="clear()">Reset</button>
