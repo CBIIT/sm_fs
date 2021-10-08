@@ -7,6 +7,10 @@ import { FpProgramRecommendedCostsComponent } from '../../fp-program-recommended
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ControlContainer, NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
+import { openNewWindow } from '../../../utils/utils';
+import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { PlanManagementService } from '../../service/plan-management.service';
 
 @Component({
   selector: 'app-funding-source-entry-modal',
@@ -26,15 +30,21 @@ export class FundingSourceEntryModalComponent implements OnInit {
   @ViewChild('modalFpRecommendedCosts') modalFpRecommendedCosts: FpProgramRecommendedCostsComponent;
 
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
+  availableFundingSources: FundingRequestFundsSrcDto[];
 
   constructor(
     private planModel: PlanModel,
     private modalService: NgbModal,
-    private logger: NGXLogger) {
+    private logger: NGXLogger,
+    private router: Router,
+    public planCoordinatorService: PlanManagementService,) {
   }
 
   ngOnInit(): void {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
+    this.planCoordinatorService.fundingSourceListEmitter.subscribe(next => {
+      this.availableFundingSources = next;
+    });
 
   }
 
@@ -49,8 +59,13 @@ export class FundingSourceEntryModalComponent implements OnInit {
   onModalSubmit(): void {
   }
 
-  openFsDetails(): void {
-
+  openFsDetails(): boolean {
+    // temporarily using # for the hashtrue file not found issue..
+    const url = '/fs/#' + this.router.createUrlTree(['fundingSourceDetails']).toString();
+    // storing the funding sources details for popup window.. removing the object in the component once retrieved
+    localStorage.setItem('fundingSources', JSON.stringify(this.availableFundingSources));
+    openNewWindow(url, 'fundingSourceDetails');
+    return false;
   }
 
   sumDirectCost(): number {
