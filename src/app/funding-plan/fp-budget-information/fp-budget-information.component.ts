@@ -45,7 +45,15 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
         }
       }
     });
-
+    this.canManagementService.oefiaTypeEmitter.subscribe(next => {
+      this.logger.debug('new OEFIA type chosen', next);
+      this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.forEach(source => {
+        if (source.fundingSourceId === next.fseId) {
+          source.octId = next.value;
+          this.logger.debug('updated source: ', source);
+        }
+      });
+    });
 
   }
 

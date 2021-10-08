@@ -5,7 +5,8 @@
   <div>
     <app-fp-can-selector
       [applId]="g.applId"
-      [fseId]="g.fseId">
+      [fseId]="g.fseId"
+      [nciSourceFlag]="g.nciSourceFlag">
     </app-fp-can-selector>
   </div>
  <div class="d-flex align-items-center">
@@ -31,7 +32,7 @@
     <i class="fas fa-trash" aria-hidden="true"></i>
   </button>
  <span
-   *ngIf="nonDefaultCAN(g.applId, g.fseId, i)"
+   *ngIf="nonDefaultCAN(g.applId, g.fseId)"
    class="btn btn-link btn-slim btn-link-warning"
    title="Non-Default CAN"
    ngbTooltip="Non-Default CAN"

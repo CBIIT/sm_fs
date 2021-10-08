@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { GrantCostPayload, PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
@@ -14,16 +14,16 @@ import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
   templateUrl: './can-selector-renderer.component.html',
   styleUrls: ['./can-selector-renderer.component.css']
 })
-export class CanSelectorRendererComponent implements OnInit {
+export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
   @ViewChild(CanSearchModalComponent) canSearchModalComponent: CanSearchModalComponent;
 
   @Input() grant: NciPfrGrantQueryDtoEx;
   @Input() projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   @Input() projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
   @Input() readOnly = false;
+  defaultCanTracker: Map<string, boolean> = new Map<string, boolean>();
 
   fundingSources: number[];
-  private defaultCanMap: Map<string, string[]>;
 
   constructor(
     private planManagementService: PlanManagementService,
@@ -33,50 +33,26 @@ export class CanSelectorRendererComponent implements OnInit {
     private logger: NGXLogger) {
   }
 
+  ngAfterViewInit(): void {
+  }
+
   ngOnInit(): void {
     this.fundingSources = this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.map(f => f.fundingSourceId);
-    this.defaultCanMap = new Map<string, string[]>();
-    this.grantCosts.forEach(gc => {
-      this.canManagementService.searchDefaultCans(
-        '',
-        gc.bmmCodes,
-        gc.activityCodes,
-        gc.nciSourceFlag).subscribe(result => {
-        const key = String(gc.fseId) + '-' + String(gc.applId);
-
-        this.logger.debug('default CANs', key, result.map(r => r.can));
-        this.defaultCanMap.set(key, result.map(r => r.can));
-      });
+    this.planManagementService.nonDefaultCanEventEmitter.subscribe(next => {
+      this.logger.debug(next);
+      const key = String(next.fseId) + '-' + String(next.applId);
+      this.defaultCanTracker.set(key, next.nonDefault);
     });
-
-    // this.logger.debug('Funding sources: ', this.fundingSources);
   }
 
   get grantCosts(): GrantCostPayload[] {
     return this.planManagementService.grantCosts.filter(g => g.applId === this.grant.applId);
   }
 
-  nonDefaultCAN(applId: number, fseId: number, index: number): boolean {
+  nonDefaultCAN(applId: number, fseId: number): boolean {
     const key = String(fseId) + '-' + String(applId);
-    // this.logger.debug('Checking non-default CAN for', key);
-    // const projectedCan = this.projectedApplIdCans?.get(key);
-    // if (!projectedCan?.can) {
-    //   // this.logger.debug('no projected CAN');
-    //   return false;
-    // }
-    const canOptions = this.defaultCanMap?.get(key);
-    if(!canOptions || canOptions.length === 0) {
-      this.logger.warn('No default CAN numbers to check')
-      return false;
-    }
-    const selectedCan = this.planModel.selectedApplIdCans.get(key);
-    if (!selectedCan?.can) {
-      this.logger.debug('no selected CAN');
-      return false;
-    }
-    this.logger.debug('CAN values', selectedCan.can);
 
-    return !canOptions.includes(selectedCan.can);
+    return this.defaultCanTracker?.get(key) || false;
   }
 
   duplicateCAN(applId: number, fseId: number, index: number): boolean {
@@ -120,6 +96,7 @@ export class CanSelectorRendererComponent implements OnInit {
     this.canSearchModalComponent.prepare();
     this.canSearchModalComponent.open().then((result) => {
       this.logger.debug('Got CAN', result);
+
       if (result) {
         this.canManagementService.selectCANEmitter.next({ fseId, can: result, applId });
       }
@@ -159,7 +136,7 @@ export class CanSelectorRendererComponent implements OnInit {
   canEnter(fseId: number): boolean {
     const displayMatrix = this.canManagementService.canDisplayMatrix?.get(fseId);
     if (!displayMatrix) {
-      this.logger.warn('no can matrix for fseId:', fseId);
+      // this.logger.warn('no can matrix for fseId:', fseId);
       return false;
     }
     // this.logger.debug('ARC enters  : ', displayMatrix.arcEnters);

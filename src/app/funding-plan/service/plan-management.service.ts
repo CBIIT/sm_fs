@@ -1,11 +1,17 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { PlanModel } from '../../model/plan/plan-model';
-import { FsRequestControllerService, FundingReqBudgetsDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
+import {
+  CanCcxDto,
+  FsRequestControllerService,
+  FundingReqBudgetsDto,
+  FundingRequestCanDto
+} from '@nci-cbiit/i2ecws-lib';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
 import { NGXLogger } from 'ngx-logger';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
+import { CanManagementService } from '../../cans/can-management.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +21,7 @@ export class PlanManagementService {
   fundingSourceListEmitter = new Subject<FundingRequestFundsSrcDto[]>();
   grantInfoCostEmitter = new Subject<{ index: number, applId?: number, dc: number, tc: number }>();
   fundingSourceSelectionEmitter = new Subject<{ index: number, source: number }>();
+  nonDefaultCanEventEmitter = new Subject<{ fseId: number, applId: number, nonDefault: boolean }>();
 
   private _listSelectedSources: FundingRequestFundsSrcDto[];
   private _selectedSources: Map<number, number> = new Map<number, number>();
@@ -40,6 +47,7 @@ export class PlanManagementService {
   constructor(
     private planModel: PlanModel,
     private fsRequestService: FsRequestControllerService,
+    private canManagementService: CanManagementService,
     private logger: NGXLogger) {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
     this.grantValues = new Map<number, { index: number, applId?: number, dc: number, tc: number }>();
@@ -368,6 +376,29 @@ export class PlanManagementService {
     }
 
     return (1 - (approved / total));
+  }
+
+  checkDefaultCANs(
+    fseId: number,
+    applId: number,
+    activityCodeList: string,
+    bmmCodeList: string,
+    nciSourceFlag: string,
+    can: string): void {
+    if (!can) {
+      this.nonDefaultCanEventEmitter.next({ applId, fseId, nonDefault: false });
+      return;
+    }
+    this.canManagementService.searchDefaultCans('', bmmCodeList, activityCodeList, nciSourceFlag).subscribe(result => {
+      const canNumbers = result?.map(c => c.can).filter(cc => !!cc) as string[];
+
+      if (canNumbers?.length === 0) {
+        this.nonDefaultCanEventEmitter.next({ applId, fseId, nonDefault: false });
+        return;
+      }
+
+      this.nonDefaultCanEventEmitter.next({ applId, fseId, nonDefault: !canNumbers.includes(can) });
+    });
   }
 }
 
