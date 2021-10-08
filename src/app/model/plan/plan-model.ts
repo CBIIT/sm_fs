@@ -153,6 +153,9 @@ export class PlanModel {
     this.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
       req.financialInfoDto.fundingRequestCans.forEach(can => {
         const key = String(can.fseId) + '-' + String(req.applId);
+        if (!can.approvedDc || !can.approvedTc) {
+          this.logger.error('CAN error :: no TC/DC values', can);
+        }
 
         c = this.selectedApplIdCans.get(key);
         if (c) {

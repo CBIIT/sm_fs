@@ -96,14 +96,12 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   }
 
   canEnterAtLeastOneCAN(): boolean {
-    this.logger.debug('user is ARC:', this.isFcArc());
     let result = false;
     for (const key of this.canManagementService.canDisplayMatrix.keys()) {
       if (this.canEnter(key)) {
         result = true;
       }
     }
-    this.logger.debug('can enter at least one: ', result)
     return result;
   }
 
