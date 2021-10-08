@@ -35,6 +35,9 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   set searchType(value: string) {
     this._searchType = value;
     this.logger.debug('Search Type set to <' + value + '>');
+    // if (value === 'G') {
+    //   this.showAdvanced = true;
+    // }
     this.searchTypeEm.emit(value);
   }
   get searchType() { return this._searchType; }

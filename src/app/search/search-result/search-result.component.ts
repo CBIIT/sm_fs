@@ -134,8 +134,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {title: 'Request ID', data: 'frqId'}, // 8
         {title: 'Request Name', data: 'requestName'}, // 9
         {title: 'Request Type', data: 'requestType'}, // 10
-        {title: 'Requesting DOC Approver', data: 'approverFullName', render: ( data, type, row, meta ) => {
-            return (!data || data == null) ? '' : '<a href="mailto:' + row.approverEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+        {title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: ( data, type, row, meta ) => {
+            return (!data || data == null) ? '' : '<a href="mailto:' + row.requestingDocApprvlEmail + '?subject=' + row.fullGrantNum + ' - ' + row.requestingDocApprvlFullName + '">' + data + '</a>';
           }}, // 11
         {title: 'Final LOA', data: 'loaName'}, // 12
         {title: 'Funding Approvals', data: 'fundsCertificationCode'}, // 13
@@ -268,8 +268,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: ( data, type, row, meta ) => {
             return (!data || data == null) ? '' : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + data + '</a>';
           }}, // 4
-        {title: 'Requesting DOC Approver', data: 'requestorDoc', render: ( data, type, row, meta ) => { //TODO
-            return (!data || data == null) ? '' : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + data + '</a>';
+        {title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: ( data, type, row, meta ) => { //TODO
+            return (!data || data == null) ? '' : '<a href="mailto:' + row.requestingDocApprvlEmail + '?subject=' + row.planName + ' - ' + row.requestingDocApprvlFullName + '">' + data + '</a>';
           }}, // 5
         {title: 'Final LOA', data: 'loaName'}, // 6
         {title: 'Funding Approvals', data: 'fundsCertificationCode'}, // 7
