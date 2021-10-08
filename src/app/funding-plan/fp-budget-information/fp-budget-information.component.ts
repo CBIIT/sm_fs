@@ -142,6 +142,10 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     return this.workflowModel.isFinancialApprover;
   }
 
+  isApprovedFinancials(): boolean {
+    return this.workflowModel.approvedByFC;
+  }
+
   deleteSelectedCAN(fundingSourceId: number): void {
     this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can: null });
 
