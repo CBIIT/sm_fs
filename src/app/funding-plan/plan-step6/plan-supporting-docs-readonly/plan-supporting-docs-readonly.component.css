@@ -1,0 +1,9 @@
+.doc-card-package {
+    border-radius: 0.25rem;
+    padding: .5rem 1rem;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: .5rem;
+    background: white;
+}
