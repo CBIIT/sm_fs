@@ -12,6 +12,8 @@ import {SearchFundingRequestActionCellRendererComponent} from "./search-funding-
 import {FundingPlanQueryDto} from "@nci-cbiit/i2ecws-lib/model/fundingPlanQueryDto";
 import {SearchFundingPlanFoasCellRendererComponent} from "./search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component";
 import {Router} from "@angular/router";
+import { BatchApproveService } from '../batch-approve/batch-approve.service';
+import { BatchApproveModalComponent } from '../batch-approve/batch-approve-modal.component';
 
 class DataTablesResponse {
   data: any[];
@@ -31,6 +33,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
               private propertiesService: AppPropertiesService,
               private loaderService: LoaderService,
               private router: Router,
+              private batchApproveService: BatchApproveService,
               private logger: NGXLogger) { }
 
   @ViewChildren(DataTableDirective) dtElements: QueryList<DataTableDirective>;
@@ -43,7 +46,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('selectFundingPlanCheckboxRenderer') selectFundingPlanCheckboxRenderer: TemplateRef<SelectFundingRequestCheckboxCellRendererComponent>;
   @ViewChild('searchFundingPlanActionRenderer') searchFundingPlanActionRenderer: TemplateRef<SearchFundingRequestActionCellRendererComponent>;
-
+  @ViewChild(BatchApproveModalComponent) batchApproveModal: BatchApproveModalComponent;
   // dtOptions: DataTables.Settings = {};
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
@@ -428,5 +431,22 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   onOpenFundingPlan($event: any) {
     this.router.navigate(['plan/retrieve', $event.fprId]);
 
+  }
+
+  canBatchApprove(): boolean {
+    return this.batchApproveService.canBatchApprove();
+  }
+
+  showBatchApproveModal(): void {
+    this.batchApproveModal.openModalForRequests([]).then(
+      (result) => {
+        this.logger.debug('Batch approve modal was submit and closed ', result);
+      }
+    )
+      .catch(
+        (reason) => {
+          this.logger.debug('user dismissed batch approve confirmation modal without proceed', reason);
+        }
+      );
   }
 }

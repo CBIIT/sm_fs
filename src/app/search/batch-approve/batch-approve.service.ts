@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FsSearchControllerService } from '@nci-cbiit/i2ecws-lib';
+import { FsSearchControllerService, FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
@@ -50,4 +50,9 @@ export class BatchApproveService {
   canUserApprovePlan(fprId: number): boolean {
     return this.fprIds.includes(fprId);
   }
+
+  canBatchApprove(): boolean {
+    return (this.isDoc || this.isSpl) && ( this.fprIds?.length > 0 || this.frqIds?.length > 0);
+  }
+
 }

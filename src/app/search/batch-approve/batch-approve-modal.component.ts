@@ -2,11 +2,12 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ApprovedPlan, BatchApprovalDto, FsPlanWorkflowControllerService,
   FsWorkflowControllerService, FundingPlanQueryDto, FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCalendar, NgbDate, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { Alert } from 'src/app/alert-billboard/alert';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
+import { BatchApproveService } from './batch-approve.service';
 
 
 @Component({
@@ -22,6 +23,8 @@ export class BatchApproveModalComponent implements OnInit {
   requestsForApproval: FundingRequestQueryDto[];
   plansForApproval: FundingPlanQueryDto[];
   splMeetingDate: string;
+  maxDate: NgbDate = this.calendar.getToday();
+
 
   requestOrPlan: 'REQUEST'|'PLAN';
   mode: 'DOC'|'SPL';
@@ -36,16 +39,18 @@ export class BatchApproveModalComponent implements OnInit {
               private fsWorkflowService: FsWorkflowControllerService,
               private fsPlanWorkflowService: FsPlanWorkflowControllerService,
               private userSessionService: AppUserSessionService,
+              private batchApproveService: BatchApproveService,
+              private calendar: NgbCalendar,
               private logger: NGXLogger) { }
 
   ngOnInit(): void { }
 
-  openModalForRequests(requests: FundingRequestQueryDto[], mode: 'DOC'|'SPL'):
+  openModalForRequests(requests: FundingRequestQueryDto[]):
   Promise<BatchApprovalDto> {
     this.alert = null;
     this.requestsForApproval = requests;
     this.requestOrPlan = 'REQUEST';
-    this.mode = mode;
+    this.mode = this.batchApproveService.isDoc ? 'DOC' : 'SPL';
     this.title = 'Request(s) Selected for Batch Approval';
     this.buttonText = 'Confirm Approve';
     this.eligibleCount = this.totalCount = requests.length;
@@ -55,12 +60,12 @@ export class BatchApproveModalComponent implements OnInit {
     });
   }
 
-  openModalForPlans(plans: FundingPlanQueryDto[], mode: 'DOC'|'SPL'):
+  openModalForPlans(plans: FundingPlanQueryDto[]):
   Promise<BatchApprovalDto> {
     this.alert = null;
     this.plansForApproval = plans;
     this.requestOrPlan = 'PLAN';
-    this.mode = mode;
+    this.mode = this.batchApproveService.isDoc ? 'DOC' : 'SPL';
     this.title = 'Plan(s) Selected for Batch Approval';
     this.buttonText = 'Conform Approve';
     this.eligibleCount = this.totalCount = plans.length;
@@ -99,7 +104,8 @@ export class BatchApproveModalComponent implements OnInit {
       dto.approvedPlans = approvedPlans;
     }
     this.logger.debug('Modal submits batch approval dto ', dto);
-//    this.fsWorkflowService.submitWorkflowUsingPOST(dto).subscribe(
+    this.modalRef.close('not submitted to backend for now');
+    return;
     this.invokeRestApi(dto).subscribe(
       (result) => {
         this.modalRef.close(dto);
