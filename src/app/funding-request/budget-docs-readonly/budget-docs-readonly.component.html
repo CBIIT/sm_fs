@@ -1,6 +1,10 @@
 <div class="row">
-    <div class="col-12">
-        <h3>Budget Documents</h3>
+    <div class="col-12 d-flex">
+        <h2>Budget Documents</h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#Budget-docs-collapse"
+            role="button" aria-expanded="true" aria-controls="apps-notcon-collapse"></a>
+    </div>
+    <div class="col-12 collapse show mt-2" id="Budget-docs-collapse">
         <div class="drag-item" *ngFor="let item of budgetDocDtos" tabindex="0">
             <span class="doc-name">{{ item.docType + ' ' + item.docFilename }}</span>
             <span class="doc-desc">(Added by <a href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on

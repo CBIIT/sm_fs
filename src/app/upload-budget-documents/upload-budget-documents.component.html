@@ -6,8 +6,16 @@
     </div>
 </div>
 <div class="row">
+
+    <div class="col-12 d-flex">
+        <h2>Budget Documents (optional)</h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#budget-docs-collapse"
+            role="button" aria-expanded="true" aria-controls="apps-notcon-collapse"></a>
+    </div>
+</div>
+
+<div class="row collapse show mt-2" id="budget-docs-collapse">
     <div class="col-12">
-        <h3>Budget Documents (optional)</h3>
         <p><small class="text-muted">You may upload Microsoft Word, Microsoft Excel, or Adobe Acrobat document(s) only.
                 Note: If you upload MS Excel, make sure it contains only one worksheet per file in order to have it
                 included in the submission package.
@@ -42,6 +50,8 @@
         <button class="btn btn-primary" [disabled]="!selectedFiles" (click)="uploadFiles()">Upload Doc</button>
     </div>
 
+
+
     <div class="col-12">
         <div class="drag-item" *ngFor="let item of budgetDocDtos | async" tabindex="0">
             <span class="doc-name">{{ item.docType + ' ' + item.docFilename }}</span>
@@ -57,7 +67,9 @@
             </div>
         </div>
     </div>
-    <div class="col-12">
-        <hr>
-    </div>
+
+</div>
+
+<div class="col-12">
+    <hr>
 </div>
