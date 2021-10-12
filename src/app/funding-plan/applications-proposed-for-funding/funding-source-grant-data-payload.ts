@@ -8,7 +8,7 @@ export class FundingSourceGrantDataPayload {
   directCost: number;
   totalCost: number;
   directCostPercentCut: number;
-  totalCostPercentCust: number;
+  totalCostPercentCut: number;
 
   constructor() {
   }
