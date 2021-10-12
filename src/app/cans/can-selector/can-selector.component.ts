@@ -81,6 +81,10 @@ export class CanSelectorComponent implements OnInit {
     if (!this.activityCodes) {
       this.activityCodes = this.model.requestDto?.activityCode;
     }
+    this.logger.debug(this.initialCAN);
+    this.logger.debug(this.defaultCans);
+    this.logger.debug(this.projectedCan);
+    this.logger.debug(this.applId);
     this.initializeAjaxSettings();
   }
 
@@ -212,8 +216,10 @@ export class CanSelectorComponent implements OnInit {
   }
 
   private initializeSelectedCan(): void {
+    this.logger.debug('initializeSelectedCAN', this.initialCAN);
     const tmp = this.data.filter(e => e.id === this.initialCAN.can);
     if (!tmp || tmp.length === 0) {
+      this.logger.debug('pushing new CAN');
       this.data.push({
         id: this.initialCAN.can,
         text: this.initialCAN.can + ' | ' + this.initialCAN.canDescription,
@@ -242,7 +248,7 @@ export class CanSelectorComponent implements OnInit {
 
   updateProjectedCan(can: CanCcxDto): void {
     this.logger.debug('updateProjecteCan', can);
-    if (this.projectedCan && this.selectedValue && this.projectedCan.can === this.selectedValue) {
+    if (this.projectedCan && this.selectedValue && this.projectedCan.can !== this.selectedValue) {
       this.selectedValue = null;
     }
     this.projectedCan = can;
