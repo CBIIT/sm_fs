@@ -1,11 +1,13 @@
 <ng-container *ngIf="readonly; then read_only else edit;"></ng-container>
 
 <ng-template #edit>
+  <form #canForm="ngForm">
   <div class="form-group">
     <!--    <label for="oefia-type">OEFIA Type</label>-->
     <div class="d-flex">
       <div class="form-check ml-auto d-flex">
-        <input type="checkbox" [id]="uniqueId" (change)="onCheckboxChange($event, index)">
+        <input type="checkbox" [id]="uniqueId" [name]="uniqueId"
+        (change)="onCheckboxChange($event, index)">
         <label [for]="uniqueId">Show All CANs</label>
       </div>
     </div>
@@ -27,11 +29,17 @@
       <ng-select2
         [name]="'can_'+index"
         [options]="allOptions"
-        [(ngModel)]="selectedValue">
+        [(ngModel)]="selectedValue"
+        [required]="canRequired"
+        #canSelect="ngModel">
         <option></option>
       </ng-select2>
+      <div class="text-danger mt-1" *ngIf="(canSelect.errors?.required)">
+        Error: Missing CAN for one or more funding sources.
+      </div>
     </ng-template>
   </div>
+  </form>
 </ng-template>
 
 <ng-template #read_only>

@@ -70,9 +70,11 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   onActionChange(value: string): void {
     this.actionEmitter.emit(value);
+    const approvalAction =  this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
     if (this.gmInfoComponent) {
-      const approvalAction =  this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
       this.gmInfoComponent.isApprovalAction = approvalAction;
+    }
+    if (this.budgetInfoComponent) {
       this.budgetInfoComponent.isApprovalAction = approvalAction;
     }
   }

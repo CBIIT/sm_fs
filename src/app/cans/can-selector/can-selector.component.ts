@@ -1,10 +1,11 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { CanManagementService } from '../can-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { Select2OptionData } from 'ng-select2';
 import { Options } from 'select2';
 import { RequestModel } from '../../model/request/request-model';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-can-selector',
@@ -12,6 +13,7 @@ import { RequestModel } from '../../model/request/request-model';
   styleUrls: ['./can-selector.component.css']
 })
 export class CanSelectorComponent implements OnInit {
+  @ViewChild('canForm', {static: false}) canForm: NgForm;
   @Input() applId: number;
   @Input() bmmCodes: string;
   @Input() activityCodes: string;

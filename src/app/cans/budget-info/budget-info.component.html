@@ -82,7 +82,6 @@
       <div class="col-6" *ngIf="model.isAddFunds() && (isFcNci() || isFcArc())">
         <app-create-type></app-create-type>
       </div>
-      <form #canForm='ngForm'>
       <table class="table table-striped table-bordered budget-info-table">
         <thead>
         <tr>
@@ -140,8 +139,6 @@
         </tr>
         </tbody>
       </table>
-      </form>
-
     </div><!-- END col-12 collapse -->
 
   </div><!-- END Row -->

@@ -28,7 +28,7 @@ export class BudgetInfoComponent implements OnInit {
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
   @ViewChildren(CanSelectorComponent) canSelectors: QueryList<CanSelectorComponent>;
   @ViewChildren(ProjectedCanComponent) projectedCans: QueryList<ProjectedCanComponent>;
-  @ViewChild('canForm', {static: false}) canForm: NgForm;
+//  @ViewChild('canForm', {static: false}) canForm: NgForm;
 
   @Input() readOnly = false;
   @Input() editing = false;
@@ -169,7 +169,17 @@ export class BudgetInfoComponent implements OnInit {
         canWarning.nonDefaultCan = true;
       }
     }
-//    this.logger.debug('CanWarning ', canWarning);
-    return this.canForm.valid;
+
+    let valid = true;
+
+    if (this.canSelectors) {
+      for (const canSelector of this.canSelectors) {
+//        this.logger.debug('canForm ', canSelector.canForm);
+        if (!canSelector.canForm.form.valid) {
+          valid = false;
+        }
+      }
+    }
+    return valid;
   }
 }
