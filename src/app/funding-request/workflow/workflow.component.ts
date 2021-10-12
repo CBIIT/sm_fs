@@ -296,6 +296,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.frqId = this.requestModel.requestDto.frqId;
+
     dto.comments = this.comments;
     dto.action = action;
     if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&
@@ -327,6 +328,10 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     if (this.workflowModel.isApprovalAction(action) && this.budgetInfoComponent?.editing) {
       this.budgetInfoComponent.refreshRequestCans();
       dto.requestCans = this.requestModel.requestCans;
+      if(this.workflowModel.isFcNci) {
+        dto.nciFc = true;
+        dto.oefiaCreateCode = this.requestModel.requestDto.oefiaCreateCode;
+      }
     }
 
     if (this.workflowModel.isGMApprover
