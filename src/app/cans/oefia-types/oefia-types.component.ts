@@ -47,6 +47,7 @@ export class OefiaTypesComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.canService.getOefiaCodes().subscribe(result => {
       this.oefiaCodes = result;
+      this.logger.debug(result);
       this.data = [];
       this.data.push({ id: '', text: '' });
       result.forEach(c => {
