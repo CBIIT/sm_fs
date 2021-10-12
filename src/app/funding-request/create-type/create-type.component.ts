@@ -93,7 +93,7 @@ export class CreateTypeComponent implements OnInit {
         this.selectedValue = 'Pre-Appl';
       }
     } else {
-      this.selectedValue = 'Pre-Appl';
+      //this.selectedValue = 'Pre-Appl';
     }
   }
 
