@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, EventEmitter, OnInit, AfterViewInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { CanManagementService } from '../can-management.service';
 import { OefiaCodingDto } from '@nci-cbiit/i2ecws-lib';
@@ -10,7 +10,7 @@ import { Select2OptionData } from 'ng-select2';
   templateUrl: './oefia-types.component.html',
   styleUrls: ['./oefia-types.component.css']
 })
-export class OefiaTypesComponent implements OnInit {
+export class OefiaTypesComponent implements OnInit, AfterViewInit {
   @Input() index = 0;
   @Input() fseId: number;
   oefiaCodes: OefiaCodingDto[];
@@ -48,11 +48,18 @@ export class OefiaTypesComponent implements OnInit {
   ngOnInit(): void {
     this.canService.getOefiaCodes().subscribe(result => {
       this.oefiaCodes = result;
+      this.logger.debug(result);
       this.data = [];
       this.data.push({ id: '', text: '' });
       result.forEach(c => {
         this.data.push({ id: String(c.id), text: c.category });
+        if(Number(c.id) === Number(this.selectedValue)) {
+          this.selectedOefiaType = {id: String(c.id), text: c.category};
+        }
       });
     });
+  }
+
+  ngAfterViewInit(): void {
   }
 }
