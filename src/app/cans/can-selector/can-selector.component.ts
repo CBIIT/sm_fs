@@ -29,6 +29,7 @@ export class CanSelectorComponent implements OnInit {
   @Input() nciSourceFlag = '';
   @Input() readonly = false;
   @Input() initialCAN: FundingRequestCanDto = null;
+  @Input() canRequired = false;
   public allCans = false;
 
   uniqueId: string;
@@ -72,10 +73,10 @@ export class CanSelectorComponent implements OnInit {
       });
     }
     this.uniqueId = 'all_cans' + String(this.index);
-    if(!this.bmmCodes) {
+    if (!this.bmmCodes) {
       this.bmmCodes = this.model.requestDto?.bmmCode;
     }
-    if(!this.activityCodes) {
+    if (!this.activityCodes) {
       this.activityCodes = this.model.requestDto?.activityCode;
     }
     this.initializeAjaxSettings();

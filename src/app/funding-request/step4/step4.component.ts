@@ -124,6 +124,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     this.checkUserRolesCas();
     this.checkDocs();
     this.isDocsStepCompleted();
+    this.logger.debug('step4 requestModel ', this.requestModel);
     // this.isDisplayBudgetDocsUpload();
 
     // this.budgetDocDtos = this.requestModel.requestDto.budgetDocs;

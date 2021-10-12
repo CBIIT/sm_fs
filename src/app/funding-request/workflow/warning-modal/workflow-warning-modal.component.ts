@@ -1,13 +1,6 @@
-import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { FsPlanWorkflowControllerService, FsWorkflowControllerService, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
-import { Observable } from 'rxjs';
-import { Alert } from 'src/app/alert-billboard/alert';
-import { PlanModel } from 'src/app/model/plan/plan-model';
-import { RequestModel } from 'src/app/model/request/request-model';
-import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
 @Component({
   selector: 'app-workflow-warning-modal',
@@ -20,14 +13,14 @@ export class WorkflowWarningModalComponent implements OnInit {
 
   private modalRef: NgbModalRef;
 
-  warningTypes: string[];
+  warningTypes: CanWarning;
 
   constructor(private modalService: NgbModal,
               private logger: NGXLogger) { }
 
   ngOnInit(): void { }
 
-  openConfirmModal(warningTypes: string[]): Promise<void> {
+  openConfirmModal(warningTypes: CanWarning): Promise<void> {
     this.warningTypes = warningTypes;
     return new Promise<void>( (resolve, reject) => {
       this.modalRef = this.modalService.open(this.modalContent);
@@ -40,8 +33,14 @@ export class WorkflowWarningModalComponent implements OnInit {
   }
 
   hasWarning(type: string): boolean {
-    return this.warningTypes?.includes(type);
+    return this.warningTypes[type];
   }
 
+}
+
+export interface CanWarning {
+  missingCan?: boolean;
+  duplicateCan?: boolean;
+  nonDefaultCan?: boolean;
 }
 

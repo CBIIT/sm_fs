@@ -12,15 +12,20 @@
     <ng-container *ngIf="allCans; then showAll; else showDefault"></ng-container>
     <ng-template #showDefault>
       <ng-select2
-        name="can"
+        [name]="'can_'+index"
         [data]="data"
-        [(ngModel)]="selectedValue">
+        [(ngModel)]="selectedValue"
+        [required]="canRequired"
+        #canSelect="ngModel">
         <option></option>
       </ng-select2>
+      <div class="text-danger mt-1" *ngIf="(canSelect.errors?.required)">
+        Error: Missing CAN for one or more funding sources.
+      </div>
     </ng-template>
     <ng-template #showAll>
       <ng-select2
-        name="can"
+        [name]="'can_'+index"
         [options]="allOptions"
         [(ngModel)]="selectedValue">
         <option></option>

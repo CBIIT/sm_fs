@@ -3,7 +3,8 @@ import {
   Input,
   OnInit,
   ViewChildren,
-  QueryList
+  QueryList,
+  ViewChild
 } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { CanManagementService } from '../can-management.service';
@@ -14,6 +15,8 @@ import { CanSelectorComponent } from '../can-selector/can-selector.component';
 import { ProjectedCanComponent } from '../projected-can/projected-can.component';
 import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
+import { NgForm } from '@angular/forms';
+import { CanWarning } from 'src/app/funding-request/workflow/warning-modal/workflow-warning-modal.component';
 
 @Component({
   selector: 'app-budget-info',
@@ -25,11 +28,15 @@ export class BudgetInfoComponent implements OnInit {
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
   @ViewChildren(CanSelectorComponent) canSelectors: QueryList<CanSelectorComponent>;
   @ViewChildren(ProjectedCanComponent) projectedCans: QueryList<ProjectedCanComponent>;
+  @ViewChild('canForm', {static: false}) canForm: NgForm;
 
   @Input() readOnly = false;
   @Input() editing = false;
 
   initialPay: boolean;
+
+  private requestNciFseIds: number[];
+  isApprovalAction: boolean;
 
   get fundingRequestCans(): FundingRequestCanDto[] {
     return this.model.requestCans;
@@ -39,7 +46,9 @@ export class BudgetInfoComponent implements OnInit {
     this.model.requestCans = value;
   }
 
-  constructor(private logger: NGXLogger, private canService: CanManagementService, public model: RequestModel,
+  constructor(private logger: NGXLogger,
+              private canService: CanManagementService,
+              public model: RequestModel,
               private workflowModel: WorkflowModel) {
   }
 
@@ -80,6 +89,11 @@ export class BudgetInfoComponent implements OnInit {
 
   ngOnInit(): void {
     this.initialPay = INITIAL_PAY_TYPES.includes(this.model.requestDto?.frtId);
+    this.requestNciFseIds = this.model.programRecommendedCostsModel.fundingSources.filter(
+      fs => fs.nciSourceFlag &&
+      this.model.programRecommendedCostsModel.selectedFundingSourceIds.has(fs.fundingSourceId)
+    ).map( fs => fs.fundingSourceId);
+    this.logger.debug('nci fsids ', this.requestNciFseIds);
   }
 
   copyProjectedCan(i: number): void {
@@ -133,5 +147,29 @@ export class BudgetInfoComponent implements OnInit {
     }
 
     return !!projectedCan;
+  }
+
+  isCanRequired(fseId: number): boolean {
+    return  this.isApprovalAction &&
+            this.workflowModel.isFcNci &&
+            this.requestNciFseIds.includes(fseId);
+  }
+
+  isFormValid(canWarning: CanWarning): boolean {
+    for (let i = 0; i < this.fundingRequestCans.length ; i++) {
+      const can = this.fundingRequestCans[i];
+//      this.logger.debug('FormValid can ', can);
+      if (this.isFcNci() && !can.can) {
+        canWarning.missingCan = true;
+      }
+      if (this.duplicateCan(i)) {
+        canWarning.duplicateCan = true;
+      }
+      if (this.nonDefaultCan(i)) {
+        canWarning.nonDefaultCan = true;
+      }
+    }
+//    this.logger.debug('CanWarning ', canWarning);
+    return this.canForm.valid;
   }
 }

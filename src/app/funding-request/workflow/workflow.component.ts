@@ -11,7 +11,7 @@ import { GmInfoComponent } from './gm-info/gm-info.component';
 import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
 import { Alert } from 'src/app/alert-billboard/alert';
-import { WorkflowWarningModalComponent } from './warning-modal/workflow-warning-modal.component';
+import { CanWarning, WorkflowWarningModalComponent } from './warning-modal/workflow-warning-modal.component';
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
 
 const approverMap = new Map<number, any>();
@@ -71,7 +71,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   onActionChange(value: string): void {
     this.actionEmitter.emit(value);
     if (this.gmInfoComponent) {
-      this.gmInfoComponent.isApprovalAction = this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
+      const approvalAction =  this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
+      this.gmInfoComponent.isApprovalAction = approvalAction;
+      this.budgetInfoComponent.isApprovalAction = approvalAction;
     }
   }
 
@@ -220,23 +222,12 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.showAddApprover = this._selectedWorkflowAction.newApproverRequired;
     this.workflowModel.prepareApproverListsForView(this._selectedWorkflowAction.action);
 
-    // if (this.approvedCostsComponent) {
-    //   this.approvedCostsComponent.resetForm(this._selectedWorkflowAction.action);
-    // }
-
   }
 
   get buttonDisabled(): boolean {
     if (!this._selectedWorkflowAction) {
       return true;
     }
-
-    // if (this._selectedWorkflowAction.commentsRequired && (!this.comments || this.comments.length === 0)) {
-    //   return true;
-    // } else if (this._selectedWorkflowAction.newApproverRequired && (!this.workflowModel.hasNewApprover)) {
-    //   return true;
-    // }
-
     return false;
   }
 
@@ -252,13 +243,30 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.alert = null;
     this.validationError = {};
     let valid = true;
-    if ((this.gmInfoComponent && !this.gmInfoComponent.isFormValid()) ||
-        (this.approvedCostsComponent && !this.approvedCostsComponent?.isFormValid()) ||
-        (this.uploadBudgetDocumentsComponent && !this.uploadBudgetDocumentsComponent.isFromValid()) ) {
+
+    if (this.gmInfoComponent && !this.gmInfoComponent.isFormValid()) {
       valid = false;
     }
+
+    if (this.approvedCostsComponent && !this.approvedCostsComponent?.isFormValid()) {
+      valid = false;
+    }
+
+    if (this.uploadBudgetDocumentsComponent && !this.uploadBudgetDocumentsComponent.isFromValid()) {
+      valid = false;
+    }
+
     if (! this.isFormValid()) {
       valid = false;
+    }
+
+    const action: WorkflowActionCode = this._selectedWorkflowAction.action;
+    const canWarning: CanWarning = {};
+    if (this.workflowModel.isApprovalAction(action) && this.budgetInfoComponent?.editing) {
+      const canFormValid = this.budgetInfoComponent.isFormValid(canWarning);
+      if (!canFormValid) {
+        valid = false;
+      }
     }
 
     if (!valid) {
@@ -268,12 +276,20 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // this.workflowWarningModalComponent.openConfirmModal(['MISSING_CAN']).then( () => {
-    //   this.logger.debug('warning modal closed with yes ');
-    // }).catch(() => {
-    //   this.logger.debug('warning modal closed with dismiss ');
-    // });
-    // return;
+    if (canWarning.duplicateCan || canWarning.missingCan || canWarning.nonDefaultCan) {
+      this.workflowWarningModalComponent.openConfirmModal(canWarning).then( () => {
+        this.logger.debug('warning modal closed with yes ');
+        this.submitWorkflowToBackend();
+      }).catch(() => {
+        this.logger.debug('warning modal closed with dismiss ');
+      });
+    }
+    else {
+      this.submitWorkflowToBackend();
+    }
+  }
+
+  private submitWorkflowToBackend(): void {
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
@@ -331,13 +347,6 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       }
     );
   }
-
-  // setGmInfoToRequestModel(gmInfo: GmInfoDto): void {
-  //   this.requestModel.requestDto.actionType = gmInfo.actionType;
-  //   this.requestModel.requestDto.pfrSpecFullName = gmInfo.defaultSpecFullName;
-  //   this.requestModel.requestDto.pfrBkupSpecNpeId = gmInfo.bkupSpecNpeId;
-  //   this.requestModel.requestDto.pfrBkupSpecFullName = gmInfo.bkupSpecFullName;
-  // }
 
   isFormValid(): boolean {
     let valid = true;

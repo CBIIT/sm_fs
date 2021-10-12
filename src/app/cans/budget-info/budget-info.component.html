@@ -82,6 +82,7 @@
       <div class="col-6" *ngIf="model.isAddFunds() && (isFcNci() || isFcArc())">
         <app-create-type></app-create-type>
       </div>
+      <form #canForm='ngForm'>
       <table class="table table-striped table-bordered budget-info-table">
         <thead>
         <tr>
@@ -111,8 +112,12 @@
             <app-projected-can [index]="i" [fseId]="can.fseId" [octId]="can.octId || can.defaultOefiaTypeId"></app-projected-can>
           </td>
           <td>
-            <app-can-selector [index]="i" [nciSourceFlag]="can.nciSourceFlag" [selectedValue]="can.can"
-                              [initialCAN]="can"></app-can-selector>
+            <app-can-selector 
+            [index]="i" 
+            [nciSourceFlag]="can.nciSourceFlag" 
+            [(selectedValue)]="can.can"
+            [initialCAN]="can"
+            [canRequired] = "isCanRequired(can.fseId)"></app-can-selector>
             <div class="d-flex align-items-center">
 
               <button class="btn btn-link btn-slim" *ngIf="showCopyProjectedCan(i)"
@@ -135,7 +140,7 @@
         </tr>
         </tbody>
       </table>
-
+      </form>
 
     </div><!-- END col-12 collapse -->
 

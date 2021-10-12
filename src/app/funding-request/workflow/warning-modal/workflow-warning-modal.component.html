@@ -7,15 +7,15 @@
     </div>
     <div class="modal-body">
       <div class="col-12">
-        <ngb-alert type="warning" [dismissible]="false" *ngIf="hasWarning('MISSING_CAN')">
+        <ngb-alert type="warning" [dismissible]="false" *ngIf="warningTypes?.missingCan">
           <b>WARNING:</b> Are you sure you want to approve this request without providing a CAN?
         </ngb-alert>
-        <ngb-alert type="warning" [dismissible]="false" *ngIf="hasWarning('DUPLICATE_CAN')">
+        <ngb-alert type="warning" [dismissible]="false" *ngIf="warningTypes?.duplicateCan">
           <b>WARNING:</b> You have provided duplicate CAN numbers. Would you like to 
           proceed? If you continue, the Approved Total Amount will be added together when 
           the TCS is updated.
         </ngb-alert>  
-        <ngb-alert type="warning" [dismissible]="false" *ngIf="hasWarning('MISMATCHED_CAN')">
+        <ngb-alert type="warning" [dismissible]="false" *ngIf="warningTypes?.nonDefaultCan">
           <b>WARNING:</b> Please note that the "NCI OEFIA Projected CAN" and "Funds Approver 
           Provided CAN Information" does not match. Are you sure you want to proceed?
         </ngb-alert>  
