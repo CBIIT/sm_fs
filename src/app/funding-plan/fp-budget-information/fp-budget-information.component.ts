@@ -7,6 +7,7 @@ import { CanManagementService } from '../../cans/can-management.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
 import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
+import { PlanManagementService } from '../service/plan-management.service';
 
 @Component({
   selector: 'app-fp-budget-information',
@@ -28,12 +29,19 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     public planModel: PlanModel,
     private logger: NGXLogger,
     private requestService: FsRequestControllerService,
+    private planManagementService: PlanManagementService,
     private canManagementService: CanManagementService,
     private workflowModel: WorkflowModel) {
   }
 
   ngOnInit(): void {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
+
+    this.planManagementService.planBudgetReadOnlyEmitter.subscribe(next => {
+      this.logger.debug('Plan budget read only:', next);
+
+      this.readOnly = next;
+    });
 
     this.canManagementService.projectedCanEmitter.subscribe(next => {
       // this.logger.debug('projected CAN:', next);

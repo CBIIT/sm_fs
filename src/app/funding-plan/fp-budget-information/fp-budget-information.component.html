@@ -7,7 +7,7 @@
        role="button"
        aria-expanded="true" aria-controls="budget-info-collapse-ro"></a>
   </div>
-  <ng-container  *ngIf="(isFcArc() && canEnterAtLeastOneCAN()) || isFcNci() then budgetHead"></ng-container>
+  <ng-container  *ngIf="((isFcArc() && canEnterAtLeastOneCAN()) || isFcNci() && !readOnly) then budgetHead"></ng-container>
   <ng-template #budgetHead>
   <div class="col-12 collapse show mt-2" id="budget-info-collapse-ro">
     <div *ngIf="isFcArc()"><p>Please provide the CAN only if known at the time of approval.</p></div>

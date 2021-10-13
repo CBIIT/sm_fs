@@ -37,6 +37,10 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.planManagementService.planBudgetReadOnlyEmitter.subscribe(next => {
+      this.logger.debug('Plan budget read only:', next);
+      this.readOnly = next;
+    });
     this.fundingSources = this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.map(f => f.fundingSourceId);
     this.planManagementService.nonDefaultCanEventEmitter.subscribe(next => {
       // this.logger.debug(next);

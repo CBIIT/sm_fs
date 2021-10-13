@@ -25,6 +25,7 @@ import { Router } from '@angular/router';
 import { AppPropertiesService } from 'src/app/service/app-properties.service';
 import { FpGrantManagementComponent } from './fp-grant-management/fp-grant-management.component';
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
+import { PlanManagementService } from '../service/plan-management.service';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -99,6 +100,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   }
 
   constructor(private requestIntegrationService: FundingRequestIntegrationService,
+              private planManagementService: PlanManagementService,
               private workflowService: FsPlanWorkflowControllerService,
               private planService: FsPlanControllerService,
               private propertiesService: AppPropertiesService,
@@ -354,12 +356,15 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     this.workflowService.submitPlanWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('submit workflow returned okay ', result);
+        this.planManagementService.planBudgetReadOnlyEmitter.next(true);
+
         this.workflowModel.initializeForPlan(dto.fprId);
         if (this.workflowModel.isSplApprover
           && this.workflowModel.isApprovalAction(action)
           && this.splMeetingDate) {
           this.planModel.fundingPlanDto.splMeetingDate = new Date(dto.splMeetingDate);
           this.logger.debug('set SplMeetingDate to planModel ' + this.planModel.fundingPlanDto.splMeetingDate);
+
         }
         else if (dto.action === WorkflowActionCode.RETURN) {
           this.planModel.fundingPlanDto.splMeetingDate = undefined;
