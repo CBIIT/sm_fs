@@ -60,7 +60,7 @@ export class FundingRequestTypeComponent implements OnInit {
           if (!!result) {
             const fundedAlert: Alert = {
               type: 'warning',
-              message: 'WARNING: This Grant Application is part of Funding Plan <a href="/#/plan/retrieve/' + result.fprId +
+              message: 'WARNING: This Grant Application is part of Funding Plan <a href="/fs/#/plan/retrieve/' + result.fprId +
                        '">' + result.fprId + '</a> in FY ' + result.planFy + '. If you continue creating this PFR, ' +
                        'you will be allowed to complete the approval process either on this request or the plan.'
             };

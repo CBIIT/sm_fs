@@ -1,6 +1,6 @@
 import {Component, OnInit, Output, ViewChild, EventEmitter, AfterViewInit, Input} from '@angular/core';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
-import { FundSelectSearchCriteria } from '@nci-cbiit/i2ecws-lib';
+// import {BoardsControllerService, FundSelectSearchCriteria, PaylistUtilControllerService} from '@nci-cbiit/i2ecws-lib';
 import { SearchCriteria } from '../search-criteria';
 import { NGXLogger } from 'ngx-logger';
 import {AppUserSessionService} from "../../service/app-user-session.service";
@@ -8,6 +8,7 @@ import {NgForm} from "@angular/forms";
 import {Select2OptionData} from "ng-select2";
 import {Options} from "select2";
 import {SearchModel} from "../model/search-model";
+import {getCurrentFiscalYear} from "../../utils/utils";
 
 @Component({
   selector: 'app-search-filter',
@@ -42,29 +43,6 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
   get searchType() { return this._searchType; }
 
-  constructor(private userSessionService: AppUserSessionService,
-              private searchModel: SearchModel,
-              private logger: NGXLogger) {
-  }
-
-  ngOnInit(): void {
-    this.searchType = this.searchModel.searchType;
-    this.searchFilter = this.searchModel.searchCriteria;
-    this.canSearchForPaylists = this.userSessionService.hasRole('GMBRCHF') ||
-                                this.userSessionService.hasRole('OEFIACRT');
-  }
-
-  ngAfterViewInit() {
-    setTimeout(() => {
-      this.searchForm.form.patchValue(this.searchFilter);
-      // next tick
-      if (this.action === 'immediate') {
-        setTimeout(() => this.search(this.searchForm), 0);
-      }
-    }, 0);
-  }
-
-  fyRange: any = {};
   //TODO - get this list from the server
   requestTypeList: Array<Select2OptionData> = [];
   requestStatusList: Array<Select2OptionData> = [
@@ -83,6 +61,69 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     multiple: true,
     allowClear: true
   };
+
+  // Paylist related fields
+  fiscalYearList: Select2OptionData[] = [];
+  ncabList: Select2OptionData[] = [];
+  costCenterList: Select2OptionData[] = [];
+
+  constructor(private userSessionService: AppUserSessionService,
+              // private boardsControllerService: BoardsControllerService,
+              // private paylistUtilControllerService: PaylistUtilControllerService,
+              private searchModel: SearchModel,
+              private logger: NGXLogger) {
+  }
+
+  ngOnInit(): void {
+    this.searchType = this.searchModel.searchType;
+    this.searchFilter = this.searchModel.searchCriteria;
+    // YP - disable sarch for paylist until paylist is fully merged with fs
+    this.canSearchForPaylists = false;
+    // this.canSearchForPaylists = this.userSessionService.hasRole('GMBRCHF') ||
+    //                             this.userSessionService.hasRole('OEFIACRT');
+    // for (let year = getCurrentFiscalYear(); year >= 2009; year--) {
+    //   this.fiscalYearList.push({ id: String(year), text: String(year)});
+    // }
+    // this.boardsControllerService.getBodDatesListUsingGET().subscribe(
+    //   result => {
+    //     const ncabResults: Array<Select2OptionData> = [];
+    //     for (const entry of result) {
+    //       ncabResults.push({
+    //         id: entry.key, text: entry.value
+    //       });
+    //     }
+    //     this.ncabList = ncabResults;
+    //   },
+    //   error => {
+    //     console.error('HttpClient get request error for----- ' + error.message); //TODO - error handling
+    //   });
+    // this.paylistUtilControllerService.getCostCentersUsingGET().subscribe(
+    //   result => {
+    //     const ccResults: Array<Select2OptionData> = [];
+    //     for (const entry of result) {
+    //       ccResults.push({
+    //         id: entry.key, text: entry.value
+    //       });
+    //     }
+    //     this.costCenterList = ccResults;
+    //   },
+    //   error => {
+    //     console.error('HttpClient get request error for----- ' + error.message); //TODO - error handling
+    //   });
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      if (!this.searchFilter.fy) {
+        this.searchFilter.fy = getCurrentFiscalYear();
+      }
+      this.searchForm.form.patchValue(this.searchFilter);
+      // next tick
+      if (this.action === 'immediate') {
+        setTimeout(() => this.search(this.searchForm), 0);
+      }
+    }, 0);
+  }
 
   clear() {
    this.searchFilter = {};
