@@ -77,7 +77,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
 
   }
 
-  copyProjectedCAN(applId: number, fseId: number, index: number): void {
+  copyProjectedCAN(applId: number, fseId: number): void {
     const key = String(fseId) + '-' + String(applId);
 
     const can = this.projectedApplIdCans?.get(key);
@@ -109,7 +109,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
     this.canManagementService.selectCANEmitter.next({ fseId, can: null, applId });
   }
 
-  canCopyProjectedCan(applId: number, fseId: number, index: number): boolean {
+  canCopyProjectedCan(applId: number, fseId: number): boolean {
     const key = String(fseId) + '-' + String(applId);
 
     if (!this.projectedApplIdCans?.get(key)?.can || this.readOnly) {
@@ -119,7 +119,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
     return true;
   }
 
-  canDeleteCAN(applId: number, fseId: number, index: number): boolean {
+  canDeleteCAN(applId: number, fseId: number): boolean {
     const key = String(fseId) + '-' + String(applId);
     const selectedCan = this.planModel.selectedApplIdCans.get(key);
     if (!selectedCan?.can || this.readOnly) {

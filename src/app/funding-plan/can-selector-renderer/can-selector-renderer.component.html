@@ -11,8 +11,8 @@
   </div>
  <div class="d-flex align-items-center">
   <button
-    *ngIf="canCopyProjectedCan(g.applId, g.fseId, i)"
-    (click)="copyProjectedCAN(g.applId, g.fseId, i)"
+    *ngIf="canCopyProjectedCan(g.applId, g.fseId)"
+    (click)="copyProjectedCAN(g.applId, g.fseId)"
     class="btn btn-link btn-slim"
     ngbTooltip="Copy NCI OEFIA Projected CAN">
     <i class="far fa-copy" aria-hidden="true"></i>
@@ -25,7 +25,7 @@
     <i class="far fa-search" aria-hidden="true"></i>
   </button>
   <button
-    *ngIf="canDeleteCAN(g.applId, g.fseId, i)"
+    *ngIf="canDeleteCAN(g.applId, g.fseId)"
     (click)="deleteCAN(g.applId, g.fseId, i)"
     class="btn btn-link btn-slim ml-2 btn-delete"
     ngbTooltip="Delete Provided CAN">
