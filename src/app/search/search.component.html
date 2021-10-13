@@ -69,7 +69,7 @@
               <div class="overview">{{filterTypeLabels.FILTER_FUNDING_PLAN_UNDER_REVIEW}} <span>{{numMyUnderReviewPlans}}</span></div>
             </button>
           </div>
-          
+
         </div>
       </div>
     </div>
@@ -81,10 +81,6 @@
                    (searchTypeEm)="onSearchType($event)">
 </app-search-filter>
 <app-search-result></app-search-result>
-<hr/>
-<app-open-request></app-open-request>
-<hr/>
-
 
 <ng-template #i2eUserCategories>
   <div class="row " >
@@ -97,10 +93,9 @@
           <div>Awaiting My Response</div></button>
   </div>
   &nbsp;&nbsp;&nbsp;
-      <div  *ngIf= "hasPaylineRoles && numMyPaylines>0" >    
+      <div  *ngIf= "hasPaylineRoles && numMyPaylines>0" >
         <a href="{{paylistDashboardUrl}}" class="button btn btn-info"> <div>Paylines Awaiting Certification </div></a>
 </div>
-  
+
 </div>
 </ng-template>
-    

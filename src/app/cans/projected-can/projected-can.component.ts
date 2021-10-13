@@ -25,19 +25,19 @@ export class ProjectedCanComponent implements OnInit {
 
   ngOnInit(): void {
     this.canService.oefiaTypeEmitter.subscribe(next => {
-      if(next.fseId && Number(next.fseId) === Number(this.fseId)) {
+      if (next.fseId && Number(next.fseId) === Number(this.fseId)) {
         this.updateProjectedCan(next.value);
       } else if (Number(this.index) === Number(next.index)) {
         this.updateProjectedCan(next.value);
       }
     });
+    if (!this.frtId) {
+      this.frtId = this.requestModel.requestDto.frtId;
+    }
     if (this.octId) {
       this.updateProjectedCan(this.octId);
     } else {
       this.updateProjectedCan(null);
-    }
-    if (!this.frtId) {
-      this.frtId = this.requestModel.requestDto.frtId;
     }
   }
 

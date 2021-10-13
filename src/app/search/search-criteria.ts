@@ -22,4 +22,9 @@ export interface SearchCriteria {
   requestingPd?: string;
   piName?: string;
   pdName?: string;
+
+  // Paylist criteria
+  fy?: number;
+  ncab?: string;
+  costCenter?: string;
 }

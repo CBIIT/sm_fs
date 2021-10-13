@@ -1,3 +1,10 @@
+  <app-batch-approve-modal *ngIf="canBatchApprove()">
+  </app-batch-approve-modal>
+  <div class="row" *ngIf="canBatchApprove()">
+    <div class="col-12">
+      <button class="btn btn-primary" (click)="showBatchApproveModal()">Batch Approve</button>
+    </div>
+  </div>
   <div class="row">
     <div class="col-12">
       <h2>Results {{(filterTypeLabel && !(noFundingRequestResult && noFundingPlanResult)) ? '- ' + filterTypeLabel : ''}}</h2>

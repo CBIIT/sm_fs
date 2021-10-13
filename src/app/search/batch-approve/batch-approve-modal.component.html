@@ -1,0 +1,62 @@
+<ng-template #batchApproveModal let-modal>
+  <form #wfcForm="ngForm" (ngSubmit)="onSubmit(wfcForm)">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title-hold">{{ title }}</span>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-12"  *ngIf="alert">
+        <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
+      </div> 
+      <p *ngIf="requestOrPlan === 'REQUEST'">{{eligibleCount}} out of {{totalCount}} Request(s) are eligible for Batch Approval 
+      </p>
+      <p *ngIf="requestOrPlan === 'PLAN'">{{eligibleCount}} out of {{totalCount}} Plan(s) are eligible for Batch Approval 
+      </p>
+      <div class="col-12" *ngIf="requestOrPlan === 'PLAN' && mode === 'SPL'">
+        <div class="form-group">
+          <label for="splMeetingDate">SPL Committee Meeting Approval Date</label>
+          <div class="input-group">
+            <input id="splMeetingDate" class="form-control" 
+                   name="splMeetingDate" 
+                   [(ngModel)]="splMeetingDate"
+                   #splmd="ngModel" 
+                   placeholder="mm/dd/yyyy"
+                   ngbDatepicker #d="ngbDatepicker" 
+                   [maxDate]="maxDate"
+                   (click)="d.toggle()">
+            <div class="input-group-append">
+              <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d.toggle()" type="button">
+                <i class="fas fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div class="text-danger mt-1" *ngIf="(splmd.errors?.required)">
+            SPL Committee Meeting Approval Date is required
+          </div>
+        </div>
+      </div>
+      <div class="col-12" *ngIf="requestOrPlan === 'REQUEST'">
+        <table>
+          <thead>
+            <th>Grant Number</th>
+            <th>PI</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let request of requestsForApproval">
+              <td>{{request.fullGrantNum}}</td>
+              <td>{{request.piFullName}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-12" *ngIf="requestOrPlan === 'PLAN'">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <input type="submit" class="btn btn-primary" value ="{{buttonText}}">
+      <button class="btn btn-primary" (click)="close()">Close</button>
+    </div>
+  </form>
+  </ng-template>

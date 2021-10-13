@@ -90,7 +90,6 @@ export class CanSelectorComponent implements OnInit {
     const bmmCodes = this.bmmCodes;
     const nciSource = this.nciSourceFlag;
     const data = this.data;
-    this.logger.debug('data', data);
 
     this.basicOptions = {
       allowClear: true,
@@ -223,8 +222,6 @@ export class CanSelectorComponent implements OnInit {
   }
 
   selectProjectedCan(): boolean {
-    this.logger.debug('selectProjectedCan', this.projectedCan);
-
     if (this.projectedCan && this.projectedCan.can && this.projectedCan.canDescrip) {
       const tmp = this.data.filter(e => e.id === this.projectedCan.can);
       if (!tmp || tmp.length === 0) {
@@ -241,8 +238,7 @@ export class CanSelectorComponent implements OnInit {
   }
 
   updateProjectedCan(can: CanCcxDto): void {
-    this.logger.debug('updateProjecteCan', can);
-    if (this.projectedCan && this.selectedValue && this.projectedCan.can === this.selectedValue) {
+    if (this.projectedCan && this.selectedValue && this.projectedCan.can !== this.selectedValue) {
       this.selectedValue = null;
     }
     this.projectedCan = can;
