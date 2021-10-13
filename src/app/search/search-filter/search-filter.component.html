@@ -41,11 +41,23 @@
       <div class="row">
         <div class="col-6">
           <label for="fy">Fiscal Year</label>
-          <input type="text" id="fy" name="fy" ngModel class="form-control">
+          <ng-select2
+            id="fy"
+            name="fy"
+            ngModel
+            [allowClear]="true"
+            [data]="fiscalYearList">
+          </ng-select2>
         </div>
         <div class="col-6">
           <label for="ncab">NCAB</label>
-          <input type="text" id="ncab" name="ncab" ngModel class="form-control">
+          <ng-select2
+            id="ncab"
+            name="ncab"
+            ngModel
+            [allowClear]="true"
+            [data]="ncabList">
+          </ng-select2>
         </div>
       </div>
     </div>
@@ -103,7 +115,7 @@
       <lib-pdname-dropdown label="Requesting PD" name="requestingPd" [showInactiveToggle]="true"></lib-pdname-dropdown>
     </div>
     <div class="col-md-6 col-lg-6 form-group">
-      <app-search-funding-request-doc name="requestingDoc"  label="Requesting Doc" [form]="searchForm"></app-search-funding-request-doc>
+      <app-search-funding-request-doc name="requestingDoc"  label="Requesting DOC" [form]="searchForm"></app-search-funding-request-doc>
     </div>
   </div>
   <div class="row"  [hidden]="!showAdvanced || (searchType != 'FR' && searchType != 'FP')">
@@ -154,12 +166,17 @@
   <!-- Fields for PL -->
   <div class="row form-group" [hidden]="!(searchType === 'PL')">
     <div class="col-md-6 col-lg-6">
-      <label for="pldoc">Division/Office/Center (DOC)</label>
-      <input type="text" id="pldoc" name="pldoc" ngModel class="form-control">
+      <app-search-funding-request-doc name="pldoc" label="Division/Office/Center (DOC)" [form]="searchForm"></app-search-funding-request-doc>
     </div>
     <div class="col-md-6 col-lg-6">
       <label for="cost-center">Cost Center</label>
-      <input type="text" id="cost-center" name="costCenter" ngModel class="form-control">
+      <ng-select2
+        id="cost-center"
+        name="costCenter"
+        ngModel
+        [allowClear]="true"
+        [data]="costCenterList">
+      </ng-select2>
     </div>
   </div>
 
