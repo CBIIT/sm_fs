@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CanManagementService } from '../can-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
@@ -6,6 +6,7 @@ import { Select2OptionData } from 'ng-select2';
 import { Options } from 'select2';
 import { RequestModel } from '../../model/request/request-model';
 import { NgForm } from '@angular/forms';
+import { convertToFundingRequestCan } from '../can-utils';
 
 @Component({
   selector: 'app-can-selector',
@@ -13,15 +14,23 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./can-selector.component.css']
 })
 export class CanSelectorComponent implements OnInit {
-  @ViewChild('canForm', {static: false}) canForm: NgForm;
+  get data(): Array<Select2OptionData> {
+    return this._data;
+  }
+
+  set data(value: Array<Select2OptionData>) {
+    this._data = value;
+  }
+  @ViewChild('canForm', { static: true }) canForm: NgForm;
   @Input() applId: number;
+  @Input() fseId: number;
   @Input() bmmCodes: string;
   @Input() activityCodes: string;
   private _selectedValue: string;
   private _selectedCanData: CanCcxDto;
   defaultCans: CanCcxDto[];
   projectedCan: CanCcxDto;
-  data: Array<Select2OptionData>;
+  private _data: Array<Select2OptionData>;
   allOptions: Options;
   defaultOptions: Options;
   basicOptions: Options;
@@ -48,10 +57,12 @@ export class CanSelectorComponent implements OnInit {
   }
 
   set selectedValue(value: string) {
+    this.logger.debug('selectedValue:', value);
     this._selectedValue = value;
     if (value) {
       this.canService.getCanDetails(value).subscribe(result => {
         this._selectedCanData = result;
+        this.logger.debug('new selected CAN', this._selectedCanData);
       });
     } else {
       this._selectedCanData = null;
@@ -61,6 +72,7 @@ export class CanSelectorComponent implements OnInit {
 
   constructor(private canService: CanManagementService,
               private logger: NGXLogger,
+              private changeDetection: ChangeDetectorRef,
               private model: RequestModel) {
   }
 
@@ -81,7 +93,24 @@ export class CanSelectorComponent implements OnInit {
     if (!this.activityCodes) {
       this.activityCodes = this.model.requestDto?.activityCode;
     }
-    this.initializeAjaxSettings();
+    // this.initializeAjaxSettings();
+    this.canService.selectCANEmitter.subscribe(next => {
+      if (Number(next.fseId) === Number(this.fseId)) {
+        this.handleNewCAN(next.can);
+      }
+
+    });
+  }
+
+  private handleNewCAN(can: CanCcxDto): void {
+    this.logger.debug('Received new CAN', can);
+    this.logger.debug(this._data);
+    const frCAN = convertToFundingRequestCan(can);
+    this.initializeSelectedCan(frCAN);
+    this.data = this._data;
+    this.changeDetection.detectChanges();
+    this.logger.debug(this._data);
+    this.selectedValue = frCAN.can;
   }
 
   private initializeAjaxSettings(): void {
@@ -89,7 +118,7 @@ export class CanSelectorComponent implements OnInit {
     const activityCodes = this.activityCodes;
     const bmmCodes = this.bmmCodes;
     const nciSource = this.nciSourceFlag;
-    const data = this.data;
+    const data = this._data;
 
     this.basicOptions = {
       allowClear: true,
@@ -199,33 +228,35 @@ export class CanSelectorComponent implements OnInit {
   }
 
   private initializeDefaultCans(): void {
+    this.logger.debug('initialize default cans');
     this.canService.getCans(this.nciSourceFlag).subscribe(result => {
-      this.data = new Array<Select2OptionData>();
+      this._data = new Array<Select2OptionData>();
       result.forEach(r => {
-        this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip, additional: r });
+        this._data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip, additional: r });
       });
       if (this.initialCAN.can) {
-        this.initializeSelectedCan();
+        this.initializeSelectedCan(this.initialCAN);
       }
     });
   }
 
-  private initializeSelectedCan(): void {
-    const tmp = this.data.filter(e => e.id === this.initialCAN.can);
+  private initializeSelectedCan(can: FundingRequestCanDto): void {
+    const tmp = this._data.filter(e => e.id === can.can);
     if (!tmp || tmp.length === 0) {
-      this.data.push({
-        id: this.initialCAN.can,
-        text: this.initialCAN.can + ' | ' + this.initialCAN.canDescription,
-        additional: this.initialCAN
+      this.logger.debug('push new can', can);
+      this._data.push({
+        id: can.can,
+        text: can.can + ' | ' + can.canDescription,
+        additional: can
       });
     }
   }
 
   selectProjectedCan(): boolean {
     if (this.projectedCan && this.projectedCan.can && this.projectedCan.canDescrip) {
-      const tmp = this.data.filter(e => e.id === this.projectedCan.can);
+      const tmp = this._data.filter(e => e.id === this.projectedCan.can);
       if (!tmp || tmp.length === 0) {
-        this.data.push({
+        this._data.push({
           id: this.projectedCan.can,
           text: this.projectedCan.can + ' | ' + this.projectedCan.canDescrip,
           additional: this.projectedCan

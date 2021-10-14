@@ -20,7 +20,6 @@ export class FpCanSelectorComponent implements OnInit {
 
   constructor(private canManagementService: CanManagementService,
               private planModel: PlanModel,
-              private planManagementService: PlanManagementService,
               private logger: NGXLogger) {
   }
 

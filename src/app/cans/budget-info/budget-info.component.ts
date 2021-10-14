@@ -16,6 +16,7 @@ import { ProjectedCanComponent } from '../projected-can/projected-can.component'
 import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
 import { CanWarning } from 'src/app/funding-request/workflow/warning-modal/workflow-warning-modal.component';
+import { CanSearchModalComponent } from '../can-search-modal/can-search-modal.component';
 
 @Component({
   selector: 'app-budget-info',
@@ -23,6 +24,7 @@ import { CanWarning } from 'src/app/funding-request/workflow/warning-modal/workf
   styleUrls: ['./budget-info.component.css']
 })
 export class BudgetInfoComponent implements OnInit {
+  @ViewChild(CanSearchModalComponent) canSearchModalComponent: CanSearchModalComponent;
 
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
   @ViewChildren(CanSelectorComponent) canSelectors: QueryList<CanSelectorComponent>;
@@ -90,8 +92,8 @@ export class BudgetInfoComponent implements OnInit {
     this.initialPay = INITIAL_PAY_TYPES.includes(this.model.requestDto?.frtId);
     this.requestNciFseIds = this.model.programRecommendedCostsModel.fundingSources.filter(
       fs => fs.nciSourceFlag &&
-      this.model.programRecommendedCostsModel.selectedFundingSourceIds.has(fs.fundingSourceId)
-    ).map( fs => fs.fundingSourceId);
+        this.model.programRecommendedCostsModel.selectedFundingSourceIds.has(fs.fundingSourceId)
+    ).map(fs => fs.fundingSourceId);
     this.logger.debug('nci fsids ', this.requestNciFseIds);
   }
 
@@ -151,13 +153,13 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   isCanRequired(fseId: number): boolean {
-    return  this.isApprovalAction &&
-            this.workflowModel.isFcNci &&
-            this.requestNciFseIds.includes(fseId);
+    return this.isApprovalAction &&
+      this.workflowModel.isFcNci &&
+      this.requestNciFseIds.includes(fseId);
   }
 
   isFormValid(canWarning: CanWarning): boolean {
-    for (let i = 0; i < this.fundingRequestCans.length ; i++) {
+    for (let i = 0; i < this.fundingRequestCans.length; i++) {
       const can = this.fundingRequestCans[i];
 //      this.logger.debug('FormValid can ', can);
       if (this.isFcNci() && !can.can) {
@@ -182,5 +184,28 @@ export class BudgetInfoComponent implements OnInit {
       }
     }
     return valid;
+  }
+
+  canSearchForCAN(fseId: number): boolean {
+    return true;
+  }
+
+  searchForCANs(fseId: number, nciSourceFlag: string): void {
+    this.logger.debug(this.model.requestDto?.bmmCode);
+    this.logger.debug(this.model.requestDto?.activityCode);
+    // TODO: set up modal with proper data
+    this.canSearchModalComponent.title = `Search for CANs`;
+    this.canSearchModalComponent.nciSourceFlag = nciSourceFlag;
+    this.canSearchModalComponent.bmmCodes = this.model.requestDto?.bmmCode;
+    this.canSearchModalComponent.activityCodes = this.model.requestDto?.activityCode;
+    this.canSearchModalComponent.prepare();
+    this.canSearchModalComponent.open().then((result) => {
+      if (result) {
+        this.canService.selectCANEmitter.next({ fseId, can: result });
+      }
+    }).catch((reason) => {
+      this.logger.warn(reason);
+    });
+
   }
 }
