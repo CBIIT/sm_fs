@@ -49,7 +49,7 @@ export class CanSelectorComponent implements OnInit {
     if (value) {
       this.canService.getCanDetails(value).subscribe(result => {
         this._selectedCanData = result;
-        this.logger.debug('new selected CAN', this._selectedCanData);
+        // this.logger.debug('new selected CAN', this._selectedCanData);
       });
     } else {
       this._selectedCanData = null;
@@ -63,7 +63,15 @@ export class CanSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (!this.bmmCodes) {
+      this.bmmCodes = this.model.requestDto?.bmmCode;
+    }
+    if (!this.activityCodes) {
+      this.activityCodes = this.model.requestDto?.activityCode;
+    }
+
     this.initializeDefaultCans();
+
     if (!this.readonly) {
       this.canService.projectedCanEmitter.subscribe(next => {
         if (Number(next.index) === Number(this.index)) {
@@ -73,23 +81,22 @@ export class CanSelectorComponent implements OnInit {
       });
     }
     this.uniqueId = 'all_cans' + String(this.index);
-    if (!this.bmmCodes) {
-      this.bmmCodes = this.model.requestDto?.bmmCode;
-    }
-    if (!this.activityCodes) {
-      this.activityCodes = this.model.requestDto?.activityCode;
-    }
+
     // this.initializeAjaxSettings();
     this.canService.selectCANEmitter.subscribe(next => {
       if (Number(next.fseId) === Number(this.fseId)) {
         this.handleNewCAN(next.can);
       }
     });
+
+    if (this.initialCAN?.can) {
+      this.handleNewCAN(convertToFundingRequestCan(this.initialCAN));
+    }
   }
 
   private handleNewCAN(can: CanCcxDto): void {
     this._selectedCanData = can;
-    const tmp = this.data.filter(e => e.id === can.can);
+    const tmp = this.data?.filter(e => e.id === can.can);
     if (!tmp || tmp.length === 0) {
       this.initialCAN = convertToFundingRequestCan(can);
       this.initializeDefaultCans();
