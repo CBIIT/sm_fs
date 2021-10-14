@@ -20,7 +20,6 @@ export class FpCanSelectorComponent implements OnInit {
 
   constructor(private canManagementService: CanManagementService,
               private planModel: PlanModel,
-              private planManagementService: PlanManagementService,
               private logger: NGXLogger) {
   }
 
@@ -29,7 +28,7 @@ export class FpCanSelectorComponent implements OnInit {
       if ((!next.applId || (Number(this.applId) === Number(next.applId))) && Number(next.fseId) === Number(this.fseId)) {
         this.selectedCAN = next.can;
         this.planModel.saveSelectedCAN(this.fseId, this.applId, next.can);
-        this.planManagementService.checkDefaultCANs(
+        this.canManagementService.checkDefaultCANs(
           this.fseId,
           this.applId,
           this.planModel.activityCodeList,

@@ -67,6 +67,9 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectedRows: Map<number, any> = new Map<number, any>();
 
+  batchApproveEnabled = false;
+  batchApproveVisible = false;
+
   ngOnInit(): void {
   }
 
@@ -358,6 +361,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noFundingRequestResult = false;
     this.filterTypeLabel = filterTypeLabel;
     this.selectedRows.clear();
+    this.batchApproveVisible = this.batchApproveService.canBatchApproveRequest();
+    this.batchApproveEnabled = false;
     this._triggerDtInstance(this.dtFundingRequestTrigger);
   }
 
@@ -367,6 +372,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noFundingPlanResult = false;
     this.filterTypeLabel = filterTypeLabel;
     this.selectedRows.clear();
+    this.batchApproveVisible = this.batchApproveService.canBatchApprovePlan();
+    this.batchApproveEnabled = false;
     this._triggerDtInstance(this.dtFundingPlanTrigger);
   }
 
@@ -392,7 +399,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   }
 
-  onCaptureFRSelectedEvent($event: any) {
+  onCaptureFRSelectedEvent($event: any): void {
     if ($event.frqId) {
       if ($event.selected) {
         this.selectedRows.set($event.frqId, $event);
@@ -400,11 +407,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       else {
         this.selectedRows.delete($event.frqId);
       }
-      console.debug('onCaptureFRSelectedEvent', this.selectedRows);
     }
+    this.batchApproveEnabled = this.selectedRows.size > 0;
   }
 
-  onCaptureFPSelectedEvent($event: any) {
+  onCaptureFPSelectedEvent($event: any): void {
     if ($event.fprId) {
       if ($event.selected) {
         this.selectedRows.set($event.fprId, $event);
@@ -412,8 +419,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       else {
         this.selectedRows.delete($event.fprId);
       }
-      console.debug('onCaptureFPSelectedEvent', this.selectedRows);
     }
+    this.batchApproveEnabled = this.selectedRows.size > 0;
   }
 
   private _populateSelectedIntoResults(id: string, data: Array<any>): void {
@@ -424,29 +431,51 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onOpenFundingRequest($event: any) {
+  onOpenFundingRequest($event: any): void {
     this.router.navigate(['request/retrieve', $event.frqId]);
   }
 
-  onOpenFundingPlan($event: any) {
+  onOpenFundingPlan($event: any): void {
     this.router.navigate(['plan/retrieve', $event.fprId]);
 
   }
 
-  canBatchApprove(): boolean {
-    return this.batchApproveService.canBatchApprove();
-  }
-
   showBatchApproveModal(): void {
-    this.batchApproveModal.openModalForRequests([]).then(
-      (result) => {
-        this.logger.debug('Batch approve modal was submit and closed ', result);
-      }
-    )
-      .catch(
-        (reason) => {
-          this.logger.debug('user dismissed batch approve confirmation modal without proceed', reason);
+    if (this.fundingRequests && this.fundingRequests.length > 0) {
+      this.batchApproveModal.openModalForRequests([...this.selectedRows.values()])
+      // .then(
+      //   (result) => {
+      //     this.logger.debug('Batch approve was submit and modal is closed ', result);
+      //     this.doFundingRequestSearch(this.searchCriteria, this.filterTypeLabel);
+      //   })
+      // .catch(
+      //     (reason) => {
+      //       this.logger.debug('user dismissed batch approve confirmation modal without proceed', reason);
+      //     });
+      .finally( () => {
+        if (this.batchApproveModal.batchApproveSuccess) {
+          this.doFundingRequestSearch(this.searchCriteria, this.filterTypeLabel);
         }
-      );
+      });
+    }
+    else if (this.fundingPlans && this.fundingPlans.length > 0) {
+      this.batchApproveModal.openModalForPlans([...this.selectedRows.values()])
+      .finally( () => {
+        if (this.batchApproveModal.batchApproveSuccess) {
+          this.doFundingPlanSearch(this.searchCriteria, this.filterTypeLabel);
+        }
+      });
+    //   .then(
+    //     (result) => {
+    //       this.logger.debug('Batch approve was submit and modal is closed ', result);
+    //       this.doFundingPlanSearch(this.searchCriteria, this.filterTypeLabel);
+    //     }
+    //   )
+    //     .catch(
+    //       (reason) => {
+    //         this.logger.debug('user dismissed batch approve confirmation modal without proceed', reason);
+    //       }
+    //     );
+     }
   }
 }

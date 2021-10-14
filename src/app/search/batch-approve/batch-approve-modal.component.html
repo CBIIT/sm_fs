@@ -9,7 +9,13 @@
     <div class="modal-body">
       <div class="col-12"  *ngIf="alert">
         <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
-      </div> 
+      </div>
+      <div class="col-12"  *ngIf="batchApproveSuccess">
+        <ngb-alert type="success" [dismissible]="false">
+          {{eligibleCount}} out of {{totalCount}} {{ requestOrPlan === 'REQUEST' ? 'Request(s)':'Plan(s)'}} have been successfully approved.
+        </ngb-alert>
+      </div>
+
       <p *ngIf="requestOrPlan === 'REQUEST'">{{eligibleCount}} out of {{totalCount}} Request(s) are eligible for Batch Approval 
       </p>
       <p *ngIf="requestOrPlan === 'PLAN'">{{eligibleCount}} out of {{totalCount}} Plan(s) are eligible for Batch Approval 
@@ -38,7 +44,22 @@
         </div>
       </div>
       <div class="col-12" *ngIf="requestOrPlan === 'REQUEST'">
-        <table>
+        <table class="table table-striped table-bordered" id="batch-approve-request-table">
+          <thead>
+            <th>Grant Number</th>
+            <th>PI</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let request of requestsForApproval">
+              <td><app-full-grant-number-cell-renderer [data]="request" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl"></app-full-grant-number-cell-renderer>
+              </td>
+              <td><a href="mailto:{{request.piEmail}}?subject={{request.fullGrantNum}}-{request.lastName}">{{request.piFullName}}</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-12" *ngIf="requestOrPlan === 'PLAN'">
+        <table class="table table-striped table-bordered" id="batch-approve-plan-table">
           <thead>
             <th>Grant Number</th>
             <th>PI</th>
@@ -46,7 +67,7 @@
           <tbody>
             <tr *ngFor="let request of requestsForApproval">
               <td>{{request.fullGrantNum}}</td>
-              <td>{{request.piFullName}}</td>
+              <td><a href="mailto:{{request.piEmail}}?subject={{request.fullGrantNum}}-{request.lastName}">{{request.piFullName}}</a></td>
             </tr>
           </tbody>
         </table>
@@ -55,8 +76,8 @@
       </div>
     </div>
     <div class="modal-footer">
-      <input type="submit" class="btn btn-primary" value ="{{buttonText}}">
-      <button class="btn btn-primary" (click)="close()">Close</button>
+      <input type="submit" class="btn btn-primary" [value] ="buttonText" [disabled] ="disableSubmit">
+      <button type="button" class="btn btn-primary" (click)="close()">Close</button>
     </div>
   </form>
   </ng-template>

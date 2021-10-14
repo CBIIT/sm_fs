@@ -1,1 +1,1 @@
-<input type="checkbox" [id]="id + data[id]" [checked]="data.selected" (change)="onSelect($event)"/>
+<input type="checkbox" [id]="id + data[id]" [checked]="data.selected" (change)="onSelect($event)" [disabled]="!canBatchApprove()"/>

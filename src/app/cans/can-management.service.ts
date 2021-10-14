@@ -23,6 +23,8 @@ export class CanManagementService {
   projectedCanEmitter = new Subject<{ index: number; can: CanCcxDto; fseId?: number; applId?: number }>();
   // Instructs all listeners to update their CAN to the selected value if fseId matches
   selectCANEmitter = new Subject<{ fseId: number; can: CanCcxDto; applId?: number }>();
+  nonDefaultCanEventEmitter = new Subject<{ fseId: number, applId: number, nonDefault: boolean }>();
+
 
   nciSourceFlag: string = null;
   // TODO: evaluate for deletion
@@ -164,6 +166,29 @@ export class CanManagementService {
       this.logger.error(error);
     });
     return true;
+  }
+
+  checkDefaultCANs(
+    fseId: number,
+    applId: number,
+    activityCodeList: string,
+    bmmCodeList: string,
+    nciSourceFlag: string,
+    can: string): void {
+    if (!can) {
+      this.nonDefaultCanEventEmitter.next({ applId, fseId, nonDefault: false });
+      return;
+    }
+    this.searchDefaultCans('', bmmCodeList, activityCodeList, nciSourceFlag).subscribe(result => {
+      const canNumbers = result?.map(c => c.can).filter(cc => !!cc) as string[];
+
+      if (canNumbers?.length === 0) {
+        this.nonDefaultCanEventEmitter.next({ applId, fseId, nonDefault: false });
+        return;
+      }
+
+      this.nonDefaultCanEventEmitter.next({ applId, fseId, nonDefault: !canNumbers.includes(can) });
+    });
   }
 
   getCanDetails(value: string): Observable<CanCcxDto> {

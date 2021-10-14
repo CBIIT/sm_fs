@@ -21,7 +21,6 @@ export class PlanManagementService {
   fundingSourceListEmitter = new Subject<FundingRequestFundsSrcDto[]>();
   grantInfoCostEmitter = new Subject<{ index: number, applId?: number, dc: number, tc: number }>();
   fundingSourceSelectionEmitter = new Subject<{ index: number, source: number }>();
-  nonDefaultCanEventEmitter = new Subject<{ fseId: number, applId: number, nonDefault: boolean }>();
   planBudgetReadOnlyEmitter = new Subject<boolean>();
 
   private _listSelectedSources: FundingRequestFundsSrcDto[];
@@ -379,28 +378,7 @@ export class PlanManagementService {
     return (1 - (approved / total));
   }
 
-  checkDefaultCANs(
-    fseId: number,
-    applId: number,
-    activityCodeList: string,
-    bmmCodeList: string,
-    nciSourceFlag: string,
-    can: string): void {
-    if (!can) {
-      this.nonDefaultCanEventEmitter.next({ applId, fseId, nonDefault: false });
-      return;
-    }
-    this.canManagementService.searchDefaultCans('', bmmCodeList, activityCodeList, nciSourceFlag).subscribe(result => {
-      const canNumbers = result?.map(c => c.can).filter(cc => !!cc) as string[];
 
-      if (canNumbers?.length === 0) {
-        this.nonDefaultCanEventEmitter.next({ applId, fseId, nonDefault: false });
-        return;
-      }
-
-      this.nonDefaultCanEventEmitter.next({ applId, fseId, nonDefault: !canNumbers.includes(can) });
-    });
-  }
 }
 
 export interface GrantCostPayload {

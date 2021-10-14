@@ -10,7 +10,7 @@
             <ul class="collapse show" id="nav-collapse-paylist"  *ngIf="oefiaCertifier || splCertifier">
                 <li class="list-group-item"><a href="{{paylistDashboardUrl}}">View/Certify Paylines</a></li>
             </ul>
-                <ul class="collapse show"  *ngIf="paylistReadOnlyRole" id="nav-collapse-paylist">
+                <ul class="collapse show"  *ngIf="paylistReadOnlyRole && !(oefiaCertifier || splCertifier)" id="nav-collapse-paylist">
                 <li class="list-group-item"><a href="{{paylistDashboardUrl}}">View Paylines</a></li>
             </ul>
             <ul class="collapse show"  id="nav-collapse-paylist">

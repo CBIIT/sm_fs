@@ -3,41 +3,18 @@
 <ng-template #edit>
   <form #canForm="ngForm">
   <div class="form-group">
-    <!--    <label for="oefia-type">OEFIA Type</label>-->
-    <div class="d-flex">
-      <div class="form-check ml-auto d-flex">
-        <input type="checkbox" [id]="uniqueId" [name]="uniqueId"
-        (change)="onCheckboxChange($event, index)">
-        <label [for]="uniqueId">Show All CANs</label>
-      </div>
-    </div>
-    <ng-container *ngIf="allCans; then showAll; else showDefault"></ng-container>
-    <ng-template #showDefault>
       <ng-select2
-        [name]="'can_'+index"
+        [allowClear]="true"
+        [name]="'can_sparkle'"
         [data]="data"
         [(ngModel)]="selectedValue"
         [required]="canRequired"
+        (ngModelChange)="onModelChange()"
         #canSelect="ngModel">
-        <option></option>
       </ng-select2>
-      <div class="text-danger mt-1" *ngIf="(canSelect.errors?.required)">
+      <div class="text-danger mt-1" *ngIf="canRequired && (canSelect.errors?.required)">
         Error: Missing CAN for one or more funding sources.
       </div>
-    </ng-template>
-    <ng-template #showAll>
-      <ng-select2
-        [name]="'can_'+index"
-        [options]="allOptions"
-        [(ngModel)]="selectedValue"
-        [required]="canRequired"
-        #canSelect="ngModel">
-        <option></option>
-      </ng-select2>
-      <div class="text-danger mt-1" *ngIf="(canSelect.errors?.required)">
-        Error: Missing CAN for one or more funding sources.
-      </div>
-    </ng-template>
   </div>
   </form>
 </ng-template>
@@ -48,7 +25,6 @@
        triggers="click:blur">{{ selectedCanData?.can }}</a> | {{ selectedCanData?.canDescrip }}
   </span>
 </ng-template>
-
 
 <ng-template #canTooltip><span class='institutionName'>{{selectedCanData.canPhsOrgCode}}</span><br>
   <span class='institutionLocation'>{{selectedCanData.canDescrip}}</span>
