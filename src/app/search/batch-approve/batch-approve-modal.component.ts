@@ -37,6 +37,8 @@ export class BatchApproveModalComponent implements OnInit {
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   eGrantsUrl: string = this.propertiesService.getProperty('EGRANTS_URL');
 
+  batchApproveSuccess = false;
+  disableSubmit = false;
   constructor(private modalService: NgbModal,
               private fsWorkflowService: FsWorkflowControllerService,
               private fsPlanWorkflowService: FsPlanWorkflowControllerService,
@@ -49,37 +51,39 @@ export class BatchApproveModalComponent implements OnInit {
   ngOnInit(): void { }
 
   openModalForRequests(requests: FundingRequestQueryDto[]):
-  Promise<BatchApprovalDto> {
+  Promise<void> {
     this.alert = null;
+    this.batchApproveSuccess = false;
     this.requestsForApproval = requests;
     this.requestOrPlan = 'REQUEST';
     this.mode = this.batchApproveService.isDoc ? 'DOC' : 'SPL';
     this.title = 'Request(s) Selected for Batch Approval';
     this.buttonText = 'Confirm Approve';
     this.eligibleCount = this.totalCount = requests.length;
-    return new Promise<BatchApprovalDto>( (resolve, reject) => {
+    return new Promise<void>( (finalize) => {
       this.modalRef = this.modalService.open(this.modalContent);
-      this.modalRef.result.then(resolve, reject);
+      this.modalRef.result.finally(finalize);
     });
   }
 
   openModalForPlans(plans: FundingPlanQueryDto[]):
-  Promise<BatchApprovalDto> {
+  Promise<void> {
     this.alert = null;
+    this.batchApproveSuccess = false;
     this.plansForApproval = plans;
     this.requestOrPlan = 'PLAN';
     this.mode = this.batchApproveService.isDoc ? 'DOC' : 'SPL';
     this.title = 'Plan(s) Selected for Batch Approval';
     this.buttonText = 'Conform Approve';
     this.eligibleCount = this.totalCount = plans.length;
-    return new Promise<BatchApprovalDto>( (resolve, reject) => {
+    return new Promise<void>( (finalize) => {
       this.modalRef = this.modalService.open(this.modalContent);
-      this.modalRef.result.then(resolve, reject);
+      this.modalRef.result.finally(finalize);
     });
   }
 
   close(): void {
-    this.modalRef.dismiss();
+    this.modalRef.close();
   }
 
   onSubmit(wfcForm: NgForm): void {
@@ -96,6 +100,7 @@ export class BatchApproveModalComponent implements OnInit {
 
     const dto: BatchApprovalDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
+//    dto.actionUserId = 'BINLI';
     if (this.requestOrPlan === 'REQUEST') {
       const approvedRequests = this.requestsForApproval.map( r => r.frqId);
       dto.approvedRequests = approvedRequests;
@@ -107,14 +112,17 @@ export class BatchApproveModalComponent implements OnInit {
       dto.approvedPlans = approvedPlans;
     }
     this.logger.debug('Modal submits batch approval dto ', dto);
-    this.modalRef.close('not submitted to backend for now');
 //    return;
     this.invokeRestApi(dto).subscribe(
       (result) => {
-        this.modalRef.close(dto);
+        this.batchApproveSuccess = true;
+        this.disableSubmit = true;
       },
-      (error) => {
-        this.logger.error('SubmitWorkflow service API failed with error ', error);
+      (errorResponse) => {
+        this.alert =  {type: 'danger',
+        message: 'Batch Approval Failed: ' +
+        ( errorResponse.error?.errorMessage ? errorResponse.error.errorMessage : errorResponse.message),
+        title: ''};
       }
     );
   }
