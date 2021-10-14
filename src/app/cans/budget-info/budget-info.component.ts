@@ -17,6 +17,7 @@ import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
 import { CanWarning } from 'src/app/funding-request/workflow/warning-modal/workflow-warning-modal.component';
 import { CanSearchModalComponent } from '../can-search-modal/can-search-modal.component';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-budget-info',
@@ -29,10 +30,12 @@ export class BudgetInfoComponent implements OnInit {
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
   @ViewChildren(CanSelectorComponent) canSelectors: QueryList<CanSelectorComponent>;
   @ViewChildren(ProjectedCanComponent) projectedCans: QueryList<ProjectedCanComponent>;
-//  @ViewChild('canForm', {static: false}) canForm: NgForm;
+  //@ViewChild('canForm', { static: false }) canForm: NgForm;
 
   @Input() readOnly = false;
   @Input() editing = false;
+  defaultCanTracker: Map<number, boolean> = new Map<number, boolean>();
+
 
   initialPay: boolean;
 
@@ -51,6 +54,20 @@ export class BudgetInfoComponent implements OnInit {
               private canService: CanManagementService,
               public model: RequestModel,
               private workflowModel: WorkflowModel) {
+  }
+
+  ngOnInit(): void {
+    this.initialPay = INITIAL_PAY_TYPES.includes(this.model.requestDto?.frtId);
+    this.requestNciFseIds = this.model.programRecommendedCostsModel.fundingSources.filter(
+      fs => fs.nciSourceFlag &&
+        this.model.programRecommendedCostsModel.selectedFundingSourceIds.has(fs.fundingSourceId)
+    ).map(fs => fs.fundingSourceId);
+    this.logger.debug('nci fsids ', this.requestNciFseIds);
+    this.canService.nonDefaultCanEventEmitter.subscribe(next => {
+      if (+next.applId === -1) {
+        this.defaultCanTracker.set(+next.fseId, next.nonDefault);
+      }
+    });
   }
 
   isFcArc(): boolean {
@@ -88,14 +105,6 @@ export class BudgetInfoComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.initialPay = INITIAL_PAY_TYPES.includes(this.model.requestDto?.frtId);
-    this.requestNciFseIds = this.model.programRecommendedCostsModel.fundingSources.filter(
-      fs => fs.nciSourceFlag &&
-        this.model.programRecommendedCostsModel.selectedFundingSourceIds.has(fs.fundingSourceId)
-    ).map(fs => fs.fundingSourceId);
-    this.logger.debug('nci fsids ', this.requestNciFseIds);
-  }
 
   copyProjectedCan(i: number): void {
     this.canSelectors.forEach((control, index) => {
@@ -106,20 +115,12 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   nonDefaultCan(i: number): boolean {
-    // TODO: this logic is wrong - we should be checking whether the CAN is one of the default CANs available.
-    // See the logic implemented for Plans.
-    if (!this.canSelectors || !this.projectedCans) {
+    if (!this.canSelectors) {
       return false;
     }
-    const selectedCan: CanCcxDto = this.canSelectors?.get(i)?.selectedCanData;
-    const projectedCan: CanCcxDto = this.projectedCans?.get(i)?.projectedCan;
-    if (!projectedCan || !projectedCan.can || !projectedCan.canDescrip) {
-      return false;
-    }
-    if (!selectedCan || !selectedCan.can || !selectedCan.canDescrip) {
-      return false;
-    }
-    return selectedCan.can !== projectedCan.can;
+    const fseId: number = this.canSelectors?.get(i)?.fseId;
+
+    return this.defaultCanTracker?.get(fseId) || false;
   }
 
   duplicateCan(i: number): boolean {
@@ -175,14 +176,14 @@ export class BudgetInfoComponent implements OnInit {
 
     let valid = true;
 
-    if (this.canSelectors) {
-      for (const canSelector of this.canSelectors) {
-//        this.logger.debug('canForm ', canSelector.canForm);
-        if (!canSelector.canForm.form.valid) {
-          valid = false;
-        }
-      }
-    }
+//     if (this.canSelectors) {
+//       for (const canSelector of this.canSelectors) {
+// //        this.logger.debug('canForm ', canSelector.canForm);
+//         if (!canSelector.canForm.form.valid) {
+//           valid = false;
+//         }
+//       }
+//     }
     return valid;
   }
 
