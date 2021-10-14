@@ -424,11 +424,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onOpenFundingRequest($event: any) {
+  onOpenFundingRequest($event: any): void {
     this.router.navigate(['request/retrieve', $event.frqId]);
   }
 
-  onOpenFundingPlan($event: any) {
+  onOpenFundingPlan($event: any): void {
     this.router.navigate(['plan/retrieve', $event.fprId]);
 
   }
@@ -438,15 +438,29 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   showBatchApproveModal(): void {
-    this.batchApproveModal.openModalForRequests([]).then(
-      (result) => {
-        this.logger.debug('Batch approve modal was submit and closed ', result);
-      }
-    )
-      .catch(
-        (reason) => {
-          this.logger.debug('user dismissed batch approve confirmation modal without proceed', reason);
+    if (this.fundingRequests && this.fundingRequests.length > 0) {
+      this.batchApproveModal.openModalForRequests([...this.selectedRows.values()]).then(
+        (result) => {
+          this.logger.debug('Batch approve modal was submit and closed ', result);
         }
-      );
+      )
+        .catch(
+          (reason) => {
+            this.logger.debug('user dismissed batch approve confirmation modal without proceed', reason);
+          }
+        );
+    }
+    else if (this.fundingPlans && this.fundingPlans.length > 0) {
+      this.batchApproveModal.openModalForPlans([...this.selectedRows.values()]).then(
+        (result) => {
+          this.logger.debug('Batch approve modal was submit and closed ', result);
+        }
+      )
+        .catch(
+          (reason) => {
+            this.logger.debug('user dismissed batch approve confirmation modal without proceed', reason);
+          }
+        );
+    }
   }
 }

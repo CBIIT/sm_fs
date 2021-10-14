@@ -43,11 +43,11 @@ export class BatchApproveService {
     return this.spl;
   }
 
-  canUserApproveRequest(frqId: number): boolean {
+  canApproveRequest(frqId: number): boolean {
     return this.frqIds.includes(frqId);
   }
 
-  canUserApprovePlan(fprId: number): boolean {
+  canApprovePlan(fprId: number): boolean {
     return this.fprIds.includes(fprId);
   }
 

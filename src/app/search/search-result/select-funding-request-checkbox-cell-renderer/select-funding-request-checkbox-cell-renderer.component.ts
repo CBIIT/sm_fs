@@ -1,6 +1,7 @@
 import {Component, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {Subject} from "rxjs";
 import {SelectGrantCheckboxEventType} from "../../../funding-plan/plan-step1/select-grant-checkbox-cell-renderer/select-grant-checkbox-event-type";
+import { BatchApproveService } from '../../batch-approve/batch-approve.service';
 
 @Component({
   selector: 'app-select-funding-request-checkbox-cell-renderer',
@@ -9,7 +10,7 @@ import {SelectGrantCheckboxEventType} from "../../../funding-plan/plan-step1/sel
 })
 export class SelectFundingRequestCheckboxCellRendererComponent implements OnInit, OnDestroy {
 
-  constructor() { }
+  constructor(private batchApproveService: BatchApproveService) { }
 
   @Input()
   data: any = {};
@@ -29,5 +30,16 @@ export class SelectFundingRequestCheckboxCellRendererComponent implements OnInit
 
   ngOnDestroy() {
     this.emitter.unsubscribe();
+  }
+
+  canBatchApprove(): boolean {
+    if (this.id === 'frqId') {
+      console.log('check batch approve frqId ', this.data.frqId);
+      return this.batchApproveService.canApproveRequest(this.data.frqId);
+    }
+    else {
+      console.log('check batch approve fprId ', this.data.fprId);
+      return this.batchApproveService.canApprovePlan(this.data.fprId);
+    }
   }
 }
