@@ -108,7 +108,7 @@ export class BatchApproveModalComponent implements OnInit {
     }
     this.logger.debug('Modal submits batch approval dto ', dto);
     this.modalRef.close('not submitted to backend for now');
-    return;
+//    return;
     this.invokeRestApi(dto).subscribe(
       (result) => {
         this.modalRef.close(dto);
