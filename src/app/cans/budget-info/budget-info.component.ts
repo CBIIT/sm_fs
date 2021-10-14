@@ -15,7 +15,6 @@ import { CanSelectorComponent } from '../can-selector/can-selector.component';
 import { ProjectedCanComponent } from '../projected-can/projected-can.component';
 import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
-import { NgForm } from '@angular/forms';
 import { CanWarning } from 'src/app/funding-request/workflow/warning-modal/workflow-warning-modal.component';
 
 @Component({
@@ -105,6 +104,8 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   nonDefaultCan(i: number): boolean {
+    // TODO: this logic is wrong - we should be checking whether the CAN is one of the default CANs available.
+    // See the logic implemented for Plans.
     if (!this.canSelectors || !this.projectedCans) {
       return false;
     }
