@@ -191,9 +191,6 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   searchForCANs(fseId: number, nciSourceFlag: string): void {
-    this.logger.debug(this.model.requestDto?.bmmCode);
-    this.logger.debug(this.model.requestDto?.activityCode);
-    // TODO: set up modal with proper data
     this.canSearchModalComponent.title = `Search for CANs`;
     this.canSearchModalComponent.nciSourceFlag = nciSourceFlag;
     this.canSearchModalComponent.bmmCodes = this.model.requestDto?.bmmCode;
@@ -204,7 +201,6 @@ export class BudgetInfoComponent implements OnInit {
         this.canService.selectCANEmitter.next({ fseId, can: result });
       }
     }).catch((reason) => {
-      this.logger.warn(reason);
     });
 
   }
