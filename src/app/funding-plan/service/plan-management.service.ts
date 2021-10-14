@@ -22,6 +22,7 @@ export class PlanManagementService {
   grantInfoCostEmitter = new Subject<{ index: number, applId?: number, dc: number, tc: number }>();
   fundingSourceSelectionEmitter = new Subject<{ index: number, source: number }>();
   nonDefaultCanEventEmitter = new Subject<{ fseId: number, applId: number, nonDefault: boolean }>();
+  planBudgetReadOnlyEmitter = new Subject<boolean>();
 
   private _listSelectedSources: FundingRequestFundsSrcDto[];
   private _selectedSources: Map<number, number> = new Map<number, number>();
