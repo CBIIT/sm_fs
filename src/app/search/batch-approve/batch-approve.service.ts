@@ -51,8 +51,12 @@ export class BatchApproveService {
     return this.fprIds.includes(fprId);
   }
 
-  canBatchApprove(): boolean {
-    return (this.isDoc || this.isSpl) && ( this.fprIds?.length > 0 || this.frqIds?.length > 0);
+  canBatchApproveRequest(): boolean {
+    return (this.isDoc || this.isSpl) && this.frqIds?.length > 0;
+  }
+
+  canBatchApprovePlan(): boolean {
+    return (this.isDoc || this.isSpl) && this.fprIds?.length > 0;
   }
 
 }

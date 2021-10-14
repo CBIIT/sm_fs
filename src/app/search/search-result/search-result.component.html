@@ -1,8 +1,11 @@
-  <app-batch-approve-modal *ngIf="canBatchApprove()">
+  <app-batch-approve-modal *ngIf="batchApproveVisible">
   </app-batch-approve-modal>
-  <div class="row" *ngIf="canBatchApprove()">
+  <div class="row" *ngIf="batchApproveVisible">
     <div class="col-12">
-      <button class="btn btn-primary" (click)="showBatchApproveModal()">Batch Approve</button>
+      <button class="btn btn-primary" (click)="showBatchApproveModal()" *ngIf="batchApproveEnabled">Batch Approve</button>
+      <span *ngIf="!batchApproveEnabled" ngbTooltip="Select one or more request(s) or plan(s) to perform batch approve">
+        <button class="btn btn-primary" disabled>Batch Approve</button>
+      </span>
     </div>
   </div>
   <div class="row">
