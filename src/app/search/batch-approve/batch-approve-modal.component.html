@@ -45,8 +45,9 @@
           </thead>
           <tbody>
             <tr *ngFor="let request of requestsForApproval">
-              <td>{{request.fullGrantNum}}</td>
-              <td>{{request.piFullName}}</td>
+              <td><app-full-grant-number-cell-renderer [data]="request" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl"></app-full-grant-number-cell-renderer>
+              </td>
+              <td><a href="mailto:{{request.piEmail}}?subject={{request.fullGrantNum}}-{request.lastName}">{{request.piFullName}}</a></td>
             </tr>
           </tbody>
         </table>
@@ -60,7 +61,7 @@
           <tbody>
             <tr *ngFor="let request of requestsForApproval">
               <td>{{request.fullGrantNum}}</td>
-              <td>{{request.piFullName}}</td>
+              <td><a href="mailto:{{request.piEmail}}?subject={{request.fullGrantNum}}-{request.lastName}">{{request.piFullName}}</a></td>
             </tr>
           </tbody>
         </table>
