@@ -88,6 +88,7 @@ export class PlanSupportingDocsReadonlyComponent implements OnInit {
   }
 
   downloadPackage() {
+    this.applIds = [];
     for (let i = 0; i < this.selectedGrants.length; i++) {
       this.applIds.push(this.selectedGrants[i].applId);
     }
@@ -125,6 +126,7 @@ export class PlanSupportingDocsReadonlyComponent implements OnInit {
   }
 
   downloadSummaryStatement() {
+    this.applIds = [];
     for (let i = 0; i < this.selectedGrants.length; i++) {
       this.applIds.push(this.selectedGrants[i].applId);
     }

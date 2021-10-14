@@ -164,6 +164,7 @@ export class PlanStep5Component implements OnInit {
   }
 
   downloadPackage() {
+    this.applIds = [];
     for (let i = 0; i < this.selectedGrants.length; i++) {
       this.applIds.push(this.selectedGrants[i].applId);
     }

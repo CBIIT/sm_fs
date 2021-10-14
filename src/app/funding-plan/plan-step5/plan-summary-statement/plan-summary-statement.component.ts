@@ -24,6 +24,7 @@ export class PlanSummaryStatementComponent implements OnInit {
   }
 
   downloadSummaryStatement() {
+    this.applIds = [];
     for (let i = 0; i < this.grantList.length; i++) {
       this.applIds.push(this.grantList[i].applId);
     }
