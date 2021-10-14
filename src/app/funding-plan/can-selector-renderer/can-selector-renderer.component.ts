@@ -42,7 +42,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
       this.readOnly = next;
     });
     this.fundingSources = this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.map(f => f.fundingSourceId);
-    this.planManagementService.nonDefaultCanEventEmitter.subscribe(next => {
+    this.canManagementService.nonDefaultCanEventEmitter.subscribe(next => {
       // this.logger.debug(next);
       const key = String(next.fseId) + '-' + String(next.applId);
       this.defaultCanTracker.set(key, next.nonDefault);
