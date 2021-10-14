@@ -8,6 +8,7 @@ import { saveAs } from 'file-saver';
 import { Step4Component } from '../step4/step4.component';
 import { Subscription } from 'rxjs';
 import { PlanModel } from 'src/app/model/plan/plan-model';
+import { FundingRequestIntegrationService } from '../integration/integration.service';
 
 @Component({
   selector: 'app-budget-docs-readonly',
@@ -31,11 +32,17 @@ export class BudgetDocsReadonlyComponent implements OnInit {
   constructor(private requestModel: RequestModel,
     private documentService: DocumentService,
     private logger: NGXLogger,
+    private requestIntegrationService: FundingRequestIntegrationService,
     private planModel: PlanModel) { }
 
   ngOnInit(): void {
     this.loadFiles();
+    this.requestSubmissionEventSubscriber = this.requestIntegrationService.requestSubmissionEmitter.subscribe(
+      () => { this.loadFiles(); }
+    );
   }
+
+
 
   loadFiles(): void {
 

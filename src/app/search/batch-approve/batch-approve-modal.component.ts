@@ -6,6 +6,7 @@ import { NgbCalendar, NgbDate, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bo
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { Alert } from 'src/app/alert-billboard/alert';
+import { AppPropertiesService } from 'src/app/service/app-properties.service';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { BatchApproveService } from './batch-approve.service';
 
@@ -25,7 +26,6 @@ export class BatchApproveModalComponent implements OnInit {
   splMeetingDate: string;
   maxDate: NgbDate = this.calendar.getToday();
 
-
   requestOrPlan: 'REQUEST'|'PLAN';
   mode: 'DOC'|'SPL';
   buttonText = '';
@@ -34,11 +34,14 @@ export class BatchApproveModalComponent implements OnInit {
 
   eligibleCount: number;
   totalCount: number;
+  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+  eGrantsUrl: string = this.propertiesService.getProperty('EGRANTS_URL');
 
   constructor(private modalService: NgbModal,
               private fsWorkflowService: FsWorkflowControllerService,
               private fsPlanWorkflowService: FsPlanWorkflowControllerService,
               private userSessionService: AppUserSessionService,
+              private propertiesService: AppPropertiesService,
               private batchApproveService: BatchApproveService,
               private calendar: NgbCalendar,
               private logger: NGXLogger) { }
