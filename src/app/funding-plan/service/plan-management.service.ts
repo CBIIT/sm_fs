@@ -337,6 +337,7 @@ export class PlanManagementService {
               this.grantCosts.push({
                 applId: grant.applId,
                 fseId: can.fseId,
+                octId: can.octId,
                 nciSourceFlag: can.nciSourceFlag,
                 fundingSourceName: can.fundingSourceName,
                 approvedDirect: can.approvedDc,
@@ -384,6 +385,7 @@ export class PlanManagementService {
 export interface GrantCostPayload {
   applId: number;
   fseId: number;
+  octId?: number;
   fundingSourceName: string;
   approvedDirect: number;
   approvedTotal: number;
