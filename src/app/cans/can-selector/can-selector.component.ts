@@ -46,7 +46,7 @@ export class CanSelectorComponent implements OnInit {
     }
     this.canService.getCanDetails(canNumber).subscribe(result => {
       this.selectedCanData = result;
-      this.logger.debug('new selected CAN', this.selectedCanData);
+      //this.logger.debug('new selected CAN', this.selectedCanData);
     });
   }
 
@@ -56,7 +56,7 @@ export class CanSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.debug('selected value', this.selectedValue);
+    //this.logger.debug('selected value', this.selectedValue);
     this.loadSelectedCanDetails(this.selectedValue);
     if (!this.bmmCodes) {
       this.bmmCodes = this.model.requestDto?.bmmCode;
@@ -96,10 +96,7 @@ export class CanSelectorComponent implements OnInit {
       result.forEach(r => {
         this.data.push({ id: r.can, text: r.can + ' | ' + r.canDescrip, additional: r });
       });
-      this.logger.debug('initializeDefaultCans() is complete', this.data);
-      this.logger.debug('can stuff -', this.selectedValue);
     });
-    this.logger.debug('initializeDefaultCans() returns');
   }
 
   selectProjectedCan(): boolean {
@@ -113,6 +110,7 @@ export class CanSelectorComponent implements OnInit {
         });
       }
       this.selectedValue = this.projectedCan.can;
+      this.loadSelectedCanDetails(this.selectedValue);
 
       return true;
     }
@@ -124,14 +122,14 @@ export class CanSelectorComponent implements OnInit {
       return;
     }
     if (this.projectedCan && this.selectedValue && this.projectedCan.can === this.selectedValue) {
-      this.logger.debug('updateProjectedCan', can, this.selectedValue);
+      // this.logger.debug('updateProjectedCan', can, this.selectedValue);
       this.selectedValue = null;
     }
     this.projectedCan = can;
   }
 
   onModelChange(): void {
-    this.logger.debug('onModelChange()', this.fseId, this.selectedValue);
+    // this.logger.debug('onModelChange()', this.fseId, this.selectedValue);
     this.canService.checkDefaultCANs(this.fseId, -1, this.activityCodes, this.bmmCodes, this.nciSourceFlag, this.selectedValue);
     if (this.selectedValue) {
       this.loadSelectedCanDetails(this.selectedValue);
