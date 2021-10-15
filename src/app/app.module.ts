@@ -148,6 +148,7 @@ import { SearchRfaPaDropdownComponent } from './search/search-filter/search-rfa-
 import { SearchFundingRequestDocComponent } from './search/search-filter/search-funding-request-doc/search-funding-request-doc.component';
 import { SearchFundingSourceComponent } from './search/search-filter/search-funding-source/search-funding-source.component';
 import { BatchApproveModalComponent } from './search/batch-approve/batch-approve-modal.component';
+import { OefiaTypeRendererComponent } from './funding-plan/oefia-type-renderer/oefia-type-renderer.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -303,7 +304,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SearchRfaPaDropdownComponent,
     SearchFundingRequestDocComponent,
     SearchFundingSourceComponent,
-    BatchApproveModalComponent
+    BatchApproveModalComponent,
+    OefiaTypeRendererComponent
   ],
 
 
