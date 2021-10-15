@@ -164,6 +164,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
 
       const sf: SearchCriteria = {}
       Object.assign(sf, form.form.value);
+      sf.searchType = this.searchType;
       sf.fundingRequestStatus = this._populateStatus(this.searchFilter.fundingRequestStatus);
       sf.fundingPlanStatus = this._populateStatus(this.searchFilter.fundingPlanStatus);
       this.logger.debug('search criteria:', sf);
