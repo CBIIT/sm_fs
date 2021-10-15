@@ -31,6 +31,7 @@
                    placeholder="mm/dd/yyyy"
                    ngbDatepicker #d="ngbDatepicker" 
                    [maxDate]="maxDate"
+                   required
                    (click)="d.toggle()">
             <div class="input-group-append">
               <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d.toggle()" type="button">
@@ -40,6 +41,9 @@
           </div>
           <div class="text-danger mt-1" *ngIf="(splmd.errors?.required)">
             SPL Committee Meeting Approval Date is required
+          </div>
+          <div class="text-danger mt-1" *ngIf="(splmd.errors?.ngbDate?.maxDate)">
+            SPL Committee Meeting Approval Date should be current or in the past 
           </div>
         </div>
       </div>
@@ -61,14 +65,31 @@
       <div class="col-12" *ngIf="requestOrPlan === 'PLAN'">
         <table class="table table-striped table-bordered" id="batch-approve-plan-table">
           <thead>
-            <th>Grant Number</th>
-            <th>PI</th>
+            <th>FOA</th>
+            <th>Title</th>
+            <th>NCAB(s)</th>
+            <th>Issue Type</th>
+            <th>Plan ID</th>
+            <th>Plan Name</th>
           </thead>
           <tbody>
-            <tr *ngFor="let request of requestsForApproval">
-              <td>{{request.fullGrantNum}}</td>
-              <td><a href="mailto:{{request.piEmail}}?subject={{request.fullGrantNum}}-{request.lastName}">{{request.piFullName}}</a></td>
-            </tr>
+            <ng-container *ngFor="let data of plansForApproval">
+              <tr *ngFor="let foas of data.fpFoasList; index as i; first as isFirst; count as rowspan">
+                <td style="width: 24%">
+                  <a href="{{foas.nihGuideAddr}}" target="_blank">{{foas.rfaPaNumber}}</a>
+                </td>
+                <td style="width: 40%">{{foas.title}}</td>
+                <td style="width: 20%">
+                  {{foas.councilMeetingDateList | formatNcabDate }}</td>
+                <td style="width: 16%">{{foas.issueType}}</td>
+                <td *ngIf="isFirst" [attr.rowspan]="rowspan">
+                  {{data.fprId}}
+                </td>
+                <td *ngIf="isFirst" [attr.rowspan]="rowspan">
+                  {{data.planName}}
+                </td>
+              </tr>
+            </ng-container>
           </tbody>
         </table>
       </div>
