@@ -9,7 +9,6 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./oefia-type-renderer.component.css']
 })
 export class OefiaTypeRendererComponent implements OnInit {
-  grantCosts: GrantCostPayload[];
   @Input() grant: NciPfrGrantQueryDtoEx;
 
 
@@ -19,11 +18,10 @@ export class OefiaTypeRendererComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.grantCosts = this.planManagementService.grantCosts.filter(g => +g.applId === +this.grant.applId);
-    if (this.grantCosts?.length === 0) {
-      this.logger.error('No grant costs found for applId', this.grant.applId);
-      this.logger.error('All grant costs available:', this.planManagementService.grantCosts);
-    }
+  }
+
+  get grantCosts(): GrantCostPayload[] {
+    return this.planManagementService.grantCosts.filter(g => g.applId === this.grant.applId);
   }
 
 }
