@@ -104,11 +104,27 @@ export class CanManagementService {
     });
   }
 
-  getCans(nciSourceFlag: string): Observable<CanCcxDto[]> {
+  getDefaultCans(nciSourceFlag: string): Observable<CanCcxDto[]> {
     return this.canService.getDefaultCansUsingGET(
       this.requestModel.requestDto.activityCode,
       this.requestModel.requestDto.bmmCode,
       null,
+      nciSourceFlag);
+  }
+
+  getDefaultCansWithExtra(nciSourceFlag: string, extra: string): Observable<CanCcxDto[]> {
+    if(!extra) {
+      return this.canService.getDefaultCansUsingGET(
+        this.requestModel.requestDto.activityCode,
+        this.requestModel.requestDto.bmmCode,
+        null,
+        nciSourceFlag);
+    }
+    return this.canService.getDefaultCansWithExtraUsingGET(
+      this.requestModel.requestDto.activityCode,
+      this.requestModel.requestDto.bmmCode,
+      null,
+      extra,
       nciSourceFlag);
   }
 
