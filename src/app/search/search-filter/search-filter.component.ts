@@ -9,6 +9,7 @@ import {Select2OptionData} from "ng-select2";
 import {Options} from "select2";
 import {SearchModel} from "../model/search-model";
 import {getCurrentFiscalYear} from "../../utils/utils";
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-search-filter',
@@ -19,7 +20,17 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
   @ViewChild('searchForm') searchForm: NgForm;
 
-  @Input() action: string;
+  private _action: string;
+  @Input() set action(value: string) {
+    console.log('search-filter::set action()', value);
+    this._action = value;
+    if (value === 'immediate') {
+      setTimeout(() => this.search(this.searchForm), 0);
+    }
+  }
+  get action(): string {
+    return this._action;
+  }
 
   @Output() callSearch = new EventEmitter<SearchCriteria>();
   @Output() searchTypeEm = new EventEmitter<string>()
@@ -70,13 +81,26 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   constructor(private userSessionService: AppUserSessionService,
               // private boardsControllerService: BoardsControllerService,
               // private paylistUtilControllerService: PaylistUtilControllerService,
+              private route: ActivatedRoute,
               private searchModel: SearchModel,
               private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
-    this.searchType = this.searchModel.searchType;
+    console.log('search-filter last path, action: ', this.route.snapshot.url, this.action);
     this.searchFilter = this.searchModel.searchCriteria;
+    switch(this.route.snapshot.url[this.route.snapshot.url.length - 1].path) {
+      case 'fr':
+        this.searchType = 'FR';
+        break;
+      case 'fp':
+        this.searchType = 'FP';
+        break;
+      case 'grants':
+        this.searchType = 'G';
+        break;
+    }
+    this.searchFilter.searchType = this.searchType;
     // YP - disable sarch for paylist until paylist is fully merged with fs
     this.canSearchForPaylists = false;
     // this.canSearchForPaylists = this.userSessionService.hasRole('GMBRCHF') ||
@@ -119,9 +143,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       }
       this.searchForm.form.patchValue(this.searchFilter);
       // next tick
-      if (this.action === 'immediate') {
-        setTimeout(() => this.search(this.searchForm), 0);
-      }
+      console.log('search-filter - ngAfterViewInit() next tick: action', this.action);
     }, 0);
   }
 

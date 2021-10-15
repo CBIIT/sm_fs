@@ -1,20 +1,21 @@
 <nav id="side-nav" aria-label="application navigation">
     <ul class="list-group">
-        <li class="list-group-item"><a routerLink="/search" class="menu-item" routerLinkActive="active"><b>Search</b></a></li>
+        <li class="list-group-item">
+          <a class="parent" data-toggle="collapse" href="#nav-collapse-search" role="button" aria-expanded="true" aria-controls="nav-collapse-search"><b>Search</b></a>
+          <ul class="collapse show" id="nav-collapse-search">
+            <li class="list-group-item"><a [routerLink]="['/search/fr']" routerLinkActive="active">Funding Requests</a></li>
+            <li class="list-group-item"><a [routerLink]="['/search/fp']" routerLinkActive="active">Funding Plans</a></li>
+            <li class="list-group-item" *ngIf="oefiaCertifier || splCertifier || paylistReadOnlyRole || ogaCertifier"><a href="{{paylistDashboardUrl}}">Paylists</a></li>
+            <li class="list-group-item"><a [routerLink]="['/search/grants']" routerLinkActive="active">Grants</a></li>
+          </ul>
+        </li>
         <li class="list-group-item"  *ngIf="oefiaCertifier || splCertifier || paylistReadOnlyRole || ogaCertifier" >
             <a href="#paylist" class="parent" data-toggle="collapse" href="#nav-collapse-paylist" role="button" aria-expanded="true" aria-controls="nav-collapse-paylist"><b>Paylists</b></a>
             <ul class="collapse show" *ngIf="ogaCertifier" id="nav-collapse-paylist">
                 <li class="list-group-item"><a href="{{paylistDashboardUrl}}">Dashboard</a></li>
                 <li class="list-group-item" *ngIf="ogaCertifier"><a href="{{paylistPendingGrantsUrl}}">Pending Grants<span class="badge badge-danger ml-1">{{pendingGrantsCount}}</span></a></li>
-            </ul>
-            <ul class="collapse show" id="nav-collapse-paylist"  *ngIf="oefiaCertifier || splCertifier">
-                <li class="list-group-item"><a href="{{paylistDashboardUrl}}">View/Certify Paylines</a></li>
-            </ul>
-                <ul class="collapse show"  *ngIf="paylistReadOnlyRole && !(oefiaCertifier || splCertifier)" id="nav-collapse-paylist">
-                <li class="list-group-item"><a href="{{paylistDashboardUrl}}">View Paylines</a></li>
-            </ul>
-            <ul class="collapse show"  id="nav-collapse-paylist">
-                <li class="list-group-item"><a href="{{paylistSearchUrl}}">Find Paylists</a></li>
+                <li class="list-group-item" *ngIf="oefiaCertifier || splCertifier"><a href="{{paylistDashboardUrl}}">View/Certify Paylines</a></li>
+                <li class="list-group-item" *ngIf="paylistReadOnlyRole && !(oefiaCertifier || splCertifier)"><a href="{{paylistDashboardUrl}}">View Paylines</a></li>
             </ul>
         </li>
 
