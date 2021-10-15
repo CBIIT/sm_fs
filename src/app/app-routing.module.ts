@@ -26,7 +26,10 @@ import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate
 const routes: Routes = [
   {
     path: '', canActivate: [AuthGuard], children: [
-      { path: '', redirectTo: '/search', pathMatch: 'full' },
+      { path: '', redirectTo: '/search/fr', pathMatch: 'full' },
+      { path: 'search/fr', component: SearchComponent, canActivate: [AuthGuard] },
+      { path: 'search/fp', component: SearchComponent, canActivate: [AuthGuard] },
+      { path: 'search/grants', component: SearchComponent, canActivate: [AuthGuard] },
       { path: 'search/:action', component: SearchComponent, canActivate: [AuthGuard] },
       { path: 'search', component: SearchComponent, canActivate: [AuthGuard] },
       { path: 'plan', component: FundingPlanComponent, children: [

@@ -22,7 +22,7 @@ export class FsMenuComponent implements OnInit {
   pd: boolean;
   pa: boolean;
   paylistReadOnlyRole: boolean =false;
-  paylistUrl: string; 
+  paylistUrl: string;
   pendingGrantsCount;
 
   constructor(
@@ -31,8 +31,9 @@ export class FsMenuComponent implements OnInit {
               private paylistControllerService: PaylistControllerService,
               private logger: NGXLogger) { }
 
-  ngOnInit(): void {  
-    this.paylistUrl = this.gwbLinksService.getProperty('Paylist');
+  ngOnInit(): void {
+    // this.paylistUrl = this.gwbLinksService.getProperty('Paylist');
+    this.paylistUrl = "/paylist/";
     this.paylistDashboardUrl = this.paylistUrl+ '#side-nav-paylists';
     this.paylistPendingGrantsUrl = this.paylistUrl + '#side-nav-grants';
     this.paylistSearchUrl =this.paylistUrl + '#side-nav-find-paylists';
@@ -43,7 +44,7 @@ export class FsMenuComponent implements OnInit {
     this.paylistReadOnlyRole = this.userSessionService.hasRole('PAYLSTVW');
     this.pd = this.userSessionService.isPD();
     this.pa = this.userSessionService.isPA();
-        
+
     this.paylistControllerService.getPaylistPendingGrantsCountUsingGET().subscribe(
       (result) => {
         this.pendingGrantsCount = result;
@@ -53,7 +54,7 @@ export class FsMenuComponent implements OnInit {
         this.logger.error('retrieveFundingRequest failed ', error);
       }
     );
-    
+
   }
 
 }

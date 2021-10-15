@@ -8,31 +8,11 @@
 </div>
 <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
   <div class="row form-group">
-    <div class="col-3 col-md-3">
-      <label for="searchType">Search for</label>
-      <div class="btn-group btn-group-toggle"
-           ngbRadioGroup name="searchType"
-           [(ngModel)]="searchType"
-           id="searchType"
-           style="display: inline;"
-      >
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="FR">Requests
-        </label>
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="FP">Plans
-        </label>
-        <label *ngIf="canSearchForPaylists" ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="PL">Paylists
-        </label>
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="G">Grants
-        </label>
-      </div>
-    </div>
 
     <div class="col-6 col-md-6" [hidden]="!searchType">
-      <lib-grantnumber-search-criteria [form]="searchForm"></lib-grantnumber-search-criteria>
+      <div class="ml-3"> <!-- temporary - need to remove style margin-left: -1rem from the component below -->
+        <lib-grantnumber-search-criteria [form]="searchForm"></lib-grantnumber-search-criteria>
+      </div>
     </div>
     <div class="col-3 col-md-3 ml-auto" [hidden]="!(searchType === 'FR' || searchType === 'FP' || searchType === 'G')">
       <lib-fy-range [minYear]="2001" [maxYear]="2025" [form]="searchForm"></lib-fy-range>
