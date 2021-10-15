@@ -5,7 +5,7 @@ import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { Select2OptionData } from 'ng-select2';
 import { RequestModel } from '../../model/request/request-model';
 import { NgForm } from '@angular/forms';
-import { convertToFundingRequestCan } from '../can-utils';
+import { convertToCanCcx, convertToFundingRequestCan } from '../can-utils';
 
 @Component({
   selector: 'app-can-selector',
@@ -19,7 +19,7 @@ export class CanSelectorComponent implements OnInit {
   @Input() bmmCodes: string;
   @Input() activityCodes: string;
   private _selectedValue: string;
-  private _selectedCanData: CanCcxDto;
+  public selectedCanData: CanCcxDto;
   defaultCans: CanCcxDto[];
   projectedCan: CanCcxDto;
   data: Array<Select2OptionData>;
@@ -40,21 +40,18 @@ export class CanSelectorComponent implements OnInit {
 
   @Output() selectedValueChange = new EventEmitter<string>();
 
-  get selectedCanData(): CanCcxDto {
-    return this._selectedCanData;
-  }
-
   set selectedValue(value: string) {
     this._selectedValue = value;
+    this.selectedValueChange.emit(value);
+
     if (value) {
       this.canService.getCanDetails(value).subscribe(result => {
-        this._selectedCanData = result;
+        this.selectedCanData = result;
         // this.logger.debug('new selected CAN', this._selectedCanData);
       });
     } else {
-      this._selectedCanData = null;
+      this.selectedCanData = null;
     }
-    this.selectedValueChange.emit(value);
   }
 
   constructor(private canService: CanManagementService,
@@ -90,12 +87,12 @@ export class CanSelectorComponent implements OnInit {
     });
 
     if (this.initialCAN?.can) {
-      this.handleNewCAN(convertToFundingRequestCan(this.initialCAN));
+      this.handleNewCAN(convertToCanCcx(this.initialCAN));
     }
   }
 
   private handleNewCAN(can: CanCcxDto): void {
-    this._selectedCanData = can;
+    this.selectedCanData = can;
     const tmp = this.data?.filter(e => e.id === can.can);
     if (!tmp || tmp.length === 0) {
       this.initialCAN = convertToFundingRequestCan(can);
