@@ -338,6 +338,7 @@ export class PlanManagementService {
                 applId: grant.applId,
                 fseId: can.fseId,
                 octId: can.octId,
+                oefiaTypeId: can.oefiaTypeId,
                 nciSourceFlag: can.nciSourceFlag,
                 fundingSourceName: can.fundingSourceName,
                 approvedDirect: can.approvedDc,
@@ -386,6 +387,7 @@ export interface GrantCostPayload {
   applId: number;
   fseId: number;
   octId?: number;
+  oefiaTypeId?: number;
   fundingSourceName: string;
   approvedDirect: number;
   approvedTotal: number;

@@ -1,7 +1,6 @@
 <span *ngFor="let g of grantCosts; let first = first; let i = index;">
   <hr *ngIf="!first">
   <div>
-    <app-fp-projected-can [index]="i" [fseId]="g.fseId" [frtId]="g.frtId" [applId]="g.applId"></app-fp-projected-can>
     <app-oefia-types [index]="i" [octId]="g.octId" [selectedValue]="g.octId" [readonly]="true"></app-oefia-types>
   </div>
 </span>

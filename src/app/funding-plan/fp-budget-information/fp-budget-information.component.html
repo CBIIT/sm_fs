@@ -67,7 +67,7 @@
         <th scope="col">Funding Source</th>
         <th scope="col">Approved Direct Cost</th>
         <th scope="col">Approved Total Cost</th>
-        <th scope="col" *ngIf="readOnly">OEFIA Coding</th>
+        <th scope="col" *ngIf="true">OEFIA Coding</th>
         <th scope="col" *ngIf="(isFcArc() && canEnterAtLeastOneCAN()) || isFcNci() || isApprovedFinancials()">NCI OEFIA Projected CAN</th>
         <th scope="col" *ngIf="(isFcArc() && canEnterAtLeastOneCAN()) || isFcNci() || isApprovedFinancials()">Funds Approver Provided CAN Information</th>
       </tr>
@@ -90,7 +90,7 @@
         <td>
           <app-grant-cost-renderer mode="approvedTotal" [grant]="grant"></app-grant-cost-renderer>
         </td>
-        <td *ngIf="readOnly"><app-oefia-type-renderer></app-oefia-type-renderer></td>
+        <td *ngIf="true"><app-oefia-type-renderer [grant]="grant"></app-oefia-type-renderer></td>
         <td *ngIf="(isFcArc() && canEnterAtLeastOneCAN()) || isFcNci() || isApprovedFinancials()">
           <app-projected-can-renderer
             [projectedCans]="projectedCans"
