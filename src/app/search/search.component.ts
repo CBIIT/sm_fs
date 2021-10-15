@@ -6,7 +6,7 @@ import { NGXLogger } from 'ngx-logger';
 import { GwbLinksService } from '@nci-cbiit/i2ecui-lib';
 import { getCurrentFiscalYear } from 'src/app/utils/utils';
 import {AppUserSessionService} from "../service/app-user-session.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {SearchModel} from "./model/search-model";
 import { BatchApproveService } from './batch-approve/batch-approve.service';
 
@@ -43,13 +43,17 @@ export class SearchComponent implements OnInit, AfterViewInit {
    action: string;
 
   constructor(private logger: NGXLogger,
+              private router: Router,
               private route: ActivatedRoute,
               private searchModel: SearchModel,
               private userSessionService: AppUserSessionService,
               private fsSearchController: FsSearchControllerService,
               private batchApproveService: BatchApproveService,
               private gwbLinksService: GwbLinksService
-            ) { }
+            ) {
+    this.router.routeReuseStrategy.shouldReuseRoute = (() => false);
+    console.log('state in constructor:', this.router.getCurrentNavigation().extras.state);
+  }
 
   ngOnInit(): void {
 
@@ -69,26 +73,46 @@ export class SearchComponent implements OnInit, AfterViewInit {
       });
     this.batchApproveService.initialize();
     let action = this.route.snapshot.params.action;
-    if (action) {
-      setTimeout(() => {
-        if (action === 'immediate') {
-          // this is a return link from the FR or FP view
-          // check the searchType from the search model
-          // and replace 'immediate' with one of the saved dashboard action type
-          if (this.searchModel.searchType &&
-               this.searchModel.searchType != 'FR' &&
-               this.searchModel.searchType != 'FP' &&
-               this.searchModel.searchType != 'PL' &&
-               this.searchModel.searchType != 'R') {
-            action = this.searchModel.searchType; // replace action 'immediate' with one of the dashboard types
-          }
-        }
+    console.log('ngOnInit() - route action, searchType, state.action:', action, this.searchModel.searchType, history.state);
+    if (action && action === 'immediate') {
+      // this is a return link from the FR or FP view
+      // check the searchType from the search model
+      // and replace 'immediate' with one of the saved dashboard action type
+      if (this.searchModel.searchType) {
+        switch(this.searchModel.searchType) {
+          case 'FR':
+          case 'awaitfr':
+          case 'myfr':
+          case 'mycafr':
+          case 'myportfoliofr':
+          case 'myreviewfr':
+            this.router.navigateByUrl('/search/fr', { state: { action: this.searchModel.searchType}});
+            break;
+          case 'FP':
+          case 'awaitfp':
+          case 'myfp':
+          case 'myreviewfp':
+            this.router.navigateByUrl('/search/fp', { state: { action: this.searchModel.searchType}});
+            break;
+          case 'G':
+            this.router.navigateByUrl('/search/grants', { state: { action: this.searchModel.searchType}});
+            break;
 
-        switch (action) {
-          case 'immediate':
-            // this is a return link from the FR or FP view
-            // check the searchType from the return code
-            this.action = action;
+        }
+      }
+    }
+  }
+
+  ngAfterViewInit() {
+    console.log('ngAfterViewInit(): state.action:', history.state);
+
+    if (history.state?.action) {
+      setTimeout(() => {
+        switch(history.state.action) {
+          case 'FR':
+          case 'FP':
+          case 'G':
+            this.action = 'immediate'
             break;
           case 'awaitfr':
             this.onAwaitingRequests();
@@ -117,9 +141,6 @@ export class SearchComponent implements OnInit, AfterViewInit {
         }
       }, 0);
     }
-  }
-
-  ngAfterViewInit() {
   }
 
   doSearch(sc: SearchCriteria) {

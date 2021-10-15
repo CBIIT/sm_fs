@@ -2,10 +2,11 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ApprovedPlan, BatchApprovalDto, FsPlanWorkflowControllerService,
   FsWorkflowControllerService, FundingPlanQueryDto, FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
-import { NgbCalendar, NgbDate, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { Alert } from 'src/app/alert-billboard/alert';
+import { DatepickerFormatter } from 'src/app/datepicker/datepicker-adapter-formatter';
 import { AppPropertiesService } from 'src/app/service/app-properties.service';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { BatchApproveService } from './batch-approve.service';
@@ -14,7 +15,10 @@ import { BatchApproveService } from './batch-approve.service';
 @Component({
   selector: 'app-batch-approve-modal',
   templateUrl: './batch-approve-modal.component.html',
-  styleUrls: ['./batch-approve-modal.component.css']
+  styleUrls: ['./batch-approve-modal.component.css'],
+  providers: [
+    { provide: NgbDateParserFormatter, useClass: DatepickerFormatter }
+  ]
 })
 
 export class BatchApproveModalComponent implements OnInit {
@@ -23,7 +27,7 @@ export class BatchApproveModalComponent implements OnInit {
 
   requestsForApproval: FundingRequestQueryDto[];
   plansForApproval: FundingPlanQueryDto[];
-  splMeetingDate: string;
+  splMeetingDate: NgbDateStruct;
   maxDate: NgbDate = this.calendar.getToday();
 
   requestOrPlan: 'REQUEST'|'PLAN';
@@ -72,12 +76,13 @@ export class BatchApproveModalComponent implements OnInit {
     this.batchApproveSuccess = false;
     this.plansForApproval = plans;
     this.requestOrPlan = 'PLAN';
-    this.mode = this.batchApproveService.isDoc ? 'DOC' : 'SPL';
+    this.mode = this.batchApproveService.isDoc() ? 'DOC' : 'SPL';
     this.title = 'Plan(s) Selected for Batch Approval';
-    this.buttonText = 'Conform Approve';
+    this.buttonText = 'Confirm Approve';
     this.eligibleCount = this.totalCount = plans.length;
+    this.logger.debug('batchApproveModal ', this);
     return new Promise<void>( (finalize) => {
-      this.modalRef = this.modalService.open(this.modalContent);
+      this.modalRef = this.modalService.open(this.modalContent, { size: 'lg' });
       this.modalRef.result.finally(finalize);
     });
   }
@@ -106,22 +111,26 @@ export class BatchApproveModalComponent implements OnInit {
       dto.approvedRequests = approvedRequests;
     }
     else {
+      const splMeetingDate2 = (!this.splMeetingDate) ? null : (
+      String(this.splMeetingDate.month).padStart(2, '0') + '/' +
+      String(this.splMeetingDate.day).padStart(2, '0') + '/' +
+      String(this.splMeetingDate.year).padStart(4, '0') ) ;
       const approvedPlans: ApprovedPlan[] = this.plansForApproval.map( r => {
-        return {fprId: r.fprId, splMeetingDate: this.splMeetingDate};
+        return {fprId: r.fprId, splMeetingDate: splMeetingDate2};
       });
       dto.approvedPlans = approvedPlans;
     }
     this.logger.debug('Modal submits batch approval dto ', dto);
 //    return;
     this.invokeRestApi(dto).subscribe(
-      (result) => {
+      () => {
         this.batchApproveSuccess = true;
         this.disableSubmit = true;
       },
       (errorResponse) => {
+        const errorMessage = errorResponse.error?.errorMessage ? errorResponse.error.errorMessage : errorResponse.message;
         this.alert =  {type: 'danger',
-        message: 'Batch Approval Failed: ' +
-        ( errorResponse.error?.errorMessage ? errorResponse.error.errorMessage : errorResponse.message),
+        message: 'Batch Approval Failed: ' + errorMessage,
         title: ''};
       }
     );
