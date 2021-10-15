@@ -185,4 +185,15 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   canDeleteCAN(fundingSourceId: number): boolean {
     return this.canEnter(fundingSourceId) && !this.readOnly;
   }
+
+  showOefiaCoding(): boolean {
+    if (this.readOnly) {
+      return true;
+    }
+    if (this.isApprovedFinancials() /* && !((this.isFcArc() && this.canEnterAtLeastOneCAN()) || this.isFcNci()) */) {
+      return true;
+    }
+
+    return false;
+  }
 }
