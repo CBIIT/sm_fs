@@ -17,7 +17,6 @@ export class OefiaTypesComponent implements OnInit, AfterViewInit {
   selectedOefiaType: { id: string; text: string };
   private _selectedValue: number;
   @Input() readonly = false;
-  @Input() octId = null;
 
   @Input()
   get selectedValue(): number {
