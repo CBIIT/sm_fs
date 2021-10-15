@@ -91,20 +91,8 @@ export class BatchApproveModalComponent implements OnInit {
     this.modalRef.close();
   }
 
-  validateSplDate(wfcForm: NgForm): boolean {
-    let valid = true;
-    if (this.requestOrPlan === 'PLAN' && this.mode === 'SPL') {
-      const today: NgbDate = this.calendar.getToday();
-      if (today.before(this.splMeetingDate)) {
-        wfcForm.form.controls.splMeetingDate.errors.future_date = true;
-        valid = false;
-      }
-    }
-    return valid;
-  }
-
   onSubmit(wfcForm: NgForm): void {
-    if (!wfcForm.valid || !this.validateSplDate(wfcForm)) {
+    if (!wfcForm.valid) {
       this.alert = {type: 'danger',
       message: 'Please correct the error identified below.',
       title: ''};
