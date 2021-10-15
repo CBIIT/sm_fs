@@ -86,11 +86,6 @@ export class BudgetInfoComponent implements OnInit {
     return this.workflowModel.approvedByFC;
   }
 
-  // TODO: evaluate for deletion
-  get defaultCans(): CanCcxDto[] {
-    return this.canService.defaultCans;
-  }
-
   refreshRequestCans(): void {
     this.model.requestCans.forEach((c, index) => {
       const selected: CanCcxDto = this.canSelectors?.get(index)?.selectedCanData;
@@ -100,7 +95,9 @@ export class BudgetInfoComponent implements OnInit {
       }
       const oefiaType = this.oefiaTypes?.get(index)?.selectedValue;
       c.octId = c.oefiaTypeId = !isNaN(oefiaType) ? (Number(oefiaType) !== 0 ? Number(oefiaType) : null) : null;
-      c.oefiaCreateCode = this.model.requestDto.oefiaCreateCode;
+      if (this.isFcNci()) {
+        c.oefiaCreateCode = this.model.requestDto.oefiaCreateCode;
+      }
       this.logger.debug('prepared CAN:', c);
     });
   }
