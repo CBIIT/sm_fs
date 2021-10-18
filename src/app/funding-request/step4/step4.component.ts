@@ -5,7 +5,7 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 import {
   FsRequestControllerService, FundingReqStatusHistoryDto,
   NciPfrGrantQueryDto, DocumentsDto,
-  FundingReqApproversDto, FsWorkflowControllerService, WorkflowTaskDto
+  FundingReqApproversDto, FsWorkflowControllerService, WorkflowTaskDto, FundingPlanDto
 } from '@nci-cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
@@ -17,6 +17,7 @@ import { WorkflowComponent } from '../workflow/workflow.component';
 import { UploadBudgetDocumentsComponent } from '../../upload-budget-documents/upload-budget-documents.component';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
+import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
 
 @Component({
   selector: 'app-step4',
@@ -62,6 +63,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   _workFlowAction = '';
 
   userCanSubmitApprove = false;
+  inflightPlan: FundingPlanDto;
 
   // get budgetDocDtos(): DocumentsDto[] {
   //   return this.requestModel.requestDto.budgetDocs;
@@ -101,6 +103,11 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     if (this.uploadBudgetDocumentsComponent && this.workflowComponent) {
       this.workflowComponent.uploadBudgetDocumentsComponent = this.uploadBudgetDocumentsComponent;
     }
+
+    if (this.requestModel.pendingAlerts.length > 0 || this.inflightPlan) {
+      const el = document.getElementById('funding-request-page-top');
+      el.scrollIntoView();
+  }
   }
 
   ngOnDestroy(): void {
@@ -124,6 +131,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     this.checkUserRolesCas();
     this.checkDocs();
     this.isDocsStepCompleted();
+    this.checkInflightFundingPlan();
     this.logger.debug('step4 requestModel ', this.requestModel);
     // this.isDisplayBudgetDocsUpload();
 
@@ -169,6 +177,15 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
       this.navigationModel.showSteps = true;
     }
     this.changeDetection.detectChanges();
+  }
+
+  checkInflightFundingPlan(): void {
+    if (INITIAL_PAY_TYPES.includes(this.requestModel.requestDto.financialInfoDto.requestTypeId)) {
+      this.fsRequestService.checkIsFundedByFundingPlanUsingGET(this.requestModel.grant.applId).subscribe(result => {
+          this.inflightPlan = result;
+          this.logger.debug('checkIsFundedByPlan ', result);
+      });
+    }
   }
 
   checkUserRolesCas(): void {
@@ -373,90 +390,6 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     return this.workflowModel.isFinancialApprover &&
            ApprovingStatuses.includes(this.requestStatus);
   }
-
-  // isDisplayBudgetDocsUpload(): void {
-  //   this.fsWorkflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
-  //     result => {
-  //       if (result) {
-  //         if (!this.isTerminalStatus() && this.requestModel.requestDto.requestStatusCode !== 'ON HOLD') {
-  //           for (const approver in result) {
-  //             if (this.isCurrentApprover(result[approver]) || this.workflowModel.approvedByFC) {
-  //               if (result[approver].roleCode === 'FCARC' ||
-  //                 result[approver].roleCode === 'FCNCI') {
-  //                 this.isDisplayBudgetDocsUploadVar = true;
-  //                 break;
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }, error => {
-  //       this.logger.error('HttpClient get request error for----- ' + error.message);
-  //     });
-  // }
-
-  // isTerminalStatus(): boolean {
-  //   return (this.terminalStatus.indexOf(this.requestModel.requestDto.requestStatusCode) > -1);
-  // }
-
-  // isCurrentApprover(approver: FundingReqApproversDto): boolean {
-  //   const loggedOnUser: NciPerson = this.userSessionService.getLoggedOnUser();
-  //   const userId = loggedOnUser.nihNetworkId;
-  //   if (approver.activeFlag === 'Y') {
-  //     if (approver.approverLdap.toLowerCase() === userId.toLowerCase() ||
-  //       this.isCurrentUserDesignee(approver.designees) ||
-  //       this.isUserPfrGmCommonApprover(approver, loggedOnUser)) {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
-
-  // isCurrentUserDesignee(designees: Array<FundingRequestPermDelDto>): boolean {
-  //   if (designees) {
-  //     const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-  //     for (const designee in designees) {
-  //       if (designees[designee].delegateTo.toLowerCase() === userId.toLowerCase()) {
-  //         return true;
-  //       }
-  //     }
-  //   }
-  //   return false;
-  // }
-
-  // isUserOEFIAFinacialAnalyst(approver: FundingReqApproversDto, loggedOnUser: NciPerson): boolean {
-  //   if (approver.roleCode === 'FCNCI' && this.hasOEFIARole(loggedOnUser)) {
-  //     return true;
-  //   }
-  //   return false;
-  // }
-
-  // hasOEFIARole(loggedOnUser: NciPerson): boolean {
-  //   const rolesList: I2ERoles[] = loggedOnUser.roles;
-  //   for (const role in rolesList) {
-  //     if (rolesList[role].roleCode === 'FA' && rolesList[role].orgAbbrev === 'OEFIA') {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
-
-  // isUserPfrGmCommonApprover(approver: FundingReqApproversDto, loggedOnUser: NciPerson): boolean {
-  //   if (approver.roleCode === 'GM' && this.hasPFRGMAPRRole(loggedOnUser)) {
-  //     return true;
-  //   }
-  //   return false;
-  // }
-
-  // hasPFRGMAPRRole(loggedOnUser: NciPerson): boolean {
-  //   const rolesList: I2ERoles[] = loggedOnUser.roles;
-  //   for (const role in rolesList) {
-  //     if (rolesList[role].roleCode === 'PFRGMAPR') {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
 
   get self(): Step4Component {
     return this;
