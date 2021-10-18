@@ -22,7 +22,7 @@ import { convertToCanCcx, convertToFundingRequestCan } from '../can-utils';
   styleUrls: ['./can-selector.component.css']
 })
 export class CanSelectorComponent implements OnInit {
-  @ViewChild('canForm', { static: true }) canForm: NgForm;
+  @ViewChild('canForm', { static: false }) canForm: NgForm;
   @Input() applId: number;
   @Input() fseId: number;
   @Input() bmmCodes: string;
@@ -46,7 +46,7 @@ export class CanSelectorComponent implements OnInit {
     }
     this.canService.getCanDetails(canNumber).subscribe(result => {
       this.selectedCanData = result;
-      //this.logger.debug('new selected CAN', this.selectedCanData);
+      // this.logger.debug('new selected CAN', this.selectedCanData);
     });
   }
 
@@ -56,7 +56,7 @@ export class CanSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //this.logger.debug('selected value', this.selectedValue);
+    // this.logger.debug('selected value', this.selectedValue);
     this.loadSelectedCanDetails(this.selectedValue);
     if (!this.bmmCodes) {
       this.bmmCodes = this.model.requestDto?.bmmCode;

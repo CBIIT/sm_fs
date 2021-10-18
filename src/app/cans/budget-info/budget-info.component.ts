@@ -30,7 +30,6 @@ export class BudgetInfoComponent implements OnInit {
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
   @ViewChildren(CanSelectorComponent) canSelectors: QueryList<CanSelectorComponent>;
   @ViewChildren(ProjectedCanComponent) projectedCans: QueryList<ProjectedCanComponent>;
-  //@ViewChild('canForm', { static: false }) canForm: NgForm;
 
   @Input() readOnly = false;
   @Input() editing = false;
@@ -62,7 +61,8 @@ export class BudgetInfoComponent implements OnInit {
       fs => fs.nciSourceFlag &&
         this.model.programRecommendedCostsModel.selectedFundingSourceIds.has(fs.fundingSourceId)
     ).map(fs => fs.fundingSourceId);
-    this.logger.debug('nci fsids ', this.requestNciFseIds);
+    this.logger.debug('NCI Funding Source Ids', this.requestNciFseIds);
+    this.logger.debug('All Funding Sources', this.model.programRecommendedCostsModel.fundingSources);
     this.canService.nonDefaultCanEventEmitter.subscribe(next => {
       if (+next.applId === -1) {
         this.defaultCanTracker.set(+next.fseId, next.nonDefault);
@@ -157,30 +157,46 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   isFormValid(canWarning: CanWarning): boolean {
-    for (let i = 0; i < this.fundingRequestCans.length; i++) {
-      const can = this.fundingRequestCans[i];
-//      this.logger.debug('FormValid can ', can);
-      if (this.isFcNci() && !can.can) {
+    const selectedCans: string[] = [];
+    for (const canSelector of this.canSelectors) {
+      if (!canSelector.selectedValue && this.isFcNci()) {
         canWarning.missingCan = true;
       }
-      if (this.duplicateCan(i)) {
-        canWarning.duplicateCan = true;
-      }
-      if (this.nonDefaultCan(i)) {
-        canWarning.nonDefaultCan = true;
+      else {
+        for (const projectedCan of this.projectedCans) {
+          if (canSelector.fseId === projectedCan.fseId && canSelector.selectedValue !== projectedCan.projectedCan.can) {
+            canWarning.nonDefaultCan = true;
+          }
+        }
+        if (selectedCans.includes(canSelector.selectedValue)) {
+          canWarning.duplicateCan = true;
+        }
+        selectedCans.push(canSelector.selectedValue);
       }
     }
 
+    // for (let i = 0; i < this..length; i++) {
+    //   const can = this.fundingRequestCans[i];
+    //   if (this.isFcNci() && !can.can) {
+    //     canWarning.missingCan = true;
+    //   }
+    //   if (this.duplicateCan(i)) {
+    //     canWarning.duplicateCan = true;
+    //   }
+    //   if (this.nonDefaultCan(i)) {
+    //     canWarning.nonDefaultCan = true;
+    //   }
+    // }
+
     let valid = true;
 
-//     if (this.canSelectors) {
-//       for (const canSelector of this.canSelectors) {
-// //        this.logger.debug('canForm ', canSelector.canForm);
-//         if (!canSelector.canForm.form.valid) {
-//           valid = false;
-//         }
-//       }
-//     }
+    if (this.canSelectors) {
+      for (const canSelector of this.canSelectors) {
+        if (canSelector.canForm && !canSelector.canForm.form.valid) {
+          valid = false;
+        }
+      }
+    }
     return valid;
   }
 

@@ -58,27 +58,26 @@ export class RetrieveRequestComponent implements OnInit {
             this.requestModel.requestDto.requestorCayCode,
             conversionActivityCode).subscribe(result1 => {
             this.requestModel.programRecommendedCostsModel.fundingSources = result1;
-            this.requestModel.restoreLineItems();
+
+            const selectedIds = new Set<number>();
+            this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
+              selectedIds.add(b.fseId);
+            });
+            this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds = selectedIds;
+
+            this.requestService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result2 => {
+              this.requestModel.programRecommendedCostsModel.grantAwarded = result2;
+              this.requestModel.restoreLineItems();
+
+              this.requestModel.requestDto.financialInfoDto.fundingRequestId = this.requestModel.requestDto.frqId;
+              this.router.navigate(['/request/step4']);
+            });
+//            this.requestModel.restoreLineItems();
           });
 
           this.canManagementService.getRequestCans(this.requestModel.requestDto.frqId).subscribe(result2 => {
             this.requestModel.requestCans = result2;
           });
-
-          const selectedIds = new Set<number>();
-          this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
-            selectedIds.add(b.fseId);
-          });
-
-          this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds = selectedIds;
-
-          this.requestService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result2 => {
-            this.requestModel.programRecommendedCostsModel.grantAwarded = result2;
-            this.requestModel.restoreLineItems();
-          });
-
-          this.requestModel.requestDto.financialInfoDto.fundingRequestId = this.requestModel.requestDto.frqId;
-          this.router.navigate(['/request/step4']);
         },
         (error) => {
           this.logger.error('retrieveFundingRequest failed ', error);
