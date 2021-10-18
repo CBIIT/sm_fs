@@ -66,7 +66,8 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.hasPaylineRoles = this.userSessionService.hasRole('OEFIACRT') ||  this.userSessionService.hasRole('DES');
 
     this.currentFY = getCurrentFiscalYear();
-    this.paylistDashboardUrl =  this.gwbLinksService.getProperty('Paylist')+ '#side-nav-paylists';
+    // this.paylistDashboardUrl =  this.gwbLinksService.getProperty('Paylist')+ '#side-nav-paylists';
+    this.paylistDashboardUrl = '/paylist/#side-nav-paylists';
 
     this.fsSearchController.getSearchDashboardDataUsingGET().subscribe(
       result => {

@@ -149,6 +149,7 @@ import { SearchFundingRequestDocComponent } from './search/search-filter/search-
 import { SearchFundingSourceComponent } from './search/search-filter/search-funding-source/search-funding-source.component';
 import { BatchApproveModalComponent } from './search/batch-approve/batch-approve-modal.component';
 import { OefiaTypeRendererComponent } from './funding-plan/oefia-type-renderer/oefia-type-renderer.component';
+import { RequestWarningComponent } from './funding-request/step4/request-warning/request-warning.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -305,7 +306,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SearchFundingRequestDocComponent,
     SearchFundingSourceComponent,
     BatchApproveModalComponent,
-    OefiaTypeRendererComponent
+    OefiaTypeRendererComponent,
+    RequestWarningComponent
   ],
 
 

@@ -1,0 +1,5 @@
+<div class="alert alert-warning" *ngIf="inflightPlan">
+    <b>WARNING:</b> This Grant Application is part of Funding Plan <a href="/fs/#/plan/retrieve/{{inflightPlan.fprId}}">
+        {{inflightPlan.fprId}}</a> in FY {{inflightPlan.planFy}}. If you continue creating this PFR, 
+        you will be allowed to complete the approval process either on this request or the plan.
+</div>

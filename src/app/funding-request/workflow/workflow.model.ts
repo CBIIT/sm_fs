@@ -97,33 +97,59 @@ export class WorkflowModel {
     }
   }
 
-  private isUserOneOfThem(approver: FundingReqApproversDto): boolean {
+  private approvedAsFciNciBefore(userId: string): boolean {
+    const fciNciResponders: string[] = this._previousApprovers.filter( a => a.roleCode === 'FCNCI')
+          .map ( a => a.responderLdap);
+    return fciNciResponders.includes(userId);
+  }
+
+  private laterFciNciApprover(userId: string): boolean {
+    if (this._pendingApprovers ) {
+      let pendingFciNciApprovers: string[] = this._pendingApprovers.filter(a => a.roleCode === 'FCNCI')
+            .map( a => a.approverLdap);
+      if (pendingFciNciApprovers.length > 1) {
+        pendingFciNciApprovers = pendingFciNciApprovers.splice(0, 1);
+        return pendingFciNciApprovers.includes(userId);
+      }
+    }
+    return false;
+  }
+
+  private isUserEligible(approver: FundingReqApproversDto): boolean {
+    // GM Approver super user;
+    if (approver.roleCode === 'GM' && this.userSessionService.hasRole('PFRGMAPR')) {
+          return true;
+    }
+    // OEFIA Funder Approver supper user
+    if (approver.roleCode === 'FCNCI' && this.hasOrgRole('OEFIA', 'PFRFNAPR')) {
+          return true;
+    }
+
     const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     if (userId === approver.approverLdap) {
         return true;
     } else if (approver.designees && approver.designees.length > 0) {
         const designees = approver.designees.map(d => d.delegateTo);
         if (designees.indexOf(userId) > -1) {
-          return true;
+          return (approver.roleCode !== 'FCNCI'
+                  || ( !this.approvedAsFciNciBefore(userId) && !this.laterFciNciApprover(userId) )
+                  || this.hasOrgRole('OEFIA', 'PFRFNAPR'));
+  //      return true;
         }
     }
 
-    // User with 'PFRGMAPPR' role can do GM approve for all requests;
-    if (approver.roleCode === 'GM' && this.userSessionService.hasRole('PFRGMAPR')) {
-      return true;
-    }
-    // User with 'FA' for 'OEFIA' can do FCNCI approval for all requests;
-    if (approver.roleCode === 'FCNCI' && this.hasOEFIARole()) {
-      return true;
+    // OEFIA FA user, needs to make sure has not approved before and is not a later official approver
+    if (approver.roleCode === 'FCNCI' && this.hasOrgRole('OEFIA', 'FA')) {
+      return (!this.approvedAsFciNciBefore(userId) && !this.laterFciNciApprover(userId));
     }
 
     return false;
   }
 
-  hasOEFIARole(): boolean {
+  hasOrgRole(org: string, role: string): boolean {
     const rolesList: I2ERoles[] = this.userSessionService.getLoggedOnUser().roles;
-    for (const role of rolesList) {
-      if (role.roleCode === 'FA' && role.orgAbbrev === 'OEFIA') {
+    for (const r of rolesList) {
+      if (r.roleCode === role && r.orgAbbrev === org) {
         return true;
       }
     }
@@ -183,11 +209,11 @@ export class WorkflowModel {
     });
 
     this._docApprover = docList && docList.length > 0 ? docList[0] : {approverFirstName: 'Unknown'};
-    this.isDocApprover = this.isUserOneOfThem(this._docApprover);
+    this.isDocApprover = this.isUserEligible(this._docApprover);
 
     this.nextApprover = this._pendingApprovers && this._pendingApprovers.length > 0 ? this._pendingApprovers[0] : null;
     if (this.nextApprover) {
-      this.isUserNextInChain = this.isUserOneOfThem(this.nextApprover);
+      this.isUserNextInChain = this.isUserEligible(this.nextApprover);
 
       if (this.isUserNextInChain) {
         this.nextApproverRoleCode = this.nextApprover.roleCode ? this.nextApprover.roleCode : 'ADDITIONAL';
