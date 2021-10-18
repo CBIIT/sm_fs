@@ -443,15 +443,6 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   showBatchApproveModal(): void {
     if (this.fundingRequests && this.fundingRequests.length > 0) {
       this.batchApproveModal.openModalForRequests([...this.selectedRows.values()])
-      // .then(
-      //   (result) => {
-      //     this.logger.debug('Batch approve was submit and modal is closed ', result);
-      //     this.doFundingRequestSearch(this.searchCriteria, this.filterTypeLabel);
-      //   })
-      // .catch(
-      //     (reason) => {
-      //       this.logger.debug('user dismissed batch approve confirmation modal without proceed', reason);
-      //     });
       .finally( () => {
         if (this.batchApproveModal.batchApproveSuccess) {
           this.doFundingRequestSearch(this.searchCriteria, this.filterTypeLabel);
@@ -465,17 +456,6 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           this.doFundingPlanSearch(this.searchCriteria, this.filterTypeLabel);
         }
       });
-    //   .then(
-    //     (result) => {
-    //       this.logger.debug('Batch approve was submit and modal is closed ', result);
-    //       this.doFundingPlanSearch(this.searchCriteria, this.filterTypeLabel);
-    //     }
-    //   )
-    //     .catch(
-    //       (reason) => {
-    //         this.logger.debug('user dismissed batch approve confirmation modal without proceed', reason);
-    //       }
-    //     );
      }
   }
 }

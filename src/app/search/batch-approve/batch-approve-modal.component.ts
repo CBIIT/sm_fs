@@ -125,6 +125,7 @@ export class BatchApproveModalComponent implements OnInit {
     this.invokeRestApi(dto).subscribe(
       () => {
         this.batchApproveSuccess = true;
+        this.batchApproveService.initialize();
         this.disableSubmit = true;
       },
       (errorResponse) => {
