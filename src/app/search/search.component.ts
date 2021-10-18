@@ -41,6 +41,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
    paylistDashboardUrl : string;
 
    action: string;
+   selectedMenuUrl: string;
 
   constructor(private logger: NGXLogger,
               private router: Router,
@@ -57,6 +58,9 @@ export class SearchComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
 
+    this.selectedMenuUrl = (this.route.snapshot.url && this.route.snapshot.url.length > 0) ?
+                            this.route.snapshot.url[this.route.snapshot.url.length - 1].path : '';
+    this.logger.debug('ngOnInit() segment = ', this.selectedMenuUrl);
     this.isPd = this.userSessionService.isPD();
     this.isPa = this.userSessionService.isPA();
     this.hasPaylineRoles = this.userSessionService.hasRole('OEFIACRT') ||  this.userSessionService.hasRole('DES');
@@ -74,30 +78,31 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.batchApproveService.initialize();
     let action = this.route.snapshot.params.action;
     console.log('ngOnInit() - route action, searchType, state.action:', action, this.searchModel.searchType, history.state);
-    if (action && action === 'immediate') {
+    if (action) {
+      const navigateAction = (action === 'immediate') ? this.searchModel.searchType : action;
+
       // this is a return link from the FR or FP view
       // check the searchType from the search model
       // and replace 'immediate' with one of the saved dashboard action type
-      if (this.searchModel.searchType) {
-        switch(this.searchModel.searchType) {
+      if (navigateAction) {
+        switch(navigateAction) {
           case 'FR':
           case 'awaitfr':
           case 'myfr':
           case 'mycafr':
           case 'myportfoliofr':
           case 'myreviewfr':
-            this.router.navigateByUrl('/search/fr', { state: { action: this.searchModel.searchType}});
+            this.router.navigateByUrl('/search/fr', { state: { action: navigateAction}});
             break;
           case 'FP':
           case 'awaitfp':
           case 'myfp':
           case 'myreviewfp':
-            this.router.navigateByUrl('/search/fp', { state: { action: this.searchModel.searchType}});
+            this.router.navigateByUrl('/search/fp', { state: { action: navigateAction}});
             break;
           case 'G':
-            this.router.navigateByUrl('/search/grants', { state: { action: this.searchModel.searchType}});
+            this.router.navigateByUrl('/search/grants', { state: { action: navigateAction}});
             break;
-
         }
       }
     }
@@ -115,28 +120,28 @@ export class SearchComponent implements OnInit, AfterViewInit {
             this.action = 'immediate'
             break;
           case 'awaitfr':
-            this.onAwaitingRequests();
+            this.searchAwaitingRequests();
             break;
           case 'myfr':
-            this.onMyRequests();
+            this.searchMyRequests();
             break;
           case 'mycafr':
-            this.onMyCARequests();
+            this.searchMyCARequests();
             break;
           case 'myportfoliofr':
-            this.onMyPortfolioRequests();
+            this.searchMyPortfolioRequests();
             break;
           case 'myreviewfr':
-            this.onMyUnderReviewRequests();
+            this.searchMyUnderReviewRequests();
             break;
           case 'awaitfp':
-            this.onAwaitingPlans();
+            this.searchAwaitingPlans();
             break;
           case 'myfp':
-            this.onMyPlans();
+            this.searchMyPlans();
             break;
           case 'myreviewfp':
-            this.onMyUnderReviewPlans();
+            this.searchMyUnderReviewPlans();
             break;
         }
       }, 0);
@@ -231,14 +236,32 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   onAwaitingRequests() {
+    if (this.selectedMenuUrl != 'fr') {
+      this.router.navigateByUrl('/search/fr', { state: { action: 'awaitfr'}});
+    }
+    else {
+      this.searchAwaitingRequests();
+    }
+  }
+
+  searchAwaitingRequests() {
     this.searchModel.searchType = 'awaitfr';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_REQUEST_AWAITING_RESPONSE;
     this.searchResultComponent.doFundingRequestSearch(this.fsFilterCriteria,
-      FilterTypeLabels.FILTER_FUNDING_PLAN_AWAITING_RESPONSE);
+      FilterTypeLabels.FILTER_REQUEST_AWAITING_RESPONSE);
   }
 
   onMyRequests() {
+    if (this.selectedMenuUrl != 'fr') {
+      this.router.navigateByUrl('/search/fr', { state: { action: 'myfr'}});
+    }
+    else {
+      this.searchMyRequests();
+    }
+  }
+
+  searchMyRequests() {
     this.searchModel.searchType = 'myfr';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_MYREQUEST;
@@ -247,6 +270,15 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   onMyCARequests() {
+    if (this.selectedMenuUrl != 'fr') {
+      this.router.navigateByUrl('/search/fr', { state: { action: 'mycafr'}});
+    }
+    else {
+      this.searchMyCARequests();
+    }
+  }
+
+  searchMyCARequests() {
     this.searchModel.searchType = 'mycafr';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.myCancerActivities = this.userSessionService.getUserCaCodes();
@@ -256,6 +288,15 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   onMyPortfolioRequests() {
+    if (this.selectedMenuUrl != 'fr') {
+      this.router.navigateByUrl('/search/fr', { state: { action: 'myportfoliofr'}});
+    }
+    else {
+      this.searchMyPortfolioRequests();
+    }
+  }
+
+  searchMyPortfolioRequests() {
     this.searchModel.searchType = 'myportfoliofr';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_PORTFOLIO;
@@ -264,6 +305,15 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   onMyUnderReviewRequests() {
+    if (this.selectedMenuUrl != 'fr') {
+      this.router.navigateByUrl('/search/fr', { state: { action: 'myreviewfr'}});
+    }
+    else {
+      this.searchMyUnderReviewRequests();
+    }
+  }
+
+  searchMyUnderReviewRequests() {
     this.searchModel.searchType = 'myreviewfr';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_REQUEST_UNDER_REVIEW;
@@ -272,6 +322,15 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   onAwaitingPlans() {
+    if (this.selectedMenuUrl != 'fp') {
+      this.router.navigateByUrl('/search/fp', { state: { action: 'awaitfp'}});
+    }
+    else {
+      this.searchAwaitingPlans();
+    }
+  }
+
+  searchAwaitingPlans() {
     this.searchModel.searchType = 'awaitfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_FUNDING_PLAN_AWAITING_RESPONSE
@@ -279,6 +338,15 @@ export class SearchComponent implements OnInit, AfterViewInit {
       FilterTypeLabels.FILTER_FUNDING_PLAN_AWAITING_RESPONSE);  }
 
   onMyPlans() {
+    if (this.selectedMenuUrl != 'fp') {
+      this.router.navigateByUrl('/search/fp', { state: { action: 'myfp'}});
+    }
+    else {
+      this.searchMyPlans();
+    }
+  }
+
+  searchMyPlans() {
     this.searchModel.searchType = 'myfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_MY_FUNDING_PLAN;
@@ -286,6 +354,15 @@ export class SearchComponent implements OnInit, AfterViewInit {
       FilterTypeLabels.FILTER_MY_FUNDING_PLAN);  }
 
   onMyUnderReviewPlans() {
+    if (this.selectedMenuUrl != 'fp') {
+      this.router.navigateByUrl('/search/fp', { state: { action: 'myreviewfp'}});
+    }
+    else {
+      this.searchMyUnderReviewPlans();
+    }
+  }
+
+  searchMyUnderReviewPlans() {
     this.searchModel.searchType = 'myreviewfp';
     this.setFyFilterCriteria();
     this.fsFilterCriteria.searchWithIn= FilterTypes.FILTER_FUNDING_PLAN_UNDER_REVIEW;
