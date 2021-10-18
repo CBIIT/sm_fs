@@ -83,8 +83,6 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     if (!displayMatrix) {
       return false;
     }
-    // this.logger.debug('ARC sees  : ', displayMatrix.arcSees);
-    // this.logger.debug('OEFIA sees: ', displayMatrix.oefiaSees);
     if ((this.isFcArc() && displayMatrix.arcSees === 'Y') || (this.isFcNci() && displayMatrix.oefiaSees === 'Y')) {
       return true;
     }
@@ -107,8 +105,6 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     if (!displayMatrix) {
       return false;
     }
-    // this.logger.debug('ARC enters  : ', displayMatrix.arcEnters);
-    // this.logger.debug('OEFIA enters: ', displayMatrix.oefiaEnters);
     if ((this.isFcArc() && displayMatrix.arcEnters === 'Y') || (this.isFcNci() && displayMatrix.oefiaEnters === 'Y')) {
       return true;
     }
