@@ -132,7 +132,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     this.checkDocs();
     this.isDocsStepCompleted();
     this.checkInflightFundingPlan();
-    this.logger.debug('step4 requestModel ', this.requestModel);
+//    this.logger.debug('step4 PRINT_THIS ', this);
     // this.isDisplayBudgetDocsUpload();
 
     // this.budgetDocDtos = this.requestModel.requestDto.budgetDocs;
