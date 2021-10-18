@@ -182,32 +182,32 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   getDirectCost(): number {
     if (this._displayType === 'percent') {
-      return this.directCostCalculated;
+      return +this.directCostCalculated;
     } else {
-      return this.directCost;
+      return +this.directCost;
     }
   }
 
   getDirectCostPercentCut(): number {
     if (this._displayType === 'percent') {
-      return this.percentCut;
+      return +this.percentCut;
     }
-    return this.dcPercentCutCalculated;
+    return +this.dcPercentCutCalculated;
   }
 
   getTotalCost(): number {
     if (this._displayType === 'percent') {
-      return this.totalCostCalculated;
+      return +this.totalCostCalculated;
     } else {
-      return this.totalCost;
+      return +this.totalCost;
     }
   }
 
   getTotalCostPercentCut(): number {
     if (this._displayType === 'percent') {
-      return this.percentCut;
+      return +this.percentCut;
     }
-    return this.tcPercentCutCalculated;
+    return +this.tcPercentCutCalculated;
   }
 
   set snapShot(data: PRCPayload) {
