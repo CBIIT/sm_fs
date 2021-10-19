@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { DocumentsDto, FsPlanControllerService, FsPlanWorkflowControllerService,
+import { CancerActivityControllerService, DocumentsDto, FsPlanControllerService, FsPlanWorkflowControllerService,
   FundingReqApproversDto, FundingReqStatusHistoryDto,
   FundingRequestQueryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
@@ -69,6 +69,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
               private requestIntegrationService: FundingRequestIntegrationService,
               private fsPlanWorkflowControllerService: FsPlanWorkflowControllerService,
               private fsPlanControllerService: FsPlanControllerService,
+              private cancerActivityService: CancerActivityControllerService,
               public planModel: PlanModel,
               private canManagementService: CanManagementService,
               private workflowModel: WorkflowModel,
@@ -312,6 +313,24 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   }
 
   submitRequest(): void {
+    this.cancerActivityService.getActiveReferralCaAssignRulesUsingGET('Y').subscribe(
+      result => {
+        const activeCayCodes: string[] = result.map(ra => ra.caCode);
+        if (activeCayCodes.includes(this.planModel.fundingPlanDto.cayCode) ) {
+          this.submitRequestToBackend();
+        }
+        else {
+          const error = {message: 'Requesting PD\'s Cancer Activity is inactive. You can update the Cancer Activity by navigating to the Step 3: Plan Info page'};
+          this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
+        }
+      },
+      error => {
+        this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
+      }
+    );
+  }
+
+  private submitRequestToBackend(): void {
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.fprId = this.fprId;
