@@ -94,26 +94,8 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
           last: '<i class="far fa-chevron-double-right" Last="First"></i>'
         }
       },
-
       ajax: (dataTablesParameters: any, callback) => {
-        this.loaderService.show();
-        // this.logger.debug('Funding Request search for: ', this.searchCriteria);
-        this.fsRequestControllerService.searchDtGrantsUsingPOST(
-          Object.assign(dataTablesParameters, this.searchCriteria)).subscribe(
-          result => {
-            // this.logger.debug('Funding Request search result: ', result);
-            this.grantList = result.data;
-            this.gsfs.searched = true;
-            callback({
-              recordsTotal: result.recordsTotal,
-              recordsFiltered: result.recordsFiltered,
-              data: result.data
-            });
-            this.loaderService.hide();
-          }, error => {
-            this.loaderService.hide();
-            this.logger.error('HttpClient get request error for----- ' + error.message);
-          });
+        this.throttle(dataTablesParameters, callback);
       },
 
       columns: [
@@ -252,6 +234,61 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     this.dtTrigger.unsubscribe();
   }
 
+
+  dtPreviousSearchValue: string;
+  dtLast: number;
+  dtTimer: NodeJS.Timeout;
+  dtFrequency: number = 800;  // ms
+
+  throttle(dataTablesParameters: any, callback): void {
+    const filterValue = dataTablesParameters.search?.value;
+    if (!filterValue || filterValue === '' || this.dtPreviousSearchValue === filterValue) { // initial search, sort, pagination, etc
+      // this.logger.debug('Ajax call - immediate search: ',filterValue, this.dtPreviousSearchValue);
+      this.dtPreviousSearchValue = filterValue;
+      this.ajaxCall(dataTablesParameters, callback);
+      return;
+    }
+
+    const now  = +new Date();
+    if (!this.dtLast || now < this.dtLast + this.dtFrequency) {
+      clearTimeout(this.dtTimer);
+      this.dtLast = now;
+      // this.logger.debug('Ajax call - create new timer: ',filterValue, this.dtPreviousSearchValue);
+      this.dtPreviousSearchValue = filterValue;
+      this.dtTimer = setTimeout(() => {
+        this.dtTimer = undefined;
+        this.dtLast = undefined;
+        // this.logger.debug('Ajax call - delayed search: ',dataTablesParameters.search?.value, this.dtPreviousSearchValue);
+        this.ajaxCall(dataTablesParameters, callback);
+      }, this.dtFrequency);
+    }
+    else {
+
+    }
+  }
+
+  ajaxCall(dataTablesParameters: any, callback): void {
+    this.loaderService.show();
+    // this.logger.debug('Funding Request search for: ', this.searchCriteria);
+    this.fsRequestControllerService.searchDtGrantsUsingPOST(
+      Object.assign(dataTablesParameters, this.searchCriteria)).subscribe(
+      result => {
+        this.grantList = result.data;
+        this.gsfs.searched = true;
+        callback({
+                   recordsTotal: result.recordsTotal,
+                   recordsFiltered: result.recordsFiltered,
+                   data: result.data
+                 });
+        this.loaderService.hide();
+      },
+      error => {
+        this.loaderService.hide();
+        this.logger.error('HttpClient get request error for----- ' + error.message);
+      }
+    );
+  }
+
   toString(aString): string{
     if (!aString) {
       return '';
@@ -265,7 +302,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     if (this.searchWithin) {
       return true;
     }
-    
+
     if (this.searchForm.form.value.fyRange.fromFy && this.searchForm.form.value.fyRange.toFy ) {
       return true;
     }
@@ -293,7 +330,9 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     if (!this.searchForm.valid) {
       return;
     }
-    
+
+    this.dtPreviousSearchValue = undefined; // reset the filter
+
     if (this.searchWithin === 'mypf') {
       this.searchCriteria.pdNpnId =  this.userSessionService.getLoggedOnUser().npnId + '';
     }

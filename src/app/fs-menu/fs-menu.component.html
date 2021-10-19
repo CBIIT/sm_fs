@@ -1,12 +1,11 @@
 <nav id="side-nav" aria-label="application navigation">
     <ul class="list-group">
 
-      <li class="list-group-item">
-        <a href="#PFR" class="parent" data-toggle="collapse" href="#nav-collapse-pfr" role="button" aria-expanded="true" aria-controls="nav-collapse-pfr"><b>Program Funding Requests</b></a>
+      <li class="list-group-item" *ngIf="pd||pa">
+        <a href="#PFR" class="parent" data-toggle="collapse" href="#nav-collapse-pfr" role="button" aria-expanded="true" aria-controls="nav-collapse-pfr"><b>Create Request</b></a>
         <ul class="collapse show" id="nav-collapse-pfr">
           <li class="list-group-item" *ngIf="pd||pa"><a routerLink="/request" routerLinkActive="active">New Funding Request</a></li>
           <li class="list-group-item" *ngIf="pd||pa"><a routerLink="/plan" routerLinkActive="active">New Funding Plan</a></li>
-          <li class="list-group-item"><a routerLink="/manage" routerLinkActive="active">Manage Designations</a></li>
         </ul>
       </li>
 
@@ -21,14 +20,15 @@
       </li>
 
       <li class="list-group-item">
-        <a class="parent" data-toggle="collapse" href="#nav-collapse-search" role="button" aria-expanded="true" aria-controls="nav-collapse-search"><b>Search</b></a>
+        <a class="parent" data-toggle="collapse" href="#nav-collapse-search" role="button" aria-expanded="true" aria-controls="nav-collapse-search"><b>Find a Request</b></a>
         <ul class="collapse show" id="nav-collapse-search">
-          <li class="list-group-item"><a [routerLink]="['/search/fr']" routerLinkActive="active">Funding Requests</a></li>
+          <li class="list-group-item"><a [routerLink]="['/search/fr']" routerLinkActive="active">Individual Requests</a></li>
           <li class="list-group-item"><a [routerLink]="['/search/fp']" routerLinkActive="active">Funding Plans</a></li>
           <li class="list-group-item" *ngIf="oefiaCertifier || splCertifier || paylistReadOnlyRole || ogaCertifier"><a href="{{paylistSearchUrl}}">Paylists</a></li>
           <li class="list-group-item"><a [routerLink]="['/search/grants']" routerLinkActive="active">Grants</a></li>
         </ul>
       </li>
+      <li class="list-group-item" id="manage-designation-group-item"><a routerLink="/manage" routerLinkActive="active"><b>Manage Designations</b></a></li>
 
     </ul>
 </nav>
