@@ -68,7 +68,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedRows: Map<number, any> = new Map<number, any>();
 
   batchApproveEnabled = false;
-  batchApproveVisible = false;
+  // batchApproveVisible = false;
 
   ngOnInit(): void {
   }
@@ -361,9 +361,9 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noFundingRequestResult = false;
     this.filterTypeLabel = filterTypeLabel;
     this.selectedRows.clear();
-    this.batchApproveVisible = this.batchApproveService.canBatchApproveRequest();
+//    this.batchApproveVisible = this.batchApproveService.canBatchApproveRequest();
     this.batchApproveEnabled = false;
-    this.logger.debug('batch approval check ', this.batchApproveVisible);
+    this.logger.debug('Request batch approval check ', this.batchApproveService, this.batchApproveVisible);
     this._triggerDtInstance(this.dtFundingRequestTrigger);
   }
 
@@ -373,9 +373,9 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noFundingPlanResult = false;
     this.filterTypeLabel = filterTypeLabel;
     this.selectedRows.clear();
-    this.batchApproveVisible = this.batchApproveService.canBatchApprovePlan();
+//    this.batchApproveVisible = this.batchApproveService.canBatchApprovePlan();
     this.batchApproveEnabled = false;
-    this.logger.debug('batch approval check ', this.batchApproveVisible);
+    this.logger.debug('Plan batch approval check ', this.batchApproveService, this.batchApproveVisible);
     this._triggerDtInstance(this.dtFundingPlanTrigger);
   }
 
@@ -440,6 +440,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   onOpenFundingPlan($event: any): void {
     this.router.navigate(['plan/retrieve', $event.fprId]);
 
+  }
+
+  get batchApproveVisible(): boolean {
+    return ( !this.noFundingPlanResult && this.batchApproveService.canBatchApprovePlan() )
+        || ( !this.noFundingRequestResult && this.batchApproveService.canBatchApproveRequest() );
   }
 
   showBatchApproveModal(): void {
