@@ -1,17 +1,16 @@
-  <app-batch-approve-modal *ngIf="batchApproveVisible">
-  </app-batch-approve-modal>
+  <app-batch-approve-modal></app-batch-approve-modal>
+  <div class="row">
+    <div class="col-12">
+      <h2>Results {{(filterTypeLabel && !(noFundingRequestResult && noFundingPlanResult)) ? '- ' + filterTypeLabel : ''}}</h2>
+      <p *ngIf="noFundingRequestResult && noFundingPlanResult">No results to display. Try applying a filter above and clicking "Search".</p>
+    </div>
+  </div>
   <div class="row" *ngIf="batchApproveVisible">
     <div class="col-12">
       <button class="btn btn-primary" (click)="showBatchApproveModal()" *ngIf="batchApproveEnabled">Batch Approve</button>
       <span *ngIf="!batchApproveEnabled" ngbTooltip="Select one or more request(s) or plan(s) to perform batch approve">
         <button class="btn btn-primary" disabled>Batch Approve</button>
       </span>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-12">
-      <h2>Results {{(filterTypeLabel && !(noFundingRequestResult && noFundingPlanResult)) ? '- ' + filterTypeLabel : ''}}</h2>
-      <p *ngIf="noFundingRequestResult && noFundingPlanResult">No results to display. Try applying a filter above and clicking "Search".</p>
     </div>
   </div>
   <div class="row"  [hidden]="noFundingRequestResult">

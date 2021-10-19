@@ -363,6 +363,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedRows.clear();
     this.batchApproveVisible = this.batchApproveService.canBatchApproveRequest();
     this.batchApproveEnabled = false;
+    this.logger.debug('batch approval check ', this.batchApproveVisible);
     this._triggerDtInstance(this.dtFundingRequestTrigger);
   }
 
@@ -374,6 +375,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedRows.clear();
     this.batchApproveVisible = this.batchApproveService.canBatchApprovePlan();
     this.batchApproveEnabled = false;
+    this.logger.debug('batch approval check ', this.batchApproveVisible);
     this._triggerDtInstance(this.dtFundingPlanTrigger);
   }
 

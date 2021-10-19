@@ -58,29 +58,41 @@ export class BatchApproveModalComponent implements OnInit {
   Promise<void> {
     this.alert = null;
     this.batchApproveSuccess = false;
-    this.requestsForApproval = requests;
+    this.requestsForApproval = requests.filter(r => this.batchApproveService.canApproveRequest(r.frqId));
     this.requestOrPlan = 'REQUEST';
     this.mode = this.batchApproveService.isDoc ? 'DOC' : 'SPL';
     this.title = 'Request(s) Selected for Batch Approval';
     this.buttonText = 'Confirm Approve';
-    this.eligibleCount = this.totalCount = requests.length;
+    this.eligibleCount = this.requestsForApproval.length;
+    this.totalCount = requests.length;
+    this.disableSubmit = this.eligibleCount < 1;
     return new Promise<void>( (finalize) => {
       this.modalRef = this.modalService.open(this.modalContent);
       this.modalRef.result.finally(finalize);
     });
   }
 
+  // canBatchApprove(): boolean {
+  //   if (this.id === 'frqId') {
+  //     return this.batchApproveService.canApproveRequest(this.data.frqId);
+  //   }
+  //   else {
+  //     return this.batchApproveService.canApprovePlan(this.data.fprId);
+  //   }
+  // }
+
   openModalForPlans(plans: FundingPlanQueryDto[]):
   Promise<void> {
     this.alert = null;
     this.batchApproveSuccess = false;
-    this.plansForApproval = plans;
+    this.plansForApproval = plans.filter( p => this.batchApproveService.canApprovePlan(p.fprId) );
     this.requestOrPlan = 'PLAN';
     this.mode = this.batchApproveService.isDoc() ? 'DOC' : 'SPL';
     this.title = 'Plan(s) Selected for Batch Approval';
     this.buttonText = 'Confirm Approve';
-    this.eligibleCount = this.totalCount = plans.length;
-    this.logger.debug('batchApproveModal ', this);
+    this.eligibleCount = this.plansForApproval.length;
+    this.totalCount = plans.length;
+    this.disableSubmit = this.eligibleCount < 1;
     return new Promise<void>( (finalize) => {
       this.modalRef = this.modalService.open(this.modalContent, { size: 'lg' });
       this.modalRef.result.finally(finalize);
