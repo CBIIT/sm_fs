@@ -32,8 +32,12 @@
   
         <div class="col-lg-4">
           <div class="form-group">
-            <lib-pdname-dropdown label="Requesting PD" [broadcast]="true" [(ngModel)]="pdNpnId"
-              [(selectedValue)]="pdNpnId" [syncWithCa]="false" [filterOnNoActiveCay]="true" [activeCayOnly]="true"
+            <lib-pdname-dropdown
+              label="Requesting PD"
+              [broadcast]="true"
+              [syncWithCa]="false"
+              [filterOnNoActiveCay]="true"
+              [activeCayOnly]="true"
               [showInactiveToggle]="false">
             </lib-pdname-dropdown>
             <div class="text-danger mt-1"
@@ -52,8 +56,12 @@
   
         <div class="col-lg-4">
           <div class="form-group">
-            <lib-cancer-activities-dropdown [selectSingleOption]="true" [maxSelection]="1" [(ngModel)]="cayCode"
-              [selectedValue]="cayCode" [syncWithPd]="true" label="Requesting PD's Cancer Activities" [broadcast]="true"
+            <lib-cancer-activities-dropdown
+              [selectSingleOption]="true"
+              [maxSelection]="1"
+              [syncWithPd]="true"
+              label="Requesting PD's Cancer Activities"
+              [broadcast]="true"
               required>
             </lib-cancer-activities-dropdown>
             <div class="text-danger mt-1"

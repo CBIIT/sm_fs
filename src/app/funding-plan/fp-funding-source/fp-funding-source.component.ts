@@ -79,15 +79,10 @@ export class FpFundingSourceComponent implements OnInit {
   }
 
   private refreshSources(pd: number, ca: string): void {
-    if (!pd || !ca) {
+    if (!pd || !ca || !this.rfaPaNumber) {
       return;
     }
-    if (!this.rfaPaNumber) {
-      this.logger.info('No rfaPaNumber available. Not refreshing sources');
-      // tslint:disable-next-line:no-console
-      // console.trace('missing rfaPaNumber');
-      return;
-    }
+    this.logger.debug('refreshSources(' + pd + ', ' + ca + ')', this.selectedValue);
     const tmp: Select2OptionData[] = [];
     this.planControllerService.getFundingPlanFundingSourcesUsingGET(ca, this.fy, pd, this.rfaPaNumber).subscribe(result => {
       this.planCoordinatorService.fundingSourceListEmitter.next(result);
@@ -96,11 +91,10 @@ export class FpFundingSourceComponent implements OnInit {
         tmp.push({ id: String(s.fundingSourceId), text: s.fundingSourceName });
       });
       this.allSources = tmp;
-      this.filterData();
+      this.data = this.allSources.filter(x => !this.planCoordinatorService.getRestrictedSources(this.index).includes(Number(x.id)));
     });
   }
 
   filterData(): void {
-    this.data = this.allSources.filter(x => !this.planCoordinatorService.getRestrictedSources(this.index).includes(Number(x.id)));
   }
 }
