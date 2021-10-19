@@ -7,6 +7,7 @@ import { PlanModel } from '../../model/plan/plan-model';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { ControlContainer, NgForm } from '@angular/forms';
+import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
 
 @Component({
   selector: 'app-fp-funding-source',
@@ -29,6 +30,7 @@ export class FpFundingSourceComponent implements OnInit {
 
   constructor(private logger: NGXLogger,
               private planControllerService: FsPlanControllerService,
+              private pdCaIntegratorService: PdCaIntegratorService,
               private planCoordinatorService: PlanManagementService,
               private planModel: PlanModel) {
   }
@@ -65,6 +67,7 @@ export class FpFundingSourceComponent implements OnInit {
     });
     this.rfaPaNumber = this.allRfaPaNumbers[0];
     this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
+      this.logger.debug(next);
       this.refreshSources(next.pd, next.ca);
     });
 
@@ -80,6 +83,7 @@ export class FpFundingSourceComponent implements OnInit {
 
   private refreshSources(pd: number, ca: string): void {
     if (!pd || !ca || !this.rfaPaNumber) {
+      this.logger.debug('no pd, ca or rfaNumber', pd, '-', ca, '-', this.rfaPaNumber);
       return;
     }
     this.logger.debug('refreshSources(' + pd + ', ' + ca + ')', this.selectedValue);

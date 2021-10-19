@@ -19,6 +19,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GrantsSearchFilterService } from '../../funding-request/grants-search/grants-search-filter.service';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
+import { PlanManagementService } from '../service/plan-management.service';
 
 
 /**
@@ -237,6 +238,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
               private router: Router,
               private route: ActivatedRoute,
               private planModel: PlanModel,
+              private planCoordinatorService: PlanManagementService,
               private logger: NGXLogger,
               private navigationModel: NavigationStepModel) {
   }
@@ -275,6 +277,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
     const isNewPlan = this.route.snapshot.params.new;
     if (isNewPlan) {
       this.planModel.reset();
+      this.planCoordinatorService.reset();
     }
 
     this.navigationModel.showSteps = true;

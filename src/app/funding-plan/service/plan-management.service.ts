@@ -61,6 +61,10 @@ export class PlanManagementService {
     this.buildPlanModel();
   }
 
+  reset(): void {
+    this.listSelectedSources = [];
+  }
+
   get listSelectedSources(): FundingRequestFundsSrcDto[] {
     return this._listSelectedSources;
   }
