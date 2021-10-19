@@ -60,13 +60,23 @@
             <lib-cancer-activities-dropdown
               [selectSingleOption]="true"
               [maxSelection]="1"
+              [(ngModel)]="cayCode"
+              [selectedValue]="cayCode"
               [syncWithPd]="true"
               label="Requesting PD's Cancer Activities"
               [broadcast]="true"
-              [selectedValue]="cayCode"
-              [(ngModel)]="cayCode"
               required>
             </lib-cancer-activities-dropdown>
+<!--            <lib-cancer-activities-dropdown-->
+<!--              [selectSingleOption]="true"-->
+<!--              [maxSelection]="1"-->
+<!--              [syncWithPd]="true"-->
+<!--              label="Requesting PD's Cancer Activities"-->
+<!--              [broadcast]="true"-->
+<!--              [selectedValue]="cayCode"-->
+<!--              [(ngModel)]="cayCode"-->
+<!--              required>-->
+<!--            </lib-cancer-activities-dropdown>-->
             <div class="text-danger mt-1"
               *ngIf="step3form.errors?.cayCodeIsRequired && (step3form.submitted || step3form.touched)">
               Requesting PD's Cancer Activity is required

@@ -61,17 +61,21 @@ export class PlanStep3Component implements OnInit {
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(3, true);
-    this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
-      this.logger.debug('new PD received');
-      this.pdNpnId = next;
-      this.planCoordinatorService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
-    });
+
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
       this.logger.debug('new cayCode received');
       this.cayCode = typeof next === 'string' ? next : next[0];
       this.planCoordinatorService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
     });
+    this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
+      this.logger.debug('new PD received');
+      this.pdNpnId = next;
+      this.planCoordinatorService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
+    });
+
+
     this.pdCaIntegratorService.docEmitter.subscribe(next => {
+      this.logger.debug('new DOC: ', next);
       this.doc = next;
     });
 
