@@ -296,7 +296,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
           this.submitRequestToBackend();
         }
         else {
-          const error = {message: 'Requesting PD\'s Cancer Activity is inactive. You can update the Cancer Activity by navigating to the Step 3: Plan Info page'};
+          const error = {message: 'Requesting PD\'s Cancer Activity is inactive. You can update the Cancer Activity by navigating to the Step 2: Request Info page'};
           this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
         }
       },
