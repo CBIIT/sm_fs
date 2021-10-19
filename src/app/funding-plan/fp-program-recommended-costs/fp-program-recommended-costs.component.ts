@@ -11,14 +11,6 @@ import { ControlContainer, NgForm } from '@angular/forms';
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class FpProgramRecommendedCostsComponent implements OnInit {
-  get displayType(): string {
-    return this._displayType;
-  }
-
-  set displayType(value: string) {
-    this.logger.debug('set displayType', value, this.grantIndex, this.sourceIndex);
-    this._displayType = value;
-  }
 
   @Input() grantIndex: number;
   @Input() sourceIndex: number;
@@ -67,12 +59,12 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   private initializeValuesForEdit(): void {
-    this.logger.debug('initialize PRC values', this.grantIndex, this.sourceIndex);
+    // this.logger.debug('initialize PRC values', this.grantIndex, this.sourceIndex);
     if (this.sourceIndex < 0 || this.sourceIndex > 2) {
       return;
     }
     if (!this.fseId && !!this.planCoordinatorService.listSelectedSources) {
-      this.logger.debug('load fseId from plan service');
+      // this.logger.debug('load fseId from plan service');
       const src = this.planCoordinatorService.listSelectedSources[this.sourceIndex];
       if (src) {
         this.fseId = src.fundingSourceId;
@@ -80,22 +72,22 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     }
     const bud = this.planCoordinatorService.getBudget(this.grant.applId, this.fseId);
     const can = this.planCoordinatorService.getCan(this.grant.applId, this.fseId);
-    this.logger.debug('source', this.sourceIndex, this.fseId, this.planCoordinatorService.listSelectedSources[this.sourceIndex]);
-    this.logger.debug('budget', bud);
-    this.logger.debug('can', can);
+    // this.logger.debug('source', this.sourceIndex, this.fseId, this.planCoordinatorService.listSelectedSources[this.sourceIndex]);
+    // this.logger.debug('budget', bud);
+    // this.logger.debug('can', can);
 
     // TODO: this logic might need revisiting.
     if (can && !isNaN(can.dcPctCut) && !isNaN(can.tcPctCut) && can.dcPctCut === can.tcPctCut) {
       this.percentCut = can.dcPctCut;
       this.displayType = 'percent';
       // this.toggleDisplay('percent', this.grantIndex, this.sourceIndex);
-      this.logger.debug('setting display to "percent" with value', this.percentCut);
+      // this.logger.debug('setting display to "percent" with value', this.percentCut);
     } else if (bud) {
       this.directCost = bud.dcRecAmt;
       this.totalCost = bud.tcRecAmt;
       this.displayType = 'dollar';
       // this.toggleDisplay('dollar', this.grantIndex, this.sourceIndex);
-      this.logger.debug('setting display to "dollar"');
+      // this.logger.debug('setting display to "dollar"');
     }
     this.recalculate();
   }
@@ -242,6 +234,16 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       totalCostCalculated: this.totalCostCalculated
     };
   }
+
+  get displayType(): string {
+    return this._displayType;
+  }
+
+  set displayType(value: string) {
+    // this.logger.debug('set displayType', value, this.grantIndex, this.sourceIndex);
+    this._displayType = value;
+  }
+
 }
 
 export interface PRCPayload {
