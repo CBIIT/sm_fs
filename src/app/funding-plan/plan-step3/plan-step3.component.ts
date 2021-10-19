@@ -79,7 +79,6 @@ export class PlanStep3Component implements OnInit {
     this.pdNpnId = this.planModel.fundingPlanDto.requestorNpnId;
     this.cayCode = this.planModel.fundingPlanDto.cayCode;
 
-    this.logger.debug('step 3 plan data', JSON.stringify(this.planModel.fundingPlanDto));
     // this.planCoordinatorService.listSelectedSources = [];
   }
 

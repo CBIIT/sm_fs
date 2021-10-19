@@ -65,6 +65,7 @@ export class FpFundingSourceComponent implements OnInit {
     });
     this.rfaPaNumber = this.allRfaPaNumbers[0];
     this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
+      this.logger.debug(next);
       this.refreshSources(next.pd, next.ca);
     });
 
@@ -80,6 +81,7 @@ export class FpFundingSourceComponent implements OnInit {
 
   private refreshSources(pd: number, ca: string): void {
     if (!pd || !ca || !this.rfaPaNumber) {
+      this.logger.debug('no pd, ca or rfaNumber', pd, '-', ca, '-', this.rfaPaNumber);
       return;
     }
     this.logger.debug('refreshSources(' + pd + ', ' + ca + ')', this.selectedValue);
