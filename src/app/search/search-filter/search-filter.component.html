@@ -14,32 +14,8 @@
         <lib-grantnumber-search-criteria [form]="searchForm"></lib-grantnumber-search-criteria>
       </div>
     </div>
-    <div class="col-3 col-md-3 ml-auto" [hidden]="!(searchType === 'FR' || searchType === 'FP' || searchType === 'G')">
+    <div class="col-3 col-md-3 mr-auto" [hidden]="!(searchType === 'FR' || searchType === 'FP' || searchType === 'G')">
       <lib-fy-range [minYear]="2001" [maxYear]="2025" [form]="searchForm"></lib-fy-range>
-    </div>
-    <div class="col-3 col-md-3" [hidden]="!(searchType === 'PL')">
-      <div class="row">
-        <div class="col-6">
-          <label for="fy">Fiscal Year</label>
-          <ng-select2
-            id="fy"
-            name="fy"
-            ngModel
-            [allowClear]="true"
-            [data]="fiscalYearList">
-          </ng-select2>
-        </div>
-        <div class="col-6">
-          <label for="ncab">NCAB</label>
-          <ng-select2
-            id="ncab"
-            name="ncab"
-            ngModel
-            [allowClear]="true"
-            [data]="ncabList">
-          </ng-select2>
-        </div>
-      </div>
     </div>
   </div>
   <div class="row form-group" [hidden]="!(searchType === 'FR')">
@@ -60,7 +36,7 @@
     </div>
   </div>
   <div class="row form-group" [hidden]="!(searchType === 'FP')">
-    <div class="form-group col-4 col-md-4">
+    <div class="form-group col-6 col-md-6">
       <label for="plan-status-select">Plan Status</label>
       <ng-select2
         id="plan-status-select"
@@ -73,7 +49,7 @@
       >
       </ng-select2>
     </div>
-    <div class="col-4 col-md-4">
+    <div class="col-3 col-md-3">
       <app-search-rfa-pa-dropdown [parentForm]="searchForm"></app-search-rfa-pa-dropdown>
     </div>
     <div class="col-3 col-md-3 ml-auto">
