@@ -34,6 +34,7 @@
           <div class="form-group">
             <lib-pdname-dropdown
               label="Requesting PD"
+              [selectedValue]="pdNpnId"
               [broadcast]="true"
               [syncWithCa]="false"
               [filterOnNoActiveCay]="true"
@@ -62,6 +63,7 @@
               [syncWithPd]="true"
               label="Requesting PD's Cancer Activities"
               [broadcast]="true"
+              [selectedValue]="cayCode"
               required>
             </lib-cancer-activities-dropdown>
             <div class="text-danger mt-1"
