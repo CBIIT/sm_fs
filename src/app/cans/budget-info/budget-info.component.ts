@@ -159,10 +159,10 @@ export class BudgetInfoComponent implements OnInit {
   isFormValid(canWarning: CanWarning): boolean {
     const selectedCans: string[] = [];
     for (const canSelector of this.canSelectors) {
-      if (!canSelector.selectedValue && this.isFcNci()) {
+      if (!canSelector.selectedValue ) {
         canWarning.missingCan = true;
       }
-      else if ( canSelector.selectedValue ) {
+      else if ( canSelector.selectedValue && this.isFcNci() ) {
         for (const projectedCan of this.projectedCans) {
           if (projectedCan.projectedCan?.can &&
               canSelector.fseId === projectedCan.fseId &&
