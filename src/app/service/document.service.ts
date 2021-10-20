@@ -103,5 +103,12 @@ export class DocumentService {
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' });
   }
 
+  downloadDetailReport(fpIds: number[] , isRequest: boolean) {
+    var url = this.docUrl + '/funding-plans-detail-report/' + fpIds + '/' + isRequest;
+    this.logger.debug('Funding Plan Cover Sheet URL:', url);
+    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
+  }
+
+
 
 }

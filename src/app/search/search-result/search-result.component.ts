@@ -15,6 +15,9 @@ import {Router} from "@angular/router";
 import { BatchApproveService } from '../batch-approve/batch-approve.service';
 import { BatchApproveModalComponent } from '../batch-approve/batch-approve-modal.component';
 import { FilterTypeLabels } from '../search.component';
+import { DocumentService } from 'src/app/service/document.service';
+import { saveAs } from 'file-saver';
+import { HttpResponse } from '@angular/common/http';
 
 class DataTablesResponse {
   data: any[];
@@ -35,6 +38,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
               private loaderService: LoaderService,
               private router: Router,
               private batchApproveService: BatchApproveService,
+              private documentService : DocumentService,
               private logger: NGXLogger) { }
 
   @ViewChildren(DataTableDirective) dtElements: QueryList<DataTableDirective>;
@@ -475,5 +479,24 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
      }
+  }
+
+  runDetailedReport(): void {
+    if (this.fundingRequests && this.fundingRequests.length > 0) {
+        this.downloadDetailReport([...this.selectedRows.keys()],true);
+    }
+    else if (this.fundingPlans && this.fundingPlans.length > 0) {
+      this.downloadDetailReport([...this.selectedRows.keys()],false);
+    }
+  }
+
+  downloadDetailReport(ids : number[], isRequest :boolean) {
+    this.documentService.downloadDetailReport(ids, isRequest)
+          .subscribe(
+            (response: HttpResponse<Blob>) => {
+              const blob = new Blob([response.body], { type: response.headers.get('content-type') });
+              saveAs(blob, 'Detail Report.pdf');
+            }
+          );
   }
 }
