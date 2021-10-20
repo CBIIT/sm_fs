@@ -74,9 +74,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
 
   tooltipGrant: any;
 
-  get noResult(): boolean {
-    return !this.grantList || this.grantList.length === 0;
-  }
+  showResults: boolean = false;
 
   ngAfterViewInit(): void {
     // this.initDatatable();
@@ -85,7 +83,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
       pagingType: 'full_numbers',
       pageLength: 100,
       serverSide: true,
-      processing: true,
+      processing: false,
       language: {
         paginate: {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
@@ -273,6 +271,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     this.fsRequestControllerService.searchDtGrantsUsingPOST(
       Object.assign(dataTablesParameters, this.searchCriteria)).subscribe(
       result => {
+        this.showResults = true
         this.grantList = result.data;
         this.gsfs.searched = true;
         callback({
@@ -310,18 +309,6 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     if (this.searchForm.form.value.grantNumber && this.searchForm.form.value.grantNumber.grantNumberIC && this.searchForm.form.value.grantNumber.grantNumberSerial) {
       return true;
     }
-    return false;
-  }
-
-  showNoResult(): boolean {
-    this.logger.debug('showNoResult grant list:', this.grantList);
-    if (!this.grantList) {
-      return true;
-    }
-    else if ( this.grantList.length === 0) {
-      return true;
-    }
-
     return false;
   }
 
