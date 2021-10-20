@@ -19,7 +19,7 @@ import { BatchApproveService } from './batch-approve/batch-approve.service';
 export class SearchComponent implements OnInit, AfterViewInit {
   @ViewChild(SearchResultComponent) searchResultComponent: SearchResultComponent;
 
-  labelSearch: string = 'Requests';
+  labelSearch: string = 'Individual Requests';
   currentFY: number = 2021;
   showOverview: boolean = true;
   numAwaitingRequests: number;
@@ -372,7 +372,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   onSearchType(type: string) {
-    this.labelSearch = type === 'FR' ? 'Requests' : (type === 'FP' ? 'Plans' : (type === 'PL' ? 'Paylists' :  'Grants'));
+    this.labelSearch = type === 'FR' ? 'Individual Requests' : (type === 'FP' ? 'Existing Plans' : (type === 'PL' ? 'Existing Paylists' :  'Existing Grants'));
   }
 
   setFyFilterCriteria(){
