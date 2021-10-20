@@ -61,8 +61,8 @@ export class FundingRequestTypeComponent implements OnInit {
             const fundedAlert: Alert = {
               type: 'warning',
               message: 'WARNING: This Grant Application is part of Funding Plan <a href="/fs/#/plan/retrieve/' + result.fprId +
-                       '">' + result.fprId + '</a> in FY ' + result.planFy + '. If you continue creating this PFR, ' +
-                       'you will be allowed to complete the approval process either on this request or the plan.'
+                '">' + result.fprId + '</a> in FY ' + result.planFy + '. If you continue creating this PFR, ' +
+                'you will be allowed to complete the approval process either on this request or the plan.'
             };
             if (otherPay) {
               this.alerts = [this.otherPayAlert, fundedAlert];
@@ -83,18 +83,18 @@ export class FundingRequestTypeComponent implements OnInit {
     this.logger.debug('did value change?:', this._selectedValue, value, valueChanged);
     // If we are changing to or from one of the clearable request types, we need to blow away the entire
     // PRC model
-    if (valueChanged && (this.clearableTypes.includes(value) || this.clearableTypes.includes(this._selectedValue))) {
+    if (valueChanged && (this.clearableTypes.includes(+value) || this.clearableTypes.includes(+this._selectedValue))) {
       this.logger.warn('About to do something totally drastic: blowing away PRC model');
-      this.model.programRecommendedCostsModel.deepReset(!!this.model.requestDto.frqId);
+      // this.model.programRecommendedCostsModel.deepReset(!!this.model.requestDto.frqId);
+      for (let i = this.model.programRecommendedCostsModel?.selectedFundingSources?.length -1; i >= 0; i--) {
+        this.model.programRecommendedCostsModel.deleteFundingSourceByIndex(i, !!this.model.requestDto.frqId);
+      }
     }
     this._selectedValue = value;
     this.selectedValueChange.emit(value);
     this.model.requestDto.frtId = value;
     this.model.requestDto.financialInfoDto.requestTypeId = value;
     this.model.programRecommendedCostsModel.fundingRequestType = value;
-    // if (valueChanged) {
-    //   this.model.programRecommendedCostsModel.reset(this.model.requestDto.frqId ? true : false);
-    // }
   }
 
   constructor(private fsLookupControllerService: FsLookupControllerService,
