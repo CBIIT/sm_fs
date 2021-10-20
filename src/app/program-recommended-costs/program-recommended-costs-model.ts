@@ -77,7 +77,9 @@ export class ProgramRecommendedCostsModel {
     if (!this._selectedFundingSources) {
       return;
     }
-    this.deleteUnselectableSources();
+    if (value?.length > 0) {
+      this.deleteUnselectableSources();
+    }
   }
 
   deleteUnselectableSources(): void {

@@ -49,6 +49,7 @@ export class RequestInformationComponent implements OnInit {
     }
     if (!requestType || !cayCode) {
       this.logger.info('Not refreshing funding sources: missing type or cayCode');
+      return;
     }
     this.fsRequestControllerService.getFundingSourcesUsingGET(
       requestType,
@@ -56,7 +57,7 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.requestDto.fy,
       this.requestModel.requestDto.financialInfoDto.requestorNpnId,
       // TODO: Revisit this logic
-      cayCode || this.requestModel.grant.cayCode,
+      cayCode,
       conversionActivityCode).subscribe(result => {
       this.requestModel.programRecommendedCostsModel.fundingSources = result;
     }, error => {
