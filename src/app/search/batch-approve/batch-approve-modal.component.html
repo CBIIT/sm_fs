@@ -20,7 +20,7 @@
       </p>
       <p *ngIf="requestOrPlan === 'PLAN'">{{eligibleCount}} out of {{totalCount}} Plan(s) are eligible for Batch Approval 
       </p>
-      <div class="col-12" *ngIf="requestOrPlan === 'PLAN' && mode === 'SPL'">
+      <div class="col-12" *ngIf="eligibleCount > 0 && requestOrPlan === 'PLAN' && mode === 'SPL'">
         <div class="form-group">
           <label for="splMeetingDate">SPL Committee Meeting Approval Date</label>
           <div class="input-group">
@@ -47,22 +47,34 @@
           </div>
         </div>
       </div>
-      <div class="col-12" *ngIf="requestOrPlan === 'REQUEST'">
+      <div class="col-12" *ngIf="eligibleCount > 0 && requestOrPlan === 'REQUEST'">
         <table class="table table-striped table-bordered" id="batch-approve-request-table">
           <thead>
             <th>Grant Number</th>
             <th>PI</th>
+            <th>PD</th>
+            <th>CA</th>
+            <th>NCAB</th>
+            <th>Request ID</th>
+            <th>Request Name</th>
+            <th>Request Type</th>
           </thead>
           <tbody>
             <tr *ngFor="let request of requestsForApproval">
               <td><app-full-grant-number-cell-renderer [data]="request" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl"></app-full-grant-number-cell-renderer>
               </td>
               <td><a href="mailto:{{request.piEmail}}?subject={{request.fullGrantNum}}-{request.lastName}">{{request.piFullName}}</a></td>
+              <td><a href="mailto:{{request.pdEmailAddress}}?subject={{request.fullGrantNum}}-{request.lastName}">{{request.pdFullName}}</a></td>
+              <td><app-cancer-activity-cell-renderer [data]="request"></app-cancer-activity-cell-renderer></td>
+              <td>{{request.councilMeetingDate | formatNcabDate }}</td>
+              <td>{{request.frqId}}</td>
+              <td>{{request.requestName}}</td>
+              <td>{{request.requestType}}</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div class="col-12" *ngIf="requestOrPlan === 'PLAN'">
+      <div class="col-12" *ngIf="eligibleCount > 0 && requestOrPlan === 'PLAN'">
         <table class="table table-striped table-bordered" id="batch-approve-plan-table">
           <thead>
             <th>FOA</th>
