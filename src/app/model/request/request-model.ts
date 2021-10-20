@@ -316,9 +316,10 @@ export class RequestModel {
       const source = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
 
       const lineItems = this.programRecommendedCostsModel.prcLineItems.get(source.fundingSourceId);
+      this.logger.debug('restore line item ids:', b.fseId, source.fundingSourceId, lineItems);
       if (lineItems) {
         lineItems.forEach(li => {
-          if (b.supportYear === li.grantAward.year) {
+          if (li.grantAward && b.supportYear === li.grantAward.year) {
             li.budgetId = b.id;
           }
         });
