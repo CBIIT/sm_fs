@@ -88,6 +88,7 @@ export class Step2Component implements OnInit {
         this.fsRequestControllerService.getRequestBudgetsUsingGET(result.frqId).subscribe(
           result1 => {
             this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos = result1;
+            this.logger.debug('restored budgets:', result1);
             this.requestModel.restoreLineItemIds();
           });
         this.requestApproverService.checkCreateApprovers().finally(
