@@ -250,6 +250,8 @@ export class UploadBudgetDocumentsComponent implements OnInit {
 
   isFromValid(): boolean {
 
+    this.isFileSelected = false;
+    this.isTypeSelected = false;
     if (this.inputFile.nativeElement.value !== '') {
       this.isFileSelected = true;
     }
