@@ -23521,7 +23521,8 @@ a.text-dark:hover, a.text-dark:focus {
 
 /* line 139, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
 #secondNav ul.nav li.nav-item {
-  font-size: 0.7875rem;
+  font-size: 0.81rem;
+  font-family: "Noto Sans", sans-serif;
 }
 
 /* line 141, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
