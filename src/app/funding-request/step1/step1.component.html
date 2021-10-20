@@ -72,10 +72,10 @@
 <div class="row">
     <div class="col-12">
         <h2>Results</h2>
-        <p *ngIf="!noResult"><small class="text-muted">To apply sorting order to multiple columns, hold down the Shift key and click the header of
+        <p *ngIf="showResults"><small class="text-muted">To apply sorting order to multiple columns, hold down the Shift key and click the header of
                 each additional column that you want to sort.</small></p>
-        <p *ngIf="noResult">No grants found to display.</p>
-        <div [ngStyle]="{display:noResult?'none':'inline'}">
+        <p *ngIf="!showResults">No grants found to display.</p>
+        <div [ngStyle]="{display:showResults?'inline':'none'}">
         <table id="grantDt" #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
           </table>
 <!--          Renderer templates -->
