@@ -110,7 +110,7 @@
     </div>
 
     <div class="col-sm-6 col-lg-2">
-        <div class="form-group">
+        <div class="form-group" *ngIf="model.requestDto.splApprovedDate">
             <p class="like-label">SPL Committee Meeting Date</p>
             <p> {{ model.requestDto.splApprovedDate | date: 'shortDate' }}</p>
         </div>
