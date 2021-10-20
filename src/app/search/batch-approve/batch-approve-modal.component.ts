@@ -67,7 +67,7 @@ export class BatchApproveModalComponent implements OnInit {
     this.totalCount = requests.length;
     this.disableSubmit = this.eligibleCount < 1;
     return new Promise<void>( (finalize) => {
-      this.modalRef = this.modalService.open(this.modalContent);
+      this.modalRef = this.modalService.open(this.modalContent, { size: 'lg' });
       this.modalRef.result.finally(finalize);
     });
   }
