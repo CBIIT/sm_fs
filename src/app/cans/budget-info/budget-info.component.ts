@@ -162,9 +162,11 @@ export class BudgetInfoComponent implements OnInit {
       if (!canSelector.selectedValue && this.isFcNci()) {
         canWarning.missingCan = true;
       }
-      else {
+      else if ( canSelector.selectedValue ) {
         for (const projectedCan of this.projectedCans) {
-          if (canSelector.fseId === projectedCan.fseId && canSelector.selectedValue !== projectedCan.projectedCan.can) {
+          if (projectedCan.projectedCan?.can &&
+              canSelector.fseId === projectedCan.fseId &&
+              canSelector.selectedValue !== projectedCan.projectedCan.can) {
             canWarning.nonDefaultCan = true;
           }
         }

@@ -105,10 +105,10 @@ export class WorkflowModel {
 
   private laterFciNciApprover(userId: string): boolean {
     if (this._pendingApprovers ) {
-      let pendingFciNciApprovers: string[] = this._pendingApprovers.filter(a => a.roleCode === 'FCNCI')
+      const pendingFciNciApprovers: string[] = this._pendingApprovers.filter(a => a.roleCode === 'FCNCI')
             .map( a => a.approverLdap);
       if (pendingFciNciApprovers.length > 1) {
-        pendingFciNciApprovers = pendingFciNciApprovers.splice(0, 1);
+        pendingFciNciApprovers.splice(0, 1);
         return pendingFciNciApprovers.includes(userId);
       }
     }
