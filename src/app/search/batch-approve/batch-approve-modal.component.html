@@ -20,7 +20,7 @@
       </p>
       <p *ngIf="requestOrPlan === 'PLAN'">{{eligibleCount}} out of {{totalCount}} Plan(s) are eligible for Batch Approval 
       </p>
-      <div class="col-12" *ngIf="requestOrPlan === 'PLAN' && mode === 'SPL'">
+      <div class="col-12" *ngIf="eligibleCount > 0 && requestOrPlan === 'PLAN' && mode === 'SPL'">
         <div class="form-group">
           <label for="splMeetingDate">SPL Committee Meeting Approval Date</label>
           <div class="input-group">
@@ -47,7 +47,7 @@
           </div>
         </div>
       </div>
-      <div class="col-12" *ngIf="requestOrPlan === 'REQUEST'">
+      <div class="col-12" *ngIf="eligibleCount > 0 && requestOrPlan === 'REQUEST'">
         <table class="table table-striped table-bordered" id="batch-approve-request-table">
           <thead>
             <th>Grant Number</th>
@@ -74,7 +74,7 @@
           </tbody>
         </table>
       </div>
-      <div class="col-12" *ngIf="requestOrPlan === 'PLAN'">
+      <div class="col-12" *ngIf="eligibleCount > 0 && requestOrPlan === 'PLAN'">
         <table class="table table-striped table-bordered" id="batch-approve-plan-table">
           <thead>
             <th>FOA</th>

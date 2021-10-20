@@ -14,6 +14,7 @@ import {SearchFundingPlanFoasCellRendererComponent} from "./search-funding-plan-
 import {Router} from "@angular/router";
 import { BatchApproveService } from '../batch-approve/batch-approve.service';
 import { BatchApproveModalComponent } from '../batch-approve/batch-approve-modal.component';
+import { FilterTypeLabels } from '../search.component';
 
 class DataTablesResponse {
   data: any[];
@@ -443,8 +444,12 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get batchApproveVisible(): boolean {
-    return ( !this.noFundingPlanResult && this.batchApproveService.canBatchApprovePlan() )
-        || ( !this.noFundingRequestResult && this.batchApproveService.canBatchApproveRequest() );
+    return ( !this.noFundingPlanResult
+             && this.batchApproveService.canBatchApprovePlan()
+             && this.searchCriteria?.searchWithIn === FilterTypeLabels.FILTER_FUNDING_PLAN_AWAITING_RESPONSE )
+        || ( !this.noFundingRequestResult
+             && this.batchApproveService.canBatchApproveRequest()
+             && this.searchCriteria.searchWithIn === FilterTypeLabels.FILTER_REQUEST_AWAITING_RESPONSE );
   }
 
   showBatchApproveModal(): void {
