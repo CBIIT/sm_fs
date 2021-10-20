@@ -139,7 +139,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
             return (!data || data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }}, // 5
         {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'}, // 6
-        {title: 'FY', data: 'fy'}, // 7
+        {title: 'FY', data: 'requestFy'}, // 7
         {title: 'Request ID', data: 'frqId'}, // 8
         {title: 'Request Name', data: 'requestName'}, // 9
         {title: 'Request Type', data: 'requestType'}, // 10
@@ -354,6 +354,12 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.dtFundingRequestTrigger.unsubscribe();
     this.dtFundingPlanTrigger.unsubscribe();
+  }
+
+  clear(): void {
+    this.filterTypeLabel = '';
+    this.noFundingPlanResult = true;
+    this.noFundingRequestResult = true;
   }
 
   doFundingRequestSearch(criteria: FundSelectSearchCriteria, filterTypeLabel: string): void {

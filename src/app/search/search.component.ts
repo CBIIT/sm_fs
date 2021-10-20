@@ -150,7 +150,10 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   doSearch(sc: SearchCriteria) {
-    if (sc.searchType === 'FR') {
+    if (sc?.searchType === 'clear') {
+      this.searchResultComponent.clear();
+    }
+    else if (sc.searchType === 'FR') {
       const fsCritera: FundSelectSearchCriteria = {};
       fsCritera.fyFrom = sc.fyRange?.fromFy;
       fsCritera.fyTo = sc.fyRange?.toFy;

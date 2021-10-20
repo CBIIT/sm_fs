@@ -1,6 +1,5 @@
 import {Component, OnInit, Output, ViewChild, EventEmitter, AfterViewInit, Input} from '@angular/core';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
-// import {BoardsControllerService, FundSelectSearchCriteria, PaylistUtilControllerService} from '@nci-cbiit/i2ecws-lib';
 import { SearchCriteria } from '../search-criteria';
 import { NGXLogger } from 'ngx-logger';
 import {AppUserSessionService} from "../../service/app-user-session.service";
@@ -8,7 +7,6 @@ import {NgForm} from "@angular/forms";
 import {Select2OptionData} from "ng-select2";
 import {Options} from "select2";
 import {SearchModel} from "../model/search-model";
-import {getCurrentFiscalYear} from "../../utils/utils";
 import {ActivatedRoute} from "@angular/router";
 
 @Component({
@@ -47,9 +45,6 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   set searchType(value: string) {
     this._searchType = value;
     this.logger.debug('Search Type set to <' + value + '>');
-    // if (value === 'G') {
-    //   this.showAdvanced = true;
-    // }
     this.searchTypeEm.emit(value);
   }
   get searchType() { return this._searchType; }
@@ -88,7 +83,6 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     console.log('search-filter last path, action: ', this.route.snapshot.url, this.action);
-    this.searchFilter = this.searchModel.searchCriteria;
     switch(this.route.snapshot.url[this.route.snapshot.url.length - 1].path) {
       case 'fr':
         this.searchType = 'FR';
@@ -100,8 +94,9 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
         this.searchType = 'G';
         break;
     }
+    this.searchFilter = this.searchModel.getSearchCriteria(this.searchType);
     this.searchFilter.searchType = this.searchType;
-    // YP - disable sarch for paylist until paylist is fully merged with fs
+    // YP - disable search for paylist until paylist is fully merged with fs
     this.canSearchForPaylists = false;
     // this.canSearchForPaylists = this.userSessionService.hasRole('GMBRCHF') ||
     //                             this.userSessionService.hasRole('OEFIACRT');
@@ -119,7 +114,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     //     this.ncabList = ncabResults;
     //   },
     //   error => {
-    //     console.error('HttpClient get request error for----- ' + error.message); //TODO - error handling
+    //     console.error('HttpClient get request error for----- ' + error.message);
     //   });
     // this.paylistUtilControllerService.getCostCentersUsingGET().subscribe(
     //   result => {
@@ -132,25 +127,25 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     //     this.costCenterList = ccResults;
     //   },
     //   error => {
-    //     console.error('HttpClient get request error for----- ' + error.message); //TODO - error handling
+    //     console.error('HttpClient get request error for----- ' + error.message);
     //   });
   }
 
   ngAfterViewInit() {
     setTimeout(() => {
-      if (!this.searchFilter.fy) {
-        this.searchFilter.fy = getCurrentFiscalYear();
-      }
-      this.searchForm.form.patchValue(this.searchFilter);
       // next tick
+      this.searchForm.form.patchValue(this.searchFilter);
       console.log('search-filter - ngAfterViewInit() next tick: action', this.action);
     }, 0);
   }
 
   clear() {
-   this.searchFilter = {};
-   this.showAdvanced = false;
-   this.searchForm.resetForm();
+    this.searchModel.reset(this.searchType);
+    this.searchFilter = this.searchModel.getSearchCriteria(this.searchType);
+    this.showAdvanced = false;
+    this.searchForm.resetForm();
+    this.searchForm.form.patchValue(this.searchFilter);
+    this.callSearch.emit({ searchType: 'clear'});
   }
 
   search(form: NgForm) {
@@ -159,8 +154,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     if (form.valid) {
       this.searchFilter = {};
       Object.assign(this.searchFilter, form.form.value);
-      this.searchModel.searchCriteria = this.searchFilter;
-      this.searchModel.searchType = this.searchType;
+      this.searchModel.setSearchCriteria(this.searchType, this.searchFilter)
 
       const sf: SearchCriteria = {}
       Object.assign(sf, form.form.value);
