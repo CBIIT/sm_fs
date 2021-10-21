@@ -3,11 +3,14 @@ import { NGXLogger } from 'ngx-logger';
 import { Injectable } from '@angular/core';
 import { Step2Component } from './step2.component';
 import { RequestLoaderService } from '../retrieve-request/request-loader.service';
+import { noop } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> {
+
+  private requestLoaded = false;
 
   constructor(
     private requestLoaderService: RequestLoaderService,
@@ -29,32 +32,32 @@ export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> 
     }
 
     if (component.step2Form.touched && component.step2Form.dirty) {
-      const ret = confirm('Uretnsaved changes will be lost if you continue.');
+      const ret = confirm('Unsaved changes will be lost if you continue.');
       if (ret) {
         this.logger.debug('time to reset the request model');
         const id = component.model.requestDto.frqId;
-        const url = nextState.url;
+        setTimeout(this.timeOutFn.bind(this), 5000);
+        this.requestLoaderService.loadRequest(id, this.successFn.bind(this), this.errorFn.bind(this));
         return true;
       } else {
         return false;
       }
     }
-
-    //   if (nextState && nextState.url && nextState.url.startsWith('/plan/step')) {
-    //     return true;
-    //   }
-    //   if (!component.canDeactivate) {
-    //     //console.log(route);
-    //     //console.log(currentState);
-    //     //console.log(nextState);
-    //     const ret = confirm('Unsaved changes will be lost if you continue.');
-    //     if (ret) {
-    //       component.resetModel();
-    //       return true;
-    //     }
-    //     return false;
-
-    //   }ret
     return true;
+  }
+
+  successFn(): void {
+    this.requestLoaded = true;
+
+  }
+
+  errorFn(err: string): void {
+    this.requestLoaded = true;
+    this.logger.error(err);
+  }
+
+  timeOutFn(): void {
+    this.requestLoaded = true;
+    this.logger.error('timeout');
   }
 }
