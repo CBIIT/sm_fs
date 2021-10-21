@@ -1,4 +1,4 @@
-import {FundingSourceTypes} from '../model/request/funding-source-types';
+import { FundingSourceTypes } from '../model/request/funding-source-types';
 
 export function getCurrentFiscalYear(): number {
   const today = new Date();
@@ -23,4 +23,17 @@ export function openNewWindow(url, windowName): void {
  */
 export function hasOwnProperty<X extends {}, Y extends PropertyKey>(obj: X, prop: Y): obj is X & Record<Y, unknown> {
   return obj.hasOwnProperty(prop);
+}
+
+export function isReallyANumber(x: string): boolean {
+  if(!x) {
+    return false;
+  }
+  if (Number.isNaN(x)) {
+    return false;
+  }
+
+  const regex = /^\d+$/;
+
+  return x.match(regex) !== null;
 }

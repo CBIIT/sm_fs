@@ -1,5 +1,6 @@
 import {Directive} from '@angular/core';
 import {AbstractControl, NG_VALIDATORS, ValidationErrors, Validator, ValidatorFn} from '@angular/forms';
+import { isReallyANumber } from '../utils/utils';
 
 @Directive({
   selector: '[appFundingSourceCostValidator]',
@@ -17,8 +18,7 @@ export const fundingSourceCostValidator: ValidatorFn = (control: AbstractControl
   const recommendedDirect = control.get('recommendedDirect');
   const recommendedTotal = control.get('recommendedTotal');
 
-
-  if (!recommendedDirect || !recommendedTotal || isNaN(recommendedDirect.value) || isNaN(recommendedTotal.value)) {
+  if (!recommendedDirect || !recommendedTotal || !isReallyANumber(recommendedDirect.value) || !isReallyANumber(recommendedTotal.value)) {
     return null;
   }
 
