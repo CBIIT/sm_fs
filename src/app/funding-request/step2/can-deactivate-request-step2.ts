@@ -25,7 +25,7 @@ export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> 
       return true;
     }
 
-    if (component.step2Form.dirty) {
+    if (component.step2Form.touched && component.step2Form.dirty) {
       const ret = confirm('Unsaved changes will be lost if you continue.');
       if (ret) {
         this.logger.debug('time to reset the request model');
