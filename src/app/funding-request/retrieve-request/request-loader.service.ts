@@ -6,6 +6,9 @@ import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conver
 import { CanManagementService } from '../../cans/can-management.service';
 import { Router } from '@angular/router';
 
+export type SuccessFunction = () => void;
+export type ErrorFunction = (s: string) => void;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -20,7 +23,7 @@ export class RequestLoaderService {
     private requestModel: RequestModel) {
   }
 
-  public loadRequest(frqId: number, path: string): void {
+  public loadRequest(frqId: number, successFn: SuccessFunction, errorFn: ErrorFunction): void {
     this.requestService.retrieveFundingRequestUsingGET(frqId).subscribe(
       (result) => {
         this.requestModel.reset();
@@ -67,15 +70,17 @@ export class RequestLoaderService {
             this.requestModel.restoreLineItems();
 
             this.requestModel.requestDto.financialInfoDto.fundingRequestId = this.requestModel.requestDto.frqId;
-            if (path) {
-              this.router.navigate([path]);
+            if (successFn) {
+              successFn();
             }
           });
         });
       },
       (error) => {
         this.logger.error('retrieveFundingRequest failed ', error);
-        this.error = 'not found';
+        if (errorFn) {
+          errorFn(error);
+        }
       }
     );
   }

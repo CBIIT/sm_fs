@@ -6,7 +6,7 @@ import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
 import { CanManagementService } from '../../cans/can-management.service';
-import { RequestLoaderService } from './request-loader.service';
+import { RequestLoaderService, SuccessFunction } from './request-loader.service';
 
 @Component({
   selector: 'app-retrieve-request',
@@ -33,11 +33,19 @@ export class RetrieveRequestComponent implements OnInit {
     this.path = this.route.snapshot.queryParamMap.get('forward') || '/request/step4';
 
     if (this.frqId) {
-      this.requestLoaderService.loadRequest(this.frqId, this.path);
+      this.requestLoaderService.loadRequest(this.frqId, this.successFn.bind(this), this.errorFn.bind(this));
     } else {
       this.error = 'not found';
     }
 
+  }
+
+  successFn(): void {
+    this.router.navigate([this.path]);
+  }
+
+  errorFn(e: string): void {
+    this.error = e;
   }
 
 
