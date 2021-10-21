@@ -59,15 +59,19 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   dtFundingRequestOptions: any = {};
   dtFundingPlanOptions: any = {};
+  dtGrantOptions: any = {};
   dtFundingRequestTrigger: Subject<any> = new Subject();
   dtFundingPlanTrigger: Subject<any> = new Subject();
+  dtGrantTrigger: Subject<any> = new Subject();
 
   fundingRequests: FundingRequestQueryDto[];
   fundingPlans: FundingPlanQueryDto[];
+  fundingGrants: any[];
   searchCriteria: FundSelectSearchCriteria;
 
   noFundingRequestResult: boolean = true;
   noFundingPlanResult: boolean = true;
+  noGrantResult: boolean = true;
   filterTypeLabel: string;
 
   selectedRows: Map<number, any> = new Map<number, any>();
@@ -163,7 +167,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {data: null, defaultContent: ''}
 
       ],
-      order: [[8, 'asc']],
+      order: [[15, 'desc']],
       responsive: {
         details: {
           type: 'column',
@@ -183,6 +187,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {responsivePriority: 6, targets: 5 }, // pd
         {responsivePriority: 7, targets: 6 }, // ca
         {responsivePriority: 8, targets: 14 }, // status
+        {responsivePriority: 8, targets: 15 }, // last action date
         {responsivePriority: 9, targets: 10 }, // request type
         {responsivePriority: 10, targets: 8 }, // reuest id
         {responsivePriority: 11, targets: 9 }, // request name
@@ -299,7 +304,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {data: null, defaultContent: ''}
 
       ],
-      order: [[3, 'asc']],
+      order: [[11, 'desc']],
       responsive: {
         details: {
           type: 'column',
@@ -353,6 +358,132 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     };
 
+    this.dtGrantOptions = {
+      pagingType: 'full_numbers',
+      pageLength: 100,
+      serverSide: true,
+      processing: false,
+      destroy: true,
+      language: {
+        paginate: {
+          first: '<i class="far fa-chevron-double-left" title="First"></i>',
+          previous: '<i class="far fa-chevron-left" title="Previous"></i>',
+          next: '<i class="far fa-chevron-right" title="Next"></i>',
+          last: '<i class="far fa-chevron-double-right" Last="First"></i>'
+        }
+      },
+      ajax: (dataTablesParameters: any, callback) => {
+        if (!this.searchCriteria) {
+          this.noGrantResult = true;
+          callback({
+            recordsTotal: 0,
+            recordsFiltered: 0,
+            data: []
+          });
+          return;
+        }
+
+        this.loaderService.show();
+        this.searchCriteria.params = dataTablesParameters;
+        this.logger.debug('Search for Grants parameters:', this.searchCriteria);
+        this.fsSearchControllerService.searchFundingRequestsUsingPOST(
+          this.searchCriteria).subscribe(
+          result => {
+            this.fundingGrants = result.data;
+            this.noGrantResult = result.recordsTotal <= 0;
+            callback({
+              recordsTotal: result.recordsTotal,
+              recordsFiltered: result.recordsFiltered,
+              data: result.data
+            });
+            this.loaderService.hide();
+          }, error => {
+            this.logger.error('HttpClient get request error for----- ' + error.message);
+            this.noGrantResult = true;
+            callback({
+              recordsTotal: 0,
+              recordsFiltered: 0,
+              data: []
+            });
+            alert(error.message);
+          });
+      },
+      columns: [
+        {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'}, // 0
+        {title: 'PI', data: 'piFullName', render: ( data, type, row, meta ) => {
+            return (!data || data == null) ? '' : '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          }, className: 'all'}, // 1
+        {title: 'Project Title', data: 'projectTitle'}, // 2
+        {title: 'I2 Status', data: 'applStatusGroupDescrip'}, // 3
+        {title: 'FOA', data: 'rfaPaNumber', render: ( data, type, row, meta ) => {
+            return (!data || data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="_blank">' + data + '</a>';
+          }, className: 'all'}, // 4
+        {title: 'FY', data: 'requestFy'}, // 5
+        {title: 'NCAB', data: 'formattedCouncilMeetingDate'}, // 6
+        {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
+            return (!data || data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          }}, // 7
+        {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'}, // 8
+        {title: 'Pctl', data: 'irgPercentileNum'}, // 9
+        {title: 'PriScr', data: 'priorityScoreNum'}, // 10
+        {title: 'Exists in Request', data: 'requests', defaultContent: '', className: 'all'}, // 11
+        {title: 'Exists in Plan', data: 'plans', defaultContent: '', className: 'all'}, // 12
+        {title: 'Exists in Paylist', data: 'paylists', defaultContent: '', className: 'all'}, // 13
+        {data: null, defaultContent: ''}
+
+      ],
+      order: [[0, 'asc']],
+      responsive: {
+        details: {
+          type: 'column',
+          target: -1
+        }
+      },
+      columnDefs: [
+        {
+          className: 'control',
+          orderable: false,
+          targets: -1
+        },
+        {responsivePriority: 1, targets: 0 }, // grant_num
+        {responsivePriority: 2, targets: 1 }, // pi
+        {responsivePriority: 3, targets: 5 }, // fy
+        {responsivePriority: 5, targets: 6 }, // ncab
+        {responsivePriority: 6, targets: 7 }, // pd
+        {responsivePriority: 7, targets: 8 }, // ca
+        {responsivePriority: 8, targets: 9 }, // pctl
+        {responsivePriority: 9, targets: 10 }, // priscr
+        {responsivePriority: 10, targets: 3 }, // i2 status
+        {responsivePriority: 11, targets: 2 } // project title
+      ],
+      dom: '<"dt-controls dt-top"l<"ml-4"i><"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
+      buttons: [
+        {
+          extend: 'excel',
+          className: 'btn-excel',
+          titleAttr: 'Excel export',
+          text: 'Export',
+          filename: 'fs-funding-requests-search-result',
+          title: null,
+          header: true,
+          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] }
+        }
+      ],
+      rowCallback: (row: Node, data: any[] | object, index: number) => {
+        // Fix for Excel output - I removed empty renderers in column definitions
+        // But now, I have to remove the first "text" child node to prevent it
+        // from rendering (angular datatables bug)
+        this.dtFundingRequestOptions.columns.forEach((column, ind) => {
+          if (column.ngTemplateRef) {
+            const cell = row.childNodes.item(ind);
+            if (cell.childNodes.length > 1) { // you have to leave at least one child node
+              $(cell.childNodes.item(0)).remove();
+            }
+          }
+        });
+      }
+    };
+
     this.selectedRows.clear();
   }
 
@@ -360,18 +491,21 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.dtFundingRequestTrigger.unsubscribe();
     this.dtFundingPlanTrigger.unsubscribe();
+    this.dtGrantTrigger.unsubscribe();
   }
 
   clear(): void {
     this.filterTypeLabel = '';
     this.noFundingPlanResult = true;
     this.noFundingRequestResult = true;
+    this.noGrantResult = true;
   }
 
   doFundingRequestSearch(criteria: FundSelectSearchCriteria, filterTypeLabel: string): void {
     this.searchCriteria = criteria;
-    this.noFundingPlanResult = true;
     this.noFundingRequestResult = false;
+    this.noFundingPlanResult = true;
+    this.noGrantResult = true;
     this.filterTypeLabel = filterTypeLabel;
     this.selectedRows.clear();
 //    this.batchApproveVisible = this.batchApproveService.canBatchApproveRequest();
@@ -385,6 +519,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.searchCriteria = criteria;
     this.noFundingRequestResult = true;
     this.noFundingPlanResult = false;
+    this.noGrantResult = true;
     this.filterTypeLabel = filterTypeLabel;
     this.selectedRows.clear();
 //    this.batchApproveVisible = this.batchApproveService.canBatchApprovePlan();
@@ -392,6 +527,19 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.runReportEnabled = false;
     this.logger.debug('Plan batch approval check ', this.batchApproveService, this.batchApproveVisible);
     this._triggerDtInstance(this.dtFundingPlanTrigger);
+  }
+
+  doGrantSearch(criteria: FundSelectSearchCriteria, filterTypeLabel: string): void {
+    this.searchCriteria = criteria;
+    this.noFundingRequestResult = true;
+    this.noFundingPlanResult = true;
+    this.noGrantResult = false;
+    this.filterTypeLabel = filterTypeLabel;
+    this.selectedRows.clear();
+//    this.batchApproveVisible = this.batchApproveService.canBatchApprovePlan();
+    this.batchApproveEnabled = false;
+    this.logger.debug('Plan batch approval check ', this.batchApproveService, this.batchApproveVisible);
+    this._triggerDtInstance(this.dtGrantTrigger);
   }
 
   _triggerDtInstance(trigger: Subject<any>): void {
