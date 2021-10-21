@@ -26,7 +26,7 @@ export function hasOwnProperty<X extends {}, Y extends PropertyKey>(obj: X, prop
 }
 
 export function isReallyANumber(x: string): boolean {
-  if(!x) {
+  if (!x) {
     return false;
   }
   if (Number.isNaN(x)) {
@@ -35,5 +35,5 @@ export function isReallyANumber(x: string): boolean {
 
   const regex = /^\d+$/;
 
-  return x.match(regex) !== null;
+  return String(x).match(regex) !== null;
 }
