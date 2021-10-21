@@ -421,7 +421,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedRows.delete($event.frqId);
       }
     }
-    this.batchApproveEnabled = this.selectedRows.size > 0;
+    this.batchApproveEnabled = this.enableBatchApprove('REQUEST');
   }
 
   onCaptureFPSelectedEvent($event: any): void {
@@ -433,7 +433,19 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedRows.delete($event.fprId);
       }
     }
-    this.batchApproveEnabled = this.selectedRows.size > 0;
+    this.batchApproveEnabled = this.enableBatchApprove('PLAN');
+  }
+
+  enableBatchApprove(requestOrPlan: 'REQUEST'|'PLAN'): boolean {
+    for (const id of this.selectedRows.keys()){
+      if (requestOrPlan === 'REQUEST' && this.batchApproveService.canApproveRequest(id)) {
+        return true;
+      }
+      else if (requestOrPlan === 'PLAN' && this.batchApproveService.canApprovePlan(id)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private _populateSelectedIntoResults(id: string, data: Array<any>): void {
@@ -455,11 +467,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get batchApproveVisible(): boolean {
     return ( !this.noFundingPlanResult
-             && this.batchApproveService.canBatchApprovePlan()
-             && this.searchCriteria?.searchWithIn === FilterTypeLabels.FILTER_FUNDING_PLAN_AWAITING_RESPONSE )
+             && this.batchApproveService.canBatchApprovePlan() )
+  //           && this.searchCriteria?.searchWithIn === FilterTypeLabels.FILTER_FUNDING_PLAN_AWAITING_RESPONSE )
         || ( !this.noFundingRequestResult
-             && this.batchApproveService.canBatchApproveRequest()
-             && this.searchCriteria.searchWithIn === FilterTypeLabels.FILTER_REQUEST_AWAITING_RESPONSE );
+             && this.batchApproveService.canBatchApproveRequest() );
+  //           && this.searchCriteria.searchWithIn === FilterTypeLabels.FILTER_REQUEST_AWAITING_RESPONSE );
   }
 
   showBatchApproveModal(): void {
@@ -483,14 +495,14 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   runDetailedReport(): void {
     if (this.fundingRequests && this.fundingRequests.length > 0) {
-        this.downloadDetailReport([...this.selectedRows.keys()],true);
+        this.downloadDetailReport([...this.selectedRows.keys()], true);
     }
     else if (this.fundingPlans && this.fundingPlans.length > 0) {
-      this.downloadDetailReport([...this.selectedRows.keys()],false);
+      this.downloadDetailReport([...this.selectedRows.keys()], false);
     }
   }
 
-  downloadDetailReport(ids : number[], isRequest :boolean) {
+  downloadDetailReport(ids: number[], isRequest: boolean): void {
     this.documentService.downloadDetailReport(ids, isRequest)
           .subscribe(
             (response: HttpResponse<Blob>) => {
