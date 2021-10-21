@@ -21,23 +21,18 @@ export class RetrieveRequestComponent implements OnInit {
   constructor(private router: Router,
               private route: ActivatedRoute,
               private requestLoaderService: RequestLoaderService,
-              private requestModel: RequestModel,
-              private requestService: FsRequestControllerService,
-              private userSessionService: AppUserSessionService,
-              private canManagementService: CanManagementService,
               private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
     this.frqId = this.route.snapshot.params.frqId;
-    this.path = this.route.snapshot.queryParamMap.get('forward') || '/request/step4';
+    this.path = this.route.snapshot.queryParams.forward || '/request/step4';
 
     if (this.frqId) {
       this.requestLoaderService.loadRequest(this.frqId, this.successFn.bind(this), this.errorFn.bind(this));
     } else {
       this.error = 'not found';
     }
-
   }
 
   successFn(): void {
