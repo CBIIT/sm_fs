@@ -70,6 +70,12 @@ export class RequestLoaderService {
             this.requestModel.restoreLineItems();
 
             this.requestModel.requestDto.financialInfoDto.fundingRequestId = this.requestModel.requestDto.frqId;
+            /*
+             * TODO - synchronize
+             * Note: the location of this function call is arbitrary; I inserted at the point where the original
+             * version was doing its routing. Ideally, we should synchronize all the above service calls and only
+             * invoke the success function when they're all complete.
+             */
             if (successFn) {
               successFn();
             }

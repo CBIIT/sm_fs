@@ -2,6 +2,7 @@ import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot, Router } fr
 import { NGXLogger } from 'ngx-logger';
 import { Injectable } from '@angular/core';
 import { Step2Component } from './step2.component';
+import { RequestLoaderService } from '../retrieve-request/request-loader.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { Step2Component } from './step2.component';
 export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> {
 
   constructor(
-    private router: Router,
+    private requestLoaderService: RequestLoaderService,
     private logger: NGXLogger) {
   }
 
