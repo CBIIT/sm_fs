@@ -22,6 +22,7 @@ import {CanDeactivatePlanStep1} from './funding-plan/plan-step1/can-deactivate-p
 import {ManageDesignationsComponent} from './manage-designations/manage-designations.component';
 import { RetrievePlanComponent } from './funding-plan/retrieve-plan/retrieve-plan.component';
 import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate-plan-step6';
+import { CanDeactivateRequestStep2 } from './funding-request/step2/can-deactivate-request-step2';
 
 const routes: Routes = [
   {
@@ -47,7 +48,7 @@ const routes: Routes = [
         {path: '', redirectTo: 'step1/new', pathMatch: 'full'},
         {path: 'step1', redirectTo: 'step1/', pathMatch: 'full'},
         {path: 'step1/:new', component: Step1Component, canActivate: [PdAuthGuard]},
-        {path: 'step2', component: Step2Component},
+        {path: 'step2', component: Step2Component, canDeactivate: [CanDeactivateRequestStep2]},
         {path: 'step3', component: Step3Component},
         {path: 'step4', component: Step4Component},
         {path: 'retrieve/:frqId', component: RetrieveRequestComponent}
