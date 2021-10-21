@@ -73,6 +73,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedRows: Map<number, any> = new Map<number, any>();
 
   batchApproveEnabled = false;
+  runReportEnabled = false;
+
   // batchApproveVisible = false;
 
   ngOnInit(): void {
@@ -374,6 +376,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedRows.clear();
 //    this.batchApproveVisible = this.batchApproveService.canBatchApproveRequest();
     this.batchApproveEnabled = false;
+    this.runReportEnabled = false;
     this.logger.debug('Request batch approval check ', this.batchApproveService, this.batchApproveVisible);
     this._triggerDtInstance(this.dtFundingRequestTrigger);
   }
@@ -386,6 +389,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedRows.clear();
 //    this.batchApproveVisible = this.batchApproveService.canBatchApprovePlan();
     this.batchApproveEnabled = false;
+    this.runReportEnabled = false;
     this.logger.debug('Plan batch approval check ', this.batchApproveService, this.batchApproveVisible);
     this._triggerDtInstance(this.dtFundingPlanTrigger);
   }
@@ -422,6 +426,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     this.batchApproveEnabled = this.enableBatchApprove('REQUEST');
+    this.runReportEnabled = this.selectedRows.size > 0;
+
   }
 
   onCaptureFPSelectedEvent($event: any): void {
@@ -434,6 +440,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     this.batchApproveEnabled = this.enableBatchApprove('PLAN');
+    this.runReportEnabled = this.selectedRows.size > 0;
+
   }
 
   enableBatchApprove(requestOrPlan: 'REQUEST'|'PLAN'): boolean {
