@@ -327,6 +327,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
 
   prepareLineItem(): void {
     this.logger.debug('prepareLineItem()');
+    this.prcForm?.resetForm();
     this.locked = false;
     if (this.percentCutUsed) {
       this.locked = true;
