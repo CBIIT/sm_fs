@@ -58,7 +58,7 @@ export class BudgetInfoComponent implements OnInit {
   ngOnInit(): void {
     this.initialPay = INITIAL_PAY_TYPES.includes(this.model.requestDto?.frtId);
     this.requestNciFseIds = this.model.programRecommendedCostsModel.fundingSources.filter(
-      fs => fs.nciSourceFlag &&
+      fs => ( fs.nciSourceFlag === 'Y') &&
         this.model.programRecommendedCostsModel.selectedFundingSourceIds.has(fs.fundingSourceId)
     ).map(fs => fs.fundingSourceId);
     this.logger.debug('NCI Funding Source Ids', this.requestNciFseIds);
@@ -159,6 +159,7 @@ export class BudgetInfoComponent implements OnInit {
   isFormValid(canWarning: CanWarning): boolean {
     const selectedCans: string[] = [];
     for (const canSelector of this.canSelectors) {
+      this.logger.debug('CanSelector Validation index= ' + canSelector.index + ' can=' + canSelector.selectedValue);
       if (!canSelector.selectedValue ) {
         canWarning.missingCan = true;
       }
