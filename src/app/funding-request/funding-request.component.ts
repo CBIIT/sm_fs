@@ -10,7 +10,6 @@ import { Step4Component } from './step4/step4.component';
   selector: 'app-funding-request',
   templateUrl: './funding-request.component.html',
   styleUrls: ['./funding-request.component.css'],
-  providers: [GrantsSearchFilterService, NavigationStepModel]
 })
 export class FundingRequestComponent implements OnInit, OnDestroy {
   activeStep = {step: 0, name: '', route: null};

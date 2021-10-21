@@ -1,8 +1,7 @@
 import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
-import { PlanStep1Component } from './plan-step1.component';
 import { NGXLogger } from 'ngx-logger';
-
 import { Injectable } from '@angular/core';
+import { Step2Component } from './step2.component';
 
 @Injectable({
   providedIn: 'root'
@@ -12,13 +11,12 @@ export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> 
   constructor(private logger: NGXLogger) {
   }
 
-
   canDeactivate(
     component: Step2Component,
     route: ActivatedRouteSnapshot,
     currentState: RouterStateSnapshot,
     nextState?: RouterStateSnapshot): boolean {
-    
+
     if (nextState?.url?.startsWith('/request/step1/new')) {
       return true;
     }
