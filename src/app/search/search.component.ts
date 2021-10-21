@@ -52,7 +52,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
               private batchApproveService: BatchApproveService,
               private gwbLinksService: GwbLinksService
             ) {
-    this.router.routeReuseStrategy.shouldReuseRoute = (() => false);
+    // this.router.routeReuseStrategy.shouldReuseRoute = (() => false);
     console.log('state in constructor:', this.router.getCurrentNavigation().extras.state);
   }
 
@@ -236,6 +236,23 @@ export class SearchComponent implements OnInit, AfterViewInit {
       this.logger.debug("Search Funding Plans criteria in component: ", fsCritera);
       this.searchResultComponent.doFundingPlanSearch(fsCritera,
         FilterTypeLabels.FILTER_FUNDING_PLAN);
+    }
+    else if (sc.searchType === 'G') {
+      const fsCritera: FundSelectSearchCriteria = {};
+      fsCritera.fyFrom = sc.fyRange?.fromFy;
+      fsCritera.fyTo = sc.fyRange?.toFy;
+      fsCritera.i2status = sc.i2status;
+      fsCritera.grantIc = sc.grantNumber?.grantNumberIC;
+      fsCritera.grantMech = sc.grantNumber?.grantNumberMech;
+      fsCritera.grantSerial = sc.grantNumber?.grantNumberSerial;
+      fsCritera.grantSuffix = sc.grantNumber?.grantNumberSuffix;
+      fsCritera.grantType = sc.grantNumber?.grantNumberType;
+      fsCritera.grantYear = sc.grantNumber?.grantNumberYear;
+      fsCritera.piName = sc.piName;
+
+      this.logger.debug("Search Grants criteria in component: ", fsCritera);
+      this.searchResultComponent.doGrantSearch(fsCritera,
+        FilterTypeLabels.FILTER_GRANT);
     }
   }
 
@@ -422,7 +439,8 @@ export enum FilterTypeLabels {
    FILTER_PAYLINE = "=My Paylines",
    FILTER_FUNDING_PLAN_UNDER_REVIEW = "My Funding Plans Under Review",
    FILTER_FUNDING_REQUEST = "Search for Existing Requests",
-   FILTER_FUNDING_PLAN = "Search for Existing Plans"
+   FILTER_FUNDING_PLAN = "Search for Existing Plans",
+   FILTER_GRANT = "Search for Existing Grants"
 }
 
 
