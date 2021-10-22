@@ -25762,3 +25762,16 @@ td .grant-icons {
 .no-drag-auto-number.doc-desc {
   font-style: italic;
 }
+
+.d-flex.left-float{
+  float: left;
+}
+
+.modal-scroll-bar{
+  height : 600px;
+  overflow:scroll;
+}
+button.btn.brn-primary.add-margin{
+  margin-left: 10px;
+  margin-right :10px;
+}
