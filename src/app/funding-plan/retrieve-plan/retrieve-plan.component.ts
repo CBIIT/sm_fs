@@ -7,6 +7,7 @@ import { PlanModel } from 'src/app/model/plan/plan-model';
 import { PlanManagementService } from '../service/plan-management.service';
 import { CanManagementService } from '../../cans/can-management.service';
 import { PlanLoaderService } from './plan-loader.service';
+import { ErrorFunction, SuccessFunction } from '../../funding-request/retrieve-request/request-loader.service';
 
 @Component({
   selector: 'app-retrieve-plan',
@@ -33,13 +34,21 @@ export class RetrievePlanComponent implements OnInit {
     this.path = '/plan/step6';
 
     if (this.fprId) {
-      this.loadPlan(this.fprId);
+      this.loadPlan(this.fprId, this.successFn.bind(this), this.errorFn.bind(this));
     } else {
       this.error = 'not found';
     }
   }
 
-  loadPlan(fprId: number): void {
+  successFn(): void {
+    this.router.navigate([this.path]);
+  }
+
+  errorFn(e: string): void {
+    this.error = e;
+  }
+
+  loadPlan(fprId: number, succesFn: SuccessFunction, errorFn: ErrorFunction): void {
     this.planService.retrieveFundingPlanUsingGET(fprId).subscribe(
       (result) => {
         this.planModel.reset();
@@ -66,11 +75,16 @@ export class RetrievePlanComponent implements OnInit {
         this.planManagementService.buildPlanModel();
         this.planManagementService.buildGrantCostModel();
         this.planManagementService.buildOefiaTypeMaps();
-        this.router.navigate([this.path]);
+        if (succesFn) {
+          succesFn();
+        }
+        // this.router.navigate([this.path]);
       },
       (error) => {
         this.logger.error('retrieveFundingPlan failed ', error);
-        this.error = 'not found';
+        if (errorFn) {
+          errorFn(error);
+        }
       }
     );
   }
