@@ -1,4 +1,4 @@
-import { CanDeactivate } from '@angular/router';
+import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { PlanStep6Component } from './plan-step6.component';
 
@@ -13,7 +13,10 @@ export class CanDeactivatePlanStep6 implements CanDeactivate<PlanStep6Component>
    * @param component - @see PlanStep6Component
    * @return boolean if the step can be deactivated
    */
-  canDeactivate(component: PlanStep6Component): boolean {
+  canDeactivate(component: PlanStep6Component, route: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState?: RouterStateSnapshot): boolean {
+    if (nextState && nextState.url && nextState.url.startsWith('/plan/step')) {
+      return true;
+    }
     if (component.isDirty()) {
       const ret = confirm('Unsaved changes will be lost if you continue.');
       if (ret) {

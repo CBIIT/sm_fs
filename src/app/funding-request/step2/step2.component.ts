@@ -21,6 +21,7 @@ import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 export class Step2Component implements OnInit {
   @ViewChild(ProgramRecommendedCostsComponent) prc: ProgramRecommendedCostsComponent;
   @ViewChild('step2Form', { static: false }) step2Form: NgForm;
+  clean = true;
 
   alerts: Alert[] = [];
 
@@ -37,6 +38,9 @@ export class Step2Component implements OnInit {
       this.router.navigate(['/request']);
     }
     this.navigationModel.setStepLinkable(2, true);
+    this.requestModel.modelDirtyBroadcastEmitter.subscribe( () => {
+      this.clean = false;
+    });
   }
 
   saveAndContinue(): void {
@@ -93,6 +97,8 @@ export class Step2Component implements OnInit {
           });
         this.requestApproverService.checkCreateApprovers().finally(
           () => {
+            this.clean = true;
+
             if (navigate) {
               this.router.navigate([navigate]);
             }

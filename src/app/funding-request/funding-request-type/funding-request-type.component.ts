@@ -84,7 +84,7 @@ export class FundingRequestTypeComponent implements OnInit {
     // If we are changing to or from one of the clearable request types, we need to blow away the entire
     // PRC model
     if (valueChanged && (this.clearableTypes.includes(+value) || this.clearableTypes.includes(+this._selectedValue))) {
-      this.logger.warn('About to do something totally drastic: blowing away PRC model');
+      // this.logger.warn('About to do something totally drastic: blowing away PRC model');
       // this.model.programRecommendedCostsModel.deepReset(!!this.model.requestDto.frqId);
       for (let i = this.model.programRecommendedCostsModel?.selectedFundingSources?.length -1; i >= 0; i--) {
         this.model.programRecommendedCostsModel.deleteFundingSourceByIndex(i, !!this.model.requestDto.frqId);

@@ -7,6 +7,12 @@
     appCancerActivityRequired>
   <input type="hidden" #prcValidValue="ngModel" [ngModel]="prcValid" name="prcValid" required>
 
+<!--  <div class="row" *ngIf="step2Form.touched">-->
+<!--    <div class="col-lg-12">-->
+<!--      <i class="fas fa-alien-monster"></i>-->
+<!--    </div>-->
+<!--  </div>-->
+
   <app-grant-information></app-grant-information>
   <hr>
   <div class="row">
@@ -40,7 +46,8 @@
     <div class="row">
       <div class="col-lg-6" *ngIf="!isSkipRequest()">
         <div class="form-group">
-          <app-other-docs-contributing-funds [preSelectedDocs]="requestModel?.requestDto?.financialInfoDto?.otherDocText"></app-other-docs-contributing-funds>
+          <app-other-docs-contributing-funds
+            [preSelectedDocs]="requestModel?.requestDto?.financialInfoDto?.otherDocText"></app-other-docs-contributing-funds>
         </div>
       </div>
 
@@ -53,7 +60,6 @@
         </div>
       </div>
     </div>
-
 
 
     <div class="row" *ngIf="isDiversitySupplement()">

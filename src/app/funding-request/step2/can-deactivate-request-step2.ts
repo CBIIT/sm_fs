@@ -23,7 +23,15 @@ export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> 
     currentState: RouterStateSnapshot,
     nextState?: RouterStateSnapshot): boolean {
 
-    if (nextState?.url?.startsWith('/request/step1/new')) {
+    const id = component.model.requestDto.frqId;
+
+    if (nextState?.url?.startsWith('/request/step1')) {
+      return true;
+    } else if (nextState?.url?.startsWith('/request/step')) {
+      // pre-emptively restore data until we have better checks in place.
+      this.requestLoaderService.loadRequest(id, this.successFn.bind(this), this.errorFn.bind(this));
+      return true;
+    } else if (nextState?.url?.startsWith('/request/')) {
       return true;
     }
 
@@ -31,19 +39,22 @@ export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> 
       return true;
     }
 
-    if (component.step2Form.touched && component.step2Form.dirty) {
-      const ret = confirm('Unsaved changes will be lost if you continue.');
-      if (ret) {
-        this.logger.debug('time to reset the request model');
-        const id = component.model.requestDto.frqId;
-        setTimeout(this.timeOutFn.bind(this), 5000);
-        this.requestLoaderService.loadRequest(id, this.successFn.bind(this), this.errorFn.bind(this));
-        return true;
-      } else {
-        return false;
-      }
+    this.logger.info(component.step2Form);
+    // return false;
+
+    // In this scenario, they are trying to leave the /request/ context and go elswhere, so we need to warn them
+    // of unsaved changes.
+    // if (!component.clean || component.step2Form.touched && component.step2Form.dirty) {
+    const ret = confirm('Unsaved changes will be lost if you continue.');
+    if (ret) {
+      this.logger.debug('time to reset the request model');
+      this.requestLoaderService.loadRequest(id, this.successFn.bind(this), this.errorFn.bind(this));
+      return true;
+    } else {
+      return false;
     }
-    return true;
+    // }
+    // return true;
   }
 
   successFn(): void {
@@ -54,10 +65,5 @@ export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> 
   errorFn(err: string): void {
     this.requestLoaded = true;
     this.logger.error(err);
-  }
-
-  timeOutFn(): void {
-    this.requestLoaded = true;
-    this.logger.error('timeout');
   }
 }
