@@ -4,7 +4,6 @@ import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
 import { RequestModel } from '../../model/request/request-model';
 import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
 import { CanManagementService } from '../../cans/can-management.service';
-import { Router } from '@angular/router';
 
 export type SuccessFunction = () => void;
 export type ErrorFunction = (s: string) => void;
@@ -17,7 +16,6 @@ export class RequestLoaderService {
 
   constructor(
     private logger: NGXLogger,
-    private router: Router,
     private requestService: FsRequestControllerService,
     private canManagementService: CanManagementService,
     private requestModel: RequestModel) {

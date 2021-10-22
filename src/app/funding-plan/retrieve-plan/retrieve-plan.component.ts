@@ -6,6 +6,7 @@ import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dt
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { PlanManagementService } from '../service/plan-management.service';
 import { CanManagementService } from '../../cans/can-management.service';
+import { PlanLoaderService } from './plan-loader.service';
 
 @Component({
   selector: 'app-retrieve-plan',
@@ -14,9 +15,11 @@ import { CanManagementService } from '../../cans/can-management.service';
 })
 export class RetrievePlanComponent implements OnInit {
   fprId: number;
+  path: string;
   error = '';
 
   constructor(private router: Router,
+              private planLoaderService: PlanLoaderService,
               private route: ActivatedRoute,
               private planModel: PlanModel,
               private planManagementService: PlanManagementService,
@@ -27,44 +30,49 @@ export class RetrievePlanComponent implements OnInit {
 
   ngOnInit(): void {
     this.fprId = this.route.snapshot.params.fprId;
+    this.path = '/plan/step6';
+
     if (this.fprId) {
-      this.planService.retrieveFundingPlanUsingGET(this.fprId).subscribe(
-        (result) => {
-          this.planModel.reset();
-          this.planModel.title = 'View Plan Details for';
-          this.planModel.returnToSearchLink = true;
-          this.planModel.fundingPlanDto = result.FundingPlanDto;
-          this.planModel.allGrants = result.AllGrants;
-          this.planModel.minimumScore = this.planModel.fundingPlanDto.fundableRangeFrom;
-          this.planModel.maximumScore = this.planModel.fundingPlanDto.fundableRangeTo;
-          this.planModel.markMainApproversCreated();
-          const selectedApplIds: number[] = result.SelectedApplIds;
-
-          if (selectedApplIds && this.planModel.allGrants) {
-            this.planModel.allGrants.forEach(g => {
-              g.selected = selectedApplIds.includes(Number(g.applId));
-            });
-          }
-
-          if (this.planModel.allGrants) {
-            this.planModel.allGrants.forEach(g => this.addRfaNcabToSearchCriteria(g));
-          }
-          this.planModel.takeDocumentSnapshot();
-          this.logger.debug('retrieved plan:', JSON.stringify(this.planModel.fundingPlanDto));
-          this.planManagementService.buildPlanModel();
-          this.planManagementService.buildGrantCostModel();
-          this.planManagementService.buildOefiaTypeMaps();
-          this.router.navigate(['/plan/step6']);
-        },
-        (error) => {
-          this.logger.error('retrieveFundingPlan failed ', error);
-          this.error = 'not found';
-        }
-      );
+      this.loadPlan(this.fprId);
     } else {
       this.error = 'not found';
     }
+  }
 
+  loadPlan(fprId: number): void {
+    this.planService.retrieveFundingPlanUsingGET(fprId).subscribe(
+      (result) => {
+        this.planModel.reset();
+        this.planModel.title = 'View Plan Details for';
+        this.planModel.returnToSearchLink = true;
+        this.planModel.fundingPlanDto = result.FundingPlanDto;
+        this.planModel.allGrants = result.AllGrants;
+        this.planModel.minimumScore = this.planModel.fundingPlanDto.fundableRangeFrom;
+        this.planModel.maximumScore = this.planModel.fundingPlanDto.fundableRangeTo;
+        this.planModel.markMainApproversCreated();
+        const selectedApplIds: number[] = result.SelectedApplIds;
+
+        if (selectedApplIds && this.planModel.allGrants) {
+          this.planModel.allGrants.forEach(g => {
+            g.selected = selectedApplIds.includes(Number(g.applId));
+          });
+        }
+
+        if (this.planModel.allGrants) {
+          this.planModel.allGrants.forEach(g => this.addRfaNcabToSearchCriteria(g));
+        }
+        this.planModel.takeDocumentSnapshot();
+        this.logger.debug('retrieved plan:', JSON.stringify(this.planModel.fundingPlanDto));
+        this.planManagementService.buildPlanModel();
+        this.planManagementService.buildGrantCostModel();
+        this.planManagementService.buildOefiaTypeMaps();
+        this.router.navigate([this.path]);
+      },
+      (error) => {
+        this.logger.error('retrieveFundingPlan failed ', error);
+        this.error = 'not found';
+      }
+    );
   }
 
   addRfaNcabToSearchCriteria(g: NciPfrGrantQueryDtoEx): void {

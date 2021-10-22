@@ -63,19 +63,19 @@ export class PlanStep3Component implements OnInit {
     this.navigationModel.setStepLinkable(3, true);
 
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
-      this.logger.debug('new cayCode received');
+      // this.logger.debug('new cayCode received');
       this.cayCode = typeof next === 'string' ? next : next[0];
       this.planCoordinatorService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
     });
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
-      this.logger.debug('new PD received');
+      // this.logger.debug('new PD received');
       this.pdNpnId = next;
       this.planCoordinatorService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
     });
 
 
     this.pdCaIntegratorService.docEmitter.subscribe(next => {
-      this.logger.debug('new DOC: ', next);
+      // this.logger.debug('new DOC: ', next);
       this.doc = next;
     });
 
@@ -100,7 +100,7 @@ export class PlanStep3Component implements OnInit {
 
   onSubmit($event: any): void {
     this.alerts = null;
-    this.logger.debug($event);
+    // this.logger.debug($event);
     if (this.step3form.valid) {
       this.buildPlanModel();
       if (!isNaN(this.planModel.fundingPlanDto.pubYr1SetAsideAmt) && !isNaN(this.planModel.fundingPlanDto.totalRecommendedAmt)
@@ -151,7 +151,7 @@ export class PlanStep3Component implements OnInit {
   }
 
   buildPlanModel(): void {
-    this.logger.debug('Building plan model');
+    // this.logger.debug('Building plan model');
     this.planModel.fundingPlanDto.planName = this.planName;
     if (!this.planModel.fundingPlanDto.planFy) {
       this.planModel.fundingPlanDto.planFy = getCurrentFiscalYear();
@@ -184,7 +184,6 @@ export class PlanStep3Component implements OnInit {
 
     const futureYears: Map<number, number> = new Map<number, number>();
     this.applicationsProposedForFunding.grantList.forEach(item => {
-      this.logger.debug('grant thing ==>', item);
       if (!!item.recommendedFutureYearsComponent) {
         const applId = item.grant.applId;
         const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue || 0;
@@ -256,7 +255,7 @@ export class PlanStep3Component implements OnInit {
     let totalRecommendedAmount = 0;
     let directRecommendedAmount = 0;
     this.applicationsProposedForFunding.prcList.forEach((item, index) => {
-      this.logger.debug('prc item', index, item);
+      // this.logger.debug('prc item', index, item);
       const source = fundingSourceDetails.get(item.sourceIndex);
       if (!!source) {
         let directCost: number;

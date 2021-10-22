@@ -1,9 +1,9 @@
-import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot} from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { Injectable } from '@angular/core';
 import { Step2Component } from './step2.component';
 import { RequestLoaderService } from '../retrieve-request/request-loader.service';
-import { noop } from 'rxjs';
+import { FormControl } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -39,8 +39,10 @@ export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> 
       return true;
     }
 
-    this.logger.info(component.step2Form);
-    // return false;
+    // this.logger.info(component.step2Form);
+    // Object.keys(component.step2Form.controls).forEach(key => {
+    //   this.logger.debug(key, component.step2Form.controls[key], component.step2Form.controls[key]._pendingDirty);
+    // });
 
     // In this scenario, they are trying to leave the /request/ context and go elswhere, so we need to warn them
     // of unsaved changes.

@@ -67,14 +67,14 @@ export class FpFundingSourceComponent implements OnInit {
     });
     this.rfaPaNumber = this.allRfaPaNumbers[0];
     this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
-      this.logger.debug(next);
+      // this.logger.debug(next);
       this.refreshSources(next.pd, next.ca);
     });
 
     if (this.planCoordinatorService.listSelectedSources) {
       const src = this.planCoordinatorService.listSelectedSources[this.index];
 
-      this.logger.debug('initial source', this.index, src);
+      // this.logger.debug('initial source', this.index, src);
       if (src) {
         this.selectedValue = Number(src.fundingSourceId);
       }
@@ -83,10 +83,10 @@ export class FpFundingSourceComponent implements OnInit {
 
   private refreshSources(pd: number, ca: string): void {
     if (!pd || !ca || !this.rfaPaNumber) {
-      this.logger.debug('no pd, ca or rfaNumber', pd, '-', ca, '-', this.rfaPaNumber);
+      // this.logger.debug('no pd, ca or rfaNumber', pd, '-', ca, '-', this.rfaPaNumber);
       return;
     }
-    this.logger.debug('refreshSources(' + pd + ', ' + ca + ')', this.selectedValue);
+    // this.logger.debug('refreshSources(' + pd + ', ' + ca + ')', this.selectedValue);
     const tmp: Select2OptionData[] = [];
     this.planControllerService.getFundingPlanFundingSourcesUsingGET(ca, this.fy, pd, this.rfaPaNumber).subscribe(result => {
       this.planCoordinatorService.fundingSourceListEmitter.next(result);

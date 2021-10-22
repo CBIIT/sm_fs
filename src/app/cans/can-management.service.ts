@@ -56,7 +56,7 @@ export class CanManagementService {
       return;
     }
     this.getFundingRequestCanDisplays(fseIds).subscribe(result => {
-      this.logger.debug('CAN display matrix:', result);
+      // this.logger.debug('CAN display matrix:', result);
       this.canDisplayMatrix = new Map(result.map(c => [c.fseId, c]));
     });
   }
@@ -131,7 +131,7 @@ export class CanManagementService {
   getRequestCans(frqId: number): Observable<FundingRequestCanDto[]> {
     const tmp = this.cachedRequestCans.get(frqId);
     if (tmp) {
-      this.logger.debug('returning cached request cans:', frqId);
+      // this.logger.debug('returning cached request cans:', frqId);
       return new Observable(subscriber => {
         subscriber.next(tmp);
       });

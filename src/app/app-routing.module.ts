@@ -23,6 +23,7 @@ import {ManageDesignationsComponent} from './manage-designations/manage-designat
 import { RetrievePlanComponent } from './funding-plan/retrieve-plan/retrieve-plan.component';
 import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate-plan-step6';
 import { CanDeactivateRequestStep2 } from './funding-request/step2/can-deactivate-request-step2';
+import { CanDeactivatePlanStep3 } from './funding-plan/plan-step3/can-deactivate-plan-step3';
 
 const routes: Routes = [
   {
@@ -38,7 +39,7 @@ const routes: Routes = [
         {path: 'step1', redirectTo: 'step1/', pathMatch: 'full'},
         {path: 'step1/:new', component: PlanStep1Component, canDeactivate: [CanDeactivatePlanStep1], canActivate: [PdAuthGuard]},
         {path: 'step2', component: PlanStep2Component},
-        {path: 'step3', component: PlanStep3Component},
+        {path: 'step3', component: PlanStep3Component, canDeactivate: [CanDeactivatePlanStep3]},
         {path: 'step4', component: PlanStep4Component},
         {path: 'step5', component: PlanStep5Component},
         {path: 'step6', component: PlanStep6Component, canDeactivate: [CanDeactivatePlanStep6]},
