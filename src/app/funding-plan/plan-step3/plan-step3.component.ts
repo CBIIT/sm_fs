@@ -159,6 +159,7 @@ export class PlanStep3Component implements OnInit {
 
     this.planModel.fundingPlanDto.requestorDoc = this.doc;
     this.planModel.fundingPlanDto.requestorNpnId = this.pdNpnId;
+    this.planModel.fundingPlanDto.requestorNpeId = null;
     this.planModel.fundingPlanDto.cayCode = this.cayCode;
 
     this.planModel.fundingPlanDto.otherContributingDocs = this.otherDocs.selectedValue;
