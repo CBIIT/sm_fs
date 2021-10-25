@@ -16217,6 +16217,10 @@ input[type="button"].btn-block {
   background-color: #fff;
   border: 1px solid #a3a6ad;
   border-radius: 0.25rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space:nowrap;
+  padding-right:15%;
 }
 
 /* line 342, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_custom-forms.scss */
@@ -16420,7 +16424,12 @@ input[type="button"].btn-block {
 .custom-file-label,
 .custom-select {
   transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowwrap;
+  padding-right: 27%;
 }
+
 
 @media (prefers-reduced-motion: reduce) {
   /* line 503, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_custom-forms.scss */
