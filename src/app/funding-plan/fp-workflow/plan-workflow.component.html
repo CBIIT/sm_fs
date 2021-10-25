@@ -1,4 +1,4 @@
-<app-fp-grant-management *ngIf="showGmInfo()" 
+<app-fp-grant-management *ngIf="showGmInfo()"
     [approvingState]="approvingState" id="workflow-grant-management">
 </app-fp-grant-management>
 <div class="row">
@@ -8,7 +8,7 @@
         aria-expanded="true" aria-controls="workflow-collapse"></a>
     </div>
 </div>
-  
+
 <div class="row collapse show" id="workflow-collapse">
 
     <div class="col-12" *ngIf="isApprover() && requestStatus && requestStatus.comments">
@@ -20,7 +20,7 @@
             </div>
         </ngb-alert>
     </div>
-    
+
     <div class="col-md-6 col-lg-4" *ngIf="isApprover()">
         <div class="form-group">
             <label for="workflow-action">Action</label>
@@ -51,17 +51,24 @@
             <div class="text-danger mt-1" *ngIf="(validationError?.approver_missing)">
                 New approver is required
             </div>
-        </div>  
+        </div>
     </div>
-    <div class="col-md-4" *ngIf="showSplMeetingDate">
+  <div class="col-12" *ngIf="showBudgetDocWarning">
+    <ngb-alert type="warning" [dismissible]="false">
+      <b>WARNING:</b> If the uploaded budget document(s) are not in eGrants,
+      please send the document(s) to the appropriate Grants Management Specialist to
+      add it the grant file in eGrants.
+    </ngb-alert>
+  </div>
+  <div class="col-md-4" *ngIf="showSplMeetingDate">
         <div class="form-group">
           <label for="startDate">SPL Committee Meeting Approval Date</label>
           <div class="input-group">
-            <input id="splMeetingDate" class="form-control" 
-                   name="splMeetingDate" [(ngModel)]="splMeetingDate" 
+            <input id="splMeetingDate" class="form-control"
+                   name="splMeetingDate" [(ngModel)]="splMeetingDate"
                    placeholder="mm/dd/yyyy"
                    ngbDatepicker #d="ngbDatepicker" [maxDate]="maxDate"
-                   (dateSelect)="onSplMeetingDateSelect($event)" 
+                   (dateSelect)="onSplMeetingDateSelect($event)"
                    (click)="d.toggle()">
             <div class="input-group-append">
               <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d.toggle()" type="button">
@@ -73,20 +80,20 @@
             SPL Committee Meeting Approval Date is required
           </div>
           <div class="text-danger mt-1" *ngIf="(validationError?.splMeetingDate_future)">
-            SPL Committee Meeting Approval Date should be current or in the past 
+            SPL Committee Meeting Approval Date should be current or in the past
           </div>
         </div>
     </div>
     <div class="col-12"  *ngIf="workflowStuckBy">
-        <ng-container *ngIf="workflowStuckBy === 'ByCompletedPfrs'"> 
+        <ng-container *ngIf="workflowStuckBy === 'ByCompletedPfrs'">
         <ngb-alert type="danger" [dismissible]="false" *ngFor="let r of completedPfrs">
-            This Funding Plan has a Grant application <a href="{{grantViewerUrl+r.applId}}" target="yourgrant">{{r.fullGrantNum}}</a> 
-            that also has a completed "Initial Pay" PFR 
-            <a (click)="retrieveRequest(r.frqId)">{{r.frqId}}</a> in FY {{r.requestFy}}. 
+            This Funding Plan has a Grant application <a href="{{grantViewerUrl+r.applId}}" target="yourgrant">{{r.fullGrantNum}}</a>
+            that also has a completed "Initial Pay" PFR
+            <a (click)="retrieveRequest(r.frqId)">{{r.frqId}}</a> in FY {{r.requestFy}}.
             The selected action cannot be processed.
         </ngb-alert>
         </ng-container>
-    </div> 
+    </div>
     <app-approver-list [readonly]="readonly" [terminalRequest]="terminalRequest" class="w-100"></app-approver-list>
 
     <div class="col-12">
@@ -98,15 +105,15 @@
             </span>
             <span class="character-counter">{{comments.length}}/2000</span>
         </div>
-        
+
     </div>
 
 </div><!-- END Row Collapse -->
 
-<div class="row collapse show" id="workflow-collapse">  
+<div class="row collapse show" id="workflow-collapse">
     <div class="col-12"  *ngIf="alert">
             <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
-    </div> 
+    </div>
     <div class="col-12 d-flex mb-4" *ngIf="isApprover()">
         <button class="btn btn-primary ml-auto" (click)="submitWorkflow()" [disabled]="buttonDisabled">{{buttonLabel}}</button>
     </div>

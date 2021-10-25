@@ -342,9 +342,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       if (updatedCANs?.length > 0) {
         dto.requestCans = updatedCANs;
       }
-      if (this.workflowModel.budgetDocAdded) {
-        alert('WARNING: If the uploaded budget document(s) are not in eGrants, please send the document(s) to the appropriate Grants Management Specialist to add it the grant file in eGrants.');
-      }
+
     }
 
     if (this.workflowModel.isGMApprover &&
@@ -365,8 +363,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
           this.planModel.fundingPlanDto.splMeetingDate = new Date(dto.splMeetingDate);
           this.logger.debug('set SplMeetingDate to planModel ' + this.planModel.fundingPlanDto.splMeetingDate);
 
-        }
-        else if (dto.action === WorkflowActionCode.RETURN) {
+        } else if (dto.action === WorkflowActionCode.RETURN) {
           this.planModel.fundingPlanDto.splMeetingDate = undefined;
         }
         this.showAddApprover = false;
@@ -381,7 +378,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   checkIfStuck(): void {
     if ((this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE ||
-      this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE_COMMENT) &&
+        this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE_COMMENT) &&
       this.approvingState &&
       this.workflowModel.lastInChain &&
       this.completedPfrs &&
@@ -429,6 +426,12 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   isDirty(): boolean {
     return this._dirty || this.workflowModel.hasNewApprover || this.gmComponent?.isFormDirty();
+  }
+
+  get showBudgetDocWarning(): boolean {
+    return this.workflowModel.isFinancialApprover
+      && this.workflowModel.isApprovalAction(this._selectedWorkflowAction?.action)
+      && this.workflowModel.budgetDocAdded;
   }
 
   onCommentsInput(): void {
