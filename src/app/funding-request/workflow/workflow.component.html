@@ -66,7 +66,15 @@
             add it the grant file in eGrants.
         </ngb-alert>
     </div> 
-
+    <div class="col-12"  *ngIf="workflowStuckBy">
+        <ng-container *ngIf="workflowStuckBy === 'ByCompletedPfrs'">
+        <ngb-alert type="danger" [dismissible]="false" *ngFor="let r of completedPfrs">
+            This Grant application is part of Funding Plan 
+            <a (click)="retrievePlan(r.fprId)">{{r.fprId}}</a> in FY {{r.planFy}}.  
+            The selected action cannot be processed.
+        </ngb-alert>
+        </ng-container>
+    </div>
     <app-approver-list [readonly]="readonly" [terminalRequest]="terminalRequest" class="w-100"></app-approver-list>
 
     <div class="col-12">
