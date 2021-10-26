@@ -25650,6 +25650,8 @@ td .grant-icons {
 /* line 462, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 #submission-package .card .card-header .doc-buttons {
   margin-left: auto;
+  min-width: 60px;
+  text-align: right;
 }
 
 /* line 470, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
