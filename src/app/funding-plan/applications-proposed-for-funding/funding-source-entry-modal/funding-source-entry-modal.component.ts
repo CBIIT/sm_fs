@@ -16,8 +16,6 @@ import { PlanManagementService } from '../../service/plan-management.service';
   selector: 'app-funding-source-entry-modal',
   templateUrl: './funding-source-entry-modal.component.html',
   styleUrls: ['./funding-source-entry-modal.component.css'],
-  // viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
-
 })
 export class FundingSourceEntryModalComponent implements OnInit {
   @Input() title = 'Add Funding Source';

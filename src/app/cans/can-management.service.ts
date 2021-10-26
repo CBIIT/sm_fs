@@ -167,7 +167,29 @@ export class CanManagementService {
   }
 
   searchAllCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
-    return this.canService.getAllCansUsingGET(activityCodes, bmmCodes, can, nciSource);
+    if(!can) {
+      const key = [bmmCodes, activityCodes, nciSource].join('_');
+      const result = this.activeCanCache.get(key);
+      if(result && result.length !== 0) {
+        this.logger.debug('cache hit for key', key);
+        return new Observable<CanCcxDto[]>(subscriber => {
+          subscriber.next(result);
+        });
+      }
+
+    }
+
+    
+    const fn = this.canService.getAllCansUsingGET(activityCodes, bmmCodes, can, nciSource);
+    const key = [bmmCodes, activityCodes, nciSource].join('_');
+    this.logger.debug('cache miss for key', key);
+
+    fn.subscribe(next => {
+      this.logger.debug('caching data for key', key);
+      this.activeCanCache.set(key, next);
+    });
+
+    return fn;
   }
 
   refreshGrantCans(): boolean {

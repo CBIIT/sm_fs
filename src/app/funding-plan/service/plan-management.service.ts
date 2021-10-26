@@ -43,6 +43,9 @@ export class PlanManagementService {
   grantCosts: GrantCostPayload[];
   private defaultOefiaTypeMap: Map<number, number>;
   private selectedOefiaTypeMap: Map<number, number>;
+  selectedPd: number;
+  selectedCa: string;
+
 
   constructor(
     private planModel: PlanModel,
@@ -56,6 +59,11 @@ export class PlanManagementService {
       if (!!v.applId) {
         this.grantValues.set(v.applId, v);
       }
+    });
+
+    this.fundingSourceValuesEmitter.subscribe(next => {
+      this.selectedPd = next.pd;
+      this.selectedCa = next.ca;
     });
 
     this.buildPlanModel();
@@ -85,7 +93,6 @@ export class PlanManagementService {
     this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
     this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
-      // this.logger.debug('=========> ', r.applId);
       const buds = new Map(r.financialInfoDto.fundingReqBudgetsDtos.map(b => [b.fseId, b]));
       const cans = new Map(r.financialInfoDto.fundingRequestCans.map(c => [c.fseId, c]));
       this.budgetMap.set(Number(r.applId), buds);
