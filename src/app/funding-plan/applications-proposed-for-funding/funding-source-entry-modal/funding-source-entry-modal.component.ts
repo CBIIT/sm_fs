@@ -26,6 +26,7 @@ export class FundingSourceEntryModalComponent implements OnInit {
   @ViewChild('modalFpFundingSource') modalFpFundingSource: FpFundingSourceComponent;
   @ViewChild('modalFpGrantInformation') modalFpGrantInformation: FpGrantInformationComponent;
   @ViewChild('modalFpRecommendedCosts') modalFpRecommendedCosts: FpProgramRecommendedCostsComponent;
+  @ViewChild('modalForm') modalForm: NgForm;
 
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   availableFundingSources: FundingRequestFundsSrcDto[];

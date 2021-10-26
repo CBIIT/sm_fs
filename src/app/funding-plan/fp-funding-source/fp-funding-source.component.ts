@@ -61,10 +61,14 @@ export class FpFundingSourceComponent implements OnInit {
 
   ngOnInit(): void {
     this.logger.warn('initialize');
-    this.init();
+    // TODO: validate that pd and ca exist
+    const pd = this.planCoordinatorService.selectedPd || null;
+    const ca = this.planCoordinatorService.selectedCa || null;
+    this.init(pd, ca);
   }
 
-  public init(): void {
+  public init(pd: number, ca: string): void {
+    this.logger.debug('initialize', pd, ca);
     this.allRfaPaNumbers = [];
     this.fy = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
     this.planModel.grantsSearchCriteria.forEach(r => {
@@ -84,6 +88,9 @@ export class FpFundingSourceComponent implements OnInit {
       if (src) {
         this.selectedValue = Number(src.fundingSourceId);
       }
+    }
+    if(pd && ca) {
+      this.refreshSources(pd, ca);
     }
   }
 
