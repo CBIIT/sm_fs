@@ -6,7 +6,7 @@
             <span [hidden]="!showSteps">&mdash; Step {{activeStep.step}}: {{activeStep.name}}</span></h1>
         </div>
         <div class="col-lg-2">
-            <button class="btn btn-primary btn-sm" (click)="goToWorkflow()" *ngIf="showGoToWorkflowButton()"><i class="fas fa-arrow-to-bottom"></i> Go to Workflow</button>
+            <button class="btn btn-primary btn-sm float-right" (click)="goToWorkflow()" *ngIf="showGoToWorkflowButton()"><i class="fas fa-arrow-to-bottom"></i> Go to Workflow</button>
         </div>
     </div>
     <div class="row justify-content-center mb-3">
