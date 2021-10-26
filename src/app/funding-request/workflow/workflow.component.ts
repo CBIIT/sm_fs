@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
-import { FsWorkflowControllerService, FundingReqStatusHistoryDto, GmInfoDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { FsRequestControllerService, FsWorkflowControllerService, FundingPlanQueryDto, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { Options } from 'select2';
@@ -13,6 +13,7 @@ import { ApprovedCostsComponent } from './approved-costs/approved-costs.componen
 import { Alert } from 'src/app/alert-billboard/alert';
 import { CanWarning, WorkflowWarningModalComponent } from './warning-modal/workflow-warning-modal.component';
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
+import { Router } from '@angular/router';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -48,6 +49,8 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   terminalRequest = false;
 
   validationError: any = {};
+  completedPfrs: FundingPlanQueryDto[];
+  workflowStuckBy: 'ByCompletedPfrs';
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
@@ -81,9 +84,11 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   constructor(private requestIntegrationService: FundingRequestIntegrationService,
               private workflowService: FsWorkflowControllerService,
+              private requestService: FsRequestControllerService,
               private userSessionService: AppUserSessionService,
               private requestModel: RequestModel,
               private workflowModel: WorkflowModel,
+              private router: Router,
               private logger: NGXLogger) {
   }
 
@@ -155,14 +160,17 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       () => {
         this.comments = '';
         this.workflowActions = this.workflowModel.getWorkflowList();
+        this.fetchCompletedPfr();
         this.logger.debug('workflow actions = ', this.workflowActions);
       }
     );
 
     this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
-      () => { addedApproverMap = this.workflowModel.addedApproverMap;
-              this.alert = null;
-              this.isFormValid();
+      () => {
+        addedApproverMap = this.workflowModel.addedApproverMap;
+        this.alert = null;
+        this.checkIfStuck();
+        this.isFormValid();
       }
     );
 
@@ -358,6 +366,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   isFormValid(): boolean {
     let valid = true;
     this.validationError = {};
+    if (this.workflowStuckBy) {
+      return false;
+    }
     if ( this._selectedWorkflowAction?.commentsRequired && !this.comments ) {
       valid = false;
       this.validationError.comments_missing = true;
@@ -367,6 +378,36 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       this.validationError.approver_missing = true;
     }
     return valid;
+  }
+
+  checkIfStuck(): void {
+    if ((this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE ||
+        this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE_COMMENT) &&
+      this.approvingState &&
+      this.workflowModel.lastInChain &&
+      this.completedPfrs &&
+      this.completedPfrs.length > 0) {
+      this.workflowStuckBy = 'ByCompletedPfrs';
+    } else {
+      this.workflowStuckBy = null;
+    }
+  }
+
+  fetchCompletedPfr(): void {
+    if (this.workflowModel.isUserNextInChain && this.workflowModel.lastInChain) {
+   //   this.workflowService.getCompletedPlanUsingGET(this.requestModel.requestDto.frqId).subscribe(
+      this.workflowService.getCompletedPlanUsingGET( 34410).subscribe(
+        //      this.planService.getCompletedPFRsUsingGET(124).subscribe(
+        result => this.completedPfrs = result,
+        error => {
+          this.logger.error('calling getCompletedPFRsUsingGET failed ', error);
+        }
+      );
+    }
+  }
+
+  retrievePlan(fprId: number): void {
+    this.router.navigate(['/plan/retrieve', fprId]);
   }
 
 }
