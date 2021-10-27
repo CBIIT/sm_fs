@@ -62,7 +62,7 @@ export class CanSearchModalComponent implements OnInit {
 
   open(): Promise<CanCcxDto> {
     return new Promise<CanCcxDto>((resolve, reject) => {
-      this.modalRef = this.modalService.open(this.modalContent, { size: 'lg' });
+      this.modalRef = this.modalService.open(this.modalContent, { size: 'lg', scrollable: true});
       this.modalRef.result.then(resolve, reject);
     });
   }
