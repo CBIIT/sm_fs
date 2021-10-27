@@ -1,0 +1,5 @@
+<div *ngFor="let req of data.requests">
+  <div>
+    <button type="button" class="btn btn-link" ngbTooltip="{{req.requestType}}" placement="top" (click)="onSelect(req.frqId)">{{req.frqId}}</button>
+  </div>
+</div>

@@ -1,8 +1,8 @@
   <app-batch-approve-modal></app-batch-approve-modal>
   <div class="row">
     <div class="col-12">
-      <h2>Results {{(filterTypeLabel && !(noFundingRequestResult && noFundingPlanResult)) ? '- ' + filterTypeLabel : ''}}</h2>
-      <p *ngIf="noFundingRequestResult && noFundingPlanResult">No results to display. Try applying a filter above and clicking "Search".</p>
+      <h2>Results {{(filterTypeLabel && !(noFundingRequestResult && noFundingPlanResult && noGrantResult)) ? '- ' + filterTypeLabel : ''}}</h2>
+      <p *ngIf="noFundingRequestResult && noFundingPlanResult && noGrantResult">No results to display. Try applying a filter above and clicking "Search".</p>
     </div>
   </div>
   <div class="row form-group">
@@ -30,12 +30,6 @@
         <ng-template #selectFundingRequestCheckboxRenderer let-data="adtData">
           <app-select-funding-request-checkbox-cell-renderer [data]="data" id="frqId" (emitter)="onCaptureFRSelectedEvent($event)"></app-select-funding-request-checkbox-cell-renderer>
         </ng-template>
-        <ng-template #fullGrantNumberRenderer let-data="adtData">
-          <app-full-grant-number-cell-renderer [data]="data" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl"></app-full-grant-number-cell-renderer>
-        </ng-template>
-        <ng-template #cancerActivityRenderer let-data="adtData">
-          <app-cancer-activity-cell-renderer [data]="data"></app-cancer-activity-cell-renderer>
-        </ng-template>
         <ng-template #searchFundingRequestActionRenderer let-data="adtData">
           <app-search-funding-request-action-cell-renderer [data]="data" (emitter)="onOpenFundingRequest($event)"></app-search-funding-request-action-cell-renderer>
         </ng-template>
@@ -58,5 +52,27 @@
           <app-search-funding-plan-foas-cell-renderer [data]="data"></app-search-funding-plan-foas-cell-renderer>
         </ng-template>
       </div>
+    </div>
   </div>
+  <div class="row" [hidden]="noGrantResult">
+    <div class="col-12">
+      <div >
+        <table id="gDt" #gDt datatable [dtOptions]="dtGrantOptions" [dtTrigger]="dtGrantTrigger" class="row-border hover" style="width: 100%">
+        </table>
+        <!--          Renderer templates -->
+        <ng-template #existInRequestRenderer let-data="adtData">
+          <app-search-grant-exist-in-request-cell-renderer [data]="data" (emitter)="onRequestSelect($event)"></app-search-grant-exist-in-request-cell-renderer>
+        </ng-template>
+        <ng-template #existInPlanRenderer let-data="adtData">
+          <app-search-grant-exist-in-plan-cell-renderer [data]="data" (emitter)="onPlanSelect($event)"></app-search-grant-exist-in-plan-cell-renderer>
+        </ng-template>
+      </div>
+    </div>
   </div>
+
+  <ng-template #fullGrantNumberRenderer let-data="adtData">
+    <app-full-grant-number-cell-renderer [data]="data" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl"></app-full-grant-number-cell-renderer>
+  </ng-template>
+  <ng-template #cancerActivityRenderer let-data="adtData">
+    <app-cancer-activity-cell-renderer [data]="data"></app-cancer-activity-cell-renderer>
+  </ng-template>

@@ -18,6 +18,8 @@ import { FilterTypeLabels } from '../search.component';
 import { DocumentService } from 'src/app/service/document.service';
 import { saveAs } from 'file-saver';
 import { HttpResponse } from '@angular/common/http';
+import {SearchGrantExistInRequestCellRendererComponent} from "./search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component";
+import {SearchGrantExistInPlanCellRendererComponent} from "./search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component";
 
 class DataTablesResponse {
   data: any[];
@@ -51,6 +53,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('selectFundingPlanCheckboxRenderer') selectFundingPlanCheckboxRenderer: TemplateRef<SelectFundingRequestCheckboxCellRendererComponent>;
   @ViewChild('searchFundingPlanActionRenderer') searchFundingPlanActionRenderer: TemplateRef<SearchFundingRequestActionCellRendererComponent>;
+  @ViewChild('existInRequestRenderer') existInRequestRenderer: TemplateRef<SearchGrantExistInRequestCellRendererComponent>;
+  @ViewChild('existInPlanRenderer') existInPlanRenderer: TemplateRef<SearchGrantExistInPlanCellRendererComponent>;
   @ViewChild(BatchApproveModalComponent) batchApproveModal: BatchApproveModalComponent;
   // dtOptions: DataTables.Settings = {};
 
@@ -386,7 +390,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loaderService.show();
         this.searchCriteria.params = dataTablesParameters;
         this.logger.debug('Search for Grants parameters:', this.searchCriteria);
-        this.fsSearchControllerService.searchFundingRequestsUsingPOST(
+        this.fsSearchControllerService.searchFsGrantsUsingPOST(
           this.searchCriteria).subscribe(
           result => {
             this.fundingGrants = result.data;
@@ -418,7 +422,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {title: 'FOA', data: 'rfaPaNumber', render: ( data, type, row, meta ) => {
             return (!data || data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="_blank">' + data + '</a>';
           }, className: 'all'}, // 4
-        {title: 'FY', data: 'requestFy'}, // 5
+        {title: 'FY', data: 'fy'}, // 5
         {title: 'NCAB', data: 'formattedCouncilMeetingDate'}, // 6
         {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
             return (!data || data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
@@ -426,9 +430,9 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'}, // 8
         {title: 'Pctl', data: 'irgPercentileNum'}, // 9
         {title: 'PriScr', data: 'priorityScoreNum'}, // 10
-        {title: 'Exists in Request', data: 'requests', defaultContent: '', className: 'all'}, // 11
-        {title: 'Exists in Plan', data: 'plans', defaultContent: '', className: 'all'}, // 12
-        {title: 'Exists in Paylist', data: 'paylists', defaultContent: '', className: 'all'}, // 13
+        {title: 'Exists in Request', data: 'requests', ngTemplateRef: { ref: this.existInRequestRenderer}, className: 'all', orderable: false}, // 11
+        {title: 'Exists in Plan', data: 'plans', ngTemplateRef: { ref: this.existInPlanRenderer}, className: 'all', orderable: false}, // 12
+        {title: 'Exists in Paylist', data: 'paylists', defaultContent: '', className: 'all', orderable: false}, // 13
         {data: null, defaultContent: ''}
 
       ],
@@ -473,10 +477,10 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         // Fix for Excel output - I removed empty renderers in column definitions
         // But now, I have to remove the first "text" child node to prevent it
         // from rendering (angular datatables bug)
-        this.dtFundingRequestOptions.columns.forEach((column, ind) => {
+        this.dtGrantOptions.columns.forEach((column, ind) => {
           if (column.ngTemplateRef) {
             const cell = row.childNodes.item(ind);
-            if (cell.childNodes.length > 1) { // you have to leave at least one child node
+            if (cell?.childNodes?.length > 1) { // you have to leave at least one child node
               $(cell.childNodes.item(0)).remove();
             }
           }
@@ -613,12 +617,23 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onOpenFundingRequest($event: any): void {
+    this.logger.debug('onOpenFundingRequest() - request/retrieve', $event.frqId);
     this.router.navigate(['request/retrieve', $event.frqId]);
   }
 
   onOpenFundingPlan($event: any): void {
     this.router.navigate(['plan/retrieve', $event.fprId]);
 
+  }
+
+  onRequestSelect($event: number) {
+    this.logger.debug('onRequestSelect() - request/retrieve', $event);
+    this.router.navigate(['request/retrieve', $event]);
+  }
+
+  onPlanSelect($event: number) {
+    this.logger.debug('onRequestSelect() - plan/retrieve', $event);
+    this.router.navigate(['plan/retrieve', $event]);
   }
 
   get batchApproveVisible(): boolean {
@@ -667,4 +682,5 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           );
   }
+
 }
