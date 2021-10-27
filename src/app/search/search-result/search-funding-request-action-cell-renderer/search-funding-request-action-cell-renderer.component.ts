@@ -1,5 +1,4 @@
 import {Component, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {Router} from "@angular/router";
 import {Subject} from "rxjs";
 
 @Component({
@@ -15,7 +14,7 @@ export class SearchFundingRequestActionCellRendererComponent implements OnInit, 
   @Output()
   emitter = new Subject<any>()
 
-  constructor(private router: Router) { }
+  constructor() { }
 
   ngOnInit(): void {
   }

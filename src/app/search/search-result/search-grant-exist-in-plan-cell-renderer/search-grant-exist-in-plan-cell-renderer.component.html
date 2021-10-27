@@ -1,0 +1,5 @@
+<div *ngFor="let plan of data.plans">
+  <div>
+    <button type="button" class="btn btn-link" ngbTooltip="{{getCategory(plan.frtId)}}" placement="top" (click)="onSelect(plan.fprId)">{{plan.fprId}}</button>
+  </div>
+</div>

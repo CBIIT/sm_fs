@@ -150,6 +150,8 @@ import { SearchFundingSourceComponent } from './search/search-filter/search-fund
 import { BatchApproveModalComponent } from './search/batch-approve/batch-approve-modal.component';
 import { OefiaTypeRendererComponent } from './funding-plan/oefia-type-renderer/oefia-type-renderer.component';
 import { RequestWarningComponent } from './funding-request/step4/request-warning/request-warning.component';
+import { SearchGrantExistInRequestCellRendererComponent } from './search/search-result/search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component';
+import { SearchGrantExistInPlanCellRendererComponent } from './search/search-result/search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -307,7 +309,9 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SearchFundingSourceComponent,
     BatchApproveModalComponent,
     OefiaTypeRendererComponent,
-    RequestWarningComponent
+    RequestWarningComponent,
+    SearchGrantExistInRequestCellRendererComponent,
+    SearchGrantExistInPlanCellRendererComponent
   ],
 
 
