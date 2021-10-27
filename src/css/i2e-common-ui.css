@@ -25199,7 +25199,13 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
 
 /* line 102, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .cdk-drop-list:hover {
-  cursor: grab;
+  /*cursor: grab;*/
+  cursor :  null;
+}
+
+.cdk-drag:hover{
+    cursor: grab;
+
 }
 
 /* line 105, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
