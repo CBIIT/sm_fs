@@ -44,7 +44,9 @@ export class FundingSourceEntryModalComponent implements OnInit {
     this.planCoordinatorService.fundingSourceListEmitter.subscribe(next => {
       this.availableFundingSources = next;
     });
-
+    this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
+      this.logger.debug(next);
+    });
   }
 
   open(): Promise<any> {
