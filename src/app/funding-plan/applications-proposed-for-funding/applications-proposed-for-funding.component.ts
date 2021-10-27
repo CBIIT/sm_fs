@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, Input, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
@@ -12,6 +12,8 @@ import { FpFundingSourceComponent } from '../fp-funding-source/fp-funding-source
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib';
 import { FundingSourceEntryModalComponent } from './funding-source-entry-modal/funding-source-entry-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { mod } from 'ngx-bootstrap/chronos/utils';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -21,7 +23,7 @@ import { FundingSourceEntryModalComponent } from './funding-source-entry-modal/f
 })
 export class ApplicationsProposedForFundingComponent implements OnInit {
 
-  @ViewChild(FundingSourceEntryModalComponent) fundingSourceEntryModalComponent: FundingSourceEntryModalComponent;
+  // @ViewChild(FundingSourceEntryModalComponent) fundingSourceEntryModalComponent: TemplateRef<FundingSourceEntryModalComponent>;
 
   @Input() parentForm: NgForm;
   @Input() readOnly = false;
@@ -39,6 +41,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   constructor(private logger: NGXLogger,
               public planModel: PlanModel,
               public planCoordinatorService: PlanManagementService,
+              private modalService: NgbModal,
               private router: Router) {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
 
@@ -181,12 +184,17 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
       this.planCoordinatorService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent.selectedValue);
     });
 
-    this.fundingSourceEntryModalComponent.open().then((result) => {
-      this.logger.debug('Got result', result);
-      if (result) {
-      }
-    }).catch((reason) => {
-      this.logger.warn(reason);
+    // this.fundingSourceEntryModalComponent.open().then((result) => {
+    //   this.logger.debug('Got result', result);
+    //   if (result) {
+    //   }
+    // }).catch((reason) => {
+    //   this.logger.warn(reason);
+    // });
+    const modalRef = this.modalService.open(FundingSourceEntryModalComponent, {size: 'xl'});
+    this.logger.debug(modalRef.componentInstance);
+    modalRef.result.then(result => {
+      this.logger.debug(result);
     });
 
   }

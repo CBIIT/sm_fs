@@ -30,7 +30,6 @@ export class FpFundingSourceComponent implements OnInit {
 
   constructor(private logger: NGXLogger,
               private planControllerService: FsPlanControllerService,
-              private pdCaIntegratorService: PdCaIntegratorService,
               private planCoordinatorService: PlanManagementService,
               private planModel: PlanModel) {
   }
@@ -41,9 +40,9 @@ export class FpFundingSourceComponent implements OnInit {
   }
 
   set selectedValue(value: number) {
-    if (this.index === -1) {
-      return;
-    }
+    // if (this.index === -1) {
+    //   return;
+    // }
     this._selectedValue = value;
     this.planCoordinatorService.fundingSourceSelectionEmitter.next({
       index: this.index,

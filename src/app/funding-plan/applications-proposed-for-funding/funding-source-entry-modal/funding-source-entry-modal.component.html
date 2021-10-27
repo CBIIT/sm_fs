@@ -1,5 +1,5 @@
-<ng-template #fsEntryModal let-modal>
-  <form #modalForm="ngForm" (ngSubmit)="onModalSubmit()">
+<!--<ng-template #fsEntryModal let-modal>-->
+  <form #modalForm="ngForm" (ngSubmit)="onModalSubmit(modalForm)">
     <div class="modal-header">
       <span class="modal-title" id="modal-title-hold">{{ title }}</span>
       <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
@@ -82,4 +82,4 @@
       <button type="submit" class="btn btn-primary" data-dismiss="modal">Add Funding Source</button>
     </div>
   </form>
-</ng-template>
+<!--</ng-template>-->
