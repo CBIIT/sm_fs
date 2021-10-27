@@ -24,6 +24,7 @@ export class PlanLoaderService {
         this.planModel.returnToSearchLink = true;
         this.planModel.fundingPlanDto = result.FundingPlanDto;
         this.planModel.allGrants = result.AllGrants;
+        this.planModel.sortGrantsByPriorityAndPI();
         this.planModel.minimumScore = this.planModel.fundingPlanDto.fundableRangeFrom;
         this.planModel.maximumScore = this.planModel.fundingPlanDto.fundableRangeTo;
         this.planModel.markMainApproversCreated();

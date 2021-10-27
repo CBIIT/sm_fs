@@ -629,6 +629,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
     }
     // save selections in planModel
     this.planModel.allGrants = this.dtData;
+    this.planModel.sortGrantsByPriorityAndPI();
     this.canDeactivate = true;
     this.planModel.fundingPlanDto.planFy = getCurrentFiscalYear();
     this.router.navigate(['/plan/step2']);

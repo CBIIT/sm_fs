@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanCcxDto, FundingPlanDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
-import { NciPfrGrantQueryDtoEx } from './nci-pfr-grant-query-dto-ex';
+import { NciPfrGrantQueryDtoEx, orderByPriorityAndPI } from './nci-pfr-grant-query-dto-ex';
 import { RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate';
 import { NGXLogger } from 'ngx-logger';
 import { Alert } from 'src/app/alert-billboard/alert';
@@ -55,6 +55,12 @@ export class PlanModel {
     this.title = 'New Plan';
     this.pendingAlerts = [];
     this.takeDocumentSnapshot();
+  }
+
+  sortGrantsByPriorityAndPI(): void {
+    if(this.allGrants) {
+      this.allGrants.sort(orderByPriorityAndPI);
+    }
   }
 
   isMainApproversRegenNeeded(): boolean {
