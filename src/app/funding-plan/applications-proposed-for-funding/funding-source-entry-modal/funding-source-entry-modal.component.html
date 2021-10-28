@@ -9,6 +9,7 @@
     <div class="modal-body">
       <!-- START Modal Body -->
 
+
       <table class="table table-bordered table-striped app-funding-table">
         <thead>
         <tr>
@@ -20,12 +21,16 @@
             </label>
             <app-fp-funding-source
               id="modalFundingSource"
-              name="modalFundingSource"
               #modalFpFundingSource
               [parentForm]="modalForm"
               [required]="true"
-              [index]="-1">
+              [index]="99">
             </app-fp-funding-source>
+            <div
+              class="text-danger mt-1"
+              *ngIf="(modalForm.submitted) && modalForm.errors?.atLeastOneGrantMustBeFunded">
+              At least one grant must be funded by this funding source
+            </div>
           </th>
         </tr>
         </thead>
@@ -33,7 +38,6 @@
         <tr *ngFor="let grant of listGrantsSelected; let i = index;">
           <td>
             <app-fp-grant-information
-              name="modalGrantInformation"
               [parentForm]="modalForm"
               #modalFpGrantInformation
               [isModal]="true"
@@ -44,7 +48,6 @@
           </td>
           <td>
             <app-fp-program-recommended-costs
-              name="modalRecommendedCosts"
               [parentForm]="modalForm"
               #modalFpRecommendedCosts
               [sourceIndex]="99"

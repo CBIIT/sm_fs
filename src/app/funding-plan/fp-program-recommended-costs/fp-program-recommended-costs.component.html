@@ -48,7 +48,7 @@
             class="form-control"
             [id]="'dc_' + grantIndex + '_' + sourceIndex"
             (change)="recalculate()"
-            [name]="'directCost_' + grantIndex + '_' + sourceIndex"
+            [name]="'directCost'"
             #dcInput="ngModel"
             [(ngModel)]="directCost"
             [required]="required">
@@ -64,7 +64,7 @@
             type="text"
             class="form-control"
             [id]="'tc_' + grantIndex + '_' + sourceIndex"
-            [name]="'totalCost_' + grantIndex + '_' + sourceIndex"
+            [name]="'totalCost'"
             #tcInput="ngModel"
             (change)="recalculate()"
             [(ngModel)]="totalCost"
@@ -179,7 +179,7 @@
             [id]="'pc_' + grantIndex + '_' + sourceIndex"
             [attr.aria-label]="'percent_cut'"
             (change)="recalculate()"
-            [name]="'percentCut_' + grantIndex + '_' + sourceIndex"
+            [name]="'percentCut'"
             [(ngModel)]="percentCut"
             #pcInput="ngModel"
             [required]="required">

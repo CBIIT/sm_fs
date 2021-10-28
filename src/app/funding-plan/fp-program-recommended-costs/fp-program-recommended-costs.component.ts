@@ -94,14 +94,6 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     this.recalculate();
   }
 
-  toggleDisplay(value: string, grantIndex: number, sourceIndex: number): void {
-    // if (!value || this.grantIndex !== grantIndex || this.sourceIndex !== sourceIndex) {
-    //   return;
-    // }
-    // this.logger.debug('toggle display', value, this.grantIndex, this.sourceIndex);
-    // this._displayType = value;
-  }
-
   // NOTE: assuming they're entering percent cut as a whole number
   recalculate(): void {
 

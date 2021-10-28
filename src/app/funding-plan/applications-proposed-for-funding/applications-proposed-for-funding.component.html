@@ -42,6 +42,11 @@
                   [index]="0"
                   [required]="true">
                 </app-fp-funding-source>
+                <div
+                  class="text-danger mt-1"
+                  *ngIf="(parentForm.submitted || parentForm.touched) && parentForm.errors?.atLeastOneGrantMustBeFunded">
+                  At least one grant must be funded by this funding source
+                </div>
               </th>
             </tr>
           </thead>

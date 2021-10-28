@@ -1,5 +1,5 @@
 import { Directive } from '@angular/core';
-import { AbstractControl, NG_VALIDATORS, ValidationErrors, Validator } from '@angular/forms';
+import { AbstractControl, FormGroup, NG_VALIDATORS, ValidationErrors, Validator } from '@angular/forms';
 import { NGXLogger } from 'ngx-logger';
 
 @Directive({
@@ -12,19 +12,32 @@ export class OneFundedGrantValidatorDirective implements Validator {
   }
 
   validate(control: AbstractControl): ValidationErrors | null {
-    // this.logger.debug('--', control, '--');
-    // this.logger.debug('--', Object.keys(control), '--');
-    // this.logger.debug('--', Object.keys(control.controls), '--');
-    const controlNames = Object.keys(control.controls);
+    const noVals: boolean[] = [];
+    const controlNames = Object.keys((control as FormGroup).controls);
+    this.logger.debug(controlNames);
     controlNames.forEach(key => {
       if (key.startsWith('prc_')) {
-        const suffix = key.substring(4);
 
         const c = control.get(key);
-        this.logger.debug(suffix, '--', key, '--', Object.keys(c?.controls));
+        const dc = c.get('directCost');
+        const tc = c.get('totalCost');
+        const pc = c.get('percentCut');
+
+        this.logger.debug(key, '--', dc?.value, '--', tc?.value, '--', pc?.value);
+        if (dc === null && pc === null && tc === null) {
+          noVals.push(true);
+        } else {
+          noVals.push(false);
+        }
       }
     });
-    return undefined;
+
+    if (noVals.length > 0) {
+      if (noVals.filter(i => !i).length === 0) {
+        return { atLeastOneGrantMustBeFunded: true };
+      }
+    }
+    return null;
   }
 
 }
