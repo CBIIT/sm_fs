@@ -62,7 +62,6 @@ export class PlanManagementService {
     });
 
     this.fundingSourceValuesEmitter.subscribe(next => {
-      this.logger.debug('storing pd/ca values', next);
       this.selectedPd = next.pd;
       this.selectedCa = next.ca;
     });

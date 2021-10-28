@@ -17,6 +17,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
   @Input() parentForm: NgForm;
   @Input() lockDollar = false;
+  @Input() required = true;
   baselineDirectCost: number;
   baselineTotalCost: number;
   directCost: number;
