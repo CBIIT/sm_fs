@@ -20,6 +20,7 @@ import { saveAs } from 'file-saver';
 import { HttpResponse } from '@angular/common/http';
 import {SearchGrantExistInRequestCellRendererComponent} from "./search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component";
 import {SearchGrantExistInPlanCellRendererComponent} from "./search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component";
+import {DatatableThrottle} from "../../utils/datatable-throttle";
 
 class DataTablesResponse {
   data: any[];
@@ -83,6 +84,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   batchApproveEnabled = false;
   runReportEnabled = false;
 
+  throttle: DatatableThrottle = new DatatableThrottle();
   // batchApproveVisible = false;
 
   ngOnInit(): void {
@@ -104,42 +106,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       },
       ajax: (dataTablesParameters: any, callback) => {
-        if (!this.searchCriteria) {
-          this.noFundingRequestResult = true;
-          callback({
-            recordsTotal: 0,
-            recordsFiltered: 0,
-            data: []
-          });
-          return;
-        }
-
-        this.loaderService.show();
-        this.searchCriteria.params = dataTablesParameters;
-        this.logger.debug('Search for Funding Requests parameters:', this.searchCriteria);
-        this.fsSearchControllerService.searchFundingRequestsUsingPOST(
-          this.searchCriteria).subscribe(
-          result => {
-            this._populateSelectedIntoResults('frqId', result.data);
-            // this.logger.debug('Search Funding Requests result: ', result);
-            this.fundingRequests = result.data;
-            this.noFundingRequestResult = result.recordsTotal <= 0;
-            callback({
-              recordsTotal: result.recordsTotal,
-              recordsFiltered: result.recordsFiltered,
-              data: result.data
-            });
-            this.loaderService.hide();
-          }, error => {
-            this.logger.error('HttpClient get request error for----- ' + error.message);
-            this.noFundingRequestResult = true;
-            callback({
-              recordsTotal: 0,
-              recordsFiltered: 0,
-              data: []
-            });
-            alert(error.message);
-          });
+        this.throttle.invoke(this, dataTablesParameters, callback, this.ajaxCallFundingRequests);
       },
       columns: [
         {title: 'Sel', data: 'selected', orderable: false, ngTemplateRef: { ref: this.selectFundingRequestCheckboxRenderer }, className: 'all' }, // 0
@@ -244,44 +211,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       },
       ajax: (dataTablesParameters: any, callback) => {
-        if (!this.searchCriteria) {
-          this.noFundingPlanResult = true;
-          callback({
-            recordsTotal: 0,
-            recordsFiltered: 0,
-            data: []
-          });
-          return;
-        }
-
-        this.loaderService.show();
-        this.searchCriteria.params = dataTablesParameters;
-        this.logger.debug('Search Funding Plans parameters:', this.searchCriteria);
-        this.fsSearchControllerService.searchFundingPlansUsingPOST(
-          this.searchCriteria).subscribe(
-          result => {
-            this._populateSelectedIntoResults('fprId', result.data);
-            // this.logger.debug('Search Funding Requests result: ', result);
-            this.fundingPlans = result.data;
-            this.noFundingPlanResult = result.recordsTotal <= 0;
-            callback({
-              recordsTotal: result.recordsTotal,
-              recordsFiltered: result.recordsFiltered,
-              data: result.data
-            });
-            this.loaderService.hide();
-            setTimeout(() => {  // FIXED ISSUE WITH TABLE RESIZING
-                this.dtElements.forEach((dtEl: DataTableDirective) => {
-                  if (dtEl.dtInstance) {
-                    dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
-                      dtInstance.columns.adjust();
-                    });
-                  }
-                });
-            }, 0)
-          }, error => {
-            this.logger.error('HttpClient get request error for----- ' + error.message);
-          });
+        this.throttle.invoke(this, dataTablesParameters, callback, this.ajaxCallFundingPlans);
       },
       columns: [
         {title: 'Sel', data: 'selected', orderable: false, ngTemplateRef: { ref: this.selectFundingPlanCheckboxRenderer }, className: 'all' }, // 0
@@ -377,40 +307,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       },
       ajax: (dataTablesParameters: any, callback) => {
-        if (!this.searchCriteria) {
-          this.noGrantResult = true;
-          callback({
-            recordsTotal: 0,
-            recordsFiltered: 0,
-            data: []
-          });
-          return;
-        }
-
-        this.loaderService.show();
-        this.searchCriteria.params = dataTablesParameters;
-        this.logger.debug('Search for Grants parameters:', this.searchCriteria);
-        this.fsSearchControllerService.searchFsGrantsUsingPOST(
-          this.searchCriteria).subscribe(
-          result => {
-            this.fundingGrants = result.data;
-            this.noGrantResult = result.recordsTotal <= 0;
-            callback({
-              recordsTotal: result.recordsTotal,
-              recordsFiltered: result.recordsFiltered,
-              data: result.data
-            });
-            this.loaderService.hide();
-          }, error => {
-            this.logger.error('HttpClient get request error for----- ' + error.message);
-            this.noGrantResult = true;
-            callback({
-              recordsTotal: 0,
-              recordsFiltered: 0,
-              data: []
-            });
-            alert(error.message);
-          });
+        this.throttle.invoke(this, dataTablesParameters, callback, this.ajaxCallFundingGrants);
       },
       columns: [
         {title: 'Grant Number', data: 'fullGrantNum', ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'}, // 0
@@ -491,11 +388,133 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedRows.clear();
   }
 
+  // Since this is a callback, it cannot use this object anymore
+  // Use $this instead
+  ajaxCallFundingRequests($this: SearchResultComponent, dataTablesParameters: any, callback): void  {
+    if (!$this.searchCriteria) {
+      $this.noFundingRequestResult = true;
+      callback({
+        recordsTotal: 0,
+        recordsFiltered: 0,
+        data: []
+      });
+      return;
+    }
+
+    $this.loaderService.show();
+    $this.searchCriteria.params = dataTablesParameters;
+    $this.logger.debug('Search for Funding Requests parameters:', $this.searchCriteria);
+    $this.fsSearchControllerService.searchFundingRequestsUsingPOST(
+      $this.searchCriteria).subscribe(
+      result => {
+        $this._populateSelectedIntoResults('frqId', result.data);
+        // $this.logger.debug('Search Funding Requests result: ', result);
+        $this.fundingRequests = result.data;
+        $this.noFundingRequestResult = result.recordsTotal <= 0;
+        callback({
+          recordsTotal: result.recordsTotal,
+          recordsFiltered: result.recordsFiltered,
+          data: result.data
+        });
+        $this.loaderService.hide();
+      }, error => {
+        $this.logger.error('HttpClient get request error for----- ' + error.message);
+        $this.noFundingRequestResult = true;
+        callback({
+          recordsTotal: 0,
+          recordsFiltered: 0,
+          data: []
+        });
+        alert(error.message);
+      });
+  }
+
+  // Since this is a callback, it cannot use this object anymore
+  // Use $this instead
+  ajaxCallFundingPlans($this: SearchResultComponent, dataTablesParameters: any, callback): void  {
+    if (!$this.searchCriteria) {
+      $this.noFundingPlanResult = true;
+      callback({
+        recordsTotal: 0,
+        recordsFiltered: 0,
+        data: []
+      });
+      return;
+    }
+
+    $this.loaderService.show();
+    $this.searchCriteria.params = dataTablesParameters;
+    $this.logger.debug('Search Funding Plans parameters:', $this.searchCriteria);
+    $this.fsSearchControllerService.searchFundingPlansUsingPOST(
+      $this.searchCriteria).subscribe(
+      result => {
+        $this._populateSelectedIntoResults('fprId', result.data);
+        // $this.logger.debug('Search Funding Requests result: ', result);
+        $this.fundingPlans = result.data;
+        $this.noFundingPlanResult = result.recordsTotal <= 0;
+        callback({
+          recordsTotal: result.recordsTotal,
+          recordsFiltered: result.recordsFiltered,
+          data: result.data
+        });
+        $this.loaderService.hide();
+        setTimeout(() => {  // FIXED ISSUE WITH TABLE RESIZING
+          $this.dtElements.forEach((dtEl: DataTableDirective) => {
+            if (dtEl.dtInstance) {
+              dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
+                dtInstance.columns.adjust();
+              });
+            }
+          });
+        }, 0)
+      }, error => {
+        $this.logger.error('HttpClient get request error for----- ' + error.message);
+      });
+
+  }
+
+  ajaxCallFundingGrants($this: SearchResultComponent, dataTablesParameters: any, callback): void {
+    if (!$this.searchCriteria) {
+      $this.noGrantResult = true;
+      callback({
+        recordsTotal: 0,
+        recordsFiltered: 0,
+        data: []
+      });
+      return;
+    }
+
+    $this.loaderService.show();
+    $this.searchCriteria.params = dataTablesParameters;
+    $this.logger.debug('Search for Grants parameters:', $this.searchCriteria);
+    $this.fsSearchControllerService.searchFsGrantsUsingPOST(
+      $this.searchCriteria).subscribe(
+      result => {
+        $this.fundingGrants = result.data;
+        $this.noGrantResult = result.recordsTotal <= 0;
+        callback({
+          recordsTotal: result.recordsTotal,
+          recordsFiltered: result.recordsFiltered,
+          data: result.data
+        });
+        $this.loaderService.hide();
+      }, error => {
+        $this.logger.error('HttpClient get request error for----- ' + error.message);
+        $this.noGrantResult = true;
+        callback({
+          recordsTotal: 0,
+          recordsFiltered: 0,
+          data: []
+        });
+        alert(error.message);
+      });
+  }
 
   ngOnDestroy(): void {
     this.dtFundingRequestTrigger.unsubscribe();
     this.dtFundingPlanTrigger.unsubscribe();
     this.dtGrantTrigger.unsubscribe();
+    this.throttle.reset();
   }
 
   clear(): void {
@@ -503,9 +522,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noFundingPlanResult = true;
     this.noFundingRequestResult = true;
     this.noGrantResult = true;
+    this.throttle.reset();
   }
 
   doFundingRequestSearch(criteria: FundSelectSearchCriteria, filterTypeLabel: string): void {
+    this.throttle.reset();
     this.searchCriteria = criteria;
     this.noFundingRequestResult = false;
     this.noFundingPlanResult = true;
@@ -520,6 +541,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   doFundingPlanSearch(criteria: FundSelectSearchCriteria, filterTypeLabel: string): void {
+    this.throttle.reset();
     this.searchCriteria = criteria;
     this.noFundingRequestResult = true;
     this.noFundingPlanResult = false;
@@ -534,6 +556,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   doGrantSearch(criteria: FundSelectSearchCriteria, filterTypeLabel: string): void {
+    this.throttle.reset();
     this.searchCriteria = criteria;
     this.noFundingRequestResult = true;
     this.noFundingPlanResult = true;

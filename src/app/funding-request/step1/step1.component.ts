@@ -24,6 +24,7 @@ import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 import { ActivatedRoute } from '@angular/router';
 import { RequestModel } from 'src/app/model/request/request-model';
 import {NgForm} from "@angular/forms";
+import {DatatableThrottle} from "../../utils/datatable-throttle";
 
 @Component({
   selector: 'app-step1',
@@ -67,6 +68,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
   selectedRfaPa: string;
   selectedCas: string[] | string = [];
   i2Status: string;
+  throttle: DatatableThrottle = new DatatableThrottle();
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   eGrantsUrl: string = this.propertiesService.getProperty('EGRANTS_URL');
@@ -93,7 +95,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         }
       },
       ajax: (dataTablesParameters: any, callback) => {
-        this.throttle(dataTablesParameters, callback);
+        this.throttle.invoke(this, dataTablesParameters, callback, this.ajaxCall);
       },
 
       columns: [
@@ -232,58 +234,27 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     this.dtTrigger.unsubscribe();
   }
 
-
-  dtPreviousSearchValue: string;
-  dtLast: number;
-  dtTimer: NodeJS.Timeout;
-  dtFrequency: number = 800;  // ms
-
-  throttle(dataTablesParameters: any, callback): void {
-    const filterValue = dataTablesParameters.search?.value;
-    if (!filterValue || filterValue === '' || this.dtPreviousSearchValue === filterValue) { // initial search, sort, pagination, etc
-      // this.logger.debug('Ajax call - immediate search: ',filterValue, this.dtPreviousSearchValue);
-      this.dtPreviousSearchValue = filterValue;
-      this.ajaxCall(dataTablesParameters, callback);
-      return;
-    }
-
-    const now  = +new Date();
-    if (!this.dtLast || now < this.dtLast + this.dtFrequency) {
-      clearTimeout(this.dtTimer);
-      this.dtLast = now;
-      // this.logger.debug('Ajax call - create new timer: ',filterValue, this.dtPreviousSearchValue);
-      this.dtPreviousSearchValue = filterValue;
-      this.dtTimer = setTimeout(() => {
-        this.dtTimer = undefined;
-        this.dtLast = undefined;
-        // this.logger.debug('Ajax call - delayed search: ',dataTablesParameters.search?.value, this.dtPreviousSearchValue);
-        this.ajaxCall(dataTablesParameters, callback);
-      }, this.dtFrequency);
-    }
-    else {
-
-    }
-  }
-
-  ajaxCall(dataTablesParameters: any, callback): void {
-    this.loaderService.show();
+  // Since this is a callback, it cannot use this object anymore
+  // Use $this instead
+  ajaxCall($this: Step1Component, dataTablesParameters: any, callback): void {
+    $this.loaderService.show();
     // this.logger.debug('Funding Request search for: ', this.searchCriteria);
-    this.fsRequestControllerService.searchDtGrantsUsingPOST(
-      Object.assign(dataTablesParameters, this.searchCriteria)).subscribe(
+    $this.fsRequestControllerService.searchDtGrantsUsingPOST(
+      Object.assign(dataTablesParameters, $this.searchCriteria)).subscribe(
       result => {
-        this.showResults = true
-        this.grantList = result.data;
-        this.gsfs.searched = true;
+        $this.showResults = true
+        $this.grantList = result.data;
+        $this.gsfs.searched = true;
         callback({
                    recordsTotal: result.recordsTotal,
                    recordsFiltered: result.recordsFiltered,
                    data: result.data
                  });
-        this.loaderService.hide();
+        $this.loaderService.hide();
       },
       error => {
-        this.loaderService.hide();
-        this.logger.error('HttpClient get request error for----- ' + error.message);
+        $this.loaderService.hide();
+        $this.logger.error('HttpClient get request error for----- ' + error.message);
       }
     );
   }
@@ -318,7 +289,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
       return;
     }
 
-    this.dtPreviousSearchValue = undefined; // reset the filter
+    this.throttle.reset();
 
     if (this.searchWithin === 'mypf') {
       this.searchCriteria.pdNpnId =  this.userSessionService.getLoggedOnUser().npnId + '';
