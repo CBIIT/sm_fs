@@ -19,7 +19,7 @@ export class FpFundingSourceComponent implements OnInit {
 
   @Input() parentForm: NgForm;
   @Input() index: number;
-  @Input() required: false;
+  @Input() required = false;
   dummy: string = null;
   data: Select2OptionData[] = [];
   allSources: Select2OptionData[] = [];
