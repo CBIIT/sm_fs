@@ -28,6 +28,7 @@ export class CanDeactivatePlanStep3 implements CanDeactivate<PlanStep3Component>
     //   return true;
     // }
 
+    // TODO: Fix this. If they submit with errors, they can then go anywhere without warning
     if (component.step3form.submitted) {
       return true;
     }
