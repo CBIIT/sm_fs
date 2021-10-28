@@ -202,6 +202,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
   }
 
   updateErrInactiveDesignees(data) {
+    this.errInactiveDesignees = false;
     for (const entry of data) {
       if (entry.newNedOrg || entry.newClassification || entry.inactiveNedDate || entry.inactiveI2eDate) {
         this.errInactiveDesignees = true;
@@ -298,7 +299,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
             this.updateDesigneeTable(result);
             this.newDesigneeForm.resetForm();
             this.successManageDesigneesMsg = 'Designee has been deleted successfully.';
-            this.successDesignee = entry;
+            this.successDesignee = null;
           },
           error => {
             this.logger.error('HttpClient delete designee request error for----- ' + error.message);

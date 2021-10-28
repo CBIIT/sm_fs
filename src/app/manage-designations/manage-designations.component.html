@@ -15,7 +15,7 @@
 <div class="row" *ngIf="successManageDesigneesMsg.length > 0">
   <div class="col-12">
     <ngb-alert type="success" [dismissible]="true" (closed)="successManageDesigneesMsg = ''">
-      <span><b>{{successManageDesigneesMsg}}</b> <i> An automated email has been sent to - <a href="mailto:{{successDesignee.delegateToEmailAddr}}">{{successDesignee.delegateToFullName}}</a> - notifying this action.</i></span>
+      <span><b>{{successManageDesigneesMsg}}</b> <i *ngIf="successDesignee"> An automated email has been sent to - <a href="mailto:{{successDesignee.delegateToEmailAddr}}">{{successDesignee.delegateToFullName}}</a> - notifying this action.</i></span>
     </ngb-alert>
   </div>
 </div>
