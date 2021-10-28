@@ -39,7 +39,9 @@ export class CanDeactivatePlanStep3 implements CanDeactivate<PlanStep3Component>
     const ret = confirm('Unsaved changes will be lost if you continue.');
     if (ret) {
       this.logger.debug('time to reset the plan model');
-      this.planLoaderService.loadPlan(id, this.successFn.bind(this), this.errorFn.bind(this));
+      if (!!id) {
+        this.planLoaderService.loadPlan(id, this.successFn.bind(this), this.errorFn.bind(this));
+      }
       return true;
     } else {
       return false;

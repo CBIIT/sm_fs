@@ -1,4 +1,4 @@
-import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { Injectable } from '@angular/core';
 import { Step2Component } from './step2.component';
@@ -50,7 +50,9 @@ export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> 
     const ret = confirm('Unsaved changes will be lost if you continue.');
     if (ret) {
       this.logger.debug('time to reset the request model');
-      this.requestLoaderService.loadRequest(id, this.successFn.bind(this), this.errorFn.bind(this));
+      if (!!id) {
+        this.requestLoaderService.loadRequest(id, this.successFn.bind(this), this.errorFn.bind(this));
+      }
       return true;
     } else {
       return false;
