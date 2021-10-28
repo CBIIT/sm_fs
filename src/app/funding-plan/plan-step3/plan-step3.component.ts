@@ -12,7 +12,7 @@ import {
   FundingRequestCanDto
 } from '@nci-cbiit/i2ecws-lib';
 import { OtherDocsContributingFundsComponent } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
-import { getCurrentFiscalYear } from '../../utils/utils';
+import { getCurrentFiscalYear, isReallyANumber } from '../../utils/utils';
 import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
 import { FpFundingInformationComponent } from '../fp-funding-information/fp-funding-information.component';
 import { ApplicationsProposedForFundingComponent } from '../applications-proposed-for-funding/applications-proposed-for-funding.component';
@@ -103,8 +103,11 @@ export class PlanStep3Component implements OnInit {
     // this.logger.debug($event);
     if (this.step3form.valid) {
       this.buildPlanModel();
-      if (!isNaN(this.planModel.fundingPlanDto.pubYr1SetAsideAmt) && !isNaN(this.planModel.fundingPlanDto.totalRecommendedAmt)
-        && Number(this.planModel.fundingPlanDto.pubYr1SetAsideAmt) !== Number(this.planModel.fundingPlanDto.totalRecommendedAmt)) {
+      const year1 = this.planModel.fundingPlanDto.pubYr1SetAsideAmt;
+      const totalRec = this.planModel.fundingPlanDto.totalRecommendedAmt;
+      this.logger.debug('--', year1, totalRec, '==', Math.round(year1), Math.round(totalRec), '--');
+      if (isReallyANumber(year1) && isReallyANumber(totalRec)
+        && Math.round(year1) !== Math.round(totalRec)) {
         if (confirm('WARNING: The Program Recommended Total Cost (1st year) in this funding plan does not match the Published 1st year Set-Aside dollar amount. Do you want to proceed with submission?')) {
           this.saveFundingPlan();
         }

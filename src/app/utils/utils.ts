@@ -25,7 +25,7 @@ export function hasOwnProperty<X extends {}, Y extends PropertyKey>(obj: X, prop
   return obj.hasOwnProperty(prop);
 }
 
-export function isReallyANumber(x: string): boolean {
+export function isReallyANumber(x: any): boolean {
   if (!x) {
     return false;
   }
@@ -33,7 +33,13 @@ export function isReallyANumber(x: string): boolean {
     return false;
   }
 
-  const regex = /^\d+$/;
+  if(x === null) {
+    return false;
+  }
 
-  return String(x).match(regex) !== null;
+  return true;
+
+  // const regex = /^\d+$/;
+  //
+  // return String(x).match(regex) !== null;
 }
