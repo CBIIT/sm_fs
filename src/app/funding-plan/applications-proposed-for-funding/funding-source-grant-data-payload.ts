@@ -2,7 +2,7 @@
  * TODO: incorporate into ApplicationsProposedForFunding component
  *
  */
-export class FundingSourceGrantDataPayload {
+export interface FundingSourceGrantDataPayload {
   applId: number;
   fseId: number;
   baselineDirectCost?: number;
@@ -15,7 +15,4 @@ export class FundingSourceGrantDataPayload {
   dcPercentCutCalculated?: number;
   tcPercentCutCalculated?: number;
   displayType?: string;
-
-  constructor() {
-  }
 }

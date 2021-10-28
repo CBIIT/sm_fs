@@ -2,7 +2,6 @@ import { Component, Input, OnInit, Query, QueryList, TemplateRef, ViewChild, Vie
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { PlanModel } from '../../../model/plan/plan-model';
 import { FpFundingSourceComponent } from '../../fp-funding-source/fp-funding-source.component';
-import { FpGrantInformationComponent } from '../../fp-grant-information/fp-grant-information.component';
 import { FpProgramRecommendedCostsComponent } from '../../fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../../model/plan/nci-pfr-grant-query-dto-ex';
@@ -21,13 +20,9 @@ import { FundingSourceGrantDataPayload } from '../funding-source-grant-data-payl
 export class FundingSourceEntryModalComponent implements OnInit {
   @Input() title = 'Add Funding Source';
 
-  // @ViewChild('fsEntryModal') private modalContent: TemplateRef<FundingSourceEntryModalComponent>;
-  // @ViewChild('fsEntryModal') private modalComponent: FundingSourceEntryModalComponent;
   @ViewChild('modalFpFundingSource') modalFpFundingSource: FpFundingSourceComponent;
-  @ViewChildren('modalFpGrantInformation') modalFpGrantInformation: QueryList<FpGrantInformationComponent>;
-  @ViewChildren('modalFpRecommendedCosts') modalFpRecommendedCosts: QueryList<FpProgramRecommendedCostsComponent>;
-
-  // private modalRef: NgbModalRef;
+  // @ViewChildren('modalFpGrantInformation') modalFpGrantInformation: QueryList<FpGrantInformationComponent>;
+  @ViewChildren(FpProgramRecommendedCostsComponent) modalFpRecommendedCosts: QueryList<FpProgramRecommendedCostsComponent>;
 
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   availableFundingSources: FundingRequestFundsSrcDto[];
@@ -35,7 +30,6 @@ export class FundingSourceEntryModalComponent implements OnInit {
   constructor(
     public modal: NgbActiveModal,
     private planModel: PlanModel,
-    // private modalService: NgbModal,
     private logger: NGXLogger,
     private router: Router,
     public planCoordinatorService: PlanManagementService,) {
@@ -51,28 +45,34 @@ export class FundingSourceEntryModalComponent implements OnInit {
     });
   }
 
-  // open(): Promise<any> {
-  //   this.logger.debug('open me');
-  //   return new Promise<any>((resolve, reject) => {
-  //     this.modalRef = this.modalService.open(this.modalContent, { size: 'xl' });
-  //     this.modalRef.result.then(resolve, reject);
-  //   });
-  // }
-
   onModalSubmit(form: NgForm): void {
-    // this.logger.debug(form);
-    // this.logger.debug('--', this.modalComponent, '--');
     this.logger.debug('--', this.modalFpFundingSource, '--');
-    this.logger.debug('--', this.modalFpGrantInformation, '--');
     this.logger.debug('--', this.modalFpRecommendedCosts, '--');
     if (!form.valid) {
       this.logger.error('form has errors', form);
       return;
     }
     const result: FundingSourceGrantDataPayload[] = [];
+
+    this.modalFpRecommendedCosts.forEach(control => {
+      result.push({
+        applId: control.grant.applId,
+        directCost: control.directCost,
+        directCostCalculated: control.directCostCalculated,
+        fseId: this.modalFpFundingSource.selectedValue,
+        percentCut: control.percentCut,
+        tcPercentCutCalculated: control.tcPercentCutCalculated,
+        dcPercentCutCalculated: control.dcPercentCutCalculated,
+        totalCost: control.totalCost,
+        totalCostCalculated: control.totalCostCalculated,
+        baselineDirectCost: control.baselineDirectCost,
+        baselineTotalCost: control.baselineTotalCost,
+        displayType: control.displayType,
+      });
+    });
+
     this.logger.debug(result);
-    // this.logger.debug(this.modalFpFundingSource.selectedValue);
-    // this.modalRef.close();
+    this.modal.close(result);
   }
 
   openFsDetails(): boolean {
