@@ -37,7 +37,11 @@
                   Funding Source
                   <a href="#" (click)="openFsDetails()"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
                 </label>
-                <app-fp-funding-source [parentForm]="parentForm" [index]="0"></app-fp-funding-source>
+                <app-fp-funding-source
+                  [parentForm]="parentForm"
+                  [index]="0"
+                  [required]="true">
+                </app-fp-funding-source>
               </th>
             </tr>
           </thead>

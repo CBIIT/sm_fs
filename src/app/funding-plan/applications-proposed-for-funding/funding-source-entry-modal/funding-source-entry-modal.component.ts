@@ -46,8 +46,7 @@ export class FundingSourceEntryModalComponent implements OnInit {
   }
 
   onModalSubmit(form: NgForm): void {
-    this.logger.debug('--', this.modalFpFundingSource, '--');
-    this.logger.debug('--', this.modalFpRecommendedCosts, '--');
+    this.logger.debug(form);
     if (!form.valid) {
       this.logger.error('form has errors', form);
       return;
