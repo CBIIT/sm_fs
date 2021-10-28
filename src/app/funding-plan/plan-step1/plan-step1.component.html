@@ -76,7 +76,8 @@
            *ngIf="rfa.ncabErrors.length > 0 || rfa.ncabErrRequired == true">
         <div *ngIf="rfa.ncabErrors.length > 0">
           <div *ngFor="let error of rfa.ncabErrors">
-            <b><span><a [routerLink]="'/plan/retrieve/' + error.fprId">Funding Plan {{error.fprId}}</a></span></b> is in the '{{error.currentPlanStatusDescription}}' status for this FOA on NCAB {{error.formattedCouncilMeetingDate}}.
+            <b><span><a [routerLink]="'/plan/retrieve/' + error.fprId">
+              Funding Plan {{error.fprId}}</a></span></b> already exists in the '{{error.currentPlanStatusDescription}}' status for this FOA.
           </div>
         </div>
         <div *ngIf="rfa.ncabErrRequired == true">NCAB is required</div>
