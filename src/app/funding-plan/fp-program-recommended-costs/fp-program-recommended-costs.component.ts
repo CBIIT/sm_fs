@@ -203,39 +203,6 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     return +this.tcPercentCutCalculated;
   }
 
-  set snapShot(data: PRCPayload) {
-    // TODO: do something with applId and fseId?
-    this.baselineTotalCost = data.baselineTotalCost;
-    this.baselineDirectCost = data.baselineDirectCost;
-    this.totalCost = data.totalCost;
-    this.totalCostCalculated = data.totalCostCalculated;
-    this.tcPercentCutCalculated = data.tcPercentCutCalculated;
-    this.displayType = data.displayType;
-    this.dcPercentCutCalculated = data.dcPercentCutCalculated;
-    this.directCost = data.directCost;
-    this.directCostCalculated = data.directCostCalculated;
-    this.percentCut = data.percentCut;
-
-    this.recalculate();
-  }
-
-  get snapShot(): PRCPayload {
-    return {
-      applId: this.grant.applId,
-      fseId: this.fseId,
-      baselineDirectCost: this.baselineDirectCost,
-      baselineTotalCost: this.baselineTotalCost,
-      dcPercentCutCalculated: this.dcPercentCutCalculated,
-      directCost: this.directCost,
-      directCostCalculated: this.directCostCalculated,
-      displayType: this.displayType,
-      percentCut: this.percentCut,
-      tcPercentCutCalculated: this.tcPercentCutCalculated,
-      totalCost: this.totalCost,
-      totalCostCalculated: this.totalCostCalculated
-    };
-  }
-
   get displayType(): string {
     return this._displayType;
   }
@@ -245,19 +212,4 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     this._displayType = value;
   }
 
-}
-
-export interface PRCPayload {
-  applId: number;
-  fseId: number;
-  baselineDirectCost: number;
-  baselineTotalCost: number;
-  directCost: number;
-  totalCost: number;
-  percentCut: number;
-  directCostCalculated: number;
-  totalCostCalculated: number;
-  dcPercentCutCalculated: number;
-  tcPercentCutCalculated: number;
-  displayType: string;
 }
