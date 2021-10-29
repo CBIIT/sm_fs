@@ -22,6 +22,7 @@ export class RetrievePlanComponent implements OnInit {
   constructor(private router: Router,
               private planLoaderService: PlanLoaderService,
               private route: ActivatedRoute,
+              private planModel: PlanModel,
               private logger: NGXLogger) {
   }
 
@@ -37,6 +38,8 @@ export class RetrievePlanComponent implements OnInit {
   }
 
   successFn(): void {
+    this.planModel.title = 'View Plan Details for';
+    this.planModel.returnToSearchLink = true;
     this.router.navigate([this.path]);
   }
 
