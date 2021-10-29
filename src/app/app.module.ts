@@ -143,7 +143,6 @@ import { SearchFundingRequestActionCellRendererComponent } from './search/search
 import { WorkflowWarningModalComponent } from './funding-request/workflow/warning-modal/workflow-warning-modal.component';
 import { SearchFundingRequestTypeComponent } from './search/search-filter/search-funding-request-type/search-funding-request-type.component';
 import { SearchFundingPlanFoasCellRendererComponent } from './search/search-result/search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component';
-import { FpMultiSourceValidatorDirective } from './validators/fp-multi-source-validator.directive';
 import { SearchRfaPaDropdownComponent } from './search/search-filter/search-rfa-pa-dropdown/search-rfa-pa-dropdown.component';
 import { SearchFundingRequestDocComponent } from './search/search-filter/search-funding-request-doc/search-funding-request-doc.component';
 import { SearchFundingSourceComponent } from './search/search-filter/search-funding-source/search-funding-source.component';
@@ -305,7 +304,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     WorkflowWarningModalComponent,
     SearchFundingRequestTypeComponent,
     SearchFundingPlanFoasCellRendererComponent,
-    FpMultiSourceValidatorDirective,
     SearchRfaPaDropdownComponent,
     SearchFundingRequestDocComponent,
     SearchFundingSourceComponent,
