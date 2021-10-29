@@ -251,6 +251,13 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
                    data: result.data
                  });
         $this.loaderService.hide();
+        setTimeout(() => {  // FIXED ISSUE WITH TABLE RESIZING
+            if ($this.dtElement.dtInstance) {
+              $this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+                dtInstance.columns.adjust();
+              });
+            }
+        }, 0);
       },
       error => {
         $this.loaderService.hide();
