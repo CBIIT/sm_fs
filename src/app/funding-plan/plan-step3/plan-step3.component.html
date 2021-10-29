@@ -1,5 +1,5 @@
 <form #step3form="ngForm" (ngSubmit)="onSubmit($event)" [class.submitted]="step3form.submitted" appPdNameRequired
-  appCancerActivityRequired appFundingInformationValidator appFpSetAsideValidator appOneFundedGrantValidator>
+      appCancerActivityRequired appFundingInformationValidator appFpSetAsideValidator appOneFundedGrantValidator>
   <div class="row" *ngIf="alerts?.length > 0">
     <div class="col-lg-12">
       <app-alert-billboard [alerts]="alerts"></app-alert-billboard>
@@ -9,7 +9,7 @@
     <div class="col-12 d-flex">
       <h2>General Information</h2>
       <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#general-info-collapse" role="button"
-        aria-expanded="true" aria-controls="general-info-collapse"></a>
+         aria-expanded="true" aria-controls="general-info-collapse"></a>
     </div>
 
     <div class="collapse show col-12" id="general-info-collapse">
@@ -17,19 +17,24 @@
         <div class="col-lg-6">
           <div class="form-group">
             <label for="fp-name">Funding Plan Name</label>
-            <input name="fundingPlanName" #fundingPlanName="ngModel" [(ngModel)]="planName" type="text" id="fp-name"
-              class="form-control" maxlength="100" required>
-            <div class="text-danger mt-1"
-              *ngIf="fundingPlanName.errors?.required && (step3form.submitted || step3form.touched)">
+            <input
+              name="fundingPlanName"
+              #fundingPlanName="ngModel"
+              [(ngModel)]="planName"
+              type="text"
+              id="fp-name"
+              class="form-control"
+              maxlength="100"
+              required>
+            <div class="text-danger mt-1" *ngIf="fundingPlanName.errors?.required && (step3form.submitted || step3form.touched)">
               Funding Plan Name is required
             </div>
-            <div class="text-danger mt-1"
-              *ngIf="fundingPlanName.errors?.maxlength && (step3form.submitted || step3form.touched)">
+            <div class="text-danger mt-1" *ngIf="fundingPlanName.errors?.maxlength && (step3form.submitted || step3form.touched)">
               Funding Plan Name can be at most 100 characters
             </div>
           </div>
         </div>
-  
+
         <div class="col-lg-4">
           <div class="form-group">
             <lib-pdname-dropdown
@@ -41,8 +46,7 @@
               [activeCayOnly]="true"
               [showInactiveToggle]="false">
             </lib-pdname-dropdown>
-            <div class="text-danger mt-1"
-              *ngIf="step3form.errors?.pdNameRequired && (step3form.submitted || step3form.touched)">
+            <div class="text-danger mt-1" *ngIf="step3form.errors?.pdNameRequired && (step3form.submitted || step3form.touched)">
               Requesting PD is required
             </div>
           </div>
@@ -54,7 +58,7 @@
           <app-other-docs-contributing-funds [preSelectedDocs]="planModel?.fundingPlanDto?.otherContributingDocs">
           </app-other-docs-contributing-funds>
         </div>
-  
+
         <div class="col-lg-4">
           <div class="form-group">
             <lib-cancer-activities-dropdown
@@ -67,27 +71,25 @@
               [broadcast]="true"
               required>
             </lib-cancer-activities-dropdown>
-<!--            <lib-cancer-activities-dropdown-->
-<!--              [selectSingleOption]="true"-->
-<!--              [maxSelection]="1"-->
-<!--              [syncWithPd]="true"-->
-<!--              label="Requesting PD's Cancer Activities"-->
-<!--              [broadcast]="true"-->
-<!--              [selectedValue]="cayCode"-->
-<!--              [(ngModel)]="cayCode"-->
-<!--              required>-->
-<!--            </lib-cancer-activities-dropdown>-->
+            <!--            <lib-cancer-activities-dropdown-->
+            <!--              [selectSingleOption]="true"-->
+            <!--              [maxSelection]="1"-->
+            <!--              [syncWithPd]="true"-->
+            <!--              label="Requesting PD's Cancer Activities"-->
+            <!--              [broadcast]="true"-->
+            <!--              [selectedValue]="cayCode"-->
+            <!--              [(ngModel)]="cayCode"-->
+            <!--              required>-->
+            <!--            </lib-cancer-activities-dropdown>-->
             <div class="text-danger mt-1"
-              *ngIf="step3form.errors?.cayCodeIsRequired && (step3form.submitted || step3form.touched)">
+                 *ngIf="step3form.errors?.cayCodeIsRequired && (step3form.submitted || step3form.touched)">
               Requesting PD's Cancer Activity is required
             </div>
           </div>
         </div>
       </div>
-      
-      
 
-      
+
     </div>
 
 

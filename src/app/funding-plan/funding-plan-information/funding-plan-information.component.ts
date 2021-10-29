@@ -45,8 +45,8 @@ export class FundingPlanInformationComponent implements OnInit {
       .set('DD', 'NCI Director')
       .set('SPL', 'Scientific Program Leaders Committee')
       .set('DAO', 'Division/Office/Center (DOC) Approver');
-      
-    if(this.showPlanName === undefined) {
+
+    if (this.showPlanName === undefined) {
       this.showPlanName = this.showAdditionalInfo;
     }
 
@@ -82,7 +82,6 @@ export class FundingPlanInformationComponent implements OnInit {
     if (this.planModel.fundingPlanDto.otherContributingDocs) {
       this.otherDocs = this.planModel.fundingPlanDto.otherContributingDocs.split(',');
     }
-
   }
 
   private restoreSavedFoaData(): void {

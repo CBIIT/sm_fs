@@ -1,7 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FundingPlanFoasDto } from '@nci-cbiit/i2ecws-lib';
-import { PlanModel } from '../../model/plan/plan-model';
-import { NGXLogger } from 'ngx-logger';
 import { ControlContainer, NgForm } from '@angular/forms';
 
 @Component({
@@ -20,15 +18,13 @@ export class PlanInfoIssueTypeComponent implements OnInit {
   priorNotice: string;
   scratch: string = null;
 
-  constructor(private planModel: PlanModel,
-              private logger: NGXLogger) {
+  constructor() {
   }
 
   ngOnInit(): void {
     if (!!this.rfaDetails.issueType) {
       this.issueType = this.rfaDetails.issueType;
       this.priorNotice = this.rfaDetails.prevRfaPaNumber;
-      // this.logger.debug('restoring: ', this.issueType, this.priorNotice);
     } else if (this.rfaDetails.prevRfaPaNumber) {
       this.priorNotice = this.rfaDetails.prevRfaPaNumber;
       this.issueType = 'reissue';
