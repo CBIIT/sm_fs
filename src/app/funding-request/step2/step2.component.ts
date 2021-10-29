@@ -38,7 +38,7 @@ export class Step2Component implements OnInit {
       this.router.navigate(['/request']);
     }
     this.navigationModel.setStepLinkable(2, true);
-    this.requestModel.modelDirtyBroadcastEmitter.subscribe( () => {
+    this.requestModel.modelDirtyBroadcastEmitter.subscribe(() => {
       this.clean = false;
     });
   }
@@ -175,9 +175,12 @@ export class Step2Component implements OnInit {
 
   // TODO: Per FS-772 we also show final LOA for pay type 4
   showFinalLOA(): boolean {
-    return Number(this.requestModel.requestDto.frtId) === Number(FundingRequestTypes.PAY_TYPE_4)
-      || (!this.isMoonshot() && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
-        Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestModel.requestDto.frtId)));
+    return (!this.isMoonshot() &&
+      [
+        Number(FundingRequestTypes.PAY_TYPE_4),
+        Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
+        Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)
+      ].includes(Number(this.requestModel.requestDto.frtId)));
   }
 
   isMoonshot(): boolean {
