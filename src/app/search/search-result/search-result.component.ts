@@ -74,9 +74,10 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   fundingGrants: any[];
   searchCriteria: FundSelectSearchCriteria;
 
-  noFundingRequestResult: boolean = true;
-  noFundingPlanResult: boolean = true;
-  noGrantResult: boolean = true;
+  showFundingRequestResult: boolean = false;
+  showFundingPlanResult: boolean = false;
+  showGrantResult: boolean = false;
+
   filterTypeLabel: string;
 
   selectedRows: Map<number, any> = new Map<number, any>();
@@ -392,7 +393,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   // Use $this instead
   ajaxCallFundingRequests($this: SearchResultComponent, dataTablesParameters: any, callback): void  {
     if (!$this.searchCriteria) {
-      $this.noFundingRequestResult = true;
+      $this.showFundingRequestResult = false;
       callback({
         recordsTotal: 0,
         recordsFiltered: 0,
@@ -407,19 +408,20 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     $this.fsSearchControllerService.searchFundingRequestsUsingPOST(
       $this.searchCriteria).subscribe(
       result => {
+        $this.showFundingRequestResult = true;
         $this._populateSelectedIntoResults('frqId', result.data);
         // $this.logger.debug('Search Funding Requests result: ', result);
         $this.fundingRequests = result.data;
-        $this.noFundingRequestResult = result.recordsTotal <= 0;
         callback({
           recordsTotal: result.recordsTotal,
           recordsFiltered: result.recordsFiltered,
           data: result.data
         });
         $this.loaderService.hide();
+        $this.autoResizeTables($this);
       }, error => {
         $this.logger.error('HttpClient get request error for----- ' + error.message);
-        $this.noFundingRequestResult = true;
+        alert('HttpClient get request error for----- ' + error.message);
         callback({
           recordsTotal: 0,
           recordsFiltered: 0,
@@ -433,7 +435,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   // Use $this instead
   ajaxCallFundingPlans($this: SearchResultComponent, dataTablesParameters: any, callback): void  {
     if (!$this.searchCriteria) {
-      $this.noFundingPlanResult = true;
+      $this.showFundingPlanResult = false;
       callback({
         recordsTotal: 0,
         recordsFiltered: 0,
@@ -448,34 +450,27 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     $this.fsSearchControllerService.searchFundingPlansUsingPOST(
       $this.searchCriteria).subscribe(
       result => {
+        $this.showFundingPlanResult = true;
         $this._populateSelectedIntoResults('fprId', result.data);
         // $this.logger.debug('Search Funding Requests result: ', result);
         $this.fundingPlans = result.data;
-        $this.noFundingPlanResult = result.recordsTotal <= 0;
         callback({
           recordsTotal: result.recordsTotal,
           recordsFiltered: result.recordsFiltered,
           data: result.data
         });
         $this.loaderService.hide();
-        setTimeout(() => {  // FIXED ISSUE WITH TABLE RESIZING
-          $this.dtElements.forEach((dtEl: DataTableDirective) => {
-            if (dtEl.dtInstance) {
-              dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
-                dtInstance.columns.adjust();
-              });
-            }
-          });
-        }, 0)
+        $this.autoResizeTables($this);
       }, error => {
         $this.logger.error('HttpClient get request error for----- ' + error.message);
+        alert('HttpClient get request error for----- ' + error.message);
       });
 
   }
 
   ajaxCallFundingGrants($this: SearchResultComponent, dataTablesParameters: any, callback): void {
     if (!$this.searchCriteria) {
-      $this.noGrantResult = true;
+      $this.showGrantResult = false;
       callback({
         recordsTotal: 0,
         recordsFiltered: 0,
@@ -490,17 +485,18 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     $this.fsSearchControllerService.searchFsGrantsUsingPOST(
       $this.searchCriteria).subscribe(
       result => {
+        $this.showGrantResult = true;
         $this.fundingGrants = result.data;
-        $this.noGrantResult = result.recordsTotal <= 0;
         callback({
           recordsTotal: result.recordsTotal,
           recordsFiltered: result.recordsFiltered,
           data: result.data
         });
         $this.loaderService.hide();
+        $this.autoResizeTables($this);
       }, error => {
         $this.logger.error('HttpClient get request error for----- ' + error.message);
-        $this.noGrantResult = true;
+        alert('HttpClient get request error for----- ' + error.message);
         callback({
           recordsTotal: 0,
           recordsFiltered: 0,
@@ -508,6 +504,18 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         });
         alert(error.message);
       });
+  }
+
+  autoResizeTables($this: SearchResultComponent): void {
+    setTimeout(() => {  // FIXED ISSUE WITH TABLE RESIZING
+      $this.dtElements.forEach((dtEl: DataTableDirective) => {
+        if (dtEl.dtInstance) {
+          dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
+            dtInstance.columns.adjust();
+          });
+        }
+      });
+    }, 0);
   }
 
   ngOnDestroy(): void {
@@ -519,18 +527,15 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clear(): void {
     this.filterTypeLabel = '';
-    this.noFundingPlanResult = true;
-    this.noFundingRequestResult = true;
-    this.noGrantResult = true;
+    this.showFundingRequestResult = false;
+    this.showFundingPlanResult = false;
+    this.showGrantResult = false;
     this.throttle.reset();
   }
 
   doFundingRequestSearch(criteria: FundSelectSearchCriteria, filterTypeLabel: string): void {
     this.throttle.reset();
     this.searchCriteria = criteria;
-    this.noFundingRequestResult = false;
-    this.noFundingPlanResult = true;
-    this.noGrantResult = true;
     this.filterTypeLabel = filterTypeLabel;
     this.selectedRows.clear();
 //    this.batchApproveVisible = this.batchApproveService.canBatchApproveRequest();
@@ -543,9 +548,6 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   doFundingPlanSearch(criteria: FundSelectSearchCriteria, filterTypeLabel: string): void {
     this.throttle.reset();
     this.searchCriteria = criteria;
-    this.noFundingRequestResult = true;
-    this.noFundingPlanResult = false;
-    this.noGrantResult = true;
     this.filterTypeLabel = filterTypeLabel;
     this.selectedRows.clear();
 //    this.batchApproveVisible = this.batchApproveService.canBatchApprovePlan();
@@ -558,9 +560,6 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   doGrantSearch(criteria: FundSelectSearchCriteria, filterTypeLabel: string): void {
     this.throttle.reset();
     this.searchCriteria = criteria;
-    this.noFundingRequestResult = true;
-    this.noFundingPlanResult = true;
-    this.noGrantResult = false;
     this.filterTypeLabel = filterTypeLabel;
     this.selectedRows.clear();
 //    this.batchApproveVisible = this.batchApproveService.canBatchApprovePlan();
@@ -660,10 +659,10 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get batchApproveVisible(): boolean {
-    return ( !this.noFundingPlanResult
+    return ( this.showFundingPlanResult
              && this.batchApproveService.canBatchApprovePlan() )
   //           && this.searchCriteria?.searchWithIn === FilterTypeLabels.FILTER_FUNDING_PLAN_AWAITING_RESPONSE )
-        || ( !this.noFundingRequestResult
+        || ( this.showFundingRequestResult
              && this.batchApproveService.canBatchApproveRequest() );
   //           && this.searchCriteria.searchWithIn === FilterTypeLabels.FILTER_REQUEST_AWAITING_RESPONSE );
   }

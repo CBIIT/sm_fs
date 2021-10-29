@@ -1,12 +1,12 @@
   <app-batch-approve-modal></app-batch-approve-modal>
   <div class="row">
     <div class="col-12">
-      <h2>Results {{(filterTypeLabel && !(noFundingRequestResult && noFundingPlanResult && noGrantResult)) ? '- ' + filterTypeLabel : ''}}</h2>
-      <p *ngIf="noFundingRequestResult && noFundingPlanResult && noGrantResult">No results to display. Try applying a filter above and clicking "Search".</p>
+      <h2>Results {{(filterTypeLabel && (showFundingRequestResult || showFundingPlanResult || showGrantResult)) ? '- ' + filterTypeLabel : ''}}</h2>
+      <p *ngIf="!(showFundingRequestResult || showFundingPlanResult || showGrantResult)">No results to display. Try applying a filter above and clicking "Search".</p>
     </div>
   </div>
   <div class="row form-group">
-    <div class="col-lg-12 d-flex" *ngIf="!(noFundingRequestResult && noFundingPlanResult)">
+    <div class="col-lg-12 d-flex" *ngIf="(showFundingRequestResult || showFundingPlanResult)">
       <button class="btn btn-primary" *ngIf="runReportEnabled" (click)="runDetailedReport()" >Report</button>
       <span *ngIf="!runReportEnabled" ngbTooltip="Select one or more request(s) or plan(s) to run Report">
         <button class="btn btn-primary" disabled>Report</button>
@@ -21,10 +21,10 @@
     </div>
 
   </div>
-  <div class="row"  [hidden]="noFundingRequestResult">
+  <div class="row"  [hidden]="!showFundingRequestResult">
     <div class="col-12">
       <div>
-        <table id="frDt" #frDt datatable [dtOptions]="dtFundingRequestOptions" [dtTrigger]="dtFundingRequestTrigger" class="row-border hover" style="width: 100%">
+        <table id="frDt" datatable [dtOptions]="dtFundingRequestOptions" [dtTrigger]="dtFundingRequestTrigger" class="row-border hover" style="width: 100%">
         </table>
         <!--          Renderer templates -->
         <ng-template #selectFundingRequestCheckboxRenderer let-data="adtData">
@@ -36,10 +36,10 @@
       </div>
     </div>
   </div>
-  <div class="row" [hidden]="noFundingPlanResult">
+  <div class="row" [hidden]="!showFundingPlanResult">
     <div class="col-12">
       <div >
-        <table id="fpDt" #fpDt datatable [dtOptions]="dtFundingPlanOptions" [dtTrigger]="dtFundingPlanTrigger" class="row-border hover" style="width: 100%">
+        <table id="fpDt" datatable [dtOptions]="dtFundingPlanOptions" [dtTrigger]="dtFundingPlanTrigger" class="row-border hover" style="width: 100%">
         </table>
         <!--          Renderer templates -->
         <ng-template #selectFundingPlanCheckboxRenderer let-data="adtData">
@@ -54,10 +54,10 @@
       </div>
     </div>
   </div>
-  <div class="row" [hidden]="noGrantResult">
+  <div class="row" [hidden]="!showGrantResult">
     <div class="col-12">
       <div >
-        <table id="gDt" #gDt datatable [dtOptions]="dtGrantOptions" [dtTrigger]="dtGrantTrigger" class="row-border hover" style="width: 100%">
+        <table id="gDt" datatable [dtOptions]="dtGrantOptions" [dtTrigger]="dtGrantTrigger" class="row-border hover" style="width: 100%">
         </table>
         <!--          Renderer templates -->
         <ng-template #existInRequestRenderer let-data="adtData">
