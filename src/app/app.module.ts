@@ -153,6 +153,7 @@ import { RequestWarningComponent } from './funding-request/step4/request-warning
 import { SearchGrantExistInRequestCellRendererComponent } from './search/search-result/search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component';
 import { SearchGrantExistInPlanCellRendererComponent } from './search/search-result/search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component';
 import { OneFundedGrantValidatorDirective } from './validators/one-funded-grant-validator.directive';
+import { GrantFundedOnceValidatorDirective } from './validators/grant-funded-once-validator.directive';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -313,7 +314,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     RequestWarningComponent,
     SearchGrantExistInRequestCellRendererComponent,
     SearchGrantExistInPlanCellRendererComponent,
-    OneFundedGrantValidatorDirective
+    OneFundedGrantValidatorDirective,
+    GrantFundedOnceValidatorDirective
   ],
 
 

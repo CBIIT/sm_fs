@@ -14,7 +14,6 @@ export class OneFundedGrantValidatorDirective implements Validator {
   validate(control: AbstractControl): ValidationErrors | null {
     const noVals: boolean[] = [];
     const controlNames = Object.keys((control as FormGroup).controls);
-    this.logger.debug(controlNames);
     controlNames.forEach(key => {
       if (key.startsWith('prc_')) {
 
@@ -23,7 +22,7 @@ export class OneFundedGrantValidatorDirective implements Validator {
         const tc = c.get('totalCost');
         const pc = c.get('percentCut');
 
-        this.logger.debug(key, '--', dc?.value, '--', tc?.value, '--', pc?.value);
+        // this.logger.debug(key, '--', dc?.value, '--', tc?.value, '--', pc?.value);
         if (dc === null && pc === null && tc === null) {
           noVals.push(true);
         } else {
