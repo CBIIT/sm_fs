@@ -21,8 +21,8 @@
         <div class="form-group">
           <label for="startDate">Start Date</label>
           <div class="input-group">
-            <input id="startDate" class="form-control" name="startDate" ngModel placeholder="mm/dd/yyyy"
-                   ngbDatepicker #d="ngbDatepicker" (click)="d.toggle()" [minDate]="minDate" required appDateInPast [disabled]="startDateReadOnly">
+            <input id="startDate" class="form-control" name="startDate" ngModel placeholder="mm/dd/yyyy" 
+            ngbDatepicker #d="ngbDatepicker" (click)="d.toggle()" [minDate]="minDate" required appDateInPast [disabled]="startDateReadOnly"  (ngModelChange)="checkValueChanged()">
             <div class="input-group-append">
               <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d.toggle()" type="button" [disabled]="startDateReadOnly">
                 <i class="fas fa-calendar" aria-hidden="true"></i>
@@ -37,7 +37,7 @@
           <div class="input-group">
             <input id="endDate" class="form-control" ngModel name="endDate" placeholder="mm/dd/yyyy"
                    ngbDatepicker #d2="ngbDatepicker" (click)="d2.toggle()"  [minDate]="minDate" required
-                   >
+                   (ngModelChange)="checkValueChanged()">
             <div class="input-group-append">
               <button class="btn-outline-secondary px-2" style="border: 1px solid;" (click)="d2.toggle()" type="button">
                 <i class="fas fa-calendar" aria-hidden="true"></i>
@@ -81,6 +81,6 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Close</button>
-    <button type="submit" class="btn btn-primary" [disabled]="editForm.pristine">Save</button>
+    <button type="submit" class="btn btn-primary" [disabled]="!enableSave">Save</button>
   </div>
 </form>
