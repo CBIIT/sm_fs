@@ -316,9 +316,15 @@
                     [data]="recommendedFutureYearsData"
                     [(ngModel)]="recommendedFutureYears"
                     (ngModelChange)="prepareType4LineItem()"
-                    [name]="'recommendedFutureYears'">
-                    <option></option>
+                    [name]="'recommendedFutureYears'"
+                    #rfy="ngModel"
+                    required>
                   </ng-select2>
+                  <div
+                    class="text-danger mt-1"
+                    *ngIf="(rfy.touched || prcForm.submitted) && rfy.errors?.required">
+                    Program recommended future years is required
+                  </div>
                 </div>
               </div>
             </div>
