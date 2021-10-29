@@ -13,7 +13,6 @@ import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRe
 import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib';
 import { FundingSourceEntryModalComponent } from './funding-source-entry-modal/funding-source-entry-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { mod } from 'ngx-bootstrap/chronos/utils';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -23,14 +22,11 @@ import { mod } from 'ngx-bootstrap/chronos/utils';
 })
 export class ApplicationsProposedForFundingComponent implements OnInit {
 
-  // @ViewChild(FundingSourceEntryModalComponent) fundingSourceEntryModalComponent: TemplateRef<FundingSourceEntryModalComponent>;
-
   @Input() parentForm: NgForm;
   @Input() readOnly = false;
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
   @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
   @ViewChildren(FpFundingSourceComponent) fundingSources: QueryList<FpFundingSourceComponent>;
-
 
   availableFundingSources: FundingRequestFundsSrcDto[];
 
@@ -43,16 +39,14 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
               public planCoordinatorService: PlanManagementService,
               private modalService: NgbModal,
               private router: Router) {
-    this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
-
   }
 
   ngOnInit(): void {
+    this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
     this.comments = this.planModel.fundingPlanDto.comments;
     this.planCoordinatorService.fundingSourceListEmitter.subscribe(next => {
       this.availableFundingSources = next;
     });
-
   }
 
   get budgetMap(): Map<number, Map<number, FundingReqBudgetsDto>> {
@@ -177,26 +171,15 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   onAddFundingSource(): void {
     this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
-    // this.logger.debug('source: ', this.fundingSources.get(0));
-    // this.logger.debug('grant info:', this.grantList.get(0));
-    // this.logger.debug('prc:', this.prcList.get(0));
     this.grantList.forEach(item => {
       this.planCoordinatorService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent.selectedValue);
     });
 
-    // this.fundingSourceEntryModalComponent.open().then((result) => {
-    //   this.logger.debug('Got result', result);
-    //   if (result) {
-    //   }
-    // }).catch((reason) => {
-    //   this.logger.warn(reason);
-    // });
     const modalRef = this.modalService.open(FundingSourceEntryModalComponent, {size: 'xl'});
     this.logger.debug(modalRef.componentInstance);
     modalRef.result.then(result => {
       this.logger.debug(result);
     });
-
   }
 
   canAddFundingSource(): boolean {
