@@ -11,8 +11,9 @@ export class OneFundedGrantValidatorDirective implements Validator {
   constructor(private logger: NGXLogger) {
   }
 
+  // Verify that at least one grant is funded by this funding source
   validate(control: AbstractControl): ValidationErrors | null {
-    const noVals: boolean[] = [];
+    const notFunded: boolean[] = [];
     const controlNames = Object.keys((control as FormGroup).controls);
     controlNames.forEach(key => {
       if (key.startsWith('prc_')) {
@@ -23,16 +24,23 @@ export class OneFundedGrantValidatorDirective implements Validator {
         const pc = c.get('percentCut');
 
         // this.logger.debug(key, '--', dc?.value, '--', tc?.value, '--', pc?.value);
+        
+        // Let me explain the approach: for each Program Recommended Costs control in the form, I 
+        // check whether the user has provided values or not, and push true or false into the array
+        // accordingly. It really doesn't matter what value we use, because all we want to know is
+        // whether they're all the same. Since I'm using booleans, the filter below drops all the
+        // true values. The size of the resulting list tells me the number of grants that are 
+        // funded by this source. If it's zero, we throw the error.
         if (dc === null && pc === null && tc === null) {
-          noVals.push(true);
+          notFunded.push(true);
         } else {
-          noVals.push(false);
+          notFunded.push(false);
         }
       }
     });
 
-    if (noVals.length > 0) {
-      if (noVals.filter(i => !i).length === 0) {
+    if (notFunded.length > 0) {
+      if (notFunded.filter(i => !i).length === 0) {
         return { atLeastOneGrantMustBeFunded: true };
       }
     }
