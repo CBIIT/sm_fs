@@ -20,8 +20,9 @@ export class PlanLoaderService {
     this.planService.retrieveFundingPlanUsingGET(fprId).subscribe(
       (result) => {
         this.planModel.reset();
-        this.planModel.title = 'View Plan Details for';
-        this.planModel.returnToSearchLink = true;
+        // these 2 properties shoule be set in the case of creating new plan.
+        // this.planModel.title = 'View Plan Details for';
+        // this.planModel.returnToSearchLink = true;
         this.planModel.fundingPlanDto = result.FundingPlanDto;
         this.planModel.allGrants = result.AllGrants;
         this.planModel.sortGrantsByPriorityAndPI();

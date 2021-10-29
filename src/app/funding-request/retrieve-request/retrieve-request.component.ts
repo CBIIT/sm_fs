@@ -21,6 +21,7 @@ export class RetrieveRequestComponent implements OnInit {
   constructor(private router: Router,
               private route: ActivatedRoute,
               private requestLoaderService: RequestLoaderService,
+              private requestModel: RequestModel,
               private logger: NGXLogger) {
   }
 
@@ -36,6 +37,8 @@ export class RetrieveRequestComponent implements OnInit {
   }
 
   successFn(): void {
+    this.requestModel.title = 'View Request Details for';
+    this.requestModel.returnToRequestPageLink = true;
     this.router.navigate([this.path]);
   }
 

@@ -9,7 +9,7 @@
 <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
   <div class="row form-group">
 
-    <div class="col-6 col-md-6" [hidden]="!searchType">
+    <div class="col-7 col-md-7" [hidden]="!searchType">
       <div class="ml-3"> <!-- temporary - need to remove style margin-left: -1rem from the component below -->
         <lib-grantnumber-search-criteria [form]="searchForm"></lib-grantnumber-search-criteria>
       </div>

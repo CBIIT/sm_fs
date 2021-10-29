@@ -21,6 +21,7 @@ export class EditDesigneeModalComponent implements OnInit, AfterViewInit {
 
   minDate: NgbDate = this.calendar.getToday();
   startDateReadOnly: boolean = false;
+  enableSave : boolean = false;
 
   constructor(public modal: NgbActiveModal,
               private calendar: NgbCalendar) { }
@@ -41,6 +42,19 @@ export class EditDesigneeModalComponent implements OnInit, AfterViewInit {
     }
   }
 
+  checkValueChanged(){
+    const selectedStartDate = this.editForm.value['startDate'];
+    const selectedEndDate = this.editForm.value['endDate'];
+    if(selectedStartDate && selectedStartDate.length>0 && !(selectedStartDate === this.data.delegateFromDate)){
+     this.enableSave = true;
+    }
+    else if(selectedEndDate && selectedEndDate.length>0 && !(selectedEndDate === this.data.delegateToDate)){
+      this.enableSave = true;
+    }else{
+      this.enableSave=false;
+    }
+
+  }
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.editForm.form.patchValue({
