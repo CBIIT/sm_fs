@@ -49,7 +49,8 @@ export class FpFundingSourceComponent implements OnInit {
       index: this.index,
       source: Number(value)
     });
-    this.planCoordinatorService.trackSelectedSources(this.index, value);
+    this.logger.debug('tracking source', value, 'at index', this.index);
+    this.planCoordinatorService.trackRestrictedSources(this.index, value);
   }
 
   sourceDetails(): FundingRequestFundsSrcDto {

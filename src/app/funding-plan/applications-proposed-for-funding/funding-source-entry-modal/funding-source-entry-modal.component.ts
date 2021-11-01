@@ -19,6 +19,7 @@ import { FundingSourceGrantDataPayload } from '../funding-source-grant-data-payl
 })
 export class FundingSourceEntryModalComponent implements OnInit {
   @Input() title = 'Add Funding Source';
+  @Input() sourceIndex = 99;
 
   @ViewChild('modalFpFundingSource') modalFpFundingSource: FpFundingSourceComponent;
   // @ViewChildren('modalFpGrantInformation') modalFpGrantInformation: QueryList<FpGrantInformationComponent>;
@@ -32,7 +33,7 @@ export class FundingSourceEntryModalComponent implements OnInit {
     private planModel: PlanModel,
     private logger: NGXLogger,
     private router: Router,
-    public planCoordinatorService: PlanManagementService,) {
+    public planCoordinatorService: PlanManagementService) {
   }
 
   ngOnInit(): void {
@@ -52,13 +53,20 @@ export class FundingSourceEntryModalComponent implements OnInit {
       return;
     }
     const result: FundingSourceGrantDataPayload[] = [];
-
+    const source = this.modalFpFundingSource.sourceDetails();
     this.modalFpRecommendedCosts.forEach(control => {
       result.push({
         applId: control.grant.applId,
         directCost: control.directCost,
         directCostCalculated: control.directCostCalculated,
+        supportYear: control.grant.supportYear,
+        budgetId: null, // TODO: handle for edit
+        canId: null, // TODO: handle for edit
+        frqId: null, // TODO: handle for edit
         fseId: this.modalFpFundingSource.selectedValue,
+        fundingSourceName: source.fundingSourceName,
+        octId: source.octId,
+        nciSourceFlag: source.nciSourceFlag,
         percentCut: control.percentCut,
         tcPercentCutCalculated: control.tcPercentCutCalculated,
         dcPercentCutCalculated: control.dcPercentCutCalculated,
@@ -67,6 +75,7 @@ export class FundingSourceEntryModalComponent implements OnInit {
         baselineDirectCost: control.baselineDirectCost,
         baselineTotalCost: control.baselineTotalCost,
         displayType: control.displayType,
+        fundingSource: source
       });
     });
 

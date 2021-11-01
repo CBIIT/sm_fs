@@ -155,7 +155,6 @@ export class PlanStep3Component implements OnInit {
   }
 
   buildPlanModel(): void {
-    // this.logger.debug('Building plan model');
     this.planModel.fundingPlanDto.planName = this.planName;
     if (!this.planModel.fundingPlanDto.planFy) {
       this.planModel.fundingPlanDto.planFy = getCurrentFiscalYear();
@@ -254,6 +253,8 @@ export class PlanStep3Component implements OnInit {
         }
       );
     });
+    // ===========================================================================================
+    // ===========================================================================================
     // Build a list of raw data for the request budgets, grouped by applid
     const budgetMap: Map<number, FundingReqBudgetsDto[]> = new Map<number, FundingReqBudgetsDto[]>();
     const canMap: Map<number, FundingRequestCanDto[]> = new Map<number, FundingRequestCanDto[]>();
@@ -328,6 +329,9 @@ export class PlanStep3Component implements OnInit {
       i.financialInfoDto.fundingReqBudgetsDtos = budgetMap.get(i.applId);
       i.financialInfoDto.fundingRequestCans = canMap.get(i.applId);
     });
+    // ====================================================================================
+    // ====================================================================================
+
 
     const bmmCodes: string[] = [];
     const activityCodes: string[] = [];
@@ -380,11 +384,109 @@ export class PlanStep3Component implements OnInit {
 
   beforeAddFundingSource($event: number): void {
     this.logger.debug('Add funding source:', $event);
-    if(+$event === 1) {}
+    if (+$event === 1) {
+    }
     this.buildPlanModel();
   }
 
   addFundingSource($event: FundingSourceGrantDataPayload[]): void {
     this.logger.debug('addFundingSource', $event);
+    let frBudget: FundingReqBudgetsDto;
+    let frCan: FundingRequestCanDto;
+    let doOnce = true;
+    $event.forEach(s => {
+        if (doOnce) {
+          this.planCoordinatorService.addNewSelectedSource(s.fundingSource);
+          this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(s.fundingSource);
+          doOnce = false;
+        }
+        let directCost: number;
+        let totalCost: number;
+        let percentCut: number;
+        let dcPercentCut: number;
+        let tcPercentCut: number;
+
+        if (s.displayType === 'percent') {
+          percentCut = s.percentCut;
+          directCost = s.directCostCalculated;
+          totalCost = s.totalCostCalculated;
+          dcPercentCut = s.percentCut;
+          tcPercentCut = s.percentCut;
+        } else if (s.displayType === 'dollar') {
+          percentCut = s.percentCut;
+          directCost = s.directCost;
+          totalCost = s.totalCost;
+          dcPercentCut = s.dcPercentCutCalculated;
+          tcPercentCut = s.tcPercentCutCalculated;
+        } else {
+          this.logger.error('Display type is null. Time to panic.');
+        }
+
+        this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.filter(r => r.applId = s.applId).forEach(req => {
+          if (!req.financialInfoDto.fundingReqBudgetsDtos) {
+            req.financialInfoDto.fundingReqBudgetsDtos = new Array<FundingReqBudgetsDto>();
+          }
+          if (!req.financialInfoDto.fundingRequestCans) {
+            req.financialInfoDto.fundingRequestCans = new Array<FundingRequestCanDto>();
+          }
+
+          const futureYears: number = this.planCoordinatorService.getRecommendedFutureYears(s.applId);
+
+          // TODO: solve for name
+          // TODO: solve for approved future years
+          frBudget = {
+            frqId: req.frqId,
+            fseId: s.fseId,
+            id: null, // this is new so ID shouldn't exist
+            name: s.fundingSourceName,
+            supportYear: s.supportYear,
+            dcRecAmt: directCost,
+            tcRecAmt: totalCost
+            // createDate?: Date;
+            // createUserId?: string;
+            // id?: number;
+          };
+
+          req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
+          this.planCoordinatorService.pushBudget(s.applId, s.fseId, frBudget);
+
+          frCan = {
+            approvedDc: directCost,
+            approvedFutureYrs: futureYears,
+            approvedTc: totalCost,
+            can: null,  // Solve for edits
+            canDescription: null, // solve for edits
+            createDate: null,
+            createUserId: null,
+            dcPctCut: dcPercentCut,
+            defaultOefiaTypeId: s.octId, // solve for edits
+            frqId: req.frqId,
+            fseId: s.fseId,
+            fundingSourceName: s.fundingSourceName,
+            id: null, // solve for edits
+            // lastChangeDate: string,
+            // lastChangeUserId: string,
+            nciSourceFlag: s.nciSourceFlag,
+            // octId: s.octId,
+            // oefiaCreateCode: string,
+            // oefiaTypeId: number,
+            // oefiaTypeIds: string,
+            // phsOrgCode: string,
+            // previousAfy: number,
+            // reimburseableCode: string,
+            requestedDc: directCost,
+            requestedFutureYrs: futureYears,
+            requestedTc: totalCost,
+            tcPctCut: tcPercentCut,
+            // updateStamp: number,
+          };
+
+          req.financialInfoDto.fundingRequestCans.push(frCan);
+          this.planCoordinatorService.pushCan(s.applId, s.fseId, frCan);
+        });
+
+        // this.planCoordinatorService.buildPlanModel();
+      }
+    );
   }
 }

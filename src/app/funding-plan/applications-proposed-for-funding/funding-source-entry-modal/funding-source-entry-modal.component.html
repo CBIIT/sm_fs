@@ -24,7 +24,7 @@
               #modalFpFundingSource
               [parentForm]="modalForm"
               [required]="true"
-              [index]="99">
+              [index]="sourceIndex">
             </app-fp-funding-source>
             <div
               class="text-danger mt-1"
@@ -41,7 +41,7 @@
               [parentForm]="modalForm"
               #modalFpGrantInformation
               [isModal]="true"
-              [sourceIndex]="99"
+              [sourceIndex]="sourceIndex"
               [grantIndex]="i"
               [grant]="grant">
             </app-fp-grant-information>
@@ -50,7 +50,7 @@
             <app-fp-program-recommended-costs
               [parentForm]="modalForm"
               #modalFpRecommendedCosts
-              [sourceIndex]="99"
+              [sourceIndex]="sourceIndex"
               [grant]="grant"
               [required]="false"
               [grantIndex]="i">

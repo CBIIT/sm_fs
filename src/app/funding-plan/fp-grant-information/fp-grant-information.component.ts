@@ -58,14 +58,7 @@ export class FpGrantInformationComponent implements OnInit {
         this.piDirect = 0;
         this.piTotal = 0;
       }
-      // result.forEach(ga => {
-      //   if (!isNaN(ga.requestAmount)) {
-      //     this.piDirect += Number(ga.requestAmount);
-      //   }
-      //   if (!isNaN(ga.requestTotalAmount)) {
-      //     this.piTotal += Number(ga.requestTotalAmount);
-      //   }
-      // });
+
       this.planCoordinatorService.grantInfoCostEmitter.next({
         index: this.grantIndex,
         applId: this.grant.applId,

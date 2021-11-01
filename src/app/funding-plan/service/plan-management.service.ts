@@ -23,16 +23,18 @@ export class PlanManagementService {
   fundingSourceSelectionEmitter = new Subject<{ index: number, source: number }>();
   planBudgetReadOnlyEmitter = new Subject<boolean>();
 
+  private _selectedSourcesMap: Map<number, FundingRequestFundsSrcDto>;
   private _listSelectedSources: FundingRequestFundsSrcDto[];
-  private _selectedSources: Map<number, number> = new Map<number, number>();
+  private _restrictedSources: Map<number, number> = new Map<number, number>();
+
   private budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
   private canMap: Map<number, Map<number, FundingRequestCanDto>>;
   // Tracks the applid and the source index where percent was selected
   private percentSelectedTracker: Map<number, number> = new Map<number, number>();
+
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
 
   inflightPFRs: Map<number, number> = new Map<number, number>();
-
   private fundedPlanTypes: FundingRequestTypes[] = [
     FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION,
     FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_SKIP,
@@ -40,7 +42,6 @@ export class PlanManagementService {
   ];
   private grantValues: Map<number, { index: number, applId?: number, dc: number, tc: number }>;
   private localRfy: Map<number, number>;
-  private _selectedSourcesMap: Map<number, FundingRequestFundsSrcDto>;
   grantCosts: GrantCostPayload[];
   private defaultOefiaTypeMap: Map<number, number>;
   private selectedOefiaTypeMap: Map<number, number>;
@@ -79,7 +80,13 @@ export class PlanManagementService {
   }
 
   set listSelectedSources(value: FundingRequestFundsSrcDto[]) {
+    console.trace('writing listSelectedSources');
     this._listSelectedSources = value;
+  }
+
+  addNewSelectedSource(source: FundingRequestFundsSrcDto): void {
+    this._selectedSourcesMap.set(source.fundingSourceId, source);
+    this._listSelectedSources = Array.from(this._selectedSourcesMap.values());
   }
 
   setPercentSelected(applId: number, sourceIndex: number, selected: boolean): void {
@@ -108,9 +115,6 @@ export class PlanManagementService {
       this.budgetMap.set(Number(r.applId), buds);
       this.canMap.set(Number(r.applId), cans);
     });
-    // this.logger.debug('budgets', this.budgetMap);
-    // this.logger.debug('cans', this.canMap);
-    // this.logger.debug('funding sources', this.planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources);
     this._selectedSourcesMap =
       new Map(this.planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.map(s => [s.fundingSourceId, s]));
     // this.logger.debug('source map', this.selectedSourcesMap);
@@ -137,27 +141,27 @@ export class PlanManagementService {
   }
 
   // NOTE: this is for the purpose of restricting selections for the second and third funding sources
-  trackSelectedSources(index: number, sourceId: number): void {
+  trackRestrictedSources(index: number, sourceId: number): void {
     // TODO: only track non-null
     // this.logger.debug('track selected sources', index, sourceId);
 
     if (!!sourceId) {
-      this._selectedSources.set(index, sourceId);
+      this._restrictedSources.set(index, sourceId);
     } else {
-      this._selectedSources.delete(index);
+      this._restrictedSources.delete(index);
     }
     // this.logger.debug('trackSelectedSources():', index, sourceId, this._selectedSources.size);
   }
 
   get selectedSourceCount(): number {
-    return this._selectedSources.size;
+    return this._listSelectedSources.length;
   }
 
 
   getRestrictedSources(index: number): number[] {
     // this.logger.debug('checking restricted sources for #', index);
     const result: number[] = [] as number[];
-    this._selectedSources.forEach((value, key) => {
+    this._restrictedSources.forEach((value, key) => {
       if (key !== index) {
         result.push(Number(value));
       }

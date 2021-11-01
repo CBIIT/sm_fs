@@ -5,8 +5,6 @@ import {
   OnInit,
   Output,
   QueryList,
-  TemplateRef,
-  ViewChild,
   ViewChildren
 } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
@@ -192,9 +190,10 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     });
 
     const modalRef = this.modalService.open(FundingSourceEntryModalComponent, {size: 'xl'});
+    modalRef.componentInstance.sourceIndex = this.getNextSourceIndex;
     modalRef.result.then((result) => {
       this.logger.debug(result);
-      this.addFundingSource.next(result);
+      this.addFundingSource.next(result.filter(f => !!f.displayType));
     }, (reason) => {
       this.logger.debug('closed with', reason);
     });
