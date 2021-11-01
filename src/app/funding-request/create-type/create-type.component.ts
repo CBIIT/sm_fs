@@ -32,11 +32,13 @@ export class CreateTypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.readOnly) {
+      return;
+    }
     this.data = [
       { id: 'Pre-Appl', text: 'Pre-Appl' },
       /*{ id: '2', text: 'Rollup' }*/
     ];
-
     if (!this.requestModel.isPayType4() && this.requestModel.isForGrantFY()) {
       this.data.push({ id: 'Rollup', text: 'Rollup' });
       const type = Number(this.requestModel.requestDto.frtId);
@@ -93,7 +95,7 @@ export class CreateTypeComponent implements OnInit {
         this.selectedValue = 'Pre-Appl';
       }
     } else {
-       this.selectedValue = 'Pre-Appl';
+      // this.selectedValue = 'Pre-Appl';
     }
   }
 

@@ -177,8 +177,10 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
     const modalRef = this.modalService.open(FundingSourceEntryModalComponent, {size: 'xl'});
     this.logger.debug(modalRef.componentInstance);
-    modalRef.result.then(result => {
+    modalRef.result.then((result) => {
       this.logger.debug(result);
+    }, (reason) => {
+      this.logger.debug('closed with', reason);
     });
   }
 
