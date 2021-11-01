@@ -135,7 +135,7 @@
 
           </tr>
           <tr *ngIf="selectedFundingSources.length > 1">
-            <td></td>
+            <td><span class="like-label">Recommended Costs</span></td>
             <td *ngFor="let li of summaryRow; let i = index; let first = first;">
               <div class="form-row">
                 <div class="col-6 font-weight-bold" *ngIf="first; else noDollar">
