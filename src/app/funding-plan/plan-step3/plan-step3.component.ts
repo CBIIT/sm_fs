@@ -23,6 +23,7 @@ import { AppUserSessionService } from '../../service/app-user-session.service';
 import { PlanApproverService } from '../approver/plan-approver.service';
 import { CanManagementService } from '../../cans/can-management.service';
 import { Alert } from '../../alert-billboard/alert';
+import { FundingSourceGrantDataPayload } from '../applications-proposed-for-funding/funding-source-grant-data-payload';
 
 @Component({
   selector: 'app-plan-step3',
@@ -295,6 +296,7 @@ export class PlanStep3Component implements OnInit {
           cans = [];
         }
         budgets.push({
+          // TODO: this is the source of the duplication
           id: this.planCoordinatorService.getBudget(item.grant.applId, source.fundingSourceId)?.id || null,
           fseId: source.fundingSourceId,
           name: source.fundingSourceName,
@@ -303,6 +305,7 @@ export class PlanStep3Component implements OnInit {
           tcRecAmt: totalCost,
         });
         cans.push({
+          // TODO: this is the source of the duplication
           id: this.planCoordinatorService.getCan(item.grant.applId, source.fundingSourceId)?.id || null,
           approvedDc: directCost,
           approvedTc: totalCost,
@@ -373,5 +376,15 @@ export class PlanStep3Component implements OnInit {
 
     this.logger.info(JSON.stringify(this.planModel.fundingPlanDto));
 
+  }
+
+  beforeAddFundingSource($event: number): void {
+    this.logger.debug('Add funding source:', $event);
+    if(+$event === 1) {}
+    this.buildPlanModel();
+  }
+
+  addFundingSource($event: FundingSourceGrantDataPayload[]): void {
+    this.logger.debug('addFundingSource', $event);
   }
 }

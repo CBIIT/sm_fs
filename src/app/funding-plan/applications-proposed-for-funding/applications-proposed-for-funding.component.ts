@@ -1,4 +1,14 @@
-import { Component, Input, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  QueryList,
+  TemplateRef,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
@@ -13,6 +23,7 @@ import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRe
 import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib';
 import { FundingSourceEntryModalComponent } from './funding-source-entry-modal/funding-source-entry-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FundingSourceGrantDataPayload } from './funding-source-grant-data-payload';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -24,6 +35,8 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   @Input() parentForm: NgForm;
   @Input() readOnly = false;
+  @Output() beforeAddFundingSource = new EventEmitter<number>();
+  @Output() addFundingSource = new EventEmitter<FundingSourceGrantDataPayload[]>();
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
   @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
   @ViewChildren(FpFundingSourceComponent) fundingSources: QueryList<FpFundingSourceComponent>;
@@ -170,15 +183,18 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   onAddFundingSource(): void {
+    // TODO Check form for errors first?
+
     this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
+    this.beforeAddFundingSource.next(this.getNextSourceIndex);
     this.grantList.forEach(item => {
       this.planCoordinatorService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent.selectedValue);
     });
 
     const modalRef = this.modalService.open(FundingSourceEntryModalComponent, {size: 'xl'});
-    this.logger.debug(modalRef.componentInstance);
     modalRef.result.then((result) => {
       this.logger.debug(result);
+      this.addFundingSource.next(result);
     }, (reason) => {
       this.logger.debug('closed with', reason);
     });
@@ -187,6 +203,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   canAddFundingSource(): boolean {
     // At least one source provided already (and valid?)
 
+    if(!this.parentForm.valid) {
+      return false;
+    }
     return this.planCoordinatorService.selectedSourceCount !== 0 && this.planCoordinatorService.selectedSourceCount < 3;
   }
 

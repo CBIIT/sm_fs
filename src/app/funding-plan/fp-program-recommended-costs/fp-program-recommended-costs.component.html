@@ -9,7 +9,7 @@
         type="radio"
         value="dollar">Dollar
     </label>
-    <label ngbButtonLabel class="btn-outline-secondary">
+    <label ngbButtonLabel class="btn-outline-secondary" *ngIf="!lockDollar">
       <input
         [id]="'percent_' + grantIndex + '_' + sourceIndex"
         name="percent"

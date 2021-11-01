@@ -1,7 +1,3 @@
-/**
- * TODO: incorporate into ApplicationsProposedForFunding component
- *
- */
 export interface FundingSourceGrantDataPayload {
   applId: number;
   fseId: number;

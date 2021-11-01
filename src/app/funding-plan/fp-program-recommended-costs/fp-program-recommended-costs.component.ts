@@ -33,13 +33,13 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   private fseId: number;
 
   constructor(
-    private planCoordinatorService: PlanManagementService,
+    private planManagementService: PlanManagementService,
     private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
     // TODO: get this from the grant?
-    this.planCoordinatorService.grantInfoCostEmitter.subscribe(next => {
+    this.planManagementService.grantInfoCostEmitter.subscribe(next => {
       if (next.index === this.grantIndex) {
         this.baselineDirectCost = next.dc;
         this.baselineTotalCost = next.tc;
@@ -47,7 +47,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       }
     });
 
-    this.planCoordinatorService.fundingSourceSelectionEmitter.subscribe(next => {
+    this.planManagementService.fundingSourceSelectionEmitter.subscribe(next => {
       if (next.index === this.sourceIndex) {
         this.fseId = next.source;
       }
@@ -57,6 +57,14 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       this.logger.warn('Eject - no grant or source index');
       return;
     }
+    // Determine whether we should lock the dollar value or not
+    this.logger.debug('checking lockDollar', this.grant.applId, this.sourceIndex, this.planManagementService.isPercentSelected(this.grant.applId));
+    if(this.planManagementService.isPercentSelected(this.grant.applId)) {
+      if(+this.planManagementService.percentSelectionIndex(this.grant.applId) !== +this.sourceIndex) {
+        this.lockDollar = true;
+      }
+    }
+    this.logger.debug('lockDollar:', this.grant.applId, this.sourceIndex, this.lockDollar);
     this.initializeValuesForEdit();
   }
 
@@ -65,22 +73,26 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     if (this.sourceIndex < 0 || this.sourceIndex > 2) {
       return;
     }
-    if (!this.fseId && !!this.planCoordinatorService.listSelectedSources) {
+    if (!this.fseId && !!this.planManagementService.listSelectedSources) {
       // this.logger.debug('load fseId from plan service');
-      const src = this.planCoordinatorService.listSelectedSources[this.sourceIndex];
+      const src = this.planManagementService.listSelectedSources[this.sourceIndex];
       if (src) {
         this.fseId = src.fundingSourceId;
       }
     }
-    const bud = this.planCoordinatorService.getBudget(this.grant.applId, this.fseId);
-    const can = this.planCoordinatorService.getCan(this.grant.applId, this.fseId);
+    const bud = this.planManagementService.getBudget(this.grant.applId, this.fseId);
+    const can = this.planManagementService.getCan(this.grant.applId, this.fseId);
     // this.logger.debug('source', this.sourceIndex, this.fseId, this.planCoordinatorService.listSelectedSources[this.sourceIndex]);
     // this.logger.debug('budget', bud);
     // this.logger.debug('can', can);
 
     // TODO: this logic might need revisiting.
+    // TODO: especially the determination of percent if lockDollar is true
     if (can && !isNaN(can.dcPctCut) && !isNaN(can.tcPctCut) && can.dcPctCut === can.tcPctCut) {
       this.percentCut = can.dcPctCut;
+      if(this.lockDollar) {
+        this.logger.error('Control is locked to dollar only but analysis indicates percent');
+      }
       this.displayType = 'percent';
       // this.toggleDisplay('percent', this.grantIndex, this.sourceIndex);
       // this.logger.debug('setting display to "percent" with value', this.percentCut);
@@ -201,7 +213,13 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   set displayType(value: string) {
-    // this.logger.debug('set displayType', value, this.grantIndex, this.sourceIndex);
+    if (value === 'percent') {
+      this.logger.info('percent selected for grant', this.grant.applId, 'and index', this.sourceIndex);
+      this.planManagementService.setPercentSelected(this.grant.applId, this.sourceIndex, true);
+    } else {
+      this.logger.info('percent deselected for grant', this.grant.applId, 'and index', this.sourceIndex);
+      this.planManagementService.setPercentSelected(this.grant.applId, this.sourceIndex, false);
+    }
     this._displayType = value;
   }
 

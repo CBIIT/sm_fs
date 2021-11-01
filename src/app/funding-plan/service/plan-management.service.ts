@@ -27,8 +27,10 @@ export class PlanManagementService {
   private _selectedSources: Map<number, number> = new Map<number, number>();
   private budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
   private canMap: Map<number, Map<number, FundingRequestCanDto>>;
-  private percentSelectionTracker: Map<number, boolean> = new Map<number, boolean>();
+  // Tracks the applid and the source index where percent was selected
+  private percentSelectedTracker: Map<number, number> = new Map<number, number>();
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
+
   inflightPFRs: Map<number, number> = new Map<number, number>();
 
   private fundedPlanTypes: FundingRequestTypes[] = [
@@ -36,7 +38,6 @@ export class PlanManagementService {
     FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_SKIP,
     FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE
   ];
-
   private grantValues: Map<number, { index: number, applId?: number, dc: number, tc: number }>;
   private localRfy: Map<number, number>;
   private _selectedSourcesMap: Map<number, FundingRequestFundsSrcDto>;
@@ -81,12 +82,21 @@ export class PlanManagementService {
     this._listSelectedSources = value;
   }
 
-  setPercentSelected(applId: number, selected: boolean): void {
-    this.percentSelectionTracker.set(applId, selected);
+  setPercentSelected(applId: number, sourceIndex: number, selected: boolean): void {
+    if(selected) {
+      this.percentSelectedTracker.set(applId, sourceIndex);
+    } else {
+      this.percentSelectedTracker.delete(applId);
+    }
   }
 
   isPercentSelected(applId: number): boolean {
-    return this.percentSelectionTracker.get(applId) || false;
+    const x = this.percentSelectedTracker.get(applId);
+    return (x !== null && x !== undefined);
+  }
+
+  percentSelectionIndex(applId: number): number {
+    return this.percentSelectedTracker.get(applId) || null;
   }
 
   buildPlanModel(): void {
