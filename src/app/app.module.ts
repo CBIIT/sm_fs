@@ -153,6 +153,7 @@ import { SearchGrantExistInRequestCellRendererComponent } from './search/search-
 import { SearchGrantExistInPlanCellRendererComponent } from './search/search-result/search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component';
 import { OneFundedGrantValidatorDirective } from './validators/one-funded-grant-validator.directive';
 import { GrantFundedOnceValidatorDirective } from './validators/grant-funded-once-validator.directive';
+import { CurrencyTogglePipe } from './pipes/currency-toggle.pipe';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -313,7 +314,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SearchGrantExistInRequestCellRendererComponent,
     SearchGrantExistInPlanCellRendererComponent,
     OneFundedGrantValidatorDirective,
-    GrantFundedOnceValidatorDirective
+    GrantFundedOnceValidatorDirective,
+    CurrencyTogglePipe
   ],
 
 

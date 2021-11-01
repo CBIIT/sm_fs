@@ -3,6 +3,8 @@
 ## Action Items
 - [ ] Document standards and usage
 - [ ] Document best practices
+- [ ] Code review
+- [ ] Error logging - how to get console logs for diagnostics?
 
 ## Create new UI components
 **NOTE:** FS-specific components should go here.  Shared components go into sm_i2e_common_ui.  If you're not sure, put it here and we'll
