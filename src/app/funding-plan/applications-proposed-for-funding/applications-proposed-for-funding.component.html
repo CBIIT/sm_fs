@@ -15,8 +15,7 @@
     <p><small>Please note that the Standard Policy Reduction should be taken into consideration when determining the
       recommended dollar amounts for the request. If you would like to include a waiver to the Standard Policy
       Reduction, please provide it as part of the justification. The current fiscal year's policy reductions can
-      be
-      viewed on the <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information"
+      be viewed on the <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information"
                        target="_blank" class="external-link">OEFIA web site</a>.</small></p>
 
     <div class="d-flex mb-2">
@@ -52,12 +51,19 @@
       <tbody>
       <tr *ngFor="let grant of listGrantsSelected; let i = index;" [ngModelGroup]="grant.fullGrantNum">
         <td>
-          <app-fp-grant-information [parentForm]="parentForm" [grantIndex]="i" [grant]="grant" [sourceIndex]="0">
+          <app-fp-grant-information 
+            [parentForm]="parentForm" 
+            [grantIndex]="i" 
+            [grant]="grant" 
+            [sourceIndex]="0">
           </app-fp-grant-information>
         </td>
         <td>
-          <app-fp-program-recommended-costs [parentForm]="parentForm" [grantIndex]="i" [grant]="grant"
-                                            [sourceIndex]="0">
+          <app-fp-program-recommended-costs 
+            [parentForm]="parentForm" 
+            [grantIndex]="i" 
+            [grant]="grant"
+            [sourceIndex]="0">
           </app-fp-program-recommended-costs>
         </td>
 
@@ -100,8 +106,7 @@
     <p><small>Please note that the Standard Policy Reduction should be taken into consideration when determining the
       recommended dollar amounts for the request. If you would like to include a waiver to the Standard Policy
       Reduction, please provide it as part of the justification. The current fiscal year's policy reductions can
-      be
-      viewed on the <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information"
+      be viewed on the <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information"
                        target="_blank" class="external-link">OEFIA web site</a>.</small></p>
 
     <div class="d-flex mb-2">
@@ -133,11 +138,14 @@
       <tbody>
       <tr *ngFor="let grant of listGrantsSelected; let grantIndex = index;">
         <td>
-          <app-fp-grant-information [parentForm]="parentForm" [grantIndex]="grantIndex" [grant]="grant"
-                                    [readOnly]="true" [sourceIndex]="0">
+          <app-fp-grant-information 
+            [parentForm]="parentForm" 
+            [grantIndex]="grantIndex" 
+            [grant]="grant"
+            [readOnly]="true" 
+            [sourceIndex]="0">
           </app-fp-grant-information>
         </td>
-        <!-- ======================================== START GRANT INFO WRAPPER ======================================== -->
 
         <ng-container *ngFor="let source of listSelectedSources; let sourceIndex = index">
           <td>
