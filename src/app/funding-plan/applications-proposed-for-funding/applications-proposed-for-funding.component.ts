@@ -185,11 +185,13 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
     this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
     this.beforeAddFundingSource.next(this.getNextSourceIndex);
-    this.grantList.forEach(item => {
-      this.planManagementService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent.selectedValue);
-    });
+    if (this.getNextSourceIndex < 2) {
+      this.grantList.forEach(item => {
+        this.planManagementService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent.selectedValue);
+      });
+    }
 
-    const modalRef = this.modalService.open(FundingSourceEntryModalComponent, {size: 'xl'});
+    const modalRef = this.modalService.open(FundingSourceEntryModalComponent, { size: 'xl' });
     modalRef.componentInstance.sourceIndex = this.getNextSourceIndex;
     modalRef.result.then((result) => {
       this.logger.debug(result);
@@ -202,7 +204,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   canAddFundingSource(): boolean {
     // At least one source provided already (and valid?)
 
-    if(!this.parentForm.valid) {
+    if (!this.parentForm.valid) {
       return false;
     }
     return this.planManagementService.selectedSourceCount !== 0 && this.planManagementService.selectedSourceCount < 3;

@@ -103,6 +103,7 @@ export class PlanStep3Component implements OnInit {
     this.alerts = null;
     // this.logger.debug($event);
     if (this.step3form.valid) {
+      // TODO: don't build plan model if we're adding second or third funding source
       this.buildPlanModel();
       const year1 = this.planModel.fundingPlanDto.pubYr1SetAsideAmt;
       const totalRec = this.planModel.fundingPlanDto.totalRecommendedAmt;
