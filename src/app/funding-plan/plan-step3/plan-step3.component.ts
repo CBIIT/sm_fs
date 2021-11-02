@@ -389,11 +389,12 @@ export class PlanStep3Component implements OnInit {
   }
 
   addFundingSource($event: FundingSourceGrantDataPayload[]): void {
-    this.logger.debug('addFundingSource', this.planModel.fundingPlanDto);
+    this.logger.debug('plan model before add funding source', JSON.stringify(this.planModel.fundingPlanDto));
     let frBudget: FundingReqBudgetsDto;
     let frCan: FundingRequestCanDto;
     let doOnce = true;
     $event.forEach(s => {
+        this.logger.debug(s);
         if (doOnce) {
           this.logger.info('add new selected source: ', s.fundingSource);
           // this.planCoordinatorService.addNewSelectedSource(s.fundingSource);
@@ -407,22 +408,22 @@ export class PlanStep3Component implements OnInit {
         let tcPercentCut: number;
 
         if (s.displayType === 'percent') {
-          percentCut = s.percentCut;
-          directCost = s.directCostCalculated;
-          totalCost = s.totalCostCalculated;
-          dcPercentCut = s.percentCut;
-          tcPercentCut = s.percentCut;
+          percentCut = +s.percentCut;
+          directCost = +s.directCostCalculated;
+          totalCost = +s.totalCostCalculated;
+          dcPercentCut = +s.percentCut;
+          tcPercentCut = +s.percentCut;
         } else if (s.displayType === 'dollar') {
-          percentCut = s.percentCut;
-          directCost = s.directCost;
-          totalCost = s.totalCost;
-          dcPercentCut = s.dcPercentCutCalculated;
-          tcPercentCut = s.tcPercentCutCalculated;
+          percentCut = +s.percentCut;
+          directCost = +s.directCost;
+          totalCost = +s.totalCost;
+          dcPercentCut = +s.dcPercentCutCalculated;
+          tcPercentCut = +s.tcPercentCutCalculated;
         } else {
           this.logger.error('Display type is null. Time to panic.');
         }
 
-        this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.filter(r => r.applId = s.applId).forEach(req => {
+        this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.filter(r => +r.applId === +s.applId).forEach(req => {
           if (!req.financialInfoDto.fundingReqBudgetsDtos) {
             this.logger.info('creating budgets for req', req);
             req.financialInfoDto.fundingReqBudgetsDtos = new Array<FundingReqBudgetsDto>();
@@ -436,13 +437,13 @@ export class PlanStep3Component implements OnInit {
           this.logger.info('future years for applId', s.applId, '==', futureYears);
 
           frBudget = {
-            frqId: req.frqId,
-            fseId: s.fseId,
+            frqId: +req.frqId,
+            fseId: +s.fseId,
             id: null, // this is new so ID shouldn't exist
             name: s.fundingSourceName,
-            supportYear: s.supportYear,
-            dcRecAmt: directCost,
-            tcRecAmt: totalCost
+            supportYear: +s.supportYear,
+            dcRecAmt: +directCost,
+            tcRecAmt: +totalCost
             // createDate?: Date;
             // createUserId?: string;
             // id?: number;
@@ -453,17 +454,17 @@ export class PlanStep3Component implements OnInit {
           // this.planCoordinatorService.pushBudget(s.applId, s.fseId, frBudget);
 
           frCan = {
-            approvedDc: directCost,
-            approvedFutureYrs: futureYears,
-            approvedTc: totalCost,
+            approvedDc: +directCost,
+            approvedFutureYrs: +futureYears,
+            approvedTc: +totalCost,
             can: null,  // Solve for edits
             canDescription: null, // solve for edits
             createDate: null,
             createUserId: null,
-            dcPctCut: dcPercentCut,
-            defaultOefiaTypeId: s.octId, // solve for edits
-            frqId: req.frqId,
-            fseId: s.fseId,
+            dcPctCut: +dcPercentCut,
+            defaultOefiaTypeId: +s.octId, // solve for edits
+            frqId: +req.frqId,
+            fseId: +s.fseId,
             fundingSourceName: s.fundingSourceName,
             id: null, // solve for edits
             // lastChangeDate: string,
@@ -476,10 +477,10 @@ export class PlanStep3Component implements OnInit {
             // phsOrgCode: string,
             // previousAfy: number,
             // reimburseableCode: string,
-            requestedDc: directCost,
-            requestedFutureYrs: futureYears,
-            requestedTc: totalCost,
-            tcPctCut: tcPercentCut,
+            requestedDc: +directCost,
+            requestedFutureYrs: +futureYears,
+            requestedTc: +totalCost,
+            tcPctCut: +tcPercentCut,
             // updateStamp: number,
           };
 
@@ -487,10 +488,9 @@ export class PlanStep3Component implements OnInit {
           req.financialInfoDto.fundingRequestCans.push(frCan);
           // this.planCoordinatorService.pushCan(s.applId, s.fseId, frCan);
         });
-
-        // this.planCoordinatorService.buildPlanModel();
       }
     );
+    this.logger.debug('plan model after add funding source', JSON.stringify(this.planModel.fundingPlanDto));
     this.planManagementService.buildPlanModel();
   }
 }
