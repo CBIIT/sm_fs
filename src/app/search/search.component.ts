@@ -52,8 +52,6 @@ export class SearchComponent implements OnInit, AfterViewInit {
               private batchApproveService: BatchApproveService,
               private gwbLinksService: GwbLinksService
             ) {
-    // this.router.routeReuseStrategy.shouldReuseRoute = (() => false);
-    console.log('state in constructor:', this.router.getCurrentNavigation().extras.state);
   }
 
   ngOnInit(): void {
@@ -73,18 +71,22 @@ export class SearchComponent implements OnInit, AfterViewInit {
       result => {
         this.dashboardDatafilterMap = new Map(result.map(item => [item.fitlerType, item]));
         this.setFilterCounts(this.dashboardDatafilterMap);
+        if (this.selectedMenuUrl === 'landing') {
+          this.processLandingPageHierarchy();
+        }
       }, error => {
         console.error('HttpClient get request error for----- ' + error.message);
       });
     this.batchApproveService.initialize();
     let action = this.route.snapshot.params.action;
-    console.log('ngOnInit() - route action, searchType, state.action:', action, this.searchModel.searchType, history.state);
-    if (action) {
+    this.logger.debug('ngOnInit() - route action, searchType, state.action:', action, this.searchModel.searchType, history.state);
+    if (action && action != 'landing') {
       const navigateAction = (action === 'immediate') ? this.searchModel.searchType : action;
 
       // this is a return link from the FR or FP view
       // check the searchType from the search model
       // and replace 'immediate' with one of the saved dashboard action type
+      // skip 'landing' action - it will be processed when Overview is loaded
       if (navigateAction) {
         switch(navigateAction) {
           case 'FR':
@@ -110,7 +112,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    console.log('ngAfterViewInit(): state.action:', history.state);
+    this.logger.debug('ngAfterViewInit(): state.action:', history.state);
 
     if (history.state?.action) {
       setTimeout(() => {
@@ -417,6 +419,25 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   filterTypeLabels = FilterTypeLabels;
+
+  // FN0091 - Hierarchical role-based landing page
+  processLandingPageHierarchy() {
+    if (this.numAwaitingRequests > 0) {
+      this.searchAwaitingRequests();
+    }
+    else if (this.numAwaitingPlans > 0) {
+      this.onAwaitingPlans();
+    }
+    else if (this.isPd && this.numMyPortfolioRequests > 0) {
+      this.searchMyPortfolioRequests();
+    }
+    else if (this.hasCancerActivities && this.numMyCARequests > 0) {
+      this.searchMyCARequests();
+    }
+    // else {
+    //   this.router.navigateByUrl('/search/fr');
+    // }
+  }
 }
 export enum FilterTypes {
    FILTER_PORTFOLIO = "My Portfolio",
