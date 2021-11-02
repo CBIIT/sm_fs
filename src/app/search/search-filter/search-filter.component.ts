@@ -20,7 +20,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
 
   private _action: string;
   @Input() set action(value: string) {
-    console.log('search-filter::set action()', value);
+    this.logger.debug('search-filter::set action()', value);
     this._action = value;
     if (value === 'immediate') {
       setTimeout(() => this.search(this.searchForm), 0);
@@ -82,7 +82,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    console.log('search-filter last path, action: ', this.route.snapshot.url, this.action);
+    this.logger.debug('search-filter last path, action: ', this.route.snapshot.url, this.action);
     switch(this.route.snapshot.url[this.route.snapshot.url.length - 1].path) {
       case 'fr':
         this.searchType = 'FR';
@@ -135,7 +135,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       // next tick
       this.searchForm.form.patchValue(this.searchFilter);
-      console.log('search-filter - ngAfterViewInit() next tick: action', this.action);
+      this.logger.debug('search-filter - ngAfterViewInit() next tick: action', this.action);
     }, 0);
   }
 
