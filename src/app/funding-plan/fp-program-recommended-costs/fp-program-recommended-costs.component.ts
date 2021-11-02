@@ -68,7 +68,8 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     this.initializeValuesForEdit();
   }
 
-  private initializeValuesForEdit(): void {
+  public initializeValuesForEdit(): void {
+    this.logger.debug('--', this.sourceIndex, '--');
     // this.logger.debug('initialize PRC values', this.grantIndex, this.sourceIndex);
     if (this.sourceIndex < 0 || this.sourceIndex > 2) {
       return;
@@ -76,12 +77,15 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     if (!this.fseId && !!this.planManagementService.listSelectedSources) {
       // this.logger.debug('load fseId from plan service');
       const src = this.planManagementService.listSelectedSources[this.sourceIndex];
+      this.logger.debug('source', src);
       if (src) {
         this.fseId = src.fundingSourceId;
       }
     }
     const bud = this.planManagementService.getBudget(this.grant.applId, this.fseId);
     const can = this.planManagementService.getCan(this.grant.applId, this.fseId);
+    this.logger.debug('budget', bud);
+    this.logger.debug('can', can);
     // this.logger.debug('source', this.sourceIndex, this.fseId, this.planCoordinatorService.listSelectedSources[this.sourceIndex]);
     // this.logger.debug('budget', bud);
     // this.logger.debug('can', can);

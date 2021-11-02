@@ -29,6 +29,8 @@ export class PlanManagementService {
 
   private budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
   private canMap: Map<number, Map<number, FundingRequestCanDto>>;
+  public requestIdMap: Map<number, number> = new Map<number, number>();
+
   // Tracks the applid and the source index where percent was selected
   private percentSelectedTracker: Map<number, number> = new Map<number, number>();
 
@@ -113,6 +115,7 @@ export class PlanManagementService {
       this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
     }
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
+      this.requestIdMap.set(r.applId, r.frqId);
       const buds = new Map(r.financialInfoDto.fundingReqBudgetsDtos?.map(b => [b.fseId, b]));
       const cans = new Map(r.financialInfoDto.fundingRequestCans?.map(c => [c.fseId, c]));
       this.budgetMap.set(Number(r.applId), buds);
@@ -160,6 +163,17 @@ export class PlanManagementService {
     return this._listSelectedSources.length;
   }
 
+  removeRestrictedSource(fseId: number): void {
+    let k: number;
+    this._restrictedSources.forEach((value, key) => {
+      if (value === fseId) {
+        k = key;
+      }
+    });
+    if (k) {
+      this._restrictedSources.delete(k);
+    }
+  }
 
   getRestrictedSources(index: number): number[] {
     // this.logger.debug('checking restricted sources for #', index);

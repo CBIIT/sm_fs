@@ -183,7 +183,11 @@ export class PlanStep3Component implements OnInit {
 
     this.planModel.fundingPlanDto.comments = this.applicationsProposedForFunding.comments;
 
+    // A little hacky, but I may have added some sources to delete sources BEFORE running this code, so I want to
+    // preserve the list.
+    const deleteSources: number[] = this.planModel.fundingPlanDto.fpFinancialInformation?.deleteSources;
     this.planModel.fundingPlanDto.fpFinancialInformation = {};
+    this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = deleteSources;
     this.planModel.fundingPlanDto.fpFinancialInformation.fiscalYear = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests = [];
@@ -209,6 +213,7 @@ export class PlanStep3Component implements OnInit {
     this.fpInfoComponent.listApplicationsNotSelectable.forEach(g => {
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
         {
+          frqId: this.planManagementService.requestIdMap.get(g.applId),
           applId: g.applId,
           frtId: FundingRequestTypes.FUNDING_PLAN__NOT_SELECTABLE_FOR_FUNDING_PLAN,
           notSelectableReason: g.notSelectableReason,
@@ -221,6 +226,7 @@ export class PlanStep3Component implements OnInit {
     this.fpInfoComponent.listApplicationsSkipped.forEach(g => {
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
         {
+          frqId: this.planManagementService.requestIdMap.get(g.applId),
           applId: g.applId,
           frtId: FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_SKIP,
           notSelectableReason: g.notSelectableReason,
@@ -233,6 +239,7 @@ export class PlanStep3Component implements OnInit {
     this.fpInfoComponent.listApplicationsWithinRange.filter(i => i.selected).forEach(g => {
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
         {
+          frqId: this.planManagementService.requestIdMap.get(g.applId),
           applId: g.applId,
           frtId: FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE,
           notSelectableReason: g.notSelectableReason,
@@ -247,6 +254,7 @@ export class PlanStep3Component implements OnInit {
         : FundingRequestTypes.FUNDING_PLAN__NOT_PROPOSED_AND_OUTSIDE_FUNDING_PLAN_SCORE_RANGE);
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
         {
+          frqId: this.planManagementService.requestIdMap.get(g.applId),
           applId: g.applId,
           frtId: type,
           notSelectableReason: g.notSelectableReason,
@@ -411,14 +419,14 @@ export class PlanStep3Component implements OnInit {
           percentCut = +s.percentCut;
           directCost = +s.directCostCalculated;
           totalCost = +s.totalCostCalculated;
-          dcPercentCut = +s.percentCut;
-          tcPercentCut = +s.percentCut;
+          dcPercentCut = +s.percentCut * 100;
+          tcPercentCut = +s.percentCut * 100;
         } else if (s.displayType === 'dollar') {
-          percentCut = +s.percentCut;
+          percentCut = +s.percentCut * 100;
           directCost = +s.directCost;
           totalCost = +s.totalCost;
-          dcPercentCut = +s.dcPercentCutCalculated;
-          tcPercentCut = +s.tcPercentCutCalculated;
+          dcPercentCut = +s.dcPercentCutCalculated * 100;
+          tcPercentCut = +s.tcPercentCutCalculated * 100;
         } else {
           this.logger.error('Display type is null. Time to panic.');
         }
@@ -489,13 +497,16 @@ export class PlanStep3Component implements OnInit {
   deleteFundingSource($event: number): void {
     this.logger.debug('delete funding source:', $event);
 
-    // STEP 1 - remove the source from the list of selected sources
+    // STEP 1 - remove the source from the list of selected sources and add to delete list
     if (!this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources) {
       this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = [];
     }
     this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources.push(+$event);
+
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources =
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.filter(s => +s.fundingSourceId !== +$event);
+
+    this.planManagementService.removeRestrictedSource(+$event);
 
     // STEP 2 - remove the budgets and CANs for that source
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
@@ -505,5 +516,7 @@ export class PlanStep3Component implements OnInit {
 
     // STEP 3 - rebuild the budget and CAN model
     this.planManagementService.buildPlanBudgetAndCanModel();
+    // this.logger.debug('initialize children');
+    // this.applicationsProposedForFunding.initializeChildren();
   }
 }

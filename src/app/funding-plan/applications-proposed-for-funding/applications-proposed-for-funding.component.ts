@@ -61,6 +61,15 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     });
   }
 
+  public initializeChildren(): void {
+    this.logger.debug(this.prcList);
+    this.prcList.forEach(control => {
+      this.logger.debug(control);
+      control.initializeValuesForEdit();
+    });
+
+  }
+
   get budgetMap(): Map<number, Map<number, FundingReqBudgetsDto>> {
     return this._budgetMap;
   }

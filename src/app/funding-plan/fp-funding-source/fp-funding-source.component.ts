@@ -46,7 +46,7 @@ export class FpFundingSourceComponent implements OnInit {
       index: this.index,
       source: Number(value)
     });
-    this.logger.debug('tracking source', value, 'at index', this.index);
+    // this.logger.debug('tracking source', value, 'at index', this.index);
     this.planCoordinatorService.trackRestrictedSources(this.index, value);
   }
 
@@ -99,7 +99,7 @@ export class FpFundingSourceComponent implements OnInit {
         tmp.push({ id: String(s.fundingSourceId), text: s.fundingSourceName });
       });
       this.allSources = tmp;
-      this.data = this.allSources.filter(x => !this.planCoordinatorService.getRestrictedSources(this.index).includes(Number(x.id)));
+      this.data = this.allSources.filter(x => !this.planCoordinatorService.getRestrictedSources(this.index).includes(Number(x.id)) /* && +x.id !== this.selectedValue */);
     });
   }
 }
