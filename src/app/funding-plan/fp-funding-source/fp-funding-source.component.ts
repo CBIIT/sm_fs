@@ -41,9 +41,6 @@ export class FpFundingSourceComponent implements OnInit {
   }
 
   set selectedValue(value: number) {
-    // if (this.index === -1) {
-    //   return;
-    // }
     this._selectedValue = value;
     this.planCoordinatorService.fundingSourceSelectionEmitter.next({
       index: this.index,

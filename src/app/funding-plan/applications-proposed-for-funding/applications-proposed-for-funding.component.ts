@@ -35,6 +35,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   @Input() readOnly = false;
   @Output() beforeAddFundingSource = new EventEmitter<number>();
   @Output() addFundingSource = new EventEmitter<FundingSourceGrantDataPayload[]>();
+  @Output() deleteFundingSource = new EventEmitter<number>();
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
   @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
   @ViewChildren(FpFundingSourceComponent) fundingSources: QueryList<FpFundingSourceComponent>;
@@ -214,11 +215,14 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     return this.planManagementService.listSelectedSources?.length <= 1;
   }
 
-  editSource(sourceIndex: number): void {
-    this.logger.debug('editSource(', sourceIndex, ')');
+  onEditFundingSource(sourceId: number): void {
+    this.logger.debug('editSource(', sourceId, ')');
   }
 
-  deleteSource(sourceIndex: number): void {
-    this.logger.debug('deleteSource(', sourceIndex, ')');
+  onDeleteFundingSource(sourceId: number): void {
+    this.logger.debug('deleteSource(', sourceId, ')');
+    if (confirm('Are you sure you want to delete this funding source?')) {
+      this.deleteFundingSource.next(sourceId);
+    }
   }
 }

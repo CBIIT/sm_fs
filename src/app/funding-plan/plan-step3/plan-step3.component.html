@@ -26,10 +26,12 @@
               class="form-control"
               maxlength="100"
               required>
-            <div class="text-danger mt-1" *ngIf="fundingPlanName.errors?.required && (step3form.submitted || step3form.touched)">
+            <div class="text-danger mt-1"
+                 *ngIf="fundingPlanName.errors?.required && (step3form.submitted || step3form.touched)">
               Funding Plan Name is required
             </div>
-            <div class="text-danger mt-1" *ngIf="fundingPlanName.errors?.maxlength && (step3form.submitted || step3form.touched)">
+            <div class="text-danger mt-1"
+                 *ngIf="fundingPlanName.errors?.maxlength && (step3form.submitted || step3form.touched)">
               Funding Plan Name can be at most 100 characters
             </div>
           </div>
@@ -46,7 +48,8 @@
               [activeCayOnly]="true"
               [showInactiveToggle]="false">
             </lib-pdname-dropdown>
-            <div class="text-danger mt-1" *ngIf="step3form.errors?.pdNameRequired && (step3form.submitted || step3form.touched)">
+            <div class="text-danger mt-1"
+                 *ngIf="step3form.errors?.pdNameRequired && (step3form.submitted || step3form.touched)">
               Requesting PD is required
             </div>
           </div>
@@ -106,7 +109,8 @@
   <app-applications-proposed-for-funding
     [parentForm]="step3form"
     (beforeAddFundingSource)="beforeAddFundingSource($event)"
-    (addFundingSource)="addFundingSource($event)">
+    (addFundingSource)="addFundingSource($event)"
+    (deleteFundingSource)="deleteFundingSource($event)">
   </app-applications-proposed-for-funding>
 
 

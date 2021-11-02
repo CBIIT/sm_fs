@@ -42,7 +42,7 @@ export class PlanLoaderService {
         }
         this.planModel.takeDocumentSnapshot();
         this.logger.debug('retrieved plan:', JSON.stringify(this.planModel.fundingPlanDto));
-        this.planManagementService.buildPlanModel();
+        this.planManagementService.buildPlanBudgetAndCanModel();
         this.planManagementService.buildGrantCostModel();
         this.planManagementService.buildOefiaTypeMaps();
         if (succesFn) {

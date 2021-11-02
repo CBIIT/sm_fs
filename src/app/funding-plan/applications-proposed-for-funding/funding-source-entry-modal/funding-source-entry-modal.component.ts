@@ -41,13 +41,12 @@ export class FundingSourceEntryModalComponent implements OnInit {
     this.planCoordinatorService.fundingSourceListEmitter.subscribe(next => {
       this.availableFundingSources = next;
     });
-    this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
-      this.logger.debug(next);
-    });
+    // this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
+    //   this.logger.debug(next);
+    // });
   }
 
   onModalSubmit(form: NgForm): void {
-    this.logger.debug(form);
     if (!form.valid) {
       this.logger.error('form has errors', form);
       return;
@@ -79,7 +78,7 @@ export class FundingSourceEntryModalComponent implements OnInit {
       });
     });
 
-    this.logger.debug(result);
+    // this.logger.debug(result);
     this.modal.close(result);
   }
 

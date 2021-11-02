@@ -103,9 +103,11 @@ export class PlanStep3Component implements OnInit {
     this.alerts = null;
     // this.logger.debug($event);
     if (this.step3form.valid) {
-      // TODO: don't build plan model if we're adding second or third funding source
-      this.buildPlanModel();
+      if (this.planManagementService.selectedSourceCount <= 1) {
+        this.buildPlanModel();
+      }
       const year1 = this.planModel.fundingPlanDto.pubYr1SetAsideAmt;
+      // TODO: Make sure totalRec is correct for multiple sources
       const totalRec = this.planModel.fundingPlanDto.totalRecommendedAmt;
       this.logger.debug('--', year1, totalRec, '==', Math.round(year1), Math.round(totalRec), '--');
       if (isReallyANumber(year1) && isReallyANumber(totalRec)
@@ -132,7 +134,7 @@ export class PlanStep3Component implements OnInit {
     this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
       this.logger.debug('Saved plan model: ', JSON.stringify(result));
       this.planModel.fundingPlanDto = result;
-      this.planManagementService.buildPlanModel();
+      this.planManagementService.buildPlanBudgetAndCanModel();
       this.planManagementService.buildGrantCostModel();
       this.planManagementService.checkInFlightPFRs(
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(s => {
@@ -390,15 +392,12 @@ export class PlanStep3Component implements OnInit {
   }
 
   addFundingSource($event: FundingSourceGrantDataPayload[]): void {
-    this.logger.debug('plan model before add funding source', JSON.stringify(this.planModel.fundingPlanDto));
     let frBudget: FundingReqBudgetsDto;
     let frCan: FundingRequestCanDto;
     let doOnce = true;
     $event.forEach(s => {
         this.logger.debug(s);
         if (doOnce) {
-          this.logger.info('add new selected source: ', s.fundingSource);
-          // this.planCoordinatorService.addNewSelectedSource(s.fundingSource);
           this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(s.fundingSource);
           doOnce = false;
         }
@@ -426,16 +425,13 @@ export class PlanStep3Component implements OnInit {
 
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.filter(r => +r.applId === +s.applId).forEach(req => {
           if (!req.financialInfoDto.fundingReqBudgetsDtos) {
-            this.logger.info('creating budgets for req', req);
             req.financialInfoDto.fundingReqBudgetsDtos = new Array<FundingReqBudgetsDto>();
           }
           if (!req.financialInfoDto.fundingRequestCans) {
-            this.logger.info('creating CANs for req', req);
             req.financialInfoDto.fundingRequestCans = new Array<FundingRequestCanDto>();
           }
 
           const futureYears: number = this.planManagementService.getRecommendedFutureYears(s.applId);
-          this.logger.info('future years for applId', s.applId, '==', futureYears);
 
           frBudget = {
             frqId: +req.frqId,
@@ -450,9 +446,7 @@ export class PlanStep3Component implements OnInit {
             // id?: number;
           };
 
-          this.logger.info('created budget', frBudget);
           req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
-          // this.planCoordinatorService.pushBudget(s.applId, s.fseId, frBudget);
 
           frCan = {
             approvedDc: +directCost,
@@ -485,13 +479,31 @@ export class PlanStep3Component implements OnInit {
             // updateStamp: number,
           };
 
-          this.logger.info('created CAN', frCan);
           req.financialInfoDto.fundingRequestCans.push(frCan);
-          // this.planCoordinatorService.pushCan(s.applId, s.fseId, frCan);
         });
       }
     );
-    this.logger.debug('plan model after add funding source', JSON.stringify(this.planModel.fundingPlanDto));
-    this.planManagementService.buildPlanModel();
+    this.planManagementService.buildPlanBudgetAndCanModel();
+  }
+
+  deleteFundingSource($event: number): void {
+    this.logger.debug('delete funding source:', $event);
+
+    // STEP 1 - remove the source from the list of selected sources
+    if (!this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources) {
+      this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = [];
+    }
+    this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources.push(+$event);
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources =
+      this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.filter(s => +s.fundingSourceId !== +$event);
+
+    // STEP 2 - remove the budgets and CANs for that source
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
+      req.financialInfoDto.fundingRequestCans = req.financialInfoDto.fundingRequestCans?.filter(c => +c.fseId !== +$event);
+      req.financialInfoDto.fundingReqBudgetsDtos = req.financialInfoDto.fundingReqBudgetsDtos?.filter(b => +b.fseId !== +$event);
+    });
+
+    // STEP 3 - rebuild the budget and CAN model
+    this.planManagementService.buildPlanBudgetAndCanModel();
   }
 }

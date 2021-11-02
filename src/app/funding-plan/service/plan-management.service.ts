@@ -68,7 +68,7 @@ export class PlanManagementService {
       this.selectedCa = next.ca;
     });
 
-    this.buildPlanModel();
+    this.buildPlanBudgetAndCanModel();
   }
 
   reset(): void {
@@ -80,7 +80,6 @@ export class PlanManagementService {
   }
 
   set listSelectedSources(value: FundingRequestFundsSrcDto[]) {
-    console.trace('writing listSelectedSources');
     this._listSelectedSources = value;
   }
 
@@ -106,7 +105,7 @@ export class PlanManagementService {
     return this.percentSelectedTracker.get(applId) || null;
   }
 
-  buildPlanModel(): void {
+  buildPlanBudgetAndCanModel(): void {
     if (!this.budgetMap) {
       this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
     }
@@ -125,24 +124,24 @@ export class PlanManagementService {
     this._listSelectedSources = Array.from(this._selectedSourcesMap.values());
   }
 
-  pushBudget(applId: number, fseId: number, budget: FundingReqBudgetsDto): void {
-    if (!this.budgetMap) {
-      this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
-    }
-    const tmp = new Map<number, FundingReqBudgetsDto>();
-    tmp.set(fseId, budget);
-    this.budgetMap.set(applId, tmp);
-
-  }
-
-  pushCan(applId: number, fseId: number, can: FundingRequestCanDto): void {
-    if (!this.canMap) {
-      this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
-    }
-    const tmp = new Map<number, FundingRequestCanDto>();
-    tmp.set(fseId, can);
-    this.canMap.set(applId, tmp);
-  }
+  // pushBudget(applId: number, fseId: number, budget: FundingReqBudgetsDto): void {
+  //   if (!this.budgetMap) {
+  //     this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
+  //   }
+  //   const tmp = new Map<number, FundingReqBudgetsDto>();
+  //   tmp.set(fseId, budget);
+  //   this.budgetMap.set(applId, tmp);
+  //
+  // }
+  //
+  // pushCan(applId: number, fseId: number, can: FundingRequestCanDto): void {
+  //   if (!this.canMap) {
+  //     this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
+  //   }
+  //   const tmp = new Map<number, FundingRequestCanDto>();
+  //   tmp.set(fseId, can);
+  //   this.canMap.set(applId, tmp);
+  // }
 
   // NOTE: this is for the purpose of restricting selections for the second and third funding sources
   trackRestrictedSources(index: number, sourceId: number): void {
