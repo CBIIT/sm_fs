@@ -127,32 +127,13 @@ export class PlanManagementService {
     this._listSelectedSources = Array.from(this._selectedSourcesMap.values());
   }
 
-  // pushBudget(applId: number, fseId: number, budget: FundingReqBudgetsDto): void {
-  //   if (!this.budgetMap) {
-  //     this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
-  //   }
-  //   const tmp = new Map<number, FundingReqBudgetsDto>();
-  //   tmp.set(fseId, budget);
-  //   this.budgetMap.set(applId, tmp);
-  //
-  // }
-  //
-  // pushCan(applId: number, fseId: number, can: FundingRequestCanDto): void {
-  //   if (!this.canMap) {
-  //     this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
-  //   }
-  //   const tmp = new Map<number, FundingRequestCanDto>();
-  //   tmp.set(fseId, can);
-  //   this.canMap.set(applId, tmp);
-  // }
-
   // NOTE: this is for the purpose of restricting selections for the second and third funding sources
   trackRestrictedSources(index: number, sourceId: number): void {
     // TODO: only track non-null
     // this.logger.debug('track selected sources', index, sourceId);
 
     if (!!sourceId) {
-      this._restrictedSources.set(index, sourceId);
+      this._restrictedSources.set(index, +sourceId);
     } else {
       this._restrictedSources.delete(index);
     }
@@ -163,16 +144,9 @@ export class PlanManagementService {
     return this._listSelectedSources.length;
   }
 
-  removeRestrictedSource(fseId: number): void {
-    let k: number;
-    this._restrictedSources.forEach((value, key) => {
-      if (value === fseId) {
-        k = key;
-      }
-    });
-    if (k) {
-      this._restrictedSources.delete(k);
-    }
+  recalculateRestrictedSources(): void {
+    this._restrictedSources =
+      new Map(this.planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.map((s, i) => [i, s.fundingSourceId]));
   }
 
   getRestrictedSources(index: number): number[] {

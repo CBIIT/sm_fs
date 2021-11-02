@@ -506,7 +506,7 @@ export class PlanStep3Component implements OnInit {
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources =
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.filter(s => +s.fundingSourceId !== +$event);
 
-    this.planManagementService.removeRestrictedSource(+$event);
+    this.planManagementService.recalculateRestrictedSources();
 
     // STEP 2 - remove the budgets and CANs for that source
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
