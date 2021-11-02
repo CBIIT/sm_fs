@@ -53,7 +53,7 @@ export class PlanStep3Component implements OnInit {
               private logger: NGXLogger,
               public planModel: PlanModel,
               private pdCaIntegratorService: PdCaIntegratorService,
-              private planCoordinatorService: PlanManagementService,
+              private planManagementService: PlanManagementService,
               private fsPlanControllerService: FsPlanControllerService,
               private planApproverService: PlanApproverService,
               private canManagementService: CanManagementService,
@@ -66,12 +66,12 @@ export class PlanStep3Component implements OnInit {
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
       // this.logger.debug('new cayCode received');
       this.cayCode = typeof next === 'string' ? next : next[0];
-      this.planCoordinatorService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
+      this.planManagementService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
     });
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
       // this.logger.debug('new PD received');
       this.pdNpnId = next;
-      this.planCoordinatorService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
+      this.planManagementService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
     });
 
 
@@ -131,10 +131,9 @@ export class PlanStep3Component implements OnInit {
     this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
       this.logger.debug('Saved plan model: ', JSON.stringify(result));
       this.planModel.fundingPlanDto = result;
-      this.planCoordinatorService.buildPlanModel();
-      this.planCoordinatorService.buildGrantCostModel();
-      this.planCoordinatorService.buildGrantCostModel();
-      this.planCoordinatorService.checkInFlightPFRs(
+      this.planManagementService.buildPlanModel();
+      this.planManagementService.buildGrantCostModel();
+      this.planManagementService.checkInFlightPFRs(
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(s => {
           return { applId: s.applId, frtId: s.frtId };
         }));
@@ -298,7 +297,7 @@ export class PlanStep3Component implements OnInit {
         }
         budgets.push({
           // TODO: this is the source of the duplication
-          id: this.planCoordinatorService.getBudget(item.grant.applId, source.fundingSourceId)?.id || null,
+          id: this.planManagementService.getBudget(item.grant.applId, source.fundingSourceId)?.id || null,
           fseId: source.fundingSourceId,
           name: source.fundingSourceName,
           supportYear: item.grant.supportYear,
@@ -307,7 +306,7 @@ export class PlanStep3Component implements OnInit {
         });
         cans.push({
           // TODO: this is the source of the duplication
-          id: this.planCoordinatorService.getCan(item.grant.applId, source.fundingSourceId)?.id || null,
+          id: this.planManagementService.getCan(item.grant.applId, source.fundingSourceId)?.id || null,
           approvedDc: directCost,
           approvedTc: totalCost,
           dcPctCut: dcPercentCut,
@@ -385,18 +384,19 @@ export class PlanStep3Component implements OnInit {
   beforeAddFundingSource($event: number): void {
     this.logger.debug('Add funding source:', $event);
     if (+$event === 1) {
+      this.buildPlanModel();
     }
-    this.buildPlanModel();
   }
 
   addFundingSource($event: FundingSourceGrantDataPayload[]): void {
-    this.logger.debug('addFundingSource', $event);
+    this.logger.debug('addFundingSource', this.planModel.fundingPlanDto);
     let frBudget: FundingReqBudgetsDto;
     let frCan: FundingRequestCanDto;
     let doOnce = true;
     $event.forEach(s => {
         if (doOnce) {
-          this.planCoordinatorService.addNewSelectedSource(s.fundingSource);
+          this.logger.info('add new selected source: ', s.fundingSource);
+          // this.planCoordinatorService.addNewSelectedSource(s.fundingSource);
           this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(s.fundingSource);
           doOnce = false;
         }
@@ -424,16 +424,17 @@ export class PlanStep3Component implements OnInit {
 
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.filter(r => r.applId = s.applId).forEach(req => {
           if (!req.financialInfoDto.fundingReqBudgetsDtos) {
+            this.logger.info('creating budgets for req', req);
             req.financialInfoDto.fundingReqBudgetsDtos = new Array<FundingReqBudgetsDto>();
           }
           if (!req.financialInfoDto.fundingRequestCans) {
+            this.logger.info('creating CANs for req', req);
             req.financialInfoDto.fundingRequestCans = new Array<FundingRequestCanDto>();
           }
 
-          const futureYears: number = this.planCoordinatorService.getRecommendedFutureYears(s.applId);
+          const futureYears: number = this.planManagementService.getRecommendedFutureYears(s.applId);
+          this.logger.info('future years for applId', s.applId, '==', futureYears);
 
-          // TODO: solve for name
-          // TODO: solve for approved future years
           frBudget = {
             frqId: req.frqId,
             fseId: s.fseId,
@@ -447,8 +448,9 @@ export class PlanStep3Component implements OnInit {
             // id?: number;
           };
 
+          this.logger.info('created budget', frBudget);
           req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
-          this.planCoordinatorService.pushBudget(s.applId, s.fseId, frBudget);
+          // this.planCoordinatorService.pushBudget(s.applId, s.fseId, frBudget);
 
           frCan = {
             approvedDc: directCost,
@@ -481,12 +483,14 @@ export class PlanStep3Component implements OnInit {
             // updateStamp: number,
           };
 
+          this.logger.info('created CAN', frCan);
           req.financialInfoDto.fundingRequestCans.push(frCan);
-          this.planCoordinatorService.pushCan(s.applId, s.fseId, frCan);
+          // this.planCoordinatorService.pushCan(s.applId, s.fseId, frCan);
         });
 
         // this.planCoordinatorService.buildPlanModel();
       }
     );
+    this.planManagementService.buildPlanModel();
   }
 }

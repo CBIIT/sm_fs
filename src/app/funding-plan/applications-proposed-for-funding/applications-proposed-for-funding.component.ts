@@ -47,7 +47,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   constructor(private logger: NGXLogger,
               public planModel: PlanModel,
-              public planCoordinatorService: PlanManagementService,
+              public planManagementService: PlanManagementService,
               private modalService: NgbModal,
               private router: Router) {
   }
@@ -55,7 +55,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   ngOnInit(): void {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
     this.comments = this.planModel.fundingPlanDto.comments;
-    this.planCoordinatorService.fundingSourceListEmitter.subscribe(next => {
+    this.planManagementService.fundingSourceListEmitter.subscribe(next => {
       this.availableFundingSources = next;
     });
   }
@@ -69,16 +69,16 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   get listSelectedSources(): FundingRequestFundsSrcDto[] {
-    return this.planCoordinatorService.listSelectedSources;
+    return this.planManagementService.listSelectedSources;
   }
 
   set listSelectedSources(value: FundingRequestFundsSrcDto[]) {
-    this.planCoordinatorService.listSelectedSources = value;
+    this.planManagementService.listSelectedSources = value;
   }
 
   get getNextSourceIndex(): number {
     // this.logger.debug('getSourceIndex():', this.planCoordinatorService.selectedSourceCount);
-    return this.planCoordinatorService.selectedSourceCount;
+    return this.planManagementService.selectedSourceCount;
   }
 
   grantSumDirectCost(grantIndex: number): number {
@@ -186,7 +186,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
     this.beforeAddFundingSource.next(this.getNextSourceIndex);
     this.grantList.forEach(item => {
-      this.planCoordinatorService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent.selectedValue);
+      this.planManagementService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent.selectedValue);
     });
 
     const modalRef = this.modalService.open(FundingSourceEntryModalComponent, {size: 'xl'});
@@ -205,11 +205,11 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     if(!this.parentForm.valid) {
       return false;
     }
-    return this.planCoordinatorService.selectedSourceCount !== 0 && this.planCoordinatorService.selectedSourceCount < 3;
+    return this.planManagementService.selectedSourceCount !== 0 && this.planManagementService.selectedSourceCount < 3;
   }
 
   isSingleSource(): boolean {
-    return this.planCoordinatorService.listSelectedSources?.length <= 1;
+    return this.planManagementService.listSelectedSources?.length <= 1;
   }
 
   editSource(sourceIndex: number): void {

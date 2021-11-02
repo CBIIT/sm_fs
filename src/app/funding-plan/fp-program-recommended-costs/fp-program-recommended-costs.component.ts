@@ -214,10 +214,10 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   set displayType(value: string) {
     if (value === 'percent') {
-      this.logger.info('percent selected for grant', this.grant.applId, 'and index', this.sourceIndex);
+      // this.logger.info('percent selected for grant', this.grant.applId, 'and index', this.sourceIndex);
       this.planManagementService.setPercentSelected(this.grant.applId, this.sourceIndex, true);
     } else {
-      this.logger.info('percent deselected for grant', this.grant.applId, 'and index', this.sourceIndex);
+      // this.logger.info('percent deselected for grant', this.grant.applId, 'and index', this.sourceIndex);
       this.planManagementService.setPercentSelected(this.grant.applId, this.sourceIndex, false);
     }
     this._displayType = value;

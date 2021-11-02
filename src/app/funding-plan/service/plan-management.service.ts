@@ -90,7 +90,7 @@ export class PlanManagementService {
   }
 
   setPercentSelected(applId: number, sourceIndex: number, selected: boolean): void {
-    if(selected) {
+    if (selected) {
       this.percentSelectedTracker.set(applId, sourceIndex);
     } else {
       this.percentSelectedTracker.delete(applId);
@@ -107,8 +107,12 @@ export class PlanManagementService {
   }
 
   buildPlanModel(): void {
-    this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
-    this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
+    if (!this.budgetMap) {
+      this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
+    }
+    if (!this.canMap) {
+      this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
+    }
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
       const buds = new Map(r.financialInfoDto.fundingReqBudgetsDtos.map(b => [b.fseId, b]));
       const cans = new Map(r.financialInfoDto.fundingRequestCans.map(c => [c.fseId, c]));

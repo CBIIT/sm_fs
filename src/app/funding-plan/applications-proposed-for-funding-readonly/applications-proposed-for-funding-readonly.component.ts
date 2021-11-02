@@ -13,7 +13,7 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
 
   constructor(public planModel: PlanModel,
-              private planCoordinatorService: PlanManagementService,
+              private planManagementService: PlanManagementService,
               private logger: NGXLogger) {
   }
 
@@ -22,43 +22,43 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
   }
 
   directCost(applId: number, fseId: number): number {
-    return this.planCoordinatorService.directCost(applId, fseId);
+    return this.planManagementService.directCost(applId, fseId);
   }
 
   directCostPercentCut(applId: number, fseId: number): number {
-    return this.planCoordinatorService.directCostPercentCut(applId, fseId);
+    return this.planManagementService.directCostPercentCut(applId, fseId);
   }
 
   totalCost(applId: number, fseId: number): number {
-    return this.planCoordinatorService.totalCost(applId, fseId);
+    return this.planManagementService.totalCost(applId, fseId);
   }
 
   totalCostPercentCut(applId: number, fseId: number): number {
-    return this.planCoordinatorService.totalCostPercentCut(applId, fseId);
+    return this.planManagementService.totalCostPercentCut(applId, fseId);
   }
 
   sourceDirectTotal(fseId: number): number {
-    return this.planCoordinatorService.sourceDirectTotal(fseId);
+    return this.planManagementService.sourceDirectTotal(fseId);
   }
 
   sourceTotalTotal(fseId: number): number {
-    return this.planCoordinatorService.sourceTotalTotal(fseId);
+    return this.planManagementService.sourceTotalTotal(fseId);
   }
 
   grandTotalDirect(): number {
-    return this.planCoordinatorService.grandTotalDirect();
+    return this.planManagementService.grandTotalDirect();
   }
 
   grandTotalTotal(): number {
-    return this.planCoordinatorService.grandTotalTotal();
+    return this.planManagementService.grandTotalTotal();
   }
 
   requestTotalDirect(applId: number): number {
-    return this.planCoordinatorService.requestDirectTotal(applId);
+    return this.planManagementService.requestDirectTotal(applId);
   }
 
   requestTotalTotal(applId: number): number {
-    return this.planCoordinatorService.requestTotalTotal(applId);
+    return this.planManagementService.requestTotalTotal(applId);
   }
 }
 

@@ -1,234 +1,219 @@
-
-  <ng-container *ngIf="isSingleSource() then singleSource else multiSource"></ng-container>
-  <ng-template #singleSource>
-      <div class="row">
-      <div class="col-12 d-flex">
-        <h2>Applications Proposed for Funding</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse"
-          href="#apps-proposed-for-funding-collapse" role="button" aria-expanded="true"
-          aria-controls="apps-proposed-for-funding-collapse"></a>
-      </div>
-      </div>
-
-      <div class="collapse show" id="apps-proposed-for-funding-collapse">
-
-        <p><small>Please note that the Standard Policy Reduction should be taken into consideration when determining the
-            recommended dollar amounts for the request. If you would like to include a waiver to the Standard Policy
-            Reduction, please provide it as part of the justification. The current fiscal year's policy reductions can
-            be
-            viewed on the <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information"
-              target="_blank" class="external-link">OEFIA web site</a>.</small></p>
-
-        <div class="d-flex mb-2">
-          <button type="button" [disabled]="!canAddFundingSource()" class="btn btn-primary ml-auto"
-            (click)="onAddFundingSource()">
-            <i class="fas fa-plus mr-1" aria-hidden="true"></i> Add Funding Source
-          </button>
-        </div>
-
-        <table class="table table-bordered table-striped app-funding-table">
-          <thead>
-            <tr>
-              <th scope="col">Grant Information</th>
-              <th scope="col">
-                <label>Program Recommended Costs</label>
-                <hr>
-                <label [attr.for]="'FundSrc- + index'">
-                  Funding Source
-                  <a href="#" (click)="openFsDetails()"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
-                </label>
-                <app-fp-funding-source
-                  [parentForm]="parentForm"
-                  [index]="0"
-                  [required]="true">
-                </app-fp-funding-source>
-                <div
-                  class="text-danger mt-1"
-                  *ngIf="(parentForm.submitted || parentForm.touched) && parentForm.errors?.atLeastOneGrantMustBeFunded">
-                  At least one grant must be funded by this funding source
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let grant of listGrantsSelected; let i = index;" [ngModelGroup]="grant.fullGrantNum">
-              <td>
-                <app-fp-grant-information [parentForm]="parentForm" [grantIndex]="i" [grant]="grant" [sourceIndex]="0">
-                </app-fp-grant-information>
-              </td>
-              <td>
-                <app-fp-program-recommended-costs [parentForm]="parentForm" [grantIndex]="i" [grant]="grant"
-                  [sourceIndex]="0">
-                </app-fp-program-recommended-costs>
-              </td>
-
-            </tr>
-
-          </tbody>
-          <tfoot>
-            <tr>
-              <td scope="row"><strong>Total Recommended Costs</strong></td>
-              <td>
-                <div class="form-row">
-                  <div class="col-lg-6">
-                    <span class="like-label">Direct Cost</span>
-                    <span>{{ sourceSumDirectCost(0) | currency }}</span>
-                  </div>
-                  <div class="col-lg-6">
-                    <span class="like-label">Total Cost</span>
-                    <span>{{ sourceSumTotalCost(0) | currency }}</span>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-
-  </ng-template>
-  <ng-template #multiSource>
-    <div class="col-12 mb-5">
-
-      <div class="col-12 d-flex">
-        <h2>Applications Proposed for Funding</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse"
-          href="#apps-proposed-for-funding-collapse" role="button" aria-expanded="true"
-          aria-controls="apps-proposed-for-funding-collapse"></a>
-        <div class="collapse show" id="apps-proposed-for-funding-collapse">
-          <p>
-            <small>
-              The Standard Policy Reduction should be taken into consideration when determining the recommended dollar
-              amounts for the funding selection plan. If you would like to include a waiver to the Standard Policy
-              Reduction, please provide it as part of the justification. The current fiscal year's policy reductions can
-              be
-              viewed on the
-              <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information" target="_blank"
-                class="external-link">
-                OEFIA web site
-              </a>.
-            </small>
-          </p>
-          <div class="d-flex mb-2">
-            <button type="button" class="btn btn-primary ml-auto" data-toggle="modal" data-target="#add-FS-modal"><i
-                class="fas fa-plus mr-1" aria-hidden="true" (click)="onAddFundingSource()"></i> Add Funding Source
-            </button>
-          </div>
-
-          <div class="table-responsive">
-
-            <table class="table table-bordered table-striped app-funding-table multiple-FS">
-              <thead>
-                <tr>
-                  <th scope="col">Grant Information</th>
-                  <th *ngFor="let source of listSelectedSources; let sourceIndex = index" colspan="2">
-                    <div class="d-flex align-items-center">
-                      <span>{{ source.fundingSourceName }}</span>
-                      <button type="button" class="btn btn-sm btn-slim btn-link ml-2" (click)="editSource(sourceIndex)"
-                        ngbTooltip="Edit" placement="left">
-                        <i class="fas fa-pencil" aria-hidden="true"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-slim btn-link btn-link-danger ml-1"
-                        (click)="deleteSource(sourceIndex)" ngbTooltip="Remove" placement="left">
-                        <i class="fas fa-trash" aria-hidden="true"></i>
-                      </button>
-                    </div>
-                  </th>
-                  <th scope="col" colspan="2">Total Recommended Costs</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let grant of listGrantsSelected; let grantIndex = index;">
-                  <td>
-                    <app-fp-grant-information [parentForm]="parentForm" [grantIndex]="grantIndex" [grant]="grant"
-                      [readOnly]="true" [sourceIndex]="0">
-                    </app-fp-grant-information>
-                  </td>
-                  <!-- ======================================== START GRANT INFO WRAPPER ======================================== -->
-
-                  <ng-container *ngFor="let source of listSelectedSources; let sourceIndex = index">
-                    <td>
-                      <strong>Direct</strong><br />
-                      {{ planCoordinatorService.directCost(grant.applId, source.fundingSourceId) | currency }} <br />
-                      {{ planCoordinatorService.directCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
-                    </td>
-
-                    <td>
-                      <strong>Total</strong><br />
-                      {{ planCoordinatorService.totalCost(grant.applId, source.fundingSourceId) | currency }} <br />
-                      {{ planCoordinatorService.totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
-                    </td>
-                  </ng-container>
-
-                  <ng-container *ngIf="listSelectedSources?.length > 1">
-                    <td>
-                      <strong>Direct</strong><br />
-                      {{ planCoordinatorService.requestDirectTotal(grant.applId) | currency}}
-                    </td>
-
-                    <td>
-                      <strong>Total</strong><br />
-                      {{ planCoordinatorService.requestTotalTotal(grant.applId) | currency }}
-                    </td>
-                  </ng-container>
-
-                </tr>
-
-              </tbody>
-
-              <tfoot>
-                <tr>
-                  <td scope="row"><strong>Total Recommended Costs</strong></td>
-                  <ng-container *ngFor="let source of listSelectedSources; let sourceIndex = index">
-                    <td>
-                      <strong>Direct</strong><br />
-                      {{ planCoordinatorService.sourceDirectTotal(source.fundingSourceId) | currency}}
-                    </td>
-
-                    <td>
-                      <strong>Total</strong><br />
-                      {{ planCoordinatorService.sourceTotalTotal(source.fundingSourceId) | currency }}
-                    </td>
-                  </ng-container>
-
-                  <ng-container *ngIf="listSelectedSources?.length > 1">
-                    <td>
-                      <strong>Direct</strong><br />
-                      {{ planCoordinatorService.grandTotalDirect() | currency}}
-                    </td>
-
-                    <td>
-                      <strong>Total</strong><br />
-                      {{ planCoordinatorService.grandTotalTotal() | currency }}
-                    </td>
-                  </ng-container>
-                </tr>
-              </tfoot>
-
-            </table>
-
-          </div>
-        </div>
-
-
-      </div>
-
-
-
-    </div>
-  </ng-template>
+<ng-container *ngIf="isSingleSource() then singleSource else multiSource"></ng-container>
+<ng-template #singleSource>
 
   <div class="row">
+    <div class="col-12 d-flex">
+      <h2>Applications Proposed for Funding</h2>
+      <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse"
+         href="#apps-proposed-for-funding-collapse" role="button" aria-expanded="true"
+         aria-controls="apps-proposed-for-funding-collapse"></a>
+    </div>
+  </div>
+
+  <div class="collapse show" id="apps-proposed-for-funding-collapse">
+
+    <p><small>Please note that the Standard Policy Reduction should be taken into consideration when determining the
+      recommended dollar amounts for the request. If you would like to include a waiver to the Standard Policy
+      Reduction, please provide it as part of the justification. The current fiscal year's policy reductions can
+      be
+      viewed on the <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information"
+                       target="_blank" class="external-link">OEFIA web site</a>.</small></p>
+
+    <div class="d-flex mb-2">
+      <button type="button" [disabled]="!canAddFundingSource()" class="btn btn-primary ml-auto"
+              (click)="onAddFundingSource()">
+        <i class="fas fa-plus mr-1" aria-hidden="true"></i> Add Funding Source
+      </button>
+    </div>
+    <table class="table table-bordered table-striped app-funding-table">
+      <thead>
+      <tr>
+        <th scope="col">Grant Information</th>
+        <th scope="col">
+          <label>Program Recommended Costs</label>
+          <hr>
+          <label [attr.for]="'FundSrc- + index'">
+            Funding Source
+            <a href="#" (click)="openFsDetails()"><i class="fas fa-question-circle" aria-hidden="true"></i></a>
+          </label>
+          <app-fp-funding-source
+            [parentForm]="parentForm"
+            [index]="0"
+            [required]="true">
+          </app-fp-funding-source>
+          <div
+            class="text-danger mt-1"
+            *ngIf="(parentForm.submitted || parentForm.touched) && parentForm.errors?.atLeastOneGrantMustBeFunded">
+            At least one grant must be funded by this funding source
+          </div>
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let grant of listGrantsSelected; let i = index;" [ngModelGroup]="grant.fullGrantNum">
+        <td>
+          <app-fp-grant-information [parentForm]="parentForm" [grantIndex]="i" [grant]="grant" [sourceIndex]="0">
+          </app-fp-grant-information>
+        </td>
+        <td>
+          <app-fp-program-recommended-costs [parentForm]="parentForm" [grantIndex]="i" [grant]="grant"
+                                            [sourceIndex]="0">
+          </app-fp-program-recommended-costs>
+        </td>
+
+      </tr>
+
+      </tbody>
+      <tfoot>
+      <tr>
+        <td scope="row"><strong>Total Recommended Costs</strong></td>
+        <td>
+          <div class="form-row">
+            <div class="col-lg-6">
+              <span class="like-label">Direct Cost</span>
+              <span>{{ sourceSumDirectCost(0) | currency }}</span>
+            </div>
+            <div class="col-lg-6">
+              <span class="like-label">Total Cost</span>
+              <span>{{ sourceSumTotalCost(0) | currency }}</span>
+            </div>
+          </div>
+        </td>
+      </tr>
+      </tfoot>
+    </table>
+  </div>
+
+</ng-template>
+<ng-template #multiSource>
+  <div class="row">
+    <div class="col-12 d-flex">
+      <h2>Applications Proposed for Funding</h2>
+      <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse"
+         href="#apps-proposed-for-funding-collapse" role="button" aria-expanded="true"
+         aria-controls="apps-proposed-for-funding-collapse"></a>
+    </div>
+  </div>
+
+  <div class="collapse show" id="apps-proposed-for-funding-collapse">
+
+    <p><small>Please note that the Standard Policy Reduction should be taken into consideration when determining the
+      recommended dollar amounts for the request. If you would like to include a waiver to the Standard Policy
+      Reduction, please provide it as part of the justification. The current fiscal year's policy reductions can
+      be
+      viewed on the <a href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information"
+                       target="_blank" class="external-link">OEFIA web site</a>.</small></p>
+
+    <div class="d-flex mb-2">
+      <button type="button" [disabled]="!canAddFundingSource()" class="btn btn-primary ml-auto"
+              (click)="onAddFundingSource()">
+        <i class="fas fa-plus mr-1" aria-hidden="true"></i> Add Funding Source
+      </button>
+    </div>
+    <table class="table table-bordered table-striped app-funding-table multiple-FS">
+      <thead>
+      <tr>
+        <th scope="col">Grant Information</th>
+        <th *ngFor="let source of listSelectedSources; let sourceIndex = index" colspan="2">
+          <div class="d-flex align-items-center">
+            <span>{{ source.fundingSourceName }}</span>
+            <button type="button" class="btn btn-sm btn-slim btn-link ml-2" (click)="editSource(sourceIndex)"
+                    ngbTooltip="Edit" placement="left">
+              <i class="fas fa-pencil" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-slim btn-link btn-link-danger ml-1"
+                    (click)="deleteSource(sourceIndex)" ngbTooltip="Remove" placement="left">
+              <i class="fas fa-trash" aria-hidden="true"></i>
+            </button>
+          </div>
+        </th>
+        <th scope="col" colspan="2">Total Recommended Costs</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let grant of listGrantsSelected; let grantIndex = index;">
+        <td>
+          <app-fp-grant-information [parentForm]="parentForm" [grantIndex]="grantIndex" [grant]="grant"
+                                    [readOnly]="true" [sourceIndex]="0">
+          </app-fp-grant-information>
+        </td>
+        <!-- ======================================== START GRANT INFO WRAPPER ======================================== -->
+
+        <ng-container *ngFor="let source of listSelectedSources; let sourceIndex = index">
+          <td>
+            <strong>Direct</strong><br/>
+            {{ planManagementService.directCost(grant.applId, source.fundingSourceId) | currency }} <br/>
+            {{ planManagementService.directCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
+          </td>
+
+          <td>
+            <strong>Total</strong><br/>
+            {{ planManagementService.totalCost(grant.applId, source.fundingSourceId) | currency }} <br/>
+            {{ planManagementService.totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
+          </td>
+        </ng-container>
+
+        <ng-container *ngIf="listSelectedSources?.length > 1">
+          <td>
+            <strong>Direct</strong><br/>
+            {{ planManagementService.requestDirectTotal(grant.applId) | currency}}
+          </td>
+
+          <td>
+            <strong>Total</strong><br/>
+            {{ planManagementService.requestTotalTotal(grant.applId) | currency }}
+          </td>
+        </ng-container>
+
+      </tr>
+
+      </tbody>
+
+      <tfoot>
+      <tr>
+        <td scope="row"><strong>Total Recommended Costs</strong></td>
+        <ng-container *ngFor="let source of listSelectedSources; let sourceIndex = index">
+          <td>
+            <strong>Direct</strong><br/>
+            {{ planManagementService.sourceDirectTotal(source.fundingSourceId) | currency}}
+          </td>
+
+          <td>
+            <strong>Total</strong><br/>
+            {{ planManagementService.sourceTotalTotal(source.fundingSourceId) | currency }}
+          </td>
+        </ng-container>
+
+        <ng-container *ngIf="listSelectedSources?.length > 1">
+          <td>
+            <strong>Direct</strong><br/>
+            {{ planManagementService.grandTotalDirect() | currency}}
+          </td>
+
+          <td>
+            <strong>Total</strong><br/>
+            {{ planManagementService.grandTotalTotal() | currency }}
+          </td>
+        </ng-container>
+      </tr>
+      </tfoot>
+
+    </table>
+
+  </div>
+</ng-template>
+
+<div class="row">
   <div class="col-12 mt-3">
     <div class="form-group">
       <label for="funding-comments">Comments <span class="optional">(optional)</span></label>
       <textarea id="funding-comments" #funding_comments name="fundingComments" maxlength="2000" class="form-control"
-        rows="2" [(ngModel)]="comments"></textarea>
+                rows="2" [(ngModel)]="comments"></textarea>
       <span class="character-counter">{{ funding_comments.value.length }}/2000</span>
     </div>
   </div>
-  </div>
+</div>
 
-  <div class="col-12">
-    <hr>
-  </div>
+<div class="col-12">
+  <hr>
+</div>
