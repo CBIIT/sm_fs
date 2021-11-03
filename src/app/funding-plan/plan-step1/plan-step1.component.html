@@ -16,19 +16,14 @@
   </div>
 </div>
 
-  <!-- PLEASE NOTE: each new set of inputs needs to have unique ids for 508 compliance -->
+<!-- PLEASE NOTE: each new set of inputs needs to have unique ids for 508 compliance -->
 <div *ngFor="let rfa of searchCriteria.rfaPaEntries; index as i">
-  <div class="row"  role="group" >
+  <div class="row" role="group">
     <div class="col-lg-3">
       <div class="form-group">
         <label [attr.for]="'rfaPa-' + i">FOA Number</label>
-        <ng-select2
-          [attr.id]="'rfaPa-' + i"
-          name="rfa-pa"
-          [(ngModel)]="rfa.rfaPaNumber"
-          [allowClear]="true"
-          [data]="searchCriteria.availableRfaPas"
-          (ngModelChange)="onRfaPaChangeSelection($event)">
+        <ng-select2 [attr.id]="'rfaPa-' + i" name="rfa-pa" [(ngModel)]="rfa.rfaPaNumber" [allowClear]="true"
+          [data]="searchCriteria.availableRfaPas" (ngModelChange)="onRfaPaChangeSelection($event)">
         </ng-select2>
       </div>
     </div>
@@ -36,32 +31,29 @@
     <div class="col col-lg-5">
       <div class="form-group">
         <label [attr.for]="'ncab-dates-' + i">NCAB Date(s)</label>
-        <ng-select2
-          [attr.id]="'ncab-dates-' + i"
-          name="ncab-dates"
-          [allowClear]="false"
-          [options]="ncab_options"
-          [data]="rfa.availableNcabDates"
-          [(ngModel)]="rfa.selectedNcabDates"
+        <ng-select2 [attr.id]="'ncab-dates-' + i" name="ncab-dates" [allowClear]="false" [options]="ncab_options"
+          [data]="rfa.availableNcabDates" [(ngModel)]="rfa.selectedNcabDates"
           (valueChanged)="rfa.onNcabChangeSelection($event)">
         </ng-select2>
       </div>
     </div>
 
     <div class="col-lg-2 col-sm-auto d-flex align-items-end mb-3">
-      <button *ngIf="searchCriteria.rfaPaEntries.length > 1"
-              type="button" class="btn btn-danger px-2 mr-2" title="Remove FOA" (click)="removeRfaPa(i)">
+      <button *ngIf="searchCriteria.rfaPaEntries.length > 1" type="button" class="btn btn-danger px-2 mr-2"
+        title="Remove FOA" (click)="removeRfaPa(i)">
         <i class="fas fa-trash" aria-hidden="true"></i>
       </button>
-      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)"
-              type="button" class="btn btn-primary px-2" title="Add FOA" (click)="appendRfaPa()">
+      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)" type="button" class="btn btn-primary px-2"
+        title="Add FOA" (click)="appendRfaPa()">
         <i class="fas fa-plus" aria-hidden="true"></i>
       </button>
     </div>
 
     <div class="col-lg-2 d-flex justify-content-end align-items-end mb-3">
-      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)" type="button" class="btn btn-outline-secondary mr-2" (click)="clear()">Clear</button>
-      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)" type="button" class="btn btn-primary" (click)="search()">Search</button>
+      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)" type="button"
+        class="btn btn-outline-secondary mr-2" (click)="clear()">Clear</button>
+      <button *ngIf="i === (searchCriteria.rfaPaEntries.length - 1)" type="button" class="btn btn-primary"
+        (click)="search()">Search</button>
     </div>
   </div>
   <div class="row" role="group" style="margin-top: -1rem;">
@@ -72,12 +64,12 @@
       </div>
     </div>
     <div class="col col-lg-5">
-      <div class="text-danger mt-1 form-group"
-           *ngIf="rfa.ncabErrors.length > 0 || rfa.ncabErrRequired == true">
+      <div class="text-danger mt-1 form-group" *ngIf="rfa.ncabErrors.length > 0 || rfa.ncabErrRequired == true">
         <div *ngIf="rfa.ncabErrors.length > 0">
           <div *ngFor="let error of rfa.ncabErrors">
             <b><span><a [routerLink]="'/plan/retrieve/' + error.fprId">
-              Funding Plan {{error.fprId}}</a></span></b> already exists in the '{{error.currentPlanStatusDescription}}' status for this FOA.
+                  Funding Plan {{error.fprId}}</a></span></b> already exists in the
+            '{{error.currentPlanStatusDescription}}' status for this FOA.
           </div>
         </div>
         <div *ngIf="rfa.ncabErrRequired == true">NCAB is required</div>
@@ -86,25 +78,27 @@
     <div class="col-lg-2 col-sm-auto d-flex align-items-end mb-3"></div>
     <div class="col-lg-2 d-flex justify-content-end align-items-end mb-3"></div>
   </div>
-  </div><!-- END Row -->
-  <div class="row col-12">
-    <hr>
-  </div>
+</div><!-- END Row -->
+<div class="row col-12">
+  <hr>
+</div>
 
 <div class="row mb-3">
   <div class="col-12">
     <h2>Results</h2>
     <div class="d-flex">
-      <p *ngIf="!(dtData.length == 0)"><small class="text-muted">To apply sorting order to multiple columns, hold down the Shift key and click the header of
-                                                                 each additional column that you want to sort.</small></p>
+      <p *ngIf="!(dtData.length == 0)"><img src="images/info.png" alt="INFO" width="15" height="10"><small
+          class="text-muted">The table below is sorted by <b>Priority Score</b> followed by <b>PI Last Name</b>. To apply sorting
+          order to multiple columns, hold down the Shift key and click the header of each additional column that you
+          want to sort.</small></p>
       <p *ngIf="(dtData.length == 0)">No grants found to display.</p>
       <button [hidden]="(dtData.length == 0)" type="button" id="selectGrantsTop" class="btn btn-primary ml-auto"
-              [ngbTooltip]="cannotSelectGrantsTooltip"
-              [disabled]="cannotSelectGrantsTooltip != null" (click)="selectGrants()">Select Grants
+        [ngbTooltip]="cannotSelectGrantsTooltip" [disabled]="cannotSelectGrantsTooltip != null"
+        (click)="selectGrants()">Select Grants
       </button>
     </div>
   </div>
-  <div class="col-12 d-flex" >
+  <div class="col-12 d-flex">
   </div>
 </div>
 <div class="row" [hidden]="(dtData.length == 0)">
@@ -112,18 +106,22 @@
     <ngb-alert *ngIf="dtData && dtData.length > 0 && noSelectableGrants" type="danger" [dismissible]="false">
       <div>The FOA(s) for the selected NCAB(s) have no selectable grant applications.</div>
     </ngb-alert>
-    <ngb-alert *ngIf="dtData && dtData.length > 0 && noSelectableGrantsWarining" type="warning" [dismissible]="true" (closed)="noSelectableGrantsWarining = ''">
+    <ngb-alert *ngIf="dtData && dtData.length > 0 && noSelectableGrantsWarining" type="warning" [dismissible]="true"
+      (closed)="noSelectableGrantsWarining = ''">
       <div [innerHTML]="noSelectableGrantsWarining"></div>
     </ngb-alert>
 
-    <table id="grantDt" #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
+    <table id="grantDt" #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover"
+      style="width: 100%">
     </table>
     <!--          Renderer templates -->
     <ng-template #selectGrantCheckboxRenderer let-data="adtData">
-      <app-select-grant-checkbox-cell-renderer [data]="data" (emitter)="onCaptureSelectedEvent($event)"></app-select-grant-checkbox-cell-renderer>
+      <app-select-grant-checkbox-cell-renderer [data]="data" (emitter)="onCaptureSelectedEvent($event)">
+      </app-select-grant-checkbox-cell-renderer>
     </ng-template>
-    <ng-template #fullGrantNumberRenderer let-data="adtData" >
-      <app-full-grant-number-cell-renderer [data]="data" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl"></app-full-grant-number-cell-renderer>
+    <ng-template #fullGrantNumberRenderer let-data="adtData">
+      <app-full-grant-number-cell-renderer [data]="data" [eGrantsUrl]="eGrantsUrl" [grantViewerUrl]="grantViewerUrl">
+      </app-full-grant-number-cell-renderer>
     </ng-template>
     <ng-template #cancerActivityRenderer let-data="adtData">
       <app-cancer-activity-cell-renderer [data]="data"></app-cancer-activity-cell-renderer>
@@ -136,8 +134,10 @@
 
 <div class="row" [hidden]="(dtData.length == 0)">
   <div class="col-12 d-flex">
-    <button type="button" id="selectGrantsBottom" class="btn btn-primary ml-auto" [ngbTooltip]="cannotSelectGrantsTooltip" [disabled]="cannotSelectGrantsTooltip != null" (click)="selectGrants()">Select Grants</button>
-<!--    <button type="button" id="selectGrantsBottom" class="btn btn-primary ml-auto" [tooltip]="cannotSelectGrantsTooltip" [disabled]="cannotSelectGrantsTooltip != null && cannotSelectGrantsTooltip.length > 0" (click)="selectGrants()">Select Grants</button>-->
+    <button type="button" id="selectGrantsBottom" class="btn btn-primary ml-auto"
+      [ngbTooltip]="cannotSelectGrantsTooltip" [disabled]="cannotSelectGrantsTooltip != null"
+      (click)="selectGrants()">Select Grants</button>
+    <!--    <button type="button" id="selectGrantsBottom" class="btn btn-primary ml-auto" [tooltip]="cannotSelectGrantsTooltip" [disabled]="cannotSelectGrantsTooltip != null && cannotSelectGrantsTooltip.length > 0" (click)="selectGrants()">Select Grants</button>-->
   </div>
 
 </div><!-- END Row -->
