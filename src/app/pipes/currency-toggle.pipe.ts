@@ -13,8 +13,7 @@ export class CurrencyTogglePipe extends CurrencyPipe implements PipeTransform {
     if (value === 0) {
       return '--';
     }
-    let formattedByMe = super.transform(value, ...args);
-    return formattedByMe;
+    return super.transform(value, ...args);
   }
 
 }
