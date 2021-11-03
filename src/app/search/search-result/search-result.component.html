@@ -66,6 +66,9 @@
         <ng-template #existInPlanRenderer let-data="adtData">
           <app-search-grant-exist-in-plan-cell-renderer [data]="data" (emitter)="onPlanSelect($event)"></app-search-grant-exist-in-plan-cell-renderer>
         </ng-template>
+        <ng-template #existInPaylistRenderer let-data="adtData">
+          <app-search-grant-exist-in-paylist-cell-renderer [data]="data" (emitter)="onPaylistSelect($event)"></app-search-grant-exist-in-paylist-cell-renderer>
+        </ng-template>
       </div>
     </div>
   </div>
