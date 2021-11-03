@@ -419,10 +419,10 @@ export class PlanStep3Component implements OnInit {
           percentCut = +s.percentCut;
           directCost = +s.directCostCalculated;
           totalCost = +s.totalCostCalculated;
-          dcPercentCut = +s.percentCut * 100;
-          tcPercentCut = +s.percentCut * 100;
+          dcPercentCut = +s.percentCut;
+          tcPercentCut = +s.percentCut;
         } else if (s.displayType === 'dollar') {
-          percentCut = +s.percentCut * 100;
+          percentCut = +s.percentCut;
           directCost = +s.directCost;
           totalCost = +s.totalCost;
           dcPercentCut = +s.dcPercentCutCalculated * 100;
