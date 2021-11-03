@@ -28,6 +28,7 @@ import {SearchGrantExistInRequestCellRendererComponent} from "./search-grant-exi
 import {SearchGrantExistInPlanCellRendererComponent} from "./search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component";
 import {DatatableThrottle} from "../../utils/datatable-throttle";
 import {SearchGrantExistInPaylistCellRendererComponent} from "./search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component";
+import {AppUserSessionService} from "../../service/app-user-session.service";
 
 class DataTablesResponse {
   data: any[];
@@ -49,6 +50,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
               private router: Router,
               private batchApproveService: BatchApproveService,
               private documentService : DocumentService,
+              private userService : AppUserSessionService,
               private logger: NGXLogger) { }
 
   @ViewChildren(DataTableDirective) dtElements: QueryList<DataTableDirective>;
@@ -93,10 +95,16 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   batchApproveEnabled = false;
   runReportEnabled = false;
 
+  canOpenPaylist: boolean = false;
+
   throttle: DatatableThrottle = new DatatableThrottle();
   // batchApproveVisible = false;
 
   ngOnInit(): void {
+    this.canOpenPaylist = this.userService.hasRole('GMBRCHF') ||
+                          this.userService.hasRole('OEFIACRT') ||
+                          this.userService.hasRole('DES') ||
+                          this.userService.hasRole('PAYLSTVW');
   }
 
   ngAfterViewInit(): void {
@@ -676,8 +684,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       // NOTE - jasperReportController DOES NOT work
       window.open('/i2ecws/api/v1/generate-paylist-report/' + $event.id + '/JR_HISTORICALPAYLIST_REPORT/PDF', '_blank');
     }
+    else if (this.canOpenPaylist) {
+      window.open('/paylist/view-paylist?' + $event.id, '_self');
+    }
     else {
-      alert('To be implemented: open paylist view for ' + $event.id + ' (' + $event.fy + ')');
+      window.open('/i2ecws/api/v1/generate-paylist-report/' + $event.id + '/JR_NONHISTORICALPAYLIST_REPORT/PDF', '_blank');
     }
 
   }
