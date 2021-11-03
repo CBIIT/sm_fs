@@ -674,7 +674,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   onPaylistSelect($event: any) {
     if ($event.fy < 2020) {
       // NOTE - jasperReportController DOES NOT work
-      window.open('i2ecws/api/v1/generate-paylist-report/' + $event.id + '/JR_HISTORICALPAYLIST_REPORT/PDF', '_blank');
+      window.open('/i2ecws/api/v1/generate-paylist-report/' + $event.id + '/JR_HISTORICALPAYLIST_REPORT/PDF', '_blank');
     }
     else {
       alert('To be implemented: open paylist view for ' + $event.id + ' (' + $event.fy + ')');
