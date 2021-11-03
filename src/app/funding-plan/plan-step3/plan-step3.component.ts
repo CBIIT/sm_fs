@@ -156,34 +156,12 @@ export class PlanStep3Component implements OnInit {
 
   buildPlanModel(): void {
     this.scrapePlanData();
+    this.buildPlanRequestLists();
+    this.buildPlanBudgetAndCanMaps();
+  }
 
-    // A little hacky, but I may have added some sources to delete sources BEFORE running this code, so I want to
-    // preserve the list.
-    const deleteSources: number[] = this.planModel.fundingPlanDto.fpFinancialInformation?.deleteSources;
-    this.planModel.fundingPlanDto.fpFinancialInformation = {};
-
-    this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = deleteSources;
-    this.planModel.fundingPlanDto.fpFinancialInformation.fiscalYear = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
-    this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
+  private buildPlanRequestLists(): void {
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests = [];
-
-    const futureYears: Map<number, number> = new Map<number, number>();
-    this.applicationsProposedForFunding.grantList.forEach(item => {
-      if (!!item.recommendedFutureYearsComponent) {
-        const applId = item.grant.applId;
-        const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue || 0;
-        // this.logger.debug('Retrieved values (applId, recommendedFutureYears) =>', applId, recommendedFutureYears);
-        futureYears.set(applId, recommendedFutureYears);
-      }
-    });
-
-    const fundingSourceDetails: Map<number, FundingRequestFundsSrcDto> = new Map<number, FundingRequestFundsSrcDto>();
-    this.applicationsProposedForFunding.fundingSources.forEach((item, index) => {
-      if (!!item.sourceDetails()) {
-        this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(item.sourceDetails());
-        fundingSourceDetails.set(index, item.sourceDetails());
-      }
-    });
 
     this.fpInfoComponent.listApplicationsNotSelectable.forEach(g => {
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
@@ -237,6 +215,34 @@ export class PlanStep3Component implements OnInit {
           financialInfoDto: {}
         }
       );
+    });
+  }
+
+  private buildPlanBudgetAndCanMaps(): void {
+    // A little hacky, but I may have added some sources to delete sources BEFORE running this code, so I want to
+    // preserve the list.
+    const deleteSources: number[] = this.planModel.fundingPlanDto.fpFinancialInformation?.deleteSources;
+    this.planModel.fundingPlanDto.fpFinancialInformation = {};
+
+    this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = deleteSources;
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
+
+    const futureYears: Map<number, number> = new Map<number, number>();
+    this.applicationsProposedForFunding.grantList.forEach(item => {
+      if (!!item.recommendedFutureYearsComponent) {
+        const applId = item.grant.applId;
+        const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue || 0;
+        // this.logger.debug('Retrieved values (applId, recommendedFutureYears) =>', applId, recommendedFutureYears);
+        futureYears.set(applId, recommendedFutureYears);
+      }
+    });
+
+    const fundingSourceDetails: Map<number, FundingRequestFundsSrcDto> = new Map<number, FundingRequestFundsSrcDto>();
+    this.applicationsProposedForFunding.fundingSources.forEach((item, index) => {
+      if (!!item.sourceDetails()) {
+        this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(item.sourceDetails());
+        fundingSourceDetails.set(index, item.sourceDetails());
+      }
     });
     // ===========================================================================================
     // ===========================================================================================
@@ -316,7 +322,6 @@ export class PlanStep3Component implements OnInit {
     });
     // ====================================================================================
     // ====================================================================================
-
   }
 
   private scrapePlanData(): void {
@@ -345,7 +350,6 @@ export class PlanStep3Component implements OnInit {
     this.planModel.fundingPlanDto.fundingEstYr5Amt = this.fpFundingInfoComponent.outYear5;
 
     this.planModel.fundingPlanDto.comments = this.applicationsProposedForFunding.comments;
-
 
     const bmmCodes: string[] = [];
     const activityCodes: string[] = [];
