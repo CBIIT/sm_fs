@@ -100,6 +100,8 @@ export class PlanStep3Component implements OnInit {
     this.alerts = null;
     // this.logger.debug($event);
     if (this.step3form.valid) {
+
+      this.scrapePlanData();
       if (this.planManagementService.selectedSourceCount <= 1) {
         this.buildPlanModel();
       }
@@ -153,58 +155,13 @@ export class PlanStep3Component implements OnInit {
   }
 
   buildPlanModel(): void {
-    this.planModel.fundingPlanDto.planName = this.planName;
-    if (!this.planModel.fundingPlanDto.planFy) {
-      this.planModel.fundingPlanDto.planFy = getCurrentFiscalYear();
-    }
+    this.scrapePlanData();
+    this.buildPlanRequestLists();
+    this.buildPlanBudgetAndCanMaps();
+  }
 
-    this.planModel.fundingPlanDto.requestorDoc = this.doc;
-    this.planModel.fundingPlanDto.requestorNpnId = this.pdNpnId;
-    this.planModel.fundingPlanDto.requestorNpeId = null;
-    this.planModel.fundingPlanDto.cayCode = this.cayCode;
-
-    this.planModel.fundingPlanDto.otherContributingDocs = this.otherDocs.selectedValue;
-
-    this.planModel.fundingPlanDto.applNotConsideredNum = this.fpInfoComponent.totalApplicationsNotConsidered;
-    this.planModel.fundingPlanDto.applProposedNum = this.fpInfoComponent.totalApplicationsSelected;
-    this.planModel.fundingPlanDto.applReceivedNum = this.fpInfoComponent.totalApplicationsReceived;
-    this.planModel.fundingPlanDto.applSkipNum = this.fpInfoComponent.totalApplicationsSkipped;
-
-    this.planModel.fundingPlanDto.pubYr1SetAsideAmt = this.fpFundingInfoComponent.firstYearSetAside;
-    this.planModel.fundingPlanDto.totalPubSetAsideAmt = this.fpFundingInfoComponent.totalSetAside;
-    this.planModel.fundingPlanDto.fundingEstYr2Amt = this.fpFundingInfoComponent.outYear2;
-    this.planModel.fundingPlanDto.fundingEstYr3Amt = this.fpFundingInfoComponent.outYear3;
-    this.planModel.fundingPlanDto.fundingEstYr4Amt = this.fpFundingInfoComponent.outYear4;
-    this.planModel.fundingPlanDto.fundingEstYr5Amt = this.fpFundingInfoComponent.outYear5;
-
-    this.planModel.fundingPlanDto.comments = this.applicationsProposedForFunding.comments;
-
-    // A little hacky, but I may have added some sources to delete sources BEFORE running this code, so I want to
-    // preserve the list.
-    const deleteSources: number[] = this.planModel.fundingPlanDto.fpFinancialInformation?.deleteSources;
-    this.planModel.fundingPlanDto.fpFinancialInformation = {};
-    this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = deleteSources;
-    this.planModel.fundingPlanDto.fpFinancialInformation.fiscalYear = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
-    this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
+  private buildPlanRequestLists(): void {
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests = [];
-
-    const futureYears: Map<number, number> = new Map<number, number>();
-    this.applicationsProposedForFunding.grantList.forEach(item => {
-      if (!!item.recommendedFutureYearsComponent) {
-        const applId = item.grant.applId;
-        const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue || 0;
-        // this.logger.debug('Retrieved values (applId, recommendedFutureYears) =>', applId, recommendedFutureYears);
-        futureYears.set(applId, recommendedFutureYears);
-      }
-    });
-
-    const fundingSourceDetails: Map<number, FundingRequestFundsSrcDto> = new Map<number, FundingRequestFundsSrcDto>();
-    this.applicationsProposedForFunding.fundingSources.forEach((item, index) => {
-      if (!!item.sourceDetails()) {
-        this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(item.sourceDetails());
-        fundingSourceDetails.set(index, item.sourceDetails());
-      }
-    });
 
     this.fpInfoComponent.listApplicationsNotSelectable.forEach(g => {
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
@@ -258,6 +215,34 @@ export class PlanStep3Component implements OnInit {
           financialInfoDto: {}
         }
       );
+    });
+  }
+
+  private buildPlanBudgetAndCanMaps(): void {
+    // A little hacky, but I may have added some sources to delete sources BEFORE running this code, so I want to
+    // preserve the list.
+    const deleteSources: number[] = this.planModel.fundingPlanDto.fpFinancialInformation?.deleteSources;
+    this.planModel.fundingPlanDto.fpFinancialInformation = {};
+
+    this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = deleteSources;
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
+
+    const futureYears: Map<number, number> = new Map<number, number>();
+    this.applicationsProposedForFunding.grantList.forEach(item => {
+      if (!!item.recommendedFutureYearsComponent) {
+        const applId = item.grant.applId;
+        const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue || 0;
+        // this.logger.debug('Retrieved values (applId, recommendedFutureYears) =>', applId, recommendedFutureYears);
+        futureYears.set(applId, recommendedFutureYears);
+      }
+    });
+
+    const fundingSourceDetails: Map<number, FundingRequestFundsSrcDto> = new Map<number, FundingRequestFundsSrcDto>();
+    this.applicationsProposedForFunding.fundingSources.forEach((item, index) => {
+      if (!!item.sourceDetails()) {
+        this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(item.sourceDetails());
+        fundingSourceDetails.set(index, item.sourceDetails());
+      }
     });
     // ===========================================================================================
     // ===========================================================================================
@@ -337,7 +322,34 @@ export class PlanStep3Component implements OnInit {
     });
     // ====================================================================================
     // ====================================================================================
+  }
 
+  private scrapePlanData(): void {
+    this.planModel.fundingPlanDto.planName = this.planName;
+    if (!this.planModel.fundingPlanDto.planFy) {
+      this.planModel.fundingPlanDto.planFy = getCurrentFiscalYear();
+    }
+
+    this.planModel.fundingPlanDto.requestorDoc = this.doc;
+    this.planModel.fundingPlanDto.requestorNpnId = this.pdNpnId;
+    this.planModel.fundingPlanDto.requestorNpeId = null;
+    this.planModel.fundingPlanDto.cayCode = this.cayCode;
+
+    this.planModel.fundingPlanDto.otherContributingDocs = this.otherDocs.selectedValue;
+
+    this.planModel.fundingPlanDto.applNotConsideredNum = this.fpInfoComponent.totalApplicationsNotConsidered;
+    this.planModel.fundingPlanDto.applProposedNum = this.fpInfoComponent.totalApplicationsSelected;
+    this.planModel.fundingPlanDto.applReceivedNum = this.fpInfoComponent.totalApplicationsReceived;
+    this.planModel.fundingPlanDto.applSkipNum = this.fpInfoComponent.totalApplicationsSkipped;
+
+    this.planModel.fundingPlanDto.pubYr1SetAsideAmt = this.fpFundingInfoComponent.firstYearSetAside;
+    this.planModel.fundingPlanDto.totalPubSetAsideAmt = this.fpFundingInfoComponent.totalSetAside;
+    this.planModel.fundingPlanDto.fundingEstYr2Amt = this.fpFundingInfoComponent.outYear2;
+    this.planModel.fundingPlanDto.fundingEstYr3Amt = this.fpFundingInfoComponent.outYear3;
+    this.planModel.fundingPlanDto.fundingEstYr4Amt = this.fpFundingInfoComponent.outYear4;
+    this.planModel.fundingPlanDto.fundingEstYr5Amt = this.fpFundingInfoComponent.outYear5;
+
+    this.planModel.fundingPlanDto.comments = this.applicationsProposedForFunding.comments;
 
     const bmmCodes: string[] = [];
     const activityCodes: string[] = [];
@@ -381,15 +393,10 @@ export class PlanStep3Component implements OnInit {
     // TODO: This next line is wrong.  This is the ldapId of the requesting PD, not the creator of the plan
     this.planModel.fundingPlanDto.requestorLdapId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     this.planModel.fundingPlanDto.planCreateUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-
-    // TODO: list of deleted sources
-
-    // this.logger.info(JSON.stringify(this.planModel.fundingPlanDto));
-
   }
 
   beforeAddFundingSource($event: number): void {
-    // this.logger.debug('Add funding source:', $event);
+    this.logger.debug('Add funding source:', $event);
     if (+$event === 1) {
       this.buildPlanModel();
     }
@@ -506,6 +513,11 @@ export class PlanStep3Component implements OnInit {
 
   deleteFundingSource($event: number): void {
     this.logger.debug('delete funding source:', $event);
+
+    if (!this.planModel.fundingPlanDto || !this.planModel.fundingPlanDto.fpFinancialInformation) {
+      this.logger.debug('Nothing to delete');
+      return;
+    }
 
     // STEP 1 - remove the source from the list of selected sources and add to delete list
     if (!this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources) {

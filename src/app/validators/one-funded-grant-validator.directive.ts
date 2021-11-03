@@ -40,11 +40,17 @@ export class OneFundedGrantValidatorDirective implements Validator {
     });
 
     if (notFunded.length > 0) {
+      // this.logger.debug('--', notFunded, '--', notFunded.filter(i => !i), '--', notFunded.filter(i => !i).length);
       if (notFunded.filter(i => !i).length === 0) {
+        // this.logger.debug('error');
         return { atLeastOneGrantMustBeFunded: true };
+      } else {
+        // this.logger.debug('no error');
+        return undefined;
       }
     }
-    return null;
+    // this.logger.debug('default no error');
+    return undefined;
   }
 
 }
