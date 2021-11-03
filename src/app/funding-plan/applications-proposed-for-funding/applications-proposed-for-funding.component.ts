@@ -34,7 +34,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   @Input() parentForm: NgForm;
   @Input() readOnly = false;
   @Output() beforeAddFundingSource = new EventEmitter<number>();
+  @Output() beforeEditFundingSource = new EventEmitter<{sourceId: number, index: number}>();
   @Output() addFundingSource = new EventEmitter<FundingSourceGrantDataPayload[]>();
+  @Output() cancelAddFundingSource = new EventEmitter<void>();
   @Output() deleteFundingSource = new EventEmitter<number>();
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
   @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
@@ -61,15 +63,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     });
   }
 
-  public initializeChildren(): void {
-    this.logger.debug(this.prcList);
-    this.prcList.forEach(control => {
-      this.logger.debug(control);
-      control.initializeValuesForEdit();
-    });
-
-  }
-
   get budgetMap(): Map<number, Map<number, FundingReqBudgetsDto>> {
     return this._budgetMap;
   }
@@ -91,49 +84,49 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     return this.planManagementService.selectedSourceCount;
   }
 
-  grantSumDirectCost(grantIndex: number): number {
-    if (!this.prcList) {
-      return 0;
-    }
-    // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
-    let sum = 0;
-    this.prcList.forEach(control => {
-      if (control.grantIndex === grantIndex) {
-        if (control.displayType === 'percent') {
-          if (!isNaN(control.directCostCalculated)) {
-            sum = sum + Number(control.directCostCalculated);
-          }
-        } else {
-          if (!isNaN(control.directCost)) {
-            sum = sum + Number(control.directCost);
-          }
-        }
-      }
-    });
-    return sum;
-  }
-
-  grantSumTotalCost(grantIndex: number): number {
-    if (!this.prcList) {
-      return 0;
-    }
-    // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
-    let sum = 0;
-    this.prcList.forEach(control => {
-      if (control.grantIndex === grantIndex) {
-        if (control.displayType === 'percent') {
-          if (!isNaN(control.totalCostCalculated)) {
-            sum = sum + Number(control.totalCostCalculated);
-          }
-        } else {
-          if (!isNaN(control.totalCost)) {
-            sum = sum + Number(control.totalCost);
-          }
-        }
-      }
-    });
-    return sum;
-  }
+  // grantSumDirectCost(grantIndex: number): number {
+  //   if (!this.prcList) {
+  //     return 0;
+  //   }
+  //   // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
+  //   let sum = 0;
+  //   this.prcList.forEach(control => {
+  //     if (control.grantIndex === grantIndex) {
+  //       if (control.displayType === 'percent') {
+  //         if (!isNaN(control.directCostCalculated)) {
+  //           sum = sum + Number(control.directCostCalculated);
+  //         }
+  //       } else {
+  //         if (!isNaN(control.directCost)) {
+  //           sum = sum + Number(control.directCost);
+  //         }
+  //       }
+  //     }
+  //   });
+  //   return sum;
+  // }
+  //
+  // grantSumTotalCost(grantIndex: number): number {
+  //   if (!this.prcList) {
+  //     return 0;
+  //   }
+  //   // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
+  //   let sum = 0;
+  //   this.prcList.forEach(control => {
+  //     if (control.grantIndex === grantIndex) {
+  //       if (control.displayType === 'percent') {
+  //         if (!isNaN(control.totalCostCalculated)) {
+  //           sum = sum + Number(control.totalCostCalculated);
+  //         }
+  //       } else {
+  //         if (!isNaN(control.totalCost)) {
+  //           sum = sum + Number(control.totalCost);
+  //         }
+  //       }
+  //     }
+  //   });
+  //   return sum;
+  // }
 
   sourceSumDirectCost(sourceIndex: number): number {
     if (!this.prcList) {
@@ -192,6 +185,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   onAddFundingSource(): void {
     // TODO Check form for errors first?
+    // TODO: someone has to distinguish add from edit
 
     this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
     this.beforeAddFundingSource.next(this.getNextSourceIndex);
@@ -208,6 +202,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
       this.addFundingSource.next(result.filter(f => !!f.displayType));
     }, (reason) => {
       this.logger.debug('closed with', reason);
+      this.cancelAddFundingSource.next();
     });
   }
 
@@ -224,8 +219,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     return this.planManagementService.listSelectedSources?.length <= 1;
   }
 
-  onEditFundingSource(sourceId: number): void {
-    this.logger.debug('editSource(', sourceId, ')');
+  onEditFundingSource(sourceId: number, index: number): void {
+    this.logger.debug('editSource(', sourceId, index, ')');
+    this.beforeEditFundingSource.next({sourceId, index});
   }
 
   onDeleteFundingSource(sourceId: number): void {

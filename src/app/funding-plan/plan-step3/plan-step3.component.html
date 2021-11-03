@@ -109,7 +109,9 @@
   <app-applications-proposed-for-funding
     [parentForm]="step3form"
     (beforeAddFundingSource)="beforeAddFundingSource($event)"
+    (beforeEditFundingSource)="beforeEditFundingSource($event)"
     (addFundingSource)="addFundingSource($event)"
+    (cancelAddFundingSource)="cancelAddFundingSource()"
     (deleteFundingSource)="deleteFundingSource($event)">
   </app-applications-proposed-for-funding>
 

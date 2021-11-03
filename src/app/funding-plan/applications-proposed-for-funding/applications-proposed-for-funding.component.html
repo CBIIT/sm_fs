@@ -122,7 +122,7 @@
         <th *ngFor="let source of listSelectedSources; let sourceIndex = index" colspan="2">
           <div class="d-flex align-items-center">
             <span>{{ source.fundingSourceName }}</span>
-            <button type="button" class="btn btn-sm btn-slim btn-link ml-2" (click)="onEditFundingSource(source.fundingSourceId)"
+            <button type="button" class="btn btn-sm btn-slim btn-link ml-2" (click)="onEditFundingSource(source.fundingSourceId, sourceIndex)"
                     ngbTooltip="Edit" placement="left">
               <i class="fas fa-pencil" aria-hidden="true"></i>
             </button>

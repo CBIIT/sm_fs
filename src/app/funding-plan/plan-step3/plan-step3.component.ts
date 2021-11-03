@@ -6,11 +6,7 @@ import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
 import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
 import { PlanManagementService } from '../service/plan-management.service';
-import {
-  FsPlanControllerService,
-  FundingPlanFoasDto,
-  FundingRequestCanDto
-} from '@nci-cbiit/i2ecws-lib';
+import { FsPlanControllerService, FundingPlanFoasDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { OtherDocsContributingFundsComponent } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { getCurrentFiscalYear, isReallyANumber } from '../../utils/utils';
 import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
@@ -43,6 +39,7 @@ export class PlanStep3Component implements OnInit {
   planName: string;
   private nextStep: string;
   alerts: Alert[];
+  private editing: { sourceId: number; index: number };
 
   get cayCodeArr(): string[] {
     return [this.cayCode];
@@ -403,6 +400,10 @@ export class PlanStep3Component implements OnInit {
     let frBudget: FundingReqBudgetsDto;
     let frCan: FundingRequestCanDto;
     let doOnce = true;
+    // If we are editing a source, delete it first, then insert the new values below
+    if (this.editing) {
+      this.deleteFundingSource(this.editing.sourceId);
+    }
     $event.forEach(s => {
         this.logger.debug(s);
         if (doOnce) {
@@ -454,7 +455,11 @@ export class PlanStep3Component implements OnInit {
             // id?: number;
           };
 
-          req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
+          if (this.editing) {
+            req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, 0, frBudget);
+          } else {
+            req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
+          }
 
           frCan = {
             approvedDc: +directCost,
@@ -487,7 +492,11 @@ export class PlanStep3Component implements OnInit {
             // updateStamp: number,
           };
 
-          req.financialInfoDto.fundingRequestCans.push(frCan);
+          if (this.editing) {
+            req.financialInfoDto.fundingRequestCans.splice(this.editing.index, 0, frCan);
+          } else {
+            req.financialInfoDto.fundingRequestCans.push(frCan);
+          }
         });
       }
     );
@@ -518,5 +527,13 @@ export class PlanStep3Component implements OnInit {
     this.planManagementService.buildPlanBudgetAndCanModel();
     // this.logger.debug('initialize children');
     // this.applicationsProposedForFunding.initializeChildren();
+  }
+
+  beforeEditFundingSource($event: { sourceId: number; index: number }): void {
+    this.editing = $event;
+  }
+
+  cancelAddFundingSource(): void {
+    this.editing = undefined;
   }
 }
