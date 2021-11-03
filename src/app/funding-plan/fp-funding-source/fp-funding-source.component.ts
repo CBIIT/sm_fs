@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Select2OptionData } from 'ng-select2';
 import { NGXLogger } from 'ngx-logger';
 import { FsPlanControllerService } from '@nci-cbiit/i2ecws-lib';
@@ -20,6 +20,7 @@ export class FpFundingSourceComponent implements OnInit {
   @Input() parentForm: NgForm;
   @Input() index: number;
   @Input() required = false;
+  @Output() sourceChangedEvent = new EventEmitter<{oldSource: number, newSource: number}>();
   dummy: string = null;
   data: Select2OptionData[] = [];
   allSources: Select2OptionData[] = [];
@@ -41,7 +42,12 @@ export class FpFundingSourceComponent implements OnInit {
   }
 
   set selectedValue(value: number) {
+    const oldValue = this._selectedValue;
     this._selectedValue = value;
+    this.logger.debug('--', oldValue, value, '--');
+    if(oldValue && +value !== +oldValue) {
+      this.sourceChangedEvent.next({oldSource: +oldValue, newSource: +value});
+    }
     this.planCoordinatorService.fundingSourceSelectionEmitter.next({
       index: this.index,
       source: Number(value)

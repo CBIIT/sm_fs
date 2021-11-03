@@ -58,13 +58,13 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       return;
     }
     // Determine whether we should lock the dollar value or not
-    this.logger.debug('checking lockDollar', this.grant.applId, this.sourceIndex, this.planManagementService.isPercentSelected(this.grant.applId));
+    // this.logger.debug('checking lockDollar', this.grant.applId, this.sourceIndex, this.planManagementService.isPercentSelected(this.grant.applId));
     if(this.planManagementService.isPercentSelected(this.grant.applId)) {
       if(+this.planManagementService.percentSelectionIndex(this.grant.applId) !== +this.sourceIndex) {
         this.lockDollar = true;
       }
     }
-    this.logger.debug('lockDollar:', this.grant.applId, this.sourceIndex, this.lockDollar);
+    // this.logger.debug('lockDollar:', this.grant.applId, this.sourceIndex, this.lockDollar);
     this.initializeValuesForEdit();
   }
 
@@ -74,7 +74,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     }
     if (!this.fseId && !!this.planManagementService.listSelectedSources) {
       const src = this.planManagementService.listSelectedSources[this.sourceIndex];
-      this.logger.debug('source', src);
+      // this.logger.debug('source', src);
       if (src) {
         this.fseId = src.fundingSourceId;
       }

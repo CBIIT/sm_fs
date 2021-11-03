@@ -37,6 +37,7 @@
           </label>
           <app-fp-funding-source
             [parentForm]="parentForm"
+            (sourceChangedEvent)="handleSourceChanged($event)"
             [index]="0"
             [required]="true">
           </app-fp-funding-source>

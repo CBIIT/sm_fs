@@ -197,4 +197,10 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
       this.deleteFundingSource.next(sourceId);
     }
   }
+
+  handleSourceChanged($event: { oldSource: number; newSource: number }): void {
+    this.logger.debug('source changed', $event);
+    this.deleteFundingSource.next(+$event.oldSource);
+
+  }
 }
