@@ -84,50 +84,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     return this.planManagementService.selectedSourceCount;
   }
 
-  // grantSumDirectCost(grantIndex: number): number {
-  //   if (!this.prcList) {
-  //     return 0;
-  //   }
-  //   // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
-  //   let sum = 0;
-  //   this.prcList.forEach(control => {
-  //     if (control.grantIndex === grantIndex) {
-  //       if (control.displayType === 'percent') {
-  //         if (!isNaN(control.directCostCalculated)) {
-  //           sum = sum + Number(control.directCostCalculated);
-  //         }
-  //       } else {
-  //         if (!isNaN(control.directCost)) {
-  //           sum = sum + Number(control.directCost);
-  //         }
-  //       }
-  //     }
-  //   });
-  //   return sum;
-  // }
-  //
-  // grantSumTotalCost(grantIndex: number): number {
-  //   if (!this.prcList) {
-  //     return 0;
-  //   }
-  //   // TODO: add index to prcList to distinguish multiple sources: prcList.filter(...).forEach(control => {
-  //   let sum = 0;
-  //   this.prcList.forEach(control => {
-  //     if (control.grantIndex === grantIndex) {
-  //       if (control.displayType === 'percent') {
-  //         if (!isNaN(control.totalCostCalculated)) {
-  //           sum = sum + Number(control.totalCostCalculated);
-  //         }
-  //       } else {
-  //         if (!isNaN(control.totalCost)) {
-  //           sum = sum + Number(control.totalCost);
-  //         }
-  //       }
-  //     }
-  //   });
-  //   return sum;
-  // }
-
   sourceSumDirectCost(sourceIndex: number): number {
     if (!this.prcList) {
       return 0;
@@ -210,6 +166,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     // At least one source provided already (and valid?)
 
     if (!this.parentForm.valid) {
+      this.logger.debug(this.parentForm);
       return false;
     }
     return this.planManagementService.selectedSourceCount !== 0 && this.planManagementService.selectedSourceCount < 3;

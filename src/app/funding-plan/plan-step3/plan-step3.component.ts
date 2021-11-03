@@ -106,7 +106,6 @@ export class PlanStep3Component implements OnInit {
       const year1 = this.planModel.fundingPlanDto.pubYr1SetAsideAmt;
       // TODO: Make sure totalRec is correct for multiple sources
       const totalRec = this.planModel.fundingPlanDto.totalRecommendedAmt;
-      this.logger.debug('--', year1, totalRec, '==', Math.round(year1), Math.round(totalRec), '--');
       if (isReallyANumber(year1) && isReallyANumber(totalRec)
         && Math.round(year1) !== Math.round(totalRec)) {
         if (confirm('WARNING: The Program Recommended Total Cost (1st year) in this funding plan does not match the Published 1st year Set-Aside dollar amount. Do you want to proceed with submission?')) {
@@ -501,6 +500,8 @@ export class PlanStep3Component implements OnInit {
       }
     );
     this.planManagementService.buildPlanBudgetAndCanModel();
+    this.planModel.fundingPlanDto.totalRecommendedAmt = this.planManagementService.grandTotalTotal();
+    this.planModel.fundingPlanDto.directRecommendedAmt = this.planManagementService.grandTotalDirect();
   }
 
   deleteFundingSource($event: number): void {
@@ -525,6 +526,8 @@ export class PlanStep3Component implements OnInit {
 
     // STEP 3 - rebuild the budget and CAN model
     this.planManagementService.buildPlanBudgetAndCanModel();
+    this.planModel.fundingPlanDto.totalRecommendedAmt = this.planManagementService.grandTotalTotal();
+    this.planModel.fundingPlanDto.directRecommendedAmt = this.planManagementService.grandTotalDirect();
     // this.logger.debug('initialize children');
     // this.applicationsProposedForFunding.initializeChildren();
   }

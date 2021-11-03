@@ -1,12 +1,7 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { PlanModel } from '../../model/plan/plan-model';
-import {
-  CanCcxDto,
-  FsRequestControllerService,
-  FundingReqBudgetsDto,
-  FundingRequestCanDto
-} from '@nci-cbiit/i2ecws-lib';
+import { FsRequestControllerService, FundingReqBudgetsDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
 import { NGXLogger } from 'ngx-logger';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
@@ -91,10 +86,13 @@ export class PlanManagementService {
   }
 
   setPercentSelected(applId: number, sourceIndex: number, selected: boolean): void {
-    if (selected) {
-      this.percentSelectedTracker.set(applId, sourceIndex);
-    } else {
-      this.percentSelectedTracker.delete(applId);
+    const currentIndex = this.percentSelectionIndex(applId);
+    if (currentIndex === null || currentIndex === sourceIndex) {
+      if (selected) {
+        this.percentSelectedTracker.set(applId, sourceIndex);
+      } else {
+        this.percentSelectedTracker.delete(applId);
+      }
     }
   }
 
