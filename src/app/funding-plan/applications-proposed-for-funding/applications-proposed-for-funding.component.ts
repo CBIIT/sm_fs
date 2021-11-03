@@ -140,10 +140,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   onAddFundingSource(): void {
-    // TODO Check form for errors first?
-    // TODO: someone has to distinguish add from edit
-
-    this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
+    // this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
     this.beforeAddFundingSource.next(this.getNextSourceIndex);
     if (this.getNextSourceIndex < 2) {
       this.grantList.forEach(item => {
@@ -154,10 +151,8 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     const modalRef = this.modalService.open(FundingSourceEntryModalComponent, { size: 'xl' });
     modalRef.componentInstance.sourceIndex = this.getNextSourceIndex;
     modalRef.result.then((result) => {
-      this.logger.debug(result);
       this.addFundingSource.next(result.filter(f => !!f.displayType));
     }, (reason) => {
-      this.logger.debug('closed with', reason);
       this.cancelAddFundingSource.next();
     });
   }
@@ -177,30 +172,29 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   onEditFundingSource(sourceId: number, index: number): void {
-    this.logger.debug('editSource(', sourceId, index, ')');
+    // this.logger.debug('editSource(', sourceId, index, ')');
     this.beforeEditFundingSource.next({sourceId, index});
     const modalRef = this.modalService.open(FundingSourceEntryModalComponent, { size: 'xl' });
     modalRef.componentInstance.sourceIndex = index;
     modalRef.result.then((result) => {
-      this.logger.debug(result);
+      // this.logger.debug(result);
       this.addFundingSource.next(result.filter(f => !!f.displayType));
     }, (reason) => {
-      this.logger.debug('closed with', reason);
+      // this.logger.debug('closed with', reason);
       this.cancelAddFundingSource.next();
     });
 
   }
 
   onDeleteFundingSource(sourceId: number): void {
-    this.logger.debug('deleteSource(', sourceId, ')');
+    // this.logger.debug('deleteSource(', sourceId, ')');
     if (confirm('Are you sure you want to delete this funding source?')) {
       this.deleteFundingSource.next(sourceId);
     }
   }
 
   handleSourceChanged($event: { oldSource: number; newSource: number }): void {
-    this.logger.debug('source changed', $event);
+    // this.logger.debug('source changed', $event);
     this.deleteFundingSource.next(+$event.oldSource);
-
   }
 }
