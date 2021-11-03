@@ -44,7 +44,7 @@ export class FpFundingSourceComponent implements OnInit {
   set selectedValue(value: number) {
     const oldValue = this._selectedValue;
     this._selectedValue = value;
-    this.logger.debug('--', oldValue, value, '--');
+    // this.logger.debug('--', oldValue, value, '--');
     if(oldValue && +value !== +oldValue) {
       this.sourceChangedEvent.next({oldSource: +oldValue, newSource: +value});
     }

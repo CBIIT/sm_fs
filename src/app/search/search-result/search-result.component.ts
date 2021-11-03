@@ -1,5 +1,11 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren} from '@angular/core';
-import { FundSelectSearchCriteria, FsSearchControllerService, FundingRequestQueryDatatableDto, FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
+import {
+  FundSelectSearchCriteria,
+  FsSearchControllerService,
+  FundingRequestQueryDatatableDto,
+  FundingRequestQueryDto,
+  JasperReportControllerService
+} from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import {Subject} from "rxjs";
 import {AppPropertiesService} from "../../service/app-properties.service";
@@ -21,6 +27,7 @@ import { HttpResponse } from '@angular/common/http';
 import {SearchGrantExistInRequestCellRendererComponent} from "./search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component";
 import {SearchGrantExistInPlanCellRendererComponent} from "./search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component";
 import {DatatableThrottle} from "../../utils/datatable-throttle";
+import {SearchGrantExistInPaylistCellRendererComponent} from "./search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component";
 
 class DataTablesResponse {
   data: any[];
@@ -56,6 +63,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('searchFundingPlanActionRenderer') searchFundingPlanActionRenderer: TemplateRef<SearchFundingRequestActionCellRendererComponent>;
   @ViewChild('existInRequestRenderer') existInRequestRenderer: TemplateRef<SearchGrantExistInRequestCellRendererComponent>;
   @ViewChild('existInPlanRenderer') existInPlanRenderer: TemplateRef<SearchGrantExistInPlanCellRendererComponent>;
+  @ViewChild('existInPaylistRenderer') existInPaylistRenderer: TemplateRef<SearchGrantExistInPaylistCellRendererComponent>;
   @ViewChild(BatchApproveModalComponent) batchApproveModal: BatchApproveModalComponent;
   // dtOptions: DataTables.Settings = {};
 
@@ -321,16 +329,21 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
             return (!data || data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="_blank">' + data + '</a>';
           }, className: 'all'}, // 4
         {title: 'FY', data: 'fy'}, // 5
-        {title: 'NCAB', data: 'formattedCouncilMeetingDate'}, // 6
+        {title: 'NCAB', data: 'councilMeetingDate', render: ( data, type, row, meta ) => {
+          if (!data || data.substr(4, 2) === '00') {
+            return '';
+          }
+          return data.substr(4,2) + '/' + data.substr(0,4)
+        }}, // 6
         {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
             return (!data || data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }}, // 7
         {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'}, // 8
         {title: 'Pctl', data: 'irgPercentileNum'}, // 9
         {title: 'PriScr', data: 'priorityScoreNum'}, // 10
-        {title: 'Exists in Request', data: 'requests', ngTemplateRef: { ref: this.existInRequestRenderer}, className: 'all', orderable: false}, // 11
-        {title: 'Exists in Plan', data: 'plans', ngTemplateRef: { ref: this.existInPlanRenderer}, className: 'all', orderable: false}, // 12
-        {title: 'Exists in Paylist', data: 'paylists', defaultContent: '', className: 'all', orderable: false}, // 13
+        {title: 'Exists in Request', data: 'frqIdList', ngTemplateRef: { ref: this.existInRequestRenderer}, className: 'all'}, // 11
+        {title: 'Exists in Plan', data: 'fprIdList', ngTemplateRef: { ref: this.existInPlanRenderer}, className: 'all'}, // 12
+        {title: 'Exists in Paylist', data: 'paylistIdList', ngTemplateRef: { ref: this.existInPaylistRenderer}, className: 'all'}, // 13
         {data: null, defaultContent: ''}
 
       ],
@@ -462,7 +475,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         $this.loaderService.hide();
         $this.autoResizeTables($this);
       }, error => {
-        $this.logger.error('HttpClient get request error for----- ' + error.message);
+        $this.logger.error('HttpClient get request error for----- ', error);
         alert('HttpClient get request error for----- ' + error.message);
       });
 
@@ -656,6 +669,17 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   onPlanSelect($event: number) {
     this.logger.debug('onRequestSelect() - plan/retrieve', $event);
     this.router.navigate(['plan/retrieve', $event]);
+  }
+
+  onPaylistSelect($event: any) {
+    if ($event.fy < 2020) {
+      // NOTE - jasperReportController DOES NOT work
+      window.open('i2ecws/api/v1/generate-paylist-report/' + $event.id + '/JR_HISTORICALPAYLIST_REPORT/PDF', '_blank');
+    }
+    else {
+      alert('To be implemented: open paylist view for ' + $event.id + ' (' + $event.fy + ')');
+    }
+
   }
 
   get batchApproveVisible(): boolean {

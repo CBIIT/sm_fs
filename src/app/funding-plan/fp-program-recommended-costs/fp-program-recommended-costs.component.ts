@@ -59,11 +59,13 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     }
     // Determine whether we should lock the dollar value or not
     // this.logger.debug('checking lockDollar', this.grant.applId, this.sourceIndex, this.planManagementService.isPercentSelected(this.grant.applId));
-    if(this.planManagementService.isPercentSelected(this.grant.applId)) {
-      if(+this.planManagementService.percentSelectionIndex(this.grant.applId) !== +this.sourceIndex) {
+    // this.logger.warn('---------------------------------------------------------------------------------');
+    if (this.planManagementService.isPercentSelected(this.grant.applId)) {
+      if (+this.planManagementService.percentSelectionIndex(this.grant.applId) !== +this.sourceIndex) {
         this.lockDollar = true;
       }
     }
+    // this.logger.warn('---------------------------------------------------------------------------------');
     // this.logger.debug('lockDollar:', this.grant.applId, this.sourceIndex, this.lockDollar);
     this.initializeValuesForEdit();
   }
@@ -86,7 +88,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     // TODO: especially the determination of percent if lockDollar is true
     if (can && !isNaN(can.dcPctCut) && !isNaN(can.tcPctCut) && can.dcPctCut === can.tcPctCut) {
       this.percentCut = can.dcPctCut;
-      if(this.lockDollar) {
+      if (this.lockDollar) {
         this.logger.error('Control is locked to dollar only but analysis indicates percent');
       }
       this.displayType = 'percent';

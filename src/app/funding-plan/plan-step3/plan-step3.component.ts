@@ -193,7 +193,7 @@ export class PlanStep3Component implements OnInit {
       if (!!item.recommendedFutureYearsComponent) {
         const applId = item.grant.applId;
         const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue || 0;
-        this.logger.debug('Retrieved values (applId, recommendedFutureYears) =>', applId, recommendedFutureYears);
+        // this.logger.debug('Retrieved values (applId, recommendedFutureYears) =>', applId, recommendedFutureYears);
         futureYears.set(applId, recommendedFutureYears);
       }
     });
@@ -384,12 +384,12 @@ export class PlanStep3Component implements OnInit {
 
     // TODO: list of deleted sources
 
-    this.logger.info(JSON.stringify(this.planModel.fundingPlanDto));
+    // this.logger.info(JSON.stringify(this.planModel.fundingPlanDto));
 
   }
 
   beforeAddFundingSource($event: number): void {
-    this.logger.debug('Add funding source:', $event);
+    // this.logger.debug('Add funding source:', $event);
     if (+$event === 1) {
       this.buildPlanModel();
     }
@@ -404,7 +404,7 @@ export class PlanStep3Component implements OnInit {
       this.deleteFundingSource(this.editing.sourceId);
     }
     $event.forEach(s => {
-        this.logger.debug(s);
+        // this.logger.debug(s);
         if (doOnce) {
           this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(s.fundingSource);
           doOnce = false;
@@ -419,10 +419,10 @@ export class PlanStep3Component implements OnInit {
           percentCut = +s.percentCut;
           directCost = +s.directCostCalculated;
           totalCost = +s.totalCostCalculated;
-          dcPercentCut = +s.percentCut * 100;
-          tcPercentCut = +s.percentCut * 100;
+          dcPercentCut = +s.percentCut;
+          tcPercentCut = +s.percentCut;
         } else if (s.displayType === 'dollar') {
-          percentCut = +s.percentCut * 100;
+          percentCut = +s.percentCut;
           directCost = +s.directCost;
           totalCost = +s.totalCost;
           dcPercentCut = +s.dcPercentCutCalculated * 100;

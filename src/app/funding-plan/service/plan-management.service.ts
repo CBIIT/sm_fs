@@ -86,23 +86,35 @@ export class PlanManagementService {
   }
 
   setPercentSelected(applId: number, sourceIndex: number, selected: boolean): void {
-    const currentIndex = this.percentSelectionIndex(applId);
+    const currentIndex = this.percentSelectionIndex(+applId);
+    // this.logger.warn('setPercentSelected', applId, sourceIndex, selected, currentIndex);
     if (currentIndex === null || currentIndex === sourceIndex) {
       if (selected) {
+        // this.logger.warn('selected');
         this.percentSelectedTracker.set(applId, sourceIndex);
       } else {
+        // this.logger.warn('deselected');
         this.percentSelectedTracker.delete(applId);
       }
     }
   }
 
   isPercentSelected(applId: number): boolean {
-    const x = this.percentSelectedTracker.get(applId);
-    return (x !== null && x !== undefined);
+    const x = this.percentSelectedTracker.get(+applId);
+    const result = (x !== null && x !== undefined);
+    // this.logger.warn('isPercentSelected:', applId, x, result);
+    return result;
   }
 
   percentSelectionIndex(applId: number): number {
-    return this.percentSelectedTracker.get(applId) || null;
+    const result = this.percentSelectedTracker.get(+applId);
+    // this.logger.warn('percentSelectionIndex', applId, result);
+
+    if (result === null || result === undefined) {
+      return null;
+    }
+
+    return result;
   }
 
   buildPlanBudgetAndCanModel(): void {

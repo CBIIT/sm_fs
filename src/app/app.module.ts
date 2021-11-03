@@ -154,6 +154,7 @@ import { SearchGrantExistInPlanCellRendererComponent } from './search/search-res
 import { OneFundedGrantValidatorDirective } from './validators/one-funded-grant-validator.directive';
 import { GrantFundedOnceValidatorDirective } from './validators/grant-funded-once-validator.directive';
 import { CurrencyTogglePipe } from './pipes/currency-toggle.pipe';
+import { SearchGrantExistInPaylistCellRendererComponent } from './search/search-result/search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -315,7 +316,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SearchGrantExistInPlanCellRendererComponent,
     OneFundedGrantValidatorDirective,
     GrantFundedOnceValidatorDirective,
-    CurrencyTogglePipe
+    CurrencyTogglePipe,
+    SearchGrantExistInPaylistCellRendererComponent
   ],
 
 
