@@ -222,6 +222,16 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   onEditFundingSource(sourceId: number, index: number): void {
     this.logger.debug('editSource(', sourceId, index, ')');
     this.beforeEditFundingSource.next({sourceId, index});
+    const modalRef = this.modalService.open(FundingSourceEntryModalComponent, { size: 'xl' });
+    modalRef.componentInstance.sourceIndex = index;
+    modalRef.result.then((result) => {
+      this.logger.debug(result);
+      this.addFundingSource.next(result.filter(f => !!f.displayType));
+    }, (reason) => {
+      this.logger.debug('closed with', reason);
+      this.cancelAddFundingSource.next();
+    });
+
   }
 
   onDeleteFundingSource(sourceId: number): void {

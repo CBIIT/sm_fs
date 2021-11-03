@@ -45,6 +45,8 @@ export class PlanLoaderService {
         this.planManagementService.buildPlanBudgetAndCanModel();
         this.planManagementService.buildGrantCostModel();
         this.planManagementService.buildOefiaTypeMaps();
+        this.planManagementService.recalculateRestrictedSources();
+
         if (succesFn) {
           succesFn();
         }
