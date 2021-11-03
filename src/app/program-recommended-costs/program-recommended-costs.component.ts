@@ -45,7 +45,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     { id: '3', text: '3' },
     { id: '4', text: '4' },
     { id: '5', text: '5' },
-    { id: '6', text: '6' },
   ];
   private _recommendedFutureYears: number;
 

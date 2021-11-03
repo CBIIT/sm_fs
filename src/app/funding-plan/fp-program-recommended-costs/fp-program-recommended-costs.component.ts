@@ -69,13 +69,10 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   public initializeValuesForEdit(): void {
-    this.logger.debug('--', this.sourceIndex, '--');
-    // this.logger.debug('initialize PRC values', this.grantIndex, this.sourceIndex);
     if (this.sourceIndex < 0 || this.sourceIndex > 2) {
       return;
     }
     if (!this.fseId && !!this.planManagementService.listSelectedSources) {
-      // this.logger.debug('load fseId from plan service');
       const src = this.planManagementService.listSelectedSources[this.sourceIndex];
       this.logger.debug('source', src);
       if (src) {
@@ -84,11 +81,6 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     }
     const bud = this.planManagementService.getBudget(this.grant.applId, this.fseId);
     const can = this.planManagementService.getCan(this.grant.applId, this.fseId);
-    this.logger.debug('budget', bud);
-    this.logger.debug('can', can);
-    // this.logger.debug('source', this.sourceIndex, this.fseId, this.planCoordinatorService.listSelectedSources[this.sourceIndex]);
-    // this.logger.debug('budget', bud);
-    // this.logger.debug('can', can);
 
     // TODO: this logic might need revisiting.
     // TODO: especially the determination of percent if lockDollar is true
@@ -98,14 +90,10 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
         this.logger.error('Control is locked to dollar only but analysis indicates percent');
       }
       this.displayType = 'percent';
-      // this.toggleDisplay('percent', this.grantIndex, this.sourceIndex);
-      // this.logger.debug('setting display to "percent" with value', this.percentCut);
     } else if (bud) {
       this.directCost = bud.dcRecAmt;
       this.totalCost = bud.tcRecAmt;
       this.displayType = 'dollar';
-      // this.toggleDisplay('dollar', this.grantIndex, this.sourceIndex);
-      // this.logger.debug('setting display to "dollar"');
     }
     this.recalculate();
   }
@@ -218,10 +206,8 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   set displayType(value: string) {
     if (value === 'percent') {
-      // this.logger.info('percent selected for grant', this.grant.applId, 'and index', this.sourceIndex);
       this.planManagementService.setPercentSelected(this.grant.applId, this.sourceIndex, true);
     } else {
-      // this.logger.info('percent deselected for grant', this.grant.applId, 'and index', this.sourceIndex);
       this.planManagementService.setPercentSelected(this.grant.applId, this.sourceIndex, false);
     }
     this._displayType = value;
