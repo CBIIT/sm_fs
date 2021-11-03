@@ -389,7 +389,7 @@ export class PlanStep3Component implements OnInit {
   }
 
   beforeAddFundingSource($event: number): void {
-    // this.logger.debug('Add funding source:', $event);
+    this.logger.debug('Add funding source:', $event);
     if (+$event === 1) {
       this.buildPlanModel();
     }
@@ -506,6 +506,11 @@ export class PlanStep3Component implements OnInit {
 
   deleteFundingSource($event: number): void {
     this.logger.debug('delete funding source:', $event);
+
+    if (!this.planModel.fundingPlanDto || !this.planModel.fundingPlanDto.fpFinancialInformation) {
+      this.logger.debug('Nothing to delete');
+      return;
+    }
 
     // STEP 1 - remove the source from the list of selected sources and add to delete list
     if (!this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources) {

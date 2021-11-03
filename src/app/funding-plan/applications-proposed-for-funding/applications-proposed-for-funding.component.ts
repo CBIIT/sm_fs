@@ -1,12 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  QueryList,
-  ViewChildren
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
@@ -34,7 +26,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   @Input() parentForm: NgForm;
   @Input() readOnly = false;
   @Output() beforeAddFundingSource = new EventEmitter<number>();
-  @Output() beforeEditFundingSource = new EventEmitter<{sourceId: number, index: number}>();
+  @Output() beforeEditFundingSource = new EventEmitter<{ sourceId: number, index: number }>();
   @Output() addFundingSource = new EventEmitter<FundingSourceGrantDataPayload[]>();
   @Output() cancelAddFundingSource = new EventEmitter<void>();
   @Output() deleteFundingSource = new EventEmitter<number>();
@@ -81,6 +73,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   get getNextSourceIndex(): number {
     // this.logger.debug('getSourceIndex():', this.planCoordinatorService.selectedSourceCount);
+    if (!this.planManagementService.selectedSourceCount) {
+      return 1;
+    }
     return this.planManagementService.selectedSourceCount;
   }
 
@@ -158,13 +153,16 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   canAddFundingSource(): boolean {
-    // At least one source provided already (and valid?)
 
-    if (!this.parentForm.valid) {
-      this.logger.debug(this.parentForm);
-      return false;
+    // if (this.parentForm.errors) {
+    //   this.logger.debug(this.parentForm.errors, this.parentForm.valid, this.parentForm.status);
+    //   return false;
+    // }
+    // this.logger.debug(this.fundingSources?.get(0)?.selectedValue, this.fundingSources?.length);
+    if (!this.planManagementService.selectedSourceCount) {
+      return !!this.fundingSources?.get(0)?.selectedValue;
     }
-    return this.planManagementService.selectedSourceCount !== 0 && this.planManagementService.selectedSourceCount < 3;
+    return this.planManagementService.selectedSourceCount < 3;
   }
 
   isSingleSource(): boolean {
@@ -173,7 +171,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   onEditFundingSource(sourceId: number, index: number): void {
     // this.logger.debug('editSource(', sourceId, index, ')');
-    this.beforeEditFundingSource.next({sourceId, index});
+    this.beforeEditFundingSource.next({ sourceId, index });
     const modalRef = this.modalService.open(FundingSourceEntryModalComponent, { size: 'xl' });
     modalRef.componentInstance.sourceIndex = index;
     modalRef.result.then((result) => {

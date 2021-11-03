@@ -7,7 +7,6 @@ import { PlanModel } from '../../model/plan/plan-model';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { ControlContainer, NgForm } from '@angular/forms';
-import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
 
 @Component({
   selector: 'app-fp-funding-source',
@@ -20,7 +19,7 @@ export class FpFundingSourceComponent implements OnInit {
   @Input() parentForm: NgForm;
   @Input() index: number;
   @Input() required = false;
-  @Output() sourceChangedEvent = new EventEmitter<{oldSource: number, newSource: number}>();
+  @Output() sourceChangedEvent = new EventEmitter<{ oldSource: number, newSource: number }>();
   dummy: string = null;
   data: Select2OptionData[] = [];
   allSources: Select2OptionData[] = [];
@@ -45,9 +44,11 @@ export class FpFundingSourceComponent implements OnInit {
     const oldValue = this._selectedValue;
     this._selectedValue = value;
     // this.logger.debug('--', oldValue, value, '--');
-    if(oldValue && +value !== +oldValue) {
-      this.sourceChangedEvent.next({oldSource: +oldValue, newSource: +value});
+    if (oldValue && +value !== +oldValue) {
+      // this.logger.debug('source changed');
+      this.sourceChangedEvent.next({ oldSource: +oldValue, newSource: +value });
     }
+    // this.logger.debug('sending new selection');
     this.planCoordinatorService.fundingSourceSelectionEmitter.next({
       index: this.index,
       source: Number(value)
@@ -88,7 +89,7 @@ export class FpFundingSourceComponent implements OnInit {
         this.selectedValue = Number(src.fundingSourceId);
       }
     }
-    if(pd && ca) {
+    if (pd && ca) {
       this.refreshSources(pd, ca);
     }
   }
