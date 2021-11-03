@@ -1,4 +1,4 @@
-import {Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-header',
@@ -8,14 +8,14 @@ import {Component, OnInit } from '@angular/core';
 
 export class HeaderComponent implements OnInit {
 
- 
+
   public headerTemplateData = {
     appName: 'Funding Selections',
-    docs: [{docName: 'User Guides', docLink: ''},
-      {docName: 'Video Tutorials', docLink: ''},
-      {docName: 'FAQ', docLink: ''},
-      {docName: 'Release Notes', docLink: ''}],
-    helpGuides: [{helpGuideName: 'Technical Support', helpGuideLink: 'mailto:NCII2ESupport@mail.nih.gov?subject=Funding Selections'}],
+    docs: [{ docName: 'User Guides', docLink: '' },
+    { docName: 'Video Tutorials', docLink: '' },
+    { docName: 'Release Notes', docLink: '' }],
+    helpGuides: [{ helpGuideName: 'Technical Support', helpGuideLink: 'mailto:NCII2ESupport@mail.nih.gov?subject=Funding Selections' },
+    { helpGuideName: 'Business Policy Questions', helpGuideLink: 'mailto:NCIProgramFundingRequestPolicyInquiry@mail.nih.gov?subject=Funding Selections' }],
   };
 
 
@@ -23,7 +23,7 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   
-     
+
+
   }
 }
