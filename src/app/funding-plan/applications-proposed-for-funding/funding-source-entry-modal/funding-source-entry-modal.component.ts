@@ -1,5 +1,5 @@
-import { Component, Input, OnInit, Query, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
-import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { PlanModel } from '../../../model/plan/plan-model';
 import { FpFundingSourceComponent } from '../../fp-funding-source/fp-funding-source.component';
 import { FpProgramRecommendedCostsComponent } from '../../fp-program-recommended-costs/fp-program-recommended-costs.component';
@@ -95,9 +95,13 @@ export class FundingSourceEntryModalComponent implements OnInit {
     let sum = 0;
     this.modalFpRecommendedCosts?.forEach(control => {
       if (control.displayType === 'percent') {
-        sum += +control.directCostCalculated;
+        if (control.directCostCalculated) {
+          sum += +control.directCostCalculated;
+        }
       } else {
-        sum += +control.directCost;
+        if (control.directCost) {
+          sum += +control.directCost;
+        }
       }
     });
     return sum;
@@ -107,9 +111,13 @@ export class FundingSourceEntryModalComponent implements OnInit {
     let sum = 0;
     this.modalFpRecommendedCosts?.forEach(control => {
       if (control.displayType === 'percent') {
-        sum += +control.totalCostCalculated;
+        if (control.totalCostCalculated) {
+          sum += +control.totalCostCalculated;
+        }
       } else {
-        sum += +control.totalCost;
+        if (control.totalCost) {
+          sum += +control.totalCost;
+        }
       }
     });
     return sum;

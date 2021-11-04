@@ -269,7 +269,9 @@ export class PlanManagementService {
     this.budgetMap?.forEach(v => {
       v.forEach(b => {
         if (b.fseId === fseId) {
-          sum += b.dcRecAmt;
+          if (b.dcRecAmt) {
+            sum += +b.dcRecAmt;
+          }
         }
       });
     });
@@ -281,7 +283,9 @@ export class PlanManagementService {
     this.budgetMap?.forEach(v => {
       v.forEach(b => {
         if (b.fseId === fseId) {
-          sum += b.tcRecAmt;
+          if (b.tcRecAmt) {
+            sum += +b.tcRecAmt;
+          }
         }
       });
     });
@@ -291,7 +295,9 @@ export class PlanManagementService {
   requestDirectTotal(applId: number): number {
     let sum = 0;
     this.budgetMap.get(applId)?.forEach(b => {
-      sum += b.dcRecAmt;
+      if (b.dcRecAmt) {
+        sum += +b.dcRecAmt;
+      }
     });
     return sum;
   }
@@ -299,7 +305,9 @@ export class PlanManagementService {
   requestTotalTotal(applId: number): number {
     let sum = 0;
     this.budgetMap.get(applId)?.forEach(b => {
-      sum += b.tcRecAmt;
+      if (b.tcRecAmt) {
+        sum += +b.tcRecAmt;
+      }
     });
     return sum;
   }
@@ -308,7 +316,9 @@ export class PlanManagementService {
     let sum = 0;
     this.budgetMap.forEach(v => {
       v.forEach(b => {
-        sum += b.dcRecAmt;
+        if (b.dcRecAmt) {
+          sum += +b.dcRecAmt;
+        }
       });
     });
     return sum;
@@ -318,7 +328,9 @@ export class PlanManagementService {
     let sum = 0;
     this.budgetMap.forEach(v => {
       v.forEach(b => {
-        sum += b.tcRecAmt;
+        if (b.tcRecAmt) {
+          sum += +b.tcRecAmt;
+        }
       });
     });
     return sum;
