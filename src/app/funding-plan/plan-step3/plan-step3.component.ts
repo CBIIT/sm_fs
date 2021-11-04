@@ -6,7 +6,7 @@ import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
 import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
 import { PlanManagementService } from '../service/plan-management.service';
-import { FsPlanControllerService, FundingPlanFoasDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanControllerService, FundingPlanFoasDto, FundingRequestCanDto, FundingRequestDto } from '@nci-cbiit/i2ecws-lib';
 import { OtherDocsContributingFundsComponent } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { getCurrentFiscalYear, isReallyANumber } from '../../utils/utils';
 import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
@@ -161,6 +161,9 @@ export class PlanStep3Component implements OnInit {
   }
 
   private buildPlanRequestLists(): void {
+    if(!this.planModel.fundingPlanDto.fpFinancialInformation) {
+      this.planModel.fundingPlanDto.fpFinancialInformation = {};
+    }
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests = [];
 
     this.fpInfoComponent.listApplicationsNotSelectable.forEach(g => {
@@ -222,8 +225,10 @@ export class PlanStep3Component implements OnInit {
     // A little hacky, but I may have added some sources to delete sources BEFORE running this code, so I want to
     // preserve the list.
     const deleteSources: number[] = this.planModel.fundingPlanDto.fpFinancialInformation?.deleteSources;
-    this.planModel.fundingPlanDto.fpFinancialInformation = {};
+    const requests: FundingRequestDto[]  = this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests;
 
+    this.planModel.fundingPlanDto.fpFinancialInformation = {};
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests = requests;
     this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = deleteSources;
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
 
@@ -325,6 +330,9 @@ export class PlanStep3Component implements OnInit {
   }
 
   private scrapePlanData(): void {
+    if(!this.planModel.fundingPlanDto) {
+      this.planModel.fundingPlanDto = {};
+    }
     this.planModel.fundingPlanDto.planName = this.planName;
     if (!this.planModel.fundingPlanDto.planFy) {
       this.planModel.fundingPlanDto.planFy = getCurrentFiscalYear();
