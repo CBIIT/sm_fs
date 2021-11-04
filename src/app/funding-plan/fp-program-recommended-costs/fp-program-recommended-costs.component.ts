@@ -94,7 +94,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
         this.logger.error('Control is locked to dollar only but analysis indicates percent');
       }
       this.displayType = 'percent';
-    } else if (bud) {
+    } else if (bud && isReallyANumber(bud.dcRecAmt) && isReallyANumber(bud.tcRecAmt)) {
       this.directCost = bud.dcRecAmt || null;
       this.totalCost = bud.tcRecAmt || null;
       this.displayType = 'dollar';
