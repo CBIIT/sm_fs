@@ -28,6 +28,10 @@ export class CanDeactivatePlanStep3 implements CanDeactivate<PlanStep3Component>
     //   return true;
     // }
 
+    // Allow them to go backwards without reloading
+    if (nextState?.url?.startsWith('/plan/step2') || nextState?.url?.startsWith('/plan/step3')) {
+      return true;
+    }
     // TODO: Fix this. If they submit with errors, they can then go anywhere without warning
     if (component.step3form.submitted) {
       return true;
