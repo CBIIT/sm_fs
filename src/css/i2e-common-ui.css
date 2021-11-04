@@ -25797,3 +25797,7 @@ button.btn.brn-primary.add-margin{
 .col-6.align-left{
   padding-left: 0;
 }
+.tdlabel{
+  margin-left: -10px;
+  margin-top: -20px;
+}

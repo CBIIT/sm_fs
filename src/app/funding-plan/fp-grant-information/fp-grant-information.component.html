@@ -2,7 +2,7 @@
   <span class='institutionLocation'>{{grant.institutionCity}},&nbsp;{{grant.institutionState}}</span>
 </ng-template>
 
-<div *ngIf="exception"><img src="images/grant-exception.png" alt="EXCEPTION" width="56" height="16"></div>
+<div *ngIf="exception"><img src="images/grant-exception.png" alt="EXCEPTION" width="64" height="16"  class="tdlabel"></div>
 
 <ng-container *ngIf="isModal then modal else primary"></ng-container>
 
@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <div class="col-4">
+    <div class="col-3">
       <span class="like-label mb-1">PI</span>
       <span [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail': 'PI/PD name':'fullGrantNum': 'lastName'"></span>
     </div>
@@ -41,7 +41,7 @@
       <span>{{ piDirect | currency }}</span>
     </div>
 
-    <div class="col-4">
+    <div class="col-3">
       <span class="like-label mb-1">PI Requested Total Cost</span>
       <span>{{ piTotal | currency }}</span>
     </div>
@@ -66,7 +66,7 @@
         <span>{{ grant.projectTitle }}</span>
       </div>
 
-      <div class="col-4">
+      <div class="col-3">
         <span class="like-label mb-1">FOA</span>
         <span><a href="{{ grant.nihGuideAddr }}" target="_blank">{{ grant.rfaPaNumber }}</a></span>
       </div>
