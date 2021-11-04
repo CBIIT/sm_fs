@@ -22,6 +22,7 @@ import { FundingSourceGrantDataPayload } from './funding-source-grant-data-paylo
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class ApplicationsProposedForFundingComponent implements OnInit {
+  dummy: any;
 
   @Input() parentForm: NgForm;
   @Input() readOnly = false;

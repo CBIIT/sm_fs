@@ -22,6 +22,7 @@ export class FpGrantInformationComponent implements OnInit {
   @Input() sourceIndex: number;
   @Input() parentForm: NgForm;
   @Input() readOnly = false;
+  @Input() checkFunding = true;
 
   skip = false;
   exception = false;
@@ -31,14 +32,14 @@ export class FpGrantInformationComponent implements OnInit {
   piTotal: number;
 
   recommendedFutureYears(): any {
-    return this.planCoordinatorService.getRecommendedFutureYears(this.grant.applId);
+    return this.planManagementService.getRecommendedFutureYears(this.grant.applId);
   }
 
   constructor(
     public model: PlanModel,
     private logger: NGXLogger,
     private requestService: FsRequestControllerService,
-    private planCoordinatorService: PlanManagementService) {
+    private planManagementService: PlanManagementService) {
   }
 
   ngOnInit(): void {
@@ -59,7 +60,7 @@ export class FpGrantInformationComponent implements OnInit {
         this.piTotal = 0;
       }
 
-      this.planCoordinatorService.grantInfoCostEmitter.next({
+      this.planManagementService.grantInfoCostEmitter.next({
         index: this.grantIndex,
         applId: this.grant.applId,
         dc: this.piDirect,

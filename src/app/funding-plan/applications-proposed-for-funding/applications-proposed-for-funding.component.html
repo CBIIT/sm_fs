@@ -64,9 +64,15 @@
             [parentForm]="parentForm" 
             [grantIndex]="i" 
             [grant]="grant"
-            [required]="false"
+            [required]="planManagementService.unfundedGrants().includes(grant.applId)"
             [sourceIndex]="0">
           </app-fp-program-recommended-costs>
+          <div
+            class="text-danger mt-1"
+            *ngIf="planManagementService.unfundedGrants().includes(grant.applId) && (parentForm.submitted || parentForm.touched)">
+            Every grant must be funded by at least one source
+            <input type="hidden" [(ngModel)]="dummy" [name]="'nofunding' + grant.applId" required>
+          </div>
         </td>
 
       </tr>
@@ -144,9 +150,15 @@
             [parentForm]="parentForm" 
             [grantIndex]="grantIndex" 
             [grant]="grant"
-            [readOnly]="true" 
+            [readOnly]="true"
             [sourceIndex]="0">
           </app-fp-grant-information>
+          <div
+            class="text-danger mt-1"
+            *ngIf="planManagementService.unfundedGrants().includes(grant.applId) && (parentForm.submitted || parentForm.touched)">
+            Every grant must be funded by at least one source
+            <input type="hidden" [(ngModel)]="dummy" [name]="'nofunding' + grant.applId" required>
+          </div>
         </td>
 
         <ng-container *ngFor="let source of listSelectedSources; let sourceIndex = index">

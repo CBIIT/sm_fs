@@ -418,6 +418,19 @@ export class PlanManagementService {
     return (1 - (approved / total));
   }
 
+  public unfundedGrants(): number[] {
+    const result: number[] = [];
+    const applIds: number[] = this.planModel.allGrants.filter(g => g.selected).map(gr => gr.applId);
+    applIds.forEach(applId => {
+      const tc = this.requestTotalTotal(applId);
+      const dc = this.requestDirectTotal(applId);
+      if (tc === 0 && dc === 0) {
+        result.push(applId);
+      }
+    });
+    return result;
+  }
+
 
 }
 

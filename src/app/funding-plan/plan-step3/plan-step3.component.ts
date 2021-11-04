@@ -99,7 +99,9 @@ export class PlanStep3Component implements OnInit {
   onSubmit($event: any): void {
     this.alerts = null;
     // this.logger.debug($event);
-    if (this.step3form.valid) {
+    // this.logger.debug(this.step3form);
+
+    if (this.step3form.valid && this.planManagementService.unfundedGrants().length === 0) {
 
       this.scrapePlanData();
       if (this.planManagementService.selectedSourceCount <= 1) {
