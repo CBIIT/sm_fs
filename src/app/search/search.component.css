@@ -58,3 +58,9 @@ div.overview {
 div.overview > span {
   float: right;
 }
+
+.btn-info.disabled, .btn-info:disabled {
+  color: #fff;
+  background-color: #63666a;
+  border-color: #63666a;
+}
