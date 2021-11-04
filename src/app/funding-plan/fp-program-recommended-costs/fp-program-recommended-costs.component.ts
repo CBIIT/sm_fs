@@ -3,6 +3,7 @@ import { PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ControlContainer, NgForm } from '@angular/forms';
+import { isReallyANumber } from '../../utils/utils';
 
 @Component({
   selector: 'app-fp-program-recommended-costs',
@@ -86,7 +87,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
     // TODO: this logic might need revisiting.
     // TODO: especially the determination of percent if lockDollar is true
-    if (can && !isNaN(can.dcPctCut) && !isNaN(can.tcPctCut) && can.dcPctCut === can.tcPctCut) {
+    if (can && isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut) {
       // this.logger.debug(can);
       this.percentCut = can.dcPctCut;
       if (this.lockDollar) {
@@ -94,8 +95,8 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       }
       this.displayType = 'percent';
     } else if (bud) {
-      this.directCost = bud.dcRecAmt;
-      this.totalCost = bud.tcRecAmt;
+      this.directCost = bud.dcRecAmt || null;
+      this.totalCost = bud.tcRecAmt || null;
       this.displayType = 'dollar';
     }
     this.recalculate();

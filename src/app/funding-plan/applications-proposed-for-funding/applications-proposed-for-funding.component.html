@@ -59,7 +59,7 @@
             [sourceIndex]="0">
           </app-fp-grant-information>
         </td>
-        <td>
+        <td [ngModelGroup]="grant.fullGrantNum + grant.applId">
           <app-fp-program-recommended-costs 
             [parentForm]="parentForm" 
             [grantIndex]="i" 
@@ -127,7 +127,7 @@
       <thead>
       <tr>
         <th scope="col">Grant Information</th>
-        <th *ngFor="let source of listSelectedSources; let sourceIndex = index" colspan="2">
+        <th *ngFor="let source of listSelectedSources; let sourceIndex = index" colspan="2" [ngModelGroup]="source.fundingSourceName">
           <div class="d-flex align-items-center">
             <span>{{ source.fundingSourceName }}</span>
             <button type="button" class="btn btn-sm btn-slim btn-link ml-2" (click)="onEditFundingSource(source.fundingSourceId, sourceIndex)"
@@ -138,6 +138,12 @@
                     (click)="onDeleteFundingSource(source.fundingSourceId)" ngbTooltip="Remove" placement="left">
               <i class="fas fa-trash" aria-hidden="true"></i>
             </button>
+            <input type="text" style="display:none" ngModel #noFundedGrants="ngModel" name="noFundedGrants" [appOneFundedGrantValidator]="source.fundingSourceId">
+          </div>
+          <div
+            class="text-danger mt-1"
+            *ngIf="noFundedGrants.errors?.sourceMustFundAtLeastOne && (parentForm.submitted || parentForm.touched)">
+            Every source must fund at least one grant
           </div>
         </th>
         <th scope="col" colspan="2">Total Recommended Costs</th>
@@ -145,7 +151,7 @@
       </thead>
       <tbody>
       <tr *ngFor="let grant of listGrantsSelected; let grantIndex = index;">
-        <td>
+        <td [ngModelGroup]="grant.applId + grant.fullGrantNum">
           <app-fp-grant-information 
             [parentForm]="parentForm" 
             [grantIndex]="grantIndex" 
