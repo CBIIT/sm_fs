@@ -67,11 +67,11 @@
             [required]="planManagementService.unfundedGrants().includes(grant.applId)"
             [sourceIndex]="0">
           </app-fp-program-recommended-costs>
+          <input type="text" style="display:none" ngModel #unFunded="ngModel" name="unfunded" [appGrantFundedOnceValidator]="grant.applId">
           <div
             class="text-danger mt-1"
-            *ngIf="planManagementService.unfundedGrants().includes(grant.applId) && (parentForm.submitted || parentForm.touched)">
+            *ngIf="unFunded.errors?.grantUnfunded && (parentForm.submitted || parentForm.touched)">
             Every grant must be funded by at least one source
-            <input type="hidden" [(ngModel)]="dummy" [name]="'nofunding' + grant.applId" required>
           </div>
         </td>
 
@@ -153,11 +153,11 @@
             [readOnly]="true"
             [sourceIndex]="0">
           </app-fp-grant-information>
+          <input type="text" style="display:none" ngModel #unFunded="ngModel" name="unfunded" [appGrantFundedOnceValidator]="grant.applId">
           <div
             class="text-danger mt-1"
-            *ngIf="planManagementService.unfundedGrants().includes(grant.applId) && (parentForm.submitted || parentForm.touched)">
+            *ngIf="unFunded.errors?.grantUnfunded && (parentForm.submitted || parentForm.touched)">
             Every grant must be funded by at least one source
-            <input type="hidden" [(ngModel)]="dummy" [name]="'nofunding' + grant.applId" required>
           </div>
         </td>
 
