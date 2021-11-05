@@ -95,6 +95,8 @@ export class BudgetInfoComponent implements OnInit {
       }
       const oefiaType = this.oefiaTypes?.get(index)?.selectedValue;
       c.octId = c.oefiaTypeId = !isNaN(oefiaType) ? (Number(oefiaType) !== 0 ? Number(oefiaType) : null) : null;
+      this.logger.debug('fcNci: ', this.isFcNci(), this.model.requestDto.oefiaCreateCode);
+
       if (this.isFcNci()) {
         c.oefiaCreateCode = this.model.requestDto.oefiaCreateCode;
       }
@@ -220,5 +222,9 @@ export class BudgetInfoComponent implements OnInit {
     }).catch((reason) => {
     });
 
+  }
+
+  resgisterNewOefiaType($event): void {
+    this.logger.info(`new Oefia type received: ${$event} -- ${this.model.requestDto.oefiaCreateCode}`);
   }
 }
