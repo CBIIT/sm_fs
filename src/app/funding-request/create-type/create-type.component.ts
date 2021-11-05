@@ -85,7 +85,6 @@ export class CreateTypeComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.readOnly) {
-      this.logger.debug('readonly: ', this.requestModel.requestDto.oefiaCreateCode);
       return;
     }
     this.data = [
@@ -95,8 +94,7 @@ export class CreateTypeComponent implements OnInit {
     if (!this.requestModel.isPayType4() && this.requestModel.isForGrantFY()) {
       this.data.push({ id: 'Rollup', text: 'Rollup' });
       const type = Number(this.requestModel.requestDto.frtId);
-      this.logger.debug('--', type, this.ROLLUP_TYPES, this.ROLLUP_TYPES.includes(type));
-      this.logger.debug('--', type, this.PRE_APPL_TYPES, this.PRE_APPL_TYPES.includes(type));
+      
       if (this.requestModel.isForGrantFY() &&
         this.ROLLUP_TYPES.includes(+type)) {
         this.logger.debug('rollup');
@@ -107,10 +105,8 @@ export class CreateTypeComponent implements OnInit {
         this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'Pre-Appl';
       }
     } else {
-      this.logger.debug('default else');
       this.selectedValue = this.requestModel.requestDto.oefiaCreateCode;
     }
-    this.logger.debug('oefiaCreateCode', this.requestModel.requestDto.oefiaCreateCode);
   }
 
 }
