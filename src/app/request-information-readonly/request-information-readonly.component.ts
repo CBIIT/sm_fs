@@ -54,7 +54,7 @@ export class RequestInformationReadonlyComponent implements OnInit {
       && ([1, 2].includes(Number(this.requestModel.grant.applTypeCode)));
     this.newInvestigator = this.requestModel.requestDto.financialInfoDto.newInvestigatorFlag;
     if (this.newInvestigator === 'false' || this.newInvestigator === 'true') {
-      this.logger.error('New investigator flag is true or false - it should only be \'Y\' or \'N\'.')
+      this.logger.error('New investigator flag is true or false - it should only be \'Y\' or \'N\'.');
     }
     this.logger.debug(this.newInvestigator);
 
@@ -68,7 +68,6 @@ export class RequestInformationReadonlyComponent implements OnInit {
     if (this.isSkip) {
       this.skipRequests = this.requestModel.requestDto.skipRequests;
     }
-    console.log('blablabla', this);
   }
 
   get grant(): NciPfrGrantQueryDto {
