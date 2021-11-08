@@ -7,7 +7,6 @@ import { CanManagementService } from '../../cans/can-management.service';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
 import { PlanModel } from '../../model/plan/plan-model';
 import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
-import { ThrowStmt } from '@angular/compiler';
 import { FpCanWarning } from '../fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
 
 
@@ -50,9 +49,8 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
       // this.logger.debug(next);
       const key = String(next.fseId) + '-' + String(next.applId);
       this.defaultCanTracker.set(key, next.nonDefault);
-    });
-    this.canManagementService.selectCANEmitter.subscribe(next => {
-      if (Number(next.applId) === this.grant?.applId) {
+      // stick validateCan here because this is called when can is set by search can modal.
+      if (Number(next.applId) === this.grant?.applId ) {
         this.validateCan();
       }
     });
@@ -186,8 +184,8 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
   checkWarning(canWarning: FpCanWarning): void {
     const usedCan: string[] = [];
     for (const g of this.grantCosts) {
-      // check for no default;
-      if (this.nonDefaultCAN(g.applId, g.fseId)) {
+      // check for no default; only for NCI approver
+      if (this.nonDefaultCAN(g.applId, g.fseId) && this.isFcNci()) {
         canWarning.nonDefaultCan = true;
       }
       const can = this.planModel.getSelectedCan(g.fseId, g.applId);
@@ -197,7 +195,8 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
           canWarning.missingCan = true;
         }
       }
-      else if (usedCan.includes(can.can)) {
+      // check for duplicated cans; only for NCI approver
+      else if (usedCan.includes(can.can) && this.isFcNci()) {
         canWarning.duplicateCan = true;
       }
       else {

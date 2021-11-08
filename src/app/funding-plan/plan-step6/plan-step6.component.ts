@@ -87,13 +87,9 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
     }
 
     this.budgetInfoComponents.changes.subscribe(
-      (comps: QueryList <FpBudgetInformationComponent>) =>
-      {
+      (comps: QueryList <FpBudgetInformationComponent>) => {
         this.workflowComponent.budgetInfoComponent = comps.first;
-      }
-      );
-    //   this.workflowComponent.budgetInfoComponent = this.budgetInfoComponent;
-    // }
+      });
 
     if (this.planModel.pendingAlerts.length > 0) {
         const el = document.getElementById('funding-plan-page-top');
