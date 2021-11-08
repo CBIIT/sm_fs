@@ -185,4 +185,49 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     }
     return rss;
   }
+
+  // Check if at least one criteria selected or both IC and Serial Number
+  validFilter(): boolean {
+    const formValue = this.searchForm?.form.value;
+    if (!formValue) {
+      return true;
+    }
+
+    // Both IC and Serial Number are entered
+    if (formValue.grantNumber?.grantNumberIC && formValue.grantNumber?.grantNumberSerial) {
+      return true;
+    }
+
+    const commonAll: boolean = formValue.fyRange?.fromFy || formValue.fyRange?.toFy || formValue.piName;
+
+    const commonFrFp: boolean = formValue.requestingPd || formValue.requestingDoc ||
+                                formValue.fundingSources || formValue.id ||
+                                formValue.institutionName ||
+                                formValue.pdName || formValue.doc
+
+    if (this.searchType === 'FR' &&
+       (commonAll || commonFrFp ||
+        (formValue.frTypes && formValue.frTypes.length > 0) ||
+        (formValue.fundingRequestStatus && formValue.fundingRequestStatus.length > 0)
+        )) {
+      return true;
+    }
+
+    if (this.searchType === 'FP' &&
+        (commonAll || commonFrFp ||
+        (formValue.fundingPlanStatus && formValue.fundingPlanStatus.length > 0) ||
+        formValue.rfaPa ||
+        formValue.ncabRange?.fromNcab || formValue.ncabRange?.toNcab
+        )) {
+      return true;
+    }
+
+    if (this.searchType === 'G' &&
+        (commonAll ||
+         formValue.i2status
+        )) {
+      return true;
+    }
+    return false;
+  }
 }
