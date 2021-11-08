@@ -48,4 +48,7 @@
    <i class="far fa-exclamation-triangle" aria-hidden="true"></i>
  </span>
 </div>
+<div class="text-danger mt-1" *ngIf="canRequiredButMissing.get(g.fseId)">
+  Error: Missing CAN for one or more funding sources.
+</div>
 </span>

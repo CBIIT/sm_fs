@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
@@ -8,6 +8,9 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
 import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 import { PlanManagementService } from '../service/plan-management.service';
+import { FpCanWarning } from '../fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
+import { CanSelectorRendererComponent } from '../can-selector-renderer/can-selector-renderer.component';
+import { VoidExpression } from 'typescript';
 
 @Component({
   selector: 'app-fp-budget-information',
@@ -16,13 +19,12 @@ import { PlanManagementService } from '../service/plan-management.service';
 })
 export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   @ViewChild(CanSearchModalComponent) canSearchModalComponent: CanSearchModalComponent;
-
+  @ViewChildren(CanSelectorRendererComponent) canSelectors: QueryList<CanSelectorRendererComponent>;
   @Input() readOnly = false;
 
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
-
 
   constructor(
     private modalService: NgbModal,
@@ -63,7 +65,7 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
         });
       });
       this.planManagementService.grantCosts.forEach(gc => {
-        if(+gc.fseId === +next.fseId) {
+        if (+gc.fseId === +next.fseId) {
           gc.oefiaTypeId = next.value;
         }
       });
@@ -204,4 +206,27 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
 
     return false;
   }
+
+  checkCanValidation(approvingAciton: boolean): void {
+    this.logger.debug('canselecters ', this.canSelectors);
+    for (const canSelector of this.canSelectors) {
+      canSelector.approvingAction = approvingAciton;
+      canSelector.validateCan();
+      this.logger.debug('canSelector ', canSelector.canRequiredButMissing, canSelector.grantCosts);
+    }
+  }
+
+  isFormValid(canWarning: FpCanWarning): boolean {
+    let valid = true;
+    for (const canSelector of this.canSelectors) {
+       canSelector.checkWarning(canWarning);
+
+       if (canSelector.canRequiredButMissing.size > 0) {
+         valid = false;
+       }
+    }
+
+    return valid;
+  }
+
 }

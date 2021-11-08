@@ -7,6 +7,8 @@ import { CanManagementService } from '../../cans/can-management.service';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
 import { PlanModel } from '../../model/plan/plan-model';
 import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
+import { ThrowStmt } from '@angular/compiler';
+import { FpCanWarning } from '../fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
 
 
 @Component({
@@ -22,6 +24,8 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
   @Input() projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
   @Input() readOnly = false;
   defaultCanTracker: Map<string, boolean> = new Map<string, boolean>();
+  canRequiredButMissing: Map<number, boolean> = new Map<number, boolean>();
+  approvingAction = false;
 
   fundingSources: number[];
 
@@ -46,6 +50,11 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
       // this.logger.debug(next);
       const key = String(next.fseId) + '-' + String(next.applId);
       this.defaultCanTracker.set(key, next.nonDefault);
+    });
+    this.canManagementService.selectCANEmitter.subscribe(next => {
+      if (Number(next.applId) === this.grant?.applId) {
+        this.validateCan();
+      }
     });
   }
 
@@ -161,5 +170,39 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
 
   isFinancialApprover(): boolean {
     return this.workflowModel.isFinancialApprover;
+  }
+
+  validateCan(): void{
+    this.canRequiredButMissing.clear();
+    if (this.approvingAction  && this.isFcNci()) {
+      for (const g of this.grantCosts) {
+        if (  g.nciSourceFlag === 'Y' && g.requestedDirect > 0 && !this.planModel.getSelectedCan(g.fseId, g.applId)) {
+            this.canRequiredButMissing.set(g.fseId, true);
+        }
+      }
+    }
+  }
+
+  checkWarning(canWarning: FpCanWarning): void {
+    const usedCan: string[] = [];
+    for (const g of this.grantCosts) {
+      // check for no default;
+      if (this.nonDefaultCAN(g.applId, g.fseId)) {
+        canWarning.nonDefaultCan = true;
+      }
+      const can = this.planModel.getSelectedCan(g.fseId, g.applId);
+      // missing can
+      if (!can) {
+        if ( g.requestedDirect > 0) {
+          canWarning.missingCan = true;
+        }
+      }
+      else if (usedCan.includes(can.can)) {
+        canWarning.duplicateCan = true;
+      }
+      else {
+        usedCan.push(can.can);
+      }
+    }
   }
 }

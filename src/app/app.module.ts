@@ -155,6 +155,7 @@ import { OneFundedGrantValidatorDirective } from './validators/one-funded-grant-
 import { GrantFundedOnceValidatorDirective } from './validators/grant-funded-once-validator.directive';
 import { CurrencyTogglePipe } from './pipes/currency-toggle.pipe';
 import { SearchGrantExistInPaylistCellRendererComponent } from './search/search-result/search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component';
+import { FpWorkflowWarningModalComponent } from './funding-plan/fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
     return appPropertiesService.initialize();
@@ -304,6 +305,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SelectFundingRequestCheckboxCellRendererComponent,
     SearchFundingRequestActionCellRendererComponent,
     WorkflowWarningModalComponent,
+    FpWorkflowWarningModalComponent,
     SearchFundingRequestTypeComponent,
     SearchFundingPlanFoasCellRendererComponent,
     SearchRfaPaDropdownComponent,

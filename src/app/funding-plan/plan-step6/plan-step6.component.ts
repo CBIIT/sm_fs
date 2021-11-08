@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Router } from '@angular/router';
 import { CancerActivityControllerService, DocumentsDto, FsPlanControllerService, FsPlanWorkflowControllerService,
   FundingReqApproversDto, FundingReqStatusHistoryDto,
@@ -18,6 +18,7 @@ import { NgForm } from '@angular/forms';
 import { DocTypeConstants } from './plan-supporting-docs-readonly/plan-supporting-docs-readonly.component';
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
 import { CanManagementService } from '../../cans/can-management.service';
+import { FpBudgetInformationComponent } from '../fp-budget-information/fp-budget-information.component';
 
 @Component({
   selector: 'app-plan-step6',
@@ -29,7 +30,9 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
   @ViewChild(PlanWorkflowComponent) workflowComponent: PlanWorkflowComponent;
   @ViewChild(UploadBudgetDocumentsComponent) uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
-
+//  @ViewChild(FpBudgetInformationComponent) budgetInfoComponent: FpBudgetInformationComponent;
+  @ViewChildren(FpBudgetInformationComponent) budgetInfoComponents: QueryList<FpBudgetInformationComponent>
+//    public Grids: QueryList<GridComponent>
   grantsSkipped: NciPfrGrantQueryDtoEx[] = [];
   grantsNotConsidered: NciPfrGrantQueryDtoEx[] = [];
 
@@ -82,6 +85,16 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
     if (this.uploadBudgetDocumentsComponent && this.workflowComponent) {
       this.workflowComponent.uploadBudgetDocumentsComponent = this.uploadBudgetDocumentsComponent;
     }
+
+    this.budgetInfoComponents.changes.subscribe(
+      (comps: QueryList <FpBudgetInformationComponent>) =>
+      {
+        this.workflowComponent.budgetInfoComponent = comps.first;
+      }
+      );
+    //   this.workflowComponent.budgetInfoComponent = this.budgetInfoComponent;
+    // }
+
     if (this.planModel.pendingAlerts.length > 0) {
         const el = document.getElementById('funding-plan-page-top');
         el.scrollIntoView();

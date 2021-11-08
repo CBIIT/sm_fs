@@ -15,7 +15,6 @@ import {
   WorkflowActionCode,
   WorkflowModel
 } from 'src/app/funding-request/workflow/workflow.model';
-import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 import { Alert } from 'src/app/alert-billboard/alert';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 import { PlanModel } from 'src/app/model/plan/plan-model';
@@ -26,6 +25,8 @@ import { AppPropertiesService } from 'src/app/service/app-properties.service';
 import { FpGrantManagementComponent } from './fp-grant-management/fp-grant-management.component';
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
 import { PlanManagementService } from '../service/plan-management.service';
+import { FpCanWarning, FpWorkflowWarningModalComponent } from './fp-warning-modal/fp-workflow-warning-modal.component';
+import { FpBudgetInformationComponent } from '../fp-budget-information/fp-budget-information.component';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -43,8 +44,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   @Input() readonly = false;
   @Output() actionEmitter = new EventEmitter<string>();
   @ViewChild(FpGrantManagementComponent) gmComponent: FpGrantManagementComponent;
+  @ViewChild(FpWorkflowWarningModalComponent) fpWorkflowWarningModalComponent: FpWorkflowWarningModalComponent;
 
-  budgetInfoComponent: BudgetInfoComponent;
+
+  budgetInfoComponent: FpBudgetInformationComponent;
   uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
 
   approverInitializationSubscription: Subscription;
@@ -96,6 +99,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     this.actionEmitter.emit(value);
     if (this.gmComponent) {
       this.gmComponent.isApprovalAction = this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
+    }
+    this.logger.debug('budgetInfoComponent ', this.budgetInfoComponent);
+    if (this.budgetInfoComponent) {
+      this.budgetInfoComponent.checkCanValidation(this.workflowModel.isApprovalAction(WorkflowActionCode[value]));
     }
   }
 
@@ -296,14 +303,39 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       valid = false;
     }
 
+    const action: WorkflowActionCode = this._selectedWorkflowAction.action;
+    const canWarning: FpCanWarning = {};
+    if (this.workflowModel.isFinancialApprover
+        && this.workflowModel.isApprovalAction(action)
+        && this.budgetInfoComponent) {
+      const canFormValid = this.budgetInfoComponent.isFormValid(canWarning);
+      if (!canFormValid) {
+        valid = false;
+      }
+    }
+
     if (!valid) {
-      this.alert = {
-        type: 'danger',
-        message: 'Please correct the errors identified above.',
-        title: ''
-      };
+      this.alert = {type: 'danger',
+      message: 'Please correct the errors identified above.',
+      title: ''};
       return;
     }
+
+    if (canWarning.duplicateCan || canWarning.missingCan || canWarning.nonDefaultCan) {
+      this.fpWorkflowWarningModalComponent.openConfirmModal(canWarning).then( () => {
+        this.logger.debug('warning modal closed with yes ');
+        this.submitWorkflowToBackend();
+      }).catch(() => {
+        this.logger.debug('warning modal closed with dismiss ');
+      });
+    }
+    else {
+      this.submitWorkflowToBackend();
+    }
+  }
+
+  private submitWorkflowToBackend(): void {
+  //  return;
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;

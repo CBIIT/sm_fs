@@ -336,7 +336,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     if (this.workflowModel.isApprovalAction(action) && this.budgetInfoComponent?.editing) {
       this.budgetInfoComponent.refreshRequestCans();
       dto.requestCans = this.requestModel.requestCans;
-      if(this.workflowModel.isFcNci) {
+      if (this.workflowModel.isFcNci) {
         dto.nciFc = true;
         dto.oefiaCreateCode = this.requestModel.requestDto.oefiaCreateCode;
       }
