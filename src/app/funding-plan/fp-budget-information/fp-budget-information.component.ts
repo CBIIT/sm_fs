@@ -208,11 +208,9 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   }
 
   checkCanValidation(approvingAciton: boolean): void {
-    this.logger.debug('canselecters ', this.canSelectors);
     for (const canSelector of this.canSelectors) {
       canSelector.approvingAction = approvingAciton;
       canSelector.validateCan();
-      this.logger.debug('canSelector ', canSelector.canRequiredButMissing, canSelector.grantCosts);
     }
   }
 

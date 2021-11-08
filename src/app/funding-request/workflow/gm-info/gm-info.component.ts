@@ -67,17 +67,6 @@ export class GmInfoComponent implements OnInit, OnDestroy {
   }
 
   loadData(): void {
-      // if (this.requestModel.requestDto.actionType) {
-      //   this.gmInfo = {};
-      //   this.gmInfo.actionType = this.requestModel.requestDto.actionType;
-      //   this.gmInfo.defaultSpecFullName = this.requestModel.requestDto.pfrSpecFullName;
-      //   this.gmInfo.defaultSpecNpeId = this.requestModel.requestDto.pfrSpecNpeId;
-      //   this.gmInfo.defaultSpecEmail = this.requestModel.requestDto.pfrSpecEmailAddress;
-      //   this.gmInfo.bkupSpecNpeId = this.requestModel.requestDto.pfrBkupSpecNpeId;
-      //   this.gmInfo.bkupSpecFullName = this.requestModel.requestDto.pfrBkupSpecFullName;
-      //   this.gmInfo.bkupSpecEmail = this.requestModel.requestDto.pfrBkupSpecEmailAddress;
-      // }
-      // else {
       this.workflowService.getDefaultGmInfoUsingGET(this.requestModel.requestDto.frqId).subscribe(
           result => {
             if (result) {
@@ -100,10 +89,9 @@ export class GmInfoComponent implements OnInit, OnDestroy {
   getGmInfo(): GmInfoDto {
     if (this.gmInfo.defaultSpecNpeId) {
       this.logger.debug('spec npe id', this.gmInfo.defaultSpecNpeId);
-      this.logger.debug('spec map', this.specialistMap);
       const spec = this.specialistMap.get(Number(this.gmInfo.defaultSpecNpeId));
-      this.logger.debug('spec',  this.specialistMap.get(22180));
-      this.gmInfo.defaultSpecFullName = spec.specCode + ' ' + spec.specFullName;
+      this.logger.debug('specialist ',  spec);
+      this.gmInfo.defaultSpecFullName = spec?.specCode + ' ' + spec?.specFullName;
     }
     return this.gmInfo;
   }
@@ -113,6 +101,13 @@ export class GmInfoComponent implements OnInit, OnDestroy {
   }
 
   isFormValid(): boolean {
+    // in the case the default specialist returned from backend is no longer active, i.e. not in the drop down list.
+    const spec = this.specialistMap.get(Number(this.gmInfo.defaultSpecNpeId));
+    if (!spec) {
+      this.logger.warn('The default specialist (npe_id=' + this.gmInfo.defaultSpecNpeId + ') is not active, treat as invalid to force user to select');
+      this.gmInfo.defaultSpecNpeId = null;
+      return false;
+    }
     return this.gmform?.valid;
   }
 
