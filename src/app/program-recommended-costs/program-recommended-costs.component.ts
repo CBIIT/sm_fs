@@ -262,7 +262,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     this.isPercentSelected();
     this.locked = false;
     const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
-    this.lineItem = this.getLineItem(edit).filter(dp => !!dp.grantAward);
+    this.lineItem = this.cloneLineItem(edit);
     this.setDisplay(this.lineItem);
     if (this.percentCutUsed && Number(edit.fundingSourceId) !== Number(this.percentCutSourceId)) {
       this.logger.warn('Percent cut already used and not by me.');
@@ -283,6 +283,28 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     // @ts-ignore
     $('#add-fsource-modal').modal('show');
+  }
+
+  private cloneLineItem(edit: FundingRequestFundsSrcDto): PrcDataPoint[] {
+    const tmp: PrcDataPoint[] = this.getLineItem(edit).filter(dp => !!dp.grantAward);
+    const result: PrcDataPoint[] = [];
+    tmp.forEach(p => {
+      const x: PrcDataPoint = new PrcDataPoint();
+      x.baselineSource = p.baselineSource;
+      x.baselineDirect = p.baselineDirect;
+      x.baselineTotal = p.baselineTotal;
+      x.fundingSource = p.fundingSource;
+      x.type = p.type;
+      x.budgetId = p.budgetId;
+      x.fundingRequestId = p.fundingRequestId;
+      x.recommendedDirect = p.recommendedDirect;
+      x.recommendedTotal = p.recommendedTotal;
+      x.percentCut = p.percentCut;
+      x.grantAward = p.grantAward;
+      result.push(x);
+    });
+
+    return result;
   }
 
   private setDisplay(lineItem: PrcDataPoint[]): void {
@@ -349,9 +371,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   prepareLineItem(): void {
+    this.prcForm?.resetForm();
     this.isPercentSelected();
     this.logger.debug('prepareLineItem()--', this.percentCutUsed, '--', this.percentCutSourceId, '--');
-    this.prcForm?.resetForm();
     this.locked = false;
     if (this.percentCutUsed) {
       this.locked = true;
