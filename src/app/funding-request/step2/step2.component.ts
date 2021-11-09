@@ -2,16 +2,16 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { RequestModel } from '../../model/request/request-model';
 import { FsRequestControllerService, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
-import { AppPropertiesService } from '../../service/app-properties.service';
 import { NGXLogger } from 'ngx-logger';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
 import { ProgramRecommendedCostsComponent } from '../../program-recommended-costs/program-recommended-costs.component';
 import { Alert } from '../../alert-billboard/alert';
 import { NgForm } from '@angular/forms';
-import { FundingSourceTypes } from '../../model/request/funding-source-types';
-import SubmitEvent = JQuery.SubmitEvent;
 import { RequestApproverService } from '../approver/approver.service';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
+import { PrcLineItemType } from '../../program-recommended-costs/prc-data-point';
+import SubmitEvent = JQuery.SubmitEvent;
+import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
 
 @Component({
   selector: 'app-step2',
@@ -29,6 +29,7 @@ export class Step2Component implements OnInit {
               public requestModel: RequestModel,
               private requestApproverService: RequestApproverService,
               private fsRequestControllerService: FsRequestControllerService,
+              private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
               private navigationModel: NavigationStepModel,
               private logger: NGXLogger) {
   }
@@ -38,8 +39,13 @@ export class Step2Component implements OnInit {
       this.router.navigate(['/request']);
     }
     this.navigationModel.setStepLinkable(2, true);
-    this.requestModel.modelDirtyBroadcastEmitter.subscribe(() => {
-      this.clean = false;
+    // Make sure the percent used model is set up correctly
+    this.requestModel.programRecommendedCostsModel?.prcLineItems?.forEach((val, key) => {
+      val.forEach(p => {
+        if (p.type === PrcLineItemType.PERCENT_CUT) {
+          this.fundingSourceSynchronizerService.percentSelectedEmitter.next({fseId: +key, selected: true});
+        }
+      });
     });
   }
 

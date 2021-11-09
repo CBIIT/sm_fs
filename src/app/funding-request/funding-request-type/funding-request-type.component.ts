@@ -80,7 +80,6 @@ export class FundingRequestTypeComponent implements OnInit {
     this.model.requestDto.financialInfoDto.requestTypeId = value;
     this.model.programRecommendedCostsModel.fundingRequestType = value;
     const valueChanged = this._selectedValue && (Number(value) !== Number(this._selectedValue));
-    this.logger.debug('did value change?:', this._selectedValue, value, valueChanged);
     // If we are changing to or from one of the clearable request types, we need to blow away the entire
     // PRC model
     if (valueChanged && (this.clearableTypes.includes(+value) || this.clearableTypes.includes(+this._selectedValue))) {

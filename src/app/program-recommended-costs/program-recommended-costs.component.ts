@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
 import { AppPropertiesService } from '../service/app-properties.service';
 import { FsRequestControllerService, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
@@ -24,7 +24,7 @@ import { Select2OptionData } from 'ng-select2';
   templateUrl: './program-recommended-costs.component.html',
   styleUrls: ['./program-recommended-costs.component.css']
 })
-export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
+export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, AfterViewInit {
   get recommendedFutureYears(): number {
     return this._recommendedFutureYears;
   }
@@ -33,7 +33,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     this.logger.debug('setRecommendedFutureYears(', value, ')');
     this._recommendedFutureYears = value;
   }
-
 
   @ViewChild('prcForm', { static: false }) prcForm: NgForm;
   @ViewChild(FundingSourceComponent) fsc: FundingSourceComponent;
@@ -156,6 +155,10 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngAfterViewInit(): void {
+    this.logger.debug('after view init');
+  }
+
 
   private loadApplAwardPeriods(): void {
     this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
@@ -256,8 +259,11 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   editSource(i: number): void {
+    this.isPercentSelected();
     this.locked = false;
     const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
+    this.lineItem = this.getLineItem(edit).filter(dp => !!dp.grantAward);
+    this.setDisplay(this.lineItem);
     if (this.percentCutUsed && Number(edit.fundingSourceId) !== Number(this.percentCutSourceId)) {
       this.logger.warn('Percent cut already used and not by me.');
       this.locked = true;
@@ -266,10 +272,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     } else if (this.percentCutUsed && Number(edit.fundingSourceId) === Number(this.percentCutSourceId)) {
       this.showPercent = true;
       this.showDollar = false;
-    }
 
+    }
     this.editing = i;
-    this.lineItem = this.getLineItem(edit).filter(dp => !!dp.grantAward);
     this.logger.debug(this.lineItem, this.lineItem?.length);
     if (this.isPayType4) {
       this._recommendedFutureYears = this.lineItem?.length - 1;
@@ -278,6 +283,22 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.next(this.lineItem[0].fundingSource.fundingSourceId);
     // @ts-ignore
     $('#add-fsource-modal').modal('show');
+  }
+
+  private setDisplay(lineItem: PrcDataPoint[]): void {
+    if (lineItem?.length === 0) {
+      return;
+    }
+    const p1 = lineItem[0];
+    if (+p1.type === +PrcLineItemType.PERCENT_CUT) {
+      this.showDollar = false;
+      this.showPercent = true;
+    } else if (+p1.type === +PrcLineItemType.COST_BASIS) {
+      this.showDollar = true;
+      this.showPercent = false;
+    } else {
+      this.logger.warn(`Can't determine display type for lineItem ${lineItem}`);
+    }
   }
 
   toggleCostDisplay(value: string): void {
@@ -306,7 +327,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   deleteSource(i: number): void {
     if (confirm('Are you sure you want to delete this row?')) {
       this.editing = undefined;
-      const saved = this.requestModel.requestDto.frqId ? true : false;
+      const saved = !!this.requestModel.requestDto.frqId;
       const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i, saved);
       this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed);
       this.logger.debug(removed, this.percentCutSourceId);
@@ -317,16 +338,19 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
         this.requestModel.programRecommendedCostsModel.padJaggedLineItems();
       }
     }
+    this.isPercentSelected();
+
   }
 
   deleteSourceUnchecked(i: number): void {
-    const saved = this.requestModel.requestDto.frqId ? true : false;
+    const saved = !!this.requestModel.requestDto.frqId;
     const removed = this.requestModel.programRecommendedCostsModel.deleteFundingSourceByIndex(i, saved);
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.next(removed);
   }
 
   prepareLineItem(): void {
-    this.logger.debug('prepareLineItem()');
+    this.isPercentSelected();
+    this.logger.debug('prepareLineItem()--', this.percentCutUsed, '--', this.percentCutSourceId, '--');
     this.prcForm?.resetForm();
     this.locked = false;
     if (this.percentCutUsed) {
@@ -371,8 +395,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
   }
 
   getLineItem(f: FundingRequestFundsSrcDto): PrcDataPoint[] {
-    const tmp = this.requestModel.programRecommendedCostsModel.getLineItemsForSource(f, !this.isPayType4);
-    return tmp;
+    return this.requestModel.programRecommendedCostsModel.getLineItemsForSource(f, !this.isPayType4);
   }
 
   /**
@@ -388,7 +411,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
     this.requestModel.programRecommendedCostsModel.selectedFundingSources.forEach(s => {
       this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.next(s.fundingSourceId);
     });
-    if(this.isPayType4) {
+    if (this.isPayType4) {
       this.requestModel.programRecommendedCostsModel.padJaggedLineItems();
     }
   }
@@ -498,7 +521,20 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy {
         this.lineItem.push(tmp);
       }
     }
-
-
   }
+
+  isPercentSelected(): boolean {
+    let result = false;
+    this.requestModel.programRecommendedCostsModel?.prcLineItems?.forEach((val, key) => {
+      val.forEach(p => {
+        if (p.type === PrcLineItemType.PERCENT_CUT) {
+          this.percentCutUsed = true;
+          this.percentCutSourceId = +key;
+          result = true;
+        }
+      });
+    });
+    return result;
+  }
+
 }

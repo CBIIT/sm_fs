@@ -113,5 +113,12 @@ export class PrcDataPoint {
     this.fundingRequestId = b.frqId;
     this.recommendedDirect = b.dcRecAmt;
     this.recommendedTotal = b.tcRecAmt;
+    if (Math.round(this.percentCutTotalCalculated * 100) ===
+      Math.round(this.percentCutDirectCalculated * 100)) {
+      this.percentCut = Math.round(this.percentCutTotalCalculated * 100);
+      this.type = PrcLineItemType.PERCENT_CUT;
+    } else {
+      this.type = PrcLineItemType.COST_BASIS;
+    }
   }
 }

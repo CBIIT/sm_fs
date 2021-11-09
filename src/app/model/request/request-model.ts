@@ -295,6 +295,7 @@ export class RequestModel {
       tmp.baselineSource = this.isInitialPay() ? PrcBaselineSource.PI_REQUESTED : PrcBaselineSource.AWARDED;
       // TODO: Start here if there's an issue with %cut displays - baselines need to be set first in order to get the correct calculation
       tmp.fromBudget(b);
+      this.logger.debug('--', tmp, '--');
 
       lineItem.push(tmp);
       this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
