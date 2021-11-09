@@ -461,7 +461,7 @@ export enum FilterTypeLabels {
    FILTER_MY_FUNDING_PLAN = "My Funding Plans",
    FILTER_PAYLINE = "=My Paylines",
    FILTER_FUNDING_PLAN_UNDER_REVIEW = "My Funding Plans Under Review",
-   FILTER_FUNDING_REQUEST = "Search for Existing Requests",
+   FILTER_FUNDING_REQUEST = "Search for Individual Requests",
    FILTER_FUNDING_PLAN = "Search for Existing Plans",
    FILTER_GRANT = "Search for Existing Grants"
 }
