@@ -85,7 +85,12 @@
     </div>
     <div class="col-md-6 col-lg-6 form-group">
         <label for="id">{{(searchType === 'FR') ? 'Request ID' : 'Plan ID'}}</label>
-        <input type="text" id="id" name="id" ngModel class="form-control">
+        <input #id="ngModel" type="text" id="id" name="id" ngModel class="form-control" maxlength="9" pattern="^[0-9]*$">
+      <div
+        class="text-danger mt-1"
+        *ngIf="(id.errors?.maxlength || id.errors?.pattern) && (id.touched || (searchForm && searchForm.submitted))">
+        ID must be numeric field
+      </div>
     </div>
   </div>
   <div class="row" [hidden]="!showAdvanced || (searchType != 'FR' && searchType != 'FP')">
