@@ -5,6 +5,11 @@
        [ngClass]="{'show-advance':!showAdvanced, 'hide-advance':showAdvanced}"
        [hidden]="!(searchType === 'FR' || searchType === 'FP')"></a>
   </div>
+  <div class="col-12" >
+    <p *ngIf="searchType === 'FR'">Search by <strong>at least one</strong> of the request criteria or by both <strong>IC and Serial Number</strong>.</p>
+    <p *ngIf="searchType === 'FP'">Search by <strong>at least one</strong> of the plan criteria or by both <strong>IC and Serial Number</strong>.</p>
+    <p *ngIf="searchType === 'G'">Search by <strong>at least one</strong> of the grant criteria or by both <strong>IC and Serial Number</strong>.</p>
+  </div>
 </div>
 <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
   <div class="row form-group">
@@ -161,7 +166,12 @@
   <div class="row form-group">
     <div class="col-lg-12 d-flex justify-content-end align-items-end">
       <button type="button" class="btn btn-outline-secondary mr-2" (click)="clear()">Reset</button>
-      <button type="submit" class="btn btn-primary">Search</button>
+      <button type="submit" class="btn btn-primary" *ngIf="validFilter(); else searchDisabled">Search</button>
+      <ng-template #searchDisabled>
+            <span ngbTooltip="Missing required search criteria">
+                <button type="submit" class="btn btn-primary" disabled>Search</button>
+            </span>
+      </ng-template>
     </div>
   </div>
 </form>
