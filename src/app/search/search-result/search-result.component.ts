@@ -237,10 +237,10 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {title: 'Plan ID', data: 'fprId'}, // 2
         {title: 'Plan Name', data: 'planName'}, // 3
         {title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: ( data, type, row, meta ) => {
-            return (!data || data == null) ? '' : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + data + '</a>';
+            return (!data || data == null) ? '' : (type === 'export') ? data : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + data + '</a>';
           }}, // 4
         {title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: ( data, type, row, meta ) => { //TODO
-            return (!data || data == null) ? '' : '<a href="mailto:' + row.requestingDocApprvlEmail + '?subject=' + row.planName + ' - ' + row.requestingDocApprvlFullName + '">' + data + '</a>';
+            return (!data || data == null) ? '' : (type === 'export') ? data : '<a href="mailto:' + row.requestingDocApprvlEmail + '?subject=' + row.planName + ' - ' + row.requestingDocApprvlFullName + '">' + data + '</a>';
           }}, // 5
         {title: 'Final LOA', data: 'loaName'}, // 6
         {title: 'Funding Approvals', data: 'fundsCertificationCode'}, // 7
@@ -282,18 +282,53 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {responsivePriority: 13, targets: 8 } // program recomm. Direct Costs
       ],
       dom: '<"dt-controls dt-top"l<"ml-4"i><"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
-      buttons: [
-        {
-          extend: 'excel',
-          className: 'btn-excel',
-          titleAttr: 'Excel export',
-          text: 'Export',
-          filename: 'fs-funding-requests-search-result',
-          title: null,
-          header: true,
-          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] } //TODO
-        }
-      ],
+      buttons: {
+        buttons: [
+          {
+            extend: 'excelHtml5',
+            className: 'btn-excel',
+            titleAttr: 'Excel export',
+            text: 'Export',
+            filename: 'fs-funding-requests-search-result',
+            title: null,
+            header: true,
+            exportOptions: {
+              columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+              orthogonal: 'export',
+              customizeData: (d) => {
+                this.logger.debug('customizeData:', d);
+                d.header[0] = 'FOA';
+                // Replace header "FOA information" with multiple columns
+                d.header.splice(1, 0, 'FOA Title', 'NCAB Date(s)', 'Issue Type');
+                for (let i = 0, size = d.body.length; i < size; i++) {
+                  let foas = d.body[i][0];
+                  if (foas.length > 0) {
+                    let foa = foas[0];
+                    d.body[i].splice(0, 1, foa.rfaPaNumber, foa.title, foa.councilMeetingDateList.replace(/,/g, ', '), foa.issueType);
+                    // insert additional rows if needed
+                    if (foas.length > 1) {
+                      for (let r = 1; r < foas.length; r++) {
+                        const row = [d.body[i].length];
+                        foa = foas[r];
+                        row[0] = foa.rfaPaNumber;
+                        row[1] = foa.title;
+                        row[2] = foa.councilMeetingDateList.replace(/,/g, ', ');
+                        row[3] = foa.issueType;
+                        d.body.splice(i + 1, 0, row);
+                        i++;
+                        size++;
+                      }
+                    }
+                  }
+                  else {
+                    d.body[i].splice(1, 0, '', '', '');
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
       rowCallback: (row: Node, data: any[] | object, index: number) => {
         // Fix for Excel output - I removed empty renderers in column definitions
         // But now, I have to remove the first "text" child node to prevent it
