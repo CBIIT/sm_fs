@@ -37,12 +37,10 @@ export class PrcDataPoint {
   baselineDirect: number;
   baselineTotal: number;
   private _recommendedDirect: number;
-  private _recommendedDirectDisplay: string;
   private _recommendedTotal: number;
-  private _recommendedTotalDisplay: string;
   percentCutDirectCalculated = 0.0;
   percentCutTotalCalculated = 0.0;
-  private _percentCut: number;
+  _percentCut: number;
   fundingSource: FundingRequestFundsSrcDto;
   grantAward: GrantAwardedDto;
   type: PrcLineItemType;
@@ -117,7 +115,7 @@ export class PrcDataPoint {
 
   set percentCut(value: number) {
     this._percentCut = value;
-    if (isNumeric(value)) {
+    if (value && !isNaN(value)) {
       value = value / 100;
       this._recommendedDirect = Math.round((1 - value) * this.baselineDirect);
       this._recommendedTotal = Math.round((1 - value) * this.baselineTotal);
@@ -150,7 +148,7 @@ export class PrcDataPoint {
     this.recommendedTotal = b.tcRecAmt;
     if (Math.round(this.percentCutTotalCalculated * 100) ===
       Math.round(this.percentCutDirectCalculated * 100)) {
-      this.percentCut = Math.round(this.percentCutTotalCalculated * 100);
+      this._percentCut = Math.round(this.percentCutTotalCalculated * 100);
       this.type = PrcLineItemType.PERCENT_CUT;
     } else {
       this.type = PrcLineItemType.COST_BASIS;

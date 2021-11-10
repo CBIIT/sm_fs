@@ -299,7 +299,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       x.fundingRequestId = p.fundingRequestId;
       x.recommendedDirect = p.recommendedDirect;
       x.recommendedTotal = p.recommendedTotal;
-      x.percentCut = p.percentCut;
+      x._percentCut = p.percentCut;
       x.grantAward = p.grantAward;
       result.push(x);
     });
