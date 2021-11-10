@@ -157,6 +157,7 @@ import { CurrencyTogglePipe } from './pipes/currency-toggle.pipe';
 import { SearchGrantExistInPaylistCellRendererComponent } from './search/search-result/search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component';
 import { FpWorkflowWarningModalComponent } from './funding-plan/fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
 import { TimeoutInterceptor } from './interceptors/timeout.interceptor';
+import { ErrorComponent } from './error/error/error.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -322,6 +323,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     GrantFundedOnceValidatorDirective,
     CurrencyTogglePipe,
     SearchGrantExistInPaylistCellRendererComponent,
+    ErrorComponent,
   ],
 
 

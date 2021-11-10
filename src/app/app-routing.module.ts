@@ -24,6 +24,7 @@ import { RetrievePlanComponent } from './funding-plan/retrieve-plan/retrieve-pla
 import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate-plan-step6';
 import { CanDeactivateRequestStep2 } from './funding-request/step2/can-deactivate-request-step2';
 import { CanDeactivatePlanStep3 } from './funding-plan/plan-step3/can-deactivate-plan-step3';
+import { ErrorComponent } from './error/error/error.component';
 
 const routes: Routes = [
   {
@@ -56,7 +57,8 @@ const routes: Routes = [
         {path: 'retrieve/:frqId', component: RetrieveRequestComponent}
       ]},
       {path: 'fundingSourceDetails', component: FundingSourcesNamesComponent},
-      {path: 'manage', component: ManageDesignationsComponent}
+      {path: 'manage', component: ManageDesignationsComponent},
+      {path: 'error', component: ErrorComponent}
     ]
   },
   { path: 'unauthorize', component: UnauthorizeComponent }
