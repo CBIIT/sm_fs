@@ -69,15 +69,15 @@
               <span *ngIf="isRestoration(); then restoration else not_restoration"></span>
               <ng-template #restoration>
                 <div *ngIf="first" class="form-row">
-                  <div class="col-2-weight-bold">Direct</div>
+                  <div class="col-6 font-weight-bold">Direct</div>
                 </div>
                 <div *ngIf="first" class="form-row">
-                  <div class="col-2-weight-bold">Total</div>
+                  <div class="col-6 font-weight-bold">Total</div>
                 </div>
                 <span *ngIf="last; then isLast else notLast"></span>
                 <ng-template #isLast>
                   <div class="form-row">
-                    <div class="col-2-weight-bold"></div>
+                    <div class="col-2 font-weight-bold"></div>
                     <div class="col-10">{{li.recommendedDirect | currencyToggle}}</div>
                   </div>
                   <div class="form-row">
@@ -94,18 +94,18 @@
                 <span *ngIf="!initialPay; then a else b"></span>
                 <ng-template #a>
                   <div class="form-row">
-                    <div class="col-2-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                    <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
                     <ng-template #notFirst>
-                      <div class="col-2-weight-bold"></div>
+                      <div class="col-2 font-weight-bold"></div>
                     </ng-template>
                     <div class="col-10">{{li.recommendedDirect | currencyToggle}}</div>
                   </div>
                 </ng-template>
                 <ng-template #b>
                   <div class="form-row">
-                    <div class="col-2-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                    <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
                     <ng-template #notFirst>
-                      <div class="col-2-weight-bold"></div>
+                      <div class="col-2 font-weight-bold"></div>
                     </ng-template>
                     <div class="col-10" *ngIf="first; else not">{{li.recommendedDirect | currencyToggle}}
                       {{ li.percentCutDirectCalculated | percentCut:true}}
@@ -118,13 +118,13 @@
                 <span *ngIf="!initialPay; then c else d"></span>
                 <ng-template #c>
                   <div class="form-row" *ngIf="first">
-                    <div class="col-2-weight-bold">Total</div>
+                    <div class="col-6 font-weight-bold">Total</div>
                     <div class="col-10">{{li.recommendedTotal | currencyToggle}}</div>
                   </div>
                 </ng-template>
                 <ng-template #d>
                   <div class="form-row" *ngIf="first">
-                    <div class="col-2-weight-bold">Total</div>
+                    <div class="col-6 font-weight-bold">Total</div>
                     <div class="col-10">{{li.recommendedTotal | currencyToggle}}
                       {{ li.percentCutTotalCalculated | percentCut:true }}
                     </div>
@@ -138,18 +138,18 @@
             <td><span class="like-label">Recommended Costs</span></td>
             <td *ngFor="let li of summaryRow; let i = index; let first = first;">
               <div class="form-row">
-                <div class="col-2-weight-bold" *ngIf="first; else noDollar">
+                <div class="col-6 font-weight-bold" *ngIf="first; else noDollar">
                   Direct ($)
                 </div>
                 <ng-template #noDollar>
-                  <div class="col-2-weight-bold">
+                  <div class="col-6 font-weight-bold">
                     Direct
                   </div>
                 </ng-template>
                 <div class="col-10">{{grandTotalDirect(i) | currencyToggle}}</div>
               </div>
               <div class="form-row" *ngIf="first">
-                <div class="col-2-weight-bold">
+                <div class="col-6 font-weight-bold">
                   Total ($)
                 </div>
                 <div class="col-10">{{grandTotal(i) | currencyToggle}}</div>
@@ -207,18 +207,18 @@
               <ng-container *ngIf="!initialPay; then a else b"></ng-container>
               <ng-template #a>
                 <div class="form-row">
-                  <div class="col-2-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                  <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
                   <ng-template #notFirst>
-                    <div class="col-2-weight-bold"></div>
+                    <div class="col-2 font-weight-bold"></div>
                   </ng-template>
                   <div class="col-10">{{li.recommendedDirect | currencyToggle}}</div>
                 </div>
               </ng-template>
               <ng-template #b>
                 <div class="form-row">
-                  <div class="col-2-weight-bold" *ngIf="first; else notFirst">Direct</div>
+                  <div class="col-6 font-weight-bold" *ngIf="first; else notFirst">Direct</div>
                   <ng-template #notFirst>
-                    <div class="col-2-weight-bold"></div>
+                    <div class="col-2 font-weight-bold"></div>
                   </ng-template>
                   <div class="col-10" *ngIf="first; else not">{{li.recommendedDirect | currencyToggle}}
                     {{ li.percentCutDirectCalculated | percentCut:true}}
@@ -232,17 +232,17 @@
               <ng-container *ngIf="!initialPay; then c else d"></ng-container>
               <ng-template #c>
                 <div class="form-row" *ngIf="first">
-                  <div class="col-2-weight-bold">Total</div>
+                  <div class="col-6 font-weight-bold">Total</div>
                   <div class="col-10">{{li.recommendedTotal | currencyToggle}}</div>
                 </div>
                 <div class="form-row" *ngIf="last && isRestoration()">
-                  <div class="col-2-weight-bold"></div>
+                  <div class="col-2 font-weight-bold"></div>
                   <div class="col-10">{{li.recommendedTotal | currencyToggle}}</div>
                 </div>
               </ng-template>
               <ng-template #d>
                 <div class="form-row" *ngIf="first">
-                  <div class="col-2-weight-bold">Total</div>
+                  <div class="col-6 font-weight-bold">Total</div>
                   <div class="col-10">{{li.recommendedTotal | currencyToggle}}
                     {{ li.percentCutTotalCalculated | percentCut:true }}
                   </div>
@@ -257,18 +257,18 @@
             <td><span class="like-label">Recommended Costs</span></td>
             <td *ngFor="let li of summaryRow; let i = index; let first = first;">
               <div class="form-row">
-                <div class="col-2-weight-bold" *ngIf="first; else noDollar">
+                <div class="col-6 font-weight-bold" *ngIf="first; else noDollar">
                   Direct ($)
                 </div>
                 <ng-template #noDollar>
-                  <div class="col-2-weight-bold">
+                  <div class="col-6 font-weight-bold">
                     Direct
                   </div>
                 </ng-template>
                 <div class="col-10">{{grandTotalDirect(i) | currencyToggle}}</div>
               </div>
               <div class="form-row" *ngIf="first">
-                <div class="col-2-weight-bold">
+                <div class="col-6 font font-weight-bold">
                   Total ($)
                 </div>
                 <div class="col-10">{{grandTotal(i) | currencyToggle}}</div>
