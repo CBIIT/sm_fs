@@ -153,7 +153,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {title: 'Last Action Date', data: 'requestStatusDate'}, // 15
         {
           title: 'Action', data: null, defaultContent: 'Select'
-          ,ngTemplateRef: { ref: this.searchFundingRequestActionRenderer}, className: 'all'
+          ,ngTemplateRef: { ref: this.searchFundingRequestActionRenderer}, className: 'all', orderable: false
         }, // 16
         {data: null, defaultContent: ''}
 
@@ -257,7 +257,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {title: 'Last Action Date', data: 'planStatusDate'}, // 11
         {
           title: 'Action', data: null, defaultContent: 'Select'
-          ,ngTemplateRef: { ref: this.searchFundingPlanActionRenderer}, className: 'all'
+          ,ngTemplateRef: { ref: this.searchFundingPlanActionRenderer}, className: 'all', orderable: false
         }, // 12
         {data: null, defaultContent: ''}
 
