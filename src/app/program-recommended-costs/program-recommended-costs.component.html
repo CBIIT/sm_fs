@@ -86,7 +86,7 @@
                   </div>
                 </ng-template>
                 <ng-template #notLast>
-                  <div *ngIf="!first" class = "force-text-center">---</div>
+                  <div *ngIf="!first" class="force-text-center">---</div>
                 </ng-template>
               </ng-template>
 
@@ -447,6 +447,8 @@
                           </div>
                           <div class="col-sm-auto">
                             <input
+                              (focus)="clearFormatting(recommendedDirect)"
+                              (blur)="format(recommendedDirect)"
                               type="text"
                               class="form-control funds-input"
                               name="recommendedDirect"
@@ -483,6 +485,8 @@
                           </div>
                           <div class="col-sm-auto">
                             <input
+                              (focus)="clearFormatting(recommendedTotal)"
+                              (blur)="format(recommendedTotal)"
                               type="text"
                               class="form-control funds-input"
                               name="recommendedTotal"
@@ -551,6 +555,8 @@
                           </div>
                           <div class="col-sm-auto">
                             <input
+                              (focus)="clearFormatting(recommendedDirect)"
+                              (blur)="format(recommendedDirect)"
                               type="text"
                               class="form-control funds-input"
                               name="recommendedDirect"
@@ -590,6 +596,8 @@
                           </div>
                           <div class="col-sm-auto">
                             <input
+                              (focus)="clearFormatting(recommendedTotal)"
+                              (blur)="format(recommendedTotal)"
                               type="text"
                               class="form-control funds-input"
                               name="recommendedTotal"
@@ -640,16 +648,19 @@
                       </div>
                       <ng-template #notFirst>
                         <div class="d-flex">
-                          <input type="text"
-                                 class="form-control funds-input ml-auto"
-                                 id="tc-dollar3"
-                                 name="recommendedDirect[{{i}}]"
-                                 #recommendedDirectX="ngModel"
-                                 aria-label="direct cost"
-                                 [(ngModel)]="li.recommendedDirect"
-                                 aria-describedby="tc-dollar-percent"
-                                 [appMinMaxValidator]="{min: 0, max: 999999999}"
-                                 pattern="[0-9]*">
+                          <input
+                            (focus)="clearFormatting(recommendedDirectX)"
+                            (blur)="format(recommendedDirectX)"
+                            type="text"
+                            class="form-control funds-input ml-auto"
+                            id="tc-dollar3"
+                            name="recommendedDirect[{{i}}]"
+                            #recommendedDirectX="ngModel"
+                            aria-label="direct cost"
+                            [(ngModel)]="li.recommendedDirect"
+                            aria-describedby="tc-dollar-percent"
+                            [appMinMaxValidator]="{min: 0, max: 999999999}"
+                            pattern="[0-9]*">
                         </div>
                         <div
                           class="text-danger mt-1"
@@ -755,15 +766,18 @@
                       </div>
                       <ng-template #notFirst>
                         <div class="col-sm-auto">
-                          <input type="text"
-                                 class="form-control funds-input"
-                                 id="tc-dollar"
-                                 name="recommendedDirect[{{i}}]"
-                                 #recommendedDirectX="ngModel"
-                                 [(ngModel)]="li.recommendedDirect"
-                                 aria-describedby="tc-dollar-percent"
-                                 pattern="[0-9]*"
-                                 [appMinMaxValidator]="{min: 0, max: 999999999}">
+                          <input
+                            (focus)="clearFormatting(recommendedDirectX)"
+                            (blur)="format(recommendedDirectX)"
+                            type="text"
+                            class="form-control funds-input"
+                            id="tc-dollar"
+                            name="recommendedDirect[{{i}}]"
+                            #recommendedDirectX="ngModel"
+                            [(ngModel)]="li.recommendedDirect"
+                            aria-describedby="tc-dollar-percent"
+                            pattern="[0-9]*"
+                            [appMinMaxValidator]="{min: 0, max: 999999999}">
                         </div>
                         <div
                           class="text-danger mt-1"
@@ -820,6 +834,8 @@
                           </div>
                           <div class="col-sm-auto">
                             <input
+                              (focus)="clearFormatting(recommendedDirect)"
+                              (blur)="format(recommendedDirect)"
                               type="text"
                               class="form-control funds-input"
                               name="recommendedDirect"
@@ -859,6 +875,8 @@
                           </div>
                           <div class="col-sm-auto">
                             <input
+                              (focus)="clearFormatting(recommendedTotal)"
+                              (blur)="format(recommendedTotal)"
                               type="text"
                               class="form-control funds-input"
                               name="recommendedTotal"
@@ -909,16 +927,19 @@
                       </div>
                       <ng-template #notFirst>
                         <div class="d-flex">
-                          <input type="text"
-                                 class="form-control funds-input ml-auto"
-                                 id="tc-dollar3"
-                                 name="recommendedDirect[{{i}}]"
-                                 #recommendedDirectX="ngModel"
-                                 aria-label="direct cost"
-                                 [(ngModel)]="li.recommendedDirect"
-                                 aria-describedby="tc-dollar-percent"
-                                 [appMinMaxValidator]="{min: 0, max: 999999999}"
-                                 pattern="[0-9]*">
+                          <input
+                            (focus)="clearFormatting(recommendedDirectX)"
+                            (blur)="format(recommendedDirectX)"
+                            type="text"
+                            class="form-control funds-input ml-auto"
+                            id="tc-dollar3"
+                            name="recommendedDirect[{{i}}]"
+                            #recommendedDirectX="ngModel"
+                            aria-label="direct cost"
+                            [(ngModel)]="li.recommendedDirect"
+                            aria-describedby="tc-dollar-percent"
+                            [appMinMaxValidator]="{min: 0, max: 999999999}"
+                            pattern="[0-9]*">
                         </div>
                         <div
                           class="text-danger mt-1"
