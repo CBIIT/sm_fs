@@ -12572,7 +12572,6 @@ pre code {
   display: flex;
   flex-wrap: wrap;
   margin-right: -15px;
-  margin-left: -15px;
 }
 
 /* line 34, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_grid.scss */
@@ -25800,4 +25799,9 @@ button.btn.brn-primary.add-margin{
 .tdlabel{
   margin-left: -10px;
   margin-top: -20px;
+}
+
+.text-danger-wrap{
+  margin-top: -12px !important;
+  margin-bottom: 16px;
 }
