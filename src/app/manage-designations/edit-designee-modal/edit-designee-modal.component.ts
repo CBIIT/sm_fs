@@ -3,6 +3,7 @@ import {NgbActiveModal, NgbCalendar, NgbDate, NgbDateAdapter, NgbDateParserForma
 import {NgForm} from "@angular/forms";
 import {FundingRequestPermDelDto} from "@nci-cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
 import {DatepickerAdapter, DatepickerFormatter} from "../../datepicker/datepicker-adapter-formatter";
+import { DatePipe } from '@angular/common'
 
 @Component({
   selector: 'app-edit-designee-modal',
@@ -22,9 +23,10 @@ export class EditDesigneeModalComponent implements OnInit, AfterViewInit {
   minDate: NgbDate = this.calendar.getToday();
   startDateReadOnly: boolean = false;
   enableSave : boolean = false;
-
+ 
   constructor(public modal: NgbActiveModal,
-              private calendar: NgbCalendar) { }
+              private calendar: NgbCalendar,
+              private datePipe : DatePipe) { }
 
   ngOnInit(): void {
     if (!this.data.delegateFrom) {
@@ -43,12 +45,16 @@ export class EditDesigneeModalComponent implements OnInit, AfterViewInit {
   }
 
   checkValueChanged(){
-    const selectedStartDate = this.editForm.value['startDate'];
-    const selectedEndDate = this.editForm.value['endDate'];
-    if(selectedStartDate && selectedStartDate.length>0 && !(selectedStartDate === this.data.delegateFromDate)){
+   
+    const selectedStartDate =this.datePipe.transform(this.editForm.value['startDate'], 'yyyy-MM-dd');
+    const selectedEndDate  =this.datePipe.transform(this.editForm.value['endDate'], 'yyyy-MM-dd');
+
+    if(selectedStartDate && selectedStartDate.length>0
+      && !(selectedStartDate ===this.datePipe.transform(this.data.delegateFromDate, 'yyyy-MM-dd'))){
      this.enableSave = true;
     }
-    else if(selectedEndDate && selectedEndDate.length>0 && !(selectedEndDate === this.data.delegateToDate)){
+    else if(selectedEndDate && selectedEndDate.length>0
+      && !(selectedEndDate ===this.datePipe.transform( this.data.delegateToDate,'yyyy-MM-dd'))){
       this.enableSave = true;
     }else{
       this.enableSave=false;
