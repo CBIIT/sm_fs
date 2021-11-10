@@ -30,9 +30,9 @@ export class SupportingDocsReadonlyComponent implements OnInit {
   justificationType = '';
   justificationText = '';
   docDtos: DocumentsDto[];
-    displayTansitionMemo: boolean = false;
+  displayTansitionMemo: boolean = false;
   isSummaryIncluded = false;
-  
+
   constructor(private documentService: DocumentService,
     private logger: NGXLogger,
     private modalService: NgbModal,
@@ -112,10 +112,13 @@ export class SupportingDocsReadonlyComponent implements OnInit {
   downloadSummaryStatement(): void {
     this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId)
       .subscribe(
-        blob => saveAs(blob, 'Summary Statement.pdf'),
-        _error => this.logger.error('Error downloading the file'),
-        () => this.logger.debug('File downloaded successfully')
-      );
+        (response: HttpResponse<Blob>) => {
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          saveAs(blob, 'Summary Statement.pdf');
+        }
+      ), error =>
+        this.logger.error('Error downloading the summary statement'),
+      () => this.logger.info('File downloaded successfully');
   }
 
 }
