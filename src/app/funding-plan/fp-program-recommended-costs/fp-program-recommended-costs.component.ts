@@ -38,6 +38,40 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     private logger: NGXLogger) {
   }
 
+  set directCostDisplay(value: string) {
+    this.directCost = null;
+    if(value) {
+      value = value.replace(/\,/g, '');
+      if (value) {
+        this.directCost = Number(value);
+      }
+    }
+  }
+
+  get directCostDisplay(): string {
+    if (this.directCost) {
+      return this.directCost.toLocaleString();
+    }
+    return null;
+  }
+
+  set totalCostDisplay(value: string) {
+    this.totalCost = null;
+    if(value) {
+      value = value.replace(/\,/g, '');
+      if (value) {
+        this.totalCost = Number(value);
+      }
+    }
+  }
+
+  get totalCostDisplay(): string {
+    if(this.totalCost) {
+      return this.totalCost.toLocaleString();
+    }
+    return null;
+  }
+
   ngOnInit(): void {
     // TODO: get this from the grant?
     this.planManagementService.grantInfoCostEmitter.subscribe(next => {

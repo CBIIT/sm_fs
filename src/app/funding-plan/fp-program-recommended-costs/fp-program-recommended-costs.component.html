@@ -50,7 +50,7 @@
             (change)="recalculate()"
             [name]="'directCost'"
             #dcInput="ngModel"
-            [(ngModel)]="directCost"
+            [(ngModel)]="directCostDisplay"
             [required]="required">
         </div>
       </div>
@@ -67,7 +67,7 @@
             [name]="'totalCost'"
             #tcInput="ngModel"
             (change)="recalculate()"
-            [(ngModel)]="totalCost"
+            [(ngModel)]="totalCostDisplay"
             [required]="required">
         </div>
       </div>
