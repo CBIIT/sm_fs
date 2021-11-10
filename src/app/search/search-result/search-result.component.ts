@@ -29,6 +29,7 @@ import {SearchGrantExistInPlanCellRendererComponent} from "./search-grant-exist-
 import {DatatableThrottle} from "../../utils/datatable-throttle";
 import {SearchGrantExistInPaylistCellRendererComponent} from "./search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component";
 import {AppUserSessionService} from "../../service/app-user-session.service";
+import {CurrencyPipe} from "@angular/common";
 
 class DataTablesResponse {
   data: any[];
@@ -99,6 +100,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   throttle: DatatableThrottle = new DatatableThrottle();
   // batchApproveVisible = false;
+
+  currencyTransformer: CurrencyPipe = new CurrencyPipe('en-US');
 
   ngOnInit(): void {
     this.canOpenPaylist = this.userService.hasRole('GMBRCHF') ||
@@ -244,8 +247,12 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           }}, // 5
         {title: 'Final LOA', data: 'loaName'}, // 6
         {title: 'Funding Approvals', data: 'fundsCertificationCode'}, // 7
-        {title: 'Program Recomm. Direct Costs', data: 'directRecommendedAmt'}, // 8  //TODO
-        {title: 'Program Recomm. Total Costs', data: 'totalRecommendedAmt'}, // 9
+        {title: 'Program Recomm. Direct Costs', data: 'directRecommendedAmt', render: ( data, type, row, meta ) => {
+            return (!data || data == null) ? '' : this.currencyTransformer.transform(data);
+          }}, // 8
+        {title: 'Program Recomm. Total Costs', data: 'totalRecommendedAmt', render: ( data, type, row, meta ) => {
+            return (!data || data == null) ? '' : this.currencyTransformer.transform(data);
+          }}, // 9
         {title: 'Status', data: 'currentStatusDescrip'}, // 10
         {title: 'Last Action Date', data: 'planStatusDate'}, // 11
         {
