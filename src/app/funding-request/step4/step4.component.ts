@@ -429,7 +429,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   hideWorkflow(): boolean {
-    return this.requestStatus === RequestStatus.REJECTED;
+    return this.requestStatus === RequestStatus.REJECTED || this.requestStatus === RequestStatus.CANCELLED;
   }
 
   goToWorkflow(): void {

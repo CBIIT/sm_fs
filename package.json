@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start-fs": "ng serve --base-href /fs/",
     "start-no-reload": "ng serve --no-live-reload",
     "build": "ng build",
     "test": "ng test",

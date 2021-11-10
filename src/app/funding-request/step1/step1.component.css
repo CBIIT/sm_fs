@@ -31,3 +31,7 @@ a.hide-advance:after {
     color: #0076a8;
     margin-left: .2rem;
 }
+
+::ng-deep .select2-container .selection .select2-selection {
+  min-width: 100px !important;
+}
