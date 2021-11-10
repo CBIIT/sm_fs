@@ -558,22 +558,4 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     });
     return result;
   }
-
-  clearFormatting(value: any): any {
-    this.logger.debug(`clearFormatting(${value.val})`);
-    if (!value.val) {
-      return null;
-    }
-    const n = String(value.val).replace(/\,/g, '');
-
-    value.val = n;
-    return n;
-  }
-
-  format(value: any): any {
-    this.logger.debug(`format(${value.val}) === ${(+value.val).toLocaleString()}`);
-    value.val = (+value.val).toLocaleString();
-    return (+value.val).toLocaleString();
-  }
-
 }

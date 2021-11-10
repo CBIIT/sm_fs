@@ -37,7 +37,9 @@ export class PrcDataPoint {
   baselineDirect: number;
   baselineTotal: number;
   private _recommendedDirect: number;
+  private _recommendedDirectDisplay: string;
   private _recommendedTotal: number;
+  private _recommendedTotalDisplay: string;
   percentCutDirectCalculated = 0.0;
   percentCutTotalCalculated = 0.0;
   private _percentCut: number;
@@ -75,6 +77,39 @@ export class PrcDataPoint {
       this.percentCutTotalCalculated = 1 - (value / this.baselineTotal);
     }
   }
+
+  get recommendedDirectDisplay(): string {
+    if (this._recommendedDirect) {
+      return Number(this._recommendedDirect).toLocaleString();
+    }
+    return null;
+  }
+
+  set recommendedDirectDisplay(value: string) {
+    this.recommendedDirect = null;
+    if (value) {
+      value = value.replace(/\,/g, '');
+      if (value) {
+        this.recommendedDirect = Number(value);
+      }
+    }
+  }
+
+  get recommendedTotalDisplay(): string {
+    if (this._recommendedTotal) {
+      return Number(this._recommendedTotal).toLocaleString();
+    }
+    return null;
+  }
+
+  set recommendedTotalDisplay(value: string) {
+    this.recommendedTotal = null;
+    if (value) {
+      value = value.replace(/\,/g, '');
+      if (value) {
+        this.recommendedTotal = Number(value);
+      }
+    }  }
 
   get percentCut(): number {
     return this._percentCut;
