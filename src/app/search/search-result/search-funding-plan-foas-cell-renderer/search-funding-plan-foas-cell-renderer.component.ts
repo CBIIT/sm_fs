@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {convertNcabs} from "../../../utils/utils";
 
 @Component({
   selector: 'app-search-funding-plan-foas-cell-renderer',
@@ -15,4 +16,7 @@ export class SearchFundingPlanFoasCellRendererComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  convert(ncabs: string ): string {
+    return convertNcabs(ncabs);
+  }
 }
