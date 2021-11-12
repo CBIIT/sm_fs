@@ -18,11 +18,14 @@ export const fundingSourceCostValidator: ValidatorFn = (control: AbstractControl
   const recommendedDirect = control.get('recommendedDirect');
   const recommendedTotal = control.get('recommendedTotal');
 
-  if (!recommendedDirect || !recommendedTotal || !isReallyANumber(recommendedDirect.value) || !isReallyANumber(recommendedTotal.value)) {
+  let recommendedDirectVal = recommendedDirect?.value?.replace(/\,/g, '');
+  let recommendedTotalVal = recommendedTotal?.value?.replace(/\,/g, '');
+
+  if (!recommendedDirect || !recommendedTotal || !isReallyANumber(recommendedDirectVal) || !isReallyANumber(recommendedTotalVal)) {
     return null;
   }
 
-  if (Number(recommendedTotal.value) < Number(recommendedDirect.value)) {
+  if (Number(recommendedTotalVal) < Number(recommendedDirectVal)) {
     return {totalCostLessThanDirectCost: true};
   }
 
