@@ -30,6 +30,7 @@ import {DatatableThrottle} from "../../utils/datatable-throttle";
 import {SearchGrantExistInPaylistCellRendererComponent} from "./search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component";
 import {AppUserSessionService} from "../../service/app-user-session.service";
 import {CurrencyPipe} from "@angular/common";
+import {convertNcabs} from "../../utils/utils";
 
 class DataTablesResponse {
   data: any[];
@@ -311,7 +312,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
                   let foas = d.body[i][0];
                   if (foas.length > 0) {
                     let foa = foas[0];
-                    d.body[i].splice(0, 1, foa.rfaPaNumber, foa.title, foa.councilMeetingDateList.replace(/,/g, ', '), foa.issueType);
+                    d.body[i].splice(0, 1, foa.rfaPaNumber, foa.title, convertNcabs(foa.councilMeetingDateList), foa.issueType);
                     // insert additional rows if needed
                     if (foas.length > 1) {
                       for (let r = 1; r < foas.length; r++) {

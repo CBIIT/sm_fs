@@ -43,3 +43,31 @@ export function isReallyANumber(x: any): boolean {
   //
   // return String(x).match(regex) !== null;
 }
+
+// Convert string like 'YYYYMM,YYYYMM ..." to 'MM/YYYY, MM/YYYY ..."
+export function convertNcabs(ncabs: string) : string {
+
+  function _convertNcab(ncab: string) {
+    if (ncab && ncab.length === 6) {
+      ncab = ncab.substr(4,2) + '/' + ncab.substr(0,4);
+    }
+    return ncab;
+  }
+
+  if (ncabs && ncabs.length > 0) {
+    const lst = ncabs.split(',');
+    let ret ;
+    for (const ncab of lst) {
+      if (ret) {
+        ret += ', ' + _convertNcab(ncab);
+      }
+      else { ret = _convertNcab(ncab); }
+    }
+    return ret;
+  }
+  return ncabs;
+}
+
+// private _convertNcab(ncab) : string {
+// }
+
