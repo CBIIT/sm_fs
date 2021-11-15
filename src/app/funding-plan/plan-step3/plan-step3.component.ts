@@ -98,14 +98,16 @@ export class PlanStep3Component implements OnInit {
 
   onSubmit($event: any): void {
     this.alerts = null;
-    // this.logger.debug($event);
-    // this.logger.debug(this.step3form);
 
     if (this.step3form.valid && this.planManagementService.unfundedGrants().length === 0) {
 
       this.scrapePlanData();
       if (this.planManagementService.selectedSourceCount <= 1) {
         this.buildPlanModel();
+      } else {
+        this.logger.info('double checking total and direct recommended amounts');
+        this.planModel.fundingPlanDto.totalRecommendedAmt = this.planManagementService.grandTotalTotal();
+        this.planModel.fundingPlanDto.directRecommendedAmt = this.planManagementService.grandTotalDirect();
       }
       const year1 = this.planModel.fundingPlanDto.pubYr1SetAsideAmt;
       // TODO: Make sure totalRec is correct for multiple sources
@@ -132,7 +134,7 @@ export class PlanStep3Component implements OnInit {
 
   private saveFundingPlan(): void {
     this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
-      this.logger.debug('Saved plan model: ', JSON.stringify(result));
+      this.logger.debug('before save: ', JSON.stringify(result));
       this.planModel.fundingPlanDto = result;
       this.planManagementService.buildPlanBudgetAndCanModel();
       this.planManagementService.buildGrantCostModel();

@@ -12,11 +12,10 @@ export class TimeoutInterceptor implements HttpInterceptor {
     private timeoutService: TimeoutService,
     private logger: NGXLogger,
     private router: Router) {
-
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    this.logger.debug(req, next);
+    // this.logger.debug(req, next);
     return next.handle(req).pipe(
       catchError((error, caught) => {
         // TODO: don't log errors to the log url... :)
@@ -27,3 +26,4 @@ export class TimeoutInterceptor implements HttpInterceptor {
     );
   }
 }
+ 
