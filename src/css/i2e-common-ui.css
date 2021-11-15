@@ -25805,3 +25805,9 @@ button.btn.brn-primary.add-margin{
   margin-top: -12px !important;
   margin-bottom: 16px;
 }
+td.all.parentTable{
+  padding: 0;
+}
+.childTable {
+  border-style: hidden
+}
