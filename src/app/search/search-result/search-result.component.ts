@@ -21,7 +21,7 @@ import {Router} from "@angular/router";
 import { BatchApproveService } from '../batch-approve/batch-approve.service';
 import { BatchApproveModalComponent } from '../batch-approve/batch-approve-modal.component';
 import { FilterTypeLabels } from '../search.component';
-import { DocumentService } from 'src/app/service/document.service';
+import { DocumentService } from '../../service/document.service';
 import { saveAs } from 'file-saver';
 import { HttpResponse } from '@angular/common/http';
 import {SearchGrantExistInRequestCellRendererComponent} from "./search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component";

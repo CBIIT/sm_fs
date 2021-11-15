@@ -28,7 +28,6 @@ export class MailtoFormatterPipe implements PipeTransform {
     //    if no further arguments, use as is
     //    otherwise, interpolate those values into args 2
     if (args[2]) {
-      // for PI/PD Email Subject: Displaying Grant number - PiLastName
       if (args[2] === 'PI/PD name' && value[args[3]] && value[args[4]]) {
         subject = '?subject=' + value[args[3]] + ' - ' + value[args[4]];
       } else {

@@ -54,7 +54,7 @@ export class RequestModel {
   // "New Request " or "View Request Label"
   title = 'New Request';
 
-  // Boolean value to show th return to RequestQuery page link
+  // Boolean value to show  return to RequestQuery page link
   returnToRequestPageLink = false;
   fundingPlanId: number;
 
