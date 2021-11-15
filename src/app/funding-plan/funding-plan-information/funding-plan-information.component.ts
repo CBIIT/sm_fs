@@ -97,7 +97,6 @@ export class FundingPlanInformationComponent implements OnInit {
       this.fundingPlanFoas = [];
       this.planModel.grantsSearchCriteria.forEach(rfa => {
         this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
-          this.logger.debug('--', rfa.rfaPaNumber, '--', next, '--');
           if (next) {
             const tmp: FundingPlanFoasDto = {} as FundingPlanFoasDto;
             tmp.rfaPaNumber = next?.noticeNumber;

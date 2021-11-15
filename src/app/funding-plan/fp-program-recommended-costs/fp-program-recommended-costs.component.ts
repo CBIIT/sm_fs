@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
@@ -12,7 +12,6 @@ import { isReallyANumber } from '../../utils/utils';
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class FpProgramRecommendedCostsComponent implements OnInit {
-
   @Input() grantIndex: number;
   @Input() sourceIndex: number;
   @Input() grant: NciPfrGrantQueryDtoEx;
@@ -23,7 +22,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   baselineTotalCost: number;
   directCost: number;
   totalCost: number;
-  percentCut: number;
+  private _percentCut: number;
   directCostCalculated: number;
   totalCostCalculated: number;
   dcPercentCutCalculated: number;
@@ -38,7 +37,19 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     private logger: NGXLogger) {
   }
 
+  get percentCut(): number {
+    return this._percentCut;
+  }
+
+  set percentCut(value: number) {
+    this.parentForm.form.updateValueAndValidity();
+
+    this._percentCut = value;
+  }
+
   set directCostDisplay(value: string) {
+    this.parentForm.form.updateValueAndValidity();
+
     this.directCost = null;
     if(value) {
       value = value.replace(/\,/g, '');
@@ -56,6 +67,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   set totalCostDisplay(value: string) {
+    this.parentForm.form.updateValueAndValidity();
     this.totalCost = null;
     if(value) {
       value = value.replace(/\,/g, '');
@@ -123,7 +135,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     // TODO: especially the determination of percent if lockDollar is true
     if (can && isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut) {
       // this.logger.debug(can);
-      this.percentCut = can.dcPctCut;
+      this._percentCut = can.dcPctCut;
       if (this.lockDollar) {
         this.logger.error('Control is locked to dollar only but analysis indicates percent');
       }
@@ -140,9 +152,9 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   recalculate(): void {
 
     if (this._displayType === 'percent') {
-      if (!!this.percentCut) {
-        this.directCostCalculated = this.baselineDirectCost * (1 - (this.percentCut / 100));
-        this.totalCostCalculated = this.baselineTotalCost * (1 - (this.percentCut / 100));
+      if (!!this._percentCut) {
+        this.directCostCalculated = this.baselineDirectCost * (1 - (this._percentCut / 100));
+        this.totalCostCalculated = this.baselineTotalCost * (1 - (this._percentCut / 100));
       }
     } else {
       if (!!this.directCost) {
@@ -205,7 +217,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   getPercentCut(): number {
-    return this.percentCut;
+    return this._percentCut;
   }
 
   getDirectCost(): number {
@@ -218,7 +230,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   getDirectCostPercentCut(): number {
     if (this._displayType === 'percent') {
-      return +this.percentCut;
+      return +this._percentCut;
     }
     return +this.dcPercentCutCalculated;
   }
@@ -233,7 +245,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   getTotalCostPercentCut(): number {
     if (this._displayType === 'percent') {
-      return +this.percentCut;
+      return +this._percentCut;
     }
     return +this.tcPercentCutCalculated;
   }
