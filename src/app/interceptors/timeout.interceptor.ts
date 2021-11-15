@@ -4,14 +4,13 @@ import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { TimeoutService } from '../service/timeout.service';
 import { catchError } from 'rxjs/operators';
-import { Router } from '@angular/router';
 
 @Injectable()
 export class TimeoutInterceptor implements HttpInterceptor {
   constructor(
     private timeoutService: TimeoutService,
     private logger: NGXLogger,
-    private router: Router) {
+  ) {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -21,9 +20,9 @@ export class TimeoutInterceptor implements HttpInterceptor {
         // TODO: don't log errors to the log url... :)
         this.logger.warn('-- error --', error);
         this.logger.warn('-- caught --', caught);
+        // this.router.navigate(['/error']);
         return Observable.throw('Something bad happened');
       })
     );
   }
 }
- 

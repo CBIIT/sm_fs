@@ -158,6 +158,7 @@ import { SearchGrantExistInPaylistCellRendererComponent } from './search/search-
 import { FpWorkflowWarningModalComponent } from './funding-plan/fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
 import { TimeoutInterceptor } from './interceptors/timeout.interceptor';
 import { ErrorComponent } from './error/error/error.component';
+import { SessionRestoreComponent } from './session/session-restore/session-restore.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -324,6 +325,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     CurrencyTogglePipe,
     SearchGrantExistInPaylistCellRendererComponent,
     ErrorComponent,
+    SessionRestoreComponent,
   ],
 
 
