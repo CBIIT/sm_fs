@@ -19,7 +19,7 @@ import { BatchApproveService } from './batch-approve/batch-approve.service';
 export class SearchComponent implements OnInit, AfterViewInit {
   @ViewChild(SearchResultComponent) searchResultComponent: SearchResultComponent;
 
-  labelSearch: string = 'Individual Requests';
+  labelSearch: string = 'for Individual Requests';
   currentFY: number = 2021;
   showOverview: boolean = true;
   numAwaitingRequests: number;
@@ -396,7 +396,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   onSearchType(type: string) {
-    this.labelSearch = type === 'FR' ? 'Individual Requests' : (type === 'FP' ? 'Existing Plans' : (type === 'PL' ? 'Existing Paylists' :  'Existing Grants'));
+    this.labelSearch = type === 'FR' ? 'for Individual Requests' : (type === 'FP' ? 'for Existing Plans' : (type === 'PL' ? 'for Existing Paylists' :  'by Grants'));
   }
 
   setFyFilterCriteria(){
@@ -463,7 +463,7 @@ export enum FilterTypeLabels {
    FILTER_FUNDING_PLAN_UNDER_REVIEW = "My Funding Plans Under Review",
    FILTER_FUNDING_REQUEST = "Search for Individual Requests",
    FILTER_FUNDING_PLAN = "Search for Existing Plans",
-   FILTER_GRANT = "Search for Existing Grants"
+   FILTER_GRANT = "Search by Grants"
 }
 
 
