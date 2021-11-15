@@ -8,7 +8,7 @@ import { AppPropertiesService } from '../service/app-properties.service';
 export class FooterComponent implements OnInit {
 
   constructor( private appPropertiesService: AppPropertiesService) { }
-  version;
+  version : string;
   ngOnInit(): void {
   this.version = this.appPropertiesService.getProperty('appVersion');
 
