@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DocumentsDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
-import { PlanModel } from 'src/app/model/plan/plan-model';
-import { DocumentService } from 'src/app/service/document.service';
+import { PlanModel } from '../../../model/plan/plan-model';
+import { DocumentService } from '../../../service/document.service';
 import { NGXLogger } from 'ngx-logger';
 import { HttpResponse } from '@angular/common/http';
 import { saveAs } from 'file-saver';
@@ -26,7 +26,7 @@ export class PlanSupportingDocsReadonlyComponent implements OnInit {
   exceptionDocDto: DocumentsDto = {};
   skipDocDto: DocumentsDto = {};
   otherDocDto: DocumentsDto = {};
-  private applIds: number[] = [];
+  applIds: number[] = [];
 
 
 
@@ -53,15 +53,13 @@ export class PlanSupportingDocsReadonlyComponent implements OnInit {
 
   }
 
-  checkUploadedDocs(): boolean {
+  checkUploadedDocs() {
 
     if (this.planDocDtos !== null) {
       this.planDocDtos.forEach(element => {
         this.resetFlags(element.docType, true, element);
       });
     }
-
-    return false;
   }
 
   resetFlags(docType: string, upload: boolean, element: DocumentsDto) {
@@ -131,7 +129,6 @@ export class PlanSupportingDocsReadonlyComponent implements OnInit {
       this.applIds.push(this.selectedGrants[i].applId);
     }
     this.documentService.downloadFpSummaryStatement(this.applIds)
-      // this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
           const blob = new Blob([response.body], { type: response.headers.get('content-type') });
