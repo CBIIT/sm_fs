@@ -237,7 +237,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       columns: [
         {title: 'Sel', data: 'selected', orderable: false, ngTemplateRef: { ref: this.selectFundingPlanCheckboxRenderer }, className: 'all' }, // 0
         {title: 'FOA information', data: 'fpFoasList', orderable: false,
-          ngTemplateRef: { ref: this.searchFundingPlanFoasRenderer },className: 'all'}, // 1
+          ngTemplateRef: { ref: this.searchFundingPlanFoasRenderer },className: 'all parentTable '}, // 1
         {title: 'Plan ID', data: 'fprId'}, // 2
         {title: 'Plan Name', data: 'planName'}, // 3
         {title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: ( data, type, row, meta ) => {
