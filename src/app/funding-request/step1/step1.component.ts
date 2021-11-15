@@ -13,7 +13,7 @@ import {AppPropertiesService} from 'src/app/service/app-properties.service';
 import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.service';
 import {AppUserSessionService} from 'src/app/service/app-user-session.service';
 import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
-import { LoaderService } from 'src/app/service/loader-spinner.service';
+import { LoaderService } from '../../service/loader-spinner.service';
 import { NGXLogger } from 'ngx-logger';
 import {FullGrantNumberCellRendererComponent} from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import {DataTableDirective} from 'angular-datatables';

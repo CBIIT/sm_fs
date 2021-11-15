@@ -3,7 +3,7 @@ import { FsLookupControllerService, FsRequestControllerService } from '@nci-cbii
 import 'select2';
 import { UserService } from '@nci-cbiit/i2ecui-lib';
 import { RequestModel } from '../../model/request/request-model';
-import { openNewWindow } from 'src/app/utils/utils';
+import { openNewWindow } from '../../utils/utils';
 import { NGXLogger } from 'ngx-logger';
 import { Select2OptionData } from 'ng-select2';
 import { FundingRequestTypeRulesDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestTypeRulesDto';

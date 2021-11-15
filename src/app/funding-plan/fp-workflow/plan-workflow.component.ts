@@ -215,7 +215,6 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   fetchCompletedPfr(): void {
     if (this.workflowModel.isUserNextInChain && this.workflowModel.lastInChain) {
       this.planService.getCompletedPFRsUsingGET(this.planModel.fundingPlanDto.fprId).subscribe(
-        //      this.planService.getCompletedPFRsUsingGET(124).subscribe(
         result => this.completedPfrs = result,
         error => {
           this.logger.error('calling getCompletedPFRsUsingGET failed ', error);

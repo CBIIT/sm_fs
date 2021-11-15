@@ -21,7 +21,7 @@ import {Router} from "@angular/router";
 import { BatchApproveService } from '../batch-approve/batch-approve.service';
 import { BatchApproveModalComponent } from '../batch-approve/batch-approve-modal.component';
 import { FilterTypeLabels } from '../search.component';
-import { DocumentService } from 'src/app/service/document.service';
+import { DocumentService } from '../../service/document.service';
 import { saveAs } from 'file-saver';
 import { HttpResponse } from '@angular/common/http';
 import {SearchGrantExistInRequestCellRendererComponent} from "./search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component";
@@ -237,11 +237,12 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       columns: [
         {title: 'Sel', data: 'selected', orderable: false, ngTemplateRef: { ref: this.selectFundingPlanCheckboxRenderer }, className: 'all' }, // 0
         {title: 'FOA information', data: 'fpFoasList', orderable: false,
-          ngTemplateRef: { ref: this.searchFundingPlanFoasRenderer },className: 'all'}, // 1
+          ngTemplateRef: { ref: this.searchFundingPlanFoasRenderer },className: 'all parentTable '}, // 1
         {title: 'Plan ID', data: 'fprId'}, // 2
         {title: 'Plan Name', data: 'planName'}, // 3
         {title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: ( data, type, row, meta ) => {
-            return (!data || data == null) ? '' : (type === 'export') ? data : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + data + '</a>';
+            const label = (data && data.length > 0) ? data + ((row.requestingCayDoc && row.requestingCayDoc.length > 0) ? (' (' + row.requestingCayDoc + ')') : '') : '';
+            return (type === 'export' || (!data || data.length == 0)) ? label : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + label + '</a>';
           }}, // 4
         {title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: ( data, type, row, meta ) => { //TODO
             return (!data || data == null) ? '' : (type === 'export') ? data : '<a href="mailto:' + row.requestingDocApprvlEmail + '?subject=' + row.planName + ' - ' + row.requestingDocApprvlFullName + '">' + data + '</a>';

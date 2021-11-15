@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AppPropertiesService } from '../service/app-properties.service';
 import { AppUserSessionService } from '../service/app-user-session.service';
-import { GwbLinksService } from '@nci-cbiit/i2ecui-lib';
 import { PaylistControllerService } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
@@ -12,9 +10,9 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class FsMenuComponent implements OnInit {
 
-  paylistDashboardUrl;
-  paylistPendingGrantsUrl;
-  paylistSearchUrl;
+  paylistDashboardUrl: string;
+  paylistPendingGrantsUrl: string;
+  paylistSearchUrl: string;
 
   ogaCertifier: boolean;
   oefiaCertifier: boolean;
@@ -23,11 +21,10 @@ export class FsMenuComponent implements OnInit {
   pa: boolean;
   paylistReadOnlyRole: boolean =false;
   paylistUrl: string;
-  pendingGrantsCount;
+  pendingGrantsCount : number;
 
   constructor(
               private userSessionService: AppUserSessionService,
-              private gwbLinksService: GwbLinksService,
               private paylistControllerService: PaylistControllerService,
               private logger: NGXLogger) { }
 
@@ -38,10 +35,10 @@ export class FsMenuComponent implements OnInit {
     this.paylistPendingGrantsUrl = this.paylistUrl + '#side-nav-grants';
     this.paylistSearchUrl =this.paylistUrl + '#side-nav-find-paylists';
 
-    this.ogaCertifier = this.userSessionService.hasRole('GMBRCHF');
-    this.oefiaCertifier = this.userSessionService.hasRole('OEFIACRT');
-    this.splCertifier = this.userSessionService.hasRole('DES');
-    this.paylistReadOnlyRole = this.userSessionService.hasRole('PAYLSTVW');
+    this.ogaCertifier = this.userSessionService.hasRole(roleNames.OGA_CERTIFIER);
+    this.oefiaCertifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
+    this.splCertifier = this.userSessionService.hasRole(roleNames.SPL_CERTIFIER);
+    this.paylistReadOnlyRole = this.userSessionService.hasRole(roleNames.PAYLIST_READ_ONLY);
     this.pd = this.userSessionService.isPD();
     this.pa = this.userSessionService.isPA();
 
@@ -57,4 +54,11 @@ export class FsMenuComponent implements OnInit {
 
   }
 
+}
+
+export enum roleNames {
+  OGA_CERTIFIER= "GMBRCHF",
+  OEFIA_CERTIFIER = "OEFIACRT",
+  SPL_CERTIFIER = "DES",
+  PAYLIST_READ_ONLY= "PAYLSTVW"
 }

@@ -1,7 +1,7 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
-import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
-import { DocumentService } from 'src/app/service/document.service';
+import { NciPfrGrantQueryDtoEx } from '../../../model/plan/nci-pfr-grant-query-dto-ex';
+import { DocumentService } from '../../../service/document.service';
 import { saveAs } from 'file-saver';
 
 @Component({
@@ -29,7 +29,6 @@ export class PlanSummaryStatementComponent implements OnInit {
       this.applIds.push(this.grantList[i].applId);
     }
     this.documentService.downloadFpSummaryStatement(this.applIds)
-    // this.documentService.downloadFrqCoverSheet(this.planModel.fundingPlanDto.fprId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
           const blob = new Blob([response.body], { type: response.headers.get('content-type') });

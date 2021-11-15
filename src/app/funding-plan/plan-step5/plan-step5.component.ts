@@ -3,8 +3,8 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { DocumentsControllerService, DocumentsDto, NciPfrGrantQueryDto, FsPlanControllerService, GrantsSkippedPreviouslyDto } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
-import { PlanModel } from 'src/app/model/plan/plan-model';
-import { DocumentService } from 'src/app/service/document.service';
+import { PlanModel } from '../../model/plan/plan-model';
+import { DocumentService } from '../../service/document.service';
 import { saveAs } from 'file-saver';
 import { Router } from '@angular/router';
 
@@ -105,15 +105,13 @@ export class PlanStep5Component implements OnInit {
     this.selectedFiles = fileSelected;
   }
 
-  checkUploadedDocs(): boolean {
+  checkUploadedDocs() {
 
     if (this.planDocDtos !== null) {
       this.planDocDtos.forEach(element => {
         this.resetFlags(element.docType, true, element);
       });
     }
-
-    return false;
   }
 
   resetFlags(docType: string, upload: boolean, element: DocumentsDto) {
@@ -154,7 +152,7 @@ export class PlanStep5Component implements OnInit {
     if (id !== null) {
       this.documentService.deleteDocById(id).subscribe(
         result => {
-          this.logger.info('Delete Success');
+          this.logger.info('Delete Success for the Doc Id: '+id);
           this.resetFlags(docType, false, {});
         }
       ), err => {
@@ -246,7 +244,6 @@ export class PlanStep5Component implements OnInit {
   }
 
   prevStep(): void {
-    //this.planModel.clearAlerts();
     this.router.navigate(['/plan/step4']);
   }
 
