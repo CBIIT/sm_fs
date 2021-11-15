@@ -241,7 +241,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {title: 'Plan ID', data: 'fprId'}, // 2
         {title: 'Plan Name', data: 'planName'}, // 3
         {title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: ( data, type, row, meta ) => {
-            return (!data || data == null) ? '' : (type === 'export') ? data : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + data + '</a>';
+            const label = (data && data.length > 0) ? data + ((row.requestingCayDoc && row.requestingCayDoc.length > 0) ? (' (' + row.requestingCayDoc + ')') : '') : '';
+            return (type === 'export' || (!data || data.length == 0)) ? label : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + label + '</a>';
           }}, // 4
         {title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: ( data, type, row, meta ) => { //TODO
             return (!data || data == null) ? '' : (type === 'export') ? data : '<a href="mailto:' + row.requestingDocApprvlEmail + '?subject=' + row.planName + ' - ' + row.requestingDocApprvlFullName + '">' + data + '</a>';
