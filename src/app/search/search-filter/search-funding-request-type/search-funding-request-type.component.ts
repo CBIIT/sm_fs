@@ -50,7 +50,7 @@ export class SearchFundingRequestTypeComponent implements OnInit, AfterViewInit 
   }
 
   openPdfDoc(): boolean {
-    openNewWindow('assets/docs/PFR-Request-type-definitions.pdf', 'Request_Type_Description');
+    openNewWindow('assets/docs/Request Type Definitions.pdf', 'Request_Type_Description');
     return false;
   }
 

@@ -194,8 +194,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {
           extend: 'excel',
           className: 'btn-excel',
-          titleAttr: 'Excel export',
-          text: 'Export',
+          titleAttr: 'Export Results in Current Page',
+          text: 'Export Current Page',
           filename: 'fs-funding-requests-search-result',
           title: null,
           header: true,
@@ -295,8 +295,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           {
             extend: 'excelHtml5',
             className: 'btn-excel',
-            titleAttr: 'Excel export',
-            text: 'Export',
+            titleAttr: 'Export Results in Current Page',
+            text: 'Export Current Page',
             filename: 'fs-funding-requests-search-result',
             title: null,
             header: true,
@@ -427,8 +427,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         {
           extend: 'excel',
           className: 'btn-excel',
-          titleAttr: 'Excel export',
-          text: 'Export',
+          titleAttr: 'Export Results in Current Page',
+          text: 'Export Current Page',
           filename: 'fs-funding-requests-search-result',
           title: null,
           header: true,
