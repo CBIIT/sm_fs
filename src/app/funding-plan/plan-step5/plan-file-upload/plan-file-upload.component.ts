@@ -100,8 +100,9 @@ export class PlanFileUploadComponent implements OnInit {
       return 'ExceptionJustification';
     } else if (this.templateType === 'CR_FUNDING_PLAN_SKIP_JUST_RPT') {
       return 'SkipJustification';
-    }
-    return 'Other';
+    } else {
+      return 'Other';
+    }  
   }
 
   reset(): void {
