@@ -4,7 +4,7 @@ import { SearchResultComponent } from './search-result/search-result.component';
 import { FundSearchDashboardDataDto , FundSelectSearchCriteria , FsSearchControllerService  } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { GwbLinksService } from '@nci-cbiit/i2ecui-lib';
-import { getCurrentFiscalYear } from 'src/app/utils/utils';
+import { getCurrentFiscalYear } from '../utils/utils';
 import {AppUserSessionService} from "../service/app-user-session.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {SearchModel} from "./model/search-model";
