@@ -31,6 +31,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   // Dummy ngModel attribute for hidden error fields
   dummy: string = null;
   private fseId: number;
+  @Output() PendingPrcValuesEmitter = new EventEmitter<PendingPrcValues>();
 
   constructor(
     private planManagementService: PlanManagementService,
@@ -42,21 +43,19 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   set percentCut(value: number) {
-    this.parentForm.form.updateValueAndValidity();
-
     this._percentCut = value;
+    this.broadcastPendingValues();
   }
 
   set directCostDisplay(value: string) {
-    this.parentForm.form.updateValueAndValidity();
-
     this.directCost = null;
-    if(value) {
+    if (value) {
       value = value.replace(/\,/g, '');
       if (value) {
         this.directCost = Number(value);
       }
     }
+    this.broadcastPendingValues();
   }
 
   get directCostDisplay(): string {
@@ -67,18 +66,29 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   set totalCostDisplay(value: string) {
-    this.parentForm.form.updateValueAndValidity();
     this.totalCost = null;
-    if(value) {
+    if (value) {
       value = value.replace(/\,/g, '');
       if (value) {
         this.totalCost = Number(value);
       }
     }
+    this.broadcastPendingValues();
+  }
+
+  broadcastPendingValues(): void {
+    const vals: PendingPrcValues = {
+      applId: this.grant.applId,
+      displayType: this._displayType,
+      percentCut: this._percentCut,
+      directCost: this.directCost,
+      totalCost: this.totalCost,
+    };
+    this.PendingPrcValuesEmitter.next(vals);
   }
 
   get totalCostDisplay(): string {
-    if(this.totalCost) {
+    if (this.totalCost) {
       return this.totalCost.toLocaleString();
     }
     return null;
@@ -105,8 +115,6 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       return;
     }
     // Determine whether we should lock the dollar value or not
-    // this.logger.debug('checking lockDollar', this.grant.applId, this.sourceIndex, this.planManagementService.isPercentSelected(this.grant.applId));
-    // this.logger.warn('---------------------------------------------------------------------------------');
     if (this.planManagementService.isPercentSelected(this.grant.applId)) {
       if (+this.planManagementService.percentSelectionIndex(this.grant.applId) !== +this.sourceIndex) {
         this.lockDollar = true;
@@ -263,4 +271,12 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     this._displayType = value;
   }
 
+}
+
+export interface PendingPrcValues {
+  applId: number;
+  displayType: string;
+  percentCut: number;
+  directCost: number;
+  totalCost: number;
 }

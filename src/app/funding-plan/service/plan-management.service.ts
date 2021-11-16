@@ -45,7 +45,6 @@ export class PlanManagementService {
   selectedPd: number;
   selectedCa: string;
 
-
   constructor(
     private planModel: PlanModel,
     private fsRequestService: FsRequestControllerService,
@@ -430,8 +429,6 @@ export class PlanManagementService {
     });
     return result;
   }
-
-
 }
 
 export interface GrantCostPayload {

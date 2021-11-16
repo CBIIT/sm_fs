@@ -4,7 +4,10 @@ import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ControlContainer, NgForm } from '@angular/forms';
 import { PlanManagementService } from '../service/plan-management.service';
-import { FpProgramRecommendedCostsComponent } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
+import {
+  FpProgramRecommendedCostsComponent,
+  PendingPrcValues
+} from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { Router } from '@angular/router';
 import { openNewWindow } from '../../utils/utils';
 import { FpGrantInformationComponent } from '../fp-grant-information/fp-grant-information.component';
@@ -40,6 +43,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   comments: string;
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
   private _budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
+  pendingValues: PendingPrcValues;
 
   constructor(private logger: NGXLogger,
               public planModel: PlanModel,
@@ -195,5 +199,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   handleSourceChanged($event: { oldSource: number; newSource: number }): void {
     // this.logger.debug('source changed', $event);
     this.deleteFundingSource.next(+$event.oldSource);
+  }
+
+  capturePendingValues($event: PendingPrcValues): void {
+    this.pendingValues = $event;
   }
 }
