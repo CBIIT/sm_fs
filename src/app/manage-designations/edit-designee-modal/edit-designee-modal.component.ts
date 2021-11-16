@@ -49,13 +49,11 @@ export class EditDesigneeModalComponent implements OnInit, AfterViewInit {
     const selectedStartDate =this.datePipe.transform(this.editForm.value['startDate'], 'yyyy-MM-dd');
     const selectedEndDate  =this.datePipe.transform(this.editForm.value['endDate'], 'yyyy-MM-dd');
 
-    if(selectedStartDate && selectedStartDate.length>0
-      && !(selectedStartDate ===this.datePipe.transform(this.data.delegateFromDate, 'yyyy-MM-dd'))){
+    if((selectedStartDate && selectedStartDate.length>0
+      && !(selectedStartDate ===this.datePipe.transform(this.data.delegateFromDate, 'yyyy-MM-dd'))) ||
+      (selectedEndDate && selectedEndDate.length>0
+        && !(selectedEndDate ===this.datePipe.transform( this.data.delegateToDate,'yyyy-MM-dd')))){
      this.enableSave = true;
-    }
-    else if(selectedEndDate && selectedEndDate.length>0
-      && !(selectedEndDate ===this.datePipe.transform( this.data.delegateToDate,'yyyy-MM-dd'))){
-      this.enableSave = true;
     }else{
       this.enableSave=false;
     }

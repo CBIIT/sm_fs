@@ -162,7 +162,7 @@ export class Step3Component implements OnInit {
   }
 
   loadJustificationText() {
-    if (this.requestModel.requestDto.justification && this.requestModel.requestDto.justification !== null) {
+    if (this.requestModel.requestDto.justification ) {
 
       this.userControllerService.findByNpnIdUsingGET(this.requestModel.requestDto.justificationCreateNpnId).subscribe(
         result => {

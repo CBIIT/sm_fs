@@ -18,6 +18,7 @@ import { UploadBudgetDocumentsComponent } from '../../upload-budget-documents/up
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
+import { FundingRequestTypes } from '../../model/request/funding-request-types';
 
 @Component({
   selector: 'app-step4',
@@ -244,10 +245,8 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    if (this.requestModel.requestDto.requestType.indexOf('Pay Type 4') > -1 &&
-    (this.requestModel.requestDto.conversionActivityCode
-      && this.requestModel.requestDto.conversionActivityCode !== null
-      && this.requestModel.requestDto.conversionActivityCode !== 'NC'))  {
+    if(+this.requestModel.requestDto.frtId === +FundingRequestTypes.PAY_TYPE_4 &&
+    (this.requestModel.requestDto.conversionActivityCode !== 'NC'))  {
       this.transitionMemoMissing = true;
       if (this.docDtos && this.docDtos.length > 0) {
         for (const doc of this.docDtos) {
