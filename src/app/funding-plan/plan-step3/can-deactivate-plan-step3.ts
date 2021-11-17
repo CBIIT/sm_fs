@@ -28,12 +28,19 @@ export class CanDeactivatePlanStep3 implements CanDeactivate<PlanStep3Component>
     //   return true;
     // }
 
+    this.logger.debug(`New URL: ${nextState?.url}`);
     // Allow them to go backwards without reloading
-    if (nextState?.url?.startsWith('/plan/step2') || nextState?.url?.startsWith('/plan/step3')) {
+    if (nextState?.url?.startsWith('/plan/step2') || nextState?.url?.startsWith('/plan/step1')) {
       return true;
     }
+
+    if(nextState?.url === '/plan') {
+      this.logger.debug('new plan?');
+      return true;
+    }
+
     // TODO: Fix this. If they submit with errors, they can then go anywhere without warning
-    if (component.step3form.submitted) {
+    if (component.step3form.submitted && component.step3form.valid) {
       return true;
     }
 
@@ -43,7 +50,7 @@ export class CanDeactivatePlanStep3 implements CanDeactivate<PlanStep3Component>
 
     const ret = confirm('Unsaved changes will be lost if you continue.');
     if (ret) {
-      this.logger.debug('time to reset the plan model');
+      this.logger.debug('time to reload the plan model');
       if (!!id) {
         this.planLoaderService.loadPlan(id, this.successFn.bind(this), this.errorFn.bind(this));
       }

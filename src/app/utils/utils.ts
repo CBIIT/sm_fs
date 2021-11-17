@@ -1,5 +1,3 @@
-import { FundingSourceTypes } from '../model/request/funding-source-types';
-
 export function getCurrentFiscalYear(): number {
   const today = new Date();
   const curMonth = today.getMonth();
@@ -7,10 +5,12 @@ export function getCurrentFiscalYear(): number {
 }
 
 //  opens   the URL in a new browser window
-export function openNewWindow(url, windowName): void {
+export function openNewWindow(url, windowName, features?): void {
   // TODO - review and eliminate winName
   const winName = windowName; // This is not necessary since it's not being changed
-  const features = 'menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700';
+  if (!features) {
+    features = 'menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700';
+  }
   const newWin = window.open(url, winName, features);
   if (newWin != null && newWin.focus() != null) {
     newWin.focus();
@@ -33,7 +33,7 @@ export function isReallyANumber(x: any): boolean {
     return false;
   }
 
-  if(x === null) {
+  if (x === null) {
     return false;
   }
 
@@ -45,23 +45,24 @@ export function isReallyANumber(x: any): boolean {
 }
 
 // Convert string like 'YYYYMM,YYYYMM ..." to 'MM/YYYY, MM/YYYY ..."
-export function convertNcabs(ncabs: string) : string {
+export function convertNcabs(ncabs: string): string {
 
   function _convertNcab(ncab: string) {
     if (ncab && ncab.length === 6) {
-      ncab = ncab.substr(4,2) + '/' + ncab.substr(0,4);
+      ncab = ncab.substr(4, 2) + '/' + ncab.substr(0, 4);
     }
     return ncab;
   }
 
   if (ncabs && ncabs.length > 0) {
     const lst = ncabs.split(',');
-    let ret ;
+    let ret;
     for (const ncab of lst) {
       if (ret) {
         ret += ', ' + _convertNcab(ncab);
+      } else {
+        ret = _convertNcab(ncab);
       }
-      else { ret = _convertNcab(ncab); }
     }
     return ret;
   }

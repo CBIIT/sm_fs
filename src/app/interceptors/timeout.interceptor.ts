@@ -4,12 +4,15 @@ import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { TimeoutService } from '../service/timeout.service';
 import { catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { openNewWindow } from '../utils/utils';
 
 @Injectable()
 export class TimeoutInterceptor implements HttpInterceptor {
   constructor(
     private timeoutService: TimeoutService,
     private logger: NGXLogger,
+    private router: Router
   ) {
   }
 
@@ -17,11 +20,15 @@ export class TimeoutInterceptor implements HttpInterceptor {
     // this.logger.debug(req, next);
     return next.handle(req).pipe(
       catchError((error, caught) => {
-        // TODO: don't log errors to the log url... :)
-        this.logger.warn('-- error --', error);
-        this.logger.warn('-- caught --', caught);
+        this.logger.warn(`-- error: ${error.text} --`);
+        if (error.status === 200 && error.text.includes('HTML')) {
+          this.logger.warn('Error is most likely timeout - redirect to login.');
+          const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
+          openNewWindow(url, 'Restore Session', undefined);
+          // return null;
+        }
         // this.router.navigate(['/error']);
-        return Observable.throw('Something bad happened');
+        throw error.text;
       })
     );
   }

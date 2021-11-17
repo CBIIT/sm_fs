@@ -25,6 +25,7 @@ import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate
 import { CanDeactivateRequestStep2 } from './funding-request/step2/can-deactivate-request-step2';
 import { CanDeactivatePlanStep3 } from './funding-plan/plan-step3/can-deactivate-plan-step3';
 import { ErrorComponent } from './error/error/error.component';
+import { SessionRestoreComponent } from './session/session-restore/session-restore.component';
 
 const routes: Routes = [
   {
@@ -58,7 +59,8 @@ const routes: Routes = [
       ]},
       {path: 'fundingSourceDetails', component: FundingSourcesNamesComponent},
       {path: 'manage', component: ManageDesignationsComponent},
-      {path: 'error', component: ErrorComponent}
+      {path: 'error', component: ErrorComponent},
+      {path: 'restoreSession', component: SessionRestoreComponent}
     ]
   },
   { path: 'unauthorize', component: UnauthorizeComponent }
