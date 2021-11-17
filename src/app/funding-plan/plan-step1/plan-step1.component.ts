@@ -32,6 +32,7 @@ class RfaPaEntry {
   availableNcabDates: Array<Select2OptionData> = [];
   parent: FundingPlanGrantsSearchCriteriaUI;
   ncabErrors: Array<FundingPlanNcabDto> = [];
+  ncabWarnings: Array<FundingPlanNcabDto> = []; // ncabs that have existing COMPLETED funding plan
   rfaErrDuplcated = false;
   rfaErrRequired = false;
   ncabErrRequired = false;
@@ -64,16 +65,17 @@ class RfaPaEntry {
         //console.log('*** on ncab change DELAYED selection ', this.rfaPaNumber, this.delayedSelectedNcabs);
         this.selectedNcabDates = this.delayedSelectedNcabs;
         this.delayedSelectedNcabs = null;
-        this._checkNcabForErrors(this.selectedNcabDates);
+        this._checkNcabForErrorsAndWarnings(this.selectedNcabDates);
       }, 200);
       return;
     }
     // reset 'ncab required' error
-    this._checkNcabForErrors($event);
+    this._checkNcabForErrorsAndWarnings($event);
   }
 
-  _checkNcabForErrors(selected: string | string[]): void {
+  _checkNcabForErrorsAndWarnings(selected: string | string[]): void {
     this.ncabErrors = [];
+    this.ncabWarnings = [];
     if (selected instanceof Array) {
       for (const ncab of selected) {
         const dto: FundingPlanNcabDto = this._findNcabDto(ncab);
@@ -83,6 +85,9 @@ class RfaPaEntry {
           && dto.currentPlanStatus != 'REJECTED'
           && dto.currentPlanStatus != 'CANCELLED') {
           this.ncabErrors.push(dto);
+        }
+        if (dto?.currentPlanStatus === 'COMPLETED') {
+          this.ncabWarnings.push(dto);
         }
       }
     }
@@ -693,6 +698,17 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
             this.noSelectableGrantsWarining += '<br>';
           }
           this.noSelectableGrantsWarining += 'Warning: No selectable grant applications exists for <b>' + rfa.rfaPaNumber + '</b> for <b>' + this._getFormattedNcab(rfa.rfaPaNumber, ncab, data) + '</b>';
+        }
+      }
+    }
+    // FS-1193 - Add warnings if there is a "completed" funding plan for selected FOA and NCAB
+    for (const rfa of this.searchCriteria.rfaPaEntries) {
+      if (rfa.ncabWarnings) {
+        for (const ncabWarning of rfa.ncabWarnings) {
+          if (this.noSelectableGrantsWarining.length > 0) {
+            this.noSelectableGrantsWarining += '<br>';
+          }
+          this.noSelectableGrantsWarining += 'Warning: Completed <b><span><a href="#/plan/retrieve/' + ncabWarning.fprId + '">Funding Plan ' + ncabWarning.fprId + '</a></span></b> for <b>' + rfa.rfaPaNumber + '</b> and <b>' + ncabWarning.formattedCouncilMeetingDate + '</b>';
         }
       }
     }
