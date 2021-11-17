@@ -1,24 +1,20 @@
-<div class="row">
-  <div class="col">
-    <div class="form-group">
-      <label for="loa">What is the final scientific level of authority based on
-        <a href="http://intranet.cancer.gov/admin/grants/policy/nci/ncipolicy.htm" target="_blank" class="external-link">NCI Policy</a>?
-      </label>
-      <ng-select2
-        id="loa"
-        class="w-auto"
-        name="finalLoa"
-        #finalLoa="ngModel"
-        [data]="data"
-        [(ngModel)]="selectedValue"
-        [allowClear]="true"
-        required>
-      </ng-select2>
-      <div
-        class="text-danger mt-1"
-        *ngIf="finalLoa.errors?.required && (finalLoa.touched || parentForm?.submitted)">
-        Final scientific level of authority is required
-      </div>
-    </div>
+<div class="form-group">
+  <label for="loa">What is the final scientific level of authority based on
+    <a href="http://intranet.cancer.gov/admin/grants/policy/nci/ncipolicy.htm" target="_blank" class="external-link">NCI Policy</a>?
+  </label>
+  <ng-select2
+    id="loa"
+    class="w-auto"
+    name="finalLoa"
+    #finalLoa="ngModel"
+    [data]="data"
+    [(ngModel)]="selectedValue"
+    [allowClear]="true"
+    required>
+  </ng-select2>
+  <div
+    class="text-danger mt-1"
+    *ngIf="finalLoa.errors?.required && (finalLoa.touched || parentForm?.submitted)">
+    Final scientific level of authority is required
   </div>
 </div>
