@@ -20,8 +20,9 @@ export class TimeoutInterceptor implements HttpInterceptor {
     // this.logger.debug(req, next);
     return next.handle(req).pipe(
       catchError((error, caught) => {
+        this.logger.warn(error);
         this.logger.warn(`-- error: ${error.text} --`);
-        if (error.status === 200 && error.text.includes('HTML')) {
+        if (error.status === 200 && error.text?.includes('HTML')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           openNewWindow(url, 'Restore Session', undefined);
