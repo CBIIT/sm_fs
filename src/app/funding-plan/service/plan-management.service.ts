@@ -7,11 +7,14 @@ import { NGXLogger } from 'ngx-logger';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { CanManagementService } from '../../cans/can-management.service';
+import { PendingPrcValues } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlanManagementService {
+  private pendingValues: Map<number, PendingPrcValues> = new Map<number, PendingPrcValues>();
+
   fundingSourceValuesEmitter = new Subject<{ pd: number, ca: string }>();
   fundingSourceListEmitter = new Subject<FundingRequestFundsSrcDto[]>();
   grantInfoCostEmitter = new Subject<{ index: number, applId?: number, dc: number, tc: number }>();
@@ -418,16 +421,39 @@ export class PlanManagementService {
   }
 
   public unfundedGrants(): number[] {
+    // this.logger.debug(this.pendingValues);
     const result: number[] = [];
     const applIds: number[] = this.planModel.allGrants.filter(g => g.selected).map(gr => gr.applId);
     applIds.forEach(applId => {
       const tc = this.requestTotalTotal(applId);
       const dc = this.requestDirectTotal(applId);
       if (tc === 0 && dc === 0) {
-        result.push(applId);
+        if(!this.hasPendingValues(applId)) {
+          result.push(applId);
+        }
       }
     });
     return result;
+  }
+
+  hasPendingValues(applId: number): boolean {
+    const vals: PendingPrcValues = this.pendingValues.get(+applId);
+    if(!vals) {
+      return false;
+    }
+    if(vals.displayType === 'percent') {
+      return (vals.percentCut != null && !isNaN(vals.percentCut));
+    } else {
+      if(vals.directCost === null || vals.totalCost === null || isNaN(vals.directCost) || isNaN(vals.totalCost)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+
+  addPendingValues(vals: PendingPrcValues) {
+    this.pendingValues.set(vals.applId, vals);
   }
 }
 

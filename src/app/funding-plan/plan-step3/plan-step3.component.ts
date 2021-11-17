@@ -122,6 +122,7 @@ export class PlanStep3Component implements OnInit {
       }
     } else {
       // push an alert here
+      this.logger.warn(this.planManagementService.unfundedGrants());
       this.alerts = [{
         type: 'danger',
         message: 'Please correct the errors identified below.',

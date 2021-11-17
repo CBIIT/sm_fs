@@ -28,7 +28,8 @@ export class CanDeactivatePlanStep3 implements CanDeactivate<PlanStep3Component>
     //   return true;
     // }
 
-    this.logger.debug(`New URL: ${nextState?.url}`);
+
+    const newUrl = nextState.url;
     // Allow them to go backwards without reloading
     if (nextState?.url?.startsWith('/plan/step2') || nextState?.url?.startsWith('/plan/step1')) {
       return true;
@@ -51,7 +52,7 @@ export class CanDeactivatePlanStep3 implements CanDeactivate<PlanStep3Component>
     const ret = confirm('Unsaved changes will be lost if you continue.');
     if (ret) {
       this.logger.debug('time to reload the plan model');
-      if (!!id) {
+      if (!!id && !newUrl?.includes('new')) {
         this.planLoaderService.loadPlan(id, this.successFn.bind(this), this.errorFn.bind(this));
       }
       return true;

@@ -85,6 +85,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       totalCost: this.totalCost,
     };
     this.PendingPrcValuesEmitter.next(vals);
+    this.planManagementService.addPendingValues(vals);
   }
 
   get totalCostDisplay(): string {
