@@ -115,9 +115,9 @@
     </div>
   </div>
 
-  <ng-container *ngIf="!isSkip">
+  <div class="col-12" *ngIf="!isSkip">
     <app-program-recommended-costs [readOnlyView]="true"></app-program-recommended-costs>
-  </ng-container>
+  </div>
 
   <div class="col-12" *ngIf=(model.requestDto.comments)>
     <ngb-alert type="primary" [dismissible]="false" class="workflow-comments mt-3">
