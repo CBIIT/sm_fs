@@ -7,125 +7,127 @@
   </div>
 </div>
 
-<div class="row collapse show mt-2" id="request-collapse">
+<div class="collapse show mt-2" id="request-collapse">
+  <div class="row">
 
-  <div class="col-lg-3">
-    <div class="form-group">
-      <p class="like-label">Request Type</p>
-      <p>{{ model.requestDto.requestType }}</p>
-    </div>
-  </div>
-
-  <div class="col-lg-3">
-    <div class="form-group">
-      <p class="like-label">Request Name</p>
-      <p>{{ model.requestDto.financialInfoDto.requestName }}</p>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-2">
-    <div class="form-group">
-      <p class="like-label">Request FY</p>
-      <p>{{ model.requestDto.requestFy }}</p>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <p class="like-label">Current Status</p>
-      <p>{{ model.requestDto.requestStatusName }}</p>
-    </div>
-  </div>
-
-  <div class="col-lg-3">
-    <div class="form-group">
-      <p class="like-label">Final Scientific LOA</p>
-      <p>{{ loaMap.get(model.requestDto.loaCode) }}</p>
-    </div>
-  </div>
-
-  <div class="col-lg-3">
-    <div class="form-group">
-      <p class="like-label">Funding Approvals</p>
-      <p>{{ model.requestDto.fundsCertificationCode }}</p>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-2">
-    <div class="form-group">
-      <p class="like-label">Requesting PD</p>
-      <p
-        [innerHTML]="model.requestDto|mailtoFormatter:'requestorPdFullName':'pdEmailAddress':'PI/PD name':'fullGrantNum': 'lastName'"></p>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <p class="like-label">Requesting PD's Cancer Activity</p>
-      <p><a [routerLink]=""
-            ngbTooltip="{{model.requestDto.financialInfoDto.requestorCayCode|codeDescription:'CancerActivities'}}"
-            triggers="click:blur" placement="top">{{model.requestDto.financialInfoDto.requestorCayCode}}</a></p>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-3" *ngIf="!isSkip && otherDocs">
-    <div class="form-group">
-      <p class="like-label">Other DOC(s) Contributing Funds</p>
-      <p>
-        <a
-          *ngFor="let doc of otherDocs; let first = first"
-          [routerLink]=""
-          ngbTooltip="{{doc|codeDescription:'NciDocs'}}"
-          triggers="click:blur" placement="top">
-          <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>
-          <ng-template #firstDoc>{{doc}}</ng-template>
-          <ng-template #notFirstDoc>, {{doc}}</ng-template>
-        </a>
-      </p>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-3" *ngIf="!isSkip && type4Request ">
-    <div class="form-group">
-      <p class="like-label">Conversion Grant Activity Code/Mechanism</p>
-      <p>{{model.requestDto.conversionActivityCode === 'NC' ? 'No Change' : model.requestDto.conversionActivityCode}}</p>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-3" *ngIf="!isSkip && diversityRequest">
-    <div class="form-group">
-      <p class="like-label">Type of Supplement</p>
-      <p>{{supplementType}}</p>
-    </div>
-  </div>
-
-  <!-- FS-784 
-  <div class="col-md-6 col-lg-3" *ngIf="!isSkip && showNewInvestigator">
-    <div class="form-group">
-      <p class="like-label">New Investigator Application</p>
-      <p>{{newInvestigator}}</p>
-    </div>
-  </div>
-  -->
-  
-  <div class="col-md-6 col-lg-3" *ngIf="isSkip">
-    <div class="form-group">
-      <p class="like-label">Skipped Request(s)</p>
-      <p *ngFor="let sreq of skipRequests">{{sreq.skipFrqId}} {{sreq.skipFullGrantNum}} {{sreq.skipRequestCurrentStatus}}</p>
-    </div>
-  </div>
-
-  <div class="col-12" *ngIf="!isSkip">
-    <app-program-recommended-costs [readOnlyView]="true"></app-program-recommended-costs>
-  </div>
-
-  <div class="col-12" *ngIf=(model.requestDto.comments)>
-    <ngb-alert type="primary" [dismissible]="false" class="workflow-comments mt-3">
-      <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
-      <div class="comment-content">
-        <div class="comment-details">{{ model.requestDto.comments }}</div>
+    <div class="col-lg-3">
+      <div class="form-group">
+        <p class="like-label">Request Type</p>
+        <p>{{ model.requestDto.requestType }}</p>
       </div>
-    </ngb-alert>
+    </div>
+
+    <div class="col-lg-3">
+      <div class="form-group">
+        <p class="like-label">Request Name</p>
+        <p>{{ model.requestDto.financialInfoDto.requestName }}</p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-2">
+      <div class="form-group">
+        <p class="like-label">Request FY</p>
+        <p>{{ model.requestDto.requestFy }}</p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="form-group">
+        <p class="like-label">Current Status</p>
+        <p>{{ model.requestDto.requestStatusName }}</p>
+      </div>
+    </div>
+
+    <div class="col-lg-3">
+      <div class="form-group">
+        <p class="like-label">Final Scientific LOA</p>
+        <p>{{ loaMap.get(model.requestDto.loaCode) }}</p>
+      </div>
+    </div>
+
+    <div class="col-lg-3">
+      <div class="form-group">
+        <p class="like-label">Funding Approvals</p>
+        <p>{{ model.requestDto.fundsCertificationCode }}</p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-2">
+      <div class="form-group">
+        <p class="like-label">Requesting PD</p>
+        <p
+          [innerHTML]="model.requestDto|mailtoFormatter:'requestorPdFullName':'pdEmailAddress':'PI/PD name':'fullGrantNum': 'lastName'"></p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="form-group">
+        <p class="like-label">Requesting PD's Cancer Activity</p>
+        <p><a [routerLink]=""
+              ngbTooltip="{{model.requestDto.financialInfoDto.requestorCayCode|codeDescription:'CancerActivities'}}"
+              triggers="click:blur" placement="top">{{model.requestDto.financialInfoDto.requestorCayCode}}</a></p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3" *ngIf="!isSkip && otherDocs">
+      <div class="form-group">
+        <p class="like-label">Other DOC(s) Contributing Funds</p>
+        <p>
+          <a
+            *ngFor="let doc of otherDocs; let first = first"
+            [routerLink]=""
+            ngbTooltip="{{doc|codeDescription:'NciDocs'}}"
+            triggers="click:blur" placement="top">
+            <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>
+            <ng-template #firstDoc>{{doc}}</ng-template>
+            <ng-template #notFirstDoc>, {{doc}}</ng-template>
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3" *ngIf="!isSkip && type4Request ">
+      <div class="form-group">
+        <p class="like-label">Conversion Grant Activity Code/Mechanism</p>
+        <p>{{model.requestDto.conversionActivityCode === 'NC' ? 'No Change' : model.requestDto.conversionActivityCode}}</p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3" *ngIf="!isSkip && diversityRequest">
+      <div class="form-group">
+        <p class="like-label">Type of Supplement</p>
+        <p>{{supplementType}}</p>
+      </div>
+    </div>
+
+    <!-- FS-784
+    <div class="col-md-6 col-lg-3" *ngIf="!isSkip && showNewInvestigator">
+      <div class="form-group">
+        <p class="like-label">New Investigator Application</p>
+        <p>{{newInvestigator}}</p>
+      </div>
+    </div>
+    -->
+
+    <div class="col-md-6 col-lg-3" *ngIf="isSkip">
+      <div class="form-group">
+        <p class="like-label">Skipped Request(s)</p>
+        <p *ngFor="let sreq of skipRequests">{{sreq.skipFrqId}} {{sreq.skipFullGrantNum}} {{sreq.skipRequestCurrentStatus}}</p>
+      </div>
+    </div>
   </div>
 
+  <app-program-recommended-costs [readOnlyView]="true" *ngIf="!isSkip"></app-program-recommended-costs>
+
+  <div class="row" *ngIf=(model.requestDto.comments)>
+    <div class="col-12">
+      <ngb-alert type="primary" [dismissible]="false" class="workflow-comments mt-3">
+        <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
+        <div class="comment-content">
+          <div class="comment-details">{{ model.requestDto.comments }}</div>
+        </div>
+      </ngb-alert>
+    </div>
+
+  </div>
 </div>
