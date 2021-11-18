@@ -3,7 +3,7 @@
     <div class="modal-header">
       <span class="modal-title" id="modal-title-hold">{{ title }}</span>
       <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-        <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true"><i class="far fa-times"></i></span>
       </button>
     </div>
     <div class="modal-body">
@@ -109,7 +109,7 @@
       </div>
     </div>
     <div class="modal-footer">
-      <input type="submit" class="btn btn-primary" [value] ="buttonText" [disabled] ="disableSubmit">
+      <input type="submit" class="btn btn-primary" [value] ="buttonText" [disabled] ="disableSubmit" autofocus>
       <button type="button" class="btn btn-primary" (click)="close()">Close</button>
     </div>
   </form>
