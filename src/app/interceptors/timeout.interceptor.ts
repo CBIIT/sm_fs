@@ -25,7 +25,7 @@ export class TimeoutInterceptor implements HttpInterceptor {
         const timestamp: number = Date.now();
         this.errorHandler.registerNewError(timestamp, error);
 
-        if (error.status === 200 && error.text?.includes('HTML')) {
+        if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           openNewWindow(url, 'Restore Session', undefined);
