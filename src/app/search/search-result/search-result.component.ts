@@ -2,7 +2,7 @@ import {
   AfterViewInit,
   Component,
   OnDestroy,
-  OnInit,
+  OnInit, Output,
   QueryList,
   TemplateRef,
   ViewChild,
@@ -47,6 +47,9 @@ class DataTablesResponse {
   styleUrls: ['./search-result.component.css']
 })
 export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  @Output()
+  refreshOverviewEmitter = new Subject<boolean>();
 
   constructor(private fsSearchControllerService: FsSearchControllerService,
               private propertiesService: AppPropertiesService,
@@ -692,6 +695,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dtFundingRequestTrigger.unsubscribe();
     this.dtFundingPlanTrigger.unsubscribe();
     this.dtGrantTrigger.unsubscribe();
+    this.refreshOverviewEmitter.unsubscribe();
     this.throttle.reset();
   }
 
@@ -844,6 +848,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         .finally(() => {
           if (this.batchApproveModal.batchApproveSuccess) {
             this.doFundingRequestSearch(this.searchCriteria, this.filterTypeLabel);
+            this.refreshOverviewEmitter.next(true);
           }
         });
     } else if (this.fundingPlans && this.fundingPlans.length > 0) {
@@ -851,6 +856,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         .finally(() => {
           if (this.batchApproveModal.batchApproveSuccess) {
             this.doFundingPlanSearch(this.searchCriteria, this.filterTypeLabel);
+            this.refreshOverviewEmitter.next(true);
           }
         });
     }

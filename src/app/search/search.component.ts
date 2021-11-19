@@ -67,16 +67,8 @@ export class SearchComponent implements OnInit, AfterViewInit {
     // this.paylistDashboardUrl =  this.gwbLinksService.getProperty('Paylist')+ '#side-nav-paylists';
     this.paylistDashboardUrl = '/paylist/#side-nav-paylists';
 
-    this.fsSearchController.getSearchDashboardDataUsingGET().subscribe(
-      result => {
-        this.dashboardDatafilterMap = new Map(result.map(item => [item.fitlerType, item]));
-        this.setFilterCounts(this.dashboardDatafilterMap);
-        if (this.selectedMenuUrl === 'landing') {
-          this.processLandingPageHierarchy();
-        }
-      }, error => {
-        console.error('HttpClient get request error for----- ' + error.message);
-      });
+    this.invokeRefreshOverview(true);
+
     this.batchApproveService.initialize();
     let action = this.route.snapshot.params.action;
     this.logger.debug('ngOnInit() - route action, searchType, state.action:', action, this.searchModel.searchType, history.state);
@@ -437,6 +429,24 @@ export class SearchComponent implements OnInit, AfterViewInit {
     // else {
     //   this.router.navigateByUrl('/search/fr');
     // }
+  }
+
+  refreshOverview() {
+    this.invokeRefreshOverview(false);
+  }
+
+  invokeRefreshOverview(checkLanding: boolean): void {
+    this.fsSearchController.getSearchDashboardDataUsingGET().subscribe(
+      result => {
+        this.dashboardDatafilterMap = new Map(result.map(item => [item.fitlerType, item]));
+        this.logger.debug('Overview refreshed:', this.dashboardDatafilterMap);
+        this.setFilterCounts(this.dashboardDatafilterMap);
+        if (this.selectedMenuUrl === 'landing' && checkLanding) {
+          this.processLandingPageHierarchy();
+        }
+      }, error => {
+        console.error('HttpClient get request error for----- ' + error.message);
+      });
   }
 }
 export enum FilterTypes {

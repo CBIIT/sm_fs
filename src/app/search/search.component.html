@@ -83,7 +83,7 @@
 <app-search-filter [action]="action" (callSearch)="doSearch($event)"
                    (searchTypeEm)="onSearchType($event)">
 </app-search-filter>
-<app-search-result></app-search-result>
+<app-search-result (refreshOverviewEmitter)="refreshOverview()"></app-search-result>
 
 <ng-template #i2eUserCategories>
   <div class="row " >
