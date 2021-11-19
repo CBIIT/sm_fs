@@ -1,9 +1,13 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {ControlContainer, NgForm, NgModel} from "@angular/forms";
+import {Component, Input, OnInit} from '@angular/core';
+import {ControlContainer, NgForm} from "@angular/forms";
 import {Select2OptionData} from "ng-select2";
 import {Options} from "select2";
 import {NGXLogger} from "ngx-logger";
 import {FsLookupControllerService} from "@nci-cbiit/i2ecws-lib";
+import {FundingRequestFundsSrcDto} from "@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto";
+import {openNewWindow} from "../../../utils/utils";
+import {Router} from "@angular/router";
+import {Location} from "@angular/common";
 
 @Component({
   selector: 'app-search-funding-source',
@@ -20,9 +24,13 @@ export class SearchFundingSourceComponent implements OnInit {
 
   data: Array<Select2OptionData> = [];
   options: Options = {};
+  availableFundingSources: FundingRequestFundsSrcDto[] = [];
 
   constructor(private logger: NGXLogger,
-              private fsLookupControllerService: FsLookupControllerService) { }
+              private router: Router,
+              private _location: Location,
+              private fsLookupControllerService: FsLookupControllerService) {
+  }
 
   ngAfterViewInit(): void {
   }
@@ -37,8 +45,19 @@ export class SearchFundingSourceComponent implements OnInit {
           });
         }
         this.data = dropdownList;
+        this.availableFundingSources = (result) ? result : [];
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
+  }
+
+  openFsDetails(): boolean {
+    // temporarily using # for the hashtrue file not found issue..
+    const url = this._location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['fundingSourceDetails'])));
+    this.logger.debug(this.router.createUrlTree(['fundingSourceDetails']).toString(), url);
+    // storaing the funding sources details for popup window.. removing the object in the component once retrieved
+    localStorage.setItem('fundingSources', JSON.stringify(this.availableFundingSources));
+    openNewWindow(url, 'fundingSourceDetails');
+    return false;
   }
 }

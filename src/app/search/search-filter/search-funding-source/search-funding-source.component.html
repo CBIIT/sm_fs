@@ -1,5 +1,7 @@
 <div class="form-group">
-  <label [for]="name ? name : 'funding-source-select'">Funding Source</label>
+  <label [for]="name ? name : 'funding-source-select'">Funding Source
+    <a href="#" (click)="openFsDetails()"><i
+    class="fas fa-question-circle more-info"></i></a></label>
   <ng-select2
     [id]="name ? name : 'funding-source-select'"
     [name]="name ? name : 'fundingSources'"
