@@ -69,6 +69,3 @@ export function convertNcabs(ncabs: string): string {
   return ncabs;
 }
 
-// private _convertNcab(ncab) : string {
-// }
-

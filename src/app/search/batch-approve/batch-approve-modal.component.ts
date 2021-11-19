@@ -72,15 +72,6 @@ export class BatchApproveModalComponent implements OnInit {
     });
   }
 
-  // canBatchApprove(): boolean {
-  //   if (this.id === 'frqId') {
-  //     return this.batchApproveService.canApproveRequest(this.data.frqId);
-  //   }
-  //   else {
-  //     return this.batchApproveService.canApprovePlan(this.data.fprId);
-  //   }
-  // }
-
   openModalForPlans(plans: FundingPlanQueryDto[]):
   Promise<void> {
     this.alert = null;
@@ -117,7 +108,6 @@ export class BatchApproveModalComponent implements OnInit {
 
     const dto: BatchApprovalDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-//    dto.actionUserId = 'BINLI';
     if (this.requestOrPlan === 'REQUEST') {
       const approvedRequests = this.requestsForApproval.map( r => r.frqId);
       dto.approvedRequests = approvedRequests;
@@ -133,7 +123,6 @@ export class BatchApproveModalComponent implements OnInit {
       dto.approvedPlans = approvedPlans;
     }
     this.logger.debug('Modal submits batch approval dto ', dto);
-//    return;
     this.invokeRestApi(dto).subscribe(
       () => {
         this.batchApproveSuccess = true;

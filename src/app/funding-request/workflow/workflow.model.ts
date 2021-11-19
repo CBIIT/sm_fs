@@ -305,7 +305,7 @@ export class WorkflowModel {
       this.addedApproverMap.set(user.id, true);
       this.hasNewApprover = true;
       this.requestIntegrationService.approverListChangeEmitter.next();
-    } else {// if ( action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) {
+    } else {  // when APPROVE_ROUTE or  ROUTE_APPROVE
       if (!this.additionalApprovers) {
         this.additionalApprovers = [];
       }

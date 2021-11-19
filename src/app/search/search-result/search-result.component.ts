@@ -719,7 +719,6 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.searchCriteria = criteria;
     this.filterTypeLabel = filterTypeLabel;
     this.selectedRows.clear();
-//    this.batchApproveVisible = this.batchApproveService.canBatchApprovePlan();
     this.batchApproveEnabled = false;
     this.runReportEnabled = false;
     this.logger.debug('Plan batch approval check ', this.batchApproveService, this.batchApproveVisible);
@@ -731,7 +730,6 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.searchCriteria = criteria;
     this.filterTypeLabel = filterTypeLabel;
     this.selectedRows.clear();
-//    this.batchApproveVisible = this.batchApproveService.canBatchApprovePlan();
     this.batchApproveEnabled = false;
     this.logger.debug('Plan batch approval check ', this.batchApproveService, this.batchApproveVisible);
     this._triggerDtInstance(this.dtGrantTrigger);
@@ -835,10 +833,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   get batchApproveVisible(): boolean {
     return (this.showFundingPlanResult
         && this.batchApproveService.canBatchApprovePlan())
-      //           && this.searchCriteria?.searchWithIn === FilterTypeLabels.FILTER_FUNDING_PLAN_AWAITING_RESPONSE )
       || (this.showFundingRequestResult
         && this.batchApproveService.canBatchApproveRequest());
-    //           && this.searchCriteria.searchWithIn === FilterTypeLabels.FILTER_REQUEST_AWAITING_RESPONSE );
   }
 
   showBatchApproveModal(): void {

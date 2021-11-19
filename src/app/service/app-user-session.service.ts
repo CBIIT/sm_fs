@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { UserService } from '@nci-cbiit/i2ecui-lib';
 import { CancerActivitiesDto, CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
-import { checkIfGenericTypesAreUnbound } from '@angular/compiler-cli/src/ngtsc/typecheck/src/ts_util';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +24,6 @@ export class AppUserSessionService {
     return new Promise<void>((resolve, reject) => {
       this.userService.getSecurityCredentials().subscribe(
         (result) => {
-          // this.logger.debug('UserService.getSecurityCrentials: ', result);
           this.loggedOnUser = result.nciPerson;
           this.environment = result.environment;
           this.roles = [];
@@ -34,9 +32,9 @@ export class AppUserSessionService {
           });
           this.caService.getCasForPdUsingGET(this.loggedOnUser.npnId, true).subscribe(
             (caresult) => {
-              // this.logger.debug('User assigned cancer activities: ', caresult);
               this.userCancerActivities = caresult;
               this.isMbOnly = (caresult && caresult.length === 1 && caresult[0].code === 'MB');
+              this.logger.debug('UserSessionService Initialization Done ', this);
               resolve();
             },
             (caerror) => {
@@ -54,12 +52,10 @@ export class AppUserSessionService {
   }
 
   isPD(): boolean {
-    // to-do: need to check roles to determine if PD
     return this.roles.indexOf('PD') > -1;
   }
 
   isPA(): boolean {
-    // to-do: need to check roles to determine if PD
     return this.roles.indexOf('PA') > -1;
   }
 

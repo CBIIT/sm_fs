@@ -30,9 +30,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
   @ViewChild(PlanWorkflowComponent) workflowComponent: PlanWorkflowComponent;
   @ViewChild(UploadBudgetDocumentsComponent) uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
-//  @ViewChild(FpBudgetInformationComponent) budgetInfoComponent: FpBudgetInformationComponent;
   @ViewChildren(FpBudgetInformationComponent) budgetInfoComponents: QueryList<FpBudgetInformationComponent>
-//    public Grids: QueryList<GridComponent>
   grantsSkipped: NciPfrGrantQueryDtoEx[] = [];
   grantsNotConsidered: NciPfrGrantQueryDtoEx[] = [];
 
@@ -50,8 +48,6 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   isRequestEverSubmitted = false;
   requestHistorySubscriber: Subscription;
   activeApproverSubscriber: Subscription;
-  // submissionResult: { status: 'success' | 'failure' | '', frqId?: number, approver?: FundingReqApproversDto, errorMessage?: string }
-  //   = { status: '' };
   requestStatus: string;
   docDtos: DocumentsDto[];
   excludedDocDtos: DocumentsDto[];
@@ -111,19 +107,12 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
       (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
       g.priorityScoreNum >= this.planModel.minimumScore &&
       g.priorityScoreNum <= this.planModel.maximumScore) );
-    // this.logger.debug('skipped grants are ', this.grantsSkipped);
 
     this.grantsNotConsidered = this.planModel.allGrants.filter(g =>
       (g.notSelectableReason && g.notSelectableReason.length > 0) ||
       (( g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)
       && !g.selected ) );
-    // this.logger.debug('unfunded grants are ', this.grantsNotConsidered);
-    // this.planApproverService.checkCreateApprovers().then( () => {
-    //   this.logger.debug('Approvers are created ');
     this.workflowModel.initializeForPlan(this.fprId);
-      // }
-      // );
-    // this.logger.debug('Step6 OnInit Plan Model ', this.planModel);
     this.checkUserRolesCas();
     this.docChecker = new FundingPlanDocChecker(this.planModel);
     this.isDocsStepCompleted();
@@ -352,7 +341,6 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
       });
     }
     this.logger.debug('Submit Funding Plan, workflowDto is ', dto);
-    // const nextApproverInChain = this.workflowModel.getNextApproverInChain();
     this.fsPlanWorkflowControllerService.submitPlanWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('Submit Request result: ', result);
@@ -364,15 +352,6 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
         this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       });
   }
-
-  // test(): void {
-  //   const dto: WorkflowTaskDto = {};
-  //   dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-  //   dto.fprId = this.fprId;
-  //   dto.action = WorkflowActionCode.SUBMIT;
-  //   dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
-  //   this.requestIntegrationService.requestSubmissionEmitter.next(dto);
-  // }
 
   hideWorkflow(): boolean {
     return this.requestStatus === RequestStatus.REJECTED || this.requestStatus === RequestStatus.CANCELLED;

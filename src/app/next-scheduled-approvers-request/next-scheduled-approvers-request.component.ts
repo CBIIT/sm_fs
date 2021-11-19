@@ -44,7 +44,6 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   private _selectedValue: number;
   approvers: Array<{ id: number; text: '' }>;
-//  approverList: Array<any> = new Array<any>();
 
   constructor(public requestModel: RequestModel,
               private userSessionService: AppUserSessionService,
@@ -161,21 +160,6 @@ export class NextScheduledApproversRequestComponent implements OnInit {
       }
     );
   }
-
-  // deleteApprover(id): void {
-  //   this.logger.debug('Remove Approver ID:', id);
-  //   let i = 0;
-  //   let j = 0;
-  //   this.approverList.forEach(d => {
-  //     if (d.id === id) {
-  //       j = i;
-  //     }
-  //     i++;
-  //   });
-
-  //   this.approverList.splice(j, 1);
-  //   addedApproverMap.delete(Number(id));
-  // }
 
   dropped(event: CdkDragDrop<any[]>): void {
    // moveItemInArray(this.requestApprovers, event.previousIndex, event.currentIndex);

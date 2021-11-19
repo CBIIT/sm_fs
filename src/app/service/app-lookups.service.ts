@@ -42,7 +42,6 @@ export class AppLookupsService {
 
   tryResolve(): void {
     if (this.cancerActivitiesLoaded && this.nciDocsLoaded) {
-      // this.logger.debug('AppLookupsService loading is done', this.lookups);
       this.resolve();
     }
   }

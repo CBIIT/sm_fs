@@ -28,24 +28,9 @@ export class ApprovedCostsComponent implements OnInit {
     this.initialPay = INITIAL_PAY_TYPES.includes(this.requestModel.requestDto?.frtId);
   }
 
-  // get cans(): FundingRequestCanDto[]{
-  //   this.logger.debug('get cans() ', this.requestModel.requestCans);
-  //   return this.requestModel.requestCans;
-  // }
-
   isFormValid(): boolean {
     return this.acform?.valid;
   }
-
-  // resetForm(action: WorkflowActionCode): void {
-  //   if (this.workflowModel.isScientificApprover
-  //     && this.workflowModel.isApprovalAction(action) ) {
-  //     this.inputDisabled = false;
-  //   } else if (!this.inputDisabled){
-  //       this.requestModel.requestCans.forEach( rc => rc.approvedFutureYrs = rc.previousAfy );
-  //       this.inputDisabled = true;
-  //   }
-  // }
 
   get editable(): boolean {
     return this.workflowModel.isScientificApprover && this.approvingState;
