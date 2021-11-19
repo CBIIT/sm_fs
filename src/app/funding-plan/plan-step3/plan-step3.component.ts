@@ -340,7 +340,7 @@ export class PlanStep3Component implements OnInit {
     this.applicationsProposedForFunding.grantList.forEach(item => {
       if (!!item.recommendedFutureYearsComponent) {
         const applId = item.grant.applId;
-        const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue || 0;
+        const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue;
         this.futureYears.set(applId, recommendedFutureYears);
         this.planManagementService.setRecommendedFutureYears(applId, recommendedFutureYears);
       }
@@ -473,6 +473,7 @@ export class PlanStep3Component implements OnInit {
           }
 
           const futureYears: number = this.planManagementService.getRecommendedFutureYears(s.applId);
+          this.logger.debug(`future years for applid ${s.applId} == ${futureYears}`);
 
           frBudget = {
             frqId: +req.frqId,
@@ -495,7 +496,7 @@ export class PlanStep3Component implements OnInit {
 
           frCan = {
             approvedDc: +directCost,
-            approvedFutureYrs: +futureYears,
+            approvedFutureYrs: futureYears,
             approvedTc: +totalCost,
             can: null,  // Solve for edits
             canDescription: null, // solve for edits
@@ -518,7 +519,7 @@ export class PlanStep3Component implements OnInit {
             // previousAfy: number,
             // reimburseableCode: string,
             requestedDc: +directCost,
-            requestedFutureYrs: +futureYears,
+            requestedFutureYrs: futureYears,
             requestedTc: +totalCost,
             tcPctCut: +tcPercentCut,
             // updateStamp: number,

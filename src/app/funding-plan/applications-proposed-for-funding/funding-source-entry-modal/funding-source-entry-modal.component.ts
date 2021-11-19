@@ -22,7 +22,6 @@ export class FundingSourceEntryModalComponent implements OnInit {
   @Input() sourceIndex = 99;
 
   @ViewChild('modalFpFundingSource') modalFpFundingSource: FpFundingSourceComponent;
-  // @ViewChildren('modalFpGrantInformation') modalFpGrantInformation: QueryList<FpGrantInformationComponent>;
   @ViewChildren(FpProgramRecommendedCostsComponent) modalFpRecommendedCosts: QueryList<FpProgramRecommendedCostsComponent>;
 
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
@@ -41,9 +40,6 @@ export class FundingSourceEntryModalComponent implements OnInit {
     this.planCoordinatorService.fundingSourceListEmitter.subscribe(next => {
       this.availableFundingSources = next;
     });
-    // this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
-    //   this.logger.debug(next);
-    // });
   }
 
   onModalSubmit(form: NgForm): void {
@@ -78,7 +74,6 @@ export class FundingSourceEntryModalComponent implements OnInit {
       });
     });
 
-    // this.logger.debug(result);
     this.modal.close(result);
   }
 
