@@ -44,7 +44,6 @@ export class PlanSubmissionAlertComponent implements OnInit, OnDestroy {
           this.action = dto.completeRequest ? 'COMPLETE' : dto.action;
           this.fprId = dto.fprId;
           window.scrollTo(0, 0);
-//          this.logger.debug('plan submit success alert component ', this);
         }
     );
     this.requestSubmitFailureEventSubscriber = this.integrationService.requestSubmitFailureEmitter.subscribe(
