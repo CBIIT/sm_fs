@@ -25,9 +25,6 @@ export class RequestLoaderService {
     this.requestService.retrieveFundingRequestUsingGET(frqId).subscribe(
       (result) => {
         this.requestModel.reset();
-        // these 2 properties should not be set in the case creating new request.
-        // this.requestModel.title = 'View Request Details for';
-        // this.requestModel.returnToRequestPageLink = true;
         this.requestModel.requestDto = result.requestDto;
         this.requestModel.grant = result.grantDto;
         this.requestModel.requestDto.financialInfoDto.requestorNpnId = this.requestModel.requestDto.requestorNpnId;

@@ -180,19 +180,6 @@ export class BudgetInfoComponent implements OnInit {
       }
     }
 
-    // for (let i = 0; i < this..length; i++) {
-    //   const can = this.fundingRequestCans[i];
-    //   if (this.isFcNci() && !can.can) {
-    //     canWarning.missingCan = true;
-    //   }
-    //   if (this.duplicateCan(i)) {
-    //     canWarning.duplicateCan = true;
-    //   }
-    //   if (this.nonDefaultCan(i)) {
-    //     canWarning.nonDefaultCan = true;
-    //   }
-    // }
-
     let valid = true;
 
     if (this.canSelectors) {

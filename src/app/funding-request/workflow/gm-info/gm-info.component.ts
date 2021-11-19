@@ -17,7 +17,6 @@ export class GmInfoComponent implements OnInit, OnDestroy {
   @Input() approvingState = false;
   @ViewChild('gmform', {static: false}) gmform: NgForm;
 
-//  readonly = false;
   options: any = {};
   gmInfo: GmInfoDto = {};
   specialistMap: Map<number, GmActiveSpecialistsDto> = new Map<number, GmActiveSpecialistsDto>();
@@ -56,8 +55,6 @@ export class GmInfoComponent implements OnInit, OnDestroy {
             map.set(specialist.specNpeId, specialist);
             return map;
           }, this.specialistMap);
-          // this.defaultSpecList = result.map( (data) =>
-          // ({id: data.specCode + ' ' + data.specFullName, text: data.specCode + ' ' + data.specFullName}));
         }
       },
       error => {
@@ -83,7 +80,6 @@ export class GmInfoComponent implements OnInit, OnDestroy {
             this.logger.error('getDefaultGmInfoUsingGET failed', error);
           }
         );
-      // }
   }
 
   getGmInfo(): GmInfoDto {
@@ -101,7 +97,7 @@ export class GmInfoComponent implements OnInit, OnDestroy {
   }
 
   isFormValid(): boolean {
-    // in the case the default specialist returned from backend is no longer active, i.e. not in the drop down list.
+    // check for the case when the default specialist returned from backend is no longer active, i.e. not in the drop down list.
     const spec = this.specialistMap.get(Number(this.gmInfo.defaultSpecNpeId));
     if (!spec) {
       this.logger.warn('The default specialist (npe_id=' + this.gmInfo.defaultSpecNpeId + ') is not active, treat as invalid to force user to select');

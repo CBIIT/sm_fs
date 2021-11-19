@@ -1,0 +1,9 @@
+::ng-deep .select2-selection__invalid {
+  color: #560520 !important;
+  background-color: #edced8 !important;
+  border-color: #e6bac9 !important;
+}
+
+::ng-deep .select2-selection__invalid .select2-selection__choice__remove {
+  color: #560520 !important;
+}

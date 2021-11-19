@@ -59,9 +59,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this._selectedValue = value;
     const user = approverMap.get(Number(value));
     this.logger.debug('Selected Approver to Add: ', user);
-    // if (this._selectedWorkflowAction) {
     this.workflowModel.addAdditionalApprover(user, this._selectedWorkflowAction ? this._selectedWorkflowAction.action : null);
-    // }
     setTimeout(() => {
       this._selectedValue = null;
     }, 0);
@@ -328,7 +326,6 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       && !this.requestModel.isSkip() ) {
         dto.requestCans = this.requestModel.requestCans;
         this.logger.debug('scientific approver:', dto.requestCans);
-//      dto.requestCans = this.approvedCostsComponent.getCans();
     }
 
     this.logger.debug(this.workflowModel.isApprovalAction(action));
@@ -395,9 +392,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   fetchCompletedPfr(): void {
     if (this.workflowModel.isUserNextInChain && this.workflowModel.lastInChain) {
-   //   this.workflowService.getCompletedPlanUsingGET(this.requestModel.requestDto.frqId).subscribe(
       this.workflowService.getCompletedPlanUsingGET( 34410).subscribe(
-        //      this.planService.getCompletedPFRsUsingGET(124).subscribe(
         result => this.completedPfrs = result,
         error => {
           this.logger.error('calling getCompletedPFRsUsingGET failed ', error);

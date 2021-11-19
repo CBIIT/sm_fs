@@ -289,7 +289,20 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
     this.navigationModel.setStepLinkable(1, true);
     this.ncab_options = {
       multiple: true,
-      allowClear: false
+      allowClear: false,
+      templateSelection: (selection, container) => {
+        if (selection && selection.hasOwnProperty('additional')) {
+          const ncabEntry : FundingPlanNcabDto = selection['additional'];
+          if (ncabEntry
+              && ncabEntry.currentPlanStatus != null
+              && ncabEntry.currentPlanStatus != 'COMPLETED'
+              && ncabEntry.currentPlanStatus != 'REJECTED'
+              && ncabEntry.currentPlanStatus != 'CANCELLED') {
+            container.addClass('select2-selection__invalid');
+          }
+        }
+        return selection?.text;
+      }
     };
 
     this.searchCriteria = new FundingPlanGrantsSearchCriteriaUI();

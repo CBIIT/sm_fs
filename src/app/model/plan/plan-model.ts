@@ -64,15 +64,12 @@ export class PlanModel {
   }
 
   isMainApproversRegenNeeded(): boolean {
-    // always regen for now. needs to figure out the criteria used for plan approvers.
+    const newCriteria = this.makeApproverCriteria();
     return true;
-//    return this.mainApproversCreated && this.approverCriteriaChanged();
   }
 
   private approverCriteriaChanged(): boolean {
     const newCriteria = this.makeApproverCriteria();
-    // this.logger.debug('new approver criteria ', newCriteria);
-    // this.logger.debug('prior approver criteria ', this.approverCriteria);
     return newCriteria.requestType !== this.approverCriteria.requestType
       || newCriteria.cayCode !== this.approverCriteria.cayCode
       || newCriteria.fundingSources !== this.approverCriteria.fundingSources
@@ -82,17 +79,10 @@ export class PlanModel {
 
   private makeApproverCriteria(): any {
     const approverCriteria: any = {};
-    //  approverCriteria.requestType = this.fundingPlanDto.financialInfoDto.requestTypeId;
     approverCriteria.cayCode = this.fundingPlanDto.cayCode;
     approverCriteria.doc = this.fundingPlanDto.requestorDoc;
-    // const fundingSources = Array.from(this.fundingPlanDto.fundingPlanFoas.map());
-    // fundingSources.sort(); commented for now to make the order of
-    // fundingSources important in determining if approvers need to be regen.
-    // approverCriteria.fundingSources = fundingSources.join(',');
     approverCriteria.otherDocs = this.fundingPlanDto.otherContributingDocs;
     approverCriteria.loaCode = this.fundingPlanDto.loaCode;
-    // from the create_main_approvers sp, it seems otherDocs has no effect on funding request approvers,
-    // only affects funding plan approvers, needs double check with David and Subashini.
     return approverCriteria;
   }
 
@@ -115,8 +105,6 @@ export class PlanModel {
 
   documentSnapshotChanged(): boolean {
     const newSnapshot = this.buildModelSnapshot();
-    // this.logger.debug('old documentSnapshot ', JSON.stringify(this.documentSnapshot));
-    // this.logger.debug('new documentSnapshot ', JSON.stringify(newSnapshot));
     return newSnapshot.rfqNcabs !== this.documentSnapshot?.rfqNcabs
       || newSnapshot.selectedGrants !== this.documentSnapshot?.selectedGrants
       || newSnapshot.scoreRange !== this.documentSnapshot?.scoreRange;

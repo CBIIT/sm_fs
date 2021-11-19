@@ -6,9 +6,7 @@ import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 import { WorkflowModel } from 'src/app/funding-request/workflow/workflow.model';
-import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from 'src/app/model/plan/plan-model';
-import { RequestModel } from 'src/app/model/request/request-model';
 
 
 @Component({
@@ -99,13 +97,6 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
       gmInfos.push(gmInfo);
     }
     return gmInfos;
-    // if (this.gmInfo.defaultSpecNpeId) {
-    //   this.logger.debug('spec npe id', this.gmInfo.defaultSpecNpeId);
-    //   this.logger.debug('spec map', this.specialistMap);
-    //   const spec = this.specialistMap.get(Number(this.gmInfo.defaultSpecNpeId));
-    //   this.logger.debug('spec',  this.specialistMap.get(22180));
-    //   this.gmInfo.defaultSpecFullName = spec.specCode + ' ' + spec.specFullName;
-    // }
   }
 
   get editable(): boolean {

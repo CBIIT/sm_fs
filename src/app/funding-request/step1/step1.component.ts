@@ -57,7 +57,6 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
 
   grantList: NciPfrGrantQueryDto[] = [];
 
-//  dtOptions:  DataTables.Settings;
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject();
   showAdvancedFilters = false;
@@ -76,10 +75,9 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
 
   tooltipGrant: any;
 
-  showResults: boolean = false;
+  showResults = false;
 
   ngAfterViewInit(): void {
-    // this.initDatatable();
 
     this.dtOptions = {
       pagingType: 'full_numbers',
@@ -125,8 +123,6 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
          ngTemplateRef: { ref: this.fundingRequestActionRenderer}, className: 'all'},
         {data: null, defaultContent: ''}
       ],
-      // columnDefs: [ { orderable: false, targets: -1 }],.
-      // responsive: true,
 
       responsive: {
         details: {
@@ -155,16 +151,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         {responsivePriority: 13, targets: 4 }, // i2 status
         {responsivePriority: 14, targets: 11 } // budget start date
       ],
-      // dom:  '<"table-controls"<""l><"ml-auto mr-2"B><""p>>' +
-      //       '<"row"<"col-12"tr>>' +
-      //       '<"table-controls"<""i><"ml-auto mr-2"B><""p>>',
-      // buttons: {
-      //     dom: {
-      //       button: {
-      //         tag: 'button',
-      //         className: 'btn btn-sm btn-outline-secondary'
-      //       }
-      //     },
+
       dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
       buttons: [
         {
@@ -336,11 +323,6 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     }
   }
 
-  private initDatatable(): void {
-    // this.dataTable = $('table#grantDt').DataTable(this.dtOptions);
-  //  this.dataTable.columns.adjust().responsive.recalc();
-  }
-
   clear(): void {
     this.searchWithin = this.gsfs.defaultSearchWithin;
     this.piName = '';
@@ -371,8 +353,6 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
 
   // restore the search criteria when user navigates back to step1 from step2, step3 ...
   restoreSearchFilter(): void {
-    // this.logger.debug('Restore search filter: ', this.gsfs, this.searchCriteria);
-  //  this.searchWithin = '';
     this.piName = this.searchCriteria.piName;
     this.selectedPd = this.gsfs.selectedPd;
     this.searchWithin = this.gsfs.searchWithin;

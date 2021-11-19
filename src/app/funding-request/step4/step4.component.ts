@@ -45,8 +45,6 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   isRequestEverSubmitted = false;
   requestHistorySubscriber: Subscription;
   activeApproverSubscriber: Subscription;
-  // submissionResult: { status: 'success' | 'failure' | '', frqId?: number, approver?: FundingReqApproversDto, errorMessage?: string }
-  //   = { status: '' };
   requestStatus: string;
   docDtos: DocumentsDto[];
    readonly = false;
@@ -59,16 +57,12 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   justificationType = '';
   justificationText = '';
   transitionMemoMissing = false;
-  // isDisplayBudgetDocsUploadVar = false;
   closeResult: string;
   _workFlowAction = '';
 
   userCanSubmitApprove = false;
   inflightPlan: FundingPlanDto;
 
-  // get budgetDocDtos(): DocumentsDto[] {
-  //   return this.requestModel.requestDto.budgetDocs;
-  // }
   get displayReadOnlyBudgetDocs(): boolean {
     return this.requestModel.requestDto.budgetDocs?.length > 0;
   }
@@ -134,13 +128,6 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     this.checkDocs();
     this.isDocsStepCompleted();
     this.checkInflightFundingPlan();
-//    this.logger.debug('step4 PRINT_THIS ', this);
-    // this.isDisplayBudgetDocsUpload();
-
-    // this.budgetDocDtos = this.requestModel.requestDto.budgetDocs;
-    // if (this.budgetDocDtos.length > 0) {
-    //   this.displayReadOnlyBudgetDocs = true;
-    // }
   }
 
   private isDocsStepCompleted(): void {
@@ -154,10 +141,6 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
     let submitted = false;
     historyResult.forEach((item: FundingReqStatusHistoryDto) => {
-      // const i = item.statusDescrip.search(/ by /gi);
-      // if (i > 0) {
-      //   item.statusDescrip = item.statusDescrip.substring(0, i);
-      // }
 
       if (item.statusCode === 'SUBMITTED') {
         submitted = true;
@@ -245,7 +228,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    if(+this.requestModel.requestDto.frtId === +FundingRequestTypes.PAY_TYPE_4 &&
+    if (+this.requestModel.requestDto.frtId === +FundingRequestTypes.PAY_TYPE_4 &&
     (this.requestModel.requestDto.conversionActivityCode !== 'NC'))  {
       this.transitionMemoMissing = true;
       if (this.docDtos && this.docDtos.length > 0) {
@@ -323,7 +306,6 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
       });
     }
     this.logger.debug('Submit Request for: ', dto);
-    // const nextApproverInChain = this.workflowModel.getNextApproverInChain();
     this.fsWorkflowControllerService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
         this.logger.debug('Submit Request result: ', result);
@@ -388,7 +370,6 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
   submitApprove(): boolean {
     return this.userCanSubmitApprove &&
-      //     this.requestStatus === 'DRAFT' &&
       !this.workflowModel.hasNewApprover;
   }
 

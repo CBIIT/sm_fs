@@ -102,7 +102,6 @@ export class WorkflowModalComponent implements OnInit {
     dto.comments = this.comments;
     dto.action =  WorkflowActionCode[this.mode];
     this.logger.debug('Modal submits workflow task dto ', dto);
-//    this.fsWorkflowService.submitWorkflowUsingPOST(dto).subscribe(
     this.invokeRestApi(dto).subscribe(
       (result) => {
         this.modalRef.close(dto);

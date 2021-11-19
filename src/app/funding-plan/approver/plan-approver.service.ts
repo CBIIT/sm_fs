@@ -36,7 +36,6 @@ export class PlanApproverService {
   }
 
   private createMainApprovers(resolve: any, reject: any): void {
-    // TO-DO, need to used the real fprId and requestorNpeId in the planModel.
     const workflowDto = { fprId: this.planModel.fundingPlanDto.fprId, requestorNpeId: this.planModel.fundingPlanDto.requestorNpeId};
     this.planService.createPlanApproversUsingPOST(workflowDto).subscribe(
       (result) => {

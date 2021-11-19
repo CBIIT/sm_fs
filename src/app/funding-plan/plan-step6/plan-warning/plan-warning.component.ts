@@ -23,8 +23,4 @@ export class PlanWarningComponent implements OnInit {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   }
 
-  // retrieveRequest(frqId: number): void{
-  //   this.router.navigate(['/request/retrieve', frqId]);
-  // }
-
 }
