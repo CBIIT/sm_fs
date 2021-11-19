@@ -24,7 +24,6 @@ export class AlertBillboardComponent implements OnInit {
     if (i === -1) {
       this.alerts.forEach((a, index) => {
         if (a.type === alert.type && a.message === alert.message) {
-          console.log('found manually at index', index);
           i = index;
         }
       });

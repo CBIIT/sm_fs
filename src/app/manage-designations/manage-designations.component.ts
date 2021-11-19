@@ -6,21 +6,21 @@ import {
   NgbDateParserFormatter,
   NgbDateStruct,
   NgbModal
-} from "@ng-bootstrap/ng-bootstrap";
-import {DatepickerAdapter, DatepickerFormatter} from "../datepicker/datepicker-adapter-formatter";
-import {NGXLogger} from "ngx-logger";
-import {DataTableDirective} from "angular-datatables";
-import {Subject} from "rxjs";
-import {NgForm} from "@angular/forms";
-import {FsDesigneeControllerService} from "@nci-cbiit/i2ecws-lib";
-import {AppUserSessionService} from "../service/app-user-session.service";
-import {DesigneeCellRendererComponent} from "./designee-cell-renderer/designee-cell-renderer.component";
-import {DesigneeActionCellRendererComponent} from "./designee-action-cell-renderer/designee-action-cell-renderer.component";
-import {EditDesigneeModalComponent} from "./edit-designee-modal/edit-designee-modal.component";
-import {FundingRequestPermDelDto} from "@nci-cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
-import {Options} from "select2";
-import {Select2OptionData} from "ng-select2";
-import {ConfirmDeleteModalComponent} from "./confirm-delete-modal/confirm-delete-modal.component";
+} from '@ng-bootstrap/ng-bootstrap';
+import {DatepickerAdapter, DatepickerFormatter} from '../datepicker/datepicker-adapter-formatter';
+import {NGXLogger} from 'ngx-logger';
+import {DataTableDirective} from 'angular-datatables';
+import {Subject} from 'rxjs';
+import {NgForm} from '@angular/forms';
+import {FsDesigneeControllerService} from '@nci-cbiit/i2ecws-lib';
+import {AppUserSessionService} from '../service/app-user-session.service';
+import {DesigneeCellRendererComponent} from './designee-cell-renderer/designee-cell-renderer.component';
+import {DesigneeActionCellRendererComponent} from './designee-action-cell-renderer/designee-action-cell-renderer.component';
+import {EditDesigneeModalComponent} from './edit-designee-modal/edit-designee-modal.component';
+import {FundingRequestPermDelDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestPermDelDto';
+import {Options} from 'select2';
+import {Select2OptionData} from 'ng-select2';
+import {ConfirmDeleteModalComponent} from './confirm-delete-modal/confirm-delete-modal.component';
 
 @Component({
   selector: 'app-manage-designations',
@@ -43,7 +43,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
   @ViewChild('actionDesigneeRenderer') actionRenderer: DesigneeActionCellRendererComponent;
   @ViewChild('form') newDesigneeForm: NgForm;
 
-  dsTemporary: boolean = false;
+  dsTemporary = false;
 
   startDate: NgbDateStruct;
   endDate: NgbDateStruct;
@@ -63,10 +63,10 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
         return '';
       }
     }
-  }
+  };
 
-  errInactiveDesignees: boolean = false;
-  successManageDesigneesMsg: string = '';
+  errInactiveDesignees = false;
+  successManageDesigneesMsg = '';
   successDesignee: FundingRequestPermDelDto;
 
   ngOnInit(): void {
@@ -86,14 +86,13 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
         delay: 500,
         type: 'GET',
         data(params): any {
-          return { 'term': params.term }
+          return { term: params.term };
         },
         processResults: this.select2processResults.bind(this),
-        //TODO - error handling
+        // TODO - error handling
         error: (error) => {
           if (error.responseText) {  // response is undefined if ajax call was aborted
             console.error(error);
-            alert(error.responseText)
           }
         }
       }
@@ -101,7 +100,6 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
   }
 
   private select2processResults(data: any): any {
-    console.debug('Results', data);
     const results = $.map(data , entry => {
       return {
         id: entry.nciLdapCn,
@@ -115,7 +113,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
         if (this.userSessionService.getLoggedOnUser().nihNetworkId === entry.id) {
           return false;
         }
-        for (let dtEntry of this.dtData) {
+        for (const dtEntry of this.dtData) {
           if (dtEntry.delegateTo === entry.id) {
             return false;
           }
@@ -133,11 +131,11 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       language: { emptyTable: 'No designees selected'},
       data: this.dtData,
       columns: [
-        {title: 'Designee', data: 'delegateToFullName', ngTemplateRef: { ref: this.designeeRenderer }}, //0
-        {title: 'Organization Name', data: 'currentNedOrg'}, //1
-        {title: 'Start Date', data: 'delegateFromDate'}, //2
-        {title: 'End Date', data: 'delegateToDate'}, //3
-        {title: 'Action', data: null, ngTemplateRef: { ref: this.actionRenderer}} //4
+        {title: 'Designee', data: 'delegateToFullName', ngTemplateRef: { ref: this.designeeRenderer }}, // 0
+        {title: 'Organization Name', data: 'currentNedOrg'}, // 1
+        {title: 'Start Date', data: 'delegateFromDate'}, // 2
+        {title: 'End Date', data: 'delegateToDate'}, // 3
+        {title: 'Action', data: null, ngTemplateRef: { ref: this.actionRenderer}} // 4
       ],
       columnDefs: [
       ],
@@ -157,7 +155,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
           }
         });
       }
-    }
+    };
     setTimeout(() => this.dtTrigger.next(), 0);
     setTimeout(() => this.initDesigneeList(), 10);
   }
@@ -244,19 +242,19 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       }
-    )
+    );
   }
 
   onPermanent() {
     this.startDate = null;
     this.endDate = null;
-    const savedName = this.newDesigneeForm.value['name'];
+    const savedName = this.newDesigneeForm.value.name;
     this.newDesigneeForm.resetForm();
     this.newDesigneeForm.form.patchValue({name: savedName});
   }
 
   onTemporary() {
-    const savedName = this.newDesigneeForm.value['name'];
+    const savedName = this.newDesigneeForm.value.name;
     this.newDesigneeForm.resetForm();
     this.newDesigneeForm.form.patchValue({name: savedName});
   }
@@ -264,7 +262,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
   onEditDesignee($event: number) {
     const entry = this._getEntryById($event);
     if (entry) {
-      const modalRef = this.modalService.open(EditDesigneeModalComponent, { size: "lg"});
+      const modalRef = this.modalService.open(EditDesigneeModalComponent, { size: 'lg'});
       modalRef.componentInstance.data = entry;
       modalRef.result.then((updatedData: any) => {
         console.debug('Result: ', updatedData);
@@ -282,7 +280,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
           error => {
             this.logger.error('HttpClient edit designee request error for----- ' + error.message);
           }
-        )
+        );
       }).finally(() => console.debug('Finally closing dialog'));
     }
   }
@@ -304,7 +302,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
           error => {
             this.logger.error('HttpClient delete designee request error for----- ' + error.message);
           }
-        )
+        );
       }).finally(() => console.debug('Finally closing dialog'));
     }
   }
@@ -319,11 +317,11 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       error => {
         this.logger.error('HttpClient put designee request error for----- ' + error.message);
       }
-    )
+    );
   }
 
-  private _getEntryById (id: number) : FundingRequestPermDelDto {
-    for (let entry of this.dtData) {
+  private _getEntryById(id: number): FundingRequestPermDelDto {
+    for (const entry of this.dtData) {
       if (entry.id === id) {
         return entry;
       }

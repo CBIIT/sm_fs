@@ -39,7 +39,6 @@ export class SearchFundingSourceComponent implements OnInit {
         this.data = dropdownList;
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
-        alert('HttpClient get request error for----- ' + error.message); //TODO error handling
       });
   }
 }

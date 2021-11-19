@@ -30,7 +30,6 @@ export class SearchRfaPaDropdownComponent implements OnInit {
         this.rfaPas = rfapaResults;
       }, error => {
         console.error('HttpClient get request error for----- ' + error.message);
-        alert('HttpClient get request error for----- ' + error.message);  //TODO error handling
       });
   }
 

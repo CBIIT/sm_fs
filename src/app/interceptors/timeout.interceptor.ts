@@ -2,15 +2,15 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
-import { TimeoutService } from '../service/timeout.service';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { openNewWindow } from '../utils/utils';
+import { ErrorHandlerService } from '../error/error-handler.service';
 
 @Injectable()
 export class TimeoutInterceptor implements HttpInterceptor {
   constructor(
-    private timeoutService: TimeoutService,
+    private errorHandler: ErrorHandlerService,
     private logger: NGXLogger,
     private router: Router
   ) {
@@ -20,10 +20,10 @@ export class TimeoutInterceptor implements HttpInterceptor {
     // this.logger.debug(req, next);
     return next.handle(req).pipe(
       catchError((error, caught) => {
-        this.logger.warn(`Raw error: ${error}`);
-        this.logger.warn(`Error.error: ${error.error}`);
-        this.logger.warn(`Error.status: ${error.status}`);
-        this.logger.warn(`Error.keys: ${Object.keys(error)}`);
+        // this.logger.warn(`Raw error: ${JSON.stringify(error)}`);
+
+        const timestamp: number = Date.now();
+        this.errorHandler.registerNewError(timestamp, error);
 
         if (error.status === 200 && error.text?.includes('HTML')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
@@ -31,7 +31,7 @@ export class TimeoutInterceptor implements HttpInterceptor {
           openNewWindow(url, 'Restore Session', undefined);
           // return null;
         }
-        this.router.navigate(['/error']);
+        this.router.navigate(['/error', timestamp]);
         throw error;
       })
     );

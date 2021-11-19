@@ -1,10 +1,9 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {ControlContainer, NgForm, NgModel} from "@angular/forms";
-import {Select2OptionData} from "ng-select2";
-import {Options} from "select2";
-import {NGXLogger} from "ngx-logger";
-import {FsLookupControllerService} from "@nci-cbiit/i2ecws-lib";
-import {openNewWindow} from "../../../utils/utils";
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ControlContainer, NgForm, NgModel } from '@angular/forms';
+import { Select2OptionData } from 'ng-select2';
+import { Options } from 'select2';
+import { NGXLogger } from 'ngx-logger';
+import { FsLookupControllerService } from '@nci-cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-search-funding-request-doc',
@@ -14,20 +13,18 @@ import {openNewWindow} from "../../../utils/utils";
 })
 export class SearchFundingRequestDocComponent implements OnInit {
 
-  @Input() required: boolean = false;
+  @Input() required = false;
   @Input() form: NgForm; // optional parent form to validate on submit
-  @Input() label: string = 'Doc';
-  @Input() name: string = 'funding-request-doc-select'; // optional control name (default is 'funding-request-doc-select')
+  @Input() label = 'Doc';
+  @Input() name = 'funding-request-doc-select'; // optional control name (default is 'funding-request-doc-select')
 
-  @ViewChild('fundingRequestDoc') frTypeControl: NgModel
+  @ViewChild('fundingRequestDoc') frTypeControl: NgModel;
 
   data: Array<Select2OptionData> = [];
   options: Options = {};
 
   constructor(private logger: NGXLogger,
-              private fsLookupControllerService: FsLookupControllerService) { }
-
-  ngAfterViewInit(): void {
+              private fsLookupControllerService: FsLookupControllerService) {
   }
 
   ngOnInit(): void {
@@ -42,7 +39,6 @@ export class SearchFundingRequestDocComponent implements OnInit {
         this.data = dropdownList;
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
-        alert('HttpClient get request error for----- ' + error.message); //TODO error handling
       });
   }
 }
