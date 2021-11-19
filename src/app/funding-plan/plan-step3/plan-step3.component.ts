@@ -40,6 +40,7 @@ export class PlanStep3Component implements OnInit {
   private nextStep: string;
   alerts: Alert[];
   private editing: { sourceId: number; index: number };
+  futureYears: Map<number, number> = new Map<number, number>();
 
   get cayCodeArr(): string[] {
     return [this.cayCode];
@@ -105,6 +106,15 @@ export class PlanStep3Component implements OnInit {
       if (this.planManagementService.selectedSourceCount <= 1) {
         this.buildPlanModel();
       } else {
+        this.rebuildRecommendedFutureYears();
+        this.logger.debug(this.futureYears);
+        this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
+          req.financialInfoDto.fundingRequestCans.forEach(can => {
+            this.logger.debug(req.applId, '==', this.futureYears.get(+req.applId));
+            can.approvedFutureYrs = this.futureYears.get(+req.applId);
+            can.requestedFutureYrs = this.futureYears.get(+req.applId);
+          });
+        });
         this.logger.info('double checking total and direct recommended amounts');
         this.planModel.fundingPlanDto.totalRecommendedAmt = this.planManagementService.grandTotalTotal();
         this.planModel.fundingPlanDto.directRecommendedAmt = this.planManagementService.grandTotalDirect();
@@ -237,15 +247,7 @@ export class PlanStep3Component implements OnInit {
     this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = deleteSources;
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = [];
 
-    const futureYears: Map<number, number> = new Map<number, number>();
-    this.applicationsProposedForFunding.grantList.forEach(item => {
-      if (!!item.recommendedFutureYearsComponent) {
-        const applId = item.grant.applId;
-        const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue || 0;
-        // this.logger.debug('Retrieved values (applId, recommendedFutureYears) =>', applId, recommendedFutureYears);
-        futureYears.set(applId, recommendedFutureYears);
-      }
-    });
+    this.rebuildRecommendedFutureYears();
 
     const fundingSourceDetails: Map<number, FundingRequestFundsSrcDto> = new Map<number, FundingRequestFundsSrcDto>();
     this.applicationsProposedForFunding.fundingSources.forEach((item, index) => {
@@ -313,7 +315,7 @@ export class PlanStep3Component implements OnInit {
           approvedTc: totalCost,
           dcPctCut: dcPercentCut,
           tcPctCut: tcPercentCut,
-          approvedFutureYrs: futureYears.get(item.grant.applId),
+          approvedFutureYrs: this.futureYears.get(item.grant.applId),
           fseId: source.fundingSourceId,
           defaultOefiaTypeId: source.octId,
           nciSourceFlag: source.nciSourceFlag,
@@ -332,6 +334,17 @@ export class PlanStep3Component implements OnInit {
     });
     // ====================================================================================
     // ====================================================================================
+  }
+
+  rebuildRecommendedFutureYears(): void {
+    this.applicationsProposedForFunding.grantList.forEach(item => {
+      if (!!item.recommendedFutureYearsComponent) {
+        const applId = item.grant.applId;
+        const recommendedFutureYears: number = item.recommendedFutureYearsComponent.selectedValue || 0;
+        this.futureYears.set(applId, recommendedFutureYears);
+        this.planManagementService.setRecommendedFutureYears(applId, recommendedFutureYears);
+      }
+    });
   }
 
   private scrapePlanData(): void {

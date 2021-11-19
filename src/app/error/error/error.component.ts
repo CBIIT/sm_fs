@@ -25,11 +25,10 @@ export class ErrorComponent implements OnInit {
 
   ngOnInit(): void {
     this.errorId = this.route.snapshot.params.errorId;
-    this.errorMessage = this.errorHandler.getMessage(this.errorId);
-    this.errorDetails = this.errorHandler.getDetails(this.errorId);
+    this.errorMessage = this.errorHandler.getMessage(+this.errorId);
+    this.errorDetails = this.errorHandler.getDetails(+this.errorId);
     this.techSupport = environment.techSupport;
     this.production = environment.production;
-    this.logger.debug(environment);
   }
 
 }

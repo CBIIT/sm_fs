@@ -157,7 +157,7 @@
             [parentForm]="parentForm" 
             [grantIndex]="grantIndex" 
             [grant]="grant"
-            [readOnly]="true"
+            [readOnly]="false"
             [sourceIndex]="0">
           </app-fp-grant-information>
           <input type="text" style="display:none" ngModel #unFunded="ngModel" name="unfunded" [appGrantFundedOnceValidator]="grant.applId">
