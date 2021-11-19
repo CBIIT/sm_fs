@@ -134,11 +134,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       columns: [
         {
-          title: 'Sel',
+          title: '',
           data: 'selected',
           orderable: false,
-          ngTemplateRef: { ref: this.selectFundingRequestCheckboxRenderer },
-          className: 'all'
+          className: 'all select-checkbox',
+          render: data => { return ''; }
         }, // 0
         {
           title: 'Grant Number',
@@ -234,6 +234,50 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           }
         });
+
+        const $node = $('.select-checkbox', row);
+
+        if  (data['selected']) {
+          $('.select-checkbox', row).addClass('selected');
+        }
+
+        $('.select-checkbox', row).off('click');
+        $('.select-checkbox', row).on('click', ($event) => {
+          data['selected'] = !data['selected'];
+          this.onCaptureFRSelectedEvent(data);
+          if  (data['selected']) {
+            $node.addClass('selected');
+          }
+          else {
+            $node.removeClass('selected');
+          }
+        });
+      },
+      headerCallback: (thead: Node, data: any[], start: number, end: number, display: any[]) => {
+        const $node = $('.select-checkbox', thead);
+        if ($node) {
+          // Reset header checkbox on load (only once)
+          $node.removeClass('selected');
+          $node.off('click');
+          $node.on('click', ($event) => {
+            if ($node.hasClass('selected')) {
+              $node.removeClass('selected');
+              for (const d of data) {
+                d['selected'] = false;
+                this.onCaptureFRSelectedEvent(d);
+              }
+              $node.closest('table').find('.select-checkbox').removeClass('selected');
+            }
+            else {
+              $node.addClass('selected');
+              for (const d of data) {
+                d['selected'] = true;
+                this.onCaptureFRSelectedEvent(d);
+              }
+              $node.closest('table').find('.select-checkbox').addClass('selected');
+            }
+          });
+        }
       }
     };
 
@@ -710,7 +754,6 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     });
-
   }
 
   onCaptureFRSelectedEvent($event: any): void {
