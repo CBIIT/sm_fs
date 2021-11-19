@@ -81,6 +81,10 @@ export class Step2Component implements OnInit {
     // TODO: make sure model is properly constructed
     this.requestModel.prepareBudgetsAndSetFinalLoa();
     this.requestModel.requestDto.financialInfoDto.conversionActivityCode = this.requestModel.requestDto.conversionActivityCode;
+    this.requestModel.requestDto.parentFrtId = null;
+    this.requestModel.requestDto.selectedFrtId = this.requestModel.requestDto.frtId;
+    this.requestModel.requestDto.financialInfoDto.requestTypeId = this.requestModel.requestDto.frtId;
+    this.requestModel.requestDto.financialInfoDto.parentRequestTypeId = null;
     this.logger.debug(JSON.stringify(this.requestModel.requestDto));
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
