@@ -112,6 +112,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userService.hasRole('OEFIACRT') ||
       this.userService.hasRole('DES') ||
       this.userService.hasRole('PAYLSTVW');
+    $.fn.DataTable['ext'].pager.numbers_length = 5;
   }
 
   ngAfterViewInit(): void {
