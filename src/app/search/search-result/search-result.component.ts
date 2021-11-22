@@ -10,35 +10,28 @@ import {
 } from '@angular/core';
 import { FsSearchControllerService, FundingRequestQueryDto, FundSelectSearchCriteria } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
-import { Subject } from "rxjs";
-import { AppPropertiesService } from "../../service/app-properties.service";
-import { LoaderService } from "../../service/loader-spinner.service";
-import { DataTableDirective } from "angular-datatables";
-import { FullGrantNumberCellRendererComponent } from "../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component";
-import { CancerActivityCellRendererComponent } from "../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component";
-import { SearchFundingRequestActionCellRendererComponent } from "./search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component";
-import { FundingPlanQueryDto } from "@nci-cbiit/i2ecws-lib/model/fundingPlanQueryDto";
-import { SearchFundingPlanFoasCellRendererComponent } from "./search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component";
-import { Router } from "@angular/router";
+import { Subject } from 'rxjs';
+import { AppPropertiesService } from '../../service/app-properties.service';
+import { LoaderService } from '../../service/loader-spinner.service';
+import { DataTableDirective } from 'angular-datatables';
+import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+import { CancerActivityCellRendererComponent } from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
+import { SearchFundingRequestActionCellRendererComponent } from './search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component';
+import { FundingPlanQueryDto } from '@nci-cbiit/i2ecws-lib/model/fundingPlanQueryDto';
+import { SearchFundingPlanFoasCellRendererComponent } from './search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component';
+import { Router } from '@angular/router';
 import { BatchApproveService } from '../batch-approve/batch-approve.service';
 import { BatchApproveModalComponent } from '../batch-approve/batch-approve-modal.component';
 import { DocumentService } from '../../service/document.service';
 import { saveAs } from 'file-saver';
 import { HttpResponse } from '@angular/common/http';
-import { SearchGrantExistInRequestCellRendererComponent } from "./search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component";
-import { SearchGrantExistInPlanCellRendererComponent } from "./search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component";
-import { DatatableThrottle } from "../../utils/datatable-throttle";
-import { SearchGrantExistInPaylistCellRendererComponent } from "./search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component";
-import { AppUserSessionService } from "../../service/app-user-session.service";
-import { CurrencyPipe } from "@angular/common";
-import { convertNcabs } from "../../utils/utils";
-
-class DataTablesResponse {
-  data: any[];
-  draw: number;
-  recordsFiltered: number;
-  recordsTotal: number;
-}
+import { SearchGrantExistInRequestCellRendererComponent } from './search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component';
+import { SearchGrantExistInPlanCellRendererComponent } from './search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component';
+import { DatatableThrottle } from '../../utils/datatable-throttle';
+import { SearchGrantExistInPaylistCellRendererComponent } from './search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component';
+import { AppUserSessionService } from '../../service/app-user-session.service';
+import { CurrencyPipe } from '@angular/common';
+import { convertNcabs } from '../../utils/utils';
 
 @Component({
   selector: 'app-search-result',
@@ -65,9 +58,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
   @ViewChild('searchFundingPlanFoasRenderer') searchFundingPlanFoasRenderer: TemplateRef<SearchFundingPlanFoasCellRendererComponent>;
-  @ViewChild('searchFundingRequestActionRenderer') searchFundingRequestActionRenderer: TemplateRef<SearchFundingRequestActionCellRendererComponent>;
+  @ViewChild('searchFundingRequestActionRenderer') searchFundingRequestActionRenderer:
+    TemplateRef<SearchFundingRequestActionCellRendererComponent>;
 
-  @ViewChild('searchFundingPlanActionRenderer') searchFundingPlanActionRenderer: TemplateRef<SearchFundingRequestActionCellRendererComponent>;
+  @ViewChild('searchFundingPlanActionRenderer') searchFundingPlanActionRenderer:
+    TemplateRef<SearchFundingRequestActionCellRendererComponent>;
   @ViewChild('existInRequestRenderer') existInRequestRenderer: TemplateRef<SearchGrantExistInRequestCellRendererComponent>;
   @ViewChild('existInPlanRenderer') existInPlanRenderer: TemplateRef<SearchGrantExistInPlanCellRendererComponent>;
   @ViewChild('existInPaylistRenderer') existInPaylistRenderer: TemplateRef<SearchGrantExistInPaylistCellRendererComponent>;
@@ -89,9 +84,9 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   fundingGrants: any[];
   searchCriteria: FundSelectSearchCriteria;
 
-  showFundingRequestResult: boolean = false;
-  showFundingPlanResult: boolean = false;
-  showGrantResult: boolean = false;
+  showFundingRequestResult = false;
+  showFundingPlanResult = false;
+  showGrantResult = false;
 
   filterTypeLabel: string;
 
@@ -100,7 +95,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   batchApproveEnabled = false;
   runReportEnabled = false;
 
-  canOpenPaylist: boolean = false;
+  canOpenPaylist = false;
 
   throttle: DatatableThrottle = new DatatableThrottle();
   // batchApproveVisible = false;
@@ -112,7 +107,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userService.hasRole('OEFIACRT') ||
       this.userService.hasRole('DES') ||
       this.userService.hasRole('PAYLSTVW');
-    $.fn.DataTable['ext'].pager.numbers_length = 5;
+    // @ts-ignore
+    $.fn.DataTable.ext.pager.numbers_length = 5;
   }
 
   ngAfterViewInit(): void {
@@ -127,7 +123,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
           previous: '<i class="far fa-chevron-left" title="Previous"></i>',
           next: '<i class="far fa-chevron-right" title="Next"></i>',
-          last: '<i class="far fa-chevron-double-right" Last="First"></i>'
+          last: '<i class="far fa-chevron-double-right" title="Last"></i>'
         }
       },
       ajax: (dataTablesParameters: any, callback) => {
@@ -139,7 +135,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           data: 'selected',
           orderable: false,
           className: 'all select-checkbox',
-          render: data => { return ''; }
+          render: () => ''
         }, // 0
         {
           title: 'Grant Number',
@@ -148,15 +144,17 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           className: 'all'
         }, // 1
         {
-          title: 'PI', data: 'piFullName', render: (data, type, row, meta) => {
-            return (!data || data == null) ? '' : '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          title: 'PI', data: 'piFullName', render: (data, type, row) => {
+            return (data == null) ? '' : '<a href="mailto:' + row.piEmail +
+              '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }, className: 'all'
         }, // 2
         { title: 'Project Title', data: 'projectTitle' }, // 3
         { title: 'I2 Status', data: 'applStatusGroupDescrip' }, // 4
         {
-          title: 'PD', data: 'pdFullName', render: (data, type, row, meta) => {
-            return (!data || data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          title: 'PD', data: 'pdFullName', render: (data, type, row) => {
+            return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress +
+              '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }
         }, // 5
         { title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer }, className: 'all' }, // 6
@@ -165,8 +163,9 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         { title: 'Request Name', data: 'requestName' }, // 9
         { title: 'Request Type', data: 'requestType' }, // 10
         {
-          title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: (data, type, row, meta) => {
-            return (!data || data == null) ? '' : '<a href="mailto:' + row.requestingDocApprvlEmail + '?subject=' + row.fullGrantNum + ' - ' + row.requestingDocApprvlFullName + '">' + data + '</a>';
+          title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: (data, type, row) => {
+            return (data == null) ? '' : '<a href="mailto:' + row.requestingDocApprvlEmail +
+              '?subject=' + row.fullGrantNum + ' - ' + row.requestingDocApprvlFullName + '">' + data + '</a>';
           }
         }, // 11
         { title: 'Final LOA', data: 'loaName' }, // 12
@@ -223,7 +222,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] }
         }
       ],
-      rowCallback: (row: Node, data: any[] | object, index: number) => {
+      rowCallback: (row: Node, data: any[] | object) => {
         // Fix for Excel output - I removed empty renderers in column definitions
         // But now, I have to remove the first "text" child node to prevent it
         // from rendering (angular datatables bug)
@@ -238,15 +237,18 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
         const $node = $('.select-checkbox', row);
 
-        if  (data['selected']) {
+        // @ts-ignore
+        if  (data.selected) {
           $('.select-checkbox', row).addClass('selected');
         }
 
         $('.select-checkbox', row).off('click');
-        $('.select-checkbox', row).on('click', ($event) => {
-          data['selected'] = !data['selected'];
+        $('.select-checkbox', row).on('click', () => {
+          // @ts-ignore
+          data.selected = !data.selected;
           this.onCaptureFRSelectedEvent(data);
-          if  (data['selected']) {
+          // @ts-ignore
+          if  (data.selected) {
             $node.addClass('selected');
           }
           else {
@@ -254,17 +256,17 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         });
       },
-      headerCallback: (thead: Node, data: any[], start: number, end: number, display: any[]) => {
+      headerCallback: (thead: Node, data: any[]) => {
         const $node = $('.select-checkbox', thead);
         if ($node) {
           // Reset header checkbox on load (only once)
           $node.removeClass('selected');
           $node.off('click');
-          $node.on('click', ($event) => {
+          $node.on('click', () => {
             if ($node.hasClass('selected')) {
               $node.removeClass('selected');
               for (const d of data) {
-                d['selected'] = false;
+                d.selected = false;
                 this.onCaptureFRSelectedEvent(d);
               }
               $node.closest('table').find('.select-checkbox').removeClass('selected');
@@ -272,7 +274,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
             else {
               $node.addClass('selected');
               for (const d of data) {
-                d['selected'] = true;
+                d.selected = true;
                 this.onCaptureFRSelectedEvent(d);
               }
               $node.closest('table').find('.select-checkbox').addClass('selected');
@@ -293,7 +295,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
           previous: '<i class="far fa-chevron-left" title="Previous"></i>',
           next: '<i class="far fa-chevron-right" title="Next"></i>',
-          last: '<i class="far fa-chevron-double-right" Last="First"></i>'
+          last: '<i class="far fa-chevron-double-right" title="Last"></i>'
         }
       },
       ajax: (dataTablesParameters: any, callback) => {
@@ -305,7 +307,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           data: 'selected',
           orderable: false,
           className: 'all select-checkbox',
-          render: data => { return ''; }
+          render: () => ''
         }, // 0
         {
           title: 'FOA information', data: 'fpFoasList', orderable: false,
@@ -314,26 +316,31 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         { title: 'Plan ID', data: 'fprId' }, // 2
         { title: 'Plan Name', data: 'planName' }, // 3
         {
-          title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: (data, type, row, meta) => {
-            const label = (data && data.length > 0) ? data + ((row.requestingCayDoc && row.requestingCayDoc.length > 0) ? (' (' + row.requestingCayDoc + ')') : '') : '';
-            return (type === 'export' || (!data || data.length == 0)) ? label : '<a href="mailto:' + row.requestorEmailAddress + '?subject=' + row.planName + ' - ' + row.requestorPdFullName + '">' + label + '</a>';
+          title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: (data, type, row) => {
+            const label = (data && data.length > 0) ? data + ((row.requestingCayDoc && row.requestingCayDoc.length > 0)
+              ? (' (' + row.requestingCayDoc + ')') : '') : '';
+            return (type === 'export' || (!data || data.length === 0)) ? label : '<a href="mailto:' +
+              row.requestorEmailAddress + '?subject=' + row.planName + ' - ' +
+              row.requestorPdFullName + '">' + label + '</a>';
           }
         }, // 4
         {
-          title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: (data, type, row, meta) => { //TODO
-            return (!data || data == null) ? '' : (type === 'export') ? data : '<a href="mailto:' + row.requestingDocApprvlEmail + '?subject=' + row.planName + ' - ' + row.requestingDocApprvlFullName + '">' + data + '</a>';
+          title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: (data, type, row) => {
+            return (data == null) ? '' : (type === 'export') ? data : '<a href="mailto:' +
+              row.requestingDocApprvlEmail + '?subject=' + row.planName + ' - ' +
+              row.requestingDocApprvlFullName + '">' + data + '</a>';
           }
         }, // 5
         { title: 'Final LOA', data: 'loaName' }, // 6
         { title: 'Funding Approvals', data: 'fundsCertificationCode' }, // 7
         {
-          title: 'Program Recomm. Direct Costs', data: 'directRecommendedAmt', render: (data, type, row, meta) => {
-            return (!data || data == null) ? '' : this.currencyTransformer.transform(data);
+          title: 'Program Recomm. Direct Costs', data: 'directRecommendedAmt', render: (data) => {
+            return (data == null) ? '' : this.currencyTransformer.transform(data);
           }
         }, // 8
         {
-          title: 'Program Recomm. Total Costs', data: 'totalRecommendedAmt', render: (data, type, row, meta) => {
-            return (!data || data == null) ? '' : this.currencyTransformer.transform(data);
+          title: 'Program Recomm. Total Costs', data: 'totalRecommendedAmt', render: (data) => {
+            return (data == null) ? '' : this.currencyTransformer.transform(data);
           }
         }, // 9
         { title: 'Status', data: 'currentStatusDescrip' }, // 10
@@ -391,7 +398,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
                 // Replace header "FOA information" with multiple columns
                 d.header.splice(1, 0, 'FOA Title', 'NCAB Date(s)', 'Issue Type');
                 for (let i = 0, size = d.body.length; i < size; i++) {
-                  let foas = d.body[i][0];
+                  const foas = d.body[i][0];
                   if (foas.length > 0) {
                     let foa = foas[0];
                     d.body[i].splice(0, 1, foa.rfaPaNumber, foa.title, convertNcabs(foa.councilMeetingDateList), foa.issueType);
@@ -418,7 +425,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         ]
       },
-      rowCallback: (row: Node, data: any[] | object, index: number) => {
+      rowCallback: (row: Node, data: any[] | object) => {
         // Fix for Excel output - I removed empty renderers in column definitions
         // But now, I have to remove the first "text" child node to prevent it
         // from rendering (angular datatables bug)
@@ -432,15 +439,18 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         });
 
         const $node = $('.select-checkbox', row);
-        if  (data['selected']) {
+        // @ts-ignore
+        if  (data.selected) {
           $node.addClass('selected');
         }
 
         $node.off('click');
-        $node.on('click', ($event) => {
-          data['selected'] = !data['selected'];
+        $node.on('click', () => {
+          // @ts-ignore
+          data.selected = !data.selected;
           this.onCaptureFPSelectedEvent(data);
-          if  (data['selected']) {
+          // @ts-ignore
+          if  (data.selected) {
             $node.addClass('selected');
           }
           else {
@@ -448,17 +458,17 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         });
       },
-      headerCallback: (thead: Node, data: any[], start: number, end: number, display: any[]) => {
+      headerCallback: (thead: Node, data: any[]) => {
         const $node = $('.select-checkbox', thead);
         if ($node) {
           // Reset header checkbox on load (only once)
           $node.removeClass('selected');
           $node.off('click');
-          $node.on('click', ($event) => {
+          $node.on('click', () => {
             if ($node.hasClass('selected')) {
               $node.removeClass('selected');
               for (const d of data) {
-                d['selected'] = false;
+                d.selected = false;
                 this.onCaptureFPSelectedEvent(d);
               }
               $node.closest('table').find('.select-checkbox').removeClass('selected');
@@ -466,7 +476,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
             else {
               $node.addClass('selected');
               for (const d of data) {
-                d['selected'] = true;
+                d.selected = true;
                 this.onCaptureFPSelectedEvent(d);
               }
               $node.closest('table').find('.select-checkbox').addClass('selected');
@@ -487,7 +497,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
           previous: '<i class="far fa-chevron-left" title="Previous"></i>',
           next: '<i class="far fa-chevron-right" title="Next"></i>',
-          last: '<i class="far fa-chevron-double-right" Last="First"></i>'
+          last: '<i class="far fa-chevron-double-right" title="Last"></i>'
         }
       },
       ajax: (dataTablesParameters: any, callback) => {
@@ -501,32 +511,36 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           className: 'all'
         }, // 0
         {
-          title: 'PI', data: 'piFullName', render: (data, type, row, meta) => {
-            return (!data || data == null) ? '' : '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          title: 'PI', data: 'piFullName', render: (data, type, row) => {
+            return (data == null) ? '' : '<a href="mailto:' + row.piEmail +
+              '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }, className: 'all'
         }, // 1
         { title: 'Project Title', data: 'projectTitle' }, // 2
         { title: 'I2 Status', data: 'applStatusGroupDescrip' }, // 3
         {
-          title: 'FOA', data: 'rfaPaNumber', render: (data, type, row, meta) => {
-            return (!data || data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="_blank">' + data + '</a>';
+          title: 'FOA', data: 'rfaPaNumber', render: (data, type, row) => {
+            return (data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="_blank">'
+              + data + '</a>';
           }, className: 'all'
         }, // 4
         { title: 'FY', data: 'fy' }, // 5
         {
-          title: 'NCAB', data: 'councilMeetingDate', render: (data, type, row, meta) => {
+          title: 'NCAB', data: 'councilMeetingDate', render: (data) => {
             if (!data || data.substr(4, 2) === '00') {
               return '';
             }
-            return data.substr(4, 2) + '/' + data.substr(0, 4)
+            return data.substr(4, 2) + '/' + data.substr(0, 4);
           }
         }, // 6
         {
-          title: 'PD', data: 'pdFullName', render: (data, type, row, meta) => {
-            return (!data || data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          title: 'PD', data: 'pdFullName', render: (data, type, row) => {
+            return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress +
+              '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }
         }, // 7
-        { title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer }, className: 'all' }, // 8
+        { title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer },
+          className: 'all' }, // 8
         { title: 'Pctl', data: 'irgPercentileNum' }, // 9
         { title: 'PriScr', data: 'priorityScoreNum' }, // 10
         {
@@ -587,7 +601,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] }
         }
       ],
-      rowCallback: (row: Node, data: any[] | object, index: number) => {
+      rowCallback: (row: Node) => {
         // Fix for Excel output - I removed empty renderers in column definitions
         // But now, I have to remove the first "text" child node to prevent it
         // from rendering (angular datatables bug)
@@ -853,17 +867,17 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   }
 
-  onRequestSelect($event: number) {
+  onRequestSelect($event: number): void {
     this.logger.debug('onRequestSelect() - request/retrieve', $event);
     this.router.navigate(['request/retrieve', $event]);
   }
 
-  onPlanSelect($event: number) {
+  onPlanSelect($event: number): void {
     this.logger.debug('onRequestSelect() - plan/retrieve', $event);
     this.router.navigate(['plan/retrieve', $event]);
   }
 
-  onPaylistSelect($event: any) {
+  onPaylistSelect($event: any): void {
     if ($event.fy < 2020) {
       // NOTE - jasperReportController DOES NOT work
       window.open('/i2ecws/api/v1/generate-paylist-report/' + $event.id + '/JR_HISTORICALPAYLIST_REPORT/PDF', '_blank');
