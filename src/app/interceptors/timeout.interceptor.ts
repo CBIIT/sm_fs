@@ -20,7 +20,7 @@ export class TimeoutInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // this.logger.debug(req, next);
-
+    // this.logger.debug(`Current route: ${this.router.url}`);
     return next.handle(req).pipe(
       retry(1),
       catchError((error, caught) => {
@@ -30,10 +30,12 @@ export class TimeoutInterceptor implements HttpInterceptor {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
-          const obs = from(modalRef.result.then(() => {
-            return next.handle(req);
-          }));
+          modalRef.result.then(() => {
+            this.router.navigate([this.router.url]);
+          });
+          this.logger.info('throwing the error just for fun');
           return throwError(error);
+          // return from(this.router.navigate([this.router.url]));
           // return obs as unknown as Observable<HttpEvent<any>>;
         } else {
           const timestamp: number = Date.now();
