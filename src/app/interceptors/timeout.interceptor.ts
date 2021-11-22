@@ -31,7 +31,7 @@ export class TimeoutInterceptor implements HttpInterceptor {
           const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
           modalRef.result.then(() => {
-            return next.handle(req);
+            //return next.handle(req);
           });
         } else {
           const timestamp: number = Date.now();

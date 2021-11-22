@@ -59,10 +59,10 @@ const routes: Routes = [
       ]},
       {path: 'fundingSourceDetails', component: FundingSourcesNamesComponent},
       {path: 'manage', component: ManageDesignationsComponent},
-      {path: 'error/:errorId', component: ErrorComponent},
-      {path: 'restoreSession', component: SessionRestoreComponent}
     ]
   },
+  {path: 'error/:errorId', component: ErrorComponent},
+  {path: 'restoreSession', component: SessionRestoreComponent},
   { path: 'unauthorize', component: UnauthorizeComponent }
 ];
 
