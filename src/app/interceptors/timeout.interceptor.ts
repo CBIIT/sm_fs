@@ -22,19 +22,22 @@ export class TimeoutInterceptor implements HttpInterceptor {
     // this.logger.debug(req, next);
     // this.logger.debug(`Current route: ${this.router.url}`);
     return next.handle(req).pipe(
-      retry(1),
+      // retry(1),
       catchError((error, caught) => {
         // this.logger.warn(`Raw error: ${JSON.stringify(error)}`);
 
         if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
+          this.logger.info('open restore modal');
           const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
+          this.logger.info('after open restore modal');
           modalRef.result.then(() => {
+            this.logger.info('restore modal closed');
             this.router.navigate([this.router.url]);
           });
-          this.logger.info('throwing the error just for fun');
-          return throwError(error);
+          return next.handle(req);
+          // return throwError(error);
           // return from(this.router.navigate([this.router.url]));
           // return obs as unknown as Observable<HttpEvent<any>>;
         } else {
