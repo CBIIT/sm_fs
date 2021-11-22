@@ -32,14 +32,11 @@ export class TimeoutInterceptor implements HttpInterceptor {
           this.logger.info('open restore modal');
           const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
           this.logger.info('after open restore modal');
-          modalRef.result.then(() => {
-            this.logger.info('restore modal closed');
+          const obs = from(modalRef.result.then(() => {
+            this.logger.info(`restore modal closed: ${this.router.url}`);
             this.router.navigate([this.router.url]);
-          });
-          return next.handle(req);
-          // return throwError(error);
-          // return from(this.router.navigate([this.router.url]));
-          // return obs as unknown as Observable<HttpEvent<any>>;
+          }));
+          return obs as unknown as Observable<HttpEvent<any>>;
         } else {
           const timestamp: number = Date.now();
           this.errorHandler.registerNewError(timestamp, error);
