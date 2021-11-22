@@ -26,19 +26,19 @@ export class TimeoutInterceptor implements HttpInterceptor {
       catchError((error, caught) => {
         // this.logger.warn(`Raw error: ${JSON.stringify(error)}`);
 
-        // if (error.status === 200 && error.url?.startsWith('https://auth')) {
-        //   this.logger.warn('Error is most likely timeout - redirect to login.');
-        //   const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
-        //   const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
-        //   modalRef.result.then(() => {
-        //     return next.handle(req);
-        //   });
-        // } else {
+        if (error.status === 200 && error.url?.startsWith('https://auth')) {
+          this.logger.warn('Error is most likely timeout - redirect to login.');
+          const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
+          const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
+          modalRef.result.then(() => {
+            return next.handle(req);
+          });
+        } else {
           const timestamp: number = Date.now();
           this.errorHandler.registerNewError(timestamp, error);
           this.router.navigate(['/error', timestamp]);
           throw error;
-        // }
+        }
       })
     );
   }
