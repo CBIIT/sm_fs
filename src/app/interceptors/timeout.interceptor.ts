@@ -33,6 +33,7 @@ export class TimeoutInterceptor implements HttpInterceptor {
           const obs = from(modalRef.result.then(() => {
             return next.handle(req);
           }));
+          this.logger.debug('return observable thing: ', obs);
           return obs as unknown as Observable<HttpEvent<any>>;
         } else {
           const timestamp: number = Date.now();
