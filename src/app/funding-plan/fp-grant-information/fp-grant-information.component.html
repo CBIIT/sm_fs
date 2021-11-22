@@ -14,16 +14,15 @@
   <div class="row mb-2">
     <div class="col-4">
       <span class="like-label mb-1">Grant Number</span>
-      <div class="d-flex align-items-center">
+      <div>
         <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
-        <div class="grant-icons ml-1">
+        &nbsp;
           <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants">
             <span class="egrants-icon"></span>
-          </a>
+          </a> &nbsp;
           <a [routerLink]="" [ngbTooltip]="InstituteTooltip" triggers="click:blur">
             <i class='fa fa-university' aria-hidden='true'></i>
           </a>
-        </div>
       </div>
     </div>
 
