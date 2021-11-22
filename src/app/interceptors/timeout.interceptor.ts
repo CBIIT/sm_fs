@@ -7,6 +7,9 @@ import { Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SessionRestoreComponent } from '../session/session-restore/session-restore.component';
+import { openNewWindow } from '../utils/utils';
+import {Location} from '@angular/common';
+
 
 @Injectable()
 export class TimeoutInterceptor implements HttpInterceptor {
@@ -14,6 +17,7 @@ export class TimeoutInterceptor implements HttpInterceptor {
     private errorHandler: ErrorHandlerService,
     private logger: NGXLogger,
     private router: Router,
+    private location: Location,
     private modalService: NgbModal
   ) {
   }
@@ -29,14 +33,17 @@ export class TimeoutInterceptor implements HttpInterceptor {
         if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
-          this.logger.info('open restore modal');
-          const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
-          this.logger.info('after open restore modal');
-          const obs = from(modalRef.result.then(() => {
-            this.logger.info(`restore modal closed: ${this.router.url}`);
-            this.router.navigate([this.router.url]);
-          }));
-          return obs as unknown as Observable<HttpEvent<any>>;
+          const url = this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
+
+          openNewWindow(url, 'Restore Session', undefined);
+          // const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
+          // this.logger.info('after open restore modal');
+          // const obs = from(modalRef.result.then(() => {
+          //   this.logger.info(`restore modal closed: ${this.router.url}`);
+          //   this.router.navigate([this.router.url]);
+          // }));
+          // return obs as unknown as Observable<HttpEvent<any>>;
+          return of(null);
         } else {
           const timestamp: number = Date.now();
           this.errorHandler.registerNewError(timestamp, error);
