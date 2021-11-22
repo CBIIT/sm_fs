@@ -109,7 +109,7 @@ export class PlanStep3Component implements OnInit {
         this.rebuildRecommendedFutureYears();
         this.logger.debug(this.futureYears);
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
-          req.financialInfoDto.fundingRequestCans.forEach(can => {
+          req.financialInfoDto.fundingRequestCans?.forEach(can => {
             this.logger.debug(req.applId, '==', this.futureYears.get(+req.applId));
             can.approvedFutureYrs = this.futureYears.get(+req.applId);
             can.requestedFutureYrs = this.futureYears.get(+req.applId);
