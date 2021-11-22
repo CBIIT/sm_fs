@@ -4,13 +4,13 @@
     <div class="col_2">
       <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="issueType" [(ngModel)]="issueType">
         <label ngbButtonLabel class="btn-outline-secondary">
-          <input name="new" ngbButton type="radio" value="new" (change)="toggleDisplay('new')">New
+          <input name="new" ngbButton type="radio" value="new" (change)="toggleDisplay('NEW')">New
         </label>
         <label ngbButtonLabel class="btn-outline-secondary">
-          <input name="reissue" ngbButton type="radio" value="reissue" (change)="toggleDisplay('reissue')">Reissue          
+          <input name="reissue" ngbButton type="radio" value="reissue" (change)="toggleDisplay('REISSUE')">Reissue          
         </label> 
       </div>
-      <div class="col_2" *ngIf="issueType==='reissue'">
+      <div class="col_2" *ngIf="issueType==='REISSUE'">
         <br><i>Previous FOA: </i>
       </div>
     <input
@@ -19,11 +19,11 @@
         style="width:7rem"
         class="form-control form-control-sm ml-2"
         [(ngModel)]="priorNotice"
-        [hidden]="issueType === 'new'"
+        [hidden]="issueType === 'NEW'"
         name="priorNotice"
         [disabled]="readOnly"
         #priorNoticeValue="ngModel"
-        [required]="issueType === 'reissue'">
+        [required]="issueType === 'REISSUE'">
     </div>
     <div
       class="text-danger mt-1"
@@ -40,10 +40,10 @@
   </ng-template>
   <ng-template #static>
     <div class="d-flex">
-      <label *ngIf="issueType==='new'">New</label>
-      <label *ngIf="issueType==='reissue'">Reissue</label>
+      <label *ngIf="issueType==='NEW'">New</label>
+      <label *ngIf="issueType==='REISSUE'">Reissue</label>
     </div>
-    <div *ngIf="issueType==='reissue'">
+    <div *ngIf="issueType==='REISSUE'">
       <i>Previous FOA: <app-foa-hyperlink [foaNumber]="priorNotice"></app-foa-hyperlink></i>
     </div>
   </ng-template>

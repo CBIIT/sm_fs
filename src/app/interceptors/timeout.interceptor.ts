@@ -30,6 +30,7 @@ export class TimeoutInterceptor implements HttpInterceptor {
           const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           openNewWindow(url, 'Restore Session', undefined);
           // return null;
+        } else {
         }
         this.router.navigate(['/error', timestamp]);
         throw error;

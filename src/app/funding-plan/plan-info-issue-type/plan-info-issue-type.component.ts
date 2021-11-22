@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FundingPlanFoasDto } from '@nci-cbiit/i2ecws-lib';
 import { ControlContainer, NgForm } from '@angular/forms';
+import { NGXLogger } from 'ngx-logger';
+
 
 @Component({
   selector: 'app-plan-info-issue-type',
@@ -18,25 +20,26 @@ export class PlanInfoIssueTypeComponent implements OnInit {
   priorNotice: string;
   scratch: string = null;
 
-  constructor() {
+  constructor(private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
+    this.logger.debug(this.rfaDetails);
     if (!!this.rfaDetails.issueType) {
       this.issueType = this.rfaDetails.issueType;
       this.priorNotice = this.rfaDetails.prevRfaPaNumber;
     } else if (this.rfaDetails.prevRfaPaNumber) {
       this.priorNotice = this.rfaDetails.prevRfaPaNumber;
-      this.issueType = 'reissue';
+      this.issueType = 'REISSUE';
     } else {
-      this.issueType = 'new';
+      this.issueType = 'NEW';
       this.priorNotice = '';
     }
   }
 
   toggleDisplay(value: string): void {
     this.issueType = value;
-    if (this.issueType === 'reissue') {
+    if (this.issueType === 'REISSUE') {
       this.priorNotice = this.rfaDetails.prevRfaPaNumber;
     } else {
       this.priorNotice = '';
@@ -44,7 +47,7 @@ export class PlanInfoIssueTypeComponent implements OnInit {
   }
 
   isValid(): boolean {
-    if (this.issueType === 'new' || (this.issueType === 'reissue' && !!this.priorNotice)) {
+    if (this.issueType === 'NEW' || (this.issueType === 'REISSUE' && !!this.priorNotice)) {
       return true;
     }
     return false;

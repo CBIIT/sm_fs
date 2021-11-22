@@ -98,6 +98,7 @@ export class FundingPlanInformationComponent implements OnInit {
       this.planModel.grantsSearchCriteria.forEach(rfa => {
         this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
           if (next) {
+            this.logger.debug(`Prior notice: ${next.priorNoticeNumber}`);
             const tmp: FundingPlanFoasDto = {} as FundingPlanFoasDto;
             tmp.rfaPaNumber = next?.noticeNumber;
             tmp.prevRfaPaNumber = next?.priorNoticeNumber;
