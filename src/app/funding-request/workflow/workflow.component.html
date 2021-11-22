@@ -70,7 +70,7 @@
         <ng-container *ngIf="workflowStuckBy === 'ByCompletedPfrs'">
         <ngb-alert type="danger" [dismissible]="false" *ngFor="let r of completedPfrs">
             This Grant application is part of Funding Plan 
-            <a (click)="retrievePlan(r.fprId)">{{r.fprId}}</a> in FY {{r.planFy}}.  
+            <a [routerLink]="" (click)="retrievePlan(r.fprId)">{{r.fprId}}</a> in FY {{r.planFy}}.  
             The selected action cannot be processed.
         </ngb-alert>
         </ng-container>
