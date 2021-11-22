@@ -1,4 +1,6 @@
 form.submitted .ng-invalid {
   border: 1px solid #a94442; /* red */
 }
-
+.fa-user-slash {
+  color: #a60a3d;
+}
