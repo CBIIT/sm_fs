@@ -16,7 +16,6 @@ import { LoaderService } from "../../service/loader-spinner.service";
 import { DataTableDirective } from "angular-datatables";
 import { FullGrantNumberCellRendererComponent } from "../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component";
 import { CancerActivityCellRendererComponent } from "../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component";
-import { SelectFundingRequestCheckboxCellRendererComponent } from "./select-funding-request-checkbox-cell-renderer/select-funding-request-checkbox-cell-renderer.component";
 import { SearchFundingRequestActionCellRendererComponent } from "./search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component";
 import { FundingPlanQueryDto } from "@nci-cbiit/i2ecws-lib/model/fundingPlanQueryDto";
 import { SearchFundingPlanFoasCellRendererComponent } from "./search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component";
@@ -63,13 +62,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChildren(DataTableDirective) dtElements: QueryList<DataTableDirective>;
 
-  @ViewChild('selectFundingRequestCheckboxRenderer') selectFundingRequestCheckboxRenderer: TemplateRef<SelectFundingRequestCheckboxCellRendererComponent>;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
   @ViewChild('searchFundingPlanFoasRenderer') searchFundingPlanFoasRenderer: TemplateRef<SearchFundingPlanFoasCellRendererComponent>;
   @ViewChild('searchFundingRequestActionRenderer') searchFundingRequestActionRenderer: TemplateRef<SearchFundingRequestActionCellRendererComponent>;
 
-  @ViewChild('selectFundingPlanCheckboxRenderer') selectFundingPlanCheckboxRenderer: TemplateRef<SelectFundingRequestCheckboxCellRendererComponent>;
   @ViewChild('searchFundingPlanActionRenderer') searchFundingPlanActionRenderer: TemplateRef<SearchFundingRequestActionCellRendererComponent>;
   @ViewChild('existInRequestRenderer') existInRequestRenderer: TemplateRef<SearchGrantExistInRequestCellRendererComponent>;
   @ViewChild('existInPlanRenderer') existInPlanRenderer: TemplateRef<SearchGrantExistInPlanCellRendererComponent>;
@@ -304,11 +301,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       columns: [
         {
-          title: 'Sel',
+          title: '',
           data: 'selected',
           orderable: false,
-          ngTemplateRef: { ref: this.selectFundingPlanCheckboxRenderer },
-          className: 'all'
+          className: 'all select-checkbox',
+          render: data => { return ''; }
         }, // 0
         {
           title: 'FOA information', data: 'fpFoasList', orderable: false,
@@ -433,6 +430,49 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           }
         });
+
+        const $node = $('.select-checkbox', row);
+        if  (data['selected']) {
+          $node.addClass('selected');
+        }
+
+        $node.off('click');
+        $node.on('click', ($event) => {
+          data['selected'] = !data['selected'];
+          this.onCaptureFPSelectedEvent(data);
+          if  (data['selected']) {
+            $node.addClass('selected');
+          }
+          else {
+            $node.removeClass('selected');
+          }
+        });
+      },
+      headerCallback: (thead: Node, data: any[], start: number, end: number, display: any[]) => {
+        const $node = $('.select-checkbox', thead);
+        if ($node) {
+          // Reset header checkbox on load (only once)
+          $node.removeClass('selected');
+          $node.off('click');
+          $node.on('click', ($event) => {
+            if ($node.hasClass('selected')) {
+              $node.removeClass('selected');
+              for (const d of data) {
+                d['selected'] = false;
+                this.onCaptureFPSelectedEvent(d);
+              }
+              $node.closest('table').find('.select-checkbox').removeClass('selected');
+            }
+            else {
+              $node.addClass('selected');
+              for (const d of data) {
+                d['selected'] = true;
+                this.onCaptureFPSelectedEvent(d);
+              }
+              $node.closest('table').find('.select-checkbox').addClass('selected');
+            }
+          });
+        }
       }
     };
 

@@ -138,7 +138,6 @@ import { FpGrantManagementComponent } from './funding-plan/fp-workflow/fp-grant-
 import { FpProjectedCanComponent } from './funding-plan/fp-projected-can/fp-projected-can.component';
 import { CanSearchModalComponent } from './cans/can-search-modal/can-search-modal.component';
 import { FundingSourceEntryModalComponent } from './funding-plan/applications-proposed-for-funding/funding-source-entry-modal/funding-source-entry-modal.component';
-import { SelectFundingRequestCheckboxCellRendererComponent } from './search/search-result/select-funding-request-checkbox-cell-renderer/select-funding-request-checkbox-cell-renderer.component';
 import { SearchFundingRequestActionCellRendererComponent } from './search/search-result/search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component';
 import { WorkflowWarningModalComponent } from './funding-request/workflow/warning-modal/workflow-warning-modal.component';
 import { SearchFundingRequestTypeComponent } from './search/search-filter/search-funding-request-type/search-funding-request-type.component';
@@ -306,7 +305,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FpProjectedCanComponent,
     CanSearchModalComponent,
     FundingSourceEntryModalComponent,
-    SelectFundingRequestCheckboxCellRendererComponent,
     SearchFundingRequestActionCellRendererComponent,
     WorkflowWarningModalComponent,
     FpWorkflowWarningModalComponent,
