@@ -36,6 +36,9 @@ export class ErrorInterceptorService implements HttpInterceptor {
           const url = this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           this.logger.info(`Error URL: ${error.url}`);
           this.logger.info(`Restore session URL: ${url}`);
+          // const currentRoute = this.router.routerState;
+          //
+          // this.router.navigateByUrl(currentRoute.snapshot.url, { skipLocationChange: true });
 
           openNewWindow(url, 'Restore Session', undefined);
           // const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
