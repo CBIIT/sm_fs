@@ -34,6 +34,8 @@ export class TimeoutInterceptor implements HttpInterceptor {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           const url = this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
+          this.logger.info(`Error URL: ${error.url}`);
+          this.logger.info(`Restore session URL: ${url}`);
 
           openNewWindow(url, 'Restore Session', undefined);
           // const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
