@@ -12,7 +12,7 @@ import {Location} from '@angular/common';
 
 
 @Injectable()
-export class TimeoutInterceptor implements HttpInterceptor {
+export class ErrorInterceptorService implements HttpInterceptor {
   constructor(
     private errorHandler: ErrorHandlerService,
     private logger: NGXLogger,
