@@ -25812,3 +25812,7 @@ td.all.parentTable{
 .childTable {
   border-style: hidden
 }
+.plan-table{
+  width: 70%;
+  overflow:hidden ;
+}
