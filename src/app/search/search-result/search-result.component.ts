@@ -386,7 +386,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
             className: 'btn-excel',
             titleAttr: 'Export Results in Current Page',
             text: 'Export Current Page',
-            filename: 'fs-funding-requests-search-result',
+            filename: 'fs-funding-plans-search-result',
             title: null,
             header: true,
             exportOptions: {
