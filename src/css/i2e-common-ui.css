@@ -18469,6 +18469,7 @@ a.close.disabled {
   position: relative;
   flex: 1 1 auto;
   padding: 1rem;
+  overflow-x: scroll;
 }
 
 /* line 167, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_modal.scss */
