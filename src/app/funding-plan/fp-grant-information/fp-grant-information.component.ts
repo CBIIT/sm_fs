@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from '../../model/plan/plan-model';
 import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
@@ -17,6 +17,7 @@ import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRe
 })
 export class FpGrantInformationComponent implements OnInit {
   @ViewChild(RecommendedFutureYearsComponent) recommendedFutureYearsComponent: RecommendedFutureYearsComponent;
+  @ViewChild('collapseAll') collapseAll: ElementRef<HTMLElement>;
   @Input() grant: NciPfrGrantQueryDtoEx;
   @Input() grantIndex: number;
   @Input() sourceIndex: number;
@@ -24,12 +25,14 @@ export class FpGrantInformationComponent implements OnInit {
   @Input() readOnly = false;
   @Input() checkFunding = true;
 
+
   skip = false;
   exception = false;
   @Input() isModal = false;
   grantAwards: GrantAwardedDto[];
   piDirect: number;
   piTotal: number;
+  fundingSourcesCount: number;
 
   recommendedFutureYears(): any {
     return this.planManagementService.getRecommendedFutureYears(this.grant.applId);
@@ -66,6 +69,12 @@ export class FpGrantInformationComponent implements OnInit {
         dc: this.piDirect,
         tc: this.piTotal
       });
+        // collapse the grant info second part when funding sources more than 2 
+       this.fundingSourcesCount=this.planManagementService.listSelectedSources.length;
+       if(this.fundingSourcesCount>2){
+        const el: HTMLElement = this.collapseAll.nativeElement;
+        el.click();
+       }
     });
   }
 
@@ -78,5 +87,7 @@ export class FpGrantInformationComponent implements OnInit {
     return (this.grant.selected && this.grant.priorityScoreNum &&
       this.grant.priorityScoreNum > this.model.maximumScore);
   }
-
+  get listSelectedSourcesLength(): Number {
+    return this.planManagementService.listSelectedSources.length;
+  }
 }
