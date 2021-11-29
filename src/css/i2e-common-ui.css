@@ -25817,6 +25817,6 @@ td.all.parentTable{
   overflow:hidden ;
 }
 .modal-horizontal-scroll{
-  overflow-x: scroll;
+  overflow-x: auto;
 
 }
