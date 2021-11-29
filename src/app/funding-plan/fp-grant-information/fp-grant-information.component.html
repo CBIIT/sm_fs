@@ -12,7 +12,7 @@
   <a class="btn btn-link grant-info-toggle-btn"  #collapseAll data-toggle="collapse" href="#row-collapse-1" role="button" aria-expanded="true" aria-controls="row-collapse-1" ngbTooltip="Collapse Grant Information" placement="top"></a>
 
   <div class="row mb-2">
-    <div class="col-6">
+    <div class="col-6 grant-info-margin">
       <span class="like-label mb-1">Grant Number</span>
       <div>
         <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <div class="col-6">
+    <div class="col-6 grant-info-margin">
       <span class="like-label mb-1">PI</span>
       <span [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail': 'PI/PD name':'fullGrantNum': 'lastName'"></span>
     </div>
@@ -35,17 +35,17 @@
 
   <div class="row mb-2">
 
-    <div class="col-6">
+    <div class="col-6 grant-info-margin">
       <span class="like-label mb-1">PI Requested Direct Cost</span>
       <span>{{ piDirect | currency }}</span>
     </div>
 
-    <div class="col-6">
+    <div class="col-6 grant-info-margin">
       <span class="like-label mb-1">PI Requested Total Cost</span>
       <span>{{ piTotal | currency }}</span>
     </div>
 
-    <div class="col-12">
+    <div class="col-12 grant-info-margin">
       <label for="rec-fy-3">Recommended Future Years</label>
       <ng-container *ngIf="readOnly then static else dropdown"></ng-container>
       <ng-template #dropdown>
@@ -60,22 +60,22 @@
 
     <div class="row mb-2">
 
-      <div class="col-12">
+      <div class="col-12 grant-info-margin">
         <span class="like-label mb-1">Project Title</span>
         <span>{{ grant.projectTitle }}</span>
       </div>
 
-      <div class="col-4">
+      <div class="col-4 grant-info-margin">
         <span class="like-label mb-1">FOA</span>
         <span><a href="{{ grant.nihGuideAddr }}" target="_blank">{{ grant.rfaPaNumber }}</a></span>
       </div>
 
-      <div class="col-4">
+      <div class="col-4 grant-info-margin">
         <span class="like-label mb-1">Pri. Scr</span>
         <span>{{ grant.priorityScoreNum | formatScorePctl }}</span>
       </div>
 
-      <div class="col-4">
+      <div class="col-4 grant-info-margin">
         <span class="like-label mb-1">NCAB Date</span>
         <span>{{ grant.councilMeetingDate|formatNcabDate }}</span>
       </div>
@@ -90,7 +90,7 @@
     <a class="btn btn-link grant-info-toggle-btn" data-toggle="collapse" #collapseAll  href="#row-collapse-1" role="button" aria-expanded="true" aria-controls="row-collapse-1" ngbTooltip="Collapse Grant Information" placement="top"></a>
 
     <div class="row mb-2">
-      <div class="col-6">
+      <div class="col-6 grant-info-margin">
         <span class="like-label mb-1">Grant Number</span>
         <div class="d-flex align-items-center">
           <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
@@ -105,17 +105,17 @@
         </div>
       </div>
 
-      <div class="col-6">
+      <div class="col-6 grant-info-margin">
         <span class="like-label mb-1">PI</span>
         <span [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail': 'PI/PD name':'fullGrantNum': 'lastName'"></span>
       </div>
 
-      <div class="col-6">
+      <div class="col-6 grant-info-margin">
         <span class="like-label mb-1">PI Requested Direct Cost</span>
         <span>{{ piDirect | currency }}</span>
       </div>
 
-      <div class="col-6">
+      <div class="col-6 grant-info-margin">
         <span class="like-label mb-1">PI Requested Total Cost</span>
         <span>{{ piTotal | currency }}</span>
       </div>
@@ -126,22 +126,22 @@
     <div class="collapse show" id="row-collapse-1">
 
       <div class="row mb-2">
-        <div class="col-12">
+        <div class="col-12 grant-info-margin">
           <span class="like-label mb-1">Project Title</span>
           <span>{{ grant.projectTitle }}</span>
         </div>
 
-        <div class="col-4">
+        <div class="col-4 grant-info-margin">
           <span class="like-label mb-1">FOA</span>
           <span><a href="{{ grant.nihGuideAddr }}" target="_blank">{{ grant.rfaPaNumber }}</a></span>
         </div>
 
-        <div class="col-4">
+        <div class="col-4 grant-info-margin">
           <span class="like-label mb-1">Pri. Scr</span>
           <span>{{ grant.priorityScoreNum | formatScorePctl }}</span>
         </div>
 
-        <div class="col-4">
+        <div class="col-4 grant-info-margin">
           <span class="like-label mb-1">NCAB Date</span>
           <span>{{ grant.councilMeetingDate|formatNcabDate }}</span>
         </div>

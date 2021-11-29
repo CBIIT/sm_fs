@@ -25818,5 +25818,10 @@ td.all.parentTable{
 }
 .modal-horizontal-scroll{
   overflow-x: auto;
-
+}
+.plan-grant-info{
+  min-width: 300px;
+}
+.grant-info-margin{
+  margin: 3px 0;
 }
