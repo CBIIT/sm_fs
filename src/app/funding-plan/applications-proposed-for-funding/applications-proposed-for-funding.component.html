@@ -128,8 +128,8 @@
       <thead>
       <tr>
         <th scope="col">Grant Information</th>
-        <th *ngFor="let source of listSelectedSources; let sourceIndex = index" colspan="2" [ngModelGroup]="source.fundingSourceName">
-          <div class="d-flex align-items-center plan-table">
+        <th *ngFor="let source of listSelectedSources; let sourceIndex = index" colspan="2" [ngModelGroup]="source.fundingSourceName" class="plan-table">
+          <div class="d-flex align-items-center ">
             <span>{{ source.fundingSourceName }}</span>
             <button type="button" class="btn btn-sm btn-slim btn-link ml-2" (click)="onEditFundingSource(source.fundingSourceId, sourceIndex)"
                     ngbTooltip="Edit" placement="left">
