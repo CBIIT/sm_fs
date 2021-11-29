@@ -2,8 +2,8 @@
   <div class="row">
     <div class="col-12">
       <h2>Results {{(filterTypeLabel && (showFundingRequestResult || showFundingPlanResult || showGrantResult)) ? '- ' + filterTypeLabel : ''}}</h2>
-      <p *ngIf="showFundingRequestResult || showFundingPlanResult || showGrantResult"><img src="images/info.png" alt="INFO" width="15" height="10"><small class="text-muted">To apply sorting order to multiple columns, hold down the Shift key and click the header of
-        each additional column that you want to sort.</small></p>
+      <p *ngIf="showFundingRequestResult || showFundingPlanResult || showGrantResult" class="alert alert-primary"><i class="far fa-info-circle"></i> To apply sorting order to multiple columns, hold down the <b>Shift</b> key and click the header of
+        each additional column that you want to sort.</p>
       <p *ngIf="!(showFundingRequestResult || showFundingPlanResult || showGrantResult)">No results to display. Try applying a filter above and clicking "Search".</p>
     </div>
   </div>

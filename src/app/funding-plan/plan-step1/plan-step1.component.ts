@@ -410,7 +410,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         },
         { data: null, defaultContent: '' }
       ],
-      order: [[11, 'asc']],
+      order: [[11, 'asc'], [2, 'asc']],
       responsive: {
         details: {
           type: 'column',
