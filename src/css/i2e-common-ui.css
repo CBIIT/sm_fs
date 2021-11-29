@@ -18469,6 +18469,7 @@ a.close.disabled {
   position: relative;
   flex: 1 1 auto;
   padding: 1rem;
+
 }
 
 /* line 167, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_modal.scss */
@@ -25815,7 +25816,7 @@ td.all.parentTable{
   width: 70%;
   overflow:hidden ;
 }
-.modal-horizontal-Scroll{
+.modal-horizontal-scroll{
   overflow-x: scroll;
 
 }

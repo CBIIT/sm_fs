@@ -6,7 +6,7 @@
         <span aria-hidden="true"><i class="far fa-times"></i></span>
       </button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body modal-horizontal-scroll">
       <div class="col-12"  *ngIf="alert">
         <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
       </div>
