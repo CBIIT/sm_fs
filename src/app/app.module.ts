@@ -155,7 +155,7 @@ import { GrantFundedOnceValidatorDirective } from './validators/grant-funded-onc
 import { CurrencyTogglePipe } from './pipes/currency-toggle.pipe';
 import { SearchGrantExistInPaylistCellRendererComponent } from './search/search-result/search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component';
 import { FpWorkflowWarningModalComponent } from './funding-plan/fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
-import { TimeoutInterceptor } from './interceptors/timeout.interceptor';
+import { ErrorInterceptorService } from './interceptors/error-interceptor.service';
 import { ErrorComponent } from './error/error/error.component';
 import { SessionRestoreComponent } from './session/session-restore/session-restore.component';
 
@@ -364,7 +364,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
       deps: [GwbLinksService], multi: true
     },
     LoaderService, { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: TimeoutInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptorService, multi: true },
   ],
   bootstrap: [AppComponent]
 })

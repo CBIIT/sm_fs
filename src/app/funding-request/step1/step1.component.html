@@ -72,8 +72,8 @@
 <div class="row">
     <div class="col-12">
         <h2>Results</h2>
-        <p *ngIf="showResults"><img src="images/info.png" alt="INFO" width="15" height="10"><small class="text-muted">To apply sorting order to multiple columns, hold down the Shift key and click the header of
-                each additional column that you want to sort.</small></p>
+        <p *ngIf="showResults" class="alert alert-primary"><i class="far fa-info-circle"></i> To apply sorting order to multiple columns, hold down the <b>Shift</b> key and click the header of
+                each additional column that you want to sort.</p>
         <p *ngIf="!showResults">No grants found to display.</p>
         <div [ngStyle]="{display:showResults?'inline':'none'}">
         <table id="grantDt" #grantDt datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">

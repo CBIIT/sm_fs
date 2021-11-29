@@ -87,10 +87,9 @@
   <div class="col-12">
     <h2>Results</h2>
     <div class="d-flex">
-      <p *ngIf="!(dtData.length == 0)"><img src="images/info.png" alt="INFO" width="15" height="10"><small
-          class="text-muted">The table below is sorted by <b>Priority Score</b> followed by <b>PI Last Name</b>. To apply sorting
-          order to multiple columns, hold down the Shift key and click the header of each additional column that you
-          want to sort.</small></p>
+      <p *ngIf="!(dtData.length == 0)" class="alert alert-primary"><i class="far fa-info-circle"></i> The table below is sorted by <b>Priority Score</b> followed by <b>PI Last Name</b>. To apply sorting
+        order to multiple columns, hold down the <b>Shift</b> key and click the header of each additional column that you
+          want to sort.</p>
       <p *ngIf="(dtData.length == 0)">No grants found to display.</p>
     </div>
   </div>
