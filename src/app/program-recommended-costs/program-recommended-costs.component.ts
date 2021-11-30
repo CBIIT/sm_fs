@@ -156,7 +156,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   ngAfterViewInit(): void {
-    this.logger.debug('after view init');
   }
 
 
