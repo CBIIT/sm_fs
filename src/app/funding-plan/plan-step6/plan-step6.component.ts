@@ -117,7 +117,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
     this.docChecker = new FundingPlanDocChecker(this.planModel);
     this.isDocsStepCompleted();
     this.checkInFlightPfr();
-    this.canManagementService.initializeCANDisplayMatrix();
+    this.canManagementService.initializeCANDisplayMatrixForPlan();
   }
 
   private isDocsStepCompleted(): void {
