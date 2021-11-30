@@ -312,7 +312,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       result => {
         this.updateDesigneeTable(result);
         this.successManageDesigneesMsg = 'Designee has been updated successfully.';
-        this.successDesignee = this._getEntryById($event);
+        this.successDesignee = null;
       },
       error => {
         this.logger.error('HttpClient put designee request error for----- ' + error.message);
