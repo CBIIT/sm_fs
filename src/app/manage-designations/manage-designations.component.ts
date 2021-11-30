@@ -1,13 +1,12 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {
   NgbCalendar,
   NgbDate,
-  NgbDateAdapter,
   NgbDateParserFormatter,
   NgbDateStruct,
   NgbModal
 } from '@ng-bootstrap/ng-bootstrap';
-import {DatepickerAdapter, DatepickerFormatter} from '../datepicker/datepicker-adapter-formatter';
+import {DatepickerFormatter} from '../datepicker/datepicker-adapter-formatter';
 import {NGXLogger} from 'ngx-logger';
 import {DataTableDirective} from 'angular-datatables';
 import {Subject} from 'rxjs';
@@ -19,7 +18,6 @@ import {DesigneeActionCellRendererComponent} from './designee-action-cell-render
 import {EditDesigneeModalComponent} from './edit-designee-modal/edit-designee-modal.component';
 import {FundingRequestPermDelDto} from '@nci-cbiit/i2ecws-lib/model/fundingRequestPermDelDto';
 import {Options} from 'select2';
-import {Select2OptionData} from 'ng-select2';
 import {ConfirmDeleteModalComponent} from './confirm-delete-modal/confirm-delete-modal.component';
 
 @Component({
@@ -53,7 +51,6 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
   dtOptions: any = {};
   dtData: FundingRequestPermDelDto[] = [];
   nameSelect2Options: Options;
-  ng2Data: Select2OptionData[] = [];
   ng2Options: Options = {
     minimumInputLength: 2,
     closeOnSelect: true,
@@ -142,7 +139,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       dom: '<"dt-controls"<"ml-auto"B<"d-inline-block">>>rt<"dt-controls"<"mr-auto"i>>',
       buttons: [
       ],
-      rowCallback: (row: Node, data: any[] | object, index: number) => {
+      rowCallback: (row: Node) => {
         // Fix for Excel output - I removed empty renderers in column definitions
         // But now, I have to remove the first "text" child node to prevent it
         // from rendering (angular datatables bug)
@@ -164,7 +161,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
     this.dtTrigger.unsubscribe();
   }
 
-  initDesigneeList() {
+  initDesigneeList(): void {
     this.designeeService.getAllApproverDesigneesUsingGET(this.userSessionService.getLoggedOnUser().nihNetworkId).subscribe(
       (result: Array<FundingRequestPermDelDto>) => {
         this.logger.debug('Get designees for user: ', result);
@@ -185,7 +182,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
   }
 
 
-  updateDesigneeTable(data: FundingRequestPermDelDto[]) {
+  updateDesigneeTable(data: FundingRequestPermDelDto[]): void {
     this.logger.debug('Get designees for user: ', data);
     this.dtData = data;
     this.dtOptions.data = this.dtData;
@@ -199,7 +196,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
     }
   }
 
-  updateErrInactiveDesignees(data) {
+  updateErrInactiveDesignees(data: FundingRequestPermDelDto[]): void {
     this.errInactiveDesignees = false;
     for (const entry of data) {
       if (entry.newNedOrg || entry.newClassification || entry.inactiveNedDate || entry.inactiveI2eDate) {
@@ -209,22 +206,14 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
     }
   }
 
-  addDesignee() {
-    console.debug('The form is ', this.newDesigneeForm.valid);
+  addDesignee(): void {
+    this.logger.debug('The form is ', this.newDesigneeForm.valid);
     this.logger.debug(this.newDesigneeForm.value);
     if (!this.newDesigneeForm.valid) {
       return;
     }
-    const fromDate: string = (this.newDesigneeForm.value.startDate) ?
-      String(this.newDesigneeForm.value.startDate.month).padStart(2, '0') + '/' +
-      String(this.newDesigneeForm.value.startDate.day).padStart(2, '0') + '/' +
-      String(this.newDesigneeForm.value.startDate.year).padStart(4, '0')
-      : null;
-    const toDate: string = (this.newDesigneeForm.value.endDate) ?
-      String(this.newDesigneeForm.value.endDate.month).padStart(2, '0') + '/' +
-      String(this.newDesigneeForm.value.endDate.day).padStart(2, '0') + '/' +
-      String(this.newDesigneeForm.value.endDate.year).padStart(4, '0')
-      : null;
+    const fromDate: string = this.formatDate(this.newDesigneeForm.value.startDate);
+    const toDate: string = this.formatDate(this.newDesigneeForm.value.endDate);
     const designeeTo = this.newDesigneeForm.value.name;
     this.designeeService.createDesigneeUsingPOST(
       fromDate, toDate, this.userSessionService.getLoggedOnUser().nihNetworkId, designeeTo).subscribe(
@@ -245,7 +234,15 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
     );
   }
 
-  onPermanent() {
+  formatDate(value: any): string {
+    return (value) ?
+      String(value.month).padStart(2, '0') + '/' +
+      String(value.day).padStart(2, '0') + '/' +
+      String(value.year).padStart(4, '0')
+      : null;
+  }
+
+  onPermanent(): void {
     this.startDate = null;
     this.endDate = null;
     const savedName = this.newDesigneeForm.value.name;
@@ -253,26 +250,26 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
     this.newDesigneeForm.form.patchValue({name: savedName});
   }
 
-  onTemporary() {
+  onTemporary(): void {
     const savedName = this.newDesigneeForm.value.name;
     this.newDesigneeForm.resetForm();
     this.newDesigneeForm.form.patchValue({name: savedName});
   }
 
-  onEditDesignee($event: number) {
+  onEditDesignee($event: number): void {
     const entry = this._getEntryById($event);
     if (entry) {
       const modalRef = this.modalService.open(EditDesigneeModalComponent, { size: 'lg'});
       modalRef.componentInstance.data = entry;
       modalRef.result.then((updatedData: any) => {
-        console.debug('Result: ', updatedData);
+        this.logger.debug('Result: ', updatedData);
         this.designeeService.updateDesigneeUsingPUT(updatedData.startDate, updatedData.endDate, updatedData.id).subscribe(
           result => {
             this.updateDesigneeTable(result);
             this.successManageDesigneesMsg = 'Designation date(s) have been updated successfully.';
-            for (const entry of result) {
-              if (entry.id === updatedData.id) {
-                this.successDesignee = entry;
+            for (const row of result) {
+              if (row.id === updatedData.id) {
+                this.successDesignee = row;
                 break;
               }
             }
@@ -281,17 +278,17 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
             this.logger.error('HttpClient edit designee request error for----- ' + error.message);
           }
         );
-      }).finally(() => console.debug('Finally closing dialog'));
+      }).finally(() => this.logger.debug('Finally closing dialog'));
     }
   }
 
-  onDeleteDesignee($event: number) {
+  onDeleteDesignee($event: number): void {
     const entry = this._getEntryById($event);
     if (entry) {
       const modalRef = this.modalService.open(ConfirmDeleteModalComponent);
       modalRef.componentInstance.data = entry;
       modalRef.result.then((updatedData: any) => {
-        console.debug('Result: ', updatedData);
+        this.logger.debug('Result: ', updatedData);
         this.designeeService.deleteDesigneeUsingDELETE($event).subscribe(
           result => {
             this.updateDesigneeTable(result);
@@ -303,11 +300,11 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
             this.logger.error('HttpClient delete designee request error for----- ' + error.message);
           }
         );
-      }).finally(() => console.debug('Finally closing dialog'));
+      }).finally(() => this.logger.debug('Finally closing dialog'));
     }
   }
 
-  onReactiveDesignee($event: number) {
+  onReactiveDesignee($event: number): void {
     this.designeeService.activateDesigneeUsingPUT($event).subscribe(
       result => {
         this.updateDesigneeTable(result);
