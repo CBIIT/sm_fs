@@ -308,7 +308,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
     this.designeeService.activateDesigneeUsingPUT($event).subscribe(
       result => {
         this.updateDesigneeTable(result);
-        this.successManageDesigneesMsg = 'Designee has been updated successfully.';
+        this.successManageDesigneesMsg = 'Designee information has been updated successfully.';
         this.successDesignee = null;
       },
       error => {
