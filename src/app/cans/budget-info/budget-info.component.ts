@@ -50,7 +50,7 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   constructor(private logger: NGXLogger,
-              private canService: CanManagementService,
+              private canManagementService: CanManagementService,
               public model: RequestModel,
               private workflowModel: WorkflowModel) {
   }
@@ -61,13 +61,13 @@ export class BudgetInfoComponent implements OnInit {
       fs => ( fs.nciSourceFlag === 'Y') &&
         this.model.programRecommendedCostsModel.selectedFundingSourceIds.has(fs.fundingSourceId)
     ).map(fs => fs.fundingSourceId);
-    this.logger.debug('NCI Funding Source Ids', this.requestNciFseIds);
-    this.logger.debug('All Funding Sources', this.model.programRecommendedCostsModel.fundingSources);
-    this.canService.nonDefaultCanEventEmitter.subscribe(next => {
+    this.canManagementService.nonDefaultCanEventEmitter.subscribe(next => {
       if (+next.applId === -1) {
         this.defaultCanTracker.set(+next.fseId, next.nonDefault);
       }
     });
+    this.canManagementService.initializeCANDisplayMatrixForRequest();
+    this.logger.debug(this.canManagementService.canDisplayMatrix);
   }
 
   isFcArc(): boolean {
@@ -204,7 +204,7 @@ export class BudgetInfoComponent implements OnInit {
     this.canSearchModalComponent.prepare();
     this.canSearchModalComponent.open().then((result) => {
       if (result) {
-        this.canService.selectCANEmitter.next({ fseId, can: result });
+        this.canManagementService.selectCANEmitter.next({ fseId, can: result });
       }
     }).catch((reason) => {
     });
@@ -213,5 +213,49 @@ export class BudgetInfoComponent implements OnInit {
 
   resgisterNewOefiaType($event): void {
     this.logger.info(`new Oefia type received: ${$event} -- ${this.model.requestDto.oefiaCreateCode}`);
+  }
+
+  /* Applicable for ARC and NCI financial approvers in edit mode; readonly display will be determined elsewhere */
+  canSee(fseId: number): boolean {
+    const displayMatrix = this.canManagementService.canDisplayMatrix.get(fseId);
+    if (!displayMatrix) {
+      return false;
+    }
+    if ((this.isFcArc() && displayMatrix.arcSees === 'Y') || (this.isFcNci() && displayMatrix.oefiaSees === 'Y')) {
+      return true;
+    }
+    return false;
+  }
+
+  canSeeAtLeastOneCAN(): boolean {
+    let result = false;
+    for (const key of this.canManagementService.canDisplayMatrix.keys()) {
+      if (this.canSee(key)) {
+        result = true;
+      }
+    }
+    return result;
+  }
+
+  /* Applicable for ARC and NCI financial approvers in edit mode; readonly display will be determined elsewhere */
+  canEnter(fseId: number): boolean {
+    const displayMatrix = this.canManagementService.canDisplayMatrix?.get(fseId);
+    if (!displayMatrix) {
+      return false;
+    }
+    if ((this.isFcArc() && displayMatrix.arcEnters === 'Y') || (this.isFcNci() && displayMatrix.oefiaEnters === 'Y')) {
+      return true;
+    }
+    return false;
+  }
+
+  canEnterAtLeastOneCAN(): boolean {
+    let result = false;
+    for (const key of this.canManagementService.canDisplayMatrix.keys()) {
+      if (this.canEnter(key)) {
+        result = true;
+      }
+    }
+    return result;
   }
 }

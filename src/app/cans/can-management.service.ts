@@ -1,15 +1,15 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import {
   CanCcxDto,
-  FsCanControllerService, FundingRequestCanDisplayDto,
+  FsCanControllerService,
+  FundingRequestCanDisplayDto,
   FundingRequestCanDto,
   FundingRequestGrantCanDto,
   OefiaCodingDto
 } from '@nci-cbiit/i2ecws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { Observable, Subject } from 'rxjs';
-import { Select2OptionData } from 'ng-select2';
 import { PlanModel } from '../model/plan/plan-model';
 
 @Injectable({
@@ -50,13 +50,25 @@ export class CanManagementService {
     this.refreshGrantCans();
   }
 
-  initializeCANDisplayMatrix(): void {
+  initializeCANDisplayMatrixForPlan(): void {
     const fseIds: number[] = this.planModel?.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.map(s => s.fundingSourceId);
     if (!fseIds || fseIds.length === 0) {
       return;
     }
+    this.buildCanDisplayMatrix(fseIds);
+  }
+
+  initializeCANDisplayMatrixForRequest(): void {
+    const fseIds: number[] = Array.from(this.requestModel?.programRecommendedCostsModel?.selectedFundingSourceIds);
+    if (!fseIds || fseIds.length === 0) {
+      return;
+    }
+    this.buildCanDisplayMatrix(fseIds);
+  }
+
+  private buildCanDisplayMatrix(fseIds: number[]): void {
     this.getFundingRequestCanDisplays(fseIds).subscribe(result => {
-      // this.logger.debug('CAN display matrix:', result);
+      this.logger.debug('CAN display matrix:', result);
       this.canDisplayMatrix = new Map(result.map(c => [c.fseId, c]));
     });
   }
@@ -113,7 +125,7 @@ export class CanManagementService {
   }
 
   getDefaultCansWithExtra(nciSourceFlag: string, extra: string): Observable<CanCcxDto[]> {
-    if(!extra) {
+    if (!extra) {
       return this.canService.getDefaultCansUsingGET(
         this.requestModel.requestDto.activityCode,
         this.requestModel.requestDto.bmmCode,
@@ -167,10 +179,10 @@ export class CanManagementService {
   }
 
   searchAllCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
-    if(!can) {
+    if (!can) {
       const key = [bmmCodes, activityCodes, nciSource].join('_');
       const result = this.activeCanCache.get(key);
-      if(result && result.length !== 0) {
+      if (result && result.length !== 0) {
         this.logger.debug('cache hit for key', key);
         return new Observable<CanCcxDto[]>(subscriber => {
           subscriber.next(result);
@@ -179,7 +191,7 @@ export class CanManagementService {
 
     }
 
-    
+
     const fn = this.canService.getAllCansUsingGET(activityCodes, bmmCodes, can, nciSource);
     const key = [bmmCodes, activityCodes, nciSource].join('_');
     this.logger.debug('cache miss for key', key);
