@@ -98,8 +98,8 @@
           <th scope="col">Approved Direct Cost</th>
           <th scope="col">Approved Total Cost</th>
           <th scope="col" [hidden]="!(isFinancialApprover() && isFcNci())">OEFIA Coding</th>
-          <th scope="col">NCI OEFIA Projected CAN</th>
-          <th scope="col">
+          <th scope="col" *ngIf="canSeeAtLeastOneCAN()">NCI OEFIA Projected CAN</th>
+          <th scope="col" *ngIf="canEnterAtLeastOneCAN();">
             <div class="d-flex">
               <span>Funds Approver Provided CAN</span>
             </div>
@@ -117,43 +117,48 @@
               [selectedValue]="can.octId || can.defaultOefiaTypeId">
             </app-oefia-types>
           </td>
-          <td>
-            <app-projected-can [index]="i" [fseId]="can.fseId" [octId]="can.octId || can.defaultOefiaTypeId"></app-projected-can>
+          <td *ngIf="canSeeAtLeastOneCAN()">
+            <ng-template *ngIf="canSee(can.fseId)">
+              <app-projected-can [index]="i" [fseId]="can.fseId"
+                                 [octId]="can.octId || can.defaultOefiaTypeId"></app-projected-can>
+            </ng-template>
           </td>
-          <td>
-            <app-can-selector 
-            [index]="i" 
-            [nciSourceFlag]="can.nciSourceFlag" 
-            [selectedValue]="can.can"
-            [initialCAN]="can"
-            [fseId]="can.fseId"
-            [canRequired] = "isCanRequired(can.fseId)">
-            </app-can-selector>
-            <div class="d-flex align-items-center">
-              <button
-                *ngIf="canSearchForCAN(can.fseId)"
-                (click)="searchForCANs(can.fseId, can.nciSourceFlag)"
-                class="btn btn-link btn-slim"
-                ngbTooltip="Search and select from active CANs">
-                <i class="far fa-search" aria-hidden="true"></i>
-              </button>
+          <td *ngIf="canEnterAtLeastOneCAN()">
+            <ng-template *ngIf="canSee(can.fseId)">
+              <app-can-selector
+                [index]="i"
+                [nciSourceFlag]="can.nciSourceFlag"
+                [selectedValue]="can.can"
+                [initialCAN]="can"
+                [fseId]="can.fseId"
+                [canRequired]="isCanRequired(can.fseId)">
+              </app-can-selector>
+              <div class="d-flex align-items-center">
+                <button
+                  *ngIf="canSearchForCAN(can.fseId)"
+                  (click)="searchForCANs(can.fseId, can.nciSourceFlag)"
+                  class="btn btn-link btn-slim"
+                  ngbTooltip="Search and select from active CANs">
+                  <i class="far fa-search" aria-hidden="true"></i>
+                </button>
 
-              <button class="btn btn-link btn-slim" *ngIf="showCopyProjectedCan(i)"
-                      ngbTooltip="Copy NCI OEFIA Projected CAN"
-                      (click)="copyProjectedCan(i)">
-                <i class="far fa-copy" aria-hidden="true"></i>
-              </button>
-              <span *ngIf="nonDefaultCan(i)" class="btn btn-link btn-slim btn-link-warning" title="Non-Default CAN"
-                    ngbTooltip="Non-Default CAN"
-                    role="alert">
+                <button class="btn btn-link btn-slim" *ngIf="showCopyProjectedCan(i)"
+                        ngbTooltip="Copy NCI OEFIA Projected CAN"
+                        (click)="copyProjectedCan(i)">
+                  <i class="far fa-copy" aria-hidden="true"></i>
+                </button>
+                <span *ngIf="nonDefaultCan(i)" class="btn btn-link btn-slim btn-link-warning" title="Non-Default CAN"
+                      ngbTooltip="Non-Default CAN"
+                      role="alert">
                 <i class="far fa-exclamation-circle" aria-hidden="true"></i>
               </span>
-              <span *ngIf="duplicateCan(i)" class="btn btn-link btn-slim btn-link-warning" title="Duplicate CAN"
-                    ngbTooltip="Duplicate CAN"
-                    role="alert">
+                <span *ngIf="duplicateCan(i)" class="btn btn-link btn-slim btn-link-warning" title="Duplicate CAN"
+                      ngbTooltip="Duplicate CAN"
+                      role="alert">
                 <i class="far fa-exclamation-triangle" aria-hidden="true"></i>
               </span>
-            </div>
+              </div>
+            </ng-template>
           </td>
         </tr>
         </tbody>
