@@ -917,15 +917,16 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   runDetailedReport(): void {
+   
     if (this.fundingRequests && this.fundingRequests.length > 0) {
-      this.downloadDetailReport([...this.selectedRows.keys()], true);
+      this.downloadDetailReport([...this.selectedRows.keys()], true, this.searchCriteria);
     } else if (this.fundingPlans && this.fundingPlans.length > 0) {
-      this.downloadDetailReport([...this.selectedRows.keys()], false);
+      this.downloadDetailReport([...this.selectedRows.keys()], false, this.searchCriteria);
     }
   }
 
-  downloadDetailReport(ids: number[], isRequest: boolean): void {
-    this.documentService.downloadDetailReport(ids, isRequest)
+  downloadDetailReport(ids: number[], isRequest: boolean, searchCriteria:FundSelectSearchCriteria  ): void {
+    this.documentService.downloadDetailReport(ids, isRequest, searchCriteria)
       .subscribe(
         (response: HttpResponse<Blob>) => {
           const blob = new Blob([response.body], { type: response.headers.get('content-type') });

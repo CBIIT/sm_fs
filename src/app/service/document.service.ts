@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpRequest, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DocumentsControllerService, DocumentsDto } from '@nci-cbiit/i2ecws-lib';
+import { DocumentsControllerService, DocumentsDto , FundSelectSearchCriteria} from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
@@ -103,10 +103,17 @@ export class DocumentService {
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' });
   }
 
-  downloadDetailReport(fpIds: number[] , isRequest: boolean) {
+  downloadDetailReport(fpIds: number[] , isRequest: boolean, searchCriteria: any ) {
+    
+    const formData: FormData = new FormData();
+
+    //formData.append('criteria', searchCriteria);
+    for ( var key in searchCriteria ) {
+      formData.append(key, searchCriteria[key]);
+  }
     var url = this.docUrl + '/funding-plans-detail-report/' + fpIds + '/' + isRequest;
     this.logger.debug('Funding Plan Cover Sheet URL:', url);
-    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
+    return this.http.post<Blob>(`${url}`,searchCriteria, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
 
