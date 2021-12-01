@@ -3,7 +3,7 @@
   <span class='institutionLocation'>{{data.institutionCity}},&nbsp;{{data.institutionState}}</span>
 </ng-template>
 <div *ngIf="skip"><img src="images/grant-skip.png" alt="SKIP" width="40" height="16"  class="tdlabel"></div>
-<div *ngIf="exception"><img src="images/grant-exception.png" alt="EXCEPTION" width="64" height="16" class="tdlabel"></div>
+<div *ngIf="exception"><img src="images/grant-exception.png" alt="EXCEPTION" width="64" height="20" class="tdlabel"></div>
 <a href="{{grantViewerUrl+data.applId}}" target="yourgrant">{{data.fullGrantNum}}</a>
 <div class="grant-icons">
   <a href="{{eGrantsUrl+data.applId}}" target="yourgrant" ngbTooltip="eGrants">
