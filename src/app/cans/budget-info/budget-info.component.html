@@ -118,13 +118,18 @@
             </app-oefia-types>
           </td>
           <td *ngIf="canSeeAtLeastOneCAN()">
-            <ng-template *ngIf="canSee(can.fseId)">
+            <ng-container *ngIf="canSee(can.fseId) then PROJECTED_CAN"></ng-container>
+            <ng-template #PROJECTED_CAN>
               <app-projected-can [index]="i" [fseId]="can.fseId"
                                  [octId]="can.octId || can.defaultOefiaTypeId"></app-projected-can>
             </ng-template>
+            <ng-template *ngIf="!canSee(can.fseId)">
+              <i class="fas fa-skull-crossbones"></i>
+            </ng-template>
           </td>
           <td *ngIf="canEnterAtLeastOneCAN()">
-            <ng-template *ngIf="canSee(can.fseId)">
+            <ng-container *ngIf="canEnter(can.fseId) then CAN_SELECT"></ng-container>
+            <ng-template #CAN_SELECT>
               <app-can-selector
                 [index]="i"
                 [nciSourceFlag]="can.nciSourceFlag"
@@ -158,6 +163,9 @@
                 <i class="far fa-exclamation-triangle" aria-hidden="true"></i>
               </span>
               </div>
+            </ng-template>
+            <ng-template *ngIf="!canSee(can.fseId)">
+              <i class="fas fa-skull-crossbones"></i>
             </ng-template>
           </td>
         </tr>

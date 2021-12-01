@@ -1,11 +1,4 @@
-import {
-  Component,
-  Input,
-  OnInit,
-  ViewChildren,
-  QueryList,
-  ViewChild
-} from '@angular/core';
+import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { CanManagementService } from '../can-management.service';
 import { RequestModel } from '../../model/request/request-model';
@@ -17,7 +10,6 @@ import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
 import { CanWarning } from 'src/app/funding-request/workflow/warning-modal/workflow-warning-modal.component';
 import { CanSearchModalComponent } from '../can-search-modal/can-search-modal.component';
-import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-budget-info',
@@ -58,7 +50,7 @@ export class BudgetInfoComponent implements OnInit {
   ngOnInit(): void {
     this.initialPay = INITIAL_PAY_TYPES.includes(this.model.requestDto?.frtId);
     this.requestNciFseIds = this.model.programRecommendedCostsModel.fundingSources.filter(
-      fs => ( fs.nciSourceFlag === 'Y') &&
+      fs => (fs.nciSourceFlag === 'Y') &&
         this.model.programRecommendedCostsModel.selectedFundingSourceIds.has(fs.fundingSourceId)
     ).map(fs => fs.fundingSourceId);
     this.canManagementService.nonDefaultCanEventEmitter.subscribe(next => {
@@ -162,14 +154,13 @@ export class BudgetInfoComponent implements OnInit {
     const selectedCans: string[] = [];
     for (const canSelector of this.canSelectors) {
       this.logger.debug('CanSelector Validation index= ' + canSelector.index + ' can=' + canSelector.selectedValue);
-      if (!canSelector.selectedValue ) {
+      if (!canSelector.selectedValue) {
         canWarning.missingCan = true;
-      }
-      else if ( canSelector.selectedValue && this.isFcNci() ) {
+      } else if (canSelector.selectedValue && this.isFcNci()) {
         for (const projectedCan of this.projectedCans) {
           if (projectedCan.projectedCan?.can &&
-              canSelector.fseId === projectedCan.fseId &&
-              canSelector.selectedValue !== projectedCan.projectedCan.can) {
+            canSelector.fseId === projectedCan.fseId &&
+            canSelector.selectedValue !== projectedCan.projectedCan.can) {
             canWarning.nonDefaultCan = true;
           }
         }
@@ -219,11 +210,16 @@ export class BudgetInfoComponent implements OnInit {
   canSee(fseId: number): boolean {
     const displayMatrix = this.canManagementService.canDisplayMatrix.get(fseId);
     if (!displayMatrix) {
+      this.logger.debug(`canSee(${fseId}) - no display matrix; return false`);
       return false;
     }
+    this.logger.debug(`isFcArc: ${this.isFcArc()} == ARC sees: ${displayMatrix.arcSees === 'Y'}`);
+    this.logger.debug(`isFcNci: ${this.isFcNci()} == NCI sees: ${displayMatrix.oefiaSees === 'Y'}`);
     if ((this.isFcArc() && displayMatrix.arcSees === 'Y') || (this.isFcNci() && displayMatrix.oefiaSees === 'Y')) {
+      this.logger.debug(`canSee(${fseId}) :: true`);
       return true;
     }
+    this.logger.debug(`canSee(${fseId}) :: false`);
     return false;
   }
 
@@ -234,6 +230,7 @@ export class BudgetInfoComponent implements OnInit {
         result = true;
       }
     }
+    this.logger.debug(`can see at least one CAN: ${result}`);
     return result;
   }
 
@@ -241,11 +238,17 @@ export class BudgetInfoComponent implements OnInit {
   canEnter(fseId: number): boolean {
     const displayMatrix = this.canManagementService.canDisplayMatrix?.get(fseId);
     if (!displayMatrix) {
+      this.logger.debug(`canEnter(${fseId}) - no display matrix; return false`);
       return false;
     }
+    this.logger.debug(`isFcArc: ${this.isFcArc()} == ARC enters: ${displayMatrix.arcEnters === 'Y'}`);
+    this.logger.debug(`isFcNci: ${this.isFcNci()} == NCI enters: ${displayMatrix.oefiaEnters === 'Y'}`);
+
     if ((this.isFcArc() && displayMatrix.arcEnters === 'Y') || (this.isFcNci() && displayMatrix.oefiaEnters === 'Y')) {
+      this.logger.debug(`canEnter(${fseId}) :: true`);
       return true;
     }
+    this.logger.debug(`canEnter(${fseId}) :: false`);
     return false;
   }
 
@@ -256,6 +259,7 @@ export class BudgetInfoComponent implements OnInit {
         result = true;
       }
     }
+    this.logger.debug(`can enter at least one CAN: ${result}`);
     return result;
   }
 }
