@@ -67,12 +67,11 @@
             <lib-cancer-activities-dropdown
               [selectSingleOption]="true"
               [maxSelection]="1"
-              [(ngModel)]="cayCode"
               [selectedValue]="cayCode"
               [syncWithPd]="true"
               label="Requesting PD's Cancer Activities"
               [broadcast]="true"
-              required>
+              (selectedValueChange)="onSelectedValueChange($event)">
             </lib-cancer-activities-dropdown>
             <!--            <lib-cancer-activities-dropdown-->
             <!--              [selectSingleOption]="true"-->

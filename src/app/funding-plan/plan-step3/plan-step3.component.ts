@@ -6,12 +6,21 @@ import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
 import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
 import { PlanManagementService } from '../service/plan-management.service';
-import { FsPlanControllerService, FundingPlanFoasDto, FundingRequestCanDto, FundingRequestDto } from '@nci-cbiit/i2ecws-lib';
-import { OtherDocsContributingFundsComponent } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
+import {
+  FsPlanControllerService,
+  FundingPlanFoasDto,
+  FundingRequestCanDto,
+  FundingRequestDto
+} from '@nci-cbiit/i2ecws-lib';
+import {
+  OtherDocsContributingFundsComponent
+} from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { getCurrentFiscalYear, isReallyANumber } from '../../utils/utils';
 import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
 import { FpFundingInformationComponent } from '../fp-funding-information/fp-funding-information.component';
-import { ApplicationsProposedForFundingComponent } from '../applications-proposed-for-funding/applications-proposed-for-funding.component';
+import {
+  ApplicationsProposedForFundingComponent
+} from '../applications-proposed-for-funding/applications-proposed-for-funding.component';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
 import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib/model/fundingReqBudgetsDto';
@@ -132,7 +141,7 @@ export class PlanStep3Component implements OnInit {
       }
     } else {
       // push an alert here
-      this.logger.warn(this.planManagementService.unfundedGrants());
+      // this.logger.warn(this.planManagementService.unfundedGrants());
       this.alerts = [{
         type: 'danger',
         message: 'Please correct the errors identified below.',
@@ -176,7 +185,7 @@ export class PlanStep3Component implements OnInit {
   }
 
   private buildPlanRequestLists(): void {
-    if(!this.planModel.fundingPlanDto.fpFinancialInformation) {
+    if (!this.planModel.fundingPlanDto.fpFinancialInformation) {
       this.planModel.fundingPlanDto.fpFinancialInformation = {};
     }
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests = [];
@@ -240,7 +249,7 @@ export class PlanStep3Component implements OnInit {
     // A little hacky, but I may have added some sources to delete sources BEFORE running this code, so I want to
     // preserve the list.
     const deleteSources: number[] = this.planModel.fundingPlanDto.fpFinancialInformation?.deleteSources;
-    const requests: FundingRequestDto[]  = this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests;
+    const requests: FundingRequestDto[] = this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests;
 
     this.planModel.fundingPlanDto.fpFinancialInformation = {};
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests = requests;
@@ -348,7 +357,7 @@ export class PlanStep3Component implements OnInit {
   }
 
   private scrapePlanData(): void {
-    if(!this.planModel.fundingPlanDto) {
+    if (!this.planModel.fundingPlanDto) {
       this.planModel.fundingPlanDto = {};
     }
     this.planModel.fundingPlanDto.planName = this.planName;
@@ -577,5 +586,14 @@ export class PlanStep3Component implements OnInit {
 
   cancelAddFundingSource(): void {
     this.editing = undefined;
+  }
+
+  onSelectedValueChange($event: string | string[]): void {
+    if (typeof $event === 'string') {
+      this.cayCode = $event;
+    } else {
+      this.logger.info($event);
+      this.cayCode = $event ? $event[0] : undefined;
+    }
   }
 }

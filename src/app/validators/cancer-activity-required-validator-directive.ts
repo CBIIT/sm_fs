@@ -24,8 +24,6 @@ export class CancerActivityRequiredValidatorDirective implements Validator {
     } else {
       return {cayCodeIsRequired: true};
     }
-
-    return null;
   }
 
 }
