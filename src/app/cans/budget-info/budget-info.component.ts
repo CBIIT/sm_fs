@@ -213,13 +213,13 @@ export class BudgetInfoComponent implements OnInit {
       this.logger.debug(`canSee(${fseId}) - no display matrix; return false`);
       return false;
     }
-    this.logger.debug(`isFcArc: ${this.isFcArc()} == ARC sees: ${displayMatrix.arcSees === 'Y'}`);
-    this.logger.debug(`isFcNci: ${this.isFcNci()} == NCI sees: ${displayMatrix.oefiaSees === 'Y'}`);
+    // this.logger.debug(`isFcArc: ${this.isFcArc()} == ARC sees: ${displayMatrix.arcSees === 'Y'}`);
+    // this.logger.debug(`isFcNci: ${this.isFcNci()} == NCI sees: ${displayMatrix.oefiaSees === 'Y'}`);
     if ((this.isFcArc() && displayMatrix.arcSees === 'Y') || (this.isFcNci() && displayMatrix.oefiaSees === 'Y')) {
-      this.logger.debug(`canSee(${fseId}) :: true`);
+      // this.logger.debug(`canSee(${fseId}) :: true`);
       return true;
     }
-    this.logger.debug(`canSee(${fseId}) :: false`);
+    // this.logger.debug(`canSee(${fseId}) :: false`);
     return false;
   }
 
@@ -230,7 +230,7 @@ export class BudgetInfoComponent implements OnInit {
         result = true;
       }
     }
-    this.logger.debug(`can see at least one CAN: ${result}`);
+    // this.logger.debug(`can see at least one CAN: ${result}`);
     return result;
   }
 
@@ -241,14 +241,14 @@ export class BudgetInfoComponent implements OnInit {
       this.logger.debug(`canEnter(${fseId}) - no display matrix; return false`);
       return false;
     }
-    this.logger.debug(`isFcArc: ${this.isFcArc()} == ARC enters: ${displayMatrix.arcEnters === 'Y'}`);
-    this.logger.debug(`isFcNci: ${this.isFcNci()} == NCI enters: ${displayMatrix.oefiaEnters === 'Y'}`);
+    // this.logger.debug(`isFcArc: ${this.isFcArc()} == ARC enters: ${displayMatrix.arcEnters === 'Y'}`);
+    // this.logger.debug(`isFcNci: ${this.isFcNci()} == NCI enters: ${displayMatrix.oefiaEnters === 'Y'}`);
 
     if ((this.isFcArc() && displayMatrix.arcEnters === 'Y') || (this.isFcNci() && displayMatrix.oefiaEnters === 'Y')) {
-      this.logger.debug(`canEnter(${fseId}) :: true`);
+      // this.logger.debug(`canEnter(${fseId}) :: true`);
       return true;
     }
-    this.logger.debug(`canEnter(${fseId}) :: false`);
+    // this.logger.debug(`canEnter(${fseId}) :: false`);
     return false;
   }
 
@@ -259,7 +259,7 @@ export class BudgetInfoComponent implements OnInit {
         result = true;
       }
     }
-    this.logger.debug(`can enter at least one CAN: ${result}`);
+    // this.logger.debug(`can enter at least one CAN: ${result}`);
     return result;
   }
 }
