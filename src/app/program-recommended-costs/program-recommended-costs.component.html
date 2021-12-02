@@ -139,7 +139,7 @@
             <td *ngFor="let li of summaryRow; let i = index; let first = first;">
               <div class="form-row">
                 <div class="col-2 font-weight-bold" *ngIf="first; else noDollar">
-                  Direct ($)
+                  Direct
                 </div>
                 <ng-template #noDollar>
                   <div class="col-2 font-weight-bold">
@@ -150,7 +150,7 @@
               </div>
               <div class="form-row" *ngIf="first">
                 <div class="col-2 font-weight-bold">
-                  Total ($)
+                  Total
                 </div>
                 <div class="col-10">{{grandTotal(i) | currencyToggle}}</div>
               </div>
@@ -258,7 +258,7 @@
             <td *ngFor="let li of summaryRow; let i = index; let first = first;">
               <div class="form-row">
                 <div class="col-2 font-weight-bold" *ngIf="first; else noDollar">
-                  Direct ($)
+                  Direct
                 </div>
                 <ng-template #noDollar>
                   <div class="col-2 font-weight-bold">
@@ -269,7 +269,7 @@
               </div>
               <div class="form-row" *ngIf="first">
                 <div class="col-2 font font-weight-bold">
-                  Total ($)
+                  Total
                 </div>
                 <div class="col-10">{{grandTotal(i) | currencyToggle}}</div>
               </div>
