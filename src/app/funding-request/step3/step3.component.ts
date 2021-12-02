@@ -288,7 +288,7 @@ export class Step3Component implements OnInit {
         this.justificationText = justification;
         this.justificationEnteredBy = this.requestModel.requestDto.justificationCreateByFullName;
         this.justificationEnteredByEmail = this.requestModel.requestDto.justificationCreateByEmailAddress;
-        this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
+        this.justificationUploadedOn =  new Date(this.requestModel.requestDto.justificationCreateDate);
         this.justificationEnteredByEmit.next(this.justificationEnteredBy);
         this.justificationEnteredByEmailEmit.next(this.justificationEnteredByEmail);
         this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'dd/MM/yyyy'));
@@ -439,7 +439,8 @@ export class Step3Component implements OnInit {
 
   loadJustification(element: DocumentsDto) {
 
-    if (element.docType === DocTypeConstants.JUSTIFICATION) {
+    if (element.docType === DocTypeConstants.JUSTIFICATION &&
+      element.id !== null) {
       this.logger.debug('Loading Document type: ', element.docFilename);
       this.justificationUploaded = of(true);
 
