@@ -202,10 +202,6 @@ export class BudgetInfoComponent implements OnInit {
 
   }
 
-  resgisterNewOefiaType($event): void {
-    this.logger.info(`new Oefia type received: ${$event} -- ${this.model.requestDto.oefiaCreateCode}`);
-  }
-
   /* Applicable for ARC and NCI financial approvers in edit mode; readonly display will be determined elsewhere */
   canSee(fseId: number): boolean {
     const displayMatrix = this.canManagementService.canDisplayMatrix.get(fseId);
