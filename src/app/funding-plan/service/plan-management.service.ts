@@ -120,12 +120,9 @@ export class PlanManagementService {
   }
 
   buildPlanBudgetAndCanModel(): void {
-    if (!this.budgetMap) {
-      this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
-    }
-    if (!this.canMap) {
-      this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
-    }
+    this.budgetMap = new Map<number, Map<number, FundingReqBudgetsDto>>();
+    this.canMap = new Map<number, Map<number, FundingRequestCanDto>>();
+
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
       this.requestIdMap.set(r.applId, r.frqId);
       const buds = new Map(r.financialInfoDto.fundingReqBudgetsDtos?.map(b => [b.fseId, b]));
@@ -428,7 +425,7 @@ export class PlanManagementService {
       const tc = this.requestTotalTotal(applId);
       const dc = this.requestDirectTotal(applId);
       if (tc === 0 && dc === 0) {
-        if(!this.hasPendingValues(applId)) {
+        if (!this.hasPendingValues(applId)) {
           result.push(applId);
         }
       }
@@ -438,13 +435,13 @@ export class PlanManagementService {
 
   hasPendingValues(applId: number): boolean {
     const vals: PendingPrcValues = this.pendingValues.get(+applId);
-    if(!vals) {
+    if (!vals) {
       return false;
     }
-    if(vals.displayType === 'percent') {
+    if (vals.displayType === 'percent') {
       return (vals.percentCut != null && !isNaN(vals.percentCut));
     } else {
-      if(vals.directCost === null || vals.totalCost === null || isNaN(vals.directCost) || isNaN(vals.totalCost)) {
+      if (vals.directCost === null || vals.totalCost === null || isNaN(vals.directCost) || isNaN(vals.totalCost)) {
         return false;
       }
     }
