@@ -23,8 +23,8 @@ import {CancerActivityCellRendererComponent} from '../../table-cell-renderers/ca
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 import { ActivatedRoute } from '@angular/router';
 import { RequestModel } from 'src/app/model/request/request-model';
-import {NgForm} from "@angular/forms";
-import {DatatableThrottle} from "../../utils/datatable-throttle";
+import {NgForm} from '@angular/forms';
+import {DatatableThrottle} from '../../utils/datatable-throttle';
 
 @Component({
   selector: 'app-step1',
@@ -107,7 +107,8 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         }},
         {title: 'I2 Status', data: 'applStatusGroupDescrip'},
         {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
-          return (!data || data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+          return (!data || data == null) ? '' :
+          '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }},
         {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'},
         {title: 'FY', data: 'fy'},
@@ -229,7 +230,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     $this.fsRequestControllerService.searchDtGrantsUsingPOST(
       Object.assign(dataTablesParameters, $this.searchCriteria)).subscribe(
       result => {
-        $this.showResults = true
+        $this.showResults = true;
         $this.grantList = result.data;
         $this.gsfs.searched = true;
         callback({
@@ -267,11 +268,14 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
       return true;
     }
 
-    if (this.searchForm.form.value.fyRange.fromFy && this.searchForm.form.value.fyRange.toFy ) {
+    if (this.searchForm?.form.value.fyRange.fromFy &&
+       this.searchForm?.form.value.fyRange.toFy ) {
       return true;
     }
 
-    if (this.searchForm.form.value.grantNumber && this.searchForm.form.value.grantNumber.grantNumberIC && this.searchForm.form.value.grantNumber.grantNumberSerial) {
+    if (this.searchForm?.form.value.grantNumber &&
+       this.searchForm?.form.value.grantNumber.grantNumberIC &&
+       this.searchForm?.form.value.grantNumber.grantNumberSerial) {
       return true;
     }
     return false;
@@ -308,7 +312,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     this.searchCriteria.piName = this.piName;
 
     this.searchCriteria.rfaPa = this.selectedRfaPa;
-    this.searchCriteria.grantType = this.searchForm.value.grantNumber.grantNumberType
+    this.searchCriteria.grantType = this.searchForm.value.grantNumber.grantNumberType;
     this.searchCriteria.grantMech = this.searchForm.value.grantNumber.grantNumberMech;
     this.searchCriteria.grantIc = this.searchForm.value.grantNumber.grantNumberIC;
     this.searchCriteria.grantSerial = this.searchForm.value.grantNumber.grantNumberSerial;
