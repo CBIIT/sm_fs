@@ -37,6 +37,7 @@ const routes: Routes = [
       { path: 'search/grants', component: SearchComponent, canActivate: [AuthGuard] },
       { path: 'search/:action', component: SearchComponent, canActivate: [AuthGuard] },
       { path: 'search', component: SearchComponent, canActivate: [AuthGuard] },
+      { path: 'restoreSession', component: SessionRestoreComponent },
       { path: 'plan', component: FundingPlanComponent, children: [
         {path: '', redirectTo: 'step1/new', pathMatch: 'full'},
         {path: 'step1', redirectTo: 'step1/', pathMatch: 'full'},
@@ -62,7 +63,6 @@ const routes: Routes = [
     ]
   },
   {path: 'error/:errorId', component: ErrorComponent},
-  {path: 'restoreSession', component: SessionRestoreComponent},
   { path: 'unauthorize', component: UnauthorizeComponent }
 ];
 
