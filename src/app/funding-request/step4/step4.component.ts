@@ -415,20 +415,29 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   goToWorkflow(): void {
     if (this.workflowModel.isFinancialApprover) {
       const el = document.getElementById('workflow-budget-info');
-      el.scrollIntoView();
+      if (el) {
+        el.scrollIntoView();
+        return;
+      }
     }
     else if (this.workflowModel.isGMApprover) {
       const el = document.getElementById('workflow-grant-management');
-      el.scrollIntoView();
+      if (el) {
+        el.scrollIntoView();
+        return;
+      }
     }
     else if (this.workflowModel.isScientificApprover) {
       const el = document.getElementById('workflow-approved-cost');
-      el.scrollIntoView();
+      if (el) {
+        el.scrollIntoView();
+        return;
+      }
     }
-    else {
-      const el = document.getElementById('workflow-section');
-      el.scrollIntoView();
-    }
+
+    const el2 = document.getElementById('workflow-section');
+    el2.scrollIntoView();
+
   }
 
   showGoToWorkflowButton(): boolean {
