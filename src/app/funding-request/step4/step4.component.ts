@@ -405,7 +405,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   showBudgetInfo(): boolean {
-    return this.workflowModel.isFinancialApprover || this.workflowModel.approvedByFC;
+    return !this.requestModel.isSkip() && (this.workflowModel.isFinancialApprover || this.workflowModel.approvedByFC);
   }
 
   hideWorkflow(): boolean {

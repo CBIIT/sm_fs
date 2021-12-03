@@ -1,25 +1,14 @@
-
-<ng-template #sessionRestoreModal let-modal>
-  <div class="modal-content">
-  <div class="modal-header">
-    <span class="modal-title" id="modal-title-hold">Session Restore</span>
-    <button type="button" class="close" aria-label="Close" (click)="modal.close('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
+<div id="content">
+  <div id="sessionRestoreMessage" style="text-align: center;">
+    <p>Your Session has been restored.</p>
+    <p>
+      Please close the window and <b><span style="color: red">Save
+					or Submit again.</span></b>
+    </p>
   </div>
-  <div class="modal-body">
-<div id="content" >
-    <div id="sessionRestoreMessage" style="text-align: center;">
-        <p>Your Session has been restored.</p>
-        <p>
-            Please close the window and <b><span style="color: red">Save
-                    or Submit again.</span></b>
-        </p>
-    </div>
 </div>
+<div>
+  <div style="text-align: center;">
+    <input type="button" id="closeDialog" onclick="afterRestoreClose()" value="Close" />
   </div>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-primary" (click)="modal.close('close click')">Close</button>
-  </div>
-</ng-template>
+</div>
