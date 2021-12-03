@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { SearchCriteria } from './search-criteria';
 import { SearchResultComponent } from './search-result/search-result.component';
 import { FundSearchDashboardDataDto , FundSelectSearchCriteria , FsSearchControllerService  } from '@nci-cbiit/i2ecws-lib';
@@ -16,7 +16,7 @@ import { BatchApproveService } from './batch-approve/batch-approve.service';
   styleUrls: ['./search.component.css'],
   providers: [BatchApproveService]
 })
-export class SearchComponent implements OnInit, AfterViewInit {
+export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(SearchResultComponent) searchResultComponent: SearchResultComponent;
 
   labelSearch: string = 'for Individual Requests';
@@ -43,6 +43,8 @@ export class SearchComponent implements OnInit, AfterViewInit {
    action: string;
    selectedMenuUrl: string;
 
+  keepSearchCriteriaModel: boolean;
+
   constructor(private logger: NGXLogger,
               private router: Router,
               private route: ActivatedRoute,
@@ -52,6 +54,12 @@ export class SearchComponent implements OnInit, AfterViewInit {
               private batchApproveService: BatchApproveService,
               private gwbLinksService: GwbLinksService
             ) {
+  }
+
+  ngOnDestroy(): void {
+    if (!this.keepSearchCriteriaModel) {
+      this.searchModel.reset();
+    }
   }
 
   ngOnInit(): void {
@@ -87,15 +95,18 @@ export class SearchComponent implements OnInit, AfterViewInit {
           case 'mycafr':
           case 'myportfoliofr':
           case 'myreviewfr':
+            this.keepSearchCriteriaModel = true;
             this.router.navigateByUrl('/search/fr', { state: { action: navigateAction}});
             break;
           case 'FP':
           case 'awaitfp':
           case 'myfp':
           case 'myreviewfp':
+            this.keepSearchCriteriaModel = true;
             this.router.navigateByUrl('/search/fp', { state: { action: navigateAction}});
             break;
           case 'G':
+            this.keepSearchCriteriaModel = true;
             this.router.navigateByUrl('/search/grants', { state: { action: navigateAction}});
             break;
         }
@@ -447,6 +458,10 @@ export class SearchComponent implements OnInit, AfterViewInit {
       }, error => {
         console.error('HttpClient get request error for----- ' + error.message);
       });
+  }
+
+  onKeepSearchCriteria(): void {
+    this.keepSearchCriteriaModel = true;
   }
 }
 export enum FilterTypes {

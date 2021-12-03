@@ -43,6 +43,9 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output()
   refreshOverviewEmitter = new Subject<boolean>();
 
+  @Output()
+  keepModelEmitter = new Subject<boolean>();
+
   constructor(private fsSearchControllerService: FsSearchControllerService,
               private propertiesService: AppPropertiesService,
               private loaderService: LoaderService,
@@ -101,6 +104,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   // batchApproveVisible = false;
 
   currencyTransformer: CurrencyPipe = new CurrencyPipe('en-US');
+
 
   ngOnInit(): void {
     this.canOpenPaylist = this.userService.hasRole('GMBRCHF') ||
@@ -750,6 +754,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dtFundingPlanTrigger.unsubscribe();
     this.dtGrantTrigger.unsubscribe();
     this.refreshOverviewEmitter.unsubscribe();
+    this.keepModelEmitter.unsubscribe();
     this.throttle.reset();
   }
 
@@ -859,21 +864,25 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onOpenFundingRequest($event: any): void {
     this.logger.debug('onOpenFundingRequest() - request/retrieve', $event.frqId);
+    this.keepModelEmitter.next(true);
     this.router.navigate(['request/retrieve', $event.frqId]);
   }
 
   onOpenFundingPlan($event: any): void {
+    this.keepModelEmitter.next(true);
     this.router.navigate(['plan/retrieve', $event.fprId]);
 
   }
 
   onRequestSelect($event: number): void {
     this.logger.debug('onRequestSelect() - request/retrieve', $event);
+    this.keepModelEmitter.next(true);
     this.router.navigate(['request/retrieve', $event]);
   }
 
   onPlanSelect($event: number): void {
     this.logger.debug('onRequestSelect() - plan/retrieve', $event);
+    this.keepModelEmitter.next(true);
     this.router.navigate(['plan/retrieve', $event]);
   }
 
@@ -917,7 +926,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   runDetailedReport(): void {
-   
+
     if (this.fundingRequests && this.fundingRequests.length > 0) {
       this.downloadDetailReport([...this.selectedRows.keys()], true, this.searchCriteria);
     } else if (this.fundingPlans && this.fundingPlans.length > 0) {
