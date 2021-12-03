@@ -449,7 +449,7 @@ export class PlanManagementService {
   }
 
 
-  addPendingValues(vals: PendingPrcValues) {
+  addPendingValues(vals: PendingPrcValues): void {
     this.pendingValues.set(vals.applId, vals);
   }
 }
