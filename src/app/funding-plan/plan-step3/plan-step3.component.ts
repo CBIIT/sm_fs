@@ -284,13 +284,14 @@ export class PlanStep3Component implements OnInit {
         directCost = item.getDirectCost();
         totalCost = item.getTotalCost();
         if (item.displayType === 'percent') {
-          percentCut = item.getPercentCut();
+          // Raw percent cut is in human-readable form: 12 rather than .12
+          percentCut = item.getPercentCut() * 1000;
           dcPercentCut = percentCut;
           tcPercentCut = percentCut;
         } else {
           percentCut = null;
-          dcPercentCut = Number(item.getDirectCostPercentCut()) * 100;
-          tcPercentCut = Number(item.getTotalCostPercentCut()) * 100;
+          dcPercentCut = Number(item.getDirectCostPercentCut()) * 100000;
+          tcPercentCut = Number(item.getTotalCostPercentCut()) * 100000;
         }
 
         if (!isNaN(totalCost)) {
@@ -458,17 +459,17 @@ export class PlanStep3Component implements OnInit {
         let tcPercentCut: number;
 
         if (s.displayType === 'percent') {
-          percentCut = +s.percentCut;
+          percentCut = +s.percentCut * 1000;
           directCost = +s.directCostCalculated;
           totalCost = +s.totalCostCalculated;
-          dcPercentCut = +s.percentCut;
-          tcPercentCut = +s.percentCut;
+          dcPercentCut = +s.percentCut * 1000;
+          tcPercentCut = +s.percentCut * 1000;
         } else if (s.displayType === 'dollar') {
-          percentCut = +s.percentCut;
+          percentCut = +s.percentCut * 1000;
           directCost = +s.directCost;
           totalCost = +s.totalCost;
-          dcPercentCut = +s.dcPercentCutCalculated * 100;
-          tcPercentCut = +s.tcPercentCutCalculated * 100;
+          dcPercentCut = +s.dcPercentCutCalculated * 100000;
+          tcPercentCut = +s.tcPercentCutCalculated * 100000;
         } else {
           this.logger.error('Display type is null. Time to panic.');
         }

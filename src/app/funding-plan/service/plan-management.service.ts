@@ -215,7 +215,7 @@ export class PlanManagementService {
 
   directCostPercentCut(applId: number, fseId: number): number {
     if (this.getCan(applId, fseId)?.dcPctCut) {
-      return this.getCan(applId, fseId).dcPctCut / 100;
+      return this.getCan(applId, fseId).dcPctCut / 100000;
     }
     const dc = this.getBudget(applId, fseId)?.dcRecAmt;
     const grantTotal = this.getGrantCostInfo(applId)?.dc;
@@ -231,7 +231,7 @@ export class PlanManagementService {
 
   totalCostPercentCut(applId: number, fseId: number): number {
     if (this.getCan(applId, fseId)?.tcPctCut) {
-      return this.getCan(applId, fseId).tcPctCut / 100;
+      return this.getCan(applId, fseId).tcPctCut / 100000;
     }
     const tc = this.getBudget(applId, fseId)?.tcRecAmt;
     const grantTotal = this.getGrantCostInfo(applId)?.tc;

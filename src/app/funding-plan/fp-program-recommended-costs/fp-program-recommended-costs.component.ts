@@ -144,7 +144,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     // TODO: especially the determination of percent if lockDollar is true
     if (can && isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut) {
       // this.logger.debug(can);
-      this._percentCut = can.dcPctCut;
+      this._percentCut = can.dcPctCut / 1000;
       if (this.lockDollar) {
         this.logger.error('Control is locked to dollar only but analysis indicates percent');
       }
