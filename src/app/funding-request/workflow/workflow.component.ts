@@ -392,7 +392,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   fetchCompletedPfr(): void {
     if (this.workflowModel.isUserNextInChain && this.workflowModel.lastInChain) {
-      this.workflowService.getCompletedPlanUsingGET( 34410).subscribe(
+      this.workflowService.getCompletedPlanUsingGET( this.requestModel.requestDto.frqId).subscribe(
         result => this.completedPfrs = result,
         error => {
           this.logger.error('calling getCompletedPFRsUsingGET failed ', error);
