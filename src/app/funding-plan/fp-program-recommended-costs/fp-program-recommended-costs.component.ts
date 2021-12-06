@@ -264,11 +264,6 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   set displayType(value: string) {
-    if (value === 'percent') {
-      this.planManagementService.setPercentSelected(this.grant.applId, this.sourceIndex, true);
-    } else {
-      this.planManagementService.setPercentSelected(this.grant.applId, this.sourceIndex, false);
-    }
     this._displayType = value;
   }
 

@@ -88,20 +88,6 @@ export class PlanManagementService {
     this._listSelectedSources = Array.from(this._selectedSourcesMap.values());
   }
 
-  setPercentSelected(applId: number, sourceIndex: number, selected: boolean): void {
-    const currentIndex = this.percentSelectionIndex(+applId);
-    // this.logger.warn('setPercentSelected', applId, sourceIndex, selected, currentIndex);
-    if (currentIndex === null || currentIndex === sourceIndex) {
-      if (selected) {
-        // this.logger.warn('selected');
-        this.percentSelectedTracker.set(applId, sourceIndex);
-      } else {
-        // this.logger.warn('deselected');
-        this.percentSelectedTracker.delete(applId);
-      }
-    }
-  }
-
   isPercentSelected(applId: number): boolean {
     let result = false;
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
