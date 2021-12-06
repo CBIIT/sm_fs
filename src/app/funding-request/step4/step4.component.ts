@@ -386,7 +386,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get isDisplayBudgetDocsUploadVar(): boolean {
-    return this.workflowModel.isFinancialApprover &&
+    return !this.requestModel.isSkip() && this.workflowModel.isFinancialApprover &&
            ApprovingStatuses.includes(this.requestStatus);
   }
 
