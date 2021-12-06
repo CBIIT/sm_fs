@@ -162,26 +162,29 @@ export class Step3Component implements OnInit {
   }
 
   loadJustificationText() {
-    if (this.requestModel.requestDto.justification ) {
+    if (this.requestModel.requestDto.justification) {
 
-      this.userControllerService.findByNpnIdUsingGET(this.requestModel.requestDto.justificationCreateNpnId).subscribe(
-        result => {
+      this.justificationUploaded = of(true);
+      this.justificationText = this.requestModel.requestDto.justification;
+      this.justificationType = 'text';
+      this.removeDocType('Justification');
+      if (this.requestModel.requestDto.justificationCreateNpnId) {
+        this.userControllerService.findByNpnIdUsingGET(this.requestModel.requestDto.justificationCreateNpnId).subscribe(
+          result => {
+            this.requestModel.requestDto.justificationCreateByFullName = result.fullNameLF;
+            this.requestModel.requestDto.justificationCreateByEmailAddress = result.emailAddress;
+            this.justificationEnteredBy = result.fullNameLF;
+            this.justificationEnteredByEmail = result.emailAddress;
+            this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
+            this.justificationEnteredByEmit.next(this.justificationEnteredBy);
+            this.justificationEnteredByEmailEmit.next(this.justificationEnteredByEmail);
+            this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'dd/MM/yyyy'));
 
-          this.justificationUploaded = of(true);
-          this.justificationText = this.requestModel.requestDto.justification;
-          this.requestModel.requestDto.justificationCreateByFullName = result.fullNameLF;
-          this.requestModel.requestDto.justificationCreateByEmailAddress = result.emailAddress;
-          this.justificationEnteredBy = result.fullNameLF;
-          this.justificationEnteredByEmail = result.emailAddress;
-          this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
-          this.justificationEnteredByEmit.next(this.justificationEnteredBy);
-          this.justificationEnteredByEmailEmit.next(this.justificationEnteredByEmail);
-          this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'dd/MM/yyyy'));
-          this.justificationType = 'text';
-          this.removeDocType('Justification');
-        }, error => {
-          this.logger.error('HttpClient get request error for----- ' + error.message);
-        });
+          }, error => {
+            this.logger.error('HttpClient get request error for----- ' + error.message);
+          });
+      }
+
     }
 
   }
@@ -288,7 +291,7 @@ export class Step3Component implements OnInit {
         this.justificationText = justification;
         this.justificationEnteredBy = this.requestModel.requestDto.justificationCreateByFullName;
         this.justificationEnteredByEmail = this.requestModel.requestDto.justificationCreateByEmailAddress;
-        this.justificationUploadedOn =  new Date(this.requestModel.requestDto.justificationCreateDate);
+        this.justificationUploadedOn = new Date(this.requestModel.requestDto.justificationCreateDate);
         this.justificationEnteredByEmit.next(this.justificationEnteredBy);
         this.justificationEnteredByEmailEmit.next(this.justificationEnteredByEmail);
         this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'dd/MM/yyyy'));
