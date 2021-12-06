@@ -30,9 +30,6 @@ export class PlanManagementService {
   private canMap: Map<number, Map<number, FundingRequestCanDto>>;
   public requestIdMap: Map<number, number> = new Map<number, number>();
 
-  // Tracks the applid and the source index where percent was selected
-  private percentSelectedTracker: Map<number, number> = new Map<number, number>();
-
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
 
   inflightPFRs: Map<number, number> = new Map<number, number>();
