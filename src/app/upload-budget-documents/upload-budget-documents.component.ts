@@ -104,7 +104,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
         result => {
           this.requestModel.requestDto.budgetDocs = result;
           this.budgetDocDtos = of(result);
-          result.forEach(element => {
+          result?.forEach(element => {
   
             this.spliceDocType(element.docType);
           });
