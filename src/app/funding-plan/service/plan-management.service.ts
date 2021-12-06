@@ -8,6 +8,7 @@ import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRe
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { CanManagementService } from '../../cans/can-management.service';
 import { PendingPrcValues } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
+import { isReallyANumber } from '../../utils/utils';
 
 @Injectable({
   providedIn: 'root'
@@ -102,19 +103,32 @@ export class PlanManagementService {
   }
 
   isPercentSelected(applId: number): boolean {
-    const x = this.percentSelectedTracker.get(+applId);
-    const result = (x !== null && x !== undefined);
+    let result = false;
+    this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
+      if (+r.applId === +applId) {
+        r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
+          if (can && isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0) {
+            this.logger.debug(`Percent selected: ${applId} - ${index} - ${can.fseId}`);
+            result = true;
+          }
+        });
+      }
+    });
     // this.logger.warn('isPercentSelected:', applId, x, result);
     return result;
   }
 
   percentSelectionIndex(applId: number): number {
-    const result = this.percentSelectedTracker.get(+applId);
-    // this.logger.warn('percentSelectionIndex', applId, result);
-
-    if (result === null || result === undefined) {
-      return null;
-    }
+    let result: number = null;
+    this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
+      if (+r.applId === +applId) {
+        r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
+          if (can && isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0) {
+            result = index;
+          }
+        });
+      }
+    });
 
     return result;
   }

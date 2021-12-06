@@ -142,7 +142,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
     // TODO: this logic might need revisiting.
     // TODO: especially the determination of percent if lockDollar is true
-    if (can && isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut) {
+    if (can && isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0) {
       // this.logger.debug(can);
       this._percentCut = can.dcPctCut / 1000;
       if (this.lockDollar) {
