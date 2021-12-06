@@ -128,7 +128,7 @@
       <thead>
       <tr>
         <th scope="col" class="plan-grant-info">Grant Information</th>
-        <th *ngFor="let source of listSelectedSources; let sourceIndex = index" colspan="2" [ngModelGroup]="source.fundingSourceName" >
+        <th *ngFor="let source of listSelectedSources; let sourceIndex = index" colspan="1" [ngModelGroup]="source.fundingSourceName" >
           <div class="d-flex align-items-center ">
             <span class="plan-table">{{ source.fundingSourceName }}</span>
             <button type="button" class="btn btn-sm btn-slim btn-link ml-2" (click)="onEditFundingSource(source.fundingSourceId, sourceIndex)"
@@ -147,7 +147,7 @@
             Every source must fund at least one grant
           </div>
         </th>
-        <th scope="col" colspan="2">Total Recommended Costs</th>
+        <th scope="col" colspan="1">Total Recommended Costs</th>
       </tr>
       </thead>
       <tbody>
@@ -173,9 +173,7 @@
             <strong>Direct</strong><br/>
             {{ planManagementService.directCost(grant.applId, source.fundingSourceId) | currency }} <br/>
             {{ planManagementService.directCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
-          </td>
-
-          <td>
+          <br/>
             <strong>Total</strong><br/>
             {{ planManagementService.totalCost(grant.applId, source.fundingSourceId) | currency }} <br/>
             {{ planManagementService.totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
@@ -186,9 +184,8 @@
           <td>
             <strong>Direct</strong><br/>
             {{ planManagementService.requestDirectTotal(grant.applId) | currency}}
-          </td>
-
-          <td>
+          <br/>
+          <br/>
             <strong>Total</strong><br/>
             {{ planManagementService.requestTotalTotal(grant.applId) | currency }}
           </td>
@@ -205,9 +202,7 @@
           <td>
             <strong>Direct</strong><br/>
             {{ planManagementService.sourceDirectTotal(source.fundingSourceId) | currency}}
-          </td>
-
-          <td>
+          <br/>
             <strong>Total</strong><br/>
             {{ planManagementService.sourceTotalTotal(source.fundingSourceId) | currency }}
           </td>
@@ -217,9 +212,7 @@
           <td>
             <strong>Direct</strong><br/>
             {{ planManagementService.grandTotalDirect() | currency}}
-          </td>
-
-          <td>
+          <br/>
             <strong>Total</strong><br/>
             {{ planManagementService.grandTotalTotal() | currency }}
           </td>

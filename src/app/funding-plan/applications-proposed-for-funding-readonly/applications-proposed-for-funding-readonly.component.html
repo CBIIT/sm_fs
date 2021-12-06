@@ -11,7 +11,7 @@
           <thead>
           <tr>
             <th  class="plan-grant-info" scope="col">Grant Information</th>
-            <th *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources" colspan="2" >
+            <th *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources" colspan="1" >
               <label>Program Recommended Costs</label>
               <hr>
               <div class="d-flex align-items-center ">
@@ -19,7 +19,7 @@
               </div>
             </th>
 
-            <th *ngIf="planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.length > 1" scope="col" colspan="2">Total Recommended Costs</th>
+            <th *ngIf="planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.length > 1" scope="col" colspan="1">Total Recommended Costs</th>
           </tr>
           </thead>
           <tbody>
@@ -40,9 +40,7 @@
               <strong>Direct</strong><br/>
               {{ directCost(grant.applId, source.fundingSourceId) | currency }} <br/>
               ({{ directCostPercentCut(grant.applId, source.fundingSourceId) | percent }} Cut)
-            </td>
-
-            <td>
+            <br/>
               <strong>Total</strong><br/>
               {{ totalCost(grant.applId, source.fundingSourceId) | currency }} <br/>
               ({{ totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }} Cut)
@@ -53,9 +51,8 @@
             <td>
               <strong>Direct</strong><br/>
               {{ requestTotalDirect(grant.applId) | currency }}
-            </td>
-
-            <td>
+            <br/>
+            <br/>
               <strong>Total</strong><br/>
               {{ requestTotalTotal(grant.applId) | currency }}
             </td>
@@ -72,9 +69,7 @@
             <td>
               <strong>Direct</strong><br/>
               {{ sourceDirectTotal(source.fundingSourceId) | currency}}
-            </td>
-
-            <td>
+            <br />
               <strong>Total</strong><br/>
               {{ sourceTotalTotal(source.fundingSourceId) | currency }}
             </td>
@@ -84,9 +79,7 @@
             <td>
               <strong>Direct</strong><br/>
               {{ grandTotalDirect() | currency }}
-            </td>
-
-            <td>
+            <br />
               <strong>Total</strong><br/>
               {{ grandTotalTotal() | currency }}
             </td>

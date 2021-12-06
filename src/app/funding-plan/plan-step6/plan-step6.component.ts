@@ -292,6 +292,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
       this.fsPlanWorkflowControllerService.deletePlanUsingDELETE(this.fprId).subscribe(
         result => {
           this.logger.debug('Funding plan was deleted: ', result);
+          // TODO: Plan management service also needs to be reset
           this.planModel.reset();
           this.router.navigate(['/search']);
         },
