@@ -25,6 +25,9 @@ export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> 
 
     const id = component.model.requestDto.frqId;
 
+    if(nextState?.url?.startsWith('/error')) {
+      return true;
+    }
     if (nextState?.url?.startsWith('/request/step1')) {
       return true;
     } else if (nextState?.url?.startsWith('/request/step')) {
