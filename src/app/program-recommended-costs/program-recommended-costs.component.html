@@ -441,7 +441,7 @@
                     <td *ngFor="let li of lineItem; let i = index; let first = first; let last = last" scope="col">
 
                       <div class="fsource-fy1-form mb-2" *ngIf="last; else notLast">
-                        <div class="form-row form-inline">
+                        <div class="form-row form-inline flex-align-right">
                           <div class="col left-label">
                             <label for="dc-dollar1">Direct Cost</label>
                           </div>
@@ -477,7 +477,7 @@
                       </div>
 
                       <div class="fsource-fy1-form" *ngIf="last">
-                        <div class="form-row form-inline">
+                        <div class="form-row form-inline flex-align-right">
                           <div class="col left-label">
                             <label for="tc-dollar1">Total Cost</label>
                           </div>

@@ -25828,3 +25828,6 @@ td.all.parentTable{
 .grant-info-margin{
   margin: 3px 0;
 }
+.flex-align-right{
+  justify-content: right
+}
