@@ -1,14 +1,12 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
-import { from, Observable, of, throwError } from 'rxjs';
-import { catchError, retry } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { SessionRestoreComponent } from '../session/session-restore/session-restore.component';
 import { openNewWindow } from '../utils/utils';
-import {Location} from '@angular/common';
+import { Location } from '@angular/common';
 
 
 @Injectable()
@@ -17,18 +15,19 @@ export class ErrorInterceptorService implements HttpInterceptor {
     private errorHandler: ErrorHandlerService,
     private logger: NGXLogger,
     private router: Router,
-    private location: Location,
-    private modalService: NgbModal
+    private location: Location
   ) {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // this.logger.debug(req, next);
-    // this.logger.debug(`Current route: ${this.router.url}`);
+    this.logger.debug(`Current route url: ${this.router.url}`);
+    this.logger.debug(`Current location: ${this.location.path(false)}`);
+    this.logger.debug(`Current location state: ${JSON.stringify(this.location.getState())}`);
     return next.handle(req).pipe(
       // retry(1),
       catchError((error, caught) => {
         // this.logger.warn(`Raw error: ${JSON.stringify(error)}`);
+        this.logger.debug(`Type of error caught: ${typeof error}`)
 
         if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
