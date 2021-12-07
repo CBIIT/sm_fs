@@ -26,8 +26,8 @@
                 </tr>
             </thead>
             <tbody cdkDropList (cdkDropListDropped)="dropped($event)" class="drag-boundary">
-                <tr *ngFor="let a of additionalApprovers; let i = index" cdkDrag cdkDragBoundary=".drag-boundary" [cdkDragDisabled]="readonly">
-                    <td><span class="order-icon" ngbTooltip="Drag & Drop to Order" *ngIf="!readonly"></span>&nbsp;{{ a.orderNum}}</td>
+                <tr *ngFor="let a of additionalApprovers; let i = index" cdkDrag   cdkDragBoundary=".drag-boundary" [cdkDragDisabled]="readonly">
+                    <td><span class="order-icon" ngbTooltip="Drag & Drop to Order"  [autoClose]="true"  *ngIf="!readonly"></span>&nbsp;{{ a.orderNum}}</td>
                     <td><a href="mailto:{{a.approverEmailAddress}}?subject={{ this.requestModel.grant.fullGrantNum }} - {{ this.requestModel.grant.lastName}}">{{ a.approverFullName }}</a></td>
                     <td>Additional Approver (Added by {{a.assignerFullName}})</td>
                     <td></td>
