@@ -86,11 +86,11 @@
           <div class="form-row">
             <div class="col-lg-6">
               <span class="like-label">Direct Cost</span>
-              <span>{{ sourceSumDirectCost(0) | currency }}</span>
+              <span>{{ sourceSumDirectCost(0) | currencyToggle }}</span>
             </div>
             <div class="col-lg-6">
               <span class="like-label">Total Cost</span>
-              <span>{{ sourceSumTotalCost(0) | currency }}</span>
+              <span>{{ sourceSumTotalCost(0) | currencyToggle }}</span>
             </div>
           </div>
         </td>
@@ -171,11 +171,11 @@
         <ng-container *ngFor="let source of listSelectedSources; let sourceIndex = index">
           <td>
             <strong>Direct</strong><br/>
-            {{ planManagementService.directCost(grant.applId, source.fundingSourceId) | currency }} <br/>
+            {{ planManagementService.directCost(grant.applId, source.fundingSourceId) | currencyToggle }} <br/>
             {{ planManagementService.directCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
           <br/>
             <strong>Total</strong><br/>
-            {{ planManagementService.totalCost(grant.applId, source.fundingSourceId) | currency }} <br/>
+            {{ planManagementService.totalCost(grant.applId, source.fundingSourceId) | currencyToggle }} <br/>
             {{ planManagementService.totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
           </td>
         </ng-container>
@@ -183,11 +183,11 @@
         <ng-container *ngIf="listSelectedSources?.length > 1">
           <td>
             <strong>Direct</strong><br/>
-            {{ planManagementService.requestDirectTotal(grant.applId) | currency}}
+            {{ planManagementService.requestDirectTotal(grant.applId) | currencyToggle}}
           <br/>
           <br/>
             <strong>Total</strong><br/>
-            {{ planManagementService.requestTotalTotal(grant.applId) | currency }}
+            {{ planManagementService.requestTotalTotal(grant.applId) | currencyToggle }}
           </td>
         </ng-container>
 
@@ -201,20 +201,20 @@
         <ng-container *ngFor="let source of listSelectedSources; let sourceIndex = index">
           <td>
             <strong>Direct</strong><br/>
-            {{ planManagementService.sourceDirectTotal(source.fundingSourceId) | currency}}
+            {{ planManagementService.sourceDirectTotal(source.fundingSourceId) | currencyToggle}}
           <br/>
             <strong>Total</strong><br/>
-            {{ planManagementService.sourceTotalTotal(source.fundingSourceId) | currency }}
+            {{ planManagementService.sourceTotalTotal(source.fundingSourceId) | currencyToggle }}
           </td>
         </ng-container>
 
         <ng-container *ngIf="listSelectedSources?.length > 1">
           <td>
             <strong>Direct</strong><br/>
-            {{ planManagementService.grandTotalDirect() | currency}}
+            {{ planManagementService.grandTotalDirect() | currencyToggle}}
           <br/>
             <strong>Total</strong><br/>
-            {{ planManagementService.grandTotalTotal() | currency }}
+            {{ planManagementService.grandTotalTotal() | currencyToggle }}
           </td>
         </ng-container>
       </tr>

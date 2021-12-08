@@ -12,8 +12,6 @@
           <tr>
             <th  class="plan-grant-info" scope="col">Grant Information</th>
             <th *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources" colspan="1" >
-<!--               <label>Program Recommended Costs</label>
-              <hr> -->
               <div class="d-flex align-items-center ">
                 <span class="plan-table">{{ source.fundingSourceName }}</span>
               </div>
@@ -38,11 +36,11 @@
             <ng-container *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources; let sourceIndex = index">
             <td>
               <strong>Direct</strong><br/>
-              {{ directCost(grant.applId, source.fundingSourceId) | currency }} <br/>
+              {{ directCost(grant.applId, source.fundingSourceId) | currencyToggle }} <br/>
               ({{ directCostPercentCut(grant.applId, source.fundingSourceId) | percent }} Cut)
             <br/>
               <strong>Total</strong><br/>
-              {{ totalCost(grant.applId, source.fundingSourceId) | currency }} <br/>
+              {{ totalCost(grant.applId, source.fundingSourceId) | currencyToggle }} <br/>
               ({{ totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }} Cut)
             </td>
             </ng-container>
@@ -50,11 +48,11 @@
             <ng-container *ngIf="planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.length > 1">
             <td>
               <strong>Direct</strong><br/>
-              {{ requestTotalDirect(grant.applId) | currency }}
+              {{ requestTotalDirect(grant.applId) | currencyToggle }}
             <br/>
             <br/>
               <strong>Total</strong><br/>
-              {{ requestTotalTotal(grant.applId) | currency }}
+              {{ requestTotalTotal(grant.applId) | currencyToggle }}
             </td>
             </ng-container>
 
@@ -68,20 +66,20 @@
             <ng-container *ngFor="let source of planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources; let sourceIndex = index">
             <td>
               <strong>Direct</strong><br/>
-              {{ sourceDirectTotal(source.fundingSourceId) | currency}}
+              {{ sourceDirectTotal(source.fundingSourceId) | currencyToggle}}
             <br />
               <strong>Total</strong><br/>
-              {{ sourceTotalTotal(source.fundingSourceId) | currency }}
+              {{ sourceTotalTotal(source.fundingSourceId) | currencyToggle }}
             </td>
             </ng-container>
 
             <ng-container *ngIf="planModel.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.length > 1">
             <td>
               <strong>Direct</strong><br/>
-              {{ grandTotalDirect() | currency }}
+              {{ grandTotalDirect() | currencyToggle }}
             <br />
               <strong>Total</strong><br/>
-              {{ grandTotalTotal() | currency }}
+              {{ grandTotalTotal() | currencyToggle }}
             </td>
             </ng-container>
           </tr>
