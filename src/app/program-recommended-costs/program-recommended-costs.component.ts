@@ -144,7 +144,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       this.selectedSourceId = selection;
     });
     this.fundingSourceSynchronizerService.percentSelectedEmitter.subscribe(next => {
-      this.logger.debug(next);
       if (next.selected) {
         this.percentCutUsed = next.selected;
         this.percentCutSourceId = next.fseId;
@@ -225,7 +224,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       tmp.budgetId = l.budgetId;
       tmp.fundingRequestId = l.fundingRequestId;
       tmp.fundingSource = l.fundingSource;
-      tmp.percentCut = l.percentCut;
+      tmp.percentCut = this.showDollar ? null : l.percentCut;
 
       liClone.push(tmp);
       if (tmp.type === PrcLineItemType.PERCENT_CUT) {
@@ -274,7 +273,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
     }
     this.editing = i;
-    this.logger.debug(this.lineItem, this.lineItem?.length);
     if (this.isPayType4) {
       this._recommendedFutureYears = this.lineItem?.length - 1;
     }
@@ -342,6 +340,8 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       if (!isNaN(pc)) {
         this.lineItem[0].percentCut = pc;
       }
+    } else {
+      // this.lineItem[0].percentCut = null;
     }
   }
 
