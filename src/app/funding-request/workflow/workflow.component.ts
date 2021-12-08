@@ -302,7 +302,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.frqId = this.requestModel.requestDto.frqId;
-
+    dto.currentStatusId = this.requestStatus.statusId;
     dto.comments = this.comments;
     dto.action = action;
     if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&

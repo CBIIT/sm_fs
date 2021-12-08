@@ -22,6 +22,7 @@ export class WorkflowModalComponent implements OnInit {
   private modalRef: NgbModalRef;
 
   mode = '';
+  currentStatusId: number;
   buttonText = '';
   title = '';
   comments = '';
@@ -36,9 +37,10 @@ export class WorkflowModalComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  openConfirmModal(mode: string): Promise<WorkflowTaskDto> {
+  openConfirmModal(mode: string, currentStatusId: number): Promise<WorkflowTaskDto> {
     this.alert = null;
     this.mode = mode;
+    this.currentStatusId = currentStatusId;
     this.comments = '';
     if (this.requestOrPlan === 'REQUEST') {
       if (mode === 'WITHDRAW') {
@@ -101,6 +103,7 @@ export class WorkflowModalComponent implements OnInit {
     }
     dto.comments = this.comments;
     dto.action =  WorkflowActionCode[this.mode];
+    dto.currentStatusId = this.currentStatusId;
     this.logger.debug('Modal submits workflow task dto ', dto);
     this.invokeRestApi(dto).subscribe(
       (result) => {

@@ -70,8 +70,6 @@
 
 </div><!-- END Row -->
 
-<div class="row">
-  <div class="col-12"*ngIf="payUsingSkip()">
+<div *ngIf="payUsingSkip()">
     <app-skipped-grants></app-skipped-grants>
-  </div>
 </div>
