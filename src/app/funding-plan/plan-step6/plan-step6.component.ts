@@ -49,6 +49,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   requestHistorySubscriber: Subscription;
   activeApproverSubscriber: Subscription;
   requestStatus: string;
+  currentStatusId: number;
   docDtos: DocumentsDto[];
   excludedDocDtos: DocumentsDto[];
   readonly = false;
@@ -166,6 +167,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
       }
       if (!item.endDate) {
         this.requestStatus = item.statusCode;
+        this.currentStatusId = item.statusId;
         this.planModel.fundingPlanDto.planStatusName = item.currentStatusDescrip;
       }
     });
@@ -231,7 +233,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   }
 
   submitWithdrawHold(action: string): void {
-    this.workflowModal.openConfirmModal(action).then(
+    this.workflowModal.openConfirmModal(action, this.currentStatusId).then(
       (result) => {
         this.logger.debug(action + ' API call returned successfully', result);
         this.workflowModel.initializeForPlan(this.fprId);
@@ -333,6 +335,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.fprId = this.fprId;
+    dto.currentStatusId = this.currentStatusId;
     dto.action = WorkflowActionCode.SUBMIT;
     dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
     dto.comments = this.workflowComponent.comments;
