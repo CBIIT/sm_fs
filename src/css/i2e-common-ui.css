@@ -23383,8 +23383,8 @@ a.text-dark:hover, a.text-dark:focus {
 @media (min-width: 768px) {
   /* line 25, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
   #i2eHeader .navbar-brand {
-    background: url("../images/I2E_Logo_White.svg") no-repeat;
-    width: 20rem;
+    background: url("../images/I2E_Logo_White.png") no-repeat;
+    width: 23rem;
   }
 }
 
