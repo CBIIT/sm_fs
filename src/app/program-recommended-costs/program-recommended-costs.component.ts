@@ -426,6 +426,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
    * So we will just preemptively remove any selected sources again.
    */
   cleanUpSources(): void {
+    this.alerts = [];
     this.editing = undefined;
     this.selectedSourceId = undefined;
     this._recommendedFutureYears = null;
