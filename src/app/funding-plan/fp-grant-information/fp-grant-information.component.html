@@ -12,7 +12,7 @@
   <a class="btn btn-link grant-info-toggle-btn"  #collapseAll data-toggle="collapse" href="#row-collapse-1" role="button" aria-expanded="true" aria-controls="row-collapse-1" ngbTooltip="Collapse Grant Information" placement="top"></a>
 
   <div class="row mb-2">
-    <div class="col-6 grant-info-margin">
+    <div class="col-4 grant-info-margin">
       <span class="like-label mb-1">Grant Number</span>
       <div>
         <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
@@ -35,7 +35,7 @@
 
   <div class="row mb-2">
 
-    <div class="col-6 grant-info-margin">
+    <div class="col-4 grant-info-margin">
       <span class="like-label mb-1">PI Requested Direct Cost</span>
       <span>{{ piDirect | currency }}</span>
     </div>
@@ -90,7 +90,7 @@
     <a class="btn btn-link grant-info-toggle-btn" data-toggle="collapse" #collapseAll  href="#row-collapse-1" role="button" aria-expanded="true" aria-controls="row-collapse-1" ngbTooltip="Collapse Grant Information" placement="top"></a>
 
     <div class="row mb-2">
-      <div class="col-6 grant-info-margin">
+      <div class="col-4 grant-info-margin">
         <span class="like-label mb-1">Grant Number</span>
         <div class="d-flex align-items-center">
           <a href="{{model.grantViewerUrl+grant.applId}}" target="yourgrant">{{grant.fullGrantNum}}</a>
@@ -110,7 +110,7 @@
         <span [innerHTML]="grant|mailtoFormatter: 'piFullName':'piEmail': 'PI/PD name':'fullGrantNum': 'lastName'"></span>
       </div>
 
-      <div class="col-6 grant-info-margin">
+      <div class="col-4 grant-info-margin">
         <span class="like-label mb-1">PI Requested Direct Cost</span>
         <span>{{ piDirect | currency }}</span>
       </div>
