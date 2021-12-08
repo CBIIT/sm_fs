@@ -7,6 +7,7 @@ import { NGXLogger } from 'ngx-logger';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { Step4Component } from '../step4/step4.component';
 import { DocumentsDto } from '@nci-cbiit/i2ecws-lib';
+import { DocTypeConstants } from '../step3/step3.component';
 
 @Component({
   selector: 'app-supporting-docs-readonly',
@@ -32,6 +33,7 @@ export class SupportingDocsReadonlyComponent implements OnInit {
   docDtos: DocumentsDto[];
   displayTansitionMemo: boolean = false;
   isSummaryIncluded = false;
+  isDisplayJustificationDetails = true;
 
   constructor(private documentService: DocumentService,
     private logger: NGXLogger,
@@ -44,6 +46,23 @@ export class SupportingDocsReadonlyComponent implements OnInit {
     this.justificationType = this.parent.justificationType;
     this.justificationText = this.parent.justificationText;
     this.docDtos = this.parent.docDtos;
+
+
+    this.docDtos.forEach((value, index) => {
+
+      if (value.docFilename === DocTypeConstants.JUSTIFICATION && value.uploadByName === null) {
+        this.isDisplayJustificationDetails = false;
+      }
+
+
+      // this._docOrderDto.docId = value.id;
+      // this._docOrderDto.sortOrderNum = index + 1;
+      // this._docOrderDto.frqId = this.requestModel.requestDto.frqId;
+      // this._docOrderDto.docTypeCode = value.docType;
+      // this._docOrderDtos.push(this._docOrderDto);
+      // this._docOrderDto = {};
+
+    });
 
     if (this.requestModel.requestDto.requestType === 'Pay Type 4' ||
       (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== null)) {

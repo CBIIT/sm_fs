@@ -49,7 +49,12 @@
           class="doc-desc">(Retrieved from
           IMPAC II)</span>
         <ng-template #displayUserName>
-          <span class="doc-desc">({{item.docFilename}} - Added by <a
+          <span  *ngIf="item.docFilename === 'Justification' && !isDisplayJustificationDetails; else displayUserDetails"
+           class="doc-desc"></span>
+        </ng-template>
+
+        <ng-template #displayUserDetails>
+          <span  class="doc-desc">({{item.docFilename}} - Added by <a
               href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
             {{item.createDate}})</span>
         </ng-template>
