@@ -111,6 +111,9 @@ export class WorkflowModalComponent implements OnInit {
       },
       (error) => {
         this.logger.error('SubmitWorkflow service API failed with error ', error);
+        this.alert = {type: 'danger',
+        message: 'Error: ' + ( error.error?.errorMessage ? error.error.errorMessage : error.message ),
+        title: ''};
       }
     );
   }
