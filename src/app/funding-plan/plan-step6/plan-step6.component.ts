@@ -30,7 +30,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   @ViewChild(WorkflowModalComponent) workflowModal: WorkflowModalComponent;
   @ViewChild(PlanWorkflowComponent) workflowComponent: PlanWorkflowComponent;
   @ViewChild(UploadBudgetDocumentsComponent) uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
-  @ViewChildren(FpBudgetInformationComponent) budgetInfoComponents: QueryList<FpBudgetInformationComponent>
+  @ViewChildren(FpBudgetInformationComponent) budgetInfoComponents: QueryList<FpBudgetInformationComponent>;
   grantsSkipped: NciPfrGrantQueryDtoEx[] = [];
   grantsNotConsidered: NciPfrGrantQueryDtoEx[] = [];
 

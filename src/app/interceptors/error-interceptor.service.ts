@@ -49,6 +49,8 @@ export class ErrorInterceptorService implements HttpInterceptor {
           // }));
           // return obs as unknown as Observable<HttpEvent<any>>;
           return of(null);
+        } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
+          return throwError(error);
         } else {
           const timestamp: number = Date.now();
           this.errorHandler.registerNewError(timestamp, error);
