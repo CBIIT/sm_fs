@@ -16,7 +16,15 @@
         <tbody>
             <tr *ngFor="let history of histories">
                 <td>{{history.startDate}}</td>
-                <td>{{ history.statusShortDescrip }} by <span [innerHTML]="history | mailtoFormatter:'performedBy':'email':'Request History'"></span></td>
+                <td>
+                    <ng-container *ngIf="history.performedBy==='SYSTEM'; then SYSTEM else USER"></ng-container>
+                    <ng-template #SYSTEM>
+                        {{ history.statusShortDescrip }}
+                    </ng-template>
+                    <ng-template #USER>
+                        {{ history.statusShortDescrip }} by <span [innerHTML]="history | mailtoFormatter:'performedBy':'email':'Request History'"></span>
+                    </ng-template>
+                </td>
                 <td>{{history.comments}}</td>
             </tr>
         </tbody>
