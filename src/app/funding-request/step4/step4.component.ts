@@ -46,6 +46,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   requestHistorySubscriber: Subscription;
   activeApproverSubscriber: Subscription;
   requestStatus: string;
+  currentStatusId: number;
   docDtos: DocumentsDto[];
    readonly = false;
   activeApprover: FundingReqApproversDto;
@@ -148,6 +149,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
       if (!item.endDate) {
         this.requestStatus = item.statusCode;
+        this.currentStatusId = item.statusId;
         this.requestModel.requestDto.requestStatusName = item.currentStatusDescrip;
       }
 
@@ -305,6 +307,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
         return a.approverLdap;
       });
     }
+    dto.currentStatusId = this.currentStatusId;
     this.logger.debug('Submit Request for: ', dto);
     this.fsWorkflowControllerService.submitWorkflowUsingPOST(dto).subscribe(
       (result) => {
@@ -320,7 +323,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   submitWithdrawHold(action: string): void {
-    this.workflowModal.openConfirmModal(action).then(
+    this.workflowModal.openConfirmModal(action, this.currentStatusId).then(
       (result) => {
         this.logger.debug(action + ' API call returned successfully', result);
         this.workflowModel.initialize();
