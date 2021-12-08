@@ -5,16 +5,18 @@ export function getCurrentFiscalYear(): number {
 }
 
 //  opens   the URL in a new browser window
-export function openNewWindow(url, windowName, features?): void {
+export function openNewWindow(url, windowName, features?): Window {
   // TODO - review and eliminate winName
   const winName = windowName; // This is not necessary since it's not being changed
   if (!features) {
     features = 'menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700';
   }
   const newWin = window.open(url, winName, features);
-  if (newWin != null && newWin.focus() != null) {
+  if (newWin != null) {
     newWin.focus();
   }
+
+  return newWin;
 }
 
 /**

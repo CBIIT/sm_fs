@@ -27,7 +27,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
       // retry(1),
       catchError((error, caught) => {
         // this.logger.warn(`Raw error: ${JSON.stringify(error)}`);
-        this.logger.debug(`Type of error caught: ${typeof error}`)
+        this.logger.debug(`Type of error caught: ${typeof error}`);
 
         if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
@@ -38,8 +38,9 @@ export class ErrorInterceptorService implements HttpInterceptor {
           // const currentRoute = this.router.routerState;
           //
           // this.router.navigateByUrl(currentRoute.snapshot.url, { skipLocationChange: true });
+          const features = 'popup,menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700,noreferrer';
 
-          openNewWindow(url, 'Restore Session', undefined);
+          openNewWindow(url, 'Restore Session', features);
           // const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
           // this.logger.info('after open restore modal');
           // const obs = from(modalRef.result.then(() => {
