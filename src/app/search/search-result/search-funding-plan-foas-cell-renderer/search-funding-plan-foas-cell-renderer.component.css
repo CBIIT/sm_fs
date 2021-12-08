@@ -1,0 +1,8 @@
+table {
+  border-style: hidden;
+  padding: 0;
+}
+
+.issue-type-column {
+  min-width: 57px;
+}

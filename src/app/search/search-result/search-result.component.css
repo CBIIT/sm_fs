@@ -1,4 +1,7 @@
 div ::ng-deep .dt-controls.dt-top .dataTables_info {
   padding-top: 0 !important;
+}
 
+::ng-deep table.dataTable tbody td.foaTable {
+  padding: 0;
 }

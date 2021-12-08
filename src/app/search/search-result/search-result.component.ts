@@ -315,7 +315,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 0
         {
           title: 'FOA information', data: 'fpFoasList', orderable: false,
-          ngTemplateRef: { ref: this.searchFundingPlanFoasRenderer }, className: 'all'
+          ngTemplateRef: { ref: this.searchFundingPlanFoasRenderer }, className: 'all foaTable'
         }, // 1
         { title: 'Plan ID', data: 'fprId' }, // 2
         { title: 'Plan Name', data: 'planName' }, // 3

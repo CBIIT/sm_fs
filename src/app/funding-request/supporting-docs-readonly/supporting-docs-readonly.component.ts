@@ -54,14 +54,6 @@ export class SupportingDocsReadonlyComponent implements OnInit {
         this.isDisplayJustificationDetails = false;
       }
 
-
-      // this._docOrderDto.docId = value.id;
-      // this._docOrderDto.sortOrderNum = index + 1;
-      // this._docOrderDto.frqId = this.requestModel.requestDto.frqId;
-      // this._docOrderDto.docTypeCode = value.docType;
-      // this._docOrderDtos.push(this._docOrderDto);
-      // this._docOrderDto = {};
-
     });
 
     if (this.requestModel.requestDto.requestType === 'Pay Type 4' ||

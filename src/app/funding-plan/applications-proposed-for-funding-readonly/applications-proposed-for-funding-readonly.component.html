@@ -37,11 +37,15 @@
             <td>
               <strong>Direct</strong><br/>
               {{ directCost(grant.applId, source.fundingSourceId) | currencyToggle }} <br/>
-              ({{ directCostPercentCut(grant.applId, source.fundingSourceId) | percent }} Cut)
+              <span *ngIf="+directCost(grant.applId, source.fundingSourceId) > 0">
+                ({{ directCostPercentCut(grant.applId, source.fundingSourceId) | percent }} Cut)
+              </span>
             <br/>
               <strong>Total</strong><br/>
               {{ totalCost(grant.applId, source.fundingSourceId) | currencyToggle }} <br/>
-              ({{ totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }} Cut)
+              <span *ngIf="+totalCost(grant.applId, source.fundingSourceId) > 0">
+                ({{ totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }} Cut)
+              </span>
             </td>
             </ng-container>
 
