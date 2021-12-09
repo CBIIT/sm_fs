@@ -112,7 +112,7 @@
                     <ng-template #notFirst>
                       <div class="col font-weight-bold"></div>
                     </ng-template>
-                    <div class="col" *ngIf="first; else not">{{li.recommendedDirect | currencyToggle}}
+                    <div class="col" *ngIf="first; else not">{{li.recommendedDirect | currencyToggle}}<br/>
                       {{ li.percentCutDirectCalculated | percentCut:true}}
                     </div>
                     <ng-template #not>
@@ -130,7 +130,7 @@
                 <ng-template #d>
                   <div class="form-row" *ngIf="first">
                     <div class="col font-weight-bold">Total</div>
-                    <div class="col">{{li.recommendedTotal | currencyToggle}}
+                    <div class="col">{{li.recommendedTotal | currencyToggle}}<br/>
                       {{ li.percentCutTotalCalculated | percentCut:true }}
                     </div>
                   </div>
@@ -224,7 +224,7 @@
                   <ng-template #notFirst>
                     <div class="col font-weight-bold"></div>
                   </ng-template>
-                  <div class="col" *ngIf="first; else not">{{li.recommendedDirect | currencyToggle}}
+                  <div class="col" *ngIf="first; else not">{{li.recommendedDirect | currencyToggle}}<br/>
                     {{ li.percentCutDirectCalculated | percentCut:true}}
                   </div>
                   <ng-template #not>
@@ -247,7 +247,7 @@
               <ng-template #d>
                 <div class="form-row" *ngIf="first">
                   <div class="col font-weight-bold">Total</div>
-                  <div class="col">{{li.recommendedTotal | currencyToggle}}
+                  <div class="col">{{li.recommendedTotal | currencyToggle}}<br/>
                     {{ li.percentCutTotalCalculated | percentCut:true }}
                   </div>
                 </div>
