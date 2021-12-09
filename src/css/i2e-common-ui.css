@@ -8044,6 +8044,7 @@ readers do not read off random characters that represent icons */
 /* line 1562, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_icons.scss */
 .fa-question-circle:before {
   content: "\f059";
+  padding: inherit;
 }
 
 /* line 1563, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_icons.scss */
