@@ -70,9 +70,11 @@
               <ng-template #restoration>
                 <div *ngIf="first" class="form-row">
                   <div class="col font-weight-bold">Direct</div>
+                  <div class="col">--</div>
                 </div>
                 <div *ngIf="first" class="form-row">
                   <div class="col font-weight-bold">Total</div>
+                  <div class="col">--</div>
                 </div>
                 <span *ngIf="last; then isLast else notLast"></span>
                 <ng-template #isLast>
@@ -86,7 +88,10 @@
                   </div>
                 </ng-template>
                 <ng-template #notLast>
-                  <div *ngIf="!first" class="force-text-center">---</div>
+                  <div *ngIf="!first" class="form-row">
+                    <div class="col">--</div>
+                  </div>
+                  <!-- <div *ngIf="!first" class="force-text-center">--</div> -->
                 </ng-template>
               </ng-template>
 
@@ -142,7 +147,7 @@
                   Direct
                 </div>
                 <ng-template #noDollar>
-                  <div class="col font-weight-bold">
+                  <div *ngIf="!isRestoration()" class="col font-weight-bold">
                     Direct
                   </div>
                 </ng-template>
@@ -516,7 +521,7 @@
                           </div>
                         </div>
                       </div>
-                      <ng-template #notLast>---</ng-template>
+                      <ng-template #notLast>--</ng-template>
 
                     </td>
                   </tr>
