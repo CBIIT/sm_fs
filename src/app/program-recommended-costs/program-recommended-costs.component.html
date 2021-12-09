@@ -147,8 +147,7 @@
                   Direct
                 </div>
                 <ng-template #noDollar>
-                  <div *ngIf="!isRestoration()" class="col font-weight-bold">
-                    Direct
+                  <div class="col font-weight-bold">
                   </div>
                 </ng-template>
                 <div class="col">{{grandTotalDirect(i) | currencyToggle}}</div>
@@ -267,7 +266,6 @@
                 </div>
                 <ng-template #noDollar>
                   <div class="col font-weight-bold">
-                    Direct
                   </div>
                 </ng-template>
                 <div class="col">{{grandTotalDirect(i) | currencyToggle}}</div>
