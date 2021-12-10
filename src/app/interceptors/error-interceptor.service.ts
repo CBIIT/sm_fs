@@ -2,7 +2,7 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
 import { openNewWindow } from '../utils/utils';
@@ -11,6 +11,9 @@ import { Location } from '@angular/common';
 
 @Injectable()
 export class ErrorInterceptorService implements HttpInterceptor {
+
+  private modalWindow: any;
+
   constructor(
     private errorHandler: ErrorHandlerService,
     private logger: NGXLogger,
@@ -42,10 +45,13 @@ export class ErrorInterceptorService implements HttpInterceptor {
 
           const errorUrl = new URL(error.url);
           errorUrl.searchParams.delete('TARGET');
-          
+          errorUrl.searchParams.set('TARGET', url);
+
           this.logger.debug(`errorUrl: ${errorUrl} :: ${errorUrl.searchParams}`);
 
-          openNewWindow(errorUrl.toString(), 'Restore Session', features);
+          if (!this.modalWindow) {
+            this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore Session', features);
+          }
           // const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
           // this.logger.info('after open restore modal');
           // const obs = from(modalRef.result.then(() => {
@@ -62,6 +68,8 @@ export class ErrorInterceptorService implements HttpInterceptor {
           this.router.navigate(['/error', timestamp]);
           return throwError(error);
         }
+      }), finalize(() => {
+        this.modalWindow = undefined;
       })
     );
   }
