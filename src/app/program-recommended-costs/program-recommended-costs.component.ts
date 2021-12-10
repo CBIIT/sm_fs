@@ -193,15 +193,16 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   addFundingSource(): void {
+    this.logger.debug(`Editing: ${this.editing}`);
     if (this.editing >= 0) {
       const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[this.editing];
       if (this.selectedSourceId !== edit.fundingSourceId) {
         this.deleteSourceUnchecked(this.editing);
-        this.editing = undefined;
         this.lineItem.forEach(l => {
           l.budgetId = undefined;
         });
       }
+      this.editing = undefined;
     } else {
       this.logger.debug('creating new budget for source', this.selectedSourceId);
     }
