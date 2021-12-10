@@ -45,7 +45,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
           
           this.logger.debug(`errorUrl: ${errorUrl} :: ${errorUrl.searchParams}`);
 
-          openNewWindow(error.url, 'Restore Session', features);
+          openNewWindow(errorUrl.toString(), 'Restore Session', features);
           // const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
           // this.logger.info('after open restore modal');
           // const obs = from(modalRef.result.then(() => {
