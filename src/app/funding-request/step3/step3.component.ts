@@ -350,8 +350,16 @@ export class Step3Component implements OnInit {
             }
           }
 
-          this.insertDocOrder(result);
-          this.removeDocType(result.docType);
+          this.insertDocOrder(result);       
+
+          this.documentService.getFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
+            result => {
+              result.forEach(element => {
+                this.removeDocType(element.docType);
+              });
+            }, error => {
+              this.logger.error('HttpClient get request error for----- ' + error.message);
+            });
         }
       },
       err => {
