@@ -353,6 +353,34 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         this.logger.error('HttpClient get request error for----- ' + error.message);
       });
 
+    // @ts-ignore
+    $.extend($.fn.dataTableExt.oSort, {
+      'pri-scr-asc': (a, b ) => {
+        if (!a && !b) {
+          return 0;
+        }
+        if (!a) {
+          return 1;
+        }
+        if (!b) {
+          return -1;
+        }
+        return a - b;
+      },
+      'pri-scr-desc': (a, b ) => {
+        if (!a && !b) {
+          return 0;
+        }
+        if (!a) {
+          return 1;
+        }
+        if (!b) {
+          return -1;
+        }
+        return b - a;
+      }
+    });
+
   }
 
   ngAfterViewInit(): void {
@@ -431,7 +459,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         { responsivePriority: 6, targets: 6 }, // pd
         { responsivePriority: 7, targets: 7 }, // ca
         { responsivePriority: 8, targets: 10 }, // pctl
-        { responsivePriority: 9, targets: 11 }, // priscr
+        { responsivePriority: 9, type: 'pri-scr', targets: 11 }, // priscr
         { responsivePriority: 10, targets: 4 }, // FOA
         { responsivePriority: 11, targets: 13 }, // existing requests
         { responsivePriority: 12, targets: 3 }, // project title
