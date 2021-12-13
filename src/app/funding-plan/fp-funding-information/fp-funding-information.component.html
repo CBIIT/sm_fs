@@ -16,10 +16,10 @@
         [disabled]="readOnly"
         id="first-set-aside"
         class="form-control"
-        [(ngModel)]="firstYearSetAside"
+        [(ngModel)]="firstYearSetAsideDisplay"
         name="firstYearSetAside"
         #year1SetAside="ngModel"
-        pattern="[0-9]*"
+        pattern="[0-9,]*"
         [appMinMaxValidator]="{min: 0, max: 999999999}">
     </div>
     <div
@@ -41,10 +41,10 @@
         [disabled]="readOnly"
         id="all-set-aside"
         class="form-control"
-        [(ngModel)]="totalSetAside"
+        [(ngModel)]="totalSetAsideDisplay"
         name="totalSetAside"
         #overallSetAside="ngModel"
-        pattern="[0-9]*"
+        pattern="[0-9,]*"
         [appMinMaxValidator]="{min: 0, max: 9999999999}">
     </div>
     <div
@@ -88,10 +88,10 @@
         [disabled]="readOnly"
         id="est-year-2"
         class="form-control"
-        [(ngModel)]="outYear2"
+        [(ngModel)]="outYear2Display"
         name="outYear2"
         #year2="ngModel"
-        pattern="[0-9]*"
+        pattern="[0-9,]*"
         [appMinMaxValidator]="{min: 0, max: 999999999}">
     </div>
     <div
@@ -113,10 +113,10 @@
         [disabled]="readOnly"
         id="est-year-3"
         class="form-control"
-        [(ngModel)]="outYear3"
+        [(ngModel)]="outYear3Display"
         name="outYear3"
         #year3="ngModel"
-        pattern="[0-9]*"
+        pattern="[0-9,]*"
         [appMinMaxValidator]="{min: 0, max: 999999999}">
     </div>
     <div
@@ -137,10 +137,10 @@
         type="text" id="est-year-4"
         [disabled]="readOnly"
         class="form-control"
-        [(ngModel)]="outYear4"
+        [(ngModel)]="outYear4Display"
         name="outYear4"
         #year4="ngModel"
-        pattern="[0-9]*"
+        pattern="[0-9,]*"
         [appMinMaxValidator]="{min: 0, max: 999999999}">
     </div>
     <div
@@ -162,10 +162,10 @@
         [disabled]="readOnly"
         id="est-year-5"
         class="form-control"
-        [(ngModel)]="outYear5"
+        [(ngModel)]="outYear5Display"
         name="outYear5"
         #year5="ngModel"
-        pattern="[0-9]*"
+        pattern="[0-9,]*"
         [appMinMaxValidator]="{min: 0, max: 999999999}">
     </div>
     <div
