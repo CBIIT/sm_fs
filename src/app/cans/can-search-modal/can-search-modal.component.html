@@ -9,7 +9,7 @@
   <div class="modal-body">
     <div class="form-group">
       <div class="d-flex left-float">
-        <label for="search_term">CAN #</label>
+        <label for="search_term">CAN #&nbsp;</label>
         <input id="search_term" type="text" [(ngModel)]="canSearchTerm"> &nbsp;&nbsp;&nbsp;&nbsp;
         <button type="button" class="btn btn-primary add-margin" (click)="search()">Search</button> &nbsp;&nbsp;
         <button type="button" class="btn btn-secondary add-margin" (click)="reset()">Reset</button> &nbsp;&nbsp;
@@ -20,6 +20,7 @@
           <label for="show_all_checkbox">Show All</label>
         </div>
       </div>
+      <br/>
       <table class="table table-striped table-bordered budget-info-table mt-3">
         <thead>
         <tr>
