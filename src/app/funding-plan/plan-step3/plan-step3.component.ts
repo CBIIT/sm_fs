@@ -119,12 +119,10 @@ export class PlanStep3Component implements OnInit {
         this.logger.debug(this.futureYears);
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
           req.financialInfoDto.fundingRequestCans?.forEach(can => {
-            this.logger.debug(req.applId, '==', this.futureYears.get(+req.applId));
             can.approvedFutureYrs = this.futureYears.get(+req.applId);
             can.requestedFutureYrs = this.futureYears.get(+req.applId);
           });
         });
-        this.logger.info('double checking total and direct recommended amounts');
         this.planModel.fundingPlanDto.totalRecommendedAmt = this.planManagementService.grandTotalTotal();
         this.planModel.fundingPlanDto.directRecommendedAmt = this.planManagementService.grandTotalDirect();
       }
@@ -443,13 +441,18 @@ export class PlanStep3Component implements OnInit {
     let frCan: FundingRequestCanDto;
     let doOnce = true;
     // If we are editing a source, delete it first, then insert the new values below
-    if (this.editing) {
-      this.deleteFundingSource(this.editing.sourceId);
-    }
+    // if (this.editing) {
+    //   this.deleteFundingSource(this.editing.sourceId);
+    // }
     $event.forEach(s => {
         // this.logger.debug(s);
         if (doOnce) {
-          this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(s.fundingSource);
+          if(this.editing) {
+            this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.splice(this.editing.index, 1, s.fundingSource);
+          } else {
+            this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(s.fundingSource);
+          }
+
           doOnce = false;
         }
         let directCost: number;
@@ -464,12 +467,14 @@ export class PlanStep3Component implements OnInit {
           totalCost = +s.totalCostCalculated;
           dcPercentCut = +s.percentCut * 1000;
           tcPercentCut = +s.percentCut * 1000;
+          this.logger.debug(`percent: ${percentCut}, ${directCost}, ${totalCost}, ${dcPercentCut}, ${tcPercentCut}`);
         } else if (s.displayType === 'dollar') {
           percentCut = +s.percentCut * 1000;
           directCost = +s.directCost;
           totalCost = +s.totalCost;
           dcPercentCut = +s.dcPercentCutCalculated * 100000;
           tcPercentCut = +s.tcPercentCutCalculated * 100000;
+          this.logger.debug(`dollar: ${percentCut}, ${directCost}, ${totalCost}, ${dcPercentCut}, ${tcPercentCut}`);
         } else {
           this.logger.error('Display type is null. Time to panic.');
         }
@@ -483,7 +488,6 @@ export class PlanStep3Component implements OnInit {
           }
 
           const futureYears: number = this.planManagementService.getRecommendedFutureYears(s.applId);
-          this.logger.debug(`future years for applid ${s.applId} == ${futureYears}`);
 
           frBudget = {
             frqId: +req.frqId,
@@ -499,8 +503,10 @@ export class PlanStep3Component implements OnInit {
           };
 
           if (this.editing) {
-            req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, 0, frBudget);
+            this.logger.debug(`splice - ${JSON.stringify(frBudget)}`);
+            req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, 1, frBudget);
           } else {
+            this.logger.debug(`push - ${JSON.stringify(frBudget)}`);
             req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
           }
 
@@ -536,7 +542,7 @@ export class PlanStep3Component implements OnInit {
           };
 
           if (this.editing) {
-            req.financialInfoDto.fundingRequestCans.splice(this.editing.index, 0, frCan);
+            req.financialInfoDto.fundingRequestCans.splice(this.editing.index, 1, frCan);
           } else {
             req.financialInfoDto.fundingRequestCans.push(frCan);
           }
