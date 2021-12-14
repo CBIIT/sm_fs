@@ -17,6 +17,7 @@ export class FpCanSelectorComponent implements OnInit {
   @Input() index = 0;
   @Input() readonly = false;
   selectedCAN: CanCcxDto;
+  projectedCAN: CanCcxDto;
 
   constructor(private canManagementService: CanManagementService,
               private planModel: PlanModel,
@@ -24,17 +25,25 @@ export class FpCanSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.canManagementService.projectedCanEmitter.subscribe(next => {
+      if (+next.fseId === +this.fseId && +next.applId === +this.applId) {
+        this.projectedCAN = next.can;
+        this.logger.debug(this.fseId, this.applId, this.projectedCAN);
+      }
+    });
     this.canManagementService.selectCANEmitter.subscribe(next => {
       if ((!next.applId || (Number(this.applId) === Number(next.applId))) && Number(next.fseId) === Number(this.fseId)) {
-        this.selectedCAN = next.can;
-        this.planModel.saveSelectedCAN(this.fseId, this.applId, next.can);
-        this.canManagementService.checkDefaultCANs(
-          this.fseId,
-          this.applId,
-          this.planModel.activityCodeList,
-          this.planModel.bmmCodeList,
-          this.nciSourceFlag,
-          next.can?.can);
+        if (!next.can || (next.can.can && this.projectedCAN?.can)) {
+          this.selectedCAN = next.can;
+          this.planModel.saveSelectedCAN(this.fseId, this.applId, next.can);
+          this.canManagementService.checkDefaultCANs(
+            this.fseId,
+            this.applId,
+            this.planModel.activityCodeList,
+            this.planModel.bmmCodeList,
+            this.nciSourceFlag,
+            next.can?.can);
+        }
       }
     });
   }
