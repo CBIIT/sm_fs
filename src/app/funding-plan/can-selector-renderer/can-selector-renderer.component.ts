@@ -69,7 +69,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
 
   duplicateCAN(applId: number, fseId: number, index: number): boolean {
     const key = String(fseId) + '-' + String(applId);
-    const targetCAN = this.projectedApplIdCans?.get(key);
+    const targetCAN = this.planModel.selectedApplIdCans?.get(key);
     let result = false;
     if (!targetCAN?.can) {
       return false;
@@ -78,7 +78,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
     this.fundingSources.forEach(sourceId => {
       if (Number(sourceId) !== Number(fseId)) {
         const key2 = String(sourceId) + '-' + String(applId);
-        const can = this.projectedApplIdCans?.get(key2);
+        const can = this.planModel.selectedApplIdCans?.get(key2);
         if (!!can?.can) {
           result = can.can === targetCAN.can;
         }
