@@ -164,6 +164,7 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
 
   deleteSelectedCAN(fundingSourceId: number): void {
     this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can: null });
+    this.logger.debug(`can delete CAN(${fundingSourceId}) : ${this.canDeleteCAN(fundingSourceId)}`);
 
   }
 
@@ -193,7 +194,7 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   }
 
   canDeleteCAN(fundingSourceId: number): boolean {
-    return this.canEnter(fundingSourceId) && !this.readOnly;
+    return !this.readOnly && this.canEnter(fundingSourceId) && this.planModel.isCanSelected(fundingSourceId);
   }
 
   showOefiaCoding(): boolean {

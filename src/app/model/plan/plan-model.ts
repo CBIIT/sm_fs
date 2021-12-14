@@ -66,7 +66,7 @@ export class PlanModel {
   }
 
   sortGrantsByPriorityAndPI(): void {
-    if(this._allGrants) {
+    if (this._allGrants) {
       this._allGrants.sort(orderByPriorityAndPI);
     }
   }
@@ -133,6 +133,22 @@ export class PlanModel {
 
   get activityCodeList(): string {
     return this.fundingPlanDto?.fundingPlanFoas[0]?.activityCodeList || '';
+  }
+
+  isCanSelected(fseId: number): boolean {
+    let result = false;
+
+    // @ts-ignore
+    this.selectedApplIdCans.forEach((v, k) => {
+      if (v) {
+        this.logger.debug(`${fseId}, ${k}, ${k.startsWith(String(fseId))}`);
+        if (k.startsWith(String(fseId))) {
+          result = true;
+        }
+      }
+    });
+
+    return result;
   }
 
   getSelectedCan(fseId: number, applId: number): CanCcxDto {
