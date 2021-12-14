@@ -165,6 +165,19 @@ export class PlanModel {
     this.selectedApplIdCans.set(key, can);
   }
 
+  sanitizeCANDataAfterReturn(): FundingRequestCanDto[] {
+    const result: FundingRequestCanDto[] = [];
+    this.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
+      req.financialInfoDto.fundingRequestCans.forEach(can => {
+        can.can = null;
+        can.canDescription = null;
+        can.phsOrgCode = null;
+        result.push(can);
+      });
+    });
+    return result;
+  }
+
   buildUpdatedCANDataModel(): FundingRequestCanDto[] {
     let c: CanCcxDto;
     const result: FundingRequestCanDto[] = [];

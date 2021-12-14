@@ -1,7 +1,9 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import {
-  FsPlanControllerService, FsPlanWorkflowControllerService,
-  FundingReqStatusHistoryDto, FundingRequestQueryDto,
+  FsPlanControllerService,
+  FsPlanWorkflowControllerService,
+  FundingReqStatusHistoryDto,
+  FundingRequestQueryDto,
   WorkflowTaskDto
 } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
@@ -349,6 +351,8 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       });
     } else if (action === WorkflowActionCode.REASSIGN) {
       dto.reassignedApproverId = this.workflowModel.pendingApprovers[0].approverLdap;
+    } else if (action === WorkflowActionCode.RETURN) {
+      dto.requestCans = this.planModel.sanitizeCANDataAfterReturn();
     }
     // complete the request when last in chain approving.
     if (this.workflowModel.lastInChain) {

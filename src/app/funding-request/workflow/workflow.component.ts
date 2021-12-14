@@ -1,12 +1,24 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
-import { FsRequestControllerService, FsWorkflowControllerService, FundingPlanQueryDto, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  FsRequestControllerService,
+  FsWorkflowControllerService,
+  FundingPlanQueryDto,
+  FundingReqStatusHistoryDto,
+  WorkflowTaskDto
+} from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { Options } from 'select2';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
-import { ApprovingStatuses, TerminalStatuses, WorkflowAction, WorkflowActionCode, WorkflowModel } from './workflow.model';
+import {
+  ApprovingStatuses,
+  TerminalStatuses,
+  WorkflowAction,
+  WorkflowActionCode,
+  WorkflowModel
+} from './workflow.model';
 import { GmInfoComponent } from './gm-info/gm-info.component';
 import { BudgetInfoComponent } from '../../cans/budget-info/budget-info.component';
 import { ApprovedCostsComponent } from './approved-costs/approved-costs.component';
@@ -312,7 +324,15 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       });
     } else if (action === WorkflowActionCode.REASSIGN) {
       dto.reassignedApproverId = this.workflowModel.pendingApprovers[0].approverLdap;
+    } else if (action === WorkflowActionCode.RETURN) {
+      dto.requestCans = this.requestModel.requestCans;
+      dto.requestCans?.forEach(c => {
+        c.can = null;
+        c.canDescription = null;
+        c.phsOrgCode = null;
+      });
     }
+
     // complete the request when last in chain approving.
     if (this.workflowModel.lastInChain) {
       if (action === WorkflowActionCode.APPROVE ||
