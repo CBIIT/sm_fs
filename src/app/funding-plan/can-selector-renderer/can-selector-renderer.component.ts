@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
-import { GrantCostPayload, PlanManagementService } from '../service/plan-management.service';
+import { PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { CanCcxDto, FundingRequestCanDisplayDto } from '@nci-cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
@@ -8,6 +8,7 @@ import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-
 import { PlanModel } from '../../model/plan/plan-model';
 import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 import { FpCanWarning } from '../fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
+import { GrantCostPayload } from '../service/grant-cost-payload';
 
 
 @Component({
@@ -50,7 +51,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
       const key = String(next.fseId) + '-' + String(next.applId);
       this.defaultCanTracker.set(key, next.nonDefault);
       // stick validateCan here because this is called when can is set by search can modal.
-      if (Number(next.applId) === this.grant?.applId ) {
+      if (Number(next.applId) === this.grant?.applId) {
         this.validateCan();
       }
     });
@@ -170,12 +171,12 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
     return this.workflowModel.isFinancialApprover;
   }
 
-  validateCan(): void{
+  validateCan(): void {
     this.canRequiredButMissing.clear();
-    if (this.approvingAction  && this.isFcNci()) {
+    if (this.approvingAction && this.isFcNci()) {
       for (const g of this.grantCosts) {
-        if (  g.nciSourceFlag === 'Y' && g.requestedDirect > 0 && !this.planModel.getSelectedCan(g.fseId, g.applId)) {
-            this.canRequiredButMissing.set(g.fseId, true);
+        if (g.nciSourceFlag === 'Y' && g.requestedDirect > 0 && !this.planModel.getSelectedCan(g.fseId, g.applId)) {
+          this.canRequiredButMissing.set(g.fseId, true);
         }
       }
     }
@@ -191,15 +192,14 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
       const can = this.planModel.getSelectedCan(g.fseId, g.applId);
       // check for missing can, for both NCI and ARC approvers
       if (!can) {
-        if ( g.requestedDirect > 0) {
+        if (g.requestedDirect > 0) {
           canWarning.missingCan = true;
         }
       }
       // check for duplicated cans; only for NCI approver
       else if (usedCan.includes(can.can) && this.isFcNci()) {
         canWarning.duplicateCan = true;
-      }
-      else {
+      } else {
         usedCan.push(can.can);
       }
     }

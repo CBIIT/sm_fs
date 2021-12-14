@@ -9,6 +9,7 @@ import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-
 import { CanManagementService } from '../../cans/can-management.service';
 import { PendingPrcValues } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { isReallyANumber } from '../../utils/utils';
+import { getOrderFunction, GrantCostPayload } from './grant-cost-payload';
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +41,7 @@ export class PlanManagementService {
   ];
   private grantValues: Map<number, { index: number, applId?: number, dc: number, tc: number }>;
   private localRfy: Map<number, number>;
-  grantCosts: GrantCostPayload[];
+  private _grantCosts: Array<GrantCostPayload>;
   private defaultOefiaTypeMap: Map<number, number>;
   private selectedOefiaTypeMap: Map<number, number>;
   selectedPd: number;
@@ -66,6 +67,11 @@ export class PlanManagementService {
     });
 
     this.buildPlanBudgetAndCanModel();
+  }
+
+  get grantCosts(): Array<GrantCostPayload> {
+    this.sortGrantCosts();
+    return this._grantCosts;
   }
 
   reset(): void {
@@ -341,13 +347,11 @@ export class PlanManagementService {
   }
 
   buildGrantCostModel(): void {
-    this.grantCosts = [];
+    this._grantCosts = [];
     let piDirect: number;
     let piTotal: number;
     let awardedTotal: number;
     let awardedDirect: number;
-
-    this.logger.debug(JSON.stringify(this.planModel));
 
     this.planModel.allGrants.filter(g => g.selected).forEach(grant => {
       this.fsRequestService.getApplPeriodsUsingGET(grant.applId).subscribe(result => {
@@ -368,7 +372,7 @@ export class PlanManagementService {
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.filter(r => r.frtId === 1024 || r.frtId === 1026).forEach(req => {
           if (Number(req.applId) === Number(grant.applId)) {
             req.financialInfoDto.fundingRequestCans.forEach(can => {
-              this.grantCosts.push({
+              this._grantCosts.push({
                 applId: grant.applId,
                 fseId: can.fseId,
                 octId: can.octId,
@@ -390,7 +394,13 @@ export class PlanManagementService {
         });
       });
     });
-    this.logger.debug('grantCosts', this.grantCosts);
+
+    this.logger.debug('_grantCosts', this._grantCosts);
+  }
+
+  sortGrantCosts(): void {
+    const fn = getOrderFunction(this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.map(s => s.fundingSourceId));
+    this._grantCosts.sort(fn);
   }
 
   buildOefiaTypeMaps(): void {
@@ -451,21 +461,4 @@ export class PlanManagementService {
   }
 }
 
-export interface GrantCostPayload {
-  applId: number;
-  fseId: number;
-  octId?: number;
-  oefiaTypeId?: number;
-  fundingSourceName: string;
-  approvedDirect: number;
-  approvedTotal: number;
-  requestedDirect: number;
-  requestedTotal: number;
-  directPercentCut: number;
-  totalPercentCut: number;
-  selectedCAN?: number;
-  activityCodes: string;
-  bmmCodes: string;
-  frtId: number;
-  nciSourceFlag?: string;
-}
+

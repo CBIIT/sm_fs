@@ -1,7 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
-import { GrantCostPayload, PlanManagementService } from '../service/plan-management.service';
+import { PlanManagementService } from '../service/plan-management.service';
+import { GrantCostPayload } from '../service/grant-cost-payload';
 import { NGXLogger } from 'ngx-logger';
+import { PlanModel } from '../../model/plan/plan-model';
 
 @Component({
   selector: 'app-funding-source-renderer',
@@ -10,13 +12,17 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class FundingSourceRendererComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
+  sourceOrder: number[];
 
   constructor(
     private planManagementService: PlanManagementService,
+    private planModel: PlanModel,
     private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
+    this.sourceOrder = this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.map(s => s.fundingSourceId);
+    this.logger.debug('source Order: ', this.sourceOrder);
   }
 
   get grantCosts(): GrantCostPayload[] {

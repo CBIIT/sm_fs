@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { NGXLogger } from 'ngx-logger';
-import { GrantCostPayload, PlanManagementService } from '../service/plan-management.service';
+import { PlanManagementService } from '../service/plan-management.service';
+import { GrantCostPayload } from '../service/grant-cost-payload';
 
 @Component({
   selector: 'app-grant-cost-renderer',
