@@ -36,7 +36,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
         if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
-          let url = this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
+          let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           url = window.location.origin + url;
 
           this.logger.info(`Error URL: ${error.url}`);
