@@ -8,9 +8,9 @@ export function orderByPriorityAndPI(e1: NciPfrGrantQueryDtoEx, e2: NciPfrGrantQ
   let result = e1.priorityScoreNum - e2.priorityScoreNum;
 
   if(result === 0) {
-    if(e1.piFullName < e2.piFullName) {
+    if(e1.piFullName?.toLocaleUpperCase() < e2.piFullName?.toLocaleUpperCase()) {
       result = -1;
-    } else if (e1.piFullName > e2.piFullName) {
+    } else if (e1.piFullName?.toLocaleUpperCase() > e2.piFullName?.toLocaleUpperCase()) {
       result = 1;
     }
   }

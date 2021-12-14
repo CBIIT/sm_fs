@@ -15,7 +15,7 @@ export class PlanModel {
   eGrantsUrl: string;
   catsConceptUrl: string;
   // allGrants array include 'selected' boolean column with is set on step 1
-  allGrants: NciPfrGrantQueryDtoEx[] = [];
+  private _allGrants: NciPfrGrantQueryDtoEx[] = [];
   grantsSearchCriteria: Array<RfaPaNcabDate> = [];
   // Data from Step 2
   minimumScore: number;
@@ -45,9 +45,17 @@ export class PlanModel {
 
   }
 
+  get allGrants(): NciPfrGrantQueryDtoEx[] {
+    return this._allGrants.sort(orderByPriorityAndPI);
+  }
+
+  set allGrants(value: NciPfrGrantQueryDtoEx[]) {
+    this._allGrants = value;
+  }
+
   reset(): void {
     this.fundingPlanDto = {};
-    this.allGrants = [];
+    this._allGrants = [];
     this.grantsSearchCriteria = [];
     this.minimumScore = 0;
     this.maximumScore = 0;
@@ -58,8 +66,8 @@ export class PlanModel {
   }
 
   sortGrantsByPriorityAndPI(): void {
-    if(this.allGrants) {
-      this.allGrants.sort(orderByPriorityAndPI);
+    if(this._allGrants) {
+      this._allGrants.sort(orderByPriorityAndPI);
     }
   }
 
@@ -99,7 +107,7 @@ export class PlanModel {
     snapshot.rfqNcabs = searchCriteria.map(a => '^' + a.rfaPaNumber + '#' + a.ncabDates.join('+')).join(',');
     snapshot.scoreRange = this.minimumScore + '-' + this.maximumScore;
     snapshot.selectedGrants =
-      this.allGrants.filter(g => g.selected).map(g => g.applId).join(',');
+      this._allGrants.filter(g => g.selected).map(g => g.applId).join(',');
     return snapshot;
   }
 
@@ -115,7 +123,7 @@ export class PlanModel {
   }
 
   get bmmCodeList(): string {
-    const tmp = new Set(this.allGrants?.filter(g => g.selected).map(g => g.bmmCode));
+    const tmp = new Set(this._allGrants?.filter(g => g.selected).map(g => g.bmmCode));
     const arr: string[] = [];
     tmp.forEach(t => {
       arr.push(t);
