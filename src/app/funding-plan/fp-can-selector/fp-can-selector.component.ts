@@ -33,7 +33,7 @@ export class FpCanSelectorComponent implements OnInit {
     });
     this.canManagementService.selectCANEmitter.subscribe(next => {
       if ((!next.applId || (Number(this.applId) === Number(next.applId))) && Number(next.fseId) === Number(this.fseId)) {
-        if (!next.can || (next.can.can && this.projectedCAN?.can)) {
+        if (!next.can || next.override || (next.can.can && this.projectedCAN?.can)) {
           this.selectedCAN = next.can;
           this.planModel.saveSelectedCAN(this.fseId, this.applId, next.can);
           this.canManagementService.checkDefaultCANs(

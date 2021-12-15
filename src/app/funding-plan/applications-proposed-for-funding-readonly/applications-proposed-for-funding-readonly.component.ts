@@ -13,7 +13,7 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
   listGrantsSelected: NciPfrGrantQueryDtoEx[];
 
   constructor(public planModel: PlanModel,
-              private planManagementService: PlanManagementService,
+              public planManagementService: PlanManagementService,
               private logger: NGXLogger) {
   }
 

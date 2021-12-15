@@ -68,6 +68,10 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     this._budgetMap = value;
   }
 
+  firstFunder(applId: number, fseId: number): boolean {
+    return true;
+  }
+
   get listSelectedSources(): FundingRequestFundsSrcDto[] {
     return this.planManagementService.listSelectedSources;
   }

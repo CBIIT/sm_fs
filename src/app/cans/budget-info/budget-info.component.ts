@@ -195,7 +195,7 @@ export class BudgetInfoComponent implements OnInit {
     this.canSearchModalComponent.prepare();
     this.canSearchModalComponent.open().then((result) => {
       if (result) {
-        this.canManagementService.selectCANEmitter.next({ fseId, can: result });
+        this.canManagementService.selectCANEmitter.next({ fseId, can: result, override: true });
       }
     }).catch((reason) => {
     });

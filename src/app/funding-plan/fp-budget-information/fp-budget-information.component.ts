@@ -138,7 +138,7 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
     this.canSearchModalComponent.open().then((result) => {
       this.logger.debug('Got CAN', result);
       if (result) {
-        this.canManagementService.selectCANEmitter.next({ fseId, can: result });
+        this.canManagementService.selectCANEmitter.next({ fseId, can: result, override: true });
       }
     }).catch((reason) => {
       this.logger.warn(reason);

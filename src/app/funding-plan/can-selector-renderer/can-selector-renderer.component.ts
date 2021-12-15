@@ -110,7 +110,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
       this.logger.debug('Got CAN', result);
 
       if (result) {
-        this.canManagementService.selectCANEmitter.next({ fseId, can: result, applId });
+        this.canManagementService.selectCANEmitter.next({ fseId, can: result, applId, override: true });
       }
     }).catch((reason) => {
       this.logger.warn(reason);

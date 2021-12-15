@@ -22,7 +22,7 @@ export class CanManagementService {
   // Used by the projected CAN component to broadcast an updated CAN after new OEFIA type chosen
   projectedCanEmitter = new Subject<{ index: number; can: CanCcxDto; fseId?: number; applId?: number }>();
   // Instructs all listeners to update their CAN to the selected value if fseId matches
-  selectCANEmitter = new Subject<{ fseId: number; can: CanCcxDto; applId?: number }>();
+  selectCANEmitter = new Subject<{ fseId: number; can: CanCcxDto; applId?: number, override?: boolean }>();
   nonDefaultCanEventEmitter = new Subject<{ fseId: number, applId: number, nonDefault: boolean }>();
 
 

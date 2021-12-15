@@ -212,6 +212,37 @@ export class PlanManagementService {
     return result;
   }
 
+  firstFunder(applId: number, fseId: number): boolean {
+    // this source is not contributing
+    const dc = this.directCost(applId, fseId);
+    if(dc === 0) {
+      return false;
+    }
+    // if this is the only source of funds for this grant, return true
+    if(this.sourceDirectTotal(applId) === dc) {
+      return true;
+    }
+    let result = false;
+    const sources: number[] = this.listSelectedSources.map(s => s.fundingSourceId);
+    this.logger.debug(sources);
+    const targetIndex = sources.indexOf(+fseId);
+
+    // This source is contributing and it's the first one
+    if(targetIndex === 0) {
+      return true;
+    }
+
+    sources.forEach((src, idx) => {
+      this.logger.debug(`${applId}, ${fseId}, ${targetIndex}, ${src}, ${idx}, ${result}`);
+      if(!result && (idx < targetIndex) && !(+src === +fseId) && (this.directCost(applId, src) === 0)) {
+        result = true;
+      }
+    });
+
+    return result;
+  }
+
+
   directCost(applId: number, fseId: number): number {
     return this.getBudget(applId, fseId)?.dcRecAmt || 0;
   }
