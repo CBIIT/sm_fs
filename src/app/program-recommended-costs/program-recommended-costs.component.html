@@ -56,7 +56,7 @@
           <ng-container *ngIf="isPayType4 then payType4Head else defaultHead"></ng-container>
 
           <tbody>
-          <tr *ngFor="let f of selectedFundingSources; let i = index;">
+          <tr *ngFor="let f of selectedFundingSources; let i = index; let firstSource = first">
             <td>
               <div class="row">
                 <div class="form-group col">
@@ -112,7 +112,7 @@
                     <ng-template #notFirst>
                       <div class="col font-weight-bold"></div>
                     </ng-template>
-                    <div class="col" *ngIf="first; else not">{{li.recommendedDirect | currencyToggle}}<br/>
+                    <div class="col" *ngIf="first && firstSource; else not">{{li.recommendedDirect | currencyToggle}}<br/>
                       {{ li.percentCutDirectCalculated | percentCut:true}}
                     </div>
                     <ng-template #not>
@@ -130,8 +130,10 @@
                 <ng-template #d>
                   <div class="form-row" *ngIf="first">
                     <div class="col font-weight-bold">Total</div>
-                    <div class="col">{{li.recommendedTotal | currencyToggle}}<br/>
+                    <div *ngIf="firstSource" class="col">{{li.recommendedTotal | currencyToggle}}<br/>
                       {{ li.percentCutTotalCalculated | percentCut:true }}
+                    </div>
+                    <div *ngIf="!firstSource" class="col">{{li.recommendedTotal | currencyToggle}}<br/>
                     </div>
                   </div>
                 </ng-template>
@@ -191,7 +193,7 @@
         <table class="table table-striped prc-table mb-0">
           <ng-container *ngIf="isPayType4 then payType4Head else defaultHead"></ng-container>
           <tbody>
-          <tr *ngFor="let f of selectedFundingSources; let i = index;">
+          <tr *ngFor="let f of selectedFundingSources; let i = index; let firstSource = first">
             <td>
               <div class="row">
                 <div class="form-group col">
@@ -224,7 +226,7 @@
                   <ng-template #notFirst>
                     <div class="col font-weight-bold"></div>
                   </ng-template>
-                  <div class="col" *ngIf="first; else not">{{li.recommendedDirect | currencyToggle}}<br/>
+                  <div class="col" *ngIf="first && firstSource; else not">{{li.recommendedDirect | currencyToggle}}<br/>
                     {{ li.percentCutDirectCalculated | percentCut:true}}
                   </div>
                   <ng-template #not>
@@ -247,8 +249,10 @@
               <ng-template #d>
                 <div class="form-row" *ngIf="first">
                   <div class="col font-weight-bold">Total</div>
-                  <div class="col">{{li.recommendedTotal | currencyToggle}}<br/>
+                  <div *ngIf="firstSource" class="col">{{li.recommendedTotal | currencyToggle}}<br/>
                     {{ li.percentCutTotalCalculated | percentCut:true }}
+                  </div>
+                  <div *ngIf="!firstSource" class="col">{{li.recommendedTotal | currencyToggle}}<br/>
                   </div>
                 </div>
 
@@ -286,7 +290,7 @@
       <button type="button" class="btn btn-primary mt-2 mb-3" data-toggle="modal" [attr.data-target]="'#' + dataTarget"
               (click)="prepareLineItem()"
               *ngIf="selectedFundingSources.length < 3; else blankSpace">
-        <i class="fas fa-plus mr-2" aria-hidden="true"></i> Add Funding Source
+        <i class="fas fa-plus mr-2" aria-hidden="true"></i> {{ pageTitle }}
       </button>
       <ng-template #blankSpace>
         <br/>
@@ -307,7 +311,7 @@
         <div class="modal-content">
           <app-alert-billboard [alerts]="alerts"></app-alert-billboard>
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Add Funding Source</h5>
+            <h5 class="modal-title" id="exampleModalLabel">{{ pageTitle }}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cleanUpSources()">
               <span aria-hidden="true"><i class="far fa-times"></i></span>
             </button>
@@ -952,7 +956,7 @@
                     (click)="cleanUpSources()">
               Close
             </button>
-            <input type="submit" class="btn btn-primary" value="Add Funding Source">
+            <input type="submit" class="btn btn-primary" value="{{ pageTitle }}">
           </div>
         </div>
       </div>

@@ -34,6 +34,14 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     this._recommendedFutureYears = value;
   }
 
+  get pageTitle(): string {
+    if(this.selectedFundingSources?.length > 0) {
+      return 'Add Additional Funding Source';
+    } else {
+      return 'Add Primary Funding Source';
+    }
+  }
+
   @ViewChild('prcForm', { static: false }) prcForm: NgForm;
   @ViewChild(FundingSourceComponent) fsc: FundingSourceComponent;
   alerts: Alert[] = [];
