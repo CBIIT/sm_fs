@@ -158,6 +158,7 @@ import { FpWorkflowWarningModalComponent } from './funding-plan/fp-workflow/fp-w
 import { ErrorInterceptorService } from './interceptors/error-interceptor.service';
 import { ErrorComponent } from './error/error/error.component';
 import { SessionRestoreComponent } from './session/session-restore/session-restore.component';
+import { CookieModule } from 'ngx-cookie';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -341,7 +342,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     LoggerModule.forRoot({
       serverLoggingUrl: '/i2ecws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR,
       enableSourceMaps: true
-    })
+    }),
+    CookieModule.forRoot()
   ],
   providers: [RequestModel, PlanModel, LoaderService, PercentPipe,
     { provide: BASE_PATH, useValue: '/i2ecws' },

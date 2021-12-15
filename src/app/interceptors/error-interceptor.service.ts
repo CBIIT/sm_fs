@@ -8,6 +8,7 @@ import { ErrorHandlerService } from '../error/error-handler.service';
 import { openNewWindow } from '../utils/utils';
 import { Location } from '@angular/common';
 import { environment } from '../../environments/environment';
+import { CookieService } from 'ngx-cookie';
 
 
 @Injectable()
@@ -19,7 +20,8 @@ export class ErrorInterceptorService implements HttpInterceptor {
     private errorHandler: ErrorHandlerService,
     private logger: NGXLogger,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private cookieService: CookieService
   ) {
   }
 
@@ -28,6 +30,8 @@ export class ErrorInterceptorService implements HttpInterceptor {
     this.logger.debug(`Current location: ${this.location.path(false)}`);
     this.logger.debug(`Current origin: ${window.location.origin}`);
     this.logger.debug(`Current location state: ${JSON.stringify(this.location.getState())}`);
+
+    this.logger.debug('cookies', this.cookieService.getAll());
 
     req.headers.keys().forEach(k => {
       this.logger.debug(`[h] ${k} == ${req.headers.get(k)}`);
