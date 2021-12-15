@@ -21,6 +21,10 @@ export class ApplicationsProposedForFundingReadonlyComponent implements OnInit {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
   }
 
+  firstFunder(applId: number, fundingSourceId: number): boolean {
+    return this.planManagementService.firstFunder(applId, fundingSourceId);
+  }
+
   directCost(applId: number, fseId: number): number {
     return this.planManagementService.directCost(applId, fseId);
   }

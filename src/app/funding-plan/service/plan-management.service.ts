@@ -222,9 +222,7 @@ export class PlanManagementService {
     if(this.sourceDirectTotal(applId) === dc) {
       return true;
     }
-    let result = false;
     const sources: number[] = this.listSelectedSources.map(s => s.fundingSourceId);
-    this.logger.debug(sources);
     const targetIndex = sources.indexOf(+fseId);
 
     // This source is contributing and it's the first one
@@ -232,6 +230,8 @@ export class PlanManagementService {
       return true;
     }
 
+    let result = false;
+    
     sources.forEach((src, idx) => {
       this.logger.debug(`${applId}, ${fseId}, ${targetIndex}, ${src}, ${idx}, ${result}`);
       if(!result && (idx < targetIndex) && !(+src === +fseId) && (this.directCost(applId, src) === 0)) {
