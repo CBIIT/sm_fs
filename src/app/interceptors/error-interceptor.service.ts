@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
 import { openNewWindow } from '../utils/utils';
 import { Location } from '@angular/common';
+import { environment } from '../../environments/environment';
 
 
 @Injectable()
@@ -27,10 +28,13 @@ export class ErrorInterceptorService implements HttpInterceptor {
     this.logger.debug(`Current location: ${this.location.path(false)}`);
     this.logger.debug(`Current origin: ${window.location.origin}`);
     this.logger.debug(`Current location state: ${JSON.stringify(this.location.getState())}`);
+
+    req.headers.keys().forEach(k => {
+      this.logger.debug(`[h] ${k} == ${req.headers.get(k)}`);
+    });
     return next.handle(req).pipe(
       // retry(1),
       catchError((error, caught) => {
-        // this.logger.warn(`Raw error: ${JSON.stringify(error)}`);
         this.logger.debug(`Type of error caught: ${typeof error}`);
 
         if (error.status === 200 && error.url?.startsWith('https://auth')) {
@@ -41,9 +45,6 @@ export class ErrorInterceptorService implements HttpInterceptor {
 
           this.logger.info(`Error URL: ${error.url}`);
           this.logger.info(`Restore session URL: ${url}`);
-          // const currentRoute = this.router.routerState;
-          //
-          // this.router.navigateByUrl(currentRoute.snapshot.url, { skipLocationChange: true });
           const features = 'popup,menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700,noreferrer';
 
           const errorUrl = new URL(error.url);
@@ -55,13 +56,6 @@ export class ErrorInterceptorService implements HttpInterceptor {
           if (!this.modalWindow) {
             this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore Session', features);
           }
-          // const modalRef = this.modalService.open(SessionRestoreComponent, { size: 'lg' });
-          // this.logger.info('after open restore modal');
-          // const obs = from(modalRef.result.then(() => {
-          //   this.logger.info(`restore modal closed: ${this.router.url}`);
-          //   this.router.navigate([this.router.url]);
-          // }));
-          // return obs as unknown as Observable<HttpEvent<any>>;
           return of(null);
         } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
           return throwError(error);
