@@ -24,7 +24,7 @@ export class PlanInfoIssueTypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.logger.debug(this.rfaDetails);
+    // this.logger.warn('Assigned RFA:', this.rfaDetails);
     if (!!this.rfaDetails.issueType) {
       this.issueType = this.rfaDetails.issueType;
       this.priorNotice = this.rfaDetails.prevRfaPaNumber;
@@ -35,6 +35,7 @@ export class PlanInfoIssueTypeComponent implements OnInit {
       this.issueType = 'NEW';
       this.priorNotice = '';
     }
+    // this.logger.warn('Issue type:', this.issueType);
   }
 
   toggleDisplay(value: string): void {

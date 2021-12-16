@@ -4,10 +4,10 @@
     <div class="col_2">
       <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="issueType" [(ngModel)]="issueType">
         <label ngbButtonLabel class="btn-outline-secondary">
-          <input name="new" ngbButton type="radio" value="new" (change)="toggleDisplay('NEW')">New
+          <input name="new" ngbButton type="radio" value="NEW" (change)="toggleDisplay('NEW')">New
         </label>
         <label ngbButtonLabel class="btn-outline-secondary">
-          <input name="reissue" ngbButton type="radio" value="reissue" (change)="toggleDisplay('REISSUE')">Reissue          
+          <input name="reissue" ngbButton type="radio" value="REISSUE" (change)="toggleDisplay('REISSUE')">Reissue          
         </label> 
       </div>
       <div class="col_2" *ngIf="issueType==='REISSUE'">
