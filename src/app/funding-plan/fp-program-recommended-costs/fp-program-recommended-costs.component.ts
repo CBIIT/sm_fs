@@ -162,8 +162,8 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
     if (this._displayType === 'percent') {
       if (!!this._percentCut) {
-        this.directCostCalculated = this.baselineDirectCost * (1 - (this._percentCut / 100));
-        this.totalCostCalculated = this.baselineTotalCost * (1 - (this._percentCut / 100));
+        this.directCostCalculated = Math.round(this.baselineDirectCost * (1 - (this._percentCut / 100)));
+        this.totalCostCalculated = Math.round(this.baselineTotalCost * (1 - (this._percentCut / 100)));
       }
     } else {
       if (!!this.directCost) {
@@ -182,11 +182,13 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   isDirectCostNumeric(): boolean {
-    return !isNaN(this.getDirectCost());
+    const period: boolean = String(this.getDirectCost()).indexOf('.') !== -1;
+    return !period && !isNaN(this.getDirectCost());
   }
 
   isTotalCostNumeric(): boolean {
-    return !isNaN(this.getTotalCost());
+    const period: boolean = String(this.getTotalCost()).indexOf('.') !== -1;
+    return !period && !isNaN(this.getTotalCost());
   }
 
   isDirectCostInRange(): boolean {
@@ -210,7 +212,8 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   isPercentNumeric(): boolean {
-    return !isNaN(this.getPercentCut());
+    const period: boolean = String(this.getPercentCut()).indexOf('.') !== -1;
+    return !period && !isNaN(this.getPercentCut());
   }
 
   isPercentInRange(): boolean {
