@@ -20,6 +20,7 @@ import { openNewWindow } from '../utils/utils';
 })
 export class SkippedGrantsComponent implements OnInit {
   dummy: string;
+  order: number = 1;
   @Input() parentForm: NgForm;
 
   _selectedValue: string;
@@ -74,6 +75,23 @@ export class SkippedGrantsComponent implements OnInit {
 
   get selectedValue(): string {
     return this._selectedValue;
+  }
+
+  sortGrants(): void {
+    this.logger.debug(`sortGrants: ${this.order}`);
+    this.skipGrantsDto.sort((a, b) => {
+      let result = 0;
+
+      if(a.skipFullGrantNum === b.skipFullGrantNum) {
+        result = 0;
+      } else if (a.skipFullGrantNum < b.skipFullGrantNum) {
+        result = -1;
+      } else {
+        result = 1;
+      }
+      return result * this.order;
+    });
+    this.order = this.order * -1;
   }
 
 
