@@ -100,8 +100,10 @@ export class SkippedGrantsComponent implements OnInit {
   }
 
   deleteSkipGrant(g: FundingRequestSkipDto): void {
-    const i = this.skipGrantsDto.indexOf(g);
-    this.skipGrantsDto.splice(i, 1);
+    if (confirm('Are you sure you want to remove the "Skipped Application"?')) {
+      const i = this.skipGrantsDto.indexOf(g);
+      this.skipGrantsDto.splice(i, 1);
+    }
   }
 
   get grant(): NciPfrGrantQueryDto {
