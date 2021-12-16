@@ -10,46 +10,53 @@
   <div class="col-6">
     <label for="req-add-skip">Select the approved skipped application(s) to fund this request.</label>
     <ng-select2 id="req-add-skip" [(ngModel)]="selectedValue" name="skippedGrants" #skippedGrants="ngModel"
-      [allowClear]="true" [options]="options">
+                [allowClear]="true" [options]="options">
       <option></option>
       <option *ngFor="let g of grants" [value]="g">{{g}}</option>
     </ng-select2>
+    <div
+      class="text-danger mt-1"
+      *ngIf="skipGrantsDto?.length === 0 && (skippedGrants.touched || parentForm.submitted)">
+      Approved Skipped application must be selected
+      <input type="hidden" [(ngModel)]="dummy" name="skipCounter" required>
+
+    </div>
   </div>
   <div class="col-6" *ngIf="skipGrantsDto?.length > 0">
     <label for="skip-list">Approved Skipped Application(s):</label>
     <table class="table table-striped table-bordered" id="skip-list">
       <thead>
-        <tr>
-          <th scope="col">Full Grant Number</th>
-          <th scope="col" style="width:5rem">Action</th>
-          <th scope="col" style="width:5rem">View</th>
-        </tr>
+      <tr>
+        <th scope="col">Full Grant Number</th>
+        <th scope="col" style="width:5rem">Action</th>
+        <th scope="col" style="width:5rem">View</th>
+      </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let g of skipGrantsDto">
-          <td>
-            <p>
-              <a href="{{model.grantViewerUrl+g.skipApplId}}" target="yourgrant">{{g.skipFullGrantNum}}</a>
-              <span class="grant-icons ml-2">
+      <tr *ngFor="let g of skipGrantsDto">
+        <td>
+          <p>
+            <a href="{{model.grantViewerUrl+g.skipApplId}}" target="yourgrant">{{g.skipFullGrantNum}}</a>
+            <span class="grant-icons ml-2">
                 <a href="{{model.eGrantsUrl+g.skipApplId}}" target="yourgrant" ngbTooltip="eGrants">
                   <span class="egrants-icon"></span>
                 </a>
                 <a [routerLink]="" (mouseenter)="setGrant(grant)" [ngbTooltip]="InstituteTooltip"
-                  triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
+                   triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
               </span>
-            </p>
+          </p>
 
-          </td>
-          <td>
-            <button class="btn btn-link btn-delete btn-slim" title="Delete" (click)="deleteSkipGrant(g)">
-              <i class="fas fa-trash" aria-hidden="true"></i>
-            </button>
-          </td>
-          <td>
-            <a [routerLink]="" (click)="openSkipRequest(g.skipFrqId)">{{g.skipFrqId}}</a>
+        </td>
+        <td>
+          <button class="btn btn-link btn-delete btn-slim" title="Delete" (click)="deleteSkipGrant(g)">
+            <i class="fas fa-trash" aria-hidden="true"></i>
+          </button>
+        </td>
+        <td>
+          <a [routerLink]="" (click)="openSkipRequest(g.skipFrqId)">{{g.skipFrqId}}</a>
 
-          </td>
-        </tr>
+        </td>
+      </tr>
       </tbody>
     </table>
   </div>

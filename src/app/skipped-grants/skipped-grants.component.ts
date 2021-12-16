@@ -1,9 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Options } from 'select2';
 import { RequestModel } from '../model/request/request-model';
 import { NGXLogger } from 'ngx-logger';
 import { ControlContainer, NgForm } from '@angular/forms';
-import { FsLookupControllerService, FsRequestControllerService, FundingRequestSkipDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import {
+  FsLookupControllerService,
+  FsRequestControllerService,
+  FundingRequestSkipDto,
+  NciPfrGrantQueryDto
+} from '@nci-cbiit/i2ecws-lib';
 import { Router } from '@angular/router';
 import { openNewWindow } from '../utils/utils';
 
@@ -14,11 +19,8 @@ import { openNewWindow } from '../utils/utils';
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
 export class SkippedGrantsComponent implements OnInit {
-  get selectedValue(): string {
-    return this._selectedValue;
-  }
-
-
+  dummy: string;
+  @Input() parentForm: NgForm;
 
   _selectedValue: string;
   options: Options;
@@ -28,12 +30,10 @@ export class SkippedGrantsComponent implements OnInit {
   tooltipGrant: any;
   private _grant: NciPfrGrantQueryDto;
 
-
   constructor(private requestModel: RequestModel,
-    private logger: NGXLogger,
-    private fsLookupControllerService: FsLookupControllerService,
-    private requestService: FsRequestControllerService,
-    private router: Router) {
+              private logger: NGXLogger,
+              private fsLookupControllerService: FsLookupControllerService,
+              private requestService: FsRequestControllerService) {
   }
 
   ngOnInit(): void {
@@ -72,6 +72,11 @@ export class SkippedGrantsComponent implements OnInit {
     };
   }
 
+  get selectedValue(): string {
+    return this._selectedValue;
+  }
+
+
   set selectedValue(value: string) {
     this._selectedValue = value;
     if (value) {
@@ -107,7 +112,7 @@ export class SkippedGrantsComponent implements OnInit {
     return this.requestModel;
   }
 
-  setGrant(grant): void {
+  setGrant(grant: NciPfrGrantQueryDto): void {
     this.tooltipGrant = grant;
   }
 
