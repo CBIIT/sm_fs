@@ -14,7 +14,7 @@ export class SessionRestoreComponent implements OnInit {
   }
 
   afterRestoreClose(): void {
-    this.logger.debug('session restore');
+    this.logger.debug('session restore', window);
     window.close();
   }
 

@@ -1,10 +1,10 @@
-<app-header *ngIf="router.url !== '/fundingSourceDetails'"></app-header>
+<app-header *ngIf="router.url !== '/fundingSourceDetails' && router.url !== '/restoreSession'"></app-header>
 <app-loader-spinner></app-loader-spinner>
 
 <div class="container" id="site-content">
     <div class="row">
         <div class="col-lg-2">
-            <app-fs-menu *ngIf="router.url !== '/fundingSourceDetails'"></app-fs-menu>
+            <app-fs-menu *ngIf="router.url !== '/fundingSourceDetails' && router.url !== '/restoreSession'"></app-fs-menu>
         </div>
         <div class="col-lg-10">
             <main id="main">
