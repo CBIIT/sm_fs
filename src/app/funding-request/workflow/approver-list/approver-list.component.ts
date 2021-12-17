@@ -76,7 +76,16 @@ export class ApproverListComponent implements OnInit, OnDestroy {
   }
 
   approverRoleName(value: FundingReqApproversDto): string {
-    return value.roleName ? value.roleName : 'Additional Approver (Added by ' + value.assignerFullName + ')';
+    if (value.roleCode) { // should use value.roleName, but the db view messed up.
+      return value.roleName;
+    }
+    else if (value.assignerFullName) {
+      return 'Additional Approver (Added by ' + value.assignerFullName + ')';
+    }
+    else {
+      return 'Additional Approver';
+    }
+  //  return value.roleName ? value.roleName : 'Additional Approver (Added by ' + value.assignerFullName + ')';
   }
 
   showActionColumn(): boolean {
