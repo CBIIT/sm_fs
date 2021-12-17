@@ -38,6 +38,7 @@ export class SkippedGrantsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.skipGrantsDto = this.requestModel.requestDto.skipRequests;
     this.options = {
       allowClear: true,
       minimumInputLength: 4,
@@ -103,6 +104,7 @@ export class SkippedGrantsComponent implements OnInit {
         result => {
           for (let dto in result) {
             this.skipGrantsDto.push(result[dto]);
+            this.requestModel.requestDto.skipRequests = this.skipGrantsDto;
             this.requestService.retrieveSkipFundingRequestUsingGET(result[dto].skipApplId).subscribe(
               (result) => {
                 this._grant = result;
@@ -121,6 +123,7 @@ export class SkippedGrantsComponent implements OnInit {
     if (confirm('Are you sure you want to remove the "Skipped Application"?')) {
       const i = this.skipGrantsDto.indexOf(g);
       this.skipGrantsDto.splice(i, 1);
+      this.requestModel.requestDto.skipRequests = this.skipGrantsDto;
     }
   }
 
