@@ -141,7 +141,7 @@ export class PlanModel {
     // @ts-ignore
     this.selectedApplIdCans.forEach((v, k) => {
       if (v) {
-        this.logger.debug(`${fseId}, ${k}, ${k.startsWith(String(fseId))}`);
+        // this.logger.debug(`${fseId}, ${k}, ${k.startsWith(String(fseId))}`);
         if (k.startsWith(String(fseId))) {
           result = true;
         }

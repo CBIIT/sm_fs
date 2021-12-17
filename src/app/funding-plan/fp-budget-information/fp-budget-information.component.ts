@@ -125,7 +125,7 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
 
   copyProjectedCAN(fundingSourceId: number): void {
     const can = this.projectedCans.get(Number(fundingSourceId));
-    this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can });
+    this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can, override: false });
   }
 
   searchForCANs(fseId: number, nciSourceFlag: string): void {
@@ -163,7 +163,7 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   }
 
   deleteSelectedCAN(fundingSourceId: number): void {
-    this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can: null });
+    this.canManagementService.selectCANEmitter.next({ fseId: fundingSourceId, can: null, override: true });
     this.logger.debug(`can delete CAN(${fundingSourceId}) : ${this.canDeleteCAN(fundingSourceId)}`);
 
   }
@@ -181,7 +181,7 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
       req.financialInfoDto.fundingRequestCans.forEach(can => {
         if (can.can) {
           this.canManagementService.getCanDetails(can.can).subscribe(result => {
-            this.canManagementService.selectCANEmitter.next({ fseId: can.fseId, can: result, applId: req.applId });
+            this.canManagementService.selectCANEmitter.next({ fseId: can.fseId, can: result, applId: req.applId, override: true });
           });
         }
       });

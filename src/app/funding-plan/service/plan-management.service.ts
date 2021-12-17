@@ -233,7 +233,7 @@ export class PlanManagementService {
     let result = false;
     
     sources.forEach((src, idx) => {
-      this.logger.debug(`${applId}, ${fseId}, ${targetIndex}, ${src}, ${idx}, ${result}`);
+      // this.logger.debug(`${applId}, ${fseId}, ${targetIndex}, ${src}, ${idx}, ${result}`);
       if(!result && (idx < targetIndex) && !(+src === +fseId) && (this.directCost(applId, src) === 0)) {
         result = true;
       }

@@ -95,7 +95,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
     const can = this.projectedApplIdCans?.get(key);
     // this.logger.debug('copy projected can', applId, fseId, can);
     if (can) {
-      this.canManagementService.selectCANEmitter.next({ fseId, can, applId });
+      this.canManagementService.selectCANEmitter.next({ fseId, can, applId, override: true });
     }
 
   }
@@ -118,7 +118,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
   }
 
   deleteCAN(applId: number, fseId: number, index: number): void {
-    this.canManagementService.selectCANEmitter.next({ fseId, can: null, applId });
+    this.canManagementService.selectCANEmitter.next({ fseId, can: null, applId, override: true });
   }
 
   canCopyProjectedCan(applId: number, fseId: number): boolean {
