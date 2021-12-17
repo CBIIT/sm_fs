@@ -155,7 +155,7 @@ export class ProgramRecommendedCostsModel {
     let data: PrcDataPoint[];
     this.selectedFundingSources.forEach(s => {
       data = this.getLineItemsForSource(s, false);
-      while (data.length < maxLength) {
+      while (data?.length < maxLength) {
         data.push(new PrcDataPoint());
       }
     });
@@ -165,8 +165,10 @@ export class ProgramRecommendedCostsModel {
     let li: PrcDataPoint[];
     this.selectedFundingSources.forEach(s => {
       li = this.getLineItemsForSource(s, false);
-      li = li.filter(dp => !!dp.grantAward);
-      this.prcLineItems.set(Number(s.fundingSourceId), li);
+      if (li) {
+        li = li.filter(dp => !!dp.grantAward);
+        this.prcLineItems.set(Number(s.fundingSourceId), li);
+      }
     });
   }
 
@@ -186,7 +188,11 @@ export class ProgramRecommendedCostsModel {
 
   // This will only be useful on the main table, since the modal doesn't have a funding source yet
   getLineItemsForSource(src: FundingRequestFundsSrcDto, truncate: boolean): PrcDataPoint[] {
-    return this.getLineItemsForSourceId(Number(src.fundingSourceId), truncate);
+    if(src?.fundingSourceId) {
+      return this.getLineItemsForSourceId(Number(src.fundingSourceId), truncate);
+    } else {
+      return null;
+    }
   }
 
   getLineItemsForSourceId(id: number, truncate: boolean): PrcDataPoint[] {

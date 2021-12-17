@@ -348,7 +348,7 @@ export class RequestModel {
           this.requestCans = [];
           const programCostModel = this.programRecommendedCostsModel;
           for (const fs of programCostModel.selectedFundingSources) {
-            const lineItems = programCostModel.getLineItemsForSourceId(fs.fundingSourceId, !this.isPayType4());
+            const lineItems = programCostModel.getLineItemsForSourceId(fs?.fundingSourceId, !this.isPayType4());
             if (lineItems.length > 0) {
               const lineItem0 = lineItems[0];
               const dto: FundingRequestCanDto = {};
