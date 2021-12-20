@@ -140,7 +140,8 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
         {responsivePriority: 11, targets: 12 }, // existing requests
         {responsivePriority: 12, targets: 2 }, // project title
         {responsivePriority: 13, targets: 4 }, // i2 status
-        {responsivePriority: 14, targets: 11 } // budget start date
+        {responsivePriority: 14, targets: 11 }, // budget start date
+        {type: 'scoretype', targets: 10}
       ],
       dom: '<"dt-controls"<"ml-auto"fB<"d-inline-block">>>rt<"dt-controls"<"mr-auto"i>>',
       buttons: [
