@@ -112,7 +112,7 @@
     <div class="col-md-6 col-lg-3" *ngIf="isSkip">
       <div class="form-group">
         <p class="like-label">Skipped Request(s)</p>
-        <p *ngFor="let sreq of skipRequests">{{sreq.skipFrqId}} {{sreq.skipFullGrantNum}} {{sreq.skipRequestCurrentStatus}}</p>
+        <p *ngFor="let sreq of skipRequests" nowrap>{{sreq.skipFrqId}} {{sreq.skipFullGrantNum}} {{sreq.skipRequestCurrentStatus}}</p>
       </div>
     </div>
   </div>
