@@ -119,7 +119,9 @@ export class SkippedGrantsComponent implements OnInit {
     this.grants = [];
   }
 
-  deleteSkipGrant(g: FundingRequestSkipDto): void {
+  deleteSkipGrant($event, g: FundingRequestSkipDto): void {
+    this.logger.debug(typeof $event);
+    $event.preventDefault();
     if (confirm('Are you sure you want to remove the "Skipped Application"?')) {
       const i = this.skipGrantsDto.indexOf(g);
       this.skipGrantsDto.splice(i, 1);

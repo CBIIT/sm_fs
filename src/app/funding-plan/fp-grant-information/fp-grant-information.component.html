@@ -45,7 +45,7 @@
       <span>{{ piTotal | currency }}</span>
     </div>
 
-    <div class="col-12 grant-info-margin">
+    <div *ngIf="recommendedFutureYears()" class="col-12 grant-info-margin">
       <label for="rec-fy-3">Recommended Future Years</label>
       <ng-container *ngIf="readOnly then static else dropdown"></ng-container>
       <ng-template #dropdown>
