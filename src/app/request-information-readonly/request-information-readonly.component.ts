@@ -36,7 +36,6 @@ export class RequestInformationReadonlyComponent implements OnInit {
     if (this.requestModel.requestDto.financialInfoDto.otherDocText) {
       this.otherDocs = this.requestModel.requestDto.financialInfoDto.otherDocText.split(',');
     }
-    this.isSkip = this.requestModel.isSkip();
     this.type4Request = this.requestModel.requestDto?.financialInfoDto?.requestTypeId
       === FundingRequestTypes.PAY_TYPE_4;
     this.diversityRequest = this.requestModel.requestDto?.financialInfoDto?.requestTypeId
@@ -65,9 +64,9 @@ export class RequestInformationReadonlyComponent implements OnInit {
     } else {
       this.newInvestigator = '';
     }
-    if (this.isSkip) {
-      this.skipRequests = this.requestModel.requestDto.skipRequests;
-    }
+
+    this.skipRequests = this.requestModel.requestDto.skipRequests;
+    this.isSkip = this.skipRequests && this.skipRequests.length > 0;
   }
 
   get grant(): NciPfrGrantQueryDto {
