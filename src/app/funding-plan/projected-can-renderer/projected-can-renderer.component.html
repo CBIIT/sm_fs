@@ -1,4 +1,4 @@
 <span *ngFor="let g of grantCosts; let first = first; let i = index;">
-  <hr *ngIf="!first">
+  <hr style="display:table" *ngIf="!first">
   <div><app-fp-projected-can [index]="i" [fseId]="g.fseId" [frtId]="g.frtId" [applId]="g.applId"></app-fp-projected-can></div>
 </span>

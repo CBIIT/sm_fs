@@ -1,5 +1,5 @@
 <span *ngFor="let g of grantCosts; let first = first; let i = index;">
-  <hr *ngIf="!first">
+  <hr style="display:table" *ngIf="!first">
   <div>
     <app-oefia-types [index]="i" [selectedValue]="g.octId || g.oefiaTypeId" [readonly]="true"></app-oefia-types>
   </div>
