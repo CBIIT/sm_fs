@@ -192,7 +192,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
       const can = this.planModel.getSelectedCan(g.fseId, g.applId);
       // check for missing can, for both NCI and ARC approvers
       if (!can) {
-        if (g.requestedDirect > 0) {
+        if (g.requestedDirect > 0 && this.canEnter(g.fseId)) {
           canWarning.missingCan = true;
         }
       }

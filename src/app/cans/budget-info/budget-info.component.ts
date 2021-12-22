@@ -154,7 +154,7 @@ export class BudgetInfoComponent implements OnInit {
     const selectedCans: string[] = [];
     for (const canSelector of this.canSelectors) {
       this.logger.debug('CanSelector Validation index= ' + canSelector.index + ' can=' + canSelector.selectedValue);
-      if (!canSelector.selectedValue) {
+      if (this.canEnter(canSelector.fseId) && !canSelector.selectedValue) {
         canWarning.missingCan = true;
       } else if (canSelector.selectedValue && this.isFcNci()) {
         for (const projectedCan of this.projectedCans) {
