@@ -18,17 +18,6 @@ export class CanDeactivatePlanStep3 implements CanDeactivate<PlanStep3Component>
     nextState?: RouterStateSnapshot): boolean {
     const id = component.planModel.fundingPlanDto.fprId;
 
-    // if (nextState?.url?.startsWith('/request/step1')) {
-    //   return true;
-    // } else if (nextState?.url?.startsWith('/request/step')) {
-    //   // pre-emptively restore data until we have better checks in place.
-    //   this.planLoaderService.loadPlan(id, this.successFn.bind(this), this.errorFn.bind(this));
-    //   return true;
-    // } else if (nextState?.url?.startsWith('/request/')) {
-    //   return true;
-    // }
-
-
     const newUrl = nextState.url;
     // Allow them to go backwards without reloading
     if (nextState?.url?.startsWith('/plan/step2') || nextState?.url?.startsWith('/plan/step1')) {

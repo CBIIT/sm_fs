@@ -2,13 +2,11 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { catchError, filter, finalize } from 'rxjs/operators';
+import { NavigationStart, Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
 import { openNewWindow } from '../utils/utils';
 import { Location } from '@angular/common';
-import { environment } from '../../environments/environment';
-import { CookieService } from 'ngx-cookie';
 
 
 @Injectable()
@@ -21,23 +19,18 @@ export class ErrorInterceptorService implements HttpInterceptor {
     private logger: NGXLogger,
     private router: Router,
     private location: Location,
-    private cookieService: CookieService
   ) {
+    router.events.pipe(filter(event => event instanceof NavigationStart)).subscribe((event: NavigationStart) => {
+      this.handleNavigationStart(event);
+    });
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     this.logger.debug(`Current route url: ${this.router.url}`);
+    // this.logger.debug(`Router state: ${this.router.routerState}`);
     this.logger.debug(`Current location: ${this.location.path(false)}`);
-    this.logger.debug(`Current origin: ${window.location.origin}`);
-    this.logger.debug(`Current location state: ${JSON.stringify(this.location.getState())}`);
 
-    this.logger.debug('cookies', this.cookieService.getAll());
-
-    req.headers.keys().forEach(k => {
-      this.logger.debug(`[h] ${k} == ${req.headers.get(k)}`);
-    });
     return next.handle(req).pipe(
-      // retry(1),
       catchError((error, caught) => {
         this.logger.debug(`Type of error caught: ${typeof error}`);
 
@@ -73,5 +66,10 @@ export class ErrorInterceptorService implements HttpInterceptor {
         this.modalWindow = undefined;
       })
     );
+  }
+
+  handleNavigationStart(event: NavigationStart): void {
+    this.logger.debug('=======> NavigationStart');
+    this.logger.debug(event);
   }
 }
