@@ -276,10 +276,13 @@ export class RequestModel {
       return false;
     }
 
+    this.logger.debug('Restoring line items');
     const awardMap = new Map<number, GrantAwardedDto>();
     this.programRecommendedCostsModel.grantAwarded.forEach(g => {
       awardMap.set(g.year, g);
     });
+
+    this.logger.debug('Awards', awardMap);
 
     this.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
       let lineItem: PrcDataPoint[] = this.programRecommendedCostsModel.prcLineItems.get(b.fseId);
@@ -294,19 +297,19 @@ export class RequestModel {
       tmp.baselineTotal = this.isInitialPay() ? tmp.grantAward.requestTotalAmount : tmp.grantAward.totalAwarded;
       tmp.baselineSource = this.isInitialPay() ? PrcBaselineSource.PI_REQUESTED : PrcBaselineSource.AWARDED;
       // TODO: Start here if there's an issue with %cut displays - baselines need to be set first in order to get the correct calculation
-      tmp.fromBudget(b);
-      // this.logger.debug('--', b, '--');
-      // this.logger.debug('--', tmp, '--');
 
       lineItem.push(tmp);
       this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
     });
 
     this.programRecommendedCostsModel.selectedFundingSources = [];
+    this.logger.debug('selected funding sourceIds:', this.programRecommendedCostsModel.selectedFundingSourceIds);
     this.programRecommendedCostsModel.selectedFundingSourceIds.forEach(i => {
       const source = this.programRecommendedCostsModel.fundingSourcesMap.get(i);
       this.programRecommendedCostsModel.selectedFundingSources.push(source);
     });
+
+    this.logger.debug('selected funding sources:', this.programRecommendedCostsModel.selectedFundingSources);
 
     this.programRecommendedCostsModel.padJaggedLineItems();
     this.loadRequestCans();

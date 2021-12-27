@@ -48,17 +48,39 @@ export class RequestLoaderService {
           this.requestModel.requestDto.financialInfoDto.fy,
           this.requestModel.requestDto.requestorNpnId,
           this.requestModel.requestDto.requestorCayCode,
+
           conversionActivityCode).subscribe(result1 => {
           this.requestModel.programRecommendedCostsModel.fundingSources = result1;
+
+          const foundSources: number[] = result1.map(r1 => r1.fundingSourceId);
 
           const selectedIds = new Set<number>();
           this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
             selectedIds.add(b.fseId);
+
           });
+
+          const additionalSources: number[] = Array.from(selectedIds).filter(s => !foundSources.includes(s));
+          if (additionalSources && additionalSources.length !== 0) {
+            this.requestService.retrieveFundingSourcesUsingGET(additionalSources).subscribe(res3 => {
+              const tmp = this.requestModel.programRecommendedCostsModel.fundingSources;
+              res3.forEach(r => tmp.push(r));
+              this.requestModel.programRecommendedCostsModel.fundingSources = tmp;
+            });
+          }
+
           this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds = selectedIds;
 
           this.canManagementService.getRequestCans(this.requestModel.requestDto.frqId).subscribe(result2 => {
+            // this.logger.debug('request CANs', result2);
             this.requestModel.requestCans = result2;
+            // const otherSources: number[] = result2.map(r => r.fseId).filter(b => !selectedIds.has(b));
+            // // this.logger.debug('Found additional sources: ', otherSources);
+            // if (otherSources && otherSources.length !== 0) {
+            //   otherSources.forEach(s => this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds.add(s));
+            //   this.requestService.retrieveFundingSourcesUsingGET(otherSources)
+            //     .subscribe(result3 => result3.forEach(r => this.requestModel.programRecommendedCostsModel.fundingSources.push(r)));
+            // }
           });
 
           this.requestService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result2 => {

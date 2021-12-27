@@ -74,9 +74,12 @@ export class ProgramRecommendedCostsModel {
   set fundingSources(value: FundingRequestFundsSrcDto[]) {
     this._fundingSources = value;
     this._fundingSourcesMap = new Map(value.map(key => [key.fundingSourceId, key] as [number, FundingRequestFundsSrcDto]));
-    if (!this._selectedFundingSources) {
+    this.logger.debug('Map of funding sources:', this.fundingSourcesMap);
+
+    if (!this._selectedFundingSources || this._selectedFundingSources.length === 0) {
       return;
     }
+    this.logger.debug('selected funding sources:', this._selectedFundingSources);
     if (value?.length > 0) {
       this.deleteUnselectableSources();
     }
