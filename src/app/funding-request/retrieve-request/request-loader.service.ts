@@ -72,15 +72,7 @@ export class RequestLoaderService {
           this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds = selectedIds;
 
           this.canManagementService.getRequestCans(this.requestModel.requestDto.frqId).subscribe(result2 => {
-            // this.logger.debug('request CANs', result2);
             this.requestModel.requestCans = result2;
-            // const otherSources: number[] = result2.map(r => r.fseId).filter(b => !selectedIds.has(b));
-            // // this.logger.debug('Found additional sources: ', otherSources);
-            // if (otherSources && otherSources.length !== 0) {
-            //   otherSources.forEach(s => this.requestModel.programRecommendedCostsModel.selectedFundingSourceIds.add(s));
-            //   this.requestService.retrieveFundingSourcesUsingGET(otherSources)
-            //     .subscribe(result3 => result3.forEach(r => this.requestModel.programRecommendedCostsModel.fundingSources.push(r)));
-            // }
           });
 
           this.requestService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result2 => {

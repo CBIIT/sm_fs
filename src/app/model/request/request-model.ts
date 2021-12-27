@@ -282,8 +282,6 @@ export class RequestModel {
       awardMap.set(g.year, g);
     });
 
-    this.logger.debug('Awards', awardMap);
-
     this.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
       let lineItem: PrcDataPoint[] = this.programRecommendedCostsModel.prcLineItems.get(b.fseId);
       if (!lineItem) {
@@ -297,6 +295,7 @@ export class RequestModel {
       tmp.baselineTotal = this.isInitialPay() ? tmp.grantAward.requestTotalAmount : tmp.grantAward.totalAwarded;
       tmp.baselineSource = this.isInitialPay() ? PrcBaselineSource.PI_REQUESTED : PrcBaselineSource.AWARDED;
       // TODO: Start here if there's an issue with %cut displays - baselines need to be set first in order to get the correct calculation
+      tmp.fromBudget(b);
 
       lineItem.push(tmp);
       this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
@@ -339,11 +338,13 @@ export class RequestModel {
 
   loadRequestCans(): void {
     if (this.requestCans && this.requestCans.length > 0) {
+      this.logger.debug('loadRequestCans():', this.requestCans);
       return;
     }
 
     this.canControllerService.getRequestCansUsingGET(this.requestDto.frqId).subscribe(
       result => {
+        this.logger.debug(result);
         if (result && result.length > 0) {
           this.requestCans = result;
           this.requestCans.forEach(rc => rc.previousAfy = rc.approvedFutureYrs);
