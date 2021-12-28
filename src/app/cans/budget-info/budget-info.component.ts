@@ -63,7 +63,7 @@ export class BudgetInfoComponent implements OnInit {
     });
     this.canManagementService.initializeCANDisplayMatrixForRequest();
     this.model.requestCans.forEach(c => {
-      if(c.approvedDc && c.approvedDc > 0) {
+      if(c.approvedDc && +c.approvedDc > 0) {
         this.showDirectCosts = true;
       }
     });

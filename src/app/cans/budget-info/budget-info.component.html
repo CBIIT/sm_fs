@@ -99,7 +99,7 @@
         <thead>
         <tr>
           <th scope="col">Funding Source</th>
-          <th scope="col">Approved Direct Cost</th>
+          <th scope="col" *ngIf="showDirectCosts">Approved Direct Cost</th>
           <th scope="col">Approved Total Cost</th>
           <th scope="col" [hidden]="!(isFinancialApprover() && isFcNci())">OEFIA Coding</th>
           <th scope="col" *ngIf="canSeeAtLeastOneCAN()">NCI OEFIA Projected CAN</th>
@@ -113,7 +113,7 @@
         <tbody>
         <tr *ngFor="let can of fundingRequestCans; let i = index; let first = first">
           <td>{{can.fundingSourceName}}</td>
-          <td>
+          <td *ngIf="showDirectCosts">
             {{ can.approvedDc | currency }} <span *ngIf="first">{{can.dcPctCut / 100000 | percentCut:initialPay}}</span>
           </td>
           <td>
