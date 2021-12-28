@@ -26,6 +26,7 @@ export class BudgetInfoComponent implements OnInit {
   @Input() readOnly = false;
   @Input() editing = false;
   showDirectCosts = false;
+  sourceOrder: number[];
 
   defaultCanTracker: Map<number, boolean> = new Map<number, boolean>();
 
@@ -65,6 +66,10 @@ export class BudgetInfoComponent implements OnInit {
       if(c.approvedDc && c.approvedDc > 0) {
         this.showDirectCosts = true;
       }
+    });
+    this.sourceOrder = this.model.programRecommendedCostsModel.selectedFundingSources.map(s => s.fundingSourceId);
+    this.model.requestCans.sort((a, b) => {
+        return this.sourceOrder.indexOf(a.fseId) - this.sourceOrder.indexOf(b.fseId);
     });
 
   }
