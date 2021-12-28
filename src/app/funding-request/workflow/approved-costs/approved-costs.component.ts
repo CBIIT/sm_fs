@@ -18,6 +18,7 @@ export class ApprovedCostsComponent implements OnInit {
 
   initialPay: boolean;
   inputDisabled = false;
+  showDirectCosts = false;
 
   constructor(public requestModel: RequestModel,
               private workflowModel: WorkflowModel,
@@ -26,6 +27,11 @@ export class ApprovedCostsComponent implements OnInit {
 
   ngOnInit(): void {
     this.initialPay = INITIAL_PAY_TYPES.includes(this.requestModel.requestDto?.frtId);
+    this.requestModel.requestCans.forEach(c => {
+      if(c.approvedDc && c.approvedDc > 0) {
+        this.showDirectCosts = true;
+      }
+    });
   }
 
   isFormValid(): boolean {

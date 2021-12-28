@@ -25,6 +25,8 @@ export class BudgetInfoComponent implements OnInit {
 
   @Input() readOnly = false;
   @Input() editing = false;
+  showDirectCosts = false;
+
   defaultCanTracker: Map<number, boolean> = new Map<number, boolean>();
 
 
@@ -59,7 +61,12 @@ export class BudgetInfoComponent implements OnInit {
       }
     });
     this.canManagementService.initializeCANDisplayMatrixForRequest();
-    this.logger.debug(this.canManagementService.canDisplayMatrix);
+    this.model.requestCans.forEach(c => {
+      if(c.approvedDc && c.approvedDc > 0) {
+        this.showDirectCosts = true;
+      }
+    });
+
   }
 
   isFcArc(): boolean {
