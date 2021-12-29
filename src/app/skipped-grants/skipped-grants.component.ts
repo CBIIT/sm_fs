@@ -20,7 +20,7 @@ import { openNewWindow } from '../utils/utils';
 })
 export class SkippedGrantsComponent implements OnInit {
   dummy: string;
-  order: number = 1;
+  order = 1;
   @Input() parentForm: NgForm;
 
   _selectedValue: string;
@@ -38,7 +38,7 @@ export class SkippedGrantsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.skipGrantsDto = this.requestModel.requestDto.skipRequests;
+    this.skipGrantsDto = this.requestModel.requestDto.skipRequests || new Array<FundingRequestSkipDto>();
     this.options = {
       allowClear: true,
       minimumInputLength: 4,
@@ -79,11 +79,11 @@ export class SkippedGrantsComponent implements OnInit {
   }
 
   sortGrants(): void {
-    this.logger.debug(`sortGrants: ${this.order}`);
+    // this.logger.debug(`sortGrants: ${this.order}`);
     this.skipGrantsDto.sort((a, b) => {
       let result = 0;
 
-      if(a.skipFullGrantNum === b.skipFullGrantNum) {
+      if (a.skipFullGrantNum === b.skipFullGrantNum) {
         result = 0;
       } else if (a.skipFullGrantNum < b.skipFullGrantNum) {
         result = -1;
@@ -97,17 +97,19 @@ export class SkippedGrantsComponent implements OnInit {
 
 
   set selectedValue(value: string) {
+    // this.logger.debug(`selected value ${value}`);
     this._selectedValue = value;
     if (value) {
       this.skipGrants.push(value);
       this.fsLookupControllerService.getFundingRequestSkipGrantsUsingGET(value).subscribe(
         result => {
-          for (let dto in result) {
+          this.logger.debug('result:', result);
+          for (const dto in result) {
             this.skipGrantsDto.push(result[dto]);
             this.requestModel.requestDto.skipRequests = this.skipGrantsDto;
             this.requestService.retrieveSkipFundingRequestUsingGET(result[dto].skipApplId).subscribe(
-              (result) => {
-                this._grant = result;
+              (r) => {
+                this._grant = r;
               }, (error) => {
                 this.logger.error('retrieveFundingRequest failed ', error);
               });
@@ -141,7 +143,7 @@ export class SkippedGrantsComponent implements OnInit {
     this.tooltipGrant = grant;
   }
 
-  openSkipRequest(skipFrqId: number) {
+  openSkipRequest(skipFrqId: number): void {
     openNewWindow('#/request/retrieve/' + skipFrqId, 'SKIP-REQUEST');
   }
 }
