@@ -14,7 +14,7 @@ import { openNewWindow } from '../utils/utils';
 export class RequestInformationReadonlyComponent implements OnInit {
 
   loaMap: Map<string, string>;
-  private tooltipGrant: NciPfrGrantQueryDto;
+  tooltipGrant: NciPfrGrantQueryDto;
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger) {
   }
