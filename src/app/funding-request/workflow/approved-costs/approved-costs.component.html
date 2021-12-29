@@ -25,7 +25,7 @@
                 <tr *ngFor=" let can of requestModel.requestCans; let i = index; let first = first">
                     <td>{{can.fundingSourceName}}</td>
                     <td *ngIf="showDirectCosts">
-                        {{can.requestedDc | currency}} <span *ngIf="first">{{can.tcPctCut / 100000 | percentCut:initialPay}}</span>
+                        {{can.requestedDc | currency}} <span *ngIf="first">{{can.dcPctCut / 100000 | percentCut:initialPay}}</span>
                     </td>
                     <td *ngIf="showDirectCosts">
                         {{can.requestedTc | currency}} <span *ngIf="first">{{can.tcPctCut / 100000 | percentCut:initialPay}}</span>
