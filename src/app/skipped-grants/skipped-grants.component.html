@@ -7,7 +7,7 @@
     </div>
   </div>
 
-  <div class="col-6">
+  <div *ngIf="!readOnly" class="col-6">
     <label for="req-add-skip">Select the approved skipped application(s) to fund this request.</label>
     <ng-select2 id="req-add-skip" [(ngModel)]="selectedValue" name="skippedGrants" #skippedGrants="ngModel"
                 [allowClear]="true" [options]="options">
@@ -28,7 +28,7 @@
       <thead>
       <tr>
         <th scope="col"><a [routerLink]="" (click)=sortGrants()>Grant Number</a></th>
-        <th scope="col" style="width:5rem">Action</th>
+        <th *ngIf="!readOnly" scope="col" style="width:5rem">Action</th>
         <th scope="col" style="width:5rem">View</th>
       </tr>
       </thead>
@@ -47,7 +47,7 @@
           </p>
 
         </td>
-        <td>
+        <td *ngIf="!readOnly">
           <button class="btn btn-link btn-delete btn-slim" title="Delete" (click)="deleteSkipGrant($event, g)">
             <i class="fas fa-trash" aria-hidden="true"></i>
           </button>

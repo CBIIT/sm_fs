@@ -3,6 +3,7 @@ import { RequestModel } from '../model/request/request-model';
 import { FundingRequestSkipDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
 import { FundingRequestTypes } from '../model/request/funding-request-types';
 import { NGXLogger } from 'ngx-logger';
+import { openNewWindow } from '../utils/utils';
 
 @Component({
   selector: 'app-request-information-readonly',
@@ -13,6 +14,7 @@ import { NGXLogger } from 'ngx-logger';
 export class RequestInformationReadonlyComponent implements OnInit {
 
   loaMap: Map<string, string>;
+  private tooltipGrant: NciPfrGrantQueryDto;
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger) {
   }
@@ -77,4 +79,11 @@ export class RequestInformationReadonlyComponent implements OnInit {
     return this.requestModel;
   }
 
+  openSkipRequest(skipFrqId: number): void {
+    openNewWindow('#/request/retrieve/' + skipFrqId, 'SKIP-REQUEST');
+  }
+
+  setGrant(grant: NciPfrGrantQueryDto): void {
+    this.tooltipGrant = grant;
+  }
 }

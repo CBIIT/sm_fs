@@ -22,6 +22,7 @@ export class SkippedGrantsComponent implements OnInit {
   dummy: string;
   order = 1;
   @Input() parentForm: NgForm;
+  @Input() readOnly = false;
 
   _selectedValue: string;
   options: Options;

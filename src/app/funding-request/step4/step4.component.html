@@ -21,7 +21,7 @@
 <app-workflow (actionEmitter)="actionType($event)" 
   [readonly]="!submitVisible() || !submitEnabled()"
   [hidden]="hideWorkflow()">
-  <app-budget-info [hidden]="!showBudgetInfo()" 
+  <app-budget-info [hidden]="!showBudgetInfo()"
     [readOnly]="budgetInfoReadOnly()" [editing]="!budgetInfoReadOnly()"
     id="workflow-budget-info">
   </app-budget-info>

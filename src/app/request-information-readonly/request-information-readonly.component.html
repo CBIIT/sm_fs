@@ -112,9 +112,39 @@
     <div class="col-md-6 col-lg-3" *ngIf="isSkip">
       <div class="form-group">
         <p class="like-label">Skipped Request(s)</p>
-        <p *ngFor="let sreq of skipRequests" nowrap>{{sreq.skipFrqId}} {{sreq.skipFullGrantNum}} {{sreq.skipRequestCurrentStatus}}</p>
+        <table class="table table-striped table-bordered" id="skip-list">
+          <thead>
+          <tr>
+            <th>Grant Number</th>
+            <th scope="col" style="width:5rem">View</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let g of skipRequests">
+            <td>
+              <p>
+                <a href="{{model.grantViewerUrl+g.skipApplId}}" target="yourgrant">{{g.skipFullGrantNum}}</a>
+                <span class="grant-icons ml-2">
+                <a href="{{model.eGrantsUrl+g.skipApplId}}" target="yourgrant" ngbTooltip="eGrants">
+                  <span class="egrants-icon"></span>
+                </a>
+                <a [routerLink]="" (mouseenter)="setGrant(grant)" [ngbTooltip]="InstituteTooltip"
+                   triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
+              </span>
+              </p>
+
+            </td>
+            <td>
+              <a [routerLink]="" (click)="openSkipRequest(g.skipFrqId)">{{g.skipFrqId}}</a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
     </div>
+    <ng-template #InstituteTooltip><span class='institutionName'>{{tooltipGrant.orgName}}</span><br>
+      <span class='institutionLocation'>{{tooltipGrant.institutionCity}},&nbsp;{{tooltipGrant.institutionState}}</span>
+    </ng-template>
   </div>
 
   <app-program-recommended-costs [readOnlyView]="true" *ngIf="!isSkip"></app-program-recommended-costs>
