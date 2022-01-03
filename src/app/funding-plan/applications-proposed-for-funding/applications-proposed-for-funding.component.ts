@@ -144,7 +144,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     this.beforeAddFundingSource.next(this.getNextSourceIndex);
     if (this.getNextSourceIndex < 2) {
       this.grantList.forEach(item => {
-        this.planManagementService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent.selectedValue);
+        this.planManagementService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent?.selectedValue);
       });
     }
 

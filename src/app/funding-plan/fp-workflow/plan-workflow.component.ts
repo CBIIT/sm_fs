@@ -342,6 +342,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.fprId = this.planModel.fundingPlanDto.fprId;
     dto.currentStatusId = this.requestStatus.statusId;
+    dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
     dto.comments = this.comments;
     dto.action = action;
     if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&

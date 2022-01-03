@@ -54,6 +54,8 @@ export class FundingRequestTypeComponent implements OnInit {
       if (Number(value) === FundingRequestTypes.OTHER_PAY_COMPETING_ONLY) {
         this.alerts = [this.otherPayAlert];
         otherPay = true;
+      } else {
+        this.alerts = [];
       }
       if (INITIAL_PAY_TYPES.includes(Number(value))) {
         this.fsRequestControllerService.checkIsFundedByFundingPlanUsingGET(this.model.grant.applId).subscribe(result => {
