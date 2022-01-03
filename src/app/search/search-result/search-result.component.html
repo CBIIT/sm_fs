@@ -16,7 +16,7 @@
       &nbsp;&nbsp;
       <span *ngIf="batchApproveVisible" >
       <button  class="btn btn-primary" (click)="showBatchApproveModal()" *ngIf="batchApproveEnabled">Batch Approve</button>
-      <span  *ngIf="!batchApproveEnabled" ngbTooltip="Select one or more eligible request(s) or plan(s) to perform batch approve">
+      <span  *ngIf="!batchApproveEnabled" ngbTooltip="Select more than one eligible request(s) or plan(s) to perform batch approve">
         <button class="btn btn-primary" disabled>Batch Approve</button>
       </span>
     </span>

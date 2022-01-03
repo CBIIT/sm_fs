@@ -96,6 +96,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     }
     this.searchFilter = this.searchModel.getSearchCriteria(this.searchType);
     this.searchFilter.searchType = this.searchType;
+    this.showAdvanced = this._containsAdvancedInSearchFilter(this.searchFilter);
     // YP - disable search for paylist until paylist is fully merged with fs
     this.canSearchForPaylists = false;
     // this.canSearchForPaylists = this.userSessionService.hasRole('GMBRCHF') ||
@@ -184,6 +185,19 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       }
     }
     return rss;
+  }
+
+
+ private _containsAdvancedInSearchFilter(sf: SearchCriteria): boolean {
+    return (sf != null &&
+      ((sf.requestingPd && sf.requestingPd !== '') ||
+       (sf.fundingSources && sf.fundingSources !== '') ||
+       (sf.id && sf.id !== '') ||
+       (sf.piName && sf.piName !== '') ||
+       (sf.institutionName && sf.institutionName !== '') ||
+       (sf.pdName && sf.pdName !== '') ||
+       (sf.doc && sf.doc !== '')
+      ));
   }
 
   // Check if at least one criteria selected or both IC and Serial Number

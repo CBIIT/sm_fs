@@ -44,6 +44,7 @@ export class BatchApproveService {
   }
 
   canApproveRequest(frqId: number): boolean {
+    this.logger.debug('this.frqIds ', this.frqIds, frqId );
     return this.frqIds.includes(frqId);
   }
 
@@ -52,11 +53,11 @@ export class BatchApproveService {
   }
 
   canBatchApproveRequest(): boolean {
-    return (this.isDoc || this.isSpl) && this.frqIds?.length > 0;
+    return (this.isDoc || this.isSpl) && this.frqIds?.length > 1;
   }
 
   canBatchApprovePlan(): boolean {
-    return (this.isDoc || this.isSpl) && this.fprIds?.length > 0;
+    return (this.isDoc || this.isSpl) && this.fprIds?.length > 1;
   }
 
 }
