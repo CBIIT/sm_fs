@@ -826,6 +826,7 @@ export class Step3Component implements OnInit {
     this.removeDocType("Supplement Application");
     this.showSuppApplications = false;
     this.modalService.dismissAll();
+    this.reset();
   }
 
   downloadSupplementAppDoc(suppApplId: number) {
