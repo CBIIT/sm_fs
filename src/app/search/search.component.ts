@@ -1,7 +1,12 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { SearchCriteria } from './search-criteria';
 import { SearchResultComponent } from './search-result/search-result.component';
-import { FundSearchDashboardDataDto , FundSelectSearchCriteria , FsSearchControllerService  } from '@nci-cbiit/i2ecws-lib';
+import {
+  FundSearchDashboardDataDto,
+  FundSelectSearchCriteria,
+  FsSearchControllerService,
+  FsDesigneeControllerService
+} from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { GwbLinksService } from '@nci-cbiit/i2ecui-lib';
 import { getCurrentFiscalYear } from '../utils/utils';
@@ -9,6 +14,7 @@ import {AppUserSessionService} from "../service/app-user-session.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {SearchModel} from "./model/search-model";
 import { BatchApproveService } from './batch-approve/batch-approve.service';
+import {FundingRequestPermDelDto} from "@nci-cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
 
 @Component({
   selector: 'app-search',
@@ -45,6 +51,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   keepSearchCriteriaModel: boolean;
 
+  errInactiveDesignees: boolean;
+
   constructor(private logger: NGXLogger,
               private router: Router,
               private route: ActivatedRoute,
@@ -52,6 +60,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
               private userSessionService: AppUserSessionService,
               private fsSearchController: FsSearchControllerService,
               private batchApproveService: BatchApproveService,
+              private designeeService: FsDesigneeControllerService,
               private gwbLinksService: GwbLinksService
             ) {
   }
@@ -457,7 +466,22 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }, error => {
         console.error('HttpClient get request error for----- ' + error.message);
+    });
+    if (this.selectedMenuUrl === 'landing' && checkLanding) {
+      this.designeeService.getAllApproverDesigneesUsingGET(this.userSessionService.getLoggedOnUser().nihNetworkId).subscribe(
+        (result: Array<FundingRequestPermDelDto>) => {
+          this.logger.debug('Get designees for user: ', result);
+          this.errInactiveDesignees = false;
+          for (const entry of result) {
+            if (entry.newNedOrg || entry.newClassification || entry.inactiveNedDate || entry.inactiveI2eDate) {
+              this.errInactiveDesignees = true;
+              break;
+            }
+          }
+        }, error => {
+          this.logger.error('HttpClient get request error for----- ' + error.message);
       });
+    }
   }
 
   onKeepSearchCriteria(): void {
