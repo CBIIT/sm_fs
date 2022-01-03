@@ -845,10 +845,14 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   enableBatchApprove(requestOrPlan: 'REQUEST' | 'PLAN'): boolean {
+    let count = 0;
     for (const id of this.selectedRows.keys()) {
       if ((requestOrPlan === 'REQUEST' && this.batchApproveService.canApproveRequest(id))
         || (requestOrPlan === 'PLAN' && this.batchApproveService.canApprovePlan(id))) {
-        return true;
+          count ++;
+          if (count > 1) { // only enable batch approve when there is more than 1 request/plan selected.
+            return true;
+          }
       }
     }
     return false;

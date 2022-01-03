@@ -317,6 +317,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     dto.currentStatusId = this.requestStatus.statusId;
     dto.comments = this.comments;
     dto.action = action;
+    dto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
     if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&
       this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0) {
       dto.additionalApproverList = this.workflowModel.additionalApprovers.map(a => {
