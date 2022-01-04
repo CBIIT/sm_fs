@@ -54,7 +54,7 @@
     </div>
     <div
       class="text-danger mt-1"
-      *ngIf="overallSetAside.errors?.min || year1SetAside.errors?.max && (parentForm.submitted || overallSetAside.touched)">
+      *ngIf="overallSetAside.errors?.min || overallSetAside.errors?.max && (parentForm.submitted || overallSetAside.touched)">
       Enter a number between 0 and 9,999,999,999
     </div>
     <div
