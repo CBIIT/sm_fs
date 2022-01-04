@@ -29,7 +29,7 @@ export class SkippedGrantsComponent implements OnInit {
   skipGrants: Array<string> = new Array<string>();
   skipGrantsDto: Array<FundingRequestSkipDto> = new Array<FundingRequestSkipDto>();
   grants: Array<string>;
-  tooltipGrant: any;
+  tooltipGrant: FundingRequestSkipDto;
   private _grant: NciPfrGrantQueryDto;
 
   constructor(private requestModel: RequestModel,
@@ -108,12 +108,12 @@ export class SkippedGrantsComponent implements OnInit {
           for (const dto in result) {
             this.skipGrantsDto.push(result[dto]);
             this.requestModel.requestDto.skipRequests = this.skipGrantsDto;
-            this.requestService.retrieveSkipFundingRequestUsingGET(result[dto].skipApplId).subscribe(
-              (r) => {
-                this._grant = r;
-              }, (error) => {
-                this.logger.error('retrieveFundingRequest failed ', error);
-              });
+            // this.requestService.retrieveSkipFundingRequestUsingGET(result[dto].skipApplId).subscribe(
+            //   (r) => {
+            //     this._grant = r;
+            //   }, (error) => {
+            //     this.logger.error('retrieveFundingRequest failed ', error);
+            //   });
           }
         }, error => {
           this.logger.error('HttpClient get request error for----- ' + error.message);
@@ -140,7 +140,8 @@ export class SkippedGrantsComponent implements OnInit {
     return this.requestModel;
   }
 
-  setGrant(grant: NciPfrGrantQueryDto): void {
+  setGrant(grant: FundingRequestSkipDto): void {
+    this.logger.debug('setGrant', grant);
     this.tooltipGrant = grant;
   }
 
