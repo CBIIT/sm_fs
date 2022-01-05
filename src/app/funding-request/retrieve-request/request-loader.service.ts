@@ -54,10 +54,12 @@ export class RequestLoaderService {
 
           const foundSources: number[] = result1.map(r1 => r1.fundingSourceId);
 
+          // FS-1387: funding sources need to come back in the same order they were inserted into the DB,
+          // so we need to make sure they are sorted by ID when we retrieve them.  The underlying API function
+          // does, and JavaScript sets preserve insertion order, so we are good to go here.
           const selectedIds = new Set<number>();
           this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos.forEach(b => {
             selectedIds.add(b.fseId);
-
           });
 
           const additionalSources: number[] = Array.from(selectedIds).filter(s => !foundSources.includes(s));
