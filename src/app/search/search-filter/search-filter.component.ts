@@ -191,6 +191,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
  private _containsAdvancedInSearchFilter(sf: SearchCriteria): boolean {
     return (sf != null &&
       ((sf.requestingPd && sf.requestingPd !== '') ||
+       (sf.requestingDoc && sf.requestingDoc !== '') ||
        (sf.fundingSources && sf.fundingSources !== '') ||
        (sf.id && sf.id !== '') ||
        (sf.piName && sf.piName !== '') ||
