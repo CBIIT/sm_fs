@@ -354,6 +354,7 @@ export class RequestModel {
           for (const fs of programCostModel.selectedFundingSources) {
             const lineItems = programCostModel.getLineItemsForSourceId(fs?.fundingSourceId, !this.isPayType4());
             if (lineItems.length > 0) {
+              const fundedYears = lineItems.filter(li => li.recommendedTotal > 0 || li.recommendedDirect > 0).length;
               const lineItem0 = lineItems[0];
               const dto: FundingRequestCanDto = {};
               dto.frqId = this.requestDto.frqId;
@@ -365,7 +366,7 @@ export class RequestModel {
               dto.approvedDc = dto.requestedDc;
               dto.dcPctCut = Math.round(100000 * lineItem0.percentCutDirectCalculated);
               dto.tcPctCut = Math.round(100000 * lineItem0.percentCutTotalCalculated);
-              dto.requestedFutureYrs = lineItems.filter(li => li.recommendedTotal > 0 || li.recommendedDirect > 0).length - 1;
+              dto.requestedFutureYrs = fundedYears === 0 ? 0 : fundedYears - 1;
               dto.approvedFutureYrs = dto.requestedFutureYrs;
               this.requestCans.push(dto);
             }
