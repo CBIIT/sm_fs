@@ -447,6 +447,12 @@ export class PlanStep3Component implements OnInit {
           if (this.editing) {
             // Since the user may have changed the funding source, splice it into the list of plan sources.
             this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.splice(this.editing.index, 1, s.fundingSource);
+            if (this.editing.sourceId !== s.fundingSource.fundingSourceId) {
+              if (!this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources) {
+                this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = [];
+              }
+              this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources.push(this.editing.sourceId);
+            }
           } else {
             this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(s.fundingSource);
           }
