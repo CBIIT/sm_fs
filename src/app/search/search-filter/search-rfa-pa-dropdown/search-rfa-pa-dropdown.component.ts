@@ -1,7 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ControlContainer, NgForm} from "@angular/forms";
-import {CancerActivityControllerService} from "@nci-cbiit/i2ecws-lib";
-import {Select2OptionData} from "ng-select2";
+import {ControlContainer, NgForm} from '@angular/forms';
+import {CancerActivityControllerService} from '@nci-cbiit/i2ecws-lib';
+import {Select2OptionData} from 'ng-select2';
+import {Options} from 'select2';
 
 @Component({
   selector: 'app-search-rfa-pa-dropdown',
@@ -16,7 +17,8 @@ export class SearchRfaPaDropdownComponent implements OnInit {
   @Input()
   parentForm: NgForm; // optional
 
-  public rfaPas: Array<Select2OptionData>;
+  data: Array<Select2OptionData>;
+  options: Options = {};
 
   ngOnInit(): void {
     this.caService.getRfaPaNoticesListUsingGET().subscribe(
@@ -27,10 +29,9 @@ export class SearchRfaPaDropdownComponent implements OnInit {
             id: entry.noticeNumber, text: entry.noticeNumber
           });
         }
-        this.rfaPas = rfapaResults;
+        this.data = rfapaResults;
       }, error => {
         console.error('HttpClient get request error for----- ' + error.message);
       });
   }
-
 }

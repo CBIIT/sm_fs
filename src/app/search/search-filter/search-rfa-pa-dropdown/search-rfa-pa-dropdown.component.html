@@ -1,8 +1,13 @@
 <div class="form-group">
   <label for="rfaPa">FOA</label>
-  <ng-select2 id="rfaPa" name="rfaPa" ngModel [allowClear]="true">
-    <option value=""></option>
-    <option *ngFor="let rfaPa of rfaPas" [value]="rfaPa.id">
-      {{rfaPa.text}}</option>
+  <ng-select2
+    id="rfaPa"
+    name="rfaPa"
+    ngModel
+    [allowClear]="true"
+    [data]="data"
+    [options]="options"
+    [ngModelOptions]="{updateOn: 'change'}"
+    >
   </ng-select2>
 </div>
