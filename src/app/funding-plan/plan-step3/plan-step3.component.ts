@@ -440,14 +440,12 @@ export class PlanStep3Component implements OnInit {
     let frBudget: FundingReqBudgetsDto;
     let frCan: FundingRequestCanDto;
     let doOnce = true;
-    // If we are editing a source, delete it first, then insert the new values below
-    // if (this.editing) {
-    //   this.deleteFundingSource(this.editing.sourceId);
-    // }
+
     $event.forEach(s => {
         // this.logger.debug(s);
         if (doOnce) {
-          if(this.editing) {
+          if (this.editing) {
+            // Since the user may have changed the funding source, splice it into the list of plan sources.
             this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.splice(this.editing.index, 1, s.fundingSource);
           } else {
             this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(s.fundingSource);
@@ -503,7 +501,7 @@ export class PlanStep3Component implements OnInit {
           };
 
           if (this.editing) {
-            this.logger.debug(`splice - ${JSON.stringify(frBudget)}`);
+            this.logger.debug(`splice - ${JSON.stringify(frBudget)} onto ${JSON.stringify(req.financialInfoDto.fundingReqBudgetsDtos[this.editing.index])}`);
             req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, 1, frBudget);
           } else {
             this.logger.debug(`push - ${JSON.stringify(frBudget)}`);
@@ -542,6 +540,7 @@ export class PlanStep3Component implements OnInit {
           };
 
           if (this.editing) {
+            this.logger.debug(`splice - ${JSON.stringify(frCan)} onto ${JSON.stringify(req.financialInfoDto.fundingRequestCans[this.editing.index])}`);
             req.financialInfoDto.fundingRequestCans.splice(this.editing.index, 1, frCan);
           } else {
             req.financialInfoDto.fundingRequestCans.push(frCan);
@@ -592,7 +591,7 @@ export class PlanStep3Component implements OnInit {
   }
 
   cancelAddFundingSource(): void {
-    this.editing = undefined;
+    this.clearEditFlag();
   }
 
   onSelectedValueChange($event: string | string[]): void {
@@ -602,5 +601,9 @@ export class PlanStep3Component implements OnInit {
       this.logger.info($event);
       this.cayCode = $event ? $event[0] : undefined;
     }
+  }
+
+  clearEditFlag(): void {
+    this.editing = undefined;
   }
 }
