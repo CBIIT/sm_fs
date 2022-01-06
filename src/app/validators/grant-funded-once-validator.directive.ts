@@ -21,6 +21,7 @@ export class GrantFundedOnceValidatorDirective implements Validator {
     }
 
     const pendingValues = control?.value;
+    this.logger.debug(pendingValues);
 
     // this.logger.debug(`Pending values: ${JSON.stringify(pendingValues)}`);
 

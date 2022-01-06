@@ -34,6 +34,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   @Output() addFundingSource = new EventEmitter<FundingSourceGrantDataPayload[]>();
   @Output() cancelAddFundingSource = new EventEmitter<void>();
   @Output() deleteFundingSource = new EventEmitter<number>();
+  @Output() clearEditFlag = new EventEmitter<void>();
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
   @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
   @ViewChildren(FpFundingSourceComponent) fundingSources: QueryList<FpFundingSourceComponent>;
@@ -152,6 +153,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     modalRef.componentInstance.sourceIndex = this.getNextSourceIndex;
     modalRef.result.then((result) => {
       this.addFundingSource.next(result.filter(f => !!f.displayType));
+      this.clearEditFlag.next();
     }, (reason) => {
       this.cancelAddFundingSource.next();
     });
@@ -175,13 +177,14 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   onEditFundingSource(sourceId: number, index: number): void {
-    // this.logger.debug('editSource(', sourceId, index, ')');
+    this.logger.debug(`editSource(${sourceId}, ${index})`);
     this.beforeEditFundingSource.next({ sourceId, index });
     const modalRef = this.modalService.open(FundingSourceEntryModalComponent, { size: 'xl' });
     modalRef.componentInstance.sourceIndex = index;
     modalRef.result.then((result) => {
       // this.logger.debug(result);
       this.addFundingSource.next(result.filter(f => !!f.displayType));
+      this.clearEditFlag.next();
     }, (reason) => {
       // this.logger.debug('closed with', reason);
       this.cancelAddFundingSource.next();
@@ -197,7 +200,8 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   handleSourceChanged($event: { oldSource: number; newSource: number }): void {
-    // this.logger.debug('source changed', $event);
+    // This event should only be triggered when there is a single funding source. For multiple sources, the change will
+    // be spliced in.
     this.deleteFundingSource.next(+$event.oldSource);
   }
 
