@@ -146,8 +146,8 @@ export class PrcDataPoint {
     this.fundingRequestId = b.frqId;
     this.recommendedDirect = b.dcRecAmt;
     this.recommendedTotal = b.tcRecAmt;
-    if (Math.round(this.percentCutTotalCalculated * 100) !== 0 && Math.round(this.percentCutTotalCalculated * 100) ===
-      Math.round(this.percentCutDirectCalculated * 100)) {
+    if (Math.round(this.percentCutTotalCalculated * 100000) !== 0 && Math.round(this.percentCutTotalCalculated * 100000) ===
+      Math.round(this.percentCutDirectCalculated * 100000)) {
       this._percentCut = Math.round(this.percentCutTotalCalculated * 100);
       this.type = PrcLineItemType.PERCENT_CUT;
     } else {
