@@ -441,10 +441,13 @@ export class PlanStep3Component implements OnInit {
     let frCan: FundingRequestCanDto;
     let doOnce = true;
 
+    this.logger.debug($event);
+
     $event.forEach(s => {
         // this.logger.debug(s);
         if (doOnce) {
           if (this.editing) {
+            this.logger.debug(`editing: ${JSON.stringify(this.editing)}`);
             // Since the user may have changed the funding source, splice it into the list of plan sources.
             this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.splice(this.editing.index, 1, s.fundingSource);
             if (this.editing.sourceId !== s.fundingSource.fundingSourceId) {
@@ -493,6 +496,8 @@ export class PlanStep3Component implements OnInit {
 
           const futureYears: number = this.planManagementService.getRecommendedFutureYears(s.applId);
 
+          const currentBudget = req.financialInfoDto.fundingReqBudgetsDtos[this.editing.index];
+
           frBudget = {
             frqId: +req.frqId,
             fseId: +s.fseId,
@@ -507,12 +512,18 @@ export class PlanStep3Component implements OnInit {
           };
 
           if (this.editing) {
-            // this.logger.debug(`splice - ${JSON.stringify(frBudget)} onto ${JSON.stringify(req.financialInfoDto.fundingReqBudgetsDtos[this.editing.index])}`);
-            req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, 1, frBudget);
+            const deleteCount = this.getBudgetDeleteCount(frBudget, currentBudget, this.editing); // Need to figure out whether we're replacing a budget or adding one...
+            if (deleteCount === 1) {
+              frBudget.id = currentBudget.id;
+            }
+            this.logger.debug(`splice - ${JSON.stringify(frBudget)} - deleting ${deleteCount} `);
+            req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, deleteCount, frBudget);
           } else {
-            // this.logger.debug(`push - ${JSON.stringify(frBudget)}`);
+            this.logger.debug(`push - ${JSON.stringify(frBudget)}`);
             req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
           }
+
+          const currentCAN = req.financialInfoDto.fundingRequestCans[this.editing.index];
 
           frCan = {
             approvedDc: +directCost,
@@ -546,8 +557,12 @@ export class PlanStep3Component implements OnInit {
           };
 
           if (this.editing) {
-            // this.logger.debug(`splice - ${JSON.stringify(frCan)} onto ${JSON.stringify(req.financialInfoDto.fundingRequestCans[this.editing.index])}`);
-            req.financialInfoDto.fundingRequestCans.splice(this.editing.index, 1, frCan);
+            const deleteCount = this.getCANDeleteCount(frCan, currentCAN, this.editing);
+            this.logger.debug(`splice - ${JSON.stringify(frCan)} deleting ${deleteCount}`);
+            if (deleteCount === 1) {
+              frCan.id = currentCAN.id;
+            }
+            req.financialInfoDto.fundingRequestCans.splice(this.editing.index, deleteCount, frCan);
           } else {
             req.financialInfoDto.fundingRequestCans.push(frCan);
           }
@@ -557,6 +572,28 @@ export class PlanStep3Component implements OnInit {
     this.planManagementService.buildPlanBudgetAndCanModel();
     this.planModel.fundingPlanDto.totalRecommendedAmt = this.planManagementService.grandTotalTotal();
     this.planModel.fundingPlanDto.directRecommendedAmt = this.planManagementService.grandTotalDirect();
+  }
+
+  private getCANDeleteCount(frCan: FundingRequestCanDto, currentCAN: FundingRequestCanDto, editing: { sourceId: number; index: number }): number {
+    this.logger.debug('can1', frCan);
+    this.logger.debug('can2', currentCAN);
+    this.logger.debug('edit', editing);
+    if (+frCan.fseId !== +currentCAN.fseId && +currentCAN.fseId !== +editing.sourceId) {
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+
+  private getBudgetDeleteCount(newBudget: FundingReqBudgetsDto, currentBudget: FundingReqBudgetsDto, editing: { sourceId: number; index: number }): number {
+    this.logger.debug('bud1', newBudget);
+    this.logger.debug('bud2', currentBudget);
+    this.logger.debug('edit', editing);
+    if (+newBudget.fseId !== +currentBudget.fseId && +currentBudget.fseId !== +editing.sourceId) {
+      return 0;
+    } else {
+      return 1;
+    }
   }
 
   deleteFundingSource($event: number): void {
@@ -597,7 +634,8 @@ export class PlanStep3Component implements OnInit {
   }
 
   cancelAddFundingSource(): void {
-    this.clearEditFlag();
+    this.editing = undefined;
+    // this.clearEditFlag();
   }
 
   onSelectedValueChange($event: string | string[]): void {
@@ -610,6 +648,7 @@ export class PlanStep3Component implements OnInit {
   }
 
   clearEditFlag(): void {
+    this.logger.debug('clear edit flag');
     this.editing = undefined;
   }
 }
