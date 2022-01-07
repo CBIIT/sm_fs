@@ -634,8 +634,7 @@ export class PlanStep3Component implements OnInit {
   }
 
   cancelAddFundingSource(): void {
-    this.editing = undefined;
-    // this.clearEditFlag();
+    this.clearEditFlag();
   }
 
   onSelectedValueChange($event: string | string[]): void {
@@ -648,7 +647,6 @@ export class PlanStep3Component implements OnInit {
   }
 
   clearEditFlag(): void {
-    this.logger.debug('clear edit flag');
     this.editing = undefined;
   }
 }
