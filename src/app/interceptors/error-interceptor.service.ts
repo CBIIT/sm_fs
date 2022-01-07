@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, filter, finalize } from 'rxjs/operators';
-import { NavigationStart, Router } from '@angular/router';
+import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
 import { openNewWindow } from '../utils/utils';
 import { Location } from '@angular/common';
@@ -22,6 +22,10 @@ export class ErrorInterceptorService implements HttpInterceptor {
   ) {
     router.events.pipe(filter(event => event instanceof NavigationStart)).subscribe((event: NavigationStart) => {
       this.handleNavigationStart(event);
+    });
+
+    router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
+      this.handleNavigationEnd(event);
     });
   }
 
@@ -67,7 +71,10 @@ export class ErrorInterceptorService implements HttpInterceptor {
   }
 
   handleNavigationStart(event: NavigationStart): void {
-    this.logger.debug('=======> NavigationStart');
-    this.logger.debug(event);
+    this.logger.info('=======> NavigationStart', event);
+  }
+
+  handleNavigationEnd(event: NavigationEnd): void {
+    this.logger.info('=======> NavigationEnd', event);
   }
 }
