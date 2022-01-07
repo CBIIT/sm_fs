@@ -30,7 +30,8 @@ export class ErrorInterceptorService implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    this.logger.debug(`Current route url: ${this.router.url}`);
+    this.logger.debug(`Current route URL: ${this.router.url}`);
+    this.logger.debug(`Request URL      : ${req.url}`);
 
     return next.handle(req).pipe(
       catchError((error, caught) => {
