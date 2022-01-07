@@ -471,14 +471,14 @@ export class PlanStep3Component implements OnInit {
           totalCost = +s.totalCostCalculated;
           dcPercentCut = +s.percentCut * 1000;
           tcPercentCut = +s.percentCut * 1000;
-          this.logger.debug(`percent: ${percentCut}, ${directCost}, ${totalCost}, ${dcPercentCut}, ${tcPercentCut}`);
+          // this.logger.debug(`percent: ${percentCut}, ${directCost}, ${totalCost}, ${dcPercentCut}, ${tcPercentCut}`);
         } else if (s.displayType === 'dollar') {
           percentCut = +s.percentCut * 1000;
           directCost = +s.directCost;
           totalCost = +s.totalCost;
           dcPercentCut = +s.dcPercentCutCalculated * 100000;
           tcPercentCut = +s.tcPercentCutCalculated * 100000;
-          this.logger.debug(`dollar: ${percentCut}, ${directCost}, ${totalCost}, ${dcPercentCut}, ${tcPercentCut}`);
+          // this.logger.debug(`dollar: ${percentCut}, ${directCost}, ${totalCost}, ${dcPercentCut}, ${tcPercentCut}`);
         } else {
           this.logger.error('Display type is null. Time to panic.');
         }
@@ -507,10 +507,10 @@ export class PlanStep3Component implements OnInit {
           };
 
           if (this.editing) {
-            this.logger.debug(`splice - ${JSON.stringify(frBudget)} onto ${JSON.stringify(req.financialInfoDto.fundingReqBudgetsDtos[this.editing.index])}`);
+            // this.logger.debug(`splice - ${JSON.stringify(frBudget)} onto ${JSON.stringify(req.financialInfoDto.fundingReqBudgetsDtos[this.editing.index])}`);
             req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, 1, frBudget);
           } else {
-            this.logger.debug(`push - ${JSON.stringify(frBudget)}`);
+            // this.logger.debug(`push - ${JSON.stringify(frBudget)}`);
             req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
           }
 
@@ -546,7 +546,7 @@ export class PlanStep3Component implements OnInit {
           };
 
           if (this.editing) {
-            this.logger.debug(`splice - ${JSON.stringify(frCan)} onto ${JSON.stringify(req.financialInfoDto.fundingRequestCans[this.editing.index])}`);
+            // this.logger.debug(`splice - ${JSON.stringify(frCan)} onto ${JSON.stringify(req.financialInfoDto.fundingRequestCans[this.editing.index])}`);
             req.financialInfoDto.fundingRequestCans.splice(this.editing.index, 1, frCan);
           } else {
             req.financialInfoDto.fundingRequestCans.push(frCan);
