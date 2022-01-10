@@ -42,7 +42,7 @@ export class SkippedGrantsComponent implements OnInit {
     this.skipGrantsDto = this.requestModel.requestDto.skipRequests || new Array<FundingRequestSkipDto>();
     this.options = {
       allowClear: true,
-      minimumInputLength: 4,
+      minimumInputLength: 2,
       closeOnSelect: true,
       placeholder: '',
       language: {
