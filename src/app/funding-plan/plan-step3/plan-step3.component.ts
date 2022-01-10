@@ -501,7 +501,7 @@ export class PlanStep3Component implements OnInit {
           frBudget = {
             frqId: +req.frqId,
             fseId: +s.fseId,
-            id: null, // this is new so ID shouldn't exist
+            id: s.budgetId,
             name: s.fundingSourceName,
             supportYear: +s.supportYear,
             dcRecAmt: +directCost,
@@ -538,7 +538,7 @@ export class PlanStep3Component implements OnInit {
             frqId: +req.frqId,
             fseId: +s.fseId,
             fundingSourceName: s.fundingSourceName,
-            id: null, // solve for edits
+            id: s.canId,
             // lastChangeDate: string,
             // lastChangeUserId: string,
             nciSourceFlag: s.nciSourceFlag,
@@ -578,6 +578,9 @@ export class PlanStep3Component implements OnInit {
     this.logger.debug('can1', frCan);
     this.logger.debug('can2', currentCAN);
     this.logger.debug('edit', editing);
+    if (!currentCAN) {
+      return 0;
+    }
     if (+frCan.fseId !== +currentCAN.fseId && +currentCAN.fseId !== +editing.sourceId) {
       return 0;
     } else {
@@ -589,6 +592,9 @@ export class PlanStep3Component implements OnInit {
     this.logger.debug('bud1', newBudget);
     this.logger.debug('bud2', currentBudget);
     this.logger.debug('edit', editing);
+    if (!currentBudget) {
+      return 0;
+    }
     if (+newBudget.fseId !== +currentBudget.fseId && +currentBudget.fseId !== +editing.sourceId) {
       return 0;
     } else {

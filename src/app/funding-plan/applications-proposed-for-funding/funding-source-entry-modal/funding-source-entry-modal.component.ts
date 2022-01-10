@@ -55,8 +55,8 @@ export class FundingSourceEntryModalComponent implements OnInit {
         directCost: control.directCost,
         directCostCalculated: control.directCostCalculated,
         supportYear: control.grant.supportYear,
-        budgetId: null, // TODO: handle for edit
-        canId: null, // TODO: handle for edit
+        budgetId: control.budgetId, // TODO: handle for edit
+        canId: control.canId, // TODO: handle for edit
         frqId: null, // TODO: handle for edit
         fseId: this.modalFpFundingSource.selectedValue,
         fundingSourceName: source.fundingSourceName,
