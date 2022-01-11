@@ -441,7 +441,9 @@ export class PlanStep3Component implements OnInit {
     let frCan: FundingRequestCanDto;
     let doOnce = true;
 
+    this.logger.debug('--------------------------------------------------------------------------------');
     this.logger.debug($event);
+    this.logger.debug('--------------------------------------------------------------------------------');
 
     $event.forEach(s => {
         // this.logger.debug(s);
@@ -494,6 +496,14 @@ export class PlanStep3Component implements OnInit {
             req.financialInfoDto.fundingRequestCans = new Array<FundingRequestCanDto>();
           }
 
+          req.financialInfoDto.fundingReqBudgetsDtos.forEach((b, i) => {
+            this.logger.debug(`${i}. ${JSON.stringify(b)}`);
+          });
+
+          // req.financialInfoDto.fundingRequestCans.forEach((c, i) => {
+          //   this.logger.debug(`${i}. ${JSON.stringify(c)}`);
+          // });
+
           const futureYears: number = this.planManagementService.getRecommendedFutureYears(s.applId);
 
           const currentBudget = req.financialInfoDto.fundingReqBudgetsDtos[this.editing?.index];
@@ -513,10 +523,9 @@ export class PlanStep3Component implements OnInit {
 
           if (this.editing) {
             const deleteCount = this.getBudgetDeleteCount(frBudget, currentBudget, this.editing); // Need to figure out whether we're replacing a budget or adding one...
-            if (deleteCount === 1) {
-              frBudget.id = currentBudget.id;
-            }
-            this.logger.debug(`splice - ${JSON.stringify(frBudget)} - deleting ${deleteCount} `);
+
+            // this.logger.debug(`splice - ${JSON.stringify(frBudget)} - deleting ${deleteCount} `);
+
             req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, deleteCount, frBudget);
           } else {
             this.logger.debug(`push - ${JSON.stringify(frBudget)}`);
@@ -558,10 +567,7 @@ export class PlanStep3Component implements OnInit {
 
           if (this.editing) {
             const deleteCount = this.getCANDeleteCount(frCan, currentCAN, this.editing);
-            this.logger.debug(`splice - ${JSON.stringify(frCan)} deleting ${deleteCount}`);
-            if (deleteCount === 1) {
-              frCan.id = currentCAN.id;
-            }
+            // this.logger.debug(`splice - ${JSON.stringify(frCan)} deleting ${deleteCount}`);
             req.financialInfoDto.fundingRequestCans.splice(this.editing.index, deleteCount, frCan);
           } else {
             req.financialInfoDto.fundingRequestCans.push(frCan);
@@ -575,9 +581,9 @@ export class PlanStep3Component implements OnInit {
   }
 
   private getCANDeleteCount(frCan: FundingRequestCanDto, currentCAN: FundingRequestCanDto, editing: { sourceId: number; index: number }): number {
-    this.logger.debug('can1', frCan);
-    this.logger.debug('can2', currentCAN);
-    this.logger.debug('edit', editing);
+    // this.logger.debug('can1', frCan);
+    // this.logger.debug('can2', currentCAN);
+    // this.logger.debug('edit', editing);
     if (!currentCAN) {
       return 0;
     }
