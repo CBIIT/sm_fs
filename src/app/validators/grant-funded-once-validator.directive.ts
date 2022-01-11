@@ -21,12 +21,13 @@ export class GrantFundedOnceValidatorDirective implements Validator {
     }
 
     const pendingValues = control?.value;
-    this.logger.debug(pendingValues);
 
-    // this.logger.debug(`Pending values: ${JSON.stringify(pendingValues)}`);
+    this.logger.debug(`Pending values: ${JSON.stringify(pendingValues)}`);
 
     const unfundedGrants = this.planManagementService.unfundedGrants();
-    
+
+    this.logger.debug(`Unfunded grants: ${JSON.stringify(unfundedGrants)}`);
+
     if (unfundedGrants?.includes(+this.applId) && !pendingValues) {
       return { grantUnfunded: true };
     }

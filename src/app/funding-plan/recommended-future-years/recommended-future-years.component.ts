@@ -30,13 +30,15 @@ export class RecommendedFutureYearsComponent implements OnInit {
   ];
 
   constructor(
-    private planService: PlanManagementService) {
+    private planService: PlanManagementService,
+    private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
     if (!!this.applId) {
       this.selectedValue = this.planService.getRecommendedFutureYears(Number(this.applId));
     }
+    this.logger.info(`RecommendedFutureYearsComponent for applId: ${this.applId} == ${this.selectedValue}`);
   }
 
 }

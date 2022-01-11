@@ -141,15 +141,11 @@ export class PlanManagementService {
 
   // NOTE: this is for the purpose of restricting selections for the second and third funding sources
   trackRestrictedSources(index: number, sourceId: number): void {
-    // TODO: only track non-null
-    // this.logger.debug('track selected sources', index, sourceId);
-
     if (!!sourceId) {
       this._restrictedSources.set(index, +sourceId);
     } else {
       this._restrictedSources.delete(index);
     }
-    // this.logger.debug('trackSelectedSources():', index, sourceId, this._selectedSources.size);
   }
 
   get selectedSourceCount(): number {
@@ -162,25 +158,21 @@ export class PlanManagementService {
   }
 
   getRestrictedSources(index: number): number[] {
-    // this.logger.debug('checking restricted sources for #', index);
     const result: number[] = [] as number[];
     this._restrictedSources.forEach((value, key) => {
       if (key !== index) {
         result.push(Number(value));
       }
     });
-    // this.logger.debug('restricted sources:', result);
     return result;
   }
 
   checkInFlightPFRs(payload: { applId: number, frtId: number } []): void {
     payload.forEach(r => {
       if (this.fundedPlanTypes.includes(r.frtId)) {
-        // this.logger.debug('checking in flight PFRs for applid:', r.applId, '====> type:', r.frtId);
         this.fsRequestService.checkInitialPayUsingGET(r.applId, r.frtId).subscribe(result => {
           if (!isNaN(result) && Number(result) > 0) {
             this.inflightPFRs.set(r.applId, result);
-            // this.logger.debug('in flight PFR found for applId:', r.applId, ':', result);
           }
         });
       }
@@ -188,6 +180,7 @@ export class PlanManagementService {
   }
 
   setRecommendedFutureYears(applId: number, rfy: number): void {
+    // this.logger.debug(`setRecommendedFutureYears(${applId}, ${rfy})`);
     if (!this.localRfy) {
       this.localRfy = new Map<number, number>();
     }
@@ -198,16 +191,21 @@ export class PlanManagementService {
 
   getRecommendedFutureYears(applId: number): number {
     if (!isNaN(this.localRfy?.get(applId))) {
+      // this.logger.debug(`getRecommendedFutureYears(${applId}) == ${this.localRfy.get(applId)} [local]`);
       return this.localRfy.get(applId);
     }
     const cans = this.canMap.get(Number(applId));
     let result: number = null;
     if (!!cans) {
       cans.forEach((c, s) => {
+        // this.logger.debug(`CAN: ${JSON.stringify(c)}::${s}`)
         result = c.approvedFutureYrs;
       });
+    } else {
+      this.logger.warn(`getRecommendedFutureYears(${applId}) == null [no CANs]`);
     }
     this.setRecommendedFutureYears(applId, result);
+    // this.logger.debug(`getRecommendedFutureYears(${applId}) == ${result} [from CAN]`);
     // this.logger.debug('RFY for can', applId, '=', result);
     return result;
   }
