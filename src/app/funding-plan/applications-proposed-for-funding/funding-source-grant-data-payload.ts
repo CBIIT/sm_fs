@@ -20,5 +20,8 @@ export interface FundingSourceGrantDataPayload {
   dcPercentCutCalculated: number;
   tcPercentCutCalculated: number;
   displayType: string;
+  can?: string;
+  canDescription?: string;
+  canPhsOrgCode?: string;
   fundingSource: FundingRequestFundsSrcDto;
 }

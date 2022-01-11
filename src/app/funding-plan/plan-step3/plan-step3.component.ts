@@ -496,7 +496,7 @@ export class PlanStep3Component implements OnInit {
 
           const futureYears: number = this.planManagementService.getRecommendedFutureYears(s.applId);
 
-          const currentBudget = req.financialInfoDto.fundingReqBudgetsDtos[this.editing.index];
+          const currentBudget = req.financialInfoDto.fundingReqBudgetsDtos[this.editing?.index];
 
           frBudget = {
             frqId: +req.frqId,
@@ -523,7 +523,7 @@ export class PlanStep3Component implements OnInit {
             req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
           }
 
-          const currentCAN = req.financialInfoDto.fundingRequestCans[this.editing.index];
+          const currentCAN = req.financialInfoDto.fundingRequestCans[this.editing?.index];
 
           frCan = {
             approvedDc: +directCost,

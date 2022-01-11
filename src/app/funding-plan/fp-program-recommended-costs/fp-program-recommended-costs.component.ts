@@ -34,6 +34,9 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   @Output() PendingPrcValuesEmitter = new EventEmitter<PendingPrcValues>();
   budgetId: number;
   canId: number;
+  canDescription: string;
+  canPhsOrgCode: string;
+  can: string;
 
   constructor(
     private planManagementService: PlanManagementService,
@@ -143,6 +146,9 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     this.budgetId = bud?.id;
     const can = this.planManagementService.getCan(this.grant.applId, this.fseId);
     this.canId = can?.id;
+    this.canDescription = can?.canDescription;
+    this.canPhsOrgCode = can?.phsOrgCode;
+    this.can = can?.can;
 
     // TODO: this logic might need revisiting.
     // TODO: especially the determination of percent if lockDollar is true
