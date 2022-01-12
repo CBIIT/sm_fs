@@ -61,7 +61,7 @@ const routes: Routes = [
       {path: 'manage', component: ManageDesignationsComponent},
     ]
   },
-  { path: 'restoreSession', component: SessionRestoreComponent },
+  { path: 'restoreSession', component: SessionRestoreComponent, canActivate: [AuthGuard] },
   { path: 'error/:errorId', component: ErrorComponent },
   { path: 'unauthorize', component: UnauthorizeComponent }
 ];
