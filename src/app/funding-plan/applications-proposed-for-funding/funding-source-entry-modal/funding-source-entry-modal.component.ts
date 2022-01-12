@@ -2,7 +2,10 @@ import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@a
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { PlanModel } from '../../../model/plan/plan-model';
 import { FpFundingSourceComponent } from '../../fp-funding-source/fp-funding-source.component';
-import { FpProgramRecommendedCostsComponent } from '../../fp-program-recommended-costs/fp-program-recommended-costs.component';
+import {
+  FpProgramRecommendedCostsComponent,
+  PendingPrcValues
+} from '../../fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../../model/plan/nci-pfr-grant-query-dto-ex';
 import { NgForm } from '@angular/forms';
@@ -32,12 +35,12 @@ export class FundingSourceEntryModalComponent implements OnInit {
     private planModel: PlanModel,
     private logger: NGXLogger,
     private router: Router,
-    public planCoordinatorService: PlanManagementService) {
+    public planManagementService: PlanManagementService) {
   }
 
   ngOnInit(): void {
     this.listGrantsSelected = this.planModel.allGrants.filter(g => g.selected);
-    this.planCoordinatorService.fundingSourceListEmitter.subscribe(next => {
+    this.planManagementService.fundingSourceListEmitter.subscribe(next => {
       this.availableFundingSources = next;
     });
   }
@@ -116,5 +119,9 @@ export class FundingSourceEntryModalComponent implements OnInit {
       }
     });
     return sum;
+  }
+
+  broadcastPendingValues($event: PendingPrcValues): void {
+    this.planManagementService.pendingValuesEmitter.next($event);
   }
 }

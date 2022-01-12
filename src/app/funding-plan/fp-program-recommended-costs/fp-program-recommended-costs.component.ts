@@ -37,6 +37,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   canDescription: string;
   canPhsOrgCode: string;
   can: string;
+  private pendingValues: PendingPrcValues;
 
   constructor(
     private planManagementService: PlanManagementService,
@@ -82,6 +83,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   broadcastPendingValues(): void {
+    this.logger.debug('broadcast pending values ....');
     const vals: PendingPrcValues = {
       applId: this.grant.applId,
       displayType: this._displayType,
@@ -89,6 +91,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       directCost: this.directCost,
       totalCost: this.totalCost,
     };
+    this.pendingValues = vals;
     this.PendingPrcValuesEmitter.next(vals);
     this.planManagementService.addPendingValues(vals);
   }

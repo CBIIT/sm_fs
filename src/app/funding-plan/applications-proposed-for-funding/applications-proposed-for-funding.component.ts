@@ -59,6 +59,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     this.planManagementService.fundingSourceListEmitter.subscribe(next => {
       this.availableFundingSources = next;
     });
+    this.planManagementService.pendingValuesEmitter.subscribe(next => {
+      this.capturePendingValues(next);
+    });
   }
 
   get budgetMap(): Map<number, Map<number, FundingReqBudgetsDto>> {
@@ -161,11 +164,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   canAddFundingSource(): boolean {
 
-    // if (this.parentForm.errors) {
-    //   this.logger.debug(this.parentForm.errors, this.parentForm.valid, this.parentForm.status);
-    //   return false;
-    // }
-    // this.logger.debug(this.fundingSources?.get(0)?.selectedValue, this.fundingSources?.length);
     if (!this.planManagementService.selectedSourceCount) {
       return !!this.fundingSources?.get(0)?.selectedValue;
     }
@@ -206,6 +204,12 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   capturePendingValues($event: PendingPrcValues): void {
+    this.logger.debug(`${JSON.stringify($event)}`);
     this.pendingValues = $event;
+  }
+
+  showFundingWarning(applId: number): boolean {
+    return (this.planManagementService.requestTotalTotal(applId) === 0
+      && this.planManagementService.requestDirectTotal(applId) === 0);
   }
 }

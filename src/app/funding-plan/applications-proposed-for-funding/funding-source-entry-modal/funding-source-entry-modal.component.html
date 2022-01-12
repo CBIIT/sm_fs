@@ -48,6 +48,7 @@
           </td>
           <td>
             <app-fp-program-recommended-costs
+              (PendingPrcValuesEmitter)="broadcastPendingValues($event)"
               [parentForm]="modalForm"
               #modalFpRecommendedCosts
               [sourceIndex]="sourceIndex"

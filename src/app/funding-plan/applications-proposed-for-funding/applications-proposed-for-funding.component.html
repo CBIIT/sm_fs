@@ -62,16 +62,21 @@
         <td [ngModelGroup]="grant.fullGrantNum + grant.applId">
           <app-fp-program-recommended-costs
             (PendingPrcValuesEmitter)="capturePendingValues($event)"
-            [parentForm]="parentForm" 
+            [parentForm]="parentForm"
+            [(ngModel)]="pendingValues"
             [grantIndex]="i" 
             [grant]="grant"
-            [required]="planManagementService.unfundedGrants().includes(grant.applId)"
             [sourceIndex]="0">
           </app-fp-program-recommended-costs>
-          <input type="text" style="display:none" [(ngModel)]="pendingValues" #unFunded="ngModel" [name]="grant.applId + '.unfunded'" [appGrantFundedOnceValidator]="grant.applId">
+<!--          <input-->
+<!--            type="text"-->
+<!--            style="display:none"-->
+<!--            [(ngModel)]="pendingValues"-->
+<!--            [name]="grant.applId + '.unfunded'"-->
+<!--            [ngModelOptions]="{updateOn: 'change'}">-->
           <div
             class="text-danger mt-1"
-            *ngIf="unFunded.errors?.grantUnfunded && (parentForm.submitted || parentForm.touched)">
+            *ngIf="showFundingWarning(grant.applId)">
             Every grant must be funded by at least one source
           </div>
         </td>
@@ -160,10 +165,9 @@
             [readOnly]="false"
             [sourceIndex]="0">
           </app-fp-grant-information>
-          <input type="text" style="display:none" ngModel #unFunded="ngModel" name="unfunded" [appGrantFundedOnceValidator]="grant.applId">
           <div
             class="text-danger mt-1"
-            *ngIf="unFunded.errors?.grantUnfunded && (parentForm.submitted || parentForm.touched)">
+            *ngIf="showFundingWarning(grant.applId)">
             Every grant must be funded by at least one source
           </div>
         </td>

@@ -22,6 +22,7 @@ export class PlanManagementService {
   grantInfoCostEmitter = new Subject<{ index: number, applId?: number, dc: number, tc: number }>();
   fundingSourceSelectionEmitter = new Subject<{ index: number, source: number }>();
   planBudgetReadOnlyEmitter = new Subject<boolean>();
+  pendingValuesEmitter = new Subject<PendingPrcValues>();
 
   private _selectedSourcesMap: Map<number, FundingRequestFundsSrcDto>;
   private _listSelectedSources: FundingRequestFundsSrcDto[];
@@ -467,6 +468,7 @@ export class PlanManagementService {
         }
       }
     });
+    this.logger.debug(`List of unfunded grants: ${JSON.stringify(result)}`);
     return result;
   }
 
@@ -487,7 +489,9 @@ export class PlanManagementService {
 
 
   addPendingValues(vals: PendingPrcValues): void {
-    this.pendingValues.set(vals.applId, vals);
+    this.logger.debug(`addPendingValues(${JSON.stringify(vals)})`);
+    this.pendingValues.set(+vals.applId, vals);
+    this.logger.debug(this.pendingValues);
   }
 }
 

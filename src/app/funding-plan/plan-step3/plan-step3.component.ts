@@ -116,7 +116,6 @@ export class PlanStep3Component implements OnInit {
         this.buildPlanModel();
       } else {
         this.rebuildRecommendedFutureYears();
-        this.logger.debug(this.futureYears);
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
           req.financialInfoDto.fundingRequestCans?.forEach(can => {
             can.approvedFutureYrs = this.futureYears.get(+req.applId);
@@ -441,15 +440,15 @@ export class PlanStep3Component implements OnInit {
     let frCan: FundingRequestCanDto;
     let doOnce = true;
 
-    this.logger.debug('--------------------------------------------------------------------------------');
-    this.logger.debug($event);
-    this.logger.debug('--------------------------------------------------------------------------------');
+    // this.logger.debug('--------------------------------------------------------------------------------');
+    // this.logger.debug($event);
+    // this.logger.debug('--------------------------------------------------------------------------------');
 
     $event.forEach(s => {
         // this.logger.debug(s);
         if (doOnce) {
           if (this.editing) {
-            this.logger.debug(`editing: ${JSON.stringify(this.editing)}`);
+            // this.logger.debug(`editing: ${JSON.stringify(this.editing)}`);
             // Since the user may have changed the funding source, splice it into the list of plan sources.
             this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.splice(this.editing.index, 1, s.fundingSource);
             if (this.editing.sourceId !== s.fundingSource.fundingSourceId) {
@@ -522,13 +521,13 @@ export class PlanStep3Component implements OnInit {
           };
 
           if (this.editing) {
-            const deleteCount = this.getBudgetDeleteCount(frBudget, currentBudget, this.editing); // Need to figure out whether we're replacing a budget or adding one...
-
-            // this.logger.debug(`splice - ${JSON.stringify(frBudget)} - deleting ${deleteCount} `);
+            // Need to figure out whether we're replacing a budget or adding one...
+            const deleteCount = this.getBudgetDeleteCount(frBudget, currentBudget, this.editing);
+            this.logger.debug(`splice - ${JSON.stringify(frBudget)} - deleting ${deleteCount} `);
 
             req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, deleteCount, frBudget);
           } else {
-            this.logger.debug(`push - ${JSON.stringify(frBudget)}`);
+            // this.logger.debug(`push - ${JSON.stringify(frBudget)}`);
             req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
           }
 
@@ -581,9 +580,6 @@ export class PlanStep3Component implements OnInit {
   }
 
   private getCANDeleteCount(frCan: FundingRequestCanDto, currentCAN: FundingRequestCanDto, editing: { sourceId: number; index: number }): number {
-    // this.logger.debug('can1', frCan);
-    // this.logger.debug('can2', currentCAN);
-    // this.logger.debug('edit', editing);
     if (!currentCAN) {
       return 0;
     }
@@ -595,9 +591,6 @@ export class PlanStep3Component implements OnInit {
   }
 
   private getBudgetDeleteCount(newBudget: FundingReqBudgetsDto, currentBudget: FundingReqBudgetsDto, editing: { sourceId: number; index: number }): number {
-    this.logger.debug('bud1', newBudget);
-    this.logger.debug('bud2', currentBudget);
-    this.logger.debug('edit', editing);
     if (!currentBudget) {
       return 0;
     }
@@ -609,10 +602,8 @@ export class PlanStep3Component implements OnInit {
   }
 
   deleteFundingSource($event: number): void {
-    this.logger.debug('delete funding source:', $event);
 
     if (!this.planModel.fundingPlanDto || !this.planModel.fundingPlanDto.fpFinancialInformation) {
-      this.logger.debug('Nothing to delete');
       return;
     }
 
@@ -637,8 +628,6 @@ export class PlanStep3Component implements OnInit {
     this.planManagementService.buildPlanBudgetAndCanModel();
     this.planModel.fundingPlanDto.totalRecommendedAmt = this.planManagementService.grandTotalTotal();
     this.planModel.fundingPlanDto.directRecommendedAmt = this.planManagementService.grandTotalDirect();
-    // this.logger.debug('initialize children');
-    // this.applicationsProposedForFunding.initializeChildren();
   }
 
   beforeEditFundingSource($event: { sourceId: number; index: number }): void {

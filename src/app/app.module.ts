@@ -36,12 +36,20 @@ import { MailtoFormatterPipe } from './pipes/mailto-formatter.pipe';
 import { GrantInformationComponent } from './grant-information/grant-information.component';
 import { ProgramRecommendedCostsComponent } from './program-recommended-costs/program-recommended-costs.component';
 import { RequestInformationComponent } from './funding-request/request-information/request-information.component';
-import { RequestInformationReadonlyComponent } from './request-information-readonly/request-information-readonly.component';
+import {
+  RequestInformationReadonlyComponent
+} from './request-information-readonly/request-information-readonly.component';
 import { RequestHistoryComponent } from './request-history/request-history.component';
-import { NextScheduledApproversRequestReadonlyComponent } from './next-scheduled-approvers-request-readonly/next-scheduled-approvers-request-readonly.component';
-import { NextScheduledApproversRequestComponent } from './next-scheduled-approvers-request/next-scheduled-approvers-request.component';
+import {
+  NextScheduledApproversRequestReadonlyComponent
+} from './next-scheduled-approvers-request-readonly/next-scheduled-approvers-request-readonly.component';
+import {
+  NextScheduledApproversRequestComponent
+} from './next-scheduled-approvers-request/next-scheduled-approvers-request.component';
 import { FundingSourceComponent } from './funding-source/funding-source.component';
-import { OtherDocsContributingFundsComponent } from './other-docs-contributing-funds/other-docs-contributing-funds.component';
+import {
+  OtherDocsContributingFundsComponent
+} from './other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { LoaderSpinnerComponent } from './loader-spinner/loader-spinner.component';
 import { LoaderService } from './service/loader-spinner.service';
@@ -56,7 +64,9 @@ import { NewInvestigatorComponent } from './new-investigator/new-investigator.co
 import { ScorePctlDisplayPipe } from './pipes/score-pctl-display.pipe';
 import { WorkflowModalComponent } from './funding-request/workflow-modal/workflow-modal.component';
 import { RetrieveRequestComponent } from './funding-request/retrieve-request/retrieve-request.component';
-import { Type4ConversionActivityCodeComponent } from './type4-conversion-mechanism/type4-conversion-activity-code.component';
+import {
+  Type4ConversionActivityCodeComponent
+} from './type4-conversion-mechanism/type4-conversion-activity-code.component';
 import { AlertBillboardComponent } from './alert-billboard/alert-billboard.component';
 import { OpenRequestComponent } from './search/open-request/open-request.component';
 import { WorkflowComponent } from './funding-request/workflow/workflow.component';
@@ -72,10 +82,18 @@ import { ActiveInitialPayValidatorDirective } from './validators/active-initial-
 import { OefiaTypesComponent } from './cans/oefia-types/oefia-types.component';
 import { ProjectedCanComponent } from './cans/projected-can/projected-can.component';
 import { CanSelectorComponent } from './cans/can-selector/can-selector.component';
-import { FullGrantNumberCellRendererComponent } from './table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
-import { CancerActivityCellRendererComponent } from './table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
-import { ExistingRequestsCellRendererComponent } from './table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
-import { FundingRequestActionCellRendererComponent } from './funding-request/step1/funding-request-action-cell-renderer/funding-request-action-cell-renderer.component';
+import {
+  FullGrantNumberCellRendererComponent
+} from './table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+import {
+  CancerActivityCellRendererComponent
+} from './table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
+import {
+  ExistingRequestsCellRendererComponent
+} from './table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
+import {
+  FundingRequestActionCellRendererComponent
+} from './funding-request/step1/funding-request-action-cell-renderer/funding-request-action-cell-renderer.component';
 import { FundableScoreRangeComponent } from './funding-plan/fundable-score-range/fundable-score-range.component';
 import { GrantTableComponent } from './funding-plan/grant-table/grant-table.component';
 import { MinMaxValidatorDirective } from './validators/min-max-validator-directive';
@@ -86,75 +104,129 @@ import { PlanStep3Component } from './funding-plan/plan-step3/plan-step3.compone
 import { PlanStep4Component } from './funding-plan/plan-step4/plan-step4.component';
 import { PlanStep5Component } from './funding-plan/plan-step5/plan-step5.component';
 import { PlanStep6Component } from './funding-plan/plan-step6/plan-step6.component';
-import { ApproverNameRendererComponent } from './funding-request/workflow/approver-list/approver-name-renderer/approver-name-renderer.component';
-import { SupportingDocsReadonlyComponent } from './funding-request/supporting-docs-readonly/supporting-docs-readonly.component';
+import {
+  ApproverNameRendererComponent
+} from './funding-request/workflow/approver-list/approver-name-renderer/approver-name-renderer.component';
+import {
+  SupportingDocsReadonlyComponent
+} from './funding-request/supporting-docs-readonly/supporting-docs-readonly.component';
 import { PercentTogglePipe } from './pipes/percent-toggle-pipe';
 import { SubmissionAlertComponent } from './funding-request/workflow/submission-alert/submission-alert.component';
 import { BudgetDocsReadonlyComponent } from './funding-request/budget-docs-readonly/budget-docs-readonly.component';
 import { CreateTypeComponent } from './funding-request/create-type/create-type.component';
-import { SelectGrantCheckboxCellRendererComponent } from './funding-plan/plan-step1/select-grant-checkbox-cell-renderer/select-grant-checkbox-cell-renderer.component';
+import {
+  SelectGrantCheckboxCellRendererComponent
+} from './funding-plan/plan-step1/select-grant-checkbox-cell-renderer/select-grant-checkbox-cell-renderer.component';
 import { ConceptAwardTrackingComponent } from './funding-plan/concept-award-tracking/concept-award-tracking.component';
 import { PlanCoverPageComponent } from './funding-plan/plan-step5/plan-cover-page/plan-cover-page.component';
 import { PlanFileUploadComponent } from './funding-plan/plan-step5/plan-file-upload/plan-file-upload.component';
-import { PlanSummaryStatementComponent } from './funding-plan/plan-step5/plan-summary-statement/plan-summary-statement.component';
-import { ApplicationsProposedForFundingComponent } from './funding-plan/applications-proposed-for-funding/applications-proposed-for-funding.component';
-import { FundingPlanInformationComponent } from './funding-plan/funding-plan-information/funding-plan-information.component';
+import {
+  PlanSummaryStatementComponent
+} from './funding-plan/plan-step5/plan-summary-statement/plan-summary-statement.component';
+import {
+  ApplicationsProposedForFundingComponent
+} from './funding-plan/applications-proposed-for-funding/applications-proposed-for-funding.component';
+import {
+  FundingPlanInformationComponent
+} from './funding-plan/funding-plan-information/funding-plan-information.component';
 import { PlanInfoIssueTypeComponent } from './funding-plan/plan-info-issue-type/plan-info-issue-type.component';
 import { FpGrantInformationComponent } from './funding-plan/fp-grant-information/fp-grant-information.component';
-import { FpProgramRecommendedCostsComponent } from './funding-plan/fp-program-recommended-costs/fp-program-recommended-costs.component';
+import {
+  FpProgramRecommendedCostsComponent
+} from './funding-plan/fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { FpFundingInformationComponent } from './funding-plan/fp-funding-information/fp-funding-information.component';
 import { ManageDesignationsComponent } from './manage-designations/manage-designations.component';
 import { DateInPastValidatorDirective } from './manage-designations/date-in-past.directive';
 import { EndDateBeforeStartValidatorDirective } from './manage-designations/end-date-before-start-validator.directive';
-import { RecommendedFutureYearsComponent } from './funding-plan/recommended-future-years/recommended-future-years.component';
+import {
+  RecommendedFutureYearsComponent
+} from './funding-plan/recommended-future-years/recommended-future-years.component';
 import { FpFundingSourceComponent } from './funding-plan/fp-funding-source/fp-funding-source.component';
 import { FundingInformationValidatorDirective } from './validators/funding-information-validator.directive';
 import { PercentCutPipe } from './pipes/percent-cut.pipe';
 import { PercentPipe } from '@angular/common';
 import { PlanWorkflowComponent } from './funding-plan/fp-workflow/plan-workflow.component';
-import { PlanSupportingDocsReadonlyComponent } from './funding-plan/plan-step6/plan-supporting-docs-readonly/plan-supporting-docs-readonly.component';
-import { DesigneeCellRendererComponent } from './manage-designations/designee-cell-renderer/designee-cell-renderer.component';
-import { DesigneeActionCellRendererComponent } from './manage-designations/designee-action-cell-renderer/designee-action-cell-renderer.component';
+import {
+  PlanSupportingDocsReadonlyComponent
+} from './funding-plan/plan-step6/plan-supporting-docs-readonly/plan-supporting-docs-readonly.component';
+import {
+  DesigneeCellRendererComponent
+} from './manage-designations/designee-cell-renderer/designee-cell-renderer.component';
+import {
+  DesigneeActionCellRendererComponent
+} from './manage-designations/designee-action-cell-renderer/designee-action-cell-renderer.component';
 import { EditDesigneeModalComponent } from './manage-designations/edit-designee-modal/edit-designee-modal.component';
 import { RetrievePlanComponent } from './funding-plan/retrieve-plan/retrieve-plan.component';
 import { RfaReissueValidatorDirective } from './validators/rfa-reissue-validator.directive';
 import { FpSetAsideValidatorDirective } from './validators/fp-set-aside-validator.directive';
-import { PlanSubmissionAlertComponent } from './funding-plan/plan-step6/plan-submission-alert/plan-submission-alert.component';
+import {
+  PlanSubmissionAlertComponent
+} from './funding-plan/plan-step6/plan-submission-alert/plan-submission-alert.component';
 import { PlanWarningComponent } from './funding-plan/plan-step6/plan-warning/plan-warning.component';
 import { ActiveFundingPlanValidatorDirective } from './validators/active-funding-plan-validator.directive';
 import { DocsGrantTableComponent } from './funding-plan/plan-step5/docs-grant-table/docs-grant-table.component';
 import { ConfirmDeleteModalComponent } from './manage-designations/confirm-delete-modal/confirm-delete-modal.component';
 import { CanSearchComponent } from './shared/can-search/can-search.component';
 import { FormatNiEsiFlagPipe } from './pipes/format-ni-esi-flag-format.pipe';
-import { ApplicationsProposedForFundingReadonlyComponent } from './funding-plan/applications-proposed-for-funding-readonly/applications-proposed-for-funding-readonly.component';
+import {
+  ApplicationsProposedForFundingReadonlyComponent
+} from './funding-plan/applications-proposed-for-funding-readonly/applications-proposed-for-funding-readonly.component';
 import { FpBudgetInformationComponent } from './funding-plan/fp-budget-information/fp-budget-information.component';
 import { FoaHyperlinkComponent } from './funding-plan/foa-hyperlink/foa-hyperlink.component';
 import { GrantCostRendererComponent } from './funding-plan/grant-cost-renderer/grant-cost-renderer.component';
-import { FundingSourceRendererComponent } from './funding-plan/funding-source-renderer/funding-source-renderer.component';
+import {
+  FundingSourceRendererComponent
+} from './funding-plan/funding-source-renderer/funding-source-renderer.component';
 import { ProjectedCanRendererComponent } from './funding-plan/projected-can-renderer/projected-can-renderer.component';
 import { CanSelectorRendererComponent } from './funding-plan/can-selector-renderer/can-selector-renderer.component';
 import { FpCanSelectorComponent } from './funding-plan/fp-can-selector/fp-can-selector.component';
-import { FpGrantManagementComponent } from './funding-plan/fp-workflow/fp-grant-management/fp-grant-management.component';
+import {
+  FpGrantManagementComponent
+} from './funding-plan/fp-workflow/fp-grant-management/fp-grant-management.component';
 import { FpProjectedCanComponent } from './funding-plan/fp-projected-can/fp-projected-can.component';
 import { CanSearchModalComponent } from './cans/can-search-modal/can-search-modal.component';
-import { FundingSourceEntryModalComponent } from './funding-plan/applications-proposed-for-funding/funding-source-entry-modal/funding-source-entry-modal.component';
-import { SearchFundingRequestActionCellRendererComponent } from './search/search-result/search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component';
-import { WorkflowWarningModalComponent } from './funding-request/workflow/warning-modal/workflow-warning-modal.component';
-import { SearchFundingRequestTypeComponent } from './search/search-filter/search-funding-request-type/search-funding-request-type.component';
-import { SearchFundingPlanFoasCellRendererComponent } from './search/search-result/search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component';
-import { SearchRfaPaDropdownComponent } from './search/search-filter/search-rfa-pa-dropdown/search-rfa-pa-dropdown.component';
-import { SearchFundingRequestDocComponent } from './search/search-filter/search-funding-request-doc/search-funding-request-doc.component';
-import { SearchFundingSourceComponent } from './search/search-filter/search-funding-source/search-funding-source.component';
+import {
+  FundingSourceEntryModalComponent
+} from './funding-plan/applications-proposed-for-funding/funding-source-entry-modal/funding-source-entry-modal.component';
+import {
+  SearchFundingRequestActionCellRendererComponent
+} from './search/search-result/search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component';
+import {
+  WorkflowWarningModalComponent
+} from './funding-request/workflow/warning-modal/workflow-warning-modal.component';
+import {
+  SearchFundingRequestTypeComponent
+} from './search/search-filter/search-funding-request-type/search-funding-request-type.component';
+import {
+  SearchFundingPlanFoasCellRendererComponent
+} from './search/search-result/search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component';
+import {
+  SearchRfaPaDropdownComponent
+} from './search/search-filter/search-rfa-pa-dropdown/search-rfa-pa-dropdown.component';
+import {
+  SearchFundingRequestDocComponent
+} from './search/search-filter/search-funding-request-doc/search-funding-request-doc.component';
+import {
+  SearchFundingSourceComponent
+} from './search/search-filter/search-funding-source/search-funding-source.component';
 import { BatchApproveModalComponent } from './search/batch-approve/batch-approve-modal.component';
 import { OefiaTypeRendererComponent } from './funding-plan/oefia-type-renderer/oefia-type-renderer.component';
 import { RequestWarningComponent } from './funding-request/step4/request-warning/request-warning.component';
-import { SearchGrantExistInRequestCellRendererComponent } from './search/search-result/search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component';
-import { SearchGrantExistInPlanCellRendererComponent } from './search/search-result/search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component';
+import {
+  SearchGrantExistInRequestCellRendererComponent
+} from './search/search-result/search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component';
+import {
+  SearchGrantExistInPlanCellRendererComponent
+} from './search/search-result/search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component';
 import { OneFundedGrantValidatorDirective } from './validators/one-funded-grant-validator.directive';
 import { GrantFundedOnceValidatorDirective } from './validators/grant-funded-once-validator.directive';
 import { CurrencyTogglePipe } from './pipes/currency-toggle.pipe';
-import { SearchGrantExistInPaylistCellRendererComponent } from './search/search-result/search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component';
-import { FpWorkflowWarningModalComponent } from './funding-plan/fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
+import {
+  SearchGrantExistInPaylistCellRendererComponent
+} from './search/search-result/search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component';
+import {
+  FpWorkflowWarningModalComponent
+} from './funding-plan/fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
 import { ErrorInterceptorService } from './interceptors/error-interceptor.service';
 import { ErrorComponent } from './error/error/error.component';
 import { SessionRestoreComponent } from './session/session-restore/session-restore.component';
@@ -340,7 +412,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     DataTablesModule,
     DragDropModule,
     LoggerModule.forRoot({
-      serverLoggingUrl: '/i2ecws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR,
+      serverLoggingUrl: '/i2ecws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.INFO,
       enableSourceMaps: true
     }),
     CookieModule.forRoot()
@@ -349,6 +421,9 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     { provide: BASE_PATH, useValue: '/i2ecws' },
     { provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS' },
     { provide: PROPERTIES_OVERRIDE, useValue: environment },
+    LoaderService,
+    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptorService, multi: true },
     {
       provide: APP_INITIALIZER, useFactory: initializeAppProperties,
       deps: [AppPropertiesService], multi: true
@@ -364,9 +439,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     {
       provide: APP_INITIALIZER, useFactory: initializeGwbLinks,
       deps: [GwbLinksService], multi: true
-    },
-    LoaderService, { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptorService, multi: true },
+    }
   ],
   bootstrap: [AppComponent]
 })
