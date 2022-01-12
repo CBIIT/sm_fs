@@ -54,7 +54,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
           this.logger.debug(`errorUrl: ${errorUrl} :: ${errorUrl.searchParams}`);
 
           if (!this.modalWindow) {
-            this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore Session', features);
+            this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
           }
           return of(null);
         } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
@@ -66,6 +66,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
           return throwError(error);
         }
       }), finalize(() => {
+        this.logger.info('finalize:', this.modalWindow);
         this.modalWindow = undefined;
       })
     );
