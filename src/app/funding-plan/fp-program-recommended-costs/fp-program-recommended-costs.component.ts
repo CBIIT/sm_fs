@@ -174,6 +174,9 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       if (!!this._percentCut) {
         this.directCostCalculated = Math.round(this.baselineDirectCost * (1 - (this._percentCut / 100)));
         this.totalCostCalculated = Math.round(this.baselineTotalCost * (1 - (this._percentCut / 100)));
+      } else {
+        this.directCostCalculated = null;
+        this.totalCostCalculated = null;
       }
     } else {
       if (!!this.directCost) {
