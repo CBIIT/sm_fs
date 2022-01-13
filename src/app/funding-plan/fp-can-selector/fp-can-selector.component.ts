@@ -35,15 +35,15 @@ export class FpCanSelectorComponent implements OnInit {
       if ((!next.applId || (Number(this.applId) === Number(next.applId))) && Number(next.fseId) === Number(this.fseId)) {
         this.logger.debug(`Should I select this CAN? ${this.fseId} -- ${JSON.stringify(next)}`);
         if (next.override || (!next.override && (next.can.can && this.projectedCAN?.can))) {
-          this.selectedCAN = next.can;
-          this.planModel.saveSelectedCAN(this.fseId, this.applId, next.can);
+          this.selectedCAN = next.override ? next.can : this.projectedCAN;
+          this.planModel.saveSelectedCAN(this.fseId, this.applId, this.selectedCAN);
           this.canManagementService.checkDefaultCANs(
             this.fseId,
             this.applId,
             this.planModel.activityCodeList,
             this.planModel.bmmCodeList,
             this.nciSourceFlag,
-            next.can?.can);
+            this.selectedCAN?.can);
         }
       }
     });
