@@ -11,7 +11,7 @@ import { NciPfrGrantQueryDtoEx } from '../../../model/plan/nci-pfr-grant-query-d
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { openNewWindow } from '../../../utils/utils';
-import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { PlanManagementService } from '../../service/plan-management.service';
 import { FundingSourceGrantDataPayload } from '../funding-source-grant-data-payload';
 

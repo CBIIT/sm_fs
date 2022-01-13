@@ -1,5 +1,5 @@
 import { Inject, Injectable, InjectionToken } from '@angular/core';
-import { LookupsControllerService } from '@nci-cbiit/i2ecws-lib';
+import { LookupsControllerService } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Injectable({

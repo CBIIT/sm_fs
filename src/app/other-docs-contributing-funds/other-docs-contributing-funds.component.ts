@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
-import { LookupsControllerService } from '@nci-cbiit/i2ecws-lib';
+import { LookupsControllerService } from '@cbiit/i2ecws-lib';
 import { Options } from 'select2';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { NGXLogger } from 'ngx-logger';
-import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
+import { PdCaIntegratorService } from '@cbiit/i2ecui-lib';
 
 
 class DocData {

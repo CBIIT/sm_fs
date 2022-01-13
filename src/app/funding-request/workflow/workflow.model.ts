@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FsPlanWorkflowControllerService, FsWorkflowControllerService, FundingReqApproversDto, I2ERoles } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanWorkflowControllerService, FsWorkflowControllerService, FundingReqApproversDto, I2ERoles } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';

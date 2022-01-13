@@ -8,7 +8,7 @@ import {
   ViewChild,
   ViewChildren
 } from '@angular/core';
-import { FsSearchControllerService, FundingRequestQueryDto, FundSelectSearchCriteria } from '@nci-cbiit/i2ecws-lib';
+import { FsSearchControllerService, FundingRequestQueryDto, FundSelectSearchCriteria } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
 import { AppPropertiesService } from '../../service/app-properties.service';
@@ -17,7 +17,7 @@ import { DataTableDirective } from 'angular-datatables';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { CancerActivityCellRendererComponent } from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
 import { SearchFundingRequestActionCellRendererComponent } from './search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component';
-import { FundingPlanQueryDto } from '@nci-cbiit/i2ecws-lib/model/fundingPlanQueryDto';
+import { FundingPlanQueryDto } from '@cbiit/i2ecws-lib/model/fundingPlanQueryDto';
 import { SearchFundingPlanFoasCellRendererComponent } from './search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component';
 import { Router } from '@angular/router';
 import { BatchApproveService } from '../batch-approve/batch-approve.service';

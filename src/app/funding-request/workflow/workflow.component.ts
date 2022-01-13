@@ -5,7 +5,7 @@ import {
   FundingPlanQueryDto,
   FundingReqStatusHistoryDto,
   WorkflowTaskDto
-} from '@nci-cbiit/i2ecws-lib';
+} from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { Options } from 'select2';

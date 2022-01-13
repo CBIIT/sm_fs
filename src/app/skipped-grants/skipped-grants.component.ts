@@ -8,7 +8,7 @@ import {
   FsRequestControllerService,
   FundingRequestSkipDto,
   NciPfrGrantQueryDto
-} from '@nci-cbiit/i2ecws-lib';
+} from '@cbiit/i2ecws-lib';
 import { Router } from '@angular/router';
 import { openNewWindow } from '../utils/utils';
 

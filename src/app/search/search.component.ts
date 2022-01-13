@@ -6,15 +6,15 @@ import {
   FundSelectSearchCriteria,
   FsSearchControllerService,
   FsDesigneeControllerService
-} from '@nci-cbiit/i2ecws-lib';
+} from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
-import { GwbLinksService } from '@nci-cbiit/i2ecui-lib';
+import { GwbLinksService } from '@cbiit/i2ecui-lib';
 import { getCurrentFiscalYear } from '../utils/utils';
 import {AppUserSessionService} from "../service/app-user-session.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {SearchModel} from "./model/search-model";
 import { BatchApproveService } from './batch-approve/batch-approve.service';
-import {FundingRequestPermDelDto} from "@nci-cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
+import {FundingRequestPermDelDto} from "@cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
 
 @Component({
   selector: 'app-search',

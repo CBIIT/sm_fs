@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { CanManagementService } from '../can-management.service';
-import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto } from '@cbiit/i2ecws-lib';
 import { RequestModel } from '../../model/request/request-model';
 
 @Component({

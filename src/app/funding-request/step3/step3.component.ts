@@ -6,7 +6,7 @@ import {
   CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
   FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto, DocumentsControllerService,
   ApplAdminSuppRoutingsDto, UserControllerService, FundingRequestDto
-} from '@nci-cbiit/i2ecws-lib';
+} from '@cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request/request-model';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';

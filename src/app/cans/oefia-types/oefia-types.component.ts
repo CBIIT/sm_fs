@@ -1,7 +1,7 @@
 import { Component, Input, EventEmitter, OnInit, AfterViewInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { CanManagementService } from '../can-management.service';
-import { OefiaCodingDto } from '@nci-cbiit/i2ecws-lib';
+import { OefiaCodingDto } from '@cbiit/i2ecws-lib';
 import { Output } from '@angular/core';
 import { Select2OptionData } from 'ng-select2';
 

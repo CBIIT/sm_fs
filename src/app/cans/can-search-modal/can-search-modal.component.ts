@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { CanCcxDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto, WorkflowTaskDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';

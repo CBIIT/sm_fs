@@ -6,7 +6,7 @@ import { RequestModel } from 'src/app/model/request/request-model';
 import { WorkflowModel } from '../workflow.model';
 import { FundingRequestIntegrationService } from '../../integration/integration.service';
 import { Subscription } from 'rxjs';
-import { FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingReqApproversDto } from '@cbiit/i2ecws-lib';
 
 @Component({
   selector: 'app-approver-list',

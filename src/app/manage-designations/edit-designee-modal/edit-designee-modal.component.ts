@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {NgbActiveModal, NgbCalendar, NgbDate, NgbDateAdapter, NgbDateParserFormatter} from "@ng-bootstrap/ng-bootstrap";
 import {NgForm} from "@angular/forms";
-import {FundingRequestPermDelDto} from "@nci-cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
+import {FundingRequestPermDelDto} from "@cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
 import {DatepickerAdapter, DatepickerFormatter} from "../../datepicker/datepicker-adapter-formatter";
 import { DatePipe } from '@angular/common'
 

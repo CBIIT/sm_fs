@@ -1,4 +1,4 @@
-import {NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {NciPfrGrantQueryDto} from '@cbiit/i2ecws-lib';
 
 export interface NciPfrGrantQueryDtoEx extends NciPfrGrantQueryDto {
   selected ?: boolean;

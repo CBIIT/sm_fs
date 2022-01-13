@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingReqApproversDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';

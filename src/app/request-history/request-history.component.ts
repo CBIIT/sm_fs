@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
-import { FsLookupControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { FsLookupControllerService, FundingReqStatusHistoryDto, NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
 import { FundingRequestIntegrationService } from '../funding-request/integration/integration.service';
 import { Subscription } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';

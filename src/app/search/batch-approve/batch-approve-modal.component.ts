@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ApprovedPlan, BatchApprovalDto, FsPlanWorkflowControllerService,
-  FsWorkflowControllerService, FundingPlanQueryDto, FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
+  FsWorkflowControllerService, FundingPlanQueryDto, FundingRequestQueryDto } from '@cbiit/i2ecws-lib';
 import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';

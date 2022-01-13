@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
-import { CancerActivityControllerService, FundingPlanFoasDto, RfaPaNoticesDto } from '@nci-cbiit/i2ecws-lib';
+import { CancerActivityControllerService, FundingPlanFoasDto, RfaPaNoticesDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ControlContainer, NgForm } from '@angular/forms';

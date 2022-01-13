@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FsPlanControllerService } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanControllerService } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from 'src/app/model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from 'src/app/model/plan/plan-model';

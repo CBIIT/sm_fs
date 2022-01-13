@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
-import { UserService } from '@nci-cbiit/i2ecui-lib';
+import { UserService } from '@cbiit/i2ecui-lib';
 
 @Injectable({
   providedIn: 'root'

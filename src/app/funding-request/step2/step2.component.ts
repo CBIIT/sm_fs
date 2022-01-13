@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { RequestModel } from '../../model/request/request-model';
-import { FsRequestControllerService, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { FsRequestControllerService, NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
 import { ProgramRecommendedCostsComponent } from '../../program-recommended-costs/program-recommended-costs.component';

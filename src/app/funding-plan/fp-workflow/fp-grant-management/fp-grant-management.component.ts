@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { FsLookupControllerService, FsPlanWorkflowControllerService, FundingPlanGrantsDto, GmActiveSpecialistsDto, GmInfoDto } from '@nci-cbiit/i2ecws-lib';
+import { FsLookupControllerService, FsPlanWorkflowControllerService, FundingPlanGrantsDto, GmActiveSpecialistsDto, GmInfoDto } from '@cbiit/i2ecws-lib';
 import { Select2OptionData } from 'ng-select2';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';

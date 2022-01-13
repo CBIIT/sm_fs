@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
-import { FundingRequestSkipDto, NciPfrGrantQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingRequestSkipDto, NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
 import { FundingRequestTypes } from '../model/request/funding-request-types';
 import { NGXLogger } from 'ngx-logger';
 import { openNewWindow } from '../utils/utils';

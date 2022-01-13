@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto } from '@cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { NGXLogger } from 'ngx-logger';
 

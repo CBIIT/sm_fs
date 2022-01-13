@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppUserSessionService } from '../service/app-user-session.service';
-import { PaylistControllerService } from '@nci-cbiit/i2ecws-lib';
+import { PaylistControllerService } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({

@@ -1,6 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { DocumentsControllerService, DocumentsDto, NciPfrGrantQueryDto, FsPlanControllerService, GrantsSkippedPreviouslyDto } from '@nci-cbiit/i2ecws-lib';
+import { DocumentsControllerService, DocumentsDto, NciPfrGrantQueryDto, FsPlanControllerService, GrantsSkippedPreviouslyDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { PlanModel } from '../../model/plan/plan-model';

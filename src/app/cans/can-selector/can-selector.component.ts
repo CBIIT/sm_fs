@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { CanManagementService } from '../can-management.service';
 import { NGXLogger } from 'ngx-logger';
-import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto, FundingRequestCanDto } from '@cbiit/i2ecws-lib';
 import { Select2OptionData } from 'ng-select2';
 import { RequestModel } from '../../model/request/request-model';
 import { NgForm } from '@angular/forms';

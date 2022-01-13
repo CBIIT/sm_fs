@@ -1,7 +1,7 @@
-import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { NGXLogger } from 'ngx-logger';
 import { PrcDataPoint } from './prc-data-point';
-import { GrantAwardedDto } from '@nci-cbiit/i2ecws-lib/model/grantAwardedDto';
+import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
 import { FundingRequestTypes } from '../model/request/funding-request-types';
 
 // @Injectable({

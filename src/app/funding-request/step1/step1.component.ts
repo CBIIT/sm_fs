@@ -7,12 +7,12 @@ import {
   ViewChild,
   TemplateRef
 } from '@angular/core';
-import {FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto} from '@nci-cbiit/i2ecws-lib';
+import {FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto} from '@cbiit/i2ecws-lib';
 import {Subject} from 'rxjs';
 import {AppPropertiesService} from 'src/app/service/app-properties.service';
 import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.service';
 import {AppUserSessionService} from 'src/app/service/app-user-session.service';
-import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
+import { GrantnumberSearchCriteriaComponent } from '@cbiit/i2ecui-lib';
 import { LoaderService } from '../../service/loader-spinner.service';
 import { NGXLogger } from 'ngx-logger';
 import {FullGrantNumberCellRendererComponent} from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';

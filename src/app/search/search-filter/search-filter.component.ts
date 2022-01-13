@@ -1,5 +1,5 @@
 import {Component, OnInit, Output, ViewChild, EventEmitter, AfterViewInit, Input} from '@angular/core';
-import { GrantnumberSearchCriteriaComponent } from '@nci-cbiit/i2ecui-lib';
+import { GrantnumberSearchCriteriaComponent } from '@cbiit/i2ecui-lib';
 import { SearchCriteria } from '../search-criteria';
 import { NGXLogger } from 'ngx-logger';
 import {AppUserSessionService} from "../../service/app-user-session.service";

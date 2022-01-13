@@ -2,7 +2,7 @@ import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@a
 import { NGXLogger } from 'ngx-logger';
 import { CanManagementService } from '../can-management.service';
 import { RequestModel } from '../../model/request/request-model';
-import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto, FundingRequestCanDto } from '@cbiit/i2ecws-lib';
 import { OefiaTypesComponent } from '../oefia-types/oefia-types.component';
 import { CanSelectorComponent } from '../can-selector/can-selector.component';
 import { ProjectedCanComponent } from '../projected-can/projected-can.component';

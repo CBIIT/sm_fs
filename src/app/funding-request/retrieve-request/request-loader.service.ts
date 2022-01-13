@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
-import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
+import { FsRequestControllerService } from '@cbiit/i2ecws-lib';
 import { RequestModel } from '../../model/request/request-model';
 import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
 import { CanManagementService } from '../../cans/can-management.service';

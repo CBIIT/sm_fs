@@ -3,7 +3,7 @@ import { RequestModel } from '../model/request/request-model';
 import { Options } from 'select2';
 import { AppUserSessionService } from '../service/app-user-session.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { FsWorkflowControllerService, FundingReqApproversDto } from '@nci-cbiit/i2ecws-lib';
+import { FsWorkflowControllerService, FundingReqApproversDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 const approverMap = new Map<number, any>();

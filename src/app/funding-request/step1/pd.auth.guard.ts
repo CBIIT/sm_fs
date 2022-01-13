@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { UserService } from '@nci-cbiit/i2ecui-lib';
+import { UserService } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
 @Injectable({

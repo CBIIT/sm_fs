@@ -1,6 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
-import { DocumentsDto } from '@nci-cbiit/i2ecws-lib';
+import { DocumentsDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { DocumentService } from 'src/app/service/document.service';

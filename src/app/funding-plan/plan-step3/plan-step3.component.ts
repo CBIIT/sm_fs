@@ -4,14 +4,14 @@ import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navi
 import { NGXLogger } from 'ngx-logger';
 import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
-import { PdCaIntegratorService } from '@nci-cbiit/i2ecui-lib';
+import { PdCaIntegratorService } from '@cbiit/i2ecui-lib';
 import { PlanManagementService } from '../service/plan-management.service';
 import {
   FsPlanControllerService,
   FundingPlanFoasDto,
   FundingRequestCanDto,
   FundingRequestDto
-} from '@nci-cbiit/i2ecws-lib';
+} from '@cbiit/i2ecws-lib';
 import {
   OtherDocsContributingFundsComponent
 } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
@@ -22,8 +22,8 @@ import {
   ApplicationsProposedForFundingComponent
 } from '../applications-proposed-for-funding/applications-proposed-for-funding.component';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
-import { FundingRequestFundsSrcDto } from '@nci-cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import { FundingReqBudgetsDto } from '@nci-cbiit/i2ecws-lib/model/fundingReqBudgetsDto';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingReqBudgetsDto } from '@cbiit/i2ecws-lib/model/fundingReqBudgetsDto';
 import { AppUserSessionService } from '../../service/app-user-session.service';
 import { PlanApproverService } from '../approver/plan-approver.service';
 import { CanManagementService } from '../../cans/can-management.service';

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { UserService } from '@nci-cbiit/i2ecui-lib';
-import { CancerActivitiesDto, CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
+import { UserService } from '@cbiit/i2ecui-lib';
+import { CancerActivitiesDto, CancerActivityControllerService, NciPerson } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { roleNames } from '../fs-menu/fs-menu.component';
 

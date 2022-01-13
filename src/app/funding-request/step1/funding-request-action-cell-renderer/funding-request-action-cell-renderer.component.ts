@@ -3,7 +3,7 @@ import {RequestModel} from "../../../model/request/request-model";
 import {Router} from "@angular/router";
 import {AppUserSessionService} from "../../../service/app-user-session.service";
 import {GrantsSearchFilterService} from "../../grants-search/grants-search-filter.service";
-import {NciPfrGrantQueryDto} from "@nci-cbiit/i2ecws-lib";
+import {NciPfrGrantQueryDto} from "@cbiit/i2ecws-lib";
 
 @Component({
   selector: 'app-funding-request-action-cell-renderer',

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { FundingRequestQueryDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingRequestQueryDto } from '@cbiit/i2ecws-lib';
 import { AppPropertiesService } from 'src/app/service/app-properties.service';
 import { FundingPlanDocChecker } from '../plan-step6.component';
 

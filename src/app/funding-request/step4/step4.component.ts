@@ -6,7 +6,7 @@ import {
   FsRequestControllerService, FundingReqStatusHistoryDto,
   NciPfrGrantQueryDto, DocumentsDto,
   FundingReqApproversDto, FsWorkflowControllerService, WorkflowTaskDto, FundingPlanDto, CancerActivityControllerService
-} from '@nci-cbiit/i2ecws-lib';
+} from '@cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { Subscription } from 'rxjs';

@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnInit, QueryList, ViewChi
 import { Router } from '@angular/router';
 import { CancerActivityControllerService, DocumentsDto, FsPlanControllerService, FsPlanWorkflowControllerService,
   FundingReqApproversDto, FundingReqStatusHistoryDto,
-  FundingRequestQueryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+  FundingRequestQueryDto, WorkflowTaskDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';

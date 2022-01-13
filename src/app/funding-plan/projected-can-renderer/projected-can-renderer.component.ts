@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
-import { CanCcxDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto } from '@cbiit/i2ecws-lib';
 import { GrantCostPayload} from '../service/grant-cost-payload';
 
 @Component({

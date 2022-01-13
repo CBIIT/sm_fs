@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ControlContainer, NgForm} from '@angular/forms';
-import {CancerActivityControllerService} from '@nci-cbiit/i2ecws-lib';
+import {CancerActivityControllerService} from '@cbiit/i2ecws-lib';
 import {Select2OptionData} from 'ng-select2';
 import {Options} from 'select2';
 

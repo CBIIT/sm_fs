@@ -1,4 +1,4 @@
-import { CanCcxDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto, FundingRequestCanDto } from '@cbiit/i2ecws-lib';
 
 
 export function convertToFundingRequestCan(can: CanCcxDto): FundingRequestCanDto {

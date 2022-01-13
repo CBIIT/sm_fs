@@ -4,7 +4,7 @@ import { PlanModel } from '../../model/plan/plan-model';
 import { ErrorFunction, SuccessFunction } from '../../funding-request/retrieve-request/request-loader.service';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanManagementService } from '../service/plan-management.service';
-import { FsPlanControllerService } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanControllerService } from '@cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 
 @Injectable({ providedIn: 'root' })

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
-import { FsRequestControllerService } from '@nci-cbiit/i2ecws-lib';
+import { FsRequestControllerService } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';

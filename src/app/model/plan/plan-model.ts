@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { CanCcxDto, FundingPlanDto, FundingRequestCanDto } from '@nci-cbiit/i2ecws-lib';
+import { CanCcxDto, FundingPlanDto, FundingRequestCanDto } from '@cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
 import { NciPfrGrantQueryDtoEx, orderByPriorityAndPI } from './nci-pfr-grant-query-dto-ex';
-import { RfaPaNcabDate } from '@nci-cbiit/i2ecws-lib/model/rfaPaNcabDate';
+import { RfaPaNcabDate } from '@cbiit/i2ecws-lib/model/rfaPaNcabDate';
 import { NGXLogger } from 'ngx-logger';
 import { Alert } from 'src/app/alert-billboard/alert';
 

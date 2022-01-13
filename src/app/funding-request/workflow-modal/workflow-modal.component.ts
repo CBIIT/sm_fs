@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { FsPlanWorkflowControllerService, FsWorkflowControllerService, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { FsPlanWorkflowControllerService, FsWorkflowControllerService, WorkflowTaskDto } from '@cbiit/i2ecws-lib';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';

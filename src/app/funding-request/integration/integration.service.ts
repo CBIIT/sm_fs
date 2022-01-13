@@ -1,6 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import { FundingReqApproversDto, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@nci-cbiit/i2ecws-lib';
+import { FundingReqApproversDto, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@cbiit/i2ecws-lib';
 import {Subject} from 'rxjs';
 
 @Injectable({providedIn: 'root'})
