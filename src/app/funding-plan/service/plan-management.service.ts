@@ -98,7 +98,7 @@ export class PlanManagementService {
       if (+r.applId === +applId) {
         r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
           if (can && isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0) {
-            this.logger.debug(`Percent selected: ${applId} - ${index} - ${can.fseId}`);
+            // this.logger.debug(`Percent selected: ${applId} - ${index} - ${JSON.stringify(can)}`);
             result = true;
           }
         });
@@ -108,13 +108,17 @@ export class PlanManagementService {
     return result;
   }
 
-  percentSelectionIndex(applId: number): number {
-    let result: number = null;
+  /**
+   * Index is not a reliable identifier - there may not be any funding for a grant from a particular source, so its index
+   * in the list of CANs might not correspond to its index in the funding sources table.
+   */
+  percentSelectionIndex(applId: number): { index, fseId } {
+    let result: { index, fseId } = null;
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
       if (+r.applId === +applId) {
         r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
           if (can && isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0) {
-            result = index;
+            result = {index, fseId: can.fseId};
           }
         });
       }

@@ -123,12 +123,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       this.logger.warn('Eject - no grant or source index');
       return;
     }
-    // Determine whether we should lock the dollar value or not
-    if (this.planManagementService.isPercentSelected(this.grant.applId)) {
-      if (+this.planManagementService.percentSelectionIndex(this.grant.applId) !== +this.sourceIndex) {
-        this.lockDollar = true;
-      }
-    }
+
     // this.logger.warn('---------------------------------------------------------------------------------');
     // this.logger.debug('lockDollar:', this.grant.applId, this.sourceIndex, this.lockDollar);
     this.initializeValuesForEdit();
@@ -152,6 +147,18 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     this.canDescription = can?.canDescription;
     this.canPhsOrgCode = can?.phsOrgCode;
     this.can = can?.can;
+
+    // Determine whether we should lock the dollar value or not
+    if (this.planManagementService.isPercentSelected(this.grant.applId)) {
+      const p = this.planManagementService.percentSelectionIndex(this.grant.applId); 
+      this.logger.debug(`${JSON.stringify(p)} -- ${this.sourceIndex} -- ${this.fseId}`)
+      if (+p.index !== +this.sourceIndex) {
+        if (+p.fseId !== +this.fseId) {
+          this.logger.debug('locking dollar');
+          this.lockDollar = true;
+        }
+      }
+    }
 
     // TODO: this logic might need revisiting.
     // TODO: especially the determination of percent if lockDollar is true
