@@ -30,6 +30,7 @@ import { SessionRestoreComponent } from './session/session-restore/session-resto
 const routes: Routes = [
   {
     path: '', canActivate: [AuthGuard], children: [
+      { path: 'restoreSession', component: SessionRestoreComponent, canActivate: [AuthGuard] },
       { path: '', redirectTo: '/search/fr/landing', pathMatch: 'full' },
       { path: 'search/fr/:action', component: SearchComponent, canActivate: [AuthGuard] },
       { path: 'search/fr', component: SearchComponent, canActivate: [AuthGuard] },
@@ -59,7 +60,6 @@ const routes: Routes = [
       ]},
       {path: 'fundingSourceDetails', component: FundingSourcesNamesComponent},
       {path: 'manage', component: ManageDesignationsComponent},
-      { path: 'restoreSession', component: SessionRestoreComponent, canActivate: [AuthGuard] }
     ]
   },
   { path: 'error/:errorId', component: ErrorComponent },
