@@ -412,7 +412,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     DataTablesModule,
     DragDropModule,
     LoggerModule.forRoot({
-      serverLoggingUrl: '/i2ecws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.INFO,
+      serverLoggingUrl: '/i2ecws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR,
       enableSourceMaps: true
     }),
     CookieModule.forRoot()
@@ -421,7 +421,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     { provide: BASE_PATH, useValue: '/i2ecws' },
     { provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS' },
     { provide: PROPERTIES_OVERRIDE, useValue: environment },
-    LoaderService,
     { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptorService, multi: true },
     {
