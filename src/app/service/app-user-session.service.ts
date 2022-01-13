@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { UserService } from '@nci-cbiit/i2ecui-lib';
 import { CancerActivitiesDto, CancerActivityControllerService, NciPerson } from '@nci-cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
+import { roleNames } from '../fs-menu/fs-menu.component';
 
 @Injectable({
   providedIn: 'root'
@@ -53,6 +54,15 @@ export class AppUserSessionService {
 
   isPD(): boolean {
     return this.roles.indexOf('PD') > -1;
+  }
+
+  isOefiaAndSplUser(): boolean {
+    return this.roles.includes(roleNames.OEFIA_CERTIFIER) 
+    || this.roles.includes(roleNames.SPL_CERTIFIER);
+  }
+
+  isGmBranchCheifUser(): boolean {
+    return this.roles.includes(roleNames.OGA_CERTIFIER);
   }
 
   isPA(): boolean {
