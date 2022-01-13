@@ -1,54 +1,58 @@
 <app-can-search-modal></app-can-search-modal>
 
-<span *ngFor="let g of grantCosts; let first = first; let i = index;">
-  <hr style="display:table" *ngIf="!first">
-  <div>
+<div class="container" *ngFor="let g of grantCosts; let first = first; let i = index">
+  <hr style="display: table" *ngIf="!first" />
+  <div class="row">
+  <div class="col-8">
     <app-fp-can-selector
       [applId]="g.applId"
       [fseId]="g.fseId"
       [nciSourceFlag]="g.nciSourceFlag">
     </app-fp-can-selector>
   </div>
- <div class="d-flex align-items-center">
-  <button
-    *ngIf="canCopyProjectedCan(g.applId, g.fseId)"
-    (click)="copyProjectedCAN(g.applId, g.fseId)"
-    class="btn btn-link btn-slim"
-    ngbTooltip="Copy NCI OEFIA Projected CAN">
-    <i class="far fa-copy" aria-hidden="true"></i>
-  </button>
-  <button
-    *ngIf="canSearchCan(g.applId, g.fseId)"
-    (click)="searchCAN(g.applId, g.fseId, g.nciSourceFlag)"
-    class="btn btn-link btn-slim"
-    ngbTooltip="Search and select from active CANs">
-    <i class="far fa-search" aria-hidden="true"></i>
-  </button>
-  <button
-    *ngIf="canDeleteCAN(g.applId, g.fseId)"
-    (click)="deleteCAN(g.applId, g.fseId, i)"
-    class="btn btn-link btn-slim ml-2 btn-delete"
-    ngbTooltip="Delete Provided CAN">
-    <i class="fas fa-trash" aria-hidden="true"></i>
-  </button>
- <span
-   *ngIf="nonDefaultCAN(g.applId, g.fseId)"
-   class="btn btn-link btn-slim btn-link-warning"
-   title="Non-Default CAN"
-   ngbTooltip="Non-Default CAN"
-   role="alert">
-   <i class="far fa-exclamation-circle" aria-hidden="true"></i>
- </span>
- <span
-   *ngIf="duplicateCAN(g.applId, g.fseId, i)"
-   class="btn btn-link btn-slim btn-link-warning"
-   title="Duplicate CAN"
-   ngbTooltip="Duplicate CAN"
-   role="alert">
-   <i class="far fa-exclamation-triangle" aria-hidden="true"></i>
- </span>
+  <div class="col-4">
+    <div class=" d-flex align-items-center">
+    <button
+      *ngIf="canCopyProjectedCan(g.applId, g.fseId)"
+      (click)="copyProjectedCAN(g.applId, g.fseId)"
+      class="btn btn-link btn-slim"
+      ngbTooltip="Copy NCI OEFIA Projected CAN">
+      <i class="far fa-copy" aria-hidden="true"></i>
+    </button>
+    <button
+      *ngIf="canSearchCan(g.applId, g.fseId)"
+      (click)="searchCAN(g.applId, g.fseId, g.nciSourceFlag)"
+      class="btn btn-link btn-slim"
+      ngbTooltip="Search and select from active CANs">
+      <i class="far fa-search" aria-hidden="true"></i>
+    </button>
+    <button
+      *ngIf="canDeleteCAN(g.applId, g.fseId)"
+      (click)="deleteCAN(g.applId, g.fseId, i)"
+      class="btn btn-link btn-slim ml-2 btn-delete"
+      ngbTooltip="Delete Provided CAN">
+      <i class="fas fa-trash" aria-hidden="true"></i>
+    </button>
+    <span
+      *ngIf="nonDefaultCAN(g.applId, g.fseId)"
+      class="btn btn-link btn-slim btn-link-warning"
+      title="Non-Default CAN"
+      ngbTooltip="Non-Default CAN"
+      role="alert">
+      <i class="far fa-exclamation-circle" aria-hidden="true"></i>
+    </span>
+    <span
+      *ngIf="duplicateCAN(g.applId, g.fseId, i)"
+      class="btn btn-link btn-slim btn-link-warning"
+      title="Duplicate CAN"
+      ngbTooltip="Duplicate CAN"
+      role="alert">
+      <i class="far fa-exclamation-triangle" aria-hidden="true"></i>
+    </span>
+  </div>
+  </div>
+  </div>
+  <div class="text-danger mt-1" *ngIf="canRequiredButMissing.get(g.fseId)">
+    Error: Missing CAN for one or more funding sources.
+  </div>
 </div>
-<div class="text-danger mt-1" *ngIf="canRequiredButMissing.get(g.fseId)">
-  Error: Missing CAN for one or more funding sources.
-</div>
-</span>
