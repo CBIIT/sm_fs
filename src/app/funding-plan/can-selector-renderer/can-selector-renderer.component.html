@@ -3,14 +3,14 @@
 <div class="container" *ngFor="let g of grantCosts; let first = first; let i = index">
   <hr style="display: table" *ngIf="!first" />
   <div class="row">
-  <div class="col-8">
+  <div class="col-9">
     <app-fp-can-selector
       [applId]="g.applId"
       [fseId]="g.fseId"
       [nciSourceFlag]="g.nciSourceFlag">
     </app-fp-can-selector>
   </div>
-  <div class="col-4">
+  <div class="col-3">
     <div class=" d-flex align-items-center">
     <button
       *ngIf="canCopyProjectedCan(g.applId, g.fseId)"
