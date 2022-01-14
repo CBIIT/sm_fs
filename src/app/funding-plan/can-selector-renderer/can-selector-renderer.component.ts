@@ -20,6 +20,8 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
   @ViewChild(CanSearchModalComponent) canSearchModalComponent: CanSearchModalComponent;
 
   @Input() grant: NciPfrGrantQueryDtoEx;
+  @Input() g: GrantCostPayload;
+  @Input() i: number
   @Input() projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   @Input() projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
   @Input() readOnly = false;

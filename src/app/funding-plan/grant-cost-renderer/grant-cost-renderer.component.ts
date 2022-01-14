@@ -11,6 +11,7 @@ import { GrantCostPayload } from '../service/grant-cost-payload';
 })
 export class GrantCostRendererComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
+  @Input() g: GrantCostPayload;
   @Input() mode: string;
 
   constructor(

@@ -11,6 +11,7 @@ import { PlanManagementService } from '../service/plan-management.service';
 import { FpCanWarning } from '../fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
 import { CanSelectorRendererComponent } from '../can-selector-renderer/can-selector-renderer.component';
 import { VoidExpression } from 'typescript';
+import { GrantCostPayload } from '../service/grant-cost-payload';
 
 @Component({
   selector: 'app-fp-budget-information',
@@ -184,7 +185,12 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
       req.financialInfoDto.fundingRequestCans.forEach(can => {
         if (can.can) {
           this.canManagementService.getCanDetails(can.can).subscribe(result => {
-            this.canManagementService.selectCANEmitter.next({ fseId: can.fseId, can: result, applId: req.applId, override: true });
+            this.canManagementService.selectCANEmitter.next({
+              fseId: can.fseId,
+              can: result,
+              applId: req.applId,
+              override: true
+            });
           });
         }
       });
@@ -221,14 +227,21 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   isFormValid(canWarning: FpCanWarning): boolean {
     let valid = true;
     for (const canSelector of this.canSelectors) {
-       canSelector.checkWarning(canWarning);
+      canSelector.checkWarning(canWarning);
 
-       if (canSelector.canRequiredButMissing.size > 0) {
-         valid = false;
-       }
+      if (canSelector.canRequiredButMissing.size > 0) {
+        valid = false;
+      }
     }
 
     return valid;
   }
 
+  getRowSpan(grant: NciPfrGrantQueryDtoEx): number {
+    return this.planManagementService.grantCosts?.filter(g => g.applId === grant.applId).length || 1;
+  }
+
+  getGrantCosts(grant: NciPfrGrantQueryDtoEx): GrantCostPayload[] {
+    return this.planManagementService.grantCosts.filter(g => g.applId === grant.applId);
+  }
 }

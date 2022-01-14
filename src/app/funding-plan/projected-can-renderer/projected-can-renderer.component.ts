@@ -12,6 +12,8 @@ import { GrantCostPayload} from '../service/grant-cost-payload';
 })
 export class ProjectedCanRendererComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
+  @Input() g: GrantCostPayload;
+  @Input() i: number;
   @Input() projectedCans: Map<number, CanCcxDto> = new Map<number, CanCcxDto>();
   @Input() projectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
 

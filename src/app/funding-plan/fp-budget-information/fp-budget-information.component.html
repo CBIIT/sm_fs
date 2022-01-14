@@ -77,29 +77,35 @@
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let grant of listGrantsSelected; let grantIndex = index">
-        <td>
+      <ng-container *ngFor="let grant of listGrantsSelected; let grantIndex = index">
+        <tr>
+        <td [rowSpan]="getRowSpan(grant) + 1">
           <app-full-grant-number-cell-renderer
             [data]="grant"
             [eGrantsUrl]="planModel.eGrantsUrl"
             [grantViewerUrl]="planModel.grantViewerUrl">
           </app-full-grant-number-cell-renderer>
         </td>
+        </tr>
+        <ng-container *ngFor="let g of getGrantCosts(grant); let i = index">
+          <tr>
         <td>
-          <app-funding-source-renderer [grant]="grant"></app-funding-source-renderer>
+          <app-funding-source-renderer [g]="g" [grant]="grant"></app-funding-source-renderer>
         </td>
         <td>
-          <app-grant-cost-renderer mode="approvedDirect" [grant]="grant"></app-grant-cost-renderer>
+          <app-grant-cost-renderer mode="approvedDirect" [g]="g" [grant]="grant"></app-grant-cost-renderer>
         </td>
         <td>
-          <app-grant-cost-renderer mode="approvedTotal" [grant]="grant"></app-grant-cost-renderer>
+          <app-grant-cost-renderer mode="approvedTotal" [g]="g" [grant]="grant"></app-grant-cost-renderer>
         </td>
-        <td *ngIf="showOefiaCoding()"><app-oefia-type-renderer [grant]="grant"></app-oefia-type-renderer></td>
+        <td *ngIf="showOefiaCoding()"><app-oefia-type-renderer [g]="g" [i]="i" [grant]="grant"></app-oefia-type-renderer></td>
         <td *ngIf="(isFcArc() && canEnterAtLeastOneCAN()) || isFcNci() || isApprovedFinancials()">
           <app-projected-can-renderer
             [projectedCans]="projectedCans"
             [projectedApplIdCans]="projectedApplIdCans"
-            [grant]="grant">
+            [grant]="grant"
+            [g]="g"
+            [i]="i">
           </app-projected-can-renderer>
         </td>
         <td *ngIf="(isFcArc() && canEnterAtLeastOneCAN()) || isFcNci() || isApprovedFinancials()">
@@ -107,10 +113,14 @@
             [projectedCans]="projectedCans"
             [projectedApplIdCans]="projectedApplIdCans"
             [readOnly]="isApprovedFinancials() && !((isFcArc() && canEnterAtLeastOneCAN()) || isFcNci())"
-            [grant]="grant">
+            [grant]="grant"
+            [g]="g"
+            [i]="i">
           </app-can-selector-renderer>
         </td>
-      </tr>
+          </tr>
+        </ng-container>
+      </ng-container>
       </tbody>
     </table>
   </div>
