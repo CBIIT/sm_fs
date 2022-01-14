@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AppUserSessionService } from '../service/app-user-session.service';
 import { PaylistControllerService } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
+import { roleNames } from '../service/role-names';
 
 @Component({
   selector: 'app-fs-menu',
@@ -56,9 +57,3 @@ export class FsMenuComponent implements OnInit {
 
 }
 
-export enum roleNames {
-  OGA_CERTIFIER= "GMBRCHF",
-  OEFIA_CERTIFIER = "OEFIACRT",
-  SPL_CERTIFIER = "DES",
-  PAYLIST_READ_ONLY= "PAYLSTVW"
-}
