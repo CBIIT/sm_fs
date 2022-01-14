@@ -169,6 +169,9 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
   }
 
   canCopyProjectedCan(fundingSourceId: number): boolean {
+    if (!this.canEnter(fundingSourceId) || this.readOnly) {
+      return false;
+    }
     if (!this.projectedCans.get(fundingSourceId)?.can || this.readOnly) {
       return false;
     }

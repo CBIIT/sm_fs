@@ -123,6 +123,9 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
 
   canCopyProjectedCan(applId: number, fseId: number): boolean {
     const key = String(fseId) + '-' + String(applId);
+    if (this.readOnly || !this.canEnter(fseId)) {
+      return false;
+    }
 
     if (!this.projectedApplIdCans?.get(key)?.can || this.readOnly) {
       return false;

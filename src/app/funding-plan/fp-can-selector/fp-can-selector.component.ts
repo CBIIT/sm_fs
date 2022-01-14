@@ -28,12 +28,12 @@ export class FpCanSelectorComponent implements OnInit {
     this.canManagementService.projectedCanEmitter.subscribe(next => {
       if (+next.fseId === +this.fseId && +next.applId === +this.applId) {
         this.projectedCAN = next.can;
-        this.logger.debug(this.fseId, this.applId, this.projectedCAN);
+        // this.logger.debug(this.fseId, this.applId, this.projectedCAN);
       }
     });
     this.canManagementService.selectCANEmitter.subscribe(next => {
       if ((!next.applId || (Number(this.applId) === Number(next.applId))) && Number(next.fseId) === Number(this.fseId)) {
-        this.logger.debug(`Should I select this CAN? ${this.fseId} -- ${JSON.stringify(next)}`);
+        // this.logger.debug(`Should I select this CAN? ${this.fseId} -- ${JSON.stringify(next)}`);
         if (next.override || (!next.override && (next.can.can && this.projectedCAN?.can))) {
           this.selectedCAN = next.override ? next.can : this.projectedCAN;
           this.planModel.saveSelectedCAN(this.fseId, this.applId, this.selectedCAN);
