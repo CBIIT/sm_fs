@@ -1,5 +1,5 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { ApplicationInitStatus, Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, filter, finalize } from 'rxjs/operators';
@@ -19,6 +19,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
     private logger: NGXLogger,
     private router: Router,
     private location: Location,
+    private initializerStatus: ApplicationInitStatus
   ) {
     router.events.pipe(filter(event => event instanceof NavigationStart)).subscribe((event: NavigationStart) => {
       this.handleNavigationStart(event);
@@ -30,13 +31,14 @@ export class ErrorInterceptorService implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    this.logger.debug(`Current route URL: ${this.router.url}`);
-    this.logger.debug(`Request URL      : ${req.url}`);
+    this.logger.debug(`Current route URL    : ${this.router.url}`);
+    this.logger.debug(`Request URL          : ${req.url}`);
+    this.logger.debug(`Initialization status: ${this.initializerStatus.done ? 'Done' : 'In Progress'}`);
 
     return next.handle(req).pipe(
       catchError((error, caught) => {
 
-        if (error.status === 200 && error.url?.startsWith('https://auth')) {
+        if (this.initializerStatus.done && error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
