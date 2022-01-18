@@ -407,7 +407,7 @@ export class PlanManagementService {
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.filter(r => r.frtId === 1024 || r.frtId === 1026).forEach(req => {
           if (Number(req.applId) === Number(grant.applId)) {
             req.financialInfoDto.fundingRequestCans.forEach(can => {
-              this._grantCosts.push({
+              let g = {
                 applId: grant.applId,
                 fseId: can.fseId,
                 octId: can.octId,
@@ -423,7 +423,12 @@ export class PlanManagementService {
                 frtId: req.frtId,
                 totalPercentCut: this.calculatePercentCut(can.approvedTc, piTotal),
                 directPercentCut: this.calculatePercentCut(can.approvedDc, piDirect),
-              });
+              };
+              if((!g.approvedDirect && !g.approvedTotal) || (g.approvedDirect === 0 && g.approvedTotal === 0)) {
+                // do nothing
+              } else {
+                this._grantCosts.push(g);
+              }
             });
           }
         });
