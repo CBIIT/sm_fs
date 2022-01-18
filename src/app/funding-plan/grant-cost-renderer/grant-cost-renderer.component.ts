@@ -13,6 +13,7 @@ export class GrantCostRendererComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
   @Input() g: GrantCostPayload;
   @Input() mode: string;
+  @Input() showPercent = false;
 
   constructor(
     private planManagementService: PlanManagementService,

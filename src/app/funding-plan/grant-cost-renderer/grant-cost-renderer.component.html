@@ -1,15 +1,31 @@
-<!--<span *ngFor="let g of grantCosts; let first = first;">-->
 <ng-container *ngIf="mode === 'approvedTotal'">
-<!--  <hr style="display:table" *ngIf="!first">-->
-  <div>{{ g.approvedTotal | currency }} ({{ g.totalPercentCut | percent }} Cut)</div>
+  <ng-container
+    *ngIf="showPercent; then percent; else nopercent"></ng-container>
+  <ng-template #percent>
+    <div>
+      {{ g.approvedTotal | currency }} ({{ g.totalPercentCut | percent }} Cut)
+    </div>
+  </ng-template>
+  <ng-template #nopercent>
+    <div>
+      {{ g.approvedTotal | currency }}
+    </div>
+  </ng-template>
 </ng-container>
 <ng-container *ngIf="mode === 'approvedDirect'">
-<!--  <hr style="display:table" *ngIf="!first">-->
-  <div *ngIf="g.approvedDirect > 0; else dash">{{ g.approvedDirect | currency }} ({{ g.directPercentCut | percent }} Cut)</div>
+  <ng-container *ngIf="showPercent; then percent; else nopercent"></ng-container>
+  <ng-template #percent>
+    <div *ngIf="g.approvedDirect > 0; else dash">
+      {{ g.approvedDirect | currency }} ({{ g.directPercentCut | percent }} Cut)
+    </div>
+  </ng-template>
+  <ng-template #nopercent>
+    <div *ngIf="g.approvedDirect > 0; else dash">
+      {{ g.approvedDirect | currency }}
+    </div>
+  </ng-template>
 </ng-container>
-<!--</span>-->
 
 <ng-template #dash>
   <div>--</div>
 </ng-template>
-

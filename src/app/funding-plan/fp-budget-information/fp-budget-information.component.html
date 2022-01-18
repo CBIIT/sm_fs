@@ -98,10 +98,10 @@
                 <app-funding-source-renderer [g]="g" [grant]="grant"></app-funding-source-renderer>
               </td>
               <td>
-                <app-grant-cost-renderer mode="approvedDirect" [g]="g" [grant]="grant"></app-grant-cost-renderer>
+                <app-grant-cost-renderer [showPercent]="firstDetail" mode="approvedDirect" [g]="g" [grant]="grant"></app-grant-cost-renderer>
               </td>
               <td>
-                <app-grant-cost-renderer mode="approvedTotal" [g]="g" [grant]="grant"></app-grant-cost-renderer>
+                <app-grant-cost-renderer [showPercent]="firstDetail" mode="approvedTotal" [g]="g" [grant]="grant"></app-grant-cost-renderer>
               </td>
               <td *ngIf="showOefiaCoding()">
                 <app-oefia-type-renderer [g]="g" [i]="i" [grant]="grant"></app-oefia-type-renderer>
