@@ -1,1 +1,1 @@
-<span *ngIf="data.requestCount > 0"><a routerLink="/search">{{data.requestCount}}</a></span>
+<span *ngIf="data.requestCount > 0"><a routerLink="/search/immediate" [queryParams]="{ grant: data.fullGrantNum }">{{data.requestCount}}</a></span>

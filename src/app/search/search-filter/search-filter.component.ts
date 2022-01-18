@@ -23,12 +23,14 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     this.logger.debug('search-filter::set action()', value);
     this._action = value;
     if (value === 'immediate') {
-      setTimeout(() => this.search(this.searchForm), 0);
+      setTimeout(() => this.immediateSearch(this.searchForm), 0);
     }
   }
   get action(): string {
     return this._action;
   }
+
+  @Input() grant: string;
 
   @Output() callSearch = new EventEmitter<SearchCriteria>();
   @Output() searchTypeEm = new EventEmitter<string>()
@@ -147,6 +149,30 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     this.searchForm.resetForm();
     this.searchForm.form.patchValue(this.searchFilter);
     this.callSearch.emit({ searchType: 'clear'});
+  }
+
+  immediateSearch(form: NgForm): void {
+    if (this.grant && this.grant.length > 0) {
+      this.searchType = 'FR';
+      this.searchModel.setSearchCriteria(this.searchType, { });
+      this.searchFilter = this.searchModel.getSearchCriteria(this.searchType);
+      this.showAdvanced = false;
+      this.searchForm.resetForm();
+      const fullGrantNum = this.grant.replace('-', '').replace(/ /g, '').trim();
+      if (fullGrantNum && form) {
+        form.form.patchValue({
+          grantNumber: {
+            grantNumberType: fullGrantNum.substring(0, 1),
+            grantNumberMech: fullGrantNum.substring(1, 4),
+            grantNumberIC: fullGrantNum.substring(4, 6),
+            grantNumberSerial: fullGrantNum.substring(6, 12),
+            grantNumberYear: fullGrantNum.substring(12, 14),
+            grantNumberSuffix: fullGrantNum.substring(14, 18)
+          }
+        });
+      }
+    }
+    this.search(form);
   }
 
   search(form: NgForm) {

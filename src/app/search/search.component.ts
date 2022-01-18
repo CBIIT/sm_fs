@@ -47,6 +47,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
    paylistDashboardUrl : string;
 
    action: string;
+   grant: string;
    selectedMenuUrl: string;
 
   keepSearchCriteriaModel: boolean;
@@ -76,6 +77,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedMenuUrl = (this.route.snapshot.url && this.route.snapshot.url.length > 0) ?
                             this.route.snapshot.url[this.route.snapshot.url.length - 1].path : '';
     this.logger.debug('ngOnInit() segment = ', this.selectedMenuUrl);
+    this.logger.debug('ngOnInit() queryParams = ', this.route.snapshot.queryParams);
     this.isPd = this.userSessionService.isPD();
     this.isPa = this.userSessionService.isPA();
     this.hasPaylineRoles = this.userSessionService.hasRole('OEFIACRT') ||  this.userSessionService.hasRole('DES');
@@ -87,17 +89,18 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.invokeRefreshOverview(true);
 
     this.batchApproveService.initialize();
-    let action = this.route.snapshot.params.action;
+    const action = this.route.snapshot.params.action;
+    this.grant = this.route.snapshot.queryParams?.grant;
     this.logger.debug('ngOnInit() - route action, searchType, state.action:', action, this.searchModel.searchType, history.state);
-    if (action && action != 'landing') {
-      const navigateAction = (action === 'immediate') ? this.searchModel.searchType : action;
+    if (action && action !== 'landing') {
+      const navigateAction = (action === 'immediate') ? ((this.grant && this.grant.length > 0) ? 'FR' : this.searchModel.searchType) : action;
 
       // this is a return link from the FR or FP view
       // check the searchType from the search model
       // and replace 'immediate' with one of the saved dashboard action type
       // skip 'landing' action - it will be processed when Overview is loaded
       if (navigateAction) {
-        switch(navigateAction) {
+        switch (navigateAction) {
           case 'FR':
           case 'awaitfr':
           case 'myfr':
@@ -105,7 +108,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
           case 'myportfoliofr':
           case 'myreviewfr':
             this.keepSearchCriteriaModel = true;
-            this.router.navigateByUrl('/search/fr', { state: { action: navigateAction}});
+            this.router.navigateByUrl('/search/fr', { state: { action: navigateAction, grant: this.grant}});
             break;
           case 'FP':
           case 'awaitfp':
@@ -128,11 +131,12 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (history.state?.action) {
       setTimeout(() => {
-        switch(history.state.action) {
+        switch (history.state.action) {
           case 'FR':
           case 'FP':
           case 'G':
-            this.action = 'immediate'
+            this.action = 'immediate';
+            this.grant = history.state?.grant;
             break;
           case 'awaitfr':
             this.searchAwaitingRequests();
