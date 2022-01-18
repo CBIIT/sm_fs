@@ -7,6 +7,7 @@ import { getCurrentFiscalYear } from 'src/app/utils/utils';
 export class GrantsSearchFilterService {
     grantsSearchCriteria: GrantsSearchCriteriaDto;
     searchWithin: string;
+    selectedCas: string[] | string;
     selectedPd: number;
     searched: boolean;
     currentFy: number;
@@ -26,6 +27,7 @@ export class GrantsSearchFilterService {
         }
 
         this.searchWithin = this.defaultSearchWithin;
+        this.selectedCas = [];
     }
 
     getGrantsSearchCriteria(): GrantsSearchCriteriaDto {

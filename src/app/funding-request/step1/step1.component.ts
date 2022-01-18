@@ -304,6 +304,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     }
     this.gsfs.selectedPd = this.selectedPd;
     this.gsfs.searchWithin = this.searchWithin;
+    this.gsfs.selectedCas = this.selectedCas;
     this.searchCriteria.fromFy = this.searchForm.form.value.fyRange.fromFy;
     this.searchCriteria.toFy = this.searchForm.form.value.fyRange.toFy;
     this.searchCriteria.fromCouncilMeetingDate = this.searchForm.form.value.ncabRange.fromNcab;
@@ -360,8 +361,8 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     this.piName = this.searchCriteria.piName;
     this.selectedPd = this.gsfs.selectedPd;
     this.searchWithin = this.gsfs.searchWithin;
+    this.selectedCas = this.gsfs.selectedCas;
     this.selectedRfaPa = this.searchCriteria.rfaPa;
-    this.selectedCas = this.searchCriteria.cayCodes;
     this.i2Status = this.searchCriteria.applStatusGroupCode;
   }
 
