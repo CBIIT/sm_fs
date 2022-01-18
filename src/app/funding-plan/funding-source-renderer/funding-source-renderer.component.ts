@@ -12,6 +12,7 @@ import { PlanModel } from '../../model/plan/plan-model';
 })
 export class FundingSourceRendererComponent implements OnInit {
   @Input() grant: NciPfrGrantQueryDtoEx;
+  @Input() g: GrantCostPayload;
   sourceOrder: number[];
 
   constructor(
