@@ -223,7 +223,7 @@ export class PlanManagementService {
       return false;
     }
     // if this is the only source of funds for this grant, return true
-    if (this.sourceDirectTotal(applId) === dc) {
+    if (this.sourceDirectTotal(fseId) === dc) {
       return true;
     }
     const sources: number[] = this.listSelectedSources.map(s => s.fundingSourceId);
