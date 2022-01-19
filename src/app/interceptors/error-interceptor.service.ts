@@ -7,6 +7,7 @@ import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
 import { openNewWindow } from '../utils/utils';
 import { Location } from '@angular/common';
+import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
 
 
 @Injectable()
@@ -19,7 +20,8 @@ export class ErrorInterceptorService implements HttpInterceptor {
     private logger: NGXLogger,
     private router: Router,
     private location: Location,
-    private initializerStatus: ApplicationInitStatus
+    private initializerStatus: ApplicationInitStatus,
+    private customLogger: CustomServerLoggingService,
   ) {
     router.events.pipe(filter(event => event instanceof NavigationStart)).subscribe((event: NavigationStart) => {
       this.handleNavigationStart(event);
@@ -75,10 +77,10 @@ export class ErrorInterceptorService implements HttpInterceptor {
   }
 
   handleNavigationStart(event: NavigationStart): void {
-    this.logger.info('=======> NavigationStart', event);
+    this.customLogger.logServer('=======> NavigationStart', event);
   }
 
   handleNavigationEnd(event: NavigationEnd): void {
-    this.logger.info('=======> NavigationEnd', event);
+    this.customLogger.logServer('=======> NavigationEnd', event);
   }
 }

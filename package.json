@@ -43,7 +43,7 @@
     "ng-select2": "1.2.5",
     "ngx-bootstrap": "^6.2.0",
     "ngx-cookie": "^5.0.2",
-    "ngx-logger": "^4.2.2",
+    "ngx-logger": "^4.3.3",
     "rxjs": "~6.6.0",
     "select2": "^4.0.13",
     "tslib": "^2.0.0",
