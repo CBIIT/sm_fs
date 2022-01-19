@@ -225,6 +225,22 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
   // Since this is a callback, it cannot use this object anymore
   // Use $this instead
   ajaxCall($this: Step1Component, dataTablesParameters: any, callback): void {
+
+    // Do not run actual search if cayCodes is null -happens when the cross-section of
+    // "Monitor My activities" (search within) and Cancer Activities selection is empty
+    // Same if selected "My Portfolio" and selected PD is not the logged user
+    if ($this.searchCriteria.cayCodes === undefined || $this.searchCriteria.pdNpnId === undefined) {
+      $this.showResults = true;
+      $this.grantList = [];
+      $this.gsfs.searched = true;
+      callback({
+        recordsTotal: 0,
+        recordsFiltered: 0,
+        data: []
+      });
+      return;
+    }
+
     $this.loaderService.show();
     // this.logger.debug('Funding Request search for: ', this.searchCriteria);
     $this.fsRequestControllerService.searchDtGrantsUsingPOST(
@@ -290,7 +306,14 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     this.throttle.reset();
 
     if (this.searchWithin === 'mypf') {
-      this.searchCriteria.pdNpnId =  this.userSessionService.getLoggedOnUser().npnId + '';
+      const npnId: string = this.userSessionService.getLoggedOnUser().npnId + '';
+      const selectedNpnId: string = this.selectedPd as any as string;
+      if (this.selectedPd && selectedNpnId !== npnId) {
+        this.searchCriteria.pdNpnId = undefined;
+      }
+      else {
+        this.searchCriteria.pdNpnId = npnId;
+      }
     }
     else {
       this.searchCriteria.pdNpnId = (this.selectedPd as any as string);
@@ -298,10 +321,22 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
 
     if (this.searchWithin === 'myca') {
       this.searchCriteria.cayCodes = this.userSessionService.getUserCaCodes();
+
+      const casArray = typeof this.selectedCas === 'string' ? [this.selectedCas] : this.selectedCas;
+      if (this.searchCriteria.cayCodes != null && casArray != null && casArray.length > 0 && casArray[0].length > 0) {
+        const filteredArray = this.searchCriteria.cayCodes.filter(value => casArray.includes(value));
+        if (filteredArray == null || filteredArray.length === 0) {
+          this.searchCriteria.cayCodes = undefined;  // to exclude search at all
+        }
+        else {
+          this.searchCriteria.cayCodes = filteredArray;
+        }
+      }
     }
     else {
-      this.searchCriteria.cayCodes = typeof this.selectedCas === 'string' ? [this.selectedCas] : this.selectedCas ;
+      this.searchCriteria.cayCodes = typeof this.selectedCas === 'string' ? [this.selectedCas] : this.selectedCas;
     }
+
     this.gsfs.selectedPd = this.selectedPd;
     this.gsfs.searchWithin = this.searchWithin;
     this.gsfs.selectedCas = this.selectedCas;
