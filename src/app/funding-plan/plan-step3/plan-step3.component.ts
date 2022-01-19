@@ -69,8 +69,8 @@ export class PlanStep3Component implements OnInit {
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(3, true);
-
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
+
       // this.logger.debug('new cayCode received');
       this.cayCode = typeof next === 'string' ? next : next[0];
       this.planManagementService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
@@ -80,16 +80,27 @@ export class PlanStep3Component implements OnInit {
       this.pdNpnId = next;
       this.planManagementService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
     });
-
-
     this.pdCaIntegratorService.docEmitter.subscribe(next => {
+
+
       // this.logger.debug('new DOC: ', next);
       this.doc = next;
     });
-
     this.planName = this.planModel.fundingPlanDto.planName;
+
     this.pdNpnId = this.planModel.fundingPlanDto.requestorNpnId;
     this.cayCode = this.planModel.fundingPlanDto.cayCode;
+
+    const existingRequests = this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(r => r.applId);
+    const allRequests = this.planModel.allGrants.filter(g => g.selected).map(r => r.applId);
+
+    const missingRequests = allRequests.filter(f => !existingRequests.includes(f));
+    this.logger.debug('all', allRequests);
+    this.logger.debug('existing', existingRequests);
+    this.logger.debug('missing', missingRequests);
+    if (missingRequests) {
+      this.addMissingGrants(missingRequests);
+    }
 
     // this.planCoordinatorService.listSelectedSources = [];
   }
@@ -445,7 +456,7 @@ export class PlanStep3Component implements OnInit {
     // this.logger.debug('--------------------------------------------------------------------------------');
 
     $event.forEach(s => {
-        // this.logger.debug(s);
+        this.logger.debug(`Saving values ${JSON.stringify(s)}`);
         if (doOnce) {
           if (this.editing) {
             // this.logger.debug(`editing: ${JSON.stringify(this.editing)}`);
@@ -495,9 +506,9 @@ export class PlanStep3Component implements OnInit {
             req.financialInfoDto.fundingRequestCans = new Array<FundingRequestCanDto>();
           }
 
-          req.financialInfoDto.fundingReqBudgetsDtos.forEach((b, i) => {
-            this.logger.debug(`${i}. ${JSON.stringify(b)}`);
-          });
+          // req.financialInfoDto.fundingReqBudgetsDtos.forEach((b, i) => {
+          //   this.logger.debug(`${i}. ${JSON.stringify(b)}`);
+          // });
 
           // req.financialInfoDto.fundingRequestCans.forEach((c, i) => {
           //   this.logger.debug(`${i}. ${JSON.stringify(c)}`);
@@ -505,69 +516,113 @@ export class PlanStep3Component implements OnInit {
 
           const futureYears: number = this.planManagementService.getRecommendedFutureYears(s.applId);
 
-          const currentBudget = req.financialInfoDto.fundingReqBudgetsDtos[this.editing?.index];
+          // const currentBudget = req.financialInfoDto.fundingReqBudgetsDtos[this.editing?.index];
 
-          frBudget = {
-            frqId: +req.frqId,
-            fseId: +s.fseId,
-            id: s.budgetId,
-            name: s.fundingSourceName,
-            supportYear: +s.supportYear,
-            dcRecAmt: +directCost,
-            tcRecAmt: +totalCost
-            // createDate?: Date;
-            // createUserId?: string;
-            // id?: number;
-          };
+          // This will match on the applid and funding request id.
+          // If none found, it's new and we push.
+          // Otherwise, we'll update the values in place.
+          frBudget = this.findMatchingBudget(req.financialInfoDto.fundingReqBudgetsDtos, this.editing);
+          this.logger.debug(`found matching budget: ${JSON.stringify(frBudget)}`);
+          let pushBudget = false;
+
+          if (!frBudget) {
+            pushBudget = true;
+            frBudget = {
+              frqId: +req.frqId,
+              fseId: +s.fseId,
+              id: s.budgetId,
+              name: s.fundingSourceName,
+              supportYear: +s.supportYear,
+              dcRecAmt: +directCost,
+              tcRecAmt: +totalCost
+              // createDate?: Date;
+              // createUserId?: string;
+              // id?: number;
+            };
+          } else {
+            frBudget.fseId = +s.fseId;
+            frBudget.name = s.fundingSourceName;
+            frBudget.supportYear = s.supportYear;
+            frBudget.dcRecAmt = +directCost;
+            frBudget.tcRecAmt = +totalCost;
+          }
 
           if (this.editing) {
             // Need to figure out whether we're replacing a budget or adding one...
-            const deleteCount = this.getBudgetDeleteCount(frBudget, currentBudget, this.editing);
-            this.logger.debug(`splice - ${JSON.stringify(frBudget)} - deleting ${deleteCount} `);
-
-            req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, deleteCount, frBudget);
+            if (pushBudget) {
+              this.logger.debug(`Pushing new budget: ${JSON.stringify(frBudget)}`);
+              req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
+            } else {
+              this.logger.debug(`Budget values updated in place`);
+              // const deleteCount = this.getBudgetDeleteCount(frBudget, currentBudget, this.editing);
+              // this.logger.debug(`splice - ${JSON.stringify(frBudget)} - deleting ${deleteCount} `);
+              //
+              // req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, deleteCount, frBudget);
+            }
           } else {
             // this.logger.debug(`push - ${JSON.stringify(frBudget)}`);
             req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
           }
 
-          const currentCAN = req.financialInfoDto.fundingRequestCans[this.editing?.index];
-
-          frCan = {
-            approvedDc: +directCost,
-            approvedFutureYrs: futureYears,
-            approvedTc: +totalCost,
-            can: null,  // Solve for edits
-            canDescription: null, // solve for edits
-            createDate: null,
-            createUserId: null,
-            dcPctCut: +dcPercentCut,
-            defaultOefiaTypeId: +s.octId, // solve for edits
-            frqId: +req.frqId,
-            fseId: +s.fseId,
-            fundingSourceName: s.fundingSourceName,
-            id: s.canId,
-            // lastChangeDate: string,
-            // lastChangeUserId: string,
-            nciSourceFlag: s.nciSourceFlag,
-            // octId: s.octId,
-            // oefiaCreateCode: string,
-            // oefiaTypeId: number,
-            // oefiaTypeIds: string,
-            // phsOrgCode: string,
-            // previousAfy: number,
-            // reimburseableCode: string,
-            requestedDc: +directCost,
-            requestedFutureYrs: futureYears,
-            requestedTc: +totalCost,
-            tcPctCut: +tcPercentCut,
-            // updateStamp: number,
-          };
+          frCan = this.findMatchingCan(req.financialInfoDto.fundingRequestCans, this.editing);
+          let pushCan = false;
+          if (!frCan) {
+            pushCan = true;
+            frCan = {
+              approvedDc: +directCost,
+              approvedFutureYrs: futureYears,
+              approvedTc: +totalCost,
+              can: null,  // Solve for edits
+              canDescription: null, // solve for edits
+              createDate: null,
+              createUserId: null,
+              dcPctCut: +dcPercentCut,
+              defaultOefiaTypeId: +s.octId, // solve for edits
+              frqId: +req.frqId,
+              fseId: +s.fseId,
+              fundingSourceName: s.fundingSourceName,
+              id: s.canId,
+              // lastChangeDate: string,
+              // lastChangeUserId: string,
+              nciSourceFlag: s.nciSourceFlag,
+              // octId: s.octId,
+              // oefiaCreateCode: string,
+              // oefiaTypeId: number,
+              // oefiaTypeIds: string,
+              // phsOrgCode: string,
+              // previousAfy: number,
+              // reimburseableCode: string,
+              requestedDc: +directCost,
+              requestedFutureYrs: futureYears,
+              requestedTc: +totalCost,
+              tcPctCut: +tcPercentCut,
+              // updateStamp: number,
+            };
+          } else {
+            frCan.approvedDc = +directCost;
+            frCan.requestedDc = +directCost;
+            frCan.approvedFutureYrs = futureYears;
+            frCan.requestedFutureYrs = futureYears;
+            frCan.approvedTc = +totalCost;
+            frCan.requestedTc = +totalCost;
+            frCan.dcPctCut = +dcPercentCut;
+            frCan.tcPctCut = +tcPercentCut;
+            frCan.defaultOefiaTypeId = +s.octId;
+            frCan.frqId = +req.frqId;
+            frCan.fseId = +s.fseId;
+            frCan.nciSourceFlag = s.nciSourceFlag;
+          }
 
           if (this.editing) {
-            const deleteCount = this.getCANDeleteCount(frCan, currentCAN, this.editing);
-            // this.logger.debug(`splice - ${JSON.stringify(frCan)} deleting ${deleteCount}`);
-            req.financialInfoDto.fundingRequestCans.splice(this.editing.index, deleteCount, frCan);
+            if (pushCan) {
+              this.logger.debug(`Inserting new CAN: ${JSON.stringify(pushCan)}`);
+              req.financialInfoDto.fundingRequestCans.push(frCan);
+            } else {
+              this.logger.debug('Updating CAN values in place');
+            }
+            // const deleteCount = this.getCANDeleteCount(frCan, currentCAN, this.editing);
+            // // this.logger.debug(`splice - ${JSON.stringify(frCan)} deleting ${deleteCount}`);
+            // req.financialInfoDto.fundingRequestCans.splice(this.editing.index, deleteCount, frCan);
           } else {
             req.financialInfoDto.fundingRequestCans.push(frCan);
           }
@@ -649,5 +704,40 @@ export class PlanStep3Component implements OnInit {
 
   clearEditFlag(): void {
     this.editing = undefined;
+  }
+
+  private findMatchingBudget(fundingReqBudgetsDtos: Array<FundingReqBudgetsDto>, editing: { sourceId: number; index: number }): FundingReqBudgetsDto {
+    let result: FundingReqBudgetsDto = null;
+
+    result = fundingReqBudgetsDtos.find(bud => +bud.fseId === +editing?.sourceId);
+
+    return result;
+  }
+
+  private findMatchingCan(fundingRequestCans: Array<FundingRequestCanDto>, editing: { sourceId: number; index: number }): FundingRequestCanDto {
+    let result: FundingRequestCanDto = null;
+    result = fundingRequestCans.find(can => +can.fseId === +editing?.sourceId);
+    return result;
+  }
+
+  private addMissingGrants(missingRequests: number[]): void {
+    const listApplicationsWithinRange = this.planModel.allGrants.filter(g =>
+      (!g.notSelectableReason || g.notSelectableReason.length === 0)
+      && g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore).map(x => x.applId);
+
+    missingRequests.forEach(applid => {
+      const inRange: boolean = listApplicationsWithinRange.includes(applid);
+      this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
+        {
+          frqId: null,
+          applId: applid,
+          fprId: this.planModel.fundingPlanDto.fprId,
+          frtId: (inRange ? FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE : FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION),
+          notSelectableReason: null,
+          nihGuideAddr: '',
+          financialInfoDto: {}
+        }
+      );
+    });
   }
 }

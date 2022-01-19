@@ -498,9 +498,9 @@ export class PlanManagementService {
 
 
   addPendingValues(vals: PendingPrcValues): void {
-    this.logger.debug(`addPendingValues(${JSON.stringify(vals)})`);
+    // this.logger.debug(`addPendingValues(${JSON.stringify(vals)})`);
     this.pendingValues.set(+vals.applId, vals);
-    this.logger.debug(this.pendingValues);
+    // this.logger.debug(this.pendingValues);
   }
 }
 
