@@ -216,14 +216,14 @@ export class PlanManagementService {
   }
 
   firstFunder(applId: number, fseId: number): boolean {
-    // this source is not contributing
+    // this source is not contributing, so it can't be first funder.
     const dc = this.directCost(applId, fseId);
     const tc = this.totalCost(applId, fseId);
     if (dc === 0 && tc === 0) {
       return false;
     }
     // if this is the only source of funds for this grant, return true
-    if (this.sourceDirectTotal(fseId) === dc) {
+    if (this.sourceDirectTotal(applId) === dc) {
       return true;
     }
     const sources: number[] = this.listSelectedSources.map(s => s.fundingSourceId);
@@ -237,7 +237,7 @@ export class PlanManagementService {
     let sum = 0;
 
     sources.forEach((src, idx) => {
-      // this.logger.debug(`${applId}, ${fseId}, ${targetIndex}, ${src}, ${idx}, ${result}`);
+      this.logger.debug(`${applId}, ${fseId}, ${targetIndex}, ${src}, ${idx}`);
       if ((idx < targetIndex) && !(+src === +fseId)) {
         sum += +this.directCost(applId, src) + +this.totalCost(applId, src);
       }
