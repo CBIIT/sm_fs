@@ -1,0 +1,12 @@
+.can_parent {
+    margin: 0 auto;
+}
+
+.can_selector {
+    float: left;
+    width: 70%;
+}
+
+.can_actions {
+    width: 30%;
+}

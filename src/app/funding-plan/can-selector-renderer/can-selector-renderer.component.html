@@ -2,17 +2,15 @@
 
 <!--<div class="container" *ngFor="let g of grantCosts; let first = first; let i = index">-->
 <!--  <hr style="display: table" *ngIf="!first" />-->
-<div class="container">
-  <div class="row">
-    <div class="col-9">
+<div class="can_parent">
+  <div class="can_selector">
     <app-fp-can-selector
       [applId]="g.applId"
       [fseId]="g.fseId"
       [nciSourceFlag]="g.nciSourceFlag">
     </app-fp-can-selector>
   </div>
-    <div class="col-3">
-    <div class=" d-flex align-items-center">
+  <div class="can_actions d-flex align-items-center">
     <button
       *ngIf="canCopyProjectedCan(g.applId, g.fseId)"
       (click)="copyProjectedCAN(g.applId, g.fseId)"
@@ -30,7 +28,7 @@
     <button
       *ngIf="canDeleteCAN(g.applId, g.fseId)"
       (click)="deleteCAN(g.applId, g.fseId, i)"
-      class="btn btn-link btn-slim ml-2 btn-delete"
+      class="btn btn-link btn-slim btn-delete"
       ngbTooltip="Delete Provided CAN">
       <i class="fas fa-trash" aria-hidden="true"></i>
     </button>
@@ -40,7 +38,7 @@
       title="Non-Default CAN"
       ngbTooltip="Non-Default CAN"
       role="alert">
-      <i class="far fa-exclamation-circle" aria-hidden="true"></i>
+          <i class="far fa-exclamation-circle" aria-hidden="true"></i>
     </span>
     <span
       *ngIf="duplicateCAN(g.applId, g.fseId, i)"
@@ -48,12 +46,10 @@
       title="Duplicate CAN"
       ngbTooltip="Duplicate CAN"
       role="alert">
-      <i class="far fa-exclamation-triangle" aria-hidden="true"></i>
+          <i class="far fa-exclamation-triangle" aria-hidden="true"></i>
     </span>
   </div>
-  </div>
-  </div>
-  <div class="text-danger mt-1" *ngIf="canRequiredButMissing.get(g.fseId)">
-    Error: Missing CAN for one or more funding sources.
-  </div>
+</div>
+<div class="text-danger mt-1" *ngIf="canRequiredButMissing.get(g.fseId)">
+  Error: Missing CAN for one or more funding sources.
 </div>
