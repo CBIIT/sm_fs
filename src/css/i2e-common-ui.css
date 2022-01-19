@@ -15616,10 +15616,10 @@ input[type="button"].btn-block {
   margin-left: -1px;
 }
 
-/* line 46, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_button-group.scss 
+/* line 46, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_button-group.scss
 .btn-group > .btn:not(:last-child):not(.dropdown-toggle),
 .btn-group > .btn-group:not(:last-child) > .btn {
-  
+
 } */
 
 /* line 51, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_button-group.scss */
@@ -23821,6 +23821,10 @@ label .optional, .like-label .optional {
   padding-left: 2em;
 }
 
+.select2-container .selection .select2-selection ul {
+  overflow: visible;
+}
+
 /* line 147, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-search--dropdown .select2-search__field {
   width: 98%;
@@ -25139,7 +25143,7 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
 
 /* line 45, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .prc-table tbody tr td {
-  text-align: right; 
+  text-align: right;
 }
 
 /* line 47, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
