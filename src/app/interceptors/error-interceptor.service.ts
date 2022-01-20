@@ -38,15 +38,15 @@ export class ErrorInterceptorService implements HttpInterceptor {
     this.logger.debug(`Initialization status: ${this.initializerStatus.done ? 'Done' : 'In Progress'}`);
 
     return next.handle(req).pipe(
-      catchError((error, caught) => {
+      catchError((error) => {
         if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           url = window.location.origin + url;
 
-          this.customLogger.logServerError(`Error URL: ${error.url}`);
-          this.customLogger.logServerError(`Source URL of error: ${this.router.url}`);
+          this.logger.info(`Error URL: ${error.url}`);
+          this.logger.info(`Source URL of error: ${this.router.url}`);
           this.logger.info(`Restore session URL: ${url}`);
           const features = 'popup,menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700,noreferrer';
 
@@ -74,10 +74,10 @@ export class ErrorInterceptorService implements HttpInterceptor {
   }
 
   handleNavigationStart(event: NavigationStart): void {
-    this.customLogger.logServer('=======> NavigationStart', event);
+    // this.customLogger.logServer('=======> NavigationStart', event);
   }
 
   handleNavigationEnd(event: NavigationEnd): void {
-    this.customLogger.logServer('=======> NavigationEnd', event);
+    // this.customLogger.logServer('=======> NavigationEnd', event);
   }
 }
