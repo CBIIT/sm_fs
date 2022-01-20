@@ -57,14 +57,15 @@ export class ErrorInterceptorService implements HttpInterceptor {
           if (!this.modalWindow) {
             this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
           }
-          return of(null);
+          return of(undefined);
         } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
           return throwError(error);
         } else {
           const timestamp: number = Date.now();
           this.errorHandler.registerNewError(timestamp, error);
           this.router.navigate(['/error', timestamp]);
-          return throwError(error);
+          // return throwError(error);
+          return of(undefined);
         }
       }), finalize(() => {
         this.modalWindow = undefined;
