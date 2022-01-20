@@ -237,7 +237,7 @@ export class PlanManagementService {
     let sum = 0;
 
     sources.forEach((src, idx) => {
-      this.logger.debug(`${applId}, ${fseId}, ${targetIndex}, ${src}, ${idx}`);
+      // this.logger.debug(`${applId}, ${fseId}, ${targetIndex}, ${src}, ${idx}`);
       if ((idx < targetIndex) && !(+src === +fseId)) {
         sum += +this.directCost(applId, src) + +this.totalCost(applId, src);
       }

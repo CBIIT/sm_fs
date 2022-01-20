@@ -33,9 +33,11 @@ export class ErrorInterceptorService implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    this.logger.debug(`Current route URL    : ${this.router.url}`);
-    this.logger.debug(`Request URL          : ${req.url}`);
-    this.logger.debug(`Initialization status: ${this.initializerStatus.done ? 'Done' : 'In Progress'}`);
+    if (!req.url.includes('heartbeat')) {
+      this.logger.debug(`Current route URL    : ${this.router.url}`);
+      this.logger.debug(`Request URL          : ${req.url}`);
+      this.logger.debug(`Initialization status: ${this.initializerStatus.done ? 'Done' : 'In Progress'}`);
+    }
 
     return next.handle(req).pipe(
       catchError((error) => {
@@ -58,14 +60,14 @@ export class ErrorInterceptorService implements HttpInterceptor {
             this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
           }
           return of(undefined);
-        } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
+        } else if (error.status === 400 || req.url.includes('logs') || req.url.includes('heartbeat')) {  // BadRequestException, checked exception from backend.
           return throwError(error);
         } else {
           const timestamp: number = Date.now();
           this.errorHandler.registerNewError(timestamp, error);
           this.router.navigate(['/error', timestamp]);
-          // return throwError(error);
-          return of(undefined);
+          return throwError(error);
+          // return of(undefined);
         }
       }), finalize(() => {
         this.modalWindow = undefined;
