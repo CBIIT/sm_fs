@@ -74,6 +74,7 @@ export class CanSearchModalComponent implements OnInit {
   set showAll(value: boolean) {
     this._showAll = value;
 
+    // Disable this?  Auto search only if there's a term or showALl is false?
     this.search();
   }
 

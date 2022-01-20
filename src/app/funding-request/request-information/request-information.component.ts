@@ -48,7 +48,7 @@ export class RequestInformationComponent implements OnInit {
       conversionActivityCode = null;
     }
     if (!requestType || !cayCode) {
-      this.logger.info('Not refreshing funding sources: missing type or cayCode');
+      this.logger.warn('Not refreshing funding sources: missing type or cayCode');
       return;
     }
     this.fsRequestControllerService.getFundingSourcesUsingGET(

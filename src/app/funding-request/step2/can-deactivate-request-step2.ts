@@ -42,7 +42,6 @@ export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> 
       return true;
     }
 
-    // this.logger.info(component.step2Form);
     // Object.keys(component.step2Form.controls).forEach(key => {
     //   this.logger.debug(key, component.step2Form.controls[key], component.step2Form.controls[key]._pendingDirty);
     // });
@@ -52,7 +51,6 @@ export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> 
     // if (!component.clean || component.step2Form.touched && component.step2Form.dirty) {
     const ret = confirm('Unsaved changes will be lost if you continue.');
     if (ret) {
-      this.logger.debug('time to reset the request model');
       if (!!id) {
         this.requestLoaderService.loadRequest(id, this.successFn.bind(this), this.errorFn.bind(this));
       }

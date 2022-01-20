@@ -38,7 +38,5 @@ export class RecommendedFutureYearsComponent implements OnInit {
     if (!!this.applId) {
       this.selectedValue = this.planService.getRecommendedFutureYears(Number(this.applId));
     }
-    this.logger.info(`RecommendedFutureYearsComponent for applId: ${this.applId} == ${this.selectedValue}`);
   }
-
 }

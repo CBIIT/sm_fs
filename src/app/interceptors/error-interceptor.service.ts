@@ -39,23 +39,20 @@ export class ErrorInterceptorService implements HttpInterceptor {
 
     return next.handle(req).pipe(
       catchError((error, caught) => {
-
         if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           url = window.location.origin + url;
 
-          this.logger.info(`Error URL: ${error.url}`);
-          this.logger.info(`Source URL of error: ${this.router.url}`);
+          this.customLogger.logServerError(`Error URL: ${error.url}`);
+          this.customLogger.logServerError(`Source URL of error: ${this.router.url}`);
           this.logger.info(`Restore session URL: ${url}`);
           const features = 'popup,menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700,noreferrer';
 
           const errorUrl = new URL(error.url);
           errorUrl.searchParams.delete('TARGET');
           errorUrl.searchParams.set('TARGET', url);
-
-          this.logger.debug(`errorUrl: ${errorUrl} :: ${errorUrl.searchParams}`);
 
           if (!this.modalWindow) {
             this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
@@ -70,7 +67,6 @@ export class ErrorInterceptorService implements HttpInterceptor {
           return throwError(error);
         }
       }), finalize(() => {
-        // this.logger.info('finalize:', this.modalWindow);
         this.modalWindow = undefined;
       })
     );

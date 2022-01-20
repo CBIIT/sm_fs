@@ -19,7 +19,7 @@ export class CustomServerLoggingService {
   }
 
   logServer(msg: string, ...extra: any): void {
-    // this.logger.debug(`Logging: ${msg} :: ${extra}`);
+    this.logger.debug(`Logging: ${msg} :: ${extra}`);
     const logBody: NgxPayload = {
       fileName: '',
       level: 3,
@@ -32,7 +32,7 @@ export class CustomServerLoggingService {
   }
 
   logServerError(msg: string, ...extra: any): void {
-    // this.logger.debug(`Logging: ${msg} :: ${extra}`);
+    this.logger.debug(`Logging: ${msg} :: ${extra}`);
     const logBody: NgxPayload = {
       fileName: '',
       level: 6,
@@ -64,7 +64,6 @@ export class CustomServerLoggingService {
 
   private post(logBody: NgxPayload): void {
     this.logService.saveLogUsingPOST(logBody).subscribe(next => {
-      this.logger.debug(`message saved to server`);
     }, error => {
       this.logger.warn(`Unable to save message to server:\n====> body: ${JSON.stringify(logBody)}\n====> error: ${JSON.stringify(error)}`);
     });

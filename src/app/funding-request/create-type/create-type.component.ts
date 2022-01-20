@@ -70,7 +70,6 @@ export class CreateTypeComponent implements OnInit {
   @Input() readOnly = false;
 
   set selectedValue(value: string) {
-    this.logger.info('setSelectedValue', value);
     this._selectedValue = value;
     this.requestModel.requestDto.oefiaCreateCode = value;
     this.requestModel.requestDto.financialInfoDto.oefiaCreateCode = value;
@@ -91,23 +90,18 @@ export class CreateTypeComponent implements OnInit {
       { id: 'Pre-Appl', text: 'Pre-Appl' },
       /*{ id: '2', text: 'Rollup' }*/
     ];
-    this.logger.info('==================================================================');
     if (!this.requestModel.isPayType4() && this.requestModel.isForGrantFY()) {
       this.data.push({ id: 'Rollup', text: 'Rollup' });
     }
     const type = Number(this.requestModel.requestDto.frtId);
-    this.logger.info(`frtId: ${type}`);
 
     if (this.requestModel.isForGrantFY() &&
       this.ROLLUP_TYPES.includes(+type)) {
-      this.logger.info('rollup');
       this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'Rollup';
     } else if (
       this.PRE_APPL_TYPES.includes(+type)) {
-      this.logger.info('pre-appl');
       this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'Pre-Appl';
     } else {
-      this.logger.info(`Selected value: '${this.selectedValue}' :: From model: '${this.requestModel.requestDto.oefiaCreateCode}'`);
       this.selectedValue = this.requestModel.requestDto.oefiaCreateCode;
     }
   }

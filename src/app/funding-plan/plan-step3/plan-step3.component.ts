@@ -697,7 +697,6 @@ export class PlanStep3Component implements OnInit {
     if (typeof $event === 'string') {
       this.cayCode = $event;
     } else {
-      this.logger.info($event);
       this.cayCode = $event ? $event[0] : undefined;
     }
   }
