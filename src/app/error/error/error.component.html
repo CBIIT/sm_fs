@@ -1,13 +1,13 @@
 <h3>Something unexpected went wrong</h3>
 <p>
   Details have been reported to the application support team.
-  If the error persists, contact <a href="mailto: {{techSupport}} ?subject=Funding Selections" title="">I2E Technical
+  If the error persists, contact <a href="mailto: {{techSupport}} ?subject=Funding Selections: {{errorMessage}}?body={{errorDetails}} " title="">I2E Technical
   Support</a>.
 </p>
 <p>
   Click <a [routerLink]="['/']" routerLinkActive="active">here</a> to return home.
 </p>
-<div *ngIf="!production">
-  <p>{{ errorMessage }}</p>
-  <pre>{{ errorDetails }}</pre>
-</div>
+<!--<div *ngIf="!production">-->
+<!--  <p>{{ errorMessage }}</p>-->
+<!--  <pre>{{ errorDetails }}</pre>-->
+<!--</div>-->
