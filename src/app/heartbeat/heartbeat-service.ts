@@ -34,10 +34,11 @@ export class HeartbeatService {
   }
 
   startCircuitBreaker(): void {
-    const zeroHour: number = this.lastGoodDbHeartbeat || this.startTime;
     this.circuitBreakerInterval = setInterval(() => {
+      const zeroHour: number = this.lastGoodDbHeartbeat || this.startTime;
       this.logger.debug(`${Date.now() - this.lastGoodHeartbeat} millis since last good heartbeat`);
       this.logger.debug(`${Date.now() - this.lastGoodDbHeartbeat} millis since last good DB heartbeat`);
+      this.logger.debug(`${300000 - (Date.now() - zeroHour)} millis until termination`);
       // TODO: use the killswitch if the time since last good heartbeat is too long
       if (Date.now() - zeroHour >= 300000 /* 5 minutes */) {
         this.killSwitch.next();
