@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   nciHome: 'https://i2e-dev.nci.nih.gov/',
-  techSupport: 'prakash.garapati@nih.gov',
+  techSupport: 'ncii2egrantsdevelopmentteam@mail.nih.gov',
   workBenchUrl: 'https://i2e-dev.nci.nih.gov/workbench/WorkbenchView',
   appVersion: require('../../package.json').version 
   
