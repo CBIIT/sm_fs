@@ -27,10 +27,13 @@ export class HeartbeatService {
   }
 
   startDefaultHeartbeat(): void {
-    this.startHeartbeat(1000);
+    if (!this.heartbeatInterval) {
+      this.startHeartbeat(1000);
+    }
   }
 
   startHeartbeat(millis: number): void {
+    this.logger.warn('Starting heartbeat');
     this.heartbeatInterval = setInterval(() => {
       this.heartbeatController.getHeartBeatUsingGET().subscribe(next => {
         // this.logger.debug(`ping: ${next.sessionId}`);
@@ -38,14 +41,17 @@ export class HeartbeatService {
         this.lastGoodHeartbeat = Date.now();
         this.heartBeat.next(true);
       }, error => {
+        this.logger.warn(`API not responding. Last good hearbeat: ${Date.now() - this.lastGoodHeartbeat} millis ago`);
         this.heartBeat.next(false);
       });
     }, millis);
   }
 
   stopHeartbeat(): void {
+    this.logger.warn('Stopping heartbeat');
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = undefined;
     }
   }
 
@@ -58,12 +64,19 @@ export class HeartbeatService {
       this.heartbeatController.getDbHeartBeatUsingGET().subscribe(next => {
         this.sessionId = next.sessionId;
         this.dbActive = next.dbActive;
-        if(next.dbActive) {
+        if (next.dbActive) {
           this.lastGoodDbHeartbeat = Date.now();
+          this.startDefaultHeartbeat();
+        } else {
+          this.logger.warn(`DB is not responsive. Last good heartbeat: ${Date.now() - this.lastGoodDbHeartbeat} millis ago`);
+          this.stopHeartbeat();
         }
         this.dbHeartBeat.next(next.dbActive);
       }, error => {
         // Technically speaking, DB status is unknown at this point, since this indicates the API itself is not responding
+        this.stopHeartbeat();
+        this.logger.warn(`DB status unknown. Last good heartbeat: ${Date.now() - this.lastGoodDbHeartbeat} millis`);
+        this.heartBeat.next(false);
         this.dbHeartBeat.next(false);
       });
     }, millis);
@@ -72,6 +85,7 @@ export class HeartbeatService {
   stopDbHeartbeat(): void {
     if (this.dbHeartbeatInterval) {
       clearInterval(this.dbHeartbeatInterval);
+      this.dbHeartbeatInterval = undefined;
     }
   }
 
