@@ -9,21 +9,47 @@ import { Subject } from 'rxjs';
 export class HeartbeatService {
   public heartBeat = new Subject<boolean>();
   public dbHeartBeat = new Subject<boolean>();
+  public killSwitch = new Subject<void>();
 
   private _sessionId: string;
   private _dbActive: boolean;
 
   private heartbeatInterval: NodeJS.Timeout;
   private dbHeartbeatInterval: NodeJS.Timeout;
+  private circuitBreakerInterval: NodeJS.Timeout;
 
   private lastGoodHeartbeat: number;
   private lastGoodDbHeartbeat: number;
+  private startTime: number = Date.now();
 
   constructor(
     private logger: NGXLogger,
     private heartbeatController: HeartbeatControllerService) {
     this.startDefaultHeartbeat();
     this.startDefaultDbHeartbeat();
+    this.startCircuitBreaker();
+    this.killSwitch.subscribe(() => {
+      this.pullThePlug();
+    });
+  }
+
+  startCircuitBreaker(): void {
+    const zeroHour: number = this.lastGoodDbHeartbeat || this.startTime;
+    this.circuitBreakerInterval = setInterval(() => {
+      this.logger.debug(`${Date.now() - this.lastGoodHeartbeat} millis since last good heartbeat`);
+      this.logger.debug(`${Date.now() - this.lastGoodDbHeartbeat} millis since last good DB heartbeat`);
+      // TODO: use the killswitch if the time since last good heartbeat is too long
+      if (Date.now() - zeroHour >= 300000 /* 5 minutes */) {
+        this.killSwitch.next();
+      }
+    }, 30000);
+  }
+
+  stopCircuitBreaker(): void {
+    if (this.circuitBreakerInterval) {
+      clearInterval(this.circuitBreakerInterval);
+      this.circuitBreakerInterval = undefined;
+    }
   }
 
   startDefaultHeartbeat(): void {
@@ -41,6 +67,7 @@ export class HeartbeatService {
         this.lastGoodHeartbeat = Date.now();
         this.heartBeat.next(true);
       }, error => {
+        this.logger.warn(`Received error: ${JSON.stringify(error)}`);
         this.logger.warn(`API not responding. Last good hearbeat: ${Date.now() - this.lastGoodHeartbeat} millis ago`);
         this.heartBeat.next(false);
       });
@@ -48,8 +75,8 @@ export class HeartbeatService {
   }
 
   stopHeartbeat(): void {
-    this.logger.warn('Stopping heartbeat');
     if (this.heartbeatInterval) {
+      this.logger.warn('Stopping heartbeat');
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = undefined;
     }
@@ -103,5 +130,12 @@ export class HeartbeatService {
 
   set dbActive(value: boolean) {
     this._dbActive = value;
+  }
+
+  private pullThePlug(): void {
+    this.logger.warn('Pulling the plug');
+    this.stopHeartbeat();
+    this.stopCircuitBreaker();
+    this.stopDbHeartbeat();
   }
 }
