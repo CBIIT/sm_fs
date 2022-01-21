@@ -8,21 +8,86 @@ import { Subject } from 'rxjs';
 })
 export class HeartbeatService {
   public heartBeat = new Subject<boolean>();
-  public sessionId: string;
+  public dbHeartBeat = new Subject<boolean>();
+
+  private _sessionId: string;
+  private _dbActive: boolean;
+
+  private heartbeatInterval: NodeJS.Timeout;
+  private dbHeartbeatInterval: NodeJS.Timeout;
+
+  private lastGoodHeartbeat: number;
+  private lastGoodDbHeartbeat: number;
 
   constructor(
     private logger: NGXLogger,
     private heartbeatController: HeartbeatControllerService) {
-    setInterval(() => {
-      heartbeatController.getHeartBeatUsingGET().subscribe(next => {
+    this.startDefaultHeartbeat();
+    this.startDefaultDbHeartbeat();
+  }
+
+  startDefaultHeartbeat(): void {
+    this.startHeartbeat(1000);
+  }
+
+  startHeartbeat(millis: number): void {
+    this.heartbeatInterval = setInterval(() => {
+      this.heartbeatController.getHeartBeatUsingGET().subscribe(next => {
         // this.logger.debug(`ping: ${next.sessionId}`);
-        this.logger.debug('Yay! Service is up :)');
         this.sessionId = next.sessionId;
+        this.lastGoodHeartbeat = Date.now();
         this.heartBeat.next(true);
       }, error => {
-        this.logger.debug('Boo! Service is down :(');
         this.heartBeat.next(false);
       });
-    }, 1000);
+    }, millis);
+  }
+
+  stopHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+    }
+  }
+
+  startDefaultDbHeartbeat(): void {
+    this.startDbHeartbeat(10000);
+  }
+
+  startDbHeartbeat(millis: number): void {
+    this.dbHeartbeatInterval = setInterval(() => {
+      this.heartbeatController.getDbHeartBeatUsingGET().subscribe(next => {
+        this.sessionId = next.sessionId;
+        this.dbActive = next.dbActive;
+        if(next.dbActive) {
+          this.lastGoodDbHeartbeat = Date.now();
+        }
+        this.dbHeartBeat.next(next.dbActive);
+      }, error => {
+        // Technically speaking, DB status is unknown at this point, since this indicates the API itself is not responding
+        this.dbHeartBeat.next(false);
+      });
+    }, millis);
+  }
+
+  stopDbHeartbeat(): void {
+    if (this.dbHeartbeatInterval) {
+      clearInterval(this.dbHeartbeatInterval);
+    }
+  }
+
+  get sessionId(): string {
+    return this._sessionId;
+  }
+
+  set sessionId(value: string) {
+    this._sessionId = value;
+  }
+
+  get dbActive(): boolean {
+    return this._dbActive;
+  }
+
+  set dbActive(value: boolean) {
+    this._dbActive = value;
   }
 }

@@ -11,7 +11,7 @@ import { HeartbeatService } from '../heartbeat/heartbeat-service';
   providedIn: 'root'
 })
 export class CustomServerLoggingService {
-  private sendLog: boolean;
+  private sendLog: boolean = false;
   private logQueue: NgxPayload[] = [];
 
   constructor(

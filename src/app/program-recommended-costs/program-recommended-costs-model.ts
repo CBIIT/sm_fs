@@ -74,12 +74,10 @@ export class ProgramRecommendedCostsModel {
   set fundingSources(value: FundingRequestFundsSrcDto[]) {
     this._fundingSources = value;
     this._fundingSourcesMap = new Map(value.map(key => [key.fundingSourceId, key] as [number, FundingRequestFundsSrcDto]));
-    this.logger.debug('Map of funding sources:', this.fundingSourcesMap);
 
     if (!this._selectedFundingSources || this._selectedFundingSources.length === 0) {
       return;
     }
-    this.logger.debug('selected funding sources:', this._selectedFundingSources);
     if (value?.length > 0) {
       this.deleteUnselectableSources();
     }
@@ -116,7 +114,6 @@ export class ProgramRecommendedCostsModel {
 
   deleteFundingSourceByIndex(index: number, saved: boolean): number {
     const removed = this._selectedFundingSources[index];
-    this.logger.debug('delete funding source:', index, removed, saved);
     if (!removed) {
       this.logger.warn('No funding source found for removal at index ', index);
     } else {
