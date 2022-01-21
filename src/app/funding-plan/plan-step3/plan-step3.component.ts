@@ -29,6 +29,7 @@ import { PlanApproverService } from '../approver/plan-approver.service';
 import { CanManagementService } from '../../cans/can-management.service';
 import { Alert } from '../../alert-billboard/alert';
 import { FundingSourceGrantDataPayload } from '../applications-proposed-for-funding/funding-source-grant-data-payload';
+import { findRequireCallReference } from '@angular/compiler-cli/ngcc/src/host/commonjs_umd_utils';
 
 @Component({
   selector: 'app-plan-step3',
@@ -92,14 +93,19 @@ export class PlanStep3Component implements OnInit {
     this.cayCode = this.planModel.fundingPlanDto.cayCode;
 
     const existingRequests = this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(r => r.applId);
-    const allRequests = this.planModel.allGrants.filter(g => g.selected).map(r => r.applId);
+    const selectedRequests = this.planModel.allGrants.filter(g => g.selected).map(r => r.applId);
 
-    const missingRequests = allRequests.filter(f => !existingRequests.includes(f));
-    this.logger.debug('all', allRequests);
+    const missingRequests = selectedRequests.filter(f => !existingRequests.includes(f));
+    const deletedRequests = existingRequests.filter(f => !selectedRequests.includes(f));
+
+    this.logger.debug('all', selectedRequests);
     this.logger.debug('existing', existingRequests);
     this.logger.debug('missing', missingRequests);
     if (missingRequests) {
       this.addMissingGrants(missingRequests);
+    }
+    if (deletedRequests) {
+      this.handleDeletedRequests(deletedRequests);
     }
 
     // this.planCoordinatorService.listSelectedSources = [];
@@ -128,6 +134,7 @@ export class PlanStep3Component implements OnInit {
       } else {
         this.rebuildRecommendedFutureYears();
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
+          this.logger.debug(`${req.applId}::${JSON.stringify(req)}`);
           req.financialInfoDto.fundingRequestCans?.forEach(can => {
             can.approvedFutureYrs = this.futureYears.get(+req.applId);
             can.requestedFutureYrs = this.futureYears.get(+req.applId);
@@ -193,6 +200,7 @@ export class PlanStep3Component implements OnInit {
   }
 
   private buildPlanRequestLists(): void {
+    this.logger.debug('build plan request lists');
     if (!this.planModel.fundingPlanDto.fpFinancialInformation) {
       this.planModel.fundingPlanDto.fpFinancialInformation = {};
     }
@@ -731,12 +739,34 @@ export class PlanStep3Component implements OnInit {
           frqId: null,
           applId: applid,
           fprId: this.planModel.fundingPlanDto.fprId,
-          frtId: (inRange ? FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE : FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION),
+          frtId: (inRange ? FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE
+            : FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION),
           notSelectableReason: null,
           nihGuideAddr: '',
           financialInfoDto: {}
         }
       );
+    });
+  }
+
+  private handleDeletedRequests(deletedRequests: number[]): void {
+    const listApplicationsWithinRange = this.planModel.allGrants.filter(g =>
+      (!g.notSelectableReason || g.notSelectableReason.length === 0)
+      && g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore).map(x => x.applId);
+
+    deletedRequests.forEach(applid => {
+      this.logger.debug(`Purge data for applid: ${applid}`);
+      const inRange: boolean = listApplicationsWithinRange.includes(applid);
+
+      const fr: FundingRequestDto = this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.find(r => r.applId === applid);
+      if (fr) {
+        fr.frtId = (inRange ? FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_SKIP
+          : FundingRequestTypes.FUNDING_PLAN__NOT_PROPOSED_AND_OUTSIDE_FUNDING_PLAN_SCORE_RANGE);
+        fr.financialInfoDto.requestTypeId = fr.frtId;
+        this.logger.debug('reset frt for', fr);
+      } else {
+        this.logger.warn(`No funding request for applId ${applid}`);
+      }
     });
   }
 }
