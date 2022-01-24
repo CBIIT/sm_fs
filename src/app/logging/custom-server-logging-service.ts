@@ -65,7 +65,7 @@ export class CustomServerLoggingService {
       lineNumber: '',
       message: msg,
       timestamp: `${Date.now()}`,
-      additional: [this.getDiagnostics(extra)],
+      additional: [this.getDiagnostics(false, extra)],
     };
     this.post(logBody);
   }
@@ -78,12 +78,12 @@ export class CustomServerLoggingService {
       lineNumber: '',
       message: msg,
       timestamp: `${Date.now()}`,
-      additional: [this.getDiagnostics(extra)],
+      additional: [this.getDiagnostics(true, extra)],
     };
     this.post(logBody);
   }
 
-  private getDiagnostics(...extra: any[]): DiagnosticPayload {
+  private getDiagnostics(attachQueue: boolean, ...extra: any[]): DiagnosticPayload {
     const diagnostics: DiagnosticPayload = {
       userId: this.userService.currentUserValue.nihNetworkId,
       applicationId: 'FUNDING_SELECTIONS',
@@ -96,6 +96,10 @@ export class CustomServerLoggingService {
       extra.forEach(x => {
         diagnostics.userProvidedData.push(x);
       });
+    }
+
+    if (attachQueue) {
+      diagnostics.userProvidedData.push(this.userQueue);
     }
 
     return diagnostics;
