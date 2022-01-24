@@ -31,10 +31,6 @@ export class CustomServerLoggingService {
     });
   }
 
-  private queueMessage(logBody: NgxPayload): void {
-    this.pushQueueMessage(this.userQueue, logBody);
-  }
-
   private pushQueueMessage(queue: NgxPayload[], body: NgxPayload): void {
     if (queue.length > this.MAX_QUEUE) {
       queue.shift();
@@ -50,15 +46,28 @@ export class CustomServerLoggingService {
     this.sendQueuedMessages(this.userQueue);
   }
 
-  logServer(msg: any, ...extra: any[]): void {
+  getUserQueue(): NgxPayload[] {
+    return this.userQueue;
+  }
+
+  /**
+   * Unlike the proxy log methods below, this method will attach additional diagnostic data to the message sent to
+   * the server.
+   */
+  logMessageWithContext(msg: any, ...extra: any[]): void {
     const logBody: NgxPayload = this.buildPayload(NgxLoggerLevel.INFO, msg, extra);
     this.pushQueueMessage(this.userQueue, logBody);
     this.post(logBody);
   }
 
-  logServerError(msg: any, ...extra: any[]): void {
+  /**
+   * As above, this method will log an error to the server with additional diagnostic data, including any messages
+   * that have been added to the userQueue
+   */
+  logErrorWithContext(msg: any, ...extra: any[]): void {
     const logBody: NgxPayload = this.buildPayload(NgxLoggerLevel.ERROR, msg, [...extra, this.userQueue]);
     this.post(logBody);
+    this.clearUserQueue();
   }
 
   private buildPayload(level: NgxLoggerLevel, msg: any, ...extra: any[]): NgxPayload {
@@ -112,7 +121,13 @@ export class CustomServerLoggingService {
     }
   }
 
-  /* proxy methods for NGXLogger */
+  /*
+   * Proxy methods for NGXLogger. They will be logged using NGXLogger, as well as added to the queue of user messages
+   * which are sent with the payload when the logErrorWithContext method is called. Since they defer to NGXLogger,
+   * they may be sent to the server as well, depending on how NGXLogger is configured. Note that .error() and .fatal()
+   * messages are NOT queued, since they should be logged immediately, and they will not carry the extra diagnostics
+   * or user queue provided by the logErrorWithContext() method. If you want that context, use logErrorWithContext().
+   */
   trace(message: any, ...additional: any[]): void {
     this.logger.trace(message, additional);
     this.queueUserMessage(NgxLoggerLevel.TRACE, message, additional);
@@ -124,7 +139,7 @@ export class CustomServerLoggingService {
   }
 
   info(message: any, ...additional: any[]): void {
-    this.logServer(message, additional);
+    this.logMessageWithContext(message, additional);
     this.logger.info(message, additional);
     this.queueUserMessage(NgxLoggerLevel.INFO, message, additional);
   }
@@ -140,17 +155,23 @@ export class CustomServerLoggingService {
   }
 
   error(message: any, ...additional: any[]): void {
+    // TODO: Should this method defer to logServerError()?
     this.logger.error(message, additional);
-    this.queueUserMessage(NgxLoggerLevel.ERROR, message, additional);
+    // this.queueUserMessage(NgxLoggerLevel.ERROR, message, additional);
   }
 
   fatal(message: any, ...additional: any[]): void {
+    // TODO: Should this method defer to logServerError()?
     this.logger.fatal(message, additional);
-    this.queueUserMessage(NgxLoggerLevel.FATAL, message, additional);
+    // this.queueUserMessage(NgxLoggerLevel.FATAL, message, additional);
   }
 
+  /**
+   * Queue the attached message if its level exceeds the cutoff set above. This will send it with any error messages
+   * logged to the server as part of its diagnostic payload.
+   */
   private queueUserMessage(level: NgxLoggerLevel, message: any, ...additional: any[]): void {
-    if (this.userQueueLevel >= level) {
+    if (+level >= +this.userQueueLevel) {
       this.pushQueueMessage(this.userQueue, this.buildPayload(level, message, additional));
     }
   }

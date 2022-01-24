@@ -11,6 +11,7 @@ import {
 import { RequestModel } from '../model/request/request-model';
 import { Observable, Subject } from 'rxjs';
 import { PlanModel } from '../model/plan/plan-model';
+import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +38,7 @@ export class CanManagementService {
 
 
   constructor(
-    private logger: NGXLogger,
+    private logger: CustomServerLoggingService,
     private canService: FsCanControllerService,
     private requestModel: RequestModel,
     private planModel: PlanModel) {
@@ -68,7 +69,6 @@ export class CanManagementService {
 
   private buildCanDisplayMatrix(fseIds: number[]): void {
     this.getFundingRequestCanDisplays(fseIds).subscribe(result => {
-      this.logger.debug('CAN display matrix:', result);
       this.canDisplayMatrix = new Map(result.map(c => [c.fseId, c]));
     });
   }
@@ -168,7 +168,7 @@ export class CanManagementService {
       // this.logger.debug(result);
       this.defaultCans = result;
     }, error => {
-      this.logger.error(error);
+      this.logger.logErrorWithContext(error, this.requestModel);
     });
     return true;
   }
@@ -179,8 +179,8 @@ export class CanManagementService {
   }
 
   searchAllCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
+    const key = [bmmCodes, activityCodes, nciSource].join('_');
     if (!can) {
-      const key = [bmmCodes, activityCodes, nciSource].join('_');
       const result = this.activeCanCache.get(key);
       if (result && result.length !== 0) {
         this.logger.debug('cache hit for key', key);
@@ -188,12 +188,10 @@ export class CanManagementService {
           subscriber.next(result);
         });
       }
-
     }
 
-
     const fn = this.canService.getAllCansUsingGET(activityCodes, bmmCodes, can, nciSource);
-    const key = [bmmCodes, activityCodes, nciSource].join('_');
+    // const key = [bmmCodes, activityCodes, nciSource].join('_');
     this.logger.debug('cache miss for key', key);
 
     fn.subscribe(next => {
@@ -213,7 +211,7 @@ export class CanManagementService {
       this.grantCans = result;
 
     }, error => {
-      this.logger.error(error);
+      this.logger.logErrorWithContext(error, this.requestModel.grant);
     });
     return true;
   }

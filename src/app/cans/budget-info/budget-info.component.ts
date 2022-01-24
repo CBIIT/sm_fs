@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { NGXLogger } from 'ngx-logger';
 import { CanManagementService } from '../can-management.service';
 import { RequestModel } from '../../model/request/request-model';
 import { CanCcxDto, FundingRequestCanDto } from '@cbiit/i2ecws-lib';
@@ -10,6 +9,7 @@ import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
 import { CanWarning } from 'src/app/funding-request/workflow/warning-modal/workflow-warning-modal.component';
 import { CanSearchModalComponent } from '../can-search-modal/can-search-modal.component';
+import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
 
 @Component({
   selector: 'app-budget-info',
@@ -44,7 +44,7 @@ export class BudgetInfoComponent implements OnInit {
     this.model.requestCans = value;
   }
 
-  constructor(private logger: NGXLogger,
+  constructor(private logger: CustomServerLoggingService,
               private canManagementService: CanManagementService,
               public model: RequestModel,
               private workflowModel: WorkflowModel) {
@@ -63,13 +63,13 @@ export class BudgetInfoComponent implements OnInit {
     });
     this.canManagementService.initializeCANDisplayMatrixForRequest();
     this.model.requestCans.forEach(c => {
-      if(c.approvedDc && +c.approvedDc > 0) {
+      if (c.approvedDc && +c.approvedDc > 0) {
         this.showDirectCosts = true;
       }
     });
     this.sourceOrder = this.model.programRecommendedCostsModel.selectedFundingSources.map(s => s.fundingSourceId);
     this.model.requestCans.sort((a, b) => {
-        return this.sourceOrder.indexOf(a.fseId) - this.sourceOrder.indexOf(b.fseId);
+      return this.sourceOrder.indexOf(a.fseId) - this.sourceOrder.indexOf(b.fseId);
     });
 
   }
@@ -99,12 +99,10 @@ export class BudgetInfoComponent implements OnInit {
       }
       const oefiaType = this.oefiaTypes?.get(index)?.selectedValue;
       c.octId = c.oefiaTypeId = !isNaN(oefiaType) ? (Number(oefiaType) !== 0 ? Number(oefiaType) : null) : null;
-      this.logger.debug('fcNci: ', this.isFcNci(), this.model.requestDto.oefiaCreateCode);
 
       if (this.isFcNci()) {
         c.oefiaCreateCode = this.model.requestDto.oefiaCreateCode;
       }
-      this.logger.debug('prepared CAN:', c);
     });
   }
 
@@ -218,16 +216,12 @@ export class BudgetInfoComponent implements OnInit {
   canSee(fseId: number): boolean {
     const displayMatrix = this.canManagementService.canDisplayMatrix.get(fseId);
     if (!displayMatrix) {
-      this.logger.debug(`canSee(${fseId}) - no display matrix; return false`);
+      this.logger.warn(`canSee(${fseId}) - no display matrix; return false`);
       return false;
     }
-    // this.logger.debug(`isFcArc: ${this.isFcArc()} == ARC sees: ${displayMatrix.arcSees === 'Y'}`);
-    // this.logger.debug(`isFcNci: ${this.isFcNci()} == NCI sees: ${displayMatrix.oefiaSees === 'Y'}`);
     if ((this.isFcArc() && displayMatrix.arcSees === 'Y') || (this.isFcNci() && displayMatrix.oefiaSees === 'Y')) {
-      // this.logger.debug(`canSee(${fseId}) :: true`);
       return true;
     }
-    // this.logger.debug(`canSee(${fseId}) :: false`);
     return false;
   }
 

@@ -5,6 +5,7 @@ import { NciPfrGrantQueryDtoEx, orderByPriorityAndPI } from './nci-pfr-grant-que
 import { RfaPaNcabDate } from '@cbiit/i2ecws-lib/model/rfaPaNcabDate';
 import { NGXLogger } from 'ngx-logger';
 import { Alert } from 'src/app/alert-billboard/alert';
+import { CustomServerLoggingService } from 'src/app/logging/custom-server-logging-service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +37,8 @@ export class PlanModel {
   pendingAlerts: Alert[] = [];
 
   constructor(propertiesService: AppPropertiesService,
-              private logger: NGXLogger) {
+              private logger: NGXLogger,
+              private customLogger: CustomServerLoggingService) {
     // TODO: static properties should be set at app level and shared somehow
     this.grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this.yourgrantsUrl = propertiesService.getProperty('URL_YOURGRANTS');
@@ -185,7 +187,7 @@ export class PlanModel {
       req.financialInfoDto.fundingRequestCans.forEach(can => {
         const key = String(can.fseId) + '-' + String(req.applId);
         if (!can.approvedDc || !can.approvedTc) {
-          this.logger.error('CAN error :: no TC/DC values', can);
+          this.logger.error('CAN error :: no TC/DC values', `PlanId: ${this.fundingPlanDto.fprId}`, can);
         }
 
         c = this.selectedApplIdCans.get(key);

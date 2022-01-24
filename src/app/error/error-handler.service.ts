@@ -22,7 +22,7 @@ export class ErrorHandlerService {
   }
 
   private logErrorDetails(timestamp: number, error: any): void {
-    this.customLogger.logServerError(``, {timestamp, error});
+    this.customLogger.logErrorWithContext(``, {timestamp, error});
     const userId: string = this.userService.currentUserValue.nihNetworkId;
     this.logger.warn(`=========== ERROR DETAILS ===========`);
     this.logger.warn(`== User/Timestamp: ${userId}/${timestamp}`);
