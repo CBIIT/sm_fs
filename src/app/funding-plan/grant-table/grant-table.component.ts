@@ -88,7 +88,7 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
             ngTemplateRef: { ref: this.fullGrantNumberRenderer}, className: 'all'},
         {title: 'PI', data: 'piFullName', // 1
             render: ( data, type, row, meta ) => {
-              return '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
+              return (data && data != null) ? '<a href="mailto:' + row.piEmail + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>' : '';
             },
             className: 'all'},
         {title: 'Project Title', data: 'projectTitle'}, // 2
