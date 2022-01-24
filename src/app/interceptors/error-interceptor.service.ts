@@ -34,22 +34,24 @@ export class ErrorInterceptorService implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (!req.url.includes('heartbeat')) {
-      this.logger.debug(`Current route URL    : ${this.router.url}`);
-      this.logger.debug(`Request URL          : ${req.url}`);
-      this.logger.debug(`Initialization status: ${this.initializerStatus.done ? 'Done' : 'In Progress'}`);
+      this.customLogger.debug(`Current route URL    : ${this.router.url}`);
+      this.customLogger.debug(`Request URL          : ${req.url}`);
+      this.customLogger.debug(`Initialization status: ${this.initializerStatus.done ? 'Done' : 'In Progress'}`);
     }
 
     return next.handle(req).pipe(
       catchError((error) => {
-        if (error.status === 200 && error.url?.startsWith('https://auth')) {
+        if (req.url.includes('logs') || req.url.includes('heartbeat')) {
+          return throwError(error);
+        } else if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           url = window.location.origin + url;
 
-          this.logger.info(`Error URL: ${error.url}`);
-          this.logger.info(`Source URL of error: ${this.router.url}`);
-          this.logger.info(`Restore session URL: ${url}`);
+          this.customLogger.info(`Error URL: ${error.url}`);
+          this.customLogger.info(`Source URL of error: ${this.router.url}`);
+          this.customLogger.info(`Restore session URL: ${url}`);
           const features = 'popup,menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700,noreferrer';
 
           const errorUrl = new URL(error.url);
@@ -60,7 +62,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
             this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
           }
           return of(undefined);
-        } else if (error.status === 400 || req.url.includes('logs') || req.url.includes('heartbeat')) {  // BadRequestException, checked exception from backend.
+        } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
           return throwError(error);
         } else {
           const timestamp: number = Date.now();
