@@ -412,7 +412,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     DataTablesModule,
     DragDropModule,
     LoggerModule.forRoot({
-      serverLoggingUrl: '/i2ecws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR,
+      serverLoggingUrl: '/i2ecws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.INFO,
       enableSourceMaps: true
     }),
     CookieModule.forRoot()
