@@ -95,7 +95,7 @@
         <h2>Application(s) Skipped</h2>
         <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-skipped-collapse" role="button" aria-expanded="true" aria-controls="apps-skipped-collapse"></a>
     </div>
-    <div class="col-12 collapse show mt-2" id="apps-skipped-collapse">
+    <div class=" collapse show mt-2" id="apps-skipped-collapse">
         <app-grant-table [grantList]="skGrants"></app-grant-table>
     </div>
     <div class="col-12">
@@ -112,7 +112,7 @@
         <h2>Application(s) Not Considered for Funding</h2>
         <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-notconsidered-collapse" role="button" aria-expanded="true" aria-controls="apps-notconsidered-collapse"></a>
     </div>
-    <div class="col-12 collapse show mt-2" id="apps-notconsidered-collapse">
+    <div class="collapse show mt-2" id="apps-notconsidered-collapse">
         <p *ngIf="!ncGrants || ncGrants.length === 0">
             Nothing found to be displayed. All applications received for this FOA to NCAB 
             <span *ngFor = "let rfaNcCab of planModel.grantsSearchCriteria let j=index">
