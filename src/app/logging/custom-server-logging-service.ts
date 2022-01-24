@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { NGXLogger } from 'ngx-logger';
-import { NgxLoggerControllerService } from '@cbiit/i2ecws-lib';
-import { NgxPayload } from '@cbiit/i2ecws-lib';
+import { NGXLogger, NgxLoggerLevel } from 'ngx-logger';
+import { NgxLoggerControllerService, NgxPayload } from '@cbiit/i2ecws-lib';
 import { UserService } from '@cbiit/i2ecui-lib';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
@@ -15,6 +14,8 @@ export class CustomServerLoggingService {
   private retryQueue: NgxPayload[] = [];
   private userQueue: NgxPayload[] = [];
   private MAX_QUEUE = 100;
+
+  public userQueueLevel: NgxLoggerLevel.INFO;
 
   constructor(
     private logger: NGXLogger,
@@ -30,60 +31,49 @@ export class CustomServerLoggingService {
     });
   }
 
-  queueMessage(msg: any, ...extra: any): void {
-    const logBody: NgxPayload = {
-      fileName: '',
-      level: 3,
-      lineNumber: '',
-      message: msg,
-      timestamp: `${Date.now()}`,
-      additional: [this.getDiagnostics(extra)],
-    };
+  private queueMessage(logBody: NgxPayload): void {
     this.pushQueueMessage(this.userQueue, logBody);
   }
 
-  pushQueueMessage(queue: NgxPayload[], body: NgxPayload): void {
+  private pushQueueMessage(queue: NgxPayload[], body: NgxPayload): void {
     if (queue.length > this.MAX_QUEUE) {
       queue.shift();
     }
     queue.push(body);
   }
 
-  clearUserQueue(): void {
+  private clearUserQueue(): void {
     this.userQueue = [];
   }
 
-  postUserQueue(): void {
+  private postUserQueue(): void {
     this.sendQueuedMessages(this.userQueue);
   }
 
   logServer(msg: any, ...extra: any[]): void {
-    this.logger.debug(`Logging: ${msg} :: ${extra}`);
-    const logBody: NgxPayload = {
-      fileName: '',
-      level: 3,
-      lineNumber: '',
-      message: msg,
-      timestamp: `${Date.now()}`,
-      additional: [this.getDiagnostics(false, extra)],
-    };
+    const logBody: NgxPayload = this.buildPayload(NgxLoggerLevel.INFO, msg, extra);
     this.post(logBody);
   }
 
   logServerError(msg: any, ...extra: any[]): void {
-    this.logger.debug(`Logging: ${msg} :: ${extra}`);
-    const logBody: NgxPayload = {
-      fileName: '',
-      level: 6,
-      lineNumber: '',
-      message: msg,
-      timestamp: `${Date.now()}`,
-      additional: [this.getDiagnostics(true, extra)],
-    };
+    const logBody: NgxPayload = this.buildPayload(NgxLoggerLevel.ERROR, msg, [...extra, this.userQueue]);
     this.post(logBody);
   }
 
-  private getDiagnostics(attachQueue: boolean, ...extra: any[]): DiagnosticPayload {
+  private buildPayload(level: NgxLoggerLevel, msg: any, ...extra: any[]): NgxPayload {
+    const payload: NgxPayload = {
+      fileName: '',
+      level: +level,
+      lineNumber: '',
+      message: msg,
+      timestamp: `${Date.now()}`,
+      additional: [this.getDiagnostics(extra)],
+    };
+
+    return payload;
+  }
+
+  private getDiagnostics(...extra: any[]): DiagnosticPayload {
     const diagnostics: DiagnosticPayload = {
       userId: this.userService.currentUserValue.nihNetworkId,
       applicationId: 'FUNDING_SELECTIONS',
@@ -96,10 +86,6 @@ export class CustomServerLoggingService {
       extra.forEach(x => {
         diagnostics.userProvidedData.push(x);
       });
-    }
-
-    if (attachQueue) {
-      diagnostics.userProvidedData.push(this.userQueue);
     }
 
     return diagnostics;
@@ -128,30 +114,44 @@ export class CustomServerLoggingService {
   /* proxy methods for NGXLogger */
   trace(message: any, ...additional: any[]): void {
     this.logger.trace(message, additional);
+    this.queueUserMessage(NgxLoggerLevel.TRACE, message, additional);
   }
 
   debug(message: any, ...additional: any[]): void {
     this.logger.debug(message, additional);
+    this.queueUserMessage(NgxLoggerLevel.DEBUG, message, additional);
   }
 
   info(message: any, ...additional: any[]): void {
+    this.logServer(message, additional);
     this.logger.info(message, additional);
+    this.queueUserMessage(NgxLoggerLevel.INFO, message, additional);
   }
 
   log(message: any, ...additional: any[]): void {
     this.logger.log(message, additional);
+    this.queueUserMessage(NgxLoggerLevel.LOG, message, additional);
   }
 
   warn(message: any, ...additional: any[]): void {
     this.logger.warn(message, additional);
+    this.queueUserMessage(NgxLoggerLevel.WARN, message, additional);
   }
 
   error(message: any, ...additional: any[]): void {
     this.logger.error(message, additional);
+    this.queueUserMessage(NgxLoggerLevel.ERROR, message, additional);
   }
 
   fatal(message: any, ...additional: any[]): void {
     this.logger.fatal(message, additional);
+    this.queueUserMessage(NgxLoggerLevel.FATAL, message, additional);
+  }
+
+  private queueUserMessage(level: NgxLoggerLevel, message: any, ...additional: any[]): void {
+    if (this.userQueueLevel >= level) {
+      this.pushQueueMessage(this.userQueue, this.buildPayload(level, message, additional));
+    }
   }
 }
 
