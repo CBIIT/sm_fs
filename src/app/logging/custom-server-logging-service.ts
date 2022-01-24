@@ -13,7 +13,7 @@ export class CustomServerLoggingService {
   private sendLog = false;
   private retryQueue: NgxPayload[] = [];
   private userQueue: NgxPayload[] = [];
-  private MAX_QUEUE = 100;
+  private MAX_QUEUE = 20;
 
   public userQueueLevel: NgxLoggerLevel.INFO;
 
@@ -52,6 +52,7 @@ export class CustomServerLoggingService {
 
   logServer(msg: any, ...extra: any[]): void {
     const logBody: NgxPayload = this.buildPayload(NgxLoggerLevel.INFO, msg, extra);
+    this.pushQueueMessage(this.userQueue, logBody);
     this.post(logBody);
   }
 
