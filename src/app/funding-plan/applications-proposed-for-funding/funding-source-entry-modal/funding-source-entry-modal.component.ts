@@ -6,7 +6,6 @@ import {
   FpProgramRecommendedCostsComponent,
   PendingPrcValues
 } from '../../fp-program-recommended-costs/fp-program-recommended-costs.component';
-import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../../model/plan/nci-pfr-grant-query-dto-ex';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,6 +13,7 @@ import { openNewWindow } from '../../../utils/utils';
 import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { PlanManagementService } from '../../service/plan-management.service';
 import { FundingSourceGrantDataPayload } from '../funding-source-grant-data-payload';
+import { CustomServerLoggingService } from '../../../logging/custom-server-logging-service';
 
 @Component({
   selector: 'app-funding-source-entry-modal',
@@ -33,7 +33,7 @@ export class FundingSourceEntryModalComponent implements OnInit {
   constructor(
     public modal: NgbActiveModal,
     private planModel: PlanModel,
-    private logger: NGXLogger,
+    private logger: CustomServerLoggingService,
     private router: Router,
     public planManagementService: PlanManagementService) {
   }
@@ -47,7 +47,7 @@ export class FundingSourceEntryModalComponent implements OnInit {
 
   onModalSubmit(form: NgForm): void {
     if (!form.valid) {
-      this.logger.error('form has errors', form);
+      this.logger.error('Form has errors', form);
       return;
     }
     const result: FundingSourceGrantDataPayload[] = [];

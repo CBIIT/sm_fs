@@ -9,7 +9,6 @@ import {
 } from '@cbiit/i2ecws-lib';
 import { AppPropertiesService } from '../../service/app-properties.service';
 import { FundingRequestErrorCodes } from './funding-request-error-codes';
-import { NGXLogger } from 'ngx-logger';
 import { ProgramRecommendedCostsModel } from '../../program-recommended-costs/program-recommended-costs-model';
 import { FundingSourceTypes } from './funding-source-types';
 import { FundingRequestTypes, INITIAL_PAY_TYPES, SKIP_TYPES } from './funding-request-types';
@@ -18,6 +17,7 @@ import { PrcBaselineSource, PrcDataPoint } from '../../program-recommended-costs
 import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
 import { getCurrentFiscalYear } from 'src/app/utils/utils';
 import { Subject } from 'rxjs';
+import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
 
 
 @Injectable({
@@ -66,8 +66,6 @@ export class RequestModel {
 
   approverCriteriaChanged(): boolean {
     const newCriteria = this.makeApproverCriteria();
-    // this.logger.debug('new approver criteria ', newCriteria);
-    // this.logger.debug('prior approver criteria ', this.approverCriteria);
     return newCriteria.requestType !== this.approverCriteria.requestType
       || newCriteria.cayCode !== this.approverCriteria.cayCode
       || newCriteria.fundingSources !== this.approverCriteria.fundingSources
@@ -153,7 +151,7 @@ export class RequestModel {
 
   constructor(private propertiesService: AppPropertiesService,
               private canControllerService: FsCanControllerService,
-              private logger: NGXLogger,
+              private logger: CustomServerLoggingService,
   ) {
     this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
@@ -375,7 +373,7 @@ export class RequestModel {
         }
       },
       error => {
-        this.logger.error('getRequestCansUsingGET failed', error);
+        this.logger.error('getRequestCansUsingGET failed', error, this.requestDto);
       }
     );
   }

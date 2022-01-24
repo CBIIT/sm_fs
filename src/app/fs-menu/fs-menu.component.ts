@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AppUserSessionService } from '../service/app-user-session.service';
 import { PaylistControllerService } from '@cbiit/i2ecws-lib';
-import { NGXLogger } from 'ngx-logger';
 import { roleNames } from '../service/role-names';
+import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
 
 @Component({
   selector: 'app-fs-menu',
@@ -20,21 +20,22 @@ export class FsMenuComponent implements OnInit {
   splCertifier: boolean;
   pd: boolean;
   pa: boolean;
-  paylistReadOnlyRole: boolean =false;
+  paylistReadOnlyRole = false;
   paylistUrl: string;
-  pendingGrantsCount : number;
+  pendingGrantsCount: number;
 
   constructor(
-              private userSessionService: AppUserSessionService,
-              private paylistControllerService: PaylistControllerService,
-              private logger: NGXLogger) { }
+    private userSessionService: AppUserSessionService,
+    private paylistControllerService: PaylistControllerService,
+    private logger: CustomServerLoggingService) {
+  }
 
   ngOnInit(): void {
     // this.paylistUrl = this.gwbLinksService.getProperty('Paylist');
-    this.paylistUrl = "/paylist/";
-    this.paylistDashboardUrl = this.paylistUrl+ '#side-nav-paylists';
+    this.paylistUrl = '/paylist/';
+    this.paylistDashboardUrl = this.paylistUrl + '#side-nav-paylists';
     this.paylistPendingGrantsUrl = this.paylistUrl + '#side-nav-grants';
-    this.paylistSearchUrl =this.paylistUrl + '#side-nav-find-paylists';
+    this.paylistSearchUrl = this.paylistUrl + '#side-nav-find-paylists';
 
     this.ogaCertifier = this.userSessionService.hasRole(roleNames.OGA_CERTIFIER);
     this.oefiaCertifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
@@ -46,14 +47,10 @@ export class FsMenuComponent implements OnInit {
     this.paylistControllerService.getPaylistPendingGrantsCountUsingGET().subscribe(
       (result) => {
         this.pendingGrantsCount = result;
-
       },
       (error) => {
-        this.logger.error('retrieveFundingRequest failed ', error);
+        this.logger.logErrorWithContext('retrieveFundingRequest failed ', error);
       }
     );
-
   }
-
 }
-

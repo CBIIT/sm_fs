@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { NGXLogger } from 'ngx-logger';
 import { UserService } from '@cbiit/i2ecui-lib';
 import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
 
@@ -11,9 +10,8 @@ export class ErrorHandlerService {
   errorLog: Map<number, any> = new Map<number, any>();
 
   constructor(
-    private logger: NGXLogger,
     private userService: UserService,
-    private customLogger: CustomServerLoggingService) {
+    private logger: CustomServerLoggingService) {
   }
 
   registerNewError(timestamp: number, error: any): void {
@@ -22,17 +20,17 @@ export class ErrorHandlerService {
   }
 
   private logErrorDetails(timestamp: number, error: any): void {
-    this.customLogger.logErrorWithContext(``, {timestamp, error});
+    this.logger.logErrorWithContext(``, { timestamp, error });
     const userId: string = this.userService.currentUserValue.nihNetworkId;
-    this.logger.warn(`=========== ERROR DETAILS ===========`);
-    this.logger.warn(`== User/Timestamp: ${userId}/${timestamp}`);
-    this.logger.warn(`== Error type: ${typeof error}`);
-    this.logger.warn(`== Raw error: ${JSON.stringify(error)}`);
-    this.logger.warn(`== Keys: ${Object.keys(error)}`);
+    this.logger.debug(`=========== ERROR DETAILS ===========`);
+    this.logger.debug(`== User/Timestamp: ${userId}/${timestamp}`);
+    this.logger.debug(`== Error type: ${typeof error}`);
+    this.logger.debug(`== Raw error: ${JSON.stringify(error)}`);
+    this.logger.debug(`== Keys: ${Object.keys(error)}`);
     Object.keys(error).forEach(key => {
-      this.logger.warn(`=== ${key} :: ${JSON.stringify(error[key])} :: ${typeof error[key]}`);
+      this.logger.debug(`=== ${key} :: ${JSON.stringify(error[key])} :: ${typeof error[key]}`);
     });
-    this.logger.warn(`=========== END ERROR DETAILS ===========`);
+    this.logger.debug(`=========== END ERROR DETAILS ===========`);
   }
 
   getMessage(errorId: number): string {

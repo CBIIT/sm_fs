@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
-import { NGXLogger } from 'ngx-logger';
 import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
 import { PdCaIntegratorService } from '@cbiit/i2ecui-lib';
@@ -30,6 +29,7 @@ import { CanManagementService } from '../../cans/can-management.service';
 import { Alert } from '../../alert-billboard/alert';
 import { FundingSourceGrantDataPayload } from '../applications-proposed-for-funding/funding-source-grant-data-payload';
 import { findRequireCallReference } from '@angular/compiler-cli/ngcc/src/host/commonjs_umd_utils';
+import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
 
 @Component({
   selector: 'app-plan-step3',
@@ -58,7 +58,7 @@ export class PlanStep3Component implements OnInit {
 
   constructor(private navigationModel: NavigationStepModel,
               private router: Router,
-              private logger: NGXLogger,
+              private logger: CustomServerLoggingService,
               public planModel: PlanModel,
               private pdCaIntegratorService: PdCaIntegratorService,
               private planManagementService: PlanManagementService,
@@ -70,25 +70,22 @@ export class PlanStep3Component implements OnInit {
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(3, true);
-    this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
 
-      // this.logger.debug('new cayCode received');
+    this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
       this.cayCode = typeof next === 'string' ? next : next[0];
       this.planManagementService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
     });
+
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
-      // this.logger.debug('new PD received');
       this.pdNpnId = next;
       this.planManagementService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
     });
+
     this.pdCaIntegratorService.docEmitter.subscribe(next => {
-
-
-      // this.logger.debug('new DOC: ', next);
       this.doc = next;
     });
-    this.planName = this.planModel.fundingPlanDto.planName;
 
+    this.planName = this.planModel.fundingPlanDto.planName;
     this.pdNpnId = this.planModel.fundingPlanDto.requestorNpnId;
     this.cayCode = this.planModel.fundingPlanDto.cayCode;
 
@@ -98,9 +95,6 @@ export class PlanStep3Component implements OnInit {
     const missingRequests = selectedRequests.filter(f => !existingRequests.includes(f));
     const deletedRequests = existingRequests.filter(f => !selectedRequests.includes(f));
 
-    this.logger.debug('all', selectedRequests);
-    this.logger.debug('existing', existingRequests);
-    this.logger.debug('missing', missingRequests);
     if (missingRequests) {
       this.addMissingGrants(missingRequests);
     }
@@ -127,7 +121,6 @@ export class PlanStep3Component implements OnInit {
     this.alerts = null;
 
     if (this.step3form.valid && this.planManagementService.unfundedGrants().length === 0) {
-
       this.scrapePlanData();
       if (this.planManagementService.selectedSourceCount <= 1) {
         this.buildPlanModel();
@@ -155,8 +148,6 @@ export class PlanStep3Component implements OnInit {
         this.saveFundingPlan();
       }
     } else {
-      // push an alert here
-      // this.logger.warn(this.planManagementService.unfundedGrants());
       this.alerts = [{
         type: 'danger',
         message: 'Please correct the errors identified below.',
@@ -168,8 +159,9 @@ export class PlanStep3Component implements OnInit {
   }
 
   private saveFundingPlan(): void {
+    this.logger.info('Plan before save', this.planModel.fundingPlanDto);
     this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
-      this.logger.debug('before save: ', JSON.stringify(result));
+      this.logger.info('Plan after save', result);
       this.planModel.fundingPlanDto = result;
       this.planManagementService.buildPlanBudgetAndCanModel();
       this.planManagementService.buildGrantCostModel();
@@ -189,7 +181,7 @@ export class PlanStep3Component implements OnInit {
           this.router.navigate([this.nextStep]);
         });
     }, error => {
-      this.logger.warn(error);
+      this.logger.logErrorWithContext(error, this.planModel.fundingPlanDto);
     });
   }
 
@@ -200,7 +192,7 @@ export class PlanStep3Component implements OnInit {
   }
 
   private buildPlanRequestLists(): void {
-    this.logger.debug('build plan request lists');
+    this.logger.debug('Build plan request lists');
     if (!this.planModel.fundingPlanDto.fpFinancialInformation) {
       this.planModel.fundingPlanDto.fpFinancialInformation = {};
     }
@@ -733,6 +725,7 @@ export class PlanStep3Component implements OnInit {
       && g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore).map(x => x.applId);
 
     missingRequests.forEach(applid => {
+      this.logger.info(`Adding newly selected grant [${applid}] to plan ${this.planModel.fundingPlanDto.fprId}`);
       const inRange: boolean = listApplicationsWithinRange.includes(applid);
       this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.push(
         {
@@ -755,7 +748,7 @@ export class PlanStep3Component implements OnInit {
       && g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore).map(x => x.applId);
 
     deletedRequests.forEach(applid => {
-      this.logger.debug(`Purge data for applid: ${applid}`);
+      this.logger.info(`Purge data for applid: ${applid} from plan ${this.planModel.fundingPlanDto.fprId}`);
       const inRange: boolean = listApplicationsWithinRange.includes(applid);
 
       const fr: FundingRequestDto = this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.find(r => r.applId === applid);
@@ -763,9 +756,8 @@ export class PlanStep3Component implements OnInit {
         fr.frtId = (inRange ? FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_SKIP
           : FundingRequestTypes.FUNDING_PLAN__NOT_PROPOSED_AND_OUTSIDE_FUNDING_PLAN_SCORE_RANGE);
         fr.financialInfoDto.requestTypeId = fr.frtId;
-        this.logger.debug('reset frt for', fr);
       } else {
-        this.logger.warn(`No funding request for applId ${applid}`);
+        this.logger.warn(`No funding request found for for applId ${applid} in plan ${this.planModel.fundingPlanDto.fprId}`);
       }
     });
   }

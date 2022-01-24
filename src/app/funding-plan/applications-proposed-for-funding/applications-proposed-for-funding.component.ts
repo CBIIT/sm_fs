@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
-import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ControlContainer, NgForm } from '@angular/forms';
@@ -17,6 +16,7 @@ import { FundingReqBudgetsDto } from '@cbiit/i2ecws-lib';
 import { FundingSourceEntryModalComponent } from './funding-source-entry-modal/funding-source-entry-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSourceGrantDataPayload } from './funding-source-grant-data-payload';
+import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -46,7 +46,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   private _budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
   pendingValues: PendingPrcValues;
 
-  constructor(private logger: NGXLogger,
+  constructor(private logger: CustomServerLoggingService,
               public planModel: PlanModel,
               public planManagementService: PlanManagementService,
               private modalService: NgbModal,
@@ -163,7 +163,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   canAddFundingSource(): boolean {
-
     if (!this.planManagementService.selectedSourceCount) {
       return !!this.fundingSources?.get(0)?.selectedValue;
     }
@@ -180,11 +179,9 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     const modalRef = this.modalService.open(FundingSourceEntryModalComponent, { size: 'xl' });
     modalRef.componentInstance.sourceIndex = index;
     modalRef.result.then((result) => {
-      // this.logger.debug(result);
       this.addFundingSource.next(result.filter(f => !!f.displayType));
       this.clearEditFlag.next();
     }, (reason) => {
-      // this.logger.debug('closed with', reason);
       this.cancelAddFundingSource.next();
     });
 
@@ -204,7 +201,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   capturePendingValues($event: PendingPrcValues): void {
-    this.logger.debug(`${JSON.stringify($event)}`);
     this.pendingValues = $event;
   }
 

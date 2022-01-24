@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { NGXLogger } from 'ngx-logger';
 import { FsRequestControllerService } from '@cbiit/i2ecws-lib';
 import { RequestModel } from '../../model/request/request-model';
 import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
 import { CanManagementService } from '../../cans/can-management.service';
+import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
 
 export type SuccessFunction = () => void;
 export type ErrorFunction = (s: string) => void;
@@ -15,15 +15,17 @@ export class RequestLoaderService {
   error: string;
 
   constructor(
-    private logger: NGXLogger,
+    private logger: CustomServerLoggingService,
     private requestService: FsRequestControllerService,
     private canManagementService: CanManagementService,
     private requestModel: RequestModel) {
   }
 
   public loadRequest(frqId: number, successFn: SuccessFunction, errorFn: ErrorFunction): void {
+    this.logger.info(`Loading request ${frqId}.`);
     this.requestService.retrieveFundingRequestUsingGET(frqId).subscribe(
       (result) => {
+        this.logger.info(`Request ${frqId} succesfully loaded. Proceeding with initialization.`);
         this.requestModel.reset();
         this.requestModel.requestDto = result.requestDto;
         this.requestModel.grant = result.grantDto;
@@ -88,6 +90,7 @@ export class RequestLoaderService {
              * version was doing its routing. Ideally, we should synchronize all the above service calls and only
              * invoke the success function when they're all complete.
              */
+            this.logger.info(`Request ${frqId} succesfully loaded and initialized. Proceeding with navigation.`);
             if (successFn) {
               successFn();
             }
@@ -95,7 +98,7 @@ export class RequestLoaderService {
         });
       },
       (error) => {
-        this.logger.error('retrieveFundingRequest failed ', error);
+        this.logger.logErrorWithContext(`loadRequest(${frqId} failed`, error);
         if (errorFn) {
           errorFn(error);
         }

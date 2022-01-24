@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CanCcxDto, WorkflowTaskDto } from '@cbiit/i2ecws-lib';
-import { NGXLogger } from 'ngx-logger';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanManagementService } from '../can-management.service';
+import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
 
 @Component({
   selector: 'app-can-search-modal',
@@ -23,7 +23,7 @@ export class CanSearchModalComponent implements OnInit {
   private _showAll: boolean;
 
   constructor(
-    private logger: NGXLogger,
+    private logger: CustomServerLoggingService,
     private modalService: NgbModal,
     private canManagementService: CanManagementService) {
   }

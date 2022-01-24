@@ -183,7 +183,6 @@ export class CanManagementService {
     if (!can) {
       const result = this.activeCanCache.get(key);
       if (result && result.length !== 0) {
-        this.logger.debug('cache hit for key', key);
         return new Observable<CanCcxDto[]>(subscriber => {
           subscriber.next(result);
         });
@@ -191,11 +190,8 @@ export class CanManagementService {
     }
 
     const fn = this.canService.getAllCansUsingGET(activityCodes, bmmCodes, can, nciSource);
-    // const key = [bmmCodes, activityCodes, nciSource].join('_');
-    this.logger.debug('cache miss for key', key);
 
     fn.subscribe(next => {
-      this.logger.debug('caching data for key', key);
       this.activeCanCache.set(key, next);
     });
 
@@ -204,7 +200,6 @@ export class CanManagementService {
 
   refreshGrantCans(): boolean {
     if (!this.requestModel.grant || !this.requestModel.grant.applId) {
-      // this.logger.debug('Not refreshing grant cans due to missing applId');
       return false;
     }
     this.canService.getGrantCansUsingGET(this.requestModel.grant.applId).subscribe(result => {

@@ -30,7 +30,6 @@ export class BudgetInfoComponent implements OnInit {
 
   defaultCanTracker: Map<number, boolean> = new Map<number, boolean>();
 
-
   initialPay: boolean;
 
   private requestNciFseIds: number[];
@@ -240,7 +239,7 @@ export class BudgetInfoComponent implements OnInit {
   canEnter(fseId: number): boolean {
     const displayMatrix = this.canManagementService.canDisplayMatrix?.get(fseId);
     if (!displayMatrix) {
-      this.logger.debug(`canEnter(${fseId}) - no display matrix; return false`);
+      this.logger.warn(`canEnter(${fseId}) - no display matrix; return false`);
       return false;
     }
     // this.logger.debug(`isFcArc: ${this.isFcArc()} == ARC enters: ${displayMatrix.arcEnters === 'Y'}`);
