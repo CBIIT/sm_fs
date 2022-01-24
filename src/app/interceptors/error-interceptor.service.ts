@@ -43,6 +43,8 @@ export class ErrorInterceptorService implements HttpInterceptor {
       catchError((error) => {
         if (req.url.includes('logs') || req.url.includes('heartbeat')) {
           return throwError(error);
+        } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
+          return throwError(error);
         } else if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.warn('Error is most likely timeout - redirect to login.');
           // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
@@ -62,8 +64,6 @@ export class ErrorInterceptorService implements HttpInterceptor {
             this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
           }
           return of(undefined);
-        } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
-          return throwError(error);
         } else {
           const timestamp: number = Date.now();
           this.errorHandler.registerNewError(timestamp, error);
