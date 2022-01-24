@@ -5,6 +5,10 @@
 - [ ] Document best practices
 - [ ] Code review
 - [ ] Error logging - how to get console logs for diagnostics?
+- [ ] Heartbeat service - parameterize magic numbers
+- [ ] Add size constraints to userQueue and logQueue in custom logging service
+- [ ] Use custom logger as proxy for all log calls to NGXLogger
+- [ ] Check for errors in 'CanDeactivate' methods
 
 ## Create new UI components
 

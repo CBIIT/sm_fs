@@ -11,8 +11,10 @@ import { HeartbeatService } from '../heartbeat/heartbeat-service';
   providedIn: 'root'
 })
 export class CustomServerLoggingService {
-  private sendLog: boolean = false;
-  private logQueue: NgxPayload[] = [];
+  private sendLog = false;
+  private retryQueue: NgxPayload[] = [];
+  private userQueue: NgxPayload[] = [];
+  private MAX_QUEUE = 100;
 
   constructor(
     private logger: NGXLogger,
@@ -23,12 +25,39 @@ export class CustomServerLoggingService {
     heartbeatService.heartBeat.subscribe(next => {
       this.sendLog = next;
       if (next) {
-        this.sendQueuedMessages();
+        this.sendQueuedMessages(this.retryQueue);
       }
     });
   }
 
-  logServer(msg: string, ...extra: any): void {
+  queueMessage(msg: any, ...extra: any): void {
+    const logBody: NgxPayload = {
+      fileName: '',
+      level: 3,
+      lineNumber: '',
+      message: msg,
+      timestamp: `${Date.now()}`,
+      additional: [this.getDiagnostics(extra)],
+    };
+    this.pushQueueMessage(this.userQueue, logBody);
+  }
+
+  pushQueueMessage(queue: NgxPayload[], body: NgxPayload): void {
+    if (queue.length > this.MAX_QUEUE) {
+      queue.shift();
+    }
+    queue.push(body);
+  }
+
+  clearUserQueue(): void {
+    this.userQueue = [];
+  }
+
+  postUserQueue(): void {
+    this.sendQueuedMessages(this.userQueue);
+  }
+
+  logServer(msg: any, ...extra: any[]): void {
     this.logger.debug(`Logging: ${msg} :: ${extra}`);
     const logBody: NgxPayload = {
       fileName: '',
@@ -41,7 +70,7 @@ export class CustomServerLoggingService {
     this.post(logBody);
   }
 
-  logServerError(msg: string, ...extra: any): void {
+  logServerError(msg: any, ...extra: any[]): void {
     this.logger.debug(`Logging: ${msg} :: ${extra}`);
     const logBody: NgxPayload = {
       fileName: '',
@@ -54,7 +83,7 @@ export class CustomServerLoggingService {
     this.post(logBody);
   }
 
-  private getDiagnostics(...extra): DiagnosticPayload {
+  private getDiagnostics(...extra: any[]): DiagnosticPayload {
     const diagnostics: DiagnosticPayload = {
       userId: this.userService.currentUserValue.nihNetworkId,
       applicationId: 'FUNDING_SELECTIONS',
@@ -74,22 +103,51 @@ export class CustomServerLoggingService {
 
   private post(logBody: NgxPayload): void {
     if (this.sendLog) {
-      this.logService.saveLogUsingPOST(logBody).subscribe(next => {
+      this.logService.saveLogUsingPOST(logBody).subscribe(() => {
       }, error => {
-        this.logger.warn(`Unable to save message to server:\n====> body: ${JSON.stringify(logBody)}\n====> error: ${JSON.stringify(error)}`);
-        this.logQueue.push(logBody);
+        this.logger.warn(`Error saving message to server: ${JSON.stringify(error)}`);
+        this.pushQueueMessage(this.retryQueue, logBody);
       });
     } else {
       this.logger.warn('Heartbeat indicates service is down; queing message for later send');
-      this.logQueue.push(logBody);
+      this.pushQueueMessage(this.retryQueue, logBody);
     }
   }
 
-  private sendQueuedMessages(): void {
+  private sendQueuedMessages(queue: NgxPayload[]): void {
     let m: NgxPayload;
-    while (typeof (m = this.logQueue.shift()) !== 'undefined') {
+    while (typeof (m = queue.shift()) !== 'undefined') {
       this.post(m);
     }
+  }
+
+  /* proxy methods for NGXLogger */
+  trace(message: any, ...additional: any[]): void {
+    this.logger.trace(message, additional);
+  }
+
+  debug(message: any, ...additional: any[]): void {
+    this.logger.debug(message, additional);
+  }
+
+  info(message: any, ...additional: any[]): void {
+    this.logger.info(message, additional);
+  }
+
+  log(message: any, ...additional: any[]): void {
+    this.logger.log(message, additional);
+  }
+
+  warn(message: any, ...additional: any[]): void {
+    this.logger.warn(message, additional);
+  }
+
+  error(message: any, ...additional: any[]): void {
+    this.logger.error(message, additional);
+  }
+
+  fatal(message: any, ...additional: any[]): void {
+    this.logger.fatal(message, additional);
   }
 }
 
