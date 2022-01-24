@@ -42,10 +42,6 @@ export class CustomServerLoggingService {
     this.userQueue = [];
   }
 
-  private postUserQueue(): void {
-    this.sendQueuedMessages(this.userQueue);
-  }
-
   getUserQueue(): NgxPayload[] {
     return this.userQueue;
   }
@@ -71,34 +67,26 @@ export class CustomServerLoggingService {
   }
 
   private buildPayload(level: NgxLoggerLevel, msg: any, ...extra: any[]): NgxPayload {
-    const payload: NgxPayload = {
+    return {
       fileName: '',
       level: +level,
       lineNumber: '',
       message: msg,
       timestamp: `${Date.now()}`,
-      additional: [this.getDiagnostics(extra)],
+      additional: [this.getDiagnostics(), extra],
     };
-
-    return payload;
   }
 
-  private getDiagnostics(...extra: any[]): DiagnosticPayload {
-    const diagnostics: DiagnosticPayload = {
+  // TODO: Modify this method to add additional diagnostic data
+  // TODO: Parameterize applicationId
+  private getDiagnostics(): DiagnosticPayload {
+    return {
       userId: this.userService.currentUserValue.nihNetworkId,
       applicationId: 'FUNDING_SELECTIONS',
       sessionId: this.heartbeatService.sessionId,
       currentRoute: this.router.url,
       envProperties: environment,
-      userProvidedData: [],
     };
-    if (extra && extra.length > 0) {
-      extra.forEach(x => {
-        diagnostics.userProvidedData.push(x);
-      });
-    }
-
-    return diagnostics;
   }
 
   private post(logBody: NgxPayload): void {
@@ -155,15 +143,11 @@ export class CustomServerLoggingService {
   }
 
   error(message: any, ...additional: any[]): void {
-    // TODO: Should this method defer to logServerError()?
     this.logger.error(message, additional);
-    // this.queueUserMessage(NgxLoggerLevel.ERROR, message, additional);
   }
 
   fatal(message: any, ...additional: any[]): void {
-    // TODO: Should this method defer to logServerError()?
     this.logger.fatal(message, additional);
-    // this.queueUserMessage(NgxLoggerLevel.FATAL, message, additional);
   }
 
   /**
@@ -183,7 +167,6 @@ export interface DiagnosticPayload {
   sessionId: string;
   currentRoute: string;
   envProperties: any;
-  userProvidedData: any;
 }
 
 
