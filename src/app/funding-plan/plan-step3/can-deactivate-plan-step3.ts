@@ -1,13 +1,13 @@
 import { PlanStep3Component } from './plan-step3.component';
 import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
-import { NGXLogger } from 'ngx-logger';
 import { Injectable } from '@angular/core';
 import { PlanLoaderService } from '../retrieve-plan/plan-loader.service';
+import { CustomServerLoggingService } from 'src/app/logging/custom-server-logging-service';
 
 @Injectable({ providedIn: 'root' })
 export class CanDeactivatePlanStep3 implements CanDeactivate<PlanStep3Component> {
   constructor(
-    private logger: NGXLogger,
+    private logger: CustomServerLoggingService,
     private planLoaderService: PlanLoaderService) {
   }
 
@@ -16,9 +16,17 @@ export class CanDeactivatePlanStep3 implements CanDeactivate<PlanStep3Component>
     route: ActivatedRouteSnapshot,
     currentState: RouterStateSnapshot,
     nextState?: RouterStateSnapshot): boolean {
+
+    this.logger.debug('Route', route);
+    this.logger.debug('Current state', currentState);
+    this.logger.debug('Next state', nextState);
+
     const id = component.planModel.fundingPlanDto.fprId;
 
-    const newUrl = nextState.url;
+    const newUrl = nextState?.url;
+    if (nextState?.url?.includes('error')) {
+      return true;
+    }
     // Allow them to go backwards without reloading
     if (nextState?.url?.startsWith('/plan/step2') || nextState?.url?.startsWith('/plan/step1')) {
       return true;

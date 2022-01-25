@@ -10,6 +10,7 @@
 - [ ] Use custom logger as proxy for all log calls to NGXLogger
 - [ ] Check for errors in 'CanDeactivate' methods
 - [ ] Fix the stupid router issue with 5 login windows during initialization...
+- [ ] Evaluate errors in logging service and set up circuit-breaker
 
 ## Create new UI components
 
