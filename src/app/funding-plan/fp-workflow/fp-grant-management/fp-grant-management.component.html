@@ -54,7 +54,7 @@
                             </ng-select2>
                             </div>
                             <ng-template #readonly2>
-                                <a href="mailto: {{grant.pfrBkupSpecEmailAddress}}">{{grant.pfrBkupSpecFullName}}</a>
+                                <a href="mailto: {{grant.pfrBkupSpecEmailAddress}}">{{grant.pfrBkupSpecFullName == null? ' -- ': grant.pfrBkupSpecFullName }}</a>
                             </ng-template>
                         </td>
                     </tr>

@@ -7,7 +7,7 @@
 </div>
 <form #gmform='ngForm'>
 <div class="row collapse show" id="grants-mgmt-collapse">
-    <div class="col-lg-auto">
+    <div class="col-lg-4">
         <div class="form-group">
             <span class="like-label" id="action-type-desc">Action Type</span>
             <span *ngIf="readonly; else actionInput">{{gmInfo.actionType}}</span>
@@ -53,11 +53,11 @@
             </ng-template>
         </div>
     </div>
-    <div class="col">
+    <div class="col-lg-4">
         <div class="form-group">
             <label for="backup-specialist">Backup Specialist <span *ngIf="!readonly" class="optional">(optional)</span></label>
             <span *ngIf="readonly"><a
-                href="mailto: {{gmInfo.bkupSpecEmail}}">{{gmInfo.bkupSpecFullName}}</a></span>
+                href="mailto: {{gmInfo.bkupSpecEmail}}">{{gmInfo.pfrBkupSpecFullName == null? ' -- ': gmInfo.pfrBkupSpecFullName }}</a></span>
             <ng-select2 *ngIf="!readonly"
                 id="backup-specialist"
                 name="backup-specialist"
