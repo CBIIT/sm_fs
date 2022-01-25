@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { NGXLogger } from 'ngx-logger';
 import { HeartbeatControllerService } from '@cbiit/i2ecws-lib';
 import { Subject } from 'rxjs';
+import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,7 @@ export class HeartbeatService {
   private startTime: number = Date.now();
 
   constructor(
-    private logger: NGXLogger,
+    private logger: CustomServerLoggingService,
     private heartbeatController: HeartbeatControllerService) {
     this.startDefaultHeartbeat();
     this.startDefaultDbHeartbeat();
@@ -60,7 +60,7 @@ export class HeartbeatService {
   }
 
   startHeartbeat(millis: number): void {
-    this.logger.warn('Starting heartbeat');
+    this.logger.logMessageWithContext('Starting heartbeat');
     this.heartbeatInterval = setInterval(() => {
       this.heartbeatController.getHeartBeatUsingGET().subscribe(next => {
         // this.logger.debug(`ping: ${next.sessionId}`);
@@ -68,8 +68,8 @@ export class HeartbeatService {
         this.lastGoodHeartbeat = Date.now();
         this.heartBeat.next(true);
       }, error => {
-        this.logger.warn(`Received error: ${JSON.stringify(error)}`);
-        this.logger.warn(`API not responding. Last good hearbeat: ${Date.now() - this.lastGoodHeartbeat} millis ago`);
+        this.logger.debug(`Received error: ${JSON.stringify(error)}`);
+        this.logger.debug(`API not responding. Last good hearbeat: ${Date.now() - this.lastGoodHeartbeat} millis ago`);
         this.heartBeat.next(false);
       });
     }, millis);
@@ -77,7 +77,7 @@ export class HeartbeatService {
 
   stopHeartbeat(): void {
     if (this.heartbeatInterval) {
-      this.logger.warn('Stopping heartbeat');
+      this.logger.logMessageWithContext('Stopping heartbeat');
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = undefined;
     }
@@ -96,14 +96,14 @@ export class HeartbeatService {
           this.lastGoodDbHeartbeat = Date.now();
           this.startDefaultHeartbeat();
         } else {
-          this.logger.warn(`DB is not responsive. Last good heartbeat: ${Date.now() - this.lastGoodDbHeartbeat} millis ago`);
+          this.logger.debug(`DB is not responsive. Last good heartbeat: ${Date.now() - this.lastGoodDbHeartbeat} millis ago`);
           this.stopHeartbeat();
         }
         this.dbHeartBeat.next(next.dbActive);
       }, error => {
         // Technically speaking, DB status is unknown at this point, since this indicates the API itself is not responding
         this.stopHeartbeat();
-        this.logger.warn(`DB status unknown. Last good heartbeat: ${Date.now() - this.lastGoodDbHeartbeat} millis`);
+        this.logger.debug(`DB status unknown. Last good heartbeat: ${Date.now() - this.lastGoodDbHeartbeat} millis`);
         this.heartBeat.next(false);
         this.dbHeartBeat.next(false);
       });
@@ -134,7 +134,7 @@ export class HeartbeatService {
   }
 
   private pullThePlug(): void {
-    this.logger.warn('Pulling the plug');
+    this.logger.logErrorWithContext('Pulling the plug');
     this.stopHeartbeat();
     this.stopCircuitBreaker();
     this.stopDbHeartbeat();

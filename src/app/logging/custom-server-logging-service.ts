@@ -107,10 +107,10 @@ export class CustomServerLoggingService {
   }
 
   private pause(): void {
-    this.logger.warn('Pause logging for 60 seconds due to unknown error');
+    this.logger.debug('Pause server logging for 60 seconds due to unknown error');
     this.paused = true;
     setTimeout(() => {
-      this.logger.debug('Restart logging after pause');
+      this.logger.debug('Restart server logging after pause');
       this.paused = false;
     }, this.pauseTimeout);
   }
