@@ -57,7 +57,7 @@
         <div class="form-group">
             <label for="backup-specialist">Backup Specialist <span *ngIf="!readonly" class="optional">(optional)</span></label>
             <span *ngIf="readonly"><a
-                href="mailto: {{gmInfo.bkupSpecEmail}}">{{gmInfo.pfrBkupSpecFullName == null? ' -- ': gmInfo.pfrBkupSpecFullName }}</a></span>
+                href="mailto: {{gmInfo.bkupSpecEmail}}">{{gmInfo.bkupSpecFullName == null? ' -- ': gmInfo.bkupSpecFullName }}</a></span>
             <ng-select2 *ngIf="!readonly"
                 id="backup-specialist"
                 name="backup-specialist"
