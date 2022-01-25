@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HeartbeatControllerService } from '@cbiit/i2ecws-lib';
+import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
-import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,7 @@ export class HeartbeatService {
   private startTime: number = Date.now();
 
   constructor(
-    private logger: CustomServerLoggingService,
+    private logger: NGXLogger,
     private heartbeatController: HeartbeatControllerService) {
     this.startDefaultHeartbeat();
     this.startDefaultDbHeartbeat();
@@ -60,7 +60,7 @@ export class HeartbeatService {
   }
 
   startHeartbeat(millis: number): void {
-    this.logger.logMessageWithContext('Starting heartbeat');
+    this.logger.info('Starting heartbeat');
     this.heartbeatInterval = setInterval(() => {
       this.heartbeatController.getHeartBeatUsingGET().subscribe(next => {
         // this.logger.debug(`ping: ${next.sessionId}`);
@@ -77,7 +77,7 @@ export class HeartbeatService {
 
   stopHeartbeat(): void {
     if (this.heartbeatInterval) {
-      this.logger.logMessageWithContext('Stopping heartbeat');
+      this.logger.info('Stopping heartbeat');
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = undefined;
     }
@@ -134,7 +134,7 @@ export class HeartbeatService {
   }
 
   private pullThePlug(): void {
-    this.logger.logErrorWithContext('Pulling the plug');
+    this.logger.error('Pulling the plug');
     this.stopHeartbeat();
     this.stopCircuitBreaker();
     this.stopDbHeartbeat();
