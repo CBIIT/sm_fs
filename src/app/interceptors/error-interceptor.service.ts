@@ -60,10 +60,11 @@ export class ErrorInterceptorService implements HttpInterceptor {
           errorUrl.searchParams.delete('TARGET');
           errorUrl.searchParams.set('TARGET', url);
 
-          if (!this.modalWindow) {
-            this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
-          }
-          // this.router.navigate(['']);
+          // if (!this.modalWindow) {
+          //   this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
+          // }
+
+          this.router.navigate(['/search/fr/landing']);
           return of(undefined);
         } else {
           const timestamp: number = Date.now();
