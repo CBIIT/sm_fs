@@ -11,6 +11,8 @@
 - [ ] Check for errors in 'CanDeactivate' methods
 - [ ] Fix the stupid router issue with 5 login windows during initialization...
 - [ ] Evaluate errors in logging service and set up circuit-breaker
+- [ ] Review and evaluate all logging statements
+- [ ] Break circular dependency between HeartbeatService and CustomLogger
 
 ## Create new UI components
 

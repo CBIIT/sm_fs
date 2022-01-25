@@ -39,6 +39,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
 
     return next.handle(req).pipe(
       catchError((error) => {
+        this.logger.debug(`Error: ${this.errorHandler.errorType(error)}`);
         // Let the log service and heartbeat service handle their own errors
         if (req.url.includes('logs') || req.url.includes('heartbeat')) {
           return throwError(error);
@@ -59,9 +60,10 @@ export class ErrorInterceptorService implements HttpInterceptor {
           errorUrl.searchParams.delete('TARGET');
           errorUrl.searchParams.set('TARGET', url);
 
-          if (!this.modalWindow) {
-            this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
-          }
+          // if (!this.modalWindow) {
+          //   this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
+          // }
+          this.router.navigate(['/']);
           return of(undefined);
         } else {
           const timestamp: number = Date.now();

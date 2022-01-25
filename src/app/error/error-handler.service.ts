@@ -14,23 +14,39 @@ export class ErrorHandlerService {
     private logger: CustomServerLoggingService) {
   }
 
+  public isTimeout(error: any): boolean {
+    if (error.status === 200 && error.url?.startsWith('https://auth')) {
+      return true;
+    }
+    return false;
+  }
+
   registerNewError(timestamp: number, error: any): void {
     this.errorLog.set(timestamp, error);
     this.logErrorDetails(timestamp, error);
   }
 
   private logErrorDetails(timestamp: number, error: any): void {
-    this.logger.logErrorWithContext(``, { timestamp, error });
+    this.logger.logErrorWithContext('New error recorded', { timestamp, error });
     const userId: string = this.userService.currentUserValue.nihNetworkId;
     this.logger.debug(`=========== ERROR DETAILS ===========`);
     this.logger.debug(`== User/Timestamp: ${userId}/${timestamp}`);
-    this.logger.debug(`== Error type: ${typeof error}`);
+    this.logger.debug(`== Error type: ${this.errorType(error)}`);
     this.logger.debug(`== Raw error: ${JSON.stringify(error)}`);
-    this.logger.debug(`== Keys: ${Object.keys(error)}`);
-    Object.keys(error).forEach(key => {
-      this.logger.debug(`=== ${key} :: ${JSON.stringify(error[key])} :: ${typeof error[key]}`);
-    });
     this.logger.debug(`=========== END ERROR DETAILS ===========`);
+  }
+
+  public errorType(error: any): string {
+    if (!error) {
+      return '-NA-';
+    }
+    if (typeof error === 'string') {
+      return error as string;
+    }
+    if (typeof error === 'object') {
+      return error.constructor.name;
+    }
+    return typeof error;
   }
 
   getMessage(errorId: number): string {
