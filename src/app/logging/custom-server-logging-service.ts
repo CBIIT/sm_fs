@@ -11,6 +11,8 @@ import { HeartbeatService } from '../heartbeat/heartbeat-service';
 })
 export class CustomServerLoggingService {
   private sendLog = false;
+  private paused = false;
+  private pauseTimeout = 60000;
   private retryQueue: NgxPayload[] = [];
   private userQueue: NgxPayload[] = [];
   private MAX_QUEUE = 20;
@@ -90,16 +92,27 @@ export class CustomServerLoggingService {
   }
 
   private post(logBody: NgxPayload): void {
-    if (this.sendLog) {
+    if (this.sendLog && !this.paused) {
       this.logService.saveLogUsingPOST(logBody).subscribe(() => {
       }, error => {
         this.logger.warn(`Error saving message to server: ${JSON.stringify(error)}`);
+        this.logger.warn(`Offending message: ${JSON.stringify(logBody)}`);
         this.pushQueueMessage(this.retryQueue, logBody);
+        this.pause();
       });
     } else {
-      this.logger.warn('Heartbeat indicates service is down; queing message for later send');
+      // this.logger.warn('Heartbeat indicates service is down; queing message for later send');
       this.pushQueueMessage(this.retryQueue, logBody);
     }
+  }
+
+  private pause(): void {
+    this.logger.warn('Pause logging for 60 seconds due to unknown error');
+    this.paused = true;
+    setTimeout(() => {
+      this.logger.debug('Restart logging after pause');
+      this.paused = false;
+    }, this.pauseTimeout);
   }
 
   private sendQueuedMessages(queue: NgxPayload[]): void {

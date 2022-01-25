@@ -1,6 +1,5 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { ApplicationInitStatus, Injectable } from '@angular/core';
-import { NGXLogger } from 'ngx-logger';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, filter, finalize } from 'rxjs/operators';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
@@ -17,11 +16,10 @@ export class ErrorInterceptorService implements HttpInterceptor {
 
   constructor(
     private errorHandler: ErrorHandlerService,
-    private logger: NGXLogger,
     private router: Router,
     private location: Location,
     private initializerStatus: ApplicationInitStatus,
-    private customLogger: CustomServerLoggingService,
+    private logger: CustomServerLoggingService,
   ) {
     router.events.pipe(filter(event => event instanceof NavigationStart)).subscribe((event: NavigationStart) => {
       this.handleNavigationStart(event);
@@ -34,26 +32,27 @@ export class ErrorInterceptorService implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (!req.url.includes('heartbeat')) {
-      this.customLogger.debug(`Current route URL    : ${this.router.url}`);
-      this.customLogger.debug(`Request URL          : ${req.url}`);
-      this.customLogger.debug(`Initialization status: ${this.initializerStatus.done ? 'Done' : 'In Progress'}`);
+      this.logger.debug(`Current route URL    : ${this.router.url}`);
+      this.logger.debug(`Request URL          : ${req.url}`);
+      this.logger.debug(`Initialization status: ${this.initializerStatus.done ? 'Done' : 'In Progress'}`);
     }
 
     return next.handle(req).pipe(
       catchError((error) => {
+        // Let the log service and heartbeat service handle their own errors
         if (req.url.includes('logs') || req.url.includes('heartbeat')) {
           return throwError(error);
         } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
           return throwError(error);
         } else if (error.status === 200 && error.url?.startsWith('https://auth')) {
-          this.logger.warn('Error is most likely timeout - redirect to login.');
+          this.logger.logMessageWithContext('Error is most likely timeout - redirect to login.', error);
           // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           url = window.location.origin + url;
 
-          this.customLogger.info(`Error URL: ${error.url}`);
-          this.customLogger.info(`Source URL of error: ${this.router.url}`);
-          this.customLogger.info(`Restore session URL: ${url}`);
+          this.logger.debug(`Error URL: ${error.url}`);
+          this.logger.debug(`Source URL of error: ${this.router.url}`);
+          this.logger.debug(`Restore session URL: ${url}`);
           const features = 'popup,menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700,noreferrer';
 
           const errorUrl = new URL(error.url);
@@ -78,10 +77,10 @@ export class ErrorInterceptorService implements HttpInterceptor {
   }
 
   handleNavigationStart(event: NavigationStart): void {
-    // this.customLogger.logServer('=======> NavigationStart', event);
+    // this.logger.logServer('=======> NavigationStart', event);
   }
 
   handleNavigationEnd(event: NavigationEnd): void {
-    // this.customLogger.logServer('=======> NavigationEnd', event);
+    // this.logger.logServer('=======> NavigationEnd', event);
   }
 }

@@ -4,11 +4,12 @@
 - [ ] Document standards and usage
 - [ ] Document best practices
 - [ ] Code review
-- [ ] Error logging - how to get console logs for diagnostics?
+- [X] Error logging - how to get console logs for diagnostics?
 - [ ] Heartbeat service - parameterize magic numbers
-- [ ] Add size constraints to userQueue and logQueue in custom logging service
+- [X] Add size constraints to userQueue and logQueue in custom logging service
 - [ ] Use custom logger as proxy for all log calls to NGXLogger
 - [ ] Check for errors in 'CanDeactivate' methods
+- [ ] Fix the stupid router issue with 5 login windows during initialization...
 
 ## Create new UI components
 
