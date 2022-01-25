@@ -35,9 +35,13 @@ export class CanSearchModalComponent implements OnInit {
   search(): void {
     if (!!this.bmmCodes && !!this.activityCodes) {
       if (this.showAll) {
-        this.canManagementService.searchAllCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
-          this.canData = result;
-        });
+        if (this.canSearchTerm || confirm('Search for all CANs with an empty search term will take a long time. Are you sure you want to proceed?')) {
+          this.canManagementService.searchAllCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
+            this.canData = result;
+          });
+        } else {
+
+        }
       } else {
         this.canManagementService.searchDefaultCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
           this.canData = result;
@@ -62,7 +66,7 @@ export class CanSearchModalComponent implements OnInit {
 
   open(): Promise<CanCcxDto> {
     return new Promise<CanCcxDto>((resolve, reject) => {
-      this.modalRef = this.modalService.open(this.modalContent, { size: 'lg', scrollable: true});
+      this.modalRef = this.modalService.open(this.modalContent, { size: 'lg', scrollable: true });
       this.modalRef.result.then(resolve, reject);
     });
   }
@@ -75,7 +79,7 @@ export class CanSearchModalComponent implements OnInit {
     this._showAll = value;
 
     // Disable this?  Auto search only if there's a term or showALl is false?
-    this.search();
+    // this.search();
   }
 
   select($event: MouseEvent, c: CanCcxDto): void {
