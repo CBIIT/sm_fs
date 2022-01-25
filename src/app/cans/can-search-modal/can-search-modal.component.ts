@@ -39,8 +39,6 @@ export class CanSearchModalComponent implements OnInit {
           this.canManagementService.searchAllCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
             this.canData = result;
           });
-        } else {
-
         }
       } else {
         this.canManagementService.searchDefaultCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
