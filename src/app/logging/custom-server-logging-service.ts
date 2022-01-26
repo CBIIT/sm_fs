@@ -5,7 +5,7 @@ import { UserService } from '@cbiit/i2ecui-lib';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { HeartbeatService } from '../heartbeat/heartbeat-service';
-import { AppPropertiesService, PROPERTIES_APP_NAME } from '../service/app-properties.service';
+import { PROPERTIES_APP_NAME } from '../service/app-properties.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class CustomServerLoggingService {
   private userQueue: NgxPayload[] = [];
   private MAX_QUEUE = 20;
 
-  public userQueueLevel: NgxLoggerLevel.INFO;
+  public userQueueLevel: NgxLoggerLevel = NgxLoggerLevel.INFO;
 
   constructor(
     private logger: NGXLogger,
@@ -27,6 +27,8 @@ export class CustomServerLoggingService {
     private router: Router,
     private heartbeatService: HeartbeatService,
     @Inject(PROPERTIES_APP_NAME) private appName: string) {
+
+    this.userQueueLevel = logger.getConfigSnapshot().serverLogLevel || NgxLoggerLevel.INFO;
 
     heartbeatService.heartBeat.subscribe(next => {
       this.sendLog = next;
@@ -55,7 +57,7 @@ export class CustomServerLoggingService {
    * Unlike the proxy log methods below, this method will attach additional diagnostic data to the message sent to
    * the server.
    */
-  logMessageWithContext(msg: any, ...extra: any[]): void {
+  logInfoWithContext(msg: any, ...extra: any[]): void {
     const logBody: NgxPayload = this.buildPayload(NgxLoggerLevel.INFO, msg, extra);
     this.pushQueueMessage(this.userQueue, logBody);
     this.post(logBody);
@@ -78,12 +80,13 @@ export class CustomServerLoggingService {
       lineNumber: '',
       message: msg,
       timestamp: `${Date.now()}`,
-      additional: [this.getDiagnostics(), extra],
+      additional: [this.getDiagnostics(), ...extra],
     };
   }
 
   // TODO: Modify this method to add additional diagnostic data
-  private getDiagnostics(): DiagnosticPayload {
+  // TODO: Move this into a separate service
+  public getDiagnostics(): DiagnosticPayload {
     return {
       userId: this.userService.currentUserValue.nihNetworkId,
       applicationId: this.appName,
@@ -132,37 +135,42 @@ export class CustomServerLoggingService {
    * or user queue provided by the logErrorWithContext() method. If you want that context, use logErrorWithContext().
    */
   trace(message: any, ...additional: any[]): void {
-    this.logger.trace(message, additional);
+    this.logger.trace(message, [this.getDiagnostics(), ...additional]);
     this.queueUserMessage(NgxLoggerLevel.TRACE, message, additional);
   }
 
   debug(message: any, ...additional: any[]): void {
-    this.logger.debug(message, additional);
+    this.logger.debug(message, [this.getDiagnostics(), ...additional]);
     this.queueUserMessage(NgxLoggerLevel.DEBUG, message, additional);
   }
 
   info(message: any, ...additional: any[]): void {
-    this.logMessageWithContext(message, additional);
-    this.logger.info(message, additional);
+    this.logger.info(message, [this.getDiagnostics(), ...additional]);
     this.queueUserMessage(NgxLoggerLevel.INFO, message, additional);
   }
 
   log(message: any, ...additional: any[]): void {
-    this.logger.log(message, additional);
+    this.logger.log(message, [this.getDiagnostics(), ...additional]);
     this.queueUserMessage(NgxLoggerLevel.LOG, message, additional);
   }
 
   warn(message: any, ...additional: any[]): void {
-    this.logger.warn(message, additional);
+    this.logger.warn(message, [this.getDiagnostics(), ...additional]);
     this.queueUserMessage(NgxLoggerLevel.WARN, message, additional);
   }
 
   error(message: any, ...additional: any[]): void {
-    this.logger.error(message, additional);
+    // Log as debug so it will show in the console, but won't get sent to the server twice
+    this.logger.debug(message, additional);
+    // this.logger.error(message, [this.getDiagnostics(), ...additional]);
+    this.logErrorWithContext(message, additional);
   }
 
   fatal(message: any, ...additional: any[]): void {
-    this.logger.fatal(message, additional);
+    // Log as debug so it will show in the console, but won't get sent to the server twice
+    this.logger.debug(message, additional);
+    // this.logger.fatal(message, [this.getDiagnostics(), ...additional]);
+    this.logErrorWithContext(message, additional);
   }
 
   /**
