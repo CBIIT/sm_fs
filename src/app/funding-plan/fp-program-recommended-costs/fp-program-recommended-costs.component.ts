@@ -83,7 +83,6 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   broadcastPendingValues(): void {
-    this.logger.debug('broadcast pending values ....');
     const vals: PendingPrcValues = {
       applId: this.grant.applId,
       displayType: this._displayType,
@@ -124,8 +123,6 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       return;
     }
 
-    // this.logger.warn('---------------------------------------------------------------------------------');
-    // this.logger.debug('lockDollar:', this.grant.applId, this.sourceIndex, this.lockDollar);
     this.initializeValuesForEdit();
   }
 
@@ -150,8 +147,8 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
     // Determine whether we should lock the dollar value or not
     if (this.planManagementService.isPercentSelected(this.grant.applId)) {
-      const p = this.planManagementService.percentSelectionIndex(this.grant.applId); 
-      this.logger.debug(`${JSON.stringify(p)} -- ${this.sourceIndex} -- ${this.fseId}`)
+      const p = this.planManagementService.percentSelectionIndex(this.grant.applId);
+      // this.logger.debug(`${JSON.stringify(p)} -- ${this.sourceIndex} -- ${this.fseId}`)
       if (+p.index !== +this.sourceIndex) {
         if (+p.fseId !== +this.fseId) {
           this.logger.debug('locking dollar');
