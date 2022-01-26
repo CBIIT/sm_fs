@@ -96,34 +96,43 @@ export class CustomServerLoggingService {
     };
   }
 
-  private post(logBody: NgxPayload): void {
+  private post(logBody: NgxPayload, retry = true): void {
     if (this.sendLog && !this.paused) {
       this.logService.saveLogUsingPOST(logBody).subscribe(() => {
       }, error => {
         this.logger.warn(`Error saving message to server: ${JSON.stringify(error)}`);
         this.logger.warn(`Offending message: ${JSON.stringify(logBody)}`);
-        this.pushQueueMessage(this.retryQueue, logBody);
+        if (retry) {
+          this.pushQueueMessage(this.retryQueue, logBody);
+        } else {
+          this.logger.warn('Last attempt. We will not try to send this message again.');
+        }
         this.pause();
       });
     } else {
       // this.logger.warn('Heartbeat indicates service is down; queing message for later send');
-      this.pushQueueMessage(this.retryQueue, logBody);
+      if (retry) {
+        this.pushQueueMessage(this.retryQueue, logBody);
+      }
     }
   }
 
   private pause(): void {
     this.logger.debug('Pause server logging for 60 seconds due to unknown error');
     this.paused = true;
-    setTimeout(() => {
-      this.logger.debug('Restart server logging after pause');
-      this.paused = false;
-    }, this.pauseTimeout);
+    setTimeout(this.restartAfterPause.bind(this), this.pauseTimeout);
+  }
+
+  restartAfterPause(): void {
+    this.logger.debug('Restart server logging after pause');
+    this.paused = false;
   }
 
   private sendQueuedMessages(queue: NgxPayload[]): void {
     let m: NgxPayload;
     while (typeof (m = queue.shift()) !== 'undefined') {
-      this.post(m);
+      // If we've already failed to send this message once before, don't try again after this
+      this.post(m, false);
     }
   }
 
@@ -131,8 +140,8 @@ export class CustomServerLoggingService {
    * Proxy methods for NGXLogger. They will be logged using NGXLogger, as well as added to the queue of user messages
    * which are sent with the payload when the logErrorWithContext method is called. Since they defer to NGXLogger,
    * they may be sent to the server as well, depending on how NGXLogger is configured. Note that .error() and .fatal()
-   * messages are NOT queued, since they should be logged immediately, and they will not carry the extra diagnostics
-   * or user queue provided by the logErrorWithContext() method. If you want that context, use logErrorWithContext().
+   * messages are NOT queued, since they should be logged immediately, and they will not carry the user queue provided
+   * by the logErrorWithContext() method. If you want that context, use logErrorWithContext().
    */
   trace(message: any, ...additional: any[]): void {
     this.logger.trace(message, [this.getDiagnostics(), ...additional]);
@@ -160,17 +169,11 @@ export class CustomServerLoggingService {
   }
 
   error(message: any, ...additional: any[]): void {
-    // Log as debug so it will show in the console, but won't get sent to the server twice
-    this.logger.debug(message, additional);
-    // this.logger.error(message, [this.getDiagnostics(), ...additional]);
-    this.logErrorWithContext(message, additional);
+    this.logger.error(message, [this.getDiagnostics(), ...additional]);
   }
 
   fatal(message: any, ...additional: any[]): void {
-    // Log as debug so it will show in the console, but won't get sent to the server twice
-    this.logger.debug(message, additional);
-    // this.logger.fatal(message, [this.getDiagnostics(), ...additional]);
-    this.logErrorWithContext(message, additional);
+    this.logger.fatal(message, [this.getDiagnostics(), ...additional]);
   }
 
   /**
@@ -188,8 +191,8 @@ export interface DiagnosticPayload {
   userId: string;
   applicationId: string;
   sessionId: string;
-  currentRoute: string;
-  envProperties: any;
+  currentRoute?: string;
+  envProperties?: any;
 }
 
 
