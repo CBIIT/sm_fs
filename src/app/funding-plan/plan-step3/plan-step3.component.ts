@@ -632,31 +632,11 @@ export class PlanStep3Component implements OnInit {
     this.planManagementService.buildPlanBudgetAndCanModel();
     this.planModel.fundingPlanDto.totalRecommendedAmt = this.planManagementService.grandTotalTotal();
     this.planModel.fundingPlanDto.directRecommendedAmt = this.planManagementService.grandTotalDirect();
-  }
-
-  private getCANDeleteCount(frCan: FundingRequestCanDto, currentCAN: FundingRequestCanDto, editing: { sourceId: number; index: number }): number {
-    if (!currentCAN) {
-      return 0;
-    }
-    if (+frCan.fseId !== +currentCAN.fseId && +currentCAN.fseId !== +editing.sourceId) {
-      return 0;
-    } else {
-      return 1;
-    }
-  }
-
-  private getBudgetDeleteCount(newBudget: FundingReqBudgetsDto, currentBudget: FundingReqBudgetsDto, editing: { sourceId: number; index: number }): number {
-    if (!currentBudget) {
-      return 0;
-    }
-    if (+newBudget.fseId !== +currentBudget.fseId && +currentBudget.fseId !== +editing.sourceId) {
-      return 0;
-    } else {
-      return 1;
-    }
+    this.planManagementService.clearPendingValues();
   }
 
   deleteFundingSource($event: number): void {
+    this.planManagementService.clearPendingValues();
 
     if (!this.planModel.fundingPlanDto || !this.planModel.fundingPlanDto.fpFinancialInformation) {
       return;
@@ -686,10 +666,12 @@ export class PlanStep3Component implements OnInit {
   }
 
   beforeEditFundingSource($event: { sourceId: number; index: number }): void {
+    this.planManagementService.clearPendingValues();
     this.editing = $event;
   }
 
   cancelAddFundingSource(): void {
+    this.planManagementService.clearPendingValues();
     this.clearEditFlag();
   }
 

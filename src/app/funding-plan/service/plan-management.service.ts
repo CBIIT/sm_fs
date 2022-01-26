@@ -118,7 +118,7 @@ export class PlanManagementService {
       if (+r.applId === +applId) {
         r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
           if (can && isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0) {
-            result = {index, fseId: can.fseId};
+            result = { index, fseId: can.fseId };
           }
         });
       }
@@ -424,7 +424,7 @@ export class PlanManagementService {
                 totalPercentCut: this.calculatePercentCut(can.approvedTc, piTotal),
                 directPercentCut: this.calculatePercentCut(can.approvedDc, piDirect),
               };
-              if((!g.approvedDirect && !g.approvedTotal) || (g.approvedDirect === 0 && g.approvedTotal === 0)) {
+              if ((!g.approvedDirect && !g.approvedTotal) || (g.approvedDirect === 0 && g.approvedTotal === 0)) {
                 // do nothing
               } else {
                 this._grantCosts.push(g);
@@ -489,13 +489,16 @@ export class PlanManagementService {
     if (vals.displayType === 'percent') {
       return (vals.percentCut != null && !isNaN(vals.percentCut));
     } else {
-      if (vals.directCost === null || vals.totalCost === null || isNaN(vals.directCost) || isNaN(vals.totalCost)) {
+      if (vals.directCost === null || vals.totalCost === null || isNaN(vals.directCost) || isNaN(vals.totalCost) || (vals.directCost === 0 && vals.totalCost === 0)) {
         return false;
       }
     }
     return true;
   }
 
+  clearPendingValues(): void {
+    this.pendingValues.clear();
+  }
 
   addPendingValues(vals: PendingPrcValues): void {
     // this.logger.debug(`addPendingValues(${JSON.stringify(vals)})`);
