@@ -47,7 +47,6 @@ export class ErrorInterceptorService implements HttpInterceptor {
           return throwError(error);
         } else if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.logMessageWithContext('Timeout encountered - redirect to login.', error);
-          // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
           let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           url = window.location.origin + url;
 
@@ -63,14 +62,13 @@ export class ErrorInterceptorService implements HttpInterceptor {
           if (!this.modalWindow) {
             this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
           }
-          // this.router.navigate(['']);
+
           return of(undefined);
         } else {
           const timestamp: number = Date.now();
           this.errorHandler.registerNewError(timestamp, error);
           this.router.navigate(['/error', timestamp]);
           return throwError(error);
-          // return of(undefined);
         }
       }), finalize(() => {
         this.modalWindow = undefined;

@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { NGXLogger, NgxLoggerLevel } from 'ngx-logger';
 import { NgxLoggerControllerService, NgxPayload } from '@cbiit/i2ecws-lib';
 import { UserService } from '@cbiit/i2ecui-lib';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { HeartbeatService } from '../heartbeat/heartbeat-service';
+import { AppPropertiesService, PROPERTIES_APP_NAME } from '../service/app-properties.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,9 @@ export class CustomServerLoggingService {
     private logService: NgxLoggerControllerService,
     private userService: UserService,
     private router: Router,
-    private heartbeatService: HeartbeatService) {
+    private heartbeatService: HeartbeatService,
+    @Inject(PROPERTIES_APP_NAME) private appName: string) {
+
     heartbeatService.heartBeat.subscribe(next => {
       this.sendLog = next;
       if (next) {
@@ -80,11 +83,10 @@ export class CustomServerLoggingService {
   }
 
   // TODO: Modify this method to add additional diagnostic data
-  // TODO: Parameterize applicationId
   private getDiagnostics(): DiagnosticPayload {
     return {
       userId: this.userService.currentUserValue.nihNetworkId,
-      applicationId: 'FUNDING_SELECTIONS',
+      applicationId: this.appName,
       sessionId: this.heartbeatService.sessionId,
       currentRoute: this.router.url,
       envProperties: environment,

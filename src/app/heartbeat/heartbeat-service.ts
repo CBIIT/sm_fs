@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HeartbeatControllerService } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
+import { AppPropertiesService } from '../service/app-properties.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,10 @@ export class HeartbeatService {
   public heartBeat = new Subject<boolean>();
   public dbHeartBeat = new Subject<boolean>();
   public killSwitch = new Subject<void>();
+
+  private HEARTBEAT_INTERVAL: number;
+  private DB_HEARTBEAT_INTERVAL: number;
+  private KILLSWITCH_INTERVAL: number;
 
   private _sessionId: string;
   private _dbActive: boolean;
@@ -22,9 +27,14 @@ export class HeartbeatService {
   private lastGoodDbHeartbeat: number;
   private startTime: number = Date.now();
 
+  // TODO: can't use CustomLogger here because of circular dependency. Resolve that...
   constructor(
     private logger: NGXLogger,
-    private heartbeatController: HeartbeatControllerService) {
+    private heartbeatController: HeartbeatControllerService,
+    private appPropertiesService: AppPropertiesService) {
+    this.HEARTBEAT_INTERVAL = +appPropertiesService.getProperty('HEARTBEAT_INTERVAL') || 10000;
+    this.DB_HEARTBEAT_INTERVAL = +appPropertiesService.getProperty('DB_HEARTBEAT_INTERVAL') || 20000;
+    this.KILLSWITCH_INTERVAL = +appPropertiesService.getProperty('KILLSWITCH_INTERVAL') || 300000;
     this.startDefaultHeartbeat();
     this.startDefaultDbHeartbeat();
     this.startCircuitBreaker();
@@ -34,16 +44,17 @@ export class HeartbeatService {
   }
 
   startCircuitBreaker(): void {
+    this.logger.info(`Starting circuit breaker: ${this.KILLSWITCH_INTERVAL} millis`);
     this.circuitBreakerInterval = setInterval(() => {
       const zeroHour: number = this.lastGoodDbHeartbeat || this.startTime;
       this.logger.debug(`${Date.now() - this.lastGoodHeartbeat} millis since last good heartbeat`);
       this.logger.debug(`${Date.now() - this.lastGoodDbHeartbeat} millis since last good DB heartbeat`);
-      this.logger.debug(`${300000 - (Date.now() - zeroHour)} millis until termination`);
+      this.logger.debug(`${this.KILLSWITCH_INTERVAL - (Date.now() - zeroHour)} millis until termination`);
       // TODO: use the killswitch if the time since last good heartbeat is too long
-      if (Date.now() - zeroHour >= 300000 /* 5 minutes */) {
+      if (Date.now() - zeroHour >= this.KILLSWITCH_INTERVAL) {
         this.killSwitch.next();
       }
-    }, 30000);
+    }, this.KILLSWITCH_INTERVAL);
   }
 
   stopCircuitBreaker(): void {
@@ -55,12 +66,12 @@ export class HeartbeatService {
 
   startDefaultHeartbeat(): void {
     if (!this.heartbeatInterval) {
-      this.startHeartbeat(1000);
+      this.startHeartbeat(this.HEARTBEAT_INTERVAL);
     }
   }
 
   startHeartbeat(millis: number): void {
-    this.logger.info('Starting heartbeat');
+    this.logger.info(`Starting heartbeat: ${this.HEARTBEAT_INTERVAL} millis`);
     this.heartbeatInterval = setInterval(() => {
       this.heartbeatController.getHeartBeatUsingGET().subscribe(next => {
         // this.logger.debug(`ping: ${next.sessionId}`);
@@ -84,10 +95,11 @@ export class HeartbeatService {
   }
 
   startDefaultDbHeartbeat(): void {
-    this.startDbHeartbeat(10000);
+    this.startDbHeartbeat(this.DB_HEARTBEAT_INTERVAL);
   }
 
   startDbHeartbeat(millis: number): void {
+    this.logger.info(`Starting DB heartbeat: ${this.DB_HEARTBEAT_INTERVAL} millis`);
     this.dbHeartbeatInterval = setInterval(() => {
       this.heartbeatController.getDbHeartBeatUsingGET().subscribe(next => {
         this.sessionId = next.sessionId;
