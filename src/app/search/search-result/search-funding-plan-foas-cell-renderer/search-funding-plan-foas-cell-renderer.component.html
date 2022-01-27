@@ -1,12 +1,12 @@
 <table >
   <tbody>
   <tr class="odd" *ngFor="let foas of data.fpFoasList">
-    <td style="width: 24%">
+    <td style="width: 70px; min-width: 70px;">
       <a href="{{foas.nihGuideAddr}}" target="_blank">{{foas.rfaPaNumber}}</a>
     </td>
-    <td style="width: 40%">{{foas.title}}</td>
-    <td style="width: 20%">{{convert(foas.councilMeetingDateList)}}</td>
-    <td style="width: 16%" class="issue-type-column">{{foas.issueType}}</td>
+    <td style="width: 100%">{{foas.title}}</td>
+    <td style="width: 58px; min-width: 58px;">{{convert(foas.councilMeetingDateList)}}</td>
+    <td style="width: 58px; min-width: 58px;" class="issue-type-column">{{foas.issueType}}</td>
   </tr>
   </tbody>
 </table>
