@@ -44,7 +44,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
           return throwError(error);
         }
         // Let the log service and heartbeat service handle their own errors
-        if (req.url.includes('logs') || req.url.includes('heartbeat')) {
+        if (req.url.includes('logs') || req.url.includes('heartbeat') || error.url.includes('logs') || error.url.includes('heartbeat') ) {
           return throwError(error);
         } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
           return throwError(error);
