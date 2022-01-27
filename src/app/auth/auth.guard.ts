@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { UserService } from '@cbiit/i2ecui-lib';
 import { SecurityCredentials, GrantedAuthority } from '@cbiit/i2ecws-lib';
 import { RequestModel } from '../model/request/request-model';
+import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class AuthGuard implements CanActivate {
   constructor(
     private router: Router,
     private userService: UserService,
-    private requestModel: RequestModel
+    private requestModel: RequestModel,
+    private logger: CustomServerLoggingService
   ) { }
 
   canActivate(
@@ -25,10 +27,12 @@ export class AuthGuard implements CanActivate {
 
             if (creds) {
               if (this.hasValidAuthority(creds.authorities)) {
+                this.logger.info(`New session started for user ${creds.username}`);
                 this.requestModel?.reset();
                 this.requestModel?.programRecommendedCostsModel?.deepReset(false);
                 resolve(true);
               } else {
+                this.logger.warn(`User ${creds.username} is not authorized to access Funding Selections`);
                 this.router.navigate(['/unauthorize']);
                 resolve(false);
               }
