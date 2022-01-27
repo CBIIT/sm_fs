@@ -20,7 +20,7 @@
       </thead>
       <tbody>
       <tr *ngFor="let rfa of fundingPlanFoas; let i = index; let first = first">
-        <td *ngIf="showPlanName">
+        <td  [ngClass]="[ fundingPlanFoas?.length>1 ? 'fp-name' : '']" [attr.rowspan]="fundingPlanFoas?.length" *ngIf="showPlanName && first">
           <ng-container *ngIf="first">{{planModel.fundingPlanDto.planName}}</ng-container>
         </td>
         <td>
@@ -136,7 +136,7 @@
     <div class="col-xl-2 col-lg-4 col-sm-6">
       <div class="form-group">
         <span class="like-label">Other DOC(s) Contributing Funds</span>
-        <p>
+        <p *ngIf="otherDocs?.length; else dash">
           <a *ngFor="let doc of otherDocs; let first = first" [routerLink]=""
              ngbTooltip="{{doc|codeDescription:'NciDocs'}}" triggers="click:blur" placement="top">
             <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>
@@ -144,6 +144,7 @@
             <ng-template #notFirstDoc>, {{doc}}</ng-template>
           </a>
         </p>
+        <ng-template #dash><div> -- </div></ng-template>
       </div>
     </div>
   </ng-container>
