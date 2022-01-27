@@ -3,7 +3,7 @@ import { CanCcxDto, WorkflowTaskDto } from '@cbiit/i2ecws-lib';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanManagementService } from '../can-management.service';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
+import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
 
 @Component({
   selector: 'app-can-search-modal',
@@ -18,9 +18,8 @@ export class CanSearchModalComponent implements OnInit {
   nciSourceFlag: string;
   bmmCodes: string;
   activityCodes: string;
-  title = 'CAN Search';
+  title = 'Search by CAN Information';
   canSearchTerm: string;
-  private _showAll: boolean;
 
   constructor(
     private logger: CustomServerLoggingService,
@@ -29,13 +28,13 @@ export class CanSearchModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.showAll = false;
   }
 
-  search(): void {
+  search(searchAll: boolean): void {
     if (!!this.bmmCodes && !!this.activityCodes) {
-      if (this.showAll) {
+      if (searchAll) {
         if (this.canSearchTerm || confirm('Searching for all CANs with an empty search term will take a long time. Are you sure you wish to proceed?')) {
+          this.canData = null;
           this.canManagementService.searchAllCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
             this.canData = result;
           });
@@ -50,12 +49,11 @@ export class CanSearchModalComponent implements OnInit {
 
   reset(): void {
     this.canSearchTerm = '';
-    this.showAll = false;
+    this.search(false);
   }
 
   prepare(): void {
     this.reset();
-    this.search();
   }
 
   onSubmit(canSearchForm: NgForm): void {
@@ -69,21 +67,18 @@ export class CanSearchModalComponent implements OnInit {
     });
   }
 
-  get showAll(): boolean {
-    return this._showAll;
-  }
-
-  set showAll(value: boolean) {
-    if (!value) {
-      this.search();
-    } else {
-      this.canData = null;
-    }
-    this._showAll = value;
-
-    // Disable this?  Auto search only if there's a term or showALl is false?
-    // this.search();
-  }
+  // get showAll(): boolean {
+  //   return this._showAll;
+  // }
+  //
+  // set showAll(value: boolean) {
+  //   if (!value) {
+  //     this.search();
+  //   } else {
+  //     this.canData = null;
+  //   }
+  //   this._showAll = value;
+  // }
 
   select($event: MouseEvent, c: CanCcxDto): void {
     $event.preventDefault();

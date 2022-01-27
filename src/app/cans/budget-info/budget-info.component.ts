@@ -197,7 +197,6 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   searchForCANs(fseId: number, nciSourceFlag: string): void {
-    this.canSearchModalComponent.title = `Search for CANs`;
     this.canSearchModalComponent.nciSourceFlag = nciSourceFlag;
     this.canSearchModalComponent.bmmCodes = this.model.requestDto?.bmmCode;
     this.canSearchModalComponent.activityCodes = this.model.requestDto?.activityCode;

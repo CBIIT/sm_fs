@@ -103,7 +103,6 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
   }
 
   searchCAN(applId: number, fseId: number, nciSourceFlag: string): void {
-    this.canSearchModalComponent.title = `Search for CANs`;
     this.canSearchModalComponent.nciSourceFlag = nciSourceFlag;
     this.canSearchModalComponent.bmmCodes = this.planModel.bmmCodeList;
     this.canSearchModalComponent.activityCodes = this.planModel.activityCodeList;

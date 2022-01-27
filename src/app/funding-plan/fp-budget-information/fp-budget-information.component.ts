@@ -131,7 +131,6 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
 
   searchForCANs(fseId: number, nciSourceFlag: string): void {
     // TODO: set up modal with proper data
-    this.canSearchModalComponent.title = `Search for CANs`;
     this.canSearchModalComponent.nciSourceFlag = nciSourceFlag;
     this.canSearchModalComponent.bmmCodes = this.planModel.bmmCodeList;
     this.canSearchModalComponent.activityCodes = this.planModel.activityCodeList;
