@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { NGXLogger } from 'ngx-logger';
 import {
   CanCcxDto,
   FsCanControllerService,
@@ -179,21 +178,19 @@ export class CanManagementService {
   }
 
   searchAllCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
-    // const key = [bmmCodes, activityCodes, nciSource].join('_');
-    // if (!can) {
-    //   const result = this.activeCanCache.get(key);
-    //   if (result && result.length !== 0) {
-    //     return new Observable<CanCcxDto[]>(subscriber => {
-    //       subscriber.next(result);
-    //     });
-    //   }
-    // }
+    const key = [can.toLowerCase(), bmmCodes, activityCodes, nciSource].join('_');
+    const result = this.activeCanCache.get(key);
+    if (result && result.length !== 0) {
+      return new Observable<CanCcxDto[]>(subscriber => {
+        subscriber.next(result);
+      });
+    }
 
     const fn = this.canService.getAllCansUsingGET(activityCodes, bmmCodes, can, nciSource);
 
-    // fn.subscribe(next => {
-    //   this.activeCanCache.set(key, next);
-    // });
+    fn.subscribe(next => {
+      this.activeCanCache.set(key, next);
+    });
 
     return fn;
   }
