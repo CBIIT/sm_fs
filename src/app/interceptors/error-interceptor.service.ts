@@ -31,7 +31,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (!req.url.includes('heartbeat')) {
+    if (!req.url.includes('heartbeat') && !!req.url.includes('logs')) {
       this.logger.debug(`Current route URL    : ${this.router.url}`);
       this.logger.debug(`Request URL          : ${req.url}`);
       this.logger.debug(`Initialization status: ${this.initializerStatus.done ? 'Done' : 'In Progress'}`);
@@ -39,8 +39,11 @@ export class ErrorInterceptorService implements HttpInterceptor {
 
     return next.handle(req).pipe(
       catchError((error) => {
-        this.logger.debug(`Error: ${this.errorHandler.errorType(error)}`);
+        this.logger.debug(`Error: ${this.errorHandler.errorType(error)}`, error);
+        this.logger.debug(`Error URL: ${error.url}`);
+        this.logger.debug(`Request URL: ${req.url}`);
         if (!this.initializerStatus.done) {
+          this.logger.debug('Initialization in progress. Let the error pass.');
           return throwError(error);
         }
         // Let the log service and heartbeat service handle their own errors
@@ -53,9 +56,6 @@ export class ErrorInterceptorService implements HttpInterceptor {
           let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           url = window.location.origin + url;
 
-          this.logger.debug(`Error URL: ${error.url}`);
-          this.logger.debug(`Source URL of error: ${this.router.url}`);
-          this.logger.debug(`Restore session URL: ${url}`);
           const features = 'popup,menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700,noreferrer';
 
           const errorUrl = new URL(error.url);
