@@ -46,7 +46,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
         } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
           return throwError(error);
         } else if (error.status === 200 && error.url?.startsWith('https://auth')) {
-          this.logger.logInfoWithContext('Timeout encountered - redirect to login.', error);
+          this.logger.info('Timeout encountered - redirect to login.', error);
           let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           url = window.location.origin + url;
 
