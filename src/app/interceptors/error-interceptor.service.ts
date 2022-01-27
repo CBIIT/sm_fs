@@ -40,14 +40,16 @@ export class ErrorInterceptorService implements HttpInterceptor {
     return next.handle(req).pipe(
       catchError((error) => {
         this.logger.debug(`Error: ${this.errorHandler.errorType(error)}`);
+        if (!this.initializerStatus.done) {
+          return throwError(error);
+        }
         // Let the log service and heartbeat service handle their own errors
         if (req.url.includes('logs') || req.url.includes('heartbeat')) {
           return throwError(error);
         } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
           return throwError(error);
         } else if (error.status === 200 && error.url?.startsWith('https://auth')) {
-          this.logger.logMessageWithContext('Timeout encountered - redirect to login.', error);
-          // const url = '/fs/#' + this.router.createUrlTree(['restoreSession']).toString();
+          this.logger.info('Timeout encountered - redirect to login.', error);
           let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           url = window.location.origin + url;
 
@@ -60,18 +62,16 @@ export class ErrorInterceptorService implements HttpInterceptor {
           errorUrl.searchParams.delete('TARGET');
           errorUrl.searchParams.set('TARGET', url);
 
-          // if (!this.modalWindow) {
-          //   this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
-          // }
+          if (!this.modalWindow) {
+            this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
+          }
 
-          this.router.navigate(['/search/fr/landing']);
           return of(undefined);
         } else {
           const timestamp: number = Date.now();
           this.errorHandler.registerNewError(timestamp, error);
           this.router.navigate(['/error', timestamp]);
           return throwError(error);
-          // return of(undefined);
         }
       }), finalize(() => {
         this.modalWindow = undefined;
