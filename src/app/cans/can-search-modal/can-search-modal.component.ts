@@ -3,7 +3,7 @@ import { CanCcxDto, WorkflowTaskDto } from '@cbiit/i2ecws-lib';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanManagementService } from '../can-management.service';
-import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 
 @Component({
   selector: 'app-can-search-modal',
@@ -74,6 +74,11 @@ export class CanSearchModalComponent implements OnInit {
   }
 
   set showAll(value: boolean) {
+    if (!value) {
+      this.search();
+    } else {
+      this.canData = null;
+    }
     this._showAll = value;
 
     // Disable this?  Auto search only if there's a term or showALl is false?
