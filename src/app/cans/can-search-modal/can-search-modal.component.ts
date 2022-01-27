@@ -33,6 +33,7 @@ export class CanSearchModalComponent implements OnInit {
   search(searchAll: boolean): void {
     if (!!this.bmmCodes && !!this.activityCodes) {
       if (searchAll) {
+        this.logger.debug(`searching for term '${this.canSearchTerm}'`);
         if (this.canSearchTerm || confirm('Searching for all CANs with an empty search term will take a long time. Are you sure you wish to proceed?')) {
           this.canData = null;
           this.canManagementService.searchAllCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
