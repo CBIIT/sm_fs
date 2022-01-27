@@ -33,7 +33,6 @@ export class CanSearchModalComponent implements OnInit {
   search(searchAll: boolean): void {
     if (!!this.bmmCodes && !!this.activityCodes) {
       if (searchAll) {
-        this.logger.debug(`searching for term '${this.canSearchTerm}'`);
         if (this.canSearchTerm || confirm('Searching for all CANs with an empty search term will take a long time. Are you sure you wish to proceed?')) {
           this.canData = null;
           this.canManagementService.searchAllCans(this.canSearchTerm, this.bmmCodes, this.activityCodes, this.nciSourceFlag).subscribe(result => {
@@ -58,7 +57,6 @@ export class CanSearchModalComponent implements OnInit {
   }
 
   onSubmit(canSearchForm: NgForm): void {
-    this.logger.debug(canSearchForm);
   }
 
   open(): Promise<CanCcxDto> {
@@ -67,19 +65,6 @@ export class CanSearchModalComponent implements OnInit {
       this.modalRef.result.then(resolve, reject);
     });
   }
-
-  // get showAll(): boolean {
-  //   return this._showAll;
-  // }
-  //
-  // set showAll(value: boolean) {
-  //   if (!value) {
-  //     this.search();
-  //   } else {
-  //     this.canData = null;
-  //   }
-  //   this._showAll = value;
-  // }
 
   select($event: MouseEvent, c: CanCcxDto): void {
     $event.preventDefault();
