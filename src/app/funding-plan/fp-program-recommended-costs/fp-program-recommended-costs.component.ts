@@ -235,21 +235,14 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     return this.isTotalCostNumeric() && this.isDirectCostNumeric() && this.getDirectCost() <= this.getTotalCost();
   }
 
-  isPercentNumeric(): boolean {
-    const period: boolean = String(this.getPercentCut()).indexOf('.') !== -1;
-    return !period && !isNaN(this.getPercentCut());
-  }
-
-  isPercentInRange(): boolean {
-    if (this.isPercentNumeric()) {
-      const p = this.getPercentCut();
-      return p >= 0 && p <= 100;
-    }
-    return false;
-  }
-
   isPercentValid(): boolean {
-    return this.isPercentInRange();
+    const reg = /^\d{0,3}(\.\d{1,2})?$/;
+    // if (this.isPercentNumeric()) {
+    //   const p = this.getPercentCut();
+    //   return p >= 0 && p <= 100;
+    // }
+    // return false;
+    return reg.test(String(this.getPercentCut()));
   }
 
   getPercentCut(): number {
@@ -294,6 +287,9 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     this._displayType = value;
   }
 
+  percentCutInRange(): boolean {
+    return this.isPercentValid() && this.getPercentCut() <= 100;
+  }
 }
 
 export interface PendingPrcValues {

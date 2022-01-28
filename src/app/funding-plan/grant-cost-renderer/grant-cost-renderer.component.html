@@ -3,7 +3,7 @@
     *ngIf="showPercent; then percent; else nopercent"></ng-container>
   <ng-template #percent>
     <div>
-      {{ g.approvedTotal | currency }} ({{ g.totalPercentCut | percent }} Cut)
+      {{ g.approvedTotal | currency }} ({{ g.totalPercentCut | percent:'1.0-2' }} Cut)
     </div>
   </ng-template>
   <ng-template #nopercent>
@@ -16,7 +16,7 @@
   <ng-container *ngIf="showPercent; then percent; else nopercent"></ng-container>
   <ng-template #percent>
     <div *ngIf="g.approvedDirect > 0; else dash">
-      {{ g.approvedDirect | currency }} ({{ g.directPercentCut | percent }} Cut)
+      {{ g.approvedDirect | currency }} ({{ g.directPercentCut | percent:'1.0-2' }} Cut)
     </div>
   </ng-template>
   <ng-template #nopercent>
