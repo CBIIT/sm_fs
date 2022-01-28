@@ -79,8 +79,6 @@ export class HeartbeatService {
         this.lastGoodHeartbeat = Date.now();
         this.heartBeat.next(true);
       }, error => {
-        // TODO: if we get a timeout here (only timeout), kill the heartbeat until the user logs back in.
-        // NOTE: the heartbeat will get automatically restarted once the DB heartbeat reports success.
         this.logger.debug(`Received error: ${JSON.stringify(error)}`);
         this.logger.debug(`API not responding. Last good hearbeat: ${Date.now() - this.lastGoodHeartbeat} millis ago`);
         this.heartBeat.next(false);

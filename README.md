@@ -5,16 +5,14 @@
 - [ ] Document best practices
 - [ ] Code review
 - [X] Error logging - how to get console logs for diagnostics?
-- [X] Heartbeat service - parameterize magic numbers
+- [ ] Heartbeat service - parameterize magic numbers
 - [X] Add size constraints to userQueue and logQueue in custom logging service
 - [ ] Use custom logger as proxy for all log calls to NGXLogger
 - [ ] Check for errors in 'CanDeactivate' methods
-- [X] Fix the stupid router issue with 5 login windows during initialization...
+- [ ] Fix the stupid router issue with 5 login windows during initialization...
 - [ ] Evaluate errors in logging service and set up circuit-breaker
 - [ ] Review and evaluate all logging statements
 - [ ] Break circular dependency between HeartbeatService and CustomLogger
-- [ ] Migrate HeartbeatService, CustomLogger, and any dependencies to common UI (which should be renamed)
-- [ ] Standardize %Cut pipes - we have multiple.
 
 ## Create new UI components
 

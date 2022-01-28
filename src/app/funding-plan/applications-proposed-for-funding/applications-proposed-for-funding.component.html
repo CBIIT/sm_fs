@@ -177,13 +177,13 @@
             <strong>Direct</strong><br/>
             {{ planManagementService.directCost(grant.applId, source.fundingSourceId) | currencyToggle }} <br/>
             <span *ngIf="planManagementService.firstFunder(grant.applId, source.fundingSourceId) && +planManagementService.directCost(grant.applId, source.fundingSourceId) > 0">
-              {{ planManagementService.directCostPercentCut(grant.applId, source.fundingSourceId) | percent:'1.0-2' }}
+              {{ planManagementService.directCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
             </span>
           <br/>
             <strong>Total</strong><br/>
             {{ planManagementService.totalCost(grant.applId, source.fundingSourceId) | currencyToggle }} <br/>
             <span *ngIf="planManagementService.firstFunder(grant.applId, source.fundingSourceId) && +planManagementService.totalCost(grant.applId, source.fundingSourceId) > 0">
-              {{ planManagementService.totalCostPercentCut(grant.applId, source.fundingSourceId) | percent:'1.0-2' }}
+              {{ planManagementService.totalCostPercentCut(grant.applId, source.fundingSourceId) | percent }}
             </span>
           </td>
         </ng-container>
