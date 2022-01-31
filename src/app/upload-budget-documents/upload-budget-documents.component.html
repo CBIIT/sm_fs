@@ -55,7 +55,7 @@
     <div class="col-12">
         <div class="drag-item" *ngFor="let item of budgetDocDtos | async" tabindex="0">
             <span class="doc-name">{{ item.docType }}</span>
-            <span class="doc-detials">{{item.docFilename}} (Added by <a href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
+            <span class="doc-desc">{{item.docFilename}} (Added by <a href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
                 {{item.createDate}})</span>
 
             <div class="ml-auto">
