@@ -24304,6 +24304,27 @@ table.dataTable tbody tr td.child ul.dtr-details li span.dtr-title {
   min-width: unset;
 }
 
+.foaTable table tr.odd,
+.foaTable table tr {
+  background-color: inherit !important;
+}
+
+table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
+  background-color: #ffffff !important;
+}
+
+table.dataTable.hover tbody tr.odd .foaTable tr:hover, table.dataTable.display tbody tr.odd .foaTable tr:hover {
+  background-color: #f4f5f6 !important;
+}
+
+table.dataTable.hover tbody tr .foaTable tr:hover, table.dataTable.display tbody tr .foaTable tr:hover {
+  background-color: #ffffff !important;
+}
+
+table.dataTable.hover tbody tr.odd:hover, table.dataTable.display tbody tr.odd:hover {
+  background-color: #f4f5f6 !important;
+}
+
 /* line 98, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable.dtr-column td.control, table.dataTable.dtr-column th.control {
   border-left-width: 0px;
