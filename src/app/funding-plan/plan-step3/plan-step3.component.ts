@@ -89,13 +89,13 @@ export class PlanStep3Component implements OnInit {
     this.pdNpnId = this.planModel.fundingPlanDto.requestorNpnId;
     this.cayCode = this.planModel.fundingPlanDto.cayCode;
 
-    const existingRequests = this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(r => r.applId);
+    const existingRequests = this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.map(r => r.applId) || [];
     const selectedRequests = this.planModel.allGrants.filter(g => g.selected).map(r => r.applId);
 
     const missingRequests = selectedRequests.filter(f => !existingRequests.includes(f));
     const deletedRequests = existingRequests.filter(f => !selectedRequests.includes(f));
 
-    if (missingRequests) {
+    if (missingRequests && existingRequests.length > 0) {
       this.addMissingGrants(missingRequests);
     }
     if (deletedRequests) {
@@ -333,6 +333,7 @@ export class PlanStep3Component implements OnInit {
           approvedTc: totalCost,
           dcPctCut: dcPercentCut,
           tcPctCut: tcPercentCut,
+          percentSelected: item.displayType === 'percent' ? true: false,
           approvedFutureYrs: this.futureYears.get(item.grant.applId),
           fseId: source.fundingSourceId,
           defaultOefiaTypeId: source.octId,
@@ -585,6 +586,7 @@ export class PlanStep3Component implements OnInit {
               // lastChangeDate: string,
               // lastChangeUserId: string,
               nciSourceFlag: s.nciSourceFlag,
+              percentSelected: s.displayType === 'percent' ? true : false,
               // octId: s.octId,
               // oefiaCreateCode: string,
               // oefiaTypeId: number,
@@ -611,6 +613,7 @@ export class PlanStep3Component implements OnInit {
             frCan.frqId = +req.frqId;
             frCan.fseId = +s.fseId;
             frCan.nciSourceFlag = s.nciSourceFlag;
+            frCan.percentSelected = s.displayType === 'percent' ? true : false;
           }
 
           if (this.editing) {
