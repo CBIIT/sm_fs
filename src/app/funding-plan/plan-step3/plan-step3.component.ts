@@ -333,7 +333,7 @@ export class PlanStep3Component implements OnInit {
           approvedTc: totalCost,
           dcPctCut: dcPercentCut,
           tcPctCut: tcPercentCut,
-          percentSelected: item.displayType === 'percent' ? true: false,
+          percentSelected: item.displayType === 'percent' ? true : false,
           approvedFutureYrs: this.futureYears.get(item.grant.applId),
           fseId: source.fundingSourceId,
           defaultOefiaTypeId: source.octId,
