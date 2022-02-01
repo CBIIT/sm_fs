@@ -17,8 +17,8 @@ export class HeaderComponent implements OnInit {
       { docName: 'Program Funding Plan Guide', docLink: this.propertiesService.getProperty('I2EWEB_URL') + 'documentation/application/FSFundingPlanUsersGuide.pdf' },
       { docName: 'Video Tutorials', docLink: this.propertiesService.getProperty('I2EWEB_URL') + '/i2e-video.html' },
       { docName: 'Release Notes', docLink: this.propertiesService.getProperty('I2EWEB_URL') + '/releaseNotes/fundingselections.html' }],
-    helpGuides: [{ helpGuideName: 'Technical Support', helpGuideLink: 'mailto:' + this.propertiesService.getProperty('TECH_SUPPORT_EMAIL') + '?subject=Funding Selections' },
-    { helpGuideName: 'Business Policy Questions', helpGuideLink: 'mailto:' + this.propertiesService.getProperty('BUS_POLICY_EMAIL') + '?subject=Funding Selections' }],
+    helpGuides: [{ helpGuideName: 'Email Technical Support', helpGuideLink: 'mailto:' + this.propertiesService.getProperty('TECH_SUPPORT_EMAIL') + '?subject=Funding Selections' },
+    { helpGuideName: 'Email Business Policy Questions', helpGuideLink: 'mailto:' + this.propertiesService.getProperty('BUS_POLICY_EMAIL') + '?subject=Funding Selections' }],
   };
 
   constructor(private propertiesService: AppPropertiesService,
