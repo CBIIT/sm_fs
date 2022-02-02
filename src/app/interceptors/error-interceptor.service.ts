@@ -7,6 +7,7 @@ import { ErrorHandlerService } from '../error/error-handler.service';
 import { openNewWindow } from '../utils/utils';
 import { Location } from '@angular/common';
 import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
+import { HeartbeatService } from '../heartbeat/heartbeat-service';
 
 
 @Injectable()
@@ -20,6 +21,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
     private location: Location,
     private initializerStatus: ApplicationInitStatus,
     private logger: CustomServerLoggingService,
+    private heartbeatService: HeartbeatService,
   ) {
     router.events.pipe(filter(event => event instanceof NavigationStart)).subscribe((event: NavigationStart) => {
       this.handleNavigationStart(event);
@@ -47,12 +49,13 @@ export class ErrorInterceptorService implements HttpInterceptor {
           return throwError(error);
         }
         // Let the log service and heartbeat service handle their own errors
-        if ((error.url.includes('logs') || error.url.includes('heartbeat'))) {
+        if ((error.url.includes('logs') || (error.url.includes('heartbeat') && error.status !== 200))) {
           return throwError(error);
         } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
           return throwError(error);
         } else if (error.status === 200 && error.url?.startsWith('https://auth')) {
           this.logger.info('Timeout encountered - redirect to login.', error);
+          this.heartbeatService.pause();
           let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           url = window.location.origin + url;
 
@@ -75,6 +78,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
         }
       }), finalize(() => {
         this.modalWindow = undefined;
+        // this.heartbeatService.restart();
       })
     );
   }

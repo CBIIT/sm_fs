@@ -43,6 +43,18 @@ export class HeartbeatService {
     });
   }
 
+  public pause(): void {
+    this.stopHeartbeat();
+    this.stopDbHeartbeat();
+    this.stopCircuitBreaker();
+  }
+
+  public restart(): void {
+    this.startDefaultHeartbeat();
+    this.startDefaultDbHeartbeat();
+    this.startCircuitBreaker();
+  }
+
   startCircuitBreaker(): void {
     this.logger.info(`Starting circuit breaker: ${this.KILLSWITCH_INTERVAL} millis`);
     this.circuitBreakerInterval = setInterval(() => {
