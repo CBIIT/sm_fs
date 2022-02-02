@@ -63,6 +63,12 @@ export class ErrorInterceptorService implements HttpInterceptor {
           return throwError(error);
         }
 
+        // Let the logger handle its own problems
+        if (error.url.includes('db-heartbeat') || req.url.includes('db-heartbeat')) {
+          this.logger.debug('Let the db-heartbeat handle its own messes');
+          return throwError(error);
+        }
+
         // Let the heartbeat service handle everything but timeouts
         if ((error.url.includes('heartbeat') || req.url.includes('heartbeat')) && !(error.status === 200)) {
           this.logger.debug('Non-200 error from heartbeat');

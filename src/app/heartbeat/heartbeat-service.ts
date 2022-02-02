@@ -27,6 +27,8 @@ export class HeartbeatService {
   private lastGoodDbHeartbeat: number;
   private startTime: number = Date.now();
 
+  private setIntervalFunction = window.setInterval;
+
   // TODO: can't use CustomLogger here because of circular dependency. Resolve that...
   constructor(
     private logger: NGXLogger,
@@ -61,7 +63,7 @@ export class HeartbeatService {
     if (!this.circuitBreakerInterval) {
       this.logger.info(`Starting circuit breaker: ${this.KILLSWITCH_INTERVAL} millis`);
     }
-    this.circuitBreakerInterval = window.setInterval(() => {
+    this.circuitBreakerInterval = this.setIntervalFunction(() => {
       const zeroHour: number = this.lastGoodDbHeartbeat || this.startTime;
       this.logger.debug(`${Date.now() - this.lastGoodHeartbeat} millis since last good heartbeat`);
       this.logger.debug(`${Date.now() - this.lastGoodDbHeartbeat} millis since last good DB heartbeat`);
@@ -90,7 +92,7 @@ export class HeartbeatService {
   startHeartbeat(millis: number): void {
     if (!this.heartbeatInterval) {
       this.logger.info(`Starting heartbeat: ${millis} millis`);
-      this.heartbeatInterval = window.setInterval(() => {
+      this.heartbeatInterval = this.setIntervalFunction(() => {
         this.logger.debug(`Ping...${JSON.stringify(this.heartbeatInterval)}`);
         this.heartbeatController.getHeartBeatUsingGET().subscribe(next => {
           // this.logger.debug(`ping: ${next.sessionId}`);
@@ -124,7 +126,7 @@ export class HeartbeatService {
   startDbHeartbeat(millis: number): void {
     if (!this.dbHeartbeatInterval) {
       this.logger.info(`Starting DB heartbeat: ${millis} millis`);
-      this.dbHeartbeatInterval = window.setInterval(() => {
+      this.dbHeartbeatInterval = this.setIntervalFunction(() => {
         this.logger.debug(`DB Ping...${JSON.stringify(this.dbHeartbeatInterval)}`);
         this.heartbeatController.getDbHeartBeatUsingGET().subscribe(next => {
           this.sessionId = next.sessionId;
@@ -139,6 +141,7 @@ export class HeartbeatService {
           this.dbHeartBeat.next(next.dbActive);
         }, error => {
           // Technically speaking, DB status is unknown at this point, since this indicates the API itself is not responding
+          // TODO: evalute whether this is a timeout and restart the heartbeat if so?
           this.stopHeartbeat();
           this.logger.debug(`DB status unknown. Last good heartbeat: ${Date.now() - this.lastGoodDbHeartbeat} millis`);
           this.heartBeat.next(false);
