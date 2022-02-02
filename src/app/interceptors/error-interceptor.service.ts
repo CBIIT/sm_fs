@@ -44,17 +44,40 @@ export class ErrorInterceptorService implements HttpInterceptor {
         this.logger.debug(`Error: ${this.errorHandler.errorType(error)}`, error);
         this.logger.debug(`Error URL: ${error.url}`);
         this.logger.debug(`Request URL: ${req.url}`);
+
+        // Pass along errors that happen during initialization
         if (!this.initializerStatus.done) {
           this.logger.debug('Initialization in progress. Let the error pass.');
           return throwError(error);
         }
-        // Let the log service and heartbeat service handle their own errors
-        if ((error.url.includes('logs') || error.url.includes('heartbeat')) || (req.url.includes('heartbeat')  && !(error.status === 200))) {
+
+        // Throw 400 errors automatically
+        if (error.status === 400) {  // BadRequestException, checked exception from backend.
+          this.logger.debug('400: let it pass');
           return throwError(error);
-        } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
+        }
+
+        // Let the logger handle its own problems
+        if (error.url.includes('logs') || req.url.includes('logs')) {
+          this.logger.debug('Let the logger handle its own messes');
           return throwError(error);
-        } else if (error.status === 200 && error.url?.startsWith('https://auth')) {
-          this.logger.info('Timeout encountered - redirect to login.', error);
+        }
+
+        // Let the DB heartbeat handle its own problems
+        if (error.url.includes('db-heartbeat') || req.url.includes('db-heartbeat')) {
+          this.logger.debug('Let the logger handle its own messes');
+          return throwError(error);
+        }
+
+        // Let the heartbeat service handle everything but timeouts
+        if ((error.url.includes('heartbeat') || req.url.includes('heartbeat')) && !(error.status === 200)) {
+          this.logger.debug('Non-200 error from heartbeat');
+          return throwError(error);
+        }
+
+        // Handle timeouts
+        if (error.status === 200 && error.url?.startsWith('https://auth')) {
+          this.logger.debug('Timeout encountered - redirect to login.', error);
           this.heartbeatService.pause();
           let url = '/fs/' + this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
           url = window.location.origin + url;
