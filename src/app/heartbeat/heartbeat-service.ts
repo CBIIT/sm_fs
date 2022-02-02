@@ -58,7 +58,9 @@ export class HeartbeatService {
   }
 
   startCircuitBreaker(): void {
-    this.logger.info(`Starting circuit breaker: ${this.KILLSWITCH_INTERVAL} millis`);
+    if (!this.circuitBreakerInterval) {
+      this.logger.info(`Starting circuit breaker: ${this.KILLSWITCH_INTERVAL} millis`);
+    }
     this.circuitBreakerInterval = setInterval(() => {
       const zeroHour: number = this.lastGoodDbHeartbeat || this.startTime;
       this.logger.debug(`${Date.now() - this.lastGoodHeartbeat} millis since last good heartbeat`);
@@ -86,7 +88,9 @@ export class HeartbeatService {
   }
 
   startHeartbeat(millis: number): void {
-    this.logger.info(`Starting heartbeat: ${millis} millis`);
+    if (!this.heartbeatInterval) {
+      this.logger.info(`Starting heartbeat: ${millis} millis`);
+    }
     this.heartbeatInterval = setInterval(() => {
       this.logger.debug('Ping...');
       this.heartbeatController.getHeartBeatUsingGET().subscribe(next => {
@@ -115,7 +119,9 @@ export class HeartbeatService {
   }
 
   startDbHeartbeat(millis: number): void {
-    this.logger.info(`Starting DB heartbeat: ${millis} millis`);
+    if (!this.dbHeartbeatInterval) {
+      this.logger.info(`Starting DB heartbeat: ${millis} millis`);
+    }
     this.dbHeartbeatInterval = setInterval(() => {
       this.logger.debug('DB Ping...');
       this.heartbeatController.getDbHeartBeatUsingGET().subscribe(next => {
