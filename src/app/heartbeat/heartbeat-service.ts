@@ -49,7 +49,7 @@ export class HeartbeatService {
     this.stopCircuitBreaker();
   }
 
-  public restart(): void {
+  public continue(): void {
     this.startDefaultHeartbeat();
     this.startDefaultDbHeartbeat();
     this.startCircuitBreaker();
