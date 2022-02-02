@@ -86,7 +86,7 @@ export class HeartbeatService {
   }
 
   startHeartbeat(millis: number): void {
-    this.logger.info(`Starting heartbeat: ${this.HEARTBEAT_INTERVAL} millis`);
+    this.logger.info(`Starting heartbeat: ${millis} millis`);
     this.heartbeatInterval = setInterval(() => {
       this.logger.debug('Ping...');
       this.heartbeatController.getHeartBeatUsingGET().subscribe(next => {
@@ -115,7 +115,7 @@ export class HeartbeatService {
   }
 
   startDbHeartbeat(millis: number): void {
-    this.logger.info(`Starting DB heartbeat: ${this.DB_HEARTBEAT_INTERVAL} millis`);
+    this.logger.info(`Starting DB heartbeat: ${millis} millis`);
     this.dbHeartbeatInterval = setInterval(() => {
       this.logger.debug('DB Ping...');
       this.heartbeatController.getDbHeartBeatUsingGET().subscribe(next => {
