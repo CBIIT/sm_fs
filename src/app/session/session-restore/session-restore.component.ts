@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
-import { HeartbeatService } from '../../heartbeat/heartbeat-service';
 
 @Component({
   selector: 'app-session-restore',
@@ -9,14 +8,13 @@ import { HeartbeatService } from '../../heartbeat/heartbeat-service';
 })
 export class SessionRestoreComponent implements OnInit {
 
-  constructor(private logger: NGXLogger, private heartbeatService: HeartbeatService) { }
+  constructor(private logger: NGXLogger) { }
 
   ngOnInit(): void {
   }
 
   afterRestoreClose(): void {
     this.logger.debug('session restore', window);
-    this.heartbeatService.continue();
     window.close();
   }
 

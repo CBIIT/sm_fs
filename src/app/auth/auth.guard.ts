@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 import { UserService } from '@cbiit/i2ecui-lib';
 import { SecurityCredentials, GrantedAuthority } from '@cbiit/i2ecws-lib';
 import { RequestModel } from '../model/request/request-model';
-import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
+import { NGXLogger } from 'ngx-logger';
+import { HeartbeatService } from '../heartbeat/heartbeat-service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class AuthGuard implements CanActivate {
     private router: Router,
     private userService: UserService,
     private requestModel: RequestModel,
-    private logger: CustomServerLoggingService
+    private logger: NGXLogger,
+    private heartbeatService: HeartbeatService
   ) { }
 
   canActivate(
@@ -30,6 +32,7 @@ export class AuthGuard implements CanActivate {
                 this.logger.info(`New session started for user ${creds.username}`);
                 this.requestModel?.reset();
                 this.requestModel?.programRecommendedCostsModel?.deepReset(false);
+                this.heartbeatService.continue();
                 resolve(true);
               } else {
                 this.logger.warn(`User ${creds.username} is not authorized to access Funding Selections`);
