@@ -44,12 +44,14 @@ export class HeartbeatService {
   }
 
   public pause(): void {
+    this.logger.debug('Pause...');
     this.stopHeartbeat();
     this.stopDbHeartbeat();
     this.stopCircuitBreaker();
   }
 
   public continue(): void {
+    this.logger.debug('Continue...');
     this.startDefaultHeartbeat();
     this.startDefaultDbHeartbeat();
     this.startCircuitBreaker();
@@ -71,6 +73,7 @@ export class HeartbeatService {
 
   stopCircuitBreaker(): void {
     if (this.circuitBreakerInterval) {
+      this.logger.info('Stopping circuit breaker');
       clearInterval(this.circuitBreakerInterval);
       this.circuitBreakerInterval = undefined;
     }
@@ -136,6 +139,7 @@ export class HeartbeatService {
 
   stopDbHeartbeat(): void {
     if (this.dbHeartbeatInterval) {
+      this.logger.info('Stopping DB heartbeat');
       clearInterval(this.dbHeartbeatInterval);
       this.dbHeartbeatInterval = undefined;
     }

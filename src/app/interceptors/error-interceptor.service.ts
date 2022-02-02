@@ -49,7 +49,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
           return throwError(error);
         }
         // Let the log service and heartbeat service handle their own errors
-        if ((error.url.includes('logs') || error.url.includes('heartbeat')) && !(error.status === 200)) {
+        if ((error.url.includes('logs') || error.url.includes('heartbeat')) || (req.url.includes('heartbeat')  && !(error.status === 200))) {
           return throwError(error);
         } else if (error.status === 400) {  // BadRequestException, checked exception from backend.
           return throwError(error);
