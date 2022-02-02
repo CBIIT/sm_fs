@@ -65,7 +65,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
 
         // Let the DB heartbeat handle its own problems
         if (error.url.includes('db-heartbeat') || req.url.includes('db-heartbeat')) {
-          this.logger.debug('Let the logger handle its own messes');
+          this.logger.debug('Let the db-heartbeat handle its own messes');
           return throwError(error);
         }
 
