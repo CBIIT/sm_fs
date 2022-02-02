@@ -92,7 +92,7 @@ export class HeartbeatService {
       this.logger.info(`Starting heartbeat: ${millis} millis`);
     }
     this.heartbeatInterval = setInterval(() => {
-      this.logger.debug('Ping...');
+      this.logger.debug(`Ping...${JSON.stringify(this.heartbeatInterval)}`);
       this.heartbeatController.getHeartBeatUsingGET().subscribe(next => {
         // this.logger.debug(`ping: ${next.sessionId}`);
         this.sessionId = next.sessionId;
@@ -123,7 +123,7 @@ export class HeartbeatService {
       this.logger.info(`Starting DB heartbeat: ${millis} millis`);
     }
     this.dbHeartbeatInterval = setInterval(() => {
-      this.logger.debug('DB Ping...');
+      this.logger.debug(`DB Ping...${JSON.stringify(this.dbHeartbeatInterval)}`);
       this.heartbeatController.getDbHeartBeatUsingGET().subscribe(next => {
         this.sessionId = next.sessionId;
         this.dbActive = next.dbActive;
