@@ -78,7 +78,6 @@ export class ErrorInterceptorService implements HttpInterceptor {
         }
       }), finalize(() => {
         this.modalWindow = undefined;
-        this.heartbeatService.continue();
       })
     );
   }
