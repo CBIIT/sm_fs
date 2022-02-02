@@ -20,7 +20,9 @@
             </div>
         </ngb-alert>
     </div>
-
+    <div class="col-12" *ngIf="isApprover()">
+        <p>You must select an action to activate the "Process Action" button below.</p>
+    </div>
     <div class="col-md-6 col-lg-4" *ngIf="isApprover()">
         <div class="form-group">
             <label for="workflow-action">Action</label>

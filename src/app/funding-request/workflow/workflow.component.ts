@@ -233,11 +233,11 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this._selectedWorkflowAction = this.workflowModel.getWorkflowAction(action);
     if (!this._selectedWorkflowAction) {
       this.showAddApprover = false;
-      this.buttonLabel = 'Process Action';
+//      this.buttonLabel = 'Process Action';
       return;
     }
 
-    this.buttonLabel = this._selectedWorkflowAction.actionButtonText;
+//    this.buttonLabel = this._selectedWorkflowAction.actionButtonText;
     this.addApproverLabel = this._selectedWorkflowAction.action === WorkflowActionCode.REASSIGN ? 'Select Approver' : 'Add Approver(s)';
     this.showAddApprover = this._selectedWorkflowAction.newApproverRequired;
     this.workflowModel.prepareApproverListsForView(this._selectedWorkflowAction.action);
