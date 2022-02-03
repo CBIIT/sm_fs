@@ -88,10 +88,11 @@ export class CanManagementService {
 
     return this.canService.retrieveProjectedCanUsingGET(
       applId,
+      frqId,
       fseId,
       frtId,
-      oefiaTypeId,
-      frqId);
+      oefiaTypeId
+      );
   }
 
   getOefiaCodes(): Observable<OefiaCodingDto[]> {
