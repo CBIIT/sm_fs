@@ -14,21 +14,22 @@ export class PlanApproverService {
 
   checkCreateApprovers(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-    if (!this.planModel.mainApproversCreated) {
+    if (!this.planModel.mainApproversCreated
+        || this.planModel.isMainApproversRegenNeeded() ) {
       this.createMainApprovers(resolve, reject);
     }
-    else if (this.planModel.isMainApproversRegenNeeded()) {
-      this.logger.debug('needs to recreate main approvers because of changes in funding request');
-      this.planService.deletePlanApproversUsingGET(this.planModel.fundingPlanDto.fprId).subscribe(
-        () => {
-          this.planModel.mainApproversCreated = false;
-          this.createMainApprovers(resolve, reject);
-        },
-        (error) => {
-          this.logger.error('deleteRequestApprovers failed ', error);
-          reject(error); }
-      );
-    }
+    // else if (this.planModel.isMainApproversRegenNeeded()) {
+    //   this.logger.debug('needs to recreate main approvers because of changes in funding request');
+    //   this.planService.deletePlanApproversUsingGET(this.planModel.fundingPlanDto.fprId).subscribe(
+    //     () => {
+    //       this.planModel.mainApproversCreated = false;
+    //       this.createMainApprovers(resolve, reject);
+    //     },
+    //     (error) => {
+    //       this.logger.error('deleteRequestApprovers failed ', error);
+    //       reject(error); }
+    //   );
+    // }
     else {
       resolve();
     }
