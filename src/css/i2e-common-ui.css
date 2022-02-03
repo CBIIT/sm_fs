@@ -25131,7 +25131,7 @@ h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
 /* line 15, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .percent-input {
   min-width: 3rem;
-  max-width: 3rem;
+  max-width: 70px;
   display: inline-block;
 }
 

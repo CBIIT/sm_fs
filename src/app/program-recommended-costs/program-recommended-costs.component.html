@@ -710,7 +710,7 @@
                       <div class="fsource-fy1-form mb-2" *ngIf="first">
                         <div class="form-row form-inline">
                           <div class="col left-label"></div>
-                          <div class="col-sm-auto">
+                          <div class="col-md-auto">
                             <input
                               type="text"
                               class="form-control percent-input"
@@ -725,10 +725,15 @@
                           <div class="col-sm-auto right-label">
                             <label for="perc-cut">% Cut</label>
                           </div>
+<!--                          <div-->
+<!--                            class="text-danger mt-1"-->
+<!--                            *ngIf="(percentCut.errors?.min || percentCut.errors?.max) && (percentCut.touched || prcForm.submitted)">-->
+<!--                            Enter a number between 0 and 100-->
+<!--                          </div>-->
                           <div
                             class="text-danger mt-1"
                             *ngIf="percentCut.errors?.pattern && (percentCut.touched || prcForm.submitted)">
-                            Enter numeric value
+                            Enter numeric value with at most two decimals
                           </div>
                           <div
                             class="text-danger mt-1"
