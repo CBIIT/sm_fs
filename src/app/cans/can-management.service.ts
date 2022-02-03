@@ -25,7 +25,6 @@ export class CanManagementService {
   selectCANEmitter = new Subject<{ fseId: number; can: CanCcxDto; applId?: number, override: boolean }>();
   nonDefaultCanEventEmitter = new Subject<{ fseId: number, applId: number, nonDefault: boolean }>();
 
-
   nciSourceFlag: string = null;
   // TODO: evaluate for deletion
   defaultCans: Array<CanCcxDto>;
@@ -76,7 +75,7 @@ export class CanManagementService {
     return this.canService.getFundingRequestCanDisplaysUsingGET(fseIds);
   }
 
-  getProjectedCan(fseId: number, oefiaTypeId: number, frtId: number, applId?: number): Observable<CanCcxDto> {
+  getProjectedCan(fseId: number, oefiaTypeId: number, frtId: number, frqId: number, applId?: number): Observable<CanCcxDto> {
     if (!applId) {
       applId = this.requestModel?.grant?.applId;
     }
@@ -86,11 +85,13 @@ export class CanManagementService {
         subscriber.complete();
       });
     }
+
     return this.canService.retrieveProjectedCanUsingGET(
       applId,
       fseId,
       frtId,
-      oefiaTypeId);
+      oefiaTypeId,
+      frqId);
   }
 
   getOefiaCodes(): Observable<OefiaCodingDto[]> {
