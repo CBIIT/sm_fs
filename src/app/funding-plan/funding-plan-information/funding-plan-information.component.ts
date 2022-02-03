@@ -69,8 +69,8 @@ export class FundingPlanInformationComponent implements OnInit {
     this.listApplicationsNotSelectable = this.planModel.allGrants.filter(g => g.notSelectableReason?.length > 0);
 
     this.listApplicationsOutsideRange = this.planModel.allGrants.filter(g =>
-      (!g.notSelectableReason || g.notSelectableReason.length === 0)
-      && g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore);
+      g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)
+      .filter(g => !g.notSelectableReason || g.notSelectableReason.length === 0);
 
     this.totalApplicationsNotConsidered = this.listApplicationsNotSelectable.length
       + this.listApplicationsOutsideRange.filter(g => !g.selected).length;
@@ -78,6 +78,11 @@ export class FundingPlanInformationComponent implements OnInit {
     this.listApplicationsNotConsidered = [];
     this.listApplicationsNotConsidered.concat(this.listApplicationsNotSelectable)
       .concat(this.listApplicationsOutsideRange.filter(g => !g.selected));
+
+    this.logger.debug(`List of applications not considered ${this.listApplicationsNotConsidered.length}`);
+    this.logger.debug(`Calculated number of apps not considered: ${this.totalApplicationsNotConsidered}`);
+    this.logger.debug(`Total apps with not selectable reason: ${this.listApplicationsNotSelectable.length}`);
+    this.logger.debug(`Apps outside range not selected: ${this.listApplicationsOutsideRange.filter(g => !g.selected).length}`);
 
     if (this.planModel.fundingPlanDto.otherContributingDocs) {
       this.otherDocs = this.planModel.fundingPlanDto.otherContributingDocs.split(',');
