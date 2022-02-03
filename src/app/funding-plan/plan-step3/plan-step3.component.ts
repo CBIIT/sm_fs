@@ -159,9 +159,9 @@ export class PlanStep3Component implements OnInit {
   }
 
   private saveFundingPlan(): void {
-    this.logger.info('Plan before save', this.planModel.fundingPlanDto);
+    this.logger.debug('Plan before save', this.planModel.fundingPlanDto);
     this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
-      this.logger.info('Plan after save', result);
+      this.logger.debug('Plan after save', result);
       this.planModel.fundingPlanDto = result;
       this.planManagementService.buildPlanBudgetAndCanModel();
       this.planManagementService.buildGrantCostModel();
