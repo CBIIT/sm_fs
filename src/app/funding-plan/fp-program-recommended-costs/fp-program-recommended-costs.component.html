@@ -182,6 +182,7 @@
             [name]="'percentCut'"
             [(ngModel)]="percentCut"
             #pcInput="ngModel"
+            pattern="^\d{0,3}(\.\d{1,2})?$"
             [required]="required">
           <div class="input-group-append">
             <span class="input-group-text" [id]="'pc_append-' + grantIndex + '_'">% Cut</span>
@@ -196,8 +197,8 @@
     </div>
     <div
       class="text-danger mt-1"
-      *ngIf="(parentForm.submitted || pcInput.touched) && !isPercentValid()">
-      Enter a numeric value between 0 and 100
+      *ngIf="(parentForm.submitted || pcInput.touched) && (pcInput.errors?.pattern || !percentCutInRange())">
+      Enter a numeric value between 0 and 100, with at most 2 decimal places
       <input type="hidden" [ngModel]="dummy" [name]="'pc_' + grantIndex + '_' + sourceIndex" required>
     </div>
   </ng-template>

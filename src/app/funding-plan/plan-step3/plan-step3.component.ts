@@ -333,6 +333,7 @@ export class PlanStep3Component implements OnInit {
           approvedTc: totalCost,
           dcPctCut: dcPercentCut,
           tcPctCut: tcPercentCut,
+          percentSelected: item.displayType === 'percent' ? true : false,
           approvedFutureYrs: this.futureYears.get(item.grant.applId),
           fseId: source.fundingSourceId,
           defaultOefiaTypeId: source.octId,
@@ -585,6 +586,7 @@ export class PlanStep3Component implements OnInit {
               // lastChangeDate: string,
               // lastChangeUserId: string,
               nciSourceFlag: s.nciSourceFlag,
+              percentSelected: s.displayType === 'percent' ? true : false,
               // octId: s.octId,
               // oefiaCreateCode: string,
               // oefiaTypeId: number,
@@ -611,6 +613,7 @@ export class PlanStep3Component implements OnInit {
             frCan.frqId = +req.frqId;
             frCan.fseId = +s.fseId;
             frCan.nciSourceFlag = s.nciSourceFlag;
+            frCan.percentSelected = s.displayType === 'percent' ? true : false;
           }
 
           if (this.editing) {
