@@ -14,21 +14,22 @@ export class RequestApproverService {
 
   checkCreateApprovers(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-    if (!this.requestModel.mainApproverCreated) {
+    if (!this.requestModel.mainApproverCreated
+        || this.requestModel.recreateMainApproverNeeded ) {
       this.createMainApprovers(resolve, reject);
     }
-    else if (this.requestModel.recreateMainApproverNeeded) {
-      this.logger.debug('needs to recreate main approvers because of changes in funding request');
-      this.workflowControllerService.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
-        () => {
-          this.requestModel.mainApproverCreated = false;
-          this.createMainApprovers(resolve, reject);
-        },
-        (error) => {
-          this.logger.error('deleteRequestApprovers failed ', error);
-          reject(error); }
-      );
-    }
+    // else if (this.requestModel.recreateMainApproverNeeded) {
+    //   this.logger.debug('needs to recreate main approvers because of changes in funding request');
+    //   this.workflowControllerService.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
+    //     () => {
+    //       this.requestModel.mainApproverCreated = false;
+    //       this.createMainApprovers(resolve, reject);
+    //     },
+    //     (error) => {
+    //       this.logger.error('deleteRequestApprovers failed ', error);
+    //       reject(error); }
+    //   );
+    // }
     else {
       resolve();
     }

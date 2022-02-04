@@ -169,7 +169,7 @@ export class PlanStep3Component implements OnInit {
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(s => {
           return { applId: s.applId, frtId: s.frtId };
         }));
-      this.planApproverService.checkCreateApprovers().finally(
+      this.planApproverService.checkCreateApprovers().then(
         () => {
           if (this.nextStep === '/plan/step6') {
             this.planModel.pendingAlerts.push({
