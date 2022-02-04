@@ -467,7 +467,7 @@ export class PlanStep3Component implements OnInit {
               if (!this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources) {
                 this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = [];
               }
-              this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources.push(this.editing.sourceId);
+              //this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources.push(this.editing.sourceId);
             }
           } else {
             this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(s.fundingSource);
