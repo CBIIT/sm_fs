@@ -97,7 +97,7 @@ export class PlanManagementService {
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
       if (+r.applId === +applId) {
         r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
-          if (can && (can.percentSelected || (isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0))) {
+          if (can && ((isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0))) {
             // this.logger.debug(`Percent selected: ${applId} - ${index} - ${JSON.stringify(can)}`);
             can.percentSelected = true;
             result = true;
@@ -118,7 +118,7 @@ export class PlanManagementService {
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
       if (+r.applId === +applId) {
         r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
-          if (can && (can.percentSelected || (isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0))) {
+          if (can && ((isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0))) {
             can.percentSelected = true;
             result = { index, fseId: can.fseId };
           }
