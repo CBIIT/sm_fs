@@ -105,7 +105,7 @@ export class Step2Component implements OnInit {
             this.logger.debug('restored budgets:', result1);
             this.requestModel.restoreLineItemIds();
           });
-        this.requestApproverService.checkCreateApprovers().finally(
+        this.requestApproverService.checkCreateApprovers().then(
           () => {
             this.clean = true;
 

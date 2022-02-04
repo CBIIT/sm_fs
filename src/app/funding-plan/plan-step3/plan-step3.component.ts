@@ -28,7 +28,6 @@ import { PlanApproverService } from '../approver/plan-approver.service';
 import { CanManagementService } from '../../cans/can-management.service';
 import { Alert } from '../../alert-billboard/alert';
 import { FundingSourceGrantDataPayload } from '../applications-proposed-for-funding/funding-source-grant-data-payload';
-import { findRequireCallReference } from '@angular/compiler-cli/ngcc/src/host/commonjs_umd_utils';
 import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
 
 @Component({
@@ -102,6 +101,8 @@ export class PlanStep3Component implements OnInit {
       this.handleDeletedRequests(deletedRequests);
     }
 
+    this.recalculateFundingRequestTypes();
+
     // this.planCoordinatorService.listSelectedSources = [];
   }
 
@@ -159,9 +160,9 @@ export class PlanStep3Component implements OnInit {
   }
 
   private saveFundingPlan(): void {
-    this.logger.info('Plan before save', this.planModel.fundingPlanDto);
+    this.logger.debug('Plan before save', this.planModel.fundingPlanDto);
     this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
-      this.logger.info('Plan after save', result);
+      this.logger.debug('Plan after save', result);
       this.planModel.fundingPlanDto = result;
       this.planManagementService.buildPlanBudgetAndCanModel();
       this.planManagementService.buildGrantCostModel();
@@ -169,7 +170,7 @@ export class PlanStep3Component implements OnInit {
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(s => {
           return { applId: s.applId, frtId: s.frtId };
         }));
-      this.planApproverService.checkCreateApprovers().finally(
+      this.planApproverService.checkCreateApprovers().then(
         () => {
           if (this.nextStep === '/plan/step6') {
             this.planModel.pendingAlerts.push({
@@ -333,6 +334,7 @@ export class PlanStep3Component implements OnInit {
           approvedTc: totalCost,
           dcPctCut: dcPercentCut,
           tcPctCut: tcPercentCut,
+          percentSelected: item.displayType === 'percent' ? true : false,
           approvedFutureYrs: this.futureYears.get(item.grant.applId),
           fseId: source.fundingSourceId,
           defaultOefiaTypeId: source.octId,
@@ -466,7 +468,7 @@ export class PlanStep3Component implements OnInit {
               if (!this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources) {
                 this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = [];
               }
-              this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources.push(this.editing.sourceId);
+              //this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources.push(this.editing.sourceId);
             }
           } else {
             this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(s.fundingSource);
@@ -585,6 +587,7 @@ export class PlanStep3Component implements OnInit {
               // lastChangeDate: string,
               // lastChangeUserId: string,
               nciSourceFlag: s.nciSourceFlag,
+              percentSelected: s.displayType === 'percent' ? true : false,
               // octId: s.octId,
               // oefiaCreateCode: string,
               // oefiaTypeId: number,
@@ -611,6 +614,7 @@ export class PlanStep3Component implements OnInit {
             frCan.frqId = +req.frqId;
             frCan.fseId = +s.fseId;
             frCan.nciSourceFlag = s.nciSourceFlag;
+            frCan.percentSelected = s.displayType === 'percent' ? true : false;
           }
 
           if (this.editing) {
@@ -741,6 +745,21 @@ export class PlanStep3Component implements OnInit {
       } else {
         this.logger.warn(`No funding request found for for applId ${applid} in plan ${this.planModel.fundingPlanDto.fprId}`);
       }
+    });
+  }
+
+  private recalculateFundingRequestTypes(): void {
+    const from = this.planModel.fundingPlanDto?.fundableRangeFrom;
+    const to = this.planModel.fundingPlanDto?.fundableRangeTo;
+    const grantsInRange = this.planModel.allGrants.filter(g => g.priorityScoreNum >= from && g.priorityScoreNum <= to).map(g => g.applId);
+    this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(req => {
+      const inRange: boolean = grantsInRange.includes(req.applId);
+      if (inRange) {
+        req.frtId = FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE;
+      } else {
+        req.frtId = FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION;
+      }
+      this.logger.debug(`Request ${req.applId} :: ${req.frtId}`);
     });
   }
 }
