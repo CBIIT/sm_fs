@@ -28,7 +28,6 @@ import { PlanApproverService } from '../approver/plan-approver.service';
 import { CanManagementService } from '../../cans/can-management.service';
 import { Alert } from '../../alert-billboard/alert';
 import { FundingSourceGrantDataPayload } from '../applications-proposed-for-funding/funding-source-grant-data-payload';
-import { findRequireCallReference } from '@angular/compiler-cli/ngcc/src/host/commonjs_umd_utils';
 import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
 
 @Component({
@@ -101,6 +100,8 @@ export class PlanStep3Component implements OnInit {
     if (deletedRequests) {
       this.handleDeletedRequests(deletedRequests);
     }
+
+    this.recalculateFundingRequestTypes();
 
     // this.planCoordinatorService.listSelectedSources = [];
   }
@@ -744,6 +745,21 @@ export class PlanStep3Component implements OnInit {
       } else {
         this.logger.warn(`No funding request found for for applId ${applid} in plan ${this.planModel.fundingPlanDto.fprId}`);
       }
+    });
+  }
+
+  private recalculateFundingRequestTypes(): void {
+    const from = this.planModel.fundingPlanDto?.fundableRangeFrom;
+    const to = this.planModel.fundingPlanDto?.fundableRangeTo;
+    const grantsInRange = this.planModel.allGrants.filter(g => g.priorityScoreNum >= from && g.priorityScoreNum <= to).map(g => g.applId);
+    this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(req => {
+      const inRange: boolean = grantsInRange.includes(req.applId);
+      if (inRange) {
+        req.frtId = FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE;
+      } else {
+        req.frtId = FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION;
+      }
+      this.logger.debug(`Request ${req.applId} :: ${req.frtId}`);
     });
   }
 }
