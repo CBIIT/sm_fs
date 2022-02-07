@@ -35,7 +35,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   get pageTitle(): string {
-    if(this.selectedFundingSources?.length > 0) {
+    if(this.selectedFundingSources?.length > 0 && this.editing !== 0) {
       return 'Add Additional Funding Source';
     } else {
       return 'Add Primary Funding Source';
