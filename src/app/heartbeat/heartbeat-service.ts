@@ -67,10 +67,9 @@ export class HeartbeatService {
 
       this.circuitBreakerInterval = this.setIntervalFunction(() => {
         const zeroHour: number = this.lastGoodDbHeartbeat || this.startTime;
-        this.logger.debug(`[${this.circuitBreakerInterval}] ${Date.now() - this.lastGoodHeartbeat} millis since last good heartbeat`);
-        this.logger.debug(`[${this.circuitBreakerInterval}]${Date.now() - this.lastGoodDbHeartbeat} millis since last good DB heartbeat`);
-        this.logger.debug(`[${this.circuitBreakerInterval}]${this.KILLSWITCH_INTERVAL - (Date.now() - zeroHour)} millis until termination`);
-        // TODO: use the killswitch if the time since last good heartbeat is too long
+        this.logger.debug(`[${this.circuitBreakerInterval}] ${Date.now() - (this.lastGoodHeartbeat || this.startTime)} millis since last good heartbeat`);
+        this.logger.debug(`[${this.circuitBreakerInterval}] ${Date.now() - (this.lastGoodDbHeartbeat || this.startTime)} millis since last good DB heartbeat`);
+        this.logger.debug(`[${this.circuitBreakerInterval}] ${this.KILLSWITCH_INTERVAL - (Date.now() - zeroHour)} millis until termination`);
         if (Date.now() - zeroHour >= this.KILLSWITCH_INTERVAL) {
           this.killSwitch.next();
         }
@@ -107,7 +106,7 @@ export class HeartbeatService {
           this.heartBeat.next(true);
         }, error => {
           this.logger.debug(`[${this.heartbeatInterval}] Received error: ${JSON.stringify(error)}`);
-          this.logger.debug(`[${this.heartbeatInterval}] API not responding. Last good hearbeat: ${Date.now() - this.lastGoodHeartbeat} millis ago`);
+          this.logger.debug(`[${this.heartbeatInterval}] API not responding. Last good hearbeat: ${Date.now() - (this.lastGoodHeartbeat || this.startTime)} millis ago`);
           this.heartBeat.next(false);
         });
       }, millis);
@@ -141,7 +140,7 @@ export class HeartbeatService {
             this.lastGoodDbHeartbeat = Date.now();
             this.startDefaultHeartbeat();
           } else {
-            this.logger.debug(`[${this.dbHeartbeatInterval}] DB is not responsive. Last good heartbeat: ${Date.now() - this.lastGoodDbHeartbeat} millis ago`);
+            this.logger.debug(`[${this.dbHeartbeatInterval}] DB is not responsive. Last good heartbeat: ${Date.now() - (this.lastGoodDbHeartbeat || this.startTime)} millis ago`);
             this.stopHeartbeat();
           }
           this.dbHeartBeat.next(next.dbActive);
@@ -149,7 +148,7 @@ export class HeartbeatService {
           // Technically speaking, DB status is unknown at this point, since this indicates the API itself is not responding
           // TODO: evalute whether this is a timeout and restart the heartbeat if so?
           this.stopHeartbeat();
-          this.logger.debug(`[${this.dbHeartbeatInterval}] DB status unknown. Last good heartbeat: ${Date.now() - this.lastGoodDbHeartbeat} millis`);
+          this.logger.debug(`[${this.dbHeartbeatInterval}] DB status unknown. Last good heartbeat: ${Date.now() - (this.lastGoodDbHeartbeat || this.startTime)} millis`);
           this.heartBeat.next(false);
           this.dbHeartBeat.next(false);
         });
