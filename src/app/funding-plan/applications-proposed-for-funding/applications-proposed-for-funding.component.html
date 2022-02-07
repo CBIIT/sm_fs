@@ -64,19 +64,14 @@
             (PendingPrcValuesEmitter)="capturePendingValues($event)"
             [parentForm]="parentForm"
             [(ngModel)]="pendingValues"
-            [grantIndex]="i" 
+            [grantIndex]="i"
+            #afprc
             [grant]="grant"
             [sourceIndex]="0">
           </app-fp-program-recommended-costs>
-<!--          <input-->
-<!--            type="text"-->
-<!--            style="display:none"-->
-<!--            [(ngModel)]="pendingValues"-->
-<!--            [name]="grant.applId + '.unfunded'"-->
-<!--            [ngModelOptions]="{updateOn: 'change'}">-->
           <div
             class="text-danger mt-1"
-            *ngIf="showFundingWarning(grant.applId)">
+            *ngIf="showFundingWarning(grant.applId, afprc)">
             Every grant must be funded by at least one source
           </div>
         </td>
@@ -167,7 +162,7 @@
           </app-fp-grant-information>
           <div
             class="text-danger mt-1"
-            *ngIf="showFundingWarning(grant.applId)">
+            *ngIf="showFundingWarning(grant.applId, null)">
             Every grant must be funded by at least one source
           </div>
         </td>

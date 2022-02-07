@@ -17,6 +17,7 @@ import { FundingSourceEntryModalComponent } from './funding-source-entry-modal/f
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSourceGrantDataPayload } from './funding-source-grant-data-payload';
 import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
+import { ProgramRecommendedCostsComponent } from '../../program-recommended-costs/program-recommended-costs.component';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -204,23 +205,23 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     this.pendingValues = $event;
   }
 
-  showFundingWarning(applId: number): boolean {
-    this.logger.debug(this.pendingValues, this.noPendingValues(applId));
+  showFundingWarning(applId: number, c: FpProgramRecommendedCostsComponent): boolean {
+    // this.logger.debug(this.pendingValues, this.noPendingValues(applId));
     return (this.planManagementService.requestTotalTotal(applId) === 0
-      && this.planManagementService.requestDirectTotal(applId) === 0);
+      && this.planManagementService.requestDirectTotal(applId) === 0 && this.noPendingValues(c.pendingValues));
   }
 
-  private noPendingValues(applId: number): boolean {
+  private noPendingValues(pendingValues: PendingPrcValues): boolean {
     const reg = /^\d{0,3}(\.\d{1,2})?$/;
 
-    if(!this.pendingValues) {
+    if(!pendingValues) {
       return true;
     }
-    if(!(+this.pendingValues.applId === applId)) {
-      return true;
-    }
+    // if(!(+pendingValues.applId === applId)) {
+    //   return true;
+    // }
 
-    if(((this.pendingValues.directCost || 0) + (this.pendingValues.totalCost || 0) === 0) && !reg.test('' + this.pendingValues.percentCut)) {
+    if(((pendingValues.directCost || 0) + (pendingValues.totalCost || 0) === 0) && !reg.test('' + pendingValues.percentCut)) {
       return true;
     }
 

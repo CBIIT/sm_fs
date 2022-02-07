@@ -37,7 +37,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   canDescription: string;
   canPhsOrgCode: string;
   can: string;
-  private pendingValues: PendingPrcValues;
+  pendingValues: PendingPrcValues;
 
   constructor(
     private planManagementService: PlanManagementService,
