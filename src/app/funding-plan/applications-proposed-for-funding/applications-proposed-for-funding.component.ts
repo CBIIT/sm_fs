@@ -207,8 +207,13 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   showFundingWarning(applId: number, c: FpProgramRecommendedCostsComponent): boolean {
     // this.logger.debug(this.pendingValues, this.noPendingValues(applId));
-    return (this.planManagementService.requestTotalTotal(applId) === 0
-      && this.planManagementService.requestDirectTotal(applId) === 0 && this.noPendingValues(c.pendingValues));
+    if (c) {
+      return (this.planManagementService.requestTotalTotal(applId) === 0
+        && this.planManagementService.requestDirectTotal(applId) === 0 && this.noPendingValues(c.pendingValues));
+    } else {
+      return (this.planManagementService.requestTotalTotal(applId) === 0
+        && this.planManagementService.requestDirectTotal(applId) === 0);
+    }
   }
 
   private noPendingValues(pendingValues: PendingPrcValues): boolean {
