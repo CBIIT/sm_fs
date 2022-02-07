@@ -205,7 +205,25 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   showFundingWarning(applId: number): boolean {
+    this.logger.debug(this.pendingValues, this.noPendingValues(applId));
     return (this.planManagementService.requestTotalTotal(applId) === 0
       && this.planManagementService.requestDirectTotal(applId) === 0);
+  }
+
+  private noPendingValues(applId: number): boolean {
+    const reg = /^\d{0,3}(\.\d{1,2})?$/;
+
+    if(!this.pendingValues) {
+      return true;
+    }
+    if(!(+this.pendingValues.applId === applId)) {
+      return true;
+    }
+
+    if(((this.pendingValues.directCost || 0) + (this.pendingValues.totalCost || 0) === 0) && !reg.test('' + this.pendingValues.percentCut)) {
+      return true;
+    }
+
+    return false;
   }
 }
