@@ -11,10 +11,8 @@ export class PercentCutPipe implements PipeTransform {
   }
 
   transform(value: number, ...args: any[]): string {
-    this.logger.debug(`value in: ${value}`);
     if (value && args[0]) { // args[0] is initialPay
       const res = '(' + this.percentPipe.transform(value, '1.0-2') + ' Cut)';
-      this.logger.debug(`value out: ${res}`);
       return res;
     }
     return '';

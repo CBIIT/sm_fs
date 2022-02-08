@@ -145,8 +145,10 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   onAddFundingSource(): void {
+
     // this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
     this.beforeAddFundingSource.next(this.getNextSourceIndex);
+
     if (this.getNextSourceIndex < 2) {
       this.grantList.forEach(item => {
         this.planManagementService.setRecommendedFutureYears(item.grant.applId, item.recommendedFutureYearsComponent?.selectedValue);
@@ -165,6 +167,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
 
   canAddFundingSource(): boolean {
     if (!this.planManagementService.selectedSourceCount) {
+
       return !!this.fundingSources?.get(0)?.selectedValue;
     }
     return this.planManagementService.selectedSourceCount < 3;
