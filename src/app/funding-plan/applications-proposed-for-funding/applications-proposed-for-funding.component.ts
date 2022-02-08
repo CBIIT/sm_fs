@@ -8,7 +8,7 @@ import {
   PendingPrcValues
 } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { Router } from '@angular/router';
-import { openNewWindow } from '../../utils/utils';
+import { isReallyANumber, openNewWindow } from '../../utils/utils';
 import { FpGrantInformationComponent } from '../fp-grant-information/fp-grant-information.component';
 import { FpFundingSourceComponent } from '../fp-funding-source/fp-funding-source.component';
 import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
@@ -17,7 +17,6 @@ import { FundingSourceEntryModalComponent } from './funding-source-entry-modal/f
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSourceGrantDataPayload } from './funding-source-grant-data-payload';
 import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
-import { ProgramRecommendedCostsComponent } from '../../program-recommended-costs/program-recommended-costs.component';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -145,9 +144,16 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   onAddFundingSource(): void {
-
+    let hasErrors = false;
     // this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
-    this.beforeAddFundingSource.next(this.getNextSourceIndex);
+    const nextSource = this.getNextSourceIndex;
+    this.beforeAddFundingSource.next(nextSource);
+
+    if (nextSource === 1 && this.badRequestData()) {
+      this.logger.debug('Checking model for errors');
+      alert('At least one grant below has errors that must be fixed before you can add an additional source.');
+      return;
+    }
 
     if (this.getNextSourceIndex < 2) {
       this.grantList.forEach(item => {
@@ -222,17 +228,44 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   private noPendingValues(pendingValues: PendingPrcValues): boolean {
     const reg = /^\d{0,3}(\.\d{1,2})?$/;
 
-    if(!pendingValues) {
+    if (!pendingValues) {
       return true;
     }
     // if(!(+pendingValues.applId === applId)) {
     //   return true;
     // }
 
-    if(((pendingValues.directCost || 0) + (pendingValues.totalCost || 0) === 0) && !reg.test('' + pendingValues.percentCut)) {
+    if (((pendingValues.directCost || 0) + (pendingValues.totalCost || 0) === 0) && !reg.test('' + pendingValues.percentCut)) {
       return true;
     }
 
     return false;
+  }
+
+  badRequestData(): boolean {
+    let result = false;
+    const reg = /^\d{0,3}(\.\d{1,2})?$/;
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(i => {
+      this.logger.debug(i.fullGrantNum);
+      i.financialInfoDto.fundingRequestCans?.forEach(c => {
+        this.logger.debug(c);
+        if(c.percentSelected) {
+          if(!reg.test('' + (c.dcPctCut/1000))) {
+            this.logger.debug(`bad percent cut field ${c.dcPctCut}`);
+            result = true;
+          }
+        } else {
+          if(!(!isReallyANumber(c.approvedDc) && !isReallyANumber(c.approvedTc))) {
+            this.logger.debug('both dc and tc are required if either is provided');
+            result = true;
+          } else if(+c.approvedDc > +c.approvedTc) {
+            this.logger.debug(`approved dc greater than approved tc ${c.approvedDc} - ${c.approvedTc}`);
+            result = true;
+          }
+        }
+      });
+    });
+
+    return result;
   }
 }
