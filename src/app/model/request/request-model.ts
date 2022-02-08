@@ -235,7 +235,7 @@ export class RequestModel {
     });
 
     // Set final loa to SPL if MoonShot funds selected and the request is type Other Pay or Special Actions
-    if (isMoonshot && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY),
+    if (isMoonshot && [Number(FundingRequestTypes.OTHER_PAY_COMPETING_ONLY), Number(FundingRequestTypes.PAY_TYPE_4),
       Number(FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS)].includes(Number(this.requestDto.frtId))) {
       // this.logger.debug('Setting final LOA to SPL Committee');
       this.requestDto.financialInfoDto.loaId = 4;
