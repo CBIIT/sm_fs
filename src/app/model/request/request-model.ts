@@ -224,7 +224,7 @@ export class RequestModel {
         temp = p.asBudget();
         if (temp !== null) {
           if (this.programRecommendedCostsModel.deletedSources.includes(p.fundingSource.fundingSourceId)) {
-            this.logger.warn('deleted source', p.fundingSource.fundingSourceId, 'still has saved budgets');
+            //this.logger.warn('deleted source', p.fundingSource.fundingSourceId, 'still has saved budgets');
             temp.id = null;
           }
 

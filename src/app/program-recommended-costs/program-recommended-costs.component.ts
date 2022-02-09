@@ -543,6 +543,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   prepareType4LineItem(): void {
     if (this.lineItem?.length > 0) {
       this.logger.warn('Replacing existing data:', this.lineItem);
+      if(this.editing >= 0) {
+        this.model.programRecommendedCostsModel.deletedSources.push(this.lineItem[0].fundingSource.fundingSourceId);
+      }
     }
     this.lineItem = new Array<PrcDataPoint>();
     if (!!this._recommendedFutureYears) {
