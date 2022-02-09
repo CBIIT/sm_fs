@@ -92,10 +92,8 @@ export class BudgetInfoComponent implements OnInit {
 
   refreshRequestCans(): void {
     this.model.requestCans.forEach((c, index) => {
-      this.logger.debug('can before', c);
       const selected: CanCcxDto = this.getCanSelectorWithIndex(index)?.selectedCanData;
       if (selected) {
-        this.logger.debug(selected);
         c.can = selected.can;
         c.canDescription = selected.canDescrip;
       }
@@ -105,7 +103,6 @@ export class BudgetInfoComponent implements OnInit {
       if (this.isFcNci()) {
         c.oefiaCreateCode = this.model.requestDto.oefiaCreateCode;
       }
-      this.logger.debug('can after', c);
     });
   }
 
@@ -114,7 +111,6 @@ export class BudgetInfoComponent implements OnInit {
       return null;
     }
     let result: OefiaTypesComponent;
-    // @ts-ignore
     this.oefiaTypes.forEach(control => {
       if(+control.index === index) {
         result = control;
@@ -128,7 +124,6 @@ export class BudgetInfoComponent implements OnInit {
       return null;
     }
     let result: CanSelectorComponent;
-    // @ts-ignore
     this.canSelectors.forEach(control => {
       if(+control.index === +index) {
         result = control;
