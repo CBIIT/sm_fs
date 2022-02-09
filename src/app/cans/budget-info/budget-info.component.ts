@@ -10,6 +10,7 @@ import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
 import { CanWarning } from 'src/app/funding-request/workflow/warning-modal/workflow-warning-modal.component';
 import { CanSearchModalComponent } from '../can-search-modal/can-search-modal.component';
 import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-budget-info',
@@ -43,7 +44,7 @@ export class BudgetInfoComponent implements OnInit {
     this.model.requestCans = value;
   }
 
-  constructor(private logger: CustomServerLoggingService,
+  constructor(private logger: NGXLogger,
               private canManagementService: CanManagementService,
               public model: RequestModel,
               private workflowModel: WorkflowModel) {
@@ -91,20 +92,50 @@ export class BudgetInfoComponent implements OnInit {
 
   refreshRequestCans(): void {
     this.model.requestCans.forEach((c, index) => {
-      const selected: CanCcxDto = this.canSelectors?.get(index)?.selectedCanData;
+      this.logger.debug('can before', c);
+      const selected: CanCcxDto = this.getCanSelectorWithIndex(index)?.selectedCanData;
       if (selected) {
+        this.logger.debug(selected);
         c.can = selected.can;
         c.canDescription = selected.canDescrip;
       }
-      const oefiaType = this.oefiaTypes?.get(index)?.selectedValue;
+      const oefiaType = this.getOefiaTypeWithIndex(index)?.selectedValue;
       c.octId = c.oefiaTypeId = !isNaN(oefiaType) ? (Number(oefiaType) !== 0 ? Number(oefiaType) : null) : null;
 
       if (this.isFcNci()) {
         c.oefiaCreateCode = this.model.requestDto.oefiaCreateCode;
       }
+      this.logger.debug('can after', c);
     });
   }
 
+  getOefiaTypeWithIndex(index: number): OefiaTypesComponent {
+    if(!this.oefiaTypes) {
+      return null;
+    }
+    let result: OefiaTypesComponent;
+    // @ts-ignore
+    this.oefiaTypes.forEach(control => {
+      if(+control.index === index) {
+        result = control;
+      }
+    });
+    return result;
+  }
+
+  getCanSelectorWithIndex(index: number): CanSelectorComponent {
+    if(!this.canSelectors) {
+      return null;
+    }
+    let result: CanSelectorComponent;
+    // @ts-ignore
+    this.canSelectors.forEach(control => {
+      if(+control.index === +index) {
+        result = control;
+      }
+    });
+    return result;
+  }
 
   copyProjectedCan(i: number): void {
     this.canSelectors.forEach((control) => {
@@ -164,9 +195,6 @@ export class BudgetInfoComponent implements OnInit {
       return false;
     }
 
-    if(!!projectedCan) {
-      this.logger.debug(`showCopyProjectedCan(${i}) :: ${JSON.stringify(projectedCan)}`);
-    }
     return !!projectedCan;
   }
 

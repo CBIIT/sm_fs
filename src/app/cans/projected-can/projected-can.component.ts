@@ -42,10 +42,11 @@ export class ProjectedCanComponent implements OnInit {
   }
 
   updateProjectedCan(oefiaType: number, emit: boolean): void {
-    const source = Number(this.fseId);
+    const source = +this.fseId
 
     this.canService.getProjectedCan(source, oefiaType, this.frtId, this.requestModel.requestDto.frqId, this.applId).subscribe(result => {
       this.projectedCan = result;
+      this.logger.debug(`Me: ${this.index}-${source} :: projected CAN ${result?.can}`);
       if (emit) {
         this.canService.projectedCanEmitter.next({ index: this.index, can: result });
       }
