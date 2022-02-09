@@ -107,8 +107,8 @@ export class BudgetInfoComponent implements OnInit {
 
 
   copyProjectedCan(i: number): void {
-    this.canSelectors.forEach((control, index) => {
-      if (i === index) {
+    this.canSelectors.forEach((control) => {
+      if (+i === +control.index) {
         control.selectProjectedCan();
       }
     });
@@ -118,7 +118,12 @@ export class BudgetInfoComponent implements OnInit {
     if (!this.canSelectors) {
       return false;
     }
-    const fseId: number = this.canSelectors?.get(i)?.fseId;
+    let fseId: number;
+      this.canSelectors.forEach(control => {
+        if(+control.index === +i) {
+          fseId = control.fseId;
+        }
+      });
 
     return this.defaultCanTracker?.get(fseId) || false;
   }
@@ -127,29 +132,41 @@ export class BudgetInfoComponent implements OnInit {
     if (!this.canSelectors) {
       return false;
     }
-    const cans: string[] = [];
-    const dupes: boolean[] = [false, false, false];
+    const theirCANs: string[] = [];
+    let myCAN: string;
+    // const dupes: boolean[] = [false, false, false];
+
     this.canSelectors.forEach((control) => {
-      cans.push(control.selectedValue || '');
-    });
-    cans.forEach((c1, i1) => {
-      cans.forEach((c2, i2) => {
-        if (i1 !== i2 && c1 !== '') {
-          if (c1 === c2) {
-            dupes[i1] = true;
-          }
+      if(control.index === i) {
+        myCAN = !!control.selectedValue ? control.selectedValue : undefined;
+      } else {
+        if(!!control.selectedValue) {
+          theirCANs.push(control.selectedValue);
         }
-      });
+      }
     });
-    return dupes[i];
+
+    return !!myCAN && theirCANs.includes(myCAN);
   }
 
   showCopyProjectedCan(i: number): boolean {
-    const projectedCan: CanCcxDto = this.projectedCans?.get(i)?.projectedCan;
+    if(!this.projectedCans) {
+      return false;
+    }
+
+    let projectedCan: CanCcxDto;
+    this.projectedCans.forEach(control => {
+      if(+control.index === +i) {
+        projectedCan = control.projectedCan;
+      }
+    });
     if (!projectedCan?.can || !projectedCan?.canDescrip) {
       return false;
     }
 
+    if(!!projectedCan) {
+      this.logger.debug(`showCopyProjectedCan(${i}) :: ${JSON.stringify(projectedCan)}`);
+    }
     return !!projectedCan;
   }
 
