@@ -59,6 +59,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   requestStatus: FundingReqStatusHistoryDto = {};
   approvingState = false;
   terminalRequest = false;
+  showCreateType = false;
 
   validationError: any = {};
   completedPfrs: FundingPlanQueryDto[];
@@ -89,6 +90,13 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     }
     if (this.budgetInfoComponent) {
       this.budgetInfoComponent.isApprovalAction = approvalAction;
+    }
+
+    if (this.workflowModel.isFcNci && approvalAction) {
+      this.showCreateType = true;
+    }
+    else {
+      this.showCreateType = false;
     }
   }
 
@@ -171,6 +179,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.comments = '';
         this.workflowActions = this.workflowModel.getWorkflowList();
         this.fetchCompletedPfr();
+        this.showCreateType = false;
         this.logger.debug('workflow actions = ', this.workflowActions);
       }
     );

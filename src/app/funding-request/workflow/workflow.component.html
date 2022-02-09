@@ -29,7 +29,7 @@
     <div class="col-12" *ngIf="isApprover()">
         <p>You must select an action to activate the "Process Action" button below.</p>
     </div>
-    <div class="col-md-6 col-lg-4" *ngIf="isApprover()">
+    <div class="col-md-4 col-lg-4" *ngIf="isApprover()">
         <div class="form-group">
             <label for="workflow-action">Action</label>
             <ng-select2
@@ -46,8 +46,8 @@
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="form-group" *ngIf="showAddApprover || !readonly">
+    <div class="col-md-4" *ngIf="showAddApprover || !readonly">
+        <div class="form-group" >
             <label for="req-add-approvers">{{addApproverLabel}} <span class="optional" *ngIf="!newApproverRequired">(optional)</span></label>
             <ng-select2
                 id="req-add-approvers"
@@ -60,6 +60,9 @@
                 New approver is required
             </div>
         </div>  
+    </div>
+    <div class="col-md-4" *ngIf="showCreateType">
+        <app-create-type></app-create-type>
     </div>
     <div class="col-12"  *ngIf="showBudgetDocWarning">
         <ngb-alert type="warning" [dismissible]="false">
