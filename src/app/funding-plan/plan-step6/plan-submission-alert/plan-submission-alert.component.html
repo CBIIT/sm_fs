@@ -62,5 +62,5 @@
     <a routerLink="/search">search</a>.
 </div>
 <div class="alert alert-danger" *ngIf="status === 'failure'">
-    <b>Failed to submit the request: </b> {{errorMessage}}
+    <b>Failed to submit the request:</b>&nbsp;<span [innerHtml]="errorMessage"></span>
 </div>
