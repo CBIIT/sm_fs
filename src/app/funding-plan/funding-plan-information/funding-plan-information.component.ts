@@ -52,7 +52,7 @@ export class FundingPlanInformationComponent implements OnInit {
 
     this.restoreSavedFoaData();
 
-    this.totalApplicationsReceived = this.planModel.allGrants.length;
+    this.totalApplicationsReceived = this.planModel.fundingPlanDto.applReceivedNum || this.planModel.allGrants.length;
 
     this.listApplicationsSelected = this.planModel.allGrants.filter(g => g.selected);
 
@@ -78,11 +78,6 @@ export class FundingPlanInformationComponent implements OnInit {
     this.listApplicationsNotConsidered = [];
     this.listApplicationsNotConsidered.concat(this.listApplicationsNotSelectable)
       .concat(this.listApplicationsOutsideRange.filter(g => !g.selected));
-
-    this.logger.debug(`List of applications not considered ${this.listApplicationsNotConsidered.length}`);
-    this.logger.debug(`Calculated number of apps not considered: ${this.totalApplicationsNotConsidered}`);
-    this.logger.debug(`Total apps with not selectable reason: ${this.listApplicationsNotSelectable.length}`);
-    this.logger.debug(`Apps outside range not selected: ${this.listApplicationsOutsideRange.filter(g => !g.selected).length}`);
 
     if (this.planModel.fundingPlanDto.otherContributingDocs) {
       this.otherDocs = this.planModel.fundingPlanDto.otherContributingDocs.split(',');

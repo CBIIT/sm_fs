@@ -9,7 +9,6 @@ import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
 import { CanWarning } from 'src/app/funding-request/workflow/warning-modal/workflow-warning-modal.component';
 import { CanSearchModalComponent } from '../can-search-modal/can-search-modal.component';
-import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({
@@ -102,33 +101,30 @@ export class BudgetInfoComponent implements OnInit {
 
       if (this.isFcNci()) {
         c.oefiaCreateCode = this.model.requestDto.oefiaCreateCode;
+        this.logger.info(`Setting OEFIA create code to ${this.model.requestDto.oefiaCreateCode} for request #${this.model.requestDto.frqId}`);
       }
     });
   }
 
   getOefiaTypeWithIndex(index: number): OefiaTypesComponent {
-    if(!this.oefiaTypes) {
-      return null;
-    }
-    let result: OefiaTypesComponent;
-    this.oefiaTypes.forEach(control => {
-      if(+control.index === index) {
-        result = control;
-      }
-    });
-    return result;
+    return this.oefiaTypes?.find(control => (+control.index === +index));
+    // if (!this.oefiaTypes) {
+    //   return null;
+    // }
+    // let result: OefiaTypesComponent;
+    // this.oefiaTypes.forEach(control => {
+    //   if (+control.index === index) {
+    //     result = control;
+    //   }
+    // });
+    // return result;
   }
 
   getCanSelectorWithIndex(index: number): CanSelectorComponent {
-    if(!this.canSelectors) {
+    if (!this.canSelectors) {
       return null;
     }
-    let result: CanSelectorComponent;
-    this.canSelectors.forEach(control => {
-      if(+control.index === +index) {
-        result = control;
-      }
-    });
+    let result: CanSelectorComponent = this.canSelectors.find(control => (+control.index === +index));
     return result;
   }
 
@@ -145,11 +141,11 @@ export class BudgetInfoComponent implements OnInit {
       return false;
     }
     let fseId: number;
-      this.canSelectors.forEach(control => {
-        if(+control.index === +i) {
-          fseId = control.fseId;
-        }
-      });
+    this.canSelectors.forEach(control => {
+      if (+control.index === +i) {
+        fseId = control.fseId;
+      }
+    });
 
     return this.defaultCanTracker?.get(fseId) || false;
   }
@@ -163,10 +159,10 @@ export class BudgetInfoComponent implements OnInit {
     // const dupes: boolean[] = [false, false, false];
 
     this.canSelectors.forEach((control) => {
-      if(control.index === i) {
+      if (control.index === i) {
         myCAN = !!control.selectedValue ? control.selectedValue : undefined;
       } else {
-        if(!!control.selectedValue) {
+        if (!!control.selectedValue) {
           theirCANs.push(control.selectedValue);
         }
       }
@@ -176,13 +172,13 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   showCopyProjectedCan(i: number): boolean {
-    if(!this.projectedCans) {
+    if (!this.projectedCans) {
       return false;
     }
 
     let projectedCan: CanCcxDto;
     this.projectedCans.forEach(control => {
-      if(+control.index === +i) {
+      if (+control.index === +i) {
         projectedCan = control.projectedCan;
       }
     });
