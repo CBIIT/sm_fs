@@ -98,9 +98,7 @@ export class HeartbeatService {
     if (!this.heartbeatInterval) {
       this.logger.info(`Starting heartbeat: ${millis} millis`);
       this.heartbeatInterval = this.setIntervalFunction(() => {
-        this.logger.debug(`[${this.heartbeatInterval}] Ping`);
         this.heartbeatController.getHeartBeatUsingGET().subscribe(next => {
-          // this.logger.debug(`ping: ${next.sessionId}`);
           this.sessionId = next.sessionId;
           this.lastGoodHeartbeat = Date.now();
           this.heartBeat.next(true);
@@ -132,7 +130,6 @@ export class HeartbeatService {
     if (!this.dbHeartbeatInterval) {
       this.logger.info(`Starting DB heartbeat: ${millis} millis`);
       this.dbHeartbeatInterval = this.setIntervalFunction(() => {
-        this.logger.debug(`[${this.dbHeartbeatInterval}] DB Ping`);
         this.heartbeatController.getDbHeartBeatUsingGET().subscribe(next => {
           this.sessionId = next.sessionId;
           this.dbActive = next.dbActive;
@@ -146,7 +143,6 @@ export class HeartbeatService {
           this.dbHeartBeat.next(next.dbActive);
         }, error => {
           // Technically speaking, DB status is unknown at this point, since this indicates the API itself is not responding
-          // TODO: evalute whether this is a timeout and restart the heartbeat if so?
           this.stopHeartbeat();
           this.logger.debug(`[${this.dbHeartbeatInterval}] DB status unknown. Last good heartbeat: ${Date.now() - (this.lastGoodDbHeartbeat || this.startTime)} millis`);
           this.heartBeat.next(false);
