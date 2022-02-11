@@ -16,6 +16,9 @@
 - [ ] Migrate HeartbeatService, CustomLogger, and any dependencies to common UI (which should be renamed)
 - [ ] Standardize %Cut pipes - we have multiple.
 - [ ] Convert back to using NGXLogger instead of CustomLogger so we get file names and line numbers in messages.
+- [ ] Either start using them, or delete all component spec.ts files
+- [ ] When we can upgrade NGXLogger, modify to attach diagnostic payload and delete CustomLogger
+- [ ] Move ROLLUP_TYPES and PRE_APPL_TYPES from CreateTypeComponent to FundingRequestTypes
 
 ## Create new UI components
 

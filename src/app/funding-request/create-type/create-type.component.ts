@@ -14,6 +14,7 @@ export class CreateTypeComponent implements OnInit {
   data: Array<Select2OptionData> = [];
   private _selectedValue: string;
 
+  // TODO: move to FundingRequestTypes
   ROLLUP_TYPES = [
     FundingRequestTypes.REINSTATEMENT_OF_DELETED_COSTS,
     FundingRequestTypes.REINSTATEMENT_OF_DELETED_COSTS__HIGH_PROGRAMMATIC_QUALITY,
@@ -25,7 +26,8 @@ export class CreateTypeComponent implements OnInit {
     FundingRequestTypes.CO_FUND_A_NON_NCI_NON_COMPETING_GRANT__UP_TO_25000_IN_A_BUDGET_PERIOD,
     FundingRequestTypes.CO_FUND_A_NON_NCI_NON_COMPETING_GRANT__UP_TO_150000_DC_IN_A_BUDGET_PERIOD_AND_NOT_EXCEEDING_450000_FOR_ALL_YEARS
   ];
-
+  
+  // TODO: move to FundingRequestTypes
   PRE_APPL_TYPES = [
     FundingRequestTypes.GENERAL_ADMINISTRATIVE_SUPPLEMENTS_ADJUSTMENT_POST_AWARD,
     FundingRequestTypes.GENERAL_ADMINISTRATIVE_SUPPLEMENTS_ADJUSTMENT_POST_AWARD__OTHER,
