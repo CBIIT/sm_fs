@@ -13,7 +13,7 @@ export class HeaderComponent implements OnInit {
   public headerTemplateData = {
     appName: 'Funding Selections',
     docs: [
-      { docName: 'Individual Request Guide', docLink: this.propertiesService.getProperty('I2EWEB_URL') + 'documentation/application/FSFundingRequestUsersGuide.pdf' },
+      { docName: 'Individual Request Guide', docLink: this.propertiesService.getProperty('I2EWEB_URL') + 'documentation/application/FSIndividualRequestUsersGuide.pdf' },
       { docName: 'Funding Plan Guide', docLink: this.propertiesService.getProperty('I2EWEB_URL') + 'documentation/application/FSFundingPlanUsersGuide.pdf' },
       { docName: 'Video Tutorials', docLink: this.propertiesService.getProperty('I2EWEB_URL') + '/i2e-video.html' },
       { docName: 'Release Notes', docLink: this.propertiesService.getProperty('I2EWEB_URL') + '/releaseNotes/fundingselections.html' }],

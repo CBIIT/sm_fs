@@ -413,7 +413,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
                         foa = foas[r];
                         row[0] = foa.rfaPaNumber;
                         row[1] = foa.title;
-                        row[2] = foa.councilMeetingDateList.replace(/,/g, ', ');
+                        row[2] = convertNcabs(foa.councilMeetingDateList);
                         row[3] = foa.issueType;
                         d.body.splice(i + 1, 0, row);
                         i++;
