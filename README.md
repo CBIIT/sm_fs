@@ -7,19 +7,19 @@
 - [X] Error logging - how to get console logs for diagnostics?
 - [X] Heartbeat service - parameterize magic numbers
 - [X] Add size constraints to userQueue and logQueue in custom logging service
-- [ ] Use custom logger as proxy for all log calls to NGXLogger
+- [ ] ~~Use custom logger as proxy for all log calls to NGXLogger~~
 - [ ] Check for errors in 'CanDeactivate' methods
 - [X] Fix the stupid router issue with 5 login windows during initialization...
-- [ ] Evaluate errors in logging service and set up circuit-breaker
+- [X] Evaluate errors in logging service and set up circuit-breaker
 - [ ] Review and evaluate all logging statements
 - [ ] Break circular dependency between HeartbeatService and CustomLogger
 - [ ] Migrate HeartbeatService, CustomLogger, and any dependencies to common UI (which should be renamed)
 - [ ] Standardize %Cut pipes - we have multiple.
+- [ ] Convert back to using NGXLogger instead of CustomLogger so we get file names and line numbers in messages.
 
 ## Create new UI components
 
-**NOTE:** FS-specific components should go here.  Shared components go into sm_i2e_common_ui.  If you're not sure, put it here and we'll
-worry about it later.
+**NOTE:** FS-specific components should go here.  Shared components go into sm_i2e_common_ui.  If you're not sure, put it here and we'll worry about it later.
 
 ``` ng generate component <optional_path>\<component_name>```
 

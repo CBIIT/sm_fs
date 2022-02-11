@@ -108,24 +108,10 @@ export class BudgetInfoComponent implements OnInit {
 
   getOefiaTypeWithIndex(index: number): OefiaTypesComponent {
     return this.oefiaTypes?.find(control => (+control.index === +index));
-    // if (!this.oefiaTypes) {
-    //   return null;
-    // }
-    // let result: OefiaTypesComponent;
-    // this.oefiaTypes.forEach(control => {
-    //   if (+control.index === index) {
-    //     result = control;
-    //   }
-    // });
-    // return result;
   }
 
   getCanSelectorWithIndex(index: number): CanSelectorComponent {
-    if (!this.canSelectors) {
-      return null;
-    }
-    let result: CanSelectorComponent = this.canSelectors.find(control => (+control.index === +index));
-    return result;
+    return this.canSelectors?.find(control => (+control.index === +index));
   }
 
   copyProjectedCan(i: number): void {
@@ -140,12 +126,7 @@ export class BudgetInfoComponent implements OnInit {
     if (!this.canSelectors) {
       return false;
     }
-    let fseId: number;
-    this.canSelectors.forEach(control => {
-      if (+control.index === +i) {
-        fseId = control.fseId;
-      }
-    });
+    let fseId: number = this.getCanSelectorWithIndex(i)?.fseId;
 
     return this.defaultCanTracker?.get(fseId) || false;
   }
@@ -156,7 +137,6 @@ export class BudgetInfoComponent implements OnInit {
     }
     const theirCANs: string[] = [];
     let myCAN: string;
-    // const dupes: boolean[] = [false, false, false];
 
     this.canSelectors.forEach((control) => {
       if (control.index === i) {
@@ -277,8 +257,6 @@ export class BudgetInfoComponent implements OnInit {
       this.logger.warn(`canEnter(${fseId}) - no display matrix; return false`);
       return false;
     }
-    // this.logger.debug(`isFcArc: ${this.isFcArc()} == ARC enters: ${displayMatrix.arcEnters === 'Y'}`);
-    // this.logger.debug(`isFcNci: ${this.isFcNci()} == NCI enters: ${displayMatrix.oefiaEnters === 'Y'}`);
 
     if ((this.isFcArc() && displayMatrix.arcEnters === 'Y') || (this.isFcNci() && displayMatrix.oefiaEnters === 'Y')) {
       // this.logger.debug(`canEnter(${fseId}) :: true`);
@@ -295,7 +273,6 @@ export class BudgetInfoComponent implements OnInit {
         result = true;
       }
     }
-    // this.logger.debug(`can enter at least one CAN: ${result}`);
     return result;
   }
 }
