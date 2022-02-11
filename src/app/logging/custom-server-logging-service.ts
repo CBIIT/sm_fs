@@ -54,8 +54,7 @@ export class CustomServerLoggingService {
   }
 
   /**
-   * Unlike the proxy log methods below, this method will attach additional diagnostic data to the message sent to
-   * the server.
+   * Unlike the proxy methods below, this method will always log to the server, regardless of level
    */
   logInfoWithContext(msg: any, ...extra: any[]): void {
     const logBody: NgxPayload = this.buildPayload(NgxLoggerLevel.INFO, msg, extra);
@@ -64,8 +63,8 @@ export class CustomServerLoggingService {
   }
 
   /**
-   * As above, this method will log an error to the server with additional diagnostic data, including any messages
-   * that have been added to the userQueue
+   * As above, this method will log an error to the server with additional diagnostic data, as well as
+   * any messages in the userQueue.
    */
   logErrorWithContext(msg: any, ...extra: any[]): void {
     const logBody: NgxPayload = this.buildPayload(NgxLoggerLevel.ERROR, msg, [...extra, this.userQueue]);
@@ -80,11 +79,11 @@ export class CustomServerLoggingService {
       lineNumber: '',
       message: msg,
       timestamp: `${Date.now()}`,
-      additional: [this.getDiagnostics(), ...extra],
+      additional: [...extra, this.getDiagnostics()],
     };
   }
 
-  // TODO: Modify this method to add additional diagnostic data
+  // TODO: Modify this method to add additional diagnostic data as necessary
   // TODO: Move this into a separate service
   public getDiagnostics(): DiagnosticPayload {
     return {
@@ -96,6 +95,7 @@ export class CustomServerLoggingService {
     };
   }
 
+  // TODO: Evaluate the error to see if it's recoverable or not
   private post(logBody: NgxPayload, retry = true): void {
     if (this.sendLog && !this.paused) {
       this.logService.saveLogUsingPOST(logBody).subscribe(() => {
@@ -144,36 +144,36 @@ export class CustomServerLoggingService {
    * by the logErrorWithContext() method. If you want that context, use logErrorWithContext().
    */
   trace(message: any, ...additional: any[]): void {
-    this.logger.trace(message, [this.getDiagnostics(), ...additional]);
+    this.logger.trace(message, [...additional, this.getDiagnostics()]);
     this.queueUserMessage(NgxLoggerLevel.TRACE, message, additional);
   }
 
   debug(message: any, ...additional: any[]): void {
-    this.logger.debug(message, [this.getDiagnostics(), ...additional]);
+    this.logger.debug(message, [...additional, this.getDiagnostics()]);
     this.queueUserMessage(NgxLoggerLevel.DEBUG, message, additional);
   }
 
   info(message: any, ...additional: any[]): void {
-    this.logger.info(message, [this.getDiagnostics(), ...additional]);
+    this.logger.info(message, [...additional, this.getDiagnostics()]);
     this.queueUserMessage(NgxLoggerLevel.INFO, message, additional);
   }
 
   log(message: any, ...additional: any[]): void {
-    this.logger.log(message, [this.getDiagnostics(), ...additional]);
+    this.logger.log(message, [...additional, this.getDiagnostics()]);
     this.queueUserMessage(NgxLoggerLevel.LOG, message, additional);
   }
 
   warn(message: any, ...additional: any[]): void {
-    this.logger.warn(message, [this.getDiagnostics(), ...additional]);
+    this.logger.warn(message, [...additional, this.getDiagnostics()]);
     this.queueUserMessage(NgxLoggerLevel.WARN, message, additional);
   }
 
   error(message: any, ...additional: any[]): void {
-    this.logger.error(message, [this.getDiagnostics(), ...additional]);
+    this.logger.error(message, [...additional, this.getDiagnostics()]);
   }
 
   fatal(message: any, ...additional: any[]): void {
-    this.logger.fatal(message, [this.getDiagnostics(), ...additional]);
+    this.logger.fatal(message, [...additional, this.getDiagnostics()]);
   }
 
   /**
