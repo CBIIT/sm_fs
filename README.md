@@ -19,6 +19,7 @@
 - [ ] Either start using them, or delete all component spec.ts files
 - [ ] When we can upgrade NGXLogger, modify to attach diagnostic payload and delete CustomLogger
 - [ ] Move ROLLUP_TYPES and PRE_APPL_TYPES from CreateTypeComponent to FundingRequestTypes
+- [ ] Build mock servers with API definition to simplify local development and testing
 
 ## Create new UI components
 
