@@ -87,11 +87,11 @@ export class CreateTypeComponent implements OnInit {
       return;
     }
     this.data = [
-      { id: 'Pre-Appl', text: 'Pre-Appl' },
+      { id: 'PRE-APPL', text: 'Pre-Appl' },
       /*{ id: '2', text: 'Rollup' }*/
     ];
     if (!this.requestModel.isPayType4() && this.requestModel.isForGrantFY()) {
-      this.data.push({ id: 'Rollup', text: 'Rollup' });
+      this.data.push({ id: 'ROLLUP', text: 'Rollup' });
     }
     const type = Number(this.requestModel.requestDto.frtId);
 
