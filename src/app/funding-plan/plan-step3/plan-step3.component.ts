@@ -29,6 +29,7 @@ import { CanManagementService } from '../../cans/can-management.service';
 import { Alert } from '../../alert-billboard/alert';
 import { FundingSourceGrantDataPayload } from '../applications-proposed-for-funding/funding-source-grant-data-payload';
 import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-plan-step3',
@@ -57,7 +58,8 @@ export class PlanStep3Component implements OnInit {
 
   constructor(private navigationModel: NavigationStepModel,
               private router: Router,
-              private logger: CustomServerLoggingService,
+              private logger: NGXLogger,
+              private customLogger: CustomServerLoggingService,
               public planModel: PlanModel,
               private pdCaIntegratorService: PdCaIntegratorService,
               private planManagementService: PlanManagementService,
@@ -102,8 +104,6 @@ export class PlanStep3Component implements OnInit {
     }
 
     this.recalculateFundingRequestTypes();
-
-    // this.planCoordinatorService.listSelectedSources = [];
   }
 
   saveContinue(): void {
@@ -182,7 +182,7 @@ export class PlanStep3Component implements OnInit {
           this.router.navigate([this.nextStep]);
         });
     }, error => {
-      this.logger.logErrorWithContext(error, this.planModel.fundingPlanDto);
+      this.customLogger.logErrorWithContext(error, this.planModel.fundingPlanDto);
     });
   }
 
@@ -453,22 +453,16 @@ export class PlanStep3Component implements OnInit {
     let frCan: FundingRequestCanDto;
     let doOnce = true;
 
-    // this.logger.debug('--------------------------------------------------------------------------------');
-    // this.logger.debug($event);
-    // this.logger.debug('--------------------------------------------------------------------------------');
-
     $event.forEach(s => {
         this.logger.debug(`Saving values ${JSON.stringify(s)}`);
         if (doOnce) {
           if (this.editing) {
-            // this.logger.debug(`editing: ${JSON.stringify(this.editing)}`);
             // Since the user may have changed the funding source, splice it into the list of plan sources.
             this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.splice(this.editing.index, 1, s.fundingSource);
             if (this.editing.sourceId !== s.fundingSource.fundingSourceId) {
               if (!this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources) {
                 this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = [];
               }
-              //this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources.push(this.editing.sourceId);
             }
           } else {
             this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.push(s.fundingSource);
@@ -508,17 +502,7 @@ export class PlanStep3Component implements OnInit {
             req.financialInfoDto.fundingRequestCans = new Array<FundingRequestCanDto>();
           }
 
-          // req.financialInfoDto.fundingReqBudgetsDtos.forEach((b, i) => {
-          //   this.logger.debug(`${i}. ${JSON.stringify(b)}`);
-          // });
-
-          // req.financialInfoDto.fundingRequestCans.forEach((c, i) => {
-          //   this.logger.debug(`${i}. ${JSON.stringify(c)}`);
-          // });
-
           const futureYears: number = this.planManagementService.getRecommendedFutureYears(s.applId);
-
-          // const currentBudget = req.financialInfoDto.fundingReqBudgetsDtos[this.editing?.index];
 
           // This will match on the applid and funding request id.
           // If none found, it's new and we push.
@@ -550,19 +534,13 @@ export class PlanStep3Component implements OnInit {
           }
 
           if (this.editing) {
-            // Need to figure out whether we're replacing a budget or adding one...
             if (pushBudget) {
               this.logger.debug(`Pushing new budget: ${JSON.stringify(frBudget)}`);
               req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
             } else {
               this.logger.debug(`Budget values updated in place`);
-              // const deleteCount = this.getBudgetDeleteCount(frBudget, currentBudget, this.editing);
-              // this.logger.debug(`splice - ${JSON.stringify(frBudget)} - deleting ${deleteCount} `);
-              //
-              // req.financialInfoDto.fundingReqBudgetsDtos.splice(this.editing.index, deleteCount, frBudget);
             }
           } else {
-            // this.logger.debug(`push - ${JSON.stringify(frBudget)}`);
             req.financialInfoDto.fundingReqBudgetsDtos.push(frBudget);
           }
 
@@ -624,9 +602,6 @@ export class PlanStep3Component implements OnInit {
             } else {
               this.logger.debug('Updating CAN values in place');
             }
-            // const deleteCount = this.getCANDeleteCount(frCan, currentCAN, this.editing);
-            // // this.logger.debug(`splice - ${JSON.stringify(frCan)} deleting ${deleteCount}`);
-            // req.financialInfoDto.fundingRequestCans.splice(this.editing.index, deleteCount, frCan);
           } else {
             req.financialInfoDto.fundingRequestCans.push(frCan);
           }
@@ -752,14 +727,16 @@ export class PlanStep3Component implements OnInit {
     const from = this.planModel.fundingPlanDto?.fundableRangeFrom;
     const to = this.planModel.fundingPlanDto?.fundableRangeTo;
     const grantsInRange = this.planModel.allGrants.filter(g => g.priorityScoreNum >= from && g.priorityScoreNum <= to).map(g => g.applId);
+    const selectedGrants = this.planModel.allGrants.filter(g => g.selected).map(g => g.applId);
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(req => {
       const inRange: boolean = grantsInRange.includes(req.applId);
-      if (inRange) {
+      const selected: boolean = selectedGrants.includes(req.applId);
+      this.logger.debug(`Grant: ${req.applId} :: inRange: ${inRange} :: selected: ${selected}`);
+      if (inRange && selected) {
         req.frtId = FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE;
-      } else {
+      } else if (selected) {
         req.frtId = FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION;
       }
-      this.logger.debug(`Request ${req.applId} :: ${req.frtId}`);
     });
   }
 }
