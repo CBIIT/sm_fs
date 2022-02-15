@@ -57,7 +57,6 @@ export class RequestInformationReadonlyComponent implements OnInit {
     if (this.newInvestigator === 'false' || this.newInvestigator === 'true') {
       this.logger.error('New investigator flag is true or false - it should only be \'Y\' or \'N\'.');
     }
-    this.logger.debug(this.newInvestigator);
 
     if (this.newInvestigator === 'Y') {
       this.newInvestigator = 'Yes';
@@ -68,7 +67,8 @@ export class RequestInformationReadonlyComponent implements OnInit {
     }
 
     this.skipRequests = this.requestModel.requestDto.skipRequests;
-    this.isSkip = this.skipRequests && this.skipRequests.length > 0;
+    // DMK: FS-1544 - there is a difference between a Skipped grant and Pay Using Skip Funds
+    this.isSkip = this.requestModel.isSkip()
   }
 
   get grant(): NciPfrGrantQueryDto {
