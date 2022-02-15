@@ -54,9 +54,11 @@
         </ng-template>
 
         <ng-template #displayUserDetails>
-          <span  class="doc-desc">({{item.docFilename}} - Added by <a
-              href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
-            {{item.createDate}})</span>
+          <span  class="doc-desc">{{item.docFilename}} 
+            <ng-container *ngIf="item.uploadByName"> (Added by <a
+              href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on {{item.createDate}})
+            </ng-container>
+          </span>
         </ng-template>
 
         <div class="ml-auto">

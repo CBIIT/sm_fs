@@ -24,9 +24,11 @@
             <span class="doc-name">Scientific Rationale for Supporting FOA (AND) Justification for Each Proposed
                 Application</span>
             <span class="doc-desc" *ngIf="isSciRatUploaded; else notUploaded">
-                {{sciRatDocDto.docFilename}} (Uploaded by <a
-                    href="mailto: {{sciRatDocDto.uploadByEmail}}">{{sciRatDocDto.uploadByName}}</a> on
-                {{sciRatDocDto.createDate}}))
+                {{sciRatDocDto.docFilename}} 
+                <ng-container *ngIf="sciRatDocDto.uploadByName">
+                    (Uploaded by <a href="mailto: {{sciRatDocDto.uploadByEmail}}">{{sciRatDocDto.uploadByName}}</a> 
+                    on {{sciRatDocDto.createDate}})
+                </ng-container>
             </span>
 
             <div class="doc-buttons" *ngIf="isSciRatUploaded">
@@ -38,9 +40,11 @@
         <div class="doc-card" *ngIf="exceptionGrants && exceptionGrants.length > 0">
             <span class="doc-name">Justification for Exception Application(s)</span>
             <span class="doc-desc" *ngIf="isExceptionsUploaded; else notUploaded">
-                {{exceptionDocDto.docFilename}} (Uploaded by <a
+                {{exceptionDocDto.docFilename}} 
+                <ng-container *ngIf="exceptionDocDto.uploadByName">(Uploaded by <a
                     href="mailto: {{exceptionDocDto.uploadByEmail}}">{{exceptionDocDto.uploadByName}}</a> on
-                {{exceptionDocDto.createDate}}))
+                {{exceptionDocDto.createDate}})
+                </ng-container>
             </span>
 
             <div class="doc-buttons" *ngIf="isSciRatUploaded">
@@ -52,9 +56,11 @@
         <div class="doc-card" *ngIf="skipGrants && skipGrants.length > 0">
             <span class="doc-name">Justification for Skipped Application(s)</span>
             <span class="doc-desc" *ngIf="isSkipUploaded; else notUploaded">
-                {{skipDocDto.docFilename}} (Uploaded by <a
+                {{skipDocDto.docFilename}} 
+                <ng-container *ngIf="skipDocDto.uploadByName">(Uploaded by <a
                     href="mailto: {{skipDocDto.uploadByEmail}}">{{skipDocDto.uploadByName}}</a> on
-                {{skipDocDto.createDate}}))
+                {{skipDocDto.createDate}})
+                </ng-container>
             </span>
 
             <div class="doc-buttons" *ngIf="isSkipUploaded">
@@ -66,9 +72,11 @@
         <div class="doc-card" *ngIf="isOtherUploaded">
             <span class="doc-name">Other</span>
             <span class="doc-desc">
-                {{otherDocDto.docFilename}} (Uploaded by <a
+                {{otherDocDto.docFilename}} 
+                <ng-container *ngIf="otherDocDto.uploadByName">(Uploaded by <a
                     href="mailto: {{otherDocDto.uploadByEmail}}">{{otherDocDto.uploadByName}}</a> on
-                {{otherDocDto.createDate}}))
+                {{otherDocDto.createDate}})
+                </ng-container>
             </span>
 
             <div class="doc-buttons" *ngIf="isSciRatUploaded">
