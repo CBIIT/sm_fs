@@ -90,6 +90,14 @@ export const SKIP_TYPES = [
   FundingRequestTypes.SKIP__NCI_RFA
 ];
 
+export const PAY_USING_SKIP = [
+  FundingRequestTypes.PAY_USING_SKIP_FUNDS,
+  FundingRequestTypes.PAY_USING_SKIP_FUNDS__WITHIN_DOC_EXCEPTION_SELECTIONS,
+  FundingRequestTypes.PAY_USING_SKIP_FUNDS__OUTSIDE_OF_DOC_EXCEPTION_SELECTIONS,
+  FundingRequestTypes.PAY_USING_SKIP_FUNDS__NCI_RFA,
+  FundingRequestTypes.PAY_USING_SKIP_FUNDS__GENERIC_PAY_USING_SKIP_FUNDS
+];
+
 // NOTE: we might not need to track all of these, just the parent type.
 export const INITIAL_PAY_TYPES = [
   FundingRequestTypes.PAY_BY_EXCEPTION,
