@@ -55,6 +55,7 @@ export class CanManagementService {
       return;
     }
     this.buildCanDisplayMatrix(fseIds);
+    this.logger.info(`Building CAN display matrix for plan ${this.planModel.fundingPlanDto.fprId}`);
   }
 
   initializeCANDisplayMatrixForRequest(): void {
@@ -68,6 +69,7 @@ export class CanManagementService {
   private buildCanDisplayMatrix(fseIds: number[]): void {
     this.getFundingRequestCanDisplays(fseIds).subscribe(result => {
       this.canDisplayMatrix = new Map(result.map(c => [c.fseId, c]));
+      this.logger.info(`CAN display matrix: ${JSON.stringify(result)}`);
     });
   }
 
