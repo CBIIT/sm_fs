@@ -81,18 +81,20 @@ export class CanManagementService {
     if (!applId) {
       applId = this.requestModel?.grant?.applId;
     }
-    if (!applId || !frtId) {
+
+    if (!applId || !frtId || !fseId) {
       return new Observable(subscriber => {
         subscriber.next(null);
         subscriber.complete();
       });
     }
 
+    this.logger.info(`getProjectedCan(${fseId}, ${oefiaTypeId}, ${frtId}, ${frqId}, ${applId})`);
     return this.canService.retrieveProjectedCanUsingGET(
       applId,
-      frqId,
       fseId,
       frtId,
+      frqId,
       oefiaTypeId
       );
   }

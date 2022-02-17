@@ -115,7 +115,7 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
 
   canEnterAtLeastOneCAN(): boolean {
     let result = false;
-    for (const key of this.canManagementService.canDisplayMatrix?.keys()) {
+    for (const key of this.canManagementService.canDisplayMatrix.keys()) {
       if (this.canEnter(key)) {
         result = true;
       }
