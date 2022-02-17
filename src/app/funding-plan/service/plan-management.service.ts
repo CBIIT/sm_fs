@@ -427,7 +427,7 @@ export class PlanManagementService {
                 directPercentCut: this.calculatePercentCut(can.approvedDc, piDirect),
               };
               if ((!g.approvedDirect && !g.approvedTotal) || (g.approvedDirect === 0 && g.approvedTotal === 0)) {
-                // do nothing
+                this.logger.error(`Not storing grant cost payload ${JSON.stringify(g)}`);
               } else {
                 this._grantCosts.push(g);
               }
