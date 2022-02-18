@@ -183,47 +183,37 @@ export class PlanStep5Component implements OnInit {
     if (this.btnLabel === 'Expand All') {
       this.btnLabel = 'Collapse All';
       this.activeIds = ['sciRat-panel', 'justExc-panel', 'justSkip-panel', 'other-panel'];
-      this.changeLabel('sciRatNotUploadedBtnId', 'EXPANDED');
-      this.changeLabel('excNotUploadedBtnId', 'EXPANDED');
-      this.changeLabel('skipNotUploadedBtnId', 'EXPANDED');
-      this.changeLabel('othNotUploadedBtnId', 'EXPANDED');
     } else {
       this.btnLabel = 'Expand All';
       this.activeIds = [];
-      this.changeLabel('sciRatNotUploadedBtnId', 'COLLAPSED');
-      this.changeLabel('excNotUploadedBtnId', 'COLLAPSED');
-      this.changeLabel('skipNotUploadedBtnId', 'COLLAPSED');
-      this.changeLabel('othNotUploadedBtnId', 'COLLAPSED');
+    }
+
+    this.changeLabel('sciRatNotUploadedBtnId');
+    if (this.exceptionGrants.length > 0 && !this.isExceptionsUploaded) {
+      this.changeLabel('excNotUploadedBtnId');
+    }
+
+    if (this.skipGrants.length > 0 && !this.isSkipUploaded) {
+      this.changeLabel('skipNotUploadedBtnId');
+    }
+
+    this.changeLabel('othNotUploadedBtnId');
+  }
+
+  changeLabel(idName: string) {
+    let body = document.getElementById(idName);
+    if (body.classList.contains("fa-plus")) {
+      let body = document.getElementById(idName);
+      body.classList.remove("fa-plus");
+      body.classList.add("fa-minus");
+      body.innerText = 'Hide Add Document'
+    } else {
+      body.classList.remove("fa-minus");
+      body.classList.add("fa-plus");
+      body.innerText = 'Add Document'
     }
 
   }
-
-  toggleLabel(idName: string): void {
-    const body = document.getElementById(idName);
-    if (body && body.classList.contains('fa-plus')) {
-      body.classList.remove('fa-plus');
-      body.classList.add('fa-minus');
-      body.innerText = 'Hide Add Document';
-    } else if (body){
-      body.classList.remove('fa-minus');
-      body.classList.add('fa-plus');
-      body.innerText = 'Add Document';
-    }
-  }
-
-  changeLabel(idName: string, expCol: 'EXPANDED'|'COLLAPSED'): void {
-    const body = document.getElementById(idName);
-    if (body && expCol === 'EXPANDED') {
-      body.classList.remove('fa-plus');
-      body.classList.add('fa-minus');
-      body.innerText = 'Hide Add Document';
-    } else if (body && expCol === 'COLLAPSED'){
-      body.classList.remove('fa-minus');
-      body.classList.add('fa-plus');
-      body.innerText = 'Add Document';
-    }
-  }
-
 
   validate(): boolean {
     if (this.selectedFiles && this.selectedFiles !== null) {
