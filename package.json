@@ -36,6 +36,7 @@
     "datatables.net-dt": "^1.10.20",
     "datatables.net-responsive": "^2.2.7",
     "datatables.net-responsive-dt": "^2.2.7",
+    "datatables.net-fixedheader": "^3.2.2",
     "file-saver": "^2.0.5",
     "jquery": "^3.5.1",
     "jquery-bootstrap-scrolling-tabs": "^2.6.1",

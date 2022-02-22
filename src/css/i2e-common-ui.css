@@ -25859,3 +25859,7 @@ td.all.parentTable{
 .flex-align-right{
   justify-content: right
 }
+
+tr[role=row] {
+  background: white;
+}

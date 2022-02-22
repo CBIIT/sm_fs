@@ -124,6 +124,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       serverSide: true,
       processing: false,
       destroy: true,
+      fixedHeader: true,
       language: {
         paginate: {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
@@ -296,6 +297,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       serverSide: true,
       processing: false,
       destroy: true,
+      fixedHeader: true,
       language: {
         paginate: {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
@@ -498,6 +500,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       serverSide: true,
       processing: false,
       destroy: true,
+      fixedHeader: true,
       language: {
         paginate: {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
