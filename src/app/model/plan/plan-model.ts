@@ -187,7 +187,7 @@ export class PlanModel {
       req.financialInfoDto.fundingRequestCans.forEach(can => {
         const key = String(can.fseId) + '-' + String(req.applId);
         if (!can.approvedDc || !can.approvedTc) {
-          this.logger.error('CAN error :: no TC/DC values', `PlanId: ${this.fundingPlanDto.fprId}`, can);
+          this.logger.info('Potential CAN error :: no TC/DC values', `PlanId: ${this.fundingPlanDto.fprId}`, can);
         }
 
         c = this.selectedApplIdCans.get(key);
@@ -199,6 +199,7 @@ export class PlanModel {
         result.push(can);
       });
     });
+    this.logger.info(`saving CAN data for plan ${this.fundingPlanDto.fprId}: `, result);
     return result;
   }
 

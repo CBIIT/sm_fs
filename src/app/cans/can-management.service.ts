@@ -55,6 +55,7 @@ export class CanManagementService {
       return;
     }
     this.buildCanDisplayMatrix(fseIds);
+    this.logger.info(`Building CAN display matrix for plan ${this.planModel.fundingPlanDto.fprId}`);
   }
 
   initializeCANDisplayMatrixForRequest(): void {
@@ -68,6 +69,7 @@ export class CanManagementService {
   private buildCanDisplayMatrix(fseIds: number[]): void {
     this.getFundingRequestCanDisplays(fseIds).subscribe(result => {
       this.canDisplayMatrix = new Map(result.map(c => [c.fseId, c]));
+      this.logger.info(`CAN display matrix: ${JSON.stringify(result)}`);
     });
   }
 
@@ -79,18 +81,20 @@ export class CanManagementService {
     if (!applId) {
       applId = this.requestModel?.grant?.applId;
     }
-    if (!applId || !frtId) {
+
+    if (!applId || !frtId || !fseId) {
       return new Observable(subscriber => {
         subscriber.next(null);
         subscriber.complete();
       });
     }
 
+    this.logger.info(`getProjectedCan(${fseId}, ${oefiaTypeId}, ${frtId}, ${frqId}, ${applId})`);
     return this.canService.retrieveProjectedCanUsingGET(
       applId,
-      frqId,
       fseId,
       frtId,
+      frqId,
       oefiaTypeId
       );
   }
