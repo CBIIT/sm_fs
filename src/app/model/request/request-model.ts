@@ -11,7 +11,7 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 import { FundingRequestErrorCodes } from './funding-request-error-codes';
 import { ProgramRecommendedCostsModel } from '../../program-recommended-costs/program-recommended-costs-model';
 import { FundingSourceTypes } from './funding-source-types';
-import { FundingRequestTypes, INITIAL_PAY_TYPES, PAY_USING_SKIP, SKIP_TYPES } from './funding-request-types';
+import { FundingRequestTypes, INITIAL_PAY_TYPES, SKIP_TYPES } from './funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
 import { PrcBaselineSource, PrcDataPoint } from '../../program-recommended-costs/prc-data-point';
 import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
@@ -208,6 +208,7 @@ export class RequestModel {
     this.pendingAlerts = [];
     this.programRecommendedCostsModel.deepReset(this.requestDto.frqId ? true : false);
     this.requestCans = undefined;
+    this.returnToRequestPageLink = false;
   }
 
   prepareBudgetsAndSetFinalLoa(): void {
@@ -446,9 +447,5 @@ export class RequestModel {
       this.requestDto.financialInfoDto.suppNewFlag = undefined;
       this.requestDto.financialInfoDto.suppAddYearFlag = undefined;
     }
-  }
-
-  isPayUsingSkip() {
-    return PAY_USING_SKIP.includes(+this.requestDto.frtId);
   }
 }

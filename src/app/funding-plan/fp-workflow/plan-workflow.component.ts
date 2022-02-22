@@ -387,10 +387,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       dto.planGmInfo = this.gmComponent?.getGmInfos();
     }
 
-    this.logger.debug('workflow dto for submission is ', dto);
+    this.logger.info('Workflow DTO for submission is ', dto);
     this.workflowService.submitPlanWorkflowUsingPOST(dto).subscribe(
       (result) => {
-        this.logger.debug('submit workflow returned okay ', result);
+        this.logger.info('submit workflow returned okay ', result);
         this.planManagementService.planBudgetReadOnlyEmitter.next(true);
 
         this.workflowModel.initializeForPlan(dto.fprId);
@@ -398,7 +398,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
           && this.workflowModel.isApprovalAction(action)
           && this.splMeetingDate) {
           this.planModel.fundingPlanDto.splMeetingDate = new Date(dto.splMeetingDate);
-          this.logger.debug('set SplMeetingDate to planModel ' + this.planModel.fundingPlanDto.splMeetingDate);
+          this.logger.info('set SplMeetingDate to planModel ' + this.planModel.fundingPlanDto.splMeetingDate);
 
         } else if (dto.action === WorkflowActionCode.RETURN) {
           this.planModel.fundingPlanDto.splMeetingDate = undefined;

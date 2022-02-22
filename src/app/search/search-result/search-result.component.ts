@@ -32,6 +32,7 @@ import { SearchGrantExistInPaylistCellRendererComponent } from './search-grant-e
 import { AppUserSessionService } from '../../service/app-user-session.service';
 import { CurrencyPipe } from '@angular/common';
 import { convertNcabs } from '../../utils/utils';
+import {NavigationModel} from '../../model/navigation-model';
 
 @Component({
   selector: 'app-search-result',
@@ -53,6 +54,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
               private batchApproveService: BatchApproveService,
               private documentService: DocumentService,
               private userService: AppUserSessionService,
+              private navigationModel: NavigationModel,
               private logger: NGXLogger) {
   }
 
@@ -122,6 +124,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       serverSide: true,
       processing: false,
       destroy: true,
+      fixedHeader: true,
       language: {
         paginate: {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
@@ -294,6 +297,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       serverSide: true,
       processing: false,
       destroy: true,
+      fixedHeader: true,
       language: {
         paginate: {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
@@ -496,6 +500,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       serverSide: true,
       processing: false,
       destroy: true,
+      fixedHeader: true,
       language: {
         paginate: {
           first: '<i class="far fa-chevron-double-left" title="First"></i>',
@@ -866,14 +871,28 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  viewSelectedResults(): void {
+    if ((this.showFundingRequestResult || this.showFundingPlanResult) && this.selectedRows.size > 0) {
+      this.navigationModel.set(Array.from(this.selectedRows.keys()),
+        this.showFundingRequestResult ? '/request/retrieve' : '/plan/retrieve');
+      this.logger.debug('viewSelectedResults() - request/retrieve ', this.showFundingRequestResult ? 'FR' : 'FP',
+                         this.selectedRows.size + ' records');
+      this.keepModelEmitter.next(true);
+      this.navigationModel.navigate();
+    }
+  }
+
   onOpenFundingRequest($event: any): void {
     this.logger.debug('onOpenFundingRequest() - request/retrieve', $event.frqId);
+    this.navigationModel.reset();
     this.keepModelEmitter.next(true);
     this.router.navigate(['request/retrieve', $event.frqId]);
   }
 
   onOpenFundingPlan($event: any): void {
+    this.logger.debug('onOpenFundingPlan() - request/retrieve', $event.fprId);
     this.keepModelEmitter.next(true);
+    this.navigationModel.reset();
     this.router.navigate(['plan/retrieve', $event.fprId]);
 
   }
