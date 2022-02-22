@@ -160,9 +160,9 @@ export class PlanStep3Component implements OnInit {
   }
 
   private saveFundingPlan(): void {
-    this.logger.debug('Plan before save', this.planModel.fundingPlanDto);
+    // this.logger.debug('Plan before save', this.planModel.fundingPlanDto);
     this.fsPlanControllerService.saveFundingPlanUsingPOST(this.planModel.fundingPlanDto).subscribe(result => {
-      this.logger.debug('Plan after save', result);
+      // this.logger.debug('Plan after save', result);
       this.planModel.fundingPlanDto = result;
       this.planManagementService.buildPlanBudgetAndCanModel();
       this.planManagementService.buildGrantCostModel();
@@ -182,7 +182,7 @@ export class PlanStep3Component implements OnInit {
           this.router.navigate([this.nextStep]);
         });
     }, error => {
-      this.customLogger.logErrorWithContext(error, this.planModel.fundingPlanDto);
+      this.customLogger.logErrorWithContext(error);
     });
   }
 
