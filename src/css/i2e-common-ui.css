@@ -25860,6 +25860,6 @@ td.all.parentTable{
   justify-content: right
 }
 
-tr[role=row] {
+div.dtfh-floatingparent {
   background: white;
 }
