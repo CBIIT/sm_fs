@@ -5,6 +5,7 @@ import { NavigationStepModel } from '../funding-request/step-indicator/navigatio
 import { PlanModel } from '../model/plan/plan-model';
 import { PlanStep5Component } from './plan-step5/plan-step5.component';
 import { PlanStep6Component } from './plan-step6/plan-step6.component';
+import {NavigationModel} from '../model/navigation-model';
 
 @Component({
   selector: 'app-funding-plan',
@@ -28,8 +29,11 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
 
   model: PlanModel;
   stepComponent: any;
+  plansNav: NavigationModel;
+
   constructor(private router: Router,
               private navigationModel: NavigationStepModel,
+              private plansNavigationModel: NavigationModel,
               private planModel: PlanModel) {
   }
 
@@ -41,6 +45,7 @@ export class FundingPlanComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.model = this.planModel;
+    this.plansNav = this.plansNavigationModel;
 
     this.routerSub = this.router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {

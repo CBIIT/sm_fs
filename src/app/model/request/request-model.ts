@@ -208,6 +208,7 @@ export class RequestModel {
     this.pendingAlerts = [];
     this.programRecommendedCostsModel.deepReset(this.requestDto.frqId ? true : false);
     this.requestCans = undefined;
+    this.returnToRequestPageLink = false;
   }
 
   prepareBudgetsAndSetFinalLoa(): void {
