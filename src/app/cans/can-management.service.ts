@@ -138,7 +138,7 @@ export class CanManagementService {
   searchDefaultCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
     this.logger.info(`searchDefaultCans(${can}, ${bmmCodes}, ${activityCodes}, ${nciSource})`);
     // FS-1476 - for Pay Type 4 requests, use the conversion mech and related default BMM code.
-    if(this.requestModel && this.requestModel.isPayType4() && this.requestModel.requestDto.conversionActivityCode) {
+    if(this.requestModel && this.requestModel.isPayType4() && this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== 'NC') {
       return this.canService.getType4DefaultCansUsingGET(this.requestModel.requestDto.conversionActivityCode, can, nciSource);
     }
     return this.canService.getDefaultCansUsingGET(activityCodes, bmmCodes, can, nciSource);
@@ -147,7 +147,7 @@ export class CanManagementService {
   searchDefaultCansWithExtra(can: string, bmmCodes: string, activityCodes: string, nciSource: string, extra: string): Observable<CanCcxDto[]> {
     this.logger.info(`searchDefaultCansWithExtera(${can}, ${bmmCodes}, ${activityCodes}, ${nciSource}, ${extra})`);
     // FS-1476 - for Pay Type 4 requests, use the conversion mech and related default BMM code.
-    if(this.requestModel && this.requestModel.isPayType4() && this.requestModel.requestDto.conversionActivityCode) {
+    if(this.requestModel && this.requestModel.isPayType4() && this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== 'NC') {
       return this.canService.getType4DefaultCansWithExtraUsingGET(this.requestModel.requestDto.conversionActivityCode, can, extra, nciSource);
     }
     return this.canService.getDefaultCansWithExtraUsingGET(activityCodes, bmmCodes, can, extra, nciSource);
