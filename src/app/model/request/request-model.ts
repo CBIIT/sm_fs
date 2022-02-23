@@ -355,6 +355,7 @@ export class RequestModel {
               const fundedYears = lineItems.filter(li => li.recommendedTotal > 0 || li.recommendedDirect > 0).length;
               const lineItem0 = lineItems[0];
               const dto: FundingRequestCanDto = {};
+              dto.nciSourceFlag = fs.nciSourceFlag;
               dto.frqId = this.requestDto.frqId;
               dto.fseId = fs.fundingSourceId;
               dto.fundingSourceName = fs.fundingSourceName;
