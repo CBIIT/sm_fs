@@ -91,7 +91,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.submitResultElement.nativeElement.scrollIntoView();
+  //  this.submitResultElement.nativeElement.scrollIntoView();
 
     if (this.budgetInfoComponent && this.workflowComponent) {
       this.workflowComponent.budgetInfoComponent = this.budgetInfoComponent;
