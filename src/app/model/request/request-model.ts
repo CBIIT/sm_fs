@@ -11,7 +11,7 @@ import { AppPropertiesService } from '../../service/app-properties.service';
 import { FundingRequestErrorCodes } from './funding-request-error-codes';
 import { ProgramRecommendedCostsModel } from '../../program-recommended-costs/program-recommended-costs-model';
 import { FundingSourceTypes } from './funding-source-types';
-import { FundingRequestTypes, INITIAL_PAY_TYPES, SKIP_TYPES } from './funding-request-types';
+import { FundingRequestTypes, INITIAL_PAY_TYPES, PAY_USING_SKIP_TYPES, SKIP_TYPES } from './funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
 import { PrcBaselineSource, PrcDataPoint } from '../../program-recommended-costs/prc-data-point';
 import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
@@ -385,6 +385,10 @@ export class RequestModel {
 
   isSkip(): boolean {
     return SKIP_TYPES.includes(Number(this.requestDto.frtId));
+  }
+
+  isPayUsingSkip(): boolean {
+    return PAY_USING_SKIP_TYPES.includes(+this.requestDto.frtId);
   }
 
   isMoonshot(): boolean {

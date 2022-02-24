@@ -15,10 +15,7 @@ export class RequestInformationReadonlyComponent implements OnInit {
 
   loaMap: Map<string, string>;
   tooltipGrant: FundingRequestSkipDto;
-
-  constructor(private requestModel: RequestModel, private logger: NGXLogger) {
-  }
-
+  isPayUsingSkip: boolean;
   otherDocs: string[];
   isSkip: boolean;
   type4Request: boolean;
@@ -27,6 +24,9 @@ export class RequestInformationReadonlyComponent implements OnInit {
   showNewInvestigator: boolean;
   supplementType: string;
   skipRequests: FundingRequestSkipDto[];
+
+  constructor(private requestModel: RequestModel, private logger: NGXLogger) {
+  }
 
   ngOnInit(): void {
     this.loaMap = new Map<string, string>()
@@ -68,7 +68,8 @@ export class RequestInformationReadonlyComponent implements OnInit {
 
     this.skipRequests = this.requestModel.requestDto.skipRequests;
     // DMK: FS-1544 - there is a difference between a Skipped grant and Pay Using Skip Funds
-    this.isSkip = this.requestModel.isSkip()
+    this.isSkip = this.requestModel.isSkip();
+    this.isPayUsingSkip = this.requestModel.isPayUsingSkip();
   }
 
   get grant(): NciPfrGrantQueryDto {
