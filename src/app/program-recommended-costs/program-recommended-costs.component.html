@@ -477,23 +477,18 @@
                               id="dc-dollar1"
                               aria-describedby="dc-dollar-percent"
                               pattern="[0-9,]*"
-                              [appMinMaxValidator]="{min: 0, max: 999999999}"
+                              [appMinMaxValidator]="{min: 1, max: 999999999}"
                               required>
                           </div>
                           <div
                             class="text-danger mt-1"
-                            *ngIf="(recommendedDirect.errors?.min || recommendedDirect.errors?.max) && (recommendedDirect.touched || prcForm.submitted)">
-                            Enter a value between 0 and 999,999,999
+                            *ngIf="(recommendedDirect.errors?.min || recommendedDirect.errors?.max || recommendedDirect.errors?.required) && (recommendedDirect.touched || prcForm.submitted)">
+                            Direct Cost is required: Enter a value between 1 and 999,999,999
                           </div>
                           <div
                             class="text-danger mt-1"
                             *ngIf="recommendedDirect.errors?.pattern && (recommendedDirect.touched || prcForm.submitted)">
                             Enter numeric value
-                          </div>
-                          <div
-                            class="text-danger mt-1"
-                            *ngIf="recommendedDirect.errors?.required && (recommendedDirect.touched || prcForm.submitted)">
-                            Direct Cost is required
                           </div>
                         </div>
                       </div>
@@ -513,18 +508,13 @@
                               [(ngModel)]="li.recommendedTotalDisplay"
                               aria-describedby="tc-dollar-percent"
                               required
-                              [appMinMaxValidator]="{min: 0, max: 999999999}"
+                              [appMinMaxValidator]="{min: 1, max: 999999999}"
                               pattern="[0-9,]*">
                           </div>
                           <div
                             class="text-danger mt-1"
-                            *ngIf="(recommendedTotal.errors?.min || recommendedTotal.errors?.max) && (recommendedTotal.touched || prcForm.submitted)">
-                            Enter a value between 0 and 999,999,999
-                          </div>
-                          <div
-                            class="text-danger mt-1"
-                            *ngIf="recommendedTotal.errors?.required && (recommendedTotal.touched || prcForm.submitted)">
-                            Total Cost is required
+                            *ngIf="(recommendedTotal.errors?.min || recommendedTotal.errors?.max || recommendedTotal.errors?.required)  && (recommendedTotal.touched || prcForm.submitted)">
+                            Total Cost is required: Enter a value between 1 and 999,999,999
                           </div>
                           <div
                             class="text-danger mt-1"
@@ -581,7 +571,7 @@
                               id="dc-dollar"
                               aria-describedby="dc-dollar-percent"
                               pattern="[0-9,]*"
-                              [appMinMaxValidator]="{min: 0, max: 999999999}"
+                              [appMinMaxValidator]="{min: 1, max: 999999999}"
                               required>
                           </div>
                           <div class="col-sm-auto right-label" *ngIf="initialPay && !locked">
@@ -589,18 +579,13 @@
                           </div>
                           <div
                             class="text-danger mt-1"
-                            *ngIf="(recommendedDirect.errors?.min || recommendedDirect.errors?.max) && (recommendedDirect.touched || prcForm.submitted)">
-                            Enter a value between 0 and 999,999,999
+                            *ngIf="(recommendedDirect.errors?.min || recommendedDirect.errors?.max || recommendedDirect.errors?.required) && (recommendedDirect.touched || prcForm.submitted)">
+                            Direct Cost is required: Enter a value between 1 and 999,999,999
                           </div>
                           <div
                             class="text-danger mt-1"
                             *ngIf="recommendedDirect.errors?.pattern && (recommendedDirect.touched || prcForm.submitted)">
                             Enter numeric value
-                          </div>
-                          <div
-                            class="text-danger mt-1"
-                            *ngIf="recommendedDirect.errors?.required && (recommendedDirect.touched || prcForm.submitted)">
-                            Direct Cost is required
                           </div>
                         </div>
                       </div>
@@ -620,7 +605,7 @@
                               [(ngModel)]="li.recommendedTotalDisplay"
                               aria-describedby="tc-dollar-percent"
                               pattern="[0-9,]*"
-                              [appMinMaxValidator]="{min: 0, max: 999999999}"
+                              [appMinMaxValidator]="{min: 1, max: 999999999}"
                               required>
                           </div>
                           <div class="col-sm-auto right-label" *ngIf="initialPay && !locked">
@@ -628,13 +613,8 @@
                           </div>
                           <div
                             class="text-danger mt-1"
-                            *ngIf="(recommendedTotal.errors?.min || recommendedTotal.errors?.max) && (recommendedTotal.touched || prcForm.submitted)">
-                            Enter a value between 0 and 999,999,999
-                          </div>
-                          <div
-                            class="text-danger mt-1"
-                            *ngIf="recommendedTotal.errors?.required && (recommendedTotal.touched || prcForm.submitted)">
-                            Total Cost is required
+                            *ngIf="(recommendedTotal.errors?.min || recommendedTotal.errors?.max || recommendedTotal.errors?.required) && (recommendedTotal.touched || prcForm.submitted)">
+                            Total Cost is required: Enter a value between 1 and 999,999,999
                           </div>
                           <div
                             class="text-danger mt-1"
@@ -671,13 +651,13 @@
                             aria-label="direct cost"
                             [(ngModel)]="li.recommendedDirectDisplay"
                             aria-describedby="tc-dollar-percent"
-                            [appMinMaxValidator]="{min: 0, max: 999999999}"
+                            [appMinMaxValidator]="{min: 1, max: 999999999}"
                             pattern="[0-9,]*">
                         </div>
                         <div
                           class="text-danger mt-1"
                           *ngIf="(recommendedDirectX.errors?.min || recommendedDirectX.errors?.max) && (recommendedDirectX.touched || prcForm.submitted)">
-                          Enter a value between 0 and 999,999,999
+                          Enter a value between 1 and 999,999,999
                         </div>
                         <div
                           class="text-danger mt-1"
@@ -733,7 +713,7 @@
 <!--                          <div-->
 <!--                            class="text-danger mt-1"-->
 <!--                            *ngIf="(percentCut.errors?.min || percentCut.errors?.max) && (percentCut.touched || prcForm.submitted)">-->
-<!--                            Enter a number between 0 and 100-->
+<!--                            Enter a number between 1 and 100-->
 <!--                          </div>-->
                           <div
                             class="text-danger mt-1"
@@ -792,12 +772,12 @@
                             [(ngModel)]="li.recommendedDirectDisplay"
                             aria-describedby="tc-dollar-percent"
                             pattern="[0-9,]*"
-                            [appMinMaxValidator]="{min: 0, max: 999999999}">
+                            [appMinMaxValidator]="{min: 1, max: 999999999}">
                         </div>
                         <div
                           class="text-danger mt-1"
                           *ngIf="(recommendedDirectX.errors?.min || recommendedDirectX.errors?.max) && (recommendedDirectX.touched || prcForm.submitted)">
-                          Enter a value between 0 and 999,999,999
+                          Enter a value between 1 and 999,999,999
                         </div>
                         <div
                           class="text-danger mt-1"
@@ -857,7 +837,7 @@
                               id="dc-dollar"
                               aria-describedby="dc-dollar-percent"
                               pattern="[0-9,]*"
-                              [appMinMaxValidator]="{min: 0, max: 999999999}"
+                              [appMinMaxValidator]="{min: 1, max: 999999999}"
                               required>
                           </div>
                           <div class="col-sm-auto right-label" *ngIf="initialPay && !locked">
@@ -865,18 +845,13 @@
                           </div>
                           <div
                             class="text-danger mt-1"
-                            *ngIf="(recommendedDirect.errors?.min || recommendedDirect.errors?.max) && (recommendedDirect.touched || prcForm.submitted)">
-                            Enter a value between 0 and 999,999,999
+                            *ngIf="(recommendedDirect.errors?.min || recommendedDirect.errors?.max || recommendedDirect.errors?.required) && (recommendedDirect.touched || prcForm.submitted)">
+                            Direct Cost is required: Enter a value between 1 and 999,999,999
                           </div>
                           <div
                             class="text-danger mt-1"
                             *ngIf="recommendedDirect.errors?.pattern && (recommendedDirect.touched || prcForm.submitted)">
                             Enter numeric value
-                          </div>
-                          <div
-                            class="text-danger mt-1"
-                            *ngIf="recommendedDirect.errors?.required && (recommendedDirect.touched || prcForm.submitted)">
-                            Direct Cost is required
                           </div>
                         </div>
                       </div>
@@ -896,7 +871,7 @@
                               [(ngModel)]="li.recommendedTotalDisplay"
                               aria-describedby="tc-dollar-percent"
                               pattern="[0-9,]*"
-                              [appMinMaxValidator]="{min: 0, max: 999999999}"
+                              [appMinMaxValidator]="{min: 1, max: 999999999}"
                               required>
                           </div>
                           <div class="col-sm-auto right-label" *ngIf="initialPay && !locked">
@@ -904,13 +879,8 @@
                           </div>
                           <div
                             class="text-danger mt-1"
-                            *ngIf="(recommendedTotal.errors?.min || recommendedTotal.errors?.max) && (recommendedTotal.touched || prcForm.submitted)">
-                            Enter a value between 0 and 999,999,999
-                          </div>
-                          <div
-                            class="text-danger mt-1"
-                            *ngIf="recommendedTotal.errors?.required && (recommendedTotal.touched || prcForm.submitted)">
-                            Total Cost is required
+                            *ngIf="(recommendedTotal.errors?.min || recommendedTotal.errors?.max || recommendedTotal.errors?.required) && (recommendedTotal.touched || prcForm.submitted)">
+                            Enter a value between 1 and 999,999,999
                           </div>
                           <div
                             class="text-danger mt-1"
@@ -947,13 +917,13 @@
                             aria-label="direct cost"
                             [(ngModel)]="li.recommendedDirectDisplay"
                             aria-describedby="tc-dollar-percent"
-                            [appMinMaxValidator]="{min: 0, max: 999999999}"
+                            [appMinMaxValidator]="{min: 1, max: 999999999}"
                             pattern="[0-9,]*">
                         </div>
                         <div
                           class="text-danger mt-1"
                           *ngIf="(recommendedDirectX.errors?.min || recommendedDirectX.errors?.max) && (recommendedDirectX.touched || prcForm.submitted)">
-                          Enter a value between 0 and 999,999,999
+                          Enter a value between 1 and 999,999,999
                         </div>
                         <div
                           class="text-danger mt-1"
