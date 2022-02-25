@@ -231,9 +231,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     if (!pendingValues) {
       return true;
     }
-    // if(!(+pendingValues.applId === applId)) {
-    //   return true;
-    // }
 
     if (((pendingValues.directCost || 0) + (pendingValues.totalCost || 0) === 0) && !reg.test('' + pendingValues.percentCut)) {
       return true;

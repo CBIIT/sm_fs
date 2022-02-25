@@ -67,16 +67,16 @@ export class HeartbeatService {
 
       this.circuitBreakerInterval = this.setIntervalFunction(() => {
         const zeroHour: number = this.lastGoodDbHeartbeat || this.startTime;
-        this.logger.debug(`[${this.circuitBreakerInterval}] ${Date.now() - (this.lastGoodHeartbeat || this.startTime)} millis since last good heartbeat`);
-        this.logger.debug(`[${this.circuitBreakerInterval}] ${Date.now() - (this.lastGoodDbHeartbeat || this.startTime)} millis since last good DB heartbeat`);
-        this.logger.debug(`[${this.circuitBreakerInterval}] ${this.KILLSWITCH_INTERVAL - (Date.now() - zeroHour)} millis until termination`);
+        // this.logger.debug(`[${this.circuitBreakerInterval}] ${Date.now() - (this.lastGoodHeartbeat || this.startTime)} millis since last good heartbeat`);
+        // this.logger.debug(`[${this.circuitBreakerInterval}] ${Date.now() - (this.lastGoodDbHeartbeat || this.startTime)} millis since last good DB heartbeat`);
+        // this.logger.debug(`[${this.circuitBreakerInterval}] ${this.KILLSWITCH_INTERVAL - (Date.now() - zeroHour)} millis until termination`);
         if (Date.now() - zeroHour >= this.KILLSWITCH_INTERVAL) {
           this.killSwitch.next();
         }
       }, this.KILLSWITCH_INTERVAL);
       this.logger.debug(`Circuitbreaker interval created: ${this.circuitBreakerInterval}`);
     } else {
-      this.logger.info(`Circuit breaker ${this.circuitBreakerInterval} already running`);
+      this.logger.debug(`Circuit breaker ${this.circuitBreakerInterval} already running`);
     }
   }
 
@@ -98,7 +98,7 @@ export class HeartbeatService {
     if (!this.heartbeatInterval) {
       this.logger.info(`Starting heartbeat: ${millis} millis`);
       this.heartbeatInterval = this.setIntervalFunction(() => {
-        this.logger.debug(`[${this.heartbeatInterval}] Ping`);
+        // this.logger.debug(`[${this.heartbeatInterval}] Ping`);
         this.heartbeatController.getHeartBeatUsingGET().subscribe(next => {
           // this.logger.debug(`ping: ${next.sessionId}`);
           this.sessionId = next.sessionId;
@@ -112,7 +112,7 @@ export class HeartbeatService {
       }, millis);
       this.logger.debug(`Heartbeat interval created: ${this.heartbeatInterval}`);
     } else {
-      this.logger.info(`Hearbeat ${this.heartbeatInterval} already running`);
+      this.logger.debug(`Hearbeat ${this.heartbeatInterval} already running`);
     }
   }
 
@@ -132,7 +132,7 @@ export class HeartbeatService {
     if (!this.dbHeartbeatInterval) {
       this.logger.info(`Starting DB heartbeat: ${millis} millis`);
       this.dbHeartbeatInterval = this.setIntervalFunction(() => {
-        this.logger.debug(`[${this.dbHeartbeatInterval}] DB Ping`);
+        // this.logger.debug(`[${this.dbHeartbeatInterval}] DB Ping`);
         this.heartbeatController.getDbHeartBeatUsingGET().subscribe(next => {
           this.sessionId = next.sessionId;
           this.dbActive = next.dbActive;
