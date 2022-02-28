@@ -651,13 +651,13 @@
                             aria-label="direct cost"
                             [(ngModel)]="li.recommendedDirectDisplay"
                             aria-describedby="tc-dollar-percent"
-                            [appMinMaxValidator]="{min: 1, max: 999999999}"
+                            [appMinMaxValidator]="{min: 0, max: 999999999}"
                             pattern="[0-9,]*">
                         </div>
                         <div
                           class="text-danger mt-1"
                           *ngIf="(recommendedDirectX.errors?.min || recommendedDirectX.errors?.max) && (recommendedDirectX.touched || prcForm.submitted)">
-                          Enter a value between 1 and 999,999,999
+                          Enter a value between 0 and 999,999,999
                         </div>
                         <div
                           class="text-danger mt-1"
@@ -772,12 +772,12 @@
                             [(ngModel)]="li.recommendedDirectDisplay"
                             aria-describedby="tc-dollar-percent"
                             pattern="[0-9,]*"
-                            [appMinMaxValidator]="{min: 1, max: 999999999}">
+                            [appMinMaxValidator]="{min: 0, max: 999999999}">
                         </div>
                         <div
                           class="text-danger mt-1"
                           *ngIf="(recommendedDirectX.errors?.min || recommendedDirectX.errors?.max) && (recommendedDirectX.touched || prcForm.submitted)">
-                          Enter a value between 1 and 999,999,999
+                          Enter a value between 0 and 999,999,999
                         </div>
                         <div
                           class="text-danger mt-1"
@@ -917,13 +917,13 @@
                             aria-label="direct cost"
                             [(ngModel)]="li.recommendedDirectDisplay"
                             aria-describedby="tc-dollar-percent"
-                            [appMinMaxValidator]="{min: 1, max: 999999999}"
+                            [appMinMaxValidator]="{min: 0, max: 999999999}"
                             pattern="[0-9,]*">
                         </div>
                         <div
                           class="text-danger mt-1"
                           *ngIf="(recommendedDirectX.errors?.min || recommendedDirectX.errors?.max) && (recommendedDirectX.touched || prcForm.submitted)">
-                          Enter a value between 1 and 999,999,999
+                          Enter a value between 0 and 999,999,999
                         </div>
                         <div
                           class="text-danger mt-1"
