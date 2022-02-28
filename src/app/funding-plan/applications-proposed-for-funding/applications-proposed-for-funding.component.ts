@@ -8,7 +8,7 @@ import {
   PendingPrcValues
 } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { Router } from '@angular/router';
-import { isReallyANumber, openNewWindow } from '../../utils/utils';
+import { isNumeric, openNewWindow } from '../../utils/utils';
 import { FpGrantInformationComponent } from '../fp-grant-information/fp-grant-information.component';
 import { FpFundingSourceComponent } from '../fp-funding-source/fp-funding-source.component';
 import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
@@ -252,7 +252,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
             result = true;
           }
         } else {
-          if(!(!isReallyANumber(c.approvedDc) && !isReallyANumber(c.approvedTc))) {
+          if(!(!isNumeric(c.approvedDc) && !isNumeric(c.approvedTc))) {
             this.logger.debug('both dc and tc are required if either is provided');
             result = true;
           } else if(+c.approvedDc > +c.approvedTc) {

@@ -11,6 +11,7 @@ import { RequestModel } from '../model/request/request-model';
 import { Observable, Subject } from 'rxjs';
 import { PlanModel } from '../model/plan/plan-model';
 import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
+import { isNumeric } from '../utils/utils';
 
 @Injectable({
   providedIn: 'root'
@@ -96,7 +97,7 @@ export class CanManagementService {
       frtId,
       frqId,
       oefiaTypeId
-      );
+    );
   }
 
   getOefiaCodes(): Observable<OefiaCodingDto[]> {
@@ -239,5 +240,17 @@ export class CanManagementService {
 
   getCanDetails(value: string): Observable<CanCcxDto> {
     return this.canService.getCanDetailsUsingGET(value);
+  }
+
+  isCanPercentSelected(can: FundingRequestCanDto): boolean {
+    if (!can) {
+      return false;
+    }
+    if (can.percentSelected) {
+      return true;
+    }
+    this.logger.debug(`falling back on evaluating actual percent cut values for can ${JSON.stringify(can)}`);
+    return (isNumeric(can.dcPctCut) && isNumeric(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0);
+
   }
 }

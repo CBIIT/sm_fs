@@ -14,7 +14,7 @@ import {
 import {
   OtherDocsContributingFundsComponent
 } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
-import { getCurrentFiscalYear, isReallyANumber } from '../../utils/utils';
+import { getCurrentFiscalYear, isNumeric } from '../../utils/utils';
 import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
 import { FpFundingInformationComponent } from '../fp-funding-information/fp-funding-information.component';
 import {
@@ -140,7 +140,7 @@ export class PlanStep3Component implements OnInit {
       const year1 = this.planModel.fundingPlanDto.pubYr1SetAsideAmt;
       // TODO: Make sure totalRec is correct for multiple sources
       const totalRec = this.planModel.fundingPlanDto.totalRecommendedAmt;
-      if (isReallyANumber(year1) && isReallyANumber(totalRec)
+      if (isNumeric(year1) && isNumeric(totalRec)
         && Math.round(year1) !== Math.round(totalRec)) {
         if (confirm('WARNING: The Program Recommended Total Cost (1st year) in this funding plan does not match the Published 1st year Set-Aside dollar amount. Do you want to proceed with submission?')) {
           this.saveFundingPlan();

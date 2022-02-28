@@ -8,7 +8,7 @@ import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingReques
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { CanManagementService } from '../../cans/can-management.service';
 import { PendingPrcValues } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
-import { isReallyANumber } from '../../utils/utils';
+import { isNumeric } from '../../utils/utils';
 import { getOrderFunction, GrantCostPayload } from './grant-cost-payload';
 
 @Injectable({
@@ -97,7 +97,7 @@ export class PlanManagementService {
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
       if (+r.applId === +applId) {
         r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
-          if (can && ((isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0))) {
+          if (this.canManagementService.isCanPercentSelected(can)) {
             // this.logger.debug(`Percent selected: ${applId} - ${index} - ${JSON.stringify(can)}`);
             can.percentSelected = true;
             result = true;
@@ -118,7 +118,7 @@ export class PlanManagementService {
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
       if (+r.applId === +applId) {
         r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
-          if (can && ((isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0))) {
+          if (this.canManagementService.isCanPercentSelected(can)) {
             can.percentSelected = true;
             result = { index, fseId: can.fseId };
           }
