@@ -90,6 +90,7 @@ export class CanSelectorComponent implements OnInit {
   }
 
   private initializeDefaultCans(extraCan: string): void {
+    this.logger.info(`initializeDefaultCans(${extraCan}, ${this.nciSourceFlag})`);
     this.canService.getDefaultCansWithExtra(this.nciSourceFlag, extraCan || null).subscribe(result => {
       this.defaultCans = result;
       this.data = new Array<Select2OptionData>();
