@@ -101,6 +101,7 @@
           <th scope="col">Funding Source</th>
           <th scope="col" *ngIf="showDirectCosts">Approved Direct Cost</th>
           <th scope="col">Approved Total Cost</th>
+          <th scope="col" [hidden]="!isApprovedFinancials()">Create Type</th>
           <th scope="col" [hidden]="!(isFinancialApprover() && isFcNci())">OEFIA Coding</th>
           <th scope="col" *ngIf="canSeeAtLeastOneCAN()">NCI OEFIA Projected CAN</th>
           <th scope="col" *ngIf="canEnterAtLeastOneCAN();">
@@ -119,6 +120,7 @@
           <td>
             {{ can.approvedTc | currency }} <span *ngIf="first">{{can.tcPctCut / 100000 | percentCut:initialPay}}</span>
           </td>
+          <td [hidden]="!isApprovedFinancials()">{{ can.oefiaCreateCode }}</td>
           <td [hidden]="!(isFinancialApprover() && isFcNci())">
             <app-oefia-types
               [index]="i"
