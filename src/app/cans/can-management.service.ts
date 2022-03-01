@@ -206,6 +206,10 @@ export class CanManagementService {
     if (can.percentSelected) {
       return true;
     }
+    // NOTE: this is deliberate. I hate JavaScript's truthiness/falsiness BS
+    if(can.percentSelected === false) {
+      return false;
+    }
     this.logger.debug(`falling back on evaluating actual percent cut values for can ${JSON.stringify(can)}`);
     return (isNumeric(can.dcPctCut) && isNumeric(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0);
 
