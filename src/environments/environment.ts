@@ -4,9 +4,6 @@
 
 export const environment = {
   production: false,
-  nciHome: 'https://i2e-dev.nci.nih.gov/',
-  techSupport: 'ncii2egrantsdevelopmentteam@mail.nih.gov',
-  workBenchUrl: 'https://i2e-dev.nci.nih.gov/workbench/WorkbenchView',
   appVersion: require('../../package.json').version,
   HEARTBEAT_INTERVAL: 10000,
   DB_HEARTBEAT_INTERVAL: 20000,

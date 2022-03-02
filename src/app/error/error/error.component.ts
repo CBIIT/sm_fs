@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ErrorHandlerService } from '../error-handler.service';
 import { environment } from '../../../environments/environment';
 import { NGXLogger } from 'ngx-logger';
+import { AppPropertiesService } from 'src/app/service/app-properties.service';
 
 @Component({
   selector: 'app-error',
@@ -20,6 +21,7 @@ export class ErrorComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private errorHandler: ErrorHandlerService,
+    private appPropertiesService: AppPropertiesService,
     private logger: NGXLogger) {
   }
 
@@ -27,7 +29,7 @@ export class ErrorComponent implements OnInit {
     this.errorId = this.route.snapshot.params.errorId;
     this.errorMessage = this.errorHandler.getMessage(+this.errorId);
     this.errorDetails = this.errorHandler.getDetails(+this.errorId);
-    this.techSupport = environment.techSupport;
+    this.techSupport = this.appPropertiesService.getProperty('TECH_SUPPORT_EMAIL'); 
     this.production = environment.production;
   }
 
