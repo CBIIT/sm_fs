@@ -1,5 +1,6 @@
 import {Component, Inject, isDevMode} from '@angular/core';
 import {Router} from '@angular/router';
+import { NGXLogger } from 'ngx-logger';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -9,9 +10,10 @@ import { environment } from 'src/environments/environment';
 })
 export class AppComponent {
 
-  constructor(public router: Router) {
-    console.log('production flag in environment?: ' + environment.production);
-    console.log('is DevMode?: ' + isDevMode());
+  constructor(public router: Router,
+              private logger: NGXLogger) {
+    this.logger.debug('production flag in environment?: ' + environment.production);
+    this.logger.debug('is DevMode?: ' + isDevMode());
   }
 
   title = 'Funding Selections';
