@@ -36,7 +36,6 @@ export class CanSelectorComponent implements OnInit {
   @Input() index = 0;
   @Input() nciSourceFlag = '';
   @Input() readonly = false;
-  @Input() initialCAN: FundingRequestCanDto = null;
   @Input() canRequired = false;
 
 
@@ -56,7 +55,7 @@ export class CanSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.logger.debug('selected value', this.selectedValue);
+    this.logger.debug('selected value', this.selectedValue);
     this.loadSelectedCanDetails(this.selectedValue);
     if (!this.bmmCodes) {
       this.bmmCodes = this.model.requestDto?.bmmCode;

@@ -61,7 +61,7 @@ export class BudgetInfoComponent implements OnInit {
       }
     });
     this.canManagementService.initializeCANDisplayMatrixForRequest();
-    this.model.requestCans.forEach(c => {
+    this.model.requestCans?.forEach(c => {
       if (c.approvedDc && +c.approvedDc > 0) {
         this.showDirectCosts = true;
       }
@@ -108,16 +108,6 @@ export class BudgetInfoComponent implements OnInit {
 
   getOefiaTypeWithIndex(index: number): OefiaTypesComponent {
     return this.oefiaTypes?.find(control => (+control.index === +index));
-    // if (!this.oefiaTypes) {
-    //   return null;
-    // }
-    // let result: OefiaTypesComponent;
-    // this.oefiaTypes.forEach(control => {
-    //   if (+control.index === index) {
-    //     result = control;
-    //   }
-    // });
-    // return result;
   }
 
   getCanSelectorWithIndex(index: number): CanSelectorComponent {
@@ -156,7 +146,6 @@ export class BudgetInfoComponent implements OnInit {
     }
     const theirCANs: string[] = [];
     let myCAN: string;
-    // const dupes: boolean[] = [false, false, false];
 
     this.canSelectors.forEach((control) => {
       if (control.index === i) {
@@ -198,7 +187,6 @@ export class BudgetInfoComponent implements OnInit {
   isFormValid(canWarning: CanWarning): boolean {
     const selectedCans: string[] = [];
     for (const canSelector of this.canSelectors) {
-      this.logger.debug('CanSelector Validation index= ' + canSelector.index + ' can=' + canSelector.selectedValue);
       if (this.canEnter(canSelector.fseId) && !canSelector.selectedValue) {
         canWarning.missingCan = true;
       } else if (canSelector.selectedValue && this.isFcNci()) {
@@ -261,9 +249,11 @@ export class BudgetInfoComponent implements OnInit {
 
   canSeeAtLeastOneCAN(): boolean {
     let result = false;
-    for (const key of this.canManagementService.canDisplayMatrix.keys()) {
-      if (this.canSee(key)) {
-        result = true;
+    if (this.canManagementService.canDisplayMatrix) {
+      for (const key of this.canManagementService.canDisplayMatrix.keys()) {
+        if (this.canSee(key)) {
+          result = true;
+        }
       }
     }
     // this.logger.debug(`can see at least one CAN: ${result}`);
@@ -277,8 +267,6 @@ export class BudgetInfoComponent implements OnInit {
       this.logger.warn(`canEnter(${fseId}) - no display matrix; return false`);
       return false;
     }
-    // this.logger.debug(`isFcArc: ${this.isFcArc()} == ARC enters: ${displayMatrix.arcEnters === 'Y'}`);
-    // this.logger.debug(`isFcNci: ${this.isFcNci()} == NCI enters: ${displayMatrix.oefiaEnters === 'Y'}`);
 
     if ((this.isFcArc() && displayMatrix.arcEnters === 'Y') || (this.isFcNci() && displayMatrix.oefiaEnters === 'Y')) {
       // this.logger.debug(`canEnter(${fseId}) :: true`);
@@ -290,9 +278,11 @@ export class BudgetInfoComponent implements OnInit {
 
   canEnterAtLeastOneCAN(): boolean {
     let result = false;
-    for (const key of this.canManagementService.canDisplayMatrix.keys()) {
-      if (this.canEnter(key)) {
-        result = true;
+    if (this.canManagementService.canDisplayMatrix) {
+      for (const key of this.canManagementService.canDisplayMatrix.keys()) {
+        if (this.canEnter(key)) {
+          result = true;
+        }
       }
     }
     // this.logger.debug(`can enter at least one CAN: ${result}`);

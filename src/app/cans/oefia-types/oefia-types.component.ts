@@ -4,6 +4,8 @@ import { CanManagementService } from '../can-management.service';
 import { OefiaCodingDto } from '@cbiit/i2ecws-lib';
 import { Output } from '@angular/core';
 import { Select2OptionData } from 'ng-select2';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { RequestModel } from '../../model/request/request-model';
 
 @Component({
   selector: 'app-oefia-types',
@@ -41,11 +43,21 @@ export class OefiaTypesComponent implements OnInit, AfterViewInit {
     this.canService.oefiaTypeEmitter.next({ index: this.index, value, fseId: this.fseId });
   }
 
-  constructor(private logger: NGXLogger, private canService: CanManagementService) {
+  constructor(
+    private logger: NGXLogger,
+    private canService: CanManagementService,
+    private requestModel: RequestModel) {
   }
 
   ngOnInit(): void {
+    this.logger.info(`Initial values: [fseId: ${this.fseId}, selectedValue: ${this._selectedValue}]`);
+    if(!this._selectedValue) {
+      const source: FundingRequestFundsSrcDto = this.requestModel.programRecommendedCostsModel.fundingSources.find(s => +s.fundingSourceId === +this.fseId);
+      this.logger.info(`No oefiaTypeId specified: fall back to funding source default ${source?.octId}`);
+      this._selectedValue = source?.octId;
+    }
     this.canService.getOefiaCodes().subscribe(result => {
+      this.logger.debug(`OEFIA Codes: ${JSON.stringify(result)}`);
       this.oefiaCodes = result;
       this.data = [];
       this.data.push({ id: '', text: '' });

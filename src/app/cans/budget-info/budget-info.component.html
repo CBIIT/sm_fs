@@ -43,6 +43,7 @@
           <td>
             <app-oefia-types
               [index]="i"
+              [fseId]="can.fseId"
               [selectedValue]="can.octId"
               [readonly]="true">
             </app-oefia-types>
@@ -55,7 +56,6 @@
               [index]="i"
               [nciSourceFlag]="can.nciSourceFlag"
               [selectedValue]="can.can"
-              [initialCAN]="can"
               [fseId]="can.fseId"
               [readonly]="true">
             </app-can-selector>
@@ -92,9 +92,7 @@
 
     <div class="col-12 collapse show mt-2" id="budget-info-collapse">
       <div><p>Please provide the CAN only if known at the time of approval.</p></div>
-<!--      <div class="col-6 align-left" *ngIf="model.isAddFunds() && (isFcNci())">
-        <app-create-type></app-create-type>
-      </div> -->
+
       <table class="table table-striped table-bordered budget-info-table">
         <thead>
         <tr>
@@ -130,11 +128,11 @@
           <td *ngIf="canSeeAtLeastOneCAN()">
             <ng-container *ngIf="canSee(can.fseId) then PROJECTED_CAN"></ng-container>
             <ng-template #PROJECTED_CAN>
-              <app-projected-can [index]="i" [fseId]="can.fseId"
-                                 [octId]="can.octId || can.defaultOefiaTypeId"></app-projected-can>
-            </ng-template>
-            <ng-template *ngIf="!canSee(can.fseId)">
-              <i class="fas fa-skull-crossbones"></i>
+              <app-projected-can
+                [index]="i"
+                [fseId]="can.fseId"
+                [octId]="can.octId || can.defaultOefiaTypeId">
+              </app-projected-can>
             </ng-template>
           </td>
           <td *ngIf="canEnterAtLeastOneCAN()">
@@ -144,7 +142,6 @@
                 [index]="i"
                 [nciSourceFlag]="can.nciSourceFlag"
                 [selectedValue]="can.can"
-                [initialCAN]="can"
                 [fseId]="can.fseId"
                 [canRequired]="isCanRequired(can.fseId)">
               </app-can-selector>
