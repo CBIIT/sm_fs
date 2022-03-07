@@ -248,12 +248,12 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
         this.logger.debug(c);
         if(c.percentSelected) {
           if(!reg.test('' + (c.dcPctCut/1000))) {
-            this.logger.debug(`bad percent cut field ${c.dcPctCut}`);
+            this.logger.debug(`bad percent cut field ${c.dcPctCut}, c`);
             result = true;
           }
         } else {
-          if(!(!isNumeric(c.approvedDc) && !isNumeric(c.approvedTc))) {
-            this.logger.debug('both dc and tc are required if either is provided');
+          if(!(isNumeric(c.approvedDc) && isNumeric(c.approvedTc))) {
+            this.logger.debug('both dc and tc are required if either is provided', c);
             result = true;
           } else if(+c.approvedDc > +c.approvedTc) {
             this.logger.debug(`approved dc greater than approved tc ${c.approvedDc} - ${c.approvedTc}`);

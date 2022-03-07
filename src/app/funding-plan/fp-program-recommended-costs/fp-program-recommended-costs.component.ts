@@ -166,6 +166,10 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       this._percentCut = can.dcPctCut / 1000;
       if (this.lockDollar) {
         this.logger.error('Control is locked to dollar only but analysis indicates percent', can);
+        if(can.percentSelected) {
+          this.logger.error(`CAN percent selected: unlocking dollar [${can.fundingSourceName}]`);
+          this.lockDollar = false;
+        }
       }
       this.displayType = 'percent';
     } else if (bud && isNumeric(bud.dcRecAmt) && isNumeric(bud.tcRecAmt)) {

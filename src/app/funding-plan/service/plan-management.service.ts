@@ -8,7 +8,6 @@ import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingReques
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { CanManagementService } from '../../cans/can-management.service';
 import { PendingPrcValues } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
-import { isNumeric } from '../../utils/utils';
 import { getOrderFunction, GrantCostPayload } from './grant-cost-payload';
 
 @Injectable({
@@ -99,7 +98,7 @@ export class PlanManagementService {
         r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
           if (this.canManagementService.isCanPercentSelected(can)) {
             // this.logger.debug(`Percent selected: ${applId} - ${index} - ${JSON.stringify(can)}`);
-            can.percentSelected = true;
+            // can.percentSelected = true;
             result = true;
           }
         });
@@ -119,7 +118,7 @@ export class PlanManagementService {
       if (+r.applId === +applId) {
         r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
           if (this.canManagementService.isCanPercentSelected(can)) {
-            can.percentSelected = true;
+            // can.percentSelected = true;
             result = { index, fseId: can.fseId };
           }
         });
@@ -383,6 +382,21 @@ export class PlanManagementService {
     this._selectedSourcesMap = value;
   }
 
+  assessPlanCANs(): void {
+    this.planModel.allGrants.filter(g => g.selected).forEach(grant => {
+      this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.filter(r => (r.applId === grant.applId) && (r.frtId === 1024 || r.frtId === 1026)).forEach(req => {
+        const allCans: number = req.financialInfoDto.fundingRequestCans.length;
+        const percentSelectedCans: number =
+          req.financialInfoDto.fundingRequestCans.filter(c => c.percentSelected).length;
+        if (allCans > 0) {
+          if (percentSelectedCans > 1) {
+            this.logger.error(`Plan: ${this.planModel.fundingPlanDto.fprId} - multiple CANs have percent selected flag for applId ${req.applId} -- ${req.financialInfoDto.fundingRequestCans.filter(c => c.percentSelected).map(x => x.fundingSourceName)}`);
+          }
+        }
+      });
+    });
+  }
+
   buildGrantCostModel(): void {
     this._grantCosts = [];
     let piDirect: number;
@@ -428,6 +442,7 @@ export class PlanManagementService {
               };
               if ((!g.approvedDirect && !g.approvedTotal) || (g.approvedDirect === 0 && g.approvedTotal === 0)) {
                 this.logger.error(`Not storing grant cost payload ${JSON.stringify(g)}`);
+                this._grantCosts.push(g);
               } else {
                 this._grantCosts.push(g);
               }

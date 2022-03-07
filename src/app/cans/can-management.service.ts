@@ -210,7 +210,7 @@ export class CanManagementService {
     if(can.percentSelected === false) {
       return false;
     }
-    this.logger.debug(`falling back on evaluating actual percent cut values for can ${JSON.stringify(can)}`);
+    this.logger.info(`Fall back to evaluating actual percent cut values for can ${JSON.stringify(can)}`);
     return (isNumeric(can.dcPctCut) && isNumeric(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0);
 
   }

@@ -43,6 +43,7 @@ export class PlanLoaderService {
         this.planManagementService.buildGrantCostModel();
         this.planManagementService.buildOefiaTypeMaps();
         this.planManagementService.recalculateRestrictedSources();
+        this.planManagementService.assessPlanCANs();
         this.logger.info(`Plan ${fprId} loaded and initialized. Proceed with navigation.`);
 
         if (succesFn) {
