@@ -247,8 +247,8 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
       i.financialInfoDto.fundingRequestCans?.forEach(c => {
         this.logger.debug(c);
         if(c.percentSelected) {
-          if(!reg.test('' + (c.dcPctCut/1000))) {
-            this.logger.debug(`bad percent cut field ${c.dcPctCut}, c`);
+          if(!reg.test('' + (c.dcPctCut/1000)) || ((c.dcPctCut/1000) < 0 || (c.dcPctCut/1000) > 100)) {
+            this.logger.debug(`bad percent cut field ${c.dcPctCut} :: ${JSON.stringify(c)}`);
             result = true;
           }
         } else {
