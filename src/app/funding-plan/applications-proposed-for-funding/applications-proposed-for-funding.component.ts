@@ -250,8 +250,8 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
             this.logger.debug(`bad percent cut field ${c.dcPctCut} :: ${JSON.stringify(c)}`);
             result = true;
           }
-        } else {
-          if(!(isNumeric(c.approvedDc) && isNumeric(c.approvedTc))) {
+        } else { // This catches scenarios where dollars are selected or nothing is selected, so we have to be prepared for both
+          if(isNumeric(c.approvedDc) ? !isNumeric(c.approvedTc) : isNumeric(c.approvedTc)) {
             this.logger.debug('both dc and tc are required if either is provided', c);
             result = true;
           } else if(+c.approvedDc > +c.approvedTc) {
@@ -261,7 +261,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
         }
       });
     });
-
     return result;
   }
 }
