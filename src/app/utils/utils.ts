@@ -28,6 +28,9 @@ export function hasOwnProperty<X extends {}, Y extends PropertyKey>(obj: X, prop
 }
 
 export function isNumeric(x: any): boolean {
+  if(x === 0) {
+    return true;
+  }
   if (!x) {
     return false;
   }
