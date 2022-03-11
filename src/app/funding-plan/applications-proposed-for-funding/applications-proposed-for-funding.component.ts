@@ -247,15 +247,15 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
       i.financialInfoDto.fundingRequestCans?.forEach(c => {
         if(c.percentSelected) {
           if(!reg.test('' + (c.dcPctCut/1000)) || ((c.dcPctCut/1000) < 0 || (c.dcPctCut/1000) > 100)) {
-            this.logger.debug(`bad percent cut field ${c.dcPctCut} :: ${JSON.stringify(c)}`);
+            this.logger.error(`bad percent cut field ${c.dcPctCut} :: ${JSON.stringify(c)} :: ${i.fullGrantNum}`);
             result = true;
           }
         } else { // This catches scenarios where dollars are selected or nothing is selected, so we have to be prepared for both
           if(isNumeric(c.approvedDc) ? !isNumeric(c.approvedTc) : isNumeric(c.approvedTc)) {
-            this.logger.debug('both dc and tc are required if either is provided', c);
+            this.logger.error(`both dc and tc are required if either is provided :: ${JSON.stringify(c)} :: ${i.fullGrantNum}`);
             result = true;
           } else if(+c.approvedDc > +c.approvedTc) {
-            this.logger.debug(`approved dc greater than approved tc ${c.approvedDc} - ${c.approvedTc}`);
+            this.logger.error(`approved dc greater than approved tc ${c.approvedDc} - ${c.approvedTc} :: ${i.fullGrantNum}`);
             result = true;
           }
         }
