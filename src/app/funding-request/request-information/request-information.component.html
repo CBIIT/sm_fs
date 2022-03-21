@@ -52,7 +52,9 @@
       *ngIf="parentForm.errors?.pdNameRequired && (parentForm.submitted || parentForm.touched)">
       PD is required
     </div>
-
+    <ngb-alert type="warning" [dismissible]="true" *ngIf="payType4K99R00Conversion()">
+      <b>WARNING:</b> Select the PD who will be assigned to the R00, NOT the PD assigned to the K99.
+    </ngb-alert>  
   </div>
 
   <div class="col-md-4 col-lg-4">

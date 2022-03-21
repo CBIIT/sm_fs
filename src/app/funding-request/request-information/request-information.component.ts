@@ -161,6 +161,13 @@ export class RequestInformationComponent implements OnInit {
 
   onType4Change(value: string): void {
     const conversionActivityCode = ConversionActivityCodes.includes(value) ? value : null;
+    if ( value === 'R00'
+        && Number(this.requestModel.requestDto.financialInfoDto.requestTypeId) === Number(FundingRequestTypes.PAY_TYPE_4)
+        && this.requestModel.grant.activityCode === 'K99' ) {
+          this.logger.debug('Selected K99 to R00 conversion for Pay Type 4');
+          this.requestModel.requestDto.financialInfoDto.requestorNpnId = undefined;
+          this.parentForm.controls['pdName'].setValue(null);
+    }
     if (this.requestModel.requestDto.financialInfoDto.requestTypeId) {
       this.refreshFundingSources(
         this.requestModel.requestDto.financialInfoDto.requestTypeId,
@@ -168,4 +175,11 @@ export class RequestInformationComponent implements OnInit {
         this.requestModel.requestDto.financialInfoDto.requestorCayCode);
     }
   }
+
+  payType4K99R00Conversion(): boolean {
+    return Number(this.requestModel.requestDto.financialInfoDto.requestTypeId) === FundingRequestTypes.PAY_TYPE_4
+           && this.requestModel.grant.activityCode === 'K99'
+           && this.requestModel.requestDto.conversionActivityCode === 'R00';
+  }
+
 }

@@ -134,7 +134,9 @@ export class Step2Component implements OnInit {
   }
 
   requestTypeSelected(): boolean {
-    if (!this.requestModel.requestDto.frtId) {
+    if (!this.requestModel.requestDto.frtId
+        || !this.requestModel.requestDto.financialInfoDto.requestorNpnId
+        || !this.requestModel.requestDto.financialInfoDto.requestorCayCode) {
       return false;
     }
     return !!this.requestModel.requestDto.frtId && Number(this.requestModel.requestDto.frtId) &&
