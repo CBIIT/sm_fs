@@ -155,7 +155,8 @@ export class Step3Component implements OnInit {
     if (this.requestModel.requestDto.requestType === 'Pay Type 4') {
       this.pushDocType("Transition Memo");
       this.displayTansitionMemo = true;
-      if (this.requestModel.requestDto.conversionActivityCode !== 'NC') {
+      if (this.requestModel.requestDto.conversionActivityCode && 
+            this.requestModel.requestDto.conversionActivityCode !== 'NC' ) {
         this.isTransitionMemoRequired = true;
       }
     }
