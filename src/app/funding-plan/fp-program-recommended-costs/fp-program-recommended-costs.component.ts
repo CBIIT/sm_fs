@@ -47,7 +47,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   get percentCut(): number {
-    return this._percentCut;
+    return null || this._percentCut;
   }
 
   set percentCut(value: number) {
@@ -172,6 +172,10 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
         }
       }
       this.displayType = 'percent';
+      if(+this._percentCut === 0) {
+        this.directCostCalculated = bud.dcRecAmt;
+        this.totalCostCalculated = bud.tcRecAmt;
+      }
     } else if (bud && isNumeric(bud.dcRecAmt) && isNumeric(bud.tcRecAmt)) {
       this.directCost = bud.dcRecAmt || null;
       this.totalCost = bud.tcRecAmt || null;
@@ -184,9 +188,15 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   recalculate(): void {
 
     if (this._displayType === 'percent') {
-      if (!!this._percentCut) {
+      if (!!this._percentCut || +this._percentCut === 0) {
         this.directCostCalculated = Math.round(this.baselineDirectCost * (1 - (this._percentCut / 100)));
         this.totalCostCalculated = Math.round(this.baselineTotalCost * (1 - (this._percentCut / 100)));
+        this.logger.debug(`Checking percent cut value: ${this._percentCut}`);
+        if(+this._percentCut === 0) {
+          this.logger.debug('Using calculated values for direct and total')
+          this.directCost = this.directCostCalculated;
+          this.totalCost = this.totalCostCalculated;
+        }
       } else {
         this.directCostCalculated = null;
         this.totalCostCalculated = null;
@@ -252,6 +262,9 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   getDirectCost(): number {
     if (this._displayType === 'percent') {
+      if(+this._percentCut === 0) {
+        return +this.directCost;
+      }
       return +this.directCostCalculated;
     } else {
       return +this.directCost;
@@ -267,6 +280,9 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   getTotalCost(): number {
     if (this._displayType === 'percent') {
+      if(+this._percentCut === 0) {
+        return +this.totalCost;
+      }
       return +this.totalCostCalculated;
     } else {
       return +this.totalCost;
