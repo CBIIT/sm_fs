@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { UserService } from '@cbiit/i2ecui-lib';
 import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
+import { PlanModel } from '../model/plan/plan-model';
+import { RequestModel } from '../model/request/request-model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +13,8 @@ export class ErrorHandlerService {
 
   constructor(
     private userService: UserService,
+    private planModel: PlanModel,
+    private requestModel: RequestModel,
     private logger: CustomServerLoggingService) {
   }
 
@@ -27,7 +31,8 @@ export class ErrorHandlerService {
   }
 
   private logErrorDetails(timestamp: number, error: any): void {
-    this.logger.logErrorWithContext('New error recorded', { timestamp, error });
+    const x: any = !!this.planModel?.fundingPlanDto ? this.planModel.fundingPlanDto : this.requestModel.requestDto;
+    this.logger.logErrorWithContext('New error recorded', { timestamp, error, x });
     const userId: string = this.userService.currentUserValue.nihNetworkId;
     this.logger.debug(`=========== ERROR DETAILS ===========`);
     this.logger.debug(`== User/Timestamp: ${userId}/${timestamp}`);

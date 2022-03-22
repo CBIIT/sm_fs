@@ -12,6 +12,7 @@ import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 import { PrcLineItemType } from '../../program-recommended-costs/prc-data-point';
 import SubmitEvent = JQuery.SubmitEvent;
 import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
+import { DocumentService } from '../../service/document.service';
 
 @Component({
   selector: 'app-step2',
@@ -31,7 +32,8 @@ export class Step2Component implements OnInit {
               private fsRequestControllerService: FsRequestControllerService,
               private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
               private navigationModel: NavigationStepModel,
-              private logger: NGXLogger) {
+              private logger: NGXLogger,
+              private documentService: DocumentService) {
   }
 
   ngOnInit(): void {
@@ -43,7 +45,7 @@ export class Step2Component implements OnInit {
     this.requestModel.programRecommendedCostsModel?.prcLineItems?.forEach((val, key) => {
       val.forEach(p => {
         if (p.type === PrcLineItemType.PERCENT_CUT) {
-          this.fundingSourceSynchronizerService.percentSelectedEmitter.next({fseId: +key, selected: true});
+          this.fundingSourceSynchronizerService.percentSelectedEmitter.next({ fseId: +key, selected: true });
         }
       });
     });
@@ -77,9 +79,21 @@ export class Step2Component implements OnInit {
         title: ''
       });
     }
+
+
     this.requestModel.clearAlerts();
     // TODO: make sure model is properly constructed
     this.requestModel.prepareBudgetsAndSetFinalLoa();
+    /**   FS-1581 Remove uploaded "Transition Memo" if the user changes the
+    request type from "Pay Type 4" to another request type. */
+    if (this.requestModel.requestDto.frqId != null) {
+      const requestTypeChanged = (this.requestModel.requestDto.frtId && this.requestModel.requestDto.parentFrtId) && (
+        Number(this.requestModel.requestDto.parentFrtId) !== Number(this.requestModel.requestDto.frtId));
+
+      if (requestTypeChanged && Number(this.requestModel.requestDto.parentFrtId) == FundingRequestTypes.PAY_TYPE_4) {
+        this.documentService.deleteTransitionMemoOnType4Change(this.model.requestDto.frqId);
+      }
+    }
     this.requestModel.requestDto.financialInfoDto.conversionActivityCode = this.requestModel.requestDto.conversionActivityCode;
     this.requestModel.requestDto.parentFrtId = null;
     this.requestModel.requestDto.selectedFrtId = this.requestModel.requestDto.frtId;

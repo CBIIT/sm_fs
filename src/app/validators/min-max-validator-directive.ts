@@ -16,8 +16,9 @@ export class MinMaxValidatorDirective implements Validator {
   validate(control: AbstractControl): ValidationErrors | null {
 
     let val = control.value;
+    //this.logger.info(`Value ${val} is ${typeof val}`);
     if (val) {
-      val = val.replace(/\,/g, '');
+      val = String(val).replace(/\,/g, '');
     }
     if (isNaN(val)) {
       return null;

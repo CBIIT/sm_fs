@@ -1,12 +1,19 @@
-<h3>Something unexpected went wrong</h3>
+<ngb-alert type="danger" [dismissible]="false">
+  <h3>Something unexpected went wrong</h3>
 <p>
-  Details have been reported to the application support team.
-  If the error persists, contact <a href="mailto: {{techSupport}} ?subject=Funding Selections&body={{errorMessage}}%0A{{errorDetails}} " title="">I2E Technical
-  Support</a>.
+  Details have been reported to the application support team. If the error persists, contact
+  <a href="mailto: {{techSupport}} ?subject=Funding Selections&body={{errorMessage}}%0A{{errorDetails}}" title="">
+    I2E Technical Support
+  </a>.
 </p>
-<p>
-  Click <a [routerLink]="['/']" routerLinkActive="active">here</a> to return home.
-</p>
+  <p>&nbsp;</p>
+<span>
+<!--  <a [routerLink]="" class="mr-1"><i class='fa fa-skull-crossbones' aria-hidden='true'></i></a>-->
+  <strong>Please do not use the back button.</strong>
+  <p>&nbsp;</p>
+  <p>Click <a [routerLink]="['/']" routerLinkActive="active">here</a> to return home.</p>
+</span>
+</ngb-alert>
 <!--<div *ngIf="!production">-->
 <!--  <p>{{ errorMessage }}</p>-->
 <!--  <pre>{{ errorDetails }}</pre>-->

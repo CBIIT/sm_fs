@@ -106,10 +106,10 @@ export class ErrorInterceptorService implements HttpInterceptor {
   }
 
   handleNavigationStart(event: NavigationStart): void {
-    // this.logger.logServer('=======> NavigationStart', event);
+    this.logger.info('=======> NavigationStart', event);
   }
 
   handleNavigationEnd(event: NavigationEnd): void {
-    // this.logger.logServer('=======> NavigationEnd', event);
+    this.logger.info('=======> NavigationEnd', event);
   }
 }

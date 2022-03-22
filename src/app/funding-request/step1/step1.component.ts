@@ -25,6 +25,7 @@ import { ActivatedRoute } from '@angular/router';
 import { RequestModel } from 'src/app/model/request/request-model';
 import {NgForm} from '@angular/forms';
 import {DatatableThrottle} from '../../utils/datatable-throttle';
+import {NavigationModel} from '../../model/navigation-model';
 
 @Component({
   selector: 'app-step1',
@@ -41,6 +42,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
               private logger: NGXLogger,
               private route: ActivatedRoute,
               private requestModel: RequestModel,
+              private reqsNavigationModel: NavigationModel,
               private navigationModel: NavigationStepModel) {
   }
 
@@ -214,6 +216,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     const isNewRequest = this.route.snapshot.params.new;
     if (isNewRequest) {
       this.requestModel.reset();
+      this.reqsNavigationModel.reset();
     }
     this.navigationModel.showSteps = true;
   }

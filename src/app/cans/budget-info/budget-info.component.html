@@ -55,7 +55,6 @@
               [index]="i"
               [nciSourceFlag]="can.nciSourceFlag"
               [selectedValue]="can.can"
-              [initialCAN]="can"
               [fseId]="can.fseId"
               [readonly]="true">
             </app-can-selector>
@@ -92,15 +91,14 @@
 
     <div class="col-12 collapse show mt-2" id="budget-info-collapse">
       <div><p>Please provide the CAN only if known at the time of approval.</p></div>
-<!--      <div class="col-6 align-left" *ngIf="model.isAddFunds() && (isFcNci())">
-        <app-create-type></app-create-type>
-      </div> -->
+
       <table class="table table-striped table-bordered budget-info-table">
         <thead>
         <tr>
           <th scope="col">Funding Source</th>
           <th scope="col" *ngIf="showDirectCosts">Approved Direct Cost</th>
           <th scope="col">Approved Total Cost</th>
+          <th scope="col" [hidden]="!isApprovedFinancials()">Create Type</th>
           <th scope="col" [hidden]="!(isFinancialApprover() && isFcNci())">OEFIA Coding</th>
           <th scope="col" *ngIf="canSeeAtLeastOneCAN()">NCI OEFIA Projected CAN</th>
           <th scope="col" *ngIf="canEnterAtLeastOneCAN();">
@@ -119,6 +117,7 @@
           <td>
             {{ can.approvedTc | currency }} <span *ngIf="first">{{can.tcPctCut / 100000 | percentCut:initialPay}}</span>
           </td>
+          <td [hidden]="!isApprovedFinancials()">{{ can.oefiaCreateCode }}</td>
           <td [hidden]="!(isFinancialApprover() && isFcNci())">
             <app-oefia-types
               [index]="i"
@@ -128,11 +127,11 @@
           <td *ngIf="canSeeAtLeastOneCAN()">
             <ng-container *ngIf="canSee(can.fseId) then PROJECTED_CAN"></ng-container>
             <ng-template #PROJECTED_CAN>
-              <app-projected-can [index]="i" [fseId]="can.fseId"
-                                 [octId]="can.octId || can.defaultOefiaTypeId"></app-projected-can>
-            </ng-template>
-            <ng-template *ngIf="!canSee(can.fseId)">
-              <i class="fas fa-skull-crossbones"></i>
+              <app-projected-can
+                [index]="i"
+                [fseId]="can.fseId"
+                [octId]="can.octId || can.defaultOefiaTypeId">
+              </app-projected-can>
             </ng-template>
           </td>
           <td *ngIf="canEnterAtLeastOneCAN()">
@@ -142,7 +141,6 @@
                 [index]="i"
                 [nciSourceFlag]="can.nciSourceFlag"
                 [selectedValue]="can.can"
-                [initialCAN]="can"
                 [fseId]="can.fseId"
                 [canRequired]="isCanRequired(can.fseId)">
               </app-can-selector>

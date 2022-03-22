@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpRequest, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DocumentsControllerService, DocumentsDto , FundSelectSearchCriteria} from '@cbiit/i2ecws-lib';
+import { DocumentsControllerService, DocumentsDto , FundSelectSearchCriteria , FsDocOrderControllerService }from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
@@ -13,7 +13,8 @@ export class DocumentService {
   private docViewerUrl = '/i2ecws/api/v1/doc-viewer';
 
   constructor(private http: HttpClient,
-    private documentsControllerService: DocumentsControllerService, private logger: NGXLogger) { }
+    private documentsControllerService: DocumentsControllerService, private logger: NGXLogger,
+    private fsDocOrderControllerService:FsDocOrderControllerService) { }
 
   upload(file: File, docDto: DocumentsDto): Observable<HttpEvent<any>> {
     const formData: FormData = new FormData();
@@ -116,6 +117,31 @@ export class DocumentService {
     return this.http.post<Blob>(`${url}`,searchCriteria, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
+  deleteTransitionMemoOnType4Change(frqId: number): void {
+    this.getFiles(frqId, 'PFR').subscribe(
+      result => {
+        result.forEach(element => {
+          if(element.id !== null && element.docType=='Transition Memo')
+          {
+            this.deleteDocById(element.id).subscribe(
+                result => {
+                  this.logger.info('Delete Success');
+                  if (result.id !== null) {
+                    this.fsDocOrderControllerService.deleteDocOrderUsingDELETE(result.id).subscribe(
+                      res => {
+                        this.logger.debug('Doc order delete successful for docId: ', result.id);
+                      }, error => {
+                        this.logger.error('Error occured while deleting DOC ORDER----- ' + error.message);
+                      });
+                   } 
+                    });
+              }
+                
+                  });      
+      }, error => {
+        this.logger.error('HttpClient get request error for----- ' + error.message);
+      });
+  }
 
 
 }

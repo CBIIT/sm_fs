@@ -3,7 +3,8 @@ import { PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ControlContainer, NgForm } from '@angular/forms';
-import { isReallyANumber } from '../../utils/utils';
+import { isNumeric } from '../../utils/utils';
+import { CanManagementService } from '../../cans/can-management.service';
 
 @Component({
   selector: 'app-fp-program-recommended-costs',
@@ -41,11 +42,12 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   constructor(
     private planManagementService: PlanManagementService,
+    private canManagementService: CanManagementService,
     private logger: NGXLogger) {
   }
 
   get percentCut(): number {
-    return this._percentCut;
+    return null || this._percentCut;
   }
 
   set percentCut(value: number) {
@@ -159,14 +161,22 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
     // TODO: this logic might need revisiting.
     // TODO: especially the determination of percent if lockDollar is true
-    if (can && ((isReallyANumber(can.dcPctCut) && isReallyANumber(can.tcPctCut) && can.dcPctCut === can.tcPctCut && can.dcPctCut !== 0 && can.tcPctCut !== 0))) {
+    if (this.canManagementService.isCanPercentSelected(can)) {
       // this.logger.debug(can);
       this._percentCut = can.dcPctCut / 1000;
       if (this.lockDollar) {
-        this.logger.error('Control is locked to dollar only but analysis indicates percent');
+        this.logger.error('Control is locked to dollar only but analysis indicates percent', can);
+        if(can.percentSelected) {
+          this.logger.error(`CAN percent selected: unlocking dollar [${can.fundingSourceName}]`);
+          this.lockDollar = false;
+        }
       }
       this.displayType = 'percent';
-    } else if (bud && isReallyANumber(bud.dcRecAmt) && isReallyANumber(bud.tcRecAmt)) {
+      if(+this._percentCut === 0) {
+        this.directCostCalculated = bud.dcRecAmt;
+        this.totalCostCalculated = bud.tcRecAmt;
+      }
+    } else if (bud && isNumeric(bud.dcRecAmt) && isNumeric(bud.tcRecAmt)) {
       this.directCost = bud.dcRecAmt || null;
       this.totalCost = bud.tcRecAmt || null;
       this.displayType = 'dollar';
@@ -178,9 +188,15 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   recalculate(): void {
 
     if (this._displayType === 'percent') {
-      if (!!this._percentCut) {
+      if (!!this._percentCut || +this._percentCut === 0) {
         this.directCostCalculated = Math.round(this.baselineDirectCost * (1 - (this._percentCut / 100)));
         this.totalCostCalculated = Math.round(this.baselineTotalCost * (1 - (this._percentCut / 100)));
+        this.logger.debug(`Checking percent cut value: ${this._percentCut}`);
+        if(+this._percentCut === 0) {
+          this.logger.debug('Using calculated values for direct and total')
+          this.directCost = this.directCostCalculated;
+          this.totalCost = this.totalCostCalculated;
+        }
       } else {
         this.directCostCalculated = null;
         this.totalCostCalculated = null;
@@ -237,11 +253,6 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   isPercentValid(): boolean {
     const reg = /^\d{0,3}(\.\d{1,2})?$/;
-    // if (this.isPercentNumeric()) {
-    //   const p = this.getPercentCut();
-    //   return p >= 0 && p <= 100;
-    // }
-    // return false;
     return reg.test(String(this.getPercentCut()));
   }
 
@@ -251,6 +262,9 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   getDirectCost(): number {
     if (this._displayType === 'percent') {
+      if(+this._percentCut === 0) {
+        return +this.directCost;
+      }
       return +this.directCostCalculated;
     } else {
       return +this.directCost;
@@ -266,6 +280,9 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   getTotalCost(): number {
     if (this._displayType === 'percent') {
+      if(+this._percentCut === 0) {
+        return +this.totalCost;
+      }
       return +this.totalCostCalculated;
     } else {
       return +this.totalCost;

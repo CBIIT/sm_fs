@@ -8,7 +8,7 @@ import {
   PendingPrcValues
 } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';
 import { Router } from '@angular/router';
-import { isReallyANumber, openNewWindow } from '../../utils/utils';
+import { isNumeric, openNewWindow } from '../../utils/utils';
 import { FpGrantInformationComponent } from '../fp-grant-information/fp-grant-information.component';
 import { FpFundingSourceComponent } from '../fp-funding-source/fp-funding-source.component';
 import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
@@ -231,9 +231,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     if (!pendingValues) {
       return true;
     }
-    // if(!(+pendingValues.applId === applId)) {
-    //   return true;
-    // }
 
     if (((pendingValues.directCost || 0) + (pendingValues.totalCost || 0) === 0) && !reg.test('' + pendingValues.percentCut)) {
       return true;
@@ -248,24 +245,22 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(i => {
       this.logger.debug(i.fullGrantNum);
       i.financialInfoDto.fundingRequestCans?.forEach(c => {
-        this.logger.debug(c);
-        if(c.percentSelected) {
-          if(!reg.test('' + (c.dcPctCut/1000))) {
-            this.logger.debug(`bad percent cut field ${c.dcPctCut}`);
+        if(c.percentSelected && c.dcPctCut) {
+          if(!reg.test('' + (c.dcPctCut/1000)) || ((c.dcPctCut/1000) < 0 || (c.dcPctCut/1000) > 100)) {
+            this.logger.error(`bad percent cut field ${c.dcPctCut} :: ${JSON.stringify(c)} :: ${i.fullGrantNum}`);
             result = true;
           }
-        } else {
-          if(!(!isReallyANumber(c.approvedDc) && !isReallyANumber(c.approvedTc))) {
-            this.logger.debug('both dc and tc are required if either is provided');
+        } else { // This catches scenarios where dollars are selected or nothing is selected, so we have to be prepared for both
+          if(isNumeric(c.approvedDc) ? !isNumeric(c.approvedTc) : isNumeric(c.approvedTc)) {
+            this.logger.error(`both dc and tc are required if either is provided :: ${JSON.stringify(c)} :: ${i.fullGrantNum}`);
             result = true;
           } else if(+c.approvedDc > +c.approvedTc) {
-            this.logger.debug(`approved dc greater than approved tc ${c.approvedDc} - ${c.approvedTc}`);
+            this.logger.error(`approved dc greater than approved tc ${c.approvedDc} - ${c.approvedTc} :: ${i.fullGrantNum}`);
             result = true;
           }
         }
       });
     });
-
     return result;
   }
 }

@@ -5,6 +5,7 @@ import {RequestModel} from '../model/request/request-model';
 import {GrantsSearchFilterService} from './grants-search/grants-search-filter.service';
 import { NavigationStepModel } from './step-indicator/navigation-step.model';
 import { Step4Component } from './step4/step4.component';
+import {NavigationModel} from '../model/navigation-model';
 
 @Component({
   selector: 'app-funding-request',
@@ -25,9 +26,11 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
 
   model: RequestModel;
   stepComponent: any;
+  requestsNav: NavigationModel;
 
   constructor(private navigationModel: NavigationStepModel,
               private router: Router,
+              private requestsNavigationModel: NavigationModel,
               private requestModel: RequestModel) {
   }
 
@@ -39,6 +42,7 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.model = this.requestModel;
+    this.requestsNav = this.requestsNavigationModel;
 
     this.routerSub = this.router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {

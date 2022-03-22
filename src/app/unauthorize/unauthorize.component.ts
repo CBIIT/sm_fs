@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { environment } from '../../environments/environment';
+import { AppPropertiesService } from '../service/app-properties.service';
 
 @Component({
   selector: 'app-unauthorize',
@@ -10,10 +11,10 @@ export class UnauthorizeComponent implements OnInit {
 
   techSupport: string;
 
-  constructor() { }
+  constructor(private appPropertiesService: AppPropertiesService) { }
 
   ngOnInit(): void {
-    this.techSupport = environment.techSupport;
+    this.techSupport = this.appPropertiesService.getProperty('TECH_SUPPORT_EMAIL');
   }
 
 }

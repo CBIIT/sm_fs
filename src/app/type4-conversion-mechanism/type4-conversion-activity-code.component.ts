@@ -26,7 +26,7 @@ export class Type4ConversionActivityCodeComponent implements OnInit {
 
   @Input() parentForm: NgForm;
 
-  label = 'Conversion Grant Activity Code(s)/Mechanism(s)';
+  label = 'Conversion Grant Activity Code/Mechanism';
   conversionActivityCodes = ConversionActivityCodeData;
 
   get model(): RequestModel {

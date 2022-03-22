@@ -1,6 +1,6 @@
 import {Directive} from '@angular/core';
 import {AbstractControl, NG_VALIDATORS, ValidationErrors, Validator, ValidatorFn} from '@angular/forms';
-import { isReallyANumber } from '../utils/utils';
+import { isNumeric } from '../utils/utils';
 
 @Directive({
   selector: '[appFundingSourceCostValidator]',
@@ -21,7 +21,7 @@ export const fundingSourceCostValidator: ValidatorFn = (control: AbstractControl
   let recommendedDirectVal = recommendedDirect?.value?.replace(/\,/g, '');
   let recommendedTotalVal = recommendedTotal?.value?.replace(/\,/g, '');
 
-  if (!recommendedDirect || !recommendedTotal || !isReallyANumber(recommendedDirectVal) || !isReallyANumber(recommendedTotalVal)) {
+  if (!recommendedDirect || !recommendedTotal || !isNumeric(recommendedDirectVal) || !isNumeric(recommendedTotalVal)) {
     return null;
   }
 

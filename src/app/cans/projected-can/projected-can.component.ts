@@ -3,6 +3,7 @@ import { NGXLogger } from 'ngx-logger';
 import { CanManagementService } from '../can-management.service';
 import { CanCcxDto } from '@cbiit/i2ecws-lib';
 import { RequestModel } from '../../model/request/request-model';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
 @Component({
   selector: 'app-projected-can',
@@ -10,9 +11,7 @@ import { RequestModel } from '../../model/request/request-model';
   styleUrls: ['./projected-can.component.css']
 })
 export class ProjectedCanComponent implements OnInit {
-
   @Input() index = 0;
-
   @Input() fseId: number;
   @Input() octId: number = null;
   @Input() frtId: number;
@@ -20,10 +19,19 @@ export class ProjectedCanComponent implements OnInit {
 
   projectedCan: CanCcxDto;
 
-  constructor(private logger: NGXLogger, private canService: CanManagementService, private requestModel: RequestModel) {
+  constructor(
+    private logger: NGXLogger,
+    private canService: CanManagementService,
+    private requestModel: RequestModel) {
   }
 
   ngOnInit(): void {
+    if(!this.octId) {
+      const source: FundingRequestFundsSrcDto = this.requestModel.programRecommendedCostsModel.fundingSources.find(s => +s.fundingSourceId === +this.fseId);
+      this.logger.info(`No oefiaTypeId specified: fall back to funding source default ${source?.octId}`);
+      this.octId = source?.octId;
+    }
+    this.logger.info(`Projected CAN initial values -> [fseId: ${this.fseId}, octId: ${this.octId}, frtId: ${this.frtId}, applId: ${this.applId}]`);
     this.canService.oefiaTypeEmitter.subscribe(next => {
       if (next.fseId && Number(next.fseId) === Number(this.fseId)) {
         this.updateProjectedCan(next.value, true);
@@ -42,9 +50,7 @@ export class ProjectedCanComponent implements OnInit {
   }
 
   updateProjectedCan(oefiaType: number, emit: boolean): void {
-    const source = +this.fseId
-
-    this.canService.getProjectedCan(source, oefiaType, this.frtId, this.requestModel.requestDto.frqId, this.applId).subscribe(result => {
+    this.canService.getProjectedCan(+this.fseId, oefiaType, this.frtId, this.requestModel.requestDto.frqId, this.applId).subscribe(result => {
       this.projectedCan = result;
       if (emit) {
         this.canService.projectedCanEmitter.next({ index: this.index, can: result });

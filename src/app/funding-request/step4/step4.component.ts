@@ -91,7 +91,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.submitResultElement.nativeElement.scrollIntoView();
+  //  this.submitResultElement.nativeElement.scrollIntoView();
 
     if (this.budgetInfoComponent && this.workflowComponent) {
       this.workflowComponent.budgetInfoComponent = this.budgetInfoComponent;
@@ -231,7 +231,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     }
 
     if (+this.requestModel.requestDto.frtId === +FundingRequestTypes.PAY_TYPE_4 &&
-    (this.requestModel.requestDto.conversionActivityCode !== 'NC'))  {
+    (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== 'NC'))  {
       this.transitionMemoMissing = true;
       if (this.docDtos && this.docDtos.length > 0) {
         for (const doc of this.docDtos) {
