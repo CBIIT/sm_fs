@@ -219,4 +219,10 @@ export class Step2Component implements OnInit {
   isSkipRequest(): boolean {
     return this.requestModel?.isSkip() || false;
   }
+
+  commentsRequired(): boolean {
+    return FUNDING_POLICY_CUT_TYPES.includes(Number(this.requestModel.requestDto.financialInfoDto.requestTypeId))
+           && this.requestModel.requestDto.financialInfoDto.fundingPolicyCut === 'Other';
+  }
+
 }

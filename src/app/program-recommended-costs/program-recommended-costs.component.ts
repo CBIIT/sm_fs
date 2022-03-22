@@ -6,6 +6,7 @@ import { NGXLogger } from 'ngx-logger';
 import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
 import {
   FundingRequestTypes,
+  FUNDING_POLICY_CUT_TYPES,
   INITIAL_PAY_TYPES,
   PRC_AWARDED_DIRECT_TOTAL_DISPLAY_TYPES,
   PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES
@@ -571,5 +572,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       });
     });
     return result;
+  }
+
+  showFpcMessage(): boolean {
+    return FUNDING_POLICY_CUT_TYPES.includes(Number(this.requestModel.requestDto.financialInfoDto.requestTypeId));
   }
 }

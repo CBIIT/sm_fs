@@ -188,7 +188,6 @@ export class RequestInformationComponent implements OnInit {
   }
 
   get selectedFundingPolicyCut(): string {
-    this.logger.debug('Funding Policy Cut', this.requestModel.requestDto.financialInfoDto.fundingPolicyCut);
     return this.requestModel.requestDto.financialInfoDto.fundingPolicyCut;
   }
 
