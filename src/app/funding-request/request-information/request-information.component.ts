@@ -4,7 +4,7 @@ import { FsRequestControllerService, NciPfrGrantQueryDto } from '@cbiit/i2ecws-l
 import { isArray } from 'rxjs/internal-compatibility';
 import { NGXLogger } from 'ngx-logger';
 import { FundingRequestValidationService } from '../../model/request/funding-request-validation-service';
-import { FundingRequestTypes } from '../../model/request/funding-request-types';
+import { FundingRequestTypes, FUNDING_POLICY_CUT_TYPES } from '../../model/request/funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
 import { ControlContainer, NgForm } from '@angular/forms';
 import { CancerActivitiesDropdownComponent } from '@cbiit/i2ecui-lib';
@@ -26,6 +26,11 @@ export class RequestInformationComponent implements OnInit {
   pdCayCodes: string[] = [];
 
   myAlerts: Alert[] = [];
+
+  fundingPolicyCutCodes = [
+    {id: 'Standard', text: 'Standard'},
+    {id: 'Other', text: 'Other'}
+  ];
 
   get selectedRequestType(): number {
     return this.requestModel.requestDto.financialInfoDto.requestTypeId || null;
@@ -180,6 +185,19 @@ export class RequestInformationComponent implements OnInit {
     return Number(this.requestModel.requestDto.financialInfoDto.requestTypeId) === FundingRequestTypes.PAY_TYPE_4
            && this.requestModel.grant.activityCode === 'K99'
            && this.requestModel.requestDto.conversionActivityCode === 'R00';
+  }
+
+  get selectedFundingPolicyCut(): string {
+    this.logger.debug('Funding Policy Cut', this.requestModel.requestDto.financialInfoDto.fundingPolicyCut);
+    return this.requestModel.requestDto.financialInfoDto.fundingPolicyCut;
+  }
+
+  set selectedFundingPolicyCut(value: string) {
+    this.requestModel.requestDto.financialInfoDto.fundingPolicyCut = value;
+  }
+
+  showFpcSelect(): boolean {
+    return FUNDING_POLICY_CUT_TYPES.includes(Number(this.selectedRequestType));
   }
 
 }

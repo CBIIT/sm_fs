@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { RequestModel } from '../../model/request/request-model';
 import { FsRequestControllerService, NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
-import { FundingRequestTypes } from '../../model/request/funding-request-types';
+import { FundingRequestTypes, FUNDING_POLICY_CUT_TYPES } from '../../model/request/funding-request-types';
 import { ProgramRecommendedCostsComponent } from '../../program-recommended-costs/program-recommended-costs.component';
 import { Alert } from '../../alert-billboard/alert';
 import { NgForm } from '@angular/forms';
@@ -85,7 +85,10 @@ export class Step2Component implements OnInit {
     this.requestModel.requestDto.selectedFrtId = this.requestModel.requestDto.frtId;
     this.requestModel.requestDto.financialInfoDto.requestTypeId = this.requestModel.requestDto.frtId;
     this.requestModel.requestDto.financialInfoDto.parentRequestTypeId = null;
-    this.logger.debug(JSON.stringify(this.requestModel.requestDto));
+    if (!FUNDING_POLICY_CUT_TYPES.includes(this.requestModel.requestDto.financialInfoDto.requestTypeId)) {
+      this.requestModel.requestDto.financialInfoDto.fundingPolicyCut = undefined;
+    }
+    this.logger.debug('fundingRequest DTO to be saved', this.requestModel.requestDto);
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
         this.requestModel.requestDto = result;
@@ -96,7 +99,7 @@ export class Step2Component implements OnInit {
             title: ''
           });
         }
-        this.logger.debug(JSON.stringify(this.requestModel.requestDto));
+        this.logger.debug('fundingRequest DTO returned after save', this.requestModel.requestDto);
         // always go to next step even if create approver fails. that's behavior before moving
         // create approvers here.
         this.fsRequestControllerService.getRequestBudgetsUsingGET(result.frqId).subscribe(

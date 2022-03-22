@@ -70,6 +70,24 @@
     <app-type4-conversion-mechanism [parentForm]="parentForm"></app-type4-conversion-mechanism>
   </div>
 
+  <div class="col-md-2 col-lg-4" *ngIf="showFpcSelect()">
+    <label for="policy-cut">Funding Policy Cut</label>
+    <ng-select2
+    id="policy-cut"
+    name="fundingPolicyCut"
+    #fundingPolicyCut="ngModel"
+    [(ngModel)]="selectedFundingPolicyCut"
+    [allowClear]="true"
+    [data]="fundingPolicyCutCodes"
+    required>
+    </ng-select2>
+    <div
+      class="text-danger mt-1"
+      *ngIf="fundingPolicyCut.errors?.required && (fundingPolicyCut.touched || parentForm?.submitted)">
+      Funding Policy Cut is required
+    </div>
+  </div>
+
 </div><!-- END Row -->
 
 <div *ngIf="payUsingSkip()">

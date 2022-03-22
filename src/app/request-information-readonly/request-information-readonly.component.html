@@ -93,6 +93,13 @@
       </div>
     </div>
 
+    <div class="col-md-6 col-lg-3"  *ngIf="model.requestDto.financialInfoDto.fundingPolicyCut">
+      <div class="form-group">
+        <p class="like-label">Funding Policy Cut</p>
+        <p>{{model.requestDto.financialInfoDto.fundingPolicyCut}}</p>
+      </div>
+    </div>
+
     <div class="col-md-6 col-lg-3" *ngIf="!isSkip && diversityRequest">
       <div class="form-group">
         <p class="like-label">Type of Supplement</p>
