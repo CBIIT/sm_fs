@@ -150,12 +150,10 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
     // Determine whether we should lock the dollar value or not
     if (this.planManagementService.isPercentSelected(this.grant.applId)) {
       const p = this.planManagementService.percentSelectionIndex(this.grant.applId);
-      // this.logger.debug(`${JSON.stringify(p)} -- ${this.sourceIndex} -- ${this.fseId}`)
-      if (+p.index !== +this.sourceIndex) {
-        if (+p.fseId !== +this.fseId) {
-          this.logger.debug('locking dollar');
-          this.lockDollar = true;
-        }
+      this.logger.debug(`${JSON.stringify(p)} -- ${this.sourceIndex} -- ${this.fseId}`)
+      if (+p.fseId !== +this.fseId) {
+        this.logger.debug('locking dollar');
+        this.lockDollar = true;
       }
     }
 
@@ -165,14 +163,14 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       // this.logger.debug(can);
       this._percentCut = can.dcPctCut / 1000;
       if (this.lockDollar) {
-        this.logger.error('Control is locked to dollar only but analysis indicates percent', can);
-        if(can.percentSelected) {
+        this.logger.error(`Control is locked to dollar only but analysis indicates percent: ${JSON.stringify(can)}`);
+        if (can.percentSelected) {
           this.logger.error(`CAN percent selected: unlocking dollar [${can.fundingSourceName}]`);
           this.lockDollar = false;
         }
       }
       this.displayType = 'percent';
-      if(+this._percentCut === 0) {
+      if (+this._percentCut === 0) {
         this.directCostCalculated = bud.dcRecAmt;
         this.totalCostCalculated = bud.tcRecAmt;
       }
@@ -191,9 +189,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
       if (!!this._percentCut || +this._percentCut === 0) {
         this.directCostCalculated = Math.round(this.baselineDirectCost * (1 - (this._percentCut / 100)));
         this.totalCostCalculated = Math.round(this.baselineTotalCost * (1 - (this._percentCut / 100)));
-        this.logger.debug(`Checking percent cut value: ${this._percentCut}`);
-        if(+this._percentCut === 0) {
-          this.logger.debug('Using calculated values for direct and total')
+        if (+this._percentCut === 0) {
           this.directCost = this.directCostCalculated;
           this.totalCost = this.totalCostCalculated;
         }
@@ -262,7 +258,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   getDirectCost(): number {
     if (this._displayType === 'percent') {
-      if(+this._percentCut === 0) {
+      if (+this._percentCut === 0) {
         return +this.directCost;
       }
       return +this.directCostCalculated;
@@ -280,7 +276,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
 
   getTotalCost(): number {
     if (this._displayType === 'percent') {
-      if(+this._percentCut === 0) {
+      if (+this._percentCut === 0) {
         return +this.totalCost;
       }
       return +this.totalCostCalculated;
