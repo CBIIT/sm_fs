@@ -97,14 +97,13 @@ export class PlanManagementService {
       if (+r.applId === +applId) {
         r.financialInfoDto.fundingRequestCans?.forEach((can, index) => {
           if (this.canManagementService.isCanPercentSelected(can)) {
-            // this.logger.debug(`Percent selected: ${applId} - ${index} - ${JSON.stringify(can)}`);
-            // can.percentSelected = true;
+            this.logger.debug(`Percent selected: ${applId} - ${index} - ${JSON.stringify(can)}`);
             result = true;
           }
         });
       }
     });
-    // this.logger.warn('isPercentSelected:', applId, x, result);
+    // this.logger.debug(`isPercentSelected(${applId}) = ${result}`);
     return result;
   }
 
