@@ -23,4 +23,7 @@ export interface SearchCriteria {
   piName?: string;
   pdName?: string;
   i2status?: string;
+  fundingRequestApproverRole?: string;
+  fundingPlanApproverRole?: string;
+  pendingApprovalStatusOnly?: boolean;
 }

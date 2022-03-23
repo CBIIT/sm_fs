@@ -75,6 +75,10 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   ncabList: Select2OptionData[] = [];
   costCenterList: Select2OptionData[] = [];
 
+  // Pending Approval flag
+  isFundingRequestPendingApproval: boolean;
+  isFundingPlanPendingApproval: boolean;
+
   constructor(private userSessionService: AppUserSessionService,
               // private boardsControllerService: BoardsControllerService,
               // private paylistUtilControllerService: PaylistUtilControllerService,
@@ -138,7 +142,29 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       // next tick
       this.searchForm.form.patchValue(this.searchFilter);
+      this.isFundingRequestPendingApproval = this.searchFilter.fundingRequestStatus && this.searchFilter.fundingRequestStatus.indexOf('PENDING APPROVAL') > -1;
+      this.isFundingPlanPendingApproval    = this.searchFilter.fundingPlanStatus && this.searchFilter.fundingPlanStatus.indexOf('PENDING APPROVAL') > -1;
       this.logger.debug('search-filter - ngAfterViewInit() next tick: action', this.action);
+      this.searchForm.form.get('fundingRequestStatus').valueChanges.subscribe(val => {
+        // this.logger.debug('*** Request Type Control changes ***', val);
+        if (val && val.indexOf('PENDING APPROVAL') > -1) {
+          this.isFundingRequestPendingApproval = true;
+        }
+        else {
+          this.isFundingRequestPendingApproval = false;
+          this.searchForm.form.patchValue({fundingRequestApproverRole: ''});
+        }
+      });
+      this.searchForm.form.get('fundingPlanStatus').valueChanges.subscribe(val => {
+        // this.logger.debug('*** Request Type Control changes ***', val);
+        if (val && val.indexOf('PENDING APPROVAL') > -1) {
+          this.isFundingPlanPendingApproval = true;
+        }
+        else {
+          this.isFundingPlanPendingApproval = false;
+          this.searchForm.form.patchValue({fundingPlanApproverRole: ''});
+        }
+      });
     }, 0);
   }
 
@@ -186,6 +212,12 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       const sf: SearchCriteria = {}
       Object.assign(sf, form.form.value);
       sf.searchType = this.searchType;
+      if (this.searchType === 'FR') {
+        sf.pendingApprovalStatusOnly = this.searchFilter.fundingRequestStatus.length === 1 && this.searchFilter.fundingRequestStatus[0] === 'PENDING APPROVAL';
+      }
+      else if ((this.searchType === 'FP')) {
+        sf.pendingApprovalStatusOnly = this.searchFilter.fundingPlanStatus.length === 1 && this.searchFilter.fundingPlanStatus[0] === 'PENDING APPROVAL';
+      }
       sf.fundingRequestStatus = this._populateStatus(this.searchFilter.fundingRequestStatus);
       sf.fundingPlanStatus = this._populateStatus(this.searchFilter.fundingPlanStatus);
       this.logger.debug('search criteria:', sf);
