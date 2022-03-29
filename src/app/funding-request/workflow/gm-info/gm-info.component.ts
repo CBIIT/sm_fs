@@ -44,7 +44,6 @@ export class GmInfoComponent implements OnInit, OnDestroy {
         this.loadData();
       }
     );
-    this.loadData();
     this.lookupService.getGmActiveSpecialistsUsingGET().subscribe(
       result => {
         if (result) {
@@ -56,6 +55,7 @@ export class GmInfoComponent implements OnInit, OnDestroy {
             return map;
           }, this.specialistMap);
         }
+        this.loadData();
       },
       error => {
         this.logger.error('getGmActiveSpecialistsUsingGET failed', error);
@@ -69,6 +69,7 @@ export class GmInfoComponent implements OnInit, OnDestroy {
             if (result) {
               this.gmInfo = result;
               this.logger.debug('getDefaultGmInfoUsingGET returned', JSON.stringify(result));
+              this.checkDefaultSpecialist();
             }
             else {
               this.gmInfo = {};
@@ -96,14 +97,18 @@ export class GmInfoComponent implements OnInit, OnDestroy {
     return !(this.workflowModel.isGMApprover && this.approvingState);
   }
 
-  isFormValid(): boolean {
-    // check for the case when the default specialist returned from backend is no longer active, i.e. not in the drop down list.
-    const spec = this.specialistMap.get(Number(this.gmInfo.defaultSpecNpeId));
-    if (!spec) {
-      this.logger.warn('The default specialist (npe_id=' + this.gmInfo.defaultSpecNpeId + ') is not active, treat as invalid to force user to select');
-      this.gmInfo.defaultSpecNpeId = null;
-      return false;
+  checkDefaultSpecialist(): void {
+    // check if the default specialist returned from backend is no longer active, i.e. not in the drop down list.
+    if (this.gmInfo.defaultSpecNpeId && !this.readonly) {
+      const spec = this.specialistMap.get(Number(this.gmInfo.defaultSpecNpeId));
+      if (!spec ) {
+        this.logger.warn('The default specialist (npe_id=' + this.gmInfo.defaultSpecNpeId + ') is not active, treat as invalid to force user to select');
+        this.gmInfo.defaultSpecNpeId = null;
+      }
     }
+  }
+
+  isFormValid(): boolean {
     return this.gmform?.valid;
   }
 
