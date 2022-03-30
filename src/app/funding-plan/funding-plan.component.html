@@ -4,7 +4,17 @@
     </div>
 </div>
 <div>
-    <a  *ngIf="model.returnToSearchLink" routerLink="/search/immediate" class="btn btn-sm btn-link btn-back"  ><i class="far fa-arrow-left fa-sm mr-1" aria-hidden="true"></i>Return to Plan Query Page</a>
+  <div *ngIf="model.returnToSearchLink">
+    <a routerLink="/search/immediate" class="btn btn-sm btn-link btn-back"><i
+    class="far fa-arrow-left fa-sm mr-1" aria-hidden="true"></i>Return to Plan Query Page</a>
+    <span *ngIf="plansNav.show">
+      <a *ngIf="plansNav.prev" href="#" (click)="plansNav.onPrevious($event)" class="ml-2 btn btn-sm btn-link btn-back"> Prev &lt; </a>
+      <a *ngIf="!plansNav.prev" class="ml-2 btn btn-sm btn-link btn-back disabled"> Prev &lt; </a>
+      <span class="btn btn-sm btn-back"> {{plansNav.current + 1}} of {{plansNav.total}} </span>
+      <a *ngIf="plansNav.next" href="#" (click)="plansNav.onNext($event)" class="btn btn-sm btn-link btn-back"> &gt; Next</a>
+      <a *ngIf="!plansNav.next" class="btn btn-sm btn-link btn-back disabled"> &gt; Next</a>
+    </span>
+  </div>
     <div class="row" id="funding-plan-page-top">
         <div class="col-lg-10">
             <h1>{{model.title}} <span *ngIf="model.fundingPlanDto?.fprId"># {{model.fundingPlanDto.fprId}}</span>

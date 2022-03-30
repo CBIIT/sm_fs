@@ -1,5 +1,15 @@
 <div>
-  <a  *ngIf="model.returnToRequestPageLink" routerLink="/search/immediate" class="btn btn-sm btn-link btn-back"  ><i class="far fa-arrow-left fa-sm mr-1" aria-hidden="true"></i>Return to Request Query Page</a>
+  <div *ngIf="model.returnToRequestPageLink">
+    <a  routerLink="/search/immediate" class="btn btn-sm btn-link btn-back">
+      <i class="far fa-arrow-left fa-sm mr-1" aria-hidden="true"></i>Return to Request Query Page</a>
+    <span *ngIf="requestsNav.show">
+      <a *ngIf="requestsNav.prev" href="#" (click)="requestsNav.onPrevious($event)" class="ml-2 btn btn-sm btn-link btn-back"> Prev &lt; </a>
+      <a *ngIf="!requestsNav.prev" class="ml-2 btn btn-sm btn-link btn-back disabled"> Prev &lt; </a>
+      <span class="btn btn-sm btn-back"> {{requestsNav.current + 1}} of {{requestsNav.total}} </span>
+      <a *ngIf="requestsNav.next" href="#" (click)="requestsNav.onNext($event)" class="btn btn-sm btn-link btn-back"> &gt; Next</a>
+      <a *ngIf="!requestsNav.next" class="btn btn-sm btn-link btn-back disabled"> &gt; Next</a>
+    </span>
+  </div>
     <div class="row" id="funding-request-page-top">
         <div class="col-lg-10">
             <h1>{{model.title}} <span *ngIf="model.requestDto?.frqId"># {{model.requestDto?.frqId}}</span>
