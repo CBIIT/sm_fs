@@ -2,10 +2,9 @@ import { Inject, Injectable } from '@angular/core';
 import { NGXLogger, NgxLoggerLevel } from 'ngx-logger';
 import { NgxLoggerControllerService, NgxPayload } from '@cbiit/i2ecws-lib';
 import { UserService } from '@cbiit/i2ecui-lib';
-import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { HeartbeatService } from '../heartbeat/heartbeat-service';
-import { PROPERTIES_APP_NAME } from '../service/app-properties.service';
+import { PROPERTIES_APP_NAME, PROPERTIES_ENVIRONMENT } from '../service/app-properties.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +25,8 @@ export class CustomServerLoggingService {
     private userService: UserService,
     private router: Router,
     private heartbeatService: HeartbeatService,
-    @Inject(PROPERTIES_APP_NAME) private appName: string) {
+    @Inject(PROPERTIES_APP_NAME) private appName: string,
+    @Inject(PROPERTIES_ENVIRONMENT) private environment: {}) {
 
     this.userQueueLevel = logger.getConfigSnapshot().serverLogLevel || NgxLoggerLevel.INFO;
 
@@ -92,7 +92,7 @@ export class CustomServerLoggingService {
       applicationId: this.appName,
       sessionId: this.heartbeatService.sessionId,
       currentRoute: this.router.url,
-      envProperties: environment,
+      envProperties: this.environment,
     };
   }
 

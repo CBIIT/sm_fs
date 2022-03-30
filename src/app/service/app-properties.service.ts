@@ -1,5 +1,5 @@
 import { Inject, Injectable, InjectionToken } from '@angular/core';
-import { LookupsControllerService } from '@cbiit/i2ecws-lib';
+import { BASE_PATH, LookupsControllerService } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
@@ -13,10 +13,12 @@ export class AppPropertiesService {
 
   constructor(private lookupService: LookupsControllerService,
               @Inject(PROPERTIES_APP_NAME) appName: string,
-              @Inject(PROPERTIES_OVERRIDE) overrideProperties: any,
+              @Inject(PROPERTIES_ENVIRONMENT) overrideProperties: any,
+              @Inject(BASE_PATH) private basePath: string,
               private logger: NGXLogger) {
     this.appName = appName;
     this.overrideProperties = overrideProperties;
+    this.logger.info(`Override properties: ${JSON.stringify(overrideProperties)}`);
   }
 
   delay = ms => new Promise(res => setTimeout(res, ms));
@@ -49,4 +51,4 @@ export class AppPropertiesService {
 }
 
 export const PROPERTIES_APP_NAME = new InjectionToken<string>('appName');
-export const PROPERTIES_OVERRIDE = new InjectionToken<string>('overrideProperties');
+export const PROPERTIES_ENVIRONMENT = new InjectionToken<{}>('overrideProperties');
