@@ -9,7 +9,6 @@ import {
   FundingRequestSkipDto,
   NciPfrGrantQueryDto
 } from '@cbiit/i2ecws-lib';
-import { Router } from '@angular/router';
 import { openNewWindow } from '../utils/utils';
 
 @Component({

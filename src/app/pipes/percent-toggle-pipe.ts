@@ -1,5 +1,4 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { isNumeric } from 'rxjs/internal-compatibility';
 
 @Pipe({
   name: 'percentToggle'

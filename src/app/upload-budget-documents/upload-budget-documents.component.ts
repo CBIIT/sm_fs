@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { of, Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { DocumentsDto } from '@cbiit/i2ecws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { PlanModel } from 'src/app/model/plan/plan-model';

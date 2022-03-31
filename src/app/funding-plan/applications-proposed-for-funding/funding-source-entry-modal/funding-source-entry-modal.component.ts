@@ -13,7 +13,7 @@ import { openNewWindow } from '../../../utils/utils';
 import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { PlanManagementService } from '../../service/plan-management.service';
 import { FundingSourceGrantDataPayload } from '../funding-source-grant-data-payload';
-import { CustomServerLoggingService } from '../../../logging/custom-server-logging-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 
 @Component({
   selector: 'app-funding-source-entry-modal',

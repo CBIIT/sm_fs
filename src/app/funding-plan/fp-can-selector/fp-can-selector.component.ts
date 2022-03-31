@@ -1,9 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CanCcxDto } from '@cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
-import { PlanManagementService } from '../service/plan-management.service';
 
 @Component({
   selector: 'app-fp-can-selector',

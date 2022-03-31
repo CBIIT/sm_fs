@@ -7,7 +7,7 @@ import { Options } from 'select2';
 import { FundingSourceSynchronizerService } from './funding-source-synchronizer-service';
 import { openNewWindow } from '../utils/utils';
 import { NGXLogger } from 'ngx-logger';
-import { ControlContainer, FormGroup, NgForm } from '@angular/forms';
+import { ControlContainer, NgForm } from '@angular/forms';
 import { ConversionActivityCodes } from '../type4-conversion-mechanism/conversion-activity-codes';
 
 @Component({

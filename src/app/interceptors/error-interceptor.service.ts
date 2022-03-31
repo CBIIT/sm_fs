@@ -6,8 +6,8 @@ import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
 import { openNewWindow } from '../utils/utils';
 import { Location } from '@angular/common';
-import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
-import { HeartbeatService } from '../heartbeat/heartbeat-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
+import { HeartbeatService } from '@cbiit/i2ecui-lib';
 
 
 @Injectable()

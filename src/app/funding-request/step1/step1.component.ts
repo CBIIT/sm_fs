@@ -1,31 +1,31 @@
-import {
-  AfterContentInit,
-  AfterViewInit,
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  TemplateRef
-} from '@angular/core';
-import {FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto} from '@cbiit/i2ecws-lib';
-import {Subject} from 'rxjs';
-import {AppPropertiesService} from 'src/app/service/app-properties.service';
-import {GrantsSearchFilterService} from '../grants-search/grants-search-filter.service';
-import {AppUserSessionService} from 'src/app/service/app-user-session.service';
+import { AfterContentInit, AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
+import { Subject } from 'rxjs';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+import { GrantsSearchFilterService } from '../grants-search/grants-search-filter.service';
+import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { GrantnumberSearchCriteriaComponent } from '@cbiit/i2ecui-lib';
 import { LoaderService } from '../../service/loader-spinner.service';
 import { NGXLogger } from 'ngx-logger';
-import {FullGrantNumberCellRendererComponent} from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
-import {DataTableDirective} from 'angular-datatables';
-import {ExistingRequestsCellRendererComponent} from '../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
-import {FundingRequestActionCellRendererComponent} from './funding-request-action-cell-renderer/funding-request-action-cell-renderer.component';
-import {CancerActivityCellRendererComponent} from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
+import {
+  FullGrantNumberCellRendererComponent
+} from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+import { DataTableDirective } from 'angular-datatables';
+import {
+  ExistingRequestsCellRendererComponent
+} from '../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
+import {
+  FundingRequestActionCellRendererComponent
+} from './funding-request-action-cell-renderer/funding-request-action-cell-renderer.component';
+import {
+  CancerActivityCellRendererComponent
+} from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 import { ActivatedRoute } from '@angular/router';
 import { RequestModel } from 'src/app/model/request/request-model';
-import {NgForm} from '@angular/forms';
-import {DatatableThrottle} from '../../utils/datatable-throttle';
-import {NavigationModel} from '../../model/navigation-model';
+import { NgForm } from '@angular/forms';
+import { DatatableThrottle } from '../../utils/datatable-throttle';
+import { NavigationModel } from '../../model/navigation-model';
 
 @Component({
   selector: 'app-step1',

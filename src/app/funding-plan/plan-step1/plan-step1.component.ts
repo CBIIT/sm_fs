@@ -1,26 +1,33 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Options } from 'select2';
 import { Select2OptionData } from 'ng-select2';
 import { FsPlanControllerService, FundingPlanRfaPaDto, RfaPaNcabDate } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { FundingPlanNcabDto } from '@cbiit/i2ecws-lib/model/fundingPlanNcabDto';
 import { Subject } from 'rxjs';
-import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
-import { CancerActivityCellRendererComponent } from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
-import { ExistingRequestsCellRendererComponent } from '../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
+import {
+  FullGrantNumberCellRendererComponent
+} from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+import {
+  CancerActivityCellRendererComponent
+} from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
+import {
+  ExistingRequestsCellRendererComponent
+} from '../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
 import { PlanModel } from '../../model/plan/plan-model';
 import { FundingPlanGrantSearchCriteria } from '@cbiit/i2ecws-lib/model/fundingPlanGrantSearchCriteria';
 import { GrantsSearchResultDatatableDto } from '@cbiit/i2ecws-lib/model/grantsSearchResultDatatableDto';
 import { DataTableDirective } from 'angular-datatables';
-import { SelectGrantCheckboxCellRendererComponent } from './select-grant-checkbox-cell-renderer/select-grant-checkbox-cell-renderer.component';
+import {
+  SelectGrantCheckboxCellRendererComponent
+} from './select-grant-checkbox-cell-renderer/select-grant-checkbox-cell-renderer.component';
 import { SelectGrantCheckboxEventType } from './select-grant-checkbox-cell-renderer/select-grant-checkbox-event-type';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GrantsSearchFilterService } from '../../funding-request/grants-search/grants-search-filter.service';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { PlanManagementService } from '../service/plan-management.service';
-import {NavigationModel} from '../../model/navigation-model';
+import { NavigationModel } from '../../model/navigation-model';
 
 
 /**

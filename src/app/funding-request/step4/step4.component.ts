@@ -1,11 +1,17 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { RequestModel } from '../../model/request/request-model';
-import { AppPropertiesService } from '../../service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import {
-  FsRequestControllerService, FundingReqStatusHistoryDto,
-  NciPfrGrantQueryDto, DocumentsDto,
-  FundingReqApproversDto, FsWorkflowControllerService, WorkflowTaskDto, FundingPlanDto, CancerActivityControllerService
+  CancerActivityControllerService,
+  DocumentsDto,
+  FsRequestControllerService,
+  FsWorkflowControllerService,
+  FundingPlanDto,
+  FundingReqApproversDto,
+  FundingReqStatusHistoryDto,
+  NciPfrGrantQueryDto,
+  WorkflowTaskDto
 } from '@cbiit/i2ecws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';

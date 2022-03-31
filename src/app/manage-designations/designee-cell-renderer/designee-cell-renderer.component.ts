@@ -1,5 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {FundingRequestPermDelDto} from "@cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
+import { Component, Input, OnInit } from '@angular/core';
+import { FundingRequestPermDelDto } from "@cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
 
 @Component({
   selector: 'app-designee-cell-renderer',

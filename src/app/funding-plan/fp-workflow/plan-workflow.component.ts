@@ -23,7 +23,7 @@ import { PlanModel } from 'src/app/model/plan/plan-model';
 import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DatepickerFormatter } from 'src/app/datepicker/datepicker-adapter-formatter';
 import { Router } from '@angular/router';
-import { AppPropertiesService } from 'src/app/service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { FpGrantManagementComponent } from './fp-grant-management/fp-grant-management.component';
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
 import { PlanManagementService } from '../service/plan-management.service';

@@ -3,7 +3,7 @@ import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-
 import { PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { CanCcxDto } from '@cbiit/i2ecws-lib';
-import { GrantCostPayload} from '../service/grant-cost-payload';
+import { GrantCostPayload } from '../service/grant-cost-payload';
 
 @Component({
   selector: 'app-projected-can-renderer',

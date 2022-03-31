@@ -4,7 +4,7 @@ import { ErrorFunction, SuccessFunction } from '../../funding-request/retrieve-r
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanManagementService } from '../service/plan-management.service';
 import { FsPlanControllerService } from '@cbiit/i2ecws-lib';
-import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 
 @Injectable({ providedIn: 'root' })
 export class PlanLoaderService {

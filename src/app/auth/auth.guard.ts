@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { UserService } from '@cbiit/i2ecui-lib';
-import { SecurityCredentials, GrantedAuthority } from '@cbiit/i2ecws-lib';
+import { GrantedAuthority, SecurityCredentials } from '@cbiit/i2ecws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { NGXLogger } from 'ngx-logger';
-import { HeartbeatService } from '../heartbeat/heartbeat-service';
+import { HeartbeatService } from '@cbiit/i2ecui-lib';
 
 @Injectable({
   providedIn: 'root'

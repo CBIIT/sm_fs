@@ -1,12 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, ParamMap } from '@angular/router';
-import { FsRequestControllerService } from '@cbiit/i2ecws-lib';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
-import { AppUserSessionService } from 'src/app/service/app-user-session.service';
-import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
-import { CanManagementService } from '../../cans/can-management.service';
-import { RequestLoaderService, SuccessFunction } from './request-loader.service';
+import { RequestLoaderService } from './request-loader.service';
 
 @Component({
   selector: 'app-retrieve-request',

@@ -1,7 +1,7 @@
-import {Directive} from '@angular/core';
-import {AbstractControl, NG_VALIDATORS, ValidationErrors, Validator} from '@angular/forms';
-import {isArray} from 'rxjs/internal-compatibility';
-import {NGXLogger} from 'ngx-logger';
+import { Directive } from '@angular/core';
+import { AbstractControl, NG_VALIDATORS, ValidationErrors, Validator } from '@angular/forms';
+import { isArray } from 'rxjs/internal-compatibility';
+import { NGXLogger } from 'ngx-logger';
 
 @Directive({
   selector: '[appCancerActivityRequired]',

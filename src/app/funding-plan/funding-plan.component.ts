@@ -3,9 +3,8 @@ import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NavigationStepModel } from '../funding-request/step-indicator/navigation-step.model';
 import { PlanModel } from '../model/plan/plan-model';
-import { PlanStep5Component } from './plan-step5/plan-step5.component';
 import { PlanStep6Component } from './plan-step6/plan-step6.component';
-import {NavigationModel} from '../model/navigation-model';
+import { NavigationModel } from '../model/navigation-model';
 
 @Component({
   selector: 'app-funding-plan',

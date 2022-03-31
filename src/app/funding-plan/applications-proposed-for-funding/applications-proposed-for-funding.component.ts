@@ -16,7 +16,7 @@ import { FundingReqBudgetsDto } from '@cbiit/i2ecws-lib';
 import { FundingSourceEntryModalComponent } from './funding-source-entry-modal/funding-source-entry-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSourceGrantDataPayload } from './funding-source-grant-data-payload';
-import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 
 @Component({
   selector: 'app-applications-proposed-for-funding',

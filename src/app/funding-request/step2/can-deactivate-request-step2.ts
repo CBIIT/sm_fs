@@ -3,7 +3,6 @@ import { NGXLogger } from 'ngx-logger';
 import { Injectable } from '@angular/core';
 import { Step2Component } from './step2.component';
 import { RequestLoaderService } from '../retrieve-request/request-loader.service';
-import { FormControl } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'

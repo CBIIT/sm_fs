@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FsSearchControllerService, FundingRequestQueryDto } from '@cbiit/i2ecws-lib';
+import { FsSearchControllerService } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 

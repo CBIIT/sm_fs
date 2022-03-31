@@ -1,9 +1,7 @@
 import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import { NGXLogger } from 'ngx-logger';
 import { PrcDataPoint } from './prc-data-point';
 import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
-import { FundingRequestTypes } from '../model/request/funding-request-types';
-import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 
 // @Injectable({
 //   providedIn: 'root'

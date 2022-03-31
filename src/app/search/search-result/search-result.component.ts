@@ -2,7 +2,8 @@ import {
   AfterViewInit,
   Component,
   OnDestroy,
-  OnInit, Output,
+  OnInit,
+  Output,
   QueryList,
   TemplateRef,
   ViewChild,
@@ -11,28 +12,42 @@ import {
 import { FsSearchControllerService, FundingRequestQueryDto, FundSelectSearchCriteria } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
-import { AppPropertiesService } from '../../service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { LoaderService } from '../../service/loader-spinner.service';
 import { DataTableDirective } from 'angular-datatables';
-import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
-import { CancerActivityCellRendererComponent } from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
-import { SearchFundingRequestActionCellRendererComponent } from './search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component';
+import {
+  FullGrantNumberCellRendererComponent
+} from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+import {
+  CancerActivityCellRendererComponent
+} from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
+import {
+  SearchFundingRequestActionCellRendererComponent
+} from './search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component';
 import { FundingPlanQueryDto } from '@cbiit/i2ecws-lib/model/fundingPlanQueryDto';
-import { SearchFundingPlanFoasCellRendererComponent } from './search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component';
+import {
+  SearchFundingPlanFoasCellRendererComponent
+} from './search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component';
 import { Router } from '@angular/router';
 import { BatchApproveService } from '../batch-approve/batch-approve.service';
 import { BatchApproveModalComponent } from '../batch-approve/batch-approve-modal.component';
 import { DocumentService } from '../../service/document.service';
 import { saveAs } from 'file-saver';
 import { HttpResponse } from '@angular/common/http';
-import { SearchGrantExistInRequestCellRendererComponent } from './search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component';
-import { SearchGrantExistInPlanCellRendererComponent } from './search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component';
+import {
+  SearchGrantExistInRequestCellRendererComponent
+} from './search-grant-exist-in-request-cell-renderer/search-grant-exist-in-request-cell-renderer.component';
+import {
+  SearchGrantExistInPlanCellRendererComponent
+} from './search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
-import { SearchGrantExistInPaylistCellRendererComponent } from './search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component';
+import {
+  SearchGrantExistInPaylistCellRendererComponent
+} from './search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component';
 import { AppUserSessionService } from '../../service/app-user-session.service';
 import { CurrencyPipe } from '@angular/common';
 import { convertNcabs } from '../../utils/utils';
-import {NavigationModel} from '../../model/navigation-model';
+import { NavigationModel } from '../../model/navigation-model';
 
 @Component({
   selector: 'app-search-result',

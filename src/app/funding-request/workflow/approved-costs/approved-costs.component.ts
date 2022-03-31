@@ -1,10 +1,9 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { FundingRequestCanDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
 import { RequestModel } from 'src/app/model/request/request-model';
-import { WorkflowActionCode, WorkflowModel } from '../workflow.model';
+import { WorkflowModel } from '../workflow.model';
 
 @Component({
   selector: 'app-approved-costs',

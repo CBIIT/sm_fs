@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ErrorHandlerService } from '../error-handler.service';
 import { environment } from '../../../environments/environment';
 import { NGXLogger } from 'ngx-logger';
-import { AppPropertiesService } from 'src/app/service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 
 @Component({
   selector: 'app-error',

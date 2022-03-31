@@ -1,6 +1,6 @@
-import {Component, Input, OnInit, Output} from '@angular/core';
-import {Subject} from "rxjs";
-import {FundingRequestTypes} from "../../../model/request/funding-request-types";
+import { Component, Input, OnInit, Output } from '@angular/core';
+import { Subject } from "rxjs";
+import { FundingRequestTypes } from "../../../model/request/funding-request-types";
 
 @Component({
   selector: 'app-search-grant-exist-in-plan-cell-renderer',

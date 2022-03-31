@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanModel } from '../../model/plan/plan-model';
 import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
@@ -7,7 +7,6 @@ import { FsRequestControllerService } from '@cbiit/i2ecws-lib';
 import { PlanManagementService } from '../service/plan-management.service';
 import { RecommendedFutureYearsComponent } from '../recommended-future-years/recommended-future-years.component';
 import { ControlContainer, NgForm } from '@angular/forms';
-import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 
 @Component({
   selector: 'app-fp-grant-information',

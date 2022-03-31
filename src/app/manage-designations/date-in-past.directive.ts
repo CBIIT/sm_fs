@@ -1,7 +1,7 @@
 import { Directive } from '@angular/core';
-import {AbstractControl, NG_VALIDATORS, ValidationErrors, Validator} from "@angular/forms";
-import {NgbCalendar, NgbDate, NgbDateStruct} from "@ng-bootstrap/ng-bootstrap";
-import {NGXLogger} from "ngx-logger";
+import { AbstractControl, NG_VALIDATORS, ValidationErrors, Validator } from "@angular/forms";
+import { NgbCalendar, NgbDate, NgbDateStruct } from "@ng-bootstrap/ng-bootstrap";
+import { NGXLogger } from "ngx-logger";
 
 @Directive({
   selector: '[appDateInPast]',

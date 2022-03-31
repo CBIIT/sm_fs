@@ -2,15 +2,14 @@ import { AfterViewInit, Component, Input, OnInit, QueryList, ViewChild, ViewChil
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
-import { CanCcxDto, FsRequestControllerService, FundingRequestCanDisplayDto } from '@cbiit/i2ecws-lib';
+import { CanCcxDto, FsRequestControllerService } from '@cbiit/i2ecws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';
 import { WorkflowModel } from '../../funding-request/workflow/workflow.model';
 import { PlanManagementService } from '../service/plan-management.service';
 import { FpCanWarning } from '../fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
 import { CanSelectorRendererComponent } from '../can-selector-renderer/can-selector-renderer.component';
-import { VoidExpression } from 'typescript';
 import { GrantCostPayload } from '../service/grant-cost-payload';
 
 @Component({

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { UserService } from '@cbiit/i2ecui-lib';
-import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 import { PlanModel } from '../model/plan/plan-model';
 import { RequestModel } from '../model/request/request-model';
 

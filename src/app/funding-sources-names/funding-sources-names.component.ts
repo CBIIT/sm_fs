@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {  FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({

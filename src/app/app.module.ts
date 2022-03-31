@@ -15,7 +15,7 @@ import { SearchPoolComponent } from './search/search-filter/search-pool/search-p
 import { SearchComponent } from './search/search.component';
 import { FundingPlanComponent } from './funding-plan/funding-plan.component';
 import { FsMenuComponent } from './fs-menu/fs-menu.component';
-import { AppPropertiesService, PROPERTIES_APP_NAME, PROPERTIES_ENVIRONMENT } from './service/app-properties.service';
+import { AppPropertiesService, PROPERTIES_APP_NAME, PROPERTIES_ENVIRONMENT } from '@cbiit/i2ecui-lib';
 import { environment } from 'src/environments/environment';
 import { SearchResultComponent } from './search/search-result/search-result.component';
 import { UnauthorizeComponent } from './unauthorize/unauthorize.component';

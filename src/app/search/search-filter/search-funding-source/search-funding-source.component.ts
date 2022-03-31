@@ -1,13 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {ControlContainer, NgForm} from "@angular/forms";
-import {Select2OptionData} from "ng-select2";
-import {Options} from "select2";
-import {NGXLogger} from "ngx-logger";
-import {FsLookupControllerService} from "@cbiit/i2ecws-lib";
-import {FundingRequestFundsSrcDto} from "@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto";
-import {openNewWindow} from "../../../utils/utils";
-import {Router} from "@angular/router";
-import {Location} from "@angular/common";
+import { Component, Input, OnInit } from '@angular/core';
+import { ControlContainer, NgForm } from "@angular/forms";
+import { Select2OptionData } from "ng-select2";
+import { Options } from "select2";
+import { NGXLogger } from "ngx-logger";
+import { FsLookupControllerService } from "@cbiit/i2ecws-lib";
+import { FundingRequestFundsSrcDto } from "@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto";
+import { openNewWindow } from "../../../utils/utils";
+import { Router } from "@angular/router";
+import { Location } from "@angular/common";
 
 @Component({
   selector: 'app-search-funding-source',

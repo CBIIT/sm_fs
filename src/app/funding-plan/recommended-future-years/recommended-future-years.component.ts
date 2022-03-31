@@ -1,7 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Select2OptionData } from 'ng-select2';
-import { PlanModel } from '../../model/plan/plan-model';
-import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanManagementService } from '../service/plan-management.service';
 import { NGXLogger } from 'ngx-logger';
 import { ControlContainer, NgForm } from '@angular/forms';
