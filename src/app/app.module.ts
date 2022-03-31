@@ -231,6 +231,7 @@ import { ErrorInterceptorService } from './interceptors/error-interceptor.servic
 import { ErrorComponent } from './error/error/error.component';
 import { SessionRestoreComponent } from './session/session-restore/session-restore.component';
 import { CookieModule } from 'ngx-cookie';
+import { SearchFundingRequestApprvlRoleComponent } from './search/search-filter/search-funding-request-apprvl-role/search-funding-request-apprvl-role.component';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -397,6 +398,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SearchGrantExistInPaylistCellRendererComponent,
     ErrorComponent,
     SessionRestoreComponent,
+    SearchFundingRequestApprvlRoleComponent,
   ],
 
 

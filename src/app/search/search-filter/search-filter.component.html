@@ -40,6 +40,13 @@
       </ng-select2>
     </div>
   </div>
+  <div class="row form-group" [hidden]="!(searchType === 'FR') || !isFundingRequestPendingApproval">
+    <div class="col-6 col-md-6">
+    </div>
+    <div class="form-group col-6 col-md-6">
+      <app-search-funding-request-apprvl-role name="fundingRequestApproverRole"  [form]="searchForm"></app-search-funding-request-apprvl-role>
+    </div>
+  </div>
   <div class="row form-group" [hidden]="!(searchType === 'FP')">
     <div class="form-group col-6 col-md-6">
       <label for="plan-status-select">Plan Status</label>
@@ -59,6 +66,13 @@
     </div>
     <div class="col-3 col-md-3 ml-auto">
       <lib-ncab-daterange [form]="searchForm"></lib-ncab-daterange>
+    </div>
+  </div>
+  <div class="row form-group" [hidden]="!(searchType === 'FP') || !isFundingPlanPendingApproval">
+    <div class="form-group col-6 col-md-6">
+      <app-search-funding-request-apprvl-role name="fundingPlanApproverRole"  [form]="searchForm"></app-search-funding-request-apprvl-role>
+    </div>
+    <div class="col-6 col-md-6">
     </div>
   </div>
 

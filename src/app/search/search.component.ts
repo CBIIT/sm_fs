@@ -179,6 +179,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       fsCritera.fyTo = sc.fyRange?.toFy;
       fsCritera.requestType = sc.frTypes;
       fsCritera.statusCodes = sc.fundingRequestStatus;
+      fsCritera.pendingApprovalStatusOnly = sc.pendingApprovalStatusOnly;
+      fsCritera.approverRoleCode = sc.fundingRequestApproverRole;
       // fsCritera.rfaPaNumber = [sc.rfaPa];
       fsCritera.grantIc = sc.grantNumber?.grantNumberIC;
       fsCritera.grantMech = sc.grantNumber?.grantNumberMech;
@@ -219,6 +221,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       fsCritera.fyFrom = sc.fyRange?.fromFy;
       fsCritera.fyTo = sc.fyRange?.toFy;
       fsCritera.fsStatus = sc.fundingPlanStatus;
+      fsCritera.approverRoleCode = sc.fundingPlanApproverRole;
+      fsCritera.pendingApprovalStatusOnly = sc.pendingApprovalStatusOnly;
       fsCritera.institution = sc.institutionName;
       fsCritera.ncabFrom = sc.ncabRange?.fromNcab;
       fsCritera.ncabTo = sc.ncabRange?.toNcab;

@@ -52,7 +52,9 @@
       *ngIf="parentForm.errors?.pdNameRequired && (parentForm.submitted || parentForm.touched)">
       PD is required
     </div>
-
+    <ngb-alert type="warning" [dismissible]="true" *ngIf="payType4K99R00Conversion()">
+      <b>WARNING:</b> Select the PD who will be assigned to the R00, NOT the PD assigned to the K99.
+    </ngb-alert>  
   </div>
 
   <div class="col-md-4 col-lg-4">
@@ -66,6 +68,24 @@
 
   <div class="col-md-2 col-lg-4" *ngIf="type4Selected()">
     <app-type4-conversion-mechanism [parentForm]="parentForm"></app-type4-conversion-mechanism>
+  </div>
+
+  <div class="col-md-2 col-lg-4" *ngIf="showFpcSelect()">
+    <label for="policy-cut">Funding Policy Cut</label>
+    <ng-select2
+    id="policy-cut"
+    name="fundingPolicyCut"
+    #fundingPolicyCut="ngModel"
+    [(ngModel)]="selectedFundingPolicyCut"
+    [allowClear]="true"
+    [data]="fundingPolicyCutCodes"
+    required>
+    </ng-select2>
+    <div
+      class="text-danger mt-1"
+      *ngIf="fundingPolicyCut.errors?.required && (fundingPolicyCut.touched || parentForm?.submitted)">
+      Funding Policy Cut is required
+    </div>
   </div>
 
 </div><!-- END Row -->

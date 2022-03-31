@@ -4,7 +4,7 @@ import { FsRequestControllerService, NciPfrGrantQueryDto } from '@cbiit/i2ecws-l
 import { isArray } from 'rxjs/internal-compatibility';
 import { NGXLogger } from 'ngx-logger';
 import { FundingRequestValidationService } from '../../model/request/funding-request-validation-service';
-import { FundingRequestTypes } from '../../model/request/funding-request-types';
+import { FundingRequestTypes, FUNDING_POLICY_CUT_TYPES } from '../../model/request/funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
 import { ControlContainer, NgForm } from '@angular/forms';
 import { CancerActivitiesDropdownComponent } from '@cbiit/i2ecui-lib';
@@ -26,6 +26,11 @@ export class RequestInformationComponent implements OnInit {
   pdCayCodes: string[] = [];
 
   myAlerts: Alert[] = [];
+
+  fundingPolicyCutCodes = [
+    {id: 'Standard', text: 'Standard'},
+    {id: 'Other', text: 'Other'}
+  ];
 
   get selectedRequestType(): number {
     return this.requestModel.requestDto.financialInfoDto.requestTypeId || null;
@@ -161,6 +166,13 @@ export class RequestInformationComponent implements OnInit {
 
   onType4Change(value: string): void {
     const conversionActivityCode = ConversionActivityCodes.includes(value) ? value : null;
+    if ( value === 'R00'
+        && Number(this.requestModel.requestDto.financialInfoDto.requestTypeId) === Number(FundingRequestTypes.PAY_TYPE_4)
+        && this.requestModel.grant.activityCode === 'K99' ) {
+          this.logger.debug('Selected K99 to R00 conversion for Pay Type 4');
+          this.requestModel.requestDto.financialInfoDto.requestorNpnId = undefined;
+          this.parentForm.controls['pdName'].setValue(null);
+    }
     if (this.requestModel.requestDto.financialInfoDto.requestTypeId) {
       this.refreshFundingSources(
         this.requestModel.requestDto.financialInfoDto.requestTypeId,
@@ -168,4 +180,23 @@ export class RequestInformationComponent implements OnInit {
         this.requestModel.requestDto.financialInfoDto.requestorCayCode);
     }
   }
+
+  payType4K99R00Conversion(): boolean {
+    return Number(this.requestModel.requestDto.financialInfoDto.requestTypeId) === FundingRequestTypes.PAY_TYPE_4
+           && this.requestModel.grant.activityCode === 'K99'
+           && this.requestModel.requestDto.conversionActivityCode === 'R00';
+  }
+
+  get selectedFundingPolicyCut(): string {
+    return this.requestModel.requestDto.financialInfoDto.fundingPolicyCut;
+  }
+
+  set selectedFundingPolicyCut(value: string) {
+    this.requestModel.requestDto.financialInfoDto.fundingPolicyCut = value;
+  }
+
+  showFpcSelect(): boolean {
+    return FUNDING_POLICY_CUT_TYPES.includes(Number(this.selectedRequestType));
+  }
+
 }
