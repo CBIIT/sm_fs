@@ -1,7 +1,6 @@
-import {Component, Input, OnInit, Output} from '@angular/core';
-import {Subject} from "rxjs";
-import {SelectGrantCheckboxEventType} from "../../funding-plan/plan-step1/select-grant-checkbox-cell-renderer/select-grant-checkbox-event-type";
-import {FundingRequestPermDelDto} from "@cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
+import { Component, Input, OnInit, Output } from '@angular/core';
+import { Subject } from "rxjs";
+import { FundingRequestPermDelDto } from "@cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
 
 @Component({
   selector: 'app-designee-action-cell-renderer',

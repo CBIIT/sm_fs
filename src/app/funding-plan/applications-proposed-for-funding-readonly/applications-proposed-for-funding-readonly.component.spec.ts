@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ApplicationsProposedForFundingReadonlyComponent } from './applications-proposed-for-funding-readonly.component';
+import {
+  ApplicationsProposedForFundingReadonlyComponent
+} from './applications-proposed-for-funding-readonly.component';
 
 describe('ApplicationsProposedForFundingReadonlyComponent', () => {
   let component: ApplicationsProposedForFundingReadonlyComponent;

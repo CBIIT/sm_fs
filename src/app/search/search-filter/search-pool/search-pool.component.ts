@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import 'select2';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { NGXLogger } from 'ngx-logger';

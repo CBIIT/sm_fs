@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {FundingRequestErrorCodes} from './funding-request-error-codes';
-import {Subject} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { FundingRequestErrorCodes } from './funding-request-error-codes';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'

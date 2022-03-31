@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { CanCcxDto, FundingPlanDto, FundingRequestCanDto } from '@cbiit/i2ecws-lib';
-import { AppPropertiesService } from '../../service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { NciPfrGrantQueryDtoEx, orderByPriorityAndPI } from './nci-pfr-grant-query-dto-ex';
 import { RfaPaNcabDate } from '@cbiit/i2ecws-lib/model/rfaPaNcabDate';
 import { NGXLogger } from 'ngx-logger';
 import { Alert } from 'src/app/alert-billboard/alert';
-import { CustomServerLoggingService } from 'src/app/logging/custom-server-logging-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +44,8 @@ export class PlanModel {
     this.yourgrantsUrl = propertiesService.getProperty('URL_YOURGRANTS');
     this.eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this.catsConceptUrl = propertiesService.getProperty('CONCEPT_ID_URL');
+
+    this.customLogger.info(`Properties: ${this.grantViewerUrl}, ${this.yourgrantsUrl}, ${this.eGrantsUrl}, ${this.catsConceptUrl}`);
 
   }
 

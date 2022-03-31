@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
-import { AppPropertiesService } from '../service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { FsRequestControllerService, NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';

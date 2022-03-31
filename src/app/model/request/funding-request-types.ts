@@ -1,5 +1,3 @@
-import { FundingSourceTypes } from './funding-source-types';
-
 export enum FundingRequestTypes {
   PAY_BY_EXCEPTION = 2,
   PAY_BY_EXCEPTION__WITHIN_DOC_EXCEPTION_SELECTIONS = 3,

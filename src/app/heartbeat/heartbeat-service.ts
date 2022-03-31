@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HeartbeatControllerService } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
-import { AppPropertiesService } from '../service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 
 @Injectable({
   providedIn: 'root'

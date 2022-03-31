@@ -3,7 +3,7 @@ import { NGXLogger, NgxLoggerLevel } from 'ngx-logger';
 import { NgxLoggerControllerService, NgxPayload } from '@cbiit/i2ecws-lib';
 import { UserService } from '@cbiit/i2ecui-lib';
 import { Router } from '@angular/router';
-import { HeartbeatService } from '../heartbeat/heartbeat-service';
+import { HeartbeatService } from '@cbiit/i2ecui-lib';
 import { PROPERTIES_APP_NAME, PROPERTIES_ENVIRONMENT } from '../service/app-properties.service';
 
 @Injectable({

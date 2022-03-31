@@ -1,5 +1,5 @@
-import {Component, Inject, isDevMode} from '@angular/core';
-import {Router} from '@angular/router';
+import { Component, isDevMode } from '@angular/core';
+import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { environment } from 'src/environments/environment';
 

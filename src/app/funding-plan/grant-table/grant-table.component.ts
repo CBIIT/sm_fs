@@ -1,9 +1,15 @@
 import { AfterViewInit, Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { PlanModel } from '../../model/plan/plan-model';
 import { DataTableDirective } from 'angular-datatables';
-import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
-import { CancerActivityCellRendererComponent } from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
-import { ExistingRequestsCellRendererComponent } from '../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
+import {
+  FullGrantNumberCellRendererComponent
+} from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+import {
+  CancerActivityCellRendererComponent
+} from '../../table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
+import {
+  ExistingRequestsCellRendererComponent
+} from '../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { Subject } from 'rxjs';
 

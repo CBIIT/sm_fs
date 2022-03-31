@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AppPropertiesService } from '../service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',

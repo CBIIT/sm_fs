@@ -18,8 +18,8 @@ import { PlanStep3Component } from './funding-plan/plan-step3/plan-step3.compone
 import { PlanStep4Component } from './funding-plan/plan-step4/plan-step4.component';
 import { PlanStep5Component } from './funding-plan/plan-step5/plan-step5.component';
 import { PlanStep6Component } from './funding-plan/plan-step6/plan-step6.component';
-import {CanDeactivatePlanStep1} from './funding-plan/plan-step1/can-deactivate-plan-step1';
-import {ManageDesignationsComponent} from './manage-designations/manage-designations.component';
+import { CanDeactivatePlanStep1 } from './funding-plan/plan-step1/can-deactivate-plan-step1';
+import { ManageDesignationsComponent } from './manage-designations/manage-designations.component';
 import { RetrievePlanComponent } from './funding-plan/retrieve-plan/retrieve-plan.component';
 import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate-plan-step6';
 import { CanDeactivateRequestStep2 } from './funding-request/step2/can-deactivate-request-step2';

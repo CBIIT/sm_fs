@@ -4,7 +4,7 @@ import { RequestModel } from 'src/app/model/request/request-model';
 import { DocumentService } from 'src/app/service/document.service';
 import { saveAs } from 'file-saver';
 import { NGXLogger } from 'ngx-logger';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Step4Component } from '../step4/step4.component';
 import { DocumentsDto } from '@cbiit/i2ecws-lib';
 import { DocTypeConstants } from '../step3/step3.component';

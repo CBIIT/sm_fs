@@ -10,9 +10,9 @@ import { NgForm } from '@angular/forms';
 import { RequestApproverService } from '../approver/approver.service';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 import { PrcLineItemType } from '../../program-recommended-costs/prc-data-point';
-import SubmitEvent = JQuery.SubmitEvent;
 import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
 import { DocumentService } from '../../service/document.service';
+import SubmitEvent = JQuery.SubmitEvent;
 
 @Component({
   selector: 'app-step2',

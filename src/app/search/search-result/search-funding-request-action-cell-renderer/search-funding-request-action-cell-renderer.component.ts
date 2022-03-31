@@ -1,5 +1,5 @@
-import {Component, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {Subject} from "rxjs";
+import { Component, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Subject } from "rxjs";
 
 @Component({
   selector: 'app-search-funding-request-action-cell-renderer',

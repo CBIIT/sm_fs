@@ -1,5 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {convertNcabs} from "../../../utils/utils";
+import { Component, Input, OnInit } from '@angular/core';
+import { convertNcabs } from "../../../utils/utils";
 
 @Component({
   selector: 'app-search-funding-plan-foas-cell-renderer',

@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {RequestModel} from '../model/request/request-model';
-import {NciPfrGrantQueryDto} from '@cbiit/i2ecws-lib';
-import {AppPropertiesService} from '../service/app-properties.service';
+import { Component, OnInit } from '@angular/core';
+import { RequestModel } from '../model/request/request-model';
+import { NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 
 @Component({
   selector: 'app-grant-information',

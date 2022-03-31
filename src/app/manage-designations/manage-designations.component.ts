@@ -1,24 +1,20 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { DatepickerFormatter } from '../datepicker/datepicker-adapter-formatter';
+import { NGXLogger } from 'ngx-logger';
+import { DataTableDirective } from 'angular-datatables';
+import { Subject } from 'rxjs';
+import { NgForm } from '@angular/forms';
+import { FsDesigneeControllerService } from '@cbiit/i2ecws-lib';
+import { AppUserSessionService } from '../service/app-user-session.service';
+import { DesigneeCellRendererComponent } from './designee-cell-renderer/designee-cell-renderer.component';
 import {
-  NgbCalendar,
-  NgbDate,
-  NgbDateParserFormatter,
-  NgbDateStruct,
-  NgbModal
-} from '@ng-bootstrap/ng-bootstrap';
-import {DatepickerFormatter} from '../datepicker/datepicker-adapter-formatter';
-import {NGXLogger} from 'ngx-logger';
-import {DataTableDirective} from 'angular-datatables';
-import {Subject} from 'rxjs';
-import {NgForm} from '@angular/forms';
-import {FsDesigneeControllerService} from '@cbiit/i2ecws-lib';
-import {AppUserSessionService} from '../service/app-user-session.service';
-import {DesigneeCellRendererComponent} from './designee-cell-renderer/designee-cell-renderer.component';
-import {DesigneeActionCellRendererComponent} from './designee-action-cell-renderer/designee-action-cell-renderer.component';
-import {EditDesigneeModalComponent} from './edit-designee-modal/edit-designee-modal.component';
-import {FundingRequestPermDelDto} from '@cbiit/i2ecws-lib/model/fundingRequestPermDelDto';
-import {Options} from 'select2';
-import {ConfirmDeleteModalComponent} from './confirm-delete-modal/confirm-delete-modal.component';
+  DesigneeActionCellRendererComponent
+} from './designee-action-cell-renderer/designee-action-cell-renderer.component';
+import { EditDesigneeModalComponent } from './edit-designee-modal/edit-designee-modal.component';
+import { FundingRequestPermDelDto } from '@cbiit/i2ecws-lib/model/fundingRequestPermDelDto';
+import { Options } from 'select2';
+import { ConfirmDeleteModalComponent } from './confirm-delete-modal/confirm-delete-modal.component';
 
 @Component({
   selector: 'app-manage-designations',

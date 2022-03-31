@@ -4,13 +4,12 @@ import {
   FsCanControllerService,
   FundingRequestCanDisplayDto,
   FundingRequestCanDto,
-  FundingRequestGrantCanDto,
   OefiaCodingDto
 } from '@cbiit/i2ecws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { Observable, Subject } from 'rxjs';
 import { PlanModel } from '../model/plan/plan-model';
-import { CustomServerLoggingService } from '../logging/custom-server-logging-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 import { isNumeric } from '../utils/utils';
 
 @Injectable({

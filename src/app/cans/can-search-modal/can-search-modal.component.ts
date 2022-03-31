@@ -1,9 +1,9 @@
-import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { CanCcxDto, WorkflowTaskDto } from '@cbiit/i2ecws-lib';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { CanCcxDto } from '@cbiit/i2ecws-lib';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanManagementService } from '../can-management.service';
-import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 
 @Component({
   selector: 'app-can-search-modal',

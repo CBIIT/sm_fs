@@ -1,11 +1,11 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
-import {Subscription} from 'rxjs';
-import {RequestModel} from '../model/request/request-model';
-import {GrantsSearchFilterService} from './grants-search/grants-search-filter.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { RequestModel } from '../model/request/request-model';
+import { GrantsSearchFilterService } from './grants-search/grants-search-filter.service';
 import { NavigationStepModel } from './step-indicator/navigation-step.model';
 import { Step4Component } from './step4/step4.component';
-import {NavigationModel} from '../model/navigation-model';
+import { NavigationModel } from '../model/navigation-model';
 
 @Component({
   selector: 'app-funding-request',

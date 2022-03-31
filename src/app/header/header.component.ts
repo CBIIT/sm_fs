@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AppPropertiesService } from '../service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from '../service/app-user-session.service';
 
 @Component({

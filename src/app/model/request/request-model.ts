@@ -7,7 +7,7 @@ import {
   FundingRequestDto,
   NciPfrGrantQueryDto
 } from '@cbiit/i2ecws-lib';
-import { AppPropertiesService } from '../../service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { FundingRequestErrorCodes } from './funding-request-error-codes';
 import { ProgramRecommendedCostsModel } from '../../program-recommended-costs/program-recommended-costs-model';
 import { FundingSourceTypes } from './funding-source-types';
@@ -17,7 +17,7 @@ import { PrcBaselineSource, PrcDataPoint } from '../../program-recommended-costs
 import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
 import { getCurrentFiscalYear } from 'src/app/utils/utils';
 import { Subject } from 'rxjs';
-import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 
 
 @Injectable({

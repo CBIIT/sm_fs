@@ -28,7 +28,7 @@ import { PlanApproverService } from '../approver/plan-approver.service';
 import { CanManagementService } from '../../cans/can-management.service';
 import { Alert } from '../../alert-billboard/alert';
 import { FundingSourceGrantDataPayload } from '../applications-proposed-for-funding/funding-source-grant-data-payload';
-import { CustomServerLoggingService } from '../../logging/custom-server-logging-service';
+import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({

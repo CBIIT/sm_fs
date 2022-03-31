@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { environment } from '../../environments/environment';
-import { AppPropertiesService } from '../service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 
 @Component({
   selector: 'app-unauthorize',

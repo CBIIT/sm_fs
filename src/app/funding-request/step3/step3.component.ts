@@ -3,18 +3,26 @@ import { Router } from '@angular/router';
 import 'select2';
 import { Options } from 'select2';
 import {
-  CgRefCodControllerService, CgRefCodesDto, DocumentsDto, NciPfrGrantQueryDto,
-  FsRequestControllerService, FsDocOrderControllerService, FundingRequestDocOrderDto, DocumentsControllerService,
-  ApplAdminSuppRoutingsDto, UserControllerService, FundingRequestDto
+  ApplAdminSuppRoutingsDto,
+  CgRefCodControllerService,
+  CgRefCodesDto,
+  DocumentsControllerService,
+  DocumentsDto,
+  FsDocOrderControllerService,
+  FsRequestControllerService,
+  FundingRequestDocOrderDto,
+  FundingRequestDto,
+  NciPfrGrantQueryDto,
+  UserControllerService
 } from '@cbiit/i2ecws-lib';
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request/request-model';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { saveAs } from 'file-saver';
-import { of, Observable, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { formatDate } from '@angular/common';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';

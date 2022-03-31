@@ -1,13 +1,13 @@
-import {Component, OnInit, Output, ViewChild, EventEmitter, AfterViewInit, Input} from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { GrantnumberSearchCriteriaComponent } from '@cbiit/i2ecui-lib';
 import { SearchCriteria } from '../search-criteria';
 import { NGXLogger } from 'ngx-logger';
-import {AppUserSessionService} from "../../service/app-user-session.service";
-import {NgForm} from "@angular/forms";
-import {Select2OptionData} from "ng-select2";
-import {Options} from "select2";
-import {SearchModel} from "../model/search-model";
-import {ActivatedRoute} from "@angular/router";
+import { AppUserSessionService } from "../../service/app-user-session.service";
+import { NgForm } from "@angular/forms";
+import { Select2OptionData } from "ng-select2";
+import { Options } from "select2";
+import { SearchModel } from "../model/search-model";
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
   selector: 'app-search-filter',

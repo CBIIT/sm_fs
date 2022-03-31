@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpRequest, HttpEvent } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DocumentsControllerService, DocumentsDto , FundSelectSearchCriteria , FsDocOrderControllerService }from '@cbiit/i2ecws-lib';
+import { DocumentsControllerService, DocumentsDto, FsDocOrderControllerService } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Injectable({

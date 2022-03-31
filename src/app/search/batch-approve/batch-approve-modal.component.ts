@@ -1,13 +1,26 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ApprovedPlan, BatchApprovalDto, FsPlanWorkflowControllerService,
-  FsWorkflowControllerService, FundingPlanQueryDto, FundingRequestQueryDto } from '@cbiit/i2ecws-lib';
-import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import {
+  ApprovedPlan,
+  BatchApprovalDto,
+  FsPlanWorkflowControllerService,
+  FsWorkflowControllerService,
+  FundingPlanQueryDto,
+  FundingRequestQueryDto
+} from '@cbiit/i2ecws-lib';
+import {
+  NgbCalendar,
+  NgbDate,
+  NgbDateParserFormatter,
+  NgbDateStruct,
+  NgbModal,
+  NgbModalRef
+} from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { Alert } from 'src/app/alert-billboard/alert';
 import { DatepickerFormatter } from 'src/app/datepicker/datepicker-adapter-formatter';
-import { AppPropertiesService } from 'src/app/service/app-properties.service';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { BatchApproveService } from './batch-approve.service';
 

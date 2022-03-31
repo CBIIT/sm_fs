@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, Output} from '@angular/core';
-import {Subject} from "rxjs";
+import { Component, Input, OnInit, Output } from '@angular/core';
+import { Subject } from "rxjs";
 
 @Component({
   selector: 'app-search-grant-exist-in-request-cell-renderer',

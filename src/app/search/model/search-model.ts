@@ -1,7 +1,7 @@
-import {Injectable} from "@angular/core";
-import {SearchCriteria} from "../search-criteria";
-import {getCurrentFiscalYear} from "../../utils/utils";
-import {NGXLogger} from "ngx-logger";
+import { Injectable } from "@angular/core";
+import { SearchCriteria } from "../search-criteria";
+import { getCurrentFiscalYear } from "../../utils/utils";
+import { NGXLogger } from "ngx-logger";
 
 @Injectable({
   providedIn: 'root'

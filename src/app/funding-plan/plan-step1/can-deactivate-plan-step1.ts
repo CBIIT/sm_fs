@@ -1,4 +1,4 @@
-import {ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
 import { PlanStep1Component } from './plan-step1.component';
 import { Injectable } from '@angular/core';
 
