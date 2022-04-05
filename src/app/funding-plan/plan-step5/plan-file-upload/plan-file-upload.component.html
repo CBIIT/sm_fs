@@ -27,7 +27,9 @@
                     file</label>
             </div>
         </div>
-        <a *ngIf="templateType !== 'Other'" [routerLink]="[]" (click)="downloadTemplate(templateType)" > Download Template</a>
+        <div style="margin-top:10px;">
+            <a *ngIf="templateType !== 'Other'"  [routerLink]="[]" (click)="downloadTemplate(templateType)" > Download Template</a>
+        </div>
     </div>
     <div class="col-sm-auto">
         <button type="button" class="btn btn-primary" [disabled]="!selectedFiles" (click)="uploadFiles()">Upload</button>
