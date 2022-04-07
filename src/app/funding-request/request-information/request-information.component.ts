@@ -57,11 +57,10 @@ export class RequestInformationComponent implements OnInit {
       return;
     }
     this.fsRequestControllerService.getFundingSources(
-      requestType,
       this.requestModel.grant.fullGrantNum,
-      this.requestModel.requestDto.fy,
       this.requestModel.requestDto.financialInfoDto.requestorNpnId,
-      // TODO: Revisit this logic
+      requestType,
+      this.requestModel.requestDto.fy,
       cayCode,
       conversionActivityCode).subscribe(result => {
       this.requestModel.programRecommendedCostsModel.fundingSources = result;

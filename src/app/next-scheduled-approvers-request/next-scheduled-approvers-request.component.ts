@@ -177,8 +177,8 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   saveAdditionalApprover(user: any): void {
     this.workflowControllerService.saveAdditionalApprover(
-      this.userSessionService.getLoggedOnUser().nihNetworkId,
       this.requestModel.requestDto.frqId,
+      this.userSessionService.getLoggedOnUser().nihNetworkId,
       user.nciLdapCn).subscribe(
       (result) => { this.processApproversResult(result); },
       (error) => {

@@ -81,10 +81,10 @@ export class FundingSourceComponent implements OnInit {
     //   ', conversionMech =', conversionActivityCode,
     //   ', cayCode =', cayCode);
     this.fsRequestControllerService.getFundingSources(
-      this.requestModel.requestDto.frtId,
       this.requestModel.grant.fullGrantNum,
-      this.requestModel.requestDto.fy,
       this.requestModel.requestDto.financialInfoDto.requestorNpnId,
+      this.requestModel.requestDto.frtId,
+      this.requestModel.requestDto.fy,
       cayCode,
       conversionActivityCode).subscribe(result => {
       this.requestModel.programRecommendedCostsModel.fundingSources = result;

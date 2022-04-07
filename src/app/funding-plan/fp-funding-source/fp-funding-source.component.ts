@@ -99,7 +99,7 @@ export class FpFundingSourceComponent implements OnInit {
       return;
     }
     const tmp: Select2OptionData[] = [];
-    this.planControllerService.getFundingPlanFundingSources(ca, this.fy, pd, this.rfaPaNumber).subscribe(result => {
+    this.planControllerService.getFundingPlanFundingSources(this.rfaPaNumber, pd, ca, this.fy).subscribe(result => {
       this.planCoordinatorService.fundingSourceListEmitter.next(result);
       this.fundingSourceDetailsMap = new Map(result.map(item => [item.fundingSourceId, item]));
       result.forEach(s => {
