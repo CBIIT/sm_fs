@@ -143,7 +143,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   checkInFlightPfr(): void {
     this.inFlightSkipped = [];
     this.inFlightProposed = [];
-    this.fsPlanControllerService.getInFlightPFRsUsingGET(this.fprId).subscribe(
+    this.fsPlanControllerService.getInFlightPFRs(this.fprId).subscribe(
       result => {
         result.forEach( r => {
           if (this.isSkip(r)) {
@@ -302,7 +302,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   deleteRequest(): void {
     if (confirm('Are you sure you want to delete this funding plan?')) {
       this.logger.debug('Call deletePlan API for FprId=' + this.fprId);
-      this.fsPlanWorkflowControllerService.deletePlanUsingDELETE(this.fprId).subscribe(
+      this.fsPlanWorkflowControllerService.deletePlan(this.fprId).subscribe(
         result => {
           this.logger.debug('Funding plan was deleted: ', result);
           // TODO: Plan management service also needs to be reset
@@ -325,7 +325,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   }
 
   submitRequest(): void {
-    this.cancerActivityService.getActiveReferralCaAssignRulesUsingGET('Y').subscribe(
+    this.cancerActivityService.getActiveReferralCaAssignRules('Y').subscribe(
       result => {
         const activeCayCodes: string[] = result.map(ra => ra.caCode);
         if (activeCayCodes.includes(this.planModel.fundingPlanDto.cayCode) ) {
@@ -356,14 +356,14 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
       });
     }
     this.logger.debug('Submit Funding Plan, workflowDto is ', dto);
-    this.fsPlanWorkflowControllerService.submitPlanWorkflowUsingPOST(dto).subscribe(
+    this.fsPlanWorkflowControllerService.submitPlanWorkflow(dto).subscribe(
       (result) => {
         this.logger.debug('Submit Request result: ', result);
         this.workflowModel.initializeForPlan(this.fprId);
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
       },
       (error) => {
-        this.logger.error('Failed when calling submitRequestUsingPOST', error);
+        this.logger.error('Failed when calling submitRequest', error);
         this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       });
   }

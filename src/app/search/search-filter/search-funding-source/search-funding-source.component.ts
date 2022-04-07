@@ -36,7 +36,7 @@ export class SearchFundingSourceComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.fsLookupControllerService.getFundingSourcesNameDetailsUsingGET().subscribe(
+    this.fsLookupControllerService.getFundingSourcesNameDetails().subscribe(
       result => {
         const dropdownList: Array<Select2OptionData> = [];
         for (const entry of result) {

@@ -40,7 +40,7 @@ export class SearchFundingRequestTypeComponent implements OnInit, AfterViewInit 
     this.options = {
     };
 
-    this.fsLookupControllerService.getSearchRequestTypesUsingGET().subscribe(
+    this.fsLookupControllerService.getSearchRequestTypes().subscribe(
       result => {
         this.requestTypes = result;
         this.prepareData(this.requestTypes);

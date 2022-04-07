@@ -158,7 +158,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
   }
 
   initDesigneeList(): void {
-    this.designeeService.getAllApproverDesigneesUsingGET(this.userSessionService.getLoggedOnUser().nihNetworkId).subscribe(
+    this.designeeService.getAllApproverDesignees(this.userSessionService.getLoggedOnUser().nihNetworkId).subscribe(
       (result: Array<FundingRequestPermDelDto>) => {
         this.logger.debug('Get designees for user: ', result);
         this.dtData = result;
@@ -211,7 +211,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
     const fromDate: string = this.formatDate(this.newDesigneeForm.value.startDate);
     const toDate: string = this.formatDate(this.newDesigneeForm.value.endDate);
     const designeeTo = this.newDesigneeForm.value.name;
-    this.designeeService.createDesigneeUsingPOST(
+    this.designeeService.createDesignee(
       fromDate, toDate, this.userSessionService.getLoggedOnUser().nihNetworkId, designeeTo).subscribe(
       result => {
         this.updateDesigneeTable(result);
@@ -259,7 +259,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       modalRef.componentInstance.data = entry;
       modalRef.result.then((updatedData: any) => {
         this.logger.debug('Result: ', updatedData);
-        this.designeeService.updateDesigneeUsingPUT(updatedData.startDate, updatedData.endDate, updatedData.id).subscribe(
+        this.designeeService.updateDesignee(updatedData.startDate, updatedData.endDate, updatedData.id).subscribe(
           result => {
             this.updateDesigneeTable(result);
             this.successManageDesigneesMsg = 'Designation date(s) have been updated successfully.';
@@ -285,7 +285,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       modalRef.componentInstance.data = entry;
       modalRef.result.then((updatedData: any) => {
         this.logger.debug('Result: ', updatedData);
-        this.designeeService.deleteDesigneeUsingDELETE($event).subscribe(
+        this.designeeService.deleteDesignee($event).subscribe(
           result => {
             this.updateDesigneeTable(result);
             this.newDesigneeForm.resetForm();
@@ -301,7 +301,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
   }
 
   onReactiveDesignee($event: number): void {
-    this.designeeService.activateDesigneeUsingPUT($event).subscribe(
+    this.designeeService.activateDesignee($event).subscribe(
       result => {
         this.updateDesigneeTable(result);
         this.successManageDesigneesMsg = 'Designee information has been updated successfully.';

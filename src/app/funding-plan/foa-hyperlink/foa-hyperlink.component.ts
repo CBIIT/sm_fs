@@ -18,11 +18,11 @@ export class FoaHyperlinkComponent implements OnInit {
 
   ngOnInit(): void {
     if (!!this.foaNumber) {
-      this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(this.foaNumber).subscribe(result => {
+      this.rfaService.getRfaPaNoticeByNoticeNumber(this.foaNumber).subscribe(result => {
         if (result?.nihGuideAddr) {
           this.nihGuideAddr = result.nihGuideAddr;
         } else {
-          this.lookupService.getNihGuideAddrUsingGET(this.foaNumber).subscribe(res => {
+          this.lookupService.getNihGuideAddr(this.foaNumber).subscribe(res => {
             if (res && res.nihGuideAddr) {
               this.nihGuideAddr = res.nihGuideAddr;
             } else {

@@ -319,7 +319,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
     this._restoreFromModel();
     this.grantSelectionTooltip();
 
-    this.fsPlanControllerService.getRfaPaListUsingGET().subscribe(
+    this.fsPlanControllerService.getRfaPaList().subscribe(
       (result: Array<FundingPlanRfaPaDto>) => {
         const tmp: Array<Select2OptionData> = [];
 
@@ -645,7 +645,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
       const criteria: FundingPlanGrantSearchCriteria = {};
       criteria.rfaPaNcabDates = this._cloneToRfaPaNcabDates();
 
-      this.fsPlanControllerService.searchFundingPlanGrantsUsingPOST(criteria).subscribe(
+      this.fsPlanControllerService.searchFundingPlanGrants(criteria).subscribe(
         (result: GrantsSearchResultDatatableDto) => {
           this.dtData = result.data;
           this._calculateNotSelectableRfaPasFlags(result.data);

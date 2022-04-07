@@ -120,9 +120,9 @@ export class WorkflowModalComponent implements OnInit {
 
   invokeRestApi(dto: WorkflowTaskDto): Observable<any> {
     if (this.requestOrPlan === 'REQUEST') {
-      return this.fsWorkflowService.submitWorkflowUsingPOST(dto);
+      return this.fsWorkflowService.submitWorkflow(dto);
     } else {
-      return this.fsPlanWorkflowService.submitPlanWorkflowUsingPOST(dto);
+      return this.fsPlanWorkflowService.submitPlanWorkflow(dto);
     }
   }
 

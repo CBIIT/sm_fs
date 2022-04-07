@@ -19,7 +19,7 @@ export class BatchApproveService {
     this.frqIds = [];
     this.doc = false;
     this.spl = false;
-    this.searchController.getWaitingDocSplApprovalsUsingGET(this.userService.getLoggedOnUser().nihNetworkId).subscribe(
+    this.searchController.getWaitingDocSplApprovals(this.userService.getLoggedOnUser().nihNetworkId).subscribe(
       result => {
         this.frqIds = result.filter( dto => dto.frqId > 0 ).map( dto => dto.frqId);
         this.fprIds = result.filter( dto => dto.fprId > 0 ).map( dto => dto.fprId);

@@ -44,7 +44,7 @@ export class FsMenuComponent implements OnInit {
     this.pd = this.userSessionService.isPD();
     this.pa = this.userSessionService.isPA();
 
-    this.paylistControllerService.getPaylistPendingGrantsCountUsingGET().subscribe(
+    this.paylistControllerService.getPaylistPendingGrantsCount().subscribe(
       (result) => {
         this.pendingGrantsCount = result;
       },

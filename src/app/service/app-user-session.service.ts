@@ -31,7 +31,7 @@ export class AppUserSessionService {
           result.authorities.forEach(authority => {
             this.roles.push(authority.authority);
           });
-          this.caService.getCasForPdUsingGET(this.loggedOnUser.npnId, true).subscribe(
+          this.caService.getCasForPd(this.loggedOnUser.npnId, true).subscribe(
             (caresult) => {
               this.userCancerActivities = caresult;
               this.isMbOnly = (caresult && caresult.length === 1 && caresult[0].code === 'MB');

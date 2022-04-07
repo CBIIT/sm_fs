@@ -216,10 +216,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   fetchCompletedPfr(): void {
     if (this.workflowModel.isUserNextInChain && this.workflowModel.lastInChain) {
-      this.planService.getCompletedPFRsUsingGET(this.planModel.fundingPlanDto.fprId).subscribe(
+      this.planService.getCompletedPFRs(this.planModel.fundingPlanDto.fprId).subscribe(
         result => this.completedPfrs = result,
         error => {
-          this.logger.error('calling getCompletedPFRsUsingGET failed ', error);
+          this.logger.error('calling getCompletedPFRs failed ', error);
         }
       );
     }
@@ -388,7 +388,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     }
 
     this.logger.info('Workflow DTO for submission is ', dto);
-    this.workflowService.submitPlanWorkflowUsingPOST(dto).subscribe(
+    this.workflowService.submitPlanWorkflow(dto).subscribe(
       (result) => {
         this.logger.info('submit workflow returned okay ', result);
         this.planManagementService.planBudgetReadOnlyEmitter.next(true);

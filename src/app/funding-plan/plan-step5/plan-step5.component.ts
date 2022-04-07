@@ -79,7 +79,7 @@ export class PlanStep5Component implements OnInit {
     for (let i = 0; i < this.selectedGrants.length; i++) {
       this.applIds.push(this.selectedGrants[i].applId);
     }
-    this.planControllerService.retrievePreviouslySkippedGrantsUsingGET(this.applIds).subscribe(
+    this.planControllerService.retrievePreviouslySkippedGrants(this.applIds).subscribe(
       result => {
         this.grantsSkippedPreviouslyDto = result;
       }, error => {
@@ -231,7 +231,7 @@ export class PlanStep5Component implements OnInit {
   nextStep(): void {
 
     if (this.validate()) {
-      this.documentsControllerService.loadDocumentsUsingGET(this.planModel.fundingPlanDto.fprId, "PFRP").subscribe(
+      this.documentsControllerService.loadDocuments(this.planModel.fundingPlanDto.fprId, "PFRP").subscribe(
         result => {
           this.planModel.fundingPlanDto.documents = result;
           this.router.navigate(['/plan/step6']);

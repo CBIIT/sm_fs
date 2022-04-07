@@ -21,7 +21,7 @@ export class SearchRfaPaDropdownComponent implements OnInit {
   options: Options = {};
 
   ngOnInit(): void {
-    this.caService.getRfaPaNoticesListUsingGET().subscribe(
+    this.caService.getRfaPaNoticesList().subscribe(
       result => {
         const rfapaResults: Array<Select2OptionData> = [];
         for (const entry of result) {

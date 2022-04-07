@@ -659,7 +659,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     $this.loaderService.show();
     $this.searchCriteria.params = dataTablesParameters;
     $this.logger.debug('Search for Funding Requests parameters:', $this.searchCriteria);
-    $this.fsSearchControllerService.searchFundingRequestsUsingPOST(
+    $this.fsSearchControllerService.searchFundingRequests(
       $this.searchCriteria).subscribe(
       result => {
         $this.showFundingRequestResult = true;
@@ -700,7 +700,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     $this.loaderService.show();
     $this.searchCriteria.params = dataTablesParameters;
     $this.logger.debug('Search Funding Plans parameters:', $this.searchCriteria);
-    $this.fsSearchControllerService.searchFundingPlansUsingPOST(
+    $this.fsSearchControllerService.searchFundingPlans(
       $this.searchCriteria).subscribe(
       result => {
         $this.showFundingPlanResult = true;
@@ -734,7 +734,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
     $this.loaderService.show();
     $this.searchCriteria.params = dataTablesParameters;
     $this.logger.debug('Search for Grants parameters:', $this.searchCriteria);
-    $this.fsSearchControllerService.searchFsGrantsUsingPOST(
+    $this.fsSearchControllerService.searchFsGrants(
       $this.searchCriteria).subscribe(
       result => {
         $this.showGrantResult = true;

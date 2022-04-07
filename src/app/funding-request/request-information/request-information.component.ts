@@ -56,7 +56,7 @@ export class RequestInformationComponent implements OnInit {
       this.logger.warn('Not refreshing funding sources: missing type or cayCode');
       return;
     }
-    this.fsRequestControllerService.getFundingSourcesUsingGET(
+    this.fsRequestControllerService.getFundingSources(
       requestType,
       this.requestModel.grant.fullGrantNum,
       this.requestModel.requestDto.fy,

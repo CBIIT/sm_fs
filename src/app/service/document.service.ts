@@ -34,7 +34,7 @@ export class DocumentService {
   }
 
   getFiles(keyId: number, keyType: string): Observable<DocumentsDto[]> {
-    return this.documentsControllerService.loadDocumentsUsingGET(keyId, keyType);
+    return this.documentsControllerService.loadDocuments(keyId, keyType);
   }
 
   downloadById(uuid: number) {
@@ -55,12 +55,12 @@ export class DocumentService {
   }
 
   deleteDocById(id: number) {
-    return this.documentsControllerService.deleteDocumentUsingPOST(id);
+    return this.documentsControllerService.deleteDocument(id);
   }
 
   getLatestFile(keyId: number, keyType: string): Observable<DocumentsDto> {
     this.logger.debug('Step3 latest files for (keyId, KeyType): ', '(' + keyId + ',' + keyType + ')');
-    return this.documentsControllerService.loadLatestDocumentUsingGET(keyId, keyType);
+    return this.documentsControllerService.loadLatestDocument(keyId, keyType);
   }
 
   downLoadFrqPackage(frqId: number, applId: number) {
@@ -71,7 +71,7 @@ export class DocumentService {
 
   getFSBudgetFiles(keyId: number, keyType: string): Observable<Array<DocumentsDto>> {
     this.logger.debug('Step3 budget files for (keyId, KeyType): ', '(' + keyId + ',' + keyType + ')');
-    return this.documentsControllerService.loadFsFinanceDocumentsUsingGET(keyId, keyType);
+    return this.documentsControllerService.loadFsFinanceDocuments(keyId, keyType);
   }
 
   downloadSupplementAppDoc(suppApplId: number) {
@@ -127,7 +127,7 @@ export class DocumentService {
                 result => {
                   this.logger.info('Delete Success');
                   if (result.id !== null) {
-                    this.fsDocOrderControllerService.deleteDocOrderUsingDELETE(result.id).subscribe(
+                    this.fsDocOrderControllerService.deleteDocOrder(result.id).subscribe(
                       res => {
                         this.logger.debug('Doc order delete successful for docId: ', result.id);
                       }, error => {

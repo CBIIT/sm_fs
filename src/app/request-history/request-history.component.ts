@@ -40,7 +40,7 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
 
   loadHistory(): void {
     if (this.requestOrPlan === 'REQUEST' && this.requestModel.requestDto.frqId != null) {
-      this.fsLookupControllerService.getRequestHistoryUsingGET(this.requestModel.requestDto.frqId).subscribe(
+      this.fsLookupControllerService.getRequestHistory(this.requestModel.requestDto.frqId).subscribe(
         result => {
           this.histories = result;
           this.logger.debug('request status history ', result);
@@ -51,7 +51,7 @@ export class RequestHistoryComponent implements OnInit, OnDestroy {
         });
     }
     else if (this.requestOrPlan === 'PLAN' && this.planModel != null) {
-      this.fsLookupControllerService.getPlanHistoryUsingGET(this.planModel.fundingPlanDto.fprId).subscribe(
+      this.fsLookupControllerService.getPlanHistory(this.planModel.fundingPlanDto.fprId).subscribe(
         result => {
           this.histories = result;
           this.logger.debug('plan status history ', result);

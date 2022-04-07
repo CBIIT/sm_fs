@@ -341,7 +341,7 @@ export class RequestModel {
       return;
     }
 
-    this.canControllerService.getRequestCansUsingGET(this.requestDto.frqId).subscribe(
+    this.canControllerService.getRequestCans(this.requestDto.frqId).subscribe(
       result => {
         this.logger.debug(result);
         if (result && result.length > 0) {
@@ -375,7 +375,7 @@ export class RequestModel {
         }
       },
       error => {
-        this.logger.error('getRequestCansUsingGET failed', error, this.requestDto);
+        this.logger.error('getRequestCans failed', error, this.requestDto);
       }
     );
   }

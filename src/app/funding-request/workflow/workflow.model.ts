@@ -162,7 +162,7 @@ export class WorkflowModel {
   }
 
   initialize(): void {
-    this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
+    this.workflowControllerService.getRequestApprovers(this.requestModel.requestDto.frqId).subscribe(
       (result) => {
         this.processApproversResult(result);
         this.requestIntegrationService.approverInitializationEmitter.next();
@@ -174,7 +174,7 @@ export class WorkflowModel {
   }
 
   initializeForPlan(planId: number): void {
-    this.planWorkflowControllerService.getPlanApproversUsingGET(planId).subscribe(
+    this.planWorkflowControllerService.getPlanApprovers(planId).subscribe(
       (result) => {
         this.processApproversResult(result);
         this.requestIntegrationService.approverInitializationEmitter.next();
@@ -330,7 +330,7 @@ export class WorkflowModel {
   }
 
   retrieveDesignees(approver: FundingReqApproversDto): void{
-    this.workflowControllerService.getApproverDesigneesUsingGET(approver.approverLdap).subscribe(
+    this.workflowControllerService.getApproverDesignees(approver.approverLdap).subscribe(
       (result) => {
         this.logger.debug('received designees', result);
         approver.designees = result;

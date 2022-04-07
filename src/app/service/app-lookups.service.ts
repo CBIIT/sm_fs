@@ -23,7 +23,7 @@ export class AppLookupsService {
   }
 
   loadCancerActivities(): void {
-    this.cancerActivityController.getAllActiveCaListUsingGET().subscribe(
+    this.cancerActivityController.getAllActiveCaList().subscribe(
       (result) => {
         const cays = {};
         result.forEach((element) => {
@@ -51,7 +51,7 @@ export class AppLookupsService {
   }
 
   loadNciDocs(): void {
-    this.lookupController.getNciDocsUsingGET().subscribe(
+    this.lookupController.getNciDocs().subscribe(
       (result) => {
         const nciDocs = {};
         result.forEach((element) => {

@@ -28,7 +28,7 @@ export class SearchFundingRequestDocComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.fsLookupControllerService.getRequestDocsUsingGET().subscribe(
+    this.fsLookupControllerService.getRequestDocs().subscribe(
       result => {
         const dropdownList: Array<Select2OptionData> = [];
         for (const entry of result) {

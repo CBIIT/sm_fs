@@ -101,13 +101,13 @@ export class SkippedGrantsComponent implements OnInit {
     this._selectedValue = value;
     if (value) {
       this.skipGrants.push(value);
-      this.fsLookupControllerService.getFundingRequestSkipGrantsUsingGET(value).subscribe(
+      this.fsLookupControllerService.getFundingRequestSkipGrants(value).subscribe(
         result => {
           this.logger.debug('result:', result);
           for (const dto in result) {
             this.skipGrantsDto.push(result[dto]);
             this.requestModel.requestDto.skipRequests = this.skipGrantsDto;
-            // this.requestService.retrieveSkipFundingRequestUsingGET(result[dto].skipApplId).subscribe(
+            // this.requestService.retrieveSkipFundingRequest(result[dto].skipApplId).subscribe(
             //   (r) => {
             //     this._grant = r;
             //   }, (error) => {

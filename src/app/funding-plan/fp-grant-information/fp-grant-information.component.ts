@@ -48,7 +48,7 @@ export class FpGrantInformationComponent implements OnInit {
     this.skip = this.isSkip();
     this.exception = this.isException();
 
-    this.requestService.getApplPeriodsUsingGET(this.grant.applId).subscribe(result => {
+    this.requestService.getApplPeriods(this.grant.applId).subscribe(result => {
       this.piDirect = 0;
       this.piTotal = 0;
       this.grantAwards = result;

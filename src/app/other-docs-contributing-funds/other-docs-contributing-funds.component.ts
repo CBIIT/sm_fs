@@ -92,7 +92,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
     const selectedDocs = this.preSelectedDocs || '';
 
-    this.lookupsControllerService.getNciDocsUsingGET().subscribe(
+    this.lookupsControllerService.getNciDocs().subscribe(
       result => {
         result.forEach(r => {
           const tmp = {

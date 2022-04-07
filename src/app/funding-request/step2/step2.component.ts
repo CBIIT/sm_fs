@@ -103,7 +103,7 @@ export class Step2Component implements OnInit {
       this.requestModel.requestDto.financialInfoDto.fundingPolicyCut = undefined;
     }
     this.logger.debug('fundingRequest DTO to be saved', this.requestModel.requestDto);
-    this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
+    this.fsRequestControllerService.saveRequest(this.requestModel.requestDto).subscribe(
       result => {
         this.requestModel.requestDto = result;
         if (jumpToStep4) {
@@ -116,7 +116,7 @@ export class Step2Component implements OnInit {
         this.logger.debug('fundingRequest DTO returned after save', this.requestModel.requestDto);
         // always go to next step even if create approver fails. that's behavior before moving
         // create approvers here.
-        this.fsRequestControllerService.getRequestBudgetsUsingGET(result.frqId).subscribe(
+        this.fsRequestControllerService.getRequestBudgets(result.frqId).subscribe(
           result1 => {
             this.requestModel.requestDto.financialInfoDto.fundingReqBudgetsDtos = result1;
             this.logger.debug('restored budgets:', result1);

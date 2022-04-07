@@ -27,7 +27,7 @@ export class ActiveFundingPlanValidatorDirective implements AsyncValidator {
       });
     }
     return new Promise(resolve => {
-      this.fsRequestService.checkIsFundedByFundingPlanUsingGET(this.requestModel.grant.applId).subscribe(result => {
+      this.fsRequestService.checkIsFundedByFundingPlan(this.requestModel.grant.applId).subscribe(result => {
         if (!result) {
           this.requestModel.initialPay = undefined;
           resolve(null);

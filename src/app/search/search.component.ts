@@ -464,7 +464,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   invokeRefreshOverview(checkLanding: boolean): void {
-    this.fsSearchController.getSearchDashboardDataUsingGET().subscribe(
+    this.fsSearchController.getSearchDashboardData().subscribe(
       result => {
         this.dashboardDatafilterMap = new Map(result.map(item => [item.fitlerType, item]));
         this.logger.debug('Overview refreshed:', this.dashboardDatafilterMap);
@@ -476,7 +476,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
         console.error('HttpClient get request error for----- ' + error.message);
     });
     if (this.selectedMenuUrl === 'landing' && checkLanding) {
-      this.designeeService.getAllApproverDesigneesUsingGET(this.userSessionService.getLoggedOnUser().nihNetworkId).subscribe(
+      this.designeeService.getAllApproverDesignees(this.userSessionService.getLoggedOnUser().nihNetworkId).subscribe(
         (result: Array<FundingRequestPermDelDto>) => {
           this.logger.debug('Get designees for user: ', result);
           this.errInactiveDesignees = false;

@@ -246,7 +246,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
 
     $this.loaderService.show();
     // this.logger.debug('Funding Request search for: ', this.searchCriteria);
-    $this.fsRequestControllerService.searchDtGrantsUsingPOST(
+    $this.fsRequestControllerService.searchDtGrants(
       Object.assign(dataTablesParameters, $this.searchCriteria)).subscribe(
       result => {
         $this.showResults = true;

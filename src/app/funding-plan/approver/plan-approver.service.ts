@@ -20,7 +20,7 @@ export class PlanApproverService {
     }
     // else if (this.planModel.isMainApproversRegenNeeded()) {
     //   this.logger.debug('needs to recreate main approvers because of changes in funding request');
-    //   this.planService.deletePlanApproversUsingGET(this.planModel.fundingPlanDto.fprId).subscribe(
+    //   this.planService.deletePlanApprovers(this.planModel.fundingPlanDto.fprId).subscribe(
     //     () => {
     //       this.planModel.mainApproversCreated = false;
     //       this.createMainApprovers(resolve, reject);
@@ -38,7 +38,7 @@ export class PlanApproverService {
 
   private createMainApprovers(resolve: any, reject: any): void {
     const workflowDto = { fprId: this.planModel.fundingPlanDto.fprId, requestorNpeId: this.planModel.fundingPlanDto.requestorNpeId};
-    this.planService.createPlanApproversUsingPOST(workflowDto).subscribe(
+    this.planService.createPlanApprovers(workflowDto).subscribe(
       (result) => {
         this.planModel.markMainApproversCreated();
         this.logger.debug('Main approvers are created: ', result);

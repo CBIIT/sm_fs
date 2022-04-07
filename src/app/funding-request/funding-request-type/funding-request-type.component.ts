@@ -58,7 +58,7 @@ export class FundingRequestTypeComponent implements OnInit {
         this.alerts = [];
       }
       if (INITIAL_PAY_TYPES.includes(Number(value))) {
-        this.fsRequestControllerService.checkIsFundedByFundingPlanUsingGET(this.model.grant.applId).subscribe(result => {
+        this.fsRequestControllerService.checkIsFundedByFundingPlan(this.model.grant.applId).subscribe(result => {
           if (!!result) {
             const fundedAlert: Alert = {
               type: 'warning',
@@ -223,10 +223,10 @@ export class FundingRequestTypeComponent implements OnInit {
 
   evoke(filter): any {
     if (filter) {
-      return this.fsLookupControllerService.getRequestTypesWithFlagUsingGET(this.model.grant.fullGrantNum,
+      return this.fsLookupControllerService.getRequestTypesWithFlag(this.model.grant.fullGrantNum,
         this.userService.currentUserValue.npnId);
     } else {
-      return this.fsLookupControllerService.getRequestTypesUsingGET();
+      return this.fsLookupControllerService.getRequestTypes();
     }
   }
 

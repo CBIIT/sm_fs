@@ -376,7 +376,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     }
 
     this.logger.debug('workflow dto for submission is ', dto);
-    this.workflowService.submitWorkflowUsingPOST(dto).subscribe(
+    this.workflowService.submitWorkflow(dto).subscribe(
       (result) => {
         this.logger.debug('submit workflow returned okay ', result);
         this.workflowModel.initialize();
@@ -422,10 +422,10 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   fetchCompletedPfr(): void {
     if (this.workflowModel.isUserNextInChain && this.workflowModel.lastInChain) {
-      this.workflowService.getCompletedPlanUsingGET( this.requestModel.requestDto.frqId).subscribe(
+      this.workflowService.getCompletedPlan( this.requestModel.requestDto.frqId).subscribe(
         result => this.completedPfrs = result,
         error => {
-          this.logger.error('calling getCompletedPFRsUsingGET failed ', error);
+          this.logger.error('calling getCompletedPFRs failed ', error);
         }
       );
     }

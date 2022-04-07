@@ -110,7 +110,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     // for (let year = getCurrentFiscalYear(); year >= 2009; year--) {
     //   this.fiscalYearList.push({ id: String(year), text: String(year)});
     // }
-    // this.boardsControllerService.getBodDatesListUsingGET().subscribe(
+    // this.boardsControllerService.getBodDatesList().subscribe(
     //   result => {
     //     const ncabResults: Array<Select2OptionData> = [];
     //     for (const entry of result) {
@@ -123,7 +123,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     //   error => {
     //     console.error('HttpClient get request error for----- ' + error.message);
     //   });
-    // this.paylistUtilControllerService.getCostCentersUsingGET().subscribe(
+    // this.paylistUtilControllerService.getCostCenters().subscribe(
     //   result => {
     //     const ccResults: Array<Select2OptionData> = [];
     //     for (const entry of result) {

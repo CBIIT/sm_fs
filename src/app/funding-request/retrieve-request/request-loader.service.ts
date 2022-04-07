@@ -23,7 +23,7 @@ export class RequestLoaderService {
 
   public loadRequest(frqId: number, successFn: SuccessFunction, errorFn: ErrorFunction): void {
     this.logger.info(`Loading request ${frqId}.`);
-    this.requestService.retrieveFundingRequestUsingGET(frqId).subscribe(
+    this.requestService.retrieveFundingRequest(frqId).subscribe(
       (result) => {
         this.logger.info(`Request ${frqId} succesfully loaded. Proceeding with initialization.`);
         this.requestModel.reset();
@@ -45,7 +45,7 @@ export class RequestLoaderService {
         const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
           ? this.requestModel.requestDto.conversionActivityCode : null;
 
-        this.requestService.getFundingSourcesUsingGET(this.requestModel.requestDto.frtId,
+        this.requestService.getFundingSources(this.requestModel.requestDto.frtId,
           this.requestModel.grant.fullGrantNum,
           this.requestModel.requestDto.financialInfoDto.fy,
           this.requestModel.requestDto.requestorNpnId,
@@ -66,7 +66,7 @@ export class RequestLoaderService {
 
           const additionalSources: number[] = Array.from(selectedIds).filter(s => !foundSources.includes(s));
           if (additionalSources && additionalSources.length !== 0) {
-            this.requestService.retrieveFundingSourcesUsingGET(additionalSources).subscribe(res3 => {
+            this.requestService.retrieveFundingSources(additionalSources).subscribe(res3 => {
               const tmp = this.requestModel.programRecommendedCostsModel.fundingSources;
               res3.forEach(r => tmp.push(r));
               this.requestModel.programRecommendedCostsModel.fundingSources = tmp;
@@ -79,7 +79,7 @@ export class RequestLoaderService {
             this.requestModel.requestCans = result2;
           });
 
-          this.requestService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result2 => {
+          this.requestService.getApplPeriods(this.requestModel.grant.applId).subscribe(result2 => {
             this.requestModel.programRecommendedCostsModel.grantAwarded = result2;
             this.requestModel.restoreLineItems();
 

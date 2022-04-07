@@ -56,10 +56,10 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
       }
     );
     this.loadData();
-    this.lookupService.getGmActiveSpecialistsUsingGET().subscribe(
+    this.lookupService.getGmActiveSpecialists().subscribe(
       result => {
         if (result) {
-          this.logger.debug('getGmActiveSpecialistsUsingGET returned', result);
+          this.logger.debug('getGmActiveSpecialists returned', result);
           this.specialists = result.map( (data) =>
           ({id: String(data.specNpeId), text: data.specCode + ' ' + data.specFullName}));
           this.specialistMap = result.reduce((map, specialist) => {
@@ -69,21 +69,21 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
         }
       },
       error => {
-        this.logger.error('getGmActiveSpecialistsUsingGET failed', error);
+        this.logger.error('getGmActiveSpecialists failed', error);
       }
   );
   }
 
   loadData(): void {
-      this.workflowService.getPlanGmInfoUsingGET(this.planModel.fundingPlanDto.fprId).subscribe(
+      this.workflowService.getPlanGmInfo(this.planModel.fundingPlanDto.fprId).subscribe(
           result => {
             if (result) {
               this.proposedGrants = result;
-              this.logger.debug('getPlanGmInfoUsingGET returned', result);
+              this.logger.debug('getPlanGmInfo returned', result);
             }
           },
           error => {
-            this.logger.error('getDefaultGmInfoUsingGET failed', error);
+            this.logger.error('getDefaultGmInfo failed', error);
           }
         );
       // }

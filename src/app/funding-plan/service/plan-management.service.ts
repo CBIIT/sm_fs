@@ -175,7 +175,7 @@ export class PlanManagementService {
   checkInFlightPFRs(payload: { applId: number, frtId: number } []): void {
     payload.forEach(r => {
       if (this.fundedPlanTypes.includes(r.frtId)) {
-        this.fsRequestService.checkInitialPayUsingGET(r.applId, r.frtId).subscribe(result => {
+        this.fsRequestService.checkInitialPay(r.applId, r.frtId).subscribe(result => {
           if (!isNaN(result) && Number(result) > 0) {
             this.inflightPFRs.set(r.applId, result);
           }
@@ -404,7 +404,7 @@ export class PlanManagementService {
     let awardedDirect: number;
 
     this.planModel.allGrants.filter(g => g.selected).forEach(grant => {
-      this.fsRequestService.getApplPeriodsUsingGET(grant.applId).subscribe(result => {
+      this.fsRequestService.getApplPeriods(grant.applId).subscribe(result => {
         // this.logger.debug('results =>', result);
         if (result && result.length > 0) {
           piDirect = Number(result[0].requestAmount);

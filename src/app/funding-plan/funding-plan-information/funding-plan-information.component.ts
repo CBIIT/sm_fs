@@ -88,7 +88,7 @@ export class FundingPlanInformationComponent implements OnInit {
     if (!!this.planModel?.fundingPlanDto?.fundingPlanFoas && this.planModel.fundingPlanDto.fundingPlanFoas.length > 0) {
       this.fundingPlanFoas = this.planModel.fundingPlanDto.fundingPlanFoas;
       this.fundingPlanFoas.forEach(foa => {
-        this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(foa.rfaPaNumber).subscribe(next => {
+        this.rfaService.getRfaPaNoticeByNoticeNumber(foa.rfaPaNumber).subscribe(next => {
           foa.nihGuideAddr = next.nihGuideAddr;
           foa.cptId = next.cptId;
         });
@@ -96,7 +96,7 @@ export class FundingPlanInformationComponent implements OnInit {
     } else {
       this.fundingPlanFoas = [];
       this.planModel.grantsSearchCriteria.forEach(rfa => {
-        this.rfaService.getRfaPaNoticeByNoticeNumberUsingGET(rfa.rfaPaNumber).subscribe(next => {
+        this.rfaService.getRfaPaNoticeByNoticeNumber(rfa.rfaPaNumber).subscribe(next => {
           if (next) {
             this.logger.debug(`Prior notice: ${next.priorNoticeNumber}`);
             const tmp: FundingPlanFoasDto = {} as FundingPlanFoasDto;

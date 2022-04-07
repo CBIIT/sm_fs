@@ -153,9 +153,9 @@ export class BatchApproveModalComponent implements OnInit {
 
   invokeRestApi(dto: BatchApprovalDto): Observable<any> {
     if (this.requestOrPlan === 'REQUEST') {
-      return this.fsWorkflowService.batchApproveRequestsUsingPOST(dto);
+      return this.fsWorkflowService.batchApproveRequests(dto);
     } else {
-      return this.fsPlanWorkflowService.batchApprovePlansUsingPOST(dto);
+      return this.fsPlanWorkflowService.batchApprovePlans(dto);
     }
   }
 

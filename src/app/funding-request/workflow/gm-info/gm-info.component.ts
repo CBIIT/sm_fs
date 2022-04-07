@@ -49,10 +49,10 @@ export class GmInfoComponent implements OnInit, OnDestroy {
         this.loadData();
       }
     );
-    this.lookupService.getGmActiveSpecialistsUsingGET().subscribe(
+    this.lookupService.getGmActiveSpecialists().subscribe(
       result => {
         if (result) {
-          this.logger.debug('getGmActiveSpecialistsUsingGET returned', result);
+          this.logger.debug('getGmActiveSpecialists returned', result);
           this.specialists = result.map( (data) =>
           ({id: String(data.specNpeId), text: data.specCode + ' ' + data.specFullName}));
           this.specialistMap = result.reduce((map, specialist) => {
@@ -63,17 +63,17 @@ export class GmInfoComponent implements OnInit, OnDestroy {
         this.loadData();
       },
       error => {
-        this.logger.error('getGmActiveSpecialistsUsingGET failed', error);
+        this.logger.error('getGmActiveSpecialists failed', error);
       }
   );
   }
 
   loadData(): void {
-      this.workflowService.getDefaultGmInfoUsingGET(this.requestModel.requestDto.frqId).subscribe(
+      this.workflowService.getDefaultGmInfo(this.requestModel.requestDto.frqId).subscribe(
           result => {
             if (result) {
               this.gmInfo = result;
-              this.logger.debug('getDefaultGmInfoUsingGET returned', JSON.stringify(result));
+              this.logger.debug('getDefaultGmInfo returned', JSON.stringify(result));
               this.checkDefaultSpecialist();
             }
             else {
@@ -83,7 +83,7 @@ export class GmInfoComponent implements OnInit, OnDestroy {
               }
           },
           error => {
-            this.logger.error('getDefaultGmInfoUsingGET failed', error);
+            this.logger.error('getDefaultGmInfo failed', error);
           }
         );
   }

@@ -28,7 +28,7 @@ export class ActiveInitialPayValidatorDirective implements AsyncValidator {
     }
 
     return new Promise(resolve => {
-      this.fsRequestService.checkInitialPayUsingGET(this.requestModel.grant.applId, Number(control.value)).subscribe(result => {
+      this.fsRequestService.checkInitialPay(this.requestModel.grant.applId, Number(control.value)).subscribe(result => {
         if (isNaN(result) || Number(result) === 0 || Number(result) === Number(this.requestModel.requestDto.frqId)) {
           this.requestModel.initialPay = undefined;
           resolve(null);

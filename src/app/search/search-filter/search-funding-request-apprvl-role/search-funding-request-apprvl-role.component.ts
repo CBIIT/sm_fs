@@ -27,7 +27,7 @@ export class SearchFundingRequestApprvlRoleComponent implements OnInit {
               private fsLookupControllerService: FsLookupControllerService) { }
 
   ngOnInit(): void {
-    this.fsLookupControllerService.getReqApproverRolesUsingGET().subscribe(
+    this.fsLookupControllerService.getReqApproverRoles().subscribe(
       result => {
         const dropdownList: Array<Select2OptionData> = [];
         for (const entry of result) {

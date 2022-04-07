@@ -80,7 +80,7 @@ export class FundingSourceComponent implements OnInit {
     // this.logger.debug('refreshFundingSources: type =', this.requestModel.requestDto.frtId,
     //   ', conversionMech =', conversionActivityCode,
     //   ', cayCode =', cayCode);
-    this.fsRequestControllerService.getFundingSourcesUsingGET(
+    this.fsRequestControllerService.getFundingSources(
       this.requestModel.requestDto.frtId,
       this.requestModel.grant.fullGrantNum,
       this.requestModel.requestDto.fy,

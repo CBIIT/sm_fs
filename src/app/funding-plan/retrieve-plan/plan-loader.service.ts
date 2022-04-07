@@ -17,7 +17,7 @@ export class PlanLoaderService {
 
   loadPlan(fprId: number, succesFn: SuccessFunction, errorFn: ErrorFunction): void {
     this.logger.info(`Loading funding plan ${fprId}`);
-    this.planService.retrieveFundingPlanUsingGET(fprId).subscribe(
+    this.planService.retrieveFundingPlan(fprId).subscribe(
       (result) => {
         this.logger.info(`Plan ${fprId} loaded. Proceeding with initialization`);
         this.planModel.reset();

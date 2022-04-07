@@ -168,7 +168,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
 
   private loadApplAwardPeriods(): void {
-    this.fsRequestControllerService.getApplPeriodsUsingGET(this.requestModel.grant.applId).subscribe(result => {
+    this.fsRequestControllerService.getApplPeriods(this.requestModel.grant.applId).subscribe(result => {
         this.requestModel.programRecommendedCostsModel.grantAwarded = result;
       }, error => {
         this.logger.error('HttpClient get request error for----- ' + error.message);

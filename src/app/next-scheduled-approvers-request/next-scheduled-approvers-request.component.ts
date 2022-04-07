@@ -108,7 +108,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
     }
     else if (this.requestModel.recreateMainApproverNeeded) {
       this.logger.debug('needs to recreate main approvers because of changes in funding request');
-      this.workflowControllerService.deleteRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
+      this.workflowControllerService.deleteRequestApprovers(this.requestModel.requestDto.frqId).subscribe(
         () => {
           this.requestModel.mainApproverCreated = false;
           this.createMainApprovers();
@@ -117,7 +117,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
       );
     }
     else {
-      this.workflowControllerService.getRequestApproversUsingGET(this.requestModel.requestDto.frqId).subscribe(
+      this.workflowControllerService.getRequestApprovers(this.requestModel.requestDto.frqId).subscribe(
         (result) => {
           this.processApproversResult(result);
           this.requestModel.captureApproverCriteria();
@@ -148,7 +148,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
 
   createMainApprovers(): void {
     const workflowDto = { frqId: this.requestModel.requestDto.frqId, requestorNpeId: this.requestModel.requestDto.requestorNpeId};
-    this.workflowControllerService.createRequestApproversUsingPOST(workflowDto).subscribe(
+    this.workflowControllerService.createRequestApprovers(workflowDto).subscribe(
       (result) => {
         this.requestModel.mainApproverCreated = true;
         this.requestModel.captureApproverCriteria();
@@ -166,32 +166,32 @@ export class NextScheduledApproversRequestComponent implements OnInit {
    if (event.previousIndex === event.currentIndex) {
      return;
    }
-   this.workflowControllerService.moveAdditionalApproverUsingPOST(
+   this.workflowControllerService.moveAdditionalApprover(
      event.currentIndex + 1, this.requestModel.requestDto.frqId, event.previousIndex + 1).subscribe(
       (result) => { this.processApproversResult(result); },
       (error) => {
-        this.logger.error('Error moveAdditionalApproverUsingPOST ', error);
+        this.logger.error('Error moveAdditionalApprover ', error);
       }
      );
   }
 
   saveAdditionalApprover(user: any): void {
-    this.workflowControllerService.saveAdditionalApproverUsingPOST(
+    this.workflowControllerService.saveAdditionalApprover(
       this.userSessionService.getLoggedOnUser().nihNetworkId,
       this.requestModel.requestDto.frqId,
       user.nciLdapCn).subscribe(
       (result) => { this.processApproversResult(result); },
       (error) => {
-        this.logger.error('Error saveAdditionalApproverUsingPOST ', error);
+        this.logger.error('Error saveAdditionalApprover ', error);
       }
     );
   }
 
   deleteAdditionalApprover(fraId: number): void {
-    this.workflowControllerService.deleteAdditionalApproverUsingPOST(fraId, this.requestModel.requestDto.frqId).subscribe(
+    this.workflowControllerService.deleteAdditionalApprover(fraId, this.requestModel.requestDto.frqId).subscribe(
       (result) => { this.processApproversResult(result); },
       (error) => {
-        this.logger.error('Error saveAdditionalApproverUsingPOST ', error);
+        this.logger.error('Error saveAdditionalApprover ', error);
       }
     );
   }

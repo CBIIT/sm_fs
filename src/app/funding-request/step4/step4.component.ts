@@ -174,7 +174,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
   checkInflightFundingPlan(): void {
     if (INITIAL_PAY_TYPES.includes(this.requestModel.requestDto.financialInfoDto.requestTypeId)) {
-      this.fsRequestService.checkIsFundedByFundingPlanUsingGET(this.requestModel.grant.applId).subscribe(result => {
+      this.fsRequestService.checkIsFundedByFundingPlan(this.requestModel.grant.applId).subscribe(result => {
           this.inflightPlan = result;
           this.logger.debug('checkIsFundedByPlan ', result);
       });
@@ -265,7 +265,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   deleteRequest(): void {
     if (confirm('Are you sure you want to delete this request?')) {
       this.logger.debug('Call deleteRequest API for FRQ ID: ', this.model.requestDto.frqId);
-      this.fsRequestService.deleteRequestUsingDELETE(this.model.requestDto.frqId).subscribe(
+      this.fsRequestService.deleteRequest(this.model.requestDto.frqId).subscribe(
         result => {
           this.logger.debug('Funding request was deleted: ', result);
           this.requestModel.reset();
@@ -279,7 +279,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   submitRequest(): void {
-    this.cancerActivityService.getActiveReferralCaAssignRulesUsingGET('Y').subscribe(
+    this.cancerActivityService.getActiveReferralCaAssignRules('Y').subscribe(
       result => {
         const activeCayCodes: string[] = result.map(ra => ra.caCode);
         if (activeCayCodes.includes(this.requestModel.requestDto.requestorCayCode) ) {
@@ -315,7 +315,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
     }
     dto.currentStatusId = this.currentStatusId;
     this.logger.debug('Submit Request for: ', dto);
-    this.fsWorkflowControllerService.submitWorkflowUsingPOST(dto).subscribe(
+    this.fsWorkflowControllerService.submitWorkflow(dto).subscribe(
       (result) => {
         this.logger.debug('Submit Request result: ', result);
         this.workflowModel.initialize();
@@ -323,7 +323,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
         this.readonly = true;
       },
       (error) => {
-        this.logger.error('Failed when calling submitRequestUsingPOST', error);
+        this.logger.error('Failed when calling submitRequest', error);
         this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       });
   }

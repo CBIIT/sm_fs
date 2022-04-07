@@ -64,7 +64,7 @@ export class CanManagementService {
   }
 
   getFundingRequestCanDisplays(fseIds: number[]): Observable<FundingRequestCanDisplayDto[]> {
-    return this.canService.getFundingRequestCanDisplaysUsingGET(fseIds);
+    return this.canService.getFundingRequestCanDisplays(fseIds);
   }
 
   getProjectedCan(fseId: number, oefiaTypeId: number, frtId: number, frqId: number, applId?: number): Observable<CanCcxDto> {
@@ -80,7 +80,7 @@ export class CanManagementService {
     }
 
     this.logger.info(`getProjectedCan(${fseId}, ${oefiaTypeId}, ${frtId}, ${frqId}, ${applId})`);
-    return this.canService.retrieveProjectedCanUsingGET(
+    return this.canService.retrieveProjectedCan(
       applId,
       fseId,
       frtId,
@@ -97,7 +97,7 @@ export class CanManagementService {
       });
     }
 
-    const fn = this.canService.getOefiaTypesUsingGET();
+    const fn = this.canService.getOefiaTypes();
     fn.subscribe(result => {
       this.oefiaCodes = result;
     });
@@ -106,7 +106,7 @@ export class CanManagementService {
   }
 
   refreshOefiaCodes(): void {
-    this.canService.getOefiaTypesUsingGET().subscribe(result => {
+    this.canService.getOefiaTypes().subscribe(result => {
       this.oefiaCodes = result;
     });
   }
@@ -128,7 +128,7 @@ export class CanManagementService {
       });
     }
 
-    const fn = this.canService.getRequestCansUsingGET(frqId);
+    const fn = this.canService.getRequestCans(frqId);
     fn.subscribe(result => {
       this.cachedRequestCans.set(frqId, result);
     });
@@ -139,18 +139,18 @@ export class CanManagementService {
     this.logger.info(`searchDefaultCans(${can}, ${bmmCodes}, ${activityCodes}, ${nciSource})`);
     // FS-1476 - for Pay Type 4 requests, use the conversion mech and related default BMM code.
     if(this.requestModel && this.requestModel.isPayType4() && this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== 'NC') {
-      return this.canService.getType4DefaultCansUsingGET(this.requestModel.requestDto.conversionActivityCode, can, nciSource);
+      return this.canService.getType4DefaultCans(this.requestModel.requestDto.conversionActivityCode, can, nciSource);
     }
-    return this.canService.getDefaultCansUsingGET(activityCodes, bmmCodes, can, nciSource);
+    return this.canService.getDefaultCans(activityCodes, bmmCodes, can, nciSource);
   }
 
   searchDefaultCansWithExtra(can: string, bmmCodes: string, activityCodes: string, nciSource: string, extra: string): Observable<CanCcxDto[]> {
     this.logger.info(`searchDefaultCansWithExtera(${can}, ${bmmCodes}, ${activityCodes}, ${nciSource}, ${extra})`);
     // FS-1476 - for Pay Type 4 requests, use the conversion mech and related default BMM code.
     if(this.requestModel && this.requestModel.isPayType4() && this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== 'NC') {
-      return this.canService.getType4DefaultCansWithExtraUsingGET(this.requestModel.requestDto.conversionActivityCode, can, extra, nciSource);
+      return this.canService.getType4DefaultCansWithExtra(this.requestModel.requestDto.conversionActivityCode, can, extra, nciSource);
     }
-    return this.canService.getDefaultCansWithExtraUsingGET(activityCodes, bmmCodes, can, extra, nciSource);
+    return this.canService.getDefaultCansWithExtra(activityCodes, bmmCodes, can, extra, nciSource);
   }
 
   searchAllCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
@@ -162,7 +162,7 @@ export class CanManagementService {
       });
     }
 
-    const fn = this.canService.getAllCansUsingGET(activityCodes, bmmCodes, can, nciSource);
+    const fn = this.canService.getAllCans(activityCodes, bmmCodes, can, nciSource);
 
     fn.subscribe(next => {
       this.activeCanCache.set(key, next);
@@ -195,7 +195,7 @@ export class CanManagementService {
   }
 
   getCanDetails(value: string): Observable<CanCcxDto> {
-    return this.canService.getCanDetailsUsingGET(value);
+    return this.canService.getCanDetails(value);
   }
 
   isCanPercentSelected(can: FundingRequestCanDto): boolean {

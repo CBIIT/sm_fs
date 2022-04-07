@@ -143,7 +143,7 @@ export class Step3Component implements OnInit {
       this.router.navigate(['/request']);
     }
     this.navigationModel.setStepLinkable(3, true);
-    this.cgRefCodControllerService.getPfrDocTypeUsingGET().subscribe(
+    this.cgRefCodControllerService.getPfrDocType().subscribe(
       result => {
         this.DocTypes = of(result);
         this.addTransitionMemo();
@@ -178,7 +178,7 @@ export class Step3Component implements OnInit {
       this.justificationType = 'text';
       this.removeDocType('Justification');
       if (this.requestModel.requestDto.justificationCreateNpnId) {
-        this.userControllerService.findByNpnIdUsingGET(this.requestModel.requestDto.justificationCreateNpnId).subscribe(
+        this.userControllerService.findByNpnId(this.requestModel.requestDto.justificationCreateNpnId).subscribe(
           result => {
             this.requestModel.requestDto.justificationCreateByFullName = result.fullNameLF;
             this.requestModel.requestDto.justificationCreateByEmailAddress = result.emailAddress;
@@ -204,7 +204,7 @@ export class Step3Component implements OnInit {
   }
 
   loadSuppApps() {
-    this.fsRequestControllerService.retrieveAdminSuppRoutingsUsingGET(this.requestModel.grant.applId).subscribe(
+    this.fsRequestControllerService.retrieveAdminSuppRoutings(this.requestModel.grant.applId).subscribe(
       result => {
         this.applAdminSuppRoutingsDtos = result;
       }, error => {
@@ -221,7 +221,7 @@ export class Step3Component implements OnInit {
 
     }
     if (!isSuppAction) {
-      this.fsRequestControllerService.findByRequestTypeCategoryUsingGET('SUPPLEMENT').subscribe(
+      this.fsRequestControllerService.findByRequestTypeCategory('SUPPLEMENT').subscribe(
         result => {
           result.forEach((element, index) => {
             if (Number(element.id) === Number(this.requestModel.requestDto.parentFrtId)) {
@@ -288,7 +288,7 @@ export class Step3Component implements OnInit {
     let reqDto: FundingRequestDto = {};
     reqDto.frqId = this.requestModel.requestDto.frqId;
     reqDto.justification = justification;
-    this.fsRequestControllerService.updateJustificationUsingPUT(reqDto).subscribe(
+    this.fsRequestControllerService.updateJustification(reqDto).subscribe(
       result => {
 
         this.justificationUploaded = of(true);
@@ -609,7 +609,7 @@ export class Step3Component implements OnInit {
   }
 
   private deleteSuppApplDocs(docType: string) {
-    this.fsRequestControllerService.deleteSuppApplIdUsingPUT(this.requestModel.requestDto.frqId).subscribe(
+    this.fsRequestControllerService.deleteSuppApplId(this.requestModel.requestDto.frqId).subscribe(
       res => {
         this.logger.debug('justification deleted');
         this.requestModel.requestDto.suppApplId = null;
@@ -717,7 +717,7 @@ export class Step3Component implements OnInit {
 
     });
 
-    this.fsDocOrderControllerService.updateDocOrderUsingPUT(this._docOrderDtos).subscribe(
+    this.fsDocOrderControllerService.updateDocOrder(this._docOrderDtos).subscribe(
       res => {
         this.logger.debug('Doc order update successful for docId: ', this._docOrderDtos);
         this._docOrderDtos.length = 0;
@@ -729,7 +729,7 @@ export class Step3Component implements OnInit {
 
   deleteDocOrder(docDto: DocumentsDto) {
     if (docDto.id !== null) {
-      this.fsDocOrderControllerService.deleteDocOrderUsingDELETE(docDto.id).subscribe(
+      this.fsDocOrderControllerService.deleteDocOrder(docDto.id).subscribe(
         res => {
           this.logger.debug('Doc order delete successful for docId: ', docDto.id);
         }, error => {
@@ -737,7 +737,7 @@ export class Step3Component implements OnInit {
         });
     } else {
 
-      this.fsDocOrderControllerService.deleteDocOrderByDocTypesUsingDELETE(docDto.docType, this.requestModel.requestDto.frqId).subscribe(
+      this.fsDocOrderControllerService.deleteDocOrderByDocTypes(docDto.docType, this.requestModel.requestDto.frqId).subscribe(
         res => {
           this.logger.debug('Doc order delete successful for docId: ', this.requestModel.requestDto.frqId);
         }, error => {
@@ -751,7 +751,7 @@ export class Step3Component implements OnInit {
     this._docOrderDto.docId = docDto.id;
     this._docOrderDto.frqId = this.requestModel.requestDto.frqId;
 
-    this.fsDocOrderControllerService.createDocOrderUsingPOST(this._docOrderDto).subscribe(
+    this.fsDocOrderControllerService.createDocOrder(this._docOrderDto).subscribe(
       res => {
         this.logger.debug('Doc order save successful for doc: ', this._docOrderDto);
       }, error => {
@@ -763,13 +763,13 @@ export class Step3Component implements OnInit {
     if (this.justificationType == 'text') {
 
 
-      this.fsRequestControllerService.deleteJustificationUsingPUT(this.requestModel.requestDto.frqId).subscribe(
+      this.fsRequestControllerService.deleteJustification(this.requestModel.requestDto.frqId).subscribe(
         res => {
           this.logger.debug('justification deleted');
           this.requestModel.requestDto.justification = '';
 
           //Delete Doc Order
-          this.fsDocOrderControllerService.deleteDocOrderByDocTypesUsingDELETE('Justification', this.requestModel.requestDto.frqId).subscribe(
+          this.fsDocOrderControllerService.deleteDocOrderByDocTypes('Justification', this.requestModel.requestDto.frqId).subscribe(
             res => {
               this.logger.debug('Doc order delete successful for docId: ', this.requestModel.requestDto.frqId);
             }, error => {
@@ -819,7 +819,7 @@ export class Step3Component implements OnInit {
 
   uploadSuppDocs(formerApplId: number) {
     this.logger.debug('updatind supp appl id: ' + formerApplId)
-    this.fsRequestControllerService.updateSuppApplIdUsingPUT(this.requestModel.requestDto.frqId, formerApplId).subscribe(
+    this.fsRequestControllerService.updateSuppApplId(this.requestModel.requestDto.frqId, formerApplId).subscribe(
       result => {
 
         this.requestModel.requestDto.suppApplId = formerApplId;
@@ -867,7 +867,7 @@ export class Step3Component implements OnInit {
 
   nextStep(): void {
     if (this.validate()) {
-      this.documentsControllerService.loadDocumentsBySortOrderUsingGET(this.requestModel.requestDto.frqId).subscribe(
+      this.documentsControllerService.loadDocumentsBySortOrder(this.requestModel.requestDto.frqId).subscribe(
         result => {
           this.router.navigate(['/request/step4']);
           this.requestModel.requestDto.includedDocs = result;
