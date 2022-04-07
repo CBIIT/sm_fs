@@ -162,17 +162,21 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   dropped(event: CdkDragDrop<any[]>): void {
-   // moveItemInArray(this.requestApprovers, event.previousIndex, event.currentIndex);
-   if (event.previousIndex === event.currentIndex) {
-     return;
-   }
-   this.workflowControllerService.moveAdditionalApprover(
-     event.currentIndex + 1, this.requestModel.requestDto.frqId, event.previousIndex + 1).subscribe(
-      (result) => { this.processApproversResult(result); },
+    // moveItemInArray(this.requestApprovers, event.previousIndex, event.currentIndex);
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
+    this.workflowControllerService.moveAdditionalApprover(
+      this.requestModel.requestDto.frqId,
+      event.previousIndex + 1,
+      event.currentIndex + 1).subscribe(
+      (result) => {
+        this.processApproversResult(result);
+      },
       (error) => {
         this.logger.error('Error moveAdditionalApprover ', error);
       }
-     );
+    );
   }
 
   saveAdditionalApprover(user: any): void {
@@ -188,7 +192,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
   }
 
   deleteAdditionalApprover(fraId: number): void {
-    this.workflowControllerService.deleteAdditionalApprover(fraId, this.requestModel.requestDto.frqId).subscribe(
+    this.workflowControllerService.deleteAdditionalApprover(this.requestModel.requestDto.frqId, fraId).subscribe(
       (result) => { this.processApproversResult(result); },
       (error) => {
         this.logger.error('Error saveAdditionalApprover ', error);

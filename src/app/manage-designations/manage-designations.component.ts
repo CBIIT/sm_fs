@@ -212,7 +212,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
     const toDate: string = this.formatDate(this.newDesigneeForm.value.endDate);
     const designeeTo = this.newDesigneeForm.value.name;
     this.designeeService.createDesignee(
-      fromDate, toDate, this.userSessionService.getLoggedOnUser().nihNetworkId, designeeTo).subscribe(
+      this.userSessionService.getLoggedOnUser().nihNetworkId, designeeTo, fromDate, toDate).subscribe(
       result => {
         this.updateDesigneeTable(result);
         this.newDesigneeForm.resetForm();
@@ -259,7 +259,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       modalRef.componentInstance.data = entry;
       modalRef.result.then((updatedData: any) => {
         this.logger.debug('Result: ', updatedData);
-        this.designeeService.updateDesignee(updatedData.startDate, updatedData.endDate, updatedData.id).subscribe(
+        this.designeeService.updateDesignee(updatedData.id, updatedData.startDate, updatedData.endDate).subscribe(
           result => {
             this.updateDesigneeTable(result);
             this.successManageDesigneesMsg = 'Designation date(s) have been updated successfully.';
