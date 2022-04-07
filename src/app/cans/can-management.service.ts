@@ -82,10 +82,10 @@ export class CanManagementService {
     this.logger.info(`getProjectedCan(${fseId}, ${oefiaTypeId}, ${frtId}, ${frqId}, ${applId})`);
     return this.canService.retrieveProjectedCan(
       applId,
-      fseId,
       frtId,
-      frqId,
-      oefiaTypeId
+      fseId,
+      oefiaTypeId,
+      frqId
     );
   }
 
@@ -139,18 +139,30 @@ export class CanManagementService {
     this.logger.info(`searchDefaultCans(${can}, ${bmmCodes}, ${activityCodes}, ${nciSource})`);
     // FS-1476 - for Pay Type 4 requests, use the conversion mech and related default BMM code.
     if(this.requestModel && this.requestModel.isPayType4() && this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== 'NC') {
-      return this.canService.getType4DefaultCans(this.requestModel.requestDto.conversionActivityCode, can, nciSource);
+      return this.canService.getType4DefaultCans(
+        this.requestModel.requestDto.conversionActivityCode,
+        nciSource,
+        can);
     }
-    return this.canService.getDefaultCans(activityCodes, bmmCodes, can, nciSource);
+    return this.canService.getDefaultCans(bmmCodes, activityCodes, nciSource, can);
   }
 
   searchDefaultCansWithExtra(can: string, bmmCodes: string, activityCodes: string, nciSource: string, extra: string): Observable<CanCcxDto[]> {
     this.logger.info(`searchDefaultCansWithExtera(${can}, ${bmmCodes}, ${activityCodes}, ${nciSource}, ${extra})`);
     // FS-1476 - for Pay Type 4 requests, use the conversion mech and related default BMM code.
     if(this.requestModel && this.requestModel.isPayType4() && this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== 'NC') {
-      return this.canService.getType4DefaultCansWithExtra(this.requestModel.requestDto.conversionActivityCode, can, extra, nciSource);
+      return this.canService.getType4DefaultCansWithExtra(
+        this.requestModel.requestDto.conversionActivityCode,
+        nciSource,
+        can,
+        extra);
     }
-    return this.canService.getDefaultCansWithExtra(activityCodes, bmmCodes, can, extra, nciSource);
+    return this.canService.getDefaultCansWithExtra(
+      bmmCodes,
+      activityCodes,
+      nciSource,
+      can,
+      extra);
   }
 
   searchAllCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
@@ -162,7 +174,7 @@ export class CanManagementService {
       });
     }
 
-    const fn = this.canService.getAllCans(activityCodes, bmmCodes, can, nciSource);
+    const fn = this.canService.getAllCans(can, bmmCodes, activityCodes, nciSource);
 
     fn.subscribe(next => {
       this.activeCanCache.set(key, next);
