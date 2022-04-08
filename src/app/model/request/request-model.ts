@@ -39,12 +39,12 @@ export class RequestModel {
   private _programRecommendedCostsModel: ProgramRecommendedCostsModel;
 
   // Grant viewer URL for use in links
-  private readonly _grantViewerUrl: string;
+  private _grantViewerUrl: string;
 
   // Request type
   private _requestType: string;
 
-  private readonly _eGrantsUrl: string;
+  private _eGrantsUrl: string;
 
   // approver stuff
   mainApproverCreated = false;
@@ -153,11 +153,16 @@ export class RequestModel {
               private canControllerService: FsCanControllerService,
               private logger: CustomServerLoggingService,
   ) {
-    this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
-    this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
+    // this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
+    // this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
     this.programRecommendedCostsModel = new ProgramRecommendedCostsModel(logger);
+  }
+
+  initializeProperties(): void {
+    this._grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+    this._eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
   }
 
   getValidationErrors(): Array<FundingRequestErrorCodes> {

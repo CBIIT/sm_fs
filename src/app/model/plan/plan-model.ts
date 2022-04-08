@@ -36,16 +36,17 @@ export class PlanModel {
   returnToSearchLink = false;
   pendingAlerts: Alert[] = [];
 
-  constructor(propertiesService: AppPropertiesService,
+  constructor(private propertiesService: AppPropertiesService,
               private logger: NGXLogger,
               private customLogger: CustomServerLoggingService) {
-    // TODO: static properties should be set at app level and shared somehow
-    this.grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
-    this.yourgrantsUrl = propertiesService.getProperty('URL_YOURGRANTS');
-    this.eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');
-    this.catsConceptUrl = propertiesService.getProperty('CONCEPT_ID_URL');
+  }
 
-    this.customLogger.info(`Properties: ${this.grantViewerUrl}, ${this.yourgrantsUrl}, ${this.eGrantsUrl}, ${this.catsConceptUrl}`);
+  initializeProperties(): void {
+    this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+    this.yourgrantsUrl = this.propertiesService.getProperty('URL_YOURGRANTS');
+    this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
+    this.catsConceptUrl = this.propertiesService.getProperty('CONCEPT_ID_URL');
+    this.customLogger.info(`Properties in PlanModel: ${this.grantViewerUrl}, ${this.yourgrantsUrl}, ${this.eGrantsUrl}, ${this.catsConceptUrl}`);
 
   }
 

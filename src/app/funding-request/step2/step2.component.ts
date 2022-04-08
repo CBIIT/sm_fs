@@ -99,7 +99,7 @@ export class Step2Component implements OnInit {
     this.requestModel.requestDto.selectedFrtId = this.requestModel.requestDto.frtId;
     this.requestModel.requestDto.financialInfoDto.requestTypeId = this.requestModel.requestDto.frtId;
     this.requestModel.requestDto.financialInfoDto.parentRequestTypeId = null;
-    if (!FUNDING_POLICY_CUT_TYPES.includes(this.requestModel.requestDto.financialInfoDto.requestTypeId)) {
+    if (!FUNDING_POLICY_CUT_TYPES.includes(Number(this.requestModel.requestDto.financialInfoDto.requestTypeId))) {
       this.requestModel.requestDto.financialInfoDto.fundingPolicyCut = undefined;
     }
     this.logger.debug('fundingRequest DTO to be saved', this.requestModel.requestDto);
