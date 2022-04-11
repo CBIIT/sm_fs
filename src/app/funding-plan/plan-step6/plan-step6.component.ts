@@ -110,7 +110,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
       g.priorityScoreNum <= this.planModel.maximumScore) );
 
     this.grantsNotConsidered = this.planModel.allGrants.filter(g =>
-      (g.notSelectableReason && g.notSelectableReason.length > 0) ||
+      ((g.notSelectableReason && g.notSelectableReason.length > 0) && !g.selected) ||
       (( g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)
       && !g.selected ) );
     this.workflowModel.initializeForPlan(this.fprId);
