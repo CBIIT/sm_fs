@@ -58,7 +58,8 @@ export class CreateTypeComponent implements OnInit {
     FundingRequestTypes.PHASE_OUT__FOR_INSTITUTIONAL_AWARDS_THAT_DID_NOT_MEET_INSTITUTIONAL_PAYLINE_FOR_COMPETING_GROUP__OVER_100000_DIRECT_COSTS,
     FundingRequestTypes.PHASE_OUT__FOR_INSTITUTIONAL_AWARDS_WITH_STRONG_JUSTIFICATION,
     FundingRequestTypes.DIVERSITY_SUPPLEMENT_INCLUDES_CURE_SUPPLEMENTS,
-    FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS
+    FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS,
+    FundingRequestTypes.PAY_TYPE_4
   ];
 
   @Input()
@@ -97,10 +98,9 @@ export class CreateTypeComponent implements OnInit {
 
     if (this.requestModel.isForGrantFY() &&
       this.ROLLUP_TYPES.includes(+type)) {
-      this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'Rollup';
-    } else if (
-      this.PRE_APPL_TYPES.includes(+type)) {
-      this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'Pre-Appl';
+      this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'ROLLUP';
+    } else if ( this.PRE_APPL_TYPES.includes(+type) ) {
+      this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'PRE-APPL';
     } else {
       this.selectedValue = this.requestModel.requestDto.oefiaCreateCode;
     }
