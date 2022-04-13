@@ -90,6 +90,7 @@ export class CanSelectorComponent implements OnInit {
   }
 
   selectProjectedCan(): boolean {
+    this.logger.info(`selecteProjectedCan: ${JSON.stringify(this.projectedCan)}`);
     if (this.projectedCan && this.projectedCan.can && this.projectedCan.canDescrip) {
       const tmp = this.data.filter(e => e.id === this.projectedCan.can);
       if (!tmp || tmp.length === 0) {
