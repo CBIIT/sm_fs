@@ -2,6 +2,8 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 
+// TODO: add command line parameters to control behavior, host, and url file settings
+
 const HOST = 'ncias-p1996-v:38080';
 const URL_FILE = 'urls.json';
 
@@ -70,10 +72,11 @@ function getRequestURL(frqId, applId, fprId, type) {
     return type === 'PLAN' ? planUrl : requestUrl;
 }
 
-function getFileName(frqId, applId, fprId, type) {
+function getFileName(frqId, applId, fprId, type, supplement) {
+    const suppl = supplement ? 'SUPP_' : '';
     return type === 'PLAN'
         ? `plan/PKG_FP_${fprId}.PDF`
-        : `request/PKG_${applId}_${frqId}.PDF`;
+        : `request/${suppl}PKG_${applId}_${frqId}.PDF`;
 }
 
 function buildUrlList() {
@@ -100,7 +103,7 @@ function buildUrlList() {
             requestIds.push(r.frqId);
             urlList.push({
                 url: getRequestURL(r.frqId, r.applId, r.fprId, r.type),
-                fileName: getFileName(r.frqId, r.applId, r.fprId, r.type),
+                fileName: getFileName(r.frqId, r.applId, r.fprId, r.type, r.supplement),
                 type: 'REQUEST',
                 success: false,
                 error: null,
@@ -113,7 +116,7 @@ function buildUrlList() {
     planMap.forEach((v, k) => {
         urlList.push({
             url: getRequestURL(null, v, k, 'PLAN'),
-            fileName: getFileName(null, v, k, 'PLAN'),
+            fileName: getFileName(null, v, k, 'PLAN', null),
             type: 'PLAN',
             success: false,
             error: null,
