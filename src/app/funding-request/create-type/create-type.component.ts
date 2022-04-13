@@ -3,6 +3,7 @@ import { Select2OptionData } from 'ng-select2';
 import { RequestModel } from '../../model/request/request-model';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
 import { NGXLogger } from 'ngx-logger';
+import { WorkflowModel } from '../workflow/workflow.model';
 
 @Component({
   selector: 'app-create-type',
@@ -80,6 +81,7 @@ export class CreateTypeComponent implements OnInit {
 
   constructor(
     public requestModel: RequestModel,
+    private workflowModel: WorkflowModel,
     private logger: NGXLogger) {
   }
 
@@ -96,10 +98,12 @@ export class CreateTypeComponent implements OnInit {
     }
     const type = Number(this.requestModel.requestDto.frtId);
 
-    if (this.requestModel.isForGrantFY() &&
-      this.ROLLUP_TYPES.includes(+type)) {
+    if (this.requestModel.isForGrantFY()
+        && this.ROLLUP_TYPES.includes(+type)
+        && !this.workflowModel.approvedByNciFC) {
       this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'ROLLUP';
-    } else if ( this.PRE_APPL_TYPES.includes(+type) ) {
+    } else if ( this.PRE_APPL_TYPES.includes(+type)
+                && !this.workflowModel.approvedByNciFC ) {
       this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'PRE-APPL';
     } else {
       this.selectedValue = this.requestModel.requestDto.oefiaCreateCode;
