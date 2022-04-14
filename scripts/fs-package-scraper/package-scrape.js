@@ -23,12 +23,12 @@ if (!urlList || urlList.length === 0) {
     urlList = loadUrlList();
 }
 
+urlList = urlList.filter((e) => !e.success);
 console.log(
-    `Total URLs to process: ${urlList.filter((e) => !e.success).length}`
+    `Total URLs to process: ${urlList.length}`
 );
 
 urlList
-    .filter((e) => !e.success)
     .forEach((u, index) => {
         setTimeout(() => {
             scrape(u.url, u.fileName);
