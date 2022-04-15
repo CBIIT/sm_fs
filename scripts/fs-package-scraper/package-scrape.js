@@ -6,6 +6,7 @@ const fs = require('fs');
 
 //const HOST = 'ncias-p1996-v:38080';
 const HOST = 'localhost:8080';
+const TIMEOUT = 15000;
 const URL_FILE = 'urls.json';
 
 const options = {
@@ -35,12 +36,11 @@ urlList
     .forEach((u, index) => {
         setTimeout(() => {
             scrape(u.url, u.fileName);
-        }, index * 30000);
+        }, index * TIMEOUT);
     });
 
 function scrape(url, fileName) {
     const req = http.get(url, options, (res) => {
-        console.log(res);
         if (res.statusCode === 200) {
             //const writeableStream = fs.createWriteStream(fileName);
 
@@ -79,8 +79,8 @@ function getRequestURL(frqId, applId, fprId, type) {
 function getFileName(frqId, applId, fprId, type, supplement) {
     const suppl = supplement ? 'SUPP_' : '';
     return type === 'PLAN'
-        ? `plan/PKG_FP_${fprId}.PDF`
-        : `request/${suppl}PKG_${applId}_${frqId}.PDF`;
+        ? `/egrants/PFR/funding_plan/PKG_FP_${fprId}.PDF`
+        : `/egrants/PFR/package/${suppl}PKG_${applId}_${frqId}.PDF`;
 }
 
 function buildUrlList() {
