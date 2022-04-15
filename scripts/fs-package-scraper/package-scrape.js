@@ -4,7 +4,8 @@ const fs = require('fs');
 
 // TODO: add command line parameters to control behavior, host, and url file settings
 
-const HOST = 'ncias-p1996-v:38080';
+//const HOST = 'ncias-p1996-v:38080';
+const HOST = 'localhost:8080';
 const URL_FILE = 'urls.json';
 
 const options = {
@@ -23,12 +24,14 @@ if (!urlList || urlList.length === 0) {
     urlList = loadUrlList();
 }
 
-urlList = urlList.filter((e) => !e.success);
+const filterClause = (e) => !e.success;
+
 console.log(
-    `Total URLs to process: ${urlList.length}`
+    `Total URLs to process: ${urlList.filter(filterClause).length}`
 );
 
 urlList
+    .filter(filterClause)
     .forEach((u, index) => {
         setTimeout(() => {
             scrape(u.url, u.fileName);
@@ -37,18 +40,19 @@ urlList
 
 function scrape(url, fileName) {
     const req = http.get(url, options, (res) => {
+        console.log(res);
         if (res.statusCode === 200) {
-            const writeableStream = fs.createWriteStream(fileName);
+            //const writeableStream = fs.createWriteStream(fileName);
 
-            res.on('data', (d) => {
-                writeableStream.write(Buffer.from(d));
-            });
+            // res.on('data', (d) => {
+            //     writeableStream.write(Buffer.from(d));
+            // });
 
-            res.on('end', () => {
-                writeableStream.end();
+            // res.on('end', () => {
+                // writeableStream.end();
                 updateUrlStatus(url, true);
                 console.log(`[SUCCESS][${url}]`);
-            });
+            // });
         } else {
             console.log(`[FAILURE][${url}]`);
             updateUrlStatus(
@@ -67,8 +71,8 @@ function scrape(url, fileName) {
 }
 
 function getRequestURL(frqId, applId, fprId, type) {
-    const requestUrl = `http://${HOST}/i2ecws/api/v1/documents/funding-requests-view-package/${frqId}/${applId}`;
-    const planUrl = `http://${HOST}/i2ecws/api/v1/documents/funding-plan-view-package/?fpId=${fprId}&applIds=${applId}`;
+    const requestUrl = `http://${HOST}/i2ecws/api/v1/documents/funding-requests-send-package/${frqId}/${applId}`;
+    const planUrl = `http://${HOST}/i2ecws/api/v1/documents/funding-plan-send-package/?fpId=${fprId}&applIds=${applId}`;
     return type === 'PLAN' ? planUrl : requestUrl;
 }
 
