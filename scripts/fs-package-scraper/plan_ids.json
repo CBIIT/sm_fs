@@ -1,506 +1,362 @@
 [
   {
-    "type": "PLAN",
-    "frqId": 33129,
-    "supplement": false,
+    "applId": 10304543,
     "fprId": 601,
-    "applId": 10304543
+    "frqId": 33129
   },
   {
-    "type": "PLAN",
-    "frqId": 33192,
-    "supplement": false,
+    "applId": 10435831,
     "fprId": 602,
-    "applId": 10435831
+    "frqId": 33192
   },
   {
-    "type": "PLAN",
-    "frqId": 33193,
-    "supplement": false,
+    "applId": 10438142,
     "fprId": 602,
-    "applId": 10438142
+    "frqId": 33193
   },
   {
-    "type": "PLAN",
-    "frqId": 33194,
-    "supplement": false,
+    "applId": 10448611,
     "fprId": 602,
-    "applId": 10448611
+    "frqId": 33194
   },
   {
-    "type": "PLAN",
-    "frqId": 33169,
-    "supplement": false,
+    "applId": 10444758,
     "fprId": 603,
-    "applId": 10444758
+    "frqId": 33169
   },
   {
-    "type": "PLAN",
-    "frqId": 33243,
-    "supplement": false,
+    "applId": 10460062,
     "fprId": 604,
-    "applId": 10460062
+    "frqId": 33243
   },
   {
-    "type": "PLAN",
-    "frqId": 33244,
-    "supplement": false,
+    "applId": 10457160,
     "fprId": 604,
-    "applId": 10457160
+    "frqId": 33244
   },
   {
-    "type": "PLAN",
-    "frqId": 33245,
-    "supplement": false,
+    "applId": 10469133,
     "fprId": 604,
-    "applId": 10469133
+    "frqId": 33245
   },
   {
-    "type": "PLAN",
-    "frqId": 33246,
-    "supplement": false,
+    "applId": 10458154,
     "fprId": 604,
-    "applId": 10458154
+    "frqId": 33246
   },
   {
-    "type": "PLAN",
-    "frqId": 33247,
-    "supplement": false,
+    "applId": 10458172,
     "fprId": 604,
-    "applId": 10458172
+    "frqId": 33247
   },
   {
-    "type": "PLAN",
-    "frqId": 33248,
-    "supplement": false,
+    "applId": 10459987,
     "fprId": 604,
-    "applId": 10459987
+    "frqId": 33248
   },
   {
-    "type": "PLAN",
-    "frqId": 33249,
-    "supplement": false,
+    "applId": 10459011,
     "fprId": 604,
-    "applId": 10459011
+    "frqId": 33249
   },
   {
-    "type": "PLAN",
-    "frqId": 33276,
-    "supplement": false,
+    "applId": 10459715,
     "fprId": 605,
-    "applId": 10459715
+    "frqId": 33276
   },
   {
-    "type": "PLAN",
-    "frqId": 33277,
-    "supplement": false,
+    "applId": 10458355,
     "fprId": 605,
-    "applId": 10458355
+    "frqId": 33277
   },
   {
-    "type": "PLAN",
-    "frqId": 33278,
-    "supplement": false,
+    "applId": 10458886,
     "fprId": 605,
-    "applId": 10458886
+    "frqId": 33278
   },
   {
-    "type": "PLAN",
-    "frqId": 33317,
-    "supplement": false,
+    "applId": 10413583,
     "fprId": 606,
-    "applId": 10413583
+    "frqId": 33317
   },
   {
-    "type": "PLAN",
-    "frqId": 33318,
-    "supplement": false,
+    "applId": 10413630,
     "fprId": 606,
-    "applId": 10413630
+    "frqId": 33318
   },
   {
-    "type": "PLAN",
-    "frqId": 33320,
-    "supplement": false,
+    "applId": 10413485,
     "fprId": 606,
-    "applId": 10413485
+    "frqId": 33320
   },
   {
-    "type": "PLAN",
-    "frqId": 33325,
-    "supplement": false,
+    "applId": 10413606,
     "fprId": 606,
-    "applId": 10413606
+    "frqId": 33325
   },
   {
-    "type": "PLAN",
-    "frqId": 33369,
-    "supplement": false,
+    "applId": 10410327,
     "fprId": 607,
-    "applId": 10410327
+    "frqId": 33369
   },
   {
-    "type": "PLAN",
-    "frqId": 33370,
-    "supplement": false,
+    "applId": 10413516,
     "fprId": 607,
-    "applId": 10413516
+    "frqId": 33370
   },
   {
-    "type": "PLAN",
-    "frqId": 33371,
-    "supplement": false,
+    "applId": 10413620,
     "fprId": 607,
-    "applId": 10413620
+    "frqId": 33371
   },
   {
-    "type": "PLAN",
-    "frqId": 33372,
-    "supplement": false,
+    "applId": 10413468,
     "fprId": 607,
-    "applId": 10413468
+    "frqId": 33372
   },
   {
-    "type": "PLAN",
-    "frqId": 33373,
-    "supplement": false,
+    "applId": 10409385,
     "fprId": 607,
-    "applId": 10409385
+    "frqId": 33373
   },
   {
-    "type": "PLAN",
-    "frqId": 33401,
-    "supplement": false,
+    "applId": 10413265,
     "fprId": 609,
-    "applId": 10413265
+    "frqId": 33401
   },
   {
-    "type": "PLAN",
-    "frqId": 33404,
-    "supplement": false,
+    "applId": 10437469,
     "fprId": 610,
-    "applId": 10437469
+    "frqId": 33404
   },
   {
-    "type": "PLAN",
-    "frqId": 33405,
-    "supplement": false,
+    "applId": 10435117,
     "fprId": 610,
-    "applId": 10435117
+    "frqId": 33405
   },
   {
-    "type": "PLAN",
-    "frqId": 33406,
-    "supplement": false,
+    "applId": 10429780,
     "fprId": 610,
-    "applId": 10429780
+    "frqId": 33406
   },
   {
-    "type": "PLAN",
-    "frqId": 33407,
-    "supplement": false,
+    "applId": 10436675,
     "fprId": 610,
-    "applId": 10436675
+    "frqId": 33407
   },
   {
-    "type": "PLAN",
-    "frqId": 33408,
-    "supplement": false,
+    "applId": 10437547,
     "fprId": 610,
-    "applId": 10437547
+    "frqId": 33408
   },
   {
-    "type": "PLAN",
-    "frqId": 33409,
-    "supplement": false,
+    "applId": 10437534,
     "fprId": 610,
-    "applId": 10437534
+    "frqId": 33409
   },
   {
-    "type": "PLAN",
-    "frqId": 33421,
-    "supplement": false,
+    "applId": 10411024,
     "fprId": 611,
-    "applId": 10411024
+    "frqId": 33421
   },
   {
-    "type": "PLAN",
-    "frqId": 33422,
-    "supplement": false,
+    "applId": 10409343,
     "fprId": 611,
-    "applId": 10409343
+    "frqId": 33422
   },
   {
-    "type": "PLAN",
-    "frqId": 33423,
-    "supplement": false,
+    "applId": 10411201,
     "fprId": 611,
-    "applId": 10411201
+    "frqId": 33423
   },
   {
-    "type": "PLAN",
-    "frqId": 33424,
-    "supplement": false,
+    "applId": 10411074,
     "fprId": 611,
-    "applId": 10411074
+    "frqId": 33424
   },
   {
-    "type": "PLAN",
-    "frqId": 33458,
-    "supplement": false,
+    "applId": 10420233,
     "fprId": 612,
-    "applId": 10420233
+    "frqId": 33458
   },
   {
-    "type": "PLAN",
-    "frqId": 33463,
-    "supplement": false,
+    "applId": 10424637,
     "fprId": 613,
-    "applId": 10424637
+    "frqId": 33463
   },
   {
-    "type": "PLAN",
-    "frqId": 33486,
-    "supplement": false,
+    "applId": 10424854,
     "fprId": 613,
-    "applId": 10424854
+    "frqId": 33486
   },
   {
-    "type": "PLAN",
-    "frqId": 33487,
-    "supplement": false,
+    "applId": 10424763,
     "fprId": 613,
-    "applId": 10424763
+    "frqId": 33487
   },
   {
-    "type": "PLAN",
-    "frqId": 33500,
-    "supplement": false,
+    "applId": 10416454,
     "fprId": 614,
-    "applId": 10416454
+    "frqId": 33500
   },
   {
-    "type": "PLAN",
-    "frqId": 33518,
-    "supplement": false,
+    "applId": 10415579,
     "fprId": 614,
-    "applId": 10415579
+    "frqId": 33518
   },
   {
-    "type": "PLAN",
-    "frqId": 33534,
-    "supplement": false,
+    "applId": 10423457,
     "fprId": 615,
-    "applId": 10423457
+    "frqId": 33534
   },
   {
-    "type": "PLAN",
-    "frqId": 33538,
-    "supplement": false,
+    "applId": 10418133,
     "fprId": 615,
-    "applId": 10418133
+    "frqId": 33538
   },
   {
-    "type": "PLAN",
-    "frqId": 33541,
-    "supplement": false,
+    "applId": 10417829,
     "fprId": 616,
-    "applId": 10417829
+    "frqId": 33541
   },
   {
-    "type": "PLAN",
-    "frqId": 33543,
-    "supplement": false,
+    "applId": 10448890,
     "fprId": 617,
-    "applId": 10448890
+    "frqId": 33543
   },
   {
-    "type": "PLAN",
-    "frqId": 33558,
-    "supplement": false,
+    "applId": 10456381,
     "fprId": 617,
-    "applId": 10456381
+    "frqId": 33558
   },
   {
-    "type": "PLAN",
-    "frqId": 33561,
-    "supplement": false,
+    "applId": 10447468,
     "fprId": 617,
-    "applId": 10447468
+    "frqId": 33561
   },
   {
-    "type": "PLAN",
-    "frqId": 33572,
-    "supplement": false,
+    "applId": 10438235,
     "fprId": 618,
-    "applId": 10438235
+    "frqId": 33572
   },
   {
-    "type": "PLAN",
-    "frqId": 33575,
-    "supplement": false,
+    "applId": 10440934,
     "fprId": 618,
-    "applId": 10440934
+    "frqId": 33575
   },
   {
-    "type": "PLAN",
-    "frqId": 33576,
-    "supplement": false,
+    "applId": 10439370,
     "fprId": 618,
-    "applId": 10439370
+    "frqId": 33576
   },
   {
-    "type": "PLAN",
-    "frqId": 33582,
-    "supplement": false,
+    "applId": 10440579,
     "fprId": 619,
-    "applId": 10440579
+    "frqId": 33582
   },
   {
-    "type": "PLAN",
-    "frqId": 33587,
-    "supplement": false,
+    "applId": 10440591,
     "fprId": 619,
-    "applId": 10440591
+    "frqId": 33587
   },
   {
-    "type": "PLAN",
-    "frqId": 33588,
-    "supplement": false,
+    "applId": 10440158,
     "fprId": 619,
-    "applId": 10440158
+    "frqId": 33588
   },
   {
-    "type": "PLAN",
-    "frqId": 33589,
-    "supplement": false,
+    "applId": 10442088,
     "fprId": 619,
-    "applId": 10442088
+    "frqId": 33589
   },
   {
-    "type": "PLAN",
-    "frqId": 33594,
-    "supplement": false,
+    "applId": 10460000,
     "fprId": 620,
-    "applId": 10460000
+    "frqId": 33594
   },
   {
-    "type": "PLAN",
-    "frqId": 33596,
-    "supplement": false,
+    "applId": 10459980,
     "fprId": 620,
-    "applId": 10459980
+    "frqId": 33596
   },
   {
-    "type": "PLAN",
-    "frqId": 33597,
-    "supplement": false,
+    "applId": 10459949,
     "fprId": 620,
-    "applId": 10459949
+    "frqId": 33597
   },
   {
-    "type": "PLAN",
-    "frqId": 33598,
-    "supplement": false,
+    "applId": 10459716,
     "fprId": 620,
-    "applId": 10459716
+    "frqId": 33598
   },
   {
-    "type": "PLAN",
-    "frqId": 33617,
-    "supplement": false,
+    "applId": 10455967,
     "fprId": 621,
-    "applId": 10455967
+    "frqId": 33617
   },
   {
-    "type": "PLAN",
-    "frqId": 33619,
-    "supplement": false,
+    "applId": 10448167,
     "fprId": 621,
-    "applId": 10448167
+    "frqId": 33619
   },
   {
-    "type": "PLAN",
-    "frqId": 33648,
-    "supplement": false,
+    "applId": 10443355,
     "fprId": 623,
-    "applId": 10443355
+    "frqId": 33648
   },
   {
-    "type": "PLAN",
-    "frqId": 33656,
-    "supplement": false,
+    "applId": 10448869,
     "fprId": 624,
-    "applId": 10448869
+    "frqId": 33656
   },
   {
-    "type": "PLAN",
-    "frqId": 33676,
-    "supplement": false,
+    "applId": 10461469,
     "fprId": 625,
-    "applId": 10461469
+    "frqId": 33676
   },
   {
-    "type": "PLAN",
-    "frqId": 33685,
-    "supplement": false,
+    "applId": 10464360,
     "fprId": 625,
-    "applId": 10464360
+    "frqId": 33685
   },
   {
-    "type": "PLAN",
-    "frqId": 33686,
-    "supplement": false,
+    "applId": 10463434,
     "fprId": 625,
-    "applId": 10463434
+    "frqId": 33686
   },
   {
-    "type": "PLAN",
-    "frqId": 33705,
-    "supplement": false,
+    "applId": 10495384,
     "fprId": 626,
-    "applId": 10495384
+    "frqId": 33705
   },
   {
-    "type": "PLAN",
-    "frqId": 33714,
-    "supplement": false,
+    "applId": 10495403,
     "fprId": 626,
-    "applId": 10495403
+    "frqId": 33714
   },
   {
-    "type": "PLAN",
-    "frqId": 33715,
-    "supplement": false,
+    "applId": 10496239,
     "fprId": 626,
-    "applId": 10496239
+    "frqId": 33715
   },
   {
-    "type": "PLAN",
-    "frqId": 33716,
-    "supplement": false,
+    "applId": 10495865,
     "fprId": 626,
-    "applId": 10495865
+    "frqId": 33716
   },
   {
-    "type": "PLAN",
-    "frqId": 33717,
-    "supplement": false,
+    "applId": 10495814,
     "fprId": 626,
-    "applId": 10495814
+    "frqId": 33717
   },
   {
-    "type": "PLAN",
-    "frqId": 33727,
-    "supplement": false,
+    "applId": 10495811,
     "fprId": 627,
-    "applId": 10495811
+    "frqId": 33727
   },
   {
-    "type": "PLAN",
-    "frqId": 33743,
-    "supplement": false,
+    "applId": 10414442,
     "fprId": 628,
-    "applId": 10414442
+    "frqId": 33743
   }
 ]

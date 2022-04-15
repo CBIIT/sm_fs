@@ -1,8 +1,8 @@
 # Running the package-scrape script
 
 
-- install LibreOffice the default location should be C:\Program Files\LibreOffice.  If not, you'll need to update **LibreOfficeLocation** in PdfFileConverterServiceImpl.
-- create C:/egrants/PFR/package and C:/egrants/PFR/funding_plan folders
+- install LibreOffice (the default location should be C:\Program Files\LibreOffice.  If not, you'll need to update **LibreOfficeLocation** in PdfFileConverterServiceImpl.)
+- Create C:/egrants/PFR/package and C:/egrants/PFR/funding_plan folders
 - Make sure you have C:/temp and a /temp folder in your tomcat directory
 - Build and deploy the latest version of the v1.0.7_fs branch of the web service locally (this is only necessary because later branches have DB changes that are not yet in prod.)
 - update the HOST variable in package-scrape.js to point to your localhost and port: example const HOST = 'localhost:8080';

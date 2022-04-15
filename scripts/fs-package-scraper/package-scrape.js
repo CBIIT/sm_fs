@@ -106,8 +106,8 @@ function buildUrlList() {
         if (!requestIds.includes(r.frqId)) {
             requestIds.push(r.frqId);
             urlList.push({
-                url: getRequestURL(r.frqId, r.applId, r.fprId, r.type),
-                fileName: getFileName(r.frqId, r.applId, r.fprId, r.type, r.supplement),
+                url: getRequestURL(r.frqId, r.applId, r.fprId, 'REQUEST'),
+                fileName: getFileName(r.frqId, r.applId, r.fprId, 'REQUEST', r.supplement),
                 type: 'REQUEST',
                 success: false,
                 error: null,
