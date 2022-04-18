@@ -15,7 +15,6 @@ export class DiversitySupplementComponent implements OnInit {
 
   constructor(public requestModel: RequestModel) {
     this.data = [];
-    this.data.push({ id: '', text: '' });
     this.data.push({ id: '1', text: 'New' });
     this.data.push({ id: '2', text: 'Additional Year (Extension)' });
   }
