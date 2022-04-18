@@ -42,6 +42,7 @@ export class FundingRequestComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.model = this.requestModel;
+    this.model.reset();
     this.requestsNav = this.requestsNavigationModel;
 
     this.routerSub = this.router.events.subscribe((val) => {
