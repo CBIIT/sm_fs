@@ -6,7 +6,7 @@ const fs = require('fs');
 
 //const HOST = 'ncias-p1996-v:38080';
 const HOST = 'localhost:8080';
-const TIMEOUT = 15000;
+const TIMEOUT = 20000;
 const URL_FILE = 'urls.json';
 
 const options = {
