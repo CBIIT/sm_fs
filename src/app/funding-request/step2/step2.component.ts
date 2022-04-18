@@ -85,6 +85,17 @@ export class Step2Component implements OnInit {
     this.requestModel.requestDto.selectedFrtId = this.requestModel.requestDto.frtId;
     this.requestModel.requestDto.financialInfoDto.requestTypeId = this.requestModel.requestDto.frtId;
     this.requestModel.requestDto.financialInfoDto.parentRequestTypeId = null;
+    if(!this.requestModel.isDiversitySupplement()) {
+      // FS-1603 - if the user changes from diversity supplement to a different type, we might have already stored this
+      // info, which we probably shouldn't.
+      this.requestModel.requestDto.financialInfoDto.suppNewFlag = undefined;
+      this.requestModel.requestDto.financialInfoDto.suppAddYearFlag = undefined;
+    } else {
+      // Shouldn't be possible, but just in case, log an error.
+      if(!this.requestModel.requestDto.financialInfoDto.suppNewFlag || !this.requestModel.requestDto.financialInfoDto.suppAddYearFlag) {
+        this.logger.error(`Missing supplement type info for Diversity Supplement request`, this.requestModel.requestDto);
+      }
+    }
     this.logger.debug(JSON.stringify(this.requestModel.requestDto));
     this.fsRequestControllerService.saveRequestUsingPOST(this.requestModel.requestDto).subscribe(
       result => {
