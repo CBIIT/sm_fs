@@ -66,7 +66,7 @@ export class FundingPlanInformationComponent implements OnInit {
     this.totalApplicationsSkipped = this.listApplicationsSkipped.length;
 
     // Total number of not selectable grants
-    this.listApplicationsNotSelectable = this.planModel.allGrants.filter(g => g.notSelectableReason?.length > 0);
+    this.listApplicationsNotSelectable = this.planModel.allGrants.filter(g => (g.notSelectableReason?.length > 0 && !g.selected));
 
     this.listApplicationsOutsideRange = this.planModel.allGrants.filter(g =>
       g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)
@@ -106,7 +106,7 @@ export class FundingPlanInformationComponent implements OnInit {
             tmp.title = next?.title;
             tmp.nihGuideAddr = next?.nihGuideAddr;
             this.fundingPlanFoas.push(tmp);
-          } 
+          }
         });
       });
     }
