@@ -1,0 +1,860 @@
+[
+  {
+    "applId": 10462069,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33805
+  },
+  {
+    "applId": 10305164,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33635
+  },
+  {
+    "applId": 10306113,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33629
+  },
+  {
+    "applId": 10279337,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33639
+  },
+  {
+    "applId": 10299447,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33642
+  },
+  {
+    "applId": 10462962,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33770
+  },
+  {
+    "applId": 10389240,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33773
+  },
+  {
+    "applId": 10462420,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33771
+  },
+  {
+    "applId": 10464756,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33813
+  },
+  {
+    "applId": 10225387,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33632
+  },
+  {
+    "applId": 10254428,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33624
+  },
+  {
+    "applId": 10164735,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33622
+  },
+  {
+    "applId": 10203889,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33621
+  },
+  {
+    "applId": 10468561,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33626
+  },
+  {
+    "applId": 10398915,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33821
+  },
+  {
+    "applId": 10220603,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33729
+  },
+  {
+    "applId": 10225462,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33420
+  },
+  {
+    "applId": 10246184,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33731
+  },
+  {
+    "applId": 10254491,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33807
+  },
+  {
+    "applId": 10170294,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33808
+  },
+  {
+    "applId": 10250688,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33809
+  },
+  {
+    "applId": 10422966,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33816
+  },
+  {
+    "applId": 10380633,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33673
+  },
+  {
+    "applId": 10348154,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33769
+  },
+  {
+    "applId": 10406930,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33768
+  },
+  {
+    "applId": 10441803,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33810
+  },
+  {
+    "applId": 10220603,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33733
+  },
+  {
+    "applId": 10451999,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33643
+  },
+  {
+    "applId": 9880096,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33818
+  },
+  {
+    "applId": 10144405,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 31652
+  },
+  {
+    "applId": 10305148,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33570
+  },
+  {
+    "applId": 10111491,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33777
+  },
+  {
+    "applId": 10310554,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33775
+  },
+  {
+    "applId": 10418074,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33764
+  },
+  {
+    "applId": 10461542,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33728
+  },
+  {
+    "applId": 10466535,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33735
+  },
+  {
+    "applId": 10417394,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33774
+  },
+  {
+    "applId": 10113557,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33806
+  },
+  {
+    "applId": 10358536,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33438
+  },
+  {
+    "applId": 10152534,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33436
+  },
+  {
+    "applId": 10395516,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33435
+  },
+  {
+    "applId": 10378561,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33441
+  },
+  {
+    "applId": 10466977,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33453
+  },
+  {
+    "applId": 10228161,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33444
+  },
+  {
+    "applId": 10456686,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33452
+  },
+  {
+    "applId": 10319022,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33445
+  },
+  {
+    "applId": 10252868,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33615
+  },
+  {
+    "applId": 10318356,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33647
+  },
+  {
+    "applId": 10333063,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33457
+  },
+  {
+    "applId": 10489753,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33641
+  },
+  {
+    "applId": 10489753,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33314
+  },
+  {
+    "applId": 10442600,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33623
+  },
+  {
+    "applId": 10391556,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33636
+  },
+  {
+    "applId": 10317106,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33644
+  },
+  {
+    "applId": 10317108,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33627
+  },
+  {
+    "applId": 10115672,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33612
+  },
+  {
+    "applId": 10491906,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33640
+  },
+  {
+    "applId": 10390451,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33637
+  },
+  {
+    "applId": 10350646,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33638
+  },
+  {
+    "applId": 10397107,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33633
+  },
+  {
+    "applId": 10299601,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33634
+  },
+  {
+    "applId": 10407469,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33630
+  },
+  {
+    "applId": 10323016,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33625
+  },
+  {
+    "applId": 10307635,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33631
+  },
+  {
+    "applId": 10014587,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33672
+  },
+  {
+    "applId": 10332544,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33674
+  },
+  {
+    "applId": 10211157,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33652
+  },
+  {
+    "applId": 10357736,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33671
+  },
+  {
+    "applId": 10466240,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33703
+  },
+  {
+    "applId": 10457135,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33675
+  },
+  {
+    "applId": 10258201,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33650
+  },
+  {
+    "applId": 10253272,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33704
+  },
+  {
+    "applId": 10383611,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33446
+  },
+  {
+    "applId": 10472142,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33732
+  },
+  {
+    "applId": 10146961,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33737
+  },
+  {
+    "applId": 10418848,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33739
+  },
+  {
+    "applId": 10445172,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33613
+  },
+  {
+    "applId": 10344658,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33734
+  },
+  {
+    "applId": 10378669,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33741
+  },
+  {
+    "applId": 10411665,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33761
+  },
+  {
+    "applId": 10398254,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33762
+  },
+  {
+    "applId": 9996528,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33772
+  },
+  {
+    "applId": 10398254,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33763
+  },
+  {
+    "applId": 10361387,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33738
+  },
+  {
+    "applId": 10359815,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33740
+  },
+  {
+    "applId": 10379392,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33742
+  },
+  {
+    "applId": 10373086,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33628
+  },
+  {
+    "applId": 10324856,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33579
+  },
+  {
+    "applId": 10373086,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33628
+  },
+  {
+    "applId": 10458357,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33609
+  },
+  {
+    "applId": 10458259,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33611
+  },
+  {
+    "applId": 10458278,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33605
+  },
+  {
+    "applId": 10457626,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33608
+  },
+  {
+    "applId": 10457759,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33607
+  },
+  {
+    "applId": 10457721,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33610
+  },
+  {
+    "applId": 10458369,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33606
+  },
+  {
+    "applId": 10381884,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33460
+  },
+  {
+    "applId": 10385213,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33461
+  },
+  {
+    "applId": 10384796,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33459
+  },
+  {
+    "applId": 10468497,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33604
+  },
+  {
+    "applId": 10204950,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33428
+  },
+  {
+    "applId": 10461542,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33451
+  },
+  {
+    "applId": 10450238,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33447
+  },
+  {
+    "applId": 10254547,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33571
+  },
+  {
+    "applId": 10407744,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33448
+  },
+  {
+    "applId": 10381384,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33455
+  },
+  {
+    "applId": 10379630,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33454
+  },
+  {
+    "applId": 10410749,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33462
+  },
+  {
+    "applId": 10261595,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33432
+  },
+  {
+    "applId": 10463260,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33443
+  },
+  {
+    "applId": 10466555,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33442
+  },
+  {
+    "applId": 10428790,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33431
+  },
+  {
+    "applId": 10464554,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33429
+  },
+  {
+    "applId": 10446803,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33433
+  },
+  {
+    "applId": 10445123,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33434
+  },
+  {
+    "applId": 10423240,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33426
+  },
+  {
+    "applId": 10440845,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33425
+  },
+  {
+    "applId": 10427491,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33316
+  },
+  {
+    "applId": 10411512,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33449
+  },
+  {
+    "applId": 10366743,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33241
+  },
+  {
+    "applId": 10437617,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33312
+  },
+  {
+    "applId": 9996528,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33237
+  },
+  {
+    "applId": 10479715,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33427
+  },
+  {
+    "applId": 9870707,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33242
+  },
+  {
+    "applId": 10485049,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33309
+  },
+  {
+    "applId": 10254572,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33310
+  },
+  {
+    "applId": 10382481,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33313
+  },
+  {
+    "applId": 10386723,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33311
+  },
+  {
+    "applId": 10254640,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33307
+  },
+  {
+    "applId": 10258848,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33308
+  },
+  {
+    "applId": 10252708,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33240
+  },
+  {
+    "applId": 10139779,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33239
+  },
+  {
+    "applId": 10333158,
+    "fprId": "",
+    "supplement": true,
+    "frqId": 33233
+  },
+  {
+    "applId": 10333158,
+    "fprId": "",
+    "supplement": true,
+    "frqId": 33232
+  },
+  {
+    "applId": 10332907,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33235
+  },
+  {
+    "applId": 10332400,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33234
+  },
+  {
+    "applId": 10333158,
+    "fprId": "",
+    "supplement": true,
+    "frqId": 33231
+  },
+  {
+    "applId": 10468497,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33191
+  },
+  {
+    "applId": 10479201,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33236
+  },
+  {
+    "applId": 9617113,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33230
+  },
+  {
+    "applId": 9839924,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33190
+  },
+  {
+    "applId": 9617113,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33189
+  },
+  {
+    "applId": 9617084,
+    "fprId": "",
+    "supplement": false,
+    "frqId": 33167
+  }
+]

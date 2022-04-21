@@ -39,6 +39,7 @@ export class WorkflowModel {
   isFcNci = false;
   approvedScientifically = false;
   approvedByGM = false;
+  approvedByNciFC = false;
   // 3 below properties are used for determining withdraw, hold button
   approvedByFC = false;
   isDocApprover = false;
@@ -264,8 +265,8 @@ export class WorkflowModel {
         if (a.roleCode === 'DOC' && a.responseCode === 'Y') {
           this.approvedByDoc = true;
         }
-        if (this.approvedByGM && this.approvedScientifically && this.approvedByFC && this.approvedByDoc) {
-          break;
+        if (a.roleCode === 'FCNCI' && a.responseCode === 'Y') {
+          this.approvedByNciFC = true;
         }
       }
     }

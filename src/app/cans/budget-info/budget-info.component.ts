@@ -119,11 +119,19 @@ export class BudgetInfoComponent implements OnInit {
   }
 
   copyProjectedCan(i: number): void {
+    let found: boolean = false;
     this.canSelectors.forEach((control) => {
       if (+i === +control.index) {
-        control.selectProjectedCan();
+        found = true;
+        const result = control.selectProjectedCan();
+        if(!result) {
+          this.logger.error(`Unable to select projected CAN for control ${JSON.stringify(control)}`);
+        }
       }
     });
+    if(!found) {
+      this.logger.error(`No matching CAN selector found at index ${i}`);
+    }
   }
 
   nonDefaultCan(i: number): boolean {

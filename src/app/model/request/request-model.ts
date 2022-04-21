@@ -205,6 +205,7 @@ export class RequestModel {
 
   reset(): void {
     this.title = 'New Request';
+    this._supplementType = null;
     this._requestDto = {};
     this._requestDto.financialInfoDto = {};
     this._requestType = undefined;

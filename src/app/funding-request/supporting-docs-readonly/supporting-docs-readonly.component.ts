@@ -90,6 +90,8 @@ export class SupportingDocsReadonlyComponent implements OnInit {
 
     if (fileName === 'Summary Statement') {
       this.downloadSummaryStatement();
+    }else if (fileName === 'Supplement Application') {
+      this.downloadSupplementAppDoc(this.requestModel.requestDto.suppApplId);
     } else {
       this.documentService.downloadById(id)
         .subscribe(
@@ -131,5 +133,16 @@ export class SupportingDocsReadonlyComponent implements OnInit {
         this.logger.error('Error downloading the summary statement'),
       () => this.logger.info('File downloaded successfully');
   }
+
+  downloadSupplementAppDoc(suppApplId: number) {
+    this.documentService.downloadSupplementAppDoc(suppApplId)
+      .subscribe(
+        (response: HttpResponse<Blob>) => {
+          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          saveAs(blob, response.headers.get('filename'));
+        }
+      );
+  }
+
 
 }

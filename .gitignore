@@ -47,7 +47,7 @@ Thumbs.db
 
 
 **/package-lock.json
-/node_modules/
+node_modules
 /bin/
 /sm_fs.NCI-02118647-L.kanozad.pui
 /sm_fs.prj
