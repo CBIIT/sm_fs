@@ -213,10 +213,10 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       Object.assign(sf, form.form.value);
       sf.searchType = this.searchType;
       if (this.searchType === 'FR') {
-        sf.pendingApprovalStatusOnly = this.searchFilter.fundingRequestStatus.length === 1 && this.searchFilter.fundingRequestStatus[0] === 'PENDING APPROVAL';
+        sf.pendingApprovalStatusOnly = this.searchFilter.fundingRequestStatus?.length === 1 && this.searchFilter.fundingRequestStatus[0] === 'PENDING APPROVAL';
       }
       else if ((this.searchType === 'FP')) {
-        sf.pendingApprovalStatusOnly = this.searchFilter.fundingPlanStatus.length === 1 && this.searchFilter.fundingPlanStatus[0] === 'PENDING APPROVAL';
+        sf.pendingApprovalStatusOnly = this.searchFilter.fundingPlanStatus?.length === 1 && this.searchFilter.fundingPlanStatus[0] === 'PENDING APPROVAL';
       }
       sf.fundingRequestStatus = this._populateStatus(this.searchFilter.fundingRequestStatus);
       sf.fundingPlanStatus = this._populateStatus(this.searchFilter.fundingPlanStatus);
