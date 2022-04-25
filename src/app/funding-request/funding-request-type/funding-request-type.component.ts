@@ -43,7 +43,7 @@ export class FundingRequestTypeComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<number>();
   otherPayAlert: Alert = {
     type: 'warning',
-    message: 'WARNING: This option should be selected only if your request will not be using any NCI funds. Send an e-mail to <a href="mailto: NCIProgramFundingRequestPolicyInquiry@mail.nih.gov" title="NCIProgramFundingRequestPolicyInquiry@mail.nih.gov"> for guidance with other special circumstances.'
+    message: 'WARNING: This option should be selected only if your request will not be using any NCI funds. Send an e-mail to <a href="mailto: NCIProgramFundingRequestPolicyInquiry@mail.nih.gov" title="">NCI PFR Policy Inquiry</a> for guidance with other special circumstances.'
   };
 
   set selectedValue(value: number) {
