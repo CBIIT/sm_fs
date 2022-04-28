@@ -92,7 +92,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       this.budgetInfoComponent.isApprovalAction = approvalAction;
     }
 
-    if (this.workflowModel.isFcNci && approvalAction) {
+    if (approvalAction && this.workflowModel.isFcNci && this.requestModel.isAddFunds()) {
       this.showCreateType = true;
     }
     else {
