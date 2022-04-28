@@ -23,7 +23,7 @@
     "@angular/localize": "~12.2.16",
     "@angular/platform-browser": "~12.2.16",
     "@angular/platform-browser-dynamic": "~12.2.16",
-    "@angular/router": "^12.2.16",
+    "@angular/router": "~12.2.16",
     "@cbiit/i2ecui-lib": "file:cbiit-i2ecui-lib-2.0.0.tgz",
     "@cbiit/i2ecws-lib": "file:cbiit-i2ecws-lib-2.0.0.tgz",
     "@ng-bootstrap/ng-bootstrap": "^10.0.0",
