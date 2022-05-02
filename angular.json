@@ -60,6 +60,10 @@
             ]
           },
           "configurations": {
+            "dev": {
+              "optimization": false,
+              "sourceMap": true
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -96,6 +100,9 @@
             "proxyConfig": "src/environments/proxy.config.js"
           },
           "configurations": {
+            "dev": {
+              "browserTarget": "fs:build:dev"
+            },
             "production": {
               "browserTarget": "fs:build:production"
             }
