@@ -25,7 +25,7 @@ import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 })
 export class RequestModel {
 
-  supportYearChangedEmitter = new Subject<{}>();
+  modelDirtyBroadcastEmitter = new Subject<void>();
 
   private _supplementType: string;
   pendingAlerts: Alert[] = [];
@@ -293,18 +293,8 @@ export class RequestModel {
         lineItem = [];
         this.programRecommendedCostsModel.prcLineItems.set(b.fseId, lineItem);
       }
-
       const tmp = new PrcDataPoint();
       tmp.grantAward = this.isPayType4() ? { year: b.supportYear } as GrantAwardedDto : awardMap.get(b.supportYear);
-      if(!tmp.grantAward) {
-        this.logger.error(`FrqId:${this.requestDto.frqId}::No grant award found for budget year ${b.supportYear}; request support year ${this.requestDto.supportYear}`);
-        const errorPayload = {
-          requestSupportYear: this.requestDto.supportYear,
-          requestBudgetStartDate: this.requestDto.budgetStartDate,
-          budgetSupportYear: b.supportYear
-        }
-        this.supportYearChangedEmitter.next(errorPayload);
-      }
       tmp.fundingSource = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
       tmp.baselineDirect = this.isInitialPay() ? tmp.grantAward.requestAmount : tmp.grantAward.directAmount;
       tmp.baselineTotal = this.isInitialPay() ? tmp.grantAward.requestTotalAmount : tmp.grantAward.totalAwarded;
