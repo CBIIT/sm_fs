@@ -299,7 +299,6 @@ export class RequestModel {
       if(!tmp.grantAward) {
         this.logger.error(`FrqId:${this.requestDto.frqId}::No grant award found for budget year ${b.supportYear}; request support year ${this.requestDto.supportYear}`);
         const errorPayload = {
-          requestId: this.requestDto.frqId,
           requestSupportYear: this.requestDto.supportYear,
           requestBudgetStartDate: this.requestDto.budgetStartDate,
           budgetSupportYear: b.supportYear
