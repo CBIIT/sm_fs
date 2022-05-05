@@ -370,8 +370,8 @@ export class RequestModel {
               dto.requestedDc = lineItem0.recommendedDirect;
               dto.approvedTc = dto.requestedTc;
               dto.approvedDc = dto.requestedDc;
-              dto.dcPctCut = Math.round(100000 * lineItem0.percentCutDirectCalculated);
-              dto.tcPctCut = Math.round(100000 * lineItem0.percentCutTotalCalculated);
+              dto.dcPctCut = this.isInitialPay() ? Math.round(100000 * lineItem0.percentCutDirectCalculated) : null;
+              dto.tcPctCut = this.isInitialPay() ? Math.round(100000 * lineItem0.percentCutTotalCalculated) : null;
               dto.requestedFutureYrs = fundedYears === 0 ? 0 : fundedYears - 1;
               dto.approvedFutureYrs = dto.requestedFutureYrs;
               this.requestCans.push(dto);
