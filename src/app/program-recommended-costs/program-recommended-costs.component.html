@@ -4,7 +4,7 @@
 <ng-template #payType4Head>
   <thead>
   <tr *ngIf="selectedFundingSources && selectedFundingSources.length > 0">
-    <th scope="row">Fiscal Year</th>
+    <th scope="row">Year</th>
     <th scope="col" *ngFor="let fy of type4FiscalYears"><span class="read-only-th">{{ fy }}</span></th>
   </tr>
   </thead>
@@ -12,7 +12,7 @@
 <ng-template #defaultHead>
   <thead>
   <tr>
-    <th scope="row">Fiscal Year</th>
+    <th scope="row">Year</th>
     <th scope="col" *ngFor="let ga of grantAwarded"><span class="read-only-th">{{ ga.year }}</span></th>
   </tr>
   <tr *ngIf="showPiCosts()">
@@ -369,7 +369,7 @@
                 <table class="table prc-table mb-0">
                   <thead>
                   <tr>
-                    <th scope="row">Fiscal Year</th>
+                    <th scope="row">Year</th>
                     <th *ngFor="let li of lineItem; let i = index; let first = first; let last = last" scope="col">
                       <div class="fsource-fy1-form" *ngIf="first; else notFirst">
                         <div class="form-row">
@@ -800,7 +800,7 @@
                 <table class="table prc-table mb-0">
                   <thead>
                   <tr>
-                    <th scope="row">Fiscal Year</th>
+                    <th scope="row">Year</th>
                     <th *ngFor="let li of lineItem; let i = index; let first = first; let last = last" scope="col">
                       <div class="fsource-fy1-form" *ngIf="first; else notFirst">
                         <div class="form-row">
