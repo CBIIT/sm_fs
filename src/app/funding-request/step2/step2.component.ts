@@ -7,7 +7,6 @@ import { FundingRequestTypes, FUNDING_POLICY_CUT_TYPES } from '../../model/reque
 import { ProgramRecommendedCostsComponent } from '../../program-recommended-costs/program-recommended-costs.component';
 import { Alert } from '../../alert-billboard/alert';
 import { NgForm } from '@angular/forms';
-import { RequestApproverService } from '../approver/approver.service';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
 import { PrcLineItemType } from '../../program-recommended-costs/prc-data-point';
 import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
@@ -28,7 +27,6 @@ export class Step2Component implements OnInit {
 
   constructor(private router: Router,
               public requestModel: RequestModel,
-              private requestApproverService: RequestApproverService,
               private fsRequestControllerService: FsRequestControllerService,
               private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
               private navigationModel: NavigationStepModel,
@@ -112,7 +110,7 @@ export class Step2Component implements OnInit {
       this.requestModel.requestDto.financialInfoDto.suppAddYearFlag = undefined;
     } else {
       // Shouldn't be possible, but just in case, log an error.
-      if(!this.requestModel.requestDto.financialInfoDto.suppNewFlag || !this.requestModel.requestDto.financialInfoDto.suppAddYearFlag) {
+      if (!this.requestModel.requestDto.financialInfoDto.suppNewFlag || !this.requestModel.requestDto.financialInfoDto.suppAddYearFlag) {
         this.logger.error(`Missing supplement type info for Diversity Supplement request`, this.requestModel.requestDto);
       }
     }
@@ -137,14 +135,10 @@ export class Step2Component implements OnInit {
             this.logger.debug('restored budgets:', result1);
             this.requestModel.restoreLineItemIds();
           });
-        this.requestApproverService.checkCreateApprovers().then(
-          () => {
-            this.clean = true;
-
-            if (navigate) {
+        this.clean = true;
+        if (navigate) {
               this.router.navigate([navigate]);
-            }
-          });
+        }
       }, error => {
         // TODO: properly handle errors here
         this.logger.error('HttpClient get request error during save request ----- ' + error.message);
