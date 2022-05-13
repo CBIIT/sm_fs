@@ -175,7 +175,7 @@ export class PlanStep3Component implements OnInit {
           if (this.nextStep === '/plan/step6') {
             this.planModel.pendingAlerts.push({
               type: 'success',
-              message: 'You have successfully saved your request',
+              message: 'You have successfully saved your plan',
               title: ''
             });
           }
