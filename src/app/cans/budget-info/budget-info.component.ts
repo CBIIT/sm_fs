@@ -91,6 +91,10 @@ export class BudgetInfoComponent implements OnInit {
 
   refreshRequestCans(): void {
     this.model.requestCans.forEach((c, index) => {
+      if(!this.model.isInitialPay()) {
+        c.dcPctCut = null;
+        c.tcPctCut = null;
+      }
       const selected: CanCcxDto = this.getCanSelectorWithIndex(index)?.selectedCanData;
       if (selected) {
         c.can = selected.can;
