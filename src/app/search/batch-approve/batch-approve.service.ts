@@ -24,7 +24,7 @@ export class BatchApproveService {
         this.frqIds = result.filter( dto => dto.frqId > 0 ).map( dto => dto.frqId);
         this.fprIds = result.filter( dto => dto.fprId > 0 ).map( dto => dto.fprId);
         if (result && result.length > 0) {
-          this.doc = result[0].roleCode === 'DOC';
+          this.doc = result[0].roleCode === 'DOC' || result[0].roleCode === 'OTHERDOC';
           this.spl = result[0].roleCode === 'SPL';
         }
         this.logger.debug('frqIds=' + this.frqIds + ' fprIds=' + this.fprIds + ' doc=' + this.doc + ' spl=' + this.spl);

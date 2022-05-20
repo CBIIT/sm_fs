@@ -44,7 +44,7 @@ export class BatchApproveModalComponent implements OnInit {
   maxDate: NgbDate = this.calendar.getToday();
 
   requestOrPlan: 'REQUEST'|'PLAN';
-  mode: 'DOC'|'SPL';
+  mode: 'DOC'|'OTHERDOC'|'SPL';
   buttonText = '';
   title = '';
   alert: Alert;
@@ -73,7 +73,7 @@ export class BatchApproveModalComponent implements OnInit {
     this.batchApproveSuccess = false;
     this.requestsForApproval = requests.filter(r => this.batchApproveService.canApproveRequest(r.frqId));
     this.requestOrPlan = 'REQUEST';
-    this.mode = this.batchApproveService.isDoc ? 'DOC' : 'SPL';
+    this.mode = this.batchApproveService.isDoc ? 'DOC' || 'OTHERDOC' : 'SPL';
     this.title = 'Request(s) Selected for Batch Approval';
     this.buttonText = 'Confirm Approve';
     this.eligibleCount = this.requestsForApproval.length;
@@ -91,7 +91,7 @@ export class BatchApproveModalComponent implements OnInit {
     this.batchApproveSuccess = false;
     this.plansForApproval = plans.filter( p => this.batchApproveService.canApprovePlan(p.fprId) );
     this.requestOrPlan = 'PLAN';
-    this.mode = this.batchApproveService.isDoc() ? 'DOC' : 'SPL';
+    this.mode = this.batchApproveService.isSpl() ? 'SPL' : 'DOC';
     this.title = 'Plan(s) Selected for Batch Approval';
     this.buttonText = 'Confirm Approve';
     this.eligibleCount = this.plansForApproval.length;
