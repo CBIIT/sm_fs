@@ -24,7 +24,6 @@ import { FundingRequestTypes } from '../../model/request/funding-request-types';
 import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { FundingReqBudgetsDto } from '@cbiit/i2ecws-lib/model/fundingReqBudgetsDto';
 import { AppUserSessionService } from '../../service/app-user-session.service';
-import { PlanApproverService } from '../approver/plan-approver.service';
 import { CanManagementService } from '../../cans/can-management.service';
 import { Alert } from '../../alert-billboard/alert';
 import { FundingSourceGrantDataPayload } from '../applications-proposed-for-funding/funding-source-grant-data-payload';
@@ -64,7 +63,6 @@ export class PlanStep3Component implements OnInit {
               private pdCaIntegratorService: PdCaIntegratorService,
               private planManagementService: PlanManagementService,
               private fsPlanControllerService: FsPlanControllerService,
-              private planApproverService: PlanApproverService,
               private canManagementService: CanManagementService,
               private userSessionService: AppUserSessionService) {
   }
@@ -170,17 +168,14 @@ export class PlanStep3Component implements OnInit {
         this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.map(s => {
           return { applId: s.applId, frtId: s.frtId };
         }));
-      this.planApproverService.checkCreateApprovers().then(
-        () => {
-          if (this.nextStep === '/plan/step6') {
+      if (this.nextStep === '/plan/step6') {
             this.planModel.pendingAlerts.push({
               type: 'success',
               message: 'You have successfully saved your plan',
               title: ''
             });
           }
-          this.router.navigate([this.nextStep]);
-        });
+      this.router.navigate([this.nextStep]);
     }, error => {
       this.customLogger.logErrorWithContext(error);
     });
