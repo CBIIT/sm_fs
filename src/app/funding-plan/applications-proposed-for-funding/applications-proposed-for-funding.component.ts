@@ -35,6 +35,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   @Output() cancelAddFundingSource = new EventEmitter<void>();
   @Output() deleteFundingSource = new EventEmitter<number>();
   @Output() clearEditFlag = new EventEmitter<void>();
+  @Output() recaptureSourceValues = new EventEmitter<void>();
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
   @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
   @ViewChildren(FpFundingSourceComponent) fundingSources: QueryList<FpFundingSourceComponent>;
@@ -207,7 +208,25 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   handleSourceChanged($event: { oldSource: number; newSource: number }): void {
     // This event should only be triggered when there is a single funding source. For multiple sources, the change will
     // be spliced in.
-    this.deleteFundingSource.next(+$event.oldSource);
+
+    this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
+      req.financialInfoDto.fundingRequestCans?.filter(c => +c.fseId === +$event.oldSource).forEach(
+        can => can.fseId = $event.newSource
+      );
+      req.financialInfoDto.fundingReqBudgetsDtos?.filter(b => +b.fseId === +$event.oldSource).forEach(
+        bud => bud.fseId = $event.newSource
+      );
+    });
+
+    if (!this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources) {
+      this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = [];
+    }
+    this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources.push(+$event.oldSource);
+
+    this.planManagementService.recalculateRestrictedSources();
+
+    //this.deleteFundingSource.next(+$event.oldSource);
+    //this.recaptureSourceValues.next();
   }
 
   capturePendingValues($event: PendingPrcValues): void {

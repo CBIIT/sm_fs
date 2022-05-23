@@ -75,16 +75,6 @@
               [broadcast]="true"
               (selectedValueChange)="onSelectedValueChange($event)">
             </lib-cancer-activities-dropdown>
-            <!--            <lib-cancer-activities-dropdown-->
-            <!--              [selectSingleOption]="true"-->
-            <!--              [maxSelection]="1"-->
-            <!--              [syncWithPd]="true"-->
-            <!--              label="Requesting PD's Cancer Activities"-->
-            <!--              [broadcast]="true"-->
-            <!--              [selectedValue]="cayCode"-->
-            <!--              [(ngModel)]="cayCode"-->
-            <!--              required>-->
-            <!--            </lib-cancer-activities-dropdown>-->
             <div class="text-danger mt-1"
                  *ngIf="step3form.errors?.cayCodeIsRequired && (step3form.submitted || step3form.touched)">
               Requesting PD's Cancer Activity is required
@@ -114,7 +104,8 @@
     (addFundingSource)="addFundingSource($event)"
     (cancelAddFundingSource)="cancelAddFundingSource()"
     (clearEditFlag)="clearEditFlag()"
-    (deleteFundingSource)="deleteFundingSource($event)">
+    (deleteFundingSource)="deleteFundingSource($event)"
+    (recaptureSourceValues)="onRecaptureSourceValues()">
   </app-applications-proposed-for-funding>
 
 

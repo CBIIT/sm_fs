@@ -557,22 +557,12 @@ export class PlanStep3Component implements OnInit {
               fseId: +s.fseId,
               fundingSourceName: s.fundingSourceName,
               id: s.canId,
-              // lastChangeDate: string,
-              // lastChangeUserId: string,
               nciSourceFlag: s.nciSourceFlag,
               percentSelected: s.displayType === 'percent' ? true : false,
-              // octId: s.octId,
-              // oefiaCreateCode: string,
-              // oefiaTypeId: number,
-              // oefiaTypeIds: string,
-              // phsOrgCode: string,
-              // previousAfy: number,
-              // reimburseableCode: string,
               requestedDc: +directCost,
               requestedFutureYrs: futureYears,
               requestedTc: +totalCost,
               tcPctCut: +tcPercentCut,
-              // updateStamp: number,
             };
           } else {
             frCan.approvedDc = +directCost;
@@ -733,5 +723,9 @@ export class PlanStep3Component implements OnInit {
         req.frtId = FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION;
       }
     });
+  }
+
+  onRecaptureSourceValues() {
+    this.logger.debug('Recapture source values');
   }
 }
