@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { NgForm } from '@angular/forms';
 import { PlanModel } from '../../model/plan/plan-model';
-import { PdCaIntegratorService } from '@cbiit/i2ecui-lib';
+import { CustomServerLoggingService, PdCaIntegratorService } from '@cbiit/i2ecui-lib';
 import { PlanManagementService } from '../service/plan-management.service';
 import {
   FsPlanControllerService,
@@ -27,7 +27,6 @@ import { AppUserSessionService } from '../../service/app-user-session.service';
 import { CanManagementService } from '../../cans/can-management.service';
 import { Alert } from '../../alert-billboard/alert';
 import { FundingSourceGrantDataPayload } from '../applications-proposed-for-funding/funding-source-grant-data-payload';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({
@@ -169,12 +168,12 @@ export class PlanStep3Component implements OnInit {
           return { applId: s.applId, frtId: s.frtId };
         }));
       if (this.nextStep === '/plan/step6') {
-            this.planModel.pendingAlerts.push({
-              type: 'success',
-              message: 'You have successfully saved your plan',
-              title: ''
-            });
-          }
+        this.planModel.pendingAlerts.push({
+          type: 'success',
+          message: 'You have successfully saved your plan',
+          title: ''
+        });
+      }
       this.router.navigate([this.nextStep]);
     }, error => {
       this.customLogger.logErrorWithContext(error);
@@ -723,9 +722,5 @@ export class PlanStep3Component implements OnInit {
         req.frtId = FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION;
       }
     });
-  }
-
-  onRecaptureSourceValues() {
-    this.logger.debug('Recapture source values');
   }
 }

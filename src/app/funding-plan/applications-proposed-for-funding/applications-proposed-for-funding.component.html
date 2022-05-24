@@ -52,10 +52,10 @@
       <tbody>
       <tr *ngFor="let grant of listGrantsSelected; let i = index;" [ngModelGroup]="grant.fullGrantNum">
         <td>
-          <app-fp-grant-information 
-            [parentForm]="parentForm" 
-            [grantIndex]="i" 
-            [grant]="grant" 
+          <app-fp-grant-information
+            [parentForm]="parentForm"
+            [grantIndex]="i"
+            [grant]="grant"
             [sourceIndex]="0">
           </app-fp-grant-information>
         </td>
@@ -153,9 +153,9 @@
       <tbody>
       <tr *ngFor="let grant of listGrantsSelected; let grantIndex = index;">
         <td [ngModelGroup]="grant.applId + grant.fullGrantNum">
-          <app-fp-grant-information 
-            [parentForm]="parentForm" 
-            [grantIndex]="grantIndex" 
+          <app-fp-grant-information
+            [parentForm]="parentForm"
+            [grantIndex]="grantIndex"
             [grant]="grant"
             [readOnly]="false"
             [sourceIndex]="0">

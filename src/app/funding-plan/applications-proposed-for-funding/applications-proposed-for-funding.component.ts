@@ -35,7 +35,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   @Output() cancelAddFundingSource = new EventEmitter<void>();
   @Output() deleteFundingSource = new EventEmitter<number>();
   @Output() clearEditFlag = new EventEmitter<void>();
-  @Output() recaptureSourceValues = new EventEmitter<void>();
   @ViewChildren(FpProgramRecommendedCostsComponent) prcList: QueryList<FpProgramRecommendedCostsComponent>;
   @ViewChildren(FpGrantInformationComponent) grantList: QueryList<FpGrantInformationComponent>;
   @ViewChildren(FpFundingSourceComponent) fundingSources: QueryList<FpFundingSourceComponent>;
@@ -221,12 +220,17 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     if (!this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources) {
       this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = [];
     }
+    this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources = this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources.filter(s => s !== +$event.newSource);
     this.planModel.fundingPlanDto.fpFinancialInformation.deleteSources.push(+$event.oldSource);
+
+    // this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources =
+    //   this.planModel.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.filter(s => +s.fundingSourceId !== +$event.oldSource);
 
     this.planManagementService.recalculateRestrictedSources();
 
-    //this.deleteFundingSource.next(+$event.oldSource);
-    //this.recaptureSourceValues.next();
+    // this.planManagementService.buildPlanBudgetAndCanModel();
+    // this.planModel.fundingPlanDto.totalRecommendedAmt = this.planManagementService.grandTotalTotal();
+    // this.planModel.fundingPlanDto.directRecommendedAmt = this.planManagementService.grandTotalDirect();
   }
 
   capturePendingValues($event: PendingPrcValues): void {
