@@ -143,11 +143,19 @@ export class Step2Component implements OnInit {
         // TODO: properly handle errors here
         this.logger.error('HttpClient get request error during save request ----- ' + error.message);
         this.logger.error('Request data: ', JSON.stringify(this.requestModel.requestDto));
+        this.logger.error('Error payload: ', error);
+        let displayMessage;
+        if(+error.status === 400 && error.error?.errorMessage) {
+          displayMessage = error.error.errorMessage;
+        } else {
+          displayMessage = 'Unexpected system error encountered: \'' + error.message + '\'';
+        }
         this.requestModel.pendingAlerts.push({
           type: 'danger',
-          message: 'Unexpected system error encountered: \'' + error.message + '\'',
+          message: displayMessage,
           title: ''
         });
+        window.scrollTo(0, 0);
       }
     );
   }
