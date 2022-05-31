@@ -2,7 +2,7 @@ import { Directive } from '@angular/core';
 import { AbstractControl, NG_VALIDATORS, ValidationErrors, Validator } from "@angular/forms";
 import { NgbCalendar, NgbDate } from "@ng-bootstrap/ng-bootstrap";
 import { NGXLogger } from "ngx-logger";
-import { DatepickerUtil } from "../datepicker/datepicker-adapter-formatter";
+import { DatepickerUtil } from "@cbiit/i2ecui-lib";
 
 @Directive({
   selector: '[appEndDateBeforeStartValidator]',
