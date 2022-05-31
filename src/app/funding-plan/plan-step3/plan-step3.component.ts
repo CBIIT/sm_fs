@@ -176,7 +176,13 @@ export class PlanStep3Component implements OnInit {
       }
       this.router.navigate([this.nextStep]);
     }, error => {
-      this.customLogger.logErrorWithContext(error);
+      // this.customLogger.logErrorWithContext(error);
+      this.logger.error(error.error);
+      this.alerts = [{
+        type: 'danger',
+        message: error.error.errorMessage
+      }];
+      window.scrollTo(0, 0);
     });
   }
 
