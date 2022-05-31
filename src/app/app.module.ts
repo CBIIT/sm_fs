@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { ApiModule, BASE_PATH } from '@cbiit/i2ecws-lib';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgSelect2Module } from 'ng-select2';
-import { GwbLinksService, I2ecuiLibModule } from '@cbiit/i2ecui-lib';
+import { GwbLinksService, I2ecuiLibModule,LoaderInterceptor } from '@cbiit/i2ecui-lib';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HeaderComponent } from './header/header.component';
 import { SearchFilterComponent } from './search/search-filter/search-filter.component';
@@ -26,13 +26,11 @@ import { Step3Component } from './funding-request/step3/step3.component';
 import { Step2Component } from './funding-request/step2/step2.component';
 import { Step4Component } from './funding-request/step4/step4.component';
 import { DataTablesModule } from 'angular-datatables';
-import { FormatNcabDatePipe } from './pipes/format-ncab-date.pipe';
 import { AppLookupsService } from './service/app-lookups.service';
 import { CodeDescriptionPipe } from './pipes/code-description.pipe';
 import { RequestModel } from './model/request/request-model';
 import { PlanModel } from './model/plan/plan-model';
 import { AppUserSessionService } from './service/app-user-session.service';
-import { MailtoFormatterPipe } from './pipes/mailto-formatter.pipe';
 import { GrantInformationComponent } from './grant-information/grant-information.component';
 import { ProgramRecommendedCostsComponent } from './program-recommended-costs/program-recommended-costs.component';
 import { RequestInformationComponent } from './funding-request/request-information/request-information.component';
@@ -51,9 +49,6 @@ import {
   OtherDocsContributingFundsComponent
 } from './other-docs-contributing-funds/other-docs-contributing-funds.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { LoaderSpinnerComponent } from './loader-spinner/loader-spinner.component';
-import { LoaderService } from './service/loader-spinner.service';
-import { LoaderInterceptor } from './interceptors/loader-spinner.interceptor';
 import { FundingSourcesNamesComponent } from './funding-sources-names/funding-sources-names.component';
 import { FinalLoaComponent } from './final-loa/final-loa.component';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
@@ -61,7 +56,6 @@ import { SkippedGrantsComponent } from './skipped-grants/skipped-grants.componen
 import { FooterComponent } from './footer/footer.component';
 import { DiversitySupplementComponent } from './diversity-supplement/diversity-supplement.component';
 import { NewInvestigatorComponent } from './new-investigator/new-investigator.component';
-import { ScorePctlDisplayPipe } from './pipes/score-pctl-display.pipe';
 import { WorkflowModalComponent } from './funding-request/workflow-modal/workflow-modal.component';
 import { RetrieveRequestComponent } from './funding-request/retrieve-request/retrieve-request.component';
 import {
@@ -143,7 +137,6 @@ import {
 } from './funding-plan/recommended-future-years/recommended-future-years.component';
 import { FpFundingSourceComponent } from './funding-plan/fp-funding-source/fp-funding-source.component';
 import { FundingInformationValidatorDirective } from './validators/funding-information-validator.directive';
-import { PercentCutPipe } from './pipes/percent-cut.pipe';
 import { PercentPipe } from '@angular/common';
 import { PlanWorkflowComponent } from './funding-plan/fp-workflow/plan-workflow.component';
 import {
@@ -167,7 +160,6 @@ import { ActiveFundingPlanValidatorDirective } from './validators/active-funding
 import { DocsGrantTableComponent } from './funding-plan/plan-step5/docs-grant-table/docs-grant-table.component';
 import { ConfirmDeleteModalComponent } from './manage-designations/confirm-delete-modal/confirm-delete-modal.component';
 import { CanSearchComponent } from './shared/can-search/can-search.component';
-import { FormatNiEsiFlagPipe } from './pipes/format-ni-esi-flag-format.pipe';
 import {
   ApplicationsProposedForFundingReadonlyComponent
 } from './funding-plan/applications-proposed-for-funding-readonly/applications-proposed-for-funding-readonly.component';
@@ -220,7 +212,6 @@ import {
 } from './search/search-result/search-grant-exist-in-plan-cell-renderer/search-grant-exist-in-plan-cell-renderer.component';
 import { OneFundedGrantValidatorDirective } from './validators/one-funded-grant-validator.directive';
 import { GrantFundedOnceValidatorDirective } from './validators/grant-funded-once-validator.directive';
-import { CurrencyTogglePipe } from './pipes/currency-toggle.pipe';
 import {
   SearchGrantExistInPaylistCellRendererComponent
 } from './search/search-result/search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component';
@@ -275,9 +266,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     Step3Component,
     Step2Component,
     Step4Component,
-    FormatNcabDatePipe,
     CodeDescriptionPipe,
-    MailtoFormatterPipe,
     GrantInformationComponent,
     ProgramRecommendedCostsComponent,
     RequestInformationComponent,
@@ -287,14 +276,12 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     NextScheduledApproversRequestComponent,
     FundingSourceComponent,
     OtherDocsContributingFundsComponent,
-    LoaderSpinnerComponent,
     FundingSourcesNamesComponent,
     FinalLoaComponent,
     SkippedGrantsComponent,
     FooterComponent,
     DiversitySupplementComponent,
     NewInvestigatorComponent,
-    ScorePctlDisplayPipe,
     WorkflowModalComponent,
     Type4ConversionActivityCodeComponent,
     RetrieveRequestComponent,
@@ -350,7 +337,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     RecommendedFutureYearsComponent,
     FpFundingSourceComponent,
     FundingInformationValidatorDirective,
-    PercentCutPipe,
     PlanWorkflowComponent,
     PlanSupportingDocsReadonlyComponent,
     PlanWorkflowComponent,
@@ -366,7 +352,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     DocsGrantTableComponent,
     ConfirmDeleteModalComponent,
     CanSearchComponent,
-    FormatNiEsiFlagPipe,
     ApplicationsProposedForFundingReadonlyComponent,
     FpBudgetInformationComponent,
     FoaHyperlinkComponent,
@@ -394,7 +379,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SearchGrantExistInPlanCellRendererComponent,
     OneFundedGrantValidatorDirective,
     GrantFundedOnceValidatorDirective,
-    CurrencyTogglePipe,
     SearchGrantExistInPaylistCellRendererComponent,
     ErrorComponent,
     SessionRestoreComponent,
@@ -419,12 +403,12 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     }),
     CookieModule.forRoot()
   ],
-  providers: [RequestModel, PlanModel, LoaderService, PercentPipe,
+  providers: [RequestModel, PlanModel, PercentPipe,
     { provide: BASE_PATH, useValue: '/i2ecws' },
     { provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS' },
     { provide: PROPERTIES_ENVIRONMENT, useValue: environment },
-    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptorService, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
     {
       provide: APP_INITIALIZER, useFactory: initializeAppProperties,
       deps: [AppPropertiesService], multi: true

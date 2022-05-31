@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { DatepickerFormatter } from '../datepicker/datepicker-adapter-formatter';
+import { DatepickerFormatter } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
 import { DataTableDirective } from 'angular-datatables';
 import { Subject } from 'rxjs';
