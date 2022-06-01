@@ -347,6 +347,8 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.fprId = this.fprId;
     dto.currentStatusId = this.currentStatusId;
+    dto.updateStamp = this.planModel.fundingPlanDto.updateStamp;
+    dto.lastChangeDate = this.planModel.fundingPlanDto.lastChangeDate;
     dto.action = WorkflowActionCode.SUBMIT;
     dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
     dto.comments = this.workflowComponent.comments;

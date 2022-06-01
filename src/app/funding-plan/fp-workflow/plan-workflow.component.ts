@@ -341,6 +341,8 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.fprId = this.planModel.fundingPlanDto.fprId;
+    dto.updateStamp = this.planModel.fundingPlanDto.updateStamp;
+    dto.lastChangeDate = this.planModel.fundingPlanDto.lastChangeDate;
     dto.currentStatusId = this.requestStatus.statusId;
     dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
     dto.comments = this.comments;
