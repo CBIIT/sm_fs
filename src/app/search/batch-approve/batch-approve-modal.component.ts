@@ -19,8 +19,7 @@ import {
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { Alert } from 'src/app/alert-billboard/alert';
-import { DatepickerFormatter } from 'src/app/datepicker/datepicker-adapter-formatter';
-import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+import { AppPropertiesService , DatepickerFormatter } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { BatchApproveService } from './batch-approve.service';
 

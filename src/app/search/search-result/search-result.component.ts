@@ -12,8 +12,7 @@ import {
 import { FsSearchControllerService, FundingRequestQueryDto, FundSelectSearchCriteria } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
-import { AppPropertiesService } from '@cbiit/i2ecui-lib';
-import { LoaderService } from '../../service/loader-spinner.service';
+import { AppPropertiesService , LoaderService } from '@cbiit/i2ecui-lib';
 import { DataTableDirective } from 'angular-datatables';
 import {
   FullGrantNumberCellRendererComponent
