@@ -311,6 +311,11 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
         },
         error => {
           this.logger.error('Error when calling deletePlan API ', error);
+          this.planModel.pendingAlerts = [{
+            type: 'danger',
+            message: error.error?.errorMessage || 'Something unexpected went wrong. Technical support has been notified.'
+          }];
+          window.scrollTo(0, 0);
         }
       );
     }
