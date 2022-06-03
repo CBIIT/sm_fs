@@ -22,6 +22,7 @@ import { Alert } from 'src/app/alert-billboard/alert';
 import { AppPropertiesService , DatepickerFormatter } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { BatchApproveService } from './batch-approve.service';
+import { convertNcabs } from 'src/app/utils/utils';
 
 
 @Component({
@@ -157,6 +158,8 @@ export class BatchApproveModalComponent implements OnInit {
       return this.fsPlanWorkflowService.batchApprovePlans(dto);
     }
   }
-
+  convert(ncabs: string ): string {
+    return convertNcabs(ncabs);
+  }
 }
 
