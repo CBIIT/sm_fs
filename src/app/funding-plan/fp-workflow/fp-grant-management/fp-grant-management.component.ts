@@ -55,7 +55,6 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
         this.loadData();
       }
     );
-    this.loadData();
     this.lookupService.getGmActiveSpecialists().subscribe(
       result => {
         if (result) {
@@ -67,6 +66,7 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
             return map;
           }, this.specialistMap);
         }
+        this.loadData();
       },
       error => {
         this.logger.error('getGmActiveSpecialists failed', error);
@@ -80,6 +80,7 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
             if (result) {
               this.proposedGrants = result;
               this.logger.debug('getPlanGmInfo returned', result);
+              this.checkDefaultSpecialist();
             }
           },
           error => {
@@ -88,6 +89,20 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
         );
       // }
   }
+
+  checkDefaultSpecialist(): void {
+    // check if the default specialist returned from backend is no longer active, i.e. not in the drop down list.
+    if (this.proposedGrants && this.proposedGrants.length > 0 && this.editable) {
+      for ( const gmInfo of this.proposedGrants) {
+        const spec = this.specialistMap.get(Number(gmInfo.pfrSpecNpeId));
+        if (!spec ) {
+          this.logger.warn('The default specialist (npe_id=' + gmInfo.pfrSpecNpeId + ') is not active, treat as invalid to force user to select');
+          gmInfo.pfrSpecNpeId = null;
+        }
+      }
+    }
+  }
+
 
   getGmInfos(): GmInfoDto[] {
     const gmInfos: GmInfoDto[] = [];
