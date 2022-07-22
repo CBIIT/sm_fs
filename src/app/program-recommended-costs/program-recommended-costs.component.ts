@@ -272,15 +272,17 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];
     this.lineItem = this.cloneLineItem(edit);
     this.setDisplay(this.lineItem);
-    if (this.percentCutUsed && Number(edit.fundingSourceId) !== Number(this.percentCutSourceId)) {
-      this.logger.warn('Percent cut already used and not by me.');
-      this.locked = true;
-      this.showDollar = true;
-      this.showPercent = false;
-    } else if (this.percentCutUsed && Number(edit.fundingSourceId) === Number(this.percentCutSourceId)) {
-      this.showPercent = true;
-      this.showDollar = false;
+    if(this.initialPay) {
+      if (this.percentCutUsed && Number(edit.fundingSourceId) !== Number(this.percentCutSourceId)) {
+        this.logger.warn('Percent cut already used and not by me.');
+        this.locked = true;
+        this.showDollar = true;
+        this.showPercent = false;
+      } else if (this.percentCutUsed && Number(edit.fundingSourceId) === Number(this.percentCutSourceId)) {
+        this.showPercent = true;
+        this.showDollar = false;
 
+      }
     }
     this.editing = i;
     if (this.isPayType4) {
@@ -316,6 +318,11 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
 
   private setDisplay(lineItem: PrcDataPoint[]): void {
     if (lineItem?.length === 0) {
+      return;
+    }
+    if (!this.initialPay) {
+      this.showDollar = true;
+      this.showPercent = false;
       return;
     }
     const p1 = lineItem[0];
