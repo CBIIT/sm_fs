@@ -48,6 +48,9 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   inFlightProposed: FundingRequestQueryDto[];
   inFlightSkipped: FundingRequestQueryDto[];
 
+  selectedApplIds: number[];
+  skippedApplIds: number[];
+
   statusesCanWithdraw = ['SUBMITTED', 'ON HOLD', 'APPROVED', 'AWC', 'DEFER',
     'RELEASED', 'DELEGATED', 'ROUTED', 'REASSIGNED'];
   statusesCanOnHold = ['SUBMITTED', 'APPROVED', 'AWC', 'DEFER',
@@ -114,21 +117,24 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
       }
     );
 
-    this.grantsSkipped = this.planModel.allGrants.filter( g =>
-      ( !g.selected &&
-      (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
-      g.priorityScoreNum >= this.planModel.minimumScore &&
-      g.priorityScoreNum <= this.planModel.maximumScore) );
+    this.fsPlanControllerService.retrieveFundingPlanGrantsInfo(this.fprId).subscribe(
+      result => {
+        this.logger.debug('retrieveFundingPlanGrantsInfo returned ', result);
+        this.selectedApplIds = result.filter( g => (g.frtId === 1024 || g.frtId === 1026)).map(g => g.applId);
+        this.skippedApplIds = result.filter( g => (g.frtId === 1025)).map(g => g.applId);
+        this.grantsSkipped = this.planModel.allGrants.filter( g =>
+          ( this.skippedApplIds.includes(g.applId)) );
+        this.grantsNotConsidered = this.planModel.allGrants.filter(g =>
+          ( !this.selectedApplIds.includes(g.applId) && !this.skippedApplIds.includes(g.applId)) );
+        this.logger.debug('skippedApplIds = ', this.skippedApplIds, 'selectedApplIds = ', this.selectedApplIds);
+        this.checkInFlightPfr();
+      }
+    );
 
-    this.grantsNotConsidered = this.planModel.allGrants.filter(g =>
-      ((g.notSelectableReason && g.notSelectableReason.length > 0) && !g.selected) ||
-      (( g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)
-      && !g.selected ) );
     this.workflowModel.initializeForPlan(this.fprId);
     this.checkUserRolesCas();
     this.docChecker = new FundingPlanDocChecker(this.planModel);
     this.isDocsStepCompleted();
-    this.checkInFlightPfr();
     this.canManagementService.initializeCANDisplayMatrixForPlan();
   }
 
