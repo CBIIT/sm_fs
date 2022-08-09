@@ -30,6 +30,7 @@ import { DocTypeConstants } from './plan-supporting-docs-readonly/plan-supportin
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
 import { CanManagementService } from '../../cans/can-management.service';
 import { FpBudgetInformationComponent } from '../fp-budget-information/fp-budget-information.component';
+import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
 
 @Component({
   selector: 'app-plan-step6',
@@ -42,6 +43,8 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   @ViewChild(PlanWorkflowComponent) workflowComponent: PlanWorkflowComponent;
   @ViewChild(UploadBudgetDocumentsComponent) uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
   @ViewChildren(FpBudgetInformationComponent) budgetInfoComponents: QueryList<FpBudgetInformationComponent>;
+  @ViewChild(FundingPlanInformationComponent) fpInfoComponent: FundingPlanInformationComponent;
+
   grantsSkipped: NciPfrGrantQueryDtoEx[] = [];
   grantsNotConsidered: NciPfrGrantQueryDtoEx[] = [];
 
@@ -106,6 +109,15 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
         const el = document.getElementById('funding-plan-page-top');
         el.scrollIntoView();
     }
+
+    if (this.fpInfoComponent) {
+      this.fpInfoComponent.totalApplicationsReceived = this.planModel.allGrants.length;
+      this.fpInfoComponent.totalApplicationsSelected = this.selectedApplIds?.length;
+      this.fpInfoComponent.totalApplicationsSkipped = this.grantsSkipped?.length;
+      this.fpInfoComponent.totalApplicationsNotConsidered = this.grantsNotConsidered.length;
+      this.fpInfoComponent.countsSetByStep6 = true;
+      this.logger.debug('Set fpInfoComp counts, selected = ' + this.fpInfoComponent.totalApplicationsSkipped);
+    }
   }
 
   ngOnInit(): void {
@@ -129,6 +141,14 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
         this.logger.debug('skippedApplIds = ', this.skippedApplIds, 'selectedApplIds = ', this.selectedApplIds);
         this.checkInFlightPfr();
         this.docChecker = new FundingPlanDocChecker(this.planModel, this);
+        if (this.fpInfoComponent) {
+          this.fpInfoComponent.totalApplicationsReceived = this.planModel.allGrants.length;
+          this.fpInfoComponent.totalApplicationsSelected = this.selectedApplIds?.length;
+          this.fpInfoComponent.totalApplicationsSkipped = this.grantsSkipped?.length;
+          this.fpInfoComponent.totalApplicationsNotConsidered = this.grantsNotConsidered.length;
+          this.fpInfoComponent.countsSetByStep6 = true;
+          this.logger.debug('set fpInfoComp counts, selected=' + this.fpInfoComponent.totalApplicationsSelected);
+        }
       },
       error => {
         this.logger.error('calling retrieveFundingPlanGrantsInfo failed ', error);
