@@ -128,12 +128,15 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
           ( !this.selectedApplIds.includes(g.applId) && !this.skippedApplIds.includes(g.applId)) );
         this.logger.debug('skippedApplIds = ', this.skippedApplIds, 'selectedApplIds = ', this.selectedApplIds);
         this.checkInFlightPfr();
+        this.docChecker = new FundingPlanDocChecker(this.planModel, this);
+      },
+      error => {
+        this.logger.error('calling retrieveFundingPlanGrantsInfo failed ', error);
       }
     );
 
     this.workflowModel.initializeForPlan(this.fprId);
     this.checkUserRolesCas();
-    this.docChecker = new FundingPlanDocChecker(this.planModel);
     this.isDocsStepCompleted();
     this.canManagementService.initializeCANDisplayMatrixForPlan();
   }
@@ -431,10 +434,12 @@ export class FundingPlanDocChecker {
 
   private missingTooltips: string[];
   private planModel: PlanModel;
+  private step6: PlanStep6Component;
 
-  constructor(planModel: PlanModel) {
+  constructor(planModel: PlanModel, step6: PlanStep6Component) {
     this.missingTooltips = [];
     this.planModel = planModel;
+    this.step6 = step6;
     let justificationUploaded = false;
     this.docTypes.forEach( rd => {
       const docMissing = this.docNotFound(rd.docType);
@@ -485,10 +490,7 @@ export class FundingPlanDocChecker {
         (g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)).length > 0;
     }
     else if (docType === DocTypeConstants.SKIP_JUSTIFICATION) {
-      return this.planModel.allGrants.filter(g => !g.selected &&
-        (!g.notSelectableReason || g.notSelectableReason.length === 0) &&
-        g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore
-        ).length > 0;
+      return this.planModel.allGrants.filter(g => this.step6.skippedApplIds.includes(g.applId)).length > 0;
     }
     else {
       return false;
