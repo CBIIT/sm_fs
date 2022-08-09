@@ -281,7 +281,6 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
       } else if (this.percentCutUsed && Number(edit.fundingSourceId) === Number(this.percentCutSourceId)) {
         this.showPercent = true;
         this.showDollar = false;
-
       }
     }
     this.editing = i;
@@ -569,11 +568,9 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
     let result = false;
     this.requestModel.programRecommendedCostsModel?.prcLineItems?.forEach((val, key) => {
       val.forEach(p => {
-        this.logger.debug('checking ', p);
         if (p.type === PrcLineItemType.PERCENT_CUT) {
           this.percentCutUsed = true;
           this.percentCutSourceId = +key;
-          this.logger.debug('percent cut used by', p);
           result = true;
         }
       });
