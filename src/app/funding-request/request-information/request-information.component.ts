@@ -60,7 +60,7 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.grant.fullGrantNum,
       this.requestModel.requestDto.financialInfoDto.requestorNpnId,
       requestType,
-      this.requestModel.requestDto.fy,
+      this.requestModel.requestDto.requestFy,
       cayCode,
       conversionActivityCode).subscribe(result => {
       this.requestModel.programRecommendedCostsModel.fundingSources = result;

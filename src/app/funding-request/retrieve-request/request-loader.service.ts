@@ -49,7 +49,7 @@ export class RequestLoaderService {
           this.requestModel.grant.fullGrantNum,
           this.requestModel.requestDto.requestorNpnId,
           this.requestModel.requestDto.frtId,
-          this.requestModel.requestDto.financialInfoDto.fy,
+          this.requestModel.requestDto.requestFy,
           this.requestModel.requestDto.requestorCayCode,
           conversionActivityCode).subscribe(result1 => {
           this.requestModel.programRecommendedCostsModel.fundingSources = result1;
