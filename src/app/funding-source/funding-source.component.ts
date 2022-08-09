@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
 import { RequestModel } from '../model/request/request-model';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ import { ConversionActivityCodes } from '../type4-conversion-mechanism/conversio
   styleUrls: ['./funding-source.component.css'],
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
-export class FundingSourceComponent implements OnInit {
+export class FundingSourceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input() parentForm: NgForm;
 
@@ -42,6 +42,9 @@ export class FundingSourceComponent implements OnInit {
   set selectedValue(value: number) {
     this._selectedValue = value;
     // this.logger.debug('emitting new selection', value);
+    this.logger.debug('selected sources', this.selectedFundingSources);
+    this.logger.debug('available funding sources', this.availableFundingSources());
+
     this.fundingSourceSynchronizerService.fundingSourceSelectionEmitter.next(value);
   }
 
@@ -53,14 +56,18 @@ export class FundingSourceComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.logger.debug('onInit()');
     this.fundingSourceSynchronizerService.fundingSourceSelectionFilterEmitter.subscribe(select => {
+      this.logger.debug(`Filtered funding source: ${select}`);
       this.selectedFundingSources.add(Number(select));
     });
     this.fundingSourceSynchronizerService.fundingSourceDeselectionEmitter.subscribe(deselect => {
+      this.logger.debug('deselecting source:', deselect);
       this.selectedFundingSources.delete(Number(deselect));
     });
     this.fundingSourceSynchronizerService.fundingSourceRestoreSelectionEmitter.subscribe(restore => {
-      this.selectedValue = restore;
+      this.logger.debug('restoring source:', restore);
+      this.selectedValue = Number(restore);
     });
     this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.subscribe(next => {
       this.lastCayCode = next;
@@ -74,12 +81,10 @@ export class FundingSourceComponent implements OnInit {
   }
 
   private refreshFundingSources(): void {
+    this.logger.debug(`refreshFundingSources(): selected value=${this._selectedValue}`);
     const cayCode = this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode;
     const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
       ? this.requestModel.requestDto.conversionActivityCode : null;
-    // this.logger.debug('refreshFundingSources: type =', this.requestModel.requestDto.frtId,
-    //   ', conversionMech =', conversionActivityCode,
-    //   ', cayCode =', cayCode);
     this.fsRequestControllerService.getFundingSources(
       this.requestModel.grant.fullGrantNum,
       this.requestModel.requestDto.financialInfoDto.requestorNpnId,
@@ -113,5 +118,13 @@ export class FundingSourceComponent implements OnInit {
   }
 
   onSubmit(): void {
+  }
+
+  ngOnDestroy(): void {
+    this.logger.debug('onDestroy()');
+  }
+
+  ngAfterViewInit(): void {
+    this.logger.debug(`afterViewInit(): selectedValue = ${this.selectedValue}`);
   }
 }
