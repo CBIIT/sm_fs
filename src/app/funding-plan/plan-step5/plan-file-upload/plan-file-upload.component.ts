@@ -6,6 +6,7 @@ import { saveAs } from 'file-saver';
 import { DocumentsDto } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Observable, of } from 'rxjs';
+import { getExtension, validExtension, validExtensions } from '../../../utils/utils';
 
 @Component({
   selector: 'app-plan-file-upload',
@@ -33,12 +34,18 @@ export class PlanFileUploadComponent implements OnInit {
   }
 
   selectFiles(event): void {
-    const files: FileList = event.target.files;
-    this.labelImport.nativeElement.innerText = Array.from(files)
-      .map(f => f.name)
-      .join(', ');
-    this.selectedFiles = event.target.files;
-    this.fileSelectEmitter.emit(this.selectedFiles);
+    const ext = getExtension(event?.target?.files[0]?.name);
+    if (validExtension(ext)) {
+      const files: FileList = event.target.files;
+      this.labelImport.nativeElement.innerText = Array.from(files)
+        .map(f => f.name)
+        .join(', ');
+      this.selectedFiles = event.target.files;
+      this.fileSelectEmitter.emit(this.selectedFiles);
+    } else {
+      this.reset();
+      alert(`Only files of the following types are accepted: ${validExtensions.join(', ')}`);
+    }
   }
 
   downloadTemplate(templateType: string) {
@@ -102,7 +109,7 @@ export class PlanFileUploadComponent implements OnInit {
       return 'SkipJustification';
     } else {
       return 'Other';
-    }  
+    }
   }
 
   reset(): void {

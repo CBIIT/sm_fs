@@ -252,7 +252,6 @@ export class Step3Component implements OnInit {
       this.reset();
       alert(`Only files of the following types are accepted: ${validExtensions.join(', ')}`);
     }
-
   }
 
 

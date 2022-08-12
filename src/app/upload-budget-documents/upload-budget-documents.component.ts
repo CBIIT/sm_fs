@@ -9,6 +9,7 @@ import { saveAs } from 'file-saver';
 import { NGXLogger } from 'ngx-logger';
 import { BudgetInfoComponent } from '../cans/budget-info/budget-info.component';
 import { WorkflowModel } from '../funding-request/workflow/workflow.model';
+import { getExtension, validExtension, validExtensions } from '../utils/utils';
 
 @Component({
   selector: 'app-upload-budget-documents',
@@ -89,7 +90,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
   ngOnInit(): void {
 
     this.loadFiles();
-     
+
   }
 
   get budgetInfoReadOnly() : boolean {
@@ -105,7 +106,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
           this.requestModel.requestDto.budgetDocs = result;
           this.budgetDocDtos = of(result);
           result?.forEach(element => {
-  
+
             this.spliceDocType(element.docType);
           });
         }, error => {
@@ -117,22 +118,28 @@ export class UploadBudgetDocumentsComponent implements OnInit {
           this.planModel.fundingPlanDto.budgetDocs = result;
           this.budgetDocDtos = of(result);
           result?.forEach(element => {
-  
+
             this.spliceDocType(element.docType);
           });
         }, error => {
           this.logger.error('HttpClient get request error for----- ' + error.message);
         });
     }
-    
+
   }
 
   selectFiles(event): void {
-    const files: FileList = event.target.files;
-    this.labelImport.nativeElement.innerText = Array.from(files)
-      .map(f => f.name)
-      .join(', ');
-    this.selectedFiles = event.target.files;
+    const ext = getExtension(event?.target?.files[0]?.name);
+    if (validExtension(ext)) {
+      const files: FileList = event.target.files;
+      this.labelImport.nativeElement.innerText = Array.from(files)
+        .map(f => f.name)
+        .join(', ');
+      this.selectedFiles = event.target.files;
+    } else {
+      this.reset();
+      alert(`Only files of the following types are accepted: ${validExtensions.join(', ')}`);
+    }
   }
 
   onDocTypeChange(event): any {
@@ -150,7 +157,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
     for (let i = 0; i < this.selectedFiles.length; i++) {
       this._docDto.docDescription = this.docDescription;
       this._docDto.docType = this.selectedDocType;
-      
+
       if (this.requestOrPlan === 'REQUEST') {
         this._docDto.keyType = 'PFR';
         this._docDto.keyId = this.requestModel.requestDto.frqId;
@@ -158,7 +165,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
         this._docDto.keyType = 'PFRP';
         this._docDto.keyId = this.planModel.fundingPlanDto.fprId;
       }
-      
+
       if (this.selectedFiles[i].size <= this.maxFileSize) {
         this.upload(this.selectedFiles[i]);
       } else {
@@ -262,7 +269,7 @@ export class UploadBudgetDocumentsComponent implements OnInit {
       this.showValidations = true;
       return false;
     }
-    
+
     return true;
   }
 
