@@ -20,6 +20,7 @@ export class FundingPlanInformationComponent implements OnInit {
   @Input() showPlanName: boolean;
 
   fundingPlanFoas: FundingPlanFoasDto[];
+  countsSetByStep6 = false;
   totalApplicationsSelected: number;
   totalApplicationsReceived: number;
   totalApplicationsSkipped: number;
@@ -52,18 +53,13 @@ export class FundingPlanInformationComponent implements OnInit {
 
     this.restoreSavedFoaData();
 
-    this.totalApplicationsReceived = this.planModel.fundingPlanDto.applReceivedNum || this.planModel.allGrants.length;
-
     this.listApplicationsSelected = this.planModel.allGrants.filter(g => g.selected);
-
-    this.totalApplicationsSelected = this.listApplicationsSelected.length;
 
     this.listApplicationsWithinRange = this.planModel.allGrants.filter(g =>
       (!g.notSelectableReason || g.notSelectableReason.length === 0)
       && g.priorityScoreNum >= this.planModel.minimumScore && g.priorityScoreNum <= this.planModel.maximumScore);
 
     this.listApplicationsSkipped = this.listApplicationsWithinRange.filter(g => !g.selected);
-    this.totalApplicationsSkipped = this.listApplicationsSkipped.length;
 
     // Total number of not selectable grants
     this.listApplicationsNotSelectable = this.planModel.allGrants.filter(g => (g.notSelectableReason?.length > 0 && !g.selected));
@@ -78,6 +74,14 @@ export class FundingPlanInformationComponent implements OnInit {
     this.listApplicationsNotConsidered = [];
     this.listApplicationsNotConsidered.concat(this.listApplicationsNotSelectable)
       .concat(this.listApplicationsOutsideRange.filter(g => !g.selected));
+
+    if (!this.countsSetByStep6) {
+      this.totalApplicationsReceived = this.planModel.fundingPlanDto.applReceivedNum || this.planModel.allGrants.length;
+      this.totalApplicationsSelected = this.listApplicationsSelected.length;
+      this.totalApplicationsSkipped = this.listApplicationsSkipped.length;
+      this.totalApplicationsNotConsidered = this.listApplicationsNotSelectable.length
+        + this.listApplicationsOutsideRange.filter(g => !g.selected).length;
+    }
 
     if (this.planModel.fundingPlanDto.otherContributingDocs) {
       this.otherDocs = this.planModel.fundingPlanDto.otherContributingDocs.split(',');
