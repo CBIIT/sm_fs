@@ -188,7 +188,7 @@ export class Step3Component implements OnInit {
             this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
             this.justificationEnteredByEmit.next(this.justificationEnteredBy);
             this.justificationEnteredByEmailEmit.next(this.justificationEnteredByEmail);
-            this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'dd/MM/yyyy'));
+            this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'MM/dd/yyyy'));
 
           }, error => {
             this.logger.error('HttpClient get request error for----- ' + error.message);
@@ -308,7 +308,7 @@ export class Step3Component implements OnInit {
         this.justificationUploadedOn = new Date(this.requestModel.requestDto.justificationCreateDate);
         this.justificationEnteredByEmit.next(this.justificationEnteredBy);
         this.justificationEnteredByEmailEmit.next(this.justificationEnteredByEmail);
-        this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'dd/MM/yyyy'));
+        this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'MM/dd/yyyy'));
 
         //Inserting doc order
         let docDto: DocumentsDto = {};
@@ -476,7 +476,7 @@ export class Step3Component implements OnInit {
 
       this.justificationEnteredByEmit.next(this.justificationEnteredBy);
       this.justificationEnteredByEmailEmit.next(this.justificationEnteredByEmail);
-      this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'dd/MM/yyyy'));
+      this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'MM/dd/yyyy'));
 
       this.justificationId = element.id;
       if (element.id !== null) {
@@ -500,7 +500,7 @@ export class Step3Component implements OnInit {
 
       this.transitionMemoEnteredByEmit.next(this.transitionMemoEnteredBy);
       this.transitionMemoEnteredByEmailEmit.next(this.transitionMemoEnteredByEmail);
-      this.transitionMemoUploadedOnEmit.next(this.format(this.transitionMemoUploadedOn, 'dd/MM/yyyy'));
+      this.transitionMemoUploadedOnEmit.next(this.format(this.transitionMemoUploadedOn, 'MM/dd/yyyy'));
     }
 
   }
