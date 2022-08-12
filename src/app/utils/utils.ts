@@ -74,3 +74,20 @@ export function convertNcabs(ncabs: string): string {
   return ncabs;
 }
 
+export function getExtension(fileName: string): string {
+  if(fileName) {
+    const parts = fileName.split('.');
+    if(parts.length <= 1) {
+      return null;
+    }
+    return parts[parts.length - 1];
+  }
+  return null;
+}
+export const validExtensions = ['doc','docx','xls','xlsx','pdf','rtf'];
+export function validExtension(ext: string): boolean {
+  if(ext) {
+    return validExtensions.includes(ext);
+  }
+  return false;
+}

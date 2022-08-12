@@ -26,6 +26,7 @@ import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { formatDate } from '@angular/common';
 import { NavigationStepModel } from '../step-indicator/navigation-step.model';
+import { getExtension, validExtension, validExtensions } from '../../utils/utils';
 
 export interface Swimlane {
   name: string;
@@ -124,16 +125,16 @@ export class Step3Component implements OnInit {
 
 
   constructor(private router: Router,
-    private cgRefCodControllerService: CgRefCodControllerService,
-    private documentService: DocumentService,
-    private requestModel: RequestModel,
-    private fsRequestControllerService: FsRequestControllerService,
-    private fsDocOrderControllerService: FsDocOrderControllerService,
-    private documentsControllerService: DocumentsControllerService,
-    private userControllerService: UserControllerService,
-    private modalService: NgbModal,
-    private navigationModel: NavigationStepModel,
-    private logger: NGXLogger) {
+              private cgRefCodControllerService: CgRefCodControllerService,
+              private documentService: DocumentService,
+              private requestModel: RequestModel,
+              private fsRequestControllerService: FsRequestControllerService,
+              private fsDocOrderControllerService: FsDocOrderControllerService,
+              private documentsControllerService: DocumentsControllerService,
+              private userControllerService: UserControllerService,
+              private modalService: NgbModal,
+              private navigationModel: NavigationStepModel,
+              private logger: NGXLogger) {
 
   }
 
@@ -163,8 +164,8 @@ export class Step3Component implements OnInit {
     if (this.requestModel.requestDto.requestType === 'Pay Type 4') {
       this.pushDocType("Transition Memo");
       this.displayTansitionMemo = true;
-      if (this.requestModel.requestDto.conversionActivityCode && 
-            this.requestModel.requestDto.conversionActivityCode !== 'NC' ) {
+      if (this.requestModel.requestDto.conversionActivityCode &&
+        this.requestModel.requestDto.conversionActivityCode !== 'NC') {
         this.isTransitionMemoRequired = true;
       }
     }
@@ -213,7 +214,6 @@ export class Step3Component implements OnInit {
   }
 
 
-
   isSupplementAction() {
     var isSuppAction: boolean = false;
     if (this.requestModel.requestDto.requestType === 'Pay Type 4') {
@@ -241,10 +241,16 @@ export class Step3Component implements OnInit {
   }
 
   selectFiles(event): void {
-    this.selectedFiles = event.target.files;
-    this.disableJustification = true;
-    if (this.selectedFiles && this.selectedFiles.length > 0) {
-      this.disableAddDocButton = false;
+    const ext = getExtension(event?.target?.files[0]?.name);
+    if (validExtension(ext)) {
+      this.selectedFiles = event.target.files;
+      this.disableJustification = true;
+      if (this.selectedFiles && this.selectedFiles.length > 0) {
+        this.disableAddDocButton = false;
+      }
+    } else {
+      this.reset();
+      alert(`Only files of the following types are accepted: ${validExtensions.join(', ')}`);
     }
 
   }
@@ -359,7 +365,7 @@ export class Step3Component implements OnInit {
             }
           }
 
-          this.insertDocOrder(result);       
+          this.insertDocOrder(result);
 
           this.documentService.getFiles(this.requestModel.requestDto.frqId, 'PFR').subscribe(
             result => {
@@ -567,7 +573,7 @@ export class Step3Component implements OnInit {
           saveAs(blob, 'Summary Statement.pdf');
         }
       ), error =>
-        this.logger.error('Error downloading the summary statement'),
+      this.logger.error('Error downloading the summary statement'),
       () => this.logger.info('File downloaded successfully');
   }
 
@@ -664,7 +670,7 @@ export class Step3Component implements OnInit {
           saveAs(blob, 'Package.pdf');
         }
       ), error =>
-        this.logger.error('Error downloading the file'),
+      this.logger.error('Error downloading the file'),
       () => console.info('File downloaded successfully');
   }
 
@@ -781,7 +787,6 @@ export class Step3Component implements OnInit {
         }, error => {
           this.logger.error('Error occured while deleting justification----- ' + error.message);
         });
-
 
 
       //this.uploadJustificationText('');
