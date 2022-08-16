@@ -141,6 +141,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
         this.logger.debug('skippedApplIds = ', this.skippedApplIds, 'selectedApplIds = ', this.selectedApplIds);
         this.checkInFlightPfr();
         this.docChecker = new FundingPlanDocChecker(this.planModel, this);
+        this.isDocsStepCompleted();
         if (this.fpInfoComponent) {
           this.fpInfoComponent.totalApplicationsReceived = this.planModel.allGrants.length;
           this.fpInfoComponent.totalApplicationsSelected = this.selectedApplIds?.length;
@@ -157,7 +158,6 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
 
     this.workflowModel.initializeForPlan(this.fprId);
     this.checkUserRolesCas();
-    this.isDocsStepCompleted();
     this.canManagementService.initializeCANDisplayMatrixForPlan();
   }
 
