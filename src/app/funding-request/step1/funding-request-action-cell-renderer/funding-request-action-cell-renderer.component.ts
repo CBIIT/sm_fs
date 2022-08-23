@@ -24,7 +24,7 @@ export class FundingRequestActionCellRendererComponent implements OnInit {
   data : any = {}
 
   disabledTooltip(grant: NciPfrGrantQueryDto): string {
-    if (grant.applTypeCode === '3') {
+    if (this.nonCompetingType3(grant)) {
       return 'Select the parent grant to request supplements';
     }
     else {
@@ -35,12 +35,16 @@ export class FundingRequestActionCellRendererComponent implements OnInit {
 
   actionDisabled(grant: NciPfrGrantQueryDto): boolean {
     const disabledStatuses: string[] = ['W', 'T', 'C', 'U', 'N', 'RR'];
-    if (grant.applTypeCode === '3' || disabledStatuses.indexOf(grant.applStatusGroupCode) !== -1) {
+    if (this.nonCompetingType3(grant) || disabledStatuses.indexOf(grant.applStatusGroupCode) !== -1) {
       return true;
     }
     else {
       return false;
     }
+  }
+
+  nonCompetingType3(grant: NciPfrGrantQueryDto): boolean {
+    return grant.applTypeCode === '3' && grant.councilMeetingDate.endsWith('00');
   }
 
   nextStep(event, grant): void {
