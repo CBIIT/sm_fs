@@ -45,12 +45,12 @@ export class RequestLoaderService {
         const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
           ? this.requestModel.requestDto.conversionActivityCode : null;
 
-        this.requestService.getFundingSources(
+        this.requestService.getFundingSourcesByNpnId(
           this.requestModel.grant.fullGrantNum,
           this.requestModel.requestDto.requestorNpnId,
+          this.requestModel.requestDto.requestorCayCode,
           this.requestModel.requestDto.frtId,
           this.requestModel.requestDto.requestFy,
-          this.requestModel.requestDto.requestorCayCode,
           conversionActivityCode).subscribe(result1 => {
           this.requestModel.programRecommendedCostsModel.fundingSources = result1;
 

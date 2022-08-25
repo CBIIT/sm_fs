@@ -85,12 +85,12 @@ export class FundingSourceComponent implements OnInit, OnDestroy, AfterViewInit 
     const cayCode = this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode;
     const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
       ? this.requestModel.requestDto.conversionActivityCode : null;
-    this.fsRequestControllerService.getFundingSources(
+    this.fsRequestControllerService.getFundingSourcesByNpnId(
       this.requestModel.grant.fullGrantNum,
       this.requestModel.requestDto.financialInfoDto.requestorNpnId,
+      cayCode,
       this.requestModel.requestDto.frtId,
       this.requestModel.requestDto.requestFy,
-      cayCode,
       conversionActivityCode).subscribe(result => {
       this.requestModel.programRecommendedCostsModel.fundingSources = result;
     }, error => {
