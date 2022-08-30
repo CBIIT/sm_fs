@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { ApiModule, BASE_PATH } from '@cbiit/i2ecws-lib';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgSelect2Module } from 'ng-select2';
-import { GwbLinksService, I2ecuiLibModule,LoaderInterceptor } from '@cbiit/i2ecui-lib';
+import { GwbLinksService, I2ecuiLibModule, LoaderInterceptor, UnauthorizeComponent } from '@cbiit/i2ecui-lib';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HeaderComponent } from './header/header.component';
 import { SearchFilterComponent } from './search/search-filter/search-filter.component';
@@ -18,7 +18,6 @@ import { FsMenuComponent } from './fs-menu/fs-menu.component';
 import { AppPropertiesService, PROPERTIES_APP_NAME, PROPERTIES_ENVIRONMENT } from '@cbiit/i2ecui-lib';
 import { environment } from 'src/environments/environment';
 import { SearchResultComponent } from './search/search-result/search-result.component';
-import { UnauthorizeComponent } from './unauthorize/unauthorize.component';
 import { StepIndicatorComponent } from './funding-request/step-indicator/step-indicator.component';
 import { FundingRequestComponent } from './funding-request/funding-request.component';
 import { Step1Component } from './funding-request/step1/step1.component';
@@ -259,7 +258,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FundingPlanComponent,
     FsMenuComponent,
     SearchResultComponent,
-    UnauthorizeComponent,
     StepIndicatorComponent,
     FundingRequestComponent,
     Step1Component,

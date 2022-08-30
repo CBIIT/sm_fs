@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { FundingPlanComponent } from './funding-plan/funding-plan.component';
 import { SearchComponent } from './search/search.component';
-import { UnauthorizeComponent } from './unauthorize/unauthorize.component';
 import { AuthGuard } from './auth/auth.guard';
 import { FundingRequestComponent } from './funding-request/funding-request.component';
 import { Step1Component } from './funding-request/step1/step1.component';
@@ -26,6 +25,7 @@ import { CanDeactivateRequestStep2 } from './funding-request/step2/can-deactivat
 import { CanDeactivatePlanStep3 } from './funding-plan/plan-step3/can-deactivate-plan-step3';
 import { ErrorComponent } from './error/error/error.component';
 import { SessionRestoreComponent } from './session/session-restore/session-restore.component';
+import { UnauthorizeComponent } from '@cbiit/i2ecui-lib';
 
 const routes: Routes = [
   {
