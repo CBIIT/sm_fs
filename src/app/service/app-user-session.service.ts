@@ -3,6 +3,7 @@ import { UserService } from '@cbiit/i2ecui-lib';
 import { CancerActivitiesDto, CancerActivityControllerService, NciPerson } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { roleNames } from '../service/role-names';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class AppUserSessionService {
 
   constructor(private userService: UserService,
               private caService: CancerActivityControllerService,
+              private router: Router,
               private logger: NGXLogger) {
   }
 
@@ -25,28 +27,33 @@ export class AppUserSessionService {
     return new Promise<void>((resolve, reject) => {
       this.userService.getSecurityCredentials().subscribe(
         (result) => {
-          this.loggedOnUser = result.nciPerson;
-          this.environment = result.environment;
-          this.roles = [];
-          result.authorities.forEach(authority => {
-            this.roles.push(authority.authority);
-          });
-          this.caService.getCasForPd(this.loggedOnUser.npnId, true).subscribe(
-            (caresult) => {
-              this.userCancerActivities = caresult;
-              this.isMbOnly = (caresult && caresult.length === 1 && caresult[0].code === 'MB');
-              this.logger.debug('UserSessionService Initialization Done ', this);
-              resolve();
-            },
-            (caerror) => {
-              this.logger.error('Failed to get User CAs for error', caerror);
-              reject();
-            }
-          );
+          if(!result.username) {
+            reject(`Authentication failed`);
+          } else {
+            this.logger.debug(result);
+            this.loggedOnUser = result.nciPerson;
+            this.environment = result.environment;
+            this.roles = [];
+            result.authorities?.forEach(authority => {
+              this.roles.push(authority.authority);
+            });
+            this.caService.getCasForPd(this.loggedOnUser.npnId, true).subscribe(
+              (caresult) => {
+                this.userCancerActivities = caresult;
+                this.isMbOnly = (caresult && caresult.length === 1 && caresult[0].code === 'MB');
+                this.logger.debug('UserSessionService Initialization Done ', this);
+                resolve();
+              },
+              (caerror) => {
+                this.logger.error('Failed to get User CAs for error', caerror);
+                reject();
+              }
+            );
+          }
         },
         (error) => {
-          this.logger.error('Failed to userService.getSecurityCrentials for error', error);
-          reject();
+          this.logger.error('Failed to get user credentials', error);
+          reject(error);
         }
       );
     });
@@ -57,7 +64,7 @@ export class AppUserSessionService {
   }
 
   isOefiaAndSplUser(): boolean {
-    return this.roles.includes(roleNames.OEFIA_CERTIFIER) 
+    return this.roles.includes(roleNames.OEFIA_CERTIFIER)
     || this.roles.includes(roleNames.SPL_CERTIFIER);
   }
 

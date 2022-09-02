@@ -6,14 +6,14 @@ import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
 import { openNewWindow } from '../utils/utils';
 import { Location } from '@angular/common';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
-import { HeartbeatService } from '@cbiit/i2ecui-lib';
+import { CustomServerLoggingService, HeartbeatService } from '@cbiit/i2ecui-lib';
 
 
 @Injectable()
 export class ErrorInterceptorService implements HttpInterceptor {
 
   private modalWindow: any;
+  private handle401 = false;
 
   constructor(
     private errorHandler: ErrorHandlerService,
@@ -33,6 +33,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    this.logger.debug(req);
     if (!req.url.includes('heartbeat') && !!req.url.includes('logs')) {
       this.logger.debug(`Current route URL    : ${this.router.url}`);
       this.logger.debug(`Request URL          : ${req.url}`);
@@ -44,6 +45,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
         this.logger.debug(`Error: ${this.errorHandler.errorType(error)}`, error);
         this.logger.debug(`Error URL: ${error.url}`);
         this.logger.debug(`Request URL: ${req.url}`);
+        this.logger.debug(`Error Status: ${error.status}`);
 
         // Pass along errors that happen during initialization
         if (!this.initializerStatus.done) {
@@ -60,6 +62,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
         // Let the logger handle its own problems
         if (error.url.includes('logs') || req.url.includes('logs')) {
           this.logger.debug('Let the logger handle its own messes');
+          if(error.status === 401) this.heartbeatService.pause();
           return throwError(error);
         }
 
@@ -73,6 +76,15 @@ export class ErrorInterceptorService implements HttpInterceptor {
         if ((error.url.includes('heartbeat') || req.url.includes('heartbeat')) && !(error.status === 200)) {
           this.logger.debug('Non-200 error from heartbeat');
           return throwError(error);
+        }
+
+        if (error.status === 401) {
+          if(!this.handle401) {
+            this.handle401 = true;
+            this.heartbeatService.pause();
+            this.router.navigate(['/unauthorize']);
+            return of(null);
+          }
         }
 
         // Handle timeouts

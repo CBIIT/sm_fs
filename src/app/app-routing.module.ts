@@ -28,6 +28,8 @@ import { SessionRestoreComponent } from './session/session-restore/session-resto
 import { UnauthorizeComponent } from '@cbiit/i2ecui-lib';
 
 const routes: Routes = [
+  { path: 'error/:errorId', component: ErrorComponent },
+  { path: 'unauthorize', component: UnauthorizeComponent },
   {
     path: '', canActivate: [AuthGuard], children: [
       { path: 'restoreSession', pathMatch: 'full', component: SessionRestoreComponent, canActivate: [AuthGuard] },
@@ -62,8 +64,7 @@ const routes: Routes = [
       {path: 'manage', component: ManageDesignationsComponent},
     ]
   },
-  { path: 'error/:errorId', component: ErrorComponent },
-  { path: 'unauthorize', component: UnauthorizeComponent }
+
 ];
 
 @NgModule({
