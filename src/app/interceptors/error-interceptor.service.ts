@@ -47,6 +47,8 @@ export class ErrorInterceptorService implements HttpInterceptor {
         this.logger.debug(`Request URL: ${req.url}`);
         this.logger.debug(`Error Status: ${error.status}`);
 
+        if(error.status === 401) this.heartbeatService.pause();
+
         // Pass along errors that happen during initialization
         if (!this.initializerStatus.done) {
           this.logger.debug('Initialization in progress. Let the error pass.');
@@ -62,7 +64,6 @@ export class ErrorInterceptorService implements HttpInterceptor {
         // Let the logger handle its own problems
         if (error.url.includes('logs') || req.url.includes('logs')) {
           this.logger.debug('Let the logger handle its own messes');
-          if(error.status === 401) this.heartbeatService.pause();
           return throwError(error);
         }
 
@@ -83,8 +84,8 @@ export class ErrorInterceptorService implements HttpInterceptor {
             this.handle401 = true;
             this.heartbeatService.pause();
             this.router.navigate(['/unauthorize']);
-            return of(null);
           }
+          return of(null);
         }
 
         // Handle timeouts
