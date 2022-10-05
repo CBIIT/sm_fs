@@ -56,12 +56,12 @@ export class RequestInformationComponent implements OnInit {
       this.logger.warn('Not refreshing funding sources: missing type or cayCode');
       return;
     }
-    this.fsRequestControllerService.getFundingSources(
+    this.fsRequestControllerService.getFundingSourcesByNpnId(
       this.requestModel.grant.fullGrantNum,
       this.requestModel.requestDto.financialInfoDto.requestorNpnId,
+      cayCode,
       requestType,
       this.requestModel.requestDto.requestFy,
-      cayCode,
       conversionActivityCode).subscribe(result => {
       this.requestModel.programRecommendedCostsModel.fundingSources = result;
     }, error => {
