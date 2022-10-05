@@ -15,7 +15,7 @@ export class AppUserSessionService {
   private userCancerActivities: CancerActivitiesDto[];
   public isMbOnly = false;
 
-  private roles: string[];
+  private roles: string[] = [];
 
   constructor(private userService: UserService,
               private caService: CancerActivityControllerService,
