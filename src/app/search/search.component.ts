@@ -48,6 +48,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
 
    action: string;
    grant: string;
+   searchGrant: string;
    selectedMenuUrl: string;
 
   keepSearchCriteriaModel: boolean;
@@ -78,6 +79,10 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
                             this.route.snapshot.url[this.route.snapshot.url.length - 1].path : '';
     this.logger.debug('ngOnInit() segment = ', this.selectedMenuUrl);
     this.logger.debug('ngOnInit() queryParams = ', this.route.snapshot.queryParams);
+    this.logger.debug('ngOnInit() params = ', this.route.snapshot.queryParams);
+    this.searchGrant = this.route.snapshot.queryParams?.grantNum;
+
+
     this.isPd = this.userSessionService.isPD();
     this.isPa = this.userSessionService.isPA();
     this.hasPaylineRoles = this.userSessionService.hasRole('OEFIACRT') ||  this.userSessionService.hasRole('DES');
@@ -93,7 +98,8 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.grant = this.route.snapshot.queryParams?.grant;
     this.logger.debug('ngOnInit() - route action, searchType, state.action:', action, this.searchModel.searchType, history.state);
     if (action && action !== 'landing') {
-      const navigateAction = (action === 'immediate') ? ((this.grant && this.grant.length > 0) ? 'FR' : this.searchModel.searchType) : action;
+      const navigateAction = (action === 'immediate') ? (this.searchGrant && this.searchGrant.length > 0) ? 'G' : ((this.grant && this.grant.length > 0) ? 'FR' : this.searchModel.searchType) : action;
+
 
       // this is a return link from the FR or FP view
       // check the searchType from the search model
@@ -119,7 +125,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
             break;
           case 'G':
             this.keepSearchCriteriaModel = true;
-            this.router.navigateByUrl('/search/grants', { state: { action: navigateAction}});
+            this.router.navigateByUrl('/search/grants', { state: { action: navigateAction, searchGrant: this.searchGrant}});
             break;
         }
       }
@@ -137,6 +143,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
           case 'G':
             this.action = 'immediate';
             this.grant = history.state?.grant;
+            this.searchGrant = history.state?.searchGrant;
             break;
           case 'awaitfr':
             this.searchAwaitingRequests();
