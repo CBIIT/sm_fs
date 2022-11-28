@@ -426,7 +426,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
             return (!data || data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
           }
         },
-        { title: 'I2 Status', data: 'applStatusGroupDescrip' }, // 5
+        { title: 'IMPAC II Status', data: 'applStatusGroupDescrip' }, // 5
         {
           title: 'PD', data: 'pdFullName', render: (data, type, row, meta) => { // 6
             return (!data || data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';

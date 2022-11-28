@@ -171,7 +171,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           }, className: 'all'
         }, // 2
         { title: 'Project Title', data: 'projectTitle' }, // 3
-        { title: 'I2 Status', data: 'applStatusGroupDescrip' }, // 4
+        { title: 'IMPAC II Status', data: 'applStatusGroupDescrip' }, // 4
         {
           title: 'PD', data: 'pdFullName', render: (data, type, row) => {
             return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress +
@@ -540,7 +540,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           }, className: 'all'
         }, // 1
         { title: 'Project Title', data: 'projectTitle' }, // 2
-        { title: 'I2 Status', data: 'applStatusGroupDescrip' }, // 3
+        { title: 'IMPAC II Status', data: 'applStatusGroupDescrip' }, // 3
         {
           title: 'FOA', data: 'rfaPaNumber', render: (data, type, row) => {
             return (data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="_blank">'

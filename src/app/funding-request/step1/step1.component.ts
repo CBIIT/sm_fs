@@ -106,7 +106,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         {title: 'FOA', data: 'rfaPaNumber', render: ( data, type, row, meta ) => {
           return (!data || data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
         }},
-        {title: 'I2 Status', data: 'applStatusGroupDescrip'},
+        {title: 'IMPAC II Status', data: 'applStatusGroupDescrip'},
         {title: 'PD', data: 'pdFullName', render: ( data, type, row, meta ) => {
           return (!data || data == null) ? '' :
           '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
