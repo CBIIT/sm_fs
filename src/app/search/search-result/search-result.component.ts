@@ -12,7 +12,7 @@ import {
 import { FsSearchControllerService, FundingRequestQueryDto, FundSelectSearchCriteria } from '@cbiit/i2ecws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
-import { AppPropertiesService , LoaderService } from '@cbiit/i2ecui-lib';
+import { AppPropertiesService , LoaderService, NameRenderComponent } from '@cbiit/i2ecui-lib';
 import { DataTableDirective } from 'angular-datatables';
 import {
   FullGrantNumberCellRendererComponent
@@ -47,6 +47,8 @@ import { AppUserSessionService } from '../../service/app-user-session.service';
 import { CurrencyPipe } from '@angular/common';
 import { convertNcabs } from '../../utils/utils';
 import { NavigationModel } from '../../model/navigation-model';
+
+
 
 @Component({
   selector: 'app-search-result',
@@ -86,10 +88,16 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('existInPlanRenderer') existInPlanRenderer: TemplateRef<SearchGrantExistInPlanCellRendererComponent>;
   @ViewChild('existInPaylistRenderer') existInPaylistRenderer: TemplateRef<SearchGrantExistInPaylistCellRendererComponent>;
   @ViewChild(BatchApproveModalComponent) batchApproveModal: BatchApproveModalComponent;
+  @ViewChild('pdNameRender') pdNameRender: TemplateRef<NameRenderComponent>;
+  @ViewChild('docApproverRender') docApproverRender: TemplateRef<NameRenderComponent>;
+  @ViewChild('docApproverRenderFp') docApproverRenderFp: TemplateRef<NameRenderComponent>;
+  @ViewChild('piNameRender') piNameRender: TemplateRef<NameRenderComponent>;
+
   // dtOptions: DataTables.Settings = {};
 
   grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   eGrantsUrl: string = this.propertiesService.getProperty('EGRANTS_URL');
+  subject: string ;
 
   dtFundingRequestOptions: any = {};
   dtFundingPlanOptions: any = {};
@@ -165,30 +173,52 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           className: 'all'
         }, // 1
         {
+          title: 'PI', data: 'piFullName',
+          ngTemplateRef:
+            { ref: this.piNameRender }
+
+        },
+       
+        /* {
           title: 'PI', data: 'piFullName', render: (data, type, row) => {
             return (data == null) ? '' : '<a href="mailto:' + row.piEmail +
               '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }, className: 'all'
-        }, // 2
+        }, */ // 2
         { title: 'Project Title', data: 'projectTitle' }, // 3
         { title: 'IMPAC II Status', data: 'applStatusGroupDescrip' }, // 4
-        {
+      /*   {
           title: 'PD', data: 'pdFullName', render: (data, type, row) => {
             return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress +
               '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
           }
+        }, */ 
+        {
+          title: 'PD', data: 'pdFullName',
+          ngTemplateRef:
+            { ref: this.pdNameRender }
+
         }, // 5
         { title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer }, className: 'all' }, // 6
         { title: 'FY', data: 'requestFy' }, // 7
         { title: 'Request ID', data: 'frqId' }, // 8
         { title: 'Request Name', data: 'requestName' }, // 9
         { title: 'Request Type', data: 'requestType' }, // 10
+
+        
+
         {
+          title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName',
+          ngTemplateRef:
+            { ref: this.docApproverRender }
+
+        }, 
+       /*  {
           title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: (data, type, row) => {
             return (data == null) ? '' : '<a href="mailto:' + row.requestingDocApprvlEmail +
               '?subject=' + row.fullGrantNum + ' - ' + row.requestingDocApprvlFullName + '">' + data + '</a>';
           }
-        }, // 11
+        }, */ // 11
         { title: 'Final LOA', data: 'loaName' }, // 12
         { title: 'Funding Approvals', data: 'fundsCertificationCode' }, // 13
         { title: 'Status', data: 'currentStatusDescrip' }, // 14
@@ -346,13 +376,13 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
               row.requestorPdFullName + '">' + label + '</a>';
           }
         }, // 4
+
         {
-          title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: (data, type, row) => {
-            return (data == null) ? '' : (type === 'export') ? data : '<a href="mailto:' +
-              row.requestingDocApprvlEmail + '?subject=' + row.planName + ' - ' +
-              row.requestingDocApprvlFullName + '">' + data + '</a>';
-          }
-        }, // 5
+          title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName',
+          ngTemplateRef:
+            { ref: this.docApproverRenderFp }
+
+        },  // 5
         { title: 'Final LOA', data: 'loaName' }, // 6
         { title: 'Funding Approvals', data: 'fundsCertificationCode' }, // 7
         {
@@ -534,17 +564,16 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           className: 'all'
         }, // 0
         {
-          title: 'PI', data: 'piFullName', render: (data, type, row) => {
-            return (data == null) ? '' : '<a href="mailto:' + row.piEmail +
-              '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-          }, className: 'all'
+          title: 'PI', data: 'piFullName',
+          ngTemplateRef:
+            { ref: this.piNameRender }
+
         }, // 1
         { title: 'Project Title', data: 'projectTitle' }, // 2
         { title: 'IMPAC II Status', data: 'applStatusGroupDescrip' }, // 3
         {
-          title: 'FOA', data: 'rfaPaNumber', render: (data, type, row) => {
-            return (data == null) ? '' : '<a href="' + row.nihGuideAddr + '" target="_blank">'
-              + data + '</a>';
+          title: 'FOA', data: 'rfaPaNumber',  ngTemplateRef:
+          { ref: this.searchFundingPlanFoasRenderer 
           }, className: 'all'
         }, // 4
         { title: 'FY', data: 'fy' }, // 5
@@ -556,11 +585,12 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
             return data.substr(4, 2) + '/' + data.substr(0, 4);
           }
         }, // 6
+
         {
-          title: 'PD', data: 'pdFullName', render: (data, type, row) => {
-            return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress +
-              '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-          }
+          title: 'PD', data: 'pdFullName',
+          ngTemplateRef:
+            { ref: this.pdNameRender }
+
         }, // 7
         { title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer },
           className: 'all' }, // 8
