@@ -177,23 +177,10 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           ngTemplateRef:
             { ref: this.piNameRender }
 
-        },
-       
-        /* {
-          title: 'PI', data: 'piFullName', render: (data, type, row) => {
-            return (data == null) ? '' : '<a href="mailto:' + row.piEmail +
-              '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-          }, className: 'all'
-        }, */ // 2
+        }, // 2
         { title: 'Project Title', data: 'projectTitle' }, // 3
         { title: 'IMPAC II Status', data: 'applStatusGroupDescrip' }, // 4
-      /*   {
-          title: 'PD', data: 'pdFullName', render: (data, type, row) => {
-            return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress +
-              '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';
-          }
-        }, */ 
-        {
+         {
           title: 'PD', data: 'pdFullName',
           ngTemplateRef:
             { ref: this.pdNameRender }
@@ -205,20 +192,12 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         { title: 'Request Name', data: 'requestName' }, // 9
         { title: 'Request Type', data: 'requestType' }, // 10
 
-        
-
         {
           title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName',
           ngTemplateRef:
             { ref: this.docApproverRender }
 
-        }, 
-       /*  {
-          title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName', render: (data, type, row) => {
-            return (data == null) ? '' : '<a href="mailto:' + row.requestingDocApprvlEmail +
-              '?subject=' + row.fullGrantNum + ' - ' + row.requestingDocApprvlFullName + '">' + data + '</a>';
-          }
-        }, */ // 11
+        },  // 11
         { title: 'Final LOA', data: 'loaName' }, // 12
         { title: 'Funding Approvals', data: 'fundsCertificationCode' }, // 13
         { title: 'Status', data: 'currentStatusDescrip' }, // 14
