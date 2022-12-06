@@ -97,3 +97,6 @@
   <ng-template #docApproverRenderFp let-data="adtData">
     <lib-name-render [data]="data"  [firstName]="data.requestingDocApprvlFullName" [email]="data.requestingDocApprvlEmail" [grantNumber]="data.fullGrantNum" [subject]="data.planName +' - '+ data.requestingDocApprvlFullName "></lib-name-render>
   </ng-template>
+  <ng-template #docAndPdApproverRender let-data="adtData">
+    <lib-name-render [data]="data"  [firstName]="data.requestorPdFullName" [email]="data.requestorEmailAddress" [grantNumber]="data.fullGrantNum" [subject]="data.planName +' - '+ data.requestorPdFullName "></lib-name-render>
+  </ng-template>

@@ -2,14 +2,14 @@
   <tbody>
   <tr *ngFor="let foas of data.fpFoasList">
     <td style="width: 70px; min-width: 70px;">
-      <a href="{{foas.nihGuideAddr}}" ngbTooltip="Click to RFA/PA Notices Guide" target="_blank">{{foas.rfaPaNumber}}</a>
+      <a href="{{foas.nihGuideAddr}}" ngbTooltip="Click to view FOA" target="_blank">{{foas.rfaPaNumber}}</a>
     </td>
     <td style="width: 100%">{{foas.title}}</td>
     <td style="width: 58px; min-width: 58px;">{{convert(foas.councilMeetingDateList)}}</td>
     <td style="width: 58px; min-width: 58px;" class="issue-type-column">{{foas.issueType}}</td>
   </tr>
   <tr>
-    <a href={{data.nihGuideAddr}} ngbTooltip="Click to RFA/PA Notices Guide" target="_blank">{{data.rfaPaNumber}}</a>
+    <a href={{data.nihGuideAddr}} ngbTooltip="Click to view FOA" target="_blank">{{data.rfaPaNumber}}</a>
   </tr>
   </tbody>
 </table>
