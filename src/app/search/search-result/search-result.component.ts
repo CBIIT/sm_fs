@@ -347,13 +347,21 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 1
         { title: 'Plan ID', data: 'fprId' }, // 2
         { title: 'Plan Name', data: 'planName' }, // 3
-
         {
+          title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: (data, type, row) => {
+            const label = (data && data.length > 0) ? data + ((row.requestingCayDoc && row.requestingCayDoc.length > 0)
+              ? (' (' + row.requestingCayDoc + ')') : '') : '';
+            return (type === 'export' || (!data || data.length === 0)) ? label : '<a href="mailto:' +
+              row.requestorEmailAddress + '?subject=' + row.planName + ' - ' +
+              row.requestorPdFullName + '">' + label + '</a>';
+          }
+        }, // 4
+       /*  {
           title: 'Requesting PD & DOC', data: 'requestorPdFullName',
           ngTemplateRef:
             { ref: this.docAndPdApproverRender }
 
-        },//4
+        },//4 */
 
         {
           title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName',
