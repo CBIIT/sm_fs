@@ -49,7 +49,6 @@ import { convertNcabs } from '../../utils/utils';
 import { NavigationModel } from '../../model/navigation-model';
 
 
-
 @Component({
   selector: 'app-search-result',
   templateUrl: './search-result.component.html',
@@ -347,21 +346,21 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 1
         { title: 'Plan ID', data: 'fprId' }, // 2
         { title: 'Plan Name', data: 'planName' }, // 3
+        // {
+        //   title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: (data, type, row) => {
+        //     const label = (data && data.length > 0) ? data + ((row.requestingCayDoc && row.requestingCayDoc.length > 0)
+        //       ? (' (' + row.requestingCayDoc + ')') : '') : '';
+        //     return (type === 'export' || (!data || data.length === 0)) ? label : '<a href="mailto:' +
+        //       row.requestorEmailAddress + '?subject=' + row.planName + ' - ' +
+        //       row.requestorPdFullName + '">' + label + '</a>';
+        //   }
+        // }, // 4
         {
-          title: 'Requesting PD & DOC', data: 'requestorPdFullName', render: (data, type, row) => {
-            const label = (data && data.length > 0) ? data + ((row.requestingCayDoc && row.requestingCayDoc.length > 0)
-              ? (' (' + row.requestingCayDoc + ')') : '') : '';
-            return (type === 'export' || (!data || data.length === 0)) ? label : '<a href="mailto:' +
-              row.requestorEmailAddress + '?subject=' + row.planName + ' - ' +
-              row.requestorPdFullName + '">' + label + '</a>';
-          }
-        }, // 4
-       /*  {
           title: 'Requesting PD & DOC', data: 'requestorPdFullName',
           ngTemplateRef:
             { ref: this.docAndPdApproverRender }
 
-        },//4 */
+        },//4 
 
         {
           title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName',
@@ -702,6 +701,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   // Since this is a callback, it cannot use this object anymore
   // Use $this instead
   ajaxCallFundingPlans($this: SearchResultComponent, dataTablesParameters: any, callback): void {
+    $this.fundingPlans = [];
     if (!$this.searchCriteria) {
       $this.showFundingPlanResult = false;
       callback({
@@ -721,7 +721,13 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         $this.showFundingPlanResult = true;
         $this._populateSelectedIntoResults('fprId', result.data);
         // $this.logger.debug('Search Funding Requests result: ', result);
-        $this.fundingPlans = result.data;
+        // $this.fundingPlans = result.data;
+        result.data.forEach(row => {
+          row.requestingCayDoc = (row.requestorPdFullName && row.requestorPdFullName.length > 0) ? row.requestorPdFullName + ((row.requestingCayDoc && row.requestingCayDoc.length > 0)
+          ? (' (' + row.requestingCayDoc + ')') : '') : '';
+          $this.fundingPlans.push(row);
+        })
+
         callback({
           recordsTotal: result.recordsTotal,
           recordsFiltered: result.recordsFiltered,
