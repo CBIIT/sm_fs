@@ -60,6 +60,10 @@
             ]
           },
           "configurations": {
+            "dev-api": {
+              "optimization": false,
+              "sourceMap": true
+            },
             "dev": {
               "optimization": false,
               "sourceMap": true
@@ -105,6 +109,18 @@
             },
             "production": {
               "browserTarget": "fs:build:production"
+            },
+            "dev-api": {
+              "browserTarget": "fs:build:dev",
+              "proxyConfig": "src/environments/proxy.config.dev-api.js"
+            },
+            "test-api": {
+              "browserTarget": "fs:build:dev",
+              "proxyConfig": "src/environments/proxy.config.test-api.js"
+            },
+            "stage-api": {
+              "browserTarget": "fs:build:dev",
+              "proxyConfig": "src/environments/proxy.config.stage-api.js"
             }
           }
         },
