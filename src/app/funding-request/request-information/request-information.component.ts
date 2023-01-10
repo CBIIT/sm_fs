@@ -24,6 +24,8 @@ export class RequestInformationComponent implements OnInit {
   @Input() parentForm: NgForm;
   isMbOnly = false;
   pdCayCodes: string[] = [];
+  selectedR00Pd: any;
+  selectedR00CayCode: any;
 
   myAlerts: Alert[] = [];
 
@@ -76,6 +78,7 @@ export class RequestInformationComponent implements OnInit {
   // of strings, but won't compile if I try to return a string.
   _selectedCayCode: string[] | string = (this.requestModel.requestDto.financialInfoDto.requestorCayCode
     ? [this.requestModel.requestDto.financialInfoDto.requestorCayCode] : []);
+
 
   get selectedCayCode(): string[] | string {
     return this._selectedCayCode;
@@ -169,8 +172,9 @@ export class RequestInformationComponent implements OnInit {
         && Number(this.requestModel.requestDto.financialInfoDto.requestTypeId) === Number(FundingRequestTypes.PAY_TYPE_4)
         && this.requestModel.grant.activityCode === 'K99' ) {
           this.logger.debug('Selected K99 to R00 conversion for Pay Type 4');
-          this.requestModel.requestDto.financialInfoDto.requestorNpnId = undefined;
-          this.parentForm.controls['pdName'].setValue(null);
+          // FS-1685
+          // this.requestModel.requestDto.financialInfoDto.requestorNpnId = undefined;
+          // this.parentForm.controls['pdName'].setValue(null);
     }
     if (this.requestModel.requestDto.financialInfoDto.requestTypeId) {
       this.refreshFundingSources(
