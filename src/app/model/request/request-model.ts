@@ -470,4 +470,10 @@ export class RequestModel {
       this.requestDto.financialInfoDto.suppAddYearFlag = undefined;
     }
   }
+
+  payType4K99R00Conversion() {
+    return +this.requestDto.financialInfoDto.requestTypeId === FundingRequestTypes.PAY_TYPE_4
+           && this.grant.activityCode === 'K99'
+           && this.requestDto.conversionActivityCode === 'R00';
+  }
 }

@@ -20,12 +20,14 @@ import { Type4SelectionService } from '../../type4-conversion-mechanism/type4-se
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
 })
 export class RequestInformationComponent implements OnInit {
+
   @ViewChild(CancerActivitiesDropdownComponent) cayCode: CancerActivitiesDropdownComponent;
   @Input() parentForm: NgForm;
   isMbOnly = false;
   pdCayCodes: string[] = [];
-  selectedR00Pd: any;
-  selectedR00CayCode: any;
+  // TODO: this will need to be converted to an NPEID with the cayCode for saving...
+  private _altPdNpnId: number;
+  private _altCayCode: string | string[];
 
   myAlerts: Alert[] = [];
 
@@ -113,8 +115,8 @@ export class RequestInformationComponent implements OnInit {
   }
 
   set selectedPd(value: number) {
+    this.logger.debug(`setSelectedPd(${value})`);
     // TODO: Evaluate whether to reset the program recommended costs model
-    // this.requestModel.programRecommendedCostsModel.reset();
     const valueChanged = this.requestModel.requestDto.requestorNpnId && (this.requestModel.requestDto.requestorNpnId !== value);
     this.requestModel.requestDto.requestorNpnId = value;
     this.requestModel.requestDto.financialInfoDto.requestorNpnId = value;
@@ -125,6 +127,21 @@ export class RequestInformationComponent implements OnInit {
     }
     this.fundingSourceSynchronizerService.fundingSourceNewPDEmitter.next(this.requestModel.requestDto.requestorNpnId);
 
+  }
+
+  get altCayCode(): string | string[] {
+    return this._altCayCode;
+  }
+
+  set altCayCode(value: string | string[]) {
+    this._altCayCode = value;
+  }
+  get altPdNpnId(): number {
+    return this._altPdNpnId;
+  }
+
+  set altPdNpnId(value: number) {
+    this._altPdNpnId = value;
   }
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger,
@@ -185,9 +202,7 @@ export class RequestInformationComponent implements OnInit {
   }
 
   payType4K99R00Conversion(): boolean {
-    return Number(this.requestModel.requestDto.financialInfoDto.requestTypeId) === FundingRequestTypes.PAY_TYPE_4
-           && this.requestModel.grant.activityCode === 'K99'
-           && this.requestModel.requestDto.conversionActivityCode === 'R00';
+    return this.requestModel.payType4K99R00Conversion();
   }
 
   get selectedFundingPolicyCut(): string {
@@ -202,4 +217,8 @@ export class RequestInformationComponent implements OnInit {
     return FUNDING_POLICY_CUT_TYPES.includes(Number(this.selectedRequestType));
   }
 
+  captureSelection($event: number) {
+    this.logger.debug(`capturePdV2SelectionChanged(${$event})`);
+
+  }
 }

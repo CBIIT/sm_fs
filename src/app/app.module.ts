@@ -223,6 +223,8 @@ import { ErrorComponent } from './error/error/error.component';
 import { SessionRestoreComponent } from './session/session-restore/session-restore.component';
 import { CookieModule } from 'ngx-cookie';
 import { SearchFundingRequestApprvlRoleComponent } from './search/search-filter/search-funding-request-apprvl-role/search-funding-request-apprvl-role.component';
+import { R00PdNameRequiredValidatorDirective } from './validators/r00-pd-name-required-validator.directive';
+import { R00CancerActivityRequiredValidatorDirective } from './validators/r00-cancer-activity-required-validator.directive';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -383,6 +385,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     ErrorComponent,
     SessionRestoreComponent,
     SearchFundingRequestApprvlRoleComponent,
+    R00PdNameRequiredValidatorDirective,
+    R00CancerActivityRequiredValidatorDirective,
   ],
 
 

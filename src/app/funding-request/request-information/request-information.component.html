@@ -55,7 +55,14 @@
   </div>
 
   <div class="col-md-4 col-lg-4">
-    <lib-cancer-activities-dropdown [lockedOptions]="pdCayCodes" [selectSingleOption]="true" [(selectedValue)]="selectedCayCode" [maxSelection]="1" [syncWithPd]="true" label="Requesting PD's Cancer Activity"></lib-cancer-activities-dropdown>
+    <lib-cancer-activities-dropdown
+      [lockedOptions]="pdCayCodes"
+      [selectSingleOption]="true"
+      [(selectedValue)]="selectedCayCode"
+      [maxSelection]="1"
+      [syncWithPd]="true"
+      label="Requesting PD's Cancer Activity">
+    </lib-cancer-activities-dropdown>
     <div
       class="text-danger mt-1"
       *ngIf="parentForm.errors?.cayCodeIsRequired && (parentForm.submitted || parentForm.touched)">
@@ -73,7 +80,10 @@
 <!--    </ngb-alert>-->
     <div class="col-md-4 col-lg-4" *ngIf="payType4K99R00Conversion()">
       <lib-pdname-dropdown-v2
-        [(selectedValue)]="selectedR00Pd"
+        [debug]="true"
+        [name]="'r00pdName'"
+        [(selectedValue)]="altPdNpnId"
+        (selectedValueChange)="captureSelection($event)"
         [channel]="'r00pd'"
         label="R00 PD"
         [broadcast]="true"
@@ -83,23 +93,25 @@
       </lib-pdname-dropdown-v2>
       <div
         class="text-danger mt-1"
-        *ngIf="parentForm.errors?.r00PdNameRequired && (parentForm.submitted || parentForm.touched)">
-        PD is required
+        *ngIf="parentForm.errors?.altPdNameRequired && (parentForm.submitted || parentForm.touched)">
+        R00 PD is required
       </div>
     </div>
 
     <div class="col-md-4 col-lg-4" *ngIf="payType4K99R00Conversion()">
       <lib-cancer-activities-dropdown-v2
+        [debug]="true"
+        [name]="'r00CancerActivity'"
         [selectSingleOption]="true"
         [channel]="'r00pd'"
-        [(selectedValue)]="selectedR00CayCode"
+        [(selectedValue)]="altCayCode"
         [maxSelection]="1"
         [syncWithPd]="true"
         label="R00 PD's Cancer Activity"></lib-cancer-activities-dropdown-v2>
       <div
         class="text-danger mt-1"
-        *ngIf="parentForm.errors?.r00CayCodeIsRequired && (parentForm.submitted || parentForm.touched)">
-        Cancer activity is required
+        *ngIf="parentForm.errors?.altCayCodeRequired && (parentForm.submitted || parentForm.touched)">
+        R00 cancer activity is required
       </div>
     </div>
 <!--  </div>-->

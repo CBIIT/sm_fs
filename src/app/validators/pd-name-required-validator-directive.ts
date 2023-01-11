@@ -8,7 +8,6 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class PdNameRequiredValidatorDirective implements Validator {
   constructor(private logger: NGXLogger) {
-
   }
 
   validate(control: AbstractControl): ValidationErrors | null {

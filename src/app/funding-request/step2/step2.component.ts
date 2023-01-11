@@ -173,6 +173,7 @@ export class Step2Component implements OnInit {
         || !this.requestModel.requestDto.financialInfoDto.requestorCayCode) {
       return false;
     }
+
     return !!this.requestModel.requestDto.frtId && Number(this.requestModel.requestDto.frtId) &&
       !([FundingRequestTypes.SKIP, FundingRequestTypes.SKIP__NCI_RFA].includes(Number(this.requestModel.requestDto.frtId)));
   }
@@ -242,4 +243,14 @@ export class Step2Component implements OnInit {
            && this.requestModel.requestDto.financialInfoDto.fundingPolicyCut === 'Other';
   }
 
+  // FS-1682
+  // TODO: ensure that for K99-R00 conversions, we have both R00 PD and CA before continuing
+  payType4K99R00valid() {
+    if(!this.requestModel.payType4K99R00Conversion()) {
+      return true;
+    } else {
+      // validate pd and ca
+      return true;
+    }
+  }
 }
