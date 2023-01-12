@@ -245,14 +245,24 @@ export class Step2Component implements OnInit {
 
   // FS-1682
   // TODO: ensure that for K99-R00 conversions, we have both R00 PD and CA before continuing
+  //this.requestModel.requestDto.conversionActivityCode === 'R00'
   payType4K99R00valid() {
-    if(!this.requestModel.payType4K99R00Conversion()) {
-      return true;
-    } else {
-      if(!this.requestModel.requestDto.financialInfoDto.altPdNpnId || !this.requestModel.requestDto.financialInfoDto.altCayCode) {
-        return false;
-      }
+    if (!this.requestModel.isPayType4()) {
       return true;
     }
+    if (!this.requestModel.isPayType4K99()) {
+      return true;
+    }
+    // At this point, we know it's a PayType4 K99 grant. If no conversion mech selected, return false;
+
+    if (!this.requestModel.requestDto.conversionActivityCode) {
+      return false;
+    }
+
+    if (this.requestModel.isR00Conversion() && (!this.requestModel.requestDto.financialInfoDto.altPdNpnId || !this.requestModel.requestDto.financialInfoDto.altCayCode)) {
+      return false;
+    }
+
+    return true;
   }
 }

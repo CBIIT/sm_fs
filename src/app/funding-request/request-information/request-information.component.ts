@@ -235,7 +235,7 @@ export class RequestInformationComponent implements OnInit {
   }
 
   payType4K99R00Conversion(): boolean {
-    return this.requestModel.payType4K99R00Conversion();
+    return this.requestModel.isPayType4K99R00Conversion();
   }
 
   get selectedFundingPolicyCut(): string {

@@ -471,13 +471,20 @@ export class RequestModel {
     }
   }
 
-  payType4K99R00Conversion(): boolean {
-    return this.payType4K99() && this.requestDto.conversionActivityCode === 'R00';
+  isR00Conversion(): boolean {
+    return this.requestDto.conversionActivityCode === 'R00';
   }
 
-  payType4K99(): boolean {
-    return +this.requestDto.financialInfoDto.requestTypeId === FundingRequestTypes.PAY_TYPE_4
-      && this.grant.activityCode === 'K99';
+  isPayType4K99R00Conversion(): boolean {
+    return this.isPayType4K99() && this.isR00Conversion();
+  }
+
+  isPayType4K99(): boolean {
+    return this.isPayType4() && this.isK99();
+  }
+
+  isK99(): boolean {
+    return this.grant.activityCode === 'K99';
   }
 
 }

@@ -96,6 +96,12 @@
         *ngIf="parentForm.errors?.altPdNameRequired && (parentForm.submitted || parentForm.touched)">
         R00 PD is required
       </div>
+      <div
+        class="text-danger mt-1"
+        *ngIf="parentForm.errors?.uniquePdsRequired && (parentForm.submitted || parentForm.touched)">
+        Requesting PD and R00 PD must not be the same
+      </div>
+
     </div>
 
     <div class="col-md-4 col-lg-4" *ngIf="payType4K99R00Conversion()">
