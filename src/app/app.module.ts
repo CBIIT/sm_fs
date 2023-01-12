@@ -66,13 +66,13 @@ import { OpenRequestComponent } from './search/open-request/open-request.compone
 import { WorkflowComponent } from './funding-request/workflow/workflow.component';
 import { ApproverListComponent } from './funding-request/workflow/approver-list/approver-list.component';
 import { FundingSourceCostValidatorDirective } from './validators/funding-source-cost-validator.directive';
-import { DiversitySupplementValidatorDirective } from './validators/diversity-supplement-validator-directive';
-import { PdNameRequiredValidatorDirective } from './validators/pd-name-required-validator-directive';
-import { CancerActivityRequiredValidatorDirective } from './validators/cancer-activity-required-validator-directive';
+import { DiversitySupplementValidatorDirective } from './validators/diversity-supplement-validator.directive';
+import { PdNameRequiredValidatorDirective } from './validators/pd-name-required-validator.directive';
+import { CancerActivityRequiredValidatorDirective } from './validators/cancer-activity-required-validator.directive';
 import { UploadBudgetDocumentsComponent } from './upload-budget-documents/upload-budget-documents.component';
 import { ApprovedCostsComponent } from './funding-request/workflow/approved-costs/approved-costs.component';
 import { BudgetInfoComponent } from './cans/budget-info/budget-info.component';
-import { ActiveInitialPayValidatorDirective } from './validators/active-initial-pay-validator-directive';
+import { ActiveInitialPayValidatorDirective } from './validators/active-initial-pay-validator.directive';
 import { OefiaTypesComponent } from './cans/oefia-types/oefia-types.component';
 import { ProjectedCanComponent } from './cans/projected-can/projected-can.component';
 import { CanSelectorComponent } from './cans/can-selector/can-selector.component';
@@ -90,7 +90,7 @@ import {
 } from './funding-request/step1/funding-request-action-cell-renderer/funding-request-action-cell-renderer.component';
 import { FundableScoreRangeComponent } from './funding-plan/fundable-score-range/fundable-score-range.component';
 import { GrantTableComponent } from './funding-plan/grant-table/grant-table.component';
-import { MinMaxValidatorDirective } from './validators/min-max-validator-directive';
+import { MinMaxValidatorDirective } from './validators/min-max-validator.directive';
 import { GmInfoComponent } from './funding-request/workflow/gm-info/gm-info.component';
 import { PlanStep1Component } from './funding-plan/plan-step1/plan-step1.component';
 import { PlanStep2Component } from './funding-plan/plan-step2/plan-step2.component';
@@ -225,6 +225,7 @@ import { CookieModule } from 'ngx-cookie';
 import { SearchFundingRequestApprvlRoleComponent } from './search/search-filter/search-funding-request-apprvl-role/search-funding-request-apprvl-role.component';
 import { R00PdNameRequiredValidatorDirective } from './validators/r00-pd-name-required-validator.directive';
 import { R00CancerActivityRequiredValidatorDirective } from './validators/r00-cancer-activity-required-validator.directive';
+import { UniquePdValidatorDirective } from './validators/unique-pd-validator.directive';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -387,6 +388,7 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     SearchFundingRequestApprvlRoleComponent,
     R00PdNameRequiredValidatorDirective,
     R00CancerActivityRequiredValidatorDirective,
+    UniquePdValidatorDirective,
   ],
 
 

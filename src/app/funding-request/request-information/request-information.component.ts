@@ -27,7 +27,16 @@ export class RequestInformationComponent implements OnInit {
   pdCayCodes: string[] = [];
   // TODO: this will need to be converted to an NPEID with the cayCode for saving...
   private _altPdNpnId: number;
-  private _altCayCode: string | string[];
+  private _altCayCode: string | string[] = (this.requestModel.requestDto.altCayCode
+    ? [this.requestModel.requestDto.altCayCode] : []);
+
+  // TODO: this is just plain weird. The CA dropdown component selectedValue attribute is an array of strings,
+  // so the setter and getter here are typed as arrays of strings. However, the value passed to the setter is
+  // just a string, and even though _selectedCayCode is typed as a string[], if I try to assign it a string[]
+  // value, it blows up at runtime.  Ditto the getter, which blows up at runtime if I try to return an array
+  // of strings, but won't compile if I try to return a string.
+  _selectedCayCode: string[] | string = (this.requestModel.requestDto.financialInfoDto.requestorCayCode
+    ? [this.requestModel.requestDto.financialInfoDto.requestorCayCode] : []);
 
   myAlerts: Alert[] = [];
 
@@ -73,13 +82,7 @@ export class RequestInformationComponent implements OnInit {
     });
   }
 
-// TODO: this is just plain weird. The CA dropdown component selectedValue attribute is an array of strings,
-  // so the setter and getter here are typed as arrays of strings. However, the value passed to the setter is
-  // just a string, and even though _selectedCayCode is typed as a string[], if I try to assign it a string[]
-  // value, it blows up at runtime.  Ditto the getter, which blows up at runtime if I try to return an array
-  // of strings, but won't compile if I try to return a string.
-  _selectedCayCode: string[] | string = (this.requestModel.requestDto.financialInfoDto.requestorCayCode
-    ? [this.requestModel.requestDto.financialInfoDto.requestorCayCode] : []);
+
 
 
   get selectedCayCode(): string[] | string {
@@ -88,7 +91,6 @@ export class RequestInformationComponent implements OnInit {
 
   set selectedCayCode(value: string[] | string) {
     // TODO: Evaluate whether to reset the program recommended costs model
-    // this.requestModel.programRecommendedCostsModel.reset();
     if (isArray(value) && value[0]) {
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = value[0];
       this.requestModel.requestDto.requestorCayCode = value[0];
@@ -134,14 +136,45 @@ export class RequestInformationComponent implements OnInit {
   }
 
   set altCayCode(value: string | string[]) {
+    // TODO
+    if (isArray(value) && value[0]) {
+      this.requestModel.requestDto.financialInfoDto.altCayCode = value[0];
+      this.requestModel.requestDto.altCayCode = value[0];
+    } else if (typeof value === 'string' || value instanceof String) {
+      this.requestModel.requestDto.financialInfoDto.altCayCode = String(value);
+      this.requestModel.requestDto.altCayCode = String(value);
+    } else {
+      this.requestModel.requestDto.financialInfoDto.altCayCode = undefined;
+      this.requestModel.requestDto.altCayCode = undefined;
+    }
+    this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.next(
+      this.requestModel.requestDto.financialInfoDto.altCayCode);
     this._altCayCode = value;
-  }
-  get altPdNpnId(): number {
-    return this._altPdNpnId;
+    // TODO: Figure this one out - do we need to do this? Probably....
+    // const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
+    //   ? this.requestModel.requestDto.conversionActivityCode : null;
+    // this.refreshFundingSources(
+    //   this.requestModel.requestDto.financialInfoDto.requestTypeId,
+    //   conversionActivityCode,
+    //   this.requestModel.requestDto.financialInfoDto.altCayCode);
   }
 
+  get altPdNpnId(): number {
+    return this.requestModel.requestDto.financialInfoDto.altPdNpnId;
+  }
+
+  // TODO: Needs work
   set altPdNpnId(value: number) {
-    this._altPdNpnId = value;
+    this.logger.debug(`setAltPdNpnId(${value})`);
+    const valueChanged = this.requestModel.requestDto.requestorNpnId && (this.requestModel.requestDto.requestorNpnId !== value);
+    this.requestModel.requestDto.altPdNpnId = value;
+    this.requestModel.requestDto.financialInfoDto.altPdNpnId = value;
+    if (valueChanged) {
+      this.requestModel.requestDto.altCayCode = undefined;
+      this.requestModel.requestDto.financialInfoDto.altCayCode = undefined;
+      //this.cayCode.selectedValue = null;
+    }
+    //this.fundingSourceSynchronizerService.fundingSourceNewPDEmitter.next(this.requestModel.requestDto.requestorNpnId);
   }
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger,

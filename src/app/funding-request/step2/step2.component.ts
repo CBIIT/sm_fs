@@ -249,7 +249,9 @@ export class Step2Component implements OnInit {
     if(!this.requestModel.payType4K99R00Conversion()) {
       return true;
     } else {
-      // validate pd and ca
+      if(!this.requestModel.requestDto.financialInfoDto.altPdNpnId || !this.requestModel.requestDto.financialInfoDto.altCayCode) {
+        return false;
+      }
       return true;
     }
   }
