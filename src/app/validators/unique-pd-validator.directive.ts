@@ -12,12 +12,10 @@ export class UniquePdValidatorDirective implements Validator {
 
   validate(control: AbstractControl): ValidationErrors | null {
     const pd = control.get('pdName');
-    this.logger.debug("pd:", pd);
     if (!pd || !pd.value) {
       return null;
     }
     const r00Pd = control.get('r00pdName');
-    this.logger.debug("r00pd", r00Pd);
     if (!r00Pd || !r00Pd.value) {
       return null;
     }

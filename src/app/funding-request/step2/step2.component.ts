@@ -78,7 +78,6 @@ export class Step2Component implements OnInit {
       });
     }
 
-
     this.requestModel.clearAlerts();
     // TODO: make sure model is properly constructed
     this.requestModel.prepareBudgetsAndSetFinalLoa();
@@ -114,7 +113,9 @@ export class Step2Component implements OnInit {
         this.logger.error(`Missing supplement type info for Diversity Supplement request`, this.requestModel.requestDto);
       }
     }
+    this.logger.debug('----save-request-------------------------------------------------------------------------------');
     this.logger.debug(JSON.stringify(this.requestModel.requestDto));
+    this.logger.debug('----end-save-request---------------------------------------------------------------------------');
 
     this.fsRequestControllerService.saveRequest(this.requestModel.requestDto).subscribe(
       result => {

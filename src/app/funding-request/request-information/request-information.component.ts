@@ -7,7 +7,7 @@ import { FundingRequestValidationService } from '../../model/request/funding-req
 import { FundingRequestTypes, FUNDING_POLICY_CUT_TYPES } from '../../model/request/funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
 import { ControlContainer, NgForm } from '@angular/forms';
-import { CancerActivitiesDropdownComponent } from '@cbiit/i2ecui-lib';
+import {CancerActivitiesDropdownComponent, CancerActivitiesDropdownV2Component} from '@cbiit/i2ecui-lib';
 import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
 import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
 import { AppUserSessionService } from '../../service/app-user-session.service';
@@ -21,7 +21,8 @@ import { Type4SelectionService } from '../../type4-conversion-mechanism/type4-se
 })
 export class RequestInformationComponent implements OnInit {
 
-  @ViewChild(CancerActivitiesDropdownComponent) cayCode: CancerActivitiesDropdownComponent;
+  @ViewChild(CancerActivitiesDropdownComponent) cayCodeComponent: CancerActivitiesDropdownComponent;
+  @ViewChild(CancerActivitiesDropdownV2Component) altCayCodeComponent: CancerActivitiesDropdownV2Component;
   @Input() parentForm: NgForm;
   isMbOnly = false;
   pdCayCodes: string[] = [];
@@ -125,7 +126,7 @@ export class RequestInformationComponent implements OnInit {
     if (valueChanged) {
       this.requestModel.requestDto.requestorCayCode = undefined;
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
-      this.cayCode.selectedValue = null;
+      this.cayCodeComponent.selectedValue = null;
     }
     this.fundingSourceSynchronizerService.fundingSourceNewPDEmitter.next(this.requestModel.requestDto.requestorNpnId);
 
@@ -136,7 +137,7 @@ export class RequestInformationComponent implements OnInit {
   }
 
   set altCayCode(value: string | string[]) {
-    // TODO
+    this.logger.debug(`setAltCayCode(${value})`);
     if (isArray(value) && value[0]) {
       this.requestModel.requestDto.financialInfoDto.altCayCode = value[0];
       this.requestModel.requestDto.altCayCode = value[0];
@@ -147,8 +148,8 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.requestDto.financialInfoDto.altCayCode = undefined;
       this.requestModel.requestDto.altCayCode = undefined;
     }
-    this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.next(
-      this.requestModel.requestDto.financialInfoDto.altCayCode);
+    // this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.next(
+    //   this.requestModel.requestDto.financialInfoDto.altCayCode);
     this._altCayCode = value;
     // TODO: Figure this one out - do we need to do this? Probably....
     // const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
@@ -166,15 +167,15 @@ export class RequestInformationComponent implements OnInit {
   // TODO: Needs work
   set altPdNpnId(value: number) {
     this.logger.debug(`setAltPdNpnId(${value})`);
-    const valueChanged = this.requestModel.requestDto.requestorNpnId && (this.requestModel.requestDto.requestorNpnId !== value);
+    const valueChanged = this.requestModel.requestDto.altPdNpnId && (this.requestModel.requestDto.altPdNpnId !== value);
     this.requestModel.requestDto.altPdNpnId = value;
     this.requestModel.requestDto.financialInfoDto.altPdNpnId = value;
     if (valueChanged) {
       this.requestModel.requestDto.altCayCode = undefined;
       this.requestModel.requestDto.financialInfoDto.altCayCode = undefined;
-      //this.cayCode.selectedValue = null;
+      this.altCayCodeComponent.selectedValue = null;
     }
-    //this.fundingSourceSynchronizerService.fundingSourceNewPDEmitter.next(this.requestModel.requestDto.requestorNpnId);
+    //this.fundingSourceSynchronizerService.fundingSourceNewPDEmitter.next(this.requestModel.requestDto.altPdNpnId);
   }
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger,
