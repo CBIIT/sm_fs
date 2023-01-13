@@ -487,4 +487,7 @@ export class RequestModel {
     return this.grant.activityCode === 'K99';
   }
 
+  is4R00(): boolean {
+    return +this.grant.applTypeCode === 4 && this.grant.activityCode === 'R00';
+  }
 }

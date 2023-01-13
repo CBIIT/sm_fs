@@ -20,7 +20,7 @@
   </div>
   <app-request-information [parentForm]="step2Form"></app-request-information>
 
-  <app-program-recommended-costs *ngIf="requestTypeSelected() && payType4K99R00valid()"></app-program-recommended-costs>
+  <app-program-recommended-costs *ngIf="showPRCSection()"></app-program-recommended-costs>
 
   <div class="row">
     <div class="col-lg-12">
@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div [hidden]="!(requestTypeSelected() && payType4K99R00valid())">
+  <div [hidden]="!(showPRCSection())">
     <div class="row" *ngIf="showFinalLOA()">
       <div class="col-lg-6">
         <div class="form-group">

@@ -70,15 +70,18 @@
     </div>
   </div>
 
-  <div class="col-md-2 col-lg-4" *ngIf="type4Selected()">
+  <div class="col-md-2 col-lg-4" *ngIf="type4Selected() && !is4R00(); else placeholder">
     <app-type4-conversion-mechanism [parentForm]="parentForm"></app-type4-conversion-mechanism>
   </div>
+  <ng-template #placeholder>
+    <div class="col-md2 col-lg4">&nbsp;&nbsp;</div>
+  </ng-template>
 
 <!--  <div class="col-md-12 col-lg-12" *ngIf="payType4K99R00Conversion()">-->
 <!--    <ngb-alert type="warning" [dismissible]="true">-->
 <!--      <b>WARNING:</b> Select the PD who will be assigned to the R00, NOT the PD assigned to the K99.-->
 <!--    </ngb-alert>-->
-    <div class="col-md-4 col-lg-4" *ngIf="payType4K99R00Conversion()">
+    <div class="col-md-4 col-lg-4" *ngIf="payType4K99R00Conversion() || isPayType44R00()">
       <lib-pdname-dropdown-v2
         [debug]="true"
         [name]="'r00pdName'"
@@ -104,7 +107,7 @@
 
     </div>
 
-    <div class="col-md-4 col-lg-4" *ngIf="payType4K99R00Conversion()">
+    <div class="col-md-4 col-lg-4" *ngIf="payType4K99R00Conversion() || isPayType44R00()">
       <lib-cancer-activities-dropdown-v2
         [debug]="true"
         [name]="'r00CancerActivity'"

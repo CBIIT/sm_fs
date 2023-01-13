@@ -255,4 +255,12 @@ export class RequestInformationComponent implements OnInit {
     this.logger.debug(`capturePdV2SelectionChanged(${$event})`);
 
   }
+
+  isPayType44R00(): boolean {
+    return this.requestModel.is4R00() && this.requestModel.isPayType4();
+  }
+
+  is4R00(): boolean {
+    return this.requestModel.is4R00();
+  }
 }

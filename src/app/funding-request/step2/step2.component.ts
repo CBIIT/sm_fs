@@ -245,15 +245,13 @@ export class Step2Component implements OnInit {
   }
 
   // FS-1682
-  // TODO: ensure that for K99-R00 conversions, we have both R00 PD and CA before continuing
-  //this.requestModel.requestDto.conversionActivityCode === 'R00'
-  payType4K99R00valid() {
-    if (!this.requestModel.isPayType4()) {
+  // This method will return true in two circumstances: first, if it's not applicable at all (not pay type 4); second,
+  // if the proper conditions are met
+  payType4K99R00valid(): boolean {
+    if (!this.requestModel.isPayType4() || !this.requestModel.isK99()) {
       return true;
     }
-    if (!this.requestModel.isPayType4K99()) {
-      return true;
-    }
+
     // At this point, we know it's a PayType4 K99 grant. If no conversion mech selected, return false;
 
     if (!this.requestModel.requestDto.conversionActivityCode) {
@@ -261,9 +259,28 @@ export class Step2Component implements OnInit {
     }
 
     if (this.requestModel.isR00Conversion() && (!this.requestModel.requestDto.financialInfoDto.altPdNpnId || !this.requestModel.requestDto.financialInfoDto.altCayCode)) {
+      // if conversion mech is R00, validate alt npn and caycode are provided
       return false;
     }
 
     return true;
+  }
+
+  isPayType44R00Valid(): boolean {
+    if (!this.requestModel.isPayType4() || !this.requestModel.is4R00()) {
+      return true;
+    }
+
+    // Grant is 4R00, so validate aldPd and altCayCode are provided
+
+    if (!this.requestModel.requestDto.financialInfoDto.altPdNpnId || !this.requestModel.requestDto.financialInfoDto.altCayCode) {
+      return false;
+    }
+
+    return true;
+  }
+
+  showPRCSection(): boolean {
+    return this.requestTypeSelected() && this.payType4K99R00valid() && this.isPayType44R00Valid();
   }
 }
