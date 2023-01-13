@@ -69,6 +69,8 @@
       </div>
     </div>
 
+
+
     <div class="col-md-6 col-lg-3" *ngIf="!isSkip && otherDocs">
       <div class="form-group">
         <p class="like-label">Other DOC(s) Contributing Funds</p>
@@ -86,10 +88,27 @@
       </div>
     </div>
 
-    <div class="col-md-6 col-lg-3" *ngIf="!isSkip && type4Request ">
+    <div class="col-md-6 col-lg-3" *ngIf="!isSkip && type4Request && !is4R00Request">
       <div class="form-group">
         <p class="like-label">Conversion Grant Activity Code/Mechanism</p>
         <p>{{model.requestDto.conversionActivityCode === 'NC' ? 'No Change' : model.requestDto.conversionActivityCode}}</p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3" *ngIf="showAltPdAndCayCode">
+      <div class="form-group">
+        <p class="like-label">R00 PD</p>
+        <p
+          [innerHTML]="model.requestDto|mailtoFormatter:'altPdFullName':'altPdEmailAddress':'PI/PD name':'fullGrantNum': 'lastName'"></p>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4" *ngIf="showAltPdAndCayCode">
+      <div class="form-group">
+        <p class="like-label">R00 PD's Cancer Activity</p>
+        <p><a [routerLink]=""
+              ngbTooltip="{{model.requestDto.financialInfoDto.altCayCode|codeDescription:'CancerActivities'}}"
+              triggers="click:blur" placement="top">{{model.requestDto.financialInfoDto.altCayCode}}</a></p>
       </div>
     </div>
 
