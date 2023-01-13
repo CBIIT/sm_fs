@@ -1,5 +1,5 @@
 INSERT INTO NCI.APP_MAIL_TEMPLATE_T (ID, APP_NAME, SHORT_IDENTIFIER, DESCRIPTION, SUBJECT, BODY, ACTIVE_FLAG, CREATE_DATE, CREATE_USER_ID, LAST_CHANGE_DATE, LAST_CHANGE_USER_ID)
-VALUES (##, 'I2ECWS', 'FS_4R00_MISSING', 'Send notification to OGA BOB Team 1 when PayType4 K99-R00 request submitted but no matching 4R00 grant is found', 'Subject - embedded in body',
+VALUES (81, 'I2ECWS', 'FS_4R00_MISSING', 'Send notification to OGA BOB Team 1 when PayType4 K99-R00 request submitted but no matching 4R00 grant is found', 'Subject - embedded in body',
 '<!DOCTYPE html>
  <html lang="en" xmlns:th="http://www.thymeleaf.org">
  <head>
