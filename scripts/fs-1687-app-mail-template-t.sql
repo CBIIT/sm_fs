@@ -23,7 +23,7 @@ VALUES (81, 'I2ECWS', 'FS_4R00_MISSING', 'Send notification to OGA BOB Team 1 wh
 
  <p>
    This is to let you know that the following Pay Type 4 request (ID: <a th:href="${viewurl +  request.frqId}" href="#" th:text="${request.frqId}">123456</a>)
-   has been submitted by the program director <a href="#" th:href="@{''mailto:'' + ${request.requestorPdEmailAddr}}"><span th:text="${request.requestorPdFullName}" th:remove="tag"></span>Jane Doe</a> and the corresponding <span th:text="${missing4R00}" th:remove="tag">4R00CA12345-03</span> does not exist in I2E.
+   has been submitted by the program director <a href="#" th:href="@{''mailto:'' + ${request.requestorPdEmailAddr}}"><span th:text="${request.requestorPdFullName}" th:remove="tag"></span></a> and the corresponding <span th:text="${missing4R00}" th:remove="tag">4R00CA12345-03</span> does not exist in I2E.
  </p>
 
  <p>

@@ -26,8 +26,6 @@ export class RequestInformationComponent implements OnInit {
   @Input() parentForm: NgForm;
   isMbOnly = false;
   pdCayCodes: string[] = [];
-  // TODO: this will need to be converted to an NPEID with the cayCode for saving...
-  private _altPdNpnId: number;
   private _altCayCode: string | string[] = (this.requestModel.requestDto.altCayCode
     ? [this.requestModel.requestDto.altCayCode] : []);
 
@@ -60,7 +58,6 @@ export class RequestInformationComponent implements OnInit {
     }
   }
 
-
   private refreshFundingSources(requestType: number, conversionActivityCode: string, cayCode: string): void {
     if (!(Number(requestType) === Number(FundingRequestTypes.PAY_TYPE_4))) {
       // NOTE: It's probably harmless to pass the conversion mech even for non-Pay_Type_4, but just in case...
@@ -82,9 +79,6 @@ export class RequestInformationComponent implements OnInit {
       this.logger.debug('HttpClient get request error for----- ' + error.message);
     });
   }
-
-
-
 
   get selectedCayCode(): string[] | string {
     return this._selectedCayCode;
@@ -132,6 +126,10 @@ export class RequestInformationComponent implements OnInit {
 
   }
 
+  /**
+   * Funding sources are still only based on the requesting PD, not the Alt PD. So we only need to sync alt cay code
+   * and alt PD with each other
+   */
   get altCayCode(): string | string[] {
     return this._altCayCode;
   }
@@ -148,23 +146,13 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.requestDto.financialInfoDto.altCayCode = undefined;
       this.requestModel.requestDto.altCayCode = undefined;
     }
-    // this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.next(
-    //   this.requestModel.requestDto.financialInfoDto.altCayCode);
     this._altCayCode = value;
-    // TODO: Figure this one out - do we need to do this? Probably....
-    // const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
-    //   ? this.requestModel.requestDto.conversionActivityCode : null;
-    // this.refreshFundingSources(
-    //   this.requestModel.requestDto.financialInfoDto.requestTypeId,
-    //   conversionActivityCode,
-    //   this.requestModel.requestDto.financialInfoDto.altCayCode);
   }
 
   get altPdNpnId(): number {
     return this.requestModel.requestDto.financialInfoDto.altPdNpnId;
   }
 
-  // TODO: Needs work
   set altPdNpnId(value: number) {
     this.logger.debug(`setAltPdNpnId(${value})`);
     const valueChanged = this.requestModel.requestDto.altPdNpnId && (this.requestModel.requestDto.altPdNpnId !== value);
@@ -175,7 +163,6 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.requestDto.financialInfoDto.altCayCode = undefined;
       this.altCayCodeComponent.selectedValue = null;
     }
-    //this.fundingSourceSynchronizerService.fundingSourceNewPDEmitter.next(this.requestModel.requestDto.altPdNpnId);
   }
 
   constructor(private requestModel: RequestModel, private logger: NGXLogger,
@@ -223,7 +210,7 @@ export class RequestInformationComponent implements OnInit {
         && Number(this.requestModel.requestDto.financialInfoDto.requestTypeId) === Number(FundingRequestTypes.PAY_TYPE_4)
         && this.requestModel.grant.activityCode === 'K99' ) {
           this.logger.debug('Selected K99 to R00 conversion for Pay Type 4');
-          // FS-1685
+          // FS-1685 - no longer clear PD and cayCode
           // this.requestModel.requestDto.financialInfoDto.requestorNpnId = undefined;
           // this.parentForm.controls['pdName'].setValue(null);
     }
