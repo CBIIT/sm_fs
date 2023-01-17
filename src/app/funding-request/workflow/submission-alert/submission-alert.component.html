@@ -6,7 +6,7 @@
         {{approver.approverLastName + ', '+ approver.approverFirstName}}</a></b> for review.
     </span>
     <span *ngIf="action==='COMPLETE'">
-        Your request <b>{{frqId}}</b> has been successfully completed. 
+        Your request <b>{{frqId}}</b> has been successfully completed.
     </span>
     <span *ngIf="action==='APPROVE_ROUTE'">
         The request {{frqId}} has been successfully approved and routed to
@@ -47,31 +47,31 @@
         {{docApprover.approverLastName + ', '+ docApprover.approverFirstName}}</a></b> for review.
     </span>
     <span *ngIf="action==='WITHDRAW'">
-        The request <b>{{frqId}}</b>  has been withdrawn. The requester and any 
-        previous approver(s) (if applicable) will be notified of your action. 
+        The request <b>{{frqId}}</b>  has been withdrawn. The requester and any
+        previous approver(s) (if applicable) will be notified of your action.
     </span>
     <span *ngIf="action==='HOLD'">
-        The request <b>{{frqId}}</b>  has been placed on hold. The requester, current, 
-        and previous approver(s) (if applicable) will be notified of your action.  
+        The request <b>{{frqId}}</b>  has been placed on hold. The requester, current,
+        and previous approver(s) (if applicable) will be notified of your action.
     </span>
     <span *ngIf="action==='RELEASE'">
-        The request <b>{{frqId}}</b> has been released from the hold status. 
-        The current approver & designee(s) will be notified to process the request. 
+        The request <b>{{frqId}}</b> has been released from the hold status.
+        The current approver & designee(s) will be notified to process the request.
     </span>
-    You can view the request details below or return to the 
+    You can view the request details below or return to the
     <a routerLink="/search">search</a>.
 </div>
 <div class="alert alert-danger" *ngIf="status === 'failure'">
-    <b>Failed to submit request:</b>&nbsp;<span [innerHtml]="errorMessage"></span>
+    <b>{{ errorLabel }}</b>&nbsp;<span [innerHtml]="errorMessage"></span>
 </div>
-<!-- 
+<!--
 Approve with more approver:
 Success! The request <Display Request ID> has been successfully approved and sent to
 <Display the next scheduled approver's last, first name in bolded text> for review.
 You can view the request details below or return to the search.
 
 Approve with no more approver:
-Success! Your request <Display Request ID> has been successfully completed. 
+Success! Your request <Display Request ID> has been successfully completed.
 You can view the request details below or return to the search.
 
 Approve and Route:
@@ -96,7 +96,7 @@ You can view the request details below or return to the search.
 
 Reject:
 The request <Display Request ID> has been rejected. The requester and any previous approver(s)
-will be notified of your action. 
+will be notified of your action.
 You can view the request details below or return to the search.
 
 Return to PD:
@@ -107,29 +107,29 @@ You can view the request details below or return to the search.
 Defer:
 Success! The request <Display Request ID> has been successfully deferred and sent back to
 the DOC approver <Display the Requesting DOC approver's last, first name in bolded text>
-for review. 
+for review.
 You can view the request details below or return to the search.
 
 Submit:
-Success! Your request <Display Request ID> has been successfully submitted and sent to 
-<Display the next scheduled approver's last, first name in bolded text> for review. 
-You can view the request details below or return to the search. 
+Success! Your request <Display Request ID> has been successfully submitted and sent to
+<Display the next scheduled approver's last, first name in bolded text> for review.
+You can view the request details below or return to the search.
 
 Submit & Approve:
-Success! Your request <Display Request ID> has been successfully submitted and approved. 
-The request has been sent to <Display the next scheduled approver's last, first name in 
-bolded text> for review. 
-You can view the request details below or return to the search. 
+Success! Your request <Display Request ID> has been successfully submitted and approved.
+The request has been sent to <Display the next scheduled approver's last, first name in
+bolded text> for review.
+You can view the request details below or return to the search.
 
 Withdraw:
-Success! The request <Display Request ID> has been withdrawn. 
-The requester and any previous approver(s) (if applicable) will be notified of your action. 
+Success! The request <Display Request ID> has been withdrawn.
+The requester and any previous approver(s) (if applicable) will be notified of your action.
 You can view the request details below or return to the search.
 
 Hold:
-Success! The request <Display Request ID> has been placed on hold. 
-The requester, current, and previous approver(s) (if applicable) will be notified of 
-your action. 
+Success! The request <Display Request ID> has been placed on hold.
+The requester, current, and previous approver(s) (if applicable) will be notified of
+your action.
 You can view the request details below or return to the search.
 
 Clicking the search link in any of the success message, the system will navigate the user back to the previous search query page.

@@ -18,6 +18,8 @@ export class SubmissionAlertComponent implements OnInit, OnDestroy {
   action: string;
   frqId: number;
   errorMessage: string;
+  private bobTeam = 'nciogabob@mail.nih.gov';
+  errorLabel = 'Failed to submit request:';
 
   constructor(private workflowModel: WorkflowModel,
               private requestModel: RequestModel,
@@ -53,6 +55,14 @@ export class SubmissionAlertComponent implements OnInit, OnDestroy {
         }
         else {
           this.errorMessage = errorResponse.message;
+        }
+
+        if(this.errorMessage.startsWith('4R00')) {
+          const r00 = this.errorMessage;
+          this.errorMessage = `Request cannot be approved, since the ${r00} cannot be found in I2E. Please contact <a href='mailto:${this.bobTeam}'>NCI OGA Business Operations Branch</a> to create the 4R00 record in IMPAC II.`
+          this.errorLabel = 'Error:'
+        } else {
+          this.errorLabel = 'Failed to submit request:';
         }
         window.scrollTo(0, 0);
       }
