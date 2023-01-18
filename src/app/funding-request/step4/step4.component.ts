@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { RequestModel } from '../../model/request/request-model';
-import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+import {AppPropertiesService, LoaderService} from '@cbiit/i2ecui-lib';
 import {
   CancerActivityControllerService,
   DocumentsDto,
@@ -93,7 +93,8 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
               private fsWorkflowControllerService: FsWorkflowControllerService,
               private cancerActivityService: CancerActivityControllerService,
               private workflowModel: WorkflowModel,
-              private navigationModel: NavigationStepModel) {
+              private navigationModel: NavigationStepModel,
+              private loaderService: LoaderService) {
   }
 
   ngAfterViewInit(): void {
@@ -279,6 +280,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   submitRequest(): void {
+    this.loaderService.show();
     this.cancerActivityService.getActiveReferralCaAssignRules('Y').subscribe(
       result => {
         const activeCayCodes: string[] = result.map(ra => ra.caCode);
@@ -298,6 +300,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
   submitRequestToBackend(): void {
     const dto: WorkflowTaskDto = {};
+    this.loaderService.show();
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
     dto.frqId = this.requestModel.requestDto.frqId;
     if (this.submitApprove()) {
@@ -321,8 +324,10 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
         this.workflowModel.initialize();
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
         this.readonly = true;
+        this.loaderService.hide();
       },
       (error) => {
+        this.loaderService.hide();
         this.logger.error('Failed when calling submitRequest', error);
         this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       });

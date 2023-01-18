@@ -414,7 +414,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     { provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS' },
     { provide: PROPERTIES_ENVIRONMENT, useValue: environment },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptorService, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },
     {
       provide: APP_INITIALIZER, useFactory: initializeAppProperties,
       deps: [AppPropertiesService], multi: true
