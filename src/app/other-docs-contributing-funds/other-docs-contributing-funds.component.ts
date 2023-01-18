@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { RequestModel } from '../model/request/request-model';
-import { LookupsControllerService } from '@cbiit/i2ecws-lib';
-import { Options } from 'select2';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { NGXLogger } from 'ngx-logger';
-import { PdCaIntegratorService } from '@cbiit/i2ecui-lib';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {RequestModel} from '../model/request/request-model';
+import {LookupsControllerService} from '@cbiit/i2ecws-lib';
+import {Options} from 'select2';
+import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import {NGXLogger} from 'ngx-logger';
+import {PdCaIntegratorService} from "@cbiit/i2ecui-lib";
 
 
 class DocData {
@@ -75,13 +75,13 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   ngOnInit(): void {
     this.initializeDocs();
     this.pdCaIntegratorSvc.docEmitter.subscribe(next => {
-      if (next) {
-        this.pdDoc = next;
-        if (this.selectedDocsArr.map(d => d.abbreviation).includes(next)) {
-          this.deselect(next);
+      if (next && next.channel === 'PD_CA_DEFAULT_CHANNEL') {
+        this.pdDoc = next.doc;
+        if (this.selectedDocsArr.map(d => d.abbreviation).includes(next.doc)) {
+          this.deselect(next.doc);
+        } else {
+          this.pdDoc = null;
         }
-      } else {
-        this.pdDoc = null;
       }
     });
   }

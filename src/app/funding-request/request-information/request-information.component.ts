@@ -1,17 +1,17 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { RequestModel } from '../../model/request/request-model';
-import { FsRequestControllerService, NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
-import { isArray } from 'rxjs/internal-compatibility';
-import { NGXLogger } from 'ngx-logger';
-import { FundingRequestValidationService } from '../../model/request/funding-request-validation-service';
-import { FundingRequestTypes, FUNDING_POLICY_CUT_TYPES } from '../../model/request/funding-request-types';
-import { Alert } from '../../alert-billboard/alert';
-import { ControlContainer, NgForm } from '@angular/forms';
-import {CancerActivitiesDropdownComponent, CancerActivitiesDropdownV2Component} from '@cbiit/i2ecui-lib';
-import { FundingSourceSynchronizerService } from '../../funding-source/funding-source-synchronizer-service';
-import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
-import { AppUserSessionService } from '../../service/app-user-session.service';
-import { Type4SelectionService } from '../../type4-conversion-mechanism/type4-selection.service';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {RequestModel} from '../../model/request/request-model';
+import {FsRequestControllerService, NciPfrGrantQueryDto} from '@cbiit/i2ecws-lib';
+import {isArray} from 'rxjs/internal-compatibility';
+import {NGXLogger} from 'ngx-logger';
+import {FundingRequestValidationService} from '../../model/request/funding-request-validation-service';
+import {FUNDING_POLICY_CUT_TYPES, FundingRequestTypes} from '../../model/request/funding-request-types';
+import {Alert} from '../../alert-billboard/alert';
+import {ControlContainer, NgForm} from '@angular/forms';
+import {CancerActivitiesDropdownComponent} from '@cbiit/i2ecui-lib';
+import {FundingSourceSynchronizerService} from '../../funding-source/funding-source-synchronizer-service';
+import {ConversionActivityCodes} from '../../type4-conversion-mechanism/conversion-activity-codes';
+import {AppUserSessionService} from '../../service/app-user-session.service';
+import {Type4SelectionService} from '../../type4-conversion-mechanism/type4-selection.service';
 
 @Component({
   selector: 'app-request-information',
@@ -21,8 +21,8 @@ import { Type4SelectionService } from '../../type4-conversion-mechanism/type4-se
 })
 export class RequestInformationComponent implements OnInit {
 
-  @ViewChild(CancerActivitiesDropdownComponent) cayCodeComponent: CancerActivitiesDropdownComponent;
-  @ViewChild(CancerActivitiesDropdownV2Component) altCayCodeComponent: CancerActivitiesDropdownV2Component;
+  @ViewChild('primaryCayCode') cayCodeComponent: CancerActivitiesDropdownComponent;
+  @ViewChild('alternateCayCode') altCayCodeComponent: CancerActivitiesDropdownComponent;
   @Input() parentForm: NgForm;
   isMbOnly = false;
   pdCayCodes: string[] = [];

@@ -1,33 +1,28 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
-import { NgForm } from '@angular/forms';
-import { PlanModel } from '../../model/plan/plan-model';
-import { CustomServerLoggingService, PdCaIntegratorService } from '@cbiit/i2ecui-lib';
-import { PlanManagementService } from '../service/plan-management.service';
-import {
-  FsPlanControllerService,
-  FundingPlanFoasDto,
-  FundingRequestCanDto,
-  FundingRequestDto
-} from '@cbiit/i2ecws-lib';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Router} from '@angular/router';
+import {NavigationStepModel} from 'src/app/funding-request/step-indicator/navigation-step.model';
+import {NgForm} from '@angular/forms';
+import {PlanModel} from '../../model/plan/plan-model';
+import {CustomServerLoggingService, PdCaIntegratorService} from '@cbiit/i2ecui-lib';
+import {PlanManagementService} from '../service/plan-management.service';
+import {FsPlanControllerService, FundingPlanFoasDto, FundingRequestCanDto, FundingRequestDto} from '@cbiit/i2ecws-lib';
 import {
   OtherDocsContributingFundsComponent
 } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
-import { getCurrentFiscalYear, isNumeric } from '../../utils/utils';
-import { FundingPlanInformationComponent } from '../funding-plan-information/funding-plan-information.component';
-import { FpFundingInformationComponent } from '../fp-funding-information/fp-funding-information.component';
+import {getCurrentFiscalYear, isNumeric} from '../../utils/utils';
+import {FundingPlanInformationComponent} from '../funding-plan-information/funding-plan-information.component';
+import {FpFundingInformationComponent} from '../fp-funding-information/fp-funding-information.component';
 import {
   ApplicationsProposedForFundingComponent
 } from '../applications-proposed-for-funding/applications-proposed-for-funding.component';
-import { FundingRequestTypes } from '../../model/request/funding-request-types';
-import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import { FundingReqBudgetsDto } from '@cbiit/i2ecws-lib/model/fundingReqBudgetsDto';
-import { AppUserSessionService } from '../../service/app-user-session.service';
-import { CanManagementService } from '../../cans/can-management.service';
-import { Alert } from '../../alert-billboard/alert';
-import { FundingSourceGrantDataPayload } from '../applications-proposed-for-funding/funding-source-grant-data-payload';
-import { NGXLogger } from 'ngx-logger';
+import {FundingRequestTypes} from '../../model/request/funding-request-types';
+import {FundingRequestFundsSrcDto} from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import {FundingReqBudgetsDto} from '@cbiit/i2ecws-lib/model/fundingReqBudgetsDto';
+import {AppUserSessionService} from '../../service/app-user-session.service';
+import {CanManagementService} from '../../cans/can-management.service';
+import {Alert} from '../../alert-billboard/alert';
+import {FundingSourceGrantDataPayload} from '../applications-proposed-for-funding/funding-source-grant-data-payload';
+import {NGXLogger} from 'ngx-logger';
 
 @Component({
   selector: 'app-plan-step3',
@@ -70,17 +65,23 @@ export class PlanStep3Component implements OnInit {
     this.navigationModel.setStepLinkable(3, true);
 
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
-      this.cayCode = typeof next === 'string' ? next : next[0];
-      this.planManagementService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
+      if (next.channel === 'PD_CA_DEFAULT_CHANNEL') {
+        this.cayCode = typeof next.cayCode === 'string' ? next.cayCode : next.cayCode[0];
+        this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
+      }
     });
 
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
-      this.pdNpnId = next;
-      this.planManagementService.fundingSourceValuesEmitter.next({ pd: this.pdNpnId, ca: this.cayCode });
+      if (next.channel === 'PD_CA_DEFAULT_CHANNEL') {
+        this.pdNpnId = next.pdId;
+        this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
+      }
     });
 
     this.pdCaIntegratorService.docEmitter.subscribe(next => {
-      this.doc = next;
+      if (next.channel === 'PD_CA_DEFAULT_CHANNEL') {
+        this.doc = next.doc;
+      }
     });
 
     this.planName = this.planModel.fundingPlanDto.planName;
