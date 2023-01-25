@@ -67,7 +67,7 @@ export class BudgetInfoComponent implements OnInit {
       }
     });
     this.sourceOrder = this.model.programRecommendedCostsModel.selectedFundingSources.map(s => s.fundingSourceId);
-    this.model.requestCans.sort((a, b) => {
+    this.model.requestCans?.sort((a, b) => {
       return this.sourceOrder.indexOf(a.fseId) - this.sourceOrder.indexOf(b.fseId);
     });
 

@@ -48,7 +48,7 @@ export class SupportingDocsReadonlyComponent implements OnInit {
     this.docDtos = this.parent.docDtos;
 
 
-    this.docDtos.forEach((value, index) => {
+    this.docDtos?.forEach((value, index) => {
 
       if (value.docFilename === DocTypeConstants.JUSTIFICATION && value.uploadByName === null) {
         this.isDisplayJustificationDetails = false;
@@ -56,7 +56,7 @@ export class SupportingDocsReadonlyComponent implements OnInit {
 
     });
 
-    if (this.requestModel.requestDto.requestType === 'Pay Type 4' ||
+    if (this.requestModel.isPayType4() ||
       (this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== null)) {
       this.displayTansitionMemo = true;
     }
