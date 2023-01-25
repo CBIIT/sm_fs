@@ -97,7 +97,7 @@
       </lib-pdname-dropdown>
       <div
         class="text-danger mt-1"
-        *ngIf="parentForm.errors?.altPdNameRequired && (parentForm.submitted || parentForm.touched)">
+        *ngIf="parentForm.errors?.altPdNameRequired && (parentForm.submitted)">
         R00 PD is required
       </div>
       <div
@@ -122,7 +122,7 @@
       </lib-cancer-activities-dropdown>
       <div
         class="text-danger mt-1"
-        *ngIf="parentForm.errors?.altCayCodeRequired && (parentForm.submitted || parentForm.touched)">
+        *ngIf="parentForm.errors?.altCayCodeRequired && (parentForm.submitted)">
         R00 cancer activity is required
       </div>
     </div>
