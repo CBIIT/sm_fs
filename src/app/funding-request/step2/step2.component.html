@@ -25,7 +25,7 @@
   <div class="row">
     <div class="col-lg-12">
       <div
-        *ngIf="prcValidValue.errors?.required && step2Form.submitted"
+        *ngIf="prcValidValue.errors?.required && step2Form.submitted && showPRCSection()"
         class="text-danger mt-1 text-danger-wrap">
         <br>Select at least one funding source to continue
       </div>
