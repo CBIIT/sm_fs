@@ -1,6 +1,4 @@
-INSERT INTO NCI.APP_MAIL_TEMPLATE_T (ID, APP_NAME, SHORT_IDENTIFIER, DESCRIPTION, SUBJECT, BODY, ACTIVE_FLAG, CREATE_DATE, CREATE_USER_ID, LAST_CHANGE_DATE, LAST_CHANGE_USER_ID)
-VALUES (81, 'I2ECWS', 'FS_4R00_MISSING', 'Send notification to OGA BOB Team 1 when PayType4 K99-R00 request submitted but no matching 4R00 grant is found', 'Subject - embedded in body',
-'<!DOCTYPE html>
+INSERT INTO NCI.APP_MAIL_TEMPLATE_T (ID, APP_NAME, SHORT_IDENTIFIER, DESCRIPTION, SUBJECT, BODY, ACTIVE_FLAG, CREATE_DATE, CREATE_USER_ID, LAST_CHANGE_DATE, LAST_CHANGE_USER_ID) VALUES (81, 'I2ECWS', 'FS_4R00_MISSING', 'Send notification to OGA BOB Team 1 when PayType4 K99-R00 request submitted but no matching 4R00 grant is found', 'Subject - embedded in body', '<!DOCTYPE html>
  <html lang="en" xmlns:th="http://www.thymeleaf.org">
  <head>
    <meta charset="UTF-8">
@@ -23,7 +21,7 @@ VALUES (81, 'I2ECWS', 'FS_4R00_MISSING', 'Send notification to OGA BOB Team 1 wh
 
  <p>
    This is to let you know that the following Pay Type 4 request (ID: <a th:href="${viewurl +  request.frqId}" href="#" th:text="${request.frqId}">123456</a>)
-   has been submitted by the program director <a href="#" th:href="@{''mailto:'' + ${request.requestorPdEmailAddr}}"><span th:text="${request.requestorPdFullName}" th:remove="tag"></span></a> and the corresponding <span th:text="${missing4R00}" th:remove="tag">4R00CA12345-03</span> does not exist in I2E.
+   has been submitted by the Program Director <a href="#" th:href="@{''mailto:'' + ${request.requestorPdEmailAddr}}"><span th:text="${request.requestorPdFullName}" th:remove="tag"></span></a> and the corresponding <span th:text="${missing4R00}" th:remove="tag">4R00CA12345-03</span> does not exist in I2E.
  </p>
 
  <p>
@@ -37,5 +35,4 @@ VALUES (81, 'I2ECWS', 'FS_4R00_MISSING', 'Send notification to OGA BOB Team 1 wh
  </p>
  </body>
  </html>
-',
-'Y', SYSDATE, 'NCI', null, null);
+', 'Y', SYSDATE, 'NCI', null, null);
