@@ -90,7 +90,7 @@
   </ng-template>
   <hr/>
 </div>
-<app-search-filter [action]="action" [grant]="grant" (callSearch)="doSearch($event)"
+<app-search-filter [action]="action" [grant]="grant" [searchGrant]="searchGrant" (callSearch)="doSearch($event)"
                    (searchTypeEm)="onSearchType($event)">
 </app-search-filter>
 <app-search-result (refreshOverviewEmitter)="refreshOverview()" (keepModelEmitter)="onKeepSearchCriteria()"></app-search-result>

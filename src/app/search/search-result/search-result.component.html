@@ -79,3 +79,24 @@
   <ng-template #cancerActivityRenderer let-data="adtData">
     <app-cancer-activity-cell-renderer [data]="data"></app-cancer-activity-cell-renderer>
   </ng-template>
+
+  <ng-template #searchFundingPlanFoasRenderer let-data="adtData">
+    <app-search-funding-plan-foas-cell-renderer [data]="data"></app-search-funding-plan-foas-cell-renderer>
+  </ng-template>
+  <ng-template #pdNameRender let-data="adtData">
+    <lib-name-render [data]="data" [firstName]="data.pdFullName"  [email]="data.pdEmailAddress" [grantNumber]="data.fullGrantNum" [subject]="data.fullGrantNum+' - ' + data.firstName +' '+data.lastName"></lib-name-render>
+  </ng-template>
+
+  <ng-template #piNameRender let-data="adtData">
+    <lib-name-render [data]="data"  [firstName]="data.piFullName" [email]="data.piEmail" [grantNumber]="data.fullGrantNum" [subject]="data.fullGrantNum+' - '+ data.firstName +' ' +data.lastName"></lib-name-render>
+  </ng-template>
+  
+  <ng-template #docApproverRender let-data="adtData">
+    <lib-name-render [data]="data"  [firstName]="data.requestingDocApprvlFullName" [email]="data.requestingDocApprvlEmail" [grantNumber]="data.fullGrantNum" [subject]="data.fullGrantNum +' - '+ data.requestingDocApprvlFullName "></lib-name-render>
+  </ng-template>
+  <ng-template #docApproverRenderFp let-data="adtData">
+    <lib-name-render [data]="data"  [firstName]="data.requestingDocApprvlFullName" [email]="data.requestingDocApprvlEmail" [grantNumber]="data.fullGrantNum" [subject]="data.planName +' - '+ data.requestingDocApprvlFullName "></lib-name-render>
+  </ng-template>
+  <ng-template #docAndPdApproverRender let-data="adtData">
+    <lib-name-render [data]="data"  [firstName]="data.requestingCayDoc" [email]="data.requestorEmailAddress" [grantNumber]="" [subject]="data.planName +' - '+ data.requestorPdFullName "></lib-name-render>
+  </ng-template>

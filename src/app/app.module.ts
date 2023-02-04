@@ -6,7 +6,14 @@ import { AppComponent } from './app.component';
 import { ApiModule, BASE_PATH } from '@cbiit/i2ecws-lib';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgSelect2Module } from 'ng-select2';
-import { GwbLinksService, I2ecuiLibModule,LoaderInterceptor } from '@cbiit/i2ecui-lib';
+import {
+  AppPropertiesService,
+  GwbLinksService,
+  I2ecuiLibModule,
+  LoaderInterceptor,
+  PROPERTIES_APP_NAME,
+  PROPERTIES_ENVIRONMENT
+} from '@cbiit/i2ecui-lib';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HeaderComponent } from './header/header.component';
 import { SearchFilterComponent } from './search/search-filter/search-filter.component';
@@ -15,10 +22,8 @@ import { SearchPoolComponent } from './search/search-filter/search-pool/search-p
 import { SearchComponent } from './search/search.component';
 import { FundingPlanComponent } from './funding-plan/funding-plan.component';
 import { FsMenuComponent } from './fs-menu/fs-menu.component';
-import { AppPropertiesService, PROPERTIES_APP_NAME, PROPERTIES_ENVIRONMENT } from '@cbiit/i2ecui-lib';
 import { environment } from 'src/environments/environment';
 import { SearchResultComponent } from './search/search-result/search-result.component';
-import { UnauthorizeComponent } from './unauthorize/unauthorize.component';
 import { StepIndicatorComponent } from './funding-request/step-indicator/step-indicator.component';
 import { FundingRequestComponent } from './funding-request/funding-request.component';
 import { Step1Component } from './funding-request/step1/step1.component';
@@ -226,6 +231,8 @@ import { SearchFundingRequestApprvlRoleComponent } from './search/search-filter/
 import { R00PdNameRequiredValidatorDirective } from './validators/r00-pd-name-required-validator.directive';
 import { R00CancerActivityRequiredValidatorDirective } from './validators/r00-cancer-activity-required-validator.directive';
 import { UniquePdValidatorDirective } from './validators/unique-pd-validator.directive';
+import { Router } from '@angular/router';
+import { ErrorHandlerService } from './error/error-handler.service';
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -245,10 +252,34 @@ export function initializeLookupMaps(lookupService: AppLookupsService): any {
   };
 }
 
-export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
+export function megaInitializer(
+  userSessionService: AppUserSessionService,
+  appPropertiesService: AppPropertiesService,
+  lookupService: AppLookupsService,
+  gwbLinksService: GwbLinksService,
+  router: Router,
+  errorHandler: ErrorHandlerService): any {
   return (): Promise<any> => {
-    return gwbLinksService.initialize();
-  };
+    return userSessionService.initialize()
+      .then(function () {
+        return appPropertiesService.initialize()
+      })
+      .then(function () {
+        return lookupService.initialize()
+      })
+      .then(function () {
+        return gwbLinksService.initialize()
+      }).catch(oops => {
+        console.error(`${JSON.stringify(oops)}`);
+        if (oops.status === 401) {
+          router.navigate(['unauthorize']);
+        } else {
+          const timeStamp = Date.now();
+          errorHandler.registerNewError(timeStamp, oops);
+          router.navigate(['/error', timeStamp])
+        }
+      });
+  }
 }
 
 @NgModule({
@@ -262,7 +293,6 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     FundingPlanComponent,
     FsMenuComponent,
     SearchResultComponent,
-    UnauthorizeComponent,
     StepIndicatorComponent,
     FundingRequestComponent,
     Step1Component,
@@ -415,20 +445,8 @@ export function initializeGwbLinks(gwbLinksService: GwbLinksService): any {
     { provide: PROPERTIES_ENVIRONMENT, useValue: environment },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptorService, multi: true },
     {
-      provide: APP_INITIALIZER, useFactory: initializeAppProperties,
-      deps: [AppPropertiesService], multi: true
-    },
-    {
-      provide: APP_INITIALIZER, useFactory: initializeUserSession,
-      deps: [AppUserSessionService], multi: true
-    },
-    {
-      provide: APP_INITIALIZER, useFactory: initializeLookupMaps,
-      deps: [AppLookupsService], multi: true
-    },
-    {
-      provide: APP_INITIALIZER, useFactory: initializeGwbLinks,
-      deps: [GwbLinksService], multi: true
+      provide: APP_INITIALIZER, useFactory: megaInitializer,
+      deps: [AppUserSessionService, AppPropertiesService, AppLookupsService, GwbLinksService, Router, ErrorHandlerService], multi: true
     }
   ],
   bootstrap: [AppComponent]

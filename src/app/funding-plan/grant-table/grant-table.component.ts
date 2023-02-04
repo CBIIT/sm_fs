@@ -102,7 +102,7 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
             render: ( data, type, row, meta ) => {
               return '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
             }},
-        {title: 'I2 Status', data: 'applStatusGroupDescrip'}, // 4
+        {title: 'IMPAC II Status', data: 'applStatusGroupDescrip'}, // 4
         {title: 'PD', data: 'pdFullName',  // 5
             render: ( data, type, row, meta ) => {
               return (data == null) ? '' : '<a href="mailto:' + row.pdEmailAddress + '?subject=' + row.fullGrantNum + ' - ' + row.lastName + '">' + data + '</a>';

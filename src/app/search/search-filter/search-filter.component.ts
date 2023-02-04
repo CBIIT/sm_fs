@@ -31,6 +31,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
 
   @Input() grant: string;
+  @Input() searchGrant: string;
 
   @Output() callSearch = new EventEmitter<SearchCriteria>();
   @Output() searchTypeEm = new EventEmitter<string>()
@@ -178,13 +179,13 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
 
   immediateSearch(form: NgForm): void {
-    if (this.grant && this.grant.length > 0) {
-      this.searchType = 'FR';
+    if (this.hasGrantDetails()) {
+      this.searchType = this.getSearchType();
       this.searchModel.setSearchCriteria(this.searchType, { });
       this.searchFilter = this.searchModel.getSearchCriteria(this.searchType);
       this.showAdvanced = false;
       this.searchForm.resetForm();
-      const fullGrantNum = this.grant.replace('-', '').replace(/ /g, '').trim();
+      const fullGrantNum = this.getFullGrantNumber().replace('-', '').replace(/ /g, '').trim();
       if (fullGrantNum && form) {
         form.form.patchValue({
           grantNumber: {
@@ -199,6 +200,30 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       }
     }
     this.search(form);
+  }
+
+  hasGrantDetails(): boolean {
+    return (this.searchGrant && this.searchGrant.length > 0) || (this.grant && this.grant.length > 0);
+  }
+
+  getSearchType(): string {
+    if(this.searchGrant && this.searchGrant.length > 0) {
+      return 'G';
+    } else if (this.grant && this.grant.length > 0) {
+      return 'FR';
+    } else {
+      return null;
+    }
+  }
+
+  getFullGrantNumber(): string {
+    if(this.searchGrant && this.searchGrant.length > 0) {
+      return this.searchGrant
+    } else if (this.grant && this.grant.length > 0) {
+      return this.grant;
+    } else {
+      return null;
+    }
   }
 
   search(form: NgForm) {

@@ -3,7 +3,7 @@
 
 <div class="container" id="site-content">
     <div class="row">
-        <div class="col-lg-2">
+        <div class="col-lg-2" *ngIf="router.url !== '/unauthorize'">
             <app-fs-menu *ngIf="router.url !== '/fundingSourceDetails' && router.url !== '/restoreSession'"></app-fs-menu>
         </div>
         <div class="col-lg-10">
