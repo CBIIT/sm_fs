@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { ErrorHandlerService } from "../error-handler.service";
 import { NGXLogger } from "ngx-logger";
-import { AppPropertiesService } from "@cbiit/i2ecui-lib";
+import { environment } from "../../../environments/environment";
 
 @Component({
   selector: "app-error",
@@ -16,7 +16,6 @@ export class ErrorComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private errorHandler: ErrorHandlerService,
-    private appPropertiesService: AppPropertiesService,
     private logger: NGXLogger) {
   }
 
@@ -24,7 +23,7 @@ export class ErrorComponent implements OnInit {
     const errorId = this.route.snapshot.params.errorId;
     const errorMessage = encodeURIComponent(this.errorHandler.getMessage(+errorId));
     const errorDetails = encodeURIComponent(this.errorHandler.getDetails(+errorId));
-    const techSupport = this.appPropertiesService.getProperty("TECH_SUPPORT_EMAIL");
+    const techSupport = environment.TECH_SUPPORT_EMAIL;
 
     this.emailLink = this.truncate(`mailto:${techSupport}?subject=Funding Selections&body=${errorMessage}%0A${errorDetails}`);
   }

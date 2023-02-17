@@ -8,6 +8,12 @@ export const environment = {
   HEARTBEAT_INTERVAL: 10000,
   DB_HEARTBEAT_INTERVAL: 20000,
   KILLSWITCH_INTERVAL: 300000,
+  TECH_SUPPORT_EMAIL: 'ncii2egrantsdevelopmentteam@mail.nih.gov',
+  CONCEPT_ID_URL: "https://deaislprod.nci.nih.gov/cats/protected/concept/viewConcept.action?conceptId=",
+  EGRANTS_URL: "https://egrants-web-dev.nci.nih.gov/Egrants/by_appl?appl_id=",
+  GRANT_VIEWER_URL: "https://i2e-dev.nci.nih.gov/yourgrants/jsp/GrantDetails.jsp?applId=",
+  I2EWEB_URL: "https://i2e-dev.nci.nih.gov/",
+  URL_YOURGRANTS: "https://i2e-dev.nci.nih.gov/yourgrants/GrantView",
 };
 
 /*
