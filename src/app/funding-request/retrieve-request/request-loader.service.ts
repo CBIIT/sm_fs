@@ -4,6 +4,7 @@ import { RequestModel } from '../../model/request/request-model';
 import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
 import { CanManagementService } from '../../cans/can-management.service';
 import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
+import { FundingRequestIntegrationService } from '../integration/integration.service';
 
 export type SuccessFunction = () => void;
 export type ErrorFunction = (s: string) => void;
@@ -18,6 +19,7 @@ export class RequestLoaderService {
     private logger: CustomServerLoggingService,
     private requestService: FsRequestControllerService,
     private canManagementService: CanManagementService,
+    private integrationService: FundingRequestIntegrationService,
     private requestModel: RequestModel) {
   }
 
@@ -77,6 +79,7 @@ export class RequestLoaderService {
 
           this.canManagementService.getRequestCans(this.requestModel.requestDto.frqId).subscribe(result2 => {
             this.requestModel.requestCans = result2;
+            this.integrationService.requestCanLoadedEmitter.next();
           });
 
           this.requestService.getApplPeriods(this.requestModel.grant.applId).subscribe(result2 => {

@@ -10,6 +10,7 @@ import { INITIAL_PAY_TYPES } from 'src/app/model/request/funding-request-types';
 import { CanWarning } from 'src/app/funding-request/workflow/warning-modal/workflow-warning-modal.component';
 import { CanSearchModalComponent } from '../can-search-modal/can-search-modal.component';
 import { NGXLogger } from 'ngx-logger';
+import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 
 @Component({
   selector: 'app-budget-info',
@@ -45,6 +46,7 @@ export class BudgetInfoComponent implements OnInit {
 
   constructor(private logger: NGXLogger,
               private canManagementService: CanManagementService,
+              private integrationService: FundingRequestIntegrationService,
               public model: RequestModel,
               private workflowModel: WorkflowModel) {
   }
@@ -60,12 +62,20 @@ export class BudgetInfoComponent implements OnInit {
         this.defaultCanTracker.set(+next.fseId, next.nonDefault);
       }
     });
-    this.canManagementService.initializeCANDisplayMatrixForRequest();
-    this.model.requestCans?.forEach(c => {
-      if (c.approvedDc && +c.approvedDc > 0) {
-        this.showDirectCosts = true;
-      }
+    this.integrationService.requestCanLoadedEmitter.subscribe( () => {
+      this.model.requestCans?.forEach(c => {
+        if (c.approvedDc && +c.approvedDc > 0) {
+          this.showDirectCosts = true;
+        }
+      });
     });
+    this.canManagementService.initializeCANDisplayMatrixForRequest();
+
+    // this.model.requestCans?.forEach(c => {
+    //   if (c.approvedDc && +c.approvedDc > 0) {
+    //     this.showDirectCosts = true;
+    //   }
+    // });
     this.sourceOrder = this.model.programRecommendedCostsModel.selectedFundingSources.map(s => s.fundingSourceId);
     this.model.requestCans?.sort((a, b) => {
       return this.sourceOrder.indexOf(a.fseId) - this.sourceOrder.indexOf(b.fseId);

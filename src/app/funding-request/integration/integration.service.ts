@@ -10,4 +10,6 @@ export class FundingRequestIntegrationService {
   approverInitializationEmitter = new Subject<void>();
   approverListChangeEmitter = new Subject<void>();
   activeApproverEmitter = new Subject<FundingReqApproversDto>();
+
+  requestCanLoadedEmitter = new Subject<void>();
 }
