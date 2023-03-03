@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CanManagementService } from '../can-management.service';
 import { RequestModel } from '../../model/request/request-model';
 import { CanCcxDto, FundingRequestCanDto } from '@cbiit/i2ecws-lib';
@@ -11,13 +11,14 @@ import { CanWarning } from 'src/app/funding-request/workflow/warning-modal/workf
 import { CanSearchModalComponent } from '../can-search-modal/can-search-modal.component';
 import { NGXLogger } from 'ngx-logger';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-budget-info',
   templateUrl: './budget-info.component.html',
   styleUrls: ['./budget-info.component.css']
 })
-export class BudgetInfoComponent implements OnInit {
+export class BudgetInfoComponent implements OnInit, OnDestroy {
   @ViewChild(CanSearchModalComponent) canSearchModalComponent: CanSearchModalComponent;
 
   @ViewChildren(OefiaTypesComponent) oefiaTypes: QueryList<OefiaTypesComponent>;
@@ -28,6 +29,8 @@ export class BudgetInfoComponent implements OnInit {
   @Input() editing = false;
   showDirectCosts = false;
   sourceOrder: number[];
+
+  private canEmitterSubscription: Subscription;
 
   defaultCanTracker: Map<number, boolean> = new Map<number, boolean>();
 
@@ -51,7 +54,12 @@ export class BudgetInfoComponent implements OnInit {
               private workflowModel: WorkflowModel) {
   }
 
+  ngOnDestroy(): void {
+    this.canEmitterSubscription?.unsubscribe();
+  }
+
   ngOnInit(): void {
+    console.log('BLBL Budget-Info ngOnInit');
     this.initialPay = INITIAL_PAY_TYPES.includes(this.model.requestDto?.frtId);
     this.requestNciFseIds = this.model.programRecommendedCostsModel.fundingSources.filter(
       fs => (fs.nciSourceFlag === 'Y') &&
@@ -62,13 +70,21 @@ export class BudgetInfoComponent implements OnInit {
         this.defaultCanTracker.set(+next.fseId, next.nonDefault);
       }
     });
-    this.integrationService.requestCanLoadedEmitter.subscribe( () => {
-      this.model.requestCans?.forEach(c => {
+
+    this.model.requestCans?.forEach( c => {
+      if (c.approvedDc && +c.approvedDc > 0) {
+        this.showDirectCosts = true;
+      }
+    });
+
+    this.canEmitterSubscription = this.integrationService.requestCanLoadedEmitter.subscribe( () => {
+      this.model.requestCans?.forEach( c => {
         if (c.approvedDc && +c.approvedDc > 0) {
           this.showDirectCosts = true;
         }
       });
     });
+
     this.canManagementService.initializeCANDisplayMatrixForRequest();
 
     // this.model.requestCans?.forEach(c => {
