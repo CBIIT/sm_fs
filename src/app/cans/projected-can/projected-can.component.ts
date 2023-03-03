@@ -28,10 +28,10 @@ export class ProjectedCanComponent implements OnInit {
   ngOnInit(): void {
     if(!this.octId) {
       const source: FundingRequestFundsSrcDto = this.requestModel.programRecommendedCostsModel.fundingSources.find(s => +s.fundingSourceId === +this.fseId);
-      this.logger.info(`No oefiaTypeId specified: fall back to funding source default ${source?.octId}`);
+      this.logger.debug(`No oefiaTypeId specified: fall back to funding source default ${source?.octId}`);
       this.octId = source?.octId;
     }
-    this.logger.info(`Projected CAN initial values -> [fseId: ${this.fseId}, octId: ${this.octId}, frtId: ${this.frtId}, applId: ${this.applId}]`);
+    this.logger.debug(`Projected CAN initial values -> [fseId: ${this.fseId}, octId: ${this.octId}, frtId: ${this.frtId}, applId: ${this.applId}]`);
     this.canService.oefiaTypeEmitter.subscribe(next => {
       if (next.fseId && Number(next.fseId) === Number(this.fseId)) {
         this.updateProjectedCan(next.value, true);

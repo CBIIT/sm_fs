@@ -33,12 +33,12 @@ export class FpProjectedCanComponent implements OnInit {
       }
     });
     const val = !isNaN(this.octId) ? this.octId : null;
-    this.logger.info(`fseId: ${this.fseId}`);
+//    this.logger.info(`fseId: ${this.fseId}`);
     this.updateProjectedCan(val);
   }
 
   private updateProjectedCan(oefiaTypeId: number): void {
-    this.logger.info(`Updating projected CAN: ${this.fseId}`);
+    this.logger.debug(`Updating projected CAN: ${this.fseId}`);
     this.canManagementService.getProjectedCan(this.fseId, oefiaTypeId, this.frtId, null, this.applId).subscribe(result => {
       this.projectedCan = result;
       // this.logger.debug('new projected CAN for', this.fseId, this.applId, result);
