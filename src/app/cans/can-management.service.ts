@@ -11,6 +11,7 @@ import { Observable, Subject } from 'rxjs';
 import { PlanModel } from '../model/plan/plan-model';
 import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 import { isNumeric } from '../utils/utils';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +33,7 @@ export class CanManagementService {
   canDisplayMatrix: Map<number, FundingRequestCanDisplayDto>;
 
   constructor(
-    private logger: CustomServerLoggingService,
+    private logger: NGXLogger,
     private canService: FsCanControllerService,
     private requestModel: RequestModel,
     private planModel: PlanModel) {
@@ -45,7 +46,7 @@ export class CanManagementService {
       return;
     }
     this.buildCanDisplayMatrix(fseIds);
-    this.logger.info(`Building CAN display matrix for plan ${this.planModel.fundingPlanDto.fprId}`);
+//    this.logger.info(`Building CAN display matrix for plan ${this.planModel.fundingPlanDto.fprId}`);
   }
 
   initializeCANDisplayMatrixForRequest(): void {
@@ -59,7 +60,7 @@ export class CanManagementService {
   private buildCanDisplayMatrix(fseIds: number[]): void {
     this.getFundingRequestCanDisplays(fseIds).subscribe(result => {
       this.canDisplayMatrix = new Map(result.map(c => [c.fseId, c]));
-      this.logger.info(`CAN display matrix: ${JSON.stringify(result)}`);
+      this.logger.debug(`CAN display matrix: ${JSON.stringify(result)}`);
     });
   }
 
@@ -79,7 +80,7 @@ export class CanManagementService {
       });
     }
 
-    this.logger.info(`getProjectedCan(${fseId}, ${oefiaTypeId}, ${frtId}, ${frqId}, ${applId})`);
+    this.logger.debug(`getProjectedCan(${fseId}, ${oefiaTypeId}, ${frtId}, ${frqId}, ${applId})`);
     return this.canService.retrieveProjectedCan(
       applId,
       frtId,
@@ -136,7 +137,7 @@ export class CanManagementService {
   }
 
   searchDefaultCans(can: string, bmmCodes: string, activityCodes: string, nciSource: string): Observable<CanCcxDto[]> {
-    this.logger.info(`searchDefaultCans(${can}, ${bmmCodes}, ${activityCodes}, ${nciSource})`);
+    this.logger.debug(`searchDefaultCans(${can}, ${bmmCodes}, ${activityCodes}, ${nciSource})`);
     // FS-1476 - for Pay Type 4 requests, use the conversion mech and related default BMM code.
     if(this.requestModel && this.requestModel.isPayType4() && this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== 'NC') {
       return this.canService.getType4DefaultCans(
@@ -148,7 +149,7 @@ export class CanManagementService {
   }
 
   searchDefaultCansWithExtra(can: string, bmmCodes: string, activityCodes: string, nciSource: string, extra: string): Observable<CanCcxDto[]> {
-    this.logger.info(`searchDefaultCansWithExtera(${can}, ${bmmCodes}, ${activityCodes}, ${nciSource}, ${extra})`);
+    this.logger.debug(`searchDefaultCansWithExtera(${can}, ${bmmCodes}, ${activityCodes}, ${nciSource}, ${extra})`);
     // FS-1476 - for Pay Type 4 requests, use the conversion mech and related default BMM code.
     if(this.requestModel && this.requestModel.isPayType4() && this.requestModel.requestDto.conversionActivityCode && this.requestModel.requestDto.conversionActivityCode !== 'NC') {
       return this.canService.getType4DefaultCansWithExtra(

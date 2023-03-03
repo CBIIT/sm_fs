@@ -49,10 +49,10 @@ export class OefiaTypesComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.logger.info(`Initial values: [fseId: ${this.fseId}, selectedValue: ${this._selectedValue}]`);
+    this.logger.debug(`Initial values: [fseId: ${this.fseId}, selectedValue: ${this._selectedValue}]`);
     if(!this._selectedValue) {
       const source: FundingRequestFundsSrcDto = this.requestModel.programRecommendedCostsModel.fundingSources.find(s => +s.fundingSourceId === +this.fseId);
-      this.logger.info(`No oefiaTypeId specified: fall back to funding source default ${source?.octId}`);
+      this.logger.debug(`No oefiaTypeId specified: fall back to funding source default ${source?.octId}`);
       this._selectedValue = source?.octId;
     }
     this.canService.getOefiaCodes().subscribe(result => {
