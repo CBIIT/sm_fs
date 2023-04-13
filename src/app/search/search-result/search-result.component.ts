@@ -58,6 +58,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Output()
   refreshOverviewEmitter = new Subject<boolean>();
+  private tableHtead: Node;
 
   @Output()
   keepModelEmitter = new Subject<boolean>();
@@ -288,6 +289,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       headerCallback: (thead: Node, data: any[]) => {
         const $node = $('.select-checkbox', thead);
+        this.tableHtead = thead;
         if ($node) {
           // Reset header checkbox on load (only once)
           $node.removeClass('selected');
@@ -1003,4 +1005,14 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
       );
   }
 
+  onResize(event) {
+     const hasHiddenColumn = $(this.tableHtead).find('.dtr-hidden').length;
+     const rows = $('td.expand-row');
+     if (hasHiddenColumn === 0) {
+        rows.removeClass("control")
+      }
+      else {
+        rows.addClass("control");
+      }
+  }
 }

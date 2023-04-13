@@ -54,7 +54,7 @@
       </div>
     </div>
   </div>
-  <div class="row" [hidden]="!showGrantResult">
+  <div class="row" [hidden]="!showGrantResult" (window:resize)="onResize($event)">
     <div class="col-12">
       <div >
         <table id="gDt" datatable [dtOptions]="dtGrantOptions" [dtTrigger]="dtGrantTrigger" class="row-border hover" style="width: 100%">

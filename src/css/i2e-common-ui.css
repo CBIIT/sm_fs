@@ -12555,7 +12555,7 @@ pre code {
 @media (min-width: 1200px) {
   /* line 6, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_grid.scss */
   .container {
-    max-width: 1800px;
+    max-width: 100vw;
   }
 }
 
