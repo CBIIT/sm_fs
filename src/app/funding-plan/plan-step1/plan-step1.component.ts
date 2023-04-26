@@ -436,7 +436,10 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         { title: 'FY', data: 'fy' }, // 8
         {
           title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', render: (data, type, row, meta) => { // 9
-            return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
+            if (!data || data.substr(4, 2) === '00') {
+              return '';
+            }
+            return data.substr(4, 2) + '/' + data.substr(0, 4);
           }
         },
         { title: 'Pctl', data: 'irgPercentileNum' }, // 10

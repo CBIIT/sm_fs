@@ -112,7 +112,10 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
         {title: 'FY', data: 'fy'}, // 7
         {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', // 8
             render: ( data, type, row, meta) => {
-              return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
+              if (!data || data.substr(4, 2) === '00') {
+                return '';
+              }
+              return data.substr(4, 2) + '/' + data.substr(0, 4);
             }},
         {title: 'Pctl', data: 'irgPercentileNum'}, // 9
         {title: 'PriScr', data: 'priorityScoreNum'}, // 10

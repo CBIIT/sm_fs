@@ -114,7 +114,10 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         {title: 'CA', data: 'cayCode', ngTemplateRef: { ref: this.cancerActivityRenderer}, className: 'all'},
         {title: 'FY', data: 'fy'},
         {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', render: ( data, type, row, meta) => {
-            return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
+          if (!data || data.substr(4, 2) === '00') {
+            return '';
+          }
+          return data.substr(4, 2) + '/' + data.substr(0, 4);
           }},
         {title: 'Pctl', data: 'irgPercentileNum'},
         {title: 'PriScr', data: 'priorityScoreNum'},
