@@ -161,12 +161,5 @@ export class BatchApproveModalComponent implements OnInit {
   convert(ncabs: string ): string {
     return convertNcabs(ncabs);
   }
-
-  public getNcabDate(ncabDate: string): string {
-    if (ncabDate && ncabDate.substring(4, 6) === '00') {
-       return '';
-    }
-    return ncabDate.substring(4, 6) + '/' + ncabDate.substring(0, 4);
-  }
 }
 
