@@ -105,7 +105,10 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
         
         {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', // 8
             render: ( data, type, row, meta) => {
-              return (data) ? data.substr(4, 2) + '/' + data.substr(0, 4) : '';
+              if (!data || data.substr(4, 2) === '00') {
+                return '';
+              }
+              return data.substr(4, 2) + '/' + data.substr(0, 4);
             }},
        
         {title: 'Pri Scr', data: 'priorityScoreNum'}, // 10

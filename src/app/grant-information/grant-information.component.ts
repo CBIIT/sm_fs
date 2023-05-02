@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
 import { NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+import { convertNcabs } from 'src/app/utils/utils';
 
 @Component({
   selector: 'app-grant-information',
@@ -28,5 +29,9 @@ export class GrantInformationComponent implements OnInit {
   
   setGrant(grant): void {
     this.tooltipGrant = grant;
+  }
+  
+  convert(ncabs: string ): string {
+    return convertNcabs(ncabs);
   }
 }

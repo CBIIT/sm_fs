@@ -54,12 +54,20 @@ export function convertNcabs(ncabs: string): string {
 
   function _convertNcab(ncab: string) {
     if (ncab && ncab.length === 6) {
-      ncab = ncab.substr(4, 2) + '/' + ncab.substr(0, 4);
+      if (ncab && ncab.substring(4, 6) === '00') {
+        return '';
+      }
+      else {
+        ncab = ncab.substr(4, 2) + '/' + ncab.substr(0, 4);
+      }
+      
     }
     return ncab;
   }
-
-  if (ncabs && ncabs.length > 0) {
+  if(ncabs && ncabs.length === 6) {
+    return _convertNcab(ncabs);
+  }
+  else if (ncabs && ncabs.length > 0) {
     const lst = ncabs.split(',');
     let ret;
     for (const ncab of lst) {
