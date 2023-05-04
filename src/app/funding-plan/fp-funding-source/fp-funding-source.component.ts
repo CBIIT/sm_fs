@@ -19,7 +19,7 @@ export class FpFundingSourceComponent implements OnInit {
   @Input() parentForm: NgForm;
   @Input() index: number;
   @Input() required = false;
-  @Output() sourceChangedEvent = new EventEmitter<{ oldSource: number, newSource: number }>();
+  @Output() sourceChangedEvent = new EventEmitter<{ oldSource: number, newSource: number, newName: string }>();
   dummy: string = null;
   data: Select2OptionData[] = [];
   allSources: Select2OptionData[] = [];
@@ -46,7 +46,7 @@ export class FpFundingSourceComponent implements OnInit {
     // this.logger.debug('--', oldValue, value, '--');
     if (oldValue && +value !== +oldValue) {
       this.logger.debug(`source changed: ${oldValue} to ${value}`);
-      this.sourceChangedEvent.next({ oldSource: +oldValue, newSource: +value });
+      this.sourceChangedEvent.next({ oldSource: +oldValue, newSource: +value, newName: this.fundingSourceDetailsMap.get(+value)?.fundingSourceName });
     }
     // this.logger.debug('sending new selection');
     this.planCoordinatorService.fundingSourceSelectionEmitter.next({
