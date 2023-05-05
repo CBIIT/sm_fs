@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { CanCcxDto } from '@cbiit/i2ecws-lib';
+import { CanCcxDto } from '@cbiit/i2efsws-lib';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanManagementService } from '../can-management.service';

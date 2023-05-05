@@ -3,8 +3,6 @@ import { Router } from '@angular/router';
 import { RequestModel } from '../../model/request/request-model';
 import {AppPropertiesService, LoaderService} from '@cbiit/i2ecui-lib';
 import {
-  CancerActivityControllerService,
-  DocumentsDto,
   FsRequestControllerService,
   FsWorkflowControllerService,
   FundingPlanDto,
@@ -12,7 +10,9 @@ import {
   FundingReqStatusHistoryDto,
   NciPfrGrantQueryDto,
   WorkflowTaskDto
-} from '@cbiit/i2ecws-lib';
+} from '@cbiit/i2efsws-lib';
+import { CancerActivityControllerService} from '@cbiit/i2erefws-lib'
+import { DocumentsDto} from '@cbiit/i2ecommonws-lib'
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
 import { Subscription } from 'rxjs';

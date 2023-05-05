@@ -5,14 +5,14 @@ import { NGXLogger } from 'ngx-logger';
 import { DataTableDirective } from 'angular-datatables';
 import { Subject } from 'rxjs';
 import { NgForm } from '@angular/forms';
-import { FsDesigneeControllerService } from '@cbiit/i2ecws-lib';
+import { FsDesigneeControllerService } from '@cbiit/i2efsws-lib';
 import { AppUserSessionService } from '../service/app-user-session.service';
 import { DesigneeCellRendererComponent } from './designee-cell-renderer/designee-cell-renderer.component';
 import {
   DesigneeActionCellRendererComponent
 } from './designee-action-cell-renderer/designee-action-cell-renderer.component';
 import { EditDesigneeModalComponent } from './edit-designee-modal/edit-designee-modal.component';
-import { FundingRequestPermDelDto } from '@cbiit/i2ecws-lib/model/fundingRequestPermDelDto';
+import { FundingRequestPermDelDto } from '@cbiit/i2efsws-lib/model/fundingRequestPermDelDto';
 import { Options } from 'select2';
 import { ConfirmDeleteModalComponent } from './confirm-delete-modal/confirm-delete-modal.component';
 

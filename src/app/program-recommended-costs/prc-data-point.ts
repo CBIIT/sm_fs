@@ -18,10 +18,10 @@
  * in the Program Recommended Costs table will have a collection of data points, one for each award year.
  *
  */
-import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
+import { GrantAwardedDto } from '@cbiit/i2efsws-lib/model/grantAwardedDto';
 import { isNumeric } from 'rxjs/internal-compatibility';
-import { FundingReqBudgetsDto } from '@cbiit/i2ecws-lib';
+import { FundingReqBudgetsDto } from '@cbiit/i2efsws-lib';
 
 export enum PrcLineItemType {
   PERCENT_CUT,

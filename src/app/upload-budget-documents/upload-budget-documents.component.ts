@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { DocumentsDto } from '@cbiit/i2ecws-lib';
+import { DocumentsDto } from '@cbiit/i2ecommonws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { DocumentService } from '../service/document.service';

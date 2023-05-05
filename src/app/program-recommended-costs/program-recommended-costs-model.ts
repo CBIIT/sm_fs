@@ -1,6 +1,6 @@
-import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 import { PrcDataPoint } from './prc-data-point';
-import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
+import { GrantAwardedDto } from '@cbiit/i2efsws-lib/model/grantAwardedDto';
 import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 
 // @Injectable({

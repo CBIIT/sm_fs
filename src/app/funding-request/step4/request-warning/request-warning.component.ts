@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FundingPlanDto } from '@cbiit/i2ecws-lib';
+import { FundingPlanDto } from '@cbiit/i2efsws-lib';
 
 @Component({
   selector: 'app-request-warning',

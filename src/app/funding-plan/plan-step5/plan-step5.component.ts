@@ -1,12 +1,11 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
-  DocumentsControllerService,
-  DocumentsDto,
   FsPlanControllerService,
   GrantsSkippedPreviouslyDto,
   NciPfrGrantQueryDto
-} from '@cbiit/i2ecws-lib';
+} from '@cbiit/i2efsws-lib';
+import {  DocumentsControllerService, DocumentsDto, } from '@cbiit/i2ecommonws-lib'
 import { NGXLogger } from 'ngx-logger';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';
 import { PlanModel } from '../../model/plan/plan-model';

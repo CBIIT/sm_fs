@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppUserSessionService } from '../service/app-user-session.service';
-import { PaylistControllerService } from '@cbiit/i2ecws-lib';
+import { PaylistControllerService } from '@cbiit/i2efsws-lib';
 import { roleNames } from '../service/role-names';
 import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 

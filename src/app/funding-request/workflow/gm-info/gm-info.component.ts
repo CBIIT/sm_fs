@@ -5,7 +5,7 @@ import {
   FsWorkflowControllerService,
   GmActiveSpecialistsDto,
   GmInfoDto
-} from '@cbiit/i2ecws-lib';
+} from '@cbiit/i2efsws-lib';
 import { Select2OptionData } from 'ng-select2';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';

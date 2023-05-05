@@ -6,7 +6,7 @@ import {
   FundingRequestCanDto,
   FundingRequestDto,
   NciPfrGrantQueryDto
-} from '@cbiit/i2ecws-lib';
+} from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { FundingRequestErrorCodes } from './funding-request-error-codes';
 import { ProgramRecommendedCostsModel } from '../../program-recommended-costs/program-recommended-costs-model';
@@ -14,7 +14,7 @@ import { FundingSourceTypes } from './funding-source-types';
 import { FundingRequestTypes, INITIAL_PAY_TYPES, PAY_USING_SKIP_TYPES, SKIP_TYPES } from './funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
 import { PrcBaselineSource, PrcDataPoint } from '../../program-recommended-costs/prc-data-point';
-import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
+import { GrantAwardedDto } from '@cbiit/i2efsws-lib/model/grantAwardedDto';
 import { getCurrentFiscalYear } from 'src/app/utils/utils';
 import { Subject } from 'rxjs';
 import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';

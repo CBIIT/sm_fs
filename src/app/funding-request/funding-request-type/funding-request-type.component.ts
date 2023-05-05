@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FsLookupControllerService, FsRequestControllerService } from '@cbiit/i2ecws-lib';
+import { FsLookupControllerService, FsRequestControllerService } from '@cbiit/i2efsws-lib';
 import 'select2';
 import { UserService } from '@cbiit/i2ecui-lib';
 import { RequestModel } from '../../model/request/request-model';
 import { openNewWindow } from '../../utils/utils';
 import { NGXLogger } from 'ngx-logger';
 import { Select2OptionData } from 'ng-select2';
-import { FundingRequestTypeRulesDto } from '@cbiit/i2ecws-lib/model/fundingRequestTypeRulesDto';
+import { FundingRequestTypeRulesDto } from '@cbiit/i2efsws-lib/model/fundingRequestTypeRulesDto';
 import { FundingRequestTypes, INITIAL_PAY_TYPES } from '../../model/request/funding-request-types';
 import { Alert } from '../../alert-billboard/alert';
 import { ControlContainer, NgForm } from '@angular/forms';

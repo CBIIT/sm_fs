@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GrantsSearchCriteriaDto } from '@cbiit/i2ecws-lib';
+import { GrantsSearchCriteriaDto } from '@cbiit/i2efsws-lib';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { getCurrentFiscalYear } from 'src/app/utils/utils';
 

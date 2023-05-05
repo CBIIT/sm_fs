@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { UserService } from '@cbiit/i2ecui-lib';
-import { GrantedAuthority, SecurityCredentials } from '@cbiit/i2ecws-lib';
+import { GrantedAuthority, SecurityCredentials } from '@cbiit/i2ecommonws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { NGXLogger } from 'ngx-logger';
 import { HeartbeatService } from '@cbiit/i2ecui-lib';

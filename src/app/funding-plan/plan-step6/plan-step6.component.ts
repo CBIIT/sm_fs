@@ -2,14 +2,15 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnInit, QueryList, ViewChi
 import { Router } from '@angular/router';
 import {
   CancerActivityControllerService,
-  DocumentsDto,
   FsPlanControllerService,
   FsPlanWorkflowControllerService,
   FundingReqApproversDto,
   FundingReqStatusHistoryDto,
   FundingRequestQueryDto,
   WorkflowTaskDto
-} from '@cbiit/i2ecws-lib';
+} from '@cbiit/i2efsws-lib';
+import { CancerActivityControllerService } from '@cbiit/i2erefws-lib'
+import { DocumentsDto } from '@cbiit/i2ecommonws-lib'
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';

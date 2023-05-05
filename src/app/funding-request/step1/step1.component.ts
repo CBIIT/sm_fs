@@ -1,5 +1,5 @@
 import { AfterContentInit, AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
+import { FsRequestControllerService, GrantsSearchCriteriaDto, NciPfrGrantQueryDto } from '@cbiit/i2efsws-lib';
 import { Subject } from 'rxjs';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { GrantsSearchFilterService } from '../grants-search/grants-search-filter.service';

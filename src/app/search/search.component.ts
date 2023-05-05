@@ -6,7 +6,7 @@ import {
   FsSearchControllerService,
   FundSearchDashboardDataDto,
   FundSelectSearchCriteria
-} from '@cbiit/i2ecws-lib';
+} from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { GwbLinksService } from '@cbiit/i2ecui-lib';
 import { getCurrentFiscalYear } from '../utils/utils';
@@ -14,7 +14,7 @@ import { AppUserSessionService } from "../service/app-user-session.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { SearchModel } from "./model/search-model";
 import { BatchApproveService } from './batch-approve/batch-approve.service';
-import { FundingRequestPermDelDto } from "@cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
+import { FundingRequestPermDelDto } from "@cbiit/i2efsws-lib/model/fundingRequestPermDelDto";
 
 @Component({
   selector: 'app-search',

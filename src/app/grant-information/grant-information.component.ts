@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
-import { NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
+import { NciPfrGrantQueryDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { convertNcabs } from 'src/app/utils/utils';
 

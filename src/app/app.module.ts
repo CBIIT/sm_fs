@@ -3,7 +3,9 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ApiModule, BASE_PATH } from '@cbiit/i2ecws-lib';
+import { ApiModule as CommonApiModule, BASE_PATH as COMMON_BASE_PATH } from '@cbiit/i2ecommonws-lib';
+import { ApiModule as FSApiModule, BASE_PATH as FS_BASE_PATH } from '@cbiit/i2efsws-lib';
+import { ApiModule as RefApiModule, BASE_PATH as REF_BASE_PATH } from '@cbiit/i2erefws-lib';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgSelect2Module } from 'ng-select2';
 import {
@@ -426,7 +428,9 @@ export function megaInitializer(
     BrowserModule,
     AppRoutingModule,
     I2ecuiLibModule,
-    ApiModule,
+    CommonApiModule,
+    FSApiModule,
+    RefApiModule,   
     HttpClientModule,
     NgSelect2Module,
     NgbModule,
@@ -440,7 +444,9 @@ export function megaInitializer(
     CookieModule.forRoot()
   ],
   providers: [RequestModel, PlanModel, PercentPipe,
-    { provide: BASE_PATH, useValue: '/i2ecws' },
+    { provide: COMMON_BASE_PATH, useValue: '/i2ecommonws' },
+    { provide: FS_BASE_PATH, useValue: '/i2efsws' },
+    { provide: REF_BASE_PATH, useValue: '/i2erefws' },
     { provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS' },
     { provide: PROPERTIES_ENVIRONMENT, useValue: environment },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptorService, multi: true },

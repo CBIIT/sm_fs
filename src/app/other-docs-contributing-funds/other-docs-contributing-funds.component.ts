@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {RequestModel} from '../model/request/request-model';
-import {LookupsControllerService} from '@cbiit/i2ecws-lib';
+import {LookupsControllerService} from '@cbiit/i2ecommonws-lib';
 import {Options} from 'select2';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {NGXLogger} from 'ngx-logger';

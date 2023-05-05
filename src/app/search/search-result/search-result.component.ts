@@ -9,7 +9,7 @@ import {
   ViewChild,
   ViewChildren
 } from '@angular/core';
-import { FsSearchControllerService, FundingRequestQueryDto, FundSelectSearchCriteria } from '@cbiit/i2ecws-lib';
+import { FsSearchControllerService, FundingRequestQueryDto, FundSelectSearchCriteria } from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
 import { AppPropertiesService , LoaderService, NameRenderComponent } from '@cbiit/i2ecui-lib';
@@ -23,7 +23,7 @@ import {
 import {
   SearchFundingRequestActionCellRendererComponent
 } from './search-funding-request-action-cell-renderer/search-funding-request-action-cell-renderer.component';
-import { FundingPlanQueryDto } from '@cbiit/i2ecws-lib/model/fundingPlanQueryDto';
+import { FundingPlanQueryDto } from '@cbiit/i2efsws-lib/model/fundingPlanQueryDto';
 import {
   SearchFundingPlanFoasCellRendererComponent
 } from './search-funding-plan-foas-cell-renderer/search-funding-plan-foas-cell-renderer.component';

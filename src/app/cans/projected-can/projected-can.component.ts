@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { CanManagementService } from '../can-management.service';
-import { CanCcxDto } from '@cbiit/i2ecws-lib';
+import { CanCcxDto } from '@cbiit/i2efsws-lib';
 import { RequestModel } from '../../model/request/request-model';
-import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 
 @Component({
   selector: 'app-projected-can',

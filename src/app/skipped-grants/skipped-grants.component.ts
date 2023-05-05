@@ -8,7 +8,7 @@ import {
   FsRequestControllerService,
   FundingRequestSkipDto,
   NciPfrGrantQueryDto
-} from '@cbiit/i2ecws-lib';
+} from '@cbiit/i2efsws-lib';
 import { openNewWindow } from '../utils/utils';
 
 @Component({

@@ -3,7 +3,7 @@ import { PlanModel } from '../../model/plan/plan-model';
 import { ErrorFunction, SuccessFunction } from '../../funding-request/retrieve-request/request-loader.service';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanManagementService } from '../service/plan-management.service';
-import { FsPlanControllerService } from '@cbiit/i2ecws-lib';
+import { FsPlanControllerService } from '@cbiit/i2efsws-lib';
 import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 
 @Injectable({ providedIn: 'root' })

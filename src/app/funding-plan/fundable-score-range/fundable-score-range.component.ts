@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from '../../model/plan/plan-model';
-import { NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
+import { NciPfrGrantQueryDto } from '@cbiit/i2efsws-lib';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { Router } from '@angular/router';
 import { NavigationStepModel } from 'src/app/funding-request/step-indicator/navigation-step.model';

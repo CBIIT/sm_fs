@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CanManagementService } from '../can-management.service';
 import { RequestModel } from '../../model/request/request-model';
-import { CanCcxDto, FundingRequestCanDto } from '@cbiit/i2ecws-lib';
+import { CanCcxDto, FundingRequestCanDto } from '@cbiit/i2efsws-lib';
 import { OefiaTypesComponent } from '../oefia-types/oefia-types.component';
 import { CanSelectorComponent } from '../can-selector/can-selector.component';
 import { ProjectedCanComponent } from '../projected-can/projected-can.component';
