@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NciPfrGrantQueryDto } from '@cbiit/i2efsws-lib';
-import { DocumentsDto } from '@cbiit/i2ecommonws'
+import { DocumentsDto } from '@cbiit/i2ecommonws-lib'
 import { PlanModel } from '../../../model/plan/plan-model';
 import { DocumentService } from '../../../service/document.service';
 import { NGXLogger } from 'ngx-logger';

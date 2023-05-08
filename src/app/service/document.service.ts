@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DocumentsControllerService, DocumentsDto, FsDocOrderControllerService } from '@cbiit/i2ecommonws-lib';
+import { DocumentsControllerService, DocumentsDto } from '@cbiit/i2ecommonws-lib';
 import { FsDocOrderControllerService } from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
 

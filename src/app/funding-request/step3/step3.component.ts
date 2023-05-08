@@ -4,14 +4,16 @@ import 'select2';
 import { Options } from 'select2';
 import {
   ApplAdminSuppRoutingsDto,
-  CgRefCodControllerService,
-  CgRefCodesDto,
   FsDocOrderControllerService,
   FsRequestControllerService,
   FundingRequestDocOrderDto,
   FundingRequestDto,
   NciPfrGrantQueryDto
 } from '@cbiit/i2efsws-lib';
+import {
+  CgRefCodControllerService,
+  CgRefCodesDto,
+} from '@cbiit/i2ecommonws-lib'
 import { DocumentsControllerService, DocumentsDto, UserControllerService } from '@cbiit/i2ecommonws-lib'
 import { DocumentService } from '../../service/document.service';
 import { RequestModel } from '../../model/request/request-model';
