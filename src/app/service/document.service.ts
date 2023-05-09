@@ -10,8 +10,8 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class DocumentService {
 
-  private docUrl = '/i2ecws/api/v1/documents';
-  private docViewerUrl = '/i2ecws/api/v1/doc-viewer';
+  private docUrl = '/i2ecommonws/api/v1/documents';
+  private docViewerUrl = '/i2ecommonws/api/v1/doc-viewer';
 
   constructor(private http: HttpClient,
     private documentsControllerService: DocumentsControllerService, private logger: NGXLogger,

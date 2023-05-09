@@ -438,7 +438,7 @@ export function megaInitializer(
     DataTablesModule,
     DragDropModule,
     LoggerModule.forRoot({
-      serverLoggingUrl: '/i2ecws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.INFO,
+      serverLoggingUrl: '/i2ecommonws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.INFO,
       enableSourceMaps: true
     }),
     CookieModule.forRoot()

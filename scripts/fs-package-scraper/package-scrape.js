@@ -71,8 +71,8 @@ function scrape(url, fileName) {
 }
 
 function getRequestURL(frqId, applId, fprId, type) {
-    const requestUrl = `http://${HOST}/i2ecws/api/v1/documents/funding-requests-send-package/${frqId}/${applId}`;
-    const planUrl = `http://${HOST}/i2ecws/api/v1/documents/funding-plan-send-package/?fpId=${fprId}&applIds=${applId}`;
+    const requestUrl = `http://${HOST}/i2efsws/api/v1/documents/funding-requests-send-package/${frqId}/${applId}`;
+    const planUrl = `http://${HOST}/i2efsws/api/v1/documents/funding-plan-send-package/?fpId=${fprId}&applIds=${applId}`;
     return type === 'PLAN' ? planUrl : requestUrl;
 }
 

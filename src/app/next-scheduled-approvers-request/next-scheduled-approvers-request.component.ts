@@ -80,7 +80,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
         }
       },
       ajax: {
-        url: '/i2ecws/api/v1/fs/lookup/funding-request/approvers/',
+        url: '/i2efsws/api/v1/fs/lookup/funding-request/approvers/',
         delay: 500,
         type: 'POST',
         data(params): any {

@@ -75,7 +75,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
         }
       },
       ajax: {
-        url: '/i2ecws/api/v1/fs/lookup/funding-request/available-designees/',
+        url: '/i2efsws/api/v1/fs/lookup/funding-request/available-designees/',
         delay: 500,
         type: 'GET',
         data(params): any {

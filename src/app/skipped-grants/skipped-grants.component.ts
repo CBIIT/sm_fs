@@ -50,7 +50,7 @@ export class SkippedGrantsComponent implements OnInit {
         }
       },
       ajax: {
-        url: '/i2ecws/api/v1/fs/lookup/funding-requests/skip-grants/',
+        url: '/i2efsws/api/v1/fs/lookup/funding-requests/skip-grants/',
         delay: 500,
         type: 'GET',
         data(params): any {
