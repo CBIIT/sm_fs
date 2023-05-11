@@ -43,6 +43,15 @@ module.exports = {
       let key = 'www-authenticate';
       proxyRes.headers[key] = proxyRes.headers[key] && proxyRes.headers[key].split(',');
     }
+  },
+  '/i2emailsvc': {
+    target: 'http://ncias-d1982-v:28080/',
+    secure: false,
+    changeOrigin: true,
+    onProxyRes: proxyRes => {
+      let key = 'www-authenticate';
+      proxyRes.headers[key] = proxyRes.headers[key] && proxyRes.headers[key].split(',');
+    }
   }
 };
 

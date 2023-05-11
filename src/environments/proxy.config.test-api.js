@@ -1,6 +1,6 @@
 module.exports = {
   '/i2ecommonws': {
-    target: 'http://ncias-q1990-v:98009/',
+    target: 'http://ncias-q1990-v:14009/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
@@ -9,7 +9,7 @@ module.exports = {
     }
   },
   '/i2efsws': {
-    target: 'http://ncias-q1990-v:14009/',
+    target: 'http://ncias-q1990-v:9009/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
@@ -36,7 +36,7 @@ module.exports = {
     }
   },
   '/i2eygws': {
-    target: 'http://ncias-q1990-v:88009/',
+    target: 'http://ncias-q1990-v:10009/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
