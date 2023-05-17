@@ -1,6 +1,6 @@
 module.exports = {
   '/i2ecommonws': {
-    target: 'http://ncias-q1990-v:14009/',
+    target: 'http://ncias-q1990-v:14080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
@@ -9,7 +9,7 @@ module.exports = {
     }
   },
   '/i2efsws': {
-    target: 'http://ncias-q1990-v:9009/',
+    target: 'http://ncias-q1990-v:9080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
@@ -18,7 +18,7 @@ module.exports = {
     }
   },
   '/i2ejasperws': {
-    target: 'http://ncias-q1990-v:15009/',
+    target: 'http://ncias-q1990-v:15080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
@@ -27,7 +27,7 @@ module.exports = {
     }
   },
   '/i2erefws': {
-    target: 'http://ncias-q1990-v:13009/',
+    target: 'http://ncias-q1990-v:13080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
@@ -36,7 +36,7 @@ module.exports = {
     }
   },
   '/i2eygws': {
-    target: 'http://ncias-q1990-v:10009/',
+    target: 'http://ncias-q1990-v:10080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {

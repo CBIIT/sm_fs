@@ -1,6 +1,6 @@
 module.exports = {
   '/i2ecommonws': {
-    target: 'http://ncias-p1996-v:14009/',
+    target: 'http://ncias-p1996-v:14080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
@@ -9,7 +9,16 @@ module.exports = {
     }
   },
   '/i2eemws': {
-    target: 'http://ncias-p1996-v:8009/',
+    target: 'http://ncias-p1996-v:8080/',
+    secure: false,
+    changeOrigin: true,
+    onProxyRes: proxyRes => {
+      let key = 'www-authenticate';
+      proxyRes.headers[key] = proxyRes.headers[key] && proxyRes.headers[key].split(',');
+    }
+  },
+  '/i2eygws': {
+    target: 'http://ncias-p1996-v:10080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
@@ -18,7 +27,7 @@ module.exports = {
     }
   },
   '/i2efsws': {
-    target: 'http://ncias-p1996-v:9009/',
+    target: 'http://ncias-p1996-v:9080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
@@ -27,7 +36,7 @@ module.exports = {
     }
   },
   '/i2ejasperws': {
-    target: 'http://ncias-p1996-v:15009/',
+    target: 'http://ncias-p1996-v:15080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
@@ -36,7 +45,7 @@ module.exports = {
     }
   },
   '/i2erefws': {
-    target: 'http://ncias-p1996-v:13009/',
+    target: 'http://ncias-p1996-v:13080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
