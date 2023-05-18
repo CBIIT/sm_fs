@@ -578,6 +578,7 @@ export class PlanStep3Component implements OnInit {
             frCan.requestedTc = +totalCost;
             frCan.dcPctCut = +dcPercentCut;
             frCan.tcPctCut = +tcPercentCut;
+            frCan.fundingSourceName = s.fundingSourceName;
             frCan.defaultOefiaTypeId = +s.octId;
             frCan.frqId = +req.frqId;
             frCan.fseId = +s.fseId;

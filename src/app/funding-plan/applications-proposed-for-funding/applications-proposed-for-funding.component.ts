@@ -204,13 +204,17 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     }
   }
 
-  handleSourceChanged($event: { oldSource: number; newSource: number }): void {
+  handleSourceChanged($event: { oldSource: number; newSource: number; newName: string }): void {
     // This event should only be triggered when there is a single funding source. For multiple sources, the change will
     // be spliced in.
+    this.logger.info('New source:', $event);
 
     this.planModel.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
       req.financialInfoDto.fundingRequestCans?.filter(c => +c.fseId === +$event.oldSource).forEach(
-        can => can.fseId = $event.newSource
+        can => {
+          can.fseId = $event.newSource;
+          can.fundingSourceName = $event.newName;
+        }
       );
       req.financialInfoDto.fundingReqBudgetsDtos?.filter(b => +b.fseId === +$event.oldSource).forEach(
         bud => bud.fseId = $event.newSource

@@ -202,11 +202,13 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   parseRequestHistories(historyResult: FundingReqStatusHistoryDto[]): void {
     let submitted = false;
     historyResult.forEach((item: FundingReqStatusHistoryDto) => {
+      this.logger.debug('Processing history: ', item);
       if (item.statusCode === 'SUBMITTED') {
         submitted = true;
       }
       if (!item.endDate) {
         this.requestStatus = item.statusCode;
+        this.logger.debug(`Request status set to ${this.requestStatus}`);
         this.currentStatusId = item.statusId;
         this.planModel.fundingPlanDto.planStatusName = item.currentStatusDescrip;
       }
@@ -234,27 +236,32 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
       this.userCanDelete = false;
       this.userCanSubmit = false;
       this.userReadonly = true;
+      this.logger.info(`PD: ${isPd} - PA: ${isPa} - canDelete: ${this.userCanDelete} - canSubmit: ${this.userCanSubmit} - readOnly: ${this.userReadonly}`);
       return;
     } else if (isPd && userNpnId === this.planModel.fundingPlanDto.requestorNpnId) {
       this.userCanSubmit = true;
       this.userCanDelete = true;
       this.userReadonly = false;
+      this.logger.info(`PD: ${isPd} - PA: ${isPa} - canDelete: ${this.userCanDelete} - canSubmit: ${this.userCanSubmit} - readOnly: ${this.userReadonly}`);
       return;
     } else if (isPd && (userCas !== null) && (userCas.length > 0)
       && (userCas.indexOf(this.planModel.fundingPlanDto.cayCode) > -1)) {
       this.userCanSubmit = true;
       this.userCanDelete = true;
       this.userReadonly = false;
+      this.logger.info(`PD: ${isPd} - PA: ${isPa} - canDelete: ${this.userCanDelete} - canSubmit: ${this.userCanSubmit} - readOnly: ${this.userReadonly}`);
       return;
     } else if ((isPa || isPd) && userId === this.planModel.fundingPlanDto.planCreateUserId) {
       this.userCanSubmit = false;
       this.userCanDelete = true;
       this.userReadonly = false;
+      this.logger.info(`PD: ${isPd} - PA: ${isPa} - canDelete: ${this.userCanDelete} - canSubmit: ${this.userCanSubmit} - readOnly: ${this.userReadonly}`);
       return;
     } else {
       this.userCanDelete = false;
       this.userCanSubmit = false;
       this.userReadonly = true;
+      this.logger.info(`PD: ${isPd} - PA: ${isPa} - canDelete: ${this.userCanDelete} - canSubmit: ${this.userCanSubmit} - readOnly: ${this.userReadonly}`);
       return;
     }
   }
@@ -394,7 +401,6 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
     this.logger.debug('Submit Funding Plan, workflowDto is ', dto);
     this.fsPlanWorkflowControllerService.submitPlanWorkflow(dto).subscribe(
       (result) => {
-        this.logger.debug('Submit Request result: ', result);
         this.workflowModel.initializeForPlan(this.fprId);
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
       },
