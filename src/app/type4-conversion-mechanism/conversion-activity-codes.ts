@@ -4,6 +4,7 @@ export const ConversionActivityCodeData = [
   {id: 'K00', text: 'K00'},
   {id: 'R00', text: 'R00'},
   {id: 'R33', text: 'R33'},
+  {id: 'R44', text: 'R44'},
 ];
 
-export const ConversionActivityCodes = ['UH3', 'K00', 'R00', 'R33'];
+export const ConversionActivityCodes = ['UH3', 'K00', 'R00', 'R33', 'R44'];
