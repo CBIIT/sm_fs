@@ -67,7 +67,7 @@ export class DocumentService {
   }
 
   downLoadFrqPackage(frqId: number, applId: number) {
-    var url = this.jasperReportUrl + '/funding-requests-view-package/' + frqId + '/' + applId;
+    var url = this.docViewerUrl + '/funding-requests-view-package/' + frqId + '/' + applId;
     this.logger.debug('Step3 FRQ Package URL: ', url);
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' });
   }
@@ -102,7 +102,7 @@ export class DocumentService {
   }
 
   downLoadFpPackage(fpId: number, applIds: number[]) {
-    var url = this.jasperReportUrl + '/funding-plan-view-package?fpId=' + fpId + '&applIds=' + applIds;
+    var url = this.docViewerUrl + '/funding-plan-view-package?fpId=' + fpId + '&applIds=' + applIds;
     this.logger.debug('Funding Plan Package URL: ', url);
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' });
   }
