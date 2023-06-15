@@ -45,6 +45,7 @@
       [broadcast]="true"
       [activeCayOnly]="true"
       [filterOnNoActiveCay]="true"
+      [channel]="'request_channel_one'"
       [showInactiveToggle]="false">
     </lib-pdname-dropdown>
     <div
@@ -60,6 +61,7 @@
       [lockedOptions]="pdCayCodes"
       [selectSingleOption]="true"
       [(selectedValue)]="selectedCayCode"
+      [channel]="'request_channel_one'"
       [maxSelection]="1"
       [syncWithPd]="true"
       label="Requesting PD's Cancer Activity">
