@@ -24,7 +24,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
   selectedDocsArr: Array<DocData> = new Array<DocData>();
   private _selectedValue: string;
-  private pdDoc: string[];
+  private pdDoc: string;
 
   public docs: Array<DocData> = new Array<DocData>()
   public options: Options;

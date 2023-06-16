@@ -38,7 +38,7 @@ export class PlanStep3Component implements OnInit {
 
   pdNpnId: number;
   cayCode: string;
-  doc: string[];
+  doc: string;
   planName: string;
   private nextStep: string;
   alerts: Alert[];
