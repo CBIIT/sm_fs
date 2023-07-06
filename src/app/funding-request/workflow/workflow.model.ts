@@ -132,8 +132,9 @@ export class WorkflowModel {
     }
 
     const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-    if (userId === approver.approverLdap) {
-        return true;
+    if (userId === approver.approverLdap ) {
+        this.logger.debug('is assigned approver, stillEligible=' + approver.stillEligible);
+        return approver.stillEligible;
     } else if (approver.designees && approver.designees.length > 0) {
         const designees = approver.designees.map(d => d.delegateTo);
         if (designees.indexOf(userId) > -1) {
