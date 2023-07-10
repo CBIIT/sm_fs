@@ -141,6 +141,10 @@
             "stage-api": {
               "browserTarget": "fs:build:dev",
               "proxyConfig": "src/environments/proxy.config.stage-api.js"
+            },
+            "local": {
+              "browserTarget": "fs:build:dev",
+              "proxyConfig": "src/environments/proxy.config.local-api.js"
             }
           }
         },

@@ -9,13 +9,13 @@ import { ApiModule as RefApiModule, BASE_PATH as REF_BASE_PATH } from '@cbiit/i2
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgSelect2Module } from 'ng-select2';
 import {
-  AppPropertiesService,
+  AppPropertiesService, ChangeUserInterceptor,
   GwbLinksService,
   I2ecuiLibModule,
   LoaderInterceptor,
   PROPERTIES_APP_NAME,
   PROPERTIES_ENVIRONMENT
-} from '@cbiit/i2ecui-lib';
+} from "@cbiit/i2ecui-lib";
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HeaderComponent } from './header/header.component';
 import { SearchFilterComponent } from './search/search-filter/search-filter.component';
@@ -430,7 +430,7 @@ export function megaInitializer(
     I2ecuiLibModule,
     CommonApiModule,
     FSApiModule,
-    RefApiModule,   
+    RefApiModule,
     HttpClientModule,
     NgSelect2Module,
     NgbModule,
@@ -449,6 +449,7 @@ export function megaInitializer(
     { provide: REF_BASE_PATH, useValue: '/i2erefws' },
     { provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS' },
     { provide: PROPERTIES_ENVIRONMENT, useValue: environment },
+    { provide: HTTP_INTERCEPTORS, useClass: ChangeUserInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptorService, multi: true },
     {
       provide: APP_INITIALIZER, useFactory: megaInitializer,
