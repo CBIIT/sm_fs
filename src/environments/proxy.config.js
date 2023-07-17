@@ -1,5 +1,5 @@
 module.exports = {
-  
+
   '/i2ecommonws': {
     target: 'http://localhost:8080/',
     secure: false,
@@ -37,7 +37,6 @@ module.exports = {
     }
   },
   '/i2eygws': {
-    target: 'http://localhost:8080/',
     target: 'http://localhost:8080/',
     secure: false,
     changeOrigin: true,
