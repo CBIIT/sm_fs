@@ -52,7 +52,7 @@ export class RequestInformationReadonlyComponent implements OnInit {
       }
     }
     this.is4R00Request = this.requestModel.is4R00();
-    this.showAltPdAndCayCode = this.is4R00Request || this.requestModel.isPayType4K99R00Conversion();
+    this.showAltPdAndCayCode = this.requestModel.isPayType44R00() || this.requestModel.isPayType4K99R00Conversion();
 
     this.showNewInvestigator = this.requestModel.requestDto.financialInfoDto.newInvestigatorFlag
       && this.requestModel.grant.activityCode === 'R01'

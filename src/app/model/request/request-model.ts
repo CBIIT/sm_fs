@@ -490,4 +490,8 @@ export class RequestModel {
   is4R00(): boolean {
     return +this.grant.applTypeCode === 4 && this.grant.activityCode === 'R00';
   }
+
+  isPayType44R00(): boolean {
+    return this.is4R00() && this.isPayType4();
+  }
 }
