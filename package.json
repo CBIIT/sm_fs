@@ -27,7 +27,7 @@
     "@angular/platform-browser": "~12.2.16",
     "@angular/platform-browser-dynamic": "~12.2.16",
     "@angular/router": "~12.2.16",
-    "@cbiit/i2ecui-lib": "5.0.0",
+    "@cbiit/i2ecui-lib": "5.2.0",
     "@cbiit/i2ecws-lib": "5.0.0",
     "@ng-bootstrap/ng-bootstrap": "^10.0.0",
     "@types/select2": "^4.0.53",
