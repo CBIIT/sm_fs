@@ -24336,7 +24336,7 @@ table.dataTable.dtr-column tbody tr > td.control:before {
   font-weight: 900;
   content: '\f055';
   color: #003e51;
-  background-color: #fff;
+  background-color: transparent;
   border: none;
   box-shadow: none;
   top: 0.8rem;
@@ -24346,6 +24346,7 @@ table.dataTable.dtr-column tbody tr > td.control:before {
   height: unset;
   width: unset;
   font-size: 1.2rem;
+  border-radius: 50%;
 }
 
 /* line 120, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
