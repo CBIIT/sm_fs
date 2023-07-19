@@ -490,4 +490,12 @@ export class RequestModel {
   is4R00(): boolean {
     return +this.grant.applTypeCode === 4 && this.grant.activityCode === 'R00';
   }
+
+  isNonNci(): boolean {
+    return this.grant.adminPhsOrgCode !== 'CA';
+  }
+
+  isCompeting(): boolean {
+    return !this.grant.councilMeetingDate.endsWith('00');
+  }
 }

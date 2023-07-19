@@ -41,9 +41,15 @@ export class FundingRequestTypeComponent implements OnInit {
   }
 
   @Output() selectedValueChange = new EventEmitter<number>();
+
   otherPayAlert: Alert = {
     type: 'warning',
     message: 'WARNING: This option should be selected only if your request will not be using any NCI funds. Send an e-mail to <a href="mailto: NCIProgramFundingRequestPolicyInquiry@mail.nih.gov" title="">NCI PFR Policy Inquiry</a> for guidance with other special circumstances.'
+  };
+
+  addFundsAlert: Alert = {
+    type: 'warning',
+    message: 'WARNING: This Request type should only be used with the approval of the NCI Grants Management officer.'
   };
 
   set selectedValue(value: number) {
@@ -51,9 +57,13 @@ export class FundingRequestTypeComponent implements OnInit {
     // problem, we can use the more natural approach of just pushing alerts into the queue.
     if (value) {
       let otherPay = false;
+      let addFunds = false;
       if (Number(value) === FundingRequestTypes.OTHER_PAY_COMPETING_ONLY) {
         this.alerts = [this.otherPayAlert];
         otherPay = true;
+      } else if (Number(value) === FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS && this.model.isNonNci() && this.model.isCompeting()) {
+        addFunds = true;
+        this.alerts = [this.addFundsAlert];
       } else {
         this.alerts = [];
       }
@@ -68,6 +78,8 @@ export class FundingRequestTypeComponent implements OnInit {
             };
             if (otherPay) {
               this.alerts = [this.otherPayAlert, fundedAlert];
+            } else if (addFunds) {
+              this.alerts = [this.addFundsAlert, fundedAlert];
             } else {
               this.alerts = [fundedAlert];
             }

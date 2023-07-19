@@ -98,9 +98,12 @@ export class CreateTypeComponent implements OnInit {
     }
     const type = Number(this.requestModel.requestDto.frtId);
 
-    if (this.requestModel.isForGrantFY()
-        && this.ROLLUP_TYPES.includes(+type)
-        && !this.workflowModel.approvedByNciFC) {
+    if ( this.requestModel.isForGrantFY()
+        && ((this.ROLLUP_TYPES.includes(+type)
+        && !this.workflowModel.approvedByNciFC) || (this.requestModel.isNonNci() && this.requestModel.isCompeting() && +type === FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS ))) {
+      if(!this.data.filter(item => item.id === 'ROLLUP')) {
+        this.data.push({ id: 'ROLLUP', text: 'Rollup' });
+      }
       this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'ROLLUP';
     } else if ( this.PRE_APPL_TYPES.includes(+type)
                 && !this.workflowModel.approvedByNciFC ) {
