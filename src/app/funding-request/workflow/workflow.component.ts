@@ -67,6 +67,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
+  processWorkflow = () => {};
 
   set selectedValue(value: number) {
     this._selectedValue = value;
@@ -198,6 +199,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.parseRequestHistories(historyResult);
       }
     );
+    this.processWorkflow = this.debounce(() => this.submitWorkflow());
   }
 
   get showBudgetDocWarning(): boolean {
@@ -435,4 +437,11 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.router.navigate(['/plan/retrieve', fprId]);
   }
 
+  debounce(cb, timeout = 1000) {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {cb.apply(this,args)}, timeout);
+    };
+  }
 }
