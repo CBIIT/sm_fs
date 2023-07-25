@@ -60,7 +60,7 @@ export function convertNcabs(ncabs: string): string {
       else {
         ncab = ncab.substr(4, 2) + '/' + ncab.substr(0, 4);
       }
-      
+
     }
     return ncab;
   }
@@ -98,4 +98,19 @@ export function validExtension(ext: string): boolean {
     return validExtensions.includes(ext);
   }
   return false;
+}
+
+export function jsonStringifyRecursive(obj) {
+  const cache = new Set();
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (cache.has(value)) {
+        // Circular reference found, discard key
+        return;
+      }
+      // Store value in our collection
+      cache.add(value);
+    }
+    return value;
+  }, 2);
 }

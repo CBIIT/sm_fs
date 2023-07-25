@@ -4,7 +4,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError, filter, finalize } from 'rxjs/operators';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
-import { openNewWindow } from '../utils/utils';
+import { openNewWindow, jsonStringifyRecursive } from '../utils/utils';
 import { Location } from '@angular/common';
 import { CustomServerLoggingService, HeartbeatService } from '@cbiit/i2ecui-lib';
 
@@ -79,6 +79,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
         }
 
         if (error.status === 401) {
+          this.record401(req, error);
           if(!this.handle401) {
             this.handle401 = true;
             this.heartbeatService.pause();
@@ -123,5 +124,10 @@ export class ErrorInterceptorService implements HttpInterceptor {
 
   handleNavigationEnd(event: NavigationEnd): void {
     this.logger.info('=======> NavigationEnd', event);
+  }
+
+  private record401(req: HttpRequest<any>, error: any) : void {
+    this.logger.error(`Error: ${jsonStringifyRecursive(error)}`);
+    this.logger.error(`Failed request details: ${jsonStringifyRecursive(req)}`);
   }
 }
