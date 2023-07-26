@@ -7,7 +7,7 @@ import {
   NgbDateParserFormatter
 } from "@ng-bootstrap/ng-bootstrap";
 import { NgForm } from "@angular/forms";
-import { FundingRequestPermDelDto } from "@cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
+import { FundingRequestPermDelDto } from "@cbiit/i2efsws-lib/model/fundingRequestPermDelDto";
 import { DatepickerAdapter, DatepickerFormatter } from "@cbiit/i2ecui-lib";
 import { DatePipe } from '@angular/common'
 

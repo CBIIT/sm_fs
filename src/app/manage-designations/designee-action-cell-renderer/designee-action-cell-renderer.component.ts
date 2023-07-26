@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { Subject } from "rxjs";
-import { FundingRequestPermDelDto } from "@cbiit/i2ecws-lib/model/fundingRequestPermDelDto";
+import { FundingRequestPermDelDto } from "@cbiit/i2efsws-lib/model/fundingRequestPermDelDto";
 
 @Component({
   selector: 'app-designee-action-cell-renderer',

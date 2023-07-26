@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FsWorkflowControllerService } from '@cbiit/i2ecws-lib';
+import { FsWorkflowControllerService } from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { RequestModel } from 'src/app/model/request/request-model';
 

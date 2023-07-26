@@ -3,7 +3,7 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild }
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { DocumentService } from 'src/app/service/document.service';
 import { saveAs } from 'file-saver';
-import { DocumentsDto } from '@cbiit/i2ecws-lib';
+import { DocumentsDto } from '@cbiit/i2ecommonws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Observable, of } from 'rxjs';
 import { getExtension, validExtension, validExtensions } from '../../../utils/utils';

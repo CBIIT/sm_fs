@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RequestModel } from '../model/request/request-model';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
-import { FsRequestControllerService, NciPfrGrantQueryDto } from '@cbiit/i2ecws-lib';
+import { FsRequestControllerService, NciPfrGrantQueryDto } from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
-import { GrantAwardedDto } from '@cbiit/i2ecws-lib/model/grantAwardedDto';
+import { GrantAwardedDto } from '@cbiit/i2efsws-lib/model/grantAwardedDto';
 import {
   FundingRequestTypes,
   FUNDING_POLICY_CUT_TYPES,
@@ -12,7 +12,7 @@ import {
   PRC_PI_REQUESTED_DIRECT_TOTAL_DISPLAY_TYPES
 } from '../model/request/funding-request-types';
 import { FundingSourceSynchronizerService } from '../funding-source/funding-source-synchronizer-service';
-import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 import { PrcBaselineSource, PrcDataPoint, PrcLineItemType } from './prc-data-point';
 import { PRC_DISPLAY_FORMAT } from './program-recommended-costs-model';
 import { NgForm } from '@angular/forms';

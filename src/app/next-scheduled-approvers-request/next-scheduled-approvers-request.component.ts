@@ -3,7 +3,7 @@ import { RequestModel } from '../model/request/request-model';
 import { Options } from 'select2';
 import { AppUserSessionService } from '../service/app-user-session.service';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { FsWorkflowControllerService, FundingReqApproversDto } from '@cbiit/i2ecws-lib';
+import { FsWorkflowControllerService, FundingReqApproversDto } from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 const approverMap = new Map<number, any>();
@@ -80,7 +80,7 @@ export class NextScheduledApproversRequestComponent implements OnInit {
         }
       },
       ajax: {
-        url: '/i2ecws/api/v1/fs/lookup/funding-request/approvers/',
+        url: '/i2efsws/api/v1/fs/lookup/funding-request/approvers/',
         delay: 500,
         type: 'POST',
         data(params): any {

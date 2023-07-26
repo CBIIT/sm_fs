@@ -2,7 +2,7 @@ import { AfterViewInit, Component, Input, OnInit, QueryList, ViewChild, ViewChil
 import { PlanModel } from '../../model/plan/plan-model';
 import { NGXLogger } from 'ngx-logger';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
-import { CanCcxDto } from '@cbiit/i2ecws-lib';
+import { CanCcxDto } from '@cbiit/i2efsws-lib';
 import { CanManagementService } from '../../cans/can-management.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CanSearchModalComponent } from '../../cans/can-search-modal/can-search-modal.component';

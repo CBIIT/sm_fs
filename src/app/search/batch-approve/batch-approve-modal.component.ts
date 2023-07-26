@@ -7,7 +7,7 @@ import {
   FsWorkflowControllerService,
   FundingPlanQueryDto,
   FundingRequestQueryDto
-} from '@cbiit/i2ecws-lib';
+} from '@cbiit/i2efsws-lib';
 import {
   NgbCalendar,
   NgbDate,

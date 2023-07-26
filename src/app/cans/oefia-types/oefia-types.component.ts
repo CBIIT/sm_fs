@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { CanManagementService } from '../can-management.service';
-import { OefiaCodingDto } from '@cbiit/i2ecws-lib';
+import { OefiaCodingDto } from '@cbiit/i2efsws-lib';
 import { Select2OptionData } from 'ng-select2';
-import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 import { RequestModel } from '../../model/request/request-model';
 
 @Component({

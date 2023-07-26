@@ -1,6 +1,6 @@
 import { Directive } from '@angular/core';
 import { AbstractControl, AsyncValidator, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
-import { FsRequestControllerService } from '@cbiit/i2ecws-lib';
+import { FsRequestControllerService } from '@cbiit/i2efsws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { Observable } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';

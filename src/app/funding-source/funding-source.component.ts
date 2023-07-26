@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 import { RequestModel } from '../model/request/request-model';
 import { Router } from '@angular/router';
-import { FsRequestControllerService } from '@cbiit/i2ecws-lib';
+import { FsRequestControllerService } from '@cbiit/i2efsws-lib';
 import { Options } from 'select2';
 import { FundingSourceSynchronizerService } from './funding-source-synchronizer-service';
 import { openNewWindow } from '../utils/utils';

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FundingReqApproversDto, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@cbiit/i2ecws-lib';
+import { FundingReqApproversDto, FundingReqStatusHistoryDto, WorkflowTaskDto } from '@cbiit/i2efsws-lib';
 import { Subject } from 'rxjs';
 
 @Injectable({providedIn: 'root'})

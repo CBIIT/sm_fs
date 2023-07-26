@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {RequestModel} from '../../model/request/request-model';
-import {FsRequestControllerService, NciPfrGrantQueryDto} from '@cbiit/i2ecws-lib';
+import {FsRequestControllerService, NciPfrGrantQueryDto} from '@cbiit/i2efsws-lib';
 import {isArray} from 'rxjs/internal-compatibility';
 import {NGXLogger} from 'ngx-logger';
 import {FundingRequestValidationService} from '../../model/request/funding-request-validation-service';

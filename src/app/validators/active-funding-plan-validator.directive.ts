@@ -2,7 +2,7 @@ import { Directive } from '@angular/core';
 import { AbstractControl, AsyncValidator, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { INITIAL_PAY_TYPES, SKIP_TYPES } from '../model/request/funding-request-types';
-import { FsRequestControllerService } from '@cbiit/i2ecws-lib';
+import { FsRequestControllerService } from '@cbiit/i2efsws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { NGXLogger } from 'ngx-logger';
 

@@ -5,7 +5,7 @@ import {
   FundingRequestCanDisplayDto,
   FundingRequestCanDto,
   OefiaCodingDto
-} from '@cbiit/i2ecws-lib';
+} from '@cbiit/i2efsws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { Observable, Subject } from 'rxjs';
 import { PlanModel } from '../model/plan/plan-model';

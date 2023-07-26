@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FundingRequestPermDelDto } from '@cbiit/i2ecws-lib/model/fundingRequestPermDelDto';
+import { FundingRequestPermDelDto } from '@cbiit/i2efsws-lib/model/fundingRequestPermDelDto';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgForm } from '@angular/forms';
 

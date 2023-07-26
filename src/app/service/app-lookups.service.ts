@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { CancerActivityControllerService, LookupsControllerService } from '@cbiit/i2ecws-lib';
+import { LookupsControllerService } from '@cbiit/i2ecommonws-lib';
+import { CancerActivityControllerService } from '@cbiit/i2erefws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Injectable({

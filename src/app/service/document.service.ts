@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DocumentsControllerService, DocumentsDto, FsDocOrderControllerService } from '@cbiit/i2ecws-lib';
+import { DocumentsControllerService, DocumentsDto } from '@cbiit/i2ecommonws-lib';
+import { FsDocOrderControllerService } from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
@@ -9,8 +10,10 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class DocumentService {
 
-  private docUrl = '/i2ecws/api/v1/documents';
-  private docViewerUrl = '/i2ecws/api/v1/doc-viewer';
+  private docUrl = '/i2ecommonws/api/v1/documents';
+  private docViewerUrl = '/i2ecommonws/api/v1/doc-viewer';
+  private jasperReportUrl = '/i2ejasperws/api/v1/documents';
+
 
   constructor(private http: HttpClient,
     private documentsControllerService: DocumentsControllerService, private logger: NGXLogger,
@@ -43,7 +46,7 @@ export class DocumentService {
   }
 
   downloadFrqCoverSheet(frqId: number) {
-    var url = this.docUrl + '/funding-requests-cover-page/' + frqId;
+    var url = this.jasperReportUrl + '/funding-requests-cover-page/' + frqId;
     this.logger.debug('Step3 FRQ Cover Sheet URL:', url);
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
@@ -81,13 +84,13 @@ export class DocumentService {
   }
 
   downloadFPCoverSheet(fpId: number) {
-    var url = this.docUrl + '/funding-plans-cover-page/' + fpId;
+    var url = this.jasperReportUrl + '/funding-plans-cover-page/' + fpId;
     this.logger.debug('Funding Plan Cover Sheet URL:', url);
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
   downloadTemplate(fprId: number,  templateType: string) {
-    var url = this.docUrl + '/funding-plans-word-template/' + fprId + '/' + templateType;
+    var url = this.jasperReportUrl  + '/funding-plans-word-template/' + fprId + '/' + templateType;
     this.logger.debug('Funding Plan Cover Sheet URL:', url);
     return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' })
   }
@@ -112,7 +115,7 @@ export class DocumentService {
     for ( var key in searchCriteria ) {
       formData.append(key, searchCriteria[key]);
   }
-    var url = this.docUrl + '/funding-plans-detail-report/' + fpIds + '/' + isRequest;
+    var url = this.jasperReportUrl + '/funding-plans-detail-report/' + fpIds + '/' + isRequest;
     this.logger.debug('Funding Plan Cover Sheet URL:', url);
     return this.http.post<Blob>(`${url}`,searchCriteria, { observe: 'response', responseType: 'blob' as 'json' })
   }

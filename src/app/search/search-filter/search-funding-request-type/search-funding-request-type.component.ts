@@ -4,8 +4,8 @@ import { Select2OptionData } from "ng-select2";
 import { Options } from "select2";
 import { NGXLogger } from "ngx-logger";
 import { openNewWindow } from "../../../utils/utils";
-import { FsLookupControllerService } from "@cbiit/i2ecws-lib";
-import { SearchFundingRequestTypesDto } from "@cbiit/i2ecws-lib/model/searchFundingRequestTypesDto";
+import { FsLookupControllerService } from "@cbiit/i2efsws-lib";
+import { SearchFundingRequestTypesDto } from "@cbiit/i2efsws-lib/model/searchFundingRequestTypesDto";
 
 @Component({
   selector: 'app-search-funding-request-type',

@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Select2OptionData } from 'ng-select2';
 import { NGXLogger } from 'ngx-logger';
-import { FsPlanControllerService } from '@cbiit/i2ecws-lib';
+import { FsPlanControllerService } from '@cbiit/i2efsws-lib';
 import { PlanManagementService } from '../service/plan-management.service';
 import { PlanModel } from '../../model/plan/plan-model';
 import { getCurrentFiscalYear } from '../../utils/utils';
-import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 import { ControlContainer, NgForm } from '@angular/forms';
 
 @Component({

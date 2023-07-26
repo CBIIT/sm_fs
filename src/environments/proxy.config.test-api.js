@@ -1,12 +1,56 @@
 module.exports = {
-  "/i2ecws": {
-    target: "http://ncias-q1990-v:38080/",
+  '/i2ecommonws': {
+    target: 'http://ncias-q1990-v:14080/',
     secure: false,
     changeOrigin: true,
-    onProxyRes: (proxyRes) => {
-      let key = "www-authenticate";
-      proxyRes.headers[key] =
-        proxyRes.headers[key] && proxyRes.headers[key].split(",");
-    },
+    onProxyRes: proxyRes => {
+      let key = 'www-authenticate';
+      proxyRes.headers[key] = proxyRes.headers[key] && proxyRes.headers[key].split(',');
+    }
   },
+  '/i2efsws': {
+    target: 'http://ncias-q1990-v:9080/',
+    secure: false,
+    changeOrigin: true,
+    onProxyRes: proxyRes => {
+      let key = 'www-authenticate';
+      proxyRes.headers[key] = proxyRes.headers[key] && proxyRes.headers[key].split(',');
+    }
+  },
+  '/i2ejasperws': {
+    target: 'http://ncias-q1990-v:15080/',
+    secure: false,
+    changeOrigin: true,
+    onProxyRes: proxyRes => {
+      let key = 'www-authenticate';
+      proxyRes.headers[key] = proxyRes.headers[key] && proxyRes.headers[key].split(',');
+    }
+  },
+  '/i2erefws': {
+    target: 'http://ncias-q1990-v:13080/',
+    secure: false,
+    changeOrigin: true,
+    onProxyRes: proxyRes => {
+      let key = 'www-authenticate';
+      proxyRes.headers[key] = proxyRes.headers[key] && proxyRes.headers[key].split(',');
+    }
+  },
+  '/i2eygws': {
+    target: 'http://ncias-q1990-v:10080/',
+    secure: false,
+    changeOrigin: true,
+    onProxyRes: proxyRes => {
+      let key = 'www-authenticate';
+      proxyRes.headers[key] = proxyRes.headers[key] && proxyRes.headers[key].split(',');
+    }
+  },
+  '/i2emailsvc': {
+    target: 'http://ncias-d1982-v:28080/',
+    secure: false,
+    changeOrigin: true,
+    onProxyRes: proxyRes => {
+      let key = 'www-authenticate';
+      proxyRes.headers[key] = proxyRes.headers[key] && proxyRes.headers[key].split(',');
+    }
+  }
 };

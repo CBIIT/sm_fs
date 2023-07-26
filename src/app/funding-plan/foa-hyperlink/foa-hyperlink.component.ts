@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CancerActivityControllerService, FsLookupControllerService } from '@cbiit/i2ecws-lib';
+import { CancerActivityControllerService } from '@cbiit/i2erefws-lib'
+import { FsLookupControllerService } from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({

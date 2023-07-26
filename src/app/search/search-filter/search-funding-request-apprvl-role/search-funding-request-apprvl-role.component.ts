@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
-import {FsLookupControllerService} from '@cbiit/i2ecws-lib';
+import {FsLookupControllerService} from '@cbiit/i2efsws-lib';
 import {ControlContainer, NgForm, NgModel} from '@angular/forms';
 import {Select2OptionData} from 'ng-select2';
 import {Options} from 'select2';

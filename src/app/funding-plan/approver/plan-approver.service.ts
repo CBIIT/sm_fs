@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FsPlanWorkflowControllerService } from '@cbiit/i2ecws-lib';
+import { FsPlanWorkflowControllerService } from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 

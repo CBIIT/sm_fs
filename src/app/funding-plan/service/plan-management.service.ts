@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { PlanModel } from '../../model/plan/plan-model';
-import { FsRequestControllerService, FundingReqBudgetsDto, FundingRequestCanDto } from '@cbiit/i2ecws-lib';
+import { FsRequestControllerService, FundingReqBudgetsDto, FundingRequestCanDto } from '@cbiit/i2efsws-lib';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
 import { NGXLogger } from 'ngx-logger';
-import { FundingRequestFundsSrcDto } from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { CanManagementService } from '../../cans/can-management.service';
 import { PendingPrcValues } from '../fp-program-recommended-costs/fp-program-recommended-costs.component';

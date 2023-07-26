@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Options } from 'select2';
 import { Select2OptionData } from 'ng-select2';
-import { FsPlanControllerService, FundingPlanRfaPaDto, RfaPaNcabDate } from '@cbiit/i2ecws-lib';
+import { FsPlanControllerService, FundingPlanRfaPaDto, RfaPaNcabDate } from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
-import { FundingPlanNcabDto } from '@cbiit/i2ecws-lib/model/fundingPlanNcabDto';
+import { FundingPlanNcabDto } from '@cbiit/i2efsws-lib/model/fundingPlanNcabDto';
 import { Subject } from 'rxjs';
 import {
   FullGrantNumberCellRendererComponent
@@ -15,8 +15,8 @@ import {
   ExistingRequestsCellRendererComponent
 } from '../../table-cell-renderers/existing-requests-cell-renderer/existing-requests-cell-renderer.component';
 import { PlanModel } from '../../model/plan/plan-model';
-import { FundingPlanGrantSearchCriteria } from '@cbiit/i2ecws-lib/model/fundingPlanGrantSearchCriteria';
-import { GrantsSearchResultDatatableDto } from '@cbiit/i2ecws-lib/model/grantsSearchResultDatatableDto';
+import { FundingPlanGrantSearchCriteria } from '@cbiit/i2efsws-lib/model/fundingPlanGrantSearchCriteria';
+import { GrantsSearchResultDatatableDto } from '@cbiit/i2efsws-lib/model/grantsSearchResultDatatableDto';
 import { DataTableDirective } from 'angular-datatables';
 import {
   SelectGrantCheckboxCellRendererComponent

@@ -5,7 +5,7 @@ import {NgForm} from '@angular/forms';
 import {PlanModel} from '../../model/plan/plan-model';
 import {CustomServerLoggingService, PdCaIntegratorService} from '@cbiit/i2ecui-lib';
 import {PlanManagementService} from '../service/plan-management.service';
-import {FsPlanControllerService, FundingPlanFoasDto, FundingRequestCanDto, FundingRequestDto} from '@cbiit/i2ecws-lib';
+import {FsPlanControllerService, FundingPlanFoasDto, FundingRequestCanDto, FundingRequestDto} from '@cbiit/i2efsws-lib';
 import {
   OtherDocsContributingFundsComponent
 } from '../../other-docs-contributing-funds/other-docs-contributing-funds.component';
@@ -16,8 +16,8 @@ import {
   ApplicationsProposedForFundingComponent
 } from '../applications-proposed-for-funding/applications-proposed-for-funding.component';
 import {FundingRequestTypes} from '../../model/request/funding-request-types';
-import {FundingRequestFundsSrcDto} from '@cbiit/i2ecws-lib/model/fundingRequestFundsSrcDto';
-import {FundingReqBudgetsDto} from '@cbiit/i2ecws-lib/model/fundingReqBudgetsDto';
+import {FundingRequestFundsSrcDto} from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
+import {FundingReqBudgetsDto} from '@cbiit/i2efsws-lib/model/fundingReqBudgetsDto';
 import {AppUserSessionService} from '../../service/app-user-session.service';
 import {CanManagementService} from '../../cans/can-management.service';
 import {Alert} from '../../alert-billboard/alert';
