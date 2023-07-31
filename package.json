@@ -30,7 +30,7 @@
     "@angular/router": "~12.2.16",
     "@cbiit/i2ecommonws-lib": "1.0.0",
     "@cbiit/i2ecui-lib": "5.1.0",
-    "@cbiit/i2efsws-lib": "5.1.0-SNAPSHOT",
+    "@cbiit/i2efsws-lib": "^1.0.1-SNAPSHOT",
     "@cbiit/i2erefws-lib": "1.0.0",
     "@cbiit/i2eygws-lib": "1.0.0",
     "@ng-bootstrap/ng-bootstrap": "^10.0.0",
