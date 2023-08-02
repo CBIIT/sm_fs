@@ -79,7 +79,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
         }
 
         if (error.status === 401) {
-          this.record401(req, error);
+          // this.record401(req, error);
           if(!this.handle401) {
             this.handle401 = true;
             this.heartbeatService.pause();
@@ -126,8 +126,8 @@ export class ErrorInterceptorService implements HttpInterceptor {
     this.logger.info('=======> NavigationEnd', event);
   }
 
-  private record401(req: HttpRequest<any>, error: any) : void {
-    this.logger.error(`Error: ${jsonStringifyRecursive(error)}`);
-    this.logger.error(`Failed request details: ${jsonStringifyRecursive(req)}`);
-  }
+  // private record401(req: HttpRequest<any>, error: any) : void {
+  //   this.logger.error(`Error: ${jsonStringifyRecursive(error)}`);
+  //   this.logger.error(`Failed request details: ${jsonStringifyRecursive(req)}`);
+  // }
 }
