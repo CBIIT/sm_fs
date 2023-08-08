@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start-local": "ng serve --configuration=local",
+    "start-local": "ng serve --configuration=local-api",
     "start-dev": "ng serve --configuration=dev-api",
     "start-test": "ng serve --configuration=test-api",
     "start-stage": "ng serve --configuration=stage-api",
