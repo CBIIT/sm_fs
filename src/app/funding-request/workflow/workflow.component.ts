@@ -67,8 +67,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
-  processWorkflow = () => {};
-
+  public disableWorkflowButton: boolean = false;
   set selectedValue(value: number) {
     this._selectedValue = value;
     const user = approverMap.get(Number(value));
@@ -199,7 +198,6 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.parseRequestHistories(historyResult);
       }
     );
-    this.processWorkflow = this.debounce(() => this.submitWorkflow());
   }
 
   get showBudgetDocWarning(): boolean {
@@ -274,6 +272,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.alert = null;
     this.validationError = {};
     let valid = true;
+    this.disableWorkflowButton = true;
 
     if (this.gmInfoComponent && !this.gmInfoComponent.isFormValid()) {
       valid = false;
@@ -435,13 +434,5 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   retrievePlan(fprId: number): void {
     this.router.navigate(['/plan/retrieve', fprId]);
-  }
-
-  debounce(cb, timeout = 1000) {
-    let timer;
-    return (...args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {cb.apply(this,args)}, timeout);
-    };
-  }
+  }clea
 }
