@@ -434,5 +434,5 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   retrievePlan(fprId: number): void {
     this.router.navigate(['/plan/retrieve', fprId]);
-  }clea
+  }
 }
