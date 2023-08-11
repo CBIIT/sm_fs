@@ -78,6 +78,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
   private _dirty = false;
+  public disableWorkflow: boolean = false;
 
   set selectedValue(value: number) {
     this._selectedValue = value;
@@ -292,6 +293,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   submitWorkflow(): void {
     this.alert = null;
     let valid = true;
+    this.disableWorkflow = true;
     if (this.workflowStuckBy) {
       return;
     }

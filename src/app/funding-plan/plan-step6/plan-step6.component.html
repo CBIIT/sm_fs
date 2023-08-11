@@ -70,7 +70,7 @@
   <div class="col-12 d-flex mb-4">
     <button class="btn btn-outline-secondary  mr-auto" (click)="prevStep()" *ngIf="!readonly">Previous</button>
     <button class="btn btn-danger mr-2" (click)="deleteRequest()" *ngIf="deleteVisible()">Delete Plan</button>
-    <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled() ">
+    <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled()" [disabled]="disableSubmitPlan">
       Submit Plan
     </button>
     <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
