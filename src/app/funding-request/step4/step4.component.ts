@@ -69,6 +69,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
   userCanSubmitApprove = false;
   inflightPlan: FundingPlanDto;
+  disableSubmit:boolean = false;
 
   get displayReadOnlyBudgetDocs(): boolean {
     return this.requestModel.requestDto.budgetDocs?.length > 0;
@@ -280,6 +281,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   }
 
   submitRequest(): void {
+    this.disableSubmit = true;
     this.loaderService.show();
     this.cancerActivityService.getActiveReferralCaAssignRules('Y').subscribe(
       result => {

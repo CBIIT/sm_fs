@@ -78,6 +78,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
   private _dirty = false;
+  public disableWorkflow: boolean = false;
 
   set selectedValue(value: number) {
     this._selectedValue = value;
@@ -292,6 +293,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   submitWorkflow(): void {
     this.alert = null;
     let valid = true;
+    this.disableWorkflow = true;
     if (this.workflowStuckBy) {
       return;
     }
@@ -318,6 +320,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       this.alert = {type: 'danger',
       message: 'Please correct the errors identified above.',
       title: ''};
+      this.disableWorkflow = false;
       return;
     }
 
@@ -326,6 +329,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         this.logger.debug('warning modal closed with yes ');
         this.submitWorkflowToBackend();
       }).catch(() => {
+        this.disableWorkflow = false;
         this.logger.debug('warning modal closed with dismiss ');
       });
     }

@@ -77,6 +77,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   userReadonly = true;
   closeResult: string;
   docChecker: FundingPlanDocChecker;
+  public disableSubmitPlan: boolean = false;
 
   private fprId: number;
 
@@ -366,6 +367,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   }
 
   submitRequest(): void {
+    this.disableSubmitPlan = true;
     this.cancerActivityService.getActiveReferralCaAssignRules('Y').subscribe(
       result => {
         const activeCayCodes: string[] = result.map(ra => ra.caCode);

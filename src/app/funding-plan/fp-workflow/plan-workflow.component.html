@@ -115,7 +115,7 @@
             <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
     </div>
     <div class="col-12 d-flex mb-4" >
-        <button class="btn btn-primary ml-auto" (click)="submitWorkflow()" *ngIf="isApprover() && !buttonDisabled ">
+        <button class="btn btn-primary ml-auto" (click)="submitWorkflow()" *ngIf="isApprover() && !buttonDisabled" [disabled]="disableWorkflow">
             {{buttonLabel}}
         </button>
         <span class="ml-auto" *ngIf="isApprover() && buttonDisabled" ngbTooltip="Select a workflow action to enable this button.">
