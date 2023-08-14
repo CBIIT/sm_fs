@@ -312,6 +312,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.logger.debug('warning modal closed with yes ');
         this.submitWorkflowToBackend();
       }).catch(() => {
+        this.disableWorkflowButton = false;
         this.logger.debug('warning modal closed with dismiss ');
       });
     }
