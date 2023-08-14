@@ -320,6 +320,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       this.alert = {type: 'danger',
       message: 'Please correct the errors identified above.',
       title: ''};
+      this.disableWorkflow = false;
       return;
     }
 
