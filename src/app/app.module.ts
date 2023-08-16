@@ -235,6 +235,8 @@ import { R00CancerActivityRequiredValidatorDirective } from './validators/r00-ca
 import { UniquePdValidatorDirective } from './validators/unique-pd-validator.directive';
 import { Router } from '@angular/router';
 import { ErrorHandlerService } from './error/error-handler.service';
+import { CancerActivitiesDropdownComponent} from "./cancer-activities-dropdown/cancer-activities-dropdown.component";
+import { PdnameDropdownComponent} from "./pdname-dropdown/pdname-dropdown.component";
 
 export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
   return (): Promise<any> => {
@@ -421,6 +423,8 @@ export function megaInitializer(
     R00PdNameRequiredValidatorDirective,
     R00CancerActivityRequiredValidatorDirective,
     UniquePdValidatorDirective,
+    CancerActivitiesDropdownComponent,
+    PdnameDropdownComponent
   ],
 
 

@@ -38,7 +38,7 @@
   </div>
 
   <div class="col-md-4 col-lg-4">
-    <lib-pdname-dropdown
+    <app-pdname-dropdown
       [cayCodes]="pdCayCodes"
       [(selectedValue)]="selectedPd"
       label="Requesting PD"
@@ -47,7 +47,7 @@
       [filterOnNoActiveCay]="true"
       [channel]="'request_channel_one'"
       [showInactiveToggle]="false">
-    </lib-pdname-dropdown>
+    </app-pdname-dropdown>
     <div
       class="text-danger mt-1"
       *ngIf="parentForm.errors?.pdNameRequired && (parentForm.submitted || parentForm.touched)">
@@ -56,7 +56,7 @@
   </div>
 
   <div class="col-md-4 col-lg-4">
-    <lib-cancer-activities-dropdown
+    <app-cancer-activities-dropdown
       #primaryCayCode
       [lockedOptions]="pdCayCodes"
       [selectSingleOption]="true"
@@ -65,7 +65,7 @@
       [maxSelection]="1"
       [syncWithPd]="true"
       label="Requesting PD's Cancer Activity">
-    </lib-cancer-activities-dropdown>
+    </app-cancer-activities-dropdown>
     <div
       class="text-danger mt-1"
       *ngIf="parentForm.errors?.cayCodeIsRequired && (parentForm.submitted || parentForm.touched)">
@@ -85,7 +85,7 @@
 <!--      <b>WARNING:</b> Select the PD who will be assigned to the R00, NOT the PD assigned to the K99.-->
 <!--    </ngb-alert>-->
     <div class="col-md-4 col-lg-4" *ngIf="payType4K99R00Conversion() || isPayType44R00()">
-      <lib-pdname-dropdown
+      <app-pdname-dropdown
         [debug]="true"
         [name]="'r00pdName'"
         [(selectedValue)]="altPdNpnId"
@@ -96,7 +96,7 @@
         [activeCayOnly]="true"
         [filterOnNoActiveCay]="true"
         [showInactiveToggle]="false">
-      </lib-pdname-dropdown>
+      </app-pdname-dropdown>
       <div
         class="text-danger mt-1"
         *ngIf="parentForm.errors?.altPdNameRequired && (parentForm.submitted)">
@@ -111,7 +111,7 @@
     </div>
 
     <div class="col-md-4 col-lg-4" *ngIf="payType4K99R00Conversion() || isPayType44R00()">
-      <lib-cancer-activities-dropdown
+      <app-cancer-activities-dropdown
         #alternateCayCode
         [debug]="true"
         [name]="'r00CancerActivity'"
@@ -121,7 +121,7 @@
         [maxSelection]="1"
         [syncWithPd]="true"
         label="R00 PD's Cancer Activity">
-      </lib-cancer-activities-dropdown>
+      </app-cancer-activities-dropdown>
       <div
         class="text-danger mt-1"
         *ngIf="parentForm.errors?.altCayCodeRequired && (parentForm.submitted)">

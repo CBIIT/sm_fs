@@ -87,7 +87,7 @@
   </div>
   <div class="row" [hidden]="!showAdvanced || (searchType != 'FR' && searchType != 'FP')">
     <div class="col-md-6 col-lg-6">
-      <lib-pdname-dropdown label="Requesting PD" name="requestingPd" [showInactiveToggle]="true"></lib-pdname-dropdown>
+      <app-pdname-dropdown label="Requesting PD" name="requestingPd" [showInactiveToggle]="true"></app-pdname-dropdown>
     </div>
     <div class="col-md-6 col-lg-6 form-group">
       <app-search-funding-request-doc name="requestingDoc"  label="Requesting DOC" [form]="searchForm"></app-search-funding-request-doc>
@@ -135,7 +135,7 @@
       <h5 class="text-divider"> <span><strong>Other&nbsp;</strong></span></h5>
     </div>
     <div class="col-md-6 col-lg-6">
-      <lib-pdname-dropdown label="PD Name" name="pdName" [showInactiveToggle]="true"></lib-pdname-dropdown>
+      <app-pdname-dropdown label="PD Name" name="pdName" [showInactiveToggle]="true"></app-pdname-dropdown>
     </div>
     <div class="col-md-6 col-lg-6 form-group">
       <app-search-funding-request-doc name="doc" label="DOC" [form]="searchForm"></app-search-funding-request-doc>

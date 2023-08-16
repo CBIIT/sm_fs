@@ -1,9 +1,9 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from "@angular/core";
 import {Router} from '@angular/router';
 import {NavigationStepModel} from 'src/app/funding-request/step-indicator/navigation-step.model';
 import {NgForm} from '@angular/forms';
 import {PlanModel} from '../../model/plan/plan-model';
-import {CustomServerLoggingService, PdCaIntegratorService} from '@cbiit/i2ecui-lib';
+import {CustomServerLoggingService} from '@cbiit/i2ecui-lib';
 import {PlanManagementService} from '../service/plan-management.service';
 import {FsPlanControllerService, FundingPlanFoasDto, FundingRequestCanDto, FundingRequestDto} from '@cbiit/i2efsws-lib';
 import {
@@ -23,6 +23,7 @@ import {CanManagementService} from '../../cans/can-management.service';
 import {Alert} from '../../alert-billboard/alert';
 import {FundingSourceGrantDataPayload} from '../applications-proposed-for-funding/funding-source-grant-data-payload';
 import {NGXLogger} from 'ngx-logger';
+import { PD_CA_DEFAULT_CHANNEL, PdCaIntegratorService } from "../../service/pd-ca-integrator.service";
 
 @Component({
   selector: 'app-plan-step3',
@@ -45,6 +46,8 @@ export class PlanStep3Component implements OnInit {
   private editing: { sourceId: number; index: number };
   futureYears: Map<number, number> = new Map<number, number>();
 
+  @Input() sharedChannel = PD_CA_DEFAULT_CHANNEL;
+
   get cayCodeArr(): string[] {
     return [this.cayCode];
   }
@@ -57,30 +60,24 @@ export class PlanStep3Component implements OnInit {
               private pdCaIntegratorService: PdCaIntegratorService,
               private planManagementService: PlanManagementService,
               private fsPlanControllerService: FsPlanControllerService,
-              private canManagementService: CanManagementService,
               private userSessionService: AppUserSessionService) {
   }
+
 
   ngOnInit(): void {
     this.navigationModel.setStepLinkable(3, true);
 
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
-      if (next.channel === 'PD_CA_DEFAULT_CHANNEL') {
+      if (next.channel === this.sharedChannel) {
         this.cayCode = typeof next.cayCode === 'string' ? next.cayCode : next.cayCode[0];
         this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
       }
     });
 
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
-      if (next.channel === 'PD_CA_DEFAULT_CHANNEL') {
+      if (next.channel === this.sharedChannel) {
         this.pdNpnId = next.pdId;
         this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
-      }
-    });
-
-    this.pdCaIntegratorService.docEmitter.subscribe(next => {
-      if (next.channel === 'PD_CA_DEFAULT_CHANNEL') {
-        this.doc = next.doc;
       }
     });
 

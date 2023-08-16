@@ -4,7 +4,7 @@ import {LookupsControllerService} from '@cbiit/i2ecommonws-lib';
 import {Options} from 'select2';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {NGXLogger} from 'ngx-logger';
-import {PdCaIntegratorService} from "@cbiit/i2ecui-lib";
+import { PD_CA_DEFAULT_CHANNEL, PdCaIntegratorService } from "../service/pd-ca-integrator.service";
 
 
 class DocData {
@@ -28,6 +28,8 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
   public docs: Array<DocData> = new Array<DocData>()
   public options: Options;
+
+  @Input() channel = PD_CA_DEFAULT_CHANNEL
 
   @Input() preSelectedDocs = '';
 
@@ -75,7 +77,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
   ngOnInit(): void {
     this.initializeDocs();
     this.pdCaIntegratorSvc.docEmitter.subscribe(next => {
-      if (next && next.channel === 'PD_CA_DEFAULT_CHANNEL') {
+      if (next && next.channel === this.channel) {
         this.pdDoc = next.doc;
         if (this.selectedDocsArr.map(d => d.abbreviation).includes(next.doc)) {
           this.deselect(next.doc);

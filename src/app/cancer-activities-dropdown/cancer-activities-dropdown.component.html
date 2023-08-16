@@ -1,0 +1,15 @@
+<div class="form-group">
+  <label [for]="name">{{ label }} <i class="fas fa-question-circle more-info"
+    triggers="click:blur" placement="top"
+    ngbTooltip="A two-letter code that represents a research categorization of a cancer specialty used to identify the major cancer emphasis of a grant. It is  a fundamental scientific program concept  that maps to an NCI Organization, such as a Branch, Office, or Center."></i></label>
+  <ng-select2
+    [id]="name"
+    [name]="name"
+    [(ngModel)]="selectedValue"
+    [options]="options">
+    <option></option>
+    <option *ngFor="let cancerActivity of cancerActivities"
+            [value]="cancerActivity.code" [selected]="isSelected(cancerActivity.code)"
+    > {{cancerActivity.referralDescription}}</option>
+  </ng-select2>
+</div>

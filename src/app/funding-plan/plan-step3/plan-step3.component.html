@@ -40,15 +40,16 @@
 
         <div class="col-lg-4">
           <div class="form-group">
-            <lib-pdname-dropdown
+            <app-pdname-dropdown
               label="Requesting PD"
               [selectedValue]="pdNpnId"
+              [channel]="sharedChannel"
               [broadcast]="true"
               [syncWithCa]="false"
               [filterOnNoActiveCay]="true"
               [activeCayOnly]="true"
               [showInactiveToggle]="false">
-            </lib-pdname-dropdown>
+            </app-pdname-dropdown>
             <div class="text-danger mt-1"
                  *ngIf="step3form.errors?.pdNameRequired && (step3form.submitted || step3form.touched)">
               Requesting PD is required
@@ -60,21 +61,22 @@
       <div class="row">
         <div class="col-lg-6" style="
           padding-left: 0px;">
-          <app-other-docs-contributing-funds [preSelectedDocs]="planModel?.fundingPlanDto?.otherContributingDocs">
+          <app-other-docs-contributing-funds [channel]="sharedChannel" [preSelectedDocs]="planModel?.fundingPlanDto?.otherContributingDocs">
           </app-other-docs-contributing-funds>
         </div>
 
         <div class="col-lg-4">
           <div class="form-group">
-            <lib-cancer-activities-dropdown
+            <app-cancer-activities-dropdown
               [selectSingleOption]="true"
               [maxSelection]="1"
               [selectedValue]="cayCode"
               [syncWithPd]="true"
+              [channel]="sharedChannel"
               label="Requesting PD's Cancer Activities"
               [broadcast]="true"
               (selectedValueChange)="onSelectedValueChange($event)">
-            </lib-cancer-activities-dropdown>
+            </app-cancer-activities-dropdown>
             <div class="text-danger mt-1"
                  *ngIf="step3form.errors?.cayCodeIsRequired && (step3form.submitted || step3form.touched)">
               Requesting PD's Cancer Activity is required

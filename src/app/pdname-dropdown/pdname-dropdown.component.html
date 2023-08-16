@@ -1,0 +1,20 @@
+<div class="form-group">
+  <div class="d-flex">
+    <label [for]="name">{{ label }}</label>
+    <div class="form-check ml-auto d-flex" *ngIf="showInactiveToggle">
+      <input type="checkbox" [id]="'inactivePd-'+name" name="inactivePd" (change)="onCheckboxChange($event)" ngModel>
+      <label [for]="'inactivePd-'+name">
+        Include Inactive PD
+        <i
+          class="fas fa-question-circle more-info"
+          triggers="click:blur"
+          placement="top"
+          ngbTooltip="Inactive PD is a PD whose Program Director role in I2E has been deactivated and should not be assigned to any active grants. Select this checkbox to display inactive PDs in the PD Name drop-down">
+        </i>
+      </label>
+    </div>
+  </div>
+  <ng-select2 [id]="name" [name]="name" [data]="pdNames" [(ngModel)]="selectedValue" [allowClear]="true"
+    [options]="options">
+  </ng-select2>
+</div>
