@@ -14,7 +14,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build-prod": "ng build --prod --base-href=/fs/ && cd dist/fs && zip -r ../fs.zip *"
+    "build-prod": "ng build --prod --base-href=/fs/ && cd dist/fs && zip -r ../fs.zip *",
+    "build-non-prod": "ng build --base-href=/fs/ && cd dist/fs && zip -r ../fs.zip *"
   },
   "private": true,
   "dependencies": {
