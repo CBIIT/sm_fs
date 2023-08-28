@@ -60,10 +60,6 @@
             ]
           },
           "configurations": {
-            "dev-api": {
-              "optimization": false,
-              "sourceMap": true
-            },
             "dev": {
               "optimization": false,
               "sourceMap": true
