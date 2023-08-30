@@ -100,6 +100,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
           const errorUrl = new URL(error.url);
           errorUrl.searchParams.delete('TARGET');
           errorUrl.searchParams.set('TARGET', url);
+          req = req.clone( {headers: req.headers?.delete('CHANGE_USER')});
 
           if (!this.modalWindow) {
             this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
@@ -119,11 +120,11 @@ export class ErrorInterceptorService implements HttpInterceptor {
   }
 
   handleNavigationStart(event: NavigationStart): void {
-    this.logger.info('=======> NavigationStart', event);
+    //this.logger.info('=======> NavigationStart', event);
   }
 
   handleNavigationEnd(event: NavigationEnd): void {
-    this.logger.info('=======> NavigationEnd', event);
+    //this.logger.info('=======> NavigationEnd', event);
   }
 
   private record401(req: HttpRequest<any>, error: any) : void {
