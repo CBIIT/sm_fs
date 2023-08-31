@@ -228,7 +228,7 @@ import {
 import {
   FpWorkflowWarningModalComponent
 } from './funding-plan/fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
-import { ErrorInterceptorService } from './interceptors/error-interceptor.service';
+import { DEBUG_ERROR_INTERCEPTOR, ErrorInterceptor } from "./interceptors/error-interceptor.service";
 import { ErrorComponent } from './error/error/error.component';
 import { SessionRestoreComponent } from './session/session-restore/session-restore.component';
 import { CookieModule } from 'ngx-cookie';
@@ -458,8 +458,9 @@ export function megaInitializer(
     { provide: INSERT_CHANGE_USER_HEADER, useValue: false },
     { provide: INSERT_CHANGE_USER_PARAM, useValue: true },
     { provide: DEBUG_CHANGE_USER, useValue: false },
+    { provide: DEBUG_ERROR_INTERCEPTOR, useValue: true },
     { provide: HTTP_INTERCEPTORS, useClass: ChangeUserInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptorService, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     {
       provide: APP_INITIALIZER, useFactory: megaInitializer,
       deps: [AppUserSessionService, AppPropertiesService, AppLookupsService, GwbLinksService, Router, ErrorHandlerService], multi: true
