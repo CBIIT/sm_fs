@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CancerActivityControllerService } from '@cbiit/i2erefws-lib'
-import { FsLookupControllerService } from '@cbiit/i2efsws-lib';
+import { CancerActivityControllerService } from '@cbiit/i2erefws-lib';
+import { LookupsControllerService } from '@cbiit/i2ecommonws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({
@@ -13,7 +13,7 @@ export class FoaHyperlinkComponent implements OnInit {
   nihGuideAddr: string;
 
   constructor(private rfaService: CancerActivityControllerService,
-              private lookupService: FsLookupControllerService,
+              private lookupService: LookupsControllerService,
               private logger: NGXLogger) {
   }
 
