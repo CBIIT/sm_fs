@@ -17,6 +17,7 @@ export const DEBUG_ERROR_INTERCEPTOR = new InjectionToken<boolean>('debugMode', 
 export class ErrorInterceptor implements HttpInterceptor {
   private modalWindow: any;
   private handled401 = false;
+  private handlingError = false;
 
   constructor(
     private errorHandler: ErrorHandlerService,
@@ -44,6 +45,13 @@ export class ErrorInterceptor implements HttpInterceptor {
     }
     return next.handle(req).pipe(
       catchError((error) => {
+        if(this.handlingError) {
+          this.logger.info(`Already handling an error. Let this one pass: -----\n${jsonStringifyRecursive(error)}\n-----`);
+          return of(EMPTY);
+        } else {
+          this.handlingError = true;
+        }
+
         if (this.debugMode) this.verboseDetails(req, error);
 
         // Pass along errors that happen during initialization
@@ -71,13 +79,13 @@ export class ErrorInterceptor implements HttpInterceptor {
           return throwError(error);
         }
 
-        if (this.shouldHandleUnauthorized(error)) {
+        if (this.isUnauthorized(error)) {
           if (this.debugMode) this.logger.debug('Unauthorized');
           return this.handleUnauthorizedError(req, error);
         }
 
         // Handle timeouts
-        if (this.shouldHandleTimeout(error)) {
+        if (this.isTimeOut(error)) {
           return this.handleTimeout(error);
         } else {
           return this.handleAllOtherErrors(req, error);
@@ -85,6 +93,7 @@ export class ErrorInterceptor implements HttpInterceptor {
       }),
       finalize(() => {
         this.modalWindow = undefined;
+        this.handlingError = false;
       })
     );
   }
@@ -99,11 +108,11 @@ export class ErrorInterceptor implements HttpInterceptor {
     return of(EMPTY);
   }
 
-  private shouldHandleUnauthorized(error) {
+  private isUnauthorized(error) {
     return error.status === 401;
   }
 
-  private shouldHandleTimeout(error) {
+  private isTimeOut(error) {
     return error.status === 200 && error.url?.startsWith('https://auth');
   }
 
@@ -153,9 +162,11 @@ export class ErrorInterceptor implements HttpInterceptor {
     this.logger.error(`Error URL: ${error.url}`);
     this.logger.error(`Request URL: ${req.url}`);
     this.logger.error(`Error Status: ${error.status}`);
+    this.logger.error('--end error summary---------------------------------------------------------');
 
     this.logger.error('--error details-------------------------------------------------------------');
     this.logger.error(`Error: ${jsonStringifyRecursive(error)}`);
     this.logger.error(`Failed request details: ${jsonStringifyRecursive(req)}`);
+    this.logger.error('--end error details---------------------------------------------------------');
   }
 }
