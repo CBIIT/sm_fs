@@ -72,6 +72,7 @@ export class ErrorInterceptor implements HttpInterceptor {
         }
 
         if (this.shouldHandleUnauthorized(error)) {
+          if (this.debugMode) this.logger.debug('Unauthorized');
           return this.handleUnauthorizedError(req, error);
         }
 
