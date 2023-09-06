@@ -7,17 +7,19 @@ import { ErrorHandlerService } from '../error/error-handler.service';
 import { jsonStringifyRecursive, openNewWindow } from '../utils/utils';
 import { Location } from '@angular/common';
 import { CustomServerLoggingService, HeartbeatService } from '@cbiit/i2ecui-lib';
+import { v4 as uuidv4 } from 'uuid';
 
 export const DEBUG_ERROR_INTERCEPTOR = new InjectionToken<boolean>('debugMode', {
   providedIn: 'root',
   factory: () => false,
 });
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ErrorInterceptor implements HttpInterceptor {
   private modalWindow: any;
   private handled401 = false;
   private handlingError = false;
+  private myUUID;
 
   constructor(
     private errorHandler: ErrorHandlerService,
@@ -28,6 +30,10 @@ export class ErrorInterceptor implements HttpInterceptor {
     private heartbeatService: HeartbeatService,
     @Inject(DEBUG_ERROR_INTERCEPTOR) private debugMode: boolean
   ) {
+
+    this.myUUID = uuidv4();
+    this.logger.debug(`ErrorInterceptor UUID: ${this.myUUID}`);
+
     router.events.pipe(filter((event) => event instanceof NavigationStart)).subscribe((event: NavigationStart) => {
       this.handleNavigationStart(event);
     });

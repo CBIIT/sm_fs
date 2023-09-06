@@ -56,6 +56,7 @@
     "rxjs": "~6.6.0",
     "select2": "^4.0.13",
     "tslib": "^2.0.0",
+    "uuid": "^9.0.0",
     "zone.js": "~0.11.3"
   },
   "main": "dist/i2ecui-lib/bundles/i2ecui-lib.umd.js",

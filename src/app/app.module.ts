@@ -455,7 +455,7 @@ export function megaInitializer(
     { provide: REF_BASE_PATH, useValue: '/i2erefws' },
     { provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS' },
     { provide: PROPERTIES_ENVIRONMENT, useValue: environment },
-    { provide: INSERT_CHANGE_USER_HEADER, useValue: true },
+    { provide: INSERT_CHANGE_USER_HEADER, useValue: false },
     { provide: INSERT_CHANGE_USER_PARAM, useValue: true },
     { provide: DEBUG_CHANGE_USER, useValue: false },
     { provide: DEBUG_ERROR_INTERCEPTOR, useValue: true },
