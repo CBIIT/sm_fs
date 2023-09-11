@@ -163,16 +163,16 @@ export class ErrorInterceptor implements HttpInterceptor {
   }
 
   private verboseDetails(req: HttpRequest<any>, error: any) {
-    this.logger.error('--error summary-------------------------------------------------------------');
-    this.logger.error(`Error Type: ${this.errorHandler.errorType(error)}`);
-    this.logger.error(`Error URL: ${error.url}`);
-    this.logger.error(`Request URL: ${req.url}`);
-    this.logger.error(`Error Status: ${error.status}`);
-    this.logger.error('--end error summary---------------------------------------------------------');
+    this.logger.debug('--error summary-------------------------------------------------------------');
+    this.logger.debug(`Error Type: ${this.errorHandler.errorType(error)}`);
+    this.logger.debug(`Error URL: ${error.url}`);
+    this.logger.debug(`Request URL: ${req.url}`);
+    this.logger.debug(`Error Status: ${error.status}`);
+    this.logger.debug('--end error summary---------------------------------------------------------');
 
-    this.logger.error('--error details-------------------------------------------------------------');
-    this.logger.error(`Error: ${jsonStringifyRecursive(error)}`);
-    this.logger.error(`Failed request details: ${jsonStringifyRecursive(req)}`);
-    this.logger.error('--end error details---------------------------------------------------------');
+    this.logger.debug('--error details-------------------------------------------------------------');
+    this.logger.debug(`Error: ${jsonStringifyRecursive(error)}`);
+    this.logger.debug(`Failed request details: ${jsonStringifyRecursive(req)}`);
+    this.logger.debug('--end error details---------------------------------------------------------');
   }
 }
