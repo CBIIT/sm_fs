@@ -67,7 +67,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
-  public disableWorkflowButton: boolean = false;
+  public disableWorkflowButton = false;
   set selectedValue(value: number) {
     this._selectedValue = value;
     const user = approverMap.get(Number(value));
@@ -269,24 +269,30 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   submitWorkflow(): void {
+    this.logger.info(`Starting submit workflow for frqId#${this.requestModel.requestDto.frqId}, action = ${this._selectedWorkflowAction.action}`);
+
     this.alert = null;
     this.validationError = {};
     let valid = true;
     this.disableWorkflowButton = true;
 
     if (this.gmInfoComponent && !this.gmInfoComponent.isFormValid()) {
+      this.logger.info(`GM info form invalid for frqId#${this.requestModel.requestDto.frqId}`);
       valid = false;
     }
 
     if (this.approvedCostsComponent && !this.approvedCostsComponent?.isFormValid()) {
+      this.logger.info(`Approved costs form invalid for frqId#${this.requestModel.requestDto.frqId}`);
       valid = false;
     }
 
     if (this.uploadBudgetDocumentsComponent && !this.uploadBudgetDocumentsComponent.isFromValid()) {
+      this.logger.info(`Budget documents form invalid for frqId#${this.requestModel.requestDto.frqId}`);
       valid = false;
     }
 
-    if (! this.isFormValid()) {
+    if (!this.isFormValid()) {
+      this.logger.info(`Workflow form invalid for frqId#${this.requestModel.requestDto.frqId}`);
       valid = false;
     }
 
@@ -295,6 +301,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     if (this.workflowModel.isApprovalAction(action) && this.budgetInfoComponent?.editing) {
       const canFormValid = this.budgetInfoComponent.isFormValid(canWarning);
       if (!canFormValid) {
+        this.logger.info(`Budget info form invalid for frqId#${this.requestModel.requestDto.frqId}`);
         valid = false;
       }
     }
@@ -308,12 +315,13 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     }
 
     if (canWarning.duplicateCan || canWarning.missingCan || canWarning.nonDefaultCan) {
+      this.logger.info(`Opening CAN warning modal for frqId#${this.requestModel.requestDto.frqId}`);
       this.workflowWarningModalComponent.openConfirmModal(canWarning).then( () => {
-        this.logger.debug('warning modal closed with yes ');
+        this.logger.info(`CAN warning modal closed for frqId#${this.requestModel.requestDto.frqId}`);
         this.submitWorkflowToBackend();
       }).catch(() => {
+        this.logger.info(`CAN warning modal dismissed for frqId#${this.requestModel.requestDto.frqId}`);
         this.disableWorkflowButton = false;
-        this.logger.debug('warning modal closed with dismiss ');
       });
     }
     else {
@@ -322,6 +330,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   }
 
   private submitWorkflowToBackend(): void {
+    this.logger.info(`Form validation successful; submitting workflow for frqId#${this.requestModel.requestDto.frqId} to backend`);
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
@@ -335,9 +344,12 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       dto.additionalApproverList = this.workflowModel.additionalApprovers.map(a => {
         return a.approverLdap;
       });
+      this.logger.info(`Additional approvers for frqId#${this.requestModel.requestDto.frqId}: ${dto.additionalApproverList}`);
     } else if (action === WorkflowActionCode.REASSIGN) {
       dto.reassignedApproverId = this.workflowModel.pendingApprovers[0].approverLdap;
+      this.logger.info(`Reassigned approver for frqId#${this.requestModel.requestDto.frqId}: ${dto.reassignedApproverId}`);
     } else if (action === WorkflowActionCode.RETURN) {
+      this.logger.info(`Returning frqId#${this.requestModel.requestDto.frqId} to npeId#${this.requestModel.requestDto.requestorNpeId}`);
       dto.requestCans = this.requestModel.requestCans;
       dto.requestCans?.forEach(c => {
         c.can = null;
@@ -348,9 +360,11 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
     // complete the request when last in chain approving.
     if (this.workflowModel.lastInChain) {
+      this.logger.info(`Last in chain approving frqId#${this.requestModel.requestDto.frqId}`);
       if (action === WorkflowActionCode.APPROVE ||
         action === WorkflowActionCode.APPROVE_COMMENT) {
         dto.completeRequest = true;
+        this.logger.info(`Setting completeRequest to true for frqId#${this.requestModel.requestDto.frqId}`);
       }
     }
     // set approved costs cans if scientific approver;
@@ -358,12 +372,11 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       && this.workflowModel.isApprovalAction(action)
       && !this.requestModel.isSkip() ) {
         dto.requestCans = this.requestModel.requestCans;
-        this.logger.debug('scientific approver:', dto.requestCans);
+        this.logger.info(`Scientific approver: setting requestCans for frqId#${this.requestModel.requestDto.frqId}`)
     }
 
-    this.logger.debug(this.workflowModel.isApprovalAction(action));
-    this.logger.debug(this.budgetInfoComponent?.editing);
     if (this.workflowModel.isApprovalAction(action) && this.budgetInfoComponent?.editing) {
+      this.logger.info(`Approving request: refreshing request cans for frqId#${this.requestModel.requestDto.frqId}`)
       this.budgetInfoComponent.refreshRequestCans();
       dto.requestCans = this.requestModel.requestCans;
       if (this.workflowModel.isFcNci) {
@@ -376,18 +389,19 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       && this.workflowModel.isApprovalAction(action)
       && !this.requestModel.isSkip() ) {
       dto.gmInfo = this.gmInfoComponent?.getGmInfo();
+      this.logger.info(`GM approver: setting gmInfo for frqId#${this.requestModel.requestDto.frqId}`);
     }
 
-    this.logger.debug('workflow dto for submission is ', dto);
+    this.logger.info(`Workflow dto for submission: ${JSON.stringify(dto)}`);
     this.workflowService.submitWorkflow(dto).subscribe(
       (result) => {
-        this.logger.debug('submit workflow returned okay ', result);
+        this.logger.info(`Submit workflow for frqId#${this.requestModel.requestDto.frqId} returned success`);
         this.workflowModel.initialize();
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
       },
       (error) => {
-        this.logger.error('submit workflow returned error', error);
+        this.logger.error(`submit workflow for frqId#${this.requestModel.requestDto.frqId} returned error: ${JSON.stringify(error)}`);
         this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       }
     );
