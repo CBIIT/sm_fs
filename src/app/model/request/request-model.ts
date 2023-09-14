@@ -17,7 +17,7 @@ import { PrcBaselineSource, PrcDataPoint } from '../../program-recommended-costs
 import { GrantAwardedDto } from '@cbiit/i2efsws-lib/model/grantAwardedDto';
 import { getCurrentFiscalYear } from 'src/app/utils/utils';
 import { Subject } from 'rxjs';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
+import { NGXLogger } from 'ngx-logger';
 
 
 @Injectable({
@@ -151,7 +151,7 @@ export class RequestModel {
 
   constructor(private propertiesService: AppPropertiesService,
               private canControllerService: FsCanControllerService,
-              private logger: CustomServerLoggingService,
+              private logger: NGXLogger,
   ) {
     // this._grantViewerUrl = propertiesService.getProperty('GRANT_VIEWER_URL');
     // this._eGrantsUrl = propertiesService.getProperty('EGRANTS_URL');

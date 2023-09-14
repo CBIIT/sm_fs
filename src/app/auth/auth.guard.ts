@@ -6,6 +6,7 @@ import { GrantedAuthority, SecurityCredentials } from '@cbiit/i2ecommonws-lib';
 import { RequestModel } from '../model/request/request-model';
 import { NGXLogger } from 'ngx-logger';
 import { HeartbeatService } from '@cbiit/i2ecui-lib';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +34,9 @@ export class AuthGuard implements CanActivate {
                 this.requestModel?.reset();
                 this.requestModel?.programRecommendedCostsModel?.deepReset(false);
                 this.heartbeatService.continue();
+                // Create and store a new UUID for this session
+                sessionStorage.setItem('UUID', uuidv4());
+                sessionStorage.setItem('SESSIONID', this.heartbeatService.sessionId);
                 resolve(true);
               } else {
                 this.logger.warn(`User ${creds.username} is not authorized to access Funding Selections`);

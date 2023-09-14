@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { UserService } from '@cbiit/i2ecui-lib';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 import { PlanModel } from '../model/plan/plan-model';
 import { RequestModel } from '../model/request/request-model';
+import { NGXLogger } from "ngx-logger";
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class ErrorHandlerService {
     private userService: UserService,
     private planModel: PlanModel,
     private requestModel: RequestModel,
-    private logger: CustomServerLoggingService) {
+    private logger: NGXLogger) {
   }
 
   public isTimeout(error: any): boolean {
@@ -32,7 +32,7 @@ export class ErrorHandlerService {
 
   private logErrorDetails(timestamp: number, error: any): void {
     const x: any = !!this.planModel?.fundingPlanDto ? this.planModel.fundingPlanDto : this.requestModel.requestDto;
-    this.logger.logErrorWithContext('New error recorded', { timestamp, error, x });
+    this.logger.error('New error recorded', { timestamp, error, x });
     const userId: string = this.userService.currentUserValue.nihNetworkId;
     this.logger.debug(`=========== ERROR DETAILS ===========`);
     this.logger.debug(`== User/Timestamp: ${userId}/${timestamp}`);

@@ -3,7 +3,6 @@ import {Router} from '@angular/router';
 import {NavigationStepModel} from 'src/app/funding-request/step-indicator/navigation-step.model';
 import {NgForm} from '@angular/forms';
 import {PlanModel} from '../../model/plan/plan-model';
-import {CustomServerLoggingService} from '@cbiit/i2ecui-lib';
 import {PlanManagementService} from '../service/plan-management.service';
 import {FsPlanControllerService, FundingPlanFoasDto, FundingRequestCanDto, FundingRequestDto} from '@cbiit/i2efsws-lib';
 import {
@@ -55,7 +54,6 @@ export class PlanStep3Component implements OnInit {
   constructor(private navigationModel: NavigationStepModel,
               private router: Router,
               private logger: NGXLogger,
-              private customLogger: CustomServerLoggingService,
               public planModel: PlanModel,
               private pdCaIntegratorService: PdCaIntegratorService,
               private planManagementService: PlanManagementService,
@@ -174,7 +172,7 @@ export class PlanStep3Component implements OnInit {
       }
       this.router.navigate([this.nextStep]);
     }, error => {
-      this.customLogger.logErrorWithContext(error.error);
+      this.logger.error(error.error);
       this.alerts = [{
         type: 'danger',
         message: error.error?.errorMessage || 'Something unexpected went wrong. Technical support has been notified.'

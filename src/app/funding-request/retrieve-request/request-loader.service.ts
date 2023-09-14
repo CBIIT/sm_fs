@@ -3,8 +3,8 @@ import { FsRequestControllerService } from '@cbiit/i2efsws-lib';
 import { RequestModel } from '../../model/request/request-model';
 import { ConversionActivityCodes } from '../../type4-conversion-mechanism/conversion-activity-codes';
 import { CanManagementService } from '../../cans/can-management.service';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 import { FundingRequestIntegrationService } from '../integration/integration.service';
+import { NGXLogger } from "ngx-logger";
 
 export type SuccessFunction = () => void;
 export type ErrorFunction = (s: string) => void;
@@ -16,7 +16,7 @@ export class RequestLoaderService {
   error: string;
 
   constructor(
-    private logger: CustomServerLoggingService,
+    private logger: NGXLogger,
     private requestService: FsRequestControllerService,
     private canManagementService: CanManagementService,
     private integrationService: FundingRequestIntegrationService,
@@ -101,7 +101,7 @@ export class RequestLoaderService {
         });
       },
       (error) => {
-        this.logger.logErrorWithContext(`loadRequest(${frqId} failed`, error);
+        this.logger.error(`loadRequest(${frqId} failed`, error);
         if (errorFn) {
           errorFn(error);
         }

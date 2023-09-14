@@ -5,7 +5,6 @@ import { NciPfrGrantQueryDtoEx, orderByPriorityAndPI } from './nci-pfr-grant-que
 import { RfaPaNcabDate } from '@cbiit/i2efsws-lib/model/rfaPaNcabDate';
 import { NGXLogger } from 'ngx-logger';
 import { Alert } from 'src/app/alert-billboard/alert';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
 
 @Injectable({
   providedIn: 'root'
@@ -37,8 +36,7 @@ export class PlanModel {
   pendingAlerts: Alert[] = [];
 
   constructor(private propertiesService: AppPropertiesService,
-              private logger: NGXLogger,
-              private customLogger: CustomServerLoggingService) {
+              private logger: NGXLogger) {
   }
 
   initializeProperties(): void {
@@ -46,7 +44,7 @@ export class PlanModel {
     this.yourgrantsUrl = this.propertiesService.getProperty('URL_YOURGRANTS');
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
     this.catsConceptUrl = this.propertiesService.getProperty('CONCEPT_ID_URL');
-    this.customLogger.info(`Properties in PlanModel: ${this.grantViewerUrl}, ${this.yourgrantsUrl}, ${this.eGrantsUrl}, ${this.catsConceptUrl}`);
+    this.logger.info(`Properties in PlanModel: ${this.grantViewerUrl}, ${this.yourgrantsUrl}, ${this.eGrantsUrl}, ${this.catsConceptUrl}`);
 
   }
 
@@ -143,7 +141,6 @@ export class PlanModel {
   isCanSelected(fseId: number): boolean {
     let result = false;
 
-    // @ts-ignore
     this.selectedApplIdCans.forEach((v, k) => {
       if (v) {
         // this.logger.debug(`${fseId}, ${k}, ${k.startsWith(String(fseId))}`);

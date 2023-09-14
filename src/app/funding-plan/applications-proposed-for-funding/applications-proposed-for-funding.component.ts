@@ -16,7 +16,7 @@ import { FundingReqBudgetsDto } from '@cbiit/i2efsws-lib';
 import { FundingSourceEntryModalComponent } from './funding-source-entry-modal/funding-source-entry-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSourceGrantDataPayload } from './funding-source-grant-data-payload';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
+import { NGXLogger } from "ngx-logger";
 
 @Component({
   selector: 'app-applications-proposed-for-funding',
@@ -46,7 +46,7 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   private _budgetMap: Map<number, Map<number, FundingReqBudgetsDto>>;
   pendingValues: PendingPrcValues;
 
-  constructor(private logger: CustomServerLoggingService,
+  constructor(private logger: NGXLogger,
               public planModel: PlanModel,
               public planManagementService: PlanManagementService,
               private modalService: NgbModal,
@@ -144,7 +144,6 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
   }
 
   onAddFundingSource(): void {
-    let hasErrors = false;
     // this.logger.debug('onAddFundingSource()', this.getNextSourceIndex);
     const nextSource = this.getNextSourceIndex;
     this.beforeAddFundingSource.next(nextSource);

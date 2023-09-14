@@ -13,6 +13,7 @@ import {
   ChangeUserInterceptor,
   GwbLinksService,
   I2ecuiLibModule,
+  CustomLoggerMetadataService,
   INSERT_CHANGE_USER_HEADER,
   INSERT_CHANGE_USER_PARAM,
   DEBUG_CHANGE_USER,
@@ -61,7 +62,7 @@ import {
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FundingSourcesNamesComponent } from './funding-sources-names/funding-sources-names.component';
 import { FinalLoaComponent } from './final-loa/final-loa.component';
-import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
+import { LoggerModule, NgxLoggerLevel, TOKEN_LOGGER_METADATA_SERVICE } from "ngx-logger";
 import { SkippedGrantsComponent } from './skipped-grants/skipped-grants.component';
 import { FooterComponent } from './footer/footer.component';
 import { DiversitySupplementComponent } from './diversity-supplement/diversity-supplement.component';
@@ -444,9 +445,11 @@ export function megaInitializer(
     DataTablesModule,
     DragDropModule,
     LoggerModule.forRoot({
-      serverLoggingUrl: '/i2ecommonws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.INFO,
-      enableSourceMaps: true
-    }),
+      serverLoggingUrl: '/i2ecommonws/api/v1/logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.INFO, enableSourceMaps: true },
+      {
+        metadataProvider: { provide: TOKEN_LOGGER_METADATA_SERVICE, useClass: CustomLoggerMetadataService },
+      }
+    ),
     CookieModule.forRoot()
   ],
   providers: [RequestModel, PlanModel, PercentPipe,

@@ -13,7 +13,7 @@ import { openNewWindow } from '../../../utils/utils';
 import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 import { PlanManagementService } from '../../service/plan-management.service';
 import { FundingSourceGrantDataPayload } from '../funding-source-grant-data-payload';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
+import { NGXLogger } from "ngx-logger";
 
 @Component({
   selector: 'app-funding-source-entry-modal',
@@ -33,7 +33,7 @@ export class FundingSourceEntryModalComponent implements OnInit {
   constructor(
     public modal: NgbActiveModal,
     private planModel: PlanModel,
-    private logger: CustomServerLoggingService,
+    private logger: NGXLogger,
     private router: Router,
     public planManagementService: PlanManagementService) {
   }

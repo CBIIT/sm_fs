@@ -6,8 +6,9 @@ import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
 import { jsonStringifyRecursive, openNewWindow } from '../utils/utils';
 import { Location } from '@angular/common';
-import { CustomServerLoggingService, HeartbeatService } from '@cbiit/i2ecui-lib';
+import { HeartbeatService } from '@cbiit/i2ecui-lib';
 import { v4 as uuidv4 } from 'uuid';
+import { NGXLogger } from "ngx-logger";
 
 export const DEBUG_ERROR_INTERCEPTOR = new InjectionToken<boolean>('debugMode', {
   providedIn: 'root',
@@ -26,7 +27,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     private router: Router,
     private location: Location,
     private initializerStatus: ApplicationInitStatus,
-    private logger: CustomServerLoggingService,
+    private logger: NGXLogger,
     private heartbeatService: HeartbeatService,
     @Inject(DEBUG_ERROR_INTERCEPTOR) private debugMode: boolean
   ) {

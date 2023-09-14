@@ -3,7 +3,7 @@ import { CanCcxDto } from '@cbiit/i2efsws-lib';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CanManagementService } from '../can-management.service';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
+import { NGXLogger } from "ngx-logger";
 
 @Component({
   selector: 'app-can-search-modal',
@@ -22,7 +22,7 @@ export class CanSearchModalComponent implements OnInit {
   canSearchTerm: string;
 
   constructor(
-    private logger: CustomServerLoggingService,
+    private logger: NGXLogger,
     private modalService: NgbModal,
     private canManagementService: CanManagementService) {
   }

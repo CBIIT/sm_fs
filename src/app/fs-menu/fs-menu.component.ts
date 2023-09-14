@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AppUserSessionService } from '../service/app-user-session.service';
 import { PaylistControllerService } from '@cbiit/i2efsws-lib';
 import { roleNames } from '../service/role-names';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
+import { NGXLogger } from "ngx-logger";
 
 @Component({
   selector: 'app-fs-menu',
@@ -27,7 +27,7 @@ export class FsMenuComponent implements OnInit {
   constructor(
     private userSessionService: AppUserSessionService,
     private paylistControllerService: PaylistControllerService,
-    private logger: CustomServerLoggingService) {
+    private logger: NGXLogger) {
   }
 
   ngOnInit(): void {
@@ -49,7 +49,7 @@ export class FsMenuComponent implements OnInit {
         this.pendingGrantsCount = result;
       },
       (error) => {
-        this.logger.logErrorWithContext('retrieveFundingRequest failed ', error);
+        this.logger.error('retrieveFundingRequest failed ', error);
       }
     );
   }

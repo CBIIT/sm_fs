@@ -1,7 +1,7 @@
 import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 import { PrcDataPoint } from './prc-data-point';
 import { GrantAwardedDto } from '@cbiit/i2efsws-lib/model/grantAwardedDto';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
+import { NGXLogger } from "ngx-logger";
 
 // @Injectable({
 //   providedIn: 'root'
@@ -47,7 +47,7 @@ export class ProgramRecommendedCostsModel {
     this.grantAwarded = undefined;
   }
 
-  constructor(private logger: CustomServerLoggingService) {
+  constructor(private logger: NGXLogger) {
   }
 
   get selectedFundingSourceIds(): Set<number> {

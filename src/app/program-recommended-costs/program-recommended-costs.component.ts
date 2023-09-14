@@ -267,6 +267,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   }
 
   editSource(i: number): void {
+    this.logger.debug(`edit source ${i}`);
     this.isPercentSelected();
     this.locked = false;
     const edit = this.requestModel.programRecommendedCostsModel.selectedFundingSources[i];

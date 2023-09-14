@@ -4,12 +4,12 @@ import { ErrorFunction, SuccessFunction } from '../../funding-request/retrieve-r
 import { NciPfrGrantQueryDtoEx } from '../../model/plan/nci-pfr-grant-query-dto-ex';
 import { PlanManagementService } from '../service/plan-management.service';
 import { FsPlanControllerService } from '@cbiit/i2efsws-lib';
-import { CustomServerLoggingService } from '@cbiit/i2ecui-lib';
+import { NGXLogger } from "ngx-logger";
 
 @Injectable({ providedIn: 'root' })
 export class PlanLoaderService {
   constructor(
-    private logger: CustomServerLoggingService,
+    private logger: NGXLogger,
     private planModel: PlanModel,
     private planManagementService: PlanManagementService,
     private planService: FsPlanControllerService) {
@@ -51,7 +51,7 @@ export class PlanLoaderService {
         }
       },
       (error) => {
-        this.logger.logErrorWithContext(`loadPlan(${fprId}) failed`, error);
+        this.logger.error(`loadPlan(${fprId}) failed`, error);
         if (errorFn) {
           errorFn(error);
         }
