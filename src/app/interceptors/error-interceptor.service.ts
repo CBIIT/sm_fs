@@ -15,7 +15,9 @@ export const DEBUG_ERROR_INTERCEPTOR = new InjectionToken<boolean>('debugMode', 
   factory: () => false,
 });
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class ErrorInterceptor implements HttpInterceptor {
   private modalWindow: any;
   private handled401 = false;
@@ -169,6 +171,8 @@ export class ErrorInterceptor implements HttpInterceptor {
     this.logger.debug(`Error URL: ${error.url}`);
     this.logger.debug(`Request URL: ${req.url}`);
     this.logger.debug(`Error Status: ${error.status}`);
+    this.logger.debug(`UUID: ${this.myUUID}`);
+    this.logger.debug(`Handling error: ${this.handlingError}`);
     this.logger.debug('--end error summary---------------------------------------------------------');
 
     this.logger.debug('--error details-------------------------------------------------------------');

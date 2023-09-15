@@ -93,7 +93,7 @@
               ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": {"scripts": true},
+              "sourceMap": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,

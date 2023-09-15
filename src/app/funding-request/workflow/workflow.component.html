@@ -1,10 +1,10 @@
-<app-approved-costs *ngIf="showApprovedCosts()" 
+<app-approved-costs *ngIf="showApprovedCosts()"
     [approvingState]="approvingState" id="workflow-approved-cost">
 </app-approved-costs>
 <ng-content>
-    
+
 </ng-content>
-<app-gm-info *ngIf="showGmInfo()" 
+<app-gm-info *ngIf="showGmInfo()"
     [approvingState]="approvingState" id="workflow-grant-management">
 </app-gm-info>
 <div class="row">
@@ -14,7 +14,7 @@
         aria-expanded="true" aria-controls="workflow-collapse"></a>
     </div>
 </div>
-  
+
 <div class="row collapse show" id="workflow-collapse">
 
     <div class="col-12" *ngIf="isApprover() && requestStatus && requestStatus.comments">
@@ -59,23 +59,23 @@
             <div class="text-danger mt-1" *ngIf="(validationError?.approver_missing)">
                 New approver is required
             </div>
-        </div>  
+        </div>
     </div>
     <div class="col-md-4" *ngIf="showCreateType">
         <app-create-type></app-create-type>
     </div>
     <div class="col-12"  *ngIf="showBudgetDocWarning">
         <ngb-alert type="warning" [dismissible]="false">
-            <b>WARNING:</b> If the uploaded budget document(s) are not in eGrants, 
-            please send the document(s) to the appropriate Grants Management Specialist to 
+            <b>WARNING:</b> If the uploaded budget document(s) are not in eGrants,
+            please send the document(s) to the appropriate Grants Management Specialist to
             add it the grant file in eGrants.
         </ngb-alert>
-    </div> 
+    </div>
     <div class="col-12"  *ngIf="workflowStuckBy">
         <ng-container *ngIf="workflowStuckBy === 'ByCompletedPfrs'">
         <ngb-alert type="danger" [dismissible]="false" *ngFor="let r of completedPfrs">
-            This Grant application is part of Funding Plan 
-            <a [routerLink]="" (click)="retrievePlan(r.fprId)">{{r.fprId}}</a> in FY {{r.planFy}}.  
+            This Grant application is part of Funding Plan
+            <a [routerLink]="" (click)="retrievePlan(r.fprId)">{{r.fprId}}</a> in FY {{r.planFy}}.
             The selected action cannot be processed.
         </ngb-alert>
         </ng-container>
@@ -91,23 +91,23 @@
             </span>
             <span class="character-counter">{{comments.length}}/2000</span>
         </div>
-        
+
     </div>
 
 </div><!-- END Row Collapse -->
 
-<div class="row">  
+<div class="row">
     <div class="col-12"  *ngIf="alert">
         <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
-    </div> 
+    </div>
     <div class="col-12 d-flex mb-4" >
-        <button class="btn btn-primary ml-auto" (click)="submitWorkflow()" *ngIf="isApprover() && !buttonDisabled" [disabled]="disableWorkflowButton">
+        <button class="btn btn-primary ml-auto" (click)="submitWorkflow($event)" *ngIf="isApprover() && !buttonDisabled" [disabled]="disableWorkflowButton">
             {{buttonLabel}}
         </button>
         <span class="ml-auto" *ngIf="isApprover() && buttonDisabled" ngbTooltip="Select a workflow action to enable this button.">
                 <button class="btn btn-primary" disabled> {{buttonLabel}}</button>
         </span>
-        
+
     </div>
 </div>
 <app-workflow-warning-modal></app-workflow-warning-modal>

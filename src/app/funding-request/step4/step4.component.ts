@@ -64,12 +64,11 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   justificationType = '';
   justificationText = '';
   transitionMemoMissing = false;
-  closeResult: string;
   _workFlowAction = '';
 
   userCanSubmitApprove = false;
   inflightPlan: FundingPlanDto;
-  disableSubmit:boolean = false;
+  disableSubmit = false;
 
   get displayReadOnlyBudgetDocs(): boolean {
     return this.requestModel.requestDto.budgetDocs?.length > 0;
@@ -266,21 +265,22 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
 
   deleteRequest(): void {
     if (confirm('Are you sure you want to delete this request?')) {
-      this.logger.debug('Call deleteRequest API for FRQ ID: ', this.model.requestDto.frqId);
+      this.logger.info('Call deleteRequest API for FRQ ID: ', this.model.requestDto.frqId);
       this.fsRequestService.deleteRequest(this.model.requestDto.frqId).subscribe(
         result => {
-          this.logger.debug('Funding request was deleted: ', result);
+          this.logger.info(`Funding request was deleted: ${JSON.stringify(result)}`);
           this.requestModel.reset();
           this.router.navigate(['/search']);
         },
         error => {
-          this.logger.error('Error when calling delelteRequest API ', error);
+          this.logger.error(`Error when calling deleteRequest API ${JSON.stringify(error)}`);
         }
       );
     }
   }
 
   submitRequest(): void {
+    this.logger.info(`Submit request clicked for request ${this.requestModel.requestDto.frqId}`)
     this.disableSubmit = true;
     this.loaderService.show();
     this.cancerActivityService.getActiveReferralCaAssignRules('Y').subscribe(
