@@ -390,18 +390,19 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       && this.workflowModel.isApprovalAction(action)
       && !this.requestModel.isSkip() ) {
       dto.gmInfo = this.gmInfoComponent?.getGmInfo();
+      this.logger.info(`GM approver: setting gmInfo for frqId#${this.requestModel.requestDto.frqId}`);
     }
 
-    this.logger.debug('workflow dto for submission is ', dto);
+    this.logger.info(`Workflow dto for submission: ${JSON.stringify(dto)}`);
     this.workflowService.submitWorkflow(dto).subscribe(
       (result) => {
-        this.logger.debug('submit workflow returned okay ', result);
+        this.logger.info(`Submit workflow for frqId#${this.requestModel.requestDto.frqId} returned success`);
         this.workflowModel.initialize();
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
       },
       (error) => {
-        this.logger.error('submit workflow returned error', error);
+        this.logger.error(`submit workflow for frqId#${this.requestModel.requestDto.frqId} returned error: ${JSON.stringify(error)}`);
         this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       }
     );
