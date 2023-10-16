@@ -18,7 +18,6 @@ import {FundingRequestTypes} from '../../model/request/funding-request-types';
 import {FundingRequestFundsSrcDto} from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 import {FundingReqBudgetsDto} from '@cbiit/i2efsws-lib/model/fundingReqBudgetsDto';
 import {AppUserSessionService} from '../../service/app-user-session.service';
-import {CanManagementService} from '../../cans/can-management.service';
 import {Alert} from '../../alert-billboard/alert';
 import {FundingSourceGrantDataPayload} from '../applications-proposed-for-funding/funding-source-grant-data-payload';
 import {NGXLogger} from 'ngx-logger';
@@ -68,6 +67,7 @@ export class PlanStep3Component implements OnInit {
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
       if (next.channel === this.sharedChannel) {
         this.cayCode = typeof next.cayCode === 'string' ? next.cayCode : next.cayCode[0];
+        this.logger.info(`new cayCode: ${this.cayCode}`);
         this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
       }
     });
@@ -75,6 +75,7 @@ export class PlanStep3Component implements OnInit {
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
       if (next.channel === this.sharedChannel) {
         this.pdNpnId = next.pdId;
+        this.logger.info(`new pdNpnId: ${this.pdNpnId}`);
         this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
       }
     });

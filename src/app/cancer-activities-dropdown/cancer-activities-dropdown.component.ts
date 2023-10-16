@@ -47,6 +47,7 @@ export class CancerActivitiesDropdownComponent implements OnInit {
 
   set npnId(value: number) {
     this._npnId = value;
+    this.logger.info(`Setting npnId to ${value} - refresh CAs`);
     this.updateDropdown();
     this.npnIdChange.emit(value);
   }
@@ -71,6 +72,7 @@ export class CancerActivitiesDropdownComponent implements OnInit {
   }
 
   set selectedValue(values: string[] | string) {
+
     this._selectedValue = Array.isArray(values) && values.length === 0 ? null : values;
     this.selectedValueChange.emit(this._selectedValue);
     if (this.broadcast) {
@@ -116,10 +118,12 @@ export class CancerActivitiesDropdownComponent implements OnInit {
           } else {
             this._npnId = -1;
           }
+          this.logger.info('new PD');
           this.updateDropdown();
         }
       });
     } else {
+      this.logger.info('no sync with PD');
       this.updateDropdown();
     }
 
@@ -128,40 +132,11 @@ export class CancerActivitiesDropdownComponent implements OnInit {
         result.forEach((element) => {
           this.caDocs[element.code] = element.nonAbbreviation;
         });
+        this.logger.info('getDocsAndCayCodes subcription');
         this.updateDropdown();
       },
       error => {
         console.error('Error when calling getDocANdCayCodes ', error);
-      });
-    this.pdCaIntegratorService.docEmitter.subscribe((doc) => {
-      if(doc.channel === PD_CA_DEFAULT_CHANNEL) {
-        if (doc && doc.doc && doc.eventType && doc.eventType !== "CA_EVENT") {
-          this.hasDoc = true;
-          this.getCasForDoc(doc.doc);
-        } else {
-          if(doc.eventType === "DOC_EVENT") {
-              this.hasDoc = false;
-          }
-          this.updateDropdown();
-        }
-      }
-    });
-  }
-  private getCasForDoc(docs: any) {
-    docs = typeof docs === 'string' ? [docs] : docs
-    forkJoin(docs.map(doc => this.caService.getCasForDoc(doc))).pipe(
-      map(res => [].concat(...res))
-    ).subscribe(
-      (result: any) => {
-        result.forEach(element => {
-          element.abbreviation = element.nonAbbreviation ? element.nonAbbreviation : '';
-          element.referralDescription = (element.code ? element.code + '-' : '') + element.cayDescription +
-            (element.nonAbbreviation ? ' (' + element.nonAbbreviation + ')' : '');
-        });
-        this.cancerActivities = this.prune(result);
-      },
-      error => {
-        console.error('Error when calling getCasForDoc ', error);
       });
   }
   private updateDropdown(): void {
@@ -222,6 +197,7 @@ export class CancerActivitiesDropdownComponent implements OnInit {
       if(this.debug) {
         this.logger.info(`getCasForPd(${this._npnId}, ${this.monitorFlag})`);
       }
+      this.logger.info(`getCasForPd(${this._npnId}, ${this.monitorFlag})`);
       return this.caService.getCasForPd(this._npnId, this.monitorFlag);
     }
   }
