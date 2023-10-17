@@ -79,7 +79,7 @@ export class FpFundingSourceComponent implements OnInit {
     });
     this.rfaPaNumber = this.allRfaPaNumbers[0];
     this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
-      this.logger.info(`funding source values changed ${next.pd} - ${next.ca}`);
+      this.logger.debug(`funding source values changed ${next.pd} - ${next.ca}`);
       this.refreshSources(next.pd, next.ca);
     });
 

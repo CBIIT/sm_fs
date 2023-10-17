@@ -118,12 +118,13 @@ export class CancerActivitiesDropdownComponent implements OnInit {
           } else {
             this._npnId = -1;
           }
-          this.logger.info('new PD');
           this.updateDropdown();
         }
       });
     } else {
-      this.logger.info('no sync with PD');
+      if(this.debug) {
+        this.logger.info('Not syncing with PD');
+      }
       this.updateDropdown();
     }
 
@@ -132,13 +133,13 @@ export class CancerActivitiesDropdownComponent implements OnInit {
         result.forEach((element) => {
           this.caDocs[element.code] = element.nonAbbreviation;
         });
-        this.logger.info('getDocsAndCayCodes subcription');
         this.updateDropdown();
       },
       error => {
-        console.error('Error when calling getDocANdCayCodes ', error);
+        console.error('Error when calling getDocAndCayCodes ', error);
       });
   }
+
   private updateDropdown(): void {
     this.pdCaIntegratorService.cayCodeLoadingEmitter.next({channel: this.channel, initialized: false});
     this.evoke().subscribe(
@@ -172,6 +173,7 @@ export class CancerActivitiesDropdownComponent implements OnInit {
         this.pdCaIntegratorService.cayCodeLoadingEmitter.next({channel: this.channel, initialized: true});
 
       }, error => {
+        this.logger.error('Error updating cayCode dropdown', error);
         console.error('HttpClient get request error for----- ' + error.message);
       });
   }
@@ -192,12 +194,14 @@ export class CancerActivitiesDropdownComponent implements OnInit {
 
   evoke(): any {
     if (this._npnId === -1) {
+      if(this.debug) {
+        this.logger.info(`allActiveCas(${this.activeOnly})`);
+      }
       return this.caService.getAllActiveCaList(this.activeOnly);
     } else {
       if(this.debug) {
         this.logger.info(`getCasForPd(${this._npnId}, ${this.monitorFlag})`);
       }
-      this.logger.info(`getCasForPd(${this._npnId}, ${this.monitorFlag})`);
       return this.caService.getCasForPd(this._npnId, this.monitorFlag);
     }
   }
