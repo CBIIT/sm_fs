@@ -43,34 +43,34 @@ export class Step3Component implements OnInit {
 
   public DocTypes: Observable<Array<CgRefCodesDto>>;
   public options: Options;
-  public _selectedDocType: string = '';
-  public _docDescription: string = '';
+  public _selectedDocType = '';
+  public _docDescription = '';
   justificationUploaded?: Observable<boolean>;
   transitionMemoUploaded?: Observable<boolean>;
-  displayTansitionMemo: boolean = false;
-  isTransitionMemoRequired: boolean = false;
-  disableJustification: boolean = false;
-  disableFile: boolean = true;
+  displayTansitionMemo = false;
+  isTransitionMemoRequired = false;
+  disableJustification = false;
+  disableFile = true;
   _docOrderDto: FundingRequestDocOrderDto = {};
   _docOrderDtos: FundingRequestDocOrderDto[] = [];
-  showJustification: boolean = false;
-  showSuppApplications: boolean = false;
+  showJustification = false;
+  showSuppApplications = false;
   baseTaskList: Observable<DocumentsDto[]>;
   include: Observable<DocumentsDto[]>;
   swimlanes: Swimlane[] = [];
   selectedFiles: FileList;
-  justificationType: string = '';
-  justificationEnteredBy: string = '';
-  justificationEnteredByEmail: string = '';
-  justificationFileName: string = '';
+  justificationType = '';
+  justificationEnteredBy = '';
+  justificationEnteredByEmail = '';
+  justificationFileName = '';
   justificationUploadedOn: Date = new Date();
   justificationEnteredByEmit = new BehaviorSubject<string>(this.justificationEnteredBy);
   justificationEnteredByEmailEmit = new BehaviorSubject<string>(this.justificationEnteredByEmail);
   justificationUploadedOnEmit = new BehaviorSubject<string>(this.justificationUploadedOn.toString());
 
-  transitionMemoEnteredBy: string = '';
-  transitionMemoEnteredByEmail: string = '';
-  transitionMemoFileName: string = '';
+  transitionMemoEnteredBy = '';
+  transitionMemoEnteredByEmail = '';
+  transitionMemoFileName = '';
   transitionMemoUploadedOn: Date = new Date();
   transitionMemoEnteredByEmit = new BehaviorSubject<string>(this.transitionMemoEnteredBy);
   transitionMemoEnteredByEmailEmit = new BehaviorSubject<string>(this.transitionMemoEnteredByEmail);
@@ -78,20 +78,20 @@ export class Step3Component implements OnInit {
 
   justificationId: number;
   transitionMemoId: number;
-  justificationText: string = '';
+  justificationText = '';
   _docType: CgRefCodesDto = {};
   closeResult: string;
-  maxFileSize: number = 10485760; //10MB
+  maxFileSize = 10485760; //10MB
   maxFileSizeError: string;
   public _docDto: DocumentsDto = {};
-  otherDocsCount: number = 0;
-  showValidations: boolean = false;
-  isFileSelected: boolean = false;
-  isJustificationEntered: boolean = false;
-  isTypeSelected: boolean = false;
+  otherDocsCount = 0;
+  showValidations = false;
+  isFileSelected = false;
+  isJustificationEntered = false;
+  isTypeSelected = false;
   applAdminSuppRoutingsDtos: ApplAdminSuppRoutingsDto[] = [];
-  disableAddDocButton: boolean = true;
-  isSSDocOrderCreated: boolean = false;
+  disableAddDocButton = true;
+  isSSDocOrderCreated = false;
 
 
   @ViewChild('inputFile')
@@ -181,9 +181,10 @@ export class Step3Component implements OnInit {
       if (this.requestModel.requestDto.justificationCreateNpnId) {
         this.userControllerService.findByNpnId(this.requestModel.requestDto.justificationCreateNpnId).subscribe(
           result => {
-            this.requestModel.requestDto.justificationCreateByFullName = result.fullNameLF;
+            this.logger.info('Justification entered by: ', JSON.stringify(result));
+            this.requestModel.requestDto.justificationCreateByFullName = result.i2eFullNameLF || result.fullNameLF;
             this.requestModel.requestDto.justificationCreateByEmailAddress = result.emailAddress;
-            this.justificationEnteredBy = result.fullNameLF;
+            this.justificationEnteredBy = result.i2eFullNameLF || result.fullNameLF;
             this.justificationEnteredByEmail = result.emailAddress;
             this.justificationUploadedOn = this.requestModel.requestDto.justificationCreateDate;
             this.justificationEnteredByEmit.next(this.justificationEnteredBy);
@@ -194,9 +195,7 @@ export class Step3Component implements OnInit {
             this.logger.error('HttpClient get request error for----- ' + error.message);
           });
       }
-
     }
-
   }
 
   format(date: Date, format: string): string {
@@ -206,16 +205,18 @@ export class Step3Component implements OnInit {
 
   loadSuppApps() {
     this.fsRequestControllerService.retrieveAdminSuppRoutings(this.requestModel.grant.applId).subscribe(
-      result => {
+      (result) => {
         this.applAdminSuppRoutingsDtos = result;
-      }, error => {
+      },
+      (error) => {
         this.logger.error('HttpClient get request error for----- ' + error.message);
-      });
+      }
+    );
   }
 
 
   isSupplementAction() {
-    var isSuppAction: boolean = false;
+    let isSuppAction = false;
     if (this.requestModel.requestDto.requestType === 'Pay Type 4') {
       isSuppAction = true;
 
@@ -290,7 +291,7 @@ export class Step3Component implements OnInit {
   }
 
   uploadJustificationText(justification: string) {
-    let reqDto: FundingRequestDto = {};
+    const reqDto: FundingRequestDto = {};
     reqDto.frqId = this.requestModel.requestDto.frqId;
     reqDto.justification = justification;
     this.fsRequestControllerService.updateJustification(reqDto).subscribe(
@@ -311,7 +312,7 @@ export class Step3Component implements OnInit {
         this.justificationUploadedOnEmit.next(this.format(this.justificationUploadedOn, 'MM/dd/yyyy'));
 
         //Inserting doc order
-        let docDto: DocumentsDto = {};
+        const docDto: DocumentsDto = {};
         docDto.docType = 'Justification';
         docDto.keyId = this.requestModel.requestDto.frqId;
         docDto.keyType = 'PFR';
@@ -453,7 +454,7 @@ export class Step3Component implements OnInit {
 
   private createSSDocOrder() {
     if (!this.isSSDocOrderCreated) {
-      let docDto: DocumentsDto = {};
+      const docDto: DocumentsDto = {};
       docDto.docType = DocTypeConstants.SUMMARY_STATEMENT;
       docDto.keyId = this.requestModel.requestDto.frqId;
       docDto.keyType = 'PFR';
@@ -547,7 +548,7 @@ export class Step3Component implements OnInit {
       this.documentService.downloadById(id)
         .subscribe(
           (response: HttpResponse<Blob>) => {
-            let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+            const blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
             saveAs(blob, fileName);
           }
         );
@@ -558,7 +559,7 @@ export class Step3Component implements OnInit {
     this.documentService.downloadFrqCoverSheet(this.requestModel.requestDto.frqId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          const blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
           saveAs(blob, 'Cover Page.pdf');
         }
       );
@@ -568,7 +569,7 @@ export class Step3Component implements OnInit {
     this.documentService.downloadFrqSummaryStatement(this.requestModel.grant.applId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          const blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
           saveAs(blob, 'Summary Statement.pdf');
         }
       ), error =>
@@ -638,9 +639,9 @@ export class Step3Component implements OnInit {
     if (docType === 'Other') {
       this.otherDocsCount--;
     }
-    var docTypeDto: CgRefCodesDto = {};
+    const docTypeDto: CgRefCodesDto = {};
     docTypeDto.rvLowValue = docType;
-    var isDocTypeExists: boolean = false;
+    let isDocTypeExists = false;
     this.DocTypes.forEach(element => {
       element.forEach(e => {
         if (e.rvLowValue === docType) {
@@ -665,7 +666,7 @@ export class Step3Component implements OnInit {
       this.requestModel.grant.applId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          const blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
           saveAs(blob, 'Package.pdf');
         }
       ), error =>
@@ -846,7 +847,7 @@ export class Step3Component implements OnInit {
     this.documentService.downloadSupplementAppDoc(suppApplId)
       .subscribe(
         (response: HttpResponse<Blob>) => {
-          let blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
+          const blob = new Blob([response.body], { 'type': response.headers.get('content-type') });
           saveAs(blob, response.headers.get('filename'));
         }
       );
