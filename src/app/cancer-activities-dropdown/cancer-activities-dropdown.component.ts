@@ -107,6 +107,14 @@ export class CancerActivitiesDropdownComponent implements OnInit {
     }
 
     if (this.syncWithPd) {
+      this.pdCaIntegratorService.pdLoadingEmitter.subscribe(next => {
+        if(next.channel === this.channel && next.initialized) {
+          if(this.debug) {
+            this.logger.info('PD Loading complete: update dropdown()');
+          }
+          this.updateDropdown();
+        }
+      });
       this.pdCaIntegratorService.pdValueEmitter.subscribe(payload => {
         if (payload.channel === this.channel) {
           if(this.debug) {
