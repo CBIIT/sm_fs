@@ -5,8 +5,8 @@
 module.exports = {
     '/i2earaws': {
     // target: 'http://localhost:8081',
-    target: 'http://ncias-d1982-v:16080/',
-    // target: 'http://ncias-q1990-v:16080/',
+    // target: 'http://ncias-d1982-v:16080/',
+    target: 'http://ncias-q1990-v:16080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
@@ -16,8 +16,8 @@ module.exports = {
   },
   '/i2ecommonws': {
     // target: 'http://localhost:8080/',
-    target: 'http://ncias-d1982-v:14080/',
-    // target: 'http://ncias-q1990-v:14080/',
+    // target: 'http://ncias-d1982-v:14080/',
+    target: 'http://ncias-q1990-v:14080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {

@@ -6,8 +6,6 @@ import { CancerActivitiesDto, CancerActivityControllerService } from "@cbiit/i2e
 import { isNumeric } from "rxjs/internal-compatibility";
 import { PD_CA_DEFAULT_CHANNEL, PdCaIntegratorService } from "../service/pd-ca-integrator.service";
 import { NGXLogger } from "ngx-logger";
-import { forkJoin } from 'rxjs';
-import { map } from 'rxjs/operators';
 @Component({
   selector: 'app-cancer-activities-dropdown',
   templateUrl: './cancer-activities-dropdown.component.html',
@@ -35,8 +33,6 @@ export class CancerActivitiesDropdownComponent implements OnInit {
   @Input() lockedOptions: string[] = [];
   @Input() channel = PD_CA_DEFAULT_CHANNEL;
   private caDocs = [];
-  selectedDOC: string = null;
-  hasDoc: boolean = false;
 
   @Input()
   get npnId(): number {
@@ -59,20 +55,7 @@ export class CancerActivitiesDropdownComponent implements OnInit {
 
   @Output() selectedValueChange = new EventEmitter<string[] | string>();
 
-  validateSelections(value: string[] | string): boolean {
-    if (this.lockedOptions.length === 0 || !value || value.length === 0) {
-      return true;
-    }
-
-    if (typeof value === 'string') {
-      return this.lockedOptions.includes(value);
-    }
-
-    return value.every(v => this.lockedOptions.includes(v));
-  }
-
   set selectedValue(values: string[] | string) {
-
     this._selectedValue = Array.isArray(values) && values.length === 0 ? null : values;
     this.selectedValueChange.emit(this._selectedValue);
     if (this.broadcast) {
@@ -157,9 +140,7 @@ export class CancerActivitiesDropdownComponent implements OnInit {
           element.referralDescription = element.referralDescription +
             (this.caDocs[element.code] ? ' (' + this.caDocs[element.code] + ')' : '');
         });
-        if(!this.hasDoc) {
-          this.cancerActivities = this.prune(result);
-        }
+        this.cancerActivities = this.prune(result);
         if (this.lockedOptions.length !== 0) {
           this.selectedValue = this.lockedOptions;
         }
