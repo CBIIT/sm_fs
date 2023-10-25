@@ -76,7 +76,7 @@ export class OtherDocsContributingFundsComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeDocs();
-    this.pdCaIntegratorSvc.docEmitter.subscribe(next => {
+    this.pdCaIntegratorSvc. docEmitter.subscribe(next => {
       if (next && next.channel === this.channel) {
         this.pdDoc = next.doc;
         if (this.selectedDocsArr.map(d => d.abbreviation).includes(next.doc)) {

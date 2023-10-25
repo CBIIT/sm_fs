@@ -71,6 +71,15 @@ export class FpFundingSourceComponent implements OnInit {
     this.init(pd, ca);
   }
 
+  private last: { pd: number, ca: string };
+
+  private newPdOrCa(next: { pd: number, ca: string }): boolean {
+    if(!this.last) {
+      return true;
+    }
+    return this.last.pd !== next.pd || this.last.ca !== next.ca;
+  }
+
   public init(pd: number, ca: string): void {
     this.allRfaPaNumbers = [];
     this.fy = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
@@ -79,8 +88,11 @@ export class FpFundingSourceComponent implements OnInit {
     });
     this.rfaPaNumber = this.allRfaPaNumbers[0];
     this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
-      this.logger.debug(`funding source values changed ${next.pd} - ${next.ca}`);
-      this.refreshSources(next.pd, next.ca);
+      if(this.newPdOrCa(next)) {
+        this.logger.debug(`funding source values changed --> ${this.last?.pd || 'NA'} to ${next.pd} - ${this.last?.ca || 'NA'} to ${next.ca}`);
+        this.refreshSources(next.pd, next.ca);
+        this.last = next;
+      }
     });
 
     if (this.planCoordinatorService.listSelectedSources) {

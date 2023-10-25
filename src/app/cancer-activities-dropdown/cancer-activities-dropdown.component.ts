@@ -152,13 +152,7 @@ export class CancerActivitiesDropdownComponent implements OnInit {
             }
           }
         }
-        if (this.selectedValue && this.selectedValue.length) {
-          this.pdCaIntegratorService.caForDocEmitter.next({code: this.selectedValue, channel: this.channel});
-        } else if (this._npnId !== -1) {
-          this.pdCaIntegratorService.caForDocEmitter.next({code: this.cancerActivities.map((a: any) => a.code), channel: this.channel});
-        } else {
-          this.pdCaIntegratorService.caForDocEmitter.next({code: null, channel: this.channel});
-        }
+
         this.pdCaIntegratorService.cayCodeLoadingEmitter.next({channel: this.channel, initialized: true});
 
       }, error => {
