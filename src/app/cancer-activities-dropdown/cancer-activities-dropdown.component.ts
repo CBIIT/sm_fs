@@ -19,7 +19,7 @@ export class CancerActivitiesDropdownComponent implements OnInit {
   private _npnId = -1;
   private _selectedValue: string [] | string;
 
-  @Input() debug = true;
+  @Input() debug = false;
   @Input() monitorFlag = false;
   @Input() selectSingleOption = false;
   @Input() label = 'Cancer Activity';

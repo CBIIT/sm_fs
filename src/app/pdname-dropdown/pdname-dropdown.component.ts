@@ -23,7 +23,7 @@ export class PdnameDropdownComponent implements OnInit {
     private logger: NGXLogger) {
   }
 
-  @Input() debug = true;
+  @Input() debug = false;
   @Input() label = 'PD Name';
   @Input() showInactiveToggle = true;
   @Input() broadcast = false;
