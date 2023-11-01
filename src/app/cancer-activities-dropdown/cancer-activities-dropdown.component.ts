@@ -19,7 +19,7 @@ export class CancerActivitiesDropdownComponent implements OnInit {
   private _npnId = -1;
   private _selectedValue: string [] | string;
 
-  @Input() debug = false;
+  @Input() debug = true;
   @Input() monitorFlag = false;
   @Input() selectSingleOption = false;
   @Input() label = 'Cancer Activity';
@@ -27,11 +27,10 @@ export class CancerActivitiesDropdownComponent implements OnInit {
   @Input() syncWithPd = true;
   @Input() name = 'cancerActivities';
   @Input() activeOnly: boolean = null;
-
-
   @Input() broadcast = false;
   @Input() lockedOptions: string[] = [];
   @Input() channel = PD_CA_DEFAULT_CHANNEL;
+  @Input() initialPd: number;
   private caDocs = [];
 
   @Input()
@@ -85,15 +84,20 @@ export class CancerActivitiesDropdownComponent implements OnInit {
       this.options.allowClear = true;
     }
 
+    if(this.initialPd) {
+      this.npnId = this.initialPd;
+    }
+
     if(this.debug) {
       this.logger.info(`Init with options: ${JSON.stringify(this.options)}`);
+      this.logger.info(`Initial PD: ${this.initialPd}`);
     }
 
     if (this.syncWithPd) {
       this.pdCaIntegratorService.pdLoadingEmitter.subscribe(next => {
         if(next.channel === this.channel && next.initialized) {
           if(this.debug) {
-            this.logger.info('PD Loading complete: update dropdown()');
+            this.logger.info(`PD Loading complete: update dropdown; pd: ${this._npnId}`);
           }
           this.updateDropdown();
         }

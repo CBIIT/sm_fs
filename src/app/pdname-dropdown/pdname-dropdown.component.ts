@@ -23,7 +23,7 @@ export class PdnameDropdownComponent implements OnInit {
     private logger: NGXLogger) {
   }
 
-  @Input() debug = false;
+  @Input() debug = true;
   @Input() label = 'PD Name';
   @Input() showInactiveToggle = true;
   @Input() broadcast = false;
@@ -58,14 +58,17 @@ export class PdnameDropdownComponent implements OnInit {
   @Output() selectedValueChange = new EventEmitter<number>();
 
   set selectedValue(value: number) {
+    const valueChanged = value !== this._selectedValue;
     if(this.debug) {
       this.logger.debug(`setSelectedValue(${value})`);
     }
     this._selectedValue = value;
 
-    this.selectedValueChange.emit(value);
+    if(valueChanged) {
+      this.selectedValueChange.emit(value);
+    }
 
-    if (this.broadcast) {
+    if (this.broadcast && valueChanged) {
       this.pdCaIntegratorService.pdValueEmitter.next({pdId: this._selectedValue, channel: this.channel});
     }
   }
@@ -130,6 +133,7 @@ export class PdnameDropdownComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.logger.info('init()')
     // TODO: can this be parameterized with an Angular template?
     this.options = {
       templateResult: pdFormatter.bind(this),

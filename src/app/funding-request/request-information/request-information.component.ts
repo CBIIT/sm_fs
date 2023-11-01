@@ -86,6 +86,7 @@ export class RequestInformationComponent implements OnInit {
 
   set selectedCayCode(value: string[] | string) {
     // TODO: Evaluate whether to reset the program recommended costs model
+    const oldValue = this.requestModel.requestDto.financialInfoDto.requestorCayCode;
     if (isArray(value) && value[0]) {
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = value[0];
       this.requestModel.requestDto.requestorCayCode = value[0];
@@ -96,15 +97,21 @@ export class RequestInformationComponent implements OnInit {
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
       this.requestModel.requestDto.requestorCayCode = undefined;
     }
-    this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.next(
-      this.requestModel.requestDto.financialInfoDto.requestorCayCode);
+    const changed = oldValue !== this.requestModel.requestDto.financialInfoDto.requestorCayCode;
+    if(changed) {
+      this.logger.debug(`CA changed from ${oldValue} to ${this.requestModel.requestDto.financialInfoDto.requestorCayCode}`);
+      this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.next(
+        this.requestModel.requestDto.financialInfoDto.requestorCayCode);
+    }
     this._selectedCayCode = value;
     const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
       ? this.requestModel.requestDto.conversionActivityCode : null;
-    this.refreshFundingSources(
-      this.requestModel.requestDto.financialInfoDto.requestTypeId,
-      conversionActivityCode,
-      this.requestModel.requestDto.financialInfoDto.requestorCayCode);
+    if(changed){
+      this.refreshFundingSources(
+        this.requestModel.requestDto.financialInfoDto.requestTypeId,
+        conversionActivityCode,
+        this.requestModel.requestDto.financialInfoDto.requestorCayCode);
+    }
   }
 
   get selectedPd(): number {
@@ -114,16 +121,17 @@ export class RequestInformationComponent implements OnInit {
   set selectedPd(value: number) {
     this.logger.debug(`setSelectedPd(${value})`);
     // TODO: Evaluate whether to reset the program recommended costs model
-    const valueChanged = this.requestModel.requestDto.requestorNpnId && (this.requestModel.requestDto.requestorNpnId !== value);
+    const oldValue = this.requestModel.requestDto.requestorNpnId;
+    const valueChanged = (oldValue !== value);
     this.requestModel.requestDto.requestorNpnId = value;
     this.requestModel.requestDto.financialInfoDto.requestorNpnId = value;
     if (valueChanged) {
+      this.logger.info(`PD changed from ${oldValue} to ${value}`);
       this.requestModel.requestDto.requestorCayCode = undefined;
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = undefined;
       this.cayCodeComponent.selectedValue = null;
+      this.fundingSourceSynchronizerService.fundingSourceNewPDEmitter.next(this.requestModel.requestDto.requestorNpnId);
     }
-    this.fundingSourceSynchronizerService.fundingSourceNewPDEmitter.next(this.requestModel.requestDto.requestorNpnId);
-
   }
 
   /**

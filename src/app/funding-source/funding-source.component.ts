@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 import { RequestModel } from '../model/request/request-model';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ import { ConversionActivityCodes } from '../type4-conversion-mechanism/conversio
   styleUrls: ['./funding-source.component.css'],
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
 })
-export class FundingSourceComponent implements OnInit, OnDestroy, AfterViewInit {
+export class FundingSourceComponent implements OnInit, OnDestroy {
 
   @Input() parentForm: NgForm;
 
@@ -70,6 +70,7 @@ export class FundingSourceComponent implements OnInit, OnDestroy, AfterViewInit 
       this.selectedValue = Number(restore);
     });
     this.fundingSourceSynchronizerService.fundingSourceNewCayCodeEmitter.subscribe(next => {
+      this.logger.info('Triggered from new cayCode');
       this.lastCayCode = next;
       this.refreshFundingSources();
     });
@@ -85,6 +86,13 @@ export class FundingSourceComponent implements OnInit, OnDestroy, AfterViewInit 
     const cayCode = this.requestModel.requestDto.financialInfoDto.requestorCayCode || this.requestModel.grant.cayCode;
     const conversionActivityCode = ConversionActivityCodes.includes(this.requestModel.requestDto.conversionActivityCode)
       ? this.requestModel.requestDto.conversionActivityCode : null;
+    this.logger.info(`grant number: ${this.requestModel.grant.fullGrantNum}`)
+    this.logger.info(`requestor npnId: ${this.requestModel.requestDto.financialInfoDto.requestorNpnId}`)
+    this.logger.info(`cayCode: ${cayCode}`)
+    this.logger.info(`frtId: ${this.requestModel.requestDto.frtId}`)
+    this.logger.info(`FY: ${this.requestModel.requestDto.requestFy}`)
+    this.logger.info(`conversion mech: ${conversionActivityCode}`)
+
     this.fsRequestControllerService.getFundingSourcesByNpnId(
       this.requestModel.grant.fullGrantNum,
       this.requestModel.requestDto.financialInfoDto.requestorNpnId,
@@ -122,9 +130,5 @@ export class FundingSourceComponent implements OnInit, OnDestroy, AfterViewInit 
 
   ngOnDestroy(): void {
     this.logger.debug('onDestroy()');
-  }
-
-  ngAfterViewInit(): void {
-    this.logger.debug(`afterViewInit(): selectedValue = ${this.selectedValue}`);
   }
 }
