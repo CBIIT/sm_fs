@@ -77,6 +77,7 @@
               [channel]="sharedChannel"
               label="Requesting PD's Cancer Activities"
               [debug]="true"
+              [initialPd]="pdNpnId"
               (selectedValueChange)="onSelectedValueChange($event)">
             </app-cancer-activities-dropdown>
             <div class="text-danger mt-1"
