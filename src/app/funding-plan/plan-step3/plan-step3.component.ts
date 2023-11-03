@@ -65,7 +65,7 @@ export class PlanStep3Component implements OnInit {
     this.navigationModel.setStepLinkable(3, true);
 
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
-      this.logger.warn(`CA ${next.channel} === ${this.sharedChannel}`)
+      // this.logger.warn(`CA ${next.channel} === ${this.sharedChannel}`)
       if (next.channel === this.sharedChannel) {
         this.cayCode = typeof next.cayCode === 'string' ? next.cayCode : next.cayCode[0];
         this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
@@ -73,7 +73,7 @@ export class PlanStep3Component implements OnInit {
     });
 
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
-      this.logger.warn(`PD ${next.channel} === ${this.sharedChannel}`)
+      // this.logger.warn(`PD ${next.channel} === ${this.sharedChannel}`)
       if (next.channel === this.sharedChannel) {
         this.pdNpnId = next.pdId;
         this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
