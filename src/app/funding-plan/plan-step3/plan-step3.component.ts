@@ -65,6 +65,7 @@ export class PlanStep3Component implements OnInit {
     this.navigationModel.setStepLinkable(3, true);
 
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
+      this.logger.warn(`CA ${next.channel} === ${this.sharedChannel}`)
       if (next.channel === this.sharedChannel) {
         this.cayCode = typeof next.cayCode === 'string' ? next.cayCode : next.cayCode[0];
         this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
@@ -72,6 +73,7 @@ export class PlanStep3Component implements OnInit {
     });
 
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
+      this.logger.warn(`PD ${next.channel} === ${this.sharedChannel}`)
       if (next.channel === this.sharedChannel) {
         this.pdNpnId = next.pdId;
         this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
@@ -81,6 +83,9 @@ export class PlanStep3Component implements OnInit {
     this.planName = this.planModel.fundingPlanDto.planName;
     this.pdNpnId = this.planModel.fundingPlanDto.requestorNpnId;
     this.cayCode = this.planModel.fundingPlanDto.cayCode;
+    this.planManagementService.selectedPd = this.planManagementService.selectedPd || this.pdNpnId;
+    this.planManagementService.selectedCa = this.planManagementService.selectedCa || this.cayCode;
+    this.logger.warn(`PD: ${this.planManagementService.selectedPd} CA: ${this.planManagementService.selectedCa}`);
 
     const existingRequests = this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.map(r => r.applId) || [];
     const selectedRequests = this.planModel.allGrants.filter(g => g.selected).map(r => r.applId);

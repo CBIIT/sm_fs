@@ -60,7 +60,7 @@ export class PdnameDropdownComponent implements OnInit {
   set selectedValue(value: number) {
     const valueChanged = value !== this._selectedValue;
     if(this.debug) {
-      this.logger.debug(`setSelectedValue(${value})`);
+      this.logger.debug(`setSelectedValue(${value} -- ${valueChanged})`);
     }
     this._selectedValue = value;
 

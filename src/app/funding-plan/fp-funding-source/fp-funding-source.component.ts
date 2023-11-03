@@ -74,13 +74,17 @@ export class FpFundingSourceComponent implements OnInit {
   private last: { pd: number, ca: string };
 
   private newPdOrCa(next: { pd: number, ca: string }): boolean {
-    if(!this.last) {
-      return true;
-    }
-    return this.last.pd !== next.pd || this.last.ca !== next.ca;
+    this.logger.debug(next);
+    this.logger.debug(this.last);
+    return true;
+    // if(!this.last) {
+    //   return true;
+    // }
+    // return this.last.pd !== next.pd || this.last.ca !== next.ca;
   }
 
   public init(pd: number, ca: string): void {
+    this.logger.info(`PD: ${pd} -- CA: ${ca}`);
     this.allRfaPaNumbers = [];
     this.fy = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
     this.planModel.grantsSearchCriteria.forEach(r => {

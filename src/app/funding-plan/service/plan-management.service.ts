@@ -451,7 +451,7 @@ export class PlanManagementService {
       });
     });
 
-    this.logger.debug('_grantCosts', this._grantCosts);
+    this.logger.debug(`grantCosts: ${this._grantCosts}`);
   }
 
   sortGrantCosts(): void {
