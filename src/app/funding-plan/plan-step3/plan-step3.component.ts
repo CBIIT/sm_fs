@@ -67,16 +67,21 @@ export class PlanStep3Component implements OnInit {
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
       // this.logger.warn(`CA ${next.channel} === ${this.sharedChannel}`)
       if (next.channel === this.sharedChannel) {
-        this.cayCode = typeof next.cayCode === 'string' ? next.cayCode : next.cayCode[0];
-        this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
+        const newCayCode = typeof next.cayCode === 'string' ? next.cayCode : next.cayCode[0];
+        if(this.cayCode !== newCayCode) {
+          this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: newCayCode});
+        }
+        this.cayCode = newCayCode;
       }
     });
 
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
       // this.logger.warn(`PD ${next.channel} === ${this.sharedChannel}`)
       if (next.channel === this.sharedChannel) {
+        if(this.pdNpnId !== next.pdId) {
+          this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
+        }
         this.pdNpnId = next.pdId;
-        this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
       }
     });
 
