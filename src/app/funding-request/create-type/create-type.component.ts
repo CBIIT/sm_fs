@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Select2OptionData } from 'ng-select2';
 import { RequestModel } from '../../model/request/request-model';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
+import { FundingSourceTypes } from '../../model/request/funding-source-types';
 import { NGXLogger } from 'ngx-logger';
 import { WorkflowModel } from '../workflow/workflow.model';
 
@@ -14,6 +15,12 @@ export class CreateTypeComponent implements OnInit {
 
   data: Array<Select2OptionData> = [];
   private _selectedValue: string;
+
+  NO_TCS_ACTION_TYPES = [
+    FundingSourceTypes.NIH_OD_CO_FUNDS, 
+    FundingSourceTypes.NIH_NON_OD_CO_FUNDS,
+    FundingSourceTypes.IDDA_REIMBURSABLE_INTER_AGENCY_FUNDS
+  ];
 
   ROLLUP_TYPES = [
     FundingRequestTypes.REINSTATEMENT_OF_DELETED_COSTS,
@@ -94,16 +101,22 @@ export class CreateTypeComponent implements OnInit {
     if (this.readOnly) {
       return;
     }
-    this.data = [
-      { id: 'PRE-APPL', text: 'Pre-Appl' },
-      /*{ id: '2', text: 'Rollup' }*/
-    ];
+    const sources = this.requestModel.programRecommendedCostsModel.fundingSources.map(source => source.fundingSourceId);
+    const noTcs = sources.some(e => this.NO_TCS_ACTION_TYPES.includes(e))
+
+    this.data = [];
+    if(noTcs) {
+      this.data.push({id: 'NO-TCS-ACTION', text: 'No TCS Action'});
+    }
+    this.data.push({ id: 'PRE-APPL', text: 'Pre-Appl' });
     if (!this.requestModel.isPayType4() && this.requestModel.isForGrantFY()) {
       this.data.push({ id: 'ROLLUP', text: 'Rollup' });
     }
     const type = Number(this.requestModel.requestDto.frtId);
 
-    if ( this.requestModel.isForGrantFY()
+    if(noTcs) {
+      this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'NO-TCS-ACTION';
+    } else if ( this.requestModel.isForGrantFY()
         && ((this.ROLLUP_TYPES.includes(+type)
         && !this.workflowModel.approvedByNciFC) || (this.requestModel.isNonNci() && this.requestModel.isCompeting() && +type === FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS ))) {
       if(!this.data.filter(item => item.id === 'ROLLUP')) {
