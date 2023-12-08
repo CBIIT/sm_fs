@@ -207,6 +207,21 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           title: 'Action', data: null, defaultContent: 'Select'
           , ngTemplateRef: { ref: this.searchFundingRequestActionRenderer }, className: 'all', orderable: false
         }, // 16
+        { title: 'NCAB', data: 'formattedCouncilMeetingDate' }, // 17
+        { 
+          title: 'Program Recommended 1st-year direct costs', 
+          data: null, 
+          render: ( data, type, row, meta ) => {
+                return "1,000,000"
+          } 
+        }, // 18
+        { 
+          title: 'Program Recommended 1st-year total costs', 
+          data: null,
+          render: ( data, type, row, meta ) => {
+                return "2,000,000"
+          }
+        }, // 19
         { data: null, defaultContent: '' }
 
       ],
@@ -218,6 +233,11 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       },
       columnDefs: [
+        {
+          targets: [17,18,19],
+          visible: false,
+          searchable: false
+        },
         {
           className: 'control',
           orderable: false,
@@ -250,7 +270,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           filename: 'fs-funding-requests-search-result',
           title: null,
           header: true,
-          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] }
+          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 8, 9, 10, 11, 12, 13, 14, 15] }
         }
       ],
       rowCallback: (row: Node, data: any[] | object) => {
