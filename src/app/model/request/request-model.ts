@@ -405,6 +405,10 @@ export class RequestModel {
     return SKIP_TYPES.includes(Number(this.requestDto.frtId));
   }
 
+  isNoTcs(): boolean {
+    return this.requestDto?.oefiaCreateCode === 'NO-TCS-ACTION';
+  }
+
   isPayUsingSkip(): boolean {
     return PAY_USING_SKIP_TYPES.includes(+this.requestDto.frtId);
   }
