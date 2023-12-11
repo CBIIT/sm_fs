@@ -406,7 +406,7 @@ export class RequestModel {
   }
 
   isNoTcs(): boolean {
-    return this.requestDto?.oefiaCreateCode === 'NO-TCS-ACTION';
+    return this.requestDto?.oefiaCreateCode === 'NO-TCS';
   }
 
   isPayUsingSkip(): boolean {
@@ -502,7 +502,7 @@ export class RequestModel {
   isCompeting(): boolean {
     return !this.grant.councilMeetingDate.endsWith('00');
   }
-  
+
   isPayType44R00(): boolean {
     return this.is4R00() && this.isPayType4();
   }

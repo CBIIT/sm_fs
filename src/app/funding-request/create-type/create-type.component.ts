@@ -17,7 +17,7 @@ export class CreateTypeComponent implements OnInit {
   private _selectedValue: string;
 
   NO_TCS_ACTION_TYPES = [
-    FundingSourceTypes.NIH_OD_CO_FUNDS, 
+    FundingSourceTypes.NIH_OD_CO_FUNDS,
     FundingSourceTypes.NIH_NON_OD_CO_FUNDS,
     FundingSourceTypes.IDDA_REIMBURSABLE_INTER_AGENCY_FUNDS
   ];
@@ -106,7 +106,7 @@ export class CreateTypeComponent implements OnInit {
 
     this.data = [];
     if(noTcs) {
-      this.data.push({id: 'NO-TCS-ACTION', text: 'No TCS Action'});
+      this.data.push({id: 'NO-TCS', text: 'No TCS Action'});
     }
     this.data.push({ id: 'PRE-APPL', text: 'Pre-Appl' });
     if (!this.requestModel.isPayType4() && this.requestModel.isForGrantFY()) {
@@ -115,7 +115,7 @@ export class CreateTypeComponent implements OnInit {
     const type = Number(this.requestModel.requestDto.frtId);
 
     if(noTcs) {
-      this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'NO-TCS-ACTION';
+      this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'NO-TCS';
     } else if ( this.requestModel.isForGrantFY()
         && ((this.ROLLUP_TYPES.includes(+type)
         && !this.workflowModel.approvedByNciFC) || (this.requestModel.isNonNci() && this.requestModel.isCompeting() && +type === FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS ))) {

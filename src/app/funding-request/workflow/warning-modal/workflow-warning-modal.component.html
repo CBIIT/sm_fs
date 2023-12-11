@@ -1,6 +1,6 @@
 <ng-template #workflowWarningModal let-modal>
     <div class="modal-header">
-      <span class="modal-title" id="modal-title-hold">Approve Budget Information</span>
+      <span class="modal-title" id="modal-title-hold">{{ title }}</span>
       <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -11,16 +11,19 @@
           <b>WARNING:</b> Are you sure you want to approve this request without providing a CAN?
         </ngb-alert>
         <ngb-alert type="warning" [dismissible]="false" *ngIf="warningTypes?.duplicateCan">
-          <b>WARNING:</b> You have provided duplicate CAN numbers. Would you like to 
-          proceed? If you continue, the Approved Total Amount will be added together when 
+          <b>WARNING:</b> You have provided duplicate CAN numbers. Would you like to
+          proceed? If you continue, the Approved Total Amount will be added together when
           the TCS is updated.
-        </ngb-alert>  
+        </ngb-alert>
         <ngb-alert type="warning" [dismissible]="false" *ngIf="warningTypes?.nonDefaultCan">
-          <b>WARNING:</b> Please note that the "NCI OEFIA Projected CAN" and "Funds Approver 
+          <b>WARNING:</b> Please note that the "NCI OEFIA Projected CAN" and "Funds Approver
           Provided CAN Information" do not match. Are you sure you want to proceed?
-        </ngb-alert>  
+        </ngb-alert>
+        <ngb-alert type="warning" [dismissible]="false" *ngIf="warningTypes?.noTcsAction">
+          <b>WARNING:</b> You have selected no TCS action. Are you sure you want to continue?
+        </ngb-alert>
       </div>
-    </div> 
+    </div>
     <div class="modal-footer">
       <button (click)="submit()" class="btn btn-primary">Yes</button>
     </div>
