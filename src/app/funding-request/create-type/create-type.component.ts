@@ -13,6 +13,8 @@ import { WorkflowModel } from '../workflow/workflow.model';
 })
 export class CreateTypeComponent implements OnInit {
 
+  @Input() required = true;
+
   data: Array<Select2OptionData> = [];
   private _selectedValue: string;
 
@@ -84,6 +86,7 @@ export class CreateTypeComponent implements OnInit {
   @Input() readOnly = false;
 
   set selectedValue(value: string) {
+    this.logger.debug(`Setting selected value ${value}`)
     this._selectedValue = value;
     this.requestModel.requestDto.oefiaCreateCode = value;
     this.requestModel.requestDto.financialInfoDto.oefiaCreateCode = value;
@@ -104,11 +107,10 @@ export class CreateTypeComponent implements OnInit {
     const sources = this.requestModel.programRecommendedCostsModel.fundingSources.map(source => source.fundingSourceId);
     const noTcs = sources.some(e => this.NO_TCS_ACTION_TYPES.includes(e))
 
-    this.data = [];
-    if(noTcs) {
-      this.data.push({id: 'NO-TCS', text: 'No TCS Action'});
-    }
-    this.data.push({ id: 'PRE-APPL', text: 'Pre-Appl' });
+    this.data = [
+      { id: 'NO-TCS', text: 'No TCS Action' },
+      { id: 'PRE-APPL', text: 'Pre-Appl' }
+    ];
     if (!this.requestModel.isPayType4() && this.requestModel.isForGrantFY()) {
       this.data.push({ id: 'ROLLUP', text: 'Rollup' });
     }
@@ -131,4 +133,7 @@ export class CreateTypeComponent implements OnInit {
     }
   }
 
+  noCreateType() {
+    return this._selectedValue === null || this._selectedValue === undefined || this._selectedValue.trim() === ''
+  }
 }

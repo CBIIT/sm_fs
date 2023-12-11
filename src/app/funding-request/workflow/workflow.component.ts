@@ -307,6 +307,11 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       }
     }
 
+    if(this.workflowModel.isApprovalAction(action) && this.workflowModel.isFcNci && this.isBlank(this.requestModel.requestDto?.oefiaCreateCode)) {
+      this.logger.info(`Blank OEFIA Create Code for frqId#${this.requestModel.requestDto.frqId}`);
+      valid = false;
+    }
+
     if(this.workflowModel.isApprovalAction(action) && this.workflowModel.isFcNci && this.requestModel.isNoTcs()) {
       canWarning.noTcsAction = true;
     }
@@ -455,5 +460,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   retrievePlan(fprId: number): void {
     this.router.navigate(['/plan/retrieve', fprId]);
+  }
+
+  private isBlank(oefiaCreateCode: string | undefined) {
+    return oefiaCreateCode === null || oefiaCreateCode === undefined || oefiaCreateCode.trim() === '';
   }
 }

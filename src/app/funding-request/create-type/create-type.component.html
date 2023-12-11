@@ -3,7 +3,7 @@
 <ng-template #editable>
   <div class="form-group">
     <!--    <label for="oefia-type">OEFIA Type</label>-->
-    <label for="create_type">Create Type (optional)</label>
+    <label for="create_type">Create Type</label>
 
     <ng-select2
       id="create_type"
@@ -12,6 +12,11 @@
       [(ngModel)]="selectedValue">
       <option></option>
     </ng-select2>
+    <div
+      class="text-danger mt-1"
+      *ngIf="required && noCreateType()">
+        Create Type is required
+    </div>
   </div>
 </ng-template>
 
