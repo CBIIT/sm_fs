@@ -208,19 +208,13 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           , ngTemplateRef: { ref: this.searchFundingRequestActionRenderer }, className: 'all', orderable: false
         }, // 16
         { title: 'NCAB', data: 'formattedCouncilMeetingDate' }, // 17
-        { 
-          title: 'Program Recommended 1st-year direct costs', 
-          data: null, 
-          render: ( data, type, row, meta ) => {
-                return "1,000,000"
-          } 
+        {
+          title: 'Program Recommended 1st-year direct costs',
+          data: 'firstYearDirectCosts'
         }, // 18
-        { 
-          title: 'Program Recommended 1st-year total costs', 
-          data: null,
-          render: ( data, type, row, meta ) => {
-                return "2,000,000"
-          }
+        {
+          title: 'Program Recommended 1st-year total costs',
+          data: 'firstYearTotalCosts'
         }, // 19
         { data: null, defaultContent: '' }
 
@@ -382,7 +376,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
           ngTemplateRef:
             { ref: this.docAndPdApproverRender }
 
-        },//4 
+        },//4
 
         {
           title: 'Requesting DOC Approver', data: 'requestingDocApprvlFullName',
@@ -580,7 +574,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         { title: 'IMPAC II Status', data: 'applStatusGroupDescrip' }, // 3
         {
           title: 'FOA', data: 'rfaPaNumber',  ngTemplateRef:
-          { ref: this.searchFundingPlanFoasRenderer 
+          { ref: this.searchFundingPlanFoasRenderer
           }, className: 'all'
         }, // 4
         { title: 'FY', data: 'fy' }, // 5
