@@ -65,9 +65,10 @@ export class PlanStep3Component implements OnInit {
     this.navigationModel.setStepLinkable(3, true);
 
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
-      // this.logger.warn(`CA ${next.channel} === ${this.sharedChannel}`)
+      this.logger.warn(`CA ${next.channel} === ${this.sharedChannel}`)
       if (next.channel === this.sharedChannel) {
         const newCayCode = typeof next.cayCode === 'string' ? next.cayCode : next.cayCode[0];
+        this.logger.warn(`CA ${this.cayCode} === ${newCayCode} :: ${this.cayCode === newCayCode}`)
         if(this.cayCode !== newCayCode) {
           this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: newCayCode});
         }
@@ -76,7 +77,7 @@ export class PlanStep3Component implements OnInit {
     });
 
     this.pdCaIntegratorService.pdValueEmitter.subscribe(next => {
-      // this.logger.warn(`PD ${next.channel} === ${this.sharedChannel}`)
+      this.logger.warn(`PD ${next.channel} === ${this.sharedChannel}`)
       if (next.channel === this.sharedChannel) {
         if(this.pdNpnId !== next.pdId) {
           this.planManagementService.fundingSourceValuesEmitter.next({pd: this.pdNpnId, ca: this.cayCode});
@@ -650,11 +651,11 @@ export class PlanStep3Component implements OnInit {
   }
 
   onSelectedValueChange($event: string | string[]): void {
-    if (typeof $event === 'string') {
-      this.cayCode = $event;
-    } else {
-      this.cayCode = $event ? $event[0] : undefined;
-    }
+    // if (typeof $event === 'string') {
+    //   this.cayCode = $event;
+    // } else {
+    //   this.cayCode = $event ? $event[0] : undefined;
+    // }
   }
 
   clearEditFlag(): void {
