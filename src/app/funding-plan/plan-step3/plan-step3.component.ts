@@ -650,14 +650,6 @@ export class PlanStep3Component implements OnInit {
     this.clearEditFlag();
   }
 
-  onSelectedValueChange($event: string | string[]): void {
-    // if (typeof $event === 'string') {
-    //   this.cayCode = $event;
-    // } else {
-    //   this.cayCode = $event ? $event[0] : undefined;
-    // }
-  }
-
   clearEditFlag(): void {
     this.editing = undefined;
   }
