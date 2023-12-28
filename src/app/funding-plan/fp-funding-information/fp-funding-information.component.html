@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-12 d-flex">
-    <h2>Funding Information (Optional)</h2>
+    <h2>Funding Information <span *ngIf="!readOnly" class="font-weight-light font-italic">(Optional)</span></h2>
     <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse"
        href="#funding-info-collapse" role="button"
        aria-expanded="true" aria-controls="funding-info-collapse"></a>
@@ -77,7 +77,7 @@
 
 <div class="row">
   <div class="col-12 mt-3">
-    <h3>List of Funding Estimates for Each Out-Year</h3>
+    <h3>List of Funding Estimates for Each Out-Year <span *ngIf="!readOnly" class="font-weight-light font-italic">(Optional)</span></h3>
   </div>
 
   <div class="col-lg-3 col-sm-6">
