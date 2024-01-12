@@ -83,13 +83,31 @@
     <app-approver-list [readonly]="readonly" [terminalRequest]="terminalRequest" class="w-100"></app-approver-list>
 
     <div class="col-12">
-        <div class="form-group" *ngIf=" isApprover() || !readonly">
+        <div class="form-group" *ngIf=" (isApprover() && isGMLeaderShip()) || !readonly ">
+            <label for="workflow-comments">Workflow Comments <span class="optional" >(optional)</span></label>
+        <div class="notes" *ngIf=" isApprover() || !readonly">
+            <label for="special-comments">Special Instructions</label>
+            <textarea class="form-control" id="special-comments" rows="1" maxlength="2000" [(ngModel)]="specialNotes" (input)="isFormValid()"></textarea>
+            <span class="character-counter">{{specialNotes.length}}/2000</span>
+        </div>
+        <div class="notes" *ngIf=" isApprover() || !readonly">
+            <label for="GM-comments">GM Notes </label>
+            <textarea class="form-control" id="GM-comments" rows="1" maxlength="2000" [(ngModel)]="gmNotes" (input)="isFormValid()"></textarea>
+            <span class="character-counter">{{gmNotes.length}}/2000</span>
+        </div>
+        <div class="notes" *ngIf=" isApprover() || !readonly">
+            <label for="active-comments">Active Comments </label>
+            <textarea class="form-control" id="active-comments" rows="1" maxlength="2000" [(ngModel)]="activeNotes" (input)="isFormValid()"></textarea>
+            <span class="character-counter">{{activeNotes.length}}/2000</span>
+        </div>
+        </div>
+        <div class="form-group" *ngIf=" (isApprover() &&  !isGMLeaderShip()) || !readonly ">
             <label for="workflow-comments">Workflow Comments <span class="optional" *ngIf="!commentsRequired">(optional)</span></label>
             <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments" (input)="isFormValid()"></textarea>
             <span class="text-danger mt-1" *ngIf="(validationError?.comments_missing)">
                 Comments are required
             </span>
-            <span class="character-counter">{{comments.length}}/2000</span>
+            <span class="character-counter">{{comments.length}}/2000</span> 
         </div>
 
     </div>

@@ -73,6 +73,10 @@ export class AppUserSessionService {
     return this.roles.includes(roleNames.OGA_CERTIFIER);
   }
 
+  isGMLeaderShipRole():boolean{
+    return this.roles.indexOf('GMLEADER') > -1 
+  }
+
   isPA(): boolean {
     return this.roles.indexOf('PA') > -1;
   }

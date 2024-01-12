@@ -1,0 +1,8 @@
+.notes{
+    margin-bottom: 0.2rem;
+    }
+.notes .character-counter {
+        color: #63666a;
+        text-align: right;
+        display: block;
+}

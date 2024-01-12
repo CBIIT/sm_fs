@@ -50,6 +50,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   options: Options;
   comments = '';
+  gmNotes='';
+  specialNotes='';
+  activeNotes=''
   buttonLabel = 'Process Action';
   addApproverLabel = 'Add Approver(s)';
   workflowActions: any[];
@@ -220,6 +223,10 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   isApprover(): boolean {
     return this.workflowModel.isUserNextInChain && this.approvingState;
+  }
+
+  isGMLeaderShip():boolean{
+    return this.userSessionService.isGMLeaderShipRole();
   }
 
   showApprovedCosts(): boolean {
