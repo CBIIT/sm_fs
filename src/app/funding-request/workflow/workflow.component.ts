@@ -182,6 +182,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
         this.comments = '';
         this.workflowActions = this.workflowModel.getWorkflowList();
         this.fetchCompletedPfr();
+        this.specialNotes = this.workflowModel.siNoteText?this.workflowModel.siNoteText:'';
+        this.gmNotes = this.workflowModel.gmsNoteText?this.workflowModel.gmsNoteText:'';
+        this.activeNotes = this.workflowModel.acNoteText?this.workflowModel.acNoteText:'';
         this.showCreateType = false;
         this.logger.debug('workflow actions = ', this.workflowActions);
       }
@@ -345,7 +348,11 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     dto.frqId = this.requestModel.requestDto.frqId;
     dto.currentStatusId = this.requestStatus.statusId;
     dto.comments = this.comments;
+    dto.siNote = this.specialNotes;
+    dto.gmsNote = this.gmNotes;
+    dto.acNote = this.activeNotes;
     dto.action = action;
+    //36095
     dto.requestorNpeId = this.requestModel.requestDto.requestorNpeId;
     if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&
       this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0) {

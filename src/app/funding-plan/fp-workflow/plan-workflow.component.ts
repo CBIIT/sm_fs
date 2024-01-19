@@ -154,6 +154,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.logger.debug('PlanWorkflowComponent ngOnInit()');
+
     const callback = this.storeData;
     this.options = {
       allowClear: true,
@@ -194,6 +195,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         this.comments = '';
         this.workflowActions = this.workflowModel.getWorkflowList();
         this.fetchCompletedPfr();
+        this.specialNotes = this.workflowModel.siNoteText?this.workflowModel.siNoteText:'';
+        this.gmNotes = this.workflowModel.gmsNoteText?this.workflowModel.gmsNoteText:'';
+        this.activeNotes = this.workflowModel.acNoteText?this.workflowModel.acNoteText:'';
         this.logger.debug('workflow actions = ', this.workflowActions);
       }
     );
@@ -356,6 +360,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     dto.currentStatusId = this.requestStatus.statusId;
     dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
     dto.comments = this.comments;
+    dto.siNote = this.specialNotes;
+    dto.gmsNote = this.gmNotes;
+    dto.acNote = this.activeNotes;
     dto.action = action;
     if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&
       this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0) {
