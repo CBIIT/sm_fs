@@ -107,7 +107,6 @@
         </ng-template>
         <ng-template #readOnly>
         <div class="form-group" *ngIf="readonly">
-            <label for="workflow-comments">Workflow Comments </label>
            <div class="notes" *ngIf="specialNotes && specialNotes.trim() !== ''">
                <label for="special-comments">Special Instructions </label>
                <textarea class="form-control" id="special-comments" rows="1" maxlength="2000" [(ngModel)]="specialNotes"  [readonly]="readonly"></textarea>
