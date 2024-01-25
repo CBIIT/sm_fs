@@ -313,6 +313,12 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       const canFormValid = this.budgetInfoComponent.isFormValid(canWarning);
       if (!canFormValid) {
         valid = false;
+      } else {
+        if(this.planModel.planUsesPoolRpgFunds() && this.planModel.planHasMultipleActivityCodes()) {
+          if(!confirm("WARNING: There is more than one activity code in this funding plan and the approval might affect proposed applications assigned to other Financial Analysts. Please coordinate with the other Financial Analysts or choose to approve and route the plan to them.")) {
+            return;
+          }
+        }
       }
     }
 
