@@ -378,7 +378,6 @@ export function megaInitializer(
     RecommendedFutureYearsComponent,
     FpFundingSourceComponent,
     FundingInformationValidatorDirective,
-    PlanWorkflowComponent,
     PlanSupportingDocsReadonlyComponent,
     PlanWorkflowComponent,
     PlanSubmissionAlertComponent,

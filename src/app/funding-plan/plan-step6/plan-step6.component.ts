@@ -77,7 +77,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   userReadonly = true;
   closeResult: string;
   docChecker: FundingPlanDocChecker;
-  public disableSubmitPlan: boolean = false;
+  public disableSubmitPlan = false;
 
   private fprId: number;
 
