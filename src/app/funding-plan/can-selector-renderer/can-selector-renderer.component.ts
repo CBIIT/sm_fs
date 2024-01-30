@@ -128,7 +128,7 @@ export class CanSelectorRendererComponent implements OnInit, AfterViewInit {
     }
 
     if (!this.projectedApplIdCans?.get(key)?.can || this.readOnly) {
-      this.logger.debug('bad data =>', applId, fseId);
+      // this.logger.debug('bad data =>', applId, fseId);
       return false;
     }
     return true;
