@@ -113,7 +113,7 @@
             <span class="character-counter">{{specialNotes.length}}/2000</span>
         </div>
         <div class="notes">
-            <label for="GM-comments">GM Notes <span class="optional" >(optional)</span></label>
+            <label for="GM-comments">GMS Notes <span class="optional" >(optional)</span></label>
             <textarea class="form-control" id="GM-comments" rows="2" maxlength="2000" [(ngModel)]="gmNotes" (input)="isFormValid()"></textarea>
             <span class="character-counter">{{gmNotes.length}}/2000</span>
         </div>
@@ -132,7 +132,7 @@
             <textarea class="form-control" id="special-comments" rows="2" maxlength="2000" [(ngModel)]="specialNotes"  [readonly]="readonly"></textarea>
         </div>
         <div class="notes" *ngIf="gmNotes && gmNotes.trim() !== ''">
-            <label for="GM-comments">GM Notes </label>
+            <label for="GM-comments">GMS Notess </label>
             <textarea class="form-control" id="GM-comments" rows="2" maxlength="2000" [(ngModel)]="gmNotes" [readonly]="readonly"></textarea>
         </div>
         <div class="notes" *ngIf="activeNotes && activeNotes.trim() !== ''">
