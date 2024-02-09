@@ -132,7 +132,7 @@
             <textarea class="form-control" id="special-comments" rows="2" maxlength="2000" [(ngModel)]="specialNotes"  [readonly]="readonly"></textarea>
         </div>
         <div class="notes" *ngIf="gmNotes && gmNotes.trim() !== ''">
-            <label for="GM-comments">GMS Notess </label>
+            <label for="GM-comments">GMS Notes </label>
             <textarea class="form-control" id="GM-comments" rows="2" maxlength="2000" [(ngModel)]="gmNotes" [readonly]="readonly"></textarea>
         </div>
         <div class="notes" *ngIf="activeNotes && activeNotes.trim() !== ''">
