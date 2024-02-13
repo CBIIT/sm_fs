@@ -67,6 +67,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   validationError: any = {};
   completedPfrs: FundingPlanQueryDto[];
   workflowStuckBy: 'ByCompletedPfrs';
+  isApprovalAction = false;
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
@@ -88,6 +89,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   onActionChange(value: string): void {
     this.actionEmitter.emit(value);
     const approvalAction =  this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
+    this.isApprovalAction = approvalAction;
     if (this.gmInfoComponent) {
       this.gmInfoComponent.isApprovalAction = approvalAction;
     }

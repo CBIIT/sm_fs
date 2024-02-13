@@ -77,6 +77,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   completedPfrs: FundingRequestQueryDto[];
   workflowStuckBy: 'ByCompletedPfrs';
   grantViewerUrl: string;
+  isApprovalAction = false;
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
@@ -101,6 +102,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   onActionChange(value: string): void {
     this._dirty = true;
+    this.isApprovalAction = this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
     this.actionEmitter.emit(value);
     if (this.gmComponent) {
       this.gmComponent.isApprovalAction = this.workflowModel.isApprovalAction(WorkflowActionCode[value]);

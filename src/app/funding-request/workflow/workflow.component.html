@@ -83,7 +83,7 @@
                 Comments are required
             </span>
             <span class="character-counter">{{comments.length}}/2000</span> 
-            <div *ngIf="isGMLeaderShip()">
+            <div *ngIf="isGMLeaderShip() && isApprovalAction">
                 <div class="notes">
                     <label for="special-comments">Special Instructions <span class="optional">(optional)</span></label>
                     <textarea class="form-control" id="special-comments" rows="2" maxlength="2000"

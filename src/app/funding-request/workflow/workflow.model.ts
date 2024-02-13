@@ -77,6 +77,7 @@ export class WorkflowModel {
   }
 
   getWorkflowAction(action: WorkflowActionCode): WorkflowAction {
+    if(action === null) return null;
     for (const wa of this.awa) {
       if (wa.action === action) {
         return wa;
@@ -86,7 +87,7 @@ export class WorkflowModel {
     return null;
   }
 
-  // for workflow action drop down
+  // for workflow action drop down1
   getWorkflowList(): { id: WorkflowActionCode, text: string }[] {
     const roleCode = this.nextApproverRoleCode;
     if (roleCode) {
