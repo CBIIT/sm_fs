@@ -108,6 +108,7 @@ export class CreateTypeComponent implements OnInit {
     const noTcs = sources.some(e => this.NO_TCS_ACTION_TYPES.includes(e))
 
     this.data = [
+      { id: '', text: '' },
       { id: 'NO-TCS', text: 'No TCS Action' },
       { id: 'PRE-APPL', text: 'Pre-Appl' }
     ];
