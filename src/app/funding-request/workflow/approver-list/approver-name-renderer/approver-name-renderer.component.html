@@ -1,2 +1,2 @@
 <a href="mailto:{{approver.approverEmailAddress}}">{{ name }}</a>{{ suffix }}
-<span ngbTooltip="Fund certifier is not the default" *ngIf="financialApprover && currentApprover && userIsFinancialAnalyst && !approver.defaultApproverFlag"> <i class="far fa-exclamation-circle" aria-hidden="true"></i></span>
+<span ngbTooltip="Fund certifier is not the default" *ngIf="financialApprover && currentApprover && userIsFinancialAnalyst && approver.defaultApproverFlag"> <i class="far fa-exclamation-circle" aria-hidden="true"></i></span>
