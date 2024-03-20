@@ -104,7 +104,7 @@ export class CreateTypeComponent implements OnInit {
     if (this.readOnly) {
       return;
     }
-    const sources = this.requestModel.programRecommendedCostsModel.fundingSources.map(source => source.fundingSourceId);
+    const sources = this.requestModel.programRecommendedCostsModel.selectedFundingSources.map(source => source.fundingSourceId);
     const noTcs = sources.some(e => this.NO_TCS_ACTION_TYPES.includes(e))
 
     this.data = [
