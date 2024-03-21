@@ -307,7 +307,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       }
     }
 
-    if(this.workflowModel.isApprovalAction(action) && this.workflowModel.isFcNci && this.isBlank(this.requestModel.requestDto?.oefiaCreateCode)) {
+    if(this.showCreateType && this.isBlank(this.requestModel.requestDto?.oefiaCreateCode)) {
       this.logger.info(`Blank OEFIA Create Code for frqId#${this.requestModel.requestDto.frqId}`);
       valid = false;
     }
