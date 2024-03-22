@@ -21,6 +21,7 @@ export class FsMenuComponent implements OnInit {
   pd: boolean;
   pa: boolean;
   paylistReadOnlyRole = false;
+  gmLeadership: boolean;
   paylistUrl: string;
   pendingGrantsCount: number;
 
@@ -41,6 +42,7 @@ export class FsMenuComponent implements OnInit {
     this.oefiaCertifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
     this.splCertifier = this.userSessionService.hasRole(roleNames.SPL_CERTIFIER);
     this.paylistReadOnlyRole = this.userSessionService.hasRole(roleNames.PAYLIST_READ_ONLY);
+    this.gmLeadership = this.userSessionService.hasRole(roleNames.GM_LEADERSHIP);
     this.pd = this.userSessionService.isPD();
     this.pa = this.userSessionService.isPA();
 
