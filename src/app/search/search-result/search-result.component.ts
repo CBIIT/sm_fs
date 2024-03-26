@@ -132,7 +132,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   ngOnInit(): void {
-    this.canOpenPaylist = this.userService.hasRole('GMBRCHF') ||
+    this.canOpenPaylist = this.userService.hasRole('GMLEADER') ||
       this.userService.hasRole('OEFIACRT') ||
       this.userService.hasRole('DES') ||
       this.userService.hasRole('PAYLSTVW');
