@@ -15,7 +15,6 @@ export class FsMenuComponent implements OnInit {
   paylistPendingGrantsUrl: string;
   paylistSearchUrl: string;
 
-  ogaCertifier: boolean;
   oefiaCertifier: boolean;
   splCertifier: boolean;
   pd: boolean;
@@ -38,7 +37,6 @@ export class FsMenuComponent implements OnInit {
     this.paylistPendingGrantsUrl = this.paylistUrl + '#side-nav-grants';
     this.paylistSearchUrl = this.paylistUrl + '#side-nav-find-paylists';
 
-    this.ogaCertifier = this.userSessionService.hasRole(roleNames.OGA_CERTIFIER);
     this.oefiaCertifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
     this.splCertifier = this.userSessionService.hasRole(roleNames.SPL_CERTIFIER);
     this.paylistReadOnlyRole = this.userSessionService.hasRole(roleNames.PAYLIST_READ_ONLY);

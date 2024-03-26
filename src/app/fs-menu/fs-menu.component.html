@@ -9,11 +9,11 @@
         </ul>
       </li>
 
-      <li class="list-group-item"  *ngIf="oefiaCertifier || splCertifier || paylistReadOnlyRole || ogaCertifier || gmLeadership" >
+      <li class="list-group-item"  *ngIf="oefiaCertifier || splCertifier || paylistReadOnlyRole || gmLeadership" >
           <a href="#paylist" class="parent" data-toggle="collapse" href="#nav-collapse-paylist" role="button" aria-expanded="true" aria-controls="nav-collapse-paylist"><b>Paylists</b></a>
           <ul class="collapse show" id="nav-collapse-paylist">
-              <li class="list-group-item" *ngIf="ogaCertifier" ><a href="{{paylistDashboardUrl}}">Dashboard</a></li>
-              <li class="list-group-item" *ngIf="ogaCertifier"><a href="{{paylistPendingGrantsUrl}}">Pending Grants<span class="badge badge-danger ml-1">{{pendingGrantsCount}}</span></a></li>
+              <li class="list-group-item" *ngIf="gmLeadership" ><a href="{{paylistDashboardUrl}}">Dashboard</a></li>
+              <li class="list-group-item" *ngIf="gmLeadership"><a href="{{paylistPendingGrantsUrl}}">Pending Grants<span class="badge badge-danger ml-1">{{pendingGrantsCount}}</span></a></li>
               <li class="list-group-item" *ngIf="oefiaCertifier || splCertifier"><a href="{{paylistDashboardUrl}}">View/Certify Paylines</a></li>
               <li class="list-group-item" *ngIf="paylistReadOnlyRole && !(oefiaCertifier || splCertifier)"><a href="{{paylistDashboardUrl}}">View Paylines</a></li>
           </ul>
@@ -24,7 +24,7 @@
         <ul class="collapse show" id="nav-collapse-search">
           <li class="list-group-item"><a [routerLink]="['/search/fr']" routerLinkActive="active">Individual Requests</a></li>
           <li class="list-group-item"><a [routerLink]="['/search/fp']" routerLinkActive="active">Funding Plans</a></li>
-          <li class="list-group-item" *ngIf="oefiaCertifier || splCertifier || paylistReadOnlyRole || ogaCertifier || gmLeadership"><a href="{{paylistSearchUrl}}">Paylists</a></li>
+          <li class="list-group-item" *ngIf="oefiaCertifier || splCertifier || paylistReadOnlyRole || gmLeadership"><a href="{{paylistSearchUrl}}">Paylists</a></li>
           <li class="list-group-item"><a [routerLink]="['/search/grants']" routerLinkActive="active">Grants</a></li>
         </ul>
       </li>
