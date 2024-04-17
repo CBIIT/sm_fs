@@ -54,7 +54,7 @@ export class GmInfoComponent implements OnInit, OnDestroy {
         if (result) {
           this.logger.debug('getGmActiveSpecialists returned', result);
           this.specialists = result.map( (data) =>
-          ({id: String(data.specNpeId), text: data.specCode + ' ' + data.specFullName}));
+          ({id: String(data.specNpeId), text: data.specFullName}));
           this.specialistMap = result.reduce((map, specialist) => {
             map.set(specialist.specNpeId, specialist);
             return map;
@@ -93,7 +93,7 @@ export class GmInfoComponent implements OnInit, OnDestroy {
       this.logger.debug('spec npe id', this.gmInfo.defaultSpecNpeId);
       const spec = this.specialistMap.get(Number(this.gmInfo.defaultSpecNpeId));
       this.logger.debug('specialist ',  spec);
-      this.gmInfo.defaultSpecFullName = spec?.specCode + ' ' + spec?.specFullName;
+      this.gmInfo.defaultSpecFullName = spec?.specFullName;
     }
     return this.gmInfo;
   }

@@ -60,7 +60,7 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
         if (result) {
           this.logger.debug('getGmActiveSpecialists returned', result);
           this.specialists = result.map( (data) =>
-          ({id: String(data.specNpeId), text: data.specCode + ' ' + data.specFullName}));
+          ({id: String(data.specNpeId), text: data.specFullName}));
           this.specialistMap = result.reduce((map, specialist) => {
             map.set(specialist.specNpeId, specialist);
             return map;
@@ -114,7 +114,7 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
       gmInfo.defaultSpecNpeId = grant.pfrSpecNpeId;
       const spec = this.specialistMap.get(Number(grant.pfrSpecNpeId));
       this.logger.debug('spec',  this.specialistMap.get(22180));
-      gmInfo.defaultSpecFullName = spec.specCode + ' ' + spec.specFullName;
+      gmInfo.defaultSpecFullName = spec.specFullName;
       gmInfos.push(gmInfo);
     }
     return gmInfos;
