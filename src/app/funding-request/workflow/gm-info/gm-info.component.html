@@ -44,12 +44,8 @@
                 [allowClear]="true"
                 [data] = "specialists"
                 [(ngModel)]= "gmInfo.defaultSpecNpeId"
-                #specFullName="ngModel"
-                [required]="isApprovalAction">
+                #specFullName="ngModel">
             </ng-select2>
-            <div class="text-danger mt-1" *ngIf="(specFullName.errors?.required)">
-                Specialist is required
-            </div>
             </ng-template>
         </div>
     </div>
