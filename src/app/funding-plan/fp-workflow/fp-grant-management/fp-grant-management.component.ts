@@ -113,8 +113,7 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
       gmInfo.bkupSpecNpeId = grant.pfrBkupSpecNpeId;
       gmInfo.defaultSpecNpeId = grant.pfrSpecNpeId;
       const spec = this.specialistMap.get(Number(grant.pfrSpecNpeId));
-      this.logger.debug('spec',  this.specialistMap.get(22180));
-      gmInfo.defaultSpecFullName = spec.specFullName;
+      gmInfo.defaultSpecFullName = spec?.specFullName;
       gmInfos.push(gmInfo);
     }
     return gmInfos;

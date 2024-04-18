@@ -92,7 +92,6 @@ export class GmInfoComponent implements OnInit, OnDestroy {
     if (this.gmInfo.defaultSpecNpeId) {
       this.logger.debug('spec npe id', this.gmInfo.defaultSpecNpeId);
       const spec = this.specialistMap.get(Number(this.gmInfo.defaultSpecNpeId));
-      this.logger.debug('specialist ',  spec);
       this.gmInfo.defaultSpecFullName = spec?.specFullName;
     }
     return this.gmInfo;
