@@ -55,7 +55,7 @@ module.exports = {
   },
 
   '/i2emailsvc': {
-    target: 'http://ncias-d1982-v:12009/',
+    target: 'http://ncias-d3203-v:12009/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
