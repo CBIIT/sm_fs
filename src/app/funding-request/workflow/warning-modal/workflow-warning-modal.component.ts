@@ -14,6 +14,7 @@ export class WorkflowWarningModalComponent implements OnInit {
   private modalRef: NgbModalRef;
 
   warningTypes: CanWarning;
+  title = 'Approve Budget Information'
 
   constructor(private modalService: NgbModal,
               private logger: NGXLogger) { }
@@ -22,6 +23,9 @@ export class WorkflowWarningModalComponent implements OnInit {
 
   openConfirmModal(warningTypes: CanWarning): Promise<void> {
     this.warningTypes = warningTypes;
+    if(this.warningTypes.noTcsAction) {
+      this.title = 'No TCS Action';
+    }
     return new Promise<void>( (resolve, reject) => {
       this.modalRef = this.modalService.open(this.modalContent);
       this.modalRef.result.then(resolve, reject);
@@ -42,5 +46,6 @@ export interface CanWarning {
   missingCan?: boolean;
   duplicateCan?: boolean;
   nonDefaultCan?: boolean;
+  noTcsAction?: boolean;
 }
 

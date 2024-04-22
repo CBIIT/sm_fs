@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Select2OptionData } from 'ng-select2';
 import { RequestModel } from '../../model/request/request-model';
 import { FundingRequestTypes } from '../../model/request/funding-request-types';
+import { FundingSourceTypes } from '../../model/request/funding-source-types';
 import { NGXLogger } from 'ngx-logger';
 import { WorkflowModel } from '../workflow/workflow.model';
 
@@ -12,8 +13,16 @@ import { WorkflowModel } from '../workflow/workflow.model';
 })
 export class CreateTypeComponent implements OnInit {
 
+  @Input() required = true;
+
   data: Array<Select2OptionData> = [];
   private _selectedValue: string;
+
+  NO_TCS_ACTION_TYPES = [
+    FundingSourceTypes.NIH_OD_CO_FUNDS,
+    FundingSourceTypes.NIH_NON_OD_CO_FUNDS,
+    FundingSourceTypes.IDDA_REIMBURSABLE_INTER_AGENCY_FUNDS
+  ];
 
   ROLLUP_TYPES = [
     FundingRequestTypes.REINSTATEMENT_OF_DELETED_COSTS,
@@ -24,7 +33,12 @@ export class CreateTypeComponent implements OnInit {
     FundingRequestTypes.CO_FUND_A_NON_NCI_NON_COMPETING_GRANT__OTHER,
     FundingRequestTypes.CO_FUND_A_NON_NCI_NON_COMPETING_GRANT__OVER_150000_DC_IN_A_BUDGET_PERIOD_OR_OVER_450000_FOR_ALL_YEARS,
     FundingRequestTypes.CO_FUND_A_NON_NCI_NON_COMPETING_GRANT__UP_TO_25000_IN_A_BUDGET_PERIOD,
-    FundingRequestTypes.CO_FUND_A_NON_NCI_NON_COMPETING_GRANT__UP_TO_150000_DC_IN_A_BUDGET_PERIOD_AND_NOT_EXCEEDING_450000_FOR_ALL_YEARS
+    FundingRequestTypes.CO_FUND_A_NON_NCI_NON_COMPETING_GRANT__UP_TO_150000_DC_IN_A_BUDGET_PERIOD_AND_NOT_EXCEEDING_450000_FOR_ALL_YEARS,
+    FundingRequestTypes.GENERAL_ADMINISTRATIVE_SUPPLEMENTS_ADJUSTMENT_POST_AWARD,
+    FundingRequestTypes.GENERAL_ADMINISTRATIVE_SUPPLEMENTS_ADJUSTMENT_POST_AWARD__UP_TO_25000_IN_A_BUDGET_PERIOD,
+    FundingRequestTypes.GENERAL_ADMINISTRATIVE_SUPPLEMENTS_ADJUSTMENT_POST_AWARD__UP_TO_150000_DC_IN_A_BUDGET_PERIOD_AND_NOT_EXCEEDING_450000_FOR_ALL_YEARS,
+    FundingRequestTypes.GENERAL_ADMINISTRATIVE_SUPPLEMENTS_ADJUSTMENT_POST_AWARD__OVER_150000_DC_IN_A_BUDGET_PERIOD_OR_OVER_450000_FOR_ALL_YEARS,
+    FundingRequestTypes.GENERAL_ADMINISTRATIVE_SUPPLEMENTS_ADJUSTMENT_POST_AWARD__OTHER
   ];
 
   PRE_APPL_TYPES = [
@@ -72,6 +86,7 @@ export class CreateTypeComponent implements OnInit {
   @Input() readOnly = false;
 
   set selectedValue(value: string) {
+    this.logger.debug(`Setting selected value ${value}`)
     this._selectedValue = value;
     this.requestModel.requestDto.oefiaCreateCode = value;
     this.requestModel.requestDto.financialInfoDto.oefiaCreateCode = value;
@@ -89,16 +104,22 @@ export class CreateTypeComponent implements OnInit {
     if (this.readOnly) {
       return;
     }
+    const sources = this.requestModel.programRecommendedCostsModel.selectedFundingSources.map(source => source.fundingSourceId);
+    const noTcs = sources.some(e => this.NO_TCS_ACTION_TYPES.includes(e))
+
     this.data = [
-      { id: 'PRE-APPL', text: 'Pre-Appl' },
-      /*{ id: '2', text: 'Rollup' }*/
+      { id: '', text: '' },
+      { id: 'NO-TCS', text: 'No TCS Action' },
+      { id: 'PRE-APPL', text: 'Pre-Appl' }
     ];
     if (!this.requestModel.isPayType4() && this.requestModel.isForGrantFY()) {
       this.data.push({ id: 'ROLLUP', text: 'Rollup' });
     }
     const type = Number(this.requestModel.requestDto.frtId);
 
-    if ( this.requestModel.isForGrantFY()
+    if(noTcs) {
+      this.selectedValue = this.requestModel.requestDto.oefiaCreateCode || 'NO-TCS';
+    } else if ( this.requestModel.isForGrantFY()
         && ((this.ROLLUP_TYPES.includes(+type)
         && !this.workflowModel.approvedByNciFC) || (this.requestModel.isNonNci() && this.requestModel.isCompeting() && +type === FundingRequestTypes.SPECIAL_ACTIONS_ADD_FUNDS_SUPPLEMENTS ))) {
       if(!this.data.filter(item => item.id === 'ROLLUP')) {
@@ -113,4 +134,7 @@ export class CreateTypeComponent implements OnInit {
     }
   }
 
+  noCreateType() {
+    return this._selectedValue === null || this._selectedValue === undefined || this._selectedValue.trim() === ''
+  }
 }

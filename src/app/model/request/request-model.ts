@@ -405,6 +405,10 @@ export class RequestModel {
     return SKIP_TYPES.includes(Number(this.requestDto.frtId));
   }
 
+  isNoTcs(): boolean {
+    return this.requestDto?.oefiaCreateCode === 'NO-TCS';
+  }
+
   isPayUsingSkip(): boolean {
     return PAY_USING_SKIP_TYPES.includes(+this.requestDto.frtId);
   }
@@ -498,7 +502,7 @@ export class RequestModel {
   isCompeting(): boolean {
     return !this.grant.councilMeetingDate.endsWith('00');
   }
-  
+
   isPayType44R00(): boolean {
     return this.is4R00() && this.isPayType4();
   }

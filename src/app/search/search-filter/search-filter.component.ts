@@ -105,38 +105,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     this.searchFilter.searchType = this.searchType;
     this.showAdvanced = this._containsAdvancedInSearchFilter(this.searchFilter);
     // YP - disable search for paylist until paylist is fully merged with fs
-    this.canSearchForPaylists = false;
-    // this.canSearchForPaylists = this.userSessionService.hasRole('GMBRCHF') ||
-    //                             this.userSessionService.hasRole('OEFIACRT');
-    // for (let year = getCurrentFiscalYear(); year >= 2009; year--) {
-    //   this.fiscalYearList.push({ id: String(year), text: String(year)});
-    // }
-    // this.boardsControllerService.getBodDatesList().subscribe(
-    //   result => {
-    //     const ncabResults: Array<Select2OptionData> = [];
-    //     for (const entry of result) {
-    //       ncabResults.push({
-    //         id: entry.key, text: entry.value
-    //       });
-    //     }
-    //     this.ncabList = ncabResults;
-    //   },
-    //   error => {
-    //     console.error('HttpClient get request error for----- ' + error.message);
-    //   });
-    // this.paylistUtilControllerService.getCostCenters().subscribe(
-    //   result => {
-    //     const ccResults: Array<Select2OptionData> = [];
-    //     for (const entry of result) {
-    //       ccResults.push({
-    //         id: entry.key, text: entry.value
-    //       });
-    //     }
-    //     this.costCenterList = ccResults;
-    //   },
-    //   error => {
-    //     console.error('HttpClient get request error for----- ' + error.message);
-    //   });
+    this.canSearchForPaylists = false;    
   }
 
   ngAfterViewInit() {
