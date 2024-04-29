@@ -24,8 +24,8 @@ export class HeaderComponent implements OnInit {
   constructor(private propertiesService: AppPropertiesService,
     private userSessionService: AppUserSessionService) {
 
-    if (userSessionService.isGmBranchCheifUser()) {
-      this.headerTemplateData.docs.splice(2, 0, { docName: 'GM Branch Chiefs User Guide', docLink: this.propertiesService.getProperty('I2EWEB_URL') + 'documentation/application/FSPaylistsUsersGuide.pdf' });
+    if (userSessionService.isGmLeadershipUser()) {
+      this.headerTemplateData.docs.splice(2, 0, { docName: 'GM Leadership User Guide', docLink: this.propertiesService.getProperty('I2EWEB_URL') + 'documentation/application/FSPaylistsUsersGuide.pdf' });
     }
     else if (userSessionService.isOefiaAndSplUser()) {
       this.headerTemplateData.docs.splice(2, 0, { docName: 'OEFIA and SPL Certifiers Guide', docLink: this.propertiesService.getProperty('I2EWEB_URL') + 'documentation/application/FSPaylinesUsersGuide.pdf' });

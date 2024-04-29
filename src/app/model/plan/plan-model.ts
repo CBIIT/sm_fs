@@ -5,6 +5,7 @@ import { NciPfrGrantQueryDtoEx, orderByPriorityAndPI } from './nci-pfr-grant-que
 import { RfaPaNcabDate } from '@cbiit/i2efsws-lib/model/rfaPaNcabDate';
 import { NGXLogger } from 'ngx-logger';
 import { Alert } from 'src/app/alert-billboard/alert';
+import { FundingSourceTypes } from '../request/funding-source-types';
 
 @Injectable({
   providedIn: 'root'
@@ -205,6 +206,15 @@ export class PlanModel {
 
   clearAlerts(): void {
     this.pendingAlerts = [];
+  }
+
+  planUsesPoolRpgFunds() : boolean {
+    return !!this.fundingPlanDto.fpFinancialInformation?.fundingPlanFundsSources?.find(s => s.fundingSourceId === FundingSourceTypes.POOL_RPG_FUNDS);
+  }
+
+  planHasMultipleActivityCodes() : boolean {
+    const tmp = new Set(this._allGrants?.filter(g => g.selected).map(g => g.activityCode));
+    return tmp.size > 1;
   }
 }
 

@@ -69,8 +69,8 @@ export class AppUserSessionService {
     || this.roles.includes(roleNames.SPL_CERTIFIER);
   }
 
-  isGmBranchCheifUser(): boolean {
-    return this.roles.includes(roleNames.OGA_CERTIFIER);
+  isGmLeadershipUser(): boolean {
+    return this.roles.includes(roleNames.GM_LEADERSHIP);
   }
 
   isPA(): boolean {
