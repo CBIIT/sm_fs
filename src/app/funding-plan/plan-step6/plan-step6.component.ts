@@ -77,7 +77,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   userReadonly = true;
   closeResult: string;
   docChecker: FundingPlanDocChecker;
-  public disableSubmitPlan: boolean = false;
+  public disableSubmitPlan = false;
 
   private fprId: number;
 
@@ -150,6 +150,8 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
           this.fpInfoComponent.totalApplicationsNotConsidered = this.grantsNotConsidered.length;
           this.fpInfoComponent.countsSetByStep6 = true;
           this.logger.debug('set fpInfoComp counts, selected=' + this.fpInfoComponent.totalApplicationsSelected);
+          this.logger.debug(`Plan uses PoolRPG: ${this.planModel.planUsesPoolRpgFunds()}`);
+          this.logger.debug(`Plan has multiple activity codes: ${this.planModel.planHasMultipleActivityCodes()}`);
         }
       },
       error => {

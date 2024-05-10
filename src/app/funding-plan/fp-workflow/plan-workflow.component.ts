@@ -4,7 +4,7 @@ import {
   FsPlanWorkflowControllerService,
   FundingReqStatusHistoryDto,
   FundingRequestQueryDto,
-  WorkflowTaskDto
+  WorkflowTaskDto,
 } from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subscription } from 'rxjs';
@@ -15,15 +15,15 @@ import {
   TerminalStatuses,
   WorkflowAction,
   WorkflowActionCode,
-  WorkflowModel
+  WorkflowModel,
 } from 'src/app/funding-request/workflow/workflow.model';
 import { Alert } from 'src/app/alert-billboard/alert';
 import { FundingRequestIntegrationService } from 'src/app/funding-request/integration/integration.service';
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
-import { AppPropertiesService , DatepickerFormatter } from '@cbiit/i2ecui-lib';
-import { FpGrantManagementComponent  } from './fp-grant-management/fp-grant-management.component';
+import { AppPropertiesService, DatepickerFormatter } from '@cbiit/i2ecui-lib';
+import { FpGrantManagementComponent } from './fp-grant-management/fp-grant-management.component';
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
 import { PlanManagementService } from '../service/plan-management.service';
 import { FpCanWarning, FpWorkflowWarningModalComponent } from './fp-warning-modal/fp-workflow-warning-modal.component';
@@ -36,17 +36,13 @@ let addedApproverMap = new Map<number, any>();
   selector: 'app-plan-workflow',
   templateUrl: './plan-workflow.component.html',
   styleUrls: ['./plan-workflow.component.css'],
-  providers: [
-    { provide: NgbDateParserFormatter, useClass: DatepickerFormatter }
-  ]
+  providers: [{ provide: NgbDateParserFormatter, useClass: DatepickerFormatter }],
 })
 export class PlanWorkflowComponent implements OnInit, OnDestroy {
-
   @Input() readonly = false;
   @Output() actionEmitter = new EventEmitter<string>();
   @ViewChild(FpGrantManagementComponent) gmComponent: FpGrantManagementComponent;
   @ViewChild(FpWorkflowWarningModalComponent) fpWorkflowWarningModalComponent: FpWorkflowWarningModalComponent;
-
 
   budgetInfoComponent: FpBudgetInformationComponent;
   uploadBudgetDocumentsComponent: UploadBudgetDocumentsComponent;
@@ -78,14 +74,17 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
   private _dirty = false;
-  public disableWorkflow: boolean = false;
+  public disableWorkflow = false;
 
   set selectedValue(value: number) {
     this._selectedValue = value;
     const user = approverMap.get(Number(value));
     this.logger.debug('Selected Approver to Add: ', user);
     // if (this._selectedWorkflowAction) {
-    this.workflowModel.addAdditionalApprover(user, this._selectedWorkflowAction ? this._selectedWorkflowAction.action : null);
+    this.workflowModel.addAdditionalApprover(
+      user,
+      this._selectedWorkflowAction ? this._selectedWorkflowAction.action : null
+    );
     // }
     setTimeout(() => {
       this._selectedValue = null;
@@ -108,18 +107,19 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     }
   }
 
-  constructor(private requestIntegrationService: FundingRequestIntegrationService,
-              private planManagementService: PlanManagementService,
-              private workflowService: FsPlanWorkflowControllerService,
-              private planService: FsPlanControllerService,
-              private propertiesService: AppPropertiesService,
-              private userSessionService: AppUserSessionService,
-              private planModel: PlanModel,
-              private workflowModel: WorkflowModel,
-              private calendar: NgbCalendar,
-              private router: Router,
-              private logger: NGXLogger) {
-  }
+  constructor(
+    private requestIntegrationService: FundingRequestIntegrationService,
+    private planManagementService: PlanManagementService,
+    private workflowService: FsPlanWorkflowControllerService,
+    private planService: FsPlanControllerService,
+    private propertiesService: AppPropertiesService,
+    private userSessionService: AppUserSessionService,
+    private planModel: PlanModel,
+    private workflowModel: WorkflowModel,
+    private calendar: NgbCalendar,
+    private router: Router,
+    private logger: NGXLogger
+  ) {}
 
   ngOnDestroy(): void {
     if (this.approverInitializationSubscription) {
@@ -142,11 +142,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       }
       return true;
     });
-    data2.forEach(user => {
+    data2.forEach((user) => {
       approverMap.set(Number(user.id), user);
     });
     return data2;
-
   }
 
   ngOnInit(): void {
@@ -160,7 +159,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       language: {
         inputTooShort(): string {
           return '';
-        }
+        },
       },
       ajax: {
         url: '/i2efsws/api/v1/fs/lookup/funding-request/approvers/',
@@ -168,22 +167,22 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         type: 'POST',
         data(params): any {
           return {
-            term: params.term
+            term: params.term,
           };
         },
         processResults(data): any {
           const data2 = callback(data);
           return {
-            results: $.map(data2, user => {
+            results: $.map(data2, (user) => {
               return {
                 id: user.id,
                 text: user.fullName + ' [' + user.parentOrgPath + ']',
-                user
+                user,
               };
-            })
+            }),
           };
-        }
-      }
+        },
+      },
     };
 
     this.approverInitializationSubscription = this.requestIntegrationService.approverInitializationEmitter.subscribe(
@@ -195,14 +194,12 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(
-      () => {
-        addedApproverMap = this.workflowModel.addedApproverMap;
-        this.alert = null;
-        this.checkIfStuck();
-        this.isFormValid();
-      }
-    );
+    this.approverChangeSubscription = this.requestIntegrationService.approverListChangeEmitter.subscribe(() => {
+      addedApproverMap = this.workflowModel.addedApproverMap;
+      this.alert = null;
+      this.checkIfStuck();
+      this.isFormValid();
+    });
 
     this.requestHistorySubscription = this.requestIntegrationService.requestHistoryLoadEmitter.subscribe(
       (historyResult) => {
@@ -211,14 +208,13 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     );
 
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
-
   }
 
   fetchCompletedPfr(): void {
     if (this.workflowModel.isUserNextInChain && this.workflowModel.lastInChain) {
       this.planService.getCompletedPFRs(this.planModel.fundingPlanDto.fprId).subscribe(
-        result => this.completedPfrs = result,
-        error => {
+        (result) => (this.completedPfrs = result),
+        (error) => {
           this.logger.error('calling getCompletedPFRs failed ', error);
         }
       );
@@ -242,12 +238,11 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   }
 
   showGmInfo(): boolean {
-    return this.workflowModel.approvedByGM ||
-      (this.workflowModel.isGMApprover && this.approvingState);
+    return this.workflowModel.approvedByGM || (this.workflowModel.isGMApprover && this.approvingState);
   }
 
   get selectedWorkflowAction(): WorkflowActionCode {
-    return (this._selectedWorkflowAction) ? this._selectedWorkflowAction.action : null;
+    return this._selectedWorkflowAction ? this._selectedWorkflowAction.action : null;
   }
 
   set selectedWorkflowAction(action: WorkflowActionCode) {
@@ -256,15 +251,15 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     this._selectedWorkflowAction = this.workflowModel.getWorkflowAction(action);
     if (!this._selectedWorkflowAction) {
       this.showAddApprover = false;
-//      this.buttonLabel = 'Process Action';
+      //      this.buttonLabel = 'Process Action';
       return;
     }
 
-//    this.buttonLabel = this._selectedWorkflowAction.actionButtonText;
-    this.addApproverLabel = this._selectedWorkflowAction.action === WorkflowActionCode.REASSIGN ? 'Select Approver' : 'Add Approver(s)';
+    //    this.buttonLabel = this._selectedWorkflowAction.actionButtonText;
+    this.addApproverLabel =
+      this._selectedWorkflowAction.action === WorkflowActionCode.REASSIGN ? 'Select Approver' : 'Add Approver(s)';
     this.showAddApprover = this._selectedWorkflowAction.newApproverRequired;
     this.workflowModel.prepareApproverListsForView(this._selectedWorkflowAction.action);
-
   }
 
   get buttonDisabled(): boolean {
@@ -283,7 +278,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   }
 
   get showSplMeetingDate(): boolean {
-    return this.workflowModel.isSplApprover && this.workflowModel.isApprovalAction(this._selectedWorkflowAction?.action);
+    return (
+      this.workflowModel.isSplApprover && this.workflowModel.isApprovalAction(this._selectedWorkflowAction?.action)
+    );
   }
 
   onSplMeetingDateSelect($event: any): void {
@@ -297,8 +294,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     if (this.workflowStuckBy) {
       return;
     }
-    if ((this.gmComponent && !this.gmComponent.isFormValid()) ||
-      (this.uploadBudgetDocumentsComponent && !this.uploadBudgetDocumentsComponent.isFromValid())) {
+    if (
+      (this.gmComponent && !this.gmComponent.isFormValid()) ||
+      (this.uploadBudgetDocumentsComponent && !this.uploadBudgetDocumentsComponent.isFromValid())
+    ) {
       valid = false;
     }
     if (!this.isFormValid()) {
@@ -307,39 +306,52 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const canWarning: FpCanWarning = {};
-    if (this.workflowModel.isFinancialApprover
-        && this.workflowModel.isApprovalAction(action)
-        && this.budgetInfoComponent) {
+    if (
+      this.workflowModel.isFinancialApprover &&
+      this.workflowModel.isApprovalAction(action) &&
+      this.budgetInfoComponent
+    ) {
       const canFormValid = this.budgetInfoComponent.isFormValid(canWarning);
       if (!canFormValid) {
         valid = false;
+      } else {
+        if (this.planModel.planUsesPoolRpgFunds() && this.planModel.planHasMultipleActivityCodes()) {
+          if (
+            !confirm(
+              'WARNING: There is more than one activity code in this funding plan and the approval might affect proposed applications assigned to other Financial Analysts. ' +
+              'Please coordinate with the other Financial Analysts or choose to approve and route the plan to them.'
+            )
+          ) {
+            return;
+          }
+        }
       }
     }
 
     if (!valid) {
-      this.alert = {type: 'danger',
-      message: 'Please correct the errors identified above.',
-      title: ''};
+      this.alert = { type: 'danger', message: 'Please correct the errors identified above.', title: '' };
       this.disableWorkflow = false;
       return;
     }
 
     if (canWarning.duplicateCan || canWarning.missingCan || canWarning.nonDefaultCan) {
-      this.fpWorkflowWarningModalComponent.openConfirmModal(canWarning).then( () => {
-        this.logger.debug('warning modal closed with yes ');
-        this.submitWorkflowToBackend();
-      }).catch(() => {
-        this.disableWorkflow = false;
-        this.logger.debug('warning modal closed with dismiss ');
-      });
-    }
-    else {
+      this.fpWorkflowWarningModalComponent
+        .openConfirmModal(canWarning)
+        .then(() => {
+          this.logger.debug('warning modal closed with yes ');
+          this.submitWorkflowToBackend();
+        })
+        .catch(() => {
+          this.disableWorkflow = false;
+          this.logger.debug('warning modal closed with dismiss ');
+        });
+    } else {
       this.submitWorkflowToBackend();
     }
   }
 
   private submitWorkflowToBackend(): void {
-  //  return;
+    //  return;
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
@@ -350,9 +362,12 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
     dto.comments = this.comments;
     dto.action = action;
-    if ((action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&
-      this.workflowModel.additionalApprovers && this.workflowModel.additionalApprovers.length > 0) {
-      dto.additionalApproverList = this.workflowModel.additionalApprovers.map(a => {
+    if (
+      (action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&
+      this.workflowModel.additionalApprovers &&
+      this.workflowModel.additionalApprovers.length > 0
+    ) {
+      dto.additionalApproverList = this.workflowModel.additionalApprovers.map((a) => {
         return a.approverLdap;
       });
     } else if (action === WorkflowActionCode.REASSIGN) {
@@ -362,18 +377,17 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     }
     // complete the request when last in chain approving.
     if (this.workflowModel.lastInChain) {
-      if (action === WorkflowActionCode.APPROVE ||
-        action === WorkflowActionCode.APPROVE_COMMENT) {
+      if (action === WorkflowActionCode.APPROVE || action === WorkflowActionCode.APPROVE_COMMENT) {
         dto.completeRequest = true;
       }
     }
     // set SPL meeting date for SPL approver;
-    if (this.workflowModel.isSplApprover
-      && this.workflowModel.isApprovalAction(action)
-      && this.splMeetingDate) {
+    if (this.workflowModel.isSplApprover && this.workflowModel.isApprovalAction(action) && this.splMeetingDate) {
       dto.splMeetingDate =
-        String(this.splMeetingDate.month).padStart(2, '0') + '/' +
-        String(this.splMeetingDate.day).padStart(2, '0') + '/' +
+        String(this.splMeetingDate.month).padStart(2, '0') +
+        '/' +
+        String(this.splMeetingDate.day).padStart(2, '0') +
+        '/' +
         String(this.splMeetingDate.year).padStart(4, '0');
       this.logger.debug('SPL approver, spl meeting date=' + this.splMeetingDate);
     }
@@ -384,11 +398,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       if (updatedCANs?.length > 0) {
         dto.requestCans = updatedCANs;
       }
-
     }
 
-    if (this.workflowModel.isGMApprover &&
-      this.workflowModel.isApprovalAction(action)) {
+    if (this.workflowModel.isGMApprover && this.workflowModel.isApprovalAction(action)) {
       dto.planGmInfo = this.gmComponent?.getGmInfos();
     }
 
@@ -399,12 +411,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         this.planManagementService.planBudgetReadOnlyEmitter.next(true);
 
         this.workflowModel.initializeForPlan(dto.fprId);
-        if (this.workflowModel.isSplApprover
-          && this.workflowModel.isApprovalAction(action)
-          && this.splMeetingDate) {
+        if (this.workflowModel.isSplApprover && this.workflowModel.isApprovalAction(action) && this.splMeetingDate) {
           this.planModel.fundingPlanDto.splMeetingDate = new Date(dto.splMeetingDate);
           this.logger.info('set SplMeetingDate to planModel ' + this.planModel.fundingPlanDto.splMeetingDate);
-
         } else if (dto.action === WorkflowActionCode.RETURN) {
           this.planModel.fundingPlanDto.splMeetingDate = undefined;
         }
@@ -419,12 +428,14 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   }
 
   checkIfStuck(): void {
-    if ((this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE ||
+    if (
+      (this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE ||
         this._selectedWorkflowAction?.action === WorkflowActionCode.APPROVE_COMMENT) &&
       this.approvingState &&
       this.workflowModel.lastInChain &&
       this.completedPfrs &&
-      this.completedPfrs.length > 0) {
+      this.completedPfrs.length > 0
+    ) {
       this.workflowStuckBy = 'ByCompletedPfrs';
     } else {
       this.workflowStuckBy = null;
@@ -434,7 +445,6 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   retrieveRequest(frqId: number): void {
     this.router.navigate(['/request/retrieve', frqId]);
   }
-
 
   isFormValid(): boolean {
     this.validationError = {};
@@ -471,9 +481,11 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   }
 
   get showBudgetDocWarning(): boolean {
-    return this.workflowModel.isFinancialApprover
-      && this.workflowModel.isApprovalAction(this._selectedWorkflowAction?.action)
-      && this.workflowModel.budgetDocAdded;
+    return (
+      this.workflowModel.isFinancialApprover &&
+      this.workflowModel.isApprovalAction(this._selectedWorkflowAction?.action) &&
+      this.workflowModel.budgetDocAdded
+    );
   }
 
   onCommentsInput(): void {

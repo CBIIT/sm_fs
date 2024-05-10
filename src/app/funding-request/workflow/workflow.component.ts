@@ -307,6 +307,15 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       }
     }
 
+    if(this.showCreateType && this.isBlank(this.requestModel.requestDto?.oefiaCreateCode)) {
+      this.logger.info(`Blank OEFIA Create Code for frqId#${this.requestModel.requestDto.frqId}`);
+      valid = false;
+    }
+
+    if(this.workflowModel.isApprovalAction(action) && this.workflowModel.isFcNci && this.requestModel.isNoTcs()) {
+      canWarning.noTcsAction = true;
+    }
+
     if (!valid) {
       this.alert = {type: 'danger',
       message: 'Please correct the errors identified above.',
@@ -315,7 +324,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (canWarning.duplicateCan || canWarning.missingCan || canWarning.nonDefaultCan) {
+    if (canWarning.duplicateCan || canWarning.missingCan || canWarning.nonDefaultCan || canWarning.noTcsAction) {
       this.logger.info(`Opening CAN warning modal for frqId#${this.requestModel.requestDto.frqId}`);
       this.workflowWarningModalComponent.openConfirmModal(canWarning).then( () => {
         this.logger.info(`CAN warning modal closed for frqId#${this.requestModel.requestDto.frqId}`);
@@ -451,5 +460,9 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   retrievePlan(fprId: number): void {
     this.router.navigate(['/plan/retrieve', fprId]);
+  }
+
+  private isBlank(oefiaCreateCode: string | undefined) {
+    return oefiaCreateCode === null || oefiaCreateCode === undefined || oefiaCreateCode.trim() === '';
   }
 }
