@@ -1,6 +1,6 @@
 module.exports = {
   '/i2ecommonws': {
-    target: 'http://ncias-d3203-v:14080/',
+    target: 'http://ncias-d3203-v:38080/',
     secure: false,
     changeOrigin: true,
     onProxyRes: proxyRes => {
