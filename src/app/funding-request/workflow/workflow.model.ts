@@ -127,7 +127,7 @@ export class WorkflowModel {
 
   private isUserEligible(approver: FundingReqApproversDto): boolean {
     // GM Approver super user;
-    if (approver.roleCode === 'GM' && this.userSessionService.hasRole('PFRGMAPR')) {
+    if (approver.roleCode === 'GM' && this.userSessionService.isPrimaryGmLeaderShip()) {
       return true;
     }
     // OEFIA Funder Approver supper user
