@@ -32,12 +32,8 @@
                             [allowClear]="true"
                             [data] = "specialists"
                             [(ngModel)]= "grant.pfrSpecNpeId"
-                            #specialist="ngModel"
-                            [required]="isApprovalAction">
+                            #specialist="ngModel">
                             </ng-select2>
-                            <div class="text-danger mt-1" *ngIf="(specialist.errors?.required)">
-                                Specialist is required
-                            </div>
                         </div>
                         <ng-template #readonly>
                             <a href="mailto: {{grant.pfrSpecEmailAddress}}">{{grant.pfrSpecFullName}}</a>

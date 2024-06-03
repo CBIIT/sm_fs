@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { UserService } from '@cbiit/i2ecui-lib';
 import { CancerActivitiesDto, CancerActivityControllerService } from '@cbiit/i2erefws-lib';
-import { NciPerson } from "@cbiit/i2ecommonws-lib";
+import { NciPerson, UserControllerService } from "@cbiit/i2ecommonws-lib";
 import { NGXLogger } from 'ngx-logger';
 import { roleNames } from '../service/role-names';
 import { Router } from '@angular/router';
@@ -17,9 +17,11 @@ export class AppUserSessionService {
   public isMbOnly = false;
 
   private roles: string[] = [];
+  private primaryGmLeadership = false;
 
   constructor(private userService: UserService,
               private caService: CancerActivityControllerService,
+              private userControllerService: UserControllerService,
               private router: Router,
               private logger: NGXLogger) {
   }
@@ -37,6 +39,13 @@ export class AppUserSessionService {
             this.roles = [];
             result.authorities?.forEach(authority => {
               this.roles.push(authority.authority);
+              if (authority.authority === 'GMLEADER') {
+                this.userControllerService.isUserRolePrimary(this.loggedOnUser.npnId, authority.authority).subscribe(
+                  isPrimary => {
+                    this.primaryGmLeadership = isPrimary;
+                  }
+                )
+              }
             });
             this.caService.getCasForPd(this.loggedOnUser.npnId, true).subscribe(
               (caresult) => {
@@ -71,6 +80,14 @@ export class AppUserSessionService {
 
   isGmLeadershipUser(): boolean {
     return this.roles.includes(roleNames.GM_LEADERSHIP);
+  }
+
+  isGMLeaderShipRole():boolean{
+    return this.roles.indexOf('GMLEADER') > -1 
+  }
+
+  isPrimaryGmLeaderShip(): boolean {
+    return this.primaryGmLeadership;
   }
 
   isPA(): boolean {

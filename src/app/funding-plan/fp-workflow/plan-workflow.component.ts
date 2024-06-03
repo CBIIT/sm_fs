@@ -53,6 +53,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   options: Options;
   comments = '';
+  gmNotes='';
+  specialNotes='';
+  activeNotes='';
   buttonLabel = 'Process Action';
   addApproverLabel = 'Add Approver(s)';
   // buttonDisabled = true;
@@ -70,6 +73,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   completedPfrs: FundingRequestQueryDto[];
   workflowStuckBy: 'ByCompletedPfrs';
   grantViewerUrl: string;
+  isApprovalAction = false;
 
   private _selectedValue: number;
   private _selectedWorkflowAction: WorkflowAction;
@@ -97,6 +101,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   onActionChange(value: string): void {
     this._dirty = true;
+    this.isApprovalAction = this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
     this.actionEmitter.emit(value);
     if (this.gmComponent) {
       this.gmComponent.isApprovalAction = this.workflowModel.isApprovalAction(WorkflowActionCode[value]);
@@ -150,6 +155,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.logger.debug('PlanWorkflowComponent ngOnInit()');
+
     const callback = this.storeData;
     this.options = {
       allowClear: true,
@@ -190,6 +196,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         this.comments = '';
         this.workflowActions = this.workflowModel.getWorkflowList();
         this.fetchCompletedPfr();
+        this.specialNotes = this.workflowModel.siNoteText?this.workflowModel.siNoteText:'';
+        this.gmNotes = this.workflowModel.gmsNoteText?this.workflowModel.gmsNoteText:'';
+        this.activeNotes = this.workflowModel.acNoteText?this.workflowModel.acNoteText:'';
         this.logger.debug('workflow actions = ', this.workflowActions);
       }
     );
@@ -235,6 +244,10 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   isApprover(): boolean {
     return this.workflowModel.isUserNextInChain && this.approvingState;
+  }
+
+  isGMLeaderShip():boolean{
+    return this.userSessionService.isGMLeaderShipRole();
   }
 
   showGmInfo(): boolean {
@@ -361,6 +374,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     dto.currentStatusId = this.requestStatus.statusId;
     dto.requestorNpeId = this.planModel.fundingPlanDto.requestorNpeId;
     dto.comments = this.comments;
+    dto.siNote = this.specialNotes;
+    dto.gmsNote = this.gmNotes;
+    dto.acNote = this.activeNotes;
     dto.action = action;
     if (
       (action === WorkflowActionCode.APPROVE_ROUTE || action === WorkflowActionCode.ROUTE_APPROVE) &&

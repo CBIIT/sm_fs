@@ -29,6 +29,9 @@ export class WorkflowModel {
   additionalApprovers: FundingReqApproversDto[];
 
   nextApproverRoleCode = '';
+  siNoteText = '';
+  gmsNoteText = '';
+  acNoteText = '';
   isUserNextInChain = false;
   lastInChain = false;
   hasNewApprover = false;
@@ -51,8 +54,8 @@ export class WorkflowModel {
   scientificRoleCodes = ['DOC', 'DD', 'SPL'];
   financialRoleCodes = ['FCNCI', 'FCARC'];
   approvalActions = [WorkflowActionCode.APPROVE,
-    WorkflowActionCode.APPROVE_COMMENT,
-    WorkflowActionCode.APPROVE_ROUTE];
+  WorkflowActionCode.APPROVE_COMMENT,
+  WorkflowActionCode.APPROVE_ROUTE];
 
   constructor(
     public requestModel: RequestModel,
@@ -74,6 +77,7 @@ export class WorkflowModel {
   }
 
   getWorkflowAction(action: WorkflowActionCode): WorkflowAction {
+    if(action === null) return null;
     for (const wa of this.awa) {
       if (wa.action === action) {
         return wa;
@@ -83,7 +87,7 @@ export class WorkflowModel {
     return null;
   }
 
-  // for workflow action drop down
+  // for workflow action drop down1
   getWorkflowList(): { id: WorkflowActionCode, text: string }[] {
     const roleCode = this.nextApproverRoleCode;
     if (roleCode) {
@@ -104,15 +108,15 @@ export class WorkflowModel {
   }
 
   private approvedAsFciNciBefore(userId: string): boolean {
-    const fciNciResponders: string[] = this._previousApprovers.filter( a => a.roleCode === 'FCNCI')
-          .map ( a => a.responderLdap);
+    const fciNciResponders: string[] = this._previousApprovers.filter(a => a.roleCode === 'FCNCI')
+      .map(a => a.responderLdap);
     return fciNciResponders.includes(userId);
   }
 
   private laterFciNciApprover(userId: string): boolean {
-    if (this._pendingApprovers ) {
+    if (this._pendingApprovers) {
       const pendingFciNciApprovers: string[] = this._pendingApprovers.filter(a => a.roleCode === 'FCNCI')
-            .map( a => a.approverLdap);
+        .map(a => a.approverLdap);
       if (pendingFciNciApprovers.length > 1) {
         pendingFciNciApprovers.splice(0, 1);
         return pendingFciNciApprovers.includes(userId);
@@ -123,26 +127,26 @@ export class WorkflowModel {
 
   private isUserEligible(approver: FundingReqApproversDto): boolean {
     // GM Approver super user;
-    if (approver.roleCode === 'GM' && this.userSessionService.hasRole('PFRGMAPR')) {
-          return true;
+    if (approver.roleCode === 'GM' && this.userSessionService.isPrimaryGmLeaderShip()) {
+      return true;
     }
     // OEFIA Funder Approver supper user
     if (approver.roleCode === 'FCNCI' && this.hasOrgRole('OEFIA', 'PFRFNAPR')) {
-          return true;
+      return true;
     }
 
     const userId = this.userSessionService.getLoggedOnUser().nihNetworkId;
-    if (userId === approver.approverLdap ) {
-        this.logger.debug('is assigned approver, stillEligible=' + approver.stillEligible);
-        return approver.stillEligible;
+    if (userId === approver.approverLdap) {
+      this.logger.debug('is assigned approver, stillEligible=' + approver.stillEligible);
+      return approver.stillEligible;
     } else if (approver.designees && approver.designees.length > 0) {
-        const designees = approver.designees.map(d => d.delegateTo);
-        if (designees.indexOf(userId) > -1) {
-          return (approver.roleCode !== 'FCNCI'
-                  || ( !this.approvedAsFciNciBefore(userId) && !this.laterFciNciApprover(userId) )
-                  || this.hasOrgRole('OEFIA', 'PFRFNAPR'));
-  //      return true;
-        }
+      const designees = approver.designees.map(d => d.delegateTo);
+      if (designees.indexOf(userId) > -1) {
+        return (approver.roleCode !== 'FCNCI'
+          || (!this.approvedAsFciNciBefore(userId) && !this.laterFciNciApprover(userId))
+          || this.hasOrgRole('OEFIA', 'PFRFNAPR'));
+        //      return true;
+      }
     }
 
     // OEFIA FA user, needs to make sure has not approved before and is not a later official approver
@@ -211,11 +215,22 @@ export class WorkflowModel {
       return approver.responseDate !== null;
     });
 
+    const notesDetailsRow = result.find(obj => obj.siNoteText !== null || obj.gmsNoteText !== null ||
+      obj.acNoteText !== null);
+
+    if (notesDetailsRow) {
+      this.siNoteText = notesDetailsRow.siNoteText ? notesDetailsRow.siNoteText : null;
+      this.gmsNoteText = notesDetailsRow.gmsNoteText ? notesDetailsRow.gmsNoteText : null;
+      this.acNoteText = notesDetailsRow.acNoteText ? notesDetailsRow.acNoteText : null
+      console.log('detail row of notes section details '+notesDetailsRow);
+    }
+
+
     const docList = result.filter((approver) => {
       return approver.roleCode === 'DOC';
     });
 
-    this._docApprover = docList && docList.length > 0 ? docList[0] : {approverFirstName: 'Unknown'};
+    this._docApprover = docList && docList.length > 0 ? docList[0] : { approverFirstName: 'Unknown' };
     this.isDocApprover = this.isUserEligible(this._docApprover);
 
     this.nextApprover = this._pendingApprovers && this._pendingApprovers.length > 0 ? this._pendingApprovers[0] : null;
@@ -331,7 +346,7 @@ export class WorkflowModel {
     }
   }
 
-  retrieveDesignees(approver: FundingReqApproversDto): void{
+  retrieveDesignees(approver: FundingReqApproversDto): void {
     this.workflowControllerService.getApproverDesignees(approver.approverLdap).subscribe(
       (result) => {
         this.logger.debug('received designees', result);
@@ -405,12 +420,12 @@ export class WorkflowAction {
   newApproverRequired: boolean;
 
   constructor(action: WorkflowActionCode,
-              actionName: string,
-              actionButtonText: string,
-              allRoles: boolean,
-              commentsRequired: boolean,
-              newApproverRequired: boolean,
-              roles?: string[]) {
+    actionName: string,
+    actionButtonText: string,
+    allRoles: boolean,
+    commentsRequired: boolean,
+    newApproverRequired: boolean,
+    roles?: string[]) {
     this.action = action;
     this.actionName = actionName;
     this.actionButtonText = actionButtonText;

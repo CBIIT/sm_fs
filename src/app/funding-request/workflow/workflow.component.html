@@ -1,17 +1,15 @@
-<app-approved-costs *ngIf="showApprovedCosts()"
-    [approvingState]="approvingState" id="workflow-approved-cost">
+<app-approved-costs *ngIf="showApprovedCosts()" [approvingState]="approvingState" id="workflow-approved-cost">
 </app-approved-costs>
 <ng-content>
 
 </ng-content>
-<app-gm-info *ngIf="showGmInfo()"
-    [approvingState]="approvingState" id="workflow-grant-management">
+<app-gm-info *ngIf="showGmInfo()" [approvingState]="approvingState" id="workflow-grant-management">
 </app-gm-info>
 <div class="row">
     <div class="col-12 d-flex">
-      <h2 id="workflow-section">Workflow</h2>
-      <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#workflow-collapse" role="button"
-        aria-expanded="true" aria-controls="workflow-collapse"></a>
+        <h2 id="workflow-section">Workflow</h2>
+        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#workflow-collapse" role="button"
+            aria-expanded="true" aria-controls="workflow-collapse"></a>
     </div>
 </div>
 
@@ -21,7 +19,8 @@
         <ngb-alert type="primary" [dismissible]="false" class="workflow-comments">
             <div><i class="fal fa-comment-alt-lines fa-3x" aria-hidden="true"></i></div>
             <div class="comment-content">
-                <div class="comment-details">Comment from <strong>{{requestStatus.performedBy}}</strong> on {{requestStatus.startDate}}</div>
+                <div class="comment-details">Comment from <strong>{{requestStatus.performedBy}}</strong> on
+                    {{requestStatus.startDate}}</div>
                 <div>{{requestStatus.comments}}</div>
             </div>
         </ngb-alert>
@@ -32,13 +31,8 @@
     <div class="col-md-4 col-lg-4" *ngIf="isApprover()">
         <div class="form-group">
             <label for="workflow-action">Action</label>
-            <ng-select2
-            id="workflow-action"
-            name="workflowAction"
-            [(ngModel)]="selectedWorkflowAction"
-            (ngModelChange)="onActionChange($event)"
-            [allowClear]="true"
-            [data]="workflowActions">
+            <ng-select2 id="workflow-action" name="workflowAction" [(ngModel)]="selectedWorkflowAction"
+                (ngModelChange)="onActionChange($event)" [allowClear]="true" [data]="workflowActions">
             </ng-select2>
             <div class="text-danger mt-1" *ngIf="(validationError?.action_missing)">
                 Action is required
@@ -47,13 +41,10 @@
     </div>
 
     <div class="col-md-4" *ngIf="showAddApprover || !readonly">
-        <div class="form-group" >
-            <label for="req-add-approvers">{{addApproverLabel}} <span class="optional" *ngIf="!newApproverRequired">(optional)</span></label>
-            <ng-select2
-                id="req-add-approvers"
-                [(ngModel)]="selectedValue"
-                [allowClear]="false"
-                [options]="options">
+        <div class="form-group">
+            <label for="req-add-approvers">{{addApproverLabel}} <span class="optional"
+                    *ngIf="!newApproverRequired">(optional)</span></label>
+            <ng-select2 id="req-add-approvers" [(ngModel)]="selectedValue" [allowClear]="false" [options]="options">
                 <option></option>
             </ng-select2>
             <div class="text-danger mt-1" *ngIf="(validationError?.approver_missing)">
@@ -64,51 +55,91 @@
     <div class="col-md-4" *ngIf="showCreateType">
         <app-create-type></app-create-type>
     </div>
-    <div class="col-12"  *ngIf="showBudgetDocWarning">
+    <div class="col-12" *ngIf="showBudgetDocWarning">
         <ngb-alert type="warning" [dismissible]="false">
             <b>WARNING:</b> If the uploaded budget document(s) are not in eGrants,
             please send the document(s) to the appropriate Grants Management Specialist to
             add it the grant file in eGrants.
         </ngb-alert>
     </div>
-    <div class="col-12"  *ngIf="workflowStuckBy">
+    <div class="col-12" *ngIf="workflowStuckBy">
         <ng-container *ngIf="workflowStuckBy === 'ByCompletedPfrs'">
-        <ngb-alert type="danger" [dismissible]="false" *ngFor="let r of completedPfrs">
-            This Grant application is part of Funding Plan
-            <a [routerLink]="" (click)="retrievePlan(r.fprId)">{{r.fprId}}</a> in FY {{r.planFy}}.
-            The selected action cannot be processed.
-        </ngb-alert>
+            <ngb-alert type="danger" [dismissible]="false" *ngFor="let r of completedPfrs">
+                This Grant application is part of Funding Plan
+                <a [routerLink]="" (click)="retrievePlan(r.fprId)">{{r.fprId}}</a> in FY {{r.planFy}}.
+                The selected action cannot be processed.
+            </ngb-alert>
         </ng-container>
     </div>
     <app-approver-list [readonly]="readonly" [terminalRequest]="terminalRequest" class="w-100"></app-approver-list>
 
     <div class="col-12">
+        <ng-container *ngIf="isApprover() || !readonly; then editComments else readOnly"></ng-container>
+        <ng-template #editComments>
         <div class="form-group" *ngIf=" isApprover() || !readonly">
             <label for="workflow-comments">Workflow Comments <span class="optional" *ngIf="!commentsRequired">(optional)</span></label>
             <textarea class="form-control" id="workflow-comments" rows="2" maxlength="2000" [(ngModel)]="comments" (input)="isFormValid()"></textarea>
             <span class="text-danger mt-1" *ngIf="(validationError?.comments_missing)">
                 Comments are required
             </span>
-            <span class="character-counter">{{comments.length}}/2000</span>
+            <span class="character-counter">{{comments.length}}/2000</span> 
+            <div *ngIf="isGMLeaderShip() && isApprovalAction">
+                <div class="notes">
+                    <label for="special-comments">Special Instructions <span class="optional">(optional)</span></label>
+                    <textarea class="form-control" id="special-comments" rows="2" maxlength="2000"
+                        [(ngModel)]="specialNotes" (input)="isFormValid()"></textarea>
+                    <span class="character-counter">{{specialNotes.length}}/2000</span>
+                </div>
+                <div class="notes">
+                    <label for="GM-comments">GMS Notes <span class="optional">(optional)</span></label>
+                    <textarea class="form-control" id="GM-comments" rows="2" maxlength="2000" [(ngModel)]="gmNotes"
+                        (input)="isFormValid()"></textarea>
+                    <span class="character-counter">{{gmNotes.length}}/2000</span>
+                </div>
+                <div class="notes">
+                    <label for="active-comments">Action Comments <span class="optional">(optional)</span></label>
+                    <textarea class="form-control" id="active-comments" rows="2" maxlength="2000"
+                        [(ngModel)]="activeNotes" (input)="isFormValid()"></textarea>
+                    <span class="character-counter">{{activeNotes.length}}/2000</span>
+                </div>
+            </div>
         </div>
-
+        </ng-template>
+        <ng-template #readOnly>
+        <div class="form-group" *ngIf="readonly">
+           <div class="notes" *ngIf="specialNotes && specialNotes.trim() !== ''">
+               <label for="special-comments">Special Instructions </label>
+               <textarea class="form-control" id="special-comments" rows="2" maxlength="2000" [(ngModel)]="specialNotes"  [readonly]="readonly"></textarea>
+           </div>
+           <div class="notes" *ngIf="gmNotes && gmNotes.trim() !== ''">
+               <label for="GM-comments">GMS Notes </label>
+               <textarea class="form-control" id="GM-comments" rows="2" maxlength="2000" [(ngModel)]="gmNotes" [readonly]="readonly"></textarea>
+           </div>
+           <div class="notes" *ngIf="activeNotes && activeNotes.trim() !== ''">
+               <label for="active-comments">Action Comments </label>
+               <textarea class="form-control" id="active-comments" rows="2" maxlength="2000" [(ngModel)]="activeNotes"   [readonly]="readonly"></textarea>
+           </div>
+           </div>
+           </ng-template>
     </div>
 
 </div><!-- END Row Collapse -->
 
 <div class="row">
-    <div class="col-12"  *ngIf="alert">
+    <div class="col-12" *ngIf="alert">
         <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
     </div>
-    <div class="col-12 d-flex mb-4" >
-        <button class="btn btn-primary ml-auto" (click)="submitWorkflow($event)" *ngIf="isApprover() && !buttonDisabled" [disabled]="disableWorkflowButton">
+    <div class="col-12 d-flex mb-4">
+        <button class="btn btn-primary ml-auto" (click)="submitWorkflow($event)" *ngIf="isApprover() && !buttonDisabled"
+            [disabled]="disableWorkflowButton">
             {{buttonLabel}}
         </button>
-        <span class="ml-auto" *ngIf="isApprover() && buttonDisabled" ngbTooltip="Select a workflow action to enable this button.">
-                <button class="btn btn-primary" disabled> {{buttonLabel}}</button>
+        <span class="ml-auto" *ngIf="isApprover() && buttonDisabled"
+            ngbTooltip="Select a workflow action to enable this button.">
+            <button class="btn btn-primary" disabled> {{buttonLabel}}</button>
         </span>
 
     </div>
 </div>
 <app-workflow-warning-modal></app-workflow-warning-modal>
-<hr end-of-workflow >
+<hr end-of-workflow>
