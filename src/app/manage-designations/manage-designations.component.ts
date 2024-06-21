@@ -117,7 +117,6 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
   }
 
 
-
   ngAfterViewInit(): void {
     this.dtOptions = {
       paging: false,

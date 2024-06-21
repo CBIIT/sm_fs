@@ -1,8 +1,8 @@
 <form #dummy="ngForm">
   <div class="row">
     <div class="col-12 d-flex">
-      <h2>Applications Proposed for Funding</h2>
-      <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apffreadonly-collapse" role="button" 
+      <h2>Applications Proposed for Funding</h2>&nbsp;<app-edit-link [target]="'/plan/step3'"></app-edit-link>
+      <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apffreadonly-collapse" role="button"
       aria-expanded="true" aria-controls="apffreadonly-collapse"></a>
     </div>
     <div  class="col-12 collapse show" id="apffreadonly-collapse">
@@ -101,7 +101,7 @@
           </div>
         </ngb-alert>
       </div>
-      
+
     </div>
     <div class="col-12">
       <hr>
