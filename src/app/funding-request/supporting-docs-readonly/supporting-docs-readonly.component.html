@@ -1,7 +1,7 @@
 <div class="row">
 
   <div class="col-12 d-flex">
-    <h2>Supporting Docs</h2>
+    <h2>Supporting Docs</h2>&nbsp;<app-edit-link [target]="'/request/step3'"></app-edit-link>
     <button class="btn btn-outline-primary mr-2 ml-auto" (click)="downloadPackage()"><i class="far fa-file-pdf"
         aria-hidden="true"></i> View Package
     </button>
@@ -54,7 +54,7 @@
         </ng-template>
 
         <ng-template #displayUserDetails>
-          <span  class="doc-desc">{{item.docFilename}} 
+          <span  class="doc-desc">{{item.docFilename}}
             <ng-container *ngIf="item.uploadByName"> (Added by <a
               href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on {{item.createDate}})
             </ng-container>

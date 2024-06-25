@@ -167,6 +167,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
       this.navigationModel.disableStepLinks();
       this.navigationModel.showSteps = false;
     } else {
+      this.logger.info('Enable step links');
       this.navigationModel.enableStepLinks();
       this.navigationModel.showSteps = true;
     }
