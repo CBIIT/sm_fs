@@ -80,6 +80,9 @@ export class ApproverListComponent implements OnInit, OnDestroy {
       if (value.roleCode === 'AA' && value.assignerFullName) {
         return value.roleName + ' (Added by ' + value.assignerFullName + ')';
       }
+      if (value.roleCode === 'FCNCI' && value.fundingSourceName) {
+        return value.roleName + ' for '+ value.fundingSourceName;
+      }
       return value.roleName;
     }
     else if (value.assignerFullName) {
