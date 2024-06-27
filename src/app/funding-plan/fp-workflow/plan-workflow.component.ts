@@ -419,6 +419,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         }
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
+        this._dirty = false;
+        this.workflowModel.hasNewApprover = false;
+        this.gmComponent.gmform.resetForm();
       },
       (error) => {
         this.logger.error('submit workflow returned error', error);
