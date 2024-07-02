@@ -220,7 +220,7 @@ export class PlanModel {
 
   purgeUnselectableSources(fundingSourceDetailsMap: Map<number, FundingRequestFundsSrcDto>) : boolean {
     if(fundingSourceDetailsMap.size === 0 || ! this.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources) { return false }
-
+    const originalSourceCount = this.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.length;
     const remainingSources = this.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.filter(s => fundingSourceDetailsMap.has(s.fundingSourceId));
     this.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.forEach(s => {
       const src = fundingSourceDetailsMap.get(s.fundingSourceId);
@@ -229,7 +229,7 @@ export class PlanModel {
       }
     });
     this.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = remainingSources;
-    return remainingSources.length !== this.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.length;
+    return remainingSources.length !== originalSourceCount;
   }
 }
 
