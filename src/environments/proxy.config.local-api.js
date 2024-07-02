@@ -2,6 +2,7 @@
  * Don't mess with this. It's for Doug. Make your own! :)
  */
 
+// eslint-disable-next-line no-undef
 module.exports = {
     '/i2earaws': {
     // target: 'http://localhost:8081',

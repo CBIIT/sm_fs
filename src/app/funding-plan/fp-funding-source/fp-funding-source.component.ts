@@ -118,6 +118,11 @@ export class FpFundingSourceComponent implements OnInit {
     this.planControllerService.getFundingPlanFundingSources(this.rfaPaNumber, pd, ca, this.fy).subscribe(result => {
       this.planCoordinatorService.fundingSourceListEmitter.next(result);
       this.fundingSourceDetailsMap = new Map(result.map(item => [item.fundingSourceId, item]));
+      this.logger.warn('Funding sources have changed; time to re-evaluate the selected sources in the model')
+      const purged = this.planModel.purgeUnselectableSources(this.fundingSourceDetailsMap);
+      if(purged) {
+        this.logger.warn('Purged sources from plan');
+      }
       result.forEach(s => {
         tmp.push({ id: String(s.fundingSourceId), text: s.fundingSourceName });
       });

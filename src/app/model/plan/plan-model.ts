@@ -6,6 +6,7 @@ import { RfaPaNcabDate } from '@cbiit/i2efsws-lib/model/rfaPaNcabDate';
 import { NGXLogger } from 'ngx-logger';
 import { Alert } from 'src/app/alert-billboard/alert';
 import { FundingSourceTypes } from '../request/funding-source-types';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 
 @Injectable({
   providedIn: 'root'
@@ -215,6 +216,20 @@ export class PlanModel {
   planHasMultipleActivityCodes() : boolean {
     const tmp = new Set(this._allGrants?.filter(g => g.selected).map(g => g.activityCode));
     return tmp.size > 1;
+  }
+
+  purgeUnselectableSources(fundingSourceDetailsMap: Map<number, FundingRequestFundsSrcDto>) : boolean {
+    if(fundingSourceDetailsMap.size === 0 || ! this.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources) { return false }
+    const originalSourceCount = this.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.length;
+    const remainingSources = this.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.filter(s => fundingSourceDetailsMap.has(s.fundingSourceId));
+    this.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.forEach(s => {
+      const src = fundingSourceDetailsMap.get(s.fundingSourceId);
+      if (!src) {
+        this.logger.warn(`Purging source ${s.fundingSourceId} from plan ${this.fundingPlanDto.fprId}`);
+      }
+    });
+    this.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources = remainingSources;
+    return remainingSources.length !== originalSourceCount;
   }
 }
 
