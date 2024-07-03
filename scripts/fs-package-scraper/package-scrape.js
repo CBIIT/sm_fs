@@ -4,7 +4,7 @@ const fs = require('fs');
 
 // TODO: add command line parameters to control behavior, host, and url file settings
 
-//const HOST = 'ncias-p1996-v:38080';
+//const HOST = 'ncias-p3301-v:38080';
 const HOST = 'localhost:8080';
 const TIMEOUT = 20000;
 const URL_FILE = 'urls.json';
