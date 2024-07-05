@@ -45,6 +45,9 @@ export class PlanStep3Component implements OnInit {
   futureYears: Map<number, number> = new Map<number, number>();
 
   @Input() sharedChannel = PD_CA_DEFAULT_CHANNEL;
+  private last: { pd: number, ca: string };
+  fy: number;
+  rfaPaNumber: string;
 
   get cayCodeArr(): string[] {
     return [this.cayCode];
@@ -57,11 +60,29 @@ export class PlanStep3Component implements OnInit {
               private pdCaIntegratorService: PdCaIntegratorService,
               private planManagementService: PlanManagementService,
               private fsPlanControllerService: FsPlanControllerService,
-              private userSessionService: AppUserSessionService) {
+              private userSessionService: AppUserSessionService,
+              private planCoordinatorService: PlanManagementService) {
   }
 
 
   ngOnInit(): void {
+
+    this.planCoordinatorService.fundingSourceValuesEmitter.subscribe(next => {
+      if(this.newPdOrCa(next)) {
+        this.logger.info(`New PD or CA; - revalidate all selected sources...`)
+        if(next.pd && next.ca) {
+          this.validateAndPurge(next)
+        }
+        this.last = next;
+      }
+    });
+    this.fy = this.planModel.fundingPlanDto.planFy || getCurrentFiscalYear();
+    const allRfaPaNumbers: string[] = [];
+    this.planModel.grantsSearchCriteria.forEach(r => {
+      allRfaPaNumbers.push(r.rfaPaNumber);
+    });
+    this.rfaPaNumber = allRfaPaNumbers[0];
+
     this.navigationModel.setStepLinkable(3, true);
 
     this.pdCaIntegratorService.cayCodeEmitter.subscribe(next => {
@@ -107,6 +128,15 @@ export class PlanStep3Component implements OnInit {
     }
 
     this.recalculateFundingRequestTypes();
+  }
+
+  private newPdOrCa(next: { pd: number, ca: string }): boolean {
+    this.logger.debug(next);
+    this.logger.debug(this.last);
+    if(!this.last) {
+      return true;
+    }
+    return this.last.pd !== next.pd || this.last.ca !== next.ca;
   }
 
   saveContinue(): void {
@@ -724,6 +754,24 @@ export class PlanStep3Component implements OnInit {
         req.frtId = FundingRequestTypes.FUNDING_PLAN__PROPOSED_AND_WITHIN_FUNDING_PLAN_SCORE_RANGE;
       } else if (selected) {
         req.frtId = FundingRequestTypes.FUNDING_PLAN__FUNDING_PLAN_EXCEPTION;
+      }
+    });
+  }
+
+  private validateAndPurge(next: { pd: number; ca: string }) {
+    this.fsPlanControllerService.getFundingPlanFundingSources(this.rfaPaNumber, next.pd, next.ca, this.fy).subscribe(result => {
+      const fundingSourceDetailsMap = new Map(result.map(item => [item.fundingSourceId, item]));
+      this.logger.warn('Funding sources have changed; time to re-evaluate the selected sources in the model')
+      const toPurge = this.planModel.purgeUnselectableSources(fundingSourceDetailsMap);
+      if(toPurge) {
+        const originalSourceLength = this.planModel?.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.length;
+        this.logger.info(`started with ${originalSourceLength} funding source(s) in the plan`)
+        this.logger.warn('Purging sources from plan');
+        toPurge.forEach(n => this.deleteFundingSource(n));
+        if(this.planModel?.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources?.length === 0) {
+          this.logger.warn("Purged all sources. Need to clean up some additional stuff")
+          this.applicationsProposedForFunding.reset()
+        }
       }
     });
   }
