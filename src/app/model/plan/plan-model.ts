@@ -216,6 +216,19 @@ export class PlanModel {
     const tmp = new Set(this._allGrants?.filter(g => g.selected).map(g => g.activityCode));
     return tmp.size > 1;
   }
+
+  purgeUnselectableSources(fundingSourceDetailsMap: Map<number, FundingRequestFundsSrcDto>) : Array<number> {
+    if(fundingSourceDetailsMap.size === 0 || ! this.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources) { return [] }
+    const deletedSources = new Array<number>()
+    this.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.forEach(s => {
+      const src = fundingSourceDetailsMap.get(s.fundingSourceId);
+      if (!src) {
+        this.logger.warn(`Purging source ${s.fundingSourceId} from plan ${this.fundingPlanDto.fprId}`);
+        deletedSources.push(s.fundingSourceId);
+      }
+    });
+    return deletedSources;
+  }
 }
 
 class ModelSnapshot {

@@ -303,6 +303,28 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   percentCutInRange(): boolean {
     return this.isPercentValid() && this.getPercentCut() <= 100;
   }
+
+  reset() {
+    this.directCost = null;
+    this.totalCost = null;
+    this._percentCut = null;
+    this.fseId = null;
+    this.directCostCalculated = null;
+    this.totalCostCalculated = null;
+    this.dcPercentCutCalculated = null;
+    this.tcPercentCutCalculated = null;
+    this.pendingValues = null as PendingPrcValues;
+    // baselineDirectCost: number;
+    // baselineTotalCost: number;
+    // _displayType: string;
+    // fseId: number;
+    // budgetId: number;
+    // canId: number;
+    // canDescription: string;
+    // canPhsOrgCode: string;
+    // can: string;
+    // pendingValues: PendingPrcValues;
+  }
 }
 
 export interface PendingPrcValues {
