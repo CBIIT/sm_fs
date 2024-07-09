@@ -6,6 +6,8 @@ import { RfaPaNcabDate } from '@cbiit/i2efsws-lib/model/rfaPaNcabDate';
 import { NGXLogger } from 'ngx-logger';
 import { Alert } from 'src/app/alert-billboard/alert';
 import { FundingSourceTypes } from '../request/funding-source-types';
+import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
+
 
 @Injectable({
   providedIn: 'root'
