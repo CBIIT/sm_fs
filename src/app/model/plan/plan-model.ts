@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanCcxDto, FundingPlanDto, FundingRequestCanDto } from '@cbiit/i2efsws-lib';
+import { CanCcxDto, FundingPlanDto, FundingRequestCanDto, FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { NciPfrGrantQueryDtoEx, orderByPriorityAndPI } from './nci-pfr-grant-query-dto-ex';
 import { RfaPaNcabDate } from '@cbiit/i2efsws-lib/model/rfaPaNcabDate';
@@ -215,6 +215,19 @@ export class PlanModel {
   planHasMultipleActivityCodes() : boolean {
     const tmp = new Set(this._allGrants?.filter(g => g.selected).map(g => g.activityCode));
     return tmp.size > 1;
+  }
+
+  purgeUnselectableSources(fundingSourceDetailsMap: Map<number, FundingRequestFundsSrcDto>) : Array<number> {
+    if(fundingSourceDetailsMap.size === 0 || ! this.fundingPlanDto?.fpFinancialInformation?.fundingPlanFundsSources) { return [] }
+    const deletedSources = new Array<number>()
+    this.fundingPlanDto.fpFinancialInformation.fundingPlanFundsSources.forEach(s => {
+      const src = fundingSourceDetailsMap.get(s.fundingSourceId);
+      if (!src) {
+        this.logger.warn(`Purging source ${s.fundingSourceId} from plan ${this.fundingPlanDto.fprId}`);
+        deletedSources.push(s.fundingSourceId);
+      }
+    });
+    return deletedSources;
   }
 }
 

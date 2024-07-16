@@ -289,4 +289,19 @@ export class ApplicationsProposedForFundingComponent implements OnInit {
     });
     return result;
   }
+
+  reset() {
+    this.logger.info("Reset after purging unselectable sources")
+    this.logger.info(this.parentForm.controls);
+    Object.keys(this.parentForm.controls).forEach(key => {
+      if(key.startsWith('prc')) {
+        this.logger.info(`Resetting ${key}`);
+        this.parentForm.controls[key].reset();
+      }
+    });
+    this.prcList.forEach((c, idx) => {
+      c.reset();
+      this.logger.info(c)
+    });
+  }
 }
