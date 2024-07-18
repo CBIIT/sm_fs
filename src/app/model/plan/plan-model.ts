@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanCcxDto, FundingPlanDto, FundingRequestCanDto } from '@cbiit/i2efsws-lib';
+import { CanCcxDto, FundingPlanDto, FundingRequestCanDto, FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { NciPfrGrantQueryDtoEx, orderByPriorityAndPI } from './nci-pfr-grant-query-dto-ex';
 import { RfaPaNcabDate } from '@cbiit/i2efsws-lib/model/rfaPaNcabDate';
