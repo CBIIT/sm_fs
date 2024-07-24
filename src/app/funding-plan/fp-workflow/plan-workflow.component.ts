@@ -67,7 +67,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   approvingState = false;
   terminalRequest = false;
   splMeetingDate: NgbDateStruct;
-  maxDate: NgbDate = this.calendar.getToday();
+  maxDate: NgbDate ;
 
   validationError: any = {};
   completedPfrs: FundingRequestQueryDto[];
@@ -124,7 +124,9 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     private calendar: NgbCalendar,
     private router: Router,
     private logger: NGXLogger
-  ) {}
+  ) {
+    this.maxDate = this.calendar.getToday();
+  }
 
   ngOnDestroy(): void {
     if (this.approverInitializationSubscription) {

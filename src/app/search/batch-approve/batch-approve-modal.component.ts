@@ -41,7 +41,7 @@ export class BatchApproveModalComponent implements OnInit {
   requestsForApproval: FundingRequestQueryDto[];
   plansForApproval: FundingPlanQueryDto[];
   splMeetingDate: NgbDateStruct;
-  maxDate: NgbDate = this.calendar.getToday();
+  maxDate: NgbDate;
 
   requestOrPlan: 'REQUEST'|'PLAN';
   mode: 'DOC'|'SPL';
@@ -51,8 +51,8 @@ export class BatchApproveModalComponent implements OnInit {
 
   eligibleCount: number;
   totalCount: number;
-  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
-  eGrantsUrl: string = this.propertiesService.getProperty('EGRANTS_URL');
+  grantViewerUrl: string ;
+  eGrantsUrl: string ;
 
   batchApproveSuccess = false;
   disableSubmit = false;
@@ -63,7 +63,11 @@ export class BatchApproveModalComponent implements OnInit {
               private propertiesService: AppPropertiesService,
               private batchApproveService: BatchApproveService,
               private calendar: NgbCalendar,
-              private logger: NGXLogger) { }
+              private logger: NGXLogger) { 
+    this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+    this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
+    this.maxDate = this.calendar.getToday();
+  }
 
   ngOnInit(): void { }
 

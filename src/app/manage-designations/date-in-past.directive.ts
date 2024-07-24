@@ -11,9 +11,11 @@ import { NGXLogger } from "ngx-logger";
 export class DateInPastValidatorDirective implements Validator {
 
   constructor(private calendar: NgbCalendar,
-              private logger: NGXLogger) { }
+              private logger: NGXLogger) { 
+    this.today = this.calendar.getToday();
+              }
 
-  today: NgbDate = this.calendar.getToday();
+  today: NgbDate;
 
   validate(control: AbstractControl): ValidationErrors | null {
     const value: NgbDateStruct = control.value;

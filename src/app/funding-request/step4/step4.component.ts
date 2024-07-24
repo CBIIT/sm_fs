@@ -47,7 +47,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
   statusesCanEditSubmit = ['DRAFT', 'WITHDRAWN', 'RFC'];
   terminalStatus = ['COMPLETED', 'REJECTED'];
 
-  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+  grantViewerUrl: string ;
   isRequestEverSubmitted = false;
   requestHistorySubscriber: Subscription;
   activeApproverSubscriber: Subscription;
@@ -95,6 +95,7 @@ export class Step4Component implements OnInit, OnDestroy, AfterViewInit {
               private workflowModel: WorkflowModel,
               private navigationModel: NavigationStepModel,
               private loaderService: LoaderService) {
+    this.grantViewerUrl  = this.propertiesService.getProperty('GRANT_VIEWER_URL');
   }
 
   ngAfterViewInit(): void {

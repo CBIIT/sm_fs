@@ -137,7 +137,7 @@
       <div class="form-group">
         <span class="like-label">Other DOC(s) Contributing Funds</span>
         <p *ngIf="otherDocs?.length; else dash">
-          <a *ngFor="let doc of otherDocs; let first = first" [routerLink]="[][]"
+          <a *ngFor="let doc of otherDocs; let first = first" [routerLink]="[]"
              ngbTooltip="{{doc|codeDescription:'NciDocs'}}" triggers="click:blur" placement="top">
             <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>
             <ng-template #firstDoc>{{doc}}</ng-template>

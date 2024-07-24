@@ -77,7 +77,7 @@
         <p>
           <a
             *ngFor="let doc of otherDocs; let first = first"
-            [routerLink]="[][]"
+            [routerLink]="[]"
             ngbTooltip="{{doc|codeDescription:'NciDocs'}}"
             triggers="click:blur" placement="top">
             <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>

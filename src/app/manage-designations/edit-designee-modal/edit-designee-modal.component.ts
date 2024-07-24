@@ -26,13 +26,15 @@ export class EditDesigneeModalComponent implements OnInit, AfterViewInit {
 
   @Input() data : FundingRequestPermDelDto = {}
 
-  minDate: NgbDate = this.calendar.getToday();
+  minDate: NgbDate ;
   startDateReadOnly: boolean = false;
   enableSave : boolean = false;
  
   constructor(public modal: NgbActiveModal,
               private calendar: NgbCalendar,
-              private datePipe : DatePipe) { }
+              private datePipe : DatePipe) { 
+    this.minDate = this.calendar.getToday();
+  }
 
   ngOnInit(): void {
     if (!this.data.delegateFrom) {

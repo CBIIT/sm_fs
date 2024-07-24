@@ -3,9 +3,9 @@ import { ControlContainer, NgForm } from "@angular/forms";
 import { Options } from "select2";
 import { LookupsControllerService } from "@cbiit/i2ecommonws-lib";
 import { CancerActivitiesDto, CancerActivityControllerService } from "@cbiit/i2erefws-lib";
-import { isNumeric } from "rxjs/internal-compatibility";
 import { PD_CA_DEFAULT_CHANNEL, PdCaIntegratorService } from "../service/pd-ca-integrator.service";
 import { NGXLogger } from "ngx-logger";
+import { isNumeric } from "../utils/utils";
 @Component({
   selector: 'app-cancer-activities-dropdown',
   templateUrl: './cancer-activities-dropdown.component.html',

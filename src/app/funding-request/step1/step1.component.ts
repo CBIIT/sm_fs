@@ -43,6 +43,10 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
               private requestModel: RequestModel,
               private reqsNavigationModel: NavigationModel,
               private navigationModel: NavigationStepModel) {
+    this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+    this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
+    this.searchCriteria = this.gsfs.getGrantsSearchCriteria();
+              
   }
 
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
@@ -70,9 +74,9 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
   i2Status: string;
   throttle: DatatableThrottle = new DatatableThrottle();
 
-  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
-  eGrantsUrl: string = this.propertiesService.getProperty('EGRANTS_URL');
-  searchCriteria: GrantsSearchCriteriaDto = this.gsfs.getGrantsSearchCriteria();
+  grantViewerUrl: string;
+  eGrantsUrl: string ;
+  searchCriteria: GrantsSearchCriteriaDto;
 
   tooltipGrant: any;
 
@@ -205,7 +209,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         }
       });
       this.search();
-      this.dtTrigger.next();
+      this.dtTrigger.next(null);
     }, 0);
 
   }
@@ -363,7 +367,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     if (this.dtElement.dtInstance) {
       this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
         dtInstance.destroy();
-        this.dtTrigger.next();
+        this.dtTrigger.next(null);
       });
     }
   }

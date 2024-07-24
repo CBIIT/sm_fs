@@ -33,15 +33,18 @@ export class FpGrantManagementComponent implements OnInit, OnDestroy {
 
   isApprovalAction = false;
 
-  grantViewerUrl: string = this.planModel.grantViewerUrl;
-  eGrantsUrl: string = this.planModel.eGrantsUrl;
+  grantViewerUrl: string; 
+  eGrantsUrl: string;
 
   constructor(private workflowService: FsPlanWorkflowControllerService,
               private planModel: PlanModel,
               private workflowModel: WorkflowModel,
               private lookupService: FsLookupControllerService,
               private requestIntegrationService: FundingRequestIntegrationService,
-              private logger: NGXLogger) { }
+              private logger: NGXLogger) { 
+    this.grantViewerUrl = this.planModel.grantViewerUrl;
+    this.eGrantsUrl = this.planModel.eGrantsUrl;
+  }
 
   ngOnDestroy(): void {
     if (this.requestSubcription) {

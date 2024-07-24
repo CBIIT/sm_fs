@@ -30,7 +30,9 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
               private calendar: NgbCalendar,
               private userSessionService: AppUserSessionService,
               private designeeService: FsDesigneeControllerService,
-              private modalService: NgbModal) { }
+              private modalService: NgbModal) {
+    this.minDate = this.calendar.getToday();
+  }
 
   @ViewChild(DataTableDirective, {static: false}) dtElement: DataTableDirective;
   @ViewChild('designeeRenderer') designeeRenderer: DesigneeCellRendererComponent;
@@ -41,7 +43,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
 
   startDate: NgbDateStruct;
   endDate: NgbDateStruct;
-  minDate: NgbDate = this.calendar.getToday();
+  minDate: NgbDate;
 
   dtTrigger: Subject<any> = new Subject();
   dtOptions: any = {};
@@ -148,7 +150,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
         });
       }
     };
-    setTimeout(() => this.dtTrigger.next(), 0);
+    setTimeout(() => this.dtTrigger.next(null), 0);
     setTimeout(() => this.initDesigneeList(), 10);
   }
 
@@ -168,7 +170,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
           this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
             dtInstance.destroy();
           });
-          this.dtTrigger.next();
+          this.dtTrigger.next(null);
         }
 
       }, error => {
@@ -186,7 +188,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
     if (this.dtElement && this.dtElement.dtInstance) {
       this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
         dtInstance.destroy();
-        this.dtTrigger.next();
+        this.dtTrigger.next(null);
       });
     }
   }

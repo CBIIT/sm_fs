@@ -46,7 +46,7 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
     if (this.dtElement && this.dtElement.dtInstance) {
       this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
         dtInstance.destroy();
-        this.dtTrigger.next();
+        this.dtTrigger.next(null);
       });
     }
   }
@@ -64,8 +64,8 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
     this._maxScore = val;
   }
 
-  grantViewerUrl: string = this.planModel.grantViewerUrl;
-  eGrantsUrl: string = this.planModel.eGrantsUrl;
+  grantViewerUrl: string; 
+  eGrantsUrl: string; 
 
   @ViewChild(DataTableDirective, {static: false}) dtElement: DataTableDirective;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
@@ -76,6 +76,8 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
   dtOptions: any = {};
 
   constructor(private planModel: PlanModel) {
+    this.grantViewerUrl = this.planModel.grantViewerUrl;
+    this.eGrantsUrl = this.planModel.eGrantsUrl;
   }
 
   get noResult(): boolean {
@@ -156,7 +158,7 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
       }
     };
 
-    setTimeout(() => this.dtTrigger.next(), 0);
+    setTimeout(() => this.dtTrigger.next(null), 0);
   }
 
 }

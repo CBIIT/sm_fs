@@ -46,7 +46,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     });
   }
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(req: HttpRequest<any>, next: HttpHandler): any {
     if (!req.url.includes('heartbeat') && !!req.url.includes('logs') && this.debugMode) {
       this.logger.debug(`Current route URL    : ${this.router.url}`);
       this.logger.debug(`Request URL          : ${req.url}`);

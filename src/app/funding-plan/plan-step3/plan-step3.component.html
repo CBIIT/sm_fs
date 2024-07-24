@@ -26,7 +26,7 @@
               id="fp-name"
               class="form-control"
               maxlength="100"
-              required>
+              [required]="true">
             <div class="text-danger mt-1"
                  *ngIf="fundingPlanName.errors?.required && (step3form.submitted || step3form.touched)">
               Funding Plan Name is required

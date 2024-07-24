@@ -255,6 +255,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
               private planCoordinatorService: PlanManagementService,
               private logger: NGXLogger,
               private navigationModel: NavigationStepModel) {
+    this.grantViewerUrl = this.planModel.grantViewerUrl;
+    this.eGrantsUrl = this.planModel.eGrantsUrl;
   }
 
   @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
@@ -276,8 +278,8 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
   // available data (lookups)
   searchCriteria: FundingPlanGrantsSearchCriteriaUI;
 
-  grantViewerUrl: string = this.planModel.grantViewerUrl;
-  eGrantsUrl: string = this.planModel.eGrantsUrl;
+  grantViewerUrl: string;
+  eGrantsUrl: string;
 
   dtTrigger: Subject<any> = new Subject();
   dtOptions: any = {};
@@ -507,7 +509,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
       }
     };
 
-    setTimeout(() => this.dtTrigger.next(), 0);
+    setTimeout(() => this.dtTrigger.next(null), 0);
   }
 
   /**
@@ -624,7 +626,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
     if (this.dtElement.dtInstance) {
       this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
         dtInstance.destroy();
-        this.dtTrigger.next();
+        this.dtTrigger.next(null);
       });
     }
     this.resetModel();
@@ -665,7 +667,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
           if (this.dtElement.dtInstance) {
             this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
               dtInstance.destroy();
-              this.dtTrigger.next();
+              this.dtTrigger.next(null);
             });
           }
         },

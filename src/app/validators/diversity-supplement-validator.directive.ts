@@ -1,7 +1,6 @@
 import { Directive, Input } from '@angular/core';
 import { AbstractControl, NG_VALIDATORS, ValidationErrors, Validator } from '@angular/forms';
 import { FundingRequestTypes } from '../model/request/funding-request-types';
-import { isArray } from 'rxjs/internal-compatibility';
 import { NGXLogger } from 'ngx-logger';
 
 @Directive({
@@ -25,7 +24,7 @@ export class DiversitySupplementValidatorDirective implements Validator {
       return null;
     }
     let ca: string;
-    if (isArray(cayCode.value) && cayCode.value.length > 0) {
+    if (Array.isArray(cayCode.value) && cayCode.value.length > 0) {
       ca = cayCode.value[0];
     } else if (typeof cayCode.value === 'string' || cayCode.value instanceof String) {
       ca = String(cayCode.value);

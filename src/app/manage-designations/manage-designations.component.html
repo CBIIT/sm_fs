@@ -48,13 +48,13 @@
     <div class="col-lg-3">
       <div class="form-group">
         <label for="name">Name</label>
-<!--        <input id="name" type="text" class="form-control" ngModel name="name" #nameInput="ngModel" required>-->
+<!--        <input id="name" type="text" class="form-control" ngModel name="name" #nameInput="ngModel" [required]="true">-->
         <ng-select2
           id="name"
           name="name"
           [allowClear]="true"
           [options]="nameSelect2Options"
-          ngModel #nameInput="ngModel" required>
+          ngModel #nameInput="ngModel" [required]="true">
             <option value=""></option>
             <option></option>
         </ng-select2>

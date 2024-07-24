@@ -61,7 +61,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
   statusesCanEditSubmit = ['DRAFT', 'WITHDRAWN', 'RFC'];
   terminalStatus = ['COMPLETED', 'REJECTED'];
 
-  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+  grantViewerUrl: string ;
   isRequestEverSubmitted = false;
   requestHistorySubscriber: Subscription;
   activeApproverSubscriber: Subscription;
@@ -93,7 +93,9 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
               private workflowModel: WorkflowModel,
               private logger: NGXLogger,
               private changeDetection: ChangeDetectorRef,
-              private router: Router) { }
+              private router: Router) {
+    this.grantViewerUrl == this.propertiesService.getProperty('GRANT_VIEWER_URL')
+    }
 
 
   ngAfterViewInit(): void {

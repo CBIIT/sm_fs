@@ -1,7 +1,6 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {RequestModel} from '../../model/request/request-model';
 import {FsRequestControllerService, NciPfrGrantQueryDto} from '@cbiit/i2efsws-lib';
-import {isArray} from 'rxjs/internal-compatibility';
 import {NGXLogger} from 'ngx-logger';
 import {FundingRequestValidationService} from '../../model/request/funding-request-validation-service';
 import {FUNDING_POLICY_CUT_TYPES, FundingRequestTypes} from '../../model/request/funding-request-types';
@@ -26,16 +25,14 @@ export class RequestInformationComponent implements OnInit {
   @Input() parentForm: NgForm;
   isMbOnly = false;
   pdCayCodes: string[] = [];
-  private _altCayCode: string | string[] = (this.requestModel.requestDto.altCayCode
-    ? [this.requestModel.requestDto.altCayCode] : []);
+  private _altCayCode: string | string[] ;
 
   // TODO: this is just plain weird. The CA dropdown component selectedValue attribute is an array of strings,
   // so the setter and getter here are typed as arrays of strings. However, the value passed to the setter is
   // just a string, and even though _selectedCayCode is typed as a string[], if I try to assign it a string[]
   // value, it blows up at runtime.  Ditto the getter, which blows up at runtime if I try to return an array
   // of strings, but won't compile if I try to return a string.
-  _selectedCayCode: string[] | string = (this.requestModel.requestDto.financialInfoDto.requestorCayCode
-    ? [this.requestModel.requestDto.financialInfoDto.requestorCayCode] : []);
+  _selectedCayCode: string[] | string ;
 
   myAlerts: Alert[] = [];
 
@@ -87,7 +84,7 @@ export class RequestInformationComponent implements OnInit {
   set selectedCayCode(value: string[] | string) {
     // TODO: Evaluate whether to reset the program recommended costs model
     const oldValue = this.requestModel.requestDto.financialInfoDto.requestorCayCode;
-    if (isArray(value) && value[0]) {
+    if (Array.isArray(value) && value[0]) {
       this.requestModel.requestDto.financialInfoDto.requestorCayCode = value[0];
       this.requestModel.requestDto.requestorCayCode = value[0];
     } else if (typeof value === 'string' || value instanceof String) {
@@ -144,7 +141,7 @@ export class RequestInformationComponent implements OnInit {
 
   set altCayCode(value: string | string[]) {
     this.logger.debug(`setAltCayCode(${value})`);
-    if (isArray(value) && value[0]) {
+    if (Array.isArray(value) && value[0]) {
       this.requestModel.requestDto.financialInfoDto.altCayCode = value[0];
       this.requestModel.requestDto.altCayCode = value[0];
     } else if (typeof value === 'string' || value instanceof String) {
@@ -179,6 +176,10 @@ export class RequestInformationComponent implements OnInit {
               private fundingSourceSynchronizerService: FundingSourceSynchronizerService,
               private appUserSessionService: AppUserSessionService,
               private type4SelectionService: Type4SelectionService) {
+    this._altCayCode = (this.requestModel.requestDto.altCayCode
+      ? [this.requestModel.requestDto.altCayCode] : []);
+    this._selectedCayCode  = (this.requestModel.requestDto.financialInfoDto.requestorCayCode
+      ? [this.requestModel.requestDto.financialInfoDto.requestorCayCode] : []);
   }
 
   ngOnInit(): void {

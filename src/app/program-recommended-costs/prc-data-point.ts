@@ -20,8 +20,8 @@
  */
 import { FundingRequestFundsSrcDto } from '@cbiit/i2efsws-lib/model/fundingRequestFundsSrcDto';
 import { GrantAwardedDto } from '@cbiit/i2efsws-lib/model/grantAwardedDto';
-import { isNumeric } from 'rxjs/internal-compatibility';
 import { FundingReqBudgetsDto } from '@cbiit/i2efsws-lib';
+import { isNumeric } from '../utils/utils';
 
 export enum PrcLineItemType {
   PERCENT_CUT,

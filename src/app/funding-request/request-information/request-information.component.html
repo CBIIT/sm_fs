@@ -21,7 +21,7 @@
         type="text"
         name="requestName"
         #requestName="ngModel"
-        [(ngModel)]="model.requestDto.financialInfoDto.requestName" required>
+        [(ngModel)]="model.requestDto.financialInfoDto.requestName" [required]="true">
       <div
         class="text-danger mt-1"
         *ngIf="!requestName.valid && (requestName.touched || parentForm.submitted)">
@@ -142,7 +142,7 @@
     [(ngModel)]="selectedFundingPolicyCut"
     [allowClear]="true"
     [data]="fundingPolicyCutCodes"
-    required>
+    [required]="true">
     </ng-select2>
     <div
       class="text-danger mt-1"

@@ -26,7 +26,7 @@
       class="text-danger mt-1"
       *ngIf="parentForm.submitted && required">
       Please enter direct and total cost or percent cut for each selected application
-      <input type="hidden" [ngModel]="dummy" name="noData" required>
+      <input type="hidden" [ngModel]="dummy" name="noData" [required]="true">
     </div>
 
   </ng-template>
@@ -116,19 +116,19 @@
       class="text-danger mt-1"
       *ngIf="(parentForm.submitted || dcInput.touched) && !isDirectCostInRange()">
       Direct cost must be a numeric value between 0 and 999,999,999
-      <input type="hidden" [ngModel]="dummy" [name]="'dc_' + grantIndex + '_' + sourceIndex" required>
+      <input type="hidden" [ngModel]="dummy" [name]="'dc_' + grantIndex + '_' + sourceIndex" [required]="true">
     </div>
     <div
       class="text-danger mt-1"
       *ngIf="(parentForm.submitted || tcInput.touched) && !isTotalCostInRange()">
       Total cost must be a numeric value between 0 and 999,999,999
-      <input type="hidden" [ngModel]="dummy" [name]="'tc_' + grantIndex + '_' + sourceIndex" required>
+      <input type="hidden" [ngModel]="dummy" [name]="'tc_' + grantIndex + '_' + sourceIndex" [required]="true">
     </div>
     <div
       class="text-danger mt-1"
       *ngIf="(parentForm.submitted || dcInput.touched || tcInput.touched) && !isTotalGreaterThanDirect()">
       Total cost must be greater than or equal to direct cost
-      <input type="hidden" [ngModel]="dummy" [name]="'tc2_' + grantIndex + '_' + sourceIndex" required>
+      <input type="hidden" [ngModel]="dummy" [name]="'tc2_' + grantIndex + '_' + sourceIndex" [required]="true">
     </div>
   </ng-template>
 
@@ -200,7 +200,7 @@
       class="text-danger mt-1"
       *ngIf="(parentForm.submitted || pcInput.touched) && (pcInput.errors?.pattern || pcInput.errors?.min || pcInput.errors?.max)">
       Enter a numeric value between 0 and 100, with at most 2 decimal places
-      <input type="hidden" [ngModel]="dummy" [name]="'pc_' + grantIndex + '_' + sourceIndex" required>
+      <input type="hidden" [ngModel]="dummy" [name]="'pc_' + grantIndex + '_' + sourceIndex" [required]="true">
     </div>
   </ng-template>
 </ng-container>

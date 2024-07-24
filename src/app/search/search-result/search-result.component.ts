@@ -72,6 +72,9 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
               private userService: AppUserSessionService,
               private navigationModel: NavigationModel,
               private logger: NGXLogger) {
+    this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+    this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
+              
   }
 
   @ViewChildren(DataTableDirective) dtElements: QueryList<DataTableDirective>;
@@ -96,8 +99,8 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // dtOptions: DataTables.Settings = {};
 
-  grantViewerUrl: string = this.propertiesService.getProperty('GRANT_VIEWER_URL');
-  eGrantsUrl: string = this.propertiesService.getProperty('EGRANTS_URL');
+  grantViewerUrl: string ;
+  eGrantsUrl: string ;
   subject: string ;
 
   dtFundingRequestOptions: any = {};
@@ -862,10 +865,10 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         if (dtEl.dtInstance) {
           dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
             dtInstance.clear();
-            setTimeout(() => trigger.next(), 0);
+            setTimeout(() => trigger.next(null), 0);
           });
         } else {
-          trigger.next();
+          trigger.next(null);
         }
       } else if (dtEl.dtInstance) {
         dtEl.dtInstance.then((dtInstance: DataTables.Api) => {
