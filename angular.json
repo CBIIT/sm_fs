@@ -116,38 +116,38 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "fs:build:dev",
-            "proxyConfig": "src/environments/proxy.config.js"
+            "proxyConfig": "src/environments/proxy.config.js",
+            "buildTarget": "fs:build:dev"
           },
           "configurations": {
             "dev": {
-              "browserTarget": "fs:build:dev"
+              "buildTarget": "fs:build:dev"
             },
             "production": {
-              "browserTarget": "fs:build:production"
+              "buildTarget": "fs:build:production"
             },
             "dev-api": {
-              "browserTarget": "fs:build:dev",
-              "proxyConfig": "src/environments/proxy.config.dev-api.js"
+              "proxyConfig": "src/environments/proxy.config.dev-api.js",
+              "buildTarget": "fs:build:dev"
             },
             "test-api": {
-              "browserTarget": "fs:build:dev",
-              "proxyConfig": "src/environments/proxy.config.test-api.js"
+              "proxyConfig": "src/environments/proxy.config.test-api.js",
+              "buildTarget": "fs:build:dev"
             },
             "stage-api": {
-              "browserTarget": "fs:build:dev",
-              "proxyConfig": "src/environments/proxy.config.stage-api.js"
+              "proxyConfig": "src/environments/proxy.config.stage-api.js",
+              "buildTarget": "fs:build:dev"
             },
             "local-api": {
-              "browserTarget": "fs:build:dev",
-              "proxyConfig": "src/environments/proxy.config.local-api.js"
+              "proxyConfig": "src/environments/proxy.config.local-api.js",
+              "buildTarget": "fs:build:dev"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "fs:build"
+            "buildTarget": "fs:build"
           }
         },
         "test": {
