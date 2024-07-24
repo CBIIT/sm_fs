@@ -1,5 +1,5 @@
 import { Directive, Input } from '@angular/core';
-import { AbstractControl, FormGroup, NG_VALIDATORS, ValidationErrors, Validator } from '@angular/forms';
+import { AbstractControl, UntypedFormGroup, NG_VALIDATORS, ValidationErrors, Validator } from '@angular/forms';
 import { NGXLogger } from 'ngx-logger';
 import { PlanManagementService } from '../funding-plan/service/plan-management.service';
 
@@ -27,7 +27,7 @@ export class OneFundedGrantValidatorDirective implements Validator {
       return null;
     } else {
       const notFunded: boolean[] = [];
-      const controlNames = Object.keys((control as FormGroup).controls);
+      const controlNames = Object.keys((control as UntypedFormGroup).controls);
       controlNames.forEach(key => {
         if (key.startsWith('prc_')) {
 
