@@ -1,7 +1,7 @@
 <div class="row mb-2">
   <div class="col-12 d-flex">
     <h2 class="d-inline-block" id="overview-label">Filters</h2>
-    <a [routerLink]="" (click)="showAdvanced = !showAdvanced" class="ml-auto"
+    <a [routerLink]="[]" (click)="showAdvanced = !showAdvanced" class="ml-auto"
        [ngClass]="{'show-advance':!showAdvanced, 'hide-advance':showAdvanced}"
        [hidden]="!(searchType === 'FR' || searchType === 'FP')"></a>
   </div>

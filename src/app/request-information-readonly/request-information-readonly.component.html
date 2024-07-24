@@ -63,7 +63,7 @@
     <div class="col-md-6 col-lg-4">
       <div class="form-group">
         <p class="like-label">Requesting PD's Cancer Activity</p>
-        <p><a [routerLink]=""
+        <p><a [routerLink]="[]"
               ngbTooltip="{{model.requestDto.financialInfoDto.requestorCayCode|codeDescription:'CancerActivities'}}"
               triggers="click:blur" placement="top">{{model.requestDto.financialInfoDto.requestorCayCode}}</a></p>
       </div>
@@ -77,7 +77,7 @@
         <p>
           <a
             *ngFor="let doc of otherDocs; let first = first"
-            [routerLink]=""
+            [routerLink]="[][]"
             ngbTooltip="{{doc|codeDescription:'NciDocs'}}"
             triggers="click:blur" placement="top">
             <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>
@@ -106,7 +106,7 @@
     <div class="col-md-6 col-lg-4" *ngIf="showAltPdAndCayCode">
       <div class="form-group">
         <p class="like-label">R00 PD's Cancer Activity</p>
-        <p><a [routerLink]=""
+        <p><a [routerLink]="[]"
               ngbTooltip="{{model.requestDto.financialInfoDto.altCayCode|codeDescription:'CancerActivities'}}"
               triggers="click:blur" placement="top">{{model.requestDto.financialInfoDto.altCayCode}}</a></p>
       </div>
@@ -154,14 +154,14 @@
                 <a href="{{model.eGrantsUrl+g.skipApplId}}" target="yourgrant" ngbTooltip="eGrants">
                   <span class="egrants-icon"></span>
                 </a>
-                <a [routerLink]="" (mouseenter)="setGrant(g)" [ngbTooltip]="InstituteTooltip"
+                <a [routerLink]="[]" (mouseenter)="setGrant(g)" [ngbTooltip]="InstituteTooltip"
                    triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
               </span>
               </p>
 
             </td>
             <td>
-              <a [routerLink]="" (click)="openSkipRequest(g.skipFrqId)">{{g.skipFrqId}}</a>
+              <a [routerLink]="[]" (click)="openSkipRequest(g.skipFrqId)">{{g.skipFrqId}}</a>
             </td>
           </tr>
           </tbody>
