@@ -19,7 +19,7 @@
                     <a href="{{model.eGrantsUrl+grant.applId}}" target="yourgrant" ngbTooltip="eGrants">
                         <span class="egrants-icon"></span>
                     </a>
-                    <a [routerLink]="" (mouseenter)="setGrant(grant)" [ngbTooltip]="InstituteTooltip" triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
+                    <a [routerLink]="[]" (mouseenter)="setGrant(grant)" [ngbTooltip]="InstituteTooltip" triggers="click:blur"><i class='fa fa-university' aria-hidden='true'></i></a>
                 </span>
             </p>
         </div>
@@ -56,7 +56,7 @@
     <div class="col-sm-6 col-lg-2">
         <div class="form-group">
             <p class="like-label">Cancer Activity</p>
-            <p><a [routerLink]="" ngbTooltip="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="click:blur" placement="top">{{grant.cayCode}}</a></p>
+            <p><a [routerLink]="[]" ngbTooltip="{{grant.cayCode|codeDescription:'CancerActivities'}}" triggers="click:blur" placement="top">{{grant.cayCode}}</a></p>
         </div>
     </div>
 

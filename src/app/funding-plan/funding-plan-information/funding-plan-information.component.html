@@ -107,7 +107,7 @@
     <div class="col-xl-2 col-lg-4 col-sm-6">
       <div class="form-group">
         <span class="like-label">Requesting PD's Cancer Activity</span>
-        <p><a [routerLink]="" ngbTooltip="{{planModel.fundingPlanDto.cayCode|codeDescription:'CancerActivities'}}"
+        <p><a [routerLink]="[]" ngbTooltip="{{planModel.fundingPlanDto.cayCode|codeDescription:'CancerActivities'}}"
               triggers="click:blur" placement="top">{{planModel.fundingPlanDto.cayCode}}</a></p>
       </div>
     </div>
@@ -137,7 +137,7 @@
       <div class="form-group">
         <span class="like-label">Other DOC(s) Contributing Funds</span>
         <p *ngIf="otherDocs?.length; else dash">
-          <a *ngFor="let doc of otherDocs; let first = first" [routerLink]=""
+          <a *ngFor="let doc of otherDocs; let first = first" [routerLink]="[][]"
              ngbTooltip="{{doc|codeDescription:'NciDocs'}}" triggers="click:blur" placement="top">
             <ng-container *ngIf="first then firstDoc; else notFirstDoc"></ng-container>
             <ng-template #firstDoc>{{doc}}</ng-template>

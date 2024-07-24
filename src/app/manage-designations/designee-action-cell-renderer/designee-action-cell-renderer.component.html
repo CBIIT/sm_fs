@@ -1,15 +1,15 @@
 <span *ngIf="editable" class="mr-2">
-  <a [routerLink]="" ngbTooltip="Edit" (click)="onEdit()">
+  <a [routerLink]="[]" ngbTooltip="Edit" (click)="onEdit()">
     <i class='fa fa-pencil' aria-hidden='true'></i>
   </a>
 </span>
 <span *ngIf="canReactivate" class="mr-2">
-  <a [routerLink]="" ngbTooltip="Update" (click)="onReactivate()">
+  <a [routerLink]="[]" ngbTooltip="Update" (click)="onReactivate()">
     <i class='fa fa-sync-alt' aria-hidden='true'></i>
   </a>
 </span>
 <span>
-  <a [routerLink]="" ngbTooltip="Delete" (click)="onDelete()" class="btn btn-link btn-delete btn-slim">
+  <a [routerLink]="[]" ngbTooltip="Delete" (click)="onDelete()" class="btn btn-link btn-delete btn-slim">
     <i class='fa fa-trash' aria-hidden='true'></i>
   </a>
 </span>

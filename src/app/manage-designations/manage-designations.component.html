@@ -6,7 +6,7 @@
 <div class="row" *ngIf="errInactiveDesignees">
   <div class="col-12">
     <ngb-alert type="danger" [dismissible]="false">
-        <span><a [routerLink]="" class="mr-1">
+        <span><a [routerLink]="[]" class="mr-1">
           <i class='fa fa-user-slash' aria-hidden='true'></i>
         </a>One or more of your designees are <strong>inactive</strong> and <strong>need to be removed or updated (if applicable)</strong>.</span>
     </ngb-alert>
