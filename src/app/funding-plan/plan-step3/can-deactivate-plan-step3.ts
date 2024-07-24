@@ -1,11 +1,11 @@
 import { PlanStep3Component } from './plan-step3.component';
-import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { PlanLoaderService } from '../retrieve-plan/plan-loader.service';
 import { NGXLogger } from "ngx-logger";
 
 @Injectable({ providedIn: 'root' })
-export class CanDeactivatePlanStep3 implements CanDeactivate<PlanStep3Component> {
+export class CanDeactivatePlanStep3  {
   constructor(
     private logger: NGXLogger,
     private planLoaderService: PlanLoaderService) {

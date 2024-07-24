@@ -1,4 +1,4 @@
-import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { Injectable } from '@angular/core';
 import { Step2Component } from './step2.component';
@@ -7,7 +7,7 @@ import { RequestLoaderService } from '../retrieve-request/request-loader.service
 @Injectable({
   providedIn: 'root'
 })
-export class CanDeactivateRequestStep2 implements CanDeactivate<Step2Component> {
+export class CanDeactivateRequestStep2  {
 
   private requestLoaded = false;
 

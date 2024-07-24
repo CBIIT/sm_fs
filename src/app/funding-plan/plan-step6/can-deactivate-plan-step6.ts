@@ -1,11 +1,11 @@
-import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { PlanStep6Component } from './plan-step6.component';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CanDeactivatePlanStep6 implements CanDeactivate<PlanStep6Component> {
+export class CanDeactivatePlanStep6  {
 
   /**
    * Checks if Step6 component can be deactivated.

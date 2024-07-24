@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PdAuthGuard implements CanActivate {
+export class PdAuthGuard  {
 
   constructor(
     private router: Router,

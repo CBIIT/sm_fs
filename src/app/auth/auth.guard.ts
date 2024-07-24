@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { UserService } from '@cbiit/i2ecui-lib';
 import { GrantedAuthority, SecurityCredentials } from '@cbiit/i2ecommonws-lib';
@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard implements CanActivate {
+export class AuthGuard  {
 
   constructor(
     private router: Router,
