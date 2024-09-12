@@ -94,6 +94,11 @@ export class GmInfoComponent implements OnInit, OnDestroy {
       const spec = this.specialistMap.get(Number(this.gmInfo.defaultSpecNpeId));
       this.gmInfo.defaultSpecFullName = spec?.specFullName;
     }
+    else {
+      this.logger.debug('no default is selected, need to clean the spec name');
+      this.gmInfo.defaultSpecFullName = null;
+    }
+    this.gmInfo.bkupSpecNpeId = null; // no longer need backup spec.
     return this.gmInfo;
   }
 
