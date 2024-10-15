@@ -282,6 +282,8 @@ export function megaInitializer(
         console.error(`${JSON.stringify(oops)}`);
         if (oops.status === 401) {
           router.navigate(['unauthorize']);
+        } else if (oops.status === 200) { 
+          console.log('Session Expired');
         } else {
           const timeStamp = Date.now();
           errorHandler.registerNewError(timeStamp, oops);
