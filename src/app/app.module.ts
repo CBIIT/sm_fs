@@ -270,27 +270,26 @@ export function megaInitializer(
   errorHandler: ErrorHandlerService): any {
   return (): Promise<any> => {
     return userSessionService.initialize()
-      .then(function () {
-        return appPropertiesService.initialize()
+      .then(function() {
+        return appPropertiesService.initialize();
       })
-      .then(function () {
-        return lookupService.initialize()
+      .then(function() {
+        return lookupService.initialize();
       })
-      .then(function () {
-        return gwbLinksService.initialize()
+      .then(function() {
+        return gwbLinksService.initialize();
       }).catch(oops => {
-        console.error(`${JSON.stringify(oops)}`);
-        if (oops.status === 401) {
-          router.navigate(['unauthorize']);
-        } else if (oops.status === 200) { 
-          console.log('Session Expired');
-        } else {
-          const timeStamp = Date.now();
-          errorHandler.registerNewError(timeStamp, oops);
-          router.navigate(['/error', timeStamp])
+        console.log('initializer failed; redirect to home');
+        if(oops.status === 200) {
+          console.log(`window.location.href: ${window.location.href}`);
+          window.location.reload(true);
         }
+        return new Promise<boolean>((resolve, reject) => {
+          errorHandler.registerNewError(Date.now(), oops);
+          reject(oops);
+        });
       });
-  }
+  };
 }
 
 @NgModule({
