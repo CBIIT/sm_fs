@@ -282,6 +282,7 @@ export function megaInitializer(
         console.log('initializer failed; redirect to home');
         if(oops.status === 200) {
           console.log(`window.location.href: ${window.location.href}`);
+          // @ts-ignore
           window.location.reload(true);
         }
         return new Promise<boolean>((resolve, reject) => {
