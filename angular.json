@@ -24,7 +24,8 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
-              "zone.js"
+              "zone.js",
+              "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.app.json",
             "aot": true,
@@ -158,7 +159,8 @@
             "main": "src/test.ts",
             "polyfills":[
               "zone.js",
-              "zone.js/testing"
+              "zone.js/testing",
+               "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
