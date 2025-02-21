@@ -13,6 +13,7 @@ import { RequestModel } from '../../model/request/request-model';
 })
 export class OefiaTypesComponent implements OnInit, AfterViewInit {
   @Input() index = 0;
+  @Input() ids;
   @Input() fseId: number;
   oefiaCodes: OefiaCodingDto[];
   selectedOefiaType: { id: string; text: string };

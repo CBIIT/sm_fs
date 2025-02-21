@@ -44,7 +44,8 @@
             <app-oefia-types
               [index]="i"
               [selectedValue]="can.octId"
-              [readonly]="true">
+              [readonly]="true"
+              [ids]="i">
             </app-oefia-types>
           </td>
           <td>
@@ -121,7 +122,7 @@
           <td [hidden]="!(isFinancialApprover() && isFcNci())">
             <app-oefia-types
               [index]="i"
-              [selectedValue]="can.octId || can.defaultOefiaTypeId">
+              [selectedValue]="can.octId || can.defaultOefiaTypeId" [ids]="i">
             </app-oefia-types>
           </td>
           <td *ngIf="canSeeAtLeastOneCAN()">
