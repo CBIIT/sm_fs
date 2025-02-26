@@ -16,7 +16,6 @@
                     <tr>
                         <th scope="col">Grant Number</th>
                         <th scope="col">Primary Specialist</th>
-                        <th scope="col">Back-up Specialist</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -38,24 +37,7 @@
                         <ng-template #readonly>
                             <a href="mailto: {{grant.pfrSpecEmailAddress}}">{{grant.pfrSpecFullName}}</a>
                         </ng-template>
-                        </td>
-                        <td>
-                            <div *ngIf="editable; else readonly2">
-                            <ng-select2
-                                id="backup-specialist{{i}}"
-                                name="backup-specialist{{i}}"
-                                [allowClear]="true"
-                                [data] = "specialists"
-                                [(ngModel)]="grant.pfrBkupSpecNpeId">
-                            </ng-select2>
-                            </div>
-                            <ng-template #readonly2>
-                                    <a *ngIf= "grant.pfrBkupSpecFullName!=null; else dash"
-                                      href="mailto: {{grant.pfrBkupSpecEmailAddress}}">{{grant.pfrBkupSpecFullName}}</a>
-                                    <ng-template #dash>
-                                        <div>--</div>
-                                      </ng-template>                            </ng-template>
-                        </td>
+                        </td>                        
                     </tr>
                 </tbody>
             </table>
