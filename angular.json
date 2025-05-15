@@ -1,7 +1,10 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "cli": {
-    "analytics": "3a9c3873-fac2-4891-9726-a1539a4d32cd"
+    "analytics": "3a9c3873-fac2-4891-9726-a1539a4d32cd",
+    "cache": {
+      "enabled": false
+    }
   },
   "version": 1,
   "newProjectRoot": "projects",
@@ -47,8 +50,8 @@
             ],
             "scripts": [
               "./node_modules/jquery/dist/jquery.js",
-              "./node_modules/jquery-bootstrap-scrolling-tabs/dist/jquery.scrolling-tabs.js",
               "./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "./node_modules/jquery-bootstrap-scrolling-tabs/dist/jquery.scrolling-tabs.js",
               "./node_modules/select2/dist/js/select2.full.js",
               "./node_modules/datatables.net/js/jquery.dataTables.js",
               "./node_modules/datatables.net-responsive/js/dataTables.responsive.js",

@@ -26,17 +26,17 @@
     </div>
     <div class="col-12 mt-2">
 
-        <ngb-accordion #a="ngbAccordion" [activeIds]="activeIds">
+        <div ngbAccordion #a="ngbAccordion">
 
-            <ngb-panel id="cover-panel">
-                <ng-template ngbPanelHeader>
+            <div ngbAccordionItem id="cover-panel">
+                <ng-template ngbAccordionHeader>
                     <app-plan-cover-page></app-plan-cover-page>
                 </ng-template>
-            </ngb-panel>
+            </div>
 
 
-            <ngb-panel id="sciRat-panel">
-                <ng-template ngbPanelHeader>
+            <div ngbAccordionItem id="sciRat-panel" [collapsed]="!activeIds.includes('sciRat-panel')">
+                <ng-template ngbAccordionHeader>
 
                     <div class="d-flex align-items-center">
                         <h3>Scientific Rationale for Supporting FOA (AND) Justification for Each Proposed
@@ -71,7 +71,7 @@
                     </div>
 
                 </ng-template>
-                <ng-template ngbPanelContent>
+                <ng-template ngbAccordionBody>
                     <div class="row">
                         <div *ngIf="grantsSkippedPreviouslyDto.previouslySkippedinPlan"
                             class="col-12 alert alert-warning">
@@ -108,10 +108,10 @@
                         </div>
                     </div>
                 </ng-template>
-            </ngb-panel>
+            </div>
 
-            <ngb-panel id="justExc-panel" *ngIf="exceptionGrants && exceptionGrants.length > 0">
-                <ng-template ngbPanelHeader>
+            <div ngbAccordionItem id="justExc-panel" *ngIf="exceptionGrants && exceptionGrants.length > 0" [collapsed]="!activeIds.includes('justExc-panel')">
+                <ng-template ngbAccordionHeader>
                     <div class="d-flex align-items-center">
                         <h3>Justification for Exception Application(s)</h3>
                         <div class="doc-details" *ngIf="isExceptionsUploaded; else excNotUploaded">
@@ -142,7 +142,7 @@
                         </ng-template>
                     </div>
                 </ng-template>
-                <ng-template ngbPanelContent>
+                <ng-template ngbAccordionBody>
                     <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
                         (fileSelectEmitter)="selectFiles($event)" [templateType]="CR_FUNDING_PLAN_EXCEPTION_JUST_RPT">
                     </app-plan-file-upload>
@@ -152,10 +152,10 @@
                         </div>
                     </div>
                 </ng-template>
-            </ngb-panel>
+            </div>
 
-            <ngb-panel id="justSkip-panel" *ngIf="skipGrants && skipGrants.length > 0">
-                <ng-template ngbPanelHeader>
+            <div ngbAccordionItem id="justSkip-panel" *ngIf="skipGrants && skipGrants.length > 0" [collapsed]="!activeIds.includes('justSkip-panel')">
+                <ng-template ngbAccordionHeader>
                     <div class="d-flex align-items-center">
                         <h3>Justification for Skipped Application(s)</h3>
                         <div class="doc-details" *ngIf="isSkipUploaded; else skipNotUploaded">
@@ -186,7 +186,7 @@
                         </ng-template>
                     </div>
                 </ng-template>
-                <ng-template ngbPanelContent>
+                <ng-template ngbAccordionBody>
                     <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
                         (fileSelectEmitter)="selectFiles($event)" [templateType]="CR_FUNDING_PLAN_SKIP_JUST_RPT">
                     </app-plan-file-upload>
@@ -196,10 +196,10 @@
                         </div>
                     </div>
                 </ng-template>
-            </ngb-panel>
+            </div>
 
-            <ngb-panel id="other-panel">
-                <ng-template ngbPanelHeader>
+            <div ngbAccordionItem id="other-panel" [collapsed]="!activeIds.includes('other-panel')">
+                <ng-template ngbAccordionHeader>
                     <div class="d-flex align-items-center">
                         <h3>Other Supporting Document</h3>
                         <div class="doc-details" *ngIf="isOtherUploaded; else othNotUploaded">
@@ -223,7 +223,7 @@
                         </div>
                         <ng-template #othNotUploadedBtn>
                             <div class="doc-buttons">
-                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"
+                                <button ngbAccordionToggle class="btn btn-sm btn-outline-secondary"
                                     (click)="changeLabel('othNotUploadedBtnId')"><i id='othNotUploadedBtnId'
                                         class="far fa-plus mr-1" aria-hidden="true">Add Document</i> </button>
                             </div>
@@ -231,20 +231,20 @@
 
                     </div>
                 </ng-template>
-                <ng-template ngbPanelContent>
+                <ng-template ngbAccordionBody>
                     <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
                         (fileSelectEmitter)="selectFiles($event)" [templateType]="Other">
                     </app-plan-file-upload>
                 </ng-template>
-            </ngb-panel>
+            </div>
 
-            <ngb-panel id="summary-panel">
-                <ng-template ngbPanelHeader>
+            <div ngbAccordionItem id="summary-panel">
+                <ng-template ngbAccordionHeader>
                     <app-plan-summary-statement [grantList]="selectedGrants"></app-plan-summary-statement>
                 </ng-template>
-            </ngb-panel>
+            </div>
 
-        </ngb-accordion>
+        </div>
 
         <button #collapseAll [hidden]="true" (click)="activeIds=[]">close all</button>
 

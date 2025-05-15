@@ -252,6 +252,7 @@ export class PlanStep5Component implements OnInit {
     this.router.navigate(['/plan/step4']);
   }
 
+  protected readonly Symbol = Symbol;
 }
 
 export enum DocTypeConstants {

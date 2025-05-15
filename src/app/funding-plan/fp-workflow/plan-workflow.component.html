@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-12 d-flex">
       <h2 id="workflow-section">Workflow</h2>
-      <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#workflow-collapse" role="button"
+      <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#workflow-collapse" role="button"
         aria-expanded="true" aria-controls="workflow-collapse"></a>
     </div>
 </div>
@@ -155,7 +155,7 @@
         <span class="ml-auto" *ngIf="isApprover() && buttonDisabled" ngbTooltip="Select a workflow action to enable this button.">
                 <button class="btn btn-primary" disabled> {{buttonLabel}}</button>
         </span>
-        
+
     </div>
 </div>
 <app-fp-workflow-warning-modal></app-fp-workflow-warning-modal>

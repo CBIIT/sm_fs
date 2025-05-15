@@ -6,8 +6,8 @@
                   [docChecker]="docChecker"></app-plan-warning>
 <app-workflow-modal requestOrPlan="PLAN"></app-workflow-modal>
 <form #parentForm="ngForm">
-<app-funding-plan-information 
-  [readOnly]="true" 
+<app-funding-plan-information
+  [readOnly]="true"
   [parentForm]="parentForm"
   [showAdditionalInfo]="true">
 </app-funding-plan-information>
@@ -25,7 +25,7 @@
 <div class="row" *ngIf="!noSkipResult">
   <div class="col-12 d-flex">
     <h2>Application(s) Skipped</h2>
-    <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-skipped-collapse" role="button"
+    <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#apps-skipped-collapse" role="button"
        aria-expanded="true" aria-controls="apps-skipped-collapse"></a>
   </div>
   <div class="collapse show mt-2" id="apps-skipped-collapse">
@@ -40,7 +40,7 @@
 <div class="row" *ngIf="!noAppNotFundingResult">
   <div class="col-12 d-flex">
     <h2>Application(s) Not Considered for Funding</h2>
-    <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-notcon-collapse" role="button"
+    <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#apps-notcon-collapse" role="button"
        aria-expanded="true" aria-controls="apps-notcon-collapse"></a>
   </div>
   <div class="collapse show mt-2" id="apps-notcon-collapse">

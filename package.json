@@ -30,15 +30,15 @@
     "@angular/platform-browser-dynamic": "^18.2.2",
     "@angular/router": "^18.2.2",
     "@cbiit/i2ecommonws-lib": "6.0.0",
-    "@cbiit/i2ecui-lib": "6.0.0",
+    "@cbiit/i2ecui-lib": "^6.1.0-SNAPSHOT",
     "@cbiit/i2efsws-lib": "6.0.0",
     "@cbiit/i2ejasperws-lib": "6.0.0",
     "@cbiit/i2erefws-lib": "6.0.0",
     "@cbiit/i2eygws-lib": "6.0.0",
-    "@ng-bootstrap/ng-bootstrap": "^11.0.0",
+    "@ng-bootstrap/ng-bootstrap": "^17.0.0",
     "@types/select2": "^4.0.63",
     "angular-datatables": "^13.0.1",
-    "bootstrap": "^4.6.0",
+    "bootstrap": "^5.3.5",
     "core-js": "^3.37.0",
     "datatables.net": "^1.13.2",
     "datatables.net-buttons": "^1.7.0",
@@ -47,9 +47,9 @@
     "datatables.net-fixedheader": "^3.2.2",
     "datatables.net-responsive": "^2.2.7",
     "datatables.net-responsive-dt": "^2.2.7",
+    "file-saver": "^2.0.5",
     "jquery": "^3.5.1",
     "jquery-bootstrap-scrolling-tabs": "^2.6.1",
-    "file-saver": "^2.0.5",
     "jszip": "^3.6.0",
     "ng-select2": "^1.2.9",
     "ngx-bootstrap": "^6.2.0",
@@ -88,6 +88,7 @@
     "@types/node": "^12.20.45",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
+    "codelyzer": "^6.0.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.26.0",
@@ -102,22 +103,21 @@
     "prettier": "2.7.1",
     "protractor": "^7.0.0",
     "ts-node": "^8.3.0",
-    "typescript": "~5.4.5",
-    "codelyzer": "^6.0.0",
-    "tslint": "~6.1.0"
+    "tslint": "~6.1.0",
+    "typescript": "~5.4.5"
   },
   "overrides": {
-    "@ng-bootstrap/ng-bootstrap" : {
+    "@ng-bootstrap/ng-bootstrap": {
       "@angular/common": "$@angular/common",
-      "@angular/core":"$@angular/core",
-      "@angular/forms":"$@angular/forms",
-      "@angular/localize":"$@angular/localize"
+      "@angular/core": "$@angular/core",
+      "@angular/forms": "$@angular/forms",
+      "@angular/localize": "$@angular/localize"
     },
-    "ng-select2" : {
+    "ng-select2": {
       "@angular/common": "$@angular/common",
-      "@angular/core":"$@angular/core",
-      "@angular/forms":"$@angular/forms",
-      "@angular/localize":"$@angular/localize",
+      "@angular/core": "$@angular/core",
+      "@angular/forms": "$@angular/forms",
+      "@angular/localize": "$@angular/localize",
       "jquery": "$jquery"
     }
   }

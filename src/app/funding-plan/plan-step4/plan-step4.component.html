@@ -6,7 +6,7 @@
 </form>
 <!--    <div class="col-12 d-flex">-->
 <!--        <h2>Funding Plan Information</h2>-->
-<!--        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#fplan-info-collapse" role="button" aria-expanded="true" aria-controls="fplan-info-collapse"></a>-->
+<!--        <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#fplan-info-collapse" role="button" aria-expanded="true" aria-controls="fplan-info-collapse"></a>-->
 <!--    </div>-->
 <!--    <div class="col-12 collapse show mt-2" id="fplan-info-collapse">-->
 <!--        <table class="table table-striped table-bordered">-->
@@ -93,7 +93,7 @@
 <div class="row" *ngIf="!noSkipResult">
     <div class="col-12 d-flex">
         <h2>Application(s) Skipped</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-skipped-collapse" role="button" aria-expanded="true" aria-controls="apps-skipped-collapse"></a>
+        <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#apps-skipped-collapse" role="button" aria-expanded="true" aria-controls="apps-skipped-collapse"></a>
     </div>
     <div class=" collapse show mt-2" id="apps-skipped-collapse">
         <app-grant-table [grantList]="skGrants"></app-grant-table>
@@ -110,16 +110,16 @@
 <div class="row">
     <div class="col-12 d-flex">
         <h2>Application(s) Not Considered for Funding</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apps-notconsidered-collapse" role="button" aria-expanded="true" aria-controls="apps-notconsidered-collapse"></a>
+        <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#apps-notconsidered-collapse" role="button" aria-expanded="true" aria-controls="apps-notconsidered-collapse"></a>
     </div>
     <div class="collapse show mt-2" id="apps-notconsidered-collapse">
         <p *ngIf="!ncGrants || ncGrants.length === 0">
-            Nothing found to be displayed. All applications received for this FOA to NCAB 
+            Nothing found to be displayed. All applications received for this FOA to NCAB
             <span *ngFor = "let rfaNcCab of planModel.grantsSearchCriteria let j=index">
                 <span *ngFor = "let ncCab of rfaNcCab.ncabDates, let i=index">
-                    {{i!=0?', ':''}}{{ncCab | formatNcabDate }} 
+                    {{i!=0?', ':''}}{{ncCab | formatNcabDate }}
                 </span>
-            </span> 
+            </span>
             have been considered for funding.
         </p>
         <p *ngIf="ncGrants.length > 0">

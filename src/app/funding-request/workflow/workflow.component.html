@@ -8,7 +8,7 @@
 <div class="row">
     <div class="col-12 d-flex">
         <h2 id="workflow-section">Workflow</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#workflow-collapse" role="button"
+        <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#workflow-collapse" role="button"
             aria-expanded="true" aria-controls="workflow-collapse"></a>
     </div>
 </div>
@@ -82,7 +82,7 @@
             <span class="text-danger mt-1" *ngIf="(validationError?.comments_missing)">
                 Comments are required
             </span>
-            <span class="character-counter">{{comments.length}}/2000</span> 
+            <span class="character-counter">{{comments.length}}/2000</span>
             <div *ngIf="isGMLeaderShip() && isApprovalAction">
                 <div class="notes">
                     <label for="special-comments">Special Instructions <span class="optional">(optional)</span></label>

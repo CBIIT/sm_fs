@@ -15336,66 +15336,66 @@ input[type="button"].btn-block {
 }
 
 /* line 42, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-.dropdown-menu-left {
+.dropdown-menu-start {
   right: auto;
   left: 0;
 }
 
 /* line 47, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-.dropdown-menu-right {
+.dropdown-menu-end {
   right: 0;
   left: auto;
 }
 
 @media (min-width: 576px) {
   /* line 42, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-sm-left {
-    right: auto;
-    left: 0;
+  .dropdown-menu-sm-start {
+    end: auto;
+    start: 0;
   }
   /* line 47, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-sm-right {
-    right: 0;
-    left: auto;
+  .dropdown-menu-sm-end {
+    end: 0;
+    start: auto;
   }
 }
 
 @media (min-width: 768px) {
   /* line 42, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-md-left {
-    right: auto;
-    left: 0;
+  .dropdown-menu-md-start {
+    end: auto;
+    start: 0;
   }
   /* line 47, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-md-right {
-    right: 0;
-    left: auto;
+  .dropdown-menu-md-end {
+    end: 0;
+    start: auto;
   }
 }
 
 @media (min-width: 992px) {
   /* line 42, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-lg-left {
-    right: auto;
-    left: 0;
+  .dropdown-menu-lg-start {
+    end: auto;
+    start: 0;
   }
   /* line 47, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-lg-right {
-    right: 0;
-    left: auto;
+  .dropdown-menu-lg-end {
+    end: 0;
+    start: auto;
   }
 }
 
 @media (min-width: 1200px) {
   /* line 42, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-xl-left {
-    right: auto;
-    left: 0;
+  .dropdown-menu-xl-start {
+    end: auto;
+    start: 0;
   }
   /* line 47, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-xl-right {
-    right: 0;
-    left: auto;
+  .dropdown-menu-xl-end {
+    end: 0;
+    start: auto;
   }
 }
 

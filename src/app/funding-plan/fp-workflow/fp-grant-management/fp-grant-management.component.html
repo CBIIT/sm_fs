@@ -2,7 +2,7 @@
 <div class="row">
     <div class="col-12 d-flex">
         <h2>Grants Management</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#grants-mgmt-collapse" role="button" aria-expanded="true" aria-controls="grants-mgmt-collapse"></a>
+        <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#grants-mgmt-collapse" role="button" aria-expanded="true" aria-controls="grants-mgmt-collapse"></a>
     </div>
 </div>
 <div class="row collapse show" id="grants-mgmt-collapse">
@@ -25,7 +25,7 @@
                         </td>
                         <td>
                         <div *ngIf="editable; else readonly">
-                            <ng-select2 
+                            <ng-select2
                             id="specialist{{i}}"
                             name="specialist{{i}}"
                             [allowClear]="true"
@@ -37,11 +37,11 @@
                         <ng-template #readonly>
                             <a href="mailto: {{grant.pfrSpecEmailAddress}}">{{grant.pfrSpecFullName}}</a>
                         </ng-template>
-                        </td>                        
+                        </td>
                     </tr>
                 </tbody>
             </table>
-        </form>    
+        </form>
     </div>
 </div>
 <div class="row">

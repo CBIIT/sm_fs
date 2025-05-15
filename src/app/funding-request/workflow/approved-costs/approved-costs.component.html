@@ -2,7 +2,7 @@
 
     <div class="col-12 d-flex">
       <h2>Approved Costs</h2>
-      <a class="collapse-toggle btn btn-link ml-auto" data-toggle="collapse" href="#apvd-costs-collapse" role="button" aria-expanded="true" aria-controls="apvd-costs-collapse"></a>
+      <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#apvd-costs-collapse" role="button" aria-expanded="true" aria-controls="apvd-costs-collapse"></a>
     </div>
 
     <div class="col-12 collapse show mt-2" id="apvd-costs-collapse">
@@ -36,13 +36,13 @@
                     <td>{{can.requestedFutureYrs}}</td>
                     <td>
                     <div *ngIf="editable; else readonly">
-                        <input                        
-                        id="apvd-future-years" 
-                        class="form-control form-control-sm" 
-                        type="text" 
-                        aria-label="approved future years" 
+                        <input
+                        id="apvd-future-years"
+                        class="form-control form-control-sm"
+                        type="text"
+                        aria-label="approved future years"
                         [(ngModel)]="can.approvedFutureYrs"
-                        #approvedFutureYrs="ngModel" 
+                        #approvedFutureYrs="ngModel"
                         name="approvedFutureYrs{{i}}"
                         required
                         pattern="[0-9]*"
