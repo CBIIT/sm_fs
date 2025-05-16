@@ -9,7 +9,7 @@
 
     <div class="col-12 d-flex">
         <h2>Budget Documents (optional)</h2>
-        <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#budget-docs-collapse"
+        <a class="collapse-toggle btn btn-link ms-auto" data-bs-toggle="collapse" href="#budget-docs-collapse"
             role="button" aria-expanded="true" aria-controls="apps-notcon-collapse"></a>
     </div>
 </div>
@@ -58,10 +58,10 @@
             <span class="doc-desc">{{item.docFilename}} (Added by <a href="mailto: {{item.uploadByEmail}}">{{item.uploadByName}}</a> on
                 {{item.createDate}})</span>
 
-            <div class="ml-auto">
-                <button class="btn btn-link btn-slim ml-2 btn-delete" title="Delete"
+            <div class="ms-auto">
+                <button class="btn btn-link btn-slim ms-2 btn-delete" title="Delete"
                     (click)="deleteDoc(item.id, item.docType)"><i class="fas fa-trash" aria-hidden="true"></i></button>
-                <button class="btn btn-link btn-slim ml-1" title="View"
+                <button class="btn btn-link btn-slim ms-1" title="View"
                     (click)="downloadFile(item.id, item.docFilename)"><i class="fas fa-eye"
                         aria-hidden="true"></i></button>
             </div>

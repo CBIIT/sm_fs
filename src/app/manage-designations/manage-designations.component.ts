@@ -133,7 +133,7 @@ export class ManageDesignationsComponent implements OnInit, AfterViewInit, OnDes
       ],
       columnDefs: [
       ],
-      dom: '<"dt-controls"<"ml-auto"B<"d-inline-block">>>rt<"dt-controls"<"mr-auto"i>>',
+      dom: '<"dt-controls"<"ms-auto"B<"d-inline-block">>>rt<"dt-controls"<"me-auto"i>>',
       buttons: [
       ],
       rowCallback: (row: Node) => {

@@ -1,7 +1,7 @@
 <div class="row mb-2">
   <div class="col-12 d-flex">
     <h2 class="d-inline-block" id="overview-label">Filters</h2>
-    <a [routerLink]="[]" (click)="showAdvanced = !showAdvanced" class="ml-auto"
+    <a [routerLink]="[]" (click)="showAdvanced = !showAdvanced" class="ms-auto"
        [ngClass]="{'show-advance':!showAdvanced, 'hide-advance':showAdvanced}"
        [hidden]="!(searchType === 'FR' || searchType === 'FP')"></a>
   </div>
@@ -15,11 +15,11 @@
   <div class="row form-group">
 
     <div class="col-7 col-md-7" [hidden]="!searchType">
-      <div class="ml-3"> <!-- temporary - need to remove style margin-left: -1rem from the component below -->
+      <div class="ms-3"> <!-- temporary - need to remove style margin-left: -1rem from the component below -->
         <lib-grantnumber-search-criteria [form]="searchForm"></lib-grantnumber-search-criteria>
       </div>
     </div>
-    <div class="col-3 col-md-3 mr-auto" [hidden]="!(searchType === 'FR' || searchType === 'FP' || searchType === 'G')">
+    <div class="col-3 col-md-3 me-auto" [hidden]="!(searchType === 'FR' || searchType === 'FP' || searchType === 'G')">
       <lib-fy-range [minYear]="2001" [maxYear]="2025" [form]="searchForm"></lib-fy-range>
     </div>
   </div>
@@ -64,7 +64,7 @@
     <div class="col-3 col-md-3">
       <app-search-rfa-pa-dropdown [parentForm]="searchForm"></app-search-rfa-pa-dropdown>
     </div>
-    <div class="col-3 col-md-3 ml-auto">
+    <div class="col-3 col-md-3 ms-auto">
       <lib-ncab-daterange [form]="searchForm"></lib-ncab-daterange>
     </div>
   </div>
@@ -165,26 +165,26 @@
       <input type="text" id="budget-mech" name="budgetMech" ngModel class="form-control">
     </div>
     <div class="col-md-6 col-lg-6">
-      <label for="pl-type">Paylist Type</label>
-      <input type="text" id="pl-type" name="plType" ngModel class="form-control">
+      <label for="ps-type">Paylist Type</label>
+      <input type="text" id="ps-type" name="plType" ngModel class="form-control">
     </div>
   </div>
 
   <div class="row form-group" [hidden]="!(searchType === 'PL')">
     <div class="col-md-6 col-lg-6">
-      <label for="pl-status">Paylist Status</label>
-      <input type="text" id="pl-status" name="plStatus" ngModel class="form-control">
+      <label for="ps-status">Paylist Status</label>
+      <input type="text" id="ps-status" name="plStatus" ngModel class="form-control">
     </div>
     <div class="col-md-6 col-lg-6">
-      <label for="pl-ca">Cancer Activity (CA)</label>
-      <input type="text" id="pl-ca" name="plCa" ngModel class="form-control">
+      <label for="ps-ca">Cancer Activity (CA)</label>
+      <input type="text" id="ps-ca" name="plCa" ngModel class="form-control">
     </div>
   </div>
 
   <!-- Form buttons -->
   <div class="row form-group">
     <div class="col-lg-12 d-flex justify-content-end align-items-end">
-      <button type="button" class="btn btn-outline-secondary mr-2" (click)="clear()">Reset</button>
+      <button type="button" class="btn btn-outline-secondary me-2" (click)="clear()">Reset</button>
       <button type="submit" class="btn btn-primary" *ngIf="validFilter(); else searchDisabled">Search</button>
       <ng-template #searchDisabled>
             <span ngbTooltip="Missing required search criteria">

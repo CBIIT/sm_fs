@@ -2,10 +2,10 @@
 
   <div class="col-12 d-flex">
     <h2>Supporting Docs</h2>&nbsp;<app-edit-link [target]="'/request/step3'"></app-edit-link>
-    <button class="btn btn-outline-primary mr-2 ml-auto" (click)="downloadPackage()"><i class="far fa-file-pdf"
+    <button class="btn btn-outline-primary me-2 ms-auto" (click)="downloadPackage()"><i class="far fa-file-pdf"
         aria-hidden="true"></i> View Package
     </button>
-    <a class="collapse-toggle btn btn-link ml-1" data-bs-toggle="collapse" href="#docs-collapse" role="button"
+    <a class="collapse-toggle btn btn-link ms-1" data-bs-toggle="collapse" href="#docs-collapse" role="button"
       aria-expanded="true" aria-controls="docs-collapse"></a>
   </div>
 
@@ -15,8 +15,8 @@
     <div class="no-drag-auto-number doc-card" tabindex="0">
       <span class="doc-name"> Cover Page </span>
       <span class="doc-desc">(Automatically Generated)</span>
-      <div class="ml-auto">
-        <button class="btn btn-link btn-slim ml-1" title="View" (click)="downloadCoverSheet()"><i class="fas fa-eye"
+      <div class="ms-auto">
+        <button class="btn btn-link btn-slim ms-1" title="View" (click)="downloadCoverSheet()"><i class="fas fa-eye"
             aria-hidden="true"></i></button>
       </div>
     </div>
@@ -61,13 +61,13 @@
           </span>
         </ng-template>
 
-        <div class="ml-auto">
+        <div class="ms-auto">
 
           <button *ngIf="item.docFilename === 'Justification' && justificationType === 'text'; else displayDownloadIcon"
-            class="btn btn-link btn-slim ml-1" title="View" (click)="open(justificationModal)"><i class="fas fa-eye"
+            class="btn btn-link btn-slim ms-1" title="View" (click)="open(justificationModal)"><i class="fas fa-eye"
               aria-hidden="true"></i></button>
           <ng-template #displayDownloadIcon>
-            <button class="btn btn-link btn-slim ml-1" title="View" (click)="downloadFile(item.id, item.docFilename)"><i
+            <button class="btn btn-link btn-slim ms-1" title="View" (click)="downloadFile(item.id, item.docFilename)"><i
                 class="fas fa-eye" aria-hidden="true"></i></button>
           </ng-template>
         </div>

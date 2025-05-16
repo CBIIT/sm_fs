@@ -1,7 +1,7 @@
 <div class="form-group">
   <div class="d-flex">
     <label [for]="name">{{ label }}</label>
-    <div class="form-check ml-auto d-flex" *ngIf="showInactiveToggle">
+    <div class="form-check ms-auto d-flex" *ngIf="showInactiveToggle">
       <input type="checkbox" [id]="'inactivePd-'+name" name="inactivePd" (change)="onCheckboxChange($event)" ngModel>
       <label [for]="'inactivePd-'+name">
         Include Inactive PD

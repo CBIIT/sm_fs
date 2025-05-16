@@ -18,7 +18,7 @@
 
 <hr before-workflow>
 
-<app-workflow (actionEmitter)="actionType($event)" 
+<app-workflow (actionEmitter)="actionType($event)"
   [readonly]="!submitVisible() || !submitEnabled()"
   [hidden]="hideWorkflow()">
   <app-budget-info [hidden]="!showBudgetInfo()"
@@ -31,19 +31,19 @@
 
 <div class="row">
   <div class="col-12 d-flex mb-4">
-    <button class="btn btn-outline-secondary  mr-auto" (click)="prevStep()" *ngIf="!readonly">Previous</button>
-    <button class="btn btn-danger mr-2" (click)="deleteRequest()" *ngIf="deleteVisible()">Delete Request</button>
+    <button class="btn btn-outline-secondary  me-auto" (click)="prevStep()" *ngIf="!readonly">Previous</button>
+    <button class="btn btn-danger me-2" (click)="deleteRequest()" *ngIf="deleteVisible()">Delete Request</button>
     <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled()" [disabled]="disableSubmit">
       {{submitApprove()?'Submit & Approve':'Submit Request'}}
     </button>
     <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
       <button class="btn btn-primary" disabled>{{submitApprove()?'Submit & Approve':'Submit Request'}}</button>
     </span>
-    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('WITHDRAW')"
+    <button class="btn btn-primary me-2" (click)="submitWithdrawHold('WITHDRAW')"
       *ngIf="withdrawVisible()">Withdraw</button>
-    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('HOLD')"
+    <button class="btn btn-primary me-2" (click)="submitWithdrawHold('HOLD')"
       *ngIf="putOnHoldVisible()">Hold</button>
-    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('RELEASE')"
+    <button class="btn btn-primary me-2" (click)="submitWithdrawHold('RELEASE')"
       *ngIf="releaseFromHoldVisible()">Release Hold</button>
   </div>
 </div>

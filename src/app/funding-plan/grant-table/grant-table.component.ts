@@ -64,8 +64,8 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
     this._maxScore = val;
   }
 
-  grantViewerUrl: string; 
-  eGrantsUrl: string; 
+  grantViewerUrl: string;
+  eGrantsUrl: string;
 
   @ViewChild(DataTableDirective, {static: false}) dtElement: DataTableDirective;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
@@ -154,7 +154,7 @@ export class GrantTableComponent implements OnInit, AfterViewInit {
         {responsivePriority: 14, targets: 11 }, // budget start date
         {type: 'scoretype', targets: 10}
       ],
-      dom: '<"dt-controls"<"ml-auto"fB<"d-inline-block">>>rt<"dt-controls"<"mr-auto"i>>',
+      dom: '<"dt-controls"<"ms-auto"fB<"d-inline-block">>>rt<"dt-controls"<"me-auto"i>>',
       buttons: [
         {
           extend: 'excel',

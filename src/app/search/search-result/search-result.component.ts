@@ -74,7 +74,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
               private logger: NGXLogger) {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
-              
+
   }
 
   @ViewChildren(DataTableDirective) dtElements: QueryList<DataTableDirective>;
@@ -257,7 +257,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         { responsivePriority: 13, targets: 4 }, // i2 status
         { responsivePriority: 14, targets: 3 } // project title
       ],
-      dom: '<"dt-controls dt-top"l<"ml-4"i><"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
+      dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       buttons: [
         {
           extend: 'excel',
@@ -434,7 +434,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         { responsivePriority: 12, targets: 9 }, // program recomm. Total Costs
         { responsivePriority: 13, targets: 8 } // program recomm. Direct Costs
       ],
-      dom: '<"dt-controls dt-top"l<"ml-4"i><"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
+      dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       buttons: {
         buttons: [
           {
@@ -645,7 +645,7 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
         { responsivePriority: 10, targets: 3 }, // i2 status
         { responsivePriority: 11, targets: 2 } // project title
       ],
-      dom: '<"dt-controls dt-top"l<"ml-4"i><"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
+      dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       buttons: [
         {
           extend: 'excel',

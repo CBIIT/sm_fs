@@ -481,7 +481,7 @@ export class PlanStep1Component implements OnInit, AfterViewInit, OnDestroy {
         { responsivePriority: 13, targets: 5 }, // i2 status
         { responsivePriority: 14, targets: 12 } // budget start date
       ],
-      dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
+      dom: '<"dt-controls"l<"ms-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       buttons: [
         {
           extend: 'excel',

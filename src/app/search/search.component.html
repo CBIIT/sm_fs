@@ -1,7 +1,7 @@
 <div class="row mb-2" *ngIf="errInactiveDesignees">
   <div class="col-12">
     <ngb-alert type="danger" [dismissible]="false">
-        <span><a [routerLink]="[]" class="mr-1">
+        <span><a [routerLink]="[]" class="me-1">
           <i class='fa fa-user-slash' aria-hidden='true'></i>
         </a>One or more of your designees are <strong>inactive</strong> and <strong>need to be removed or updated (if applicable)</strong>.
           Click <a routerLink="/manage">here</a> to manage your designations.</span>
@@ -19,7 +19,7 @@
 <div class="row mb-2">
   <div class="col-12 d-flex">
     <h2 class="d-inline-block" id="overview-label">Overview <span style="font-weight: normal">&mdash;  FY {{currentFY}}</span></h2>
-    <a [routerLink]="[]" (click)="showOverview = !showOverview" class="ml-auto"
+    <a [routerLink]="[]" (click)="showOverview = !showOverview" class="ms-auto"
        [ngClass]="{'show-overview':!showOverview, 'hide-overview':showOverview}"></a>
   </div>
 </div>
@@ -33,7 +33,7 @@
   <div class="row" >
     <div class="col-7 border-right">
       <div class="row">
-        <div class="col-4 pr-1">
+        <div class="col-4 pe-1">
           <button class="btn btn-info" style="width: 100%; height: 100%" (click)="onAwaitingRequests()" [disabled]="numAwaitingRequests == 0"><div>{{numAwaitingRequests}} Requests</div><div>Awaiting My Response</div></button>
         </div>
         <div *ngIf="isPd||isPa" class="col-4 px-1">
@@ -48,7 +48,7 @@
             </button>
           </div>
         </div>
-        <div  class="col-4 pl-1 pr-4">
+        <div  class="col-4 ps-1 pe-4">
           <div *ngIf="isPd"class="mb-1">
             <button class="btn btn-outline-primary" style="width: 100%" (click)="onMyPortfolioRequests()" [disabled]="numMyPortfolioRequests == 0">
               <div class="overview">{{filterTypeLabels.FILTER_PORTFOLIO}} <span>{{numMyPortfolioRequests}}</span></div>
@@ -64,14 +64,14 @@
     </div>
     <div class="col-5">
       <div class="row">
-        <div class="col-6 pl-4 pr-1">
+        <div class="col-6 ps-4 pe-1">
           <button class="btn btn-info" style="width: 100%; height: 100%" (click)="onAwaitingPlans()"
                   [disabled]="numAwaitingPlans == 0">
             <div>{{numAwaitingPlans}} Funding Plans</div>
             <div>Awaiting My Response</div>
           </button>
         </div>
-        <div *ngIf="isPd||isPa" class="col-6 pl-1">
+        <div *ngIf="isPd||isPa" class="col-6 ps-1">
           <div class="mb-1">
             <button class="btn btn-outline-primary" style="width: 100%" (click)="onMyPlans()" [disabled]="numMyPlans == 0">
               <div class="overview">{{filterTypeLabels.FILTER_MY_FUNDING_PLAN}} <span>{{numMyPlans}}</span></div>

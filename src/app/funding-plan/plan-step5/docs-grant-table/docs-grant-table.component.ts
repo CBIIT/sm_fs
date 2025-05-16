@@ -64,8 +64,8 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
     this._maxScore = val;
   }
 
-  grantViewerUrl: string; 
-  eGrantsUrl: string; 
+  grantViewerUrl: string;
+  eGrantsUrl: string;
 
   @ViewChild(DataTableDirective, {static: false}) dtElement: DataTableDirective;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
@@ -104,7 +104,7 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
             render: ( data, type, row, meta ) => {
               return '<a href="' + row.nihGuideAddr + '" target="_blank" >' + data + '</a>';
             }},
-        
+
         {title: 'NCAB', data: 'councilMeetingDate', defaultContent: '', // 8
             render: ( data, type, row, meta) => {
               if (!data || data.substr(4, 2) === '00') {
@@ -112,9 +112,9 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
               }
               return data.substr(4, 2) + '/' + data.substr(0, 4);
             }},
-       
+
         {title: 'Pri Scr', data: 'priorityScoreNum'}, // 10
-       
+
         {data: null, defaultContent: ''}
       ],
       order: [[5, 'asc']],
@@ -130,9 +130,9 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
           orderable: false,
           targets: -1
         },
-        
+
       ],
-      dom: '<"dt-controls"<"ml-auto"fB<"d-inline-block">>>rt<"dt-controls"<"mr-auto"i>>',
+      dom: '<"dt-controls"<"ms-auto"fB<"d-inline-block">>>rt<"dt-controls"<"me-auto"i>>',
       buttons: [
         {
           extend: 'excel',
@@ -146,7 +146,7 @@ export class DocsGrantTableComponent implements OnInit, AfterViewInit {
         }
       ],
       rowCallback: (row: Node, data: any[] | object, index: number) => {
-       
+
         this.dtOptions.columns.forEach((column, ind) => {
           if (column.ngTemplateRef) {
             const cell = row.childNodes.item(ind);

@@ -7,8 +7,8 @@
           <input name="new" ngbButton type="radio" value="NEW" (change)="toggleDisplay('NEW')">New
         </label>
         <label ngbButtonLabel class="btn-outline-secondary">
-          <input name="reissue" ngbButton type="radio" value="REISSUE" (change)="toggleDisplay('REISSUE')">Reissue          
-        </label> 
+          <input name="reissue" ngbButton type="radio" value="REISSUE" (change)="toggleDisplay('REISSUE')">Reissue
+        </label>
       </div>
       <div class="col_2" *ngIf="issueType==='REISSUE'">
         <br><i>Previous FOA: </i>
@@ -17,7 +17,7 @@
         type="text"
         [id]="'notice-' + index"
         style="width:7rem"
-        class="form-control form-control-sm ml-2"
+        class="form-control form-control-sm ms-2"
         [(ngModel)]="priorNotice"
         [hidden]="issueType === 'NEW'"
         name="priorNotice"

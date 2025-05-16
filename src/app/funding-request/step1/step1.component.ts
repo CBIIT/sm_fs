@@ -46,7 +46,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
     this.searchCriteria = this.gsfs.getGrantsSearchCriteria();
-              
+
   }
 
   @ViewChild(GrantnumberSearchCriteriaComponent) grantNumberComponent: GrantnumberSearchCriteriaComponent;
@@ -161,7 +161,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
         {responsivePriority: 14, targets: 11 } // budget start date
       ],
 
-      dom: '<"dt-controls"l<"ml-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"mr-auto"i>p>',
+      dom: '<"dt-controls"l<"ms-auto"fB<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       buttons: [
         {
           extend: 'excel',

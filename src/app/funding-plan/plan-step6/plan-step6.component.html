@@ -25,7 +25,7 @@
 <div class="row" *ngIf="!noSkipResult">
   <div class="col-12 d-flex">
     <h2>Application(s) Skipped</h2>
-    <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#apps-skipped-collapse" role="button"
+    <a class="collapse-toggle btn btn-link ms-auto" data-bs-toggle="collapse" href="#apps-skipped-collapse" role="button"
        aria-expanded="true" aria-controls="apps-skipped-collapse"></a>
   </div>
   <div class="collapse show mt-2" id="apps-skipped-collapse">
@@ -40,7 +40,7 @@
 <div class="row" *ngIf="!noAppNotFundingResult">
   <div class="col-12 d-flex">
     <h2>Application(s) Not Considered for Funding</h2>
-    <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse" href="#apps-notcon-collapse" role="button"
+    <a class="collapse-toggle btn btn-link ms-auto" data-bs-toggle="collapse" href="#apps-notcon-collapse" role="button"
        aria-expanded="true" aria-controls="apps-notcon-collapse"></a>
   </div>
   <div class="collapse show mt-2" id="apps-notcon-collapse">
@@ -68,27 +68,27 @@
 <!-- START Buttons Section -->
 <div class="row">
   <div class="col-12 d-flex mb-4">
-    <button class="btn btn-outline-secondary  mr-auto" (click)="prevStep()" *ngIf="!readonly">Previous</button>
-    <button class="btn btn-danger mr-2" (click)="deleteRequest()" *ngIf="deleteVisible()">Delete Plan</button>
+    <button class="btn btn-outline-secondary  me-auto" (click)="prevStep()" *ngIf="!readonly">Previous</button>
+    <button class="btn btn-danger me-2" (click)="deleteRequest()" *ngIf="deleteVisible()">Delete Plan</button>
     <button class="btn btn-primary" (click)="submitRequest()" *ngIf="submitVisible() && submitEnabled()" [disabled]="disableSubmitPlan">
       Submit Plan
     </button>
     <span *ngIf="submitVisible() && !submitEnabled()" [ngbTooltip]="submitDisableTooltip()">
           <button class="btn btn-primary" disabled>Submit Plan</button>
         </span>
-    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('WITHDRAW')"
+    <button class="btn btn-primary me-2" (click)="submitWithdrawHold('WITHDRAW')"
             *ngIf="withdrawVisible()">Withdraw
     </button>
-    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('HOLD')"
+    <button class="btn btn-primary me-2" (click)="submitWithdrawHold('HOLD')"
             *ngIf="putOnHoldVisible()">Hold
     </button>
-    <button class="btn btn-primary mr-2" (click)="submitWithdrawHold('RELEASE')"
+    <button class="btn btn-primary me-2" (click)="submitWithdrawHold('RELEASE')"
             *ngIf="releaseFromHoldVisible()">Release Hold
     </button>
   </div>
 </div>
 <!-- END Buttons Section -->
-<!--<button class="btn btn-primary mr-2" (click)="test()">Test Something</button>  -->
+<!--<button class="btn btn-primary me-2" (click)="test()">Test Something</button>  -->
 <!-- START Funding Plan History Section -->
 <app-request-history requestOrPlan="PLAN"></app-request-history>
 <!-- END Funding Plan History Section -->

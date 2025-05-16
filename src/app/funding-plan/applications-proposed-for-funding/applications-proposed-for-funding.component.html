@@ -4,7 +4,7 @@
   <div class="row">
     <div class="col-12 d-flex">
       <h2>Applications Proposed for Funding</h2>
-      <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse"
+      <a class="collapse-toggle btn btn-link ms-auto" data-bs-toggle="collapse"
          href="#apps-proposed-for-funding-collapse" role="button" aria-expanded="true"
          aria-controls="apps-proposed-for-funding-collapse"></a>
     </div>
@@ -19,9 +19,9 @@
                        target="_blank" class="external-link">OEFIA web site</a>.</small></p>
 
     <div class="d-flex mb-2">
-      <button type="button" [disabled]="!canAddFundingSource()" class="btn btn-primary ml-auto"
+      <button type="button" [disabled]="!canAddFundingSource()" class="btn btn-primary ms-auto"
               (click)="onAddFundingSource()">
-        <i class="fas fa-plus mr-1" aria-hidden="true"></i> Add Additional Funding Source
+        <i class="fas fa-plus me-1" aria-hidden="true"></i> Add Additional Funding Source
       </button>
     </div>
     <table class="table table-bordered table-striped app-funding-table">
@@ -104,7 +104,7 @@
   <div class="row">
     <div class="col-12 d-flex">
       <h2>Applications Proposed for Funding</h2>
-      <a class="collapse-toggle btn btn-link ml-auto" data-bs-toggle="collapse"
+      <a class="collapse-toggle btn btn-link ms-auto" data-bs-toggle="collapse"
          href="#apps-proposed-for-funding-collapse" role="button" aria-expanded="true"
          aria-controls="apps-proposed-for-funding-collapse"></a>
     </div>
@@ -119,9 +119,9 @@
                        target="_blank" class="external-link">OEFIA web site</a>.</small></p>
 
     <div class="d-flex mb-2">
-      <button type="button" [disabled]="!canAddFundingSource()" class="btn btn-primary ml-auto"
+      <button type="button" [disabled]="!canAddFundingSource()" class="btn btn-primary ms-auto"
               (click)="onAddFundingSource()">
-        <i class="fas fa-plus mr-1" aria-hidden="true"></i> Add Additional Funding Source
+        <i class="fas fa-plus me-1" aria-hidden="true"></i> Add Additional Funding Source
       </button>
     </div>
     <table class="table table-bordered table-striped app-funding-table multiple-FS">
@@ -131,11 +131,11 @@
         <th *ngFor="let source of listSelectedSources; let sourceIndex = index" colspan="1" [ngModelGroup]="source.fundingSourceName" >
           <div class="d-flex align-items-center ">
             <span class="plan-table">{{ source.fundingSourceName }}</span>
-            <button type="button" class="btn btn-sm btn-slim btn-link ml-2" (click)="onEditFundingSource(source.fundingSourceId, sourceIndex)"
+            <button type="button" class="btn btn-sm btn-slim btn-link ms-2" (click)="onEditFundingSource(source.fundingSourceId, sourceIndex)"
                     ngbTooltip="Edit" placement="left">
               <i class="fas fa-pencil" aria-hidden="true"></i>
             </button>
-            <button type="button" class="btn btn-sm btn-slim btn-link btn-link-danger ml-1"
+            <button type="button" class="btn btn-sm btn-slim btn-link btn-link-danger ms-1"
                     (click)="onDeleteFundingSource(source.fundingSourceId)" ngbTooltip="Remove" placement="left">
               <i class="fas fa-trash" aria-hidden="true"></i>
             </button>

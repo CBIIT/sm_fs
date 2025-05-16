@@ -13,9 +13,9 @@
       <span *ngIf="!runReportEnabled" ngbTooltip="Select one or more request(s) or plan(s) to run Report">
         <button class="btn btn-primary" disabled>Report</button>
       </span>
-      <button class="btn btn-primary ml-2" *ngIf="runReportEnabled" (click)="viewSelectedResults()" >View</button>
+      <button class="btn btn-primary ms-2" *ngIf="runReportEnabled" (click)="viewSelectedResults()" >View</button>
       <span *ngIf="!runReportEnabled" [ngbTooltip]="showFundingRequestResult ? 'Select one or more requests to view' : 'Select one or more plans to view'">
-        <button class="btn btn-primary ml-2" disabled>View</button>
+        <button class="btn btn-primary ms-2" disabled>View</button>
       </span>
       &nbsp;&nbsp;
       <span *ngIf="batchApproveVisible" >
@@ -90,7 +90,7 @@
   <ng-template #piNameRender let-data="adtData">
     <lib-name-render [data]="data"  [firstName]="data.piFullName" [email]="data.piEmail" [grantNumber]="data.fullGrantNum" [subject]="data.fullGrantNum+' - '+ data.firstName +' ' +data.lastName"></lib-name-render>
   </ng-template>
-  
+
   <ng-template #docApproverRender let-data="adtData">
     <lib-name-render [data]="data"  [firstName]="data.requestingDocApprvlFullName" [email]="data.requestingDocApprvlEmail" [grantNumber]="data.fullGrantNum" [subject]="data.fullGrantNum +' - '+ data.requestingDocApprvlFullName "></lib-name-render>
   </ng-template>

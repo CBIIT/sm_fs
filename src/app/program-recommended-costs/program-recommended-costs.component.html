@@ -213,7 +213,7 @@
                   <span>{{ f.fundingSourceName }}</span>
                 </div>
                 <div class="col-sm-auto">
-                  <button type="button" class="btn btn-sm btn-danger mr-2" (click)="deleteSource(i)" title="Remove"><i
+                  <button type="button" class="btn btn-sm btn-danger me-2" (click)="deleteSource(i)" title="Remove"><i
                     class="fas fa-trash" aria-hidden="true"></i>
                   </button>
                   <button type="button" class="btn btn-sm btn-primary" (click)="editSource(i)" title="Edit"><i
@@ -307,7 +307,7 @@
       <button type="button" class="btn btn-primary mt-2 mb-3" data-bs-toggle="modal" [attr.data-bs-target]="'#' + dataTarget"
               (click)="prepareLineItem()"
               *ngIf="selectedFundingSources.length < 3; else blankSpace">
-        <i class="fas fa-plus mr-2" aria-hidden="true"></i> {{ pageTitle }}
+        <i class="fas fa-plus me-2" aria-hidden="true"></i> {{ pageTitle }}
       </button>
       <ng-template #blankSpace>
         <br/>
@@ -646,7 +646,7 @@
                         <div class="d-flex">
                           <input
                             type="text"
-                            class="form-control funds-input ml-auto"
+                            class="form-control funds-input ms-auto"
                             id="tc-dollar3"
                             name="recommendedDirect[{{i}}]"
                             #recommendedDirectX="ngModel"
@@ -913,7 +913,7 @@
                         <div class="d-flex">
                           <input
                             type="text"
-                            class="form-control funds-input ml-auto"
+                            class="form-control funds-input ms-auto"
                             id="tc-dollar3"
                             name="recommendedDirect[{{i}}]"
                             #recommendedDirectX="ngModel"
@@ -945,7 +945,7 @@
 
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary mr-auto" data-bs-dismiss="modal"
+            <button type="button" class="btn btn-outline-secondary me-auto" data-bs-dismiss="modal"
                     (click)="cleanUpSources()">
               Close
             </button>

@@ -16,7 +16,7 @@
   <div cdkDropList (cdkDropListDropped)="dropped($event)">
     <div class="drag-item" [ngbTooltip]="tooltip()" placement="top-left" cdkDrag *ngFor="let doc of selectedDocsArr">
       <span>{{ doc.abbreviation }} &mdash; {{ doc.description }}</span>
-      <div class="ml-auto">
+      <div class="ms-auto">
         <button class="btn btn-link btn-delete btn-slim" title="Delete" (click)="deselect(doc.abbreviation)">
           <i class="fas fa-trash" aria-hidden="true"></i>
         </button>
