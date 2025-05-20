@@ -28,15 +28,15 @@
 
         <div ngbAccordion #a="ngbAccordion">
 
-            <div ngbAccordionItem id="cover-panel">
-                <ng-template ngbAccordionHeader>
+            <div ngbAccordionItem id="cover-panel" class="card">
+                <div ngbAccordionHeader class="card-header">
                     <app-plan-cover-page></app-plan-cover-page>
-                </ng-template>
+                </div>
             </div>
 
 
-            <div ngbAccordionItem id="sciRat-panel" [collapsed]="!activeIds.includes('sciRat-panel')">
-                <div ngbAccordionHeader>
+            <div ngbAccordionItem id="sciRat-panel" [collapsed]="!activeIds.includes('sciRat-panel')" class="card">
+                <div ngbAccordionHeader class="card-header">
 
                     <div class="d-flex align-items-center">
                         <h3>Scientific Rationale for Supporting FOA (AND) Justification for Each Proposed
@@ -72,7 +72,7 @@
 
                 </div>
               <div ngbAccordionCollapse>
-                <div ngbAccordionBody>
+                <div ngbAccordionBody class="card-body">
                   <div class="row">
                     <div *ngIf="grantsSkippedPreviouslyDto.previouslySkippedinPlan"
                          class="col-12 alert alert-warning">
@@ -113,8 +113,8 @@
               </div>
             </div>
 
-            <div ngbAccordionItem id="justExc-panel" *ngIf="exceptionGrants && exceptionGrants.length > 0" [collapsed]="!activeIds.includes('justExc-panel')">
-                <div ngbAccordionHeader>
+            <div ngbAccordionItem id="justExc-panel" *ngIf="exceptionGrants && exceptionGrants.length > 0" [collapsed]="!activeIds.includes('justExc-panel')" class="card">
+                <div ngbAccordionHeader class="card-header">
                     <div class="d-flex align-items-center">
                         <h3>Justification for Exception Application(s)</h3>
                         <div class="doc-details" *ngIf="isExceptionsUploaded; else excNotUploaded">
@@ -138,7 +138,7 @@
                         </div>
                         <ng-template #excNotUploadedBtn>
                             <div class="doc-buttons">
-                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"
+                                <button ngbAccordionToggle class="btn btn-sm btn-outline-secondary"
                                     (click)="changeLabel('excNotUploadedBtnId')"><i id='excNotUploadedBtnId'
                                         class="far fa-plus me-1" aria-hidden="true">Add Document</i></button>
                             </div>
@@ -146,7 +146,7 @@
                     </div>
                 </div>
               <div ngbAccordionCollapse>
-                <div ngbAccordionBody>
+                <div ngbAccordionBody class="card-body">
                   <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
                                         (fileSelectEmitter)="selectFiles($event)"
                                         [templateType]="CR_FUNDING_PLAN_EXCEPTION_JUST_RPT">
@@ -160,8 +160,8 @@
               </div>
             </div>
 
-            <div ngbAccordionItem id="justSkip-panel" *ngIf="skipGrants && skipGrants.length > 0" [collapsed]="!activeIds.includes('justSkip-panel')">
-                <div ngbAccordionHeader>
+            <div ngbAccordionItem id="justSkip-panel" *ngIf="skipGrants && skipGrants.length > 0" [collapsed]="!activeIds.includes('justSkip-panel')" class="card">
+                <div ngbAccordionHeader class="card-header">
                     <div class="d-flex align-items-center">
                         <h3>Justification for Skipped Application(s)</h3>
                         <div class="doc-details" *ngIf="isSkipUploaded; else skipNotUploaded">
@@ -185,7 +185,7 @@
                         </div>
                         <ng-template #skipNotUploadedBtn>
                             <div class="doc-buttons">
-                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"
+                                <button ngbAccordionToggle class="btn btn-sm btn-outline-secondary"
                                     (click)="changeLabel('skipNotUploadedBtnId')"><i id='skipNotUploadedBtnId'
                                         class="far fa-plus me-1" aria-hidden="true">Add Document</i></button>
                             </div>
@@ -193,7 +193,7 @@
                     </div>
                 </div>
               <div ngbAccordionCollapse>
-                <div ngbAccordionBody>
+                <div ngbAccordionBody class="card-body">
                   <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
                                         (fileSelectEmitter)="selectFiles($event)"
                                         [templateType]="CR_FUNDING_PLAN_SKIP_JUST_RPT">
@@ -207,8 +207,8 @@
               </div>
             </div>
 
-            <div ngbAccordionItem id="other-panel" [collapsed]="!activeIds.includes('other-panel')">
-                <div ngbAccordionHeader>
+            <div ngbAccordionItem id="other-panel" [collapsed]="!activeIds.includes('other-panel')" class="card">
+                <div ngbAccordionHeader class="card-header">
                     <div class="d-flex align-items-center">
                         <h3>Other Supporting Document</h3>
                         <div class="doc-details" *ngIf="isOtherUploaded; else othNotUploaded">
@@ -241,7 +241,7 @@
                     </div>
                 </div>
               <div ngbAccordionCollapse>
-                <div ngbAccordionBody>
+                <div ngbAccordionBody class="card-body">
                   <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
                                         (fileSelectEmitter)="selectFiles($event)" [templateType]="Other">
                   </app-plan-file-upload>
@@ -249,8 +249,8 @@
               </div>
             </div>
 
-            <div ngbAccordionItem id="summary-panel">
-                <div ngbAccordionHeader>
+            <div ngbAccordionItem id="summary-panel" class="card">
+                <div ngbAccordionHeader class="card-header">
                     <app-plan-summary-statement [grantList]="selectedGrants"></app-plan-summary-statement>
                 </div>
             </div>
