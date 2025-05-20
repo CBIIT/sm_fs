@@ -36,7 +36,7 @@
 
 
             <div ngbAccordionItem id="sciRat-panel" [collapsed]="!activeIds.includes('sciRat-panel')">
-                <ng-template ngbAccordionHeader>
+                <div ngbAccordionHeader>
 
                     <div class="d-flex align-items-center">
                         <h3>Scientific Rationale for Supporting FOA (AND) Justification for Each Proposed
@@ -63,55 +63,58 @@
                         </div>
                         <ng-template #sciRatNotUploadedBtn>
                             <div class="doc-buttons">
-                                <button ngbPanelToggle class="btn btn-sm btn-outline-secondary"
+                                <button ngbAccordionToggle class="btn btn-sm btn-outline-secondary"
                                     (click)="changeLabel('sciRatNotUploadedBtnId')"><i id='sciRatNotUploadedBtnId'
                                         class="far fa-plus me-1" aria-hidden="true">Add Document</i></button>
                             </div>
                         </ng-template>
                     </div>
 
-                </ng-template>
-                <ng-template ngbAccordionBody>
-                    <div class="row">
-                        <div *ngIf="grantsSkippedPreviouslyDto.previouslySkippedinPlan"
-                            class="col-12 alert alert-warning">
-                            WARNING: You have selected the following application(s) that were skipped in the prior
-                            completed funding plan.
-                            Note that justification must address the reason for funding a previously skipped
-                            application.
-                            <div *ngFor="let skippedPlan of grantsSkippedPreviouslyDto.prevFundingPlanGrants">
-                                <b><span>{{skippedPlan.fullGrantNum}}</span></b> has been skipped in the Funding Plan ID
-                                <b><span><a
-                                            [routerLink]="'/plan/retrieve/' + skippedPlan.fprId">{{skippedPlan.fprId}}</a></span></b>
-                            </div>
-                        </div>
+                </div>
+              <div ngbAccordionCollapse>
+                <div ngbAccordionBody>
+                  <div class="row">
+                    <div *ngIf="grantsSkippedPreviouslyDto.previouslySkippedinPlan"
+                         class="col-12 alert alert-warning">
+                      WARNING: You have selected the following application(s) that were skipped in the prior
+                      completed funding plan.
+                      Note that justification must address the reason for funding a previously skipped
+                      application.
+                      <div *ngFor="let skippedPlan of grantsSkippedPreviouslyDto.prevFundingPlanGrants">
+                        <b><span>{{ skippedPlan.fullGrantNum }}</span></b> has been skipped in the Funding Plan ID
+                        <b><span><a
+                          [routerLink]="'/plan/retrieve/' + skippedPlan.fprId">{{ skippedPlan.fprId }}</a></span></b>
+                      </div>
                     </div>
-                    <div class="row">
-                        <div *ngIf="grantsSkippedPreviouslyDto.previouslySkippedinRequest"
-                            class="col-12 alert alert-warning">
-                            WARNING: You have selected the following application(s) that has a skip request.
-                            Note that justification must address the reason for funding a previously skipped
-                            application.
-                            <div *ngFor="let skippedRequest of grantsSkippedPreviouslyDto.prevFundingRequests">
-                                <b><span>{{skippedRequest.fullGrantNum}}</span></b> has a Skip Request ID <b><span><a
-                                            [routerLink]="'/request/retrieve/' + skippedRequest.frqId">{{skippedRequest.frqId}}</a></span></b>
-                            </div>
-                        </div>
+                  </div>
+                  <div class="row">
+                    <div *ngIf="grantsSkippedPreviouslyDto.previouslySkippedinRequest"
+                         class="col-12 alert alert-warning">
+                      WARNING: You have selected the following application(s) that has a skip request.
+                      Note that justification must address the reason for funding a previously skipped
+                      application.
+                      <div *ngFor="let skippedRequest of grantsSkippedPreviouslyDto.prevFundingRequests">
+                        <b><span>{{ skippedRequest.fullGrantNum }}</span></b> has a Skip Request ID <b><span><a
+                        [routerLink]="'/request/retrieve/' + skippedRequest.frqId">{{ skippedRequest.frqId }}</a></span></b>
+                      </div>
                     </div>
-                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
-                        (fileSelectEmitter)="selectFiles($event)" [templateType]="CR_FUNDING_PLAN_SCIENTIFIC_RPT">
-                    </app-plan-file-upload>
-                    <div class="row">
-                        <div class="col-12">
-                            <app-applications-proposed-for-funding-readonly>
-                            </app-applications-proposed-for-funding-readonly>
-                        </div>
+                  </div>
+                  <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
+                                        (fileSelectEmitter)="selectFiles($event)"
+                                        [templateType]="CR_FUNDING_PLAN_SCIENTIFIC_RPT">
+                  </app-plan-file-upload>
+                  <div class="row">
+                    <div class="col-12">
+                      <app-applications-proposed-for-funding-readonly>
+                      </app-applications-proposed-for-funding-readonly>
                     </div>
-                </ng-template>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div ngbAccordionItem id="justExc-panel" *ngIf="exceptionGrants && exceptionGrants.length > 0" [collapsed]="!activeIds.includes('justExc-panel')">
-                <ng-template ngbAccordionHeader>
+                <div ngbAccordionHeader>
                     <div class="d-flex align-items-center">
                         <h3>Justification for Exception Application(s)</h3>
                         <div class="doc-details" *ngIf="isExceptionsUploaded; else excNotUploaded">
@@ -141,21 +144,24 @@
                             </div>
                         </ng-template>
                     </div>
-                </ng-template>
-                <ng-template ngbAccordionBody>
-                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
-                        (fileSelectEmitter)="selectFiles($event)" [templateType]="CR_FUNDING_PLAN_EXCEPTION_JUST_RPT">
-                    </app-plan-file-upload>
-                    <div class="row">
-                        <div class="col-12">
-                            <app-docs-grant-table [grantList]="exceptionGrants"></app-docs-grant-table>
-                        </div>
+                </div>
+              <div ngbAccordionCollapse>
+                <div ngbAccordionBody>
+                  <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
+                                        (fileSelectEmitter)="selectFiles($event)"
+                                        [templateType]="CR_FUNDING_PLAN_EXCEPTION_JUST_RPT">
+                  </app-plan-file-upload>
+                  <div class="row">
+                    <div class="col-12">
+                      <app-docs-grant-table [grantList]="exceptionGrants"></app-docs-grant-table>
                     </div>
-                </ng-template>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div ngbAccordionItem id="justSkip-panel" *ngIf="skipGrants && skipGrants.length > 0" [collapsed]="!activeIds.includes('justSkip-panel')">
-                <ng-template ngbAccordionHeader>
+                <div ngbAccordionHeader>
                     <div class="d-flex align-items-center">
                         <h3>Justification for Skipped Application(s)</h3>
                         <div class="doc-details" *ngIf="isSkipUploaded; else skipNotUploaded">
@@ -185,21 +191,24 @@
                             </div>
                         </ng-template>
                     </div>
-                </ng-template>
-                <ng-template ngbAccordionBody>
-                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
-                        (fileSelectEmitter)="selectFiles($event)" [templateType]="CR_FUNDING_PLAN_SKIP_JUST_RPT">
-                    </app-plan-file-upload>
-                    <div class="row">
-                        <div class="col-12">
-                            <app-docs-grant-table [grantList]="skipGrants"></app-docs-grant-table>
-                        </div>
+                </div>
+              <div ngbAccordionCollapse>
+                <div ngbAccordionBody>
+                  <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
+                                        (fileSelectEmitter)="selectFiles($event)"
+                                        [templateType]="CR_FUNDING_PLAN_SKIP_JUST_RPT">
+                  </app-plan-file-upload>
+                  <div class="row">
+                    <div class="col-12">
+                      <app-docs-grant-table [grantList]="skipGrants"></app-docs-grant-table>
                     </div>
-                </ng-template>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div ngbAccordionItem id="other-panel" [collapsed]="!activeIds.includes('other-panel')">
-                <ng-template ngbAccordionHeader>
+                <div ngbAccordionHeader>
                     <div class="d-flex align-items-center">
                         <h3>Other Supporting Document</h3>
                         <div class="doc-details" *ngIf="isOtherUploaded; else othNotUploaded">
@@ -230,18 +239,20 @@
                         </ng-template>
 
                     </div>
-                </ng-template>
-                <ng-template ngbAccordionBody>
-                    <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
-                        (fileSelectEmitter)="selectFiles($event)" [templateType]="Other">
-                    </app-plan-file-upload>
-                </ng-template>
+                </div>
+              <div ngbAccordionCollapse>
+                <div ngbAccordionBody>
+                  <app-plan-file-upload (fileUploadEmitter)="reloadFiles($event)"
+                                        (fileSelectEmitter)="selectFiles($event)" [templateType]="Other">
+                  </app-plan-file-upload>
+                </div>
+              </div>
             </div>
 
             <div ngbAccordionItem id="summary-panel">
-                <ng-template ngbAccordionHeader>
+                <div ngbAccordionHeader>
                     <app-plan-summary-statement [grantList]="selectedGrants"></app-plan-summary-statement>
-                </ng-template>
+                </div>
             </div>
 
         </div>
