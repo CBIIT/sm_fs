@@ -20,7 +20,7 @@ import {
   PROPERTIES_APP_NAME,
   PROPERTIES_ENVIRONMENT
 } from "@cbiit/i2ecui-lib";
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { HeaderComponent } from './header/header.component';
 import { SearchFilterComponent } from './search/search-filter/search-filter.component';
 import { FundingRequestTypeComponent } from './funding-request/funding-request-type/funding-request-type.component';
@@ -432,7 +432,8 @@ export function megaInitializer(
         PdnameDropdownComponent,
         EditLinkComponent
     ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
+    bootstrap: [AppComponent],
+    imports: [BrowserModule, NgbAccordionModule,
         AppRoutingModule,
         I2ecuiLibModule,
         CommonApiModule,
@@ -448,7 +449,8 @@ export function megaInitializer(
         }, {
             metadataProvider: { provide: TOKEN_LOGGER_METADATA_SERVICE, useClass: CustomLoggerMetadataService },
         }),
-        CookieModule.forRoot()], providers: [RequestModel, PlanModel, PercentPipe,
+        CookieModule.forRoot()
+], providers: [RequestModel, PlanModel, PercentPipe,
         { provide: COMMON_BASE_PATH, useValue: '/i2ecommonws' },
         { provide: FS_BASE_PATH, useValue: '/i2efsws' },
         { provide: REF_BASE_PATH, useValue: '/i2erefws' },
