@@ -25,17 +25,17 @@
 .fa-lg {
   font-size: 1.33333em;
   line-height: 0.75em;
-  vertical-align: -0.0667em;
+  vertical-align: -.0667em;
 }
 
 /* line 11, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_larger.scss */
 .fa-xs {
-  font-size: 0.75em;
+  font-size: .75em;
 }
 
 /* line 15, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_larger.scss */
 .fa-sm {
-  font-size: 0.875em;
+  font-size: .875em;
 }
 
 /* line 20, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_larger.scss */
@@ -118,8 +118,8 @@
 /* line 4, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_bordered-pulled.scss */
 .fa-border {
   border: solid 0.08em #eee;
-  border-radius: 0.1em;
-  padding: 0.2em 0.25em 0.15em;
+  border-radius: .1em;
+  padding: .2em .25em .15em;
 }
 
 /* line 10, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_bordered-pulled.scss */
@@ -138,7 +138,7 @@
 .far.fa-pull-left,
 .fal.fa-pull-left,
 .fab.fa-pull-left {
-  margin-right: 0.3em;
+  margin-right: .3em;
 }
 
 /* line 19, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_bordered-pulled.scss */
@@ -147,7 +147,7 @@
 .far.fa-pull-right,
 .fal.fa-pull-right,
 .fab.fa-pull-right {
-  margin-left: 0.3em;
+  margin-left: .3em;
 }
 
 /* line 4, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_animated.scss */
@@ -200,8 +200,7 @@
 }
 
 /* line 10, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_rotated-flipped.scss */
-.fa-flip-both,
-.fa-flip-horizontal.fa-flip-vertical {
+.fa-flip-both, .fa-flip-horizontal.fa-flip-vertical {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)";
   transform: scale(-1, -1);
 }
@@ -9678,10 +9677,6 @@ readers do not read off random characters that represent icons */
   content: "\f249";
 }
 
-/* line 1888, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_icons.scss */
-.fa-sticky-note-o:before {
-  content: "\f24a";
-}
 /* line 1889, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_icons.scss */
 .fa-stocking:before {
   content: "\f7d5";
@@ -11820,8 +11815,7 @@ readers do not read off random characters that represent icons */
 }
 
 /* line 47, ../Github/sm_i2e_common_ui/src/scss/fontawesome/_mixins.scss */
-.sr-only-focusable:active,
-.sr-only-focusable:focus {
+.sr-only-focusable:active, .sr-only-focusable:focus {
   clip: auto;
   height: auto;
   margin: 0;
@@ -11835,21 +11829,17 @@ readers do not read off random characters that represent icons */
  * License - https://fontawesome.com/license (Commercial License)
  */
 @font-face {
-  font-family: "Font Awesome 5 Pro";
+  font-family: 'Font Awesome 5 Pro';
   font-style: normal;
   font-weight: 400;
   font-display: block;
   src: url("../fonts/fa-regular-400.eot");
-  src: url("../fonts/fa-regular-400.eot?#iefix") format("embedded-opentype"),
-    url("../fonts/fa-regular-400.woff2") format("woff2"),
-    url("../fonts/fa-regular-400.woff") format("woff"),
-    url("../fonts/fa-regular-400.ttf") format("truetype"),
-    url("../fonts/fa-regular-400.svg#fontawesome") format("svg");
+  src: url("../fonts/fa-regular-400.eot?#iefix") format("embedded-opentype"), url("../fonts/fa-regular-400.woff2") format("woff2"), url("../fonts/fa-regular-400.woff") format("woff"), url("../fonts/fa-regular-400.ttf") format("truetype"), url("../fonts/fa-regular-400.svg#fontawesome") format("svg");
 }
 
 /* line 20, ../Github/sm_i2e_common_ui/src/scss/fontawesome/regular.scss */
 .far {
-  font-family: "Font Awesome 5 Pro";
+  font-family: 'Font Awesome 5 Pro';
   font-weight: 400;
 }
 
@@ -11858,22 +11848,18 @@ readers do not read off random characters that represent icons */
  * License - https://fontawesome.com/license (Commercial License)
  */
 @font-face {
-  font-family: "Font Awesome 5 Pro";
+  font-family: 'Font Awesome 5 Pro';
   font-style: normal;
   font-weight: 900;
   font-display: block;
   src: url("../fonts/fa-solid-900.eot");
-  src: url("../fonts/fa-solid-900.eot?#iefix") format("embedded-opentype"),
-    url("../fonts/fa-solid-900.woff2") format("woff2"),
-    url("../fonts/fa-solid-900.woff") format("woff"),
-    url("../fonts/fa-solid-900.ttf") format("truetype"),
-    url("../fonts/fa-solid-900.svg#fontawesome") format("svg");
+  src: url("../fonts/fa-solid-900.eot?#iefix") format("embedded-opentype"), url("../fonts/fa-solid-900.woff2") format("woff2"), url("../fonts/fa-solid-900.woff") format("woff"), url("../fonts/fa-solid-900.ttf") format("truetype"), url("../fonts/fa-solid-900.svg#fontawesome") format("svg");
 }
 
 /* line 20, ../Github/sm_i2e_common_ui/src/scss/fontawesome/solid.scss */
 .fa,
 .fas {
-  font-family: "Font Awesome 5 Pro";
+  font-family: 'Font Awesome 5 Pro';
   font-weight: 900;
 }
 
@@ -11882,21 +11868,17 @@ readers do not read off random characters that represent icons */
  * License - https://fontawesome.com/license (Commercial License)
  */
 @font-face {
-  font-family: "Font Awesome 5 Pro";
+  font-family: 'Font Awesome 5 Pro';
   font-style: normal;
   font-weight: 300;
   font-display: block;
   src: url("../fonts/fa-light-300.eot");
-  src: url("../fonts/fa-light-300.eot?#iefix") format("embedded-opentype"),
-    url("../fonts/fa-light-300.woff2") format("woff2"),
-    url("../fonts/fa-light-300.woff") format("woff"),
-    url("../fonts/fa-light-300.ttf") format("truetype"),
-    url("../fonts/fa-light-300.svg#fontawesome") format("svg");
+  src: url("../fonts/fa-light-300.eot?#iefix") format("embedded-opentype"), url("../fonts/fa-light-300.woff2") format("woff2"), url("../fonts/fa-light-300.woff") format("woff"), url("../fonts/fa-light-300.ttf") format("truetype"), url("../fonts/fa-light-300.svg#fontawesome") format("svg");
 }
 
 /* line 20, ../Github/sm_i2e_common_ui/src/scss/fontawesome/light.scss */
 .fal {
-  font-family: "Font Awesome 5 Pro";
+  font-family: 'Font Awesome 5 Pro';
   font-weight: 300;
 }
 
@@ -11913,7 +11895,7 @@ readers do not read off random characters that represent icons */
   --purple: #606eb2;
   --pink: #e83e8c;
   --red: #a60a3d;
-  --orange: #fe5000;
+  --orange: #FE5000;
   --yellow: #ffb81c;
   --green: #117e46;
   --teal: #40c1ac;
@@ -11935,8 +11917,7 @@ readers do not read off random characters that represent icons */
   --breakpoint-lg: 992px;
   --breakpoint-xl: 1200px;
   --font-family-sans-serif: "Noto Sans", sans-serif;
-  --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 /* line 19, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_reboot.scss */
@@ -11955,16 +11936,7 @@ html {
 }
 
 /* line 35, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_reboot.scss */
-article,
-aside,
-figcaption,
-figure,
-footer,
-header,
-hgroup,
-main,
-nav,
-section {
+article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
   display: block;
 }
 
@@ -11993,12 +11965,7 @@ hr {
 }
 
 /* line 88, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_reboot.scss */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
   margin-bottom: 0.5rem;
 }
@@ -12049,7 +12016,7 @@ dt {
 
 /* line 143, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_reboot.scss */
 dd {
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
   margin-left: 0;
 }
 
@@ -12080,12 +12047,12 @@ sup {
 
 /* line 174, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_reboot.scss */
 sub {
-  bottom: -0.25em;
+  bottom: -.25em;
 }
 
 /* line 175, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_reboot.scss */
 sup {
-  top: -0.5em;
+  top: -.5em;
 }
 
 /* line 182, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_reboot.scss */
@@ -12108,8 +12075,7 @@ a:not([href]):not([tabindex]) {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a:not([href]):not([tabindex]):hover,
-a:not([href]):not([tabindex]):focus {
+a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
   color: inherit;
   text-decoration: none;
 }
@@ -12124,8 +12090,7 @@ pre,
 code,
 kbd,
 samp {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 1em;
 }
 
@@ -12278,7 +12243,7 @@ legend {
   width: 100%;
   max-width: 100%;
   padding: 0;
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
   font-size: 1.5rem;
   line-height: inherit;
   color: inherit;
@@ -12335,18 +12300,8 @@ template {
 }
 
 /* line 7, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6 {
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
   margin-bottom: 0.5rem;
   font-family: "Montserrat", sans-serif;
   font-weight: 700;
@@ -12355,38 +12310,32 @@ h6,
 }
 
 /* line 16, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
-h1,
-.h1 {
+h1, .h1 {
   font-size: 1.62rem;
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
-h2,
-.h2 {
+h2, .h2 {
   font-size: 1.44rem;
 }
 
 /* line 18, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
-h3,
-.h3 {
+h3, .h3 {
   font-size: 1.26rem;
 }
 
 /* line 19, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
-h4,
-.h4 {
+h4, .h4 {
   font-size: 1.17rem;
 }
 
 /* line 20, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
-h5,
-.h5 {
+h5, .h5 {
   font-size: 1.08rem;
 }
 
 /* line 21, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_type.scss */
-h6,
-.h6 {
+h6, .h6 {
   font-size: 0.9rem;
 }
 
@@ -12640,75 +12589,11 @@ pre code {
 }
 
 /* line 8, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_grid-framework.scss */
-.col-1,
-.col-2,
-.col-3,
-.col-4,
-.col-5,
-.col-6,
-.col-7,
-.col-8,
-.col-9,
-.col-10,
-.col-11,
-.col-12,
-.col,
-.col-auto,
-.col-sm-1,
-.col-sm-2,
-.col-sm-3,
-.col-sm-4,
-.col-sm-5,
-.col-sm-6,
-.col-sm-7,
-.col-sm-8,
-.col-sm-9,
-.col-sm-10,
-.col-sm-11,
-.col-sm-12,
-.col-sm,
-.col-sm-auto,
-.col-md-1,
-.col-md-2,
-.col-md-3,
-.col-md-4,
-.col-md-5,
-.col-md-6,
-.col-md-7,
-.col-md-8,
-.col-md-9,
-.col-md-10,
-.col-md-11,
-.col-md-12,
-.col-md,
-.col-md-auto,
-.col-lg-1,
-.col-lg-2,
-.col-lg-3,
-.col-lg-4,
-.col-lg-5,
-.col-lg-6,
-.col-lg-7,
-.col-lg-8,
-.col-lg-9,
-.col-lg-10,
-.col-lg-11,
-.col-lg-12,
-.col-lg,
-.col-lg-auto,
-.col-xl-1,
-.col-xl-2,
-.col-xl-3,
-.col-xl-4,
-.col-xl-5,
-.col-xl-6,
-.col-xl-7,
-.col-xl-8,
-.col-xl-9,
-.col-xl-10,
-.col-xl-11,
-.col-xl-12,
-.col-xl,
+.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col,
+.col-auto, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm,
+.col-sm-auto, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md,
+.col-md-auto, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg,
+.col-lg-auto, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl,
 .col-xl-auto {
   position: relative;
   width: 100%;
@@ -14116,8 +14001,7 @@ pre code {
 }
 
 /* line 48, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_forms.scss */
-.form-control:disabled,
-.form-control[readonly] {
+.form-control:disabled, .form-control[readonly] {
   background-color: #dbdde0;
   opacity: 1;
 }
@@ -14175,8 +14059,7 @@ select.form-control:focus::-ms-value {
 }
 
 /* line 122, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_forms.scss */
-.form-control-plaintext.form-control-sm,
-.form-control-plaintext.form-control-lg {
+.form-control-plaintext.form-control-sm, .form-control-plaintext.form-control-lg {
   padding-right: 0;
   padding-left: 0;
 }
@@ -14200,8 +14083,7 @@ select.form-control:focus::-ms-value {
 }
 
 /* line 155, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_forms.scss */
-select.form-control[size],
-select.form-control[multiple] {
+select.form-control[size], select.form-control[multiple] {
   height: auto;
 }
 
@@ -14294,7 +14176,7 @@ textarea.form-control {
   display: none;
   max-width: 100%;
   padding: 0.25rem 0.5rem;
-  margin-top: 0.1rem;
+  margin-top: .1rem;
   font-size: 0.7875rem;
   line-height: 1.3;
   color: #fff;
@@ -14303,8 +14185,7 @@ textarea.form-control {
 }
 
 /* line 54, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .form-control:valid,
-.form-control.is-valid {
+.was-validated .form-control:valid, .form-control.is-valid {
   border-color: #117e46;
   padding-right: calc(1.3em + 0.75rem);
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23117e46' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
@@ -14314,140 +14195,110 @@ textarea.form-control {
 }
 
 /* line 66, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .form-control:valid:focus,
-.form-control.is-valid:focus {
+.was-validated .form-control:valid:focus, .form-control.is-valid:focus {
   border-color: #117e46;
   box-shadow: 0 0 0 0.2rem rgba(17, 126, 70, 0.25);
 }
 
 /* line 71, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .form-control:valid ~ .valid-feedback,
-.was-validated .form-control:valid ~ .valid-tooltip,
-.form-control.is-valid ~ .valid-feedback,
+.was-validated .form-control:valid ~ .valid-tooltip, .form-control.is-valid ~ .valid-feedback,
 .form-control.is-valid ~ .valid-tooltip {
   display: block;
 }
 
 /* line 80, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated textarea.form-control:valid,
-textarea.form-control.is-valid {
+.was-validated textarea.form-control:valid, textarea.form-control.is-valid {
   padding-right: calc(1.3em + 0.75rem);
-  background-position: top calc(0.325em + 0.1875rem) right
-    calc(0.325em + 0.1875rem);
+  background-position: top calc(0.325em + 0.1875rem) right calc(0.325em + 0.1875rem);
 }
 
 /* line 90, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-select:valid,
-.custom-select.is-valid {
+.was-validated .custom-select:valid, .custom-select.is-valid {
   border-color: #117e46;
   padding-right: calc((1em + 0.75rem) * 3 / 4 + 1.75rem);
-  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23383d40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e")
-      no-repeat right 0.75rem center/8px 10px,
-    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23117e46' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e")
-      #fff no-repeat center right 1.75rem / calc(0.65em + 0.375rem)
-      calc(0.65em + 0.375rem);
+  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23383d40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px, url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23117e46' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") #fff no-repeat center right 1.75rem/calc(0.65em + 0.375rem) calc(0.65em + 0.375rem);
 }
 
 /* line 99, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-select:valid:focus,
-.custom-select.is-valid:focus {
+.was-validated .custom-select:valid:focus, .custom-select.is-valid:focus {
   border-color: #117e46;
   box-shadow: 0 0 0 0.2rem rgba(17, 126, 70, 0.25);
 }
 
 /* line 104, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .custom-select:valid ~ .valid-feedback,
-.was-validated .custom-select:valid ~ .valid-tooltip,
-.custom-select.is-valid ~ .valid-feedback,
+.was-validated .custom-select:valid ~ .valid-tooltip, .custom-select.is-valid ~ .valid-feedback,
 .custom-select.is-valid ~ .valid-tooltip {
   display: block;
 }
 
 /* line 115, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .form-control-file:valid ~ .valid-feedback,
-.was-validated .form-control-file:valid ~ .valid-tooltip,
-.form-control-file.is-valid ~ .valid-feedback,
+.was-validated .form-control-file:valid ~ .valid-tooltip, .form-control-file.is-valid ~ .valid-feedback,
 .form-control-file.is-valid ~ .valid-tooltip {
   display: block;
 }
 
 /* line 125, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .form-check-input:valid ~ .form-check-label,
-.form-check-input.is-valid ~ .form-check-label {
+.was-validated .form-check-input:valid ~ .form-check-label, .form-check-input.is-valid ~ .form-check-label {
   color: #117e46;
 }
 
 /* line 129, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .form-check-input:valid ~ .valid-feedback,
-.was-validated .form-check-input:valid ~ .valid-tooltip,
-.form-check-input.is-valid ~ .valid-feedback,
+.was-validated .form-check-input:valid ~ .valid-tooltip, .form-check-input.is-valid ~ .valid-feedback,
 .form-check-input.is-valid ~ .valid-tooltip {
   display: block;
 }
 
 /* line 139, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-control-input:valid ~ .custom-control-label,
-.custom-control-input.is-valid ~ .custom-control-label {
+.was-validated .custom-control-input:valid ~ .custom-control-label, .custom-control-input.is-valid ~ .custom-control-label {
   color: #117e46;
 }
 
 /* line 142, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-control-input:valid ~ .custom-control-label::before,
-.custom-control-input.is-valid ~ .custom-control-label::before {
+.was-validated .custom-control-input:valid ~ .custom-control-label::before, .custom-control-input.is-valid ~ .custom-control-label::before {
   border-color: #117e46;
 }
 
 /* line 147, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .custom-control-input:valid ~ .valid-feedback,
-.was-validated .custom-control-input:valid ~ .valid-tooltip,
-.custom-control-input.is-valid ~ .valid-feedback,
+.was-validated .custom-control-input:valid ~ .valid-tooltip, .custom-control-input.is-valid ~ .valid-feedback,
 .custom-control-input.is-valid ~ .valid-tooltip {
   display: block;
 }
 
 /* line 153, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated
-  .custom-control-input:valid:checked
-  ~ .custom-control-label::before,
-.custom-control-input.is-valid:checked ~ .custom-control-label::before {
+.was-validated .custom-control-input:valid:checked ~ .custom-control-label::before, .custom-control-input.is-valid:checked ~ .custom-control-label::before {
   border-color: #17ab5f;
   background-color: #17ab5f;
 }
 
 /* line 160, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated
-  .custom-control-input:valid:focus
-  ~ .custom-control-label::before,
-.custom-control-input.is-valid:focus ~ .custom-control-label::before {
+.was-validated .custom-control-input:valid:focus ~ .custom-control-label::before, .custom-control-input.is-valid:focus ~ .custom-control-label::before {
   box-shadow: 0 0 0 0.2rem rgba(17, 126, 70, 0.25);
 }
 
 /* line 164, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated
-  .custom-control-input:valid:focus:not(:checked)
-  ~ .custom-control-label::before,
-.custom-control-input.is-valid:focus:not(:checked)
-  ~ .custom-control-label::before {
+.was-validated .custom-control-input:valid:focus:not(:checked) ~ .custom-control-label::before, .custom-control-input.is-valid:focus:not(:checked) ~ .custom-control-label::before {
   border-color: #117e46;
 }
 
 /* line 175, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-file-input:valid ~ .custom-file-label,
-.custom-file-input.is-valid ~ .custom-file-label {
+.was-validated .custom-file-input:valid ~ .custom-file-label, .custom-file-input.is-valid ~ .custom-file-label {
   border-color: #117e46;
 }
 
 /* line 179, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .custom-file-input:valid ~ .valid-feedback,
-.was-validated .custom-file-input:valid ~ .valid-tooltip,
-.custom-file-input.is-valid ~ .valid-feedback,
+.was-validated .custom-file-input:valid ~ .valid-tooltip, .custom-file-input.is-valid ~ .valid-feedback,
 .custom-file-input.is-valid ~ .valid-tooltip {
   display: block;
 }
 
 /* line 185, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-file-input:valid:focus ~ .custom-file-label,
-.custom-file-input.is-valid:focus ~ .custom-file-label {
+.was-validated .custom-file-input:valid:focus ~ .custom-file-label, .custom-file-input.is-valid:focus ~ .custom-file-label {
   border-color: #117e46;
   box-shadow: 0 0 0 0.2rem rgba(17, 126, 70, 0.25);
 }
@@ -14469,7 +14320,7 @@ textarea.form-control.is-valid {
   display: none;
   max-width: 100%;
   padding: 0.25rem 0.5rem;
-  margin-top: 0.1rem;
+  margin-top: .1rem;
   font-size: 0.7875rem;
   line-height: 1.3;
   color: #fff;
@@ -14478,8 +14329,7 @@ textarea.form-control.is-valid {
 }
 
 /* line 54, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .form-control:invalid,
-.form-control.is-invalid {
+.was-validated .form-control:invalid, .form-control.is-invalid {
   border-color: #a60a3d;
   padding-right: calc(1.3em + 0.75rem);
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23a60a3d' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23a60a3d' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E");
@@ -14489,140 +14339,110 @@ textarea.form-control.is-valid {
 }
 
 /* line 66, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .form-control:invalid:focus,
-.form-control.is-invalid:focus {
+.was-validated .form-control:invalid:focus, .form-control.is-invalid:focus {
   border-color: #a60a3d;
   box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.25);
 }
 
 /* line 71, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .form-control:invalid ~ .invalid-feedback,
-.was-validated .form-control:invalid ~ .invalid-tooltip,
-.form-control.is-invalid ~ .invalid-feedback,
+.was-validated .form-control:invalid ~ .invalid-tooltip, .form-control.is-invalid ~ .invalid-feedback,
 .form-control.is-invalid ~ .invalid-tooltip {
   display: block;
 }
 
 /* line 80, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated textarea.form-control:invalid,
-textarea.form-control.is-invalid {
+.was-validated textarea.form-control:invalid, textarea.form-control.is-invalid {
   padding-right: calc(1.3em + 0.75rem);
-  background-position: top calc(0.325em + 0.1875rem) right
-    calc(0.325em + 0.1875rem);
+  background-position: top calc(0.325em + 0.1875rem) right calc(0.325em + 0.1875rem);
 }
 
 /* line 90, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-select:invalid,
-.custom-select.is-invalid {
+.was-validated .custom-select:invalid, .custom-select.is-invalid {
   border-color: #a60a3d;
   padding-right: calc((1em + 0.75rem) * 3 / 4 + 1.75rem);
-  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23383d40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e")
-      no-repeat right 0.75rem center/8px 10px,
-    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23a60a3d' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23a60a3d' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E")
-      #fff no-repeat center right 1.75rem / calc(0.65em + 0.375rem)
-      calc(0.65em + 0.375rem);
+  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23383d40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px, url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23a60a3d' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23a60a3d' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E") #fff no-repeat center right 1.75rem/calc(0.65em + 0.375rem) calc(0.65em + 0.375rem);
 }
 
 /* line 99, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-select:invalid:focus,
-.custom-select.is-invalid:focus {
+.was-validated .custom-select:invalid:focus, .custom-select.is-invalid:focus {
   border-color: #a60a3d;
   box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.25);
 }
 
 /* line 104, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .custom-select:invalid ~ .invalid-feedback,
-.was-validated .custom-select:invalid ~ .invalid-tooltip,
-.custom-select.is-invalid ~ .invalid-feedback,
+.was-validated .custom-select:invalid ~ .invalid-tooltip, .custom-select.is-invalid ~ .invalid-feedback,
 .custom-select.is-invalid ~ .invalid-tooltip {
   display: block;
 }
 
 /* line 115, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .form-control-file:invalid ~ .invalid-feedback,
-.was-validated .form-control-file:invalid ~ .invalid-tooltip,
-.form-control-file.is-invalid ~ .invalid-feedback,
+.was-validated .form-control-file:invalid ~ .invalid-tooltip, .form-control-file.is-invalid ~ .invalid-feedback,
 .form-control-file.is-invalid ~ .invalid-tooltip {
   display: block;
 }
 
 /* line 125, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .form-check-input:invalid ~ .form-check-label,
-.form-check-input.is-invalid ~ .form-check-label {
+.was-validated .form-check-input:invalid ~ .form-check-label, .form-check-input.is-invalid ~ .form-check-label {
   color: #a60a3d;
 }
 
 /* line 129, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .form-check-input:invalid ~ .invalid-feedback,
-.was-validated .form-check-input:invalid ~ .invalid-tooltip,
-.form-check-input.is-invalid ~ .invalid-feedback,
+.was-validated .form-check-input:invalid ~ .invalid-tooltip, .form-check-input.is-invalid ~ .invalid-feedback,
 .form-check-input.is-invalid ~ .invalid-tooltip {
   display: block;
 }
 
 /* line 139, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-control-input:invalid ~ .custom-control-label,
-.custom-control-input.is-invalid ~ .custom-control-label {
+.was-validated .custom-control-input:invalid ~ .custom-control-label, .custom-control-input.is-invalid ~ .custom-control-label {
   color: #a60a3d;
 }
 
 /* line 142, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-control-input:invalid ~ .custom-control-label::before,
-.custom-control-input.is-invalid ~ .custom-control-label::before {
+.was-validated .custom-control-input:invalid ~ .custom-control-label::before, .custom-control-input.is-invalid ~ .custom-control-label::before {
   border-color: #a60a3d;
 }
 
 /* line 147, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .custom-control-input:invalid ~ .invalid-feedback,
-.was-validated .custom-control-input:invalid ~ .invalid-tooltip,
-.custom-control-input.is-invalid ~ .invalid-feedback,
+.was-validated .custom-control-input:invalid ~ .invalid-tooltip, .custom-control-input.is-invalid ~ .invalid-feedback,
 .custom-control-input.is-invalid ~ .invalid-tooltip {
   display: block;
 }
 
 /* line 153, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated
-  .custom-control-input:invalid:checked
-  ~ .custom-control-label::before,
-.custom-control-input.is-invalid:checked ~ .custom-control-label::before {
+.was-validated .custom-control-input:invalid:checked ~ .custom-control-label::before, .custom-control-input.is-invalid:checked ~ .custom-control-label::before {
   border-color: #d60d4f;
   background-color: #d60d4f;
 }
 
 /* line 160, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated
-  .custom-control-input:invalid:focus
-  ~ .custom-control-label::before,
-.custom-control-input.is-invalid:focus ~ .custom-control-label::before {
+.was-validated .custom-control-input:invalid:focus ~ .custom-control-label::before, .custom-control-input.is-invalid:focus ~ .custom-control-label::before {
   box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.25);
 }
 
 /* line 164, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated
-  .custom-control-input:invalid:focus:not(:checked)
-  ~ .custom-control-label::before,
-.custom-control-input.is-invalid:focus:not(:checked)
-  ~ .custom-control-label::before {
+.was-validated .custom-control-input:invalid:focus:not(:checked) ~ .custom-control-label::before, .custom-control-input.is-invalid:focus:not(:checked) ~ .custom-control-label::before {
   border-color: #a60a3d;
 }
 
 /* line 175, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-file-input:invalid ~ .custom-file-label,
-.custom-file-input.is-invalid ~ .custom-file-label {
+.was-validated .custom-file-input:invalid ~ .custom-file-label, .custom-file-input.is-invalid ~ .custom-file-label {
   border-color: #a60a3d;
 }
 
 /* line 179, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
 .was-validated .custom-file-input:invalid ~ .invalid-feedback,
-.was-validated .custom-file-input:invalid ~ .invalid-tooltip,
-.custom-file-input.is-invalid ~ .invalid-feedback,
+.was-validated .custom-file-input:invalid ~ .invalid-tooltip, .custom-file-input.is-invalid ~ .invalid-feedback,
 .custom-file-input.is-invalid ~ .invalid-tooltip {
   display: block;
 }
 
 /* line 185, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_forms.scss */
-.was-validated .custom-file-input:invalid:focus ~ .custom-file-label,
-.custom-file-input.is-invalid:focus ~ .custom-file-label {
+.was-validated .custom-file-input:invalid:focus ~ .custom-file-label, .custom-file-input.is-invalid:focus ~ .custom-file-label {
   border-color: #a60a3d;
   box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.25);
 }
@@ -14711,8 +14531,7 @@ textarea.form-control.is-invalid {
   font-size: 0.9rem;
   line-height: 1.3;
   border-radius: 0.25rem;
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -14729,15 +14548,13 @@ textarea.form-control.is-invalid {
 }
 
 /* line 25, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_buttons.scss */
-.btn:focus,
-.btn.focus {
+.btn:focus, .btn.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
 }
 
 /* line 32, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_buttons.scss */
-.btn.disabled,
-.btn:disabled {
+.btn.disabled, .btn:disabled {
   opacity: 0.65;
 }
 
@@ -14762,22 +14579,19 @@ fieldset:disabled a.btn {
 }
 
 /* line 18, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-primary:focus,
-.btn-primary.focus {
+.btn-primary:focus, .btn-primary.focus {
   box-shadow: 0 0 0 0.2rem rgba(38, 139, 181, 0.5);
 }
 
 /* line 29, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-primary.disabled,
-.btn-primary:disabled {
+.btn-primary.disabled, .btn-primary:disabled {
   color: #fff;
   background-color: #0076a8;
   border-color: #0076a8;
 }
 
 /* line 40, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-primary:not(:disabled):not(.disabled):active,
-.btn-primary:not(:disabled):not(.disabled).active,
+.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
 .show > .btn-primary.dropdown-toggle {
   color: #fff;
   background-color: #005275;
@@ -14785,8 +14599,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 50, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-primary:not(:disabled):not(.disabled):active:focus,
-.btn-primary:not(:disabled):not(.disabled).active:focus,
+.btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
 .show > .btn-primary.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(38, 139, 181, 0.5);
 }
@@ -14806,22 +14619,19 @@ fieldset:disabled a.btn {
 }
 
 /* line 18, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-secondary:focus,
-.btn-secondary.focus {
+.btn-secondary:focus, .btn-secondary.focus {
   box-shadow: 0 0 0 0.2rem rgba(122, 125, 128, 0.5);
 }
 
 /* line 29, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-secondary.disabled,
-.btn-secondary:disabled {
+.btn-secondary.disabled, .btn-secondary:disabled {
   color: #fff;
   background-color: #63666a;
   border-color: #63666a;
 }
 
 /* line 40, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-secondary:not(:disabled):not(.disabled):active,
-.btn-secondary:not(:disabled):not(.disabled).active,
+.btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active,
 .show > .btn-secondary.dropdown-toggle {
   color: #fff;
   background-color: #4a4d50;
@@ -14829,8 +14639,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 50, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-secondary:not(:disabled):not(.disabled):active:focus,
-.btn-secondary:not(:disabled):not(.disabled).active:focus,
+.btn-secondary:not(:disabled):not(.disabled):active:focus, .btn-secondary:not(:disabled):not(.disabled).active:focus,
 .show > .btn-secondary.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(122, 125, 128, 0.5);
 }
@@ -14850,22 +14659,19 @@ fieldset:disabled a.btn {
 }
 
 /* line 18, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-success:focus,
-.btn-success.focus {
+.btn-success:focus, .btn-success.focus {
   box-shadow: 0 0 0 0.2rem rgba(53, 145, 98, 0.5);
 }
 
 /* line 29, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-success.disabled,
-.btn-success:disabled {
+.btn-success.disabled, .btn-success:disabled {
   color: #fff;
   background-color: #117e46;
   border-color: #117e46;
 }
 
 /* line 40, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-success:not(:disabled):not(.disabled):active,
-.btn-success:not(:disabled):not(.disabled).active,
+.btn-success:not(:disabled):not(.disabled):active, .btn-success:not(:disabled):not(.disabled).active,
 .show > .btn-success.dropdown-toggle {
   color: #fff;
   background-color: #0b512d;
@@ -14873,8 +14679,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 50, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-success:not(:disabled):not(.disabled):active:focus,
-.btn-success:not(:disabled):not(.disabled).active:focus,
+.btn-success:not(:disabled):not(.disabled):active:focus, .btn-success:not(:disabled):not(.disabled).active:focus,
 .show > .btn-success.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(53, 145, 98, 0.5);
 }
@@ -14894,22 +14699,19 @@ fieldset:disabled a.btn {
 }
 
 /* line 18, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-info:focus,
-.btn-info.focus {
+.btn-info:focus, .btn-info.focus {
   box-shadow: 0 0 0 0.2rem rgba(58, 176, 195, 0.5);
 }
 
 /* line 29, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-info.disabled,
-.btn-info:disabled {
+.btn-info.disabled, .btn-info:disabled {
   color: #fff;
   background-color: #17a2b8;
   border-color: #17a2b8;
 }
 
 /* line 40, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-info:not(:disabled):not(.disabled):active,
-.btn-info:not(:disabled):not(.disabled).active,
+.btn-info:not(:disabled):not(.disabled):active, .btn-info:not(:disabled):not(.disabled).active,
 .show > .btn-info.dropdown-toggle {
   color: #fff;
   background-color: #117a8b;
@@ -14917,8 +14719,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 50, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-info:not(:disabled):not(.disabled):active:focus,
-.btn-info:not(:disabled):not(.disabled).active:focus,
+.btn-info:not(:disabled):not(.disabled):active:focus, .btn-info:not(:disabled):not(.disabled).active:focus,
 .show > .btn-info.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(58, 176, 195, 0.5);
 }
@@ -14938,22 +14739,19 @@ fieldset:disabled a.btn {
 }
 
 /* line 18, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-warning:focus,
-.btn-warning.focus {
+.btn-warning:focus, .btn-warning.focus {
   box-shadow: 0 0 0 0.2rem rgba(223, 163, 30, 0.5);
 }
 
 /* line 29, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-warning.disabled,
-.btn-warning:disabled {
+.btn-warning.disabled, .btn-warning:disabled {
   color: #272a2b;
   background-color: #ffb81c;
   border-color: #ffb81c;
 }
 
 /* line 40, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-warning:not(:disabled):not(.disabled):active,
-.btn-warning:not(:disabled):not(.disabled).active,
+.btn-warning:not(:disabled):not(.disabled):active, .btn-warning:not(:disabled):not(.disabled).active,
 .show > .btn-warning.dropdown-toggle {
   color: #272a2b;
   background-color: #e89f00;
@@ -14961,8 +14759,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 50, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-warning:not(:disabled):not(.disabled):active:focus,
-.btn-warning:not(:disabled):not(.disabled).active:focus,
+.btn-warning:not(:disabled):not(.disabled):active:focus, .btn-warning:not(:disabled):not(.disabled).active:focus,
 .show > .btn-warning.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(223, 163, 30, 0.5);
 }
@@ -14982,22 +14779,19 @@ fieldset:disabled a.btn {
 }
 
 /* line 18, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-danger:focus,
-.btn-danger.focus {
+.btn-danger:focus, .btn-danger.focus {
   box-shadow: 0 0 0 0.2rem rgba(179, 47, 90, 0.5);
 }
 
 /* line 29, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-danger.disabled,
-.btn-danger:disabled {
+.btn-danger.disabled, .btn-danger:disabled {
   color: #fff;
   background-color: #a60a3d;
   border-color: #a60a3d;
 }
 
 /* line 40, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-danger:not(:disabled):not(.disabled):active,
-.btn-danger:not(:disabled):not(.disabled).active,
+.btn-danger:not(:disabled):not(.disabled):active, .btn-danger:not(:disabled):not(.disabled).active,
 .show > .btn-danger.dropdown-toggle {
   color: #fff;
   background-color: #76072b;
@@ -15005,8 +14799,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 50, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-danger:not(:disabled):not(.disabled):active:focus,
-.btn-danger:not(:disabled):not(.disabled).active:focus,
+.btn-danger:not(:disabled):not(.disabled):active:focus, .btn-danger:not(:disabled):not(.disabled).active:focus,
 .show > .btn-danger.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(179, 47, 90, 0.5);
 }
@@ -15026,22 +14819,19 @@ fieldset:disabled a.btn {
 }
 
 /* line 18, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-light:focus,
-.btn-light.focus {
+.btn-light:focus, .btn-light.focus {
   box-shadow: 0 0 0 0.2rem rgba(213, 215, 216, 0.5);
 }
 
 /* line 29, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-light.disabled,
-.btn-light:disabled {
+.btn-light.disabled, .btn-light:disabled {
   color: #272a2b;
   background-color: #f4f5f6;
   border-color: #f4f5f6;
 }
 
 /* line 40, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-light:not(:disabled):not(.disabled):active,
-.btn-light:not(:disabled):not(.disabled).active,
+.btn-light:not(:disabled):not(.disabled):active, .btn-light:not(:disabled):not(.disabled).active,
 .show > .btn-light.dropdown-toggle {
   color: #272a2b;
   background-color: #d8dcdf;
@@ -15049,8 +14839,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 50, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-light:not(:disabled):not(.disabled):active:focus,
-.btn-light:not(:disabled):not(.disabled).active:focus,
+.btn-light:not(:disabled):not(.disabled):active:focus, .btn-light:not(:disabled):not(.disabled).active:focus,
 .show > .btn-light.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(213, 215, 216, 0.5);
 }
@@ -15070,22 +14859,19 @@ fieldset:disabled a.btn {
 }
 
 /* line 18, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-dark:focus,
-.btn-dark.focus {
+.btn-dark:focus, .btn-dark.focus {
   box-shadow: 0 0 0 0.2rem rgba(38, 91, 107, 0.5);
 }
 
 /* line 29, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-dark.disabled,
-.btn-dark:disabled {
+.btn-dark.disabled, .btn-dark:disabled {
   color: #fff;
   background-color: #003e51;
   border-color: #003e51;
 }
 
 /* line 40, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-dark:not(:disabled):not(.disabled):active,
-.btn-dark:not(:disabled):not(.disabled).active,
+.btn-dark:not(:disabled):not(.disabled):active, .btn-dark:not(:disabled):not(.disabled).active,
 .show > .btn-dark.dropdown-toggle {
   color: #fff;
   background-color: #00171e;
@@ -15093,8 +14879,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 50, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-dark:not(:disabled):not(.disabled):active:focus,
-.btn-dark:not(:disabled):not(.disabled).active:focus,
+.btn-dark:not(:disabled):not(.disabled):active:focus, .btn-dark:not(:disabled):not(.disabled).active:focus,
 .show > .btn-dark.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(38, 91, 107, 0.5);
 }
@@ -15113,21 +14898,18 @@ fieldset:disabled a.btn {
 }
 
 /* line 71, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-primary:focus,
-.btn-outline-primary.focus {
+.btn-outline-primary:focus, .btn-outline-primary.focus {
   box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.5);
 }
 
 /* line 76, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-primary.disabled,
-.btn-outline-primary:disabled {
+.btn-outline-primary.disabled, .btn-outline-primary:disabled {
   color: #0076a8;
   background-color: transparent;
 }
 
 /* line 82, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-primary:not(:disabled):not(.disabled):active,
-.btn-outline-primary:not(:disabled):not(.disabled).active,
+.btn-outline-primary:not(:disabled):not(.disabled):active, .btn-outline-primary:not(:disabled):not(.disabled).active,
 .show > .btn-outline-primary.dropdown-toggle {
   color: #fff;
   background-color: #0076a8;
@@ -15135,8 +14917,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 89, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-primary:not(:disabled):not(.disabled):active:focus,
-.btn-outline-primary:not(:disabled):not(.disabled).active:focus,
+.btn-outline-primary:not(:disabled):not(.disabled):active:focus, .btn-outline-primary:not(:disabled):not(.disabled).active:focus,
 .show > .btn-outline-primary.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.5);
 }
@@ -15155,21 +14936,18 @@ fieldset:disabled a.btn {
 }
 
 /* line 71, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-secondary:focus,
-.btn-outline-secondary.focus {
+.btn-outline-secondary:focus, .btn-outline-secondary.focus {
   box-shadow: 0 0 0 0.2rem rgba(99, 102, 106, 0.5);
 }
 
 /* line 76, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-secondary.disabled,
-.btn-outline-secondary:disabled {
+.btn-outline-secondary.disabled, .btn-outline-secondary:disabled {
   color: #63666a;
   background-color: transparent;
 }
 
 /* line 82, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-secondary:not(:disabled):not(.disabled):active,
-.btn-outline-secondary:not(:disabled):not(.disabled).active,
+.btn-outline-secondary:not(:disabled):not(.disabled):active, .btn-outline-secondary:not(:disabled):not(.disabled).active,
 .show > .btn-outline-secondary.dropdown-toggle {
   color: #fff;
   background-color: #63666a;
@@ -15177,8 +14955,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 89, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-secondary:not(:disabled):not(.disabled):active:focus,
-.btn-outline-secondary:not(:disabled):not(.disabled).active:focus,
+.btn-outline-secondary:not(:disabled):not(.disabled):active:focus, .btn-outline-secondary:not(:disabled):not(.disabled).active:focus,
 .show > .btn-outline-secondary.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(99, 102, 106, 0.5);
 }
@@ -15197,21 +14974,18 @@ fieldset:disabled a.btn {
 }
 
 /* line 71, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-success:focus,
-.btn-outline-success.focus {
+.btn-outline-success:focus, .btn-outline-success.focus {
   box-shadow: 0 0 0 0.2rem rgba(17, 126, 70, 0.5);
 }
 
 /* line 76, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-success.disabled,
-.btn-outline-success:disabled {
+.btn-outline-success.disabled, .btn-outline-success:disabled {
   color: #117e46;
   background-color: transparent;
 }
 
 /* line 82, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-success:not(:disabled):not(.disabled):active,
-.btn-outline-success:not(:disabled):not(.disabled).active,
+.btn-outline-success:not(:disabled):not(.disabled):active, .btn-outline-success:not(:disabled):not(.disabled).active,
 .show > .btn-outline-success.dropdown-toggle {
   color: #fff;
   background-color: #117e46;
@@ -15219,8 +14993,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 89, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-success:not(:disabled):not(.disabled):active:focus,
-.btn-outline-success:not(:disabled):not(.disabled).active:focus,
+.btn-outline-success:not(:disabled):not(.disabled):active:focus, .btn-outline-success:not(:disabled):not(.disabled).active:focus,
 .show > .btn-outline-success.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(17, 126, 70, 0.5);
 }
@@ -15239,21 +15012,18 @@ fieldset:disabled a.btn {
 }
 
 /* line 71, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-info:focus,
-.btn-outline-info.focus {
+.btn-outline-info:focus, .btn-outline-info.focus {
   box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.5);
 }
 
 /* line 76, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-info.disabled,
-.btn-outline-info:disabled {
+.btn-outline-info.disabled, .btn-outline-info:disabled {
   color: #17a2b8;
   background-color: transparent;
 }
 
 /* line 82, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-info:not(:disabled):not(.disabled):active,
-.btn-outline-info:not(:disabled):not(.disabled).active,
+.btn-outline-info:not(:disabled):not(.disabled):active, .btn-outline-info:not(:disabled):not(.disabled).active,
 .show > .btn-outline-info.dropdown-toggle {
   color: #fff;
   background-color: #17a2b8;
@@ -15261,8 +15031,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 89, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-info:not(:disabled):not(.disabled):active:focus,
-.btn-outline-info:not(:disabled):not(.disabled).active:focus,
+.btn-outline-info:not(:disabled):not(.disabled):active:focus, .btn-outline-info:not(:disabled):not(.disabled).active:focus,
 .show > .btn-outline-info.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.5);
 }
@@ -15281,21 +15050,18 @@ fieldset:disabled a.btn {
 }
 
 /* line 71, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-warning:focus,
-.btn-outline-warning.focus {
+.btn-outline-warning:focus, .btn-outline-warning.focus {
   box-shadow: 0 0 0 0.2rem rgba(255, 184, 28, 0.5);
 }
 
 /* line 76, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-warning.disabled,
-.btn-outline-warning:disabled {
+.btn-outline-warning.disabled, .btn-outline-warning:disabled {
   color: #ffb81c;
   background-color: transparent;
 }
 
 /* line 82, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-warning:not(:disabled):not(.disabled):active,
-.btn-outline-warning:not(:disabled):not(.disabled).active,
+.btn-outline-warning:not(:disabled):not(.disabled):active, .btn-outline-warning:not(:disabled):not(.disabled).active,
 .show > .btn-outline-warning.dropdown-toggle {
   color: #272a2b;
   background-color: #ffb81c;
@@ -15303,8 +15069,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 89, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-warning:not(:disabled):not(.disabled):active:focus,
-.btn-outline-warning:not(:disabled):not(.disabled).active:focus,
+.btn-outline-warning:not(:disabled):not(.disabled):active:focus, .btn-outline-warning:not(:disabled):not(.disabled).active:focus,
 .show > .btn-outline-warning.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(255, 184, 28, 0.5);
 }
@@ -15323,21 +15088,18 @@ fieldset:disabled a.btn {
 }
 
 /* line 71, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-danger:focus,
-.btn-outline-danger.focus {
+.btn-outline-danger:focus, .btn-outline-danger.focus {
   box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.5);
 }
 
 /* line 76, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-danger.disabled,
-.btn-outline-danger:disabled {
+.btn-outline-danger.disabled, .btn-outline-danger:disabled {
   color: #a60a3d;
   background-color: transparent;
 }
 
 /* line 82, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-danger:not(:disabled):not(.disabled):active,
-.btn-outline-danger:not(:disabled):not(.disabled).active,
+.btn-outline-danger:not(:disabled):not(.disabled):active, .btn-outline-danger:not(:disabled):not(.disabled).active,
 .show > .btn-outline-danger.dropdown-toggle {
   color: #fff;
   background-color: #a60a3d;
@@ -15345,8 +15107,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 89, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-danger:not(:disabled):not(.disabled):active:focus,
-.btn-outline-danger:not(:disabled):not(.disabled).active:focus,
+.btn-outline-danger:not(:disabled):not(.disabled):active:focus, .btn-outline-danger:not(:disabled):not(.disabled).active:focus,
 .show > .btn-outline-danger.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.5);
 }
@@ -15365,21 +15126,18 @@ fieldset:disabled a.btn {
 }
 
 /* line 71, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-light:focus,
-.btn-outline-light.focus {
+.btn-outline-light:focus, .btn-outline-light.focus {
   box-shadow: 0 0 0 0.2rem rgba(244, 245, 246, 0.5);
 }
 
 /* line 76, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-light.disabled,
-.btn-outline-light:disabled {
+.btn-outline-light.disabled, .btn-outline-light:disabled {
   color: #f4f5f6;
   background-color: transparent;
 }
 
 /* line 82, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-light:not(:disabled):not(.disabled):active,
-.btn-outline-light:not(:disabled):not(.disabled).active,
+.btn-outline-light:not(:disabled):not(.disabled):active, .btn-outline-light:not(:disabled):not(.disabled).active,
 .show > .btn-outline-light.dropdown-toggle {
   color: #272a2b;
   background-color: #f4f5f6;
@@ -15387,8 +15145,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 89, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-light:not(:disabled):not(.disabled):active:focus,
-.btn-outline-light:not(:disabled):not(.disabled).active:focus,
+.btn-outline-light:not(:disabled):not(.disabled):active:focus, .btn-outline-light:not(:disabled):not(.disabled).active:focus,
 .show > .btn-outline-light.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(244, 245, 246, 0.5);
 }
@@ -15407,21 +15164,18 @@ fieldset:disabled a.btn {
 }
 
 /* line 71, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-dark:focus,
-.btn-outline-dark.focus {
+.btn-outline-dark:focus, .btn-outline-dark.focus {
   box-shadow: 0 0 0 0.2rem rgba(0, 62, 81, 0.5);
 }
 
 /* line 76, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-dark.disabled,
-.btn-outline-dark:disabled {
+.btn-outline-dark.disabled, .btn-outline-dark:disabled {
   color: #003e51;
   background-color: transparent;
 }
 
 /* line 82, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-dark:not(:disabled):not(.disabled):active,
-.btn-outline-dark:not(:disabled):not(.disabled).active,
+.btn-outline-dark:not(:disabled):not(.disabled):active, .btn-outline-dark:not(:disabled):not(.disabled).active,
 .show > .btn-outline-dark.dropdown-toggle {
   color: #fff;
   background-color: #003e51;
@@ -15429,8 +15183,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 89, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_buttons.scss */
-.btn-outline-dark:not(:disabled):not(.disabled):active:focus,
-.btn-outline-dark:not(:disabled):not(.disabled).active:focus,
+.btn-outline-dark:not(:disabled):not(.disabled):active:focus, .btn-outline-dark:not(:disabled):not(.disabled).active:focus,
 .show > .btn-outline-dark.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(0, 62, 81, 0.5);
 }
@@ -15449,22 +15202,19 @@ fieldset:disabled a.btn {
 }
 
 /* line 87, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_buttons.scss */
-.btn-link:focus,
-.btn-link.focus {
+.btn-link:focus, .btn-link.focus {
   text-decoration: underline;
   box-shadow: none;
 }
 
 /* line 93, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_buttons.scss */
-.btn-link:disabled,
-.btn-link.disabled {
+.btn-link:disabled, .btn-link.disabled {
   color: #63666a;
   pointer-events: none;
 }
 
 /* line 107, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_buttons.scss */
-.btn-lg,
-.btn-group-lg > .btn {
+.btn-lg, .btn-group-lg > .btn {
   padding: 0.5rem 1rem;
   font-size: 1.125rem;
   line-height: 1.5;
@@ -15472,8 +15222,7 @@ fieldset:disabled a.btn {
 }
 
 /* line 111, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_buttons.scss */
-.btn-sm,
-.btn-group-sm > .btn {
+.btn-sm, .btn-group-sm > .btn {
   padding: 0.25rem 0.5rem;
   font-size: 0.7875rem;
   line-height: 1.5;
@@ -15587,25 +15336,25 @@ input[type="button"].btn-block {
 }
 
 /* line 42, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-.dropdown-menu-left, .dropdown-menu-start {
+.dropdown-menu-start {
   right: auto;
   left: 0;
 }
 
 /* line 47, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-.dropdown-menu-right, .dropdown-menu-end {
+.dropdown-menu-end {
   right: 0;
   left: auto;
 }
 
 @media (min-width: 576px) {
   /* line 42, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-sm-left, .dropdown-menu-sm-start {
+  .dropdown-menu-sm-left {
     right: auto;
     left: 0;
   }
   /* line 47, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-sm-right, .dropdown-menu-sm-end {
+  .dropdown-menu-sm-right {
     right: 0;
     left: auto;
   }
@@ -15613,12 +15362,12 @@ input[type="button"].btn-block {
 
 @media (min-width: 768px) {
   /* line 42, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-md-left, .dropdown-menu-md-start {
+  .dropdown-menu-md-left {
     right: auto;
     left: 0;
   }
   /* line 47, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-md-right, .dropdown-menu-md-end {
+  .dropdown-menu-md-right {
     right: 0;
     left: auto;
   }
@@ -15626,12 +15375,12 @@ input[type="button"].btn-block {
 
 @media (min-width: 992px) {
   /* line 42, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-lg-left, .dropdown-menu-lg-start {
+  .dropdown-menu-lg-left {
     right: auto;
     left: 0;
   }
   /* line 47, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-lg-right, .dropdown-menu-lg-end {
+  .dropdown-menu-lg-right {
     right: 0;
     left: auto;
   }
@@ -15639,12 +15388,12 @@ input[type="button"].btn-block {
 
 @media (min-width: 1200px) {
   /* line 42, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-xl-left, .dropdown-menu-xl-start {
+  .dropdown-menu-xl-left {
     right: auto;
     left: 0;
   }
   /* line 47, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-  .dropdown-menu-xl-right, .dropdown-menu-xl-end {
+  .dropdown-menu-xl-right {
     right: 0;
     left: auto;
   }
@@ -15750,10 +15499,7 @@ input[type="button"].btn-block {
 }
 
 /* line 106, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-.dropdown-menu[x-placement^="top"],
-.dropdown-menu[x-placement^="right"],
-.dropdown-menu[x-placement^="bottom"],
-.dropdown-menu[x-placement^="left"] {
+.dropdown-menu[x-placement^="top"], .dropdown-menu[x-placement^="right"], .dropdown-menu[x-placement^="bottom"], .dropdown-menu[x-placement^="left"] {
   right: auto;
   bottom: auto;
 }
@@ -15781,24 +15527,21 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.dropdown-item:hover,
-.dropdown-item:focus {
+.dropdown-item:hover, .dropdown-item:focus {
   color: #1b1d1e;
   text-decoration: none;
   background-color: #f4f5f6;
 }
 
 /* line 153, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-.dropdown-item.active,
-.dropdown-item:active {
+.dropdown-item.active, .dropdown-item:active {
   color: #fff;
   text-decoration: none;
   background-color: #0076a8;
 }
 
 /* line 160, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_dropdown.scss */
-.dropdown-item.disabled,
-.dropdown-item:disabled {
+.dropdown-item.disabled, .dropdown-item:disabled {
   color: #63666a;
   pointer-events: none;
   background-color: transparent;
@@ -15848,9 +15591,7 @@ input[type="button"].btn-block {
 }
 
 /* line 19, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_button-group.scss */
-.btn-group > .btn:focus,
-.btn-group > .btn:active,
-.btn-group > .btn.active,
+.btn-group > .btn:focus, .btn-group > .btn:active, .btn-group > .btn.active,
 .btn-group-vertical > .btn:focus,
 .btn-group-vertical > .btn:active,
 .btn-group-vertical > .btn.active {
@@ -15907,15 +15648,13 @@ input[type="button"].btn-block {
 }
 
 /* line 84, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_button-group.scss */
-.btn-sm + .dropdown-toggle-split,
-.btn-group-sm > .btn + .dropdown-toggle-split {
+.btn-sm + .dropdown-toggle-split, .btn-group-sm > .btn + .dropdown-toggle-split {
   padding-right: 0.375rem;
   padding-left: 0.375rem;
 }
 
 /* line 89, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_button-group.scss */
-.btn-lg + .dropdown-toggle-split,
-.btn-group-lg > .btn + .dropdown-toggle-split {
+.btn-lg + .dropdown-toggle-split, .btn-group-lg > .btn + .dropdown-toggle-split {
   padding-right: 0.75rem;
   padding-left: 0.75rem;
 }
@@ -16163,12 +15902,8 @@ input[type="button"].btn-block {
 .input-group > .input-group-prepend > .input-group-text,
 .input-group > .input-group-append:not(:last-child) > .btn,
 .input-group > .input-group-append:not(:last-child) > .input-group-text,
-.input-group
-  > .input-group-append:last-child
-  > .btn:not(:last-child):not(.dropdown-toggle),
-.input-group
-  > .input-group-append:last-child
-  > .input-group-text:not(:last-child) {
+.input-group > .input-group-append:last-child > .btn:not(:last-child):not(.dropdown-toggle),
+.input-group > .input-group-append:last-child > .input-group-text:not(:last-child) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -16179,9 +15914,7 @@ input[type="button"].btn-block {
 .input-group > .input-group-prepend:not(:first-child) > .btn,
 .input-group > .input-group-prepend:not(:first-child) > .input-group-text,
 .input-group > .input-group-prepend:first-child > .btn:not(:first-child),
-.input-group
-  > .input-group-prepend:first-child
-  > .input-group-text:not(:first-child) {
+.input-group > .input-group-prepend:first-child > .input-group-text:not(:first-child) {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
@@ -16285,31 +16018,23 @@ input[type="button"].btn-block {
 }
 
 /* line 119, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_custom-forms.scss */
-.custom-checkbox
-  .custom-control-input:indeterminate
-  ~ .custom-control-label::before {
+.custom-checkbox .custom-control-input:indeterminate ~ .custom-control-label::before {
   border-color: #0076a8;
   background-color: #0076a8;
 }
 
 /* line 124, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_custom-forms.scss */
-.custom-checkbox
-  .custom-control-input:indeterminate
-  ~ .custom-control-label::after {
+.custom-checkbox .custom-control-input:indeterminate ~ .custom-control-label::after {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'%3e%3cpath stroke='%23fff' d='M0 2h4'/%3e%3c/svg%3e");
 }
 
 /* line 130, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_custom-forms.scss */
-.custom-checkbox
-  .custom-control-input:disabled:checked
-  ~ .custom-control-label::before {
+.custom-checkbox .custom-control-input:disabled:checked ~ .custom-control-label::before {
   background-color: rgba(0, 118, 168, 0.5);
 }
 
 /* line 133, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_custom-forms.scss */
-.custom-checkbox
-  .custom-control-input:disabled:indeterminate
-  ~ .custom-control-label::before {
+.custom-checkbox .custom-control-input:disabled:indeterminate ~ .custom-control-label::before {
   background-color: rgba(0, 118, 168, 0.5);
 }
 
@@ -16324,9 +16049,7 @@ input[type="button"].btn-block {
 }
 
 /* line 156, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_custom-forms.scss */
-.custom-radio
-  .custom-control-input:disabled:checked
-  ~ .custom-control-label::before {
+.custom-radio .custom-control-input:disabled:checked ~ .custom-control-label::before {
   background-color: rgba(0, 118, 168, 0.5);
 }
 
@@ -16351,8 +16074,7 @@ input[type="button"].btn-block {
   height: calc(1rem - 4px);
   background-color: #82858a;
   border-radius: 0.5rem;
-  transition: transform 0.15s ease-in-out, background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: transform 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -16369,9 +16091,7 @@ input[type="button"].btn-block {
 }
 
 /* line 199, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_custom-forms.scss */
-.custom-switch
-  .custom-control-input:disabled:checked
-  ~ .custom-control-label::before {
+.custom-switch .custom-control-input:disabled:checked ~ .custom-control-label::before {
   background-color: rgba(0, 118, 168, 0.5);
 }
 
@@ -16386,8 +16106,7 @@ input[type="button"].btn-block {
   line-height: 1.3;
   color: #272a2b;
   vertical-align: middle;
-  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23383d40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e")
-    no-repeat right 0.75rem center/8px 10px;
+  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23383d40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
   background-color: #fff;
   border: 1px solid #a3a6ad;
   border-radius: 0.25rem;
@@ -16408,8 +16127,7 @@ input[type="button"].btn-block {
 }
 
 /* line 250, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_custom-forms.scss */
-.custom-select[multiple],
-.custom-select[size]:not([size="1"]) {
+.custom-select[multiple], .custom-select[size]:not([size="1"]) {
   height: auto;
   padding-right: 0.75rem;
   background-image: none;
@@ -16501,8 +16219,8 @@ input[type="button"].btn-block {
   border-radius: 0.25rem;
   text-overflow: ellipsis;
   overflow: hidden;
-  white-space: nowrap;
-  padding-right: 15%;
+  white-space:nowrap;
+  padding-right:15%;
 }
 
 /* line 342, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_custom-forms.scss */
@@ -16565,8 +16283,7 @@ input[type="button"].btn-block {
   background-color: #0076a8;
   border: 0;
   border-radius: 1rem;
-  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   appearance: none;
 }
 
@@ -16600,8 +16317,7 @@ input[type="button"].btn-block {
   background-color: #0076a8;
   border: 0;
   border-radius: 1rem;
-  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   appearance: none;
 }
 
@@ -16638,8 +16354,7 @@ input[type="button"].btn-block {
   background-color: #0076a8;
   border: 0;
   border-radius: 1rem;
-  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   appearance: none;
 }
 
@@ -16708,13 +16423,13 @@ input[type="button"].btn-block {
 .custom-control-label::before,
 .custom-file-label,
 .custom-select {
-  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow:ellipsis;
   white-space: nowwrap;
   padding-right: 27%;
 }
+
 
 @media (prefers-reduced-motion: reduce) {
   /* line 503, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_custom-forms.scss */
@@ -16741,8 +16456,7 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.nav-link:hover,
-.nav-link:focus {
+.nav-link:hover, .nav-link:focus {
   text-decoration: none;
 }
 
@@ -16771,8 +16485,7 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.nav-tabs .nav-link:hover,
-.nav-tabs .nav-link:focus {
+.nav-tabs .nav-link:hover, .nav-tabs .nav-link:focus {
   border-color: #dbdde0 #dbdde0 #c1c2c9;
 }
 
@@ -16864,8 +16577,7 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.navbar-brand:hover,
-.navbar-brand:focus {
+.navbar-brand:hover, .navbar-brand:focus {
   text-decoration: none;
 }
 
@@ -16915,8 +16627,7 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.navbar-toggler:hover,
-.navbar-toggler:focus {
+.navbar-toggler:hover, .navbar-toggler:focus {
   text-decoration: none;
 }
 
@@ -17159,8 +16870,7 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.navbar-light .navbar-brand:hover,
-.navbar-light .navbar-brand:focus {
+.navbar-light .navbar-brand:hover, .navbar-light .navbar-brand:focus {
   color: rgba(0, 0, 0, 0.9);
 }
 
@@ -17170,8 +16880,7 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.navbar-light .navbar-nav .nav-link:hover,
-.navbar-light .navbar-nav .nav-link:focus {
+.navbar-light .navbar-nav .nav-link:hover, .navbar-light .navbar-nav .nav-link:focus {
   color: rgba(0, 0, 0, 0.7);
 }
 
@@ -17210,8 +16919,7 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.navbar-light .navbar-text a:hover,
-.navbar-light .navbar-text a:focus {
+.navbar-light .navbar-text a:hover, .navbar-light .navbar-text a:focus {
   color: rgba(0, 0, 0, 0.9);
 }
 
@@ -17221,8 +16929,7 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.navbar-dark .navbar-brand:hover,
-.navbar-dark .navbar-brand:focus {
+.navbar-dark .navbar-brand:hover, .navbar-dark .navbar-brand:focus {
   color: #fff;
 }
 
@@ -17232,8 +16939,7 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.navbar-dark .navbar-nav .nav-link:hover,
-.navbar-dark .navbar-nav .nav-link:focus {
+.navbar-dark .navbar-nav .nav-link:hover, .navbar-dark .navbar-nav .nav-link:focus {
   color: rgba(255, 255, 255, 0.75);
 }
 
@@ -17272,8 +16978,7 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.navbar-dark .navbar-text a:hover,
-.navbar-dark .navbar-text a:focus {
+.navbar-dark .navbar-text a:hover, .navbar-dark .navbar-text a:focus {
   color: #fff;
 }
 
@@ -17709,8 +17414,7 @@ input[type="button"].btn-block {
   white-space: nowrap;
   vertical-align: baseline;
   border-radius: 0.25rem;
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -17721,8 +17425,7 @@ input[type="button"].btn-block {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.badge:hover,
-a.badge:focus {
+a.badge:hover, a.badge:focus {
   text-decoration: none;
 }
 
@@ -17751,15 +17454,13 @@ a.badge:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.badge-primary:hover,
-a.badge-primary:focus {
+a.badge-primary:hover, a.badge-primary:focus {
   color: #fff;
   background-color: #005275;
 }
 
 /* line 11, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_badge.scss */
-a.badge-primary:focus,
-a.badge-primary.focus {
+a.badge-primary:focus, a.badge-primary.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.5);
 }
@@ -17771,15 +17472,13 @@ a.badge-primary.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.badge-secondary:hover,
-a.badge-secondary:focus {
+a.badge-secondary:hover, a.badge-secondary:focus {
   color: #fff;
   background-color: #4a4d50;
 }
 
 /* line 11, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_badge.scss */
-a.badge-secondary:focus,
-a.badge-secondary.focus {
+a.badge-secondary:focus, a.badge-secondary.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(99, 102, 106, 0.5);
 }
@@ -17791,15 +17490,13 @@ a.badge-secondary.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.badge-success:hover,
-a.badge-success:focus {
+a.badge-success:hover, a.badge-success:focus {
   color: #fff;
   background-color: #0b512d;
 }
 
 /* line 11, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_badge.scss */
-a.badge-success:focus,
-a.badge-success.focus {
+a.badge-success:focus, a.badge-success.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(17, 126, 70, 0.5);
 }
@@ -17811,15 +17508,13 @@ a.badge-success.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.badge-info:hover,
-a.badge-info:focus {
+a.badge-info:hover, a.badge-info:focus {
   color: #fff;
   background-color: #117a8b;
 }
 
 /* line 11, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_badge.scss */
-a.badge-info:focus,
-a.badge-info.focus {
+a.badge-info:focus, a.badge-info.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.5);
 }
@@ -17831,15 +17526,13 @@ a.badge-info.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.badge-warning:hover,
-a.badge-warning:focus {
+a.badge-warning:hover, a.badge-warning:focus {
   color: #272a2b;
   background-color: #e89f00;
 }
 
 /* line 11, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_badge.scss */
-a.badge-warning:focus,
-a.badge-warning.focus {
+a.badge-warning:focus, a.badge-warning.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(255, 184, 28, 0.5);
 }
@@ -17851,15 +17544,13 @@ a.badge-warning.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.badge-danger:hover,
-a.badge-danger:focus {
+a.badge-danger:hover, a.badge-danger:focus {
   color: #fff;
   background-color: #76072b;
 }
 
 /* line 11, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_badge.scss */
-a.badge-danger:focus,
-a.badge-danger.focus {
+a.badge-danger:focus, a.badge-danger.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.5);
 }
@@ -17871,15 +17562,13 @@ a.badge-danger.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.badge-light:hover,
-a.badge-light:focus {
+a.badge-light:hover, a.badge-light:focus {
   color: #272a2b;
   background-color: #d8dcdf;
 }
 
 /* line 11, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_badge.scss */
-a.badge-light:focus,
-a.badge-light.focus {
+a.badge-light:focus, a.badge-light.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(244, 245, 246, 0.5);
 }
@@ -17891,15 +17580,13 @@ a.badge-light.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.badge-dark:hover,
-a.badge-dark:focus {
+a.badge-dark:hover, a.badge-dark:focus {
   color: #fff;
   background-color: #00171e;
 }
 
 /* line 11, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_badge.scss */
-a.badge-dark:focus,
-a.badge-dark.focus {
+a.badge-dark:focus, a.badge-dark.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 62, 81, 0.5);
 }
@@ -18135,16 +17822,7 @@ a.badge-dark.focus {
 
 /* line 30, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_progress.scss */
 .progress-bar-striped {
-  background-image: linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.15) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.15) 50%,
-    rgba(255, 255, 255, 0.15) 75%,
-    transparent 75%,
-    transparent
-  );
+  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
   background-size: 1rem 1rem;
 }
 
@@ -18187,8 +17865,7 @@ a.badge-dark.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.list-group-item-action:hover,
-.list-group-item-action:focus {
+.list-group-item-action:hover, .list-group-item-action:focus {
   z-index: 1;
   color: #4b4e52;
   text-decoration: none;
@@ -18225,8 +17902,7 @@ a.badge-dark.focus {
 }
 
 /* line 63, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_list-group.scss */
-.list-group-item.disabled,
-.list-group-item:disabled {
+.list-group-item.disabled, .list-group-item:disabled {
   color: #63666a;
   pointer-events: none;
   background-color: #fff;
@@ -18396,8 +18072,7 @@ a.badge-dark.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.list-group-item-primary.list-group-item-action:hover,
-.list-group-item-primary.list-group-item-action:focus {
+.list-group-item-primary.list-group-item-action:hover, .list-group-item-primary.list-group-item-action:focus {
   color: #003d57;
   background-color: #a5cfe1;
 }
@@ -18416,8 +18091,7 @@ a.badge-dark.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.list-group-item-secondary.list-group-item-action:hover,
-.list-group-item-secondary.list-group-item-action:focus {
+.list-group-item-secondary.list-group-item-action:hover, .list-group-item-secondary.list-group-item-action:focus {
   color: #333537;
   background-color: #c6c7c9;
 }
@@ -18436,8 +18110,7 @@ a.badge-dark.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.list-group-item-success.list-group-item-action:hover,
-.list-group-item-success.list-group-item-action:focus {
+.list-group-item-success.list-group-item-action:hover, .list-group-item-success.list-group-item-action:focus {
   color: #094224;
   background-color: #abd2be;
 }
@@ -18456,8 +18129,7 @@ a.badge-dark.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.list-group-item-info.list-group-item-action:hover,
-.list-group-item-info.list-group-item-action:focus {
+.list-group-item-info.list-group-item-action:hover, .list-group-item-info.list-group-item-action:focus {
   color: #0c5460;
   background-color: #abdde5;
 }
@@ -18476,8 +18148,7 @@ a.badge-dark.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.list-group-item-warning.list-group-item-action:hover,
-.list-group-item-warning.list-group-item-action:focus {
+.list-group-item-warning.list-group-item-action:hover, .list-group-item-warning.list-group-item-action:focus {
   color: #85600f;
   background-color: #ffe3a6;
 }
@@ -18496,8 +18167,7 @@ a.badge-dark.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.list-group-item-danger.list-group-item-action:hover,
-.list-group-item-danger.list-group-item-action:focus {
+.list-group-item-danger.list-group-item-action:hover, .list-group-item-danger.list-group-item-action:focus {
   color: #560520;
   background-color: #dfa7ba;
 }
@@ -18516,8 +18186,7 @@ a.badge-dark.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.list-group-item-light.list-group-item-action:hover,
-.list-group-item-light.list-group-item-action:focus {
+.list-group-item-light.list-group-item-action:hover, .list-group-item-light.list-group-item-action:focus {
   color: #7f7f80;
   background-color: #efefef;
 }
@@ -18536,8 +18205,7 @@ a.badge-dark.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.list-group-item-dark.list-group-item-action:hover,
-.list-group-item-dark.list-group-item-action:focus {
+.list-group-item-dark.list-group-item-action:hover, .list-group-item-dark.list-group-item-action:focus {
   color: #00202a;
   background-color: #a9bec4;
 }
@@ -18557,7 +18225,7 @@ a.badge-dark.focus {
   line-height: 1;
   color: #000;
   text-shadow: 0 1px 0 #fff;
-  opacity: 0.5;
+  opacity: .5;
 }
 
 /* line 13, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
@@ -18567,9 +18235,8 @@ a.badge-dark.focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.close:not(:disabled):not(.disabled):hover,
-.close:not(:disabled):not(.disabled):focus {
-  opacity: 0.75;
+.close:not(:disabled):not(.disabled):hover, .close:not(:disabled):not(.disabled):focus {
+  opacity: .75;
 }
 
 /* line 29, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_close.scss */
@@ -18803,6 +18470,7 @@ a.close.disabled {
   position: relative;
   flex: 1 1 auto;
   padding: 1rem;
+
 }
 
 /* line 167, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_modal.scss */
@@ -18818,12 +18486,12 @@ a.close.disabled {
 
 /* line 176, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_modal.scss */
 .modal-footer > :not(:first-child) {
-  margin-left: 0.25rem;
+  margin-left: .25rem;
 }
 
 /* line 177, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_modal.scss */
 .modal-footer > :not(:last-child) {
-  margin-right: 0.25rem;
+  margin-right: .25rem;
 }
 
 /* line 181, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_modal.scss */
@@ -18925,84 +18593,72 @@ a.close.disabled {
 }
 
 /* line 32, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-top,
-.bs-tooltip-auto[x-placement^="top"] {
+.bs-tooltip-top, .bs-tooltip-auto[x-placement^="top"] {
   padding: 0.4rem 0;
 }
 
 /* line 35, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-top .arrow,
-.bs-tooltip-auto[x-placement^="top"] .arrow {
+.bs-tooltip-top .arrow, .bs-tooltip-auto[x-placement^="top"] .arrow {
   bottom: 0;
 }
 
 /* line 38, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-top .arrow::before,
-.bs-tooltip-auto[x-placement^="top"] .arrow::before {
+.bs-tooltip-top .arrow::before, .bs-tooltip-auto[x-placement^="top"] .arrow::before {
   top: 0;
   border-width: 0.4rem 0.4rem 0;
   border-top-color: #000;
 }
 
 /* line 46, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-right,
-.bs-tooltip-auto[x-placement^="right"] {
+.bs-tooltip-right, .bs-tooltip-auto[x-placement^="right"] {
   padding: 0 0.4rem;
 }
 
 /* line 49, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-right .arrow,
-.bs-tooltip-auto[x-placement^="right"] .arrow {
+.bs-tooltip-right .arrow, .bs-tooltip-auto[x-placement^="right"] .arrow {
   left: 0;
   width: 0.4rem;
   height: 0.8rem;
 }
 
 /* line 54, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-right .arrow::before,
-.bs-tooltip-auto[x-placement^="right"] .arrow::before {
+.bs-tooltip-right .arrow::before, .bs-tooltip-auto[x-placement^="right"] .arrow::before {
   right: 0;
   border-width: 0.4rem 0.4rem 0.4rem 0;
   border-right-color: #000;
 }
 
 /* line 62, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-bottom,
-.bs-tooltip-auto[x-placement^="bottom"] {
+.bs-tooltip-bottom, .bs-tooltip-auto[x-placement^="bottom"] {
   padding: 0.4rem 0;
 }
 
 /* line 65, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-bottom .arrow,
-.bs-tooltip-auto[x-placement^="bottom"] .arrow {
+.bs-tooltip-bottom .arrow, .bs-tooltip-auto[x-placement^="bottom"] .arrow {
   top: 0;
 }
 
 /* line 68, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-bottom .arrow::before,
-.bs-tooltip-auto[x-placement^="bottom"] .arrow::before {
+.bs-tooltip-bottom .arrow::before, .bs-tooltip-auto[x-placement^="bottom"] .arrow::before {
   bottom: 0;
   border-width: 0 0.4rem 0.4rem;
   border-bottom-color: #000;
 }
 
 /* line 76, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-left,
-.bs-tooltip-auto[x-placement^="left"] {
+.bs-tooltip-left, .bs-tooltip-auto[x-placement^="left"] {
   padding: 0 0.4rem;
 }
 
 /* line 79, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-left .arrow,
-.bs-tooltip-auto[x-placement^="left"] .arrow {
+.bs-tooltip-left .arrow, .bs-tooltip-auto[x-placement^="left"] .arrow {
   right: 0;
   width: 0.4rem;
   height: 0.8rem;
 }
 
 /* line 84, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_tooltip.scss */
-.bs-tooltip-left .arrow::before,
-.bs-tooltip-auto[x-placement^="left"] .arrow::before {
+.bs-tooltip-left .arrow::before, .bs-tooltip-auto[x-placement^="left"] .arrow::before {
   left: 0;
   border-width: 0.4rem 0 0.4rem 0.4rem;
   border-left-color: #000;
@@ -19058,8 +18714,7 @@ a.close.disabled {
 }
 
 /* line 27, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.popover .arrow::before,
-.popover .arrow::after {
+.popover .arrow::before, .popover .arrow::after {
   position: absolute;
   display: block;
   content: "";
@@ -19068,42 +18723,36 @@ a.close.disabled {
 }
 
 /* line 38, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-top,
-.bs-popover-auto[x-placement^="top"] {
+.bs-popover-top, .bs-popover-auto[x-placement^="top"] {
   margin-bottom: 0.5rem;
 }
 
 /* line 41, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-top > .arrow,
-.bs-popover-auto[x-placement^="top"] > .arrow {
+.bs-popover-top > .arrow, .bs-popover-auto[x-placement^="top"] > .arrow {
   bottom: calc((0.5rem + 1px) * -1);
 }
 
 /* line 44, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-top > .arrow::before,
-.bs-popover-auto[x-placement^="top"] > .arrow::before {
+.bs-popover-top > .arrow::before, .bs-popover-auto[x-placement^="top"] > .arrow::before {
   bottom: 0;
   border-width: 0.5rem 0.5rem 0;
   border-top-color: rgba(0, 0, 0, 0.25);
 }
 
 /* line 50, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-top > .arrow::after,
-.bs-popover-auto[x-placement^="top"] > .arrow::after {
+.bs-popover-top > .arrow::after, .bs-popover-auto[x-placement^="top"] > .arrow::after {
   bottom: 1px;
   border-width: 0.5rem 0.5rem 0;
   border-top-color: #fff;
 }
 
 /* line 58, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-right,
-.bs-popover-auto[x-placement^="right"] {
+.bs-popover-right, .bs-popover-auto[x-placement^="right"] {
   margin-left: 0.5rem;
 }
 
 /* line 61, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-right > .arrow,
-.bs-popover-auto[x-placement^="right"] > .arrow {
+.bs-popover-right > .arrow, .bs-popover-auto[x-placement^="right"] > .arrow {
   left: calc((0.5rem + 1px) * -1);
   width: 0.5rem;
   height: 1rem;
@@ -19111,52 +18760,45 @@ a.close.disabled {
 }
 
 /* line 67, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-right > .arrow::before,
-.bs-popover-auto[x-placement^="right"] > .arrow::before {
+.bs-popover-right > .arrow::before, .bs-popover-auto[x-placement^="right"] > .arrow::before {
   left: 0;
   border-width: 0.5rem 0.5rem 0.5rem 0;
   border-right-color: rgba(0, 0, 0, 0.25);
 }
 
 /* line 73, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-right > .arrow::after,
-.bs-popover-auto[x-placement^="right"] > .arrow::after {
+.bs-popover-right > .arrow::after, .bs-popover-auto[x-placement^="right"] > .arrow::after {
   left: 1px;
   border-width: 0.5rem 0.5rem 0.5rem 0;
   border-right-color: #fff;
 }
 
 /* line 81, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-bottom,
-.bs-popover-auto[x-placement^="bottom"] {
+.bs-popover-bottom, .bs-popover-auto[x-placement^="bottom"] {
   margin-top: 0.5rem;
 }
 
 /* line 84, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-bottom > .arrow,
-.bs-popover-auto[x-placement^="bottom"] > .arrow {
+.bs-popover-bottom > .arrow, .bs-popover-auto[x-placement^="bottom"] > .arrow {
   top: calc((0.5rem + 1px) * -1);
 }
 
 /* line 87, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-bottom > .arrow::before,
-.bs-popover-auto[x-placement^="bottom"] > .arrow::before {
+.bs-popover-bottom > .arrow::before, .bs-popover-auto[x-placement^="bottom"] > .arrow::before {
   top: 0;
   border-width: 0 0.5rem 0.5rem 0.5rem;
   border-bottom-color: rgba(0, 0, 0, 0.25);
 }
 
 /* line 93, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-bottom > .arrow::after,
-.bs-popover-auto[x-placement^="bottom"] > .arrow::after {
+.bs-popover-bottom > .arrow::after, .bs-popover-auto[x-placement^="bottom"] > .arrow::after {
   top: 1px;
   border-width: 0 0.5rem 0.5rem 0.5rem;
   border-bottom-color: #fff;
 }
 
 /* line 101, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-bottom .popover-header::before,
-.bs-popover-auto[x-placement^="bottom"] .popover-header::before {
+.bs-popover-bottom .popover-header::before, .bs-popover-auto[x-placement^="bottom"] .popover-header::before {
   position: absolute;
   top: 0;
   left: 50%;
@@ -19168,14 +18810,12 @@ a.close.disabled {
 }
 
 /* line 113, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-left,
-.bs-popover-auto[x-placement^="left"] {
+.bs-popover-left, .bs-popover-auto[x-placement^="left"] {
   margin-right: 0.5rem;
 }
 
 /* line 116, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-left > .arrow,
-.bs-popover-auto[x-placement^="left"] > .arrow {
+.bs-popover-left > .arrow, .bs-popover-auto[x-placement^="left"] > .arrow {
   right: calc((0.5rem + 1px) * -1);
   width: 0.5rem;
   height: 1rem;
@@ -19183,16 +18823,14 @@ a.close.disabled {
 }
 
 /* line 122, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-left > .arrow::before,
-.bs-popover-auto[x-placement^="left"] > .arrow::before {
+.bs-popover-left > .arrow::before, .bs-popover-auto[x-placement^="left"] > .arrow::before {
   right: 0;
   border-width: 0.5rem 0 0.5rem 0.5rem;
   border-left-color: rgba(0, 0, 0, 0.25);
 }
 
 /* line 128, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_popover.scss */
-.bs-popover-left > .arrow::after,
-.bs-popover-auto[x-placement^="left"] > .arrow::after {
+.bs-popover-left > .arrow::after, .bs-popover-auto[x-placement^="left"] > .arrow::after {
   right: 1px;
   border-width: 0.5rem 0 0.5rem 0.5rem;
   border-left-color: #fff;
@@ -19339,8 +18977,7 @@ a.close.disabled {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-.carousel-control-prev:hover,
-.carousel-control-prev:focus,
+.carousel-control-prev:hover, .carousel-control-prev:focus,
 .carousel-control-next:hover,
 .carousel-control-next:focus {
   color: #fff;
@@ -19407,7 +19044,7 @@ a.close.disabled {
   background-clip: padding-box;
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent;
-  opacity: 0.5;
+  opacity: .5;
   transition: opacity 0.6s ease;
 }
 
@@ -19451,7 +19088,7 @@ a.close.disabled {
   border: 0.25em solid currentColor;
   border-right-color: transparent;
   border-radius: 50%;
-  animation: spinner-border 0.75s linear infinite;
+  animation: spinner-border .75s linear infinite;
 }
 
 /* line 21, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_spinners.scss */
@@ -19479,7 +19116,7 @@ a.close.disabled {
   background-color: currentColor;
   border-radius: 50%;
   opacity: 0;
-  animation: spinner-grow 0.75s linear infinite;
+  animation: spinner-grow .75s linear infinite;
 }
 
 /* line 52, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_spinners.scss */
@@ -19524,8 +19161,7 @@ a.close.disabled {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.bg-primary:hover,
-a.bg-primary:focus,
+a.bg-primary:hover, a.bg-primary:focus,
 button.bg-primary:hover,
 button.bg-primary:focus {
   background-color: #005275 !important;
@@ -19537,8 +19173,7 @@ button.bg-primary:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.bg-secondary:hover,
-a.bg-secondary:focus,
+a.bg-secondary:hover, a.bg-secondary:focus,
 button.bg-secondary:hover,
 button.bg-secondary:focus {
   background-color: #4a4d50 !important;
@@ -19550,8 +19185,7 @@ button.bg-secondary:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.bg-success:hover,
-a.bg-success:focus,
+a.bg-success:hover, a.bg-success:focus,
 button.bg-success:hover,
 button.bg-success:focus {
   background-color: #0b512d !important;
@@ -19563,8 +19197,7 @@ button.bg-success:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.bg-info:hover,
-a.bg-info:focus,
+a.bg-info:hover, a.bg-info:focus,
 button.bg-info:hover,
 button.bg-info:focus {
   background-color: #117a8b !important;
@@ -19576,8 +19209,7 @@ button.bg-info:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.bg-warning:hover,
-a.bg-warning:focus,
+a.bg-warning:hover, a.bg-warning:focus,
 button.bg-warning:hover,
 button.bg-warning:focus {
   background-color: #e89f00 !important;
@@ -19589,8 +19221,7 @@ button.bg-warning:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.bg-danger:hover,
-a.bg-danger:focus,
+a.bg-danger:hover, a.bg-danger:focus,
 button.bg-danger:hover,
 button.bg-danger:focus {
   background-color: #76072b !important;
@@ -19602,8 +19233,7 @@ button.bg-danger:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.bg-light:hover,
-a.bg-light:focus,
+a.bg-light:hover, a.bg-light:focus,
 button.bg-light:hover,
 button.bg-light:focus {
   background-color: #d8dcdf !important;
@@ -19615,8 +19245,7 @@ button.bg-light:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.bg-dark:hover,
-a.bg-dark:focus,
+a.bg-dark:hover, a.bg-dark:focus,
 button.bg-dark:hover,
 button.bg-dark:focus {
   background-color: #00171e !important;
@@ -20954,8 +20583,7 @@ button.bg-dark:focus {
 }
 
 /* line 24, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_screen-reader.scss */
-.sr-only-focusable:active,
-.sr-only-focusable:focus {
+.sr-only-focusable:active, .sr-only-focusable:focus {
   position: static;
   width: auto;
   height: auto;
@@ -23341,8 +22969,7 @@ button.bg-dark:focus {
 
 /* line 7, ../Github/sm_i2e_common_ui/src/scss/bootstrap/utilities/_text.scss */
 .text-monospace {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace !important;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 }
 
 /* line 11, ../Github/sm_i2e_common_ui/src/scss/bootstrap/utilities/_text.scss */
@@ -23498,8 +23125,7 @@ button.bg-dark:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.text-primary:hover,
-a.text-primary:focus {
+a.text-primary:hover, a.text-primary:focus {
   color: #00405c !important;
 }
 
@@ -23509,8 +23135,7 @@ a.text-primary:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.text-secondary:hover,
-a.text-secondary:focus {
+a.text-secondary:hover, a.text-secondary:focus {
   color: #3e4042 !important;
 }
 
@@ -23520,8 +23145,7 @@ a.text-secondary:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.text-success:hover,
-a.text-success:focus {
+a.text-success:hover, a.text-success:focus {
   color: #083b21 !important;
 }
 
@@ -23531,8 +23155,7 @@ a.text-success:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.text-info:hover,
-a.text-info:focus {
+a.text-info:hover, a.text-info:focus {
   color: #0f6674 !important;
 }
 
@@ -23542,8 +23165,7 @@ a.text-info:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.text-warning:hover,
-a.text-warning:focus {
+a.text-warning:hover, a.text-warning:focus {
   color: #cf8e00 !important;
 }
 
@@ -23553,8 +23175,7 @@ a.text-warning:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.text-danger:hover,
-a.text-danger:focus {
+a.text-danger:hover, a.text-danger:focus {
   color: #5e0622 !important;
 }
 
@@ -23564,8 +23185,7 @@ a.text-danger:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.text-light:hover,
-a.text-light:focus {
+a.text-light:hover, a.text-light:focus {
   color: #cacfd4 !important;
 }
 
@@ -23575,8 +23195,7 @@ a.text-light:focus {
 }
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
-a.text-dark:hover,
-a.text-dark:focus {
+a.text-dark:hover, a.text-dark:focus {
   color: #000305 !important;
 }
 
@@ -23742,7 +23361,7 @@ a.text-dark:focus {
 
 /* line 9, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
 #i2eHeader {
-  padding: 0.8rem 1rem;
+  padding: .8rem 1rem;
   background: #013b51 url("../images/I2E_Header-BG.png") no-repeat center;
   background-size: cover;
   border-bottom: #40c1ac 5px solid;
@@ -23778,8 +23397,7 @@ a.text-dark:focus {
 }
 
 /* line 34, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
-#i2eHeader .navbar-toggler:hover,
-#i2eHeader .navbar-toggler:focus {
+#i2eHeader .navbar-toggler:hover, #i2eHeader .navbar-toggler:focus {
   background: #0076a8;
 }
 
@@ -23791,7 +23409,7 @@ a.text-dark:focus {
 /* line 41, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
 #i2eHeader .appName {
   color: #fff;
-  font-family: "Montserrat", sans-serif;
+  font-family: "Montserrat",sans-serif;
   font-weight: 700;
   text-shadow: 2px 2px 2px #003e51;
   font-size: 1.1rem;
@@ -23820,9 +23438,9 @@ a.text-dark:focus {
 
 /* line 64, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
 #i2eHeader .navbar-collapse.show {
-  padding-top: 0.3rem;
+  padding-top: .3rem;
   border-top: 1px solid rgba(255, 255, 255, 0.5);
-  margin-top: 0.8rem;
+  margin-top: .8rem;
   transition: all 200ms;
 }
 
@@ -23836,14 +23454,14 @@ a.text-dark:focus {
 /* line 75, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
 #i2eHeader .navbar-collapse .nav-item .nav-link:hover {
   box-shadow: inset 0 -0.2rem #40c1ac;
-  transition: box-shadow 0.2s, color 0.2s;
+  transition: box-shadow .2s, color .2s;
 }
 
 /* line 80, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
 #i2eHeader .navbar-collapse .nav-item .navbar-text {
   color: white;
   font-size: 0.7875rem;
-  padding: 0.5rem;
+  padding: .5rem;
 }
 
 /* line 86, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
@@ -23859,7 +23477,7 @@ a.text-dark:focus {
 
 /* line 95, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
 #i2eHeader .navbar-collapse .nav-item.change-user .dropdown-menu {
-  padding: 0.5rem 1rem 1rem 1rem;
+  padding: .5rem 1rem 1rem 1rem;
   min-width: 18rem;
 }
 
@@ -23872,7 +23490,7 @@ a.text-dark:focus {
   /* line 103, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
   #i2eHeader .navbar-collapse .nav-item.change-user a {
     font-size: 1.2rem;
-    padding: 0.2rem 0.5rem;
+    padding: .2rem .5rem;
   }
 }
 
@@ -23890,8 +23508,7 @@ a.text-dark:focus {
 
 @media (min-width: 768px) {
   /* line 122, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
-  #i2eHeader .navbar-collapse.show,
-  #i2eHeader .navbar-collapse {
+  #i2eHeader .navbar-collapse.show, #i2eHeader .navbar-collapse {
     padding-top: 0rem;
     border-top: none;
     margin-top: 0rem;
@@ -23926,8 +23543,7 @@ a.text-dark:focus {
 }
 
 /* line 145, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
-#secondNav ul.nav li.nav-item a.nav-link:hover,
-#secondNav ul.nav li.nav-item a.nav-link:focus {
+#secondNav ul.nav li.nav-item a.nav-link:hover, #secondNav ul.nav li.nav-item a.nav-link:focus {
   background: #f4f5f6;
 }
 
@@ -23956,11 +23572,7 @@ a.text-dark:focus {
 }
 
 /* line 173, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
-#secondNav .scrtabs-tab-container,
-#secondNav .scrtabs-tabs-fixed-container,
-#secondNav ul.nav,
-#secondNav li.nav-item,
-#secondNav a.nav-link {
+#secondNav .scrtabs-tab-container, #secondNav .scrtabs-tabs-fixed-container, #secondNav ul.nav, #secondNav li.nav-item, #secondNav a.nav-link {
   height: 2.4rem;
 }
 
@@ -23979,46 +23591,34 @@ a.text-dark:focus {
   font-size: 0.9rem;
   padding: 0.55rem 0.5rem;
   color: #0076a8;
-  transition: box-shadow 0.6s ease, color 0.2s ease;
+  transition: box-shadow .6s ease, color .2s ease;
 }
 
 /* line 188, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
-#secondNav .scrtabs-tab-container .scrtabs-tab-scroll-arrow:hover,
-#secondNav .scrtabs-tab-container .scrtabs-tab-scroll-arrow:focus {
+#secondNav .scrtabs-tab-container .scrtabs-tab-scroll-arrow:hover, #secondNav .scrtabs-tab-container .scrtabs-tab-scroll-arrow:focus {
   background-color: #f4f5f6;
   color: #003e51;
 }
 
 /* line 192, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
-#secondNav
-  .scrtabs-tab-container
-  .scrtabs-tab-scroll-arrow.scrtabs-tab-scroll-arrow-right {
+#secondNav .scrtabs-tab-container .scrtabs-tab-scroll-arrow.scrtabs-tab-scroll-arrow-right {
   border-left: 1px solid #dbdde0;
   text-align: right;
   box-shadow: 7px 0px 15px 15px rgba(0, 0, 0, 0.2);
-  clip-path: polygon(
-    calc(100% - 70px) 0px,
-    100% 0,
-    100% 100%,
-    calc(100% - 70px) 100%
-  );
+  clip-path: polygon(calc(100% - 70px) 0px, 100% 0, 100% 100%, calc(100% - 70px) 100%);
   margin-left: auto;
 }
 
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
   /* line 192, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
-  #secondNav
-    .scrtabs-tab-container
-    .scrtabs-tab-scroll-arrow.scrtabs-tab-scroll-arrow-right {
+  #secondNav .scrtabs-tab-container .scrtabs-tab-scroll-arrow.scrtabs-tab-scroll-arrow-right {
     clip-path: none !important;
     box-shadow: -5px 0px 10px -3px rgba(0, 0, 0, 0.2);
   }
 }
 
 /* line 204, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
-#secondNav
-  .scrtabs-tab-container
-  .scrtabs-tab-scroll-arrow.scrtabs-tab-scroll-arrow-left {
+#secondNav .scrtabs-tab-container .scrtabs-tab-scroll-arrow.scrtabs-tab-scroll-arrow-left {
   border-right: 1px solid #dbdde0;
   text-align: left;
   box-shadow: -7px 0px 15px 15px rgba(0, 0, 0, 0.2);
@@ -24028,9 +23628,7 @@ a.text-dark:focus {
 
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
   /* line 204, ../Github/sm_i2e_common_ui/src/scss/custom/_header.scss */
-  #secondNav
-    .scrtabs-tab-container
-    .scrtabs-tab-scroll-arrow.scrtabs-tab-scroll-arrow-left {
+  #secondNav .scrtabs-tab-container .scrtabs-tab-scroll-arrow.scrtabs-tab-scroll-arrow-left {
     clip-path: none !important;
     box-shadow: 5px 0px 10px -3px rgba(0, 0, 0, 0.2);
   }
@@ -24064,24 +23662,21 @@ textarea ~ .counter {
 }
 
 /* line 20, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.form-control:disabled,
-.form-control[readonly] {
+.form-control:disabled, .form-control[readonly] {
   background-color: #eee;
   color: #4b4e52;
 }
 
 /* line 26, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-label,
-.like-label {
+label, .like-label {
   display: block;
   font-weight: bold;
   line-height: 1.1;
-  margin-bottom: 0.3rem;
+  margin-bottom: .3rem;
 }
 
 /* line 31, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-label .optional,
-.like-label .optional {
+label .optional, .like-label .optional {
   font-weight: normal;
   color: #63666a;
   font-style: italic;
@@ -24104,19 +23699,15 @@ label .optional,
   color: #272a2b;
   line-height: 1.3;
   padding: 0.375rem 0.75rem;
-  /*max-width: 250px;*/
+  max-width: 250px;
   /*overflow: visible !important;*/
   /*white-space: break-spaces !important;*/
 }
 
 /* line 52, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.select2-container
-  .selection
-  .select2-selection
-  .select2-selection__rendered
-  .select2-selection__clear {
-  width: calc(calc(1.3em + 0.75rem) - (0.375rem * 2));
-  height: calc(calc(1.3em + 0.75rem) - (0.375rem * 2));
+.select2-container .selection .select2-selection .select2-selection__rendered .select2-selection__clear {
+  width: calc( calc(1.3em + 0.75rem) - ( 0.375rem * 2 ));
+  height: calc( calc(1.3em + 0.75rem) - ( 0.375rem * 2 ));
   background: #f4f5f6;
   position: absolute;
   right: 1.5rem;
@@ -24126,11 +23717,7 @@ label .optional,
 }
 
 /* line 61, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.select2-container
-  .selection
-  .select2-selection
-  .select2-selection__rendered
-  .select2-selection__clear:hover {
+.select2-container .selection .select2-selection .select2-selection__rendered .select2-selection__clear:hover {
   color: #272a2b;
   background-color: #dbdde0;
 }
@@ -24142,66 +23729,40 @@ label .optional,
 }
 
 /* line 70, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.select2-container
-  .selection
-  .select2-selection.select2-selection--multiple
-  .select2-selection__rendered {
+.select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered {
   padding: 0.25rem 0.75rem 0rem 0.75rem;
   height: 100%;
 }
 
 /* line 73, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.select2-container
-  .selection
-  .select2-selection.select2-selection--multiple
-  .select2-selection__rendered
-  .select2-selection__choice {
+.select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
   margin-top: 0rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: .25rem;
   background: #e5f6ff;
   border-color: #94dbff;
   padding: 1px 5px 1px 2px;
 }
 
 /* line 79, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.select2-container
-  .selection
-  .select2-selection.select2-selection--multiple
-  .select2-selection__rendered
-  .select2-selection__choice
-  .select2-selection__choice__remove {
+.select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered .select2-selection__choice .select2-selection__choice__remove {
   color: #0076a8;
-  padding: 0 0.25rem;
+  padding: 0 .25rem;
   margin-right: 0px;
 }
 
 /* line 83, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.select2-container
-  .selection
-  .select2-selection.select2-selection--multiple
-  .select2-selection__rendered
-  .select2-selection__choice
-  .select2-selection__choice__remove:hover {
+.select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered .select2-selection__choice .select2-selection__choice__remove:hover {
   color: #003e51;
 }
 
 /* line 88, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.select2-container
-  .selection
-  .select2-selection.select2-selection--multiple
-  .select2-selection__rendered
-  .select2-search
-  .select2-search__field {
+.select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered .select2-search .select2-search__field {
   margin-top: 2px;
 }
 
 /* line 91, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.select2-container
-  .selection
-  .select2-selection.select2-selection--multiple
-  .select2-selection__rendered
-  .select2-selection__clear {
-  right: 0.5rem;
+.select2-container .selection .select2-selection.select2-selection--multiple .select2-selection__rendered .select2-selection__clear {
+  right: .5rem;
   cursor: pointer;
   float: unset;
   font-weight: bold;
@@ -24233,8 +23794,8 @@ label .optional,
 
 /* line 118, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .select2-container .selection .select2-selection__arrow b:before {
-  content: "\f0d7";
-  font-family: "Font Awesome 5 Pro";
+  content: '\f0d7';
+  font-family: 'Font Awesome 5 Pro';
   display: inline-block;
   color: #63666a;
 }
@@ -24270,18 +23831,12 @@ label .optional,
 }
 
 /* line 156, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-select.is-invalid ~ span.select2-container .selection .select2-selection,
-select:invalid ~ span.select2-container .selection .select2-selection {
+select.is-invalid ~ span.select2-container .selection .select2-selection, select:invalid ~ span.select2-container .selection .select2-selection {
   border-color: #a60a3d;
 }
 
 /* line 160, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-select.is-invalid
-  ~ span.select2-container.select2-container--focus
-  .select2-selection,
-select:invalid
-  ~ span.select2-container.select2-container--focus
-  .select2-selection {
+select.is-invalid ~ span.select2-container.select2-container--focus .select2-selection, select:invalid ~ span.select2-container.select2-container--focus .select2-selection {
   box-shadow: 0 0 0 0.2rem rgba(166, 10, 61, 0.25);
 }
 
@@ -24295,38 +23850,18 @@ select:invalid
 }
 
 /* line 175, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.input-group
-  ng-select2:not(:first-of-type)
-  .select2-container--default
-  .select2-selection--single {
+.input-group ng-select2:not(:first-of-type) .select2-container--default .select2-selection--single {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   margin-left: -1px;
 }
 
 /* line 182, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.input-group
-  ng-select2:not(:last-of-type)
-  .select2-container--default
-  .select2-selection--single {
+.input-group ng-select2:not(:last-of-type) .select2-container--default .select2-selection--single {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-ul.select2-selection__rendered {
-  padding-right: 30px !important;
-}
-
-ul.select2-selection__rendered:after {
-  content: "";
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  border-top: 5px solid #333;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-}
 /* line 189, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .input-group .input-group-text:not(:first-child) {
   border-top-left-radius: 0;
@@ -24344,8 +23879,8 @@ ul.select2-selection__rendered:after {
 .input-group-readonly input {
   display: block;
   width: 100%;
-  padding-top: 0.375rem;
-  padding-bottom: 0.375rem;
+  padding-top: .375rem;
+  padding-bottom: .375rem;
   margin-bottom: 0;
   line-height: 1.5;
   color: #272a2b;
@@ -24362,7 +23897,7 @@ ul.select2-selection__rendered:after {
 /* line 224, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input {
   position: absolute;
-  margin-top: 0.3rem;
+  margin-top: .3rem;
   margin-left: -1.25rem;
   z-index: -1;
   opacity: 0;
@@ -24380,17 +23915,17 @@ ul.select2-selection__rendered:after {
 
 /* line 239, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input ~ label:before {
-  font-family: "Font Awesome 5 Pro";
+  font-family: 'Font Awesome 5 Pro';
   font-weight: 400;
   display: inline-block;
   margin-left: -1.2rem;
-  margin-right: 0.3rem;
+  margin-right: .3rem;
   color: #272a2b;
   width: 1rem;
   height: 1.1rem;
   font-size: 1rem;
   line-height: 1.1rem;
-  border-radius: 0.2rem;
+  border-radius: .2rem;
   text-align: center;
   transition: box-shadow 0.15s ease-in-out;
 }
@@ -24403,8 +23938,7 @@ ul.select2-selection__rendered:after {
 
 /* line 258, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input:focus ~ label:before {
-  box-shadow: 0 0 0 0.1rem rgba(0, 118, 168, 0.25),
-    inset 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
+  box-shadow: 0 0 0 0.1rem rgba(0, 118, 168, 0.25), inset 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
 }
 
 /* line 261, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
@@ -24414,32 +23948,31 @@ ul.select2-selection__rendered:after {
 
 /* line 265, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="radio"] ~ label:before {
-  content: "\f111";
+  content: '\f111';
   border-radius: 1rem;
   width: 1.1rem;
 }
 
 /* line 270, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="radio"]:checked ~ label:before {
-  content: "\f192";
+  content: '\f192';
 }
 
 /* line 275, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="checkbox"] ~ label:before {
-  content: "\f0c8";
+  content: '\f0c8';
 }
 
 /* line 278, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
 .form-check input[type="checkbox"]:checked ~ label:before {
-  content: "\f14a";
+  content: '\f14a';
 }
 
 /* line 286, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.form-check-inline input,
-.form-inline .form-check input {
+.form-check-inline input, .form-inline .form-check input {
   position: static;
   margin-top: 0;
-  margin-right: 0.3125rem;
+  margin-right: .3125rem;
   margin-left: 0;
 }
 
@@ -24485,11 +24018,10 @@ ul.select2-selection__rendered:after {
   max-width: none;
   display: block;
   width: 100%;
-  margin-bottom: 0rem;
+  margin-bottom: .0rem;
   margin-top: -1.5rem;
   margin-left: -1rem;
-  text-shadow: 1px 1px 0px #fff, 1px -1px 0px #fff, -1px -1px 0px #fff,
-    -1px 1px 0px #fff;
+  text-shadow: 1px 1px 0px #fff, 1px -1px 0px #fff, -1px -1px 0px #fff, -1px 1px 0px #fff;
   margin-right: 0rem;
 }
 
@@ -24499,8 +24031,8 @@ ul.select2-selection__rendered:after {
     width: auto;
     max-width: 4rem;
     display: inline-block;
-    margin-top: 0.15rem;
-    margin-right: 0.5rem;
+    margin-top: .15rem;
+    margin-right: .5rem;
   }
 }
 
@@ -24510,8 +24042,7 @@ ul.select2-selection__rendered:after {
 }
 
 /* line 345, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.grant-number-container #grantNumberIC,
-.grant-number-container #grantNumberYear {
+.grant-number-container #grantNumberIC, .grant-number-container #grantNumberYear {
   width: calc(1.5rem + (0.9rem * 2));
 }
 
@@ -24544,8 +24075,7 @@ ul.select2-selection__rendered:after {
 }
 
 /* line 367, ../Github/sm_i2e_common_ui/src/scss/custom/_forms.scss */
-.grant-number-container .btn-clear-fields:hover,
-.grant-number-container .btn-clear-fields:focus {
+.grant-number-container .btn-clear-fields:hover, .grant-number-container .btn-clear-fields:focus {
   background: #383d40;
 }
 
@@ -24603,17 +24133,16 @@ ul.select2-selection__rendered:after {
 }
 
 /* line 39, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-link:hover,
-.btn-link:focus {
+.btn-link:hover, .btn-link:focus {
   background-color: rgba(0, 118, 168, 0.1);
   transition: all 0.2s, color 0.2s !important;
 }
 
 /* line 46, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
 .btn-back {
-  margin-left: -0.5rem;
-  margin-top: -0.3rem;
-  margin-bottom: 0.4rem;
+  margin-left: -.5rem;
+  margin-top: -.3rem;
+  margin-bottom: .4rem;
 }
 
 /* line 53, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
@@ -24624,7 +24153,7 @@ ul.select2-selection__rendered:after {
 
 /* line 58, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
 .btn-slim {
-  padding: 0.2rem 0.3rem;
+  padding: .2rem .3rem;
 }
 
 /* line 63, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
@@ -24633,8 +24162,7 @@ ul.select2-selection__rendered:after {
 }
 
 /* line 65, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-delete.btn-link:hover,
-.btn-delete.btn-link:focus {
+.btn-delete.btn-link:hover, .btn-delete.btn-link:focus {
   background-color: rgba(166, 10, 61, 0.1);
   transition: all 0.2s, color 0.2s !important;
 }
@@ -24645,8 +24173,7 @@ ul.select2-selection__rendered:after {
 }
 
 /* line 75, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-link.btn-link-warning:hover,
-.btn-link.btn-link-warning:focus {
+.btn-link.btn-link-warning:hover, .btn-link.btn-link-warning:focus {
   background-color: rgba(255, 184, 28, 0.1);
   transition: all 0.2s, color 0.2s !important;
 }
@@ -24657,8 +24184,7 @@ ul.select2-selection__rendered:after {
 }
 
 /* line 82, ../Github/sm_i2e_common_ui/src/scss/custom/_buttons.scss */
-.btn-link.btn-link-danger:hover,
-.btn-link.btn-link-danger:focus {
+.btn-link.btn-link-danger:hover, .btn-link.btn-link-danger:focus {
   background-color: rgba(166, 10, 61, 0.1);
   transition: all 0.2s, color 0.2s !important;
 }
@@ -24669,7 +24195,7 @@ ul.select2-selection__rendered:after {
 }
 
 /* line 7, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-.table-striped-reverse tbody tr:nth-of-type(2n + 1) {
+.table-striped-reverse tbody tr:nth-of-type(2n+1) {
   background-color: transparent;
 }
 
@@ -24717,9 +24243,9 @@ table.dataTable thead th.no-sort:after {
 }
 
 /* line 45, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-/*table.dataTable thead th:not(.select-checkbox):before {*/
-/*  content: none !important;*/
-/*}*/
+table.dataTable thead th:not(.select-checkbox):before {
+  content: none !important;
+}
 
 /* line 51, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr.odd {
@@ -24752,7 +24278,7 @@ table.dataTable tbody tr td {
 
 /* line 71, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr td.child {
-  padding: 0.3rem 0.75rem 0.4rem 0.75rem;
+  padding: .3rem .75rem .4rem .75rem;
 }
 
 /* line 73, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
@@ -24763,7 +24289,7 @@ table.dataTable tbody tr td.child ul.dtr-details {
 /* line 75, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr td.child ul.dtr-details li {
   width: 100%;
-  padding: 0.4rem 0;
+  padding: .4rem 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
@@ -24774,7 +24300,7 @@ table.dataTable tbody tr td.child ul.dtr-details li:last-child {
 
 /* line 82, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable tbody tr td.child ul.dtr-details li span.dtr-title {
-  margin-right: 0.3rem;
+  margin-right: .3rem;
   min-width: unset;
 }
 
@@ -24783,29 +24309,24 @@ table.dataTable tbody tr td.child ul.dtr-details li span.dtr-title {
   background-color: inherit !important;
 }
 
-table.dataTable.hover tbody tr:hover,
-table.dataTable.display tbody tr:hover {
+table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   background-color: #ffffff !important;
 }
 
-table.dataTable.hover tbody tr.odd .foaTable tr:hover,
-table.dataTable.display tbody tr.odd .foaTable tr:hover {
+table.dataTable.hover tbody tr.odd .foaTable tr:hover, table.dataTable.display tbody tr.odd .foaTable tr:hover {
   background-color: #f4f5f6 !important;
 }
 
-table.dataTable.hover tbody tr .foaTable tr:hover,
-table.dataTable.display tbody tr .foaTable tr:hover {
+table.dataTable.hover tbody tr .foaTable tr:hover, table.dataTable.display tbody tr .foaTable tr:hover {
   background-color: #ffffff !important;
 }
 
-table.dataTable.hover tbody tr.odd:hover,
-table.dataTable.display tbody tr.odd:hover {
+table.dataTable.hover tbody tr.odd:hover, table.dataTable.display tbody tr.odd:hover {
   background-color: #f4f5f6 !important;
 }
 
 /* line 98, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable.dtr-column td.control,
-table.dataTable.dtr-column th.control {
+table.dataTable.dtr-column td.control, table.dataTable.dtr-column th.control {
   border-left-width: 0px;
 }
 
@@ -24813,7 +24334,7 @@ table.dataTable.dtr-column th.control {
 table.dataTable.dtr-column tbody tr > td.control:before {
   font-family: "Font Awesome 5 Pro";
   font-weight: 900;
-  content: "\f055";
+  content: '\f055';
   color: #003e51;
   background-color: transparent;
   border: none;
@@ -24836,7 +24357,7 @@ table.dataTable.dtr-column tbody tr > td.control:hover:before {
 
 /* line 126, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
 table.dataTable.dtr-column tbody tr.parent > td.control:before {
-  content: "\f056";
+  content: '\f056';
   color: #82858a;
   background-color: #fff;
 }
@@ -24883,12 +24404,8 @@ div.dataTables_wrapper .table-controls div.dataTables_length label {
 }
 
 /* line 163, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-div.dataTables_wrapper
-  .table-controls
-  div.dataTables_length
-  label
-  .form-control {
-  padding: 0.25rem 0.3rem;
+div.dataTables_wrapper .table-controls div.dataTables_length label .form-control {
+  padding: .25rem 0.3rem;
 }
 
 /* line 169, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
@@ -24904,64 +24421,45 @@ div.dataTables_wrapper .table-controls ul.pagination .page-item .page-link {
 }
 
 /* line 176, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-div.dataTables_wrapper
-  .table-controls
-  ul.pagination
-  .page-item
-  .page-link:hover {
+div.dataTables_wrapper .table-controls ul.pagination .page-item .page-link:hover {
   background-color: #f4f5f6;
   color: #003e51;
 }
 
 /* line 182, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-div.dataTables_wrapper
-  .table-controls
-  ul.pagination
-  .page-item.disabled
-  .page-link {
+div.dataTables_wrapper .table-controls ul.pagination .page-item.disabled .page-link {
   background-color: #f4f5f6;
   color: #a3a6ad;
 }
 
 /* line 188, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-div.dataTables_wrapper
-  .table-controls
-  ul.pagination
-  .page-item.active
-  .page-link {
+div.dataTables_wrapper .table-controls ul.pagination .page-item.active .page-link {
   color: #fff;
   background-color: #63666a;
   border-color: #63666a;
 }
 
 /* line 192, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-div.dataTables_wrapper
-  .table-controls
-  ul.pagination
-  .page-item.active
-  .page-link:hover {
+div.dataTables_wrapper .table-controls ul.pagination .page-item.active .page-link:hover {
   background-color: #4b4e52;
   border-color: #4b4e52;
 }
 
 /* line 204, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr .select-checkbox,
-table.dataTable thead tr .select-checkbox {
+table.dataTable tbody tr .select-checkbox, table.dataTable thead tr .select-checkbox {
   text-align: center;
 }
 
 /* line 206, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr .select-checkbox:hover,
-table.dataTable thead tr .select-checkbox:hover {
+table.dataTable tbody tr .select-checkbox:hover, table.dataTable thead tr .select-checkbox:hover {
   cursor: pointer;
 }
 
 /* line 209, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr .select-checkbox:before,
-table.dataTable thead tr .select-checkbox:before {
+table.dataTable tbody tr .select-checkbox:before, table.dataTable thead tr .select-checkbox:before {
   font-family: "Font Awesome 5 Pro";
   font-weight: 400;
-  content: "\f0c8";
+  content: '\f0c8';
   border: none;
   color: #82858a;
   position: unset;
@@ -24974,116 +24472,87 @@ table.dataTable thead tr .select-checkbox:before {
   font-size: 1rem;
   line-height: 1rem;
   display: inline-block;
-  border-radius: 0.2rem;
+  border-radius: .2rem;
 }
 
 /* line 227, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr .select-checkbox.selected:before,
-table.dataTable thead tr .select-checkbox.selected:before {
+table.dataTable tbody tr .select-checkbox.selected:before, table.dataTable thead tr .select-checkbox.selected:before {
   color: #003e51;
   font-family: "Font Awesome 5 Pro";
   font-weight: 900;
-  content: "\f14a";
+  content: '\f14a';
 }
 
 /* line 233, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr .select-checkbox:focus:before,
-table.dataTable thead tr .select-checkbox:focus:before {
-  box-shadow: 0 0 0 0.1rem rgba(0, 118, 168, 0.25),
-    inset 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
+table.dataTable tbody tr .select-checkbox:focus:before, table.dataTable thead tr .select-checkbox:focus:before {
+  box-shadow: 0 0 0 0.1rem rgba(0, 118, 168, 0.25), inset 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
 }
 
 /* line 237, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected,
-table.dataTable thead tr.selected {
+table.dataTable tbody tr.selected, table.dataTable thead tr.selected {
   color: #333;
 }
 
 /* line 239, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected.even,
-table.dataTable thead tr.selected.even {
+table.dataTable tbody tr.selected.even, table.dataTable thead tr.selected.even {
   background-color: #e5f6ff;
 }
 
 /* line 241, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected.even + tr.child,
-table.dataTable tbody tr.selected.even + tr.child:hover,
-table.dataTable thead tr.selected.even + tr.child,
-table.dataTable thead tr.selected.even + tr.child:hover {
+table.dataTable tbody tr.selected.even + tr.child, table.dataTable tbody tr.selected.even + tr.child:hover, table.dataTable thead tr.selected.even + tr.child, table.dataTable thead tr.selected.even + tr.child:hover {
   background-color: #e5f6ff !important;
 }
 
 /* line 245, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected.odd,
-table.dataTable thead tr.selected.odd {
+table.dataTable tbody tr.selected.odd, table.dataTable thead tr.selected.odd {
   background-color: #a8e5ff !important;
 }
 
 /* line 247, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected.odd + tr.child,
-table.dataTable tbody tr.selected.odd + tr.child:hover,
-table.dataTable thead tr.selected.odd + tr.child,
-table.dataTable thead tr.selected.odd + tr.child:hover {
+table.dataTable tbody tr.selected.odd + tr.child, table.dataTable tbody tr.selected.odd + tr.child:hover, table.dataTable thead tr.selected.odd + tr.child, table.dataTable thead tr.selected.odd + tr.child:hover {
   background-color: #a8e5ff !important;
 }
 
 /* line 251, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected a,
-table.dataTable thead tr.selected a {
+table.dataTable tbody tr.selected a, table.dataTable thead tr.selected a {
   color: #0076a8;
 }
 
 /* line 253, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected a.btn-primary,
-table.dataTable tbody tr.selected a.btn-danger,
-table.dataTable tbody tr.selected a.btn-secondary,
-table.dataTable tbody tr.selected a.btn-success,
-table.dataTable tbody tr.selected a.btn-dark,
-table.dataTable thead tr.selected a.btn-primary,
-table.dataTable thead tr.selected a.btn-danger,
-table.dataTable thead tr.selected a.btn-secondary,
-table.dataTable thead tr.selected a.btn-success,
-table.dataTable thead tr.selected a.btn-dark {
+table.dataTable tbody tr.selected a.btn-primary, table.dataTable tbody tr.selected a.btn-danger, table.dataTable tbody tr.selected a.btn-secondary, table.dataTable tbody tr.selected a.btn-success, table.dataTable tbody tr.selected a.btn-dark, table.dataTable thead tr.selected a.btn-primary, table.dataTable thead tr.selected a.btn-danger, table.dataTable thead tr.selected a.btn-secondary, table.dataTable thead tr.selected a.btn-success, table.dataTable thead tr.selected a.btn-dark {
   color: white;
 }
 
 /* line 256, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected a.btn-outline-primary,
-table.dataTable thead tr.selected a.btn-outline-primary {
+table.dataTable tbody tr.selected a.btn-outline-primary, table.dataTable thead tr.selected a.btn-outline-primary {
   color: #0076a8;
 }
 
 /* line 259, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected a.btn-outline-secondary,
-table.dataTable thead tr.selected a.btn-outline-secondary {
+table.dataTable tbody tr.selected a.btn-outline-secondary, table.dataTable thead tr.selected a.btn-outline-secondary {
   color: #63666a;
 }
 
 /* line 264, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected .select-checkbox:before,
-table.dataTable thead tr.selected .select-checkbox:before {
+table.dataTable tbody tr.selected .select-checkbox:before, table.dataTable thead tr.selected .select-checkbox:before {
   font-family: "Font Awesome 5 Pro";
   font-weight: 900;
-  content: "\f14a";
+  content: '\f14a';
   color: #003e51;
 }
 
 /* line 270, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected .select-checkbox:after,
-table.dataTable thead tr.selected .select-checkbox:after {
+table.dataTable tbody tr.selected .select-checkbox:after, table.dataTable thead tr.selected .select-checkbox:after {
   content: none;
 }
 
 /* line 273, ../Github/sm_i2e_common_ui/src/scss/custom/_tables.scss */
-table.dataTable tbody tr.selected .select-checkbox:focus:before,
-table.dataTable thead tr.selected .select-checkbox:focus:before {
-  box-shadow: 0 0 0 0.1rem rgba(0, 118, 168, 0.25),
-    inset 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
+table.dataTable tbody tr.selected .select-checkbox:focus:before, table.dataTable thead tr.selected .select-checkbox:focus:before {
+  box-shadow: 0 0 0 0.1rem rgba(0, 118, 168, 0.25), inset 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
 }
 
 /* line 4, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-body,
-body > app-root {
+body, body > app-root {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
@@ -25093,7 +24562,7 @@ body > app-root {
 
 /* line 12, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 main {
-  margin: 0.9rem 0rem 2rem 0rem;
+  margin: .9rem 0rem 2rem 0rem;
 }
 
 /* line 16, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
@@ -25102,8 +24571,7 @@ main {
 }
 
 /* line 21, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-a:focus,
-a:hover {
+a:focus, a:hover {
   text-decoration: none !important;
 }
 
@@ -25146,10 +24614,10 @@ code {
 
 /* line 56, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .external-link:after {
-  content: "\f35d";
-  font-family: "Font Awesome 5 Pro";
+  content: '\f35d';
+  font-family: 'Font Awesome 5 Pro';
   display: inline-block;
-  margin-left: 0.15rem;
+  margin-left: .15rem;
   font-size: 55%;
   transform: translate(0%, -50%);
 }
@@ -25165,7 +24633,7 @@ code {
 .footer p {
   text-align: center;
   color: #fff;
-  font-size: 0.8rem;
+  font-size: .8rem;
 }
 
 /* line 74, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
@@ -25176,29 +24644,29 @@ code {
 /* line 76, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .footer ul li {
   color: #fff;
-  font-size: 0.8rem;
+  font-size: .8rem;
 }
 
 /* line 79, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .footer ul li a {
   color: #fff;
-  font-size: 0.8rem;
+  font-size: .8rem;
 }
 
 /* line 82, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .footer ul li a:hover {
   text-decoration: none;
   box-shadow: 0 0.15rem #40c1ac;
-  transition: box-shadow 0.2s, color 0.2s;
+  transition: box-shadow .2s, color .2s;
 }
 
 /* line 88, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .footer ul li:not(:last-child):after {
-  content: "";
+  content: '';
   display: inline-block;
   position: relative;
-  margin-left: 0.8rem;
-  top: 0.2rem;
+  margin-left: .8rem;
+  top: .2rem;
   width: 1px;
   height: 1rem;
   background: rgba(255, 255, 255, 0.6);
@@ -25225,13 +24693,13 @@ code {
 
 /* line 124, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .list-group.list-group-flush .list-group-item {
-  padding: 0.3rem 0.2rem;
+  padding: 0.3rem .2rem;
   border: none;
 }
 
 /* line 127, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .list-group.list-group-flush .list-group-item.lvl2 {
-  padding-left: 0.9rem;
+  padding-left: .9rem;
 }
 
 /* line 130, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
@@ -25253,7 +24721,7 @@ code {
 
 /* line 145, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .list-inline li:not(:last-child) {
-  margin-right: 0.5rem;
+  margin-right: .5rem;
 }
 
 /* line 151, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
@@ -25284,18 +24752,17 @@ code {
   font-size: 1.1rem;
   font-family: "Montserrat", sans-serif;
   font-weight: 700 !important;
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
   display: inline-block;
 }
 
 /* line 180, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .alert p {
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
 }
 
 /* line 183, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-.alert a:hover,
-.alert a:focus {
+.alert a:hover, .alert a:focus {
   text-decoration: underline !important;
 }
 
@@ -25308,19 +24775,19 @@ ul.no-bullets {
 #back-to-top {
   display: none;
   position: fixed;
-  bottom: 0.7rem;
-  right: 0.8rem;
+  bottom: .7rem;
+  right: .8rem;
   z-index: 1090;
   cursor: pointer;
-  font-size: 0.7rem;
-  padding: 0.6rem 0.6rem 0.5rem 0.6rem;
+  font-size: .7rem;
+  padding: 0.6rem 0.6rem 0.5rem .6rem;
   border-radius: 0.8rem;
   line-height: 0.7rem;
 }
 
 /* line 206, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #back-to-top i {
-  margin-bottom: 0.1rem;
+  margin-bottom: .1rem;
 }
 
 /* line 213, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
@@ -25339,34 +24806,32 @@ ul.no-bullets {
 }
 
 /* line 222, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-.collapse-toggle:before,
-.collapse-toggle[aria-expanded="false"]:before {
-  content: "\f055";
-  font-family: "Font Awesome 5 Pro";
+.collapse-toggle:before, .collapse-toggle[aria-expanded=false]:before {
+  content: '\f055';
+  font-family: 'Font Awesome 5 Pro';
   display: inline-block;
   font-weight: 300;
   color: #0076a8;
 }
 
 /* line 229, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-.collapse-toggle[aria-expanded="true"]:before {
-  content: "\f056";
+.collapse-toggle[aria-expanded=true]:before {
+  content: '\f056';
 }
 
 /* line 232, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-.collapse-toggle:after,
-.collapse-toggle[aria-expanded="false"]:after {
-  content: "Show";
+.collapse-toggle:after, .collapse-toggle[aria-expanded=false]:after {
+  content: 'Show';
   font-family: "Noto Sans", sans-serif;
   display: inline-block;
   font-weight: regular;
   color: #0076a8;
-  margin-left: 0.2rem;
+  margin-left: .2rem;
 }
 
 /* line 240, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-.collapse-toggle[aria-expanded="true"]:after {
-  content: "Hide";
+.collapse-toggle[aria-expanded=true]:after {
+  content: 'Hide';
 }
 
 /* line 247, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
@@ -25387,7 +24852,7 @@ ul.no-bullets {
   font-family: "Montserrat", sans-serif;
   line-height: 1.1;
   font-size: 1rem;
-  margin-bottom: 0.2rem;
+  margin-bottom: .2rem;
 }
 
 /* line 261, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
@@ -25398,15 +24863,14 @@ ul.no-bullets {
 /* line 267, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .tag {
   display: inline-block;
-  padding: 0.35em 0.5em;
+  padding: .35em .5em;
   font-size: 90%;
   line-height: 1;
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
-  border-radius: 0.25rem;
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  border-radius: .25rem;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
   border: 1px solid;
 }
 
@@ -25515,7 +24979,7 @@ ul.no-bullets {
 /* line 357, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul li a {
   display: block;
-  padding: 0.75rem 0.5rem;
+  padding: .75rem .5rem;
   color: #272a2b;
   border-radius: 0rem;
   border-bottom: 1px solid #c1c2c9;
@@ -25527,29 +24991,29 @@ ul.no-bullets {
 }
 
 /* line 366, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-#side-nav ul li a.parent[aria-expanded="false"]:after {
+#side-nav ul li a.parent[aria-expanded=false]:after {
   font-family: "Font Awesome 5 Pro";
   font-weight: 400;
-  content: "\f055";
+  content: '\f055';
   position: absolute;
-  right: 0.5rem;
-  top: 0.75rem;
+  right: .5rem;
+  top: .75rem;
 }
 
 /* line 375, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-#side-nav ul li a.parent[aria-expanded="true"]:after {
+#side-nav ul li a.parent[aria-expanded=true]:after {
   font-family: "Font Awesome 5 Pro";
   font-weight: 400;
-  content: "\f056";
+  content: '\f056';
   position: absolute;
-  right: 0.5rem;
-  top: 0.75rem;
+  right: .5rem;
+  top: .75rem;
 }
 
 /* line 384, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul li a.active {
   border-left: 0.3rem solid #40c1ac;
-  padding-left: calc(1.5rem - 0.3rem);
+  padding-left: calc(1.5rem - .3rem);
   font-weight: bold;
 }
 
@@ -25565,13 +25029,13 @@ ul.no-bullets {
 
 /* line 397, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 #side-nav ul ul li a.active {
-  padding-left: calc(1.5rem - 0.3rem);
+  padding-left: calc(1.5rem - .3rem);
 }
 
 /* line 406, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .infoTooltip {
-  padding: 0.2rem;
-  margin-left: -0.2rem;
+  padding: .2rem;
+  margin-left: -.2rem;
 }
 
 /* line 410, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
@@ -25584,16 +25048,14 @@ ul.no-bullets {
 /* line 416, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .more-info {
   padding: 0px 2px;
-  padding: 0rem 0.2rem;
-  margin-left: -0.2rem;
+  padding: 0rem .2rem;
+  margin-left: -.2rem;
   cursor: pointer;
   color: #0076a8;
 }
 
 /* line 423, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
-h1 .infoTooltip i,
-h2 .infoTooltip i,
-h3 .infoTooltip i {
+h1 .infoTooltip i, h2 .infoTooltip i, h3 .infoTooltip i {
   font-size: 85%;
 }
 
@@ -25609,7 +25071,7 @@ h3 .infoTooltip i {
 
 /* line 435, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
 .hr-text:before {
-  content: "";
+  content: '';
   background: #c1c2c9;
   position: absolute;
   left: 0;
@@ -25623,7 +25085,7 @@ h3 .infoTooltip i {
   content: attr(data-content);
   position: relative;
   display: inline-block;
-  padding: 0 0.5em;
+  padding: 0 .5em;
   line-height: 1.5em;
   color: #272a2b;
   background-color: #fcfcfa;
@@ -25637,8 +25099,7 @@ h3 .infoTooltip i {
 }
 
 /* line 2, ../Github/sm_i2e_common_ui/src/scss/custom/_utilities.scss */
-.text-sm,
-small {
+.text-sm, small {
   font-size: 0.7875rem;
   line-height: 1.1375;
 }
@@ -25758,8 +25219,8 @@ small {
 .drop-well {
   width: 100%;
   display: flex;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
+  padding: .5rem;
+  border-radius: .5rem;
   border: 1px solid #a3a6ad;
   box-shadow: 2px 2px 4px -2px rgba(0, 0, 0, 0.2) inset;
   flex-direction: column;
@@ -25768,11 +25229,12 @@ small {
 /* line 102, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .cdk-drop-list:hover {
   /*cursor: grab;*/
-  cursor: null;
+  cursor :  null;
 }
 
-.cdk-drag:hover {
-  cursor: grab;
+.cdk-drag:hover{
+    cursor: grab;
+
 }
 
 /* line 105, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -25783,24 +25245,24 @@ small {
 /* line 110, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .drag-item {
   border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
+  padding: .5rem 1rem;
   display: flex;
   align-items: center;
   border: 1px solid #a3a6ad;
   width: 100%;
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
   background: white;
 }
 
 /* line 119, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .drag-item:before {
-  content: "\f7a4";
+  content: '\f7a4';
   font-family: "Font Awesome 5 Pro";
   display: inline-block;
   color: #63666a;
   font-size: 1rem;
   font-weight: 900;
-  margin-right: 0.75rem;
+  margin-right: .75rem;
 }
 
 /* line 128, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -25810,7 +25272,7 @@ small {
 
 /* line 130, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .drag-item.drag-item-locked:before {
-  content: "\f023";
+  content: '\f023';
 }
 
 /* line 134, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -25822,7 +25284,7 @@ small {
 /* line 141, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .drag-item .doc-name {
   font-weight: bold;
-  margin-right: 0.5rem;
+  margin-right: .5rem;
 }
 
 /* line 145, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -25833,25 +25295,24 @@ small {
 /* line 150, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .doc-card {
   border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
+  padding: .5rem 1rem;
   display: flex;
   align-items: center;
   border: 1px solid #a3a6ad;
   width: 100%;
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
   background: white;
 }
 
 /* line 160, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
-.doc-card .draggable :before,
-.doc-card .placeholder :before {
-  content: "\f7a4";
+.doc-card .draggable :before, .doc-card .placeholder :before {
+  content: '\f7a4';
   font-family: "Font Awesome 5 Pro";
   display: inline-block;
   color: #63666a;
   font-size: 1rem;
   font-weight: 900;
-  margin-right: 0.75rem;
+  margin-right: .75rem;
 }
 
 /* line 170, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -25861,7 +25322,7 @@ small {
 
 /* line 172, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .doc-card.locked:before {
-  content: "\f023";
+  content: '\f023';
 }
 
 /* line 176, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -25873,7 +25334,7 @@ small {
 /* line 180, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .doc-card .doc-name {
   font-weight: bold;
-  margin-right: 0.5rem;
+  margin-right: .5rem;
 }
 
 /* line 184, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -25888,7 +25349,7 @@ small {
 
 /* line 189, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .doc-card .doc-buttons .btn {
-  margin-left: 0.25rem;
+  margin-left: .25rem;
 }
 
 /* line 199, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -25901,7 +25362,7 @@ small {
   list-style-type: none;
   width: 25%;
   float: left;
-  font-size: 0.9rem;
+  font-size: .9rem;
   position: relative;
   text-align: center;
   text-transform: none;
@@ -25913,8 +25374,7 @@ small {
 }
 
 /* line 211, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
-.progressbar li a:hover,
-.progressbar li a:focus {
+.progressbar li a:hover, .progressbar li a:focus {
   text-decoration: underline !important;
 }
 
@@ -25940,7 +25400,7 @@ small {
 .progressbar li:after {
   width: 100%;
   height: 2px;
-  content: "";
+  content: '';
   position: absolute;
   background-color: #a3a6ad;
   top: 15px;
@@ -25976,14 +25436,14 @@ small {
   border-color: #117e46;
   background-color: #117e46;
   color: white;
-  content: "✔";
+  content: '✔';
 }
 
 /* line 268, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
 }
 
 /* line 272, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -26019,8 +25479,7 @@ small {
   display: inline-block;
   background: transparent;
   border: 1px solid #63666a;
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
   margin-right: 0rem;
   margin-bottom: 0rem;
 }
@@ -26040,9 +25499,9 @@ small {
 /* line 306, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .dt-controls .dt-buttons .btn-excel:before {
   display: inline-block;
-  font-family: "Font Awesome 5 Pro";
-  content: "\f1c3";
-  margin-right: 0.2rem;
+  font-family: 'Font Awesome 5 Pro';
+  content: '\f1c3';
+  margin-right: .2rem;
 }
 
 /* line 314, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -26140,22 +25599,22 @@ small {
 
 /* line 384, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 table ~ .dt-controls {
-  margin-top: 0.5rem;
+  margin-top: .5rem;
 }
 
 /* line 392, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .next-approvers-table tbody tr.cdk-drag .order-icon:before {
-  content: "\f7a4";
+  content: '\f7a4';
   font-family: "Font Awesome 5 Pro";
   display: inline-block;
-  margin-right: 0.75rem;
+  margin-right: .75rem;
   color: #63666a;
   font-weight: 900;
 }
 
 /* line 401, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .next-approvers-table tbody tr.cdk-drag.cdk-drag-disabled .order-icon:before {
-  content: "\f023";
+  content: '\f023';
 }
 
 /* line 406, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -26168,9 +25627,7 @@ table ~ .dt-controls {
   display: flex;
   flex-direction: row;
 }
-::ng-deep .cdk-overlay-container {
-  z-index: 1060;
-}
+
 /* line 416, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .workflow-comments .comment-content {
   margin-left: 1rem;
@@ -26191,7 +25648,7 @@ table ~ .dt-controls {
 
 /* line 430, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .grant-icons a {
-  padding: 0.2rem;
+  padding: .2rem;
 }
 
 /* line 435, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -26202,8 +25659,8 @@ td .grant-icons {
 /* line 439, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 .egrants-icon {
   background: transparent url("../images/egrants_icon.svg") no-repeat center;
-  height: 0.8rem;
-  width: 0.8rem;
+  height: .8rem;
+  width: .8rem;
   display: inline-block;
   line-height: 1;
   margin-bottom: -1px;
@@ -26222,7 +25679,7 @@ td .grant-icons {
 
 /* line 458, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
 #submission-package .card .card-header .doc-details {
-  margin-left: 0.5rem;
+  margin-left: .5rem;
   font-style: italic;
 }
 
@@ -26270,7 +25727,7 @@ td .grant-icons {
   position: absolute;
   top: -0.75rem;
   right: -0.75rem;
-  padding: 0.2rem 0.5rem;
+  padding: .2rem .5rem;
 }
 
 /* line 497, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -26278,7 +25735,7 @@ td .grant-icons {
   display: inline-block;
   font-weight: 400;
   font-family: "Font Awesome 5 Pro";
-  content: "\f056";
+  content: '\f056';
   font-size: 1.1rem;
 }
 
@@ -26287,7 +25744,7 @@ td .grant-icons {
   display: inline-block;
   font-weight: 400;
   font-family: "Font Awesome 5 Pro";
-  content: "\f055";
+  content: '\f055';
   font-size: 1.1rem;
 }
 
@@ -26308,10 +25765,7 @@ td .grant-icons {
 }
 
 /* line 533, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
-.app-funding-table.multiple-FS
-  .grant-info-wrapper
-  .grant-info-row
-  .grant-info-col {
+.app-funding-table.multiple-FS .grant-info-wrapper .grant-info-row .grant-info-col {
   width: 100%;
 }
 
@@ -26322,18 +25776,18 @@ td .grant-icons {
 
 /*# sourceMappingURL=i2e-common-ui.css.map */
 
-.force-text-center {
+.force-text-center{
   padding-left: 6em;
 }
 
 .no-drag-auto-number {
   border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
+  padding: .5rem 1rem;
   display: flex;
   align-items: center;
   border: 1px solid #a3a6ad;
   width: 100%;
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
   background: #fff;
   counter-increment: par-num;
 }
@@ -26348,7 +25802,7 @@ td .grant-icons {
 
 .no-drag-auto-number .doc-name {
   font-weight: bold;
-  margin-right: 0.5rem;
+  margin-right: .5rem;
 }
 
 /* line 145, ../Github/sm_i2e_common_ui/src/scss/custom/_fs-custom.scss */
@@ -26356,55 +25810,55 @@ td .grant-icons {
   font-style: italic;
 }
 
-.d-flex.left-float {
+.d-flex.left-float{
   float: left;
 }
 
-.modal-scroll-bar {
-  height: 600px;
-  overflow: scroll;
+.modal-scroll-bar{
+  height : 600px;
+  overflow:scroll;
 }
-button.btn.brn-primary.add-margin {
+button.btn.brn-primary.add-margin{
   margin-left: 10px;
-  margin-right: 10px;
+  margin-right :10px;
 }
-.col-6.align-left {
+.col-6.align-left{
   padding-left: 0;
 }
-.tdlabel {
+.tdlabel{
   margin-left: -12px;
   margin-top: -20px;
 }
-.tdlabel2 {
+.tdlabel2{
   margin-left: -12px;
   margin-top: -30px;
 }
 
-.text-danger-wrap {
+.text-danger-wrap{
   margin-top: -12px !important;
   margin-bottom: 16px;
 }
-td.all.parentTable {
+td.all.parentTable{
   padding: 0;
 }
 .childTable {
-  border-style: hidden;
+  border-style: hidden
 }
-.plan-table {
+.plan-table{
   width: 70%;
-  overflow: hidden;
+  overflow:hidden ;
 }
-.modal-horizontal-scroll {
+.modal-horizontal-scroll{
   overflow-x: auto;
 }
-.plan-grant-info {
+.plan-grant-info{
   min-width: 300px;
 }
-.grant-info-margin {
+.grant-info-margin{
   margin: 3px 0;
 }
-.flex-align-right {
-  justify-content: right;
+.flex-align-right{
+  justify-content: right
 }
 
 div.dtfh-floatingparent {
