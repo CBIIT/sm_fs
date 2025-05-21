@@ -13,6 +13,10 @@ table.dataTable thead > tr > td.sorting_desc:before
   content: "▲"/"";
 }
 
+ngb-modal-backdrop.modal-backdrop.fade.show {
+  z-index: 1050 !important;
+}
+
 select:required:not(:focus) ~ span.select2-container .selection .select2-selection {
   border-color: #a3a6ad;
 }
