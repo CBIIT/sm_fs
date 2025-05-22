@@ -30,15 +30,12 @@
 <div class="row form-group">
   <div class="col-12 col-md-3">
     <label for="tempOrPerm">Designee Type</label>
-    <div class="btn-group btn-group-toggle"
-         ngbRadioGroup name="radioBasic"
-         [(ngModel)]="dsTemporary"
-         id="tempOrPerm">
-      <label ngbButtonLabel class="btn-outline-secondary">
-        <input ngbButton type="radio" [value]="true" (click)="onTemporary()">Temporary
+    <div class="btn-group btn-group-toggle" id="tempOrPerm">
+      <label class="btn btn-outline-secondary">
+        <input class="btn-check" [(ngModel)]="dsTemporary" name="dsTemporary" type="radio" [value]="true" (click)="onTemporary()">Temporary
       </label>
-      <label ngbButtonLabel class="btn-outline-secondary">
-        <input ngbButton type="radio" [value]="false" (click)="onPermanent()"> Permanent
+      <label class="btn btn-outline-secondary">
+        <input class="btn-check" [(ngModel)]="dsTemporary" name="dsTemporary" type="radio" [value]="false" (click)="onPermanent()"> Permanent
       </label>
     </div>
   </div>

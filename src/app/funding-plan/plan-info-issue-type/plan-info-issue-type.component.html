@@ -2,14 +2,14 @@
   <ng-container *ngIf="readOnly then static else dynamic"></ng-container>
   <ng-template #dynamic>
     <div class="col_2">
-      <div class="btn-group btn-group-toggle btn-group-sm" ngbRadioGroup name="issueType" [(ngModel)]="issueType">
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input name="new" ngbButton type="radio" value="NEW" (change)="toggleDisplay('NEW')">New
+      <div class="btn-group btn-group-toggle btn-group-sm" role="group">
+        <label class="btn btn-outline-secondary">
+            <input class="btn-check" name="issueType" type="radio" [value]="'NEW'" [(ngModel)]="issueType">New
         </label>
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input name="reissue" ngbButton type="radio" value="REISSUE" (change)="toggleDisplay('REISSUE')">Reissue
+        <label class="btn btn-outline-secondary">
+            <input class="btn-check" name="issueType" type="radio" [value]="'REISSUE'" [(ngModel)]="issueType">Reissue
         </label>
-      </div>
+    </div>
       <div class="col_2" *ngIf="issueType==='REISSUE'">
         <br><i>Previous FOA: </i>
       </div>

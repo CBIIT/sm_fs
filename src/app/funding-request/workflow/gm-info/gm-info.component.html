@@ -13,17 +13,16 @@
             <span *ngIf="readonly; else actionInput">{{gmInfo.actionType}}</span>
             <ng-template #actionInput>
             <div class="btn-group btn-group-toggle"
-                ngbRadioGroup
                 name="radioBasic"
                 [(ngModel)]="gmInfo.actionType"
                 aria-describedby="action-type-desc"
                 #actionType="ngModel"
                 [required]="isApprovalAction">
-                <label ngbButtonLabel class="btn-outline-secondary">
-                  <input ngbButton type="radio" value="AWARD">Award
+                <label class="btn-outline-secondary">
+                  <input type="radio" value="AWARD">Award
                 </label>
-                <label ngbButtonLabel class="btn-outline-secondary">
-                  <input ngbButton type="radio" value="REVISION">Revision
+                <label class="btn-outline-secondary">
+                  <input type="radio" value="REVISION">Revision
                 </label>
             </div>
             <div class="text-danger mt-1" *ngIf="(actionType.errors?.required)">

@@ -1,19 +1,20 @@
 <ng-container [ngModelGroup]="'prc_' + grantIndex + '_' + sourceIndex">
-  <div class="btn-group btn-group-toggle btn-group-sm btn-group-block mb-2" ngbRadioGroup name="displayType"
-       [(ngModel)]="displayType">
-    <label ngbButtonLabel class="btn-outline-secondary">
+  <div class="btn-group btn-group-toggle btn-group-sm btn-group-block mb-2">
+    <label class="btn btn-outline-secondary">
       <input
+        name="displayType"
+        class="btn-check"
         [id]="'dollar_' + grantIndex + '_' + sourceIndex"
-        name="dollar"
-        ngbButton
+        [(ngModel)]="displayType"
         type="radio"
         value="dollar">Dollar
     </label>
-    <label ngbButtonLabel class="btn-outline-secondary" *ngIf="!lockDollar">
+    <label class="btn btn-outline-secondary" *ngIf="!lockDollar">
       <input
+        name="displayType"
+        class="btn-check"
         [id]="'percent_' + grantIndex + '_' + sourceIndex"
-        name="percent"
-        ngbButton
+        [(ngModel)]="displayType"
         type="radio"
         value="percent">% Cut
     </label>

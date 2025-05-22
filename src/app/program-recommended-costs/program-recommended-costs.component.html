@@ -541,13 +541,12 @@
                         <div class="form-row">
                           <div class="col left-label"></div>
                           <div class="col-sm-auto">
-                            <div class="btn-group btn-group-toggle" ngbRadioGroup name="value"
-                                 *ngIf="initialPay && !locked">
-                              <label ngbButtonLabel class="btn-outline-secondary active">
-                                <input ngbButton type="radio" value="dollar">Dollar
+                            <div class="btn-group btn-group-toggle" *ngIf="initialPay && !locked">
+                              <label class="btn btn-outline-secondary active">
+                                <input class="btn-check" name="value" type="radio" value="dollar">Dollar
                               </label>
-                              <label ngbButtonLabel class="btn-outline-secondary">
-                                <input ngbButton type="radio" (change)="toggleCostDisplay('percent')" value="percent">%
+                              <label class="btn btn-outline-secondary">
+                                <input class="btn-check" name="value" type="radio" (change)="toggleCostDisplay('percent')" value="percent">%
                                 Cut
                               </label>
                               <label><a
@@ -678,13 +677,12 @@
                         <div class="form-row">
                           <div class="col left-label"></div>
                           <div class="col-sm-auto">
-                            <div class="btn-group btn-group-toggle" ngbRadioGroup name="value"
-                                 *ngIf="initialPay && !locked">
-                              <label ngbButtonLabel class="btn-outline-secondary">
-                                <input ngbButton type="radio" (change)="toggleCostDisplay('dollar')" value="dollar">Dollar
+                            <div class="btn-group btn-group-toggle" *ngIf="initialPay && !locked">
+                              <label class="btn btn-outline-secondary">
+                                <input name="value" class="btn-check" type="radio" (change)="toggleCostDisplay('dollar')" value="dollar">Dollar
                               </label>
-                              <label ngbButtonLabel class="btn-outline-secondary active">
-                                <input ngbButton type="radio" value="percent">% Cut
+                              <label class="btn btn-outline-secondary active">
+                                <input name="value" class="btn-check" type="radio" value="percent">% Cut
                               </label>
                               <label><a
                                 href="https://mynci.cancer.gov/topics/oefia-current-fiscal-year-funding-information#mynci-polmatrix"

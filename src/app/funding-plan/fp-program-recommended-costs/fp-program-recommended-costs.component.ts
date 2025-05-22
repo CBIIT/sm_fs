@@ -198,13 +198,13 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
         this.totalCostCalculated = null;
       }
     } else {
-      if (!!this.directCost) {
+      if (this.directCost) {
         this.dcPercentCutCalculated = (this.baselineDirectCost - this.directCost) / this.baselineDirectCost;
       } else {
         this.dcPercentCutCalculated = null;
       }
 
-      if (!!this.totalCost) {
+      if (this.totalCost) {
         this.tcPercentCutCalculated = (this.baselineTotalCost - this.totalCost) / this.baselineTotalCost;
       } else {
         this.tcPercentCutCalculated = null;
@@ -297,6 +297,7 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
   }
 
   set displayType(value: string) {
+    this.logger.warn(`Setting displayType to ${value}`);
     this._displayType = value;
   }
 

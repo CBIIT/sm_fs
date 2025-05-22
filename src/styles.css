@@ -17,6 +17,19 @@ ngb-modal-backdrop.modal-backdrop.fade.show {
   z-index: 1050 !important;
 }
 
+ngb-datepicker-navigation {
+    background-color: #f4f5f6 !important;
+}
+
+.ngb-dp-weekdays {
+    background-color: #f4f5f6 !important;
+}
+
+.ngb-dp-weekday {
+    color: #17a2b8 !important;
+    background-color: #f4f5f6;
+}
+
 select:required:not(:focus) ~ span.select2-container .selection .select2-selection {
   border-color: #a3a6ad;
 }
@@ -90,3 +103,194 @@ select:invalid ~ span.select2-container .selection .select2-selection {
 
 .scrtabs-tabs-fixed-container ul.nav-tabs > li {
   white-space: nowrap; }
+
+/* line 5, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+/* line 14, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-heading {
+    color: inherit;
+}
+
+/* line 20, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-link {
+    font-weight: 700;
+}
+
+/* line 29, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-dismissible {
+    padding-right: 3.85rem;
+}
+
+/* line 33, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-dismissible .btn-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.75rem 1.25rem;
+    color: inherit;
+}
+
+/* line 48, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-primary {
+    color: #003d57;
+    background-color: #cce4ee;
+    border-color: #b8d9e7;
+}
+
+/* line 6, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-primary hr {
+    border-top-color: #a5cfe1;
+}
+
+/* line 10, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-primary .alert-link {
+    color: #001924;
+}
+
+/* line 48, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-secondary {
+    color: #333537;
+    background-color: #e0e0e1;
+    border-color: #d3d4d5;
+}
+
+/* line 6, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-secondary hr {
+    border-top-color: #c6c7c9;
+}
+
+/* line 10, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-secondary .alert-link {
+    color: #1a1c1d;
+}
+
+/* line 48, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-success {
+    color: #094224;
+    background-color: #cfe5da;
+    border-color: #bcdbcb;
+}
+
+/* line 6, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-success hr {
+    border-top-color: #abd2be;
+}
+
+/* line 10, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-success .alert-link {
+    color: #03150c;
+}
+
+/* line 48, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
+/* line 6, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-info hr {
+    border-top-color: #abdde5;
+}
+
+/* line 10, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-info .alert-link {
+    color: #062c33;
+}
+
+/* line 48, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-warning {
+    color: #85600f;
+    background-color: #fff1d2;
+    border-color: #ffebbf;
+}
+
+/* line 6, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-warning hr {
+    border-top-color: #ffe3a6;
+}
+
+/* line 10, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-warning .alert-link {
+    color: #573f0a;
+}
+
+/* line 48, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-danger {
+    color: #560520;
+    background-color: #edced8;
+    border-color: #e6bac9;
+}
+
+/* line 6, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-danger hr {
+    border-top-color: #dfa7ba;
+}
+
+/* line 10, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-danger .alert-link {
+    color: #26020e;
+}
+
+/* line 48, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-light {
+    color: #7f7f80;
+    background-color: #fdfdfd;
+    border-color: #fcfcfc;
+}
+
+/* line 6, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-light hr {
+    border-top-color: #efefef;
+}
+
+/* line 10, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-light .alert-link {
+    color: #666666;
+}
+
+/* line 48, ../Github/sm_i2e_common_ui/src/scss/bootstrap/_alert.scss */
+.alert-dark {
+    color: #00202a;
+    background-color: #ccd8dc;
+    border-color: #b8c9ce;
+}
+
+/* line 6, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-dark hr {
+    border-top-color: #a9bec4;
+}
+
+/* line 10, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_alert.scss */
+.alert-dark .alert-link {
+    color: black;
+}
+
+/*line 173, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss*/
+.alert .alert-heading {
+    font-size: 1.1rem;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+}
+
+/* line 180, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.alert p {
+    margin-bottom: 0.5rem;
+}
+
+/* line 183, ../Github/sm_i2e_common_ui/src/scss/custom/_components.scss */
+.alert a:hover,
+.alert a:focus {
+    text-decoration: underline !important;
+}
+
+
