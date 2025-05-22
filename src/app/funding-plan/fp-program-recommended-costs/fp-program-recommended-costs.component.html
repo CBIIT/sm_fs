@@ -1,6 +1,6 @@
 <ng-container [ngModelGroup]="'prc_' + grantIndex + '_' + sourceIndex">
   <div class="btn-group btn-group-toggle btn-group-sm btn-group-block mb-2">
-    <label class="btn btn-outline-secondary">
+    <label class="btn btn-outline-secondary" [class.active]="displayType === 'dollar'">
       <input
         name="displayType"
         class="btn-check"
@@ -9,7 +9,7 @@
         type="radio"
         value="dollar">Dollar
     </label>
-    <label class="btn btn-outline-secondary" *ngIf="!lockDollar">
+    <label class="btn btn-outline-secondary" [class.active]="displayType === 'percent'" *ngIf="!lockDollar">
       <input
         name="displayType"
         class="btn-check"

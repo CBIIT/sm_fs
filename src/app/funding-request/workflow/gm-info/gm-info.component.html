@@ -18,11 +18,11 @@
                 aria-describedby="action-type-desc"
                 #actionType="ngModel"
                 [required]="isApprovalAction">
-                <label class="btn-outline-secondary">
-                  <input type="radio" value="AWARD">Award
+                <label class="btn-outline-secondary" [class.active]="gmInfo.actionType === 'AWARD'">
+                  <input [(ngModel)]="gmInfo.actionType" name="actionType" type="radio" value="AWARD">Award
                 </label>
-                <label class="btn-outline-secondary">
-                  <input type="radio" value="REVISION">Revision
+                <label class="btn-outline-secondary" [class.active]="gmInfo.actionType === 'REVISION'">
+                  <input [(ngModel)]="gmInfo.actionType" name="actionType" type="radio" value="REVISION">Revision
                 </label>
             </div>
             <div class="text-danger mt-1" *ngIf="(actionType.errors?.required)">

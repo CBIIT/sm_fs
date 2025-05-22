@@ -3,10 +3,10 @@
   <ng-template #dynamic>
     <div class="col_2">
       <div class="btn-group btn-group-toggle btn-group-sm" role="group">
-        <label class="btn btn-outline-secondary">
+        <label class="btn btn-outline-secondary" [class.active]="issueType === 'NEW'">
             <input class="btn-check" name="issueType" type="radio" [value]="'NEW'" [(ngModel)]="issueType">New
         </label>
-        <label class="btn btn-outline-secondary">
+        <label class="btn btn-outline-secondary" [class.active]="issueType === 'REISSUE'">
             <input class="btn-check" name="issueType" type="radio" [value]="'REISSUE'" [(ngModel)]="issueType">Reissue
         </label>
     </div>
