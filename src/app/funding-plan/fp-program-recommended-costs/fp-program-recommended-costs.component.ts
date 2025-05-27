@@ -198,13 +198,13 @@ export class FpProgramRecommendedCostsComponent implements OnInit {
         this.totalCostCalculated = null;
       }
     } else {
-      if (this.directCost) {
+      if (this.directCost && this.baselineDirectCost !== 0) {
         this.dcPercentCutCalculated = (this.baselineDirectCost - this.directCost) / this.baselineDirectCost;
       } else {
         this.dcPercentCutCalculated = null;
       }
 
-      if (this.totalCost) {
+      if (this.totalCost && this.baselineTotalCost !== 0) {
         this.tcPercentCutCalculated = (this.baselineTotalCost - this.totalCost) / this.baselineTotalCost;
       } else {
         this.tcPercentCutCalculated = null;
