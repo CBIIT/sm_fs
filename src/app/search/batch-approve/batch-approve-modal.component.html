@@ -86,7 +86,7 @@
             <ng-container *ngFor="let data of plansForApproval">
               <tr *ngFor="let foas of data.fpFoasList; index as i; first as isFirst; count as rowspan">
                 <td style="width: 24%">
-                  <a href="{{foas.nihGuideAddr}}" target="_blank">{{foas.rfaPaNumber}}</a>
+                  <a href="{{foas.nihGuideAddr}}" target="_blank" rel="noopener noreferrer">{{foas.rfaPaNumber}}</a>
                 </td>
                 <td style="width: 40%">{{foas.title}}</td>
                 <td style="width: 20%">

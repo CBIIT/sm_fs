@@ -24,7 +24,7 @@
           <ng-container *ngIf="first">{{planModel.fundingPlanDto.planName}}</ng-container>
         </td>
         <td>
-          <a href="{{rfa.nihGuideAddr}}" target="_blank">{{rfa.rfaPaNumber}}</a>
+          <a href="{{rfa.nihGuideAddr}}" target="_blank" rel="noopener noreferrer">{{rfa.rfaPaNumber}}</a>
         </td>
         <td>
           <app-concept-award-tracking [cptId]="rfa.cptId"></app-concept-award-tracking>
