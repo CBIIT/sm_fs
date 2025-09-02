@@ -305,10 +305,10 @@ export class RequestModel {
           budgetSupportYear: b.supportYear
         }
         this.supportYearChangedEmitter.next(errorPayload);
-      }
+      } 
       tmp.fundingSource = this.programRecommendedCostsModel.fundingSourcesMap.get(b.fseId);
-      tmp.baselineDirect = this.isInitialPay() ? tmp.grantAward.requestAmount : tmp.grantAward.directAmount;
-      tmp.baselineTotal = this.isInitialPay() ? tmp.grantAward.requestTotalAmount : tmp.grantAward.totalAwarded;
+      tmp.baselineDirect = tmp.grantAward?(this.isInitialPay() ? tmp.grantAward.requestAmount : tmp.grantAward.directAmount):0;
+      tmp.baselineTotal = tmp.grantAward?(this.isInitialPay() ? tmp.grantAward.requestTotalAmount : tmp.grantAward.totalAwarded):0;
       tmp.baselineSource = this.isInitialPay() ? PrcBaselineSource.PI_REQUESTED : PrcBaselineSource.AWARDED;
       // TODO: Start here if there's an issue with %cut displays - baselines need to be set first in order to get the correct calculation
       tmp.fromBudget(b);
