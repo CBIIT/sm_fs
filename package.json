@@ -120,6 +120,7 @@
       "@angular/forms": "$@angular/forms",
       "@angular/localize": "$@angular/localize",
       "jquery": "$jquery"
-    }
+    },
+     "axios": "1.12.0"
   }
 }
