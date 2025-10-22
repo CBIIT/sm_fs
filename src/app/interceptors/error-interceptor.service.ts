@@ -1,4 +1,4 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { ApplicationInitStatus, Inject, Injectable, InjectionToken } from '@angular/core';
 import { EMPTY, Observable, of, throwError } from 'rxjs';
 import { catchError, filter, finalize } from 'rxjs/operators';
@@ -61,6 +61,8 @@ export class ErrorInterceptor implements HttpInterceptor {
           this.handlingError = true;
         }
 
+        const headers = req.headers || new HttpHeaders();
+
         if (this.debugMode) this.verboseDetails(req, error);
 
         // Pass along errors that happen during initialization
@@ -95,7 +97,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 
         // Handle timeouts
         if (this.isTimeOut(error)) {
-          return this.handleTimeout(error);
+          return this.handleTimeout(error, headers);
         } else {
           return this.handleAllOtherErrors(req, error);
         }
@@ -136,8 +138,9 @@ export class ErrorInterceptor implements HttpInterceptor {
     return throwError(error);
   }
 
-  private handleTimeout(error: any) {
-    if (this.debugMode) this.logger.debug('Timeout encountered - redirect to login.');
+  private handleTimeout(error: any, headers: HttpHeaders) {
+    this.logger.info('Timeout encountered - redirect to login.');
+    this.logger.info(`SM_USER header: ${headers.get('SM_USER')}`);
     this.heartbeatService.pause();
     let url =
       '/fs/' +
@@ -149,6 +152,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     const errorUrl = new URL(error.url);
     errorUrl.searchParams.delete('TARGET');
     errorUrl.searchParams.set('TARGET', url);
+    this.logger.info(`Redirecting to ${errorUrl.toString()}`);
 
     if (!this.modalWindow) {
       this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
