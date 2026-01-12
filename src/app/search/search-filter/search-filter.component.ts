@@ -8,6 +8,7 @@ import { Select2OptionData } from "ng-select2";
 import { Options } from "select2";
 import { SearchModel } from "../model/search-model";
 import { ActivatedRoute } from "@angular/router";
+import { getCurrentFiscalYear } from '../../utils/utils';
 
 @Component({
   selector: 'app-search-filter',
@@ -30,6 +31,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     return this._action;
   }
 
+  protected fiscalYear: number;
+
   @Input() grant: string;
   @Input() searchGrant: string;
 
@@ -37,7 +40,6 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   @Output() searchTypeEm = new EventEmitter<string>()
 
   public searchFilter: SearchCriteria;
-
 
   showAdvanced: boolean = false;
 
@@ -86,6 +88,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
               private route: ActivatedRoute,
               private searchModel: SearchModel,
               private logger: NGXLogger) {
+    this.fiscalYear = getCurrentFiscalYear();
   }
 
   ngOnInit(): void {
@@ -105,7 +108,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     this.searchFilter.searchType = this.searchType;
     this.showAdvanced = this._containsAdvancedInSearchFilter(this.searchFilter);
     // YP - disable search for paylist until paylist is fully merged with fs
-    this.canSearchForPaylists = false;    
+    this.canSearchForPaylists = false;
   }
 
   ngAfterViewInit() {
@@ -254,6 +257,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
 
   // Check if at least one criteria selected or both IC and Serial Number
+
   validFilter(): boolean {
     const formValue = this.searchForm?.form.value;
     if (!formValue) {

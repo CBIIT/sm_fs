@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="col-3 col-md-3 me-auto" [hidden]="!(searchType === 'FR' || searchType === 'FP' || searchType === 'G')">
-      <lib-fy-range [minYear]="2001" [maxYear]="2025" [form]="searchForm"></lib-fy-range>
+      <lib-fy-range [minYear]="2001" [maxYear]="fiscalYear" [form]="searchForm"></lib-fy-range>
     </div>
   </div>
   <div class="row form-group" [hidden]="!(searchType === 'FR')">

@@ -25,6 +25,7 @@ import { RequestModel } from 'src/app/model/request/request-model';
 import { NgForm } from '@angular/forms';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { NavigationModel } from '../../model/navigation-model';
+import {getCurrentFiscalYear} from '../../utils/utils';
 
 @Component({
   selector: 'app-step1',
@@ -46,6 +47,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
     this.searchCriteria = this.gsfs.getGrantsSearchCriteria();
+    this.fiscalYear = getCurrentFiscalYear();
 
   }
 
@@ -58,6 +60,7 @@ export class Step1Component implements OnInit, AfterViewInit, AfterContentInit, 
   @ViewChild('fundingRequestActionRenderer') fundingRequestActionRenderer: TemplateRef<FundingRequestActionCellRendererComponent>;
   @ViewChild('searchForm') searchForm: NgForm;
 
+  protected fiscalYear: number;
   dataTable: any;
 
   grantList: NciPfrGrantQueryDto[] = [];
