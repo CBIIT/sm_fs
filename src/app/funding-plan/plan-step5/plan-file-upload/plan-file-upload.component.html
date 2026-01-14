@@ -1,5 +1,5 @@
 <div class="row">
-    <div *ngIf="templateType !== 'Other'; else otherNote" class="col-lg-6">
+    <div *ngIf="templateType !== 'Other' && templateType !== 'CR_FUNDING_PLAN_SKIP_JUST_RPT'; else otherNote" class="col-lg-6">
         <p>Approvals can be completed only if you provide all the information
             requested in this <a [routerLink]="[]" (click)="downloadTemplate(templateType)" >template</a>.
             You may upload Microsoft Word, Rich Text Format, Microsoft Excel, or Adobe Acrobat document(s) only.
