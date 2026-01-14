@@ -143,7 +143,7 @@ export class PlanStep6Component implements OnInit, AfterViewInit {
           ( !this.selectedApplIds.includes(g.applId) && !this.skippedApplIds.includes(g.applId)) );
         this.logger.debug('skippedApplIds = ', this.skippedApplIds, 'selectedApplIds = ', this.selectedApplIds);
         this.checkInFlightPfr();
-        this.docChecker = new FundingPlanDocChecker(this.planModel, this);
+        this.docChecker = new FundingPlanDocChecker(this.planModel);
         this.isDocsStepCompleted();
         if (this.fpInfoComponent) {
           this.fpInfoComponent.totalApplicationsReceived = this.planModel.allGrants.length;
@@ -460,18 +460,15 @@ export class FundingPlanDocChecker {
 
   private docTypes: any[] = [
     {docType: DocTypeConstants.JUSTIFICATION, tooltip: 'Scientific Rationale'},
-    {docType: DocTypeConstants.EXCEPTION_JUSTIFICATION, tooltip: 'Exception Justification'},
-    {docType: DocTypeConstants.SKIP_JUSTIFICATION, tooltip: 'Skipped Justification'}
+    {docType: DocTypeConstants.EXCEPTION_JUSTIFICATION, tooltip: 'Exception Justification'}
   ];
 
   private missingTooltips: string[];
   private planModel: PlanModel;
-  private step6: PlanStep6Component;
 
-  constructor(planModel: PlanModel, step6: PlanStep6Component) {
+  constructor(planModel: PlanModel) {
     this.missingTooltips = [];
     this.planModel = planModel;
-    this.step6 = step6;
     let justificationUploaded = false;
     this.docTypes.forEach( rd => {
       const docMissing = this.docNotFound(rd.docType);
@@ -498,7 +495,11 @@ export class FundingPlanDocChecker {
         }
       }
       this.warningText = this.tooltipText + (this.missingTooltips.length > 1 ? ' have ' : ' has ');
-      this.tooltipText = 'You must upload ' + this.tooltipText + ' to submit this Plan';
+      if (this.missingTooltips.length === 1 && this.missingTooltips[0] === 'Scientific Rationale') {
+        this.tooltipText = 'You must upload Scientific Rationale to submit this Plan.';
+      } else {
+        this.tooltipText = 'You must upload ' + this.tooltipText + ' to submit this Plan';
+      }
     }
     this.planChangedAfterUpload = justificationUploaded && this.planModel.documentSnapshotChanged();
   }
@@ -520,9 +521,6 @@ export class FundingPlanDocChecker {
     else if (docType === DocTypeConstants.EXCEPTION_JUSTIFICATION) {
       return  this.planModel.allGrants.filter(g => g.selected &&
         (g.priorityScoreNum < this.planModel.minimumScore || g.priorityScoreNum > this.planModel.maximumScore)).length > 0;
-    }
-    else if (docType === DocTypeConstants.SKIP_JUSTIFICATION) {
-      return this.planModel.allGrants.filter(g => this.step6.skippedApplIds.includes(g.applId)).length > 0;
     }
     else {
       return false;

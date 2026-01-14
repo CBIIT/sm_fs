@@ -53,9 +53,9 @@
                         aria-hidden="true"></i></button>
             </div>
         </div>
-        <div class="doc-card" *ngIf="skipGrants && skipGrants.length > 0">
+        <div class="doc-card" *ngIf="isSkipUploaded">
             <span class="doc-name">Justification for Skipped Application(s)</span>
-            <span class="doc-desc" *ngIf="isSkipUploaded; else notUploaded">
+            <span class="doc-desc">
                 {{skipDocDto.docFilename}}
                 <ng-container *ngIf="skipDocDto.uploadByName">(Uploaded by <a
                     href="mailto: {{skipDocDto.uploadByEmail}}">{{skipDocDto.uploadByName}}</a> on
@@ -63,12 +63,13 @@
                 </ng-container>
             </span>
 
-            <div class="doc-buttons" *ngIf="isSkipUploaded">
+            <div class="doc-buttons">
                 <button type="button" class="btn btn-link btn-slim" title="View Document"
                     (click)="downloadFile(skipDocDto.id, skipDocDto.docFilename)"><i class="far fa-eye"
                         aria-hidden="true"></i></button>
             </div>
         </div>
+
         <div class="doc-card" *ngIf="isOtherUploaded">
             <span class="doc-name">Other</span>
             <span class="doc-desc">
