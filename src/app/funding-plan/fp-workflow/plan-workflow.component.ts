@@ -22,6 +22,7 @@ import { FundingRequestIntegrationService } from 'src/app/funding-request/integr
 import { PlanModel } from 'src/app/model/plan/plan-model';
 import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
+import { NavigationModel } from 'src/app/model/navigation-model';
 import { AppPropertiesService, DatepickerFormatter } from '@cbiit/i2ecui-lib';
 import { FpGrantManagementComponent } from './fp-grant-management/fp-grant-management.component';
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
@@ -123,6 +124,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     private workflowModel: WorkflowModel,
     private calendar: NgbCalendar,
     private router: Router,
+    private navigationModel: NavigationModel,
     private logger: NGXLogger
   ) {
     this.maxDate = this.calendar.getToday();
@@ -367,6 +369,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
 
   private submitWorkflowToBackend(): void {
     //  return;
+    this.navigationModel.submitting = true;
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
@@ -426,6 +429,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     this.workflowService.submitPlanWorkflow(dto).subscribe(
       (result) => {
         this.logger.info('submit workflow returned okay ', result);
+        this.navigationModel.submitting = false;
         this.planManagementService.planBudgetReadOnlyEmitter.next(true);
 
         this.workflowModel.initializeForPlan(dto.fprId);
@@ -442,6 +446,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
         this.gmComponent.gmform.resetForm();
       },
       (error) => {
+        this.navigationModel.submitting = false;
         this.logger.error('submit workflow returned error', error);
         this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       }

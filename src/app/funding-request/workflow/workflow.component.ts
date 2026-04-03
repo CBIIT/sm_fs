@@ -26,6 +26,7 @@ import { Alert } from 'src/app/alert-billboard/alert';
 import { CanWarning, WorkflowWarningModalComponent } from './warning-modal/workflow-warning-modal.component';
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
 import { Router } from '@angular/router';
+import { NavigationModel } from 'src/app/model/navigation-model';
 
 const approverMap = new Map<number, any>();
 let addedApproverMap = new Map<number, any>();
@@ -112,6 +113,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
               private requestModel: RequestModel,
               private workflowModel: WorkflowModel,
               private router: Router,
+              private navigationModel: NavigationModel,
               private logger: NGXLogger) {
   }
 
@@ -353,6 +355,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
 
   private submitWorkflowToBackend(): void {
     this.logger.info(`Form validation successful; submitting workflow for frqId#${this.requestModel.requestDto.frqId} to backend`);
+    this.navigationModel.submitting = true;
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
@@ -422,11 +425,13 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.workflowService.submitWorkflow(dto).subscribe(
       (result) => {
         this.logger.info(`Submit workflow for frqId#${this.requestModel.requestDto.frqId} returned success`);
+        this.navigationModel.submitting = false;
         this.workflowModel.initialize();
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
       },
       (error) => {
+        this.navigationModel.submitting = false;
         this.logger.error(`submit workflow for frqId#${this.requestModel.requestDto.frqId} returned error: ${JSON.stringify(error)}`);
         this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       }
