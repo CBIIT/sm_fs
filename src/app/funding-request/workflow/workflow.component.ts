@@ -7,6 +7,7 @@ import {
   WorkflowTaskDto
 } from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
+import { LoaderService } from '@cbiit/i2ecui-lib';
 import { Subscription } from 'rxjs';
 import { Options } from 'select2';
 import { RequestModel } from 'src/app/model/request/request-model';
@@ -114,6 +115,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
               private workflowModel: WorkflowModel,
               private router: Router,
               private navigationModel: NavigationModel,
+              private loaderService: LoaderService,
               private logger: NGXLogger) {
   }
 
@@ -356,6 +358,7 @@ export class WorkflowComponent implements OnInit, OnDestroy {
   private submitWorkflowToBackend(): void {
     this.logger.info(`Form validation successful; submitting workflow for frqId#${this.requestModel.requestDto.frqId} to backend`);
     this.navigationModel.submitting = true;
+    this.loaderService.show();
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
@@ -426,12 +429,14 @@ export class WorkflowComponent implements OnInit, OnDestroy {
       (result) => {
         this.logger.info(`Submit workflow for frqId#${this.requestModel.requestDto.frqId} returned success`);
         this.navigationModel.submitting = false;
+        this.loaderService.hide();
         this.workflowModel.initialize();
         this.showAddApprover = false;
         this.requestIntegrationService.requestSubmissionEmitter.next(dto);
       },
       (error) => {
         this.navigationModel.submitting = false;
+        this.loaderService.hide();
         this.logger.error(`submit workflow for frqId#${this.requestModel.requestDto.frqId} returned error: ${JSON.stringify(error)}`);
         this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       }
