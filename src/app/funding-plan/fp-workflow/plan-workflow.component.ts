@@ -23,7 +23,7 @@ import { PlanModel } from 'src/app/model/plan/plan-model';
 import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import { NavigationModel } from 'src/app/model/navigation-model';
-import { AppPropertiesService, DatepickerFormatter } from '@cbiit/i2ecui-lib';
+import { AppPropertiesService, DatepickerFormatter, LoaderService } from '@cbiit/i2ecui-lib';
 import { FpGrantManagementComponent } from './fp-grant-management/fp-grant-management.component';
 import { UploadBudgetDocumentsComponent } from 'src/app/upload-budget-documents/upload-budget-documents.component';
 import { PlanManagementService } from '../service/plan-management.service';
@@ -125,6 +125,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
     private calendar: NgbCalendar,
     private router: Router,
     private navigationModel: NavigationModel,
+    private loaderService: LoaderService,
     private logger: NGXLogger
   ) {
     this.maxDate = this.calendar.getToday();
@@ -370,6 +371,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
   private submitWorkflowToBackend(): void {
     //  return;
     this.navigationModel.submitting = true;
+    this.loaderService.show();
     const action: WorkflowActionCode = this._selectedWorkflowAction.action;
     const dto: WorkflowTaskDto = {};
     dto.actionUserId = this.userSessionService.getLoggedOnUser().nihNetworkId;
@@ -430,6 +432,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       (result) => {
         this.logger.info('submit workflow returned okay ', result);
         this.navigationModel.submitting = false;
+        this.loaderService.hide();
         this.planManagementService.planBudgetReadOnlyEmitter.next(true);
 
         this.workflowModel.initializeForPlan(dto.fprId);
@@ -447,6 +450,7 @@ export class PlanWorkflowComponent implements OnInit, OnDestroy {
       },
       (error) => {
         this.navigationModel.submitting = false;
+        this.loaderService.hide();
         this.logger.error('submit workflow returned error', error);
         this.requestIntegrationService.requestSubmitFailureEmitter.next(error);
       }
