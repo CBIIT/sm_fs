@@ -107,7 +107,7 @@ jobs:
             exit 1
           fi
           
-          sudo su - githubuser -c "cd $GITHUB_WORKSPACE/ && scp -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:/tmp/'$ARTIFACT_FILENAME'"
+          sudo su - githubuser -c "cd $GITHUB_WORKSPACE/${{ env.build-base-path }} && scp -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:/tmp/'$ARTIFACT_FILENAME'"
           sudo su - githubuser -c "
             ssh -o StrictHostKeyChecking=no tomcatb@${TARGET_SERVER} '
               cd ${DEPLOY_PATH} &&
