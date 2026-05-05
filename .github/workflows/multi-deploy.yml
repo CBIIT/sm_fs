@@ -1,4 +1,4 @@
-name: Deploy GPMATS to Different Environments
+name: Deploy Funding Selection to Different Environments
 on:
   workflow_dispatch:
     inputs:
