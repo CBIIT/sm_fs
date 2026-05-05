@@ -12,9 +12,12 @@ on:
 env:
   NODE_VERSION: '18.x'
   ANGULAR_CLI_VERSION: '18.2.2'
+  app-base-href: '/fs/'
+  build-base-path: 'dist/fs/' 
+  artifact-name: 'fs-build'       
 
 jobs:
-  build-fs:
+  npm-build:
     name: Build Funding Selection Angular Application
     runs-on: 
       group: cbiit-global-runners
@@ -65,7 +68,7 @@ jobs:
           echo "Angular: $(ng version)"
 
       - name: Build application
-        run: ng build --configuration=dev --base-href=/fs/
+        run: ng build --configuration=dev --base-href=${{ env.app-base-href }}
 
       - name: Log build output
         run: |
@@ -73,21 +76,21 @@ jobs:
           echo "  Build Output Summary"
           echo "========================================="
           echo "Files:"
-          ls -lah dist/fs
+          ls -lah ${{ env.build-base-path }}
           echo ""
-          echo "Total size: $(du -sh dist/fs | cut -f1)"
-          echo "File count: $(find dist/fs -type f | wc -l)"
+          echo "Total size: $(du -sh ${{ env.build-base-path }} | cut -f1)"
+          echo "File count: $(find ${{ env.build-base-path }} -type f | wc -l)"
           echo "========================================="
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fs-build
-          path: dist/fs
+          name: ${{ env.artifact-name }}
+          path: ${{ env.build-base-path }}
           retention-days: 7
 
   deploy-to-dev:
-    needs: build-fs
+    needs: npm-build
     if: ${{ inputs.dev_deploy }}
     # Call the reusable workflow defined in .github/workflows/multi-deploy.yml
     uses: ./.github/workflows/multi-deploy.yml

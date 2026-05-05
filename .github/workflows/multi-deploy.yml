@@ -38,14 +38,15 @@ on:
         description: 'Require manual approval for production deploys'
         default: false
 env:
-  remote: 'tbd'
   remote_path: '/local/content/web/i2e/wwwroot/fs'
   remote_user: 'tomcatb'
-  dev_server: 'nciws-d2648-v'
+  remote: 'nciws-d2648-v'  # default to dev server
   qa_server: 'nciws-q2169-v'
   stage_server: 'nciws-s2173-v'
   prod_server: 'nciws-p2171-v'
-  app: 'fs'
+  app_name: 'fs'
+  build-base-path: 'dist/fs/' 
+  artifact-name: 'fs-build'   
   tier: ${{ inputs.environment }}
 
 jobs:
@@ -57,16 +58,12 @@ jobs:
     steps:
       - name: Set target server based on environment selection  
         run: |
-          if [ "${{ inputs.environment }}" = "dev" ]; then
-            echo "remote=${{env.dev_server}}" >> $GITHUB_ENV
-          elif [ "${{ inputs.environment }}" = "qa" ]; then
+          if [ "${{ inputs.environment }}" = "qa" ]; then
             echo "remote=${{env.qa_server}}" >> $GITHUB_ENV
           elif [ "${{ inputs.environment }}" = "stage" ]; then
             echo "remote=${{env.stage_server}}" >> $GITHUB_ENV
           elif [ "${{ inputs.environment }}" = "prod" ]; then
             echo "remote=${{env.prod_server}}" >> $GITHUB_ENV
-          else
-            echo "remote=${{env.dev_server}}" >> $GITHUB_ENV
           fi
 
       - name: Display Build Information
@@ -88,20 +85,20 @@ jobs:
         uses: dawidd6/action-download-artifact@v11
         with:
           workflow: npm-build.yml
-          name: fs-build
-          path: dist/fs
+          name: ${{ env.artifact-name }}
+          path: ${{ env.build-base-path }}
           run_number: ${{inputs.run_num}}
           run_id: ${{inputs.run_id}}
           skip_unpack: true
           
       - name: Deploy to Target Server
         run: |
-          ARTIFACT_FILENAME="fs-build.zip"
+          ARTIFACT_FILENAME="${{ env.artifact-name }}.zip"
           TARGET_SERVER="${{env.remote}}"
           DEPLOY_PATH="${{env.remote_path}}"
           
           echo "🚀 Deploying build ${{ inputs.run_num }} to ${TARGET_SERVER}..."
-          cd dist/fs
+          cd ${{ env.build-base-path }}
           
           if [ ! -f "$ARTIFACT_FILENAME" ]; then
             echo "❌ Error: build artifact $ARTIFACT_FILENAME not found"
@@ -110,14 +107,14 @@ jobs:
             exit 1
           fi
           
-          sudo su - githubuser -c "cd $GITHUB_WORKSPACE/dist/fs && scp -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:/tmp/'$ARTIFACT_FILENAME'"
+          sudo su - githubuser -c "cd $GITHUB_WORKSPACE/ && scp -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:/tmp/'$ARTIFACT_FILENAME'"
           sudo su - githubuser -c "
             ssh -o StrictHostKeyChecking=no tomcatb@${TARGET_SERVER} '
               cd ${DEPLOY_PATH} &&
               cp /tmp/$ARTIFACT_FILENAME . &&
               mkdir -p backups &&
               if [ -f index.html ] || [ \$(ls -A . 2>/dev/null) ]; then
-                BACKUP_NAME=fs-backup-\$(date +%Y%m%d_%H%M%S) &&
+                BACKUP_NAME=${{ env.app_name }}-backup-\$(date +%Y%m%d_%H%M%S) &&
                 mkdir -p backups/\$BACKUP_NAME &&
                 find . -maxdepth 1 -not -name backups -not -name . -not -name $ARTIFACT_FILENAME -exec mv {} backups/\$BACKUP_NAME/ \;
               fi &&
