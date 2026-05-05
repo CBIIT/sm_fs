@@ -1,4 +1,4 @@
-name: Build GPMATS using NPM
+name: Build Funding Selection using NPM
 
 on:
   workflow_dispatch:
