@@ -1,0 +1,100 @@
+name: Build GPMATS using NPM
+
+on:
+  workflow_dispatch:
+    inputs:
+      dev_deploy:
+        required: false
+        type: boolean
+        description: 'Deploy to Development after build?'
+        default: true
+
+env:
+  NODE_VERSION: '18.x'
+  ANGULAR_CLI_VERSION: '18.2.2'
+
+jobs:
+  build-fs:
+    name: Build Funding Selection Angular Application
+    runs-on: 
+      group: cbiit-global-runners
+      labels: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log build information
+        run: |
+          echo "========================================="
+          echo "  Funding Selection Build Information"
+          echo "========================================="
+          echo "Repository:    ${{ github.repository }}"
+          echo "Branch:        ${{ github.ref_name }}"
+          echo "Commit SHA:    ${{ github.sha }}"
+          echo "Commit Msg:    $(git log -1 --pretty=%s)"
+          echo "Triggered by:  ${{ github.actor }}"
+          echo "Run Number:    ${{ github.run_number }}"
+          echo "Run ID:        ${{ github.run_id }}"
+          echo "Runner OS:     ${{ runner.os }}"
+          echo "Node Version:  ${{ env.NODE_VERSION }}"
+          echo "Angular CLI:   ${{ env.ANGULAR_CLI_VERSION }}"
+          echo "Timestamp:     $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          echo "========================================="
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup .npmrc
+        run: |
+          echo "@cbiit:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_PAT }}" >> .npmrc
+
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli@${{ env.ANGULAR_CLI_VERSION }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Log dependency versions
+        run: |
+          echo "Node:    $(node --version)"
+          echo "NPM:     $(npm --version)"
+          echo "Angular: $(ng version)"
+
+      - name: Build application
+        run: ng build --configuration=dev --base-href=/fs/
+
+      - name: Log build output
+        run: |
+          echo "======================= =================="
+          echo "  Build Output Summary"
+          echo "========================================="
+          echo "Files:"
+          ls -lah dist/fs
+          echo ""
+          echo "Total size: $(du -sh dist/fs | cut -f1)"
+          echo "File count: $(find dist/fs -type f | wc -l)"
+          echo "========================================="
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fs-build
+          path: dist/fs
+          retention-days: 7
+
+  deploy-to-dev:
+    needs: build-fs
+    if: ${{ inputs.dev_deploy }}
+    # Call the reusable workflow defined in .github/workflows/multi-deploy.yml
+    uses: ./.github/workflows/multi-deploy.yml
+    with:
+      # Pass the current workflow run id as the deployment run_id
+      run_id: ${{ github.run_id }}
+      # Deploy to dev environment
+      environment: 'dev'
+      production_approval: false
+    secrets: inherit

@@ -1,0 +1,149 @@
+name: Deploy GPMATS to Different Environments
+on:
+  workflow_dispatch:
+    inputs:
+      run_num:
+        required: true
+        type: string
+        description: 'Build run number to deploy'
+      environment:
+        required: true
+        type: choice
+        description: 'Deployment environment (select one)'
+        options:
+          - dev
+          - qa
+          - stage
+          - prod
+        default: dev
+      production_approval:
+        required: false
+        type: boolean
+        description: 'Require manual approval for production deploys'
+        default: false
+        
+  workflow_call:
+    inputs:
+      run_id:
+        required: true
+        type: string
+        description: 'Build run id to deploy'
+      environment:
+        required: true
+        type: string
+        description: 'Deployment environment (dev, qa, stage, prod)'
+      production_approval:
+        required: false
+        type: boolean
+        description: 'Require manual approval for production deploys'
+        default: false
+env:
+  remote: 'tbd'
+  remote_path: '/local/content/web/i2e/wwwroot/fs'
+  remote_user: 'tomcatb'
+  dev_server: 'nciws-d2648-v'
+  qa_server: 'nciws-q2169-v'
+  stage_server: 'nciws-s2173-v'
+  prod_server: 'nciws-p2171-v'
+  app: 'fs'
+  tier: ${{ inputs.environment }}
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }} Environment
+    runs-on: 
+      group: cbiit-global-runners
+      labels: self-hosted
+    steps:
+      - name: Set target server based on environment selection  
+        run: |
+          if [ "${{ inputs.environment }}" = "dev" ]; then
+            echo "remote=${{env.dev_server}}" >> $GITHUB_ENV
+          elif [ "${{ inputs.environment }}" = "qa" ]; then
+            echo "remote=${{env.qa_server}}" >> $GITHUB_ENV
+          elif [ "${{ inputs.environment }}" = "stage" ]; then
+            echo "remote=${{env.stage_server}}" >> $GITHUB_ENV
+          elif [ "${{ inputs.environment }}" = "prod" ]; then
+            echo "remote=${{env.prod_server}}" >> $GITHUB_ENV
+          else
+            echo "remote=${{env.dev_server}}" >> $GITHUB_ENV
+          fi
+
+      - name: Display Build Information
+        run: |
+          echo "🚀 DEPLOYMENT BUILD INFORMATION - Environment: ${{ inputs.environment }}"
+          echo "=================================="
+          echo "Build Run Number: ${{ inputs.run_num }}"
+          echo "Build Run ID: ${{ inputs.run_id }}"
+          echo "Environment: ${{env.tier}}"
+          echo "Target Server: ${{env.remote}}"
+          echo "Deploy Path: ${{env.remote_path}}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          echo "=================================="
+          
+      - name: Download Build Artifact
+        uses: dawidd6/action-download-artifact@v11
+        with:
+          workflow: npm-build.yml
+          name: fs-build
+          path: dist/fs
+          run_number: ${{inputs.run_num}}
+          run_id: ${{inputs.run_id}}
+          skip_unpack: true
+          
+      - name: Deploy to Target Server
+        run: |
+          ARTIFACT_FILENAME="fs-build.zip"
+          TARGET_SERVER="${{env.remote}}"
+          DEPLOY_PATH="${{env.remote_path}}"
+          
+          echo "🚀 Deploying build ${{ inputs.run_num }} to ${TARGET_SERVER}..."
+          cd dist/fs
+          
+          if [ ! -f "$ARTIFACT_FILENAME" ]; then
+            echo "❌ Error: build artifact $ARTIFACT_FILENAME not found"
+            echo "Available files in artifacts directory:"
+            ls -la
+            exit 1
+          fi
+          
+          sudo su - githubuser -c "cd $GITHUB_WORKSPACE/dist/fs && scp -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:/tmp/'$ARTIFACT_FILENAME'"
+          sudo su - githubuser -c "
+            ssh -o StrictHostKeyChecking=no tomcatb@${TARGET_SERVER} '
+              cd ${DEPLOY_PATH} &&
+              cp /tmp/$ARTIFACT_FILENAME . &&
+              mkdir -p backups &&
+              if [ -f index.html ] || [ \$(ls -A . 2>/dev/null) ]; then
+                BACKUP_NAME=fs-backup-\$(date +%Y%m%d_%H%M%S) &&
+                mkdir -p backups/\$BACKUP_NAME &&
+                find . -maxdepth 1 -not -name backups -not -name . -not -name $ARTIFACT_FILENAME -exec mv {} backups/\$BACKUP_NAME/ \;
+              fi &&
+              unzip -o $ARTIFACT_FILENAME &&
+              chmod -R 755 . &&
+              find . -type f -name \"*.html\" -exec chmod 644 {} \; &&
+              find . -type f -name \"*.js\" -exec chmod 644 {} \; &&
+              find . -type f -name \"*.css\" -exec chmod 644 {} \; &&
+              
+              # Create QA deployment info file
+              echo \"{
+                \\\"deployedAt\\\": \\\"\$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\",
+                \\\"buildNumber\\\": \\\"${{ inputs.run_num }}\\\",
+                \\\"environment\\\": \\\"QA\\\",
+                \\\"deployedBy\\\": \\\"${{ github.actor }}\\\",
+                \\\"server\\\": \\\"${TARGET_SERVER}\\\",
+                \\\"deployPath\\\": \\\"${DEPLOY_PATH}\\\",
+                \\\"workflowRun\\\": \\\"${{ github.run_id }}\\\"
+              }\" > deployment-info.json &&
+              
+              rm -f $ARTIFACT_FILENAME &&
+              cd backups && ls -t gpmats-backup-* 2>/dev/null | tail -n +6 | xargs -r rm -rf && cd .. &&
+              rm -f /tmp/$ARTIFACT_FILENAME
+            '
+          "
+          
+          echo "✅ deployment completed successfully!"
+          echo "📊 Build: ${{ inputs.run_num }} | Environment: ${{inputs.environment}} | Deployed by: ${{ github.actor }}"
+
