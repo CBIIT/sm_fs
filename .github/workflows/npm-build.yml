@@ -18,7 +18,7 @@ env:
 
 jobs:
   npm-build:
-    name: Build Funding Selection Angular Application
+    name: Build Angular Application
     runs-on: 
       group: cbiit-global-runners
       labels: self-hosted
@@ -30,7 +30,7 @@ jobs:
       - name: Log build information
         run: |
           echo "========================================="
-          echo "  Funding Selection Build Information"
+          echo "  Angular Build Information"
           echo "========================================="
           echo "Repository:    ${{ github.repository }}"
           echo "Branch:        ${{ github.ref_name }}"
