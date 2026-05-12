@@ -1,4 +1,5 @@
-name: Deploy Funding Selection to Different Environments
+name: Deploy Angular Application to Apache Server
+run-name: Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} to ${{ inputs.environment}} - Run #${{ github.run_number }}
 on:
   workflow_dispatch:
     inputs:
@@ -38,16 +39,25 @@ on:
         description: 'Require manual approval for production deploys'
         default: false
 env:
-  remote_path: '/local/content/web/i2e/wwwroot/fs'
-  remote_user: 'tomcatb'
-  remote: 'nciws-d2648-v'  # default to dev server
-  qa_server: 'nciws-q2169-v'
-  stage_server: 'nciws-s2173-v'
-  prod_server: 'nciws-p2171-v'
-  app_name: 'fs'
-  build-base-path: 'dist/fs/' 
-  artifact-name: 'fs-build'   
+  app_name: ${{ fromJson(vars.APP_PROPERTIES).app_name }}
+  artifact_name: ${{ fromJson(vars.APP_PROPERTIES).artifact_name }}
+  remote: ${{ fromJson(vars.APP_PROPERTIES).dev_server }} 
+  remote_home: ${{ fromJson(vars.APP_PROPERTIES).remote_home }}   
+  remote_user: ${{ fromJson(vars.APP_PROPERTIES).remote_user }}
+  qa_server: ${{ fromJson(vars.APP_PROPERTIES).qa_server }}
+  stage_server: ${{ fromJson(vars.APP_PROPERTIES).stage_server }}     
+  prod_server: ${{ fromJson(vars.APP_PROPERTIES).prod_server }}
+  build_base_path: ${{ fromJson(vars.APP_PROPERTIES).build_base_path }}
   tier: ${{ inputs.environment }}
+ # remote_path: '/local/content/web/i2e/wwwroot/fs'
+ # remote_user: 'tomcatb'
+ # remote: 'nciws-d2648-v'  # default to dev server
+ # qa_server: 'nciws-q2169-v'
+ # stage_server: 'nciws-s2173-v'
+ # prod_server: 'nciws-p2171-v'
+ # app_name: 'fs'
+ # build-base-path: 'dist/fs/' 
+ # artifact-name: 'fs-build'   
 
 jobs:
   deploy:
@@ -74,7 +84,7 @@ jobs:
           echo "Build Run ID: ${{ inputs.run_id }}"
           echo "Environment: ${{env.tier}}"
           echo "Target Server: ${{env.remote}}"
-          echo "Deploy Path: ${{env.remote_path}}"
+          echo "Deploy Path: ${{env.remote_home}}"
           echo "Triggered by: ${{ github.actor }}"
           echo "Workflow: ${{ github.workflow }}"
           echo "Repository: ${{ github.repository }}"
@@ -85,20 +95,20 @@ jobs:
         uses: dawidd6/action-download-artifact@v11
         with:
           workflow: npm-build.yml
-          name: ${{ env.artifact-name }}
-          path: ${{ env.build-base-path }}
+          name: ${{ env.artifact_name }}
+          path: ${{ env.build_base_path }}
           run_number: ${{inputs.run_num}}
           run_id: ${{inputs.run_id}}
           skip_unpack: true
           
       - name: Deploy to Target Server
         run: |
-          ARTIFACT_FILENAME="${{ env.artifact-name }}.zip"
+          ARTIFACT_FILENAME="${{ env.artifact_name }}.zip"
           TARGET_SERVER="${{env.remote}}"
-          DEPLOY_PATH="${{env.remote_path}}"
+          DEPLOY_PATH="${{env.remote_home}}"
           
-          echo "🚀 Deploying build ${{ inputs.run_num }} to ${TARGET_SERVER}..."
-          cd ${{ env.build-base-path }}
+          echo "🚀 Deploying build ${{ inputs.run_num || inputs.run_id }} to ${TARGET_SERVER}..."
+          cd ${{ env.build_base_path }}
           
           if [ ! -f "$ARTIFACT_FILENAME" ]; then
             echo "❌ Error: build artifact $ARTIFACT_FILENAME not found"
@@ -107,7 +117,7 @@ jobs:
             exit 1
           fi
           
-          sudo su - githubuser -c "cd $GITHUB_WORKSPACE/${{ env.build-base-path }} && scp -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:/tmp/'$ARTIFACT_FILENAME'"
+          sudo su - githubuser -c "cd $GITHUB_WORKSPACE/${{ env.build_base_path }} && scp -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:/tmp/'$ARTIFACT_FILENAME'"
           sudo su - githubuser -c "
             ssh -o StrictHostKeyChecking=no tomcatb@${TARGET_SERVER} '
               cd ${DEPLOY_PATH} &&
@@ -142,5 +152,5 @@ jobs:
           "
           
           echo "✅ deployment completed successfully!"
-          echo "📊 Build: ${{ inputs.run_num }} | Environment: ${{inputs.environment}} | Deployed by: ${{ github.actor }}"
+          echo "📊 Artifact from Build: ${{ inputs.run_num || inputs.run_id }} | Environment: ${{inputs.environment}} | Deployed by: ${{ github.actor }}"
 

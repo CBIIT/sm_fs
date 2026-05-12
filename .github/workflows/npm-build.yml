@@ -1,4 +1,5 @@
-name: Build Funding Selection using NPM
+name: Build Angular Application and Deploy to Dev
+run-name: Build and Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} - Run #${{ github.run_number }} on ${{ github.ref_name }}
 
 on:
   workflow_dispatch:
@@ -10,11 +11,11 @@ on:
         default: true
 
 env:
-  NODE_VERSION: '18.x'
-  ANGULAR_CLI_VERSION: '18.2.2'
-  app-base-href: '/fs/'
-  build-base-path: 'dist/fs/' 
-  artifact-name: 'fs-build'       
+  NODE_VERSION: ${{ fromJson(vars.WORKFLOW_PROPERTIES).NODE_VERSION }} # '18.x'
+  ANGULAR_CLI_VERSION: ${{ fromJson(vars.WORKFLOW_PROPERTIES).ANGULAR_CLI_VERSION }} # '18.2.2'
+  app_base_href: ${{ fromJson(vars.APP_PROPERTIES).app_base_href }} # '/fs/'
+  build_base_path: ${{ fromJson(vars.APP_PROPERTIES).build_base_path }} # 'dist/fs/' 
+  artifact_name: ${{ fromJson(vars.APP_PROPERTIES).artifact_name }} #'fs-build'       
 
 jobs:
   npm-build:
@@ -68,7 +69,7 @@ jobs:
           echo "Angular: $(ng version)"
 
       - name: Build application
-        run: ng build --configuration=dev --base-href=${{ env.app-base-href }}
+        run: ng build --configuration=dev --base-href=${{ env.app_base_href }}
 
       - name: Log build output
         run: |
@@ -76,24 +77,24 @@ jobs:
           echo "  Build Output Summary"
           echo "========================================="
           echo "Files:"
-          ls -lah ${{ env.build-base-path }}
+          ls -lah ${{ env.build_base_path }}
           echo ""
-          echo "Total size: $(du -sh ${{ env.build-base-path }} | cut -f1)"
-          echo "File count: $(find ${{ env.build-base-path }} -type f | wc -l)"
+          echo "Total size: $(du -sh ${{ env.build_base_path }} | cut -f1)"
+          echo "File count: $(find ${{ env.build_base_path }} -type f | wc -l)"
           echo "========================================="
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.artifact-name }}
-          path: ${{ env.build-base-path }}
+          name: ${{ env.artifact_name }}
+          path: ${{ env.build_base_path }}
           retention-days: 7
 
   deploy-to-dev:
     needs: npm-build
     if: ${{ inputs.dev_deploy }}
     # Call the reusable workflow defined in .github/workflows/multi-deploy.yml
-    uses: ./.github/workflows/multi-deploy.yml
+    uses: ./.github/workflows/deploy-apache.yml
     with:
       # Pass the current workflow run id as the deployment run_id
       run_id: ${{ github.run_id }}
