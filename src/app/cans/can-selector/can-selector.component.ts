@@ -72,9 +72,10 @@ export class CanSelectorComponent implements OnInit {
   }
 
   private handleNewCAN(can: CanCcxDto): void {
-    this.loadSelectedCanDetails(can.can);
+    // Set selectedCanData immediately from the already-available CanCcxDto to avoid
+    // a race condition where the user submits before the async loadSelectedCanDetails returns.
+    this.selectedCanData = can;
     this.initializeDefaultCans(can.can);
-
     this.selectedValue = can.can;
   }
 
@@ -101,7 +102,9 @@ export class CanSelectorComponent implements OnInit {
         });
       }
       this.selectedValue = this.projectedCan.can;
-      this.loadSelectedCanDetails(this.selectedValue);
+      // Set selectedCanData immediately from the already-available projectedCan to avoid
+      // a race condition where the user submits before the async loadSelectedCanDetails returns.
+      this.selectedCanData = this.projectedCan;
 
       return true;
     }
@@ -123,7 +126,14 @@ export class CanSelectorComponent implements OnInit {
     // this.logger.debug('onModelChange()', this.fseId, this.selectedValue);
     this.canService.checkDefaultCANs(this.fseId, -1, this.activityCodes, this.bmmCodes, this.nciSourceFlag, this.selectedValue);
     if (this.selectedValue) {
-      this.loadSelectedCanDetails(this.selectedValue);
+      // Try to resolve CAN details synchronously from already-loaded data to avoid a race
+      // condition where the user submits before the async loadSelectedCanDetails returns.
+      const existingData = this.data?.find(d => d.id === this.selectedValue)?.additional as CanCcxDto;
+      if (existingData) {
+        this.selectedCanData = existingData;
+      } else {
+        this.loadSelectedCanDetails(this.selectedValue);
+      }
     } else {
       this.selectedCanData = null;
     }
