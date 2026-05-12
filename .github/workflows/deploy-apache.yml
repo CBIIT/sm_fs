@@ -1,5 +1,5 @@
 name: Deploy Angular Application to Apache Server
-run-name: Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} to ${{ inputs.environment}} - Run #${{ github.run_number }}
+run-name: Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} from Build ${{ inputs.run_num || inputs.run_id }} to ${{ inputs.environment}} - Run #${{ github.run_number }}
 on:
   workflow_dispatch:
     inputs:
@@ -13,7 +13,7 @@ on:
         description: 'Deployment environment (select one)'
         options:
           - dev
-          - qa
+          - test
           - stage
           - prod
         default: dev
@@ -68,7 +68,7 @@ jobs:
     steps:
       - name: Set target server based on environment selection  
         run: |
-          if [ "${{ inputs.environment }}" = "qa" ]; then
+          if [ "${{ inputs.environment }}" = "test" ]; then
             echo "remote=${{env.qa_server}}" >> $GITHUB_ENV
           elif [ "${{ inputs.environment }}" = "stage" ]; then
             echo "remote=${{env.stage_server}}" >> $GITHUB_ENV
@@ -76,6 +76,14 @@ jobs:
             echo "remote=${{env.prod_server}}" >> $GITHUB_ENV
           fi
 
+      - name: Output Inputs and Environment Variables
+        run: |
+          echo "Workflow INPUTS & ENVIRONMENT VARIABLES"
+          echo "=========================================="
+          echo "Inputs: ${{ toJson(inputs) }}"
+          echo "Environment Variables: ${{ toJson(env) }}"
+          echo "=========================================="
+          
       - name: Display Build Information
         run: |
           echo "🚀 DEPLOYMENT BUILD INFORMATION - Environment: ${{ inputs.environment }}"
