@@ -20,9 +20,9 @@ env:
 jobs:
   npm-build:
     name: Build Angular Application
-    runs-on: 
-      group: cbiit-global-runners
-      labels: self-hosted
+    runs-on: [fargate-al2023-s-nonprod]
+#      group: cbiit-global-runners
+#      labels: self-hosted
 
     steps:
       - name: Checkout code
