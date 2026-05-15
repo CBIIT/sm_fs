@@ -22,7 +22,7 @@ jobs:
     name: Build Angular Application
     runs-on: 
       group: cbiit-test-automation-runners
-      labels: [fargate-al2023-s-nonprod]
+      labels: fargate-al2023-s-nonprod
 
     steps:
       - name: Checkout code
