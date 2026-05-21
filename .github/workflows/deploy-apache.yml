@@ -127,8 +127,8 @@ jobs:
             exit 1
           fi
           
-          sudo su - cbiit-user -c "cd $GITHUB_WORKSPACE/${{ env.build_base_path }} && scp -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:/tmp/'$ARTIFACT_FILENAME'"
-          sudo su - cbiit-user -c "
+          sudo su - cbiit-runner -c "cd $GITHUB_WORKSPACE/${{ env.build_base_path }} && scp -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:/tmp/'$ARTIFACT_FILENAME'"
+          sudo su - cbiit-runner -c "
             ssh -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no tomcatb@${TARGET_SERVER} '
               cd ${DEPLOY_PATH} &&
               cp /tmp/$ARTIFACT_FILENAME . &&
