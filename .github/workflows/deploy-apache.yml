@@ -127,9 +127,12 @@ jobs:
             exit 1
           fi
           
-          sudo su - cbiit-runner -c "cd $GITHUB_WORKSPACE/${{ env.build_base_path }} && scp -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:/tmp/'$ARTIFACT_FILENAME'"
+          sudo su - cbiit-runner -c "cd $GITHUB_WORKSPACE/${{ env.build_base_path }} && scp -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:[...]
           sudo su - cbiit-runner -c "
             ssh -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no tomcatb@${TARGET_SERVER} '
+              if [ ! -d ${DEPLOY_PATH} ]; then
+                mkdir -p ${DEPLOY_PATH}
+              fi &&
               cd ${DEPLOY_PATH} &&
               cp /tmp/$ARTIFACT_FILENAME . &&
               mkdir -p backups &&
@@ -163,4 +166,3 @@ jobs:
           
           echo "✅ deployment completed successfully!"
           echo "📊 Artifact from Build: ${{ inputs.run_num || inputs.run_id }} | Environment: ${{inputs.environment}} | Deployed by: ${{ github.actor }}"
-
