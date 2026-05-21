@@ -21,8 +21,8 @@ jobs:
   npm-build:
     name: Build Angular Application
     runs-on: 
-      group: cbiit-global-runners
-      labels: self-hosted
+      group: cbiit-test-automation-runners
+      labels: fargate-al2023-s-nonprod
 
     steps:
       - name: Checkout code

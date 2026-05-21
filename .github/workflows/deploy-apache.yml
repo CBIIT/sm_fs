@@ -63,8 +63,10 @@ jobs:
   deploy:
     name: Deploy to ${{ inputs.environment }} Environment
     runs-on: 
-      group: cbiit-global-runners
-      labels: self-hosted
+      group: cbiit-test-automation-runners
+      labels: fargate-al2023-s-nonprod
+#      group: cbiit-global-runners
+#      labels: self-hosted
     steps:
       - name: Set target server based on environment selection  
         run: |
