@@ -41,23 +41,11 @@ on:
 env:
   app_name: ${{ fromJson(vars.APP_PROPERTIES).app_name }}
   artifact_name: ${{ fromJson(vars.APP_PROPERTIES).artifact_name }}
-  remote: ${{ fromJson(vars.APP_PROPERTIES).dev_server }} 
+  remote:
   remote_home: ${{ fromJson(vars.APP_PROPERTIES).remote_home }}   
   remote_user: ${{ fromJson(vars.APP_PROPERTIES).remote_user }}
-  qa_server: ${{ fromJson(vars.APP_PROPERTIES).qa_server }}
-  stage_server: ${{ fromJson(vars.APP_PROPERTIES).stage_server }}     
-  prod_server: ${{ fromJson(vars.APP_PROPERTIES).prod_server }}
   build_base_path: ${{ fromJson(vars.APP_PROPERTIES).build_base_path }}
-  tier: ${{ inputs.environment }}
- # remote_path: '/local/content/web/i2e/wwwroot/fs'
- # remote_user: 'tomcatb'
- # remote: 'nciws-d2648-v'  # default to dev server
- # qa_server: 'nciws-q2169-v'
- # stage_server: 'nciws-s2173-v'
- # prod_server: 'nciws-p2171-v'
- # app_name: 'fs'
- # build-base-path: 'dist/fs/' 
- # artifact-name: 'fs-build'   
+  tier: ${{ inputs.environment }} 
 
 jobs:
   deploy:
@@ -70,12 +58,14 @@ jobs:
     steps:
       - name: Set target server based on environment selection  
         run: |
-          if [ "${{ inputs.environment }}" = "test" ]; then
-            echo "remote=${{env.qa_server}}" >> $GITHUB_ENV
+          if [ "${{ inputs.environment }}" = "dev" ]; then
+            echo "remote=${{fromJson(vars.APP_PROPERTIES).dev_server}}" >> $GITHUB_ENV
+          elif [ "${{ inputs.environment }}" = "test" ]; then
+            echo "remote=${{fromJson(vars.APP_PROPERTIES).qa_server}}" >> $GITHUB_ENV
           elif [ "${{ inputs.environment }}" = "stage" ]; then
-            echo "remote=${{env.stage_server}}" >> $GITHUB_ENV
+            echo "remote=${{fromJson(vars.APP_PROPERTIES).stage_server}}" >> $GITHUB_ENV
           elif [ "${{ inputs.environment }}" = "prod" ]; then
-            echo "remote=${{env.prod_server}}" >> $GITHUB_ENV
+            echo "remote=${{fromJson(vars.APP_PROPERTIES).prod_server}}" >> $GITHUB_ENV
           fi
 
       - name: Output Inputs and Environment Variables
@@ -116,6 +106,7 @@ jobs:
           ARTIFACT_FILENAME="${{ env.artifact_name }}.zip"
           TARGET_SERVER="${{env.remote}}"
           DEPLOY_PATH="${{env.remote_home}}"
+          REMOTE_USER="${{ env.remote_user }}"
           
           echo "🚀 Deploying build ${{ inputs.run_num || inputs.run_id }} to ${TARGET_SERVER}..."
           cd ${{ env.build_base_path }}
@@ -127,9 +118,9 @@ jobs:
             exit 1
           fi
           
-          sudo su - cbiit-runner -c "cd $GITHUB_WORKSPACE/${{ env.build_base_path }} && scp -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:[...]
-          sudo su - cbiit-runner -c "
-            ssh -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no tomcatb@${TARGET_SERVER} '
+          cd $GITHUB_WORKSPACE/${{ env.build_base_path }} 
+          scp -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' ${REMOTE_USER}@${TARGET_SERVER}:[...]
+          ssh -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no ${REMOTE_USER}@${TARGET_SERVER} '
               if [ ! -d ${DEPLOY_PATH} ]; then
                 mkdir -p ${DEPLOY_PATH}
               fi &&
@@ -150,19 +141,18 @@ jobs:
               # Create QA deployment info file
               echo \"{
                 \\\"deployedAt\\\": \\\"\$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\",
-                \\\"buildNumber\\\": \\\"${{ inputs.run_num }}\\\",
-                \\\"environment\\\": \\\"QA\\\",
+                \\\"build workflow run number/id\\\": \\\"${{ inputs.run_num || inputs.run_id }}\\\",
+                \\\"environment\\\": \\\"${{ inputs.environment }}\\\",
                 \\\"deployedBy\\\": \\\"${{ github.actor }}\\\",
                 \\\"server\\\": \\\"${TARGET_SERVER}\\\",
                 \\\"deployPath\\\": \\\"${DEPLOY_PATH}\\\",
-                \\\"workflowRun\\\": \\\"${{ github.run_id }}\\\"
+                \\\"deploy workflow run id\\\": \\\"${{ github.run_id }}\\\"
               }\" > deployment-info.json &&
               
               rm -f $ARTIFACT_FILENAME &&
               cd backups && ls -t gpmats-backup-* 2>/dev/null | tail -n +6 | xargs -r rm -rf && cd .. &&
               rm -f /tmp/$ARTIFACT_FILENAME
             '
-          "
           
           echo "✅ deployment completed successfully!"
           echo "📊 Artifact from Build: ${{ inputs.run_num || inputs.run_id }} | Environment: ${{inputs.environment}} | Deployed by: ${{ github.actor }}"
