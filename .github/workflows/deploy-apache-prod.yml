@@ -1,0 +1,39 @@
+name: Deploy to Production Apache Server
+run-name: Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} from Build ${{ inputs.run_num || inputs.run_id }} to Production - Run #${{ github.run_number }}
+on:
+  workflow_dispatch:
+    inputs:
+      run_num:
+        required: true
+        type: string
+        description: 'Build run number to deploy'
+      validation_code:
+        required: true
+        type: string
+        description: 'Enter "fs-production" to confirm production deployment'
+      production_approval:
+        required: false
+        type: boolean
+        description: 'Require manual approval for production deploys'
+        default: false
+
+jobs:
+  validate-code:
+    if: inputs.validation_code != 'fs-production'
+    name: Validate Production Deployment Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if validation code is incorrect
+        run: |
+          echo "Invalid validation code provided. To deploy to production, enter 'fs-production' as the validation code."
+          exit 1
+  deploy-to-production:
+    if: inputs.validation_code == 'fs-production'
+    # Call the reusable workflow defined in .github/workflows/deploy-apache.yml
+    uses: ./.github/workflows/deploy-apache.yml
+    with:
+      # Pass the current workflow run id as the deployment run_id
+      run_id: ${{ github.run_id }}
+      # Deploy to dev environment
+      environment: 'dev'
+    secrets: inherit

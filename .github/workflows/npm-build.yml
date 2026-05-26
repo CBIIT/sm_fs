@@ -100,5 +100,4 @@ jobs:
       run_id: ${{ github.run_id }}
       # Deploy to dev environment
       environment: 'dev'
-      production_approval: false
     secrets: inherit
