@@ -119,40 +119,40 @@ jobs:
           fi
           
           cd $GITHUB_WORKSPACE/${{ env.build_base_path }} 
-          scp -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no $ARTIFACT_FILENAME ${REMOTE_USER}@${TARGET_SERVER}:[...]
-          ssh -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no ${REMOTE_USER}@${TARGET_SERVER} '
+          scp -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no $ARTIFACT_FILENAME ${REMOTE_USER}@${TARGET_SERVER}:/tmp/
+          ssh -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no ${REMOTE_USER}@${TARGET_SERVER} << 'EOF'
               if [ ! -d ${DEPLOY_PATH} ]; then
                 mkdir -p ${DEPLOY_PATH}
               fi &&
               cd ${DEPLOY_PATH} &&
               cp /tmp/$ARTIFACT_FILENAME . &&
               mkdir -p backups &&
-              if [ -f index.html ] || [ \$(ls -A . 2>/dev/null) ]; then
-                BACKUP_NAME=${{ env.app_name }}-backup-\$(date +%Y%m%d_%H%M%S) &&
-                mkdir -p backups/\$BACKUP_NAME &&
-                find . -maxdepth 1 -not -name backups -not -name . -not -name $ARTIFACT_FILENAME -exec mv {} backups/\$BACKUP_NAME/ \;
+              if [ -f index.html ] || [ $(ls -A . 2>/dev/null) ]; then
+                BACKUP_NAME=${{ env.app_name }}-backup-$(date +%Y%m%d_%H%M%S) &&
+                mkdir -p backups/$BACKUP_NAME &&
+                find . -maxdepth 1 -not -name backups -not -name . -not -name $ARTIFACT_FILENAME -exec mv {} backups/$BACKUP_NAME/ \;
               fi &&
               unzip -o $ARTIFACT_FILENAME &&
               chmod -R 755 . &&
-              find . -type f -name \"*.html\" -exec chmod 644 {} \; &&
-              find . -type f -name \"*.js\" -exec chmod 644 {} \; &&
-              find . -type f -name \"*.css\" -exec chmod 644 {} \; &&
+              find . -type f -name "*.html" -exec chmod 644 {} \; &&
+              find . -type f -name "*.js" -exec chmod 644 {} \; &&
+              find . -type f -name "*.css" -exec chmod 644 {} \; &&
               
               # Create QA deployment info file
-              echo \"{
-                \\\"deployedAt\\\": \\\"\$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\",
-                \\\"build workflow run number/id\\\": \\\"${{ inputs.run_num || inputs.run_id }}\\\",
-                \\\"environment\\\": \\\"${{ inputs.environment }}\\\",
-                \\\"deployedBy\\\": \\\"${{ github.actor }}\\\",
-                \\\"server\\\": \\\"${TARGET_SERVER}\\\",
-                \\\"deployPath\\\": \\\"${DEPLOY_PATH}\\\",
-                \\\"deploy workflow run id\\\": \\\"${{ github.run_id }}\\\"
-              }\" > deployment-info.json &&
+              echo "{
+                \"deployedAt\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+                \"build workflow run number/id\": \"${{ inputs.run_num || inputs.run_id }}\",
+                \"environment\": \"${{ inputs.environment }}\",
+                \"deployedBy\": \"${{ github.actor }}\",
+                \"server\": \"${TARGET_SERVER}\",
+                \"deployPath\": \"${DEPLOY_PATH}\",
+                \"deploy workflow run id\": \"${{ github.run_id }}\"
+              }" > deployment-info.json &&
               
               rm -f $ARTIFACT_FILENAME &&
               cd backups && ls -t gpmats-backup-* 2>/dev/null | tail -n +6 | xargs -r rm -rf && cd .. &&
               rm -f /tmp/$ARTIFACT_FILENAME
-            '
+          EOF
           
           echo "✅ deployment completed successfully!"
           echo "📊 Artifact from Build: ${{ inputs.run_num || inputs.run_id }} | Environment: ${{inputs.environment}} | Deployed by: ${{ github.actor }}"
