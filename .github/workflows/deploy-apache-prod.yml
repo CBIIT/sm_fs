@@ -1,5 +1,5 @@
 name: Deploy to Production Apache Server
-run-name: Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} from Build ${{ inputs.run_num || inputs.run_id }} to Production - Run #${{ github.run_number }}
+run-name: Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} from Build ${{ inputs.run_num || inputs.run_id }} to Production
 on:
   workflow_dispatch:
     inputs:
