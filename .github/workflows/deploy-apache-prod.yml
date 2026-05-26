@@ -19,7 +19,6 @@ on:
 
 jobs:
   validate-code:
-    if: inputs.validation_code != 'fs-production'
     name: Validate Production Deployment Code
     runs-on: ubuntu-latest
     steps:
