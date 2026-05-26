@@ -15,14 +15,8 @@ on:
           - dev
           - test
           - stage
-          - prod
         default: dev
-      production_approval:
-        required: false
-        type: boolean
-        description: 'Require manual approval for production deploys'
-        default: false
-        
+
   workflow_call:
     inputs:
       run_id:
@@ -33,11 +27,7 @@ on:
         required: true
         type: string
         description: 'Deployment environment (dev, qa, stage, prod)'
-      production_approval:
-        required: false
-        type: boolean
-        description: 'Require manual approval for production deploys'
-        default: false
+
 env:
   app_name: ${{ fromJson(vars.APP_PROPERTIES).app_name }}
   artifact_name: ${{ fromJson(vars.APP_PROPERTIES).artifact_name }}
