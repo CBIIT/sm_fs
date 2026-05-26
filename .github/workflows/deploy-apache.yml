@@ -119,7 +119,7 @@ jobs:
           fi
           
           cd $GITHUB_WORKSPACE/${{ env.build_base_path }} 
-          scp -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' ${REMOTE_USER}@${TARGET_SERVER}:[...]
+          scp -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no $ARTIFACT_FILENAME ${REMOTE_USER}@${TARGET_SERVER}:[...]
           ssh -i /home/cbiit-runner/.ssh/id_rsa -o StrictHostKeyChecking=no ${REMOTE_USER}@${TARGET_SERVER} '
               if [ ! -d ${DEPLOY_PATH} ]; then
                 mkdir -p ${DEPLOY_PATH}
