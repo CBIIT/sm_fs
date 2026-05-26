@@ -125,7 +125,6 @@ jobs:
                 mkdir -p ${DEPLOY_PATH}
               fi &&
               cd ${DEPLOY_PATH} &&
-              echo "debug ${ARTIFACT_FILENAME}" &&
               cp /tmp/${ARTIFACT_FILENAME} . &&
               mkdir -p backups &&
               if [ -f index.html ] || [ $(ls -A . 2>/dev/null) ]; then
