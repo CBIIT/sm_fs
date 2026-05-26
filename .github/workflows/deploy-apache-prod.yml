@@ -25,15 +25,20 @@ jobs:
     steps:
       - name: Fail if validation code is incorrect
         run: |
-          echo "Invalid validation code provided. To deploy to production, enter 'fs-production' as the validation code."
-          exit 1
+          if [ "${{ inputs.validation_code }}" != "fs-production" ]; then
+            echo "Invalid validation code provided. To deploy to production, enter 'fs-production' as the validation code."
+            exit 1
+          else
+            echo "Validation code accepted. Proceeding with production deployment."
+          fi
+
   deploy-to-production:
-    if: inputs.validation_code == 'fs-production'
+    needs: validate-code
     # Call the reusable workflow defined in .github/workflows/deploy-apache.yml
     uses: ./.github/workflows/deploy-apache.yml
     with:
-      # Pass the current workflow run id as the deployment run_id
-      run_id: ${{ github.run_id }}
+      # Pass the current workflow run number as the deployment run_number
+      run_num: ${{ inputs.run_num }}
       # Deploy to dev environment
       environment: 'dev'
     secrets: inherit

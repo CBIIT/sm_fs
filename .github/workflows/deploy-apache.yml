@@ -20,9 +20,13 @@ on:
   workflow_call:
     inputs:
       run_id:
-        required: true
+        required: false
         type: string
         description: 'Build run id to deploy'
+      run_num:
+        required: false
+        type: string
+        description: 'Build run number to deploy'
       environment:
         required: true
         type: string
