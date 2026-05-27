@@ -13,6 +13,7 @@ export class NavigationModel {
   next: boolean;
   current: number;
   total: number;
+  submitting = false;
 
   route: string;
 
@@ -28,6 +29,7 @@ export class NavigationModel {
     this.next = false;
     this.current = -1;
     this.total = -1;
+    this.submitting = false;
   }
 
   set(ids: number[], path: string): void {
@@ -42,6 +44,7 @@ export class NavigationModel {
 
   onPrevious($event: any): void {
     $event.preventDefault();
+    if (this.submitting) { return; }
     if (this.current > 0) {
       this.current--;
       this.prev = this.current > 0;
@@ -52,6 +55,7 @@ export class NavigationModel {
 
   onNext($event: any): void {
     $event.preventDefault();
+    if (this.submitting) { return; }
     if (this.current < this.total - 1) {
       this.current++;
     }

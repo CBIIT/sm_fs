@@ -1,0 +1,103 @@
+name: Build Angular Application and Deploy to Dev
+run-name: Build and Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} - Run #${{ github.run_number }} on ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      dev_deploy:
+        required: false
+        type: boolean
+        description: 'Deploy to Development after build?'
+        default: true
+
+env:
+  NODE_VERSION: ${{ fromJson(vars.WORKFLOW_PROPERTIES).NODE_VERSION }} # '18.x'
+  ANGULAR_CLI_VERSION: ${{ fromJson(vars.WORKFLOW_PROPERTIES).ANGULAR_CLI_VERSION }} # '18.2.2'
+  app_base_href: ${{ fromJson(vars.APP_PROPERTIES).app_base_href }} # '/fs/'
+  build_base_path: ${{ fromJson(vars.APP_PROPERTIES).build_base_path }} # 'dist/fs/' 
+  artifact_name: ${{ fromJson(vars.APP_PROPERTIES).artifact_name }} #'fs-build'       
+
+jobs:
+  npm-build:
+    name: Build Angular Application
+    runs-on: 
+      group: cbiit-test-automation-runners
+      labels: fargate-al2023-s-nonprod
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log build information
+        run: |
+          echo "========================================="
+          echo "  Angular Build Information"
+          echo "========================================="
+          echo "Repository:    ${{ github.repository }}"
+          echo "Branch:        ${{ github.ref_name }}"
+          echo "Commit SHA:    ${{ github.sha }}"
+          echo "Commit Msg:    $(git log -1 --pretty=%s)"
+          echo "Triggered by:  ${{ github.actor }}"
+          echo "Run Number:    ${{ github.run_number }}"
+          echo "Run ID:        ${{ github.run_id }}"
+          echo "Runner OS:     ${{ runner.os }}"
+          echo "Node Version:  ${{ env.NODE_VERSION }}"
+          echo "Angular CLI:   ${{ env.ANGULAR_CLI_VERSION }}"
+          echo "Timestamp:     $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          echo "========================================="
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup .npmrc
+        run: |
+          echo "@cbiit:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_PAT }}" >> .npmrc
+
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli@${{ env.ANGULAR_CLI_VERSION }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Log dependency versions
+        run: |
+          echo "Node:    $(node --version)"
+          echo "NPM:     $(npm --version)"
+          echo "Angular: $(ng version)"
+
+      - name: Build application
+        run: ng build --configuration=dev --base-href=${{ env.app_base_href }}
+
+      - name: Log build output
+        run: |
+          echo "======================= =================="
+          echo "  Build Output Summary"
+          echo "========================================="
+          echo "Files:"
+          ls -lah ${{ env.build_base_path }}
+          echo ""
+          echo "Total size: $(du -sh ${{ env.build_base_path }} | cut -f1)"
+          echo "File count: $(find ${{ env.build_base_path }} -type f | wc -l)"
+          echo "========================================="
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.artifact_name }}
+          path: ${{ env.build_base_path }}
+          retention-days: 7
+
+  deploy-to-dev:
+    needs: npm-build
+    if: ${{ inputs.dev_deploy }}
+    # Call the reusable workflow defined in .github/workflows/multi-deploy.yml
+    uses: ./.github/workflows/deploy-apache.yml
+    with:
+      # Pass the current workflow run id as the deployment run_id
+      run_id: ${{ github.run_id }}
+      # Deploy to dev environment
+      environment: 'dev'
+    secrets: inherit

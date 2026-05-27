@@ -1,0 +1,164 @@
+name: Deploy Angular Application to Apache Server
+run-name: Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} from Build ${{ inputs.run_num || inputs.run_id }} to ${{ inputs.environment}} - Run #${{ github.run_number }}
+on:
+  workflow_dispatch:
+    inputs:
+      run_num:
+        required: true
+        type: string
+        description: 'Build run number to deploy'
+      environment:
+        required: true
+        type: choice
+        description: 'Deployment environment (select one)'
+        options:
+          - dev
+          - test
+          - stage
+          - prod
+        default: dev
+      production_approval:
+        required: false
+        type: boolean
+        description: 'Require manual approval for production deploys'
+        default: false
+        
+  workflow_call:
+    inputs:
+      run_id:
+        required: true
+        type: string
+        description: 'Build run id to deploy'
+      environment:
+        required: true
+        type: string
+        description: 'Deployment environment (dev, qa, stage, prod)'
+      production_approval:
+        required: false
+        type: boolean
+        description: 'Require manual approval for production deploys'
+        default: false
+env:
+  app_name: ${{ fromJson(vars.APP_PROPERTIES).app_name }}
+  artifact_name: ${{ fromJson(vars.APP_PROPERTIES).artifact_name }}
+  remote: ${{ fromJson(vars.APP_PROPERTIES).dev_server }} 
+  remote_home: ${{ fromJson(vars.APP_PROPERTIES).remote_home }}   
+  remote_user: ${{ fromJson(vars.APP_PROPERTIES).remote_user }}
+  qa_server: ${{ fromJson(vars.APP_PROPERTIES).qa_server }}
+  stage_server: ${{ fromJson(vars.APP_PROPERTIES).stage_server }}     
+  prod_server: ${{ fromJson(vars.APP_PROPERTIES).prod_server }}
+  build_base_path: ${{ fromJson(vars.APP_PROPERTIES).build_base_path }}
+  tier: ${{ inputs.environment }}
+ # remote_path: '/local/content/web/i2e/wwwroot/fs'
+ # remote_user: 'tomcatb'
+ # remote: 'nciws-d2648-v'  # default to dev server
+ # qa_server: 'nciws-q2169-v'
+ # stage_server: 'nciws-s2173-v'
+ # prod_server: 'nciws-p2171-v'
+ # app_name: 'fs'
+ # build-base-path: 'dist/fs/' 
+ # artifact-name: 'fs-build'   
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }} Environment
+    runs-on: 
+      group: cbiit-global-runners
+      labels: self-hosted
+    steps:
+      - name: Set target server based on environment selection  
+        run: |
+          if [ "${{ inputs.environment }}" = "test" ]; then
+            echo "remote=${{env.qa_server}}" >> $GITHUB_ENV
+          elif [ "${{ inputs.environment }}" = "stage" ]; then
+            echo "remote=${{env.stage_server}}" >> $GITHUB_ENV
+          elif [ "${{ inputs.environment }}" = "prod" ]; then
+            echo "remote=${{env.prod_server}}" >> $GITHUB_ENV
+          fi
+
+      - name: Output Inputs and Environment Variables
+        run: |
+          echo "Workflow INPUTS & ENVIRONMENT VARIABLES"
+          echo "=========================================="
+          echo "Inputs: ${{ toJson(inputs) }}"
+          echo "Environment Variables: ${{ toJson(env) }}"
+          echo "=========================================="
+          
+      - name: Display Build Information
+        run: |
+          echo "🚀 DEPLOYMENT BUILD INFORMATION - Environment: ${{ inputs.environment }}"
+          echo "=================================="
+          echo "Build Run Number: ${{ inputs.run_num }}"
+          echo "Build Run ID: ${{ inputs.run_id }}"
+          echo "Environment: ${{env.tier}}"
+          echo "Target Server: ${{env.remote}}"
+          echo "Deploy Path: ${{env.remote_home}}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          echo "=================================="
+          
+      - name: Download Build Artifact
+        uses: dawidd6/action-download-artifact@v11
+        with:
+          workflow: npm-build.yml
+          name: ${{ env.artifact_name }}
+          path: ${{ env.build_base_path }}
+          run_number: ${{inputs.run_num}}
+          run_id: ${{inputs.run_id}}
+          skip_unpack: true
+          
+      - name: Deploy to Target Server
+        run: |
+          ARTIFACT_FILENAME="${{ env.artifact_name }}.zip"
+          TARGET_SERVER="${{env.remote}}"
+          DEPLOY_PATH="${{env.remote_home}}"
+          
+          echo "🚀 Deploying build ${{ inputs.run_num || inputs.run_id }} to ${TARGET_SERVER}..."
+          cd ${{ env.build_base_path }}
+          
+          if [ ! -f "$ARTIFACT_FILENAME" ]; then
+            echo "❌ Error: build artifact $ARTIFACT_FILENAME not found"
+            echo "Available files in artifacts directory:"
+            ls -la
+            exit 1
+          fi
+          
+          sudo su - githubuser -c "cd $GITHUB_WORKSPACE/${{ env.build_base_path }} && scp -o StrictHostKeyChecking=no '$ARTIFACT_FILENAME' tomcatb@${TARGET_SERVER}:/tmp/'$ARTIFACT_FILENAME'"
+          sudo su - githubuser -c "
+            ssh -o StrictHostKeyChecking=no tomcatb@${TARGET_SERVER} '
+              cd ${DEPLOY_PATH} &&
+              cp /tmp/$ARTIFACT_FILENAME . &&
+              mkdir -p backups &&
+              if [ -f index.html ] || [ \$(ls -A . 2>/dev/null) ]; then
+                BACKUP_NAME=${{ env.app_name }}-backup-\$(date +%Y%m%d_%H%M%S) &&
+                mkdir -p backups/\$BACKUP_NAME &&
+                find . -maxdepth 1 -not -name backups -not -name . -not -name $ARTIFACT_FILENAME -exec mv {} backups/\$BACKUP_NAME/ \;
+              fi &&
+              unzip -o $ARTIFACT_FILENAME &&
+              chmod -R 755 . &&
+              find . -type f -name \"*.html\" -exec chmod 644 {} \; &&
+              find . -type f -name \"*.js\" -exec chmod 644 {} \; &&
+              find . -type f -name \"*.css\" -exec chmod 644 {} \; &&
+              
+              # Create QA deployment info file
+              echo \"{
+                \\\"deployedAt\\\": \\\"\$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\",
+                \\\"buildNumber\\\": \\\"${{ inputs.run_num }}\\\",
+                \\\"environment\\\": \\\"QA\\\",
+                \\\"deployedBy\\\": \\\"${{ github.actor }}\\\",
+                \\\"server\\\": \\\"${TARGET_SERVER}\\\",
+                \\\"deployPath\\\": \\\"${DEPLOY_PATH}\\\",
+                \\\"workflowRun\\\": \\\"${{ github.run_id }}\\\"
+              }\" > deployment-info.json &&
+              
+              rm -f $ARTIFACT_FILENAME &&
+              cd backups && ls -t gpmats-backup-* 2>/dev/null | tail -n +6 | xargs -r rm -rf && cd .. &&
+              rm -f /tmp/$ARTIFACT_FILENAME
+            '
+          "
+          
+          echo "✅ deployment completed successfully!"
+          echo "📊 Artifact from Build: ${{ inputs.run_num || inputs.run_id }} | Environment: ${{inputs.environment}} | Deployed by: ${{ github.actor }}"
+
