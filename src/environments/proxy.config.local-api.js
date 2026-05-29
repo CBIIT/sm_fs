@@ -38,8 +38,8 @@ module.exports = {
     }
   },
   '/i2efsws': {
-    target: 'http://localhost:8083/',
-    // target: 'http://ncias-d3203-v:9080/',
+    // target: 'http://localhost:8083/',
+    target: 'http://ncias-d3203-v:9080/',
     // target: 'http://ncias-q3252-v:9080/',
     secure: false,
     changeOrigin: true,

@@ -967,11 +967,23 @@ export class SearchResultComponent implements OnInit, AfterViewInit, OnDestroy {
   onPaylistSelect($event: any): void {
     if ($event.fy < 2020) {
       // NOTE - jasperReportController DOES NOT work
-      window.open('/i2ejasperws/api/v1/generate-paylist-report/' + $event.id + '/JR_HISTORICALPAYLIST_REPORT/PDF', '_blank');
+      this.documentService.downloadPaylistReport($event.id, 'JR_HISTORICALPAYLIST_REPORT').subscribe(
+        (response: HttpResponse<Blob>) => {
+          const blob = new Blob([response.body], { type: 'application/pdf' });
+          saveAs(blob, `paylist-report-${$event.id}.pdf`);
+        },
+        error => this.logger.error('Error downloading historical paylist report', error)
+      );
     } else if (this.canOpenPaylist) {
       window.open('/paylist/view-paylist?' + $event.id, '_self');
     } else {
-      window.open('/i2ejasperws/api/v1/generate-paylist-report/' + $event.id + '/JR_NONHISTORICALPAYLIST_REPORT/PDF', '_blank');
+      this.documentService.downloadPaylistReport($event.id, 'JR_NONHISTORICALPAYLIST_REPORT').subscribe(
+        (response: HttpResponse<Blob>) => {
+          const blob = new Blob([response.body], { type: 'application/pdf' });
+          saveAs(blob, `paylist-report-${$event.id}.pdf`);
+        },
+        error => this.logger.error('Error downloading paylist report', error)
+      );
     }
 
   }

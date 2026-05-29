@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { FundingPlanComponent } from './funding-plan/funding-plan.component';
 import { SearchComponent } from './search/search.component';
 import { AuthGuard } from './auth/auth.guard';
+import { MsalGuard } from '@azure/msal-angular';
 import { FundingRequestComponent } from './funding-request/funding-request.component';
 import { Step1Component } from './funding-request/step1/step1.component';
 import { Step2Component } from './funding-request/step2/step2.component';
@@ -24,15 +25,13 @@ import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate
 import { CanDeactivateRequestStep2 } from './funding-request/step2/can-deactivate-request-step2';
 import { CanDeactivatePlanStep3 } from './funding-plan/plan-step3/can-deactivate-plan-step3';
 import { ErrorComponent } from './error/error/error.component';
-import { SessionRestoreComponent } from './session/session-restore/session-restore.component';
 import { UnauthorizeComponent } from '@cbiit/i2ecui-lib';
 
 const routes: Routes = [
   { path: 'error/:errorId', component: ErrorComponent },
   { path: 'unauthorize', component: UnauthorizeComponent },
   {
-    path: '', canActivate: [AuthGuard], children: [
-      { path: 'restoreSession', pathMatch: 'full', component: SessionRestoreComponent, canActivate: [AuthGuard] },
+    path: '', canActivate: [MsalGuard, AuthGuard], children: [
       { path: '', redirectTo: '/search/fr/landing', pathMatch: 'full' },
       { path: 'search/fr/:action', component: SearchComponent, canActivate: [AuthGuard] },
       { path: 'search/fr', component: SearchComponent, canActivate: [AuthGuard] },

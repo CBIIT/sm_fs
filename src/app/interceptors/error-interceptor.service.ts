@@ -4,9 +4,10 @@ import { EMPTY, Observable, of, throwError } from 'rxjs';
 import { catchError, filter, finalize } from 'rxjs/operators';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { ErrorHandlerService } from '../error/error-handler.service';
-import { jsonStringifyRecursive, openNewWindow } from '../utils/utils';
-import { Location } from '@angular/common';
+import { jsonStringifyRecursive } from '../utils/utils';
 import { HeartbeatService } from '@cbiit/i2ecui-lib';
+import { MsalBroadcastService } from '@azure/msal-angular';
+import { InteractionStatus } from '@azure/msal-browser';
 import { v4 as uuidv4 } from 'uuid';
 import { NGXLogger } from "ngx-logger";
 
@@ -19,18 +20,16 @@ export const DEBUG_ERROR_INTERCEPTOR = new InjectionToken<boolean>('debugMode', 
   providedIn: 'root'
 })
 export class ErrorInterceptor implements HttpInterceptor {
-  private modalWindow: any;
-  private handled401 = false;
   private handlingError = false;
   private myUUID;
 
   constructor(
     private errorHandler: ErrorHandlerService,
     private router: Router,
-    private location: Location,
     private initializerStatus: ApplicationInitStatus,
     private logger: NGXLogger,
     private heartbeatService: HeartbeatService,
+    private msalBroadcastService: MsalBroadcastService,
     @Inject(DEBUG_ERROR_INTERCEPTOR) private debugMode: boolean
   ) {
 
@@ -44,6 +43,14 @@ export class ErrorInterceptor implements HttpInterceptor {
     router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
       this.handleNavigationEnd(event);
     });
+
+    // Pause heartbeat during MSAL interactions, resume when idle
+    this.msalBroadcastService.inProgress$
+      .pipe(filter(status => status !== InteractionStatus.None))
+      .subscribe(() => this.heartbeatService.pause());
+    this.msalBroadcastService.inProgress$
+      .pipe(filter(status => status === InteractionStatus.None))
+      .subscribe(() => this.heartbeatService.continue());
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): any {
@@ -61,8 +68,6 @@ export class ErrorInterceptor implements HttpInterceptor {
           this.handlingError = true;
         }
 
-        const headers = req.headers || new HttpHeaders();
-
         if (this.debugMode) this.verboseDetails(req, error);
 
         // Pass along errors that happen during initialization
@@ -73,7 +78,6 @@ export class ErrorInterceptor implements HttpInterceptor {
 
         // Throw 400 errors automatically
         if (error.status === 400) {
-          // BadRequestException, checked exception from backend.
           if (this.debugMode) this.logger.debug('400: let it pass');
           return throwError(error);
         }
@@ -90,45 +94,15 @@ export class ErrorInterceptor implements HttpInterceptor {
           return throwError(error);
         }
 
-        if (this.isUnauthorized(error)) {
-          if (this.debugMode) this.logger.debug('Unauthorized');
-          return this.handleUnauthorizedError(req, error);
-        }
-
-        // Handle timeouts
-        if (this.isTimeOut(error)) {
-          return this.handleTimeout(error, headers);
-        } else {
-          return this.handleAllOtherErrors(req, error);
-        }
+        return this.handleAllOtherErrors(req, error);
       }),
       finalize(() => {
-        this.modalWindow = undefined;
         this.handlingError = false;
       })
     );
   }
 
-  private handleUnauthorizedError(req: HttpRequest<any>, error) {
-    this.heartbeatService.pause();
-    if (!this.handled401) {
-      this.verboseDetails(req, error);
-      this.handled401 = true;
-      return this.router.navigate(['/unauthorize']);
-    }
-    return of(EMPTY);
-  }
-
-  private isUnauthorized(error) {
-    return error.status === 401;
-  }
-
-  private isTimeOut(error) {
-    return error.status === 200 && error.url?.startsWith('https://auth');
-  }
-
   private handleAllOtherErrors(req: HttpRequest<any>, error) {
-    // Handle all other errors
     this.verboseDetails(req, error);
     const timestamp: number = Date.now();
     this.errorHandler.registerNewError(timestamp, error);
@@ -136,29 +110,6 @@ export class ErrorInterceptor implements HttpInterceptor {
       this.logger.error('Finished navigating to /error');
     });
     return throwError(error);
-  }
-
-  private handleTimeout(error: any, headers: HttpHeaders) {
-    this.logger.info('Timeout encountered - redirect to login.');
-    this.logger.info(`SM_USER header: ${headers.get('SM_USER')}`);
-    this.heartbeatService.pause();
-    let url =
-      '/fs/' +
-      this.location.prepareExternalUrl(this.router.serializeUrl(this.router.createUrlTree(['restoreSession'])));
-    url = window.location.origin + url;
-
-    const features = 'popup,menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700,noreferrer';
-
-    const errorUrl = new URL(error.url);
-    errorUrl.searchParams.delete('TARGET');
-    errorUrl.searchParams.set('TARGET', url);
-    this.logger.info(`Redirecting to ${errorUrl.toString()}`);
-
-    if (!this.modalWindow) {
-      this.modalWindow = openNewWindow(errorUrl.toString(), 'Restore_Session', features);
-    }
-
-    return of(undefined);
   }
 
   handleNavigationStart(event: NavigationStart): void {

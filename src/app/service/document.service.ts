@@ -120,6 +120,12 @@ export class DocumentService {
     return this.http.post<Blob>(`${url}`,searchCriteria, { observe: 'response', responseType: 'blob' as 'json' })
   }
 
+  downloadPaylistReport(paylistId: number, reportName: string) {
+    const url = `/i2ejasperws/api/v1/generate-paylist-report/${paylistId}/${reportName}/PDF`;
+    this.logger.debug('Paylist report URL:', url);
+    return this.http.get<Blob>(`${url}`, { observe: 'response', responseType: 'blob' as 'json' });
+  }
+
   deleteTransitionMemoOnType4Change(frqId: number): void {
     this.getFiles(frqId, 'PFR').subscribe(
       result => {

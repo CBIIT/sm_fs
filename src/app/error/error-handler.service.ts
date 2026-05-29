@@ -18,13 +18,6 @@ export class ErrorHandlerService {
     private logger: NGXLogger) {
   }
 
-  public isTimeout(error: any): boolean {
-    if (error.status === 200 && error.url?.startsWith('https://auth')) {
-      return true;
-    }
-    return false;
-  }
-
   registerNewError(timestamp: number, error: any): void {
     this.errorLog.set(timestamp, error);
     this.logErrorDetails(timestamp, error);

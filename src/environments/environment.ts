@@ -14,6 +14,16 @@ export const environment = {
   GRANT_VIEWER_URL: "https://i2e-dev.nci.nih.gov/yourgrants/jsp/GrantDetails.jsp?applId=",
   I2EWEB_URL: "https://i2e-dev.nci.nih.gov/",
   URL_YOURGRANTS: "https://i2e-dev.nci.nih.gov/yourgrants/GrantView",
+  msalConfig: {
+    auth: {
+      clientId: '4450b02b-ea0d-4a8c-bf01-cbad66fb841c',
+      authority: 'https://login.microsoftonline.com/14b77578-9773-42d5-8507-251ca2dc2b06',
+      redirectUri: 'http://localhost:4200/',
+    }
+  },
+  apiConfig: {
+    scopes: ['api://4450b02b-ea0d-4a8c-bf01-cbad66fb841c/access'],
+  },
 };
 
 /*

@@ -21,6 +21,20 @@ import {
   PROPERTIES_ENVIRONMENT
 } from "@cbiit/i2ecui-lib";
 import { NgbModule, NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  MsalService,
+  MsalGuard,
+  MsalInterceptor,
+  MsalBroadcastService,
+  MSAL_INSTANCE,
+  MSAL_GUARD_CONFIG,
+  MSAL_INTERCEPTOR_CONFIG
+} from '@azure/msal-angular';
+import {
+  PublicClientApplication,
+  InteractionType,
+  BrowserCacheLocation
+} from '@azure/msal-browser';
 import { HeaderComponent } from './header/header.component';
 import { SearchFilterComponent } from './search/search-filter/search-filter.component';
 import { FundingRequestTypeComponent } from './funding-request/funding-request-type/funding-request-type.component';
@@ -62,7 +76,7 @@ import {
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FundingSourcesNamesComponent } from './funding-sources-names/funding-sources-names.component';
 import { FinalLoaComponent } from './final-loa/final-loa.component';
-import { LoggerModule, NgxLoggerLevel, TOKEN_LOGGER_METADATA_SERVICE } from "ngx-logger";
+import { LoggerModule, NGXLogger, NgxLoggerLevel, TOKEN_LOGGER_METADATA_SERVICE } from "ngx-logger";
 import { SkippedGrantsComponent } from './skipped-grants/skipped-grants.component';
 import { FooterComponent } from './footer/footer.component';
 import { DiversitySupplementComponent } from './diversity-supplement/diversity-supplement.component';
@@ -231,7 +245,6 @@ import {
 } from './funding-plan/fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
 import { DEBUG_ERROR_INTERCEPTOR, ErrorInterceptor } from "./interceptors/error-interceptor.service";
 import { ErrorComponent } from './error/error/error.component';
-import { SessionRestoreComponent } from './session/session-restore/session-restore.component';
 import { CookieModule } from 'ngx-cookie';
 import { SearchFundingRequestApprvlRoleComponent } from './search/search-filter/search-funding-request-apprvl-role/search-funding-request-apprvl-role.component';
 import { R00PdNameRequiredValidatorDirective } from './validators/r00-pd-name-required-validator.directive';
@@ -243,53 +256,119 @@ import { CancerActivitiesDropdownComponent} from "./cancer-activities-dropdown/c
 import { PdnameDropdownComponent} from "./pdname-dropdown/pdname-dropdown.component";
 import { EditLinkComponent } from './edit-link/edit-link.component';
 
-export function initializeAppProperties(appPropertiesService: AppPropertiesService): any {
-  return (): Promise<any> => {
-    return appPropertiesService.initialize();
+declare var $: any;
+
+export function msalInstanceFactory(): PublicClientApplication {
+  return new PublicClientApplication({
+    auth: {
+      clientId: environment.msalConfig.auth.clientId,
+      authority: environment.msalConfig.auth.authority,
+      redirectUri: environment.msalConfig.auth.redirectUri,
+      postLogoutRedirectUri: environment.msalConfig.auth.redirectUri,
+    },
+    cache: {
+      cacheLocation: BrowserCacheLocation.SessionStorage,
+      storeAuthStateInCookie: false,
+    },
+  });
+}
+
+export function msalGuardConfigFactory() {
+  return {
+    interactionType: InteractionType.Redirect,
+    authRequest: { scopes: environment.apiConfig.scopes },
   };
 }
 
-export function initializeUserSession(userSessionService: AppUserSessionService): any {
-  return (): Promise<any> => {
-    return userSessionService.initialize();
+export function msalInterceptorConfigFactory() {
+  return {
+    interactionType: InteractionType.Redirect,
+    protectedResourceMap: new Map([
+      ['/i2ecommonws/*', environment.apiConfig.scopes],
+      ['/i2efsws/*', environment.apiConfig.scopes],
+      ['/i2erefws/*', environment.apiConfig.scopes],
+      ['/i2ejasperws/*', environment.apiConfig.scopes],
+      ['/i2eygws/*', environment.apiConfig.scopes],
+    ]),
   };
 }
 
-export function initializeLookupMaps(lookupService: AppLookupsService): any {
-  return (): Promise<any> => {
-    return lookupService.initialize();
-  };
-}
-
-export function megaInitializer(
+export function combinedInitializerFactory(
+  msalService: MsalService,
   userSessionService: AppUserSessionService,
   appPropertiesService: AppPropertiesService,
   lookupService: AppLookupsService,
   gwbLinksService: GwbLinksService,
   router: Router,
-  errorHandler: ErrorHandlerService): any {
-  return (): Promise<any> => {
-    return userSessionService.initialize()
-      .then(function() {
-        return appPropertiesService.initialize();
-      })
-      .then(function() {
-        return lookupService.initialize();
-      })
-      .then(function() {
-        return gwbLinksService.initialize();
-      }).catch(oops => {
-        console.log('initializer failed; redirect to home');
-        if(oops.status === 200) {
-          console.log(`window.location.href: ${window.location.href}`);
-          // @ts-ignore
-          window.location.reload(true);
+  errorHandler: ErrorHandlerService,
+  logger: NGXLogger
+): () => Promise<void> {
+  return async () => {
+    // Step 1: Initialize MSAL (required for MSAL Browser v3+)
+    logger.debug('combinedInitializer: initializing MSAL instance');
+    await msalService.instance.initialize();
+    logger.debug('combinedInitializer: MSAL instance initialized');
+
+    // Step 2: Handle any pending redirect (returning from Entra login)
+    logger.debug('combinedInitializer: starting MSAL redirect handling');
+    await msalService.handleRedirectObservable().toPromise();
+    logger.debug('combinedInitializer: redirect handling complete');
+
+    // Step 3: Check if user is authenticated
+    const accounts = msalService.instance.getAllAccounts();
+    if (accounts.length === 0) {
+      logger.info('combinedInitializer: no accounts found, triggering login redirect');
+      await msalService.loginRedirect({ scopes: environment.apiConfig.scopes }).toPromise();
+      return new Promise<void>(() => {}); // Never resolves — redirect navigates away
+    }
+
+    // Step 4: Set active account
+    msalService.instance.setActiveAccount(accounts[0]);
+    logger.info('combinedInitializer: user authenticated, active account set, proceeding with app initialization');
+
+    // Step 5: Acquire token and set up jQuery AJAX bridge
+    const tokenResponse = await msalService.instance.acquireTokenSilent({
+      scopes: environment.apiConfig.scopes,
+      account: accounts[0],
+    });
+    let cachedAccessToken = tokenResponse.accessToken;
+
+    const scheduleTokenRefresh = (expiresOn: Date | null) => {
+      if (!expiresOn) return;
+      const refreshInMs = expiresOn.getTime() - Date.now() - 5 * 60 * 1000;
+      if (refreshInMs > 0) {
+        setTimeout(async () => {
+          try {
+            const refreshed = await msalService.instance.acquireTokenSilent({
+              scopes: environment.apiConfig.scopes,
+              account: msalService.instance.getActiveAccount()!,
+            });
+            cachedAccessToken = refreshed.accessToken;
+            scheduleTokenRefresh(refreshed.expiresOn);
+          } catch (e) {
+            logger.error('Token refresh failed', e);
+          }
+        }, refreshInMs);
+      }
+    };
+    scheduleTokenRefresh(tokenResponse.expiresOn);
+
+    $.ajaxSetup({
+      beforeSend: (xhr, settings) => {
+        if (settings.url && settings.url.startsWith('/i2e')) {
+          xhr.setRequestHeader('Authorization', `Bearer ${cachedAccessToken}`);
         }
-        return new Promise<boolean>((resolve, reject) => {
-          errorHandler.registerNewError(Date.now(), oops);
-          reject(oops);
-        });
-      });
+      },
+    });
+    logger.debug('combinedInitializer: jQuery AJAX token bridge configured');
+
+    // Step 6: App initialization chain (same order as existing megaInitializer)
+    await userSessionService.initialize();
+    await appPropertiesService.initialize();
+    await lookupService.initialize();
+    await gwbLinksService.initialize();
+
+    logger.debug('combinedInitializer: app initialization complete');
   };
 }
 
@@ -423,7 +502,6 @@ export function megaInitializer(
         GrantFundedOnceValidatorDirective,
         SearchGrantExistInPaylistCellRendererComponent,
         ErrorComponent,
-        SessionRestoreComponent,
         SearchFundingRequestApprvlRoleComponent,
         R00PdNameRequiredValidatorDirective,
         R00CancerActivityRequiredValidatorDirective,
@@ -460,11 +538,18 @@ export function megaInitializer(
         { provide: INSERT_CHANGE_USER_PARAM, useValue: true },
         { provide: DEBUG_CHANGE_USER, useValue: false },
         { provide: DEBUG_ERROR_INTERCEPTOR, useValue: true },
+        { provide: MSAL_INSTANCE, useFactory: msalInstanceFactory },
+        { provide: MSAL_GUARD_CONFIG, useFactory: msalGuardConfigFactory },
+        { provide: MSAL_INTERCEPTOR_CONFIG, useFactory: msalInterceptorConfigFactory },
+        MsalService,
+        MsalGuard,
+        MsalBroadcastService,
         { provide: HTTP_INTERCEPTORS, useClass: ChangeUserInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
         {
-            provide: APP_INITIALIZER, useFactory: megaInitializer,
-            deps: [AppUserSessionService, AppPropertiesService, AppLookupsService, GwbLinksService, Router, ErrorHandlerService], multi: true
+            provide: APP_INITIALIZER, useFactory: combinedInitializerFactory,
+            deps: [MsalService, AppUserSessionService, AppPropertiesService, AppLookupsService, GwbLinksService, Router, ErrorHandlerService, NGXLogger], multi: true
         }, provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {
 }
