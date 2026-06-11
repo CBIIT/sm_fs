@@ -268,7 +268,6 @@ export function msalInstanceFactory(): PublicClientApplication {
     },
     cache: {
       cacheLocation: BrowserCacheLocation.SessionStorage,
-      storeAuthStateInCookie: false,
     },
   });
 }
@@ -284,11 +283,7 @@ export function msalInterceptorConfigFactory() {
   return {
     interactionType: InteractionType.Redirect,
     protectedResourceMap: new Map([
-      ['/i2ecommonws/*', environment.apiConfig.scopes],
-      ['/i2efsws/*', environment.apiConfig.scopes],
-      ['/i2erefws/*', environment.apiConfig.scopes],
-      ['/i2ejasperws/*', environment.apiConfig.scopes],
-      ['/i2eygws/*', environment.apiConfig.scopes],
+      [environment.apiBaseUrl + '/*', environment.apiConfig.scopes],
     ]),
   };
 }

@@ -14,6 +14,7 @@ export const environment = {
   GRANT_VIEWER_URL: "https://i2e-dev.nci.nih.gov/yourgrants/jsp/GrantDetails.jsp?applId=",
   I2EWEB_URL: "https://i2e-dev.nci.nih.gov/",
   URL_YOURGRANTS: "https://i2e-dev.nci.nih.gov/yourgrants/GrantView",
+  apiBaseUrl: '',
   msalConfig: {
     auth: {
       clientId: '4450b02b-ea0d-4a8c-bf01-cbad66fb841c',

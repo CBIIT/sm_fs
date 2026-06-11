@@ -9,6 +9,7 @@ export const environment = {
   DB_HEARTBEAT_INTERVAL: 20000,
   KILLSWITCH_INTERVAL: 300000,
   TECH_SUPPORT_EMAIL: 'ncii2egrantsdevelopmentteam@mail.nih.gov',
+  apiBaseUrl: '',
   msalConfig: {
     auth: {
       clientId: '4450b02b-ea0d-4a8c-bf01-cbad66fb841c',
