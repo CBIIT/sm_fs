@@ -32,7 +32,7 @@
     "@azure/msal-angular": "^5.2.5",
     "@azure/msal-browser": "^5.13.0",
     "@cbiit/i2ecommonws-lib": "6.0.0",
-    "@cbiit/i2ecui-lib": "6.3.1-SNAPSHOT",
+    "@cbiit/i2ecui-lib": "6.3.2-SNAPSHOT",
     "@cbiit/i2efsws-lib": "6.0.0",
     "@cbiit/i2ejasperws-lib": "6.0.0",
     "@cbiit/i2erefws-lib": "6.0.0",
@@ -59,7 +59,7 @@
     "ngx-cookie": "^6.0.1",
     "ngx-logger": "^5.0.12",
     "rxjs": "^7.5.5",
-    "select2": "^4.0.13",
+    "select2": "4.0.13",
     "tslib": "^2.0.0",
     "uuid": "^9.0.0",
     "zone.js": "~0.14.8"
