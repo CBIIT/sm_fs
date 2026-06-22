@@ -6,7 +6,7 @@ export const environment = {
   KILLSWITCH_INTERVAL: 300000,
   TECH_SUPPORT_EMAIL: 'NCII2ESupport@mail.nih.gov',
   GRANT_VIEWER_URL: 'https://i2e.nci.nih.gov/yourgrants/jsp/GrantDetails.jsp?applId=',
-  I2EWEB_URL: 'https://i2e.nci.nih.gov/',
+  // I2EWEB_URL: 'https://i2e.nci.nih.gov/',
   URL_YOURGRANTS: 'https://i2e.nci.nih.gov/yourgrants/GrantView',
   apiBaseUrl: '',
   msalConfig: {
@@ -20,4 +20,3 @@ export const environment = {
     scopes: ['api://4450b02b-ea0d-4a8c-bf01-cbad66fb841c/access'],
   },
 };
-
