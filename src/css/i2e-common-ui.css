@@ -15564,7 +15564,7 @@ input[type="button"].btn-block {
 
 /* line 17, ../Github/sm_i2e_common_ui/src/scss/bootstrap/mixins/_hover.scss */
 .dropdown-item:hover, .dropdown-item:focus {
-  color: #1b1d1e;
+  color: #1b1d1e !important;
   text-decoration: none;
   background-color: #f4f5f6;
 }
