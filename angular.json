@@ -122,6 +122,16 @@
                   "maximumError": "4kb"
                 }
               ]
+            },
+            "local": {
+              "optimization": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.local.ts"
+                }
+              ]
             }
           }
         },
@@ -152,7 +162,7 @@
             },
             "local-api": {
               "proxyConfig": "src/environments/proxy.config.local-api.js",
-              "buildTarget": "fs:build:dev"
+              "buildTarget": "fs:build:local"
             }
           }
         },
@@ -166,10 +176,10 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/test.ts",
-            "polyfills":[
+            "polyfills": [
               "zone.js",
               "zone.js/testing",
-               "@angular/localize/init"
+              "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
