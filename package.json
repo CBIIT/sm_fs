@@ -35,7 +35,7 @@
     "@azure/msal-angular": "^5.2.5",
     "@azure/msal-browser": "^5.13.0",
     "@cbiit/i2ecommonws-lib": "6.0.0",
-    "@cbiit/i2ecui-lib": "6.3.3-SNAPSHOT",
+    "@cbiit/i2ecui-lib": "6.3.4-SNAPSHOT",
     "@cbiit/i2efsws-lib": "6.0.0",
     "@cbiit/i2ejasperws-lib": "6.0.0",
     "@cbiit/i2erefws-lib": "6.0.0",
