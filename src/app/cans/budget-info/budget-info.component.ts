@@ -122,9 +122,11 @@ export class BudgetInfoComponent implements OnInit, OnDestroy {
         c.tcPctCut = null;
       }
       const selected: CanCcxDto = this.getCanSelectorWithIndex(index)?.selectedCanData;
+      const projectedCan: CanCcxDto = this.getCanSelectorWithIndex(index)?.projectedCan;
       if (selected) {
         c.can = selected.can;
         c.canDescription = selected.canDescrip;
+        c.projectedCan = projectedCan?.can;
       }
       const oefiaType = this.getOefiaTypeWithIndex(index)?.selectedValue;
       c.octId = c.oefiaTypeId = !isNaN(oefiaType) ? (Number(oefiaType) !== 0 ? Number(oefiaType) : null) : null;
