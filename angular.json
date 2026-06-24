@@ -132,6 +132,17 @@
                   "with": "src/environments/environment.local.ts"
                 }
               ]
+            },
+            "apache-local": {
+              "optimization": false,
+              "sourceMap": true,
+              "baseHref": "/fs/",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.local.ts"
+                }
+              ]
             }
           }
         },
@@ -163,6 +174,10 @@
             "local-api": {
               "proxyConfig": "src/environments/proxy.config.local-api.js",
               "buildTarget": "fs:build:local"
+            },
+            "apache": {
+              "buildTarget": "fs:build:apache-local",
+              "allowedHosts": ["localhost"]
             }
           }
         },

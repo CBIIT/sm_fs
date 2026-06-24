@@ -9,6 +9,7 @@
     "start-test": "ng serve --configuration=test-api",
     "start-stage": "ng serve --configuration=stage-api",
     "start-fs": "ng serve --base-href /fs/",
+  "start-apache": "ng serve --configuration=apache",
     "start-no-reload": "ng serve --no-live-reload",
     "build": "ng build",
     "test": "ng test",
