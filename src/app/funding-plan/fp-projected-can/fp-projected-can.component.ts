@@ -18,6 +18,7 @@ export class FpProjectedCanComponent implements OnInit {
   @Input() frqId: number;
 
   projectedCan: CanCcxDto;
+  displaySavedProjectdCan = false;
 
 
   constructor(
@@ -32,12 +33,21 @@ export class FpProjectedCanComponent implements OnInit {
         this.updateProjectedCan(next.value);
       }
     });
+    this.canManagementService.savedProjectedCanEmitter.subscribe(next => {
+      if (Number(next.fseId) === Number(this.fseId) && Number(next.applId) === Number(this.applId)) {
+        this.projectedCan = next.savedCan;
+        this.displaySavedProjectdCan= true;
+      }
+    }); 
     const val = !isNaN(this.octId) ? this.octId : null;
 //    this.logger.info(`fseId: ${this.fseId}`);
     this.updateProjectedCan(val);
   }
 
   private updateProjectedCan(oefiaTypeId: number): void {
+    if (this.displaySavedProjectdCan) {
+      return;
+    }
     this.logger.debug(`Updating projected CAN: ${this.fseId}`);
     this.canManagementService.getProjectedCan(this.fseId, oefiaTypeId, this.frtId, null, this.applId).subscribe(result => {
       this.projectedCan = result;

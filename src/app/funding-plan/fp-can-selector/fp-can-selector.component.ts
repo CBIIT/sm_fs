@@ -30,6 +30,7 @@ export class FpCanSelectorComponent implements OnInit {
       // this.logger.info(`My applId = ${this.applId} -- fseId = ${this.fseId}`);
       if (+next.fseId === +this.fseId && +next.applId === +this.applId) {
         this.projectedCAN = next.can;
+        this.planModel.saveProjectedCAN(this.fseId, this.applId, this.projectedCAN?.can);
         // this.logger.debug(this.fseId, this.applId, this.projectedCAN);
       }
     });
@@ -39,7 +40,7 @@ export class FpCanSelectorComponent implements OnInit {
         if (next.override || (!next.override && (next.can.can && this.projectedCAN?.can))) {
           this.logger.debug(`in selectCANEmitter handler: ${next.applId}, ${next.fseId}, ${next.override}, ${next.can?.can}`);
           this.selectedCAN = next.override ? next.can : this.projectedCAN;
-          this.planModel.saveSelectedCAN(this.fseId, this.applId, this.selectedCAN);
+          this.planModel.saveSelectedCAN(this.fseId, this.applId, this.selectedCAN, this.projectedCAN?.can );
           this.canManagementService.checkDefaultCANs(
             this.fseId,
             this.applId,

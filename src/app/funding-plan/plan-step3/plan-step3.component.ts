@@ -760,7 +760,7 @@ export class PlanStep3Component implements OnInit {
 
   private validateAndPurge(next: { pd: number; ca: string }) {
     this.fsPlanControllerService.getFundingPlanFundingSources(this.rfaPaNumber, next.pd, next.ca, this.fy).subscribe(result => {
-      const fundingSourceDetailsMap = new Map(result.map(item => [item.fundingSourceId, item]));
+      const fundingSourceDetailsMap: Map<number, FundingRequestFundsSrcDto> = new Map(result.map(item => [item.fundingSourceId, item]));
       this.logger.warn('Funding sources have changed; time to re-evaluate the selected sources in the model')
       const toPurge = this.planModel.purgeUnselectableSources(fundingSourceDetailsMap);
       if(toPurge) {
