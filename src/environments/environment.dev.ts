@@ -9,9 +9,6 @@ export const environment = {
   DB_HEARTBEAT_INTERVAL: 20000,
   KILLSWITCH_INTERVAL: 300000,
   TECH_SUPPORT_EMAIL: 'ncii2egrantsdevelopmentteam@mail.nih.gov',
-  GRANT_VIEWER_URL: 'https://i2e-dev.nci.nih.gov/yourgrants/jsp/GrantDetails.jsp?applId=',
-  // I2EWEB_URL: 'https://i2e-dev.nci.nih.gov/',
-  URL_YOURGRANTS: 'https://i2e-dev.nci.nih.gov/yourgrants/GrantView',
   apiBaseUrl: '',
   msalConfig: {
     auth: {
