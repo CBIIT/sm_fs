@@ -21,7 +21,7 @@
 
 <ng-template #read_only>
   <span *ngIf="selectedCanData?.can">
-    <a [routerLink]="[]" [ngbTooltip]="canTooltip"
+    <a href="" (click)="$event.preventDefault()" [ngbTooltip]="canTooltip"
        triggers="click:blur">{{ selectedCanData?.can }}</a> | {{ selectedCanData?.canDescrip }}
   </span>
 </ng-template>

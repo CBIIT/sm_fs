@@ -107,7 +107,7 @@
     <div class="col-xl-2 col-lg-4 col-sm-6">
       <div class="form-group">
         <span class="like-label">Requesting PD's Cancer Activity</span>
-        <p><a [routerLink]="[]" ngbTooltip="{{planModel.fundingPlanDto.cayCode|codeDescription:'CancerActivities'}}"
+        <p><a href="" (click)="$event.preventDefault()" ngbTooltip="{{planModel.fundingPlanDto.cayCode|codeDescription:'CancerActivities'}}"
               triggers="click:blur" placement="top">{{planModel.fundingPlanDto.cayCode}}</a></p>
       </div>
     </div>
