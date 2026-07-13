@@ -2,7 +2,25 @@
 /*table#grantDt tr.odd,.even {*/
 /*    display:none !important*/
 /*}*/
-
+/* ── change-user typeahead dropdown  copied from sm_gpmats for fixing similar issue in GPMATS ───────────
+   ngb-typeahead-window is rendered as a body-level portal by ng-bootstrap and
+   sits outside the change-user component host. Angular's ViewEncapsulation.Emulated
+   scopes component styles with attribute selectors that never reach the portal, so
+   these hover/active/cursor rules must live here as global styles.
+   Must use a specificity high enough to beat Bootstrap's .dropdown-item:hover rule. */
+ngb-typeahead-window .dropdown-item {
+  cursor: pointer;
+}
+/* Use .dropdown-menu in the selector for higher specificity than i2e-common-ui.css's
+   bare .dropdown-item:hover/:focus rules (which load later and would otherwise win). */
+ngb-typeahead-window.dropdown-menu .dropdown-item.active,
+ngb-typeahead-window.dropdown-menu .dropdown-item:hover,
+ngb-typeahead-window.dropdown-menu .dropdown-item:focus {
+  background-color: #0076a8;
+  color: #fff;
+  outline: none;
+}
+/* ─────────────────────────────────────────────────────────────────────────── */
 table.dataTable thead > tr > th.sorting:before, table.dataTable thead > tr > th.sorting_asc:before, table.dataTable thead > tr > th.sorting_desc:before,
 table.dataTable thead > tr > td.sorting:before,
 table.dataTable thead > tr > td.sorting_asc:before,
