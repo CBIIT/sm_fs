@@ -122,7 +122,7 @@ export class BudgetInfoComponent implements OnInit, OnDestroy {
         c.tcPctCut = null;
       }
       const selected: CanCcxDto = this.getCanSelectorWithIndex(index)?.selectedCanData;
-      const projectedCan: CanCcxDto = this.getCanSelectorWithIndex(index)?.projectedCan;
+      const projectedCan: CanCcxDto = this.getProjectedCanWithIndex(index)?.projectedCan;
       if (selected) {
         c.can = selected.can;
         c.canDescription = selected.canDescrip;
@@ -147,6 +147,14 @@ export class BudgetInfoComponent implements OnInit, OnDestroy {
       return null;
     }
     let result: CanSelectorComponent = this.canSelectors.find(control => (+control.index === +index));
+    return result;
+  }
+
+  getProjectedCanWithIndex(index: number): ProjectedCanComponent {
+    if (!this.projectedCans) {
+      return null;
+    }
+    let result: ProjectedCanComponent = this.projectedCans.find(control => (+control.index === +index));
     return result;
   }
 
