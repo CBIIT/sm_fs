@@ -160,10 +160,11 @@ export class BudgetInfoComponent implements OnInit, OnDestroy {
 
   copyProjectedCan(i: number): void {
     let found: boolean = false;
+    const projectedCan: CanCcxDto = this.getProjectedCanWithIndex(i)?.projectedCan;
     this.canSelectors.forEach((control) => {
       if (+i === +control.index) {
         found = true;
-        const result = control.selectProjectedCan();
+        const result = control.selectProjectedCan(projectedCan);
         if(!result) {
           this.logger.error(`Unable to select projected CAN for control ${JSON.stringify(control)}`);
         }
