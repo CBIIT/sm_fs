@@ -255,6 +255,7 @@ import { ErrorHandlerService } from './error/error-handler.service';
 import { CancerActivitiesDropdownComponent} from "./cancer-activities-dropdown/cancer-activities-dropdown.component";
 import { PdnameDropdownComponent} from "./pdname-dropdown/pdname-dropdown.component";
 import { EditLinkComponent } from './edit-link/edit-link.component';
+import { SavedProjectedCanComponent } from './cans/saved-projected-can/saved-projected-can.component';
 
 declare var $: any;
 
@@ -503,7 +504,8 @@ export function combinedInitializerFactory(
         UniquePdValidatorDirective,
         CancerActivitiesDropdownComponent,
         PdnameDropdownComponent,
-        EditLinkComponent
+        EditLinkComponent,
+        SavedProjectedCanComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule, NgbAccordionModule,

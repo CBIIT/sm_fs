@@ -24,6 +24,8 @@ export class CanManagementService {
   // Instructs all listeners to update their CAN to the selected value if fseId matches
   selectCANEmitter = new Subject<{ fseId: number; can: CanCcxDto; applId?: number, override: boolean }>();
   nonDefaultCanEventEmitter = new Subject<{ fseId: number, applId: number, nonDefault: boolean }>();
+  savedProjectedCanEmitter = new Subject<{ fseId: number, applId: number, savedCan: CanCcxDto }>();
+  
 
   nciSourceFlag: string = null;
   oefiaCodes: Array<OefiaCodingDto>;

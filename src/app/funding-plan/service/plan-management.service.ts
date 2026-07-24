@@ -133,8 +133,8 @@ export class PlanManagementService {
 
     this.planModel.fundingPlanDto.fpFinancialInformation?.fundingRequests?.forEach(r => {
       this.requestIdMap.set(r.applId, r.frqId);
-      const buds = new Map(r.financialInfoDto.fundingReqBudgetsDtos?.map(b => [b.fseId, b]));
-      const cans = new Map(r.financialInfoDto.fundingRequestCans?.map(c => [c.fseId, c]));
+      const buds: Map<number, FundingReqBudgetsDto> = new Map(r.financialInfoDto.fundingReqBudgetsDtos?.map(b => [b.fseId, b]));
+      const cans: Map<number, FundingRequestCanDto> = new Map(r.financialInfoDto.fundingRequestCans?.map(c => [c.fseId, c]));
       this.budgetMap.set(Number(r.applId), buds);
       this.canMap.set(Number(r.applId), cans);
     });

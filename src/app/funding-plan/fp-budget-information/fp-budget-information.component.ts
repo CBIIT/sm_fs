@@ -189,9 +189,17 @@ export class FpBudgetInformationComponent implements OnInit, AfterViewInit {
             });
           });
         }
+        if (can.projectedCan && this.workflowModel.approvedByNciFC && !this.workflowModel.isFinancialApprover)  {
+          this.canManagementService.getCanDetails(can.projectedCan).subscribe(result => {
+            this.canManagementService.savedProjectedCanEmitter.next({
+              fseId: can.fseId,
+              applId: req.applId,
+              savedCan: result
+            });
+          });
+        }
       });
     });
-
   }
 
   canSearchForCAN(fundingSourceId: number): boolean {
