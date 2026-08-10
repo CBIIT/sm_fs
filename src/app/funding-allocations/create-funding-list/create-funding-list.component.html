@@ -1,0 +1,130 @@
+<div class="ms-3">
+  <h2>Create Funding List</h2>
+  <div class="my-4">Use this page to search for existing grants and add them to either a new list or an existing list.</div>
+</div>
+
+
+<div class="row mb-2">
+  <div class="col-12 d-flex">
+    <h3 class="d-inline-block">Filters</h3>
+  </div>
+</div>
+
+<form #filterForm="ngForm" (ngSubmit)="search()">
+
+  <!-- Row 1: Grant Number (full width) -->
+  <div class="row form-group">
+    <div class="col-12 ms-3">
+      <lib-grantnumber-search-criteria [form]="filterForm"></lib-grantnumber-search-criteria>
+    </div>
+  </div>
+
+  <!-- Row 2: PD Name | Division Office Center | Cancer Activity -->
+  <div class="row form-group">
+    <div class="col-lg-4">
+      <app-pdname-dropdown label="PD Name" name="pdName" [broadcast]="true" [showInactiveToggle]="true" [syncWithCa]="true"></app-pdname-dropdown>
+    </div>
+    <div class="col-lg-4">
+      <lib-doc-dropdown [name]="'doc'" label="DOC" [maxSelection]="5" [selectedValue]="selectedDocs" (selectedValueChange)="onDocSelected($event)"></lib-doc-dropdown>
+    </div>
+    <div class="col-lg-4">
+      <app-cancer-activities-dropdown
+        [(selectedValue)]="selectedCancerActivities"
+        [broadcast]="true" [syncWithPd]="true"
+				[activeOnly]="true" label="Cancer Activities">
+      </app-cancer-activities-dropdown>
+    </div>
+  </div>
+
+  <!-- Row 3: IMPAC II Status | Percentile | Priority Score -->
+  <div class="row form-group">
+    <div class="col-lg-4">
+      <lib-i2status-dropdown
+        [(selectedValue)]="i2Status"
+        [showI2GroupInfo]="true"
+        [form]="filterForm">
+      </lib-i2status-dropdown>
+    </div>
+    <div class="col-lg-4">
+      <lib-irg-percentile [form]="filterForm"></lib-irg-percentile>
+    </div>
+    <div class="col-lg-4">
+      <lib-priority-score [form]="filterForm"></lib-priority-score>
+    </div>
+  </div>
+
+  <!-- Row 4: FY Range | NCAB Range | PI Name -->
+  <div class="row form-group">
+    <div class="col-lg-4">
+      <lib-fy-range [minYear]="2001" [maxYear]="fiscalYear" [form]="filterForm"></lib-fy-range>
+    </div>
+    <div class="col-lg-4">
+      <lib-ncab-daterange [form]="filterForm"></lib-ncab-daterange>
+    </div>
+    <div class="col-lg-4 form-group">
+      <label for="piName">PI Name</label>
+      <input type="text" id="piName" name="piName"
+             [(ngModel)]="searchCriteria.piName"
+             class="form-control">
+    </div>
+  </div>
+
+  <!-- Row 5: NOFO | NOSI | Mechanism -->
+  <div class="row form-group">
+    <div class="col-lg-4 form-group">
+      <lib-nofo-dropdown aria-label="NOFO Dropdown" ></lib-nofo-dropdown>
+    </div>
+    <div class="col-lg-4 form-group">
+      <lib-nosi-dropdown aria-label="NOSI Dropdown"></lib-nosi-dropdown>
+    </div>
+    <div class="col-lg-4 form-group">
+      <lib-mech-select aria-label="Mechanism Dropdown"></lib-mech-select>
+    </div>
+  </div>
+
+  <!-- Row 6: Type | Exclude checkbox | (empty) -->
+  <div class="row form-group">
+    <div class="col-lg-4 form-group">
+      <lib-type-select aria-label="Type Dropdown"></lib-type-select>
+    </div>
+    <div class="col-lg-4 d-flex align-items-center">
+      <div class="form-check d-flex">
+        <input type="checkbox" id="excludeInList" name="excludeInList"
+               [(ngModel)]="excludeInList" class="form-check-input">
+        <label for="excludeInList" class="form-check-label ms-2">
+          Exclude Grants Already in a List
+        </label>
+            <i class="fas fa-info-circle ms-1 text-primary"
+             ngbTooltip="Excludes grant applications already on an existing list, except those marked 'Do Not Pay'."
+             triggers="click:blur"
+             placement="top">
+          </i>
+      </div>
+    </div>
+    <div class="col-lg-4"></div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="row form-group me-3">
+    <div class="col-lg-12 d-flex justify-content-end align-items-end">
+      <button type="button" class="btn btn-outline-secondary me-2" (click)="reset()">Reset</button>
+      <span [ngbTooltip]="hasAnyCriteria ? null : 'Search by selecting or providing at least one criteria.'"
+            placement="top">
+        <button type="button" class="btn btn-primary" [disabled]="!hasAnyCriteria" (click)="search()">Search</button>
+      </span>
+    </div>
+  </div>
+
+</form>
+
+<!-- Results -->
+<div class="row mb-2">
+  <div class="col-12">
+    <h3>Results</h3>
+  </div>
+</div>
+
+<app-create-funding-table
+  [grantViewerUrl]="grantViewerUrl"
+  [eGrantsUrl]="eGrantsUrl">
+</app-create-funding-table>

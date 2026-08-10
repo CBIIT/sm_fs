@@ -1,0 +1,29 @@
+<div class="row form-group">
+  <div class="col-12">
+    <button class="btn btn-primary"
+            [disabled]="!hasSelectedGrants"
+            (click)="addSelectedToList()">
+      Add Selected Grants to List
+    </button>
+  </div>
+</div>
+
+<div class="row" [hidden]="!showResults">
+  <div class="col-12">
+    <table id="grantListDt"
+           datatable
+           [dtOptions]="dtOptions"
+           [dtTrigger]="dtTrigger"
+           class="row-border hover"
+           style="width: 100%">
+    </table>
+    <!-- Renderer templates -->
+    <ng-template #fullGrantNumberRenderer let-data="adtData">
+      <app-full-grant-number-cell-renderer
+        [data]="data"
+        [eGrantsUrl]="eGrantsUrl"
+        [grantViewerUrl]="grantViewerUrl">
+      </app-full-grant-number-cell-renderer>
+    </ng-template>
+  </div>
+</div>

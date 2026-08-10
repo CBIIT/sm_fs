@@ -18,6 +18,8 @@ export class CancerActivitiesDropdownComponent implements OnInit {
   public options: Options;
   private _npnId = -1;
   private _selectedValue: string [] | string;
+  private allCancerActivities: Array<CancerActivitiesDto> = [];
+  private selectedDocFilter: string[] = [];
 
   @Input() debug = false;
   @Input() monitorFlag = false;
@@ -133,6 +135,12 @@ export class CancerActivitiesDropdownComponent implements OnInit {
       error => {
         console.error('Error when calling getDocAndCayCodes ', error);
       });
+
+    this.pdCaIntegratorService.docEmitter.subscribe(payload => {
+      if (payload.eventType === 'CA_EVENT' || payload.channel !== this.channel) return;
+      this.selectedDocFilter = Array.isArray(payload.doc) ? payload.doc : (payload.doc ? [payload.doc] : []);
+      this.applyDocFilter();
+    });
   }
 
   private updateDropdown(): void {
@@ -145,6 +153,8 @@ export class CancerActivitiesDropdownComponent implements OnInit {
             (this.caDocs[element.code] ? ' (' + this.caDocs[element.code] + ')' : '');
         });
         this.cancerActivities = this.prune(result);
+        this.allCancerActivities = [...this.cancerActivities];
+        this.applyDocFilter();
         if (this.lockedOptions.length !== 0) {
           this.selectedValue = this.lockedOptions;
         }
@@ -177,6 +187,16 @@ export class CancerActivitiesDropdownComponent implements OnInit {
     });
 
     return result;
+  }
+
+  private applyDocFilter(): void {
+    if (this.selectedDocFilter.length === 0) {
+      this.cancerActivities = [...this.allCancerActivities];
+    } else {
+      this.cancerActivities = this.allCancerActivities.filter(ca =>
+        this.selectedDocFilter.includes(this.caDocs[(ca as any).code])
+      );
+    }
   }
 
   evoke(): any {

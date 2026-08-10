@@ -45,6 +45,7 @@
               "node_modules/datatables.net-dt/css/jquery.dataTables.css",
               "node_modules/datatables.net-responsive-dt/css/responsive.dataTables.css",
               "node_modules/datatables.net-buttons-dt/css/buttons.dataTables.css",
+              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
               "src/css/buttons.css",
               "src/css/i2e-common-ui.css"
             ],
@@ -62,7 +63,8 @@
               "./node_modules/datatables.net-buttons/js/buttons.flash.js",
               "./node_modules/datatables.net-buttons/js/buttons.html5.js",
               "./node_modules/datatables.net-buttons/js/buttons.print.js",
-              "src/js/ngselect-autofocus.js"
+              "src/js/ngselect-autofocus.js",
+              "node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js"
             ]
           },
           "configurations": {

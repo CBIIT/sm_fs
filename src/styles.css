@@ -292,5 +292,38 @@ select:invalid ~ span.select2-container .selection .select2-selection {
 .alert a:focus {
     text-decoration: underline !important;
 }
+/** Fixed columns css 
+  
+  These classes are injected by fixed columns extensions
+  and can be tweaked here to match the colors of headers and body
+  to hide the scrolling element behind the fixed header.
+  
+  */
+  
+  table.dataTable thead tr > .dtfc-fixed-left,
+  table.dataTable thead tr > .dtfc-fixed-right,
+  table.dataTable tfoot tr > .dtfc-fixed-left,
+  table.dataTable tfoot tr > .dtfc-fixed-right {
+    top: 0;
+    bottom: 0;
+    z-index: 15;
+    background-color: white;
+    /* i2e-common-ui.css sets border-right-width:0 on all th — override with !important */
+    border-right: 2px solid #dee2e6 !important;
+    
+  }
+
+  table.dataTable tbody tr > .dtfc-fixed-left,
+  table.dataTable tbody tr > .dtfc-fixed-right {
+    z-index: 10;
+    background-color: white;
+    /* i2e-common-ui.css sets border-right-width:0 on all td — override with !important */
+    border-right: 2px solid #dee2e6 !important;
+  }
+  
+  div.dtfc-left-top-blocker,
+  div.dtfc-right-top-blocker {
+    background-color: white;
+  }
 
 

@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { ApiModule as CommonApiModule, BASE_PATH as COMMON_BASE_PATH } from '@cbiit/i2ecommonws-lib';
 import { ApiModule as FSApiModule, BASE_PATH as FS_BASE_PATH } from '@cbiit/i2efsws-lib';
 import { ApiModule as RefApiModule, BASE_PATH as REF_BASE_PATH } from '@cbiit/i2erefws-lib';
+import { ApiModule as YGApiModule, BASE_PATH as YG_BASE_PATH } from '@cbiit/i2eygws-lib';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { NgSelect2Module } from 'ng-select2';
 import {
@@ -255,6 +256,9 @@ import { ErrorHandlerService } from './error/error-handler.service';
 import { CancerActivitiesDropdownComponent} from "./cancer-activities-dropdown/cancer-activities-dropdown.component";
 import { PdnameDropdownComponent} from "./pdname-dropdown/pdname-dropdown.component";
 import { EditLinkComponent } from './edit-link/edit-link.component';
+import { CreateFundingListComponent } from './funding-allocations/create-funding-list/create-funding-list.component';
+import { CreateFundingTableComponent } from './funding-allocations/create-funding-list/create-funding-table/create-funding-table.component';
+import { SearchListsComponent } from './funding-allocations/search-lists/search-lists.component';
 
 declare var $: any;
 
@@ -503,7 +507,10 @@ export function combinedInitializerFactory(
         UniquePdValidatorDirective,
         CancerActivitiesDropdownComponent,
         PdnameDropdownComponent,
-        EditLinkComponent
+        EditLinkComponent,
+        CreateFundingListComponent,
+        CreateFundingTableComponent,
+        SearchListsComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule, NgbAccordionModule,
@@ -512,6 +519,7 @@ export function combinedInitializerFactory(
         CommonApiModule,
         FSApiModule,
         RefApiModule,
+        YGApiModule,
         NgSelect2Module,
         NgbModule,
         FormsModule,
@@ -527,6 +535,7 @@ export function combinedInitializerFactory(
         { provide: COMMON_BASE_PATH, useValue: '/i2ecommonws' },
         { provide: FS_BASE_PATH, useValue: '/i2efsws' },
         { provide: REF_BASE_PATH, useValue: '/i2erefws' },
+        { provide: YG_BASE_PATH, useValue: '/i2eygws' },
         { provide: PROPERTIES_APP_NAME, useValue: 'FUNDING-SELECTIONS' },
         { provide: PROPERTIES_ENVIRONMENT, useValue: environment },
         { provide: INSERT_CHANGE_USER_HEADER, useValue: true },
