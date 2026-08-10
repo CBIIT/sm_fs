@@ -122,9 +122,11 @@ export class BudgetInfoComponent implements OnInit, OnDestroy {
         c.tcPctCut = null;
       }
       const selected: CanCcxDto = this.getCanSelectorWithIndex(index)?.selectedCanData;
+      const projectedCan: CanCcxDto = this.getProjectedCanWithIndex(index)?.projectedCan;
       if (selected) {
         c.can = selected.can;
         c.canDescription = selected.canDescrip;
+        c.projectedCan = projectedCan?.can;
       }
       const oefiaType = this.getOefiaTypeWithIndex(index)?.selectedValue;
       c.octId = c.oefiaTypeId = !isNaN(oefiaType) ? (Number(oefiaType) !== 0 ? Number(oefiaType) : null) : null;
@@ -148,12 +150,21 @@ export class BudgetInfoComponent implements OnInit, OnDestroy {
     return result;
   }
 
+  getProjectedCanWithIndex(index: number): ProjectedCanComponent {
+    if (!this.projectedCans) {
+      return null;
+    }
+    let result: ProjectedCanComponent = this.projectedCans.find(control => (+control.index === +index));
+    return result;
+  }
+
   copyProjectedCan(i: number): void {
     let found: boolean = false;
+    const projectedCan: CanCcxDto = this.getProjectedCanWithIndex(i)?.projectedCan;
     this.canSelectors.forEach((control) => {
       if (+i === +control.index) {
         found = true;
-        const result = control.selectProjectedCan();
+        const result = control.selectProjectedCan(projectedCan);
         if(!result) {
           this.logger.error(`Unable to select projected CAN for control ${JSON.stringify(control)}`);
         }

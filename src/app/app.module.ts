@@ -259,6 +259,7 @@ import { EditLinkComponent } from './edit-link/edit-link.component';
 import { CreateFundingListComponent } from './funding-allocations/create-funding-list/create-funding-list.component';
 import { CreateFundingTableComponent } from './funding-allocations/create-funding-list/create-funding-table/create-funding-table.component';
 import { SearchListsComponent } from './funding-allocations/search-lists/search-lists.component';
+import { SavedProjectedCanComponent } from './cans/saved-projected-can/saved-projected-can.component';
 
 declare var $: any;
 
@@ -510,7 +511,8 @@ export function combinedInitializerFactory(
         EditLinkComponent,
         CreateFundingListComponent,
         CreateFundingTableComponent,
-        SearchListsComponent
+        SearchListsComponent,
+        SavedProjectedCanComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule, NgbAccordionModule,

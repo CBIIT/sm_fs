@@ -11,6 +11,7 @@ import { FundingSourceTypes } from '../request/funding-source-types';
   providedIn: 'root'
 })
 export class PlanModel {
+
   grantViewerUrl: string;
   yourgrantsUrl: string;
   eGrantsUrl: string;
@@ -24,7 +25,7 @@ export class PlanModel {
 
   fundingPlanDto: FundingPlanDto = {};
   selectedApplIdCans: Map<string, CanCcxDto> = new Map<string, CanCcxDto>();
-
+  projectedApplIdCans: Map<string, string> = new Map<string, string>();
 
   documentSnapshot: ModelSnapshot;
 
@@ -66,6 +67,8 @@ export class PlanModel {
     this.returnToSearchLink = false;
     this.title = 'New Plan';
     this.pendingAlerts = [];
+    this.selectedApplIdCans.clear();
+    this.projectedApplIdCans.clear();
     this.takeDocumentSnapshot();
   }
 
@@ -159,13 +162,25 @@ export class PlanModel {
     return this.selectedApplIdCans.get(key);
   }
 
-  saveSelectedCAN(fseId: number, applId: number, can: CanCcxDto): void {
+  saveSelectedCAN(fseId: number, applId: number, can: CanCcxDto, projectedCan: string): void {
     if (!this.selectedApplIdCans) {
       this.selectedApplIdCans = new Map<string, CanCcxDto>();
     }
+    if (!this.projectedApplIdCans) {
+      this.projectedApplIdCans = new Map<string, string>();
+    }
     const key = String(fseId) + '-' + String(applId);
-
+    this.projectedApplIdCans.set(key, projectedCan);
     this.selectedApplIdCans.set(key, can);
+
+  }
+
+  saveProjectedCAN(fseId: number, applId: number, projectedCan: string ) {
+    if (!this.projectedApplIdCans) {
+      this.projectedApplIdCans = new Map<string, string>();
+    }
+    const key = String(fseId) + '-' + String(applId);
+    this.projectedApplIdCans.set(key, projectedCan);
   }
 
   sanitizeCANDataAfterReturn(): FundingRequestCanDto[] {
@@ -182,7 +197,6 @@ export class PlanModel {
   }
 
   buildUpdatedCANDataModel(): FundingRequestCanDto[] {
-    let c: CanCcxDto;
     const result: FundingRequestCanDto[] = [];
     this.fundingPlanDto.fpFinancialInformation.fundingRequests.forEach(req => {
       req.financialInfoDto.fundingRequestCans.forEach(can => {
@@ -191,11 +205,13 @@ export class PlanModel {
           this.logger.info('Potential CAN error :: no TC/DC values', `PlanId: ${this.fundingPlanDto.fprId}`, can);
         }
 
-        c = this.selectedApplIdCans.get(key);
+        const c = this.selectedApplIdCans.get(key);
+        const projectedCan = this.projectedApplIdCans.get(key);
         if (c) {
           can.can = c.can;
           can.canDescription = c.canDescrip;
           can.phsOrgCode = c.canPhsOrgCode;
+          can.projectedCan = projectedCan;
         }
         result.push(can);
       });
