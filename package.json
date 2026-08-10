@@ -33,17 +33,11 @@
     "@angular/platform-browser": "^18.2.2",
     "@angular/platform-browser-dynamic": "^18.2.2",
     "@angular/router": "^18.2.2",
-<<<<<<< HEAD
     "@azure/msal-angular": "^5.2.5",
     "@azure/msal-browser": "^5.13.0",
-    "@cbiit/i2ecommonws-lib": "6.1.0",
     "@cbiit/i2ecui-lib": "6.4.1-SNAPSHOT",
-    "@cbiit/i2efsws-lib": "6.2.0-SNAPSHOT.202608071021",
-=======
+    "@cbiit/i2efsws-lib": "6.2.0-SNAPSHOT",
     "@cbiit/i2ecommonws-lib": "6.1.0",
-    "@cbiit/i2ecui-lib": "6.1.1",
-    "@cbiit/i2efsws-lib": "6.1.0",
->>>>>>> 8413fafd5cef935ecd5355bc68ac7df9e544bdae
     "@cbiit/i2ejasperws-lib": "6.0.0",
     "@cbiit/i2erefws-lib": "6.0.0",
     "@cbiit/i2eygws-lib": "6.0.0",
