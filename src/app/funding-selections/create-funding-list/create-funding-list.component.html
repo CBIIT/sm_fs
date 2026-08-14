@@ -110,21 +110,15 @@
       <button type="button" class="btn btn-outline-secondary me-2" (click)="reset()">Reset</button>
       <span [ngbTooltip]="hasAnyCriteria ? null : 'Search by selecting or providing at least one criteria.'"
             placement="top">
-        <button type="button" class="btn btn-primary" [disabled]="!hasAnyCriteria" (click)="search()">Search</button>
+        <button type="button" class="btn btn-primary me-5" [disabled]="!hasAnyCriteria" (click)="search()">Search</button>
       </span>
     </div>
   </div>
 
 </form>
 
-<!-- Results -->
-<div class="row mb-2">
-  <div class="col-12">
-    <h3>Results</h3>
-  </div>
-</div>
-
 <app-create-funding-table
   [grantViewerUrl]="grantViewerUrl"
-  [eGrantsUrl]="eGrantsUrl">
+  [eGrantsUrl]="eGrantsUrl"
+  [i2eURL]="i2eURL">
 </app-create-funding-table>

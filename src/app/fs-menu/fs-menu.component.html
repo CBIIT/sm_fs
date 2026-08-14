@@ -1,11 +1,11 @@
 <nav id="side-nav" aria-label="application navigation">
     <ul class="list-group">
 
-      <li class="list-group-item">
-        <a class="parent" data-bs-toggle="collapse" href="#nav-collapse-fa" role="button" aria-expanded="true" aria-controls="nav-collapse-fa"><b>Funding Allocations</b></a>
+      <li class="list-group-item" *ngIf="oefiaCertifier">
+        <a class="parent" data-bs-toggle="collapse" href="#nav-collapse-fa" role="button" aria-expanded="true" aria-controls="nav-collapse-fa"><b>Funding Selections</b></a>
         <ul class="collapse show" id="nav-collapse-fa">
-          <li class="list-group-item"><a [routerLink]="['/funding-allocations/create']" routerLinkActive="active">Create Funding List</a></li>
-          <li class="list-group-item"><a [routerLink]="['/funding-allocations/search']" routerLinkActive="active">Search Lists</a></li>     
+          <li class="list-group-item"><a [routerLink]="['/funding-selections/create']" routerLinkActive="active">Create Funding List</a></li>
+          <li class="list-group-item"><a [routerLink]="['/funding-selections/search']" routerLinkActive="active">Search Lists</a></li>
         </ul>
       </li>
 

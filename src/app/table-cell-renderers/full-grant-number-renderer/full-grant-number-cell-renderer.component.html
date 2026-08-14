@@ -4,14 +4,29 @@
 </ng-template>
 <div *ngIf="skip"><img src="images/grant-skip.png" alt="SKIP" width="40" height="16"  class="tdlabel"></div>
 <div *ngIf="exception"><img src="images/grant-exception.png" alt="EXCEPTION" width="64" height="20" class="tdlabel"></div>
-<a href="{{grantViewerUrl+data.applId}}" target="yourgrant" ngbTooltip="Click to View Grant Details">{{data.fullGrantNum}}</a>
+<a href="{{grantViewerUrl+data.applId}}" target="yourgrant" ngbTooltip="Click to View Grant Details">{{data.fullGrantNum ? data.fullGrantNum : data.grantNumber}}</a>
 <div class="grant-icons">
-  <a href="{{eGrantsUrl+data.applId}}" target="yourgrant" ngbTooltip="eGrants">
+  <a href="{{eGrantsUrl+data.applId}}" target="yourgrant" ngbTooltip="eGrants" container="body">
     <span class="egrants-icon"></span>
   </a>
-  <a href="" (click)="$event.preventDefault()" [ngbTooltip]="InstituteTooltip">
+  <div *ngIf="data.fullGrantNum">
+  <a href="" (click)="$event.preventDefault()" [ngbTooltip]="InstituteTooltip" container="body">
     <i class='fa fa-university' aria-hidden='true'></i>
   </a>
+  </div>
+  <div *ngIf="data.grantNumber">
+      <a href="" (click)="$event.preventDefault()" ngbTooltip="View Grantee Institution." container="body">
+    <i class='fa fa-university' aria-hidden='true'></i>
+  </a>
+  </div>
+
+  <div *ngIf="data.grantNumber">
+    <a href="{{i2eURL+'fs/#/search/immediate?grantNum='+data.grantNumber}}" ngbTooltip="View Funding Document"
+      target="_blank" aria-label="View Funding Document" container="body">
+      <i class="far fa-file" aria-hidden="true"></i></a>
+  </div>
+
+
   <ng-content>
   </ng-content>
 </div>

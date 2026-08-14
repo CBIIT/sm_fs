@@ -14,4 +14,13 @@ export class CancerActivityCellRendererComponent implements OnInit {
 
   @Input()
   data : any = {}
+
+  get cancerActivityValue() {
+    if (this.data && this.data.cancerActivity) {
+      return this.data.cancerActivity;
+    }
+    else if(this.data && this.data.cayCode) {
+      return this.data.cayCode;
+    }
+  }
 }

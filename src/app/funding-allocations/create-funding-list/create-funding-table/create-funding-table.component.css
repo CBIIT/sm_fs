@@ -1,8 +1,0 @@
-
-  ::ng-deep table.dataTable {
-    border: 1px solid #a3a6ad;
-    border-left-width: 0px;
-    border-bottom-width: 0px;
-    table-layout: auto !important;
-    border-collapse: separate !important;
-}

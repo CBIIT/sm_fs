@@ -1,0 +1,130 @@
+<div class="ms-3">
+
+    <a routerLink="/funding-selections/create" class="text-decoration-none small">
+        &lt; Back to Search Results
+    </a>
+
+    <!-- Page header -->
+    <div class="d-flex justify-content-between align-items-center my-3">
+        <h2 class="mb-0">{{ selectionDate }}</h2>
+        <button class="btn btn-primary">Send Grants to Division Office Centers &gt;</button>
+    </div>
+
+    <!-- Overview -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title fw-bold">Overview</h5>
+            <div class="d-flex align-items-center criteria-bar my-4">
+                <div class="criteria-item">ID: <strong>{{ listId }}</strong>
+                </div>
+                <div class="criteria-item">Status: <strong>{{ listStatus }}</strong></div>
+                <div class="criteria-item">Total Number of Grants::
+                    <strong>{{ totalGrants }}</strong>
+                </div>
+                <div class="criteria-item">DOC Recommended Total: <strong>{{
+                        docRecommendedTotal | currency:'USD':'symbol':'1.0-0'}}</strong></div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- DOC Status -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title fw-bold my-3">DOC Status</h5>
+            <p class="card-text mb-3">
+                View the Division Office Centers involved in this grant list, the number of grants assigned to each
+                office, and the status of their review. Click a grant count to filter the table
+                below and view only the grants assigned to that DOC.
+            </p>
+            <div class="doc-status-wrapper">
+                <div class="doc-status-column" *ngFor="let col of docStatusColumns; let last = last"
+                    [class.border-end]="!last">
+                    <div class="doc-row" *ngFor="let d of col; let lastRow = last" [class.border-bottom]="!lastRow">
+                        <span class="doc-name">{{ d.doc }}</span>
+
+                        <a href="#" class="doc-count" (click)="$event.preventDefault()">
+                            {{ d.count }}
+                        </a>
+
+                        <span class="doc-status">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span>{{ d.status }}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Grants in this List -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title fw-bold my-3">Grants in this List</h5>
+            <p class="card-text text-muted mb-3">
+                View and edit grants in the table below by expanding the rows individually, or select multiple grants
+                and click "Bulk Edit".
+            </p>
+
+            <!-- Action buttons -->
+            <div class="d-flex gap-2 mb-3">
+                <!-- Bulk Edit -->
+                <button type="button" class="btn btn-primary me-3">
+                    <i class="fas fa-pen me-2"></i>
+                    Bulk Edit
+                </button>
+
+                <!-- Add Grants to List -->
+                <button type="button" class="btn btn-outline-primary me-3">
+                    <i class="fas fa-plus me-2"></i>
+                    Add Grants to List
+                </button>
+
+                <!-- Remove Selected Grants -->
+                <button type="button" class="btn btn-outline-danger">
+                    <i class="fas fa-minus-circle me-2"></i>
+                    Remove Selected Grants
+                </button>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        View Documents for Selected Grants
+                    </button>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary">View PDF</button>
+            </div>
+
+            <!-- Grants DataTable -->
+            <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover"
+                style="width: 100%">
+            </table>
+        </div>
+    </div>
+
+    <!-- List History -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title fw-bold">List History</h5>
+            <table class="table table-sm table-bordered mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let h of listHistory">
+                        <td>{{ h.date }}</td>
+                        <td>{{ h.status }}</td>
+                        <td>{{ h.actionBy }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>

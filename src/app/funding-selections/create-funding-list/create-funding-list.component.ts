@@ -20,6 +20,7 @@ export class CreateFundingListComponent implements AfterViewInit {
   fiscalYear: number;
   grantViewerUrl: string;
   eGrantsUrl: string;
+  i2eURL: string;
 
   selectedCancerActivities: string[] | string = [];
   selectedDocs: string[] = [];
@@ -35,6 +36,7 @@ export class CreateFundingListComponent implements AfterViewInit {
   ) {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
+    this.i2eURL = this.propertiesService.getProperty('I2EWEB_URL').trim();
     this.fiscalYear = getCurrentFiscalYear();
   }
 
@@ -109,9 +111,11 @@ export class CreateFundingListComponent implements AfterViewInit {
     criteria.supportYear = grantNumberForm.grantNumberYear;
     criteria.suffixCode = grantNumberForm.grantNumberSuffix;
 
+    const toNum = (v: any): number | undefined => (v !== '' && v != null) ? Number(v) : undefined;
+
     const fyRange = formValue.fyRange || {};
-    criteria.fyRangeFrom = fyRange.fromFy;
-    criteria.fyRangeTo = fyRange.toFy;
+    criteria.fyRangeFrom = toNum(fyRange.fromFy);
+    criteria.fyRangeTo = toNum(fyRange.toFy);
 
     const ncabRange = formValue.ncabRange || {};
     criteria.ncabRangeFrom = ncabRange.fromNcab;
@@ -120,9 +124,9 @@ export class CreateFundingListComponent implements AfterViewInit {
     criteria.piName = this.searchCriteria.piName;
     criteria.pdName = formValue.pdName;
     criteria.divisionOfficeCenter = this.selectedDocs.length ? this.selectedDocs : undefined;
-    criteria.cancerActivity = Array.isArray(this.selectedCancerActivities)
+    criteria.cancerActivity = Array.isArray(this.selectedCancerActivities) && this.selectedCancerActivities.length
       ? (this.selectedCancerActivities as string[])
-      : (this.selectedCancerActivities ? [this.selectedCancerActivities as string] : undefined);
+      : (this.selectedCancerActivities && !Array.isArray(this.selectedCancerActivities) ? [this.selectedCancerActivities as string] : undefined);
     criteria.impacStatus = Array.isArray(this.i2Status)
       ? (this.i2Status as FundingAllocationGrantSearchCriteriaDto.ImpacStatusEnum[])
       : (this.i2Status ? [this.i2Status as FundingAllocationGrantSearchCriteriaDto.ImpacStatusEnum] : undefined);
@@ -130,13 +134,13 @@ export class CreateFundingListComponent implements AfterViewInit {
     criteria.nosi = formValue.nosi ? [formValue.nosi] : undefined;
 
     const irgRange = formValue.irgPercentileRange || {};
-    const toNum = (v: any): number | undefined => (v !== '' && v != null) ? Number(v) : undefined;
     criteria.irgPercentileFrom = toNum(irgRange.fromIrgPercentile);
     criteria.irgPercentileTo = toNum(irgRange.toIrgPercentile);
 
     const pscRange = formValue.priorityScoreRange || {};
     criteria.priorityScoreFrom = toNum(pscRange.fromPriorityScore);
     criteria.priorityScoreTo = toNum(pscRange.toPriorityScore);
+    criteria.excludeGrantsAlreadyInList = this.excludeInList;
 
     this.fundingTable.search(criteria);
   }

@@ -27,6 +27,9 @@ export class FullGrantNumberCellRendererComponent implements OnInit {
   grantViewerUrl=""
 
   @Input()
+  i2eURL=""
+
+  @Input()
   set data(value: any) {
     this._data = value;
     if (this.data && this._minScore >= 0 && this._maxScore >= 0) {

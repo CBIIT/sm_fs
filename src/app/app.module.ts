@@ -106,6 +106,9 @@ import {
   FullGrantNumberCellRendererComponent
 } from './table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import {
+  FoaCellRendererComponent
+} from './table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
+import {
   CancerActivityCellRendererComponent
 } from './table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
 import {
@@ -256,9 +259,9 @@ import { ErrorHandlerService } from './error/error-handler.service';
 import { CancerActivitiesDropdownComponent} from "./cancer-activities-dropdown/cancer-activities-dropdown.component";
 import { PdnameDropdownComponent} from "./pdname-dropdown/pdname-dropdown.component";
 import { EditLinkComponent } from './edit-link/edit-link.component';
-import { CreateFundingListComponent } from './funding-allocations/create-funding-list/create-funding-list.component';
-import { CreateFundingTableComponent } from './funding-allocations/create-funding-list/create-funding-table/create-funding-table.component';
-import { SearchListsComponent } from './funding-allocations/search-lists/search-lists.component';
+import { CreateFundingListComponent } from './funding-selections/create-funding-list/create-funding-list.component';
+import { CreateFundingTableComponent } from './funding-selections/create-funding-list/create-funding-table/create-funding-table.component';
+import { SearchListsComponent } from './funding-selections/search-lists/search-lists.component';
 import { SavedProjectedCanComponent } from './cans/saved-projected-can/saved-projected-can.component';
 
 declare var $: any;
@@ -423,6 +426,7 @@ export function combinedInitializerFactory(
         ProjectedCanComponent,
         CanSelectorComponent,
         FullGrantNumberCellRendererComponent,
+        FoaCellRendererComponent,
         CancerActivityCellRendererComponent,
         ExistingRequestsCellRendererComponent,
         FundingRequestActionCellRendererComponent,

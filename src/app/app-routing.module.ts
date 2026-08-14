@@ -21,8 +21,8 @@ import { PlanStep6Component } from './funding-plan/plan-step6/plan-step6.compone
 import { CanDeactivatePlanStep1 } from './funding-plan/plan-step1/can-deactivate-plan-step1';
 import { ManageDesignationsComponent } from './manage-designations/manage-designations.component';
 import { RetrievePlanComponent } from './funding-plan/retrieve-plan/retrieve-plan.component';
-import { CreateFundingListComponent } from './funding-allocations/create-funding-list/create-funding-list.component';
-import { SearchListsComponent } from './funding-allocations/search-lists/search-lists.component';
+import { CreateFundingListComponent } from './funding-selections/create-funding-list/create-funding-list.component';
+import { SearchListsComponent } from './funding-selections/search-lists/search-lists.component';
 import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate-plan-step6';
 import { CanDeactivateRequestStep2 } from './funding-request/step2/can-deactivate-request-step2';
 import { CanDeactivatePlanStep3 } from './funding-plan/plan-step3/can-deactivate-plan-step3';
@@ -63,8 +63,8 @@ const routes: Routes = [
       ]},
       {path: 'fundingSourceDetails', component: FundingSourcesNamesComponent},
       {path: 'manage', component: ManageDesignationsComponent},
-      {path: 'funding-allocations/create', component: CreateFundingListComponent, canActivate: [AuthGuard]},
-      {path: 'funding-allocations/search', component: SearchListsComponent, canActivate: [AuthGuard]},
+      {path: 'funding-selections/create', component: CreateFundingListComponent, canActivate: [AuthGuard]},
+      {path: 'funding-selections/search', component: SearchListsComponent, canActivate: [AuthGuard]},
     ]
   },
 
