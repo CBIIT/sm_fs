@@ -37,7 +37,7 @@
     "@azure/msal-browser": "^5.13.0",
     "@cbiit/i2ecommonws-lib": "6.1.0",
     "@cbiit/i2ecui-lib": "~6.4.1-SNAPSHOT",
-    "@cbiit/i2efsws-lib": "^6.2.0-SNAPSHOT.202608141416",
+    "@cbiit/i2efsws-lib": "~6.2.0-SNAPSHOT",
     "@cbiit/i2ejasperws-lib": "6.0.0",
     "@cbiit/i2erefws-lib": "6.0.0",
     "@cbiit/i2eygws-lib": "6.0.0",
