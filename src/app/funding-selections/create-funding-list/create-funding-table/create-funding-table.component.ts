@@ -4,9 +4,9 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Select2OptionData } from 'ng-select2';
 import { FoaCellRendererComponent } from '../../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import {
-  FundingAllocationsControllerService,
-  FundingAllocationGrantSearchCriteriaDto,
-  FundingAllocationSearchResultDto
+  FundingSubmissionsControllerService,
+  FundingSubmissionGrantSearchCriteriaDto,
+  FundingSubmissionSearchResultDto
 } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
@@ -44,11 +44,11 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   isDtInitialized = false;
   showResults = false;
   selectAll = false;
-  grantList: FundingAllocationSearchResultDto[] = [];
+  grantList: FundingSubmissionSearchResultDto[] = [];
   throttle: DatatableThrottle = new DatatableThrottle();
-  selectedRows: Map<number, FundingAllocationSearchResultDto> = new Map();
+  selectedRows: Map<number, FundingSubmissionSearchResultDto> = new Map();
 
-  private searchCriteria: FundingAllocationGrantSearchCriteriaDto = {};
+  private searchCriteria: FundingSubmissionGrantSearchCriteriaDto = {};
   private modalRef: NgbModalRef;
   selectedDate = '';
   readonly mockSelectionDates: Select2OptionData[] = [
@@ -60,7 +60,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   ];
 
   constructor(
-    private fundingAllocationsControllerService: FundingAllocationsControllerService,
+    private fundingAllocationsControllerService: FundingSubmissionsControllerService,
     private loaderService: LoaderService,
     private propertiesService: AppPropertiesService,
     private logger: NGXLogger,
@@ -327,7 +327,7 @@ allDataSelected(data: any[]): boolean {
     }
   }
 
-  search(criteria: FundingAllocationGrantSearchCriteriaDto): void {
+  search(criteria: FundingSubmissionGrantSearchCriteriaDto): void {
     this.throttle.reset();
     this.selectedRows.clear();
     this.searchCriteria = criteria;
@@ -368,12 +368,12 @@ allDataSelected(data: any[]): boolean {
         if (Array.isArray(v) && v.length === 0) return false;
         return true;
       })
-    ) as FundingAllocationGrantSearchCriteriaDto; */
+    ) as FundingSubmissionGrantSearchCriteriaDto; */
 
     // DataTables sends search.regex as a string ("false"/"true"); backend expects boolean.
     const normalizeSearch = (s: any) => s ? { ...s, regex: s.regex === true || s.regex === 'true' } : s;
 
-    const body: FundingAllocationGrantSearchCriteriaDto = {
+    const body: FundingSubmissionGrantSearchCriteriaDto = {
       ...$this.searchCriteria,
       draw: dataTablesParameters.draw,
       columns: (dataTablesParameters.columns || []).map((c: any) => ({ ...c, search: normalizeSearch(c.search) })),

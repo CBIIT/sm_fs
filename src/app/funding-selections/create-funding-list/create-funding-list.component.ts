@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, ViewChild } from '@angular/core';
-import { FundSelectSearchCriteria, FundingAllocationGrantSearchCriteriaDto } from '@cbiit/i2efsws-lib';
+import { FundSelectSearchCriteria, FundingSubmissionGrantSearchCriteriaDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, PdCaIntegratorService as LibPdCaIntegratorService } from '@cbiit/i2ecui-lib';
 import { PdCaIntegratorService, PD_CA_DEFAULT_CHANNEL } from '../../service/pd-ca-integrator.service';
 import { NGXLogger } from 'ngx-logger';
@@ -97,7 +97,7 @@ export class CreateFundingListComponent implements AfterViewInit {
     const formValue = this.filterForm?.form.value || {};
     const grantNumberForm = formValue.grantNumber || {};
 
-    const criteria: FundingAllocationGrantSearchCriteriaDto = {};
+    const criteria: FundingSubmissionGrantSearchCriteriaDto = {};
     criteria.grantType = grantNumberForm.grantNumberType;
     criteria.grantNumberMech = grantNumberForm.grantNumberMech;
     criteria.grantTypeCodes = Array.isArray(formValue.typeSelect) && formValue.typeSelect.length
@@ -128,8 +128,8 @@ export class CreateFundingListComponent implements AfterViewInit {
       ? (this.selectedCancerActivities as string[])
       : (this.selectedCancerActivities && !Array.isArray(this.selectedCancerActivities) ? [this.selectedCancerActivities as string] : undefined);
     criteria.impacStatus = Array.isArray(this.i2Status)
-      ? (this.i2Status as FundingAllocationGrantSearchCriteriaDto.ImpacStatusEnum[])
-      : (this.i2Status ? [this.i2Status as FundingAllocationGrantSearchCriteriaDto.ImpacStatusEnum] : undefined);
+      ? (this.i2Status as FundingSubmissionGrantSearchCriteriaDto.ImpacStatusEnum[])
+      : (this.i2Status ? [this.i2Status as FundingSubmissionGrantSearchCriteriaDto.ImpacStatusEnum] : undefined);
     criteria.nofo = Array.isArray(formValue.rfaPa) && formValue.rfaPa.length ? formValue.rfaPa : undefined;
     criteria.nosi = formValue.nosi ? [formValue.nosi] : undefined;
 
