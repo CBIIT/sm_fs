@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
@@ -63,13 +63,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     { applId: 1008, grantNumber: 'U54CA890123-01',  piName: 'Anderson, Susan H.',piEmail:'s.anderson@nih.gov',institution: 'Harvard Medical School',             projectTitle: 'NCI Physical Sciences Oncology Center',                      doc: 'DCCPS', ncabDate: '10/2026', percentile: 15, priorityScore: 28, previousScore: 22, totalCost: 2100000, i2Status: 'Awarded', budgetCategory: 'U54', esiFlag: true  },
   ];
 
-  constructor(private router: Router, private logger: NGXLogger) {}
+  constructor(private route: ActivatedRoute, private router: Router, private logger: NGXLogger) {}
 
   ngOnInit(): void {
-    const state = history.state;
-    if (state?.selectionDate) {
-      this.selectionDate = state.selectionDate;
-    }
+    this.route.queryParams.subscribe(params => {
+      if (params['selectionDate']) {
+        this.selectionDate = params['selectionDate'];
+      }
+    });
     $.fn.DataTable.ext.pager.numbers_length = 5;
     this.logger.debug('SearchListsComponent selectionDate:', this.selectionDate);
   }

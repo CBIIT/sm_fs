@@ -259,9 +259,9 @@ import { ErrorHandlerService } from './error/error-handler.service';
 import { CancerActivitiesDropdownComponent} from "./cancer-activities-dropdown/cancer-activities-dropdown.component";
 import { PdnameDropdownComponent} from "./pdname-dropdown/pdname-dropdown.component";
 import { EditLinkComponent } from './edit-link/edit-link.component';
-import { CreateFundingListComponent } from './funding-selections/create-funding-list/create-funding-list.component';
-import { CreateFundingTableComponent } from './funding-selections/create-funding-list/create-funding-table/create-funding-table.component';
-import { SearchListsComponent } from './funding-selections/search-lists/search-lists.component';
+import { CreateFundingListComponent } from './funding-submissions/create-funding-list/create-funding-list.component';
+import { CreateFundingTableComponent } from './funding-submissions/create-funding-list/create-funding-table/create-funding-table.component';
+import { SearchListsComponent } from './funding-submissions/search-lists/search-lists.component';
 import { SavedProjectedCanComponent } from './cans/saved-projected-can/saved-projected-can.component';
 
 declare var $: any;

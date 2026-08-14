@@ -6,7 +6,7 @@
     <div class="col-12 mb-3">
       <h3>Results</h3>
     </div>
-    <p class="row alert alert-primary ms-3"><i class="far fa-info-circle"></i> To apply sorting order to multiple columns, hold
+    <p class="alert alert-primary ms-3 col-12"><i class="far fa-info-circle"></i> To apply sorting order to multiple columns, hold
       down the <b>Shift</b> key and click the header of
       each additional column that you want to sort. Please note, sorting by column headers will unselect any selected
       rows.</p>
@@ -74,6 +74,14 @@
 
 <ng-template #nosiCellRender let-data="adtData">
   <app-foa-cell-renderer [data]="data" [mode] ="'NOSI'"></app-foa-cell-renderer>
+</ng-template>
+<ng-template #existsInListRenderer let-data="adtData">
+  <a *ngIf="data.existsInListSelectionDate"
+     [routerLink]="['/funding-submissions/search']"
+     [queryParams]="{ selectionDate: data.existsInListSelectionDate }"
+     ngbTooltip="Click to view list" container="body">
+    {{ data.existsInListSelectionDate }}
+  </a>
 </ng-template>
 <ng-template #cancerActivityRenderer let-data="adtData">
   <app-cancer-activity-cell-renderer [data]="data"></app-cancer-activity-cell-renderer>

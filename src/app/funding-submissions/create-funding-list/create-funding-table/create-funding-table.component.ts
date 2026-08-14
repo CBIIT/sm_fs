@@ -33,6 +33,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   @ViewChild('nosiCellRender') nosiCellRender: TemplateRef<FoaCellRendererComponent>;
   @ViewChild('addToListModal') private addToListModalRef: TemplateRef<any>;
   @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
+  @ViewChild('existsInListRenderer') existsInListRenderer: TemplateRef<any>;
 
   @Input() grantViewerUrl: string;
   @Input() eGrantsUrl: string;
@@ -60,7 +61,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   ];
 
   constructor(
-    private fundingAllocationsControllerService: FundingSubmissionsControllerService,
+    private fundingSubmissionsControllerService: FundingSubmissionsControllerService,
     private loaderService: LoaderService,
     private propertiesService: AppPropertiesService,
     private logger: NGXLogger,
@@ -97,7 +98,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
           title: '',
           data: 'applId',
           orderable: false,
-          width: '36px',
+          width: '20px',
           className: 'all select-checkbox',
           render: () => ''
         },//0
@@ -132,13 +133,13 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         {
           title: 'DOC',
           data: 'doc',
-          width: '60px',
+          width: '40px',
           defaultContent: ''
         }, // 5
         {
           title: 'NCAB',
           data: 'ncabDate',
-          width: '80px',
+          width: '50px',
           defaultContent: '',
           render: (data, type) => {
             if (!data) return '';
@@ -149,13 +150,13 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         {
           title: 'NOFO',
           data: 'nofo',
-          width: '100px',
+          width: '50px',
           ngTemplateRef: { ref: this.foaCellRender },
         }, // 7
         {
           title: 'NOSI',
           data: 'nosi',
-          width: '100px',
+          width: '40px',
           ngTemplateRef: { ref: this.nosiCellRender },
         }, // 8
         {
@@ -168,13 +169,13 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         {
           title: 'PriScr',
           data: 'priorityScoreDisplay',
-          width: '30px',
+          width: '40px',
           defaultContent: ''
         }, // 10
         {
-          title: 'Previous Scr',
+          title: 'Pre Scr',
           data: 'previousScore',
-          width: '100px',
+          width: '40px',
           defaultContent: ''
         }, // 11
         {
@@ -192,14 +193,15 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         {
           title: 'Exists in List',
           data: 'existsInListSelectionDate',
-          width: '110px',
-          defaultContent: ''
+          width: '50px',
+          defaultContent: '',
+          ngTemplateRef: { ref: this.existsInListRenderer },
         }, // 13
         {
           title: 'ESI',
           data: 'esiFlag',
           width: '30px',
-          render: (data) => data === true ? 'Y' : data === false ? '' : ''
+          render: (data) => data === true ? 'Y' : data === false ? 'N' : ''
         }, // 14
         {
           title: 'CA',
@@ -384,7 +386,7 @@ allDataSelected(data: any[]): boolean {
     };
 
     $this.loaderService.show();
-    $this.fundingAllocationsControllerService.searchGrants(body).subscribe(
+    $this.fundingSubmissionsControllerService.searchGrants(body).subscribe(
       result => {
         $this.grantList = result.data || [];
         callback({
@@ -424,7 +426,7 @@ allDataSelected(data: any[]): boolean {
     const dateText = selectedItem?.text || String(this.selectedDate);
     this.logger.debug('saveToList:', { applIds, selectionDate: dateText });
     this.modalRef?.close({ applIds, selectionDate: dateText });
-    this.router.navigate(['/funding-selections/search'], { state: { selectionDate: dateText } });
+    this.router.navigate(['/funding-submissions/search'], { queryParams: { selectionDate: dateText } });
   }
 
   get hasSelectedGrants(): boolean {
