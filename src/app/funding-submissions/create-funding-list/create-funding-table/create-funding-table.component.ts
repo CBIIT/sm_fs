@@ -173,7 +173,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
           defaultContent: ''
         }, // 10
         {
-          title: 'Pre Scr',
+          title: 'PreScr',
           data: 'previousScore',
           width: '40px',
           defaultContent: ''
