@@ -120,7 +120,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         }, // 2
         {
           title: 'Institution',
-          data: 'institution',
+          data: 'orgName',
           width: '150px',
           defaultContent: ''
         }, // 3

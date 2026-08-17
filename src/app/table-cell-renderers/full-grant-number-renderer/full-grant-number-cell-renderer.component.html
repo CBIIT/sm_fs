@@ -6,7 +6,7 @@
 <div *ngIf="exception"><img src="images/grant-exception.png" alt="EXCEPTION" width="64" height="20" class="tdlabel"></div>
 <a href="{{grantViewerUrl+data.applId}}" target="yourgrant" ngbTooltip="Click to View Grant Details">{{data.fullGrantNum ? data.fullGrantNum : data.grantNumber}}</a>
 <div class="grant-icons">
-  <a href="{{eGrantsUrl+data.applId}}" target="yourgrant" ngbTooltip="eGrants" container="body">
+  <a href="{{eGrantsUrl+data.applId}}" target="yourgrant" ngbTooltip="Click to go to this grant folder in the eGrants module." container="body">
     <span class="egrants-icon"></span>
   </a>
   <div *ngIf="data.fullGrantNum">
@@ -15,7 +15,7 @@
   </a>
   </div>
   <div *ngIf="data.grantNumber">
-      <a href="" (click)="$event.preventDefault()" ngbTooltip="View Grantee Institution." container="body">
+      <a href="" (click)="$event.preventDefault()" [ngbTooltip]="InstituteTooltip" container="body">
     <i class='fa fa-university' aria-hidden='true'></i>
   </a>
   </div>
