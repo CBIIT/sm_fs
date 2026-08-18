@@ -6,7 +6,8 @@ import { FoaCellRendererComponent } from '../../../table-cell-renderers/foa-cell
 import {
   FundingSubmissionsControllerService,
   FundingSubmissionGrantSearchCriteriaDto,
-  FundingSubmissionSearchResultDto
+  FundingSubmissionSearchResultDto,
+  SelectionDateCodeDto
 } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
@@ -52,13 +53,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   private searchCriteria: FundingSubmissionGrantSearchCriteriaDto = {};
   private modalRef: NgbModalRef;
   selectedDate = '';
-  readonly mockSelectionDates: Select2OptionData[] = [
-    { id: '1', text: 'June 16' },
-    { id: '2', text: 'July 16' },
-    { id: '3', text: 'July 23' },
-    { id: '4', text: 'August 6' },
-    { id: '5', text: 'August 20' },
-  ];
+  selectionDateOptions: Select2OptionData[] = [];
 
   constructor(
     private fundingSubmissionsControllerService: FundingSubmissionsControllerService,
@@ -71,6 +66,12 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
 
   ngOnInit(): void {
     $.fn.DataTable.ext.pager.numbers_length = 5;
+    this.fundingSubmissionsControllerService.getSelectionDateCodes().subscribe({
+      next: (dates: SelectionDateCodeDto[]) => {
+        this.selectionDateOptions = dates.map(d => ({ id: d.code, text: d.name || d.description || d.code }));
+      },
+      error: (err) => this.logger.error('Failed to load selection date codes', err)
+    });
   }
 
   ngAfterViewInit(): void {
@@ -345,34 +346,11 @@ allDataSelected(data: any[]): boolean {
     }
   }
 
-  // TODO: remove mock data when real API is wired
- private static readonly MOCK_DATA: any[] = [
-    { applId: 1001, fullGrantNum: '2R01CA259365-06', piFullName: 'Housley', piEmail: 'housley@nih.gov', lastName: 'Housley', orgName: 'Johns Hopkins University', projectTitle: 'Novel Biomarkers in Colorectal Cancer', doc: 'DCB', formattedCouncilMeetingDate: '10/2026', rfaPaNumber: 'PA23-261', nihGuideAddr: 'https://grants.nih.gov', nosiNumber: 'NOT-CA-19-032', irgPercentileNum: 13, priorityScoreNum: 29, previousScore: 20, totalCost: 550774, existsInList: 'July 16', existsInListUrl: '#list-1', esiStatus: 'No', cayCode: '' },
-    { applId: 1002, fullGrantNum: '2R01CA259365-06', piFullName: 'Lytle', piEmail: 'lytle@nih.gov', lastName: 'Lytle', orgName: 'Stanford University', projectTitle: 'Immunotherapy Response Prediction', doc: 'DCB', formattedCouncilMeetingDate: '10/2026', rfaPaNumber: 'PA23-261', nihGuideAddr: 'https://grants.nih.gov', nosiNumber: 'NOT-CA-29-032', irgPercentileNum: 10, priorityScoreNum: 27, previousScore: 20, totalCost: 712030, existsInList: 'July 16', existsInListUrl: '#list-1', esiStatus: 'Yes', cayCode: '' },
-    { applId: 1003, fullGrantNum: '2R01CA259365-06', piFullName: 'Morris', piEmail: 'morris@nih.gov', lastName: 'Morris', orgName: 'University of Michigan', projectTitle: 'Multi-Center Lung Cancer Screening Trial', doc: 'DCB', formattedCouncilMeetingDate: '10/2026', rfaPaNumber: 'PA23-261', nihGuideAddr: 'https://grants.nih.gov', nosiNumber: 'NOT-CA-29-032', irgPercentileNum: 11, priorityScoreNum: 30, previousScore: 20, totalCost: 300112, existsInList: 'July 17', existsInListUrl: '', esiStatus: 'Yes', cayCode: '' },
-    { applId: 1004, fullGrantNum: '2R01CA259365-06', piFullName: 'Wang', piEmail: 'wang@nih.gov', lastName: 'Wang', orgName: 'MD Anderson Cancer Center', projectTitle: 'Epigenetic Regulation in Breast Cancer Metastasis', doc: 'DCTD', formattedCouncilMeetingDate: '10/2026', rfaPaNumber: 'PA23-261', nihGuideAddr: 'https://grants.nih.gov', nosiNumber: 'NOT-CA-29-032', irgPercentileNum: 8, priorityScoreNum: 14, previousScore: 20, totalCost: 50037, existsInList: 'July 18', existsInListUrl: '', esiStatus: 'Yes', cayCode: '' },
-    { applId: 1005, fullGrantNum: 'P50CA567890-01', piFullName: 'Davis, Michael E.', piEmail: 'm.davis@nih.gov', lastName: 'Davis', orgName: 'Memorial Sloan Kettering', projectTitle: 'SPORE in Prostate Cancer', doc: 'DCP', formattedCouncilMeetingDate: '10/2026', rfaPaNumber: 'RFA-CA-24-030', nihGuideAddr: 'https://grants.nih.gov', nosiNumber: 'NOT-CA-24-003', irgPercentileNum: 22, priorityScoreNum: 35, previousScore: 30, totalCost: 1200000, existsInList: '', existsInListUrl: '', esiStatus: 'No', cayCode: 'CB' },
-    { applId: 1006, fullGrantNum: 'R03CA678901-01', piFullName: 'Martinez, Linda F.', piEmail: 'l.martinez@nih.gov', lastName: 'Martinez', orgName: 'University of Texas', projectTitle: 'Pilot Study: Pancreatic Cancer Early Detection', doc: 'DCCPS', formattedCouncilMeetingDate: '10/2026', rfaPaNumber: 'PA-24-003', nihGuideAddr: 'https://grants.nih.gov', nosiNumber: '', irgPercentileNum: 18, priorityScoreNum: 32, previousScore: 28, totalCost: 75000, existsInList: '', existsInListUrl: '', esiStatus: 'Yes', cayCode: '' },
-    { applId: 1007, fullGrantNum: 'R01CA789012-01', piFullName: 'Wilson, James G.', piEmail: 'j.wilson@nih.gov', lastName: 'Wilson', orgName: 'Yale University', projectTitle: 'CAR-T Cell Engineering for Hematologic Malignancies', doc: 'DCB', formattedCouncilMeetingDate: '10/2026', rfaPaNumber: 'RFA-CA-24-040', nihGuideAddr: 'https://grants.nih.gov', nosiNumber: '', irgPercentileNum: 5, priorityScoreNum: 22, previousScore: 25, totalCost: 450000, existsInList: '', existsInListUrl: '', esiStatus: 'No', cayCode: 'TG' },
-    { applId: 1008, fullGrantNum: 'U54CA890123-01', piFullName: 'Anderson, Susan H.', piEmail: 's.anderson@nih.gov', lastName: 'Anderson', orgName: 'Harvard Medical School', projectTitle: 'NCI Physical Sciences Oncology Center', doc: 'DCCPS', formattedCouncilMeetingDate: '10/2026', rfaPaNumber: 'RFA-CA-24-050', nihGuideAddr: 'https://grants.nih.gov', nosiNumber: 'NOT-CA-24-004', irgPercentileNum: 15, priorityScoreNum: 28, previousScore: 22, totalCost: 2100000, existsInList: 'July 20', existsInListUrl: '#list-2', esiStatus: 'Yes', cayCode: 'BC' },
-  ];
-
   ajaxCall($this: CreateFundingTableComponent, dataTablesParameters: any, callback: any): void {
     if (!$this.showResults) {
       callback({ recordsTotal: 0, recordsFiltered: 0, data: [] });
       return;
     }
-
-    // strip empty strings, nulls, undefined, and empty arrays so the backend doesn't reject them
- /*    const cleanedCriteria = Object.fromEntries(
-      Object.entries($this.searchCriteria).filter(([, v]) => {
-        if (v === null || v === undefined || v === '') return false;
-        if (Array.isArray(v) && v.length === 0) return false;
-        return true;
-      })
-    ) as FundingSubmissionGrantSearchCriteriaDto; */
-
-    // DataTables sends search.regex as a string ("false"/"true"); backend expects boolean.
     const normalizeSearch = (s: any) => s ? { ...s, regex: s.regex === true || s.regex === 'true' } : s;
 
     const body: FundingSubmissionGrantSearchCriteriaDto = {
@@ -412,7 +390,7 @@ allDataSelected(data: any[]): boolean {
   }
 
   addSelectedToList(): void {
-    this.selectedDate = this.mockSelectionDates[0].id as string;
+    this.selectedDate = '';
     this.modalRef = this.modalService.open(this.addToListModalRef, { size: 'lg', centered: true });
   }
 
@@ -422,7 +400,7 @@ allDataSelected(data: any[]): boolean {
 
   saveToList(): void {
     const applIds = Array.from(this.selectedRows.keys());
-    const selectedItem = this.mockSelectionDates.find(d => d.id === String(this.selectedDate));
+    const selectedItem = this.selectionDateOptions.find(d => d.id === String(this.selectedDate));
     const dateText = selectedItem?.text || String(this.selectedDate);
     this.logger.debug('saveToList:', { applIds, selectionDate: dateText });
     this.modalRef?.close({ applIds, selectionDate: dateText });

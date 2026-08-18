@@ -1,0 +1,36 @@
+.grant-detail-panel {
+  background-color: #f8f9fa;
+}
+
+.grid-container {
+  max-width: min(1150px, calc(100vw - 60px));
+}
+
+/* Remove all inner cell borders; outer borders stay on thead/tbody elements via inline style */
+.grid-container table td,
+.grid-container table th {
+  border-width: 0 !important;
+}
+
+/* Right border on the 4th column creates the Grant Info / Funding Allocations divider */
+.grid-container table tbody tr td:nth-child(4),
+.grid-container table thead tr th:first-child {
+  border-right: 2px solid #aaa !important;
+}
+
+.grid-label {
+  font-weight: 600;
+  white-space: nowrap;
+  width: 1%;
+  padding-right: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.grid-item {
+  font-size: 0.875rem;
+  min-width: 80px;
+}
+
+.grid-label.sep {
+  padding-left: 0.75rem;
+}

@@ -1,0 +1,191 @@
+﻿<div *ngIf="data" class="grant-detail-panel p-2">
+  <form #detailForm="ngForm" (ngSubmit)="onSave()">
+    <div class="grid-container mt-2 me-2">
+      <table class="table table-sm table-borderless table-striped">
+        <thead style="border:2px solid #aaa;background-color:#ebeff1;position:static;">
+          <tr>
+            <th scope="col" colspan="4" style="text-align:center;color:#0076a8">GRANT INFORMATION (current from IMPAC II)</th>
+            <th scope="col" colspan="4" style="text-align:center;border-left:2px solid #aaa;color:#0076a8">FUNDING ALLOCATIONS</th>
+          </tr>
+        </thead>
+        <tbody style="border:2px solid #aaa">
+
+          <!-- Row 1 -->
+          <tr>
+            <td class="grid-label">Grant Number:</td>
+            <td class="grid-item">
+              <a href="{{grantViewerUrl}}{{data.applId}}" target="yourgrant">{{data.grantNumber}}</a>
+            </td>
+            <td class="grid-label">PI:</td>
+            <td class="grid-item">{{data.piName}}</td>
+            <td class="grid-label sep">NCI Decision:</td>
+            <td class="grid-item">
+              <span *ngIf="!isEditMode">{{data.nciDecision || '-'}}</span>
+              <ng-select2 *ngIf="isEditMode" name="nciDecision" [(ngModel)]="formModel.nciDecision"
+                [data]="decisionOptions" [allowClear]="true" width="100%">
+              </ng-select2>
+            </td>
+            <td class="grid-label">DOC Decision:</td>
+            <td class="grid-item">
+              <span *ngIf="!isEditMode">{{data.docDecision || '-'}}</span>
+              <ng-select2 *ngIf="isEditMode" name="docDecision" [(ngModel)]="formModel.docDecision"
+                [data]="decisionOptions" [allowClear]="true" width="100%">
+              </ng-select2>
+            </td>
+          </tr>
+
+          <!-- Row 2 -->
+          <tr>
+            <td class="grid-label">Project Title:</td>
+            <td class="grid-item">{{data.projectTitle}}</td>
+            <td class="grid-label">Percentile:</td>
+            <td class="grid-item">{{data.percentile != null ? (data.percentile + '%') : ''}}</td>
+            <td class="grid-label sep">DOC Rec % Red:</td>
+            <td class="grid-item">
+              <span *ngIf="!isEditMode">{{data.docRecPctRed != null ? (data.docRecPctRed + '%') : '-'}}</span>
+              <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
+                name="docRecReductionPct" [(ngModel)]="formModel.docRecReductionPct"
+                placeholder="Enter Value" min="0" max="100">
+            </td>
+            <td class="grid-label">DOC Rec $:</td>
+            <td class="grid-item">
+              <span *ngIf="!isEditMode">{{data.docRecAmt != null ? ('$' + (data.docRecAmt | number)) : '-'}}</span>
+              <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
+                name="docRecAmt" [(ngModel)]="formModel.docRecAmt"
+                placeholder="Enter Value" min="0">
+            </td>
+          </tr>
+
+          <!-- Row 3 -->
+          <tr>
+            <td class="grid-label">DOC:</td>
+            <td class="grid-item">{{data.doc}}</td>
+            <td class="grid-label">Institution:</td>
+            <td class="grid-item">{{data.orgName}}</td>
+            <td class="grid-label sep">DOC Priority:</td>
+            <td class="grid-item">
+              <span *ngIf="!isEditMode">{{data.docPriority || '-'}}</span>
+              <ng-select2 *ngIf="isEditMode" name="docPriority" [(ngModel)]="formModel.docPriority"
+                [data]="priorityOptions" [allowClear]="true" width="100%">
+              </ng-select2>
+            </td>
+            <td class="grid-label">2Y Annual Fnd R01:</td>
+            <td class="grid-item">
+              <span *ngIf="!isEditMode">{{data.twoYrFunding || '-'}}</span>
+              <ng-select2 *ngIf="isEditMode" name="annualFundingR01" [(ngModel)]="formModel.annualFundingR01"
+                [data]="yesNoOptions" [allowClear]="true" width="100%">
+              </ng-select2>
+            </td>
+          </tr>
+
+          <!-- Row 4 -->
+          <tr>
+            <td class="grid-label">NCAB:</td>
+            <td class="grid-item">{{data.ncabDate}}</td>
+            <td class="grid-label">Impact Score:</td>
+            <td class="grid-item">{{data.priorityScore}}</td>
+            <td class="grid-label sep">Annual or MYF:</td>
+            <td class="grid-item">
+              <span *ngIf="!isEditMode">{{data.annualOrMyf || '-'}}</span>
+              <ng-select2 *ngIf="isEditMode" name="annualOrMyf" [(ngModel)]="formModel.annualOrMyf"
+                [data]="annualMyfOptions" [allowClear]="true" width="100%">
+              </ng-select2>
+            </td>
+            <td class="grid-label">Budget Categories:</td>
+            <td class="grid-item">
+              <span *ngIf="!isEditMode">{{data.budgetCategory || '-'}}</span>
+              <ng-select2 *ngIf="isEditMode" name="budgetCategories" [(ngModel)]="formModel.budgetCategories"
+                [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
+              </ng-select2>
+            </td>
+          </tr>
+
+          <!-- Row 5 -->
+          <tr>
+            <td class="grid-label">ESI:</td>
+            <td class="grid-item">{{data.esiFlag === true ? 'Yes' : data.esiFlag === false ? 'No' : ''}}</td>
+            <td class="grid-label">Recused:</td>
+            <td class="grid-item">{{data.recused || '-'}}</td>
+            <td class="grid-label sep">DOC/NCI Decision:</td>
+            <td class="grid-item">
+              <span *ngIf="!isEditMode">{{data.docNciSel || '-'}}</span>
+              <ng-select2 *ngIf="isEditMode" name="docNciSelection" [(ngModel)]="formModel.docNciSelection"
+                [data]="selectionOptions" [allowClear]="true" width="100%">
+              </ng-select2>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+
+          <!-- Row 6 -->
+          <tr>
+            <td class="grid-label">NOFO:</td>
+            <td class="grid-item">{{data.nofo}}</td>
+            <td class="grid-label">Previous Score:</td>
+            <td class="grid-item">{{data.previousScore}}</td>
+            <td class="grid-label sep align-top pt-2">DOC Notes<br><span class="fw-normal">(Optional)</span></td>
+            <td class="grid-item" colspan="3">
+              <span *ngIf="!isEditMode">{{data.docNotes || ''}}</span>
+              <div *ngIf="isEditMode">
+                <textarea class="form-control form-control-sm" rows="2"
+                  name="docNotes" [(ngModel)]="formModel.docNotes" maxlength="1000"></textarea>
+                <div class="text-end small text-muted">{{(formModel.docNotes || '').length}}/1000</div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 7 -->
+          <tr>
+            <td class="grid-label">&gt;2M NIH Support:</td>
+            <td class="grid-item">{{data.gt2mNihSupport || '-'}}</td>
+            <td class="grid-label">App Tc Est:</td>
+            <td class="grid-item">{{data.appTcEst || '-'}}</td>
+            <td class="grid-label sep align-top pt-2">OEFIA Notes<br><span class="fw-normal">(Optional)</span></td>
+            <td class="grid-item" colspan="3">
+              <span *ngIf="!isEditMode">{{data.oefiaNote || ''}}</span>
+              <div *ngIf="isEditMode">
+                <textarea class="form-control form-control-sm" rows="2"
+                  name="oefiaNotes" [(ngModel)]="formModel.oefiaNotes" maxlength="1000"></textarea>
+                <div class="text-end small text-muted">{{(formModel.oefiaNotes || '').length}}/1000</div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 8 -->
+          <tr>
+            <td class="grid-label">PFR:</td>
+            <td class="grid-item">{{data.pfr || '-'}}</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td class="grid-label sep align-top pt-2">Justification<br><span class="fw-normal">(Optional)</span></td>
+            <td class="grid-item" colspan="3">
+              <span *ngIf="!isEditMode">{{data.justificationText || ''}}</span>
+              <div *ngIf="isEditMode">
+                <div class="d-flex align-items-start gap-2 mb-1">
+                  <label class="btn btn-sm btn-primary mb-0">
+                    Choose File
+                    <input type="file" class="d-none" (change)="onFileChange($event)">
+                  </label>
+                  <span class="small text-muted">
+                    {{justificationFile ? justificationFile.name : 'You may upload Microsoft Word, Rich Text Format, Microsoft Excel, or Adobe Acrobat document(s) only. Max file size is 10MB'}}
+                  </span>
+                </div>
+                <textarea class="form-control form-control-sm" rows="2"
+                  name="justificationText" [(ngModel)]="formModel.justificationText" maxlength="1000"></textarea>
+                <div class="text-end small text-muted">{{(formModel.justificationText || '').length}}/1000</div>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <!-- Buttons sit inside grid-container so they align with the table and stay visible -->
+      <div class="d-flex justify-content-end gap-2 py-2 border-top">
+        <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode" (click)="onEdit()">Edit</button>
+        <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode" (click)="onCancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" *ngIf="isEditMode">Save</button>
+      </div>
+    </div>
+  </form>
+</div>

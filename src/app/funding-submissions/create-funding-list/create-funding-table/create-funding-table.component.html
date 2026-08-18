@@ -23,7 +23,7 @@
 
 <ng-template #addToListModal>
   <div class="modal-header">
-    <h4 class="modal-title">Add Grants to Selection Date</h4>
+    <h4 class="modal-title">Save Grant List</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()"></button>
   </div>
   <div class="modal-body">
@@ -36,9 +36,10 @@
       <ng-select2
         id="selectionDate"
         name="selectionDate"
-        [data]="mockSelectionDates"
+        [data]="selectionDateOptions"
         [(ngModel)]="selectedDate"
         [allowClear]="true"
+        placeholder="Select date"
         class="w-100">
       </ng-select2>
     </div>
