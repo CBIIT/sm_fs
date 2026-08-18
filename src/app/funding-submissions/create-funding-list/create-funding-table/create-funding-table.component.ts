@@ -240,6 +240,8 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         });
 
         const $checkbox = $('.select-checkbox', row);
+        // Restore from Map so selections survive page navigation
+        data.selected = this.selectedRows.has(data.applId);
         if (data.selected) {
           $checkbox.addClass('selected');
         } else {
@@ -268,7 +270,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         }
         // this.tableHtead = thead;
         if ($node) {
-          // Reset header checkbox on load (only once)
+          // Check Map so header state is accurate after page navigation
           if (this.allDataSelected(data)) {
             $node.addClass('selected');
           }
@@ -281,14 +283,14 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
               $node.removeClass('selected');
               for (const d of data) {
                 d.selected = false;
-                //this.onCaptureSelectionEvent(d, false);
+                this.selectedRows.delete(d.applId);
               }
               $node.closest('table').find('.select-checkbox').removeClass('selected');
             } else {
               $node.addClass('selected');
               for (const d of data) {
                 d.selected = true;
-                //this.onCaptureSelectionEvent(d, true);
+                this.selectedRows.set(d.applId, d);
               }
               $node.closest('table').find('.select-checkbox').addClass('selected');
             }
@@ -317,7 +319,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   }
 
 allDataSelected(data: any[]): boolean {
-    return data?.length > 0 && data.every(row => row.selected === true);
+    return data?.length > 0 && data.every(row => this.selectedRows.has(row.applId));
   }
   clearResults(): void {
     this.showResults = false;
