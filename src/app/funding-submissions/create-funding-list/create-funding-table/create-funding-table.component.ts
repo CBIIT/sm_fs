@@ -1,10 +1,11 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Select2OptionData } from 'ng-select2';
 import { FoaCellRendererComponent } from '../../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import {
   FundingSubmissionsControllerService,
+  FundingSubmissionAddGrantsToListRequestDto,
   FundingSubmissionGrantSearchCriteriaDto,
   FundingSubmissionSearchResultDto,
   SelectionDateCodeDto
@@ -39,6 +40,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   @Input() grantViewerUrl: string;
   @Input() eGrantsUrl: string;
   @Input() i2eURL: string;
+  @Output() firstDraw = new EventEmitter<void>();
   
 
   dtOptions: any = {};
@@ -49,6 +51,9 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   grantList: FundingSubmissionSearchResultDto[] = [];
   throttle: DatatableThrottle = new DatatableThrottle();
   selectedRows: Map<number, FundingSubmissionSearchResultDto> = new Map();
+  private currentPage = 0;
+  private pendingRestorePage: number | null = null;
+  private pendingRestoreRows: Map<number, FundingSubmissionSearchResultDto> | null = null;
 
   private searchCriteria: FundingSubmissionGrantSearchCriteriaDto = {};
   private modalRef: NgbModalRef;
@@ -69,6 +74,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
     this.fundingSubmissionsControllerService.getSelectionDateCodes().subscribe({
       next: (dates: SelectionDateCodeDto[]) => {
         this.selectionDateOptions = dates.map(d => ({ id: d.code, text: d.name || d.description || d.code }));
+        this.logger.debug('selectionDateOptions:', this.selectionDateOptions);
       },
       error: (err) => this.logger.error('Failed to load selection date codes', err)
     });
@@ -260,7 +266,9 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
           }
         });
       },
-
+initComplete: () => {
+        setTimeout(() => this.firstDraw.emit());
+      },
       headerCallback: (thead: Node, data: any[]) => {
         const $node = $('.select-checkbox', thead);
         const $header = $('.sorting', thead);
@@ -303,7 +311,13 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         // handler; if we adjust before it, header cells end up misaligned.
         setTimeout(() => {
           this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+            this.currentPage = dt.page();
             dt.columns.adjust();
+            if (this.pendingRestorePage !== null && this.pendingRestorePage > 0) {
+              const page = this.pendingRestorePage;
+              this.pendingRestorePage = null;
+              dt.page(page).draw('page');
+            }
           });
         }, 0);
       },
@@ -334,7 +348,12 @@ allDataSelected(data: any[]): boolean {
 
   search(criteria: FundingSubmissionGrantSearchCriteriaDto): void {
     this.throttle.reset();
-    this.selectedRows.clear();
+    if (this.pendingRestoreRows !== null) {
+      this.selectedRows = this.pendingRestoreRows;
+      this.pendingRestoreRows = null;
+    } else {
+      this.selectedRows.clear();
+    }
     this.searchCriteria = criteria;
     this.showResults = true;
 
@@ -401,15 +420,57 @@ allDataSelected(data: any[]): boolean {
   }
 
   saveToList(): void {
-    const applIds = Array.from(this.selectedRows.keys());
-    const selectedItem = this.selectionDateOptions.find(d => d.id === String(this.selectedDate));
-    const dateText = selectedItem?.text || String(this.selectedDate);
-    this.logger.debug('saveToList:', { applIds, selectionDate: dateText });
-    this.modalRef?.close({ applIds, selectionDate: dateText });
-    this.router.navigate(['/funding-submissions/search'], { queryParams: { selectionDate: dateText } });
+    // Coerce to Number — DataTables can return applId as string at runtime
+    const applIds = Array.from(this.selectedRows.keys()).map(id => Number(id));
+    const body: FundingSubmissionAddGrantsToListRequestDto = {
+      selectionDate: this.selectedDate,
+      applIds
+    };
+    this.logger.debug('addGrantsToList request:', body);
+    this.loaderService.show();
+    this.fundingSubmissionsControllerService.addGrantsToList(body).subscribe({
+      next: (result) => {
+        this.loaderService.hide();
+        this.logger.debug('addGrantsToList result:', result);
+        this.modalRef?.close();
+        this.router.navigate(['/funding-submissions/search'], { queryParams: { listId: result.listId } });
+      },
+      error: (err) => {
+        this.loaderService.hide();
+        this.logger.error('addGrantsToList error', err?.status, err?.error, body);
+      }
+    });
   }
 
   get hasSelectedGrants(): boolean {
     return this.selectedRows.size > 0;
+  }
+
+  getState() {
+    return {
+      selectedRows: new Map(this.selectedRows),
+      showResults: this.showResults,
+      currentPage: this.currentPage,
+      searchCriteria: { ...this.searchCriteria }
+    };
+  }
+
+  restoreState(selectedRows: Map<number, FundingSubmissionSearchResultDto>, currentPage: number): void {
+    this.pendingRestoreRows = new Map(selectedRows);
+    this.pendingRestorePage = currentPage > 0 ? currentPage : null;
+  }
+
+  navigateToList(selectionDate: string): void {
+    this.fundingSubmissionsControllerService.searchLists({ selectionCode: [selectionDate], start: 0, length: 1 }).subscribe({
+      next: (result) => {
+        const listId = result.data?.[0]?.listId;
+        if (listId) {
+          this.router.navigate(['/funding-submissions/search'], { queryParams: { listId } });
+        } else {
+          this.logger.warn('No list found for selection date', selectionDate);
+        }
+      },
+      error: (err) => this.logger.error('Failed to find list for selection date', err)
+    });
   }
 }

@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { FundSelectSearchCriteria, FundingSubmissionGrantSearchCriteriaDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, PdCaIntegratorService as LibPdCaIntegratorService } from '@cbiit/i2ecui-lib';
 import { PdCaIntegratorService, PD_CA_DEFAULT_CHANNEL } from '../../service/pd-ca-integrator.service';
@@ -6,13 +6,14 @@ import { NGXLogger } from 'ngx-logger';
 import { NgForm } from '@angular/forms';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { CreateFundingTableComponent } from './create-funding-table/create-funding-table.component';
+import { FundingSubmissionsStateService } from '../funding-submissions-state.service';
 
 @Component({
   selector: 'app-create-funding-list',
   templateUrl: './create-funding-list.component.html',
   styleUrls: ['./create-funding-list.component.css']
 })
-export class CreateFundingListComponent implements AfterViewInit {
+export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('filterForm') filterForm: NgForm;
   @ViewChild(CreateFundingTableComponent) fundingTable: CreateFundingTableComponent;
@@ -32,7 +33,8 @@ export class CreateFundingListComponent implements AfterViewInit {
     private propertiesService: AppPropertiesService,
     private libPdCaIntegratorService: LibPdCaIntegratorService,
     private pdCaIntegratorService: PdCaIntegratorService,
-    private logger: NGXLogger
+    private logger: NGXLogger,
+    private stateService: FundingSubmissionsStateService
   ) {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
@@ -41,8 +43,62 @@ export class CreateFundingListComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // trigger lib-doc-dropdown to load all NCI docs on init (it relies on this event to populate)
     this.libPdCaIntegratorService.caForDocEmitter.next({ code: [], channel: 'CA_DOC_DEFAULT_CHANNEL' });
+
+    const state = this.stateService.getListPageState();
+    if (state) {
+      setTimeout(() => {
+        this.selectedDocs = state.selectedDocs;
+        if (this.selectedDocs.length) {
+          this.onDocSelected(state.selectedDocs);
+        }
+        this.selectedCancerActivities = state.selectedCancerActivities;
+        this.i2Status = state.i2Status;
+        this.excludeInList = state.excludeInList;
+        this.filterForm?.form.patchValue(state.formValue);
+        if (state.showResults) {
+          this.fundingTable?.restoreState(state.selectedRows, state.currentPage);
+          this.fundingTable?.search(state.searchCriteria);
+        }
+      });
+    }
+  }
+
+  onTableFirstDraw(): void {
+    const state = this.stateService.getListPageState();
+    const $ = (window as any).jQuery;
+    if (!state || !$) return;
+    const ncabRange = state.formValue?.ncabRange;
+    if (!ncabRange?.fromNcab && !ncabRange?.toNcab) return;
+
+    // getBodDatesList() runs concurrently with the grant search; options may not be
+    // in the DOM yet when initComplete fires. Poll until they arrive (length > 1
+    // means the API-loaded options are present alongside the static blank option).
+    let retries = 0;
+    const applyNcab = () => {
+      if (!this.filterForm) return;
+      if ($('#fromNcab option').length > 1) {
+        // Options loaded; patchValue → writeValue → setElementValue → trigger('change.select2')
+        this.filterForm.form.get('ncabRange')?.patchValue(ncabRange);
+      } else if (retries++ < 30) {
+        setTimeout(applyNcab, 100);
+      }
+    };
+    applyNcab();
+  }
+
+  ngOnDestroy(): void {
+    const tableState = this.fundingTable?.getState();
+    if (tableState) {
+      this.stateService.saveListPageState({
+        formValue: this.filterForm?.form.value,
+        selectedCancerActivities: this.selectedCancerActivities,
+        selectedDocs: this.selectedDocs,
+        i2Status: this.i2Status,
+        excludeInList: this.excludeInList,
+        ...tableState
+      });
+    }
   }
 
   onDocSelected(docs: string[]): void {

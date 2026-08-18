@@ -6,6 +6,8 @@ import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { Select2OptionData } from 'ng-select2';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+import { FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
+import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 
@@ -25,42 +27,18 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   grantViewerUrl = '';
   eGrantsUrl = '';
 
-  selectionDate = 'July 23';
-  listId = 32124;
-  listStatus = 'Draft';
-  totalGrants = 400;
-  docRecommendedTotal = 18000000;
+  selectionDate = '';
+  listId = 0;
+  listStatus = '';
+  totalGrants = 0;
+  docRecommendedTotal = 0;
 
-  // Three columns × four rows to match the DOC Status grid layout
-  docStatusColumns = [
-    [
-      { doc: 'CCG', count: 50, status: 'Draft' },
-      { doc: 'CCT', count: 30, status: 'Draft' },
-      { doc: 'CGH', count: 24, status: 'Draft' },
-      { doc: 'CRCHD', count: 43, status: 'Draft' },
-    ],
-    [
-      { doc: 'CSSI', count: 59, status: 'Draft' },
-      { doc: 'DCB', count: 30, status: 'Draft' },
-      { doc: 'DCCPS', count: 24, status: 'Draft' },
-      { doc: 'DCP', count: 43, status: 'Draft' },
-    ],
-    [
-      { doc: 'DCTD', count: 20, status: 'Draft' },
-      { doc: 'OCC', count: 30, status: 'Draft' },
-      { doc: 'OHAM', count: 40, status: 'Draft' },
-      { doc: 'SBIR', count: 10, status: 'Draft' },
-    ],
-  ];
-
-  listHistory = [
-    { date: '1/1/2026 12:00am', status: 'Saved', actionBy: 'Doe, Jane' },
-    { date: '1/1/2026 12:00am', status: 'Saved', actionBy: 'Doe, Jane' },
-    { date: '1/1/2026 12:00am', status: 'Saved', actionBy: 'Doe, Jane' },
-  ];
+  docStatusColumns: any[][] = [];
+  listHistory: any[] = [];
 
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
+  throttle: DatatableThrottle = new DatatableThrottle();
 
   selectedViewDoc: string = null;
   viewDocOptions: Select2OptionData[] = [
@@ -69,28 +47,21 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     { id: 'both', text: 'Abstract(s) and Summary Statement(s)' },
   ];
 
-  // TODO: replace with real API data
-  private readonly mockGrants = [
-    { applId: 1001, grantNumber: '2R01CA259365-06', piName: 'Housley', piEmail: 'housley@nih.gov', institution: 'Johns Hopkins University', projectTitle: 'Novel Biomarkers in Colorectal Cancer', doc: 'DCB', ncabDate: '10/2026', percentile: 13, priorityScore: 29, previousScore: 20, totalCost: 550774, i2Status: '-', budgetCategory: 'R01/R37', esiFlag: false, absFlag: true,  ssFlag: true,  justFlag: true,  reviewStatus: 'Draft', appTcEst: null, nciDecision: 'Yes', docDecision: 'No', docPriority: null, docRecAmt: 791000, docRecPctRed: 17, docNciSel: 'NCI Selection', twoYrFunding: null, annualOrMyf: 'Annual', recused: null, nofo: 'PA23-261', dateAdded: '5/10/2027 9:00',  addedBy: 'DOC' },
-    { applId: 1002, grantNumber: '2R01CA259365-06', piName: 'Lytle',            piEmail: 'lytle@nih.gov',      institution: 'Stanford University',       projectTitle: 'Immunotherapy Response Prediction',            doc: 'DCB',   ncabDate: '10/2026', percentile: 13, priorityScore: 29, previousScore: 20, totalCost: 712030,  i2Status: '-', budgetCategory: 'R01/R37', esiFlag: false, absFlag: true,  ssFlag: true,  justFlag: true,  reviewStatus: 'Draft', appTcEst: null, nciDecision: 'Yes', docDecision: 'No', docPriority: null, docRecAmt: 791000, docRecPctRed: 17, docNciSel: 'NCI Selection', twoYrFunding: null, annualOrMyf: 'Annual', recused: null, nofo: 'PA23-261', dateAdded: '5/10/2027 9:00',  addedBy: 'DOC' },
-    { applId: 1003, grantNumber: '2R01CA259365-06', piName: 'Morris',           piEmail: 'morris@nih.gov',     institution: 'University of Michigan',    projectTitle: 'Multi-Center Lung Cancer Screening Trial',     doc: 'DCB',   ncabDate: '10/2026', percentile: 13, priorityScore: 29, previousScore: 20, totalCost: 300112,  i2Status: '-', budgetCategory: 'R01/R37', esiFlag: false, absFlag: true,  ssFlag: true,  justFlag: true,  reviewStatus: 'Draft', appTcEst: null, nciDecision: 'Yes', docDecision: 'No', docPriority: null, docRecAmt: 791000, docRecPctRed: 17, docNciSel: 'NCI Selection', twoYrFunding: null, annualOrMyf: 'Annual', recused: null, nofo: 'PA23-261', dateAdded: '5/10/2027 9:00',  addedBy: 'DOC' },
-    { applId: 1004, grantNumber: '2R01CA259365-06', piName: 'Wang',             piEmail: 'wang@nih.gov',       institution: 'MD Anderson Cancer Center', projectTitle: 'Epigenetic Regulation in Breast Cancer Metastasis', doc: 'DCTD', ncabDate: '10/2026', percentile: 13, priorityScore: 29, previousScore: 20, totalCost: 50037,   i2Status: '-', budgetCategory: 'R03',    esiFlag: false, absFlag: true,  ssFlag: true,  justFlag: true,  reviewStatus: 'Draft', appTcEst: null, nciDecision: 'Yes', docDecision: 'No', docPriority: null, docRecAmt: 791000, docRecPctRed: 17, docNciSel: 'DOC Selection', twoYrFunding: null, annualOrMyf: 'Annual', recused: null, nofo: 'PA23-261', dateAdded: '5/10/2027 10:00', addedBy: 'OEFIA' },
-    { applId: 1005, grantNumber: '2R01CA259365-06', piName: 'Zhang',            piEmail: 'zhang@nih.gov',      institution: 'Memorial Sloan Kettering',  projectTitle: 'SPORE in Prostate Cancer',                     doc: 'DCTD', ncabDate: '10/2026', percentile: 13, priorityScore: 29, previousScore: 20, totalCost: 1200000, i2Status: '-', budgetCategory: 'R03',    esiFlag: true,  absFlag: false, ssFlag: true,  justFlag: true,  reviewStatus: 'Draft', appTcEst: null, nciDecision: 'Yes', docDecision: 'No', docPriority: null, docRecAmt: 791000, docRecPctRed: 17, docNciSel: 'DOC Selection', twoYrFunding: null, annualOrMyf: 'Annual', recused: null, nofo: 'PA23-261', dateAdded: '5/10/2027 10:00', addedBy: 'OEFIA' },
-    { applId: 1006, grantNumber: 'R03CA678901-01', piName: 'Deng',              piEmail: 'deng@nih.gov',       institution: 'University of Texas',       projectTitle: 'Pilot Study: Pancreatic Cancer Early Detection', doc: 'DCTD', ncabDate: '10/2026', percentile: 13, priorityScore: 29, previousScore: 20, totalCost: 75000,   i2Status: '-', budgetCategory: 'R03',    esiFlag: false, absFlag: false, ssFlag: false, justFlag: true,  reviewStatus: 'Draft', appTcEst: null, nciDecision: 'Yes', docDecision: 'No', docPriority: null, docRecAmt: 791000, docRecPctRed: 17, docNciSel: 'DOC Selection', twoYrFunding: null, annualOrMyf: 'MYF',    recused: null, nofo: 'PA23-261', dateAdded: '5/10/2027 10:00', addedBy: 'OEFIA' },
-    { applId: 1007, grantNumber: 'R01CA789012-01', piName: 'Wilson, James G.',  piEmail: 'j.wilson@nih.gov',   institution: 'Yale University',           projectTitle: 'CAR-T Cell Engineering for Hematologic Malignancies', doc: 'DCB', ncabDate: '10/2026', percentile: 5,  priorityScore: 22, previousScore: 25, totalCost: 450000,  i2Status: '-', budgetCategory: 'R01',    esiFlag: false, absFlag: true,  ssFlag: true,  justFlag: false, reviewStatus: 'Draft', appTcEst: null, nciDecision: 'No',  docDecision: 'No', docPriority: null, docRecAmt: 791000, docRecPctRed: 17, docNciSel: 'DOC Selection', twoYrFunding: null, annualOrMyf: 'MYF',    recused: null, nofo: 'PA23-261', dateAdded: '5/10/2027 10:00', addedBy: 'OEFIA' },
-    { applId: 1008, grantNumber: 'U54CA890123-01', piName: 'Anderson, Susan H.',piEmail: 's.anderson@nih.gov', institution: 'Harvard Medical School',    projectTitle: 'NCI Physical Sciences Oncology Center',        doc: 'DCCPS',ncabDate: '10/2026', percentile: 15, priorityScore: 28, previousScore: 22, totalCost: 2100000, i2Status: '-', budgetCategory: 'U54',    esiFlag: true,  absFlag: false, ssFlag: true,  justFlag: true,  reviewStatus: 'Draft', appTcEst: null, nciDecision: 'Yes', docDecision: 'Yes',docPriority: null, docRecAmt: 791000, docRecPctRed: 17, docNciSel: 'NCI Selection', twoYrFunding: null, annualOrMyf: 'Annual', recused: null, nofo: 'PA23-261', dateAdded: '5/10/2027 10:00', addedBy: 'DOC' },
-  ];
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private logger: NGXLogger,
     private environmentInjector: EnvironmentInjector,
-    private propertiesService: AppPropertiesService
+    private propertiesService: AppPropertiesService,
+    private fundingSubmissionsService: FundingSubmissionsControllerService
   ) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
+      if (params['listId']) {
+        this.listId = Number(params['listId']);
+        this.loadListMeta();
+      }
       if (params['selectionDate']) {
         this.selectionDate = params['selectionDate'];
       }
@@ -99,16 +70,31 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
     this.i2eURL = this.propertiesService.getProperty('I2EWEB_URL').trim();
-    this.logger.debug('SearchListsComponent selectionDate:', this.selectionDate);
+  }
+
+  private loadListMeta(): void {
+    this.fundingSubmissionsService.searchLists({ listId: this.listId, start: 0, length: 1 }).subscribe({
+      next: (result) => {
+        const list = result.data?.[0];
+        if (list) {
+          this.selectionDate = list.code || this.selectionDate;
+          this.listStatus = list.listStatus || '';
+        }
+        this.logger.debug('List metadata:', list);
+      },
+      error: (err) => this.logger.error('Failed to load list metadata', err)
+    });
   }
 
   ngAfterViewInit(): void {
     this.dtOptions = {
       pagingType: 'full_numbers',
       pageLength: 10,
-      serverSide: false,
+      serverSide: true,
       processing: false,
-      data: this.mockGrants,
+      ajax: (dataTablesParameters: any, callback) => {
+        this.throttle.invoke(this, dataTablesParameters, callback, this.ajaxCall);
+      },
       scrollX: true,
       autoWidth: false,
       language: {
@@ -133,166 +119,170 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           data: 'absFlag',
           width: '40px',
           defaultContent: '',
-          render: (data: boolean) => data ? '<a href="#">Y</a>' : ''
+          render: (data: boolean, _t: any, row: any) => data ? `<a href="${row.absUrl}" target="_blank">Y</a>` : ''
         }, // 1
         {
           title: 'SS',
           data: 'ssFlag',
           width: '40px',
           defaultContent: '',
-          render: (data: boolean) => data ? '<a href="#">Y</a>' : ''
+          render: (data: boolean, _t: any, row: any) => data ? `<a href="${row.ssUrl}" target="_blank">Y</a>` : ''
         }, // 2
-        {
-          title: 'Justification',
-          data: 'justFlag',
-          width: '90px',
-          defaultContent: '',
-          render: (data: boolean) => data ? '<a href="#">Y</a>' : ''
-        }, // 3
         {
           title: 'Grant Number',
           data: 'grantNumber',
           width: '140px',
           ngTemplateRef: { ref: this.fullGrantNumberRenderer },
           className: 'all'
-        }, // 4
+        }, // 3
         {
           title: 'DOC',
           data: 'doc',
           width: '50px',
           defaultContent: ''
-        }, // 5
-        {
-          title: 'Review Status',
-          data: 'reviewStatus',
-          width: '90px',
-          defaultContent: ''
-        }, // 6
+        }, // 4
         {
           title: 'Budget Categories',
           data: 'budgetCategory',
           width: '110px',
           defaultContent: ''
-        }, // 7
+        }, // 5
         {
           title: 'PI',
           data: 'piName',
           width: '130px',
-          render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.piEmail}">${data}</a>` : ''
-        }, // 8
+          render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.piEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>` : ''
+        }, // 6
         {
           title: 'IMPAC II Status',
           data: 'i2Status',
           width: '100px',
           defaultContent: ''
-        }, // 9
+        }, // 7
         {
           title: 'NCAB',
           data: 'ncabDate',
           width: '70px',
-          defaultContent: ''
-        }, // 10
+          defaultContent: '',
+          render: (data: any, type: any) => {
+            if (!data) return '';
+            const d = new Date(data);
+            return isNaN(d.getTime()) ? data : `${d.getMonth() + 1}/${d.getFullYear()}`;
+          }
+        }, // 8
         {
           title: 'Pctl',
           data: 'percentile',
           width: '50px',
           defaultContent: '',
           render: (data: number) => data != null ? `${data}%` : ''
-        }, // 11
+        }, // 9
         {
           title: 'Priority Score',
-          data: 'priorityScore',
+          data: 'priorityScoreDisplay',
           width: '90px',
           defaultContent: ''
-        }, // 12
+        }, // 10
         {
           title: 'ESI',
           data: 'esiFlag',
           width: '50px',
           render: (data: boolean) => data === true ? 'Yes' : data === false ? 'No' : ''
-        }, // 13
+        }, // 11
         {
           title: 'Application TC Est',
           data: 'appTcEst',
           width: '110px',
-          defaultContent: '-'
-        }, // 14
+          defaultContent: ''
+        }, // 12
         {
           title: 'NCI Decision',
           data: 'nciDecision',
           width: '90px',
           defaultContent: ''
-        }, // 15
+        }, // 13
         {
           title: 'DOC Decision',
           data: 'docDecision',
           width: '90px',
           defaultContent: ''
-        }, // 16
+        }, // 14
         {
           title: 'DOC Priority',
           data: 'docPriority',
           width: '80px',
-          defaultContent: '-'
-        }, // 17
+          defaultContent: ''
+        }, // 15
         {
           title: 'DOC Rec. $',
           data: 'docRecAmt',
           width: '90px',
           defaultContent: '',
-          render: (data: number) => data != null ? '$' + Number(data).toLocaleString('en-US') : '-'
-        }, // 18
+          render: (data: number) => data != null ? '$' + Number(data).toLocaleString('en-US') : ''
+        }, // 16
         {
           title: 'DOC Rec. % Red.',
           data: 'docRecPctRed',
           width: '95px',
           defaultContent: '',
-          render: (data: number) => data != null ? `${data}%` : '-'
-        }, // 19
+          render: (data: number) => data != null ? `${data}%` : ''
+        }, // 17
         {
           title: 'DOC/NCI Sel',
           data: 'docNciSel',
           width: '100px',
           defaultContent: ''
-        }, // 20
+        }, // 18
         {
           title: 'Two-Year Annual Funding R01 (HRHR)?',
           data: 'twoYrFunding',
           width: '160px',
-          defaultContent: '-'
-        }, // 21
+          defaultContent: '',
+          render: (data: any) => data ? 'Y' : ''
+        }, // 19
         {
           title: 'Annual or MYF',
           data: 'annualOrMyf',
           width: '90px',
           defaultContent: ''
-        }, // 22
+        }, // 20
         {
           title: 'Recused',
           data: 'recused',
           width: '70px',
           defaultContent: '',
-          render: (data: any) => data || '-'
-        }, // 23
+          render: (data: any) => data ? 'Y' : ''
+        }, // 21
         {
           title: 'NOFO',
           data: 'nofo',
           width: '80px',
           defaultContent: '',
           ngTemplateRef: { ref: this.foaCellRender }
-        }, // 24
+        }, // 22
         {
           title: 'Date Added',
           data: 'dateAdded',
           width: '120px',
-          defaultContent: ''
-        }, // 25
+          defaultContent: '',
+          render: (data: any) => {
+            if (!data) return '';
+            const d = new Date(data);
+            if (isNaN(d.getTime())) return data;
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const hh = String(d.getHours()).padStart(2, '0');
+            const min = String(d.getMinutes()).padStart(2, '0');
+            return `${mm}/${dd}/${d.getFullYear()} ${hh}:${min}`;
+          }
+        }, // 23
         {
           title: 'Added By',
           data: 'addedBy',
           width: '80px',
-          defaultContent: ''
-        }, // 26
+          defaultContent: '',
+          render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.addedByEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>` : ''
+        }, // 24
         {
           title: 'Action',
           data: null,
@@ -300,13 +290,13 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           width: '60px',
           className: 'all',
           defaultContent: '<button class="btn btn-link p-0 toggle-details" title="Details"><i class="far fa-plus-circle fa-lg"></i></button>'
-        }, // 27
+        }, // 25
       ],
       dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"B<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       buttons: [
         { extend: 'excel', className: 'btn-excel', titleAttr: 'Export All Results', text: 'Export All Results', filename: 'fs-funding-list-detail', title: null, header: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8] } }
       ],
-      order: [[4, 'asc']],
+      order: [[3, 'asc']],
       fixedColumns: { left: 1, right: 1 },
       rowCallback: (row: Node, data: any) => {
         this.dtOptions.columns.forEach((column: any, ind: number) => {
@@ -368,6 +358,34 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     };
     setTimeout(() => this.dtTrigger.next(null));
+  }
+
+  ajaxCall($this: SearchListsComponent, dataTablesParameters: any, callback: any): void {
+    if (!$this.listId) {
+      callback({ recordsTotal: 0, recordsFiltered: 0, data: [] });
+      return;
+    }
+    const normalizeSearch = (s: any) => s ? { ...s, regex: s.regex === true || s.regex === 'true' } : s;
+    // listId is not in the DTO interface but accepted server-side to scope results to the list
+    const body = {
+      listId: $this.listId,
+      draw: dataTablesParameters.draw,
+      columns: (dataTablesParameters.columns || []).map((c: any) => ({ ...c, search: normalizeSearch(c.search) })),
+      order: dataTablesParameters.order,
+      start: dataTablesParameters.start,
+      length: dataTablesParameters.length,
+      search: normalizeSearch(dataTablesParameters.search)
+    } as any;
+    $this.fundingSubmissionsService.searchGrants(body).subscribe({
+      next: (result) => {
+        $this.totalGrants = result.recordsTotal ?? 0;
+        callback({ recordsTotal: result.recordsTotal, recordsFiltered: result.recordsFiltered, data: result.data });
+      },
+      error: (err) => {
+        $this.logger.error('Failed to load list grants', err);
+        callback({ recordsTotal: 0, recordsFiltered: 0, data: [] });
+      }
+    });
   }
 
   ngOnDestroy(): void {

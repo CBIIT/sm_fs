@@ -80,8 +80,8 @@
 </ng-template>
 <ng-template #existsInListRenderer let-data="adtData">
   <a *ngIf="data.existsInListSelectionDate"
-     [routerLink]="['/funding-submissions/search']"
-     [queryParams]="{ selectionDate: data.existsInListSelectionDate }"
+     href="javascript:void(0)"
+     (click)="navigateToList(data.existsInListSelectionDate)"
      ngbTooltip="Click to view list" container="body">
     {{ data.existsInListSelectionDate }}
   </a>
