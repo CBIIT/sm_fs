@@ -304,7 +304,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
       dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"B<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       buttons: [
-        { extend: 'excel', className: 'btn-excel', titleAttr: 'Export All Results', text: 'Export All Results', filename: 'fs-funding-list-detail', title: null, header: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8] } }
+        { extend: 'excel', className: 'btn-excel', titleAttr: 'Export All Results', text: 'Export All Results', filename: 'fs-funding-list-detail', title: null, header: true, exportOptions: { columns: [1, 2, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26] } }
       ],
       order: [[4, 'asc']],
       fixedColumns: { left: 1, right: 1 },

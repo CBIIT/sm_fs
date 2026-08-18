@@ -222,7 +222,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
           filename: 'fs-funding-list-grants',
           title: null,
           header: true,
-          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8] }
+          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] }
         }
       ],
       order: [[1, 'desc']],
