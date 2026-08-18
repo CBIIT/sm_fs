@@ -327,6 +327,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
               dt.columns.adjust();
 
+              dt.rows().count() > 0 ? (dt as any).button(0).enable() : (dt as any).button(0).disable();
+
               $(dt.table(0).body())
                 .off('click', '.toggle-details')
                 .on('click', '.toggle-details', (event) => {
