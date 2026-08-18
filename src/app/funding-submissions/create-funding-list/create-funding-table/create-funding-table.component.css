@@ -43,3 +43,7 @@
 ::ng-deep .dataTables_scrollHead table.dataTable thead th:last-child {
   box-shadow: inset -1px 0 0 0 #a3a6ad;
 }
+
+::ng-deep table.dataTable tbody td.dataTables_empty {
+  background-color: #e9ecef;
+}

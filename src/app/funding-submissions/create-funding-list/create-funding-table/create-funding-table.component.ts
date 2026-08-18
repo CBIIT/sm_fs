@@ -182,7 +182,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         {
           title: 'PI Req. Total',
           data: 'piRequestedTotal',
-          width: '120px',
+          width: '90px',
           defaultContent: '',
           render: (data, type) => {
             if (type === 'display' && data != null) {
