@@ -134,7 +134,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
           defaultContent: ''
         }, // 1
         {
-          title: 'code',
+          title: 'Code',
           data: 'code',
           width: '130px',
           defaultContent: ''
