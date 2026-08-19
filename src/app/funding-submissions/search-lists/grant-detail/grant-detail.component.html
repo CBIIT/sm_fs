@@ -42,14 +42,14 @@
             <td class="grid-item">{{data.percentile != null ? (data.percentile + '%') : ''}}</td>
             <td class="grid-label sep">DOC Rec % Red:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docRecPctRed != null ? (data.docRecPctRed + '%') : '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.docRecommendedReductionPct != null ? (data.docRecommendedReductionPct + '%') : '-'}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecReductionPct" [(ngModel)]="formModel.docRecReductionPct"
                 placeholder="Enter Value" min="0" max="100">
             </td>
             <td class="grid-label">DOC Rec $:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docRecAmt != null ? ('$' + (data.docRecAmt | number)) : '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.docRecommendedAmount != null ? ('$' + (data.docRecommendedAmount | number)) : '-'}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecAmt" [(ngModel)]="formModel.docRecAmt"
                 placeholder="Enter Value" min="0">
@@ -71,7 +71,7 @@
             </td>
             <td class="grid-label">2Y Annual Fnd R01:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.twoYrFunding || '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.twoYearAnnualFundingR01Flag || '-'}}</span>
               <ng-select2 *ngIf="isEditMode" name="annualFundingR01" [(ngModel)]="formModel.annualFundingR01"
                 [data]="yesNoOptions" [allowClear]="true" width="100%">
               </ng-select2>
@@ -93,7 +93,7 @@
             </td>
             <td class="grid-label">Budget Categories:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.budgetCategory || '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.budgetCategories || '-'}}</span>
               <ng-select2 *ngIf="isEditMode" name="budgetCategories" [(ngModel)]="formModel.budgetCategories"
                 [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
               </ng-select2>
@@ -108,7 +108,7 @@
             <td class="grid-item">{{data.recused || '-'}}</td>
             <td class="grid-label sep">DOC/NCI Decision:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docNciSel || '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.docNciSelection || '-'}}</span>
               <ng-select2 *ngIf="isEditMode" name="docNciSelection" [(ngModel)]="formModel.docNciSelection"
                 [data]="selectionOptions" [allowClear]="true" width="100%">
               </ng-select2>
@@ -166,7 +166,7 @@
                     Choose File
                     <input type="file" class="d-none" (change)="onFileChange($event)">
                   </label>
-                  <span class="small text-muted">
+                  <span class="small text-muted mx-2">
                     {{justificationFile ? justificationFile.name : 'You may upload Microsoft Word, Rich Text Format, Microsoft Excel, or Adobe Acrobat document(s) only. Max file size is 10MB'}}
                   </span>
                 </div>
@@ -184,7 +184,7 @@
       <div class="d-flex justify-content-end gap-2 py-2 border-top">
         <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode" (click)="onEdit()">Edit</button>
         <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode" (click)="onCancel()">Cancel</button>
-        <button type="submit" class="btn btn-primary" *ngIf="isEditMode">Save</button>
+        <button type="submit" class="btn btn-primary ms-3" *ngIf="isEditMode">Save</button>
       </div>
     </div>
   </form>

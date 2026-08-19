@@ -69,11 +69,11 @@ export class GrantDetailComponent implements OnInit {
       nciDecision:        this.data?.nciDecision ?? '',
       docDecision:        this.data?.docDecision ?? '',
       docPriority:        this.data?.docPriority ?? '',
-      docRecAmt:          this.data?.docRecAmt ?? null,
-      docRecReductionPct: this.data?.docRecPctRed ?? null,
-      docNciSelection:    this.data?.docNciSel ?? '',
-      annualFundingR01:   this.data?.twoYrFunding ?? '',
-      budgetCategories:   this.data?.budgetCategory ?? '',
+      docRecAmt:          this.data?.docRecommendedAmount ?? null,
+      docRecReductionPct: this.data?.docRecommendedReductionPct ?? null,
+      docNciSelection:    this.data?.docNciSelection ?? '',
+      annualFundingR01:   this.data?.twoYearAnnualFundingR01Flag ?? '',
+      budgetCategories:   this.data?.budgetCategories ?? '',
       docNotes:           this.data?.docNotes ?? '',
       oefiaNotes:         this.data?.oefiaNote ?? '',
       annualOrMyf:        this.data?.annualOrMyf ?? '',
@@ -94,6 +94,7 @@ export class GrantDetailComponent implements OnInit {
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.justificationFile = input.files?.[0] ?? null;
+    this.cdr.detectChanges();
   }
 
   onSave(): void {
@@ -132,16 +133,16 @@ export class GrantDetailComponent implements OnInit {
   }
 
   private applyFormModelToData(nciDecision: string): void {
-    this.data.nciDecision       = nciDecision;
-    this.data.docDecision       = this.formModel.docDecision;
-    this.data.docPriority       = this.formModel.docPriority;
-    this.data.docRecAmt         = this.formModel.docRecAmt;
-    this.data.docRecPctRed      = this.formModel.docRecReductionPct;
-    this.data.docNciSel         = this.formModel.docNciSelection;
-    this.data.twoYrFunding      = this.formModel.annualFundingR01;
-    this.data.budgetCategory    = this.formModel.budgetCategories;
-    this.data.docNotes          = this.formModel.docNotes;
-    this.data.oefiaNote         = this.formModel.oefiaNotes;
-    this.data.annualOrMyf       = this.formModel.annualOrMyf;
+    this.data.nciDecision                 = nciDecision;
+    this.data.docDecision                 = this.formModel.docDecision;
+    this.data.docPriority                 = this.formModel.docPriority;
+    this.data.docRecommendedAmount        = this.formModel.docRecAmt;
+    this.data.docRecommendedReductionPct  = this.formModel.docRecReductionPct;
+    this.data.docNciSelection             = this.formModel.docNciSelection;
+    this.data.twoYearAnnualFundingR01Flag = this.formModel.annualFundingR01;
+    this.data.budgetCategories            = this.formModel.budgetCategories;
+    this.data.docNotes                    = this.formModel.docNotes;
+    this.data.oefiaNote                   = this.formModel.oefiaNotes;
+    this.data.annualOrMyf                 = this.formModel.annualOrMyf;
   }
 }
