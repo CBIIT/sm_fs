@@ -19,6 +19,7 @@ import {
 } from '../../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { DatatableThrottle } from '../../../utils/datatable-throttle';
 import { CancerActivityCellRendererComponent } from 'src/app/table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
+import { HttpClient } from '@angular/common/http';
 
 declare var $: any;
 
@@ -66,7 +67,8 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
     private propertiesService: AppPropertiesService,
     private logger: NGXLogger,
     private modalService: NgbModal,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
