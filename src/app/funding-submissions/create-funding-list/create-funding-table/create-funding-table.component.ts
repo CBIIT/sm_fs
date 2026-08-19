@@ -496,4 +496,5 @@ allDataSelected(data: any[]): boolean {
       }
 
     );
+  }
 }
