@@ -1,0 +1,11 @@
+<div class="form-group">
+  <label [for]="name">{{ label }}</label>
+  <ng-select2
+    [id]="name"
+    [name]="name"
+    [(ngModel)]="selectedValue"
+    [options]="options">
+    <option></option>
+    <option *ngFor="let doc of docs" [value]="doc.abbreviation" [selected]="isSelected(doc.abbreviation)"> {{doc.abbreviation}} - {{doc.description}}</option>
+  </ng-select2>
+</div>

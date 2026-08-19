@@ -257,6 +257,7 @@ import { UniquePdValidatorDirective } from './validators/unique-pd-validator.dir
 import { Router } from '@angular/router';
 import { ErrorHandlerService } from './error/error-handler.service';
 import { CancerActivitiesDropdownComponent} from "./cancer-activities-dropdown/cancer-activities-dropdown.component";
+import { DocSelectComponent } from "./doc-select/doc-select.component";
 import { PdnameDropdownComponent} from "./pdname-dropdown/pdname-dropdown.component";
 import { EditLinkComponent } from './edit-link/edit-link.component';
 import { CreateFundingListComponent } from './funding-submissions/create-funding-list/create-funding-list.component';
@@ -514,6 +515,7 @@ export function combinedInitializerFactory(
         R00CancerActivityRequiredValidatorDirective,
         UniquePdValidatorDirective,
         CancerActivitiesDropdownComponent,
+        DocSelectComponent,
         PdnameDropdownComponent,
         EditLinkComponent,
         CreateFundingListComponent,

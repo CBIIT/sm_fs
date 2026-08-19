@@ -19,6 +19,7 @@ import {
 } from '../../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { DatatableThrottle } from '../../../utils/datatable-throttle';
 import { CancerActivityCellRendererComponent } from 'src/app/table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
+import { HttpClient } from '@angular/common/http';
 
 declare var $: any;
 
@@ -66,7 +67,8 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
     private propertiesService: AppPropertiesService,
     private logger: NGXLogger,
     private modalService: NgbModal,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -222,13 +224,14 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
       buttons: [
         {
           extend: 'excel',
-          className: 'btn-excel',
+          className: 'btn-excel btn-export-all',
           titleAttr: 'Export All Results',
           text: '</i>Export All Results',
           filename: 'fs-funding-list-grants',
           title: null,
           header: true,
-          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] }
+          action: this.exportGrantSearchResults.bind(this),
+          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] }      
         }
       ],
       order: [[1, 'desc']],
@@ -472,5 +475,26 @@ allDataSelected(data: any[]): boolean {
       },
       error: (err) => this.logger.error('Failed to find list for selection date', err)
     });
+  }
+
+   exportGrantSearchResults() {
+    this.logger.debug('Exporting grant search results');
+    this.logger.debug(this.searchCriteria);
+    const searchCriteria = JSON.parse(JSON.stringify(this.searchCriteria));
+    searchCriteria.length = -1;
+    this.loaderService.show();
+    this.http.post('/i2efsws/api/v1/funding-submissions/grants/export', searchCriteria, { responseType: 'arraybuffer' }).subscribe(
+
+      (response) => {
+        this.loaderService.hide();
+        const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.download = 'funding_submissions_grants_result_all.xls';
+        anchor.href = url;
+        anchor.click();
+      }
+
+    );
   }
 }

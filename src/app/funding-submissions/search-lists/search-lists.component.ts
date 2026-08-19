@@ -5,11 +5,12 @@ import { Subject, forkJoin } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { Select2OptionData } from 'ng-select2';
-import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { FundingSubmissionsControllerService, FundingSubmissionListGrantDto } from '@cbiit/i2efsws-lib';
+import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+import { HttpClient } from '@angular/common/http';
 
 declare var $: any;
 
@@ -53,12 +54,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   constructor(
+    private loaderService: LoaderService,
     private route: ActivatedRoute,
     private router: Router,
     private logger: NGXLogger,
     private environmentInjector: EnvironmentInjector,
     private propertiesService: AppPropertiesService,
-    private fundingSubmissionsService: FundingSubmissionsControllerService
+    private fundingSubmissionsService: FundingSubmissionsControllerService,
+    private http: HttpClient
   ) { }
 
   ngOnInit(): void {
@@ -333,7 +336,16 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
       dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"B<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       buttons: [
-        { extend: 'excel', className: 'btn-excel', titleAttr: 'Export All Results', text: 'Export All Results', filename: 'fs-funding-list-detail', title: null, header: true, exportOptions: { columns: [1, 2, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26] } }
+        {
+          extend: 'excel',
+          className: 'btn-excel btn-export-all',
+          titleAttr: 'Export All Results',
+          text: '</i>Export All Results',
+          title: null,
+          header: true,
+          action: this.exportGrantListResults.bind(this),
+          exportOptions: { columns: [1, 2, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26] }      
+        }
       ],
       order: [[3, 'asc']],
       fixedColumns: { left: 1, right: 1 },
@@ -483,5 +495,26 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.dtTrigger && !this.dtTrigger.closed) {
       this.dtTrigger.unsubscribe();
     }
+  }
+
+   exportGrantListResults() {
+    this.logger.debug('Exporting grant search results');
+    this.logger.debug(this.fundingSubmissionsService.searchLists);
+    const searchCriteria = JSON.parse(JSON.stringify(this.fundingSubmissionsService.searchLists));
+    searchCriteria.length = -1;
+    this.loaderService.show();
+    this.http.post('/i2efsws/api/v1/funding-submissions/lists/export', searchCriteria, { responseType: 'arraybuffer' }).subscribe(
+
+      (response) => {
+        this.loaderService.hide();
+        const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.download = 'funding_submissions_lists_result_all.xls';
+        anchor.href = url;
+        anchor.click();
+      }
+
+    );
   }
 }
