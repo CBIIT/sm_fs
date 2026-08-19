@@ -433,7 +433,7 @@ allDataSelected(data: any[]): boolean {
         this.loaderService.hide();
         this.logger.debug('addGrantsToList result:', result);
         this.modalRef?.close();
-        this.router.navigate(['/funding-submissions/search'], { queryParams: { listId: result.listId } });
+        this.router.navigate(['/funding-submissions/search'], { queryParams: { listId: result.listId, from: 'create' } });
       },
       error: (err) => {
         this.loaderService.hide();
@@ -465,7 +465,7 @@ allDataSelected(data: any[]): boolean {
       next: (result) => {
         const listId = result.data?.[0]?.listId;
         if (listId) {
-          this.router.navigate(['/funding-submissions/search'], { queryParams: { listId } });
+          this.router.navigate(['/funding-submissions/search'], { queryParams: { listId, from: 'create' } });
         } else {
           this.logger.warn('No list found for selection date', selectionDate);
         }

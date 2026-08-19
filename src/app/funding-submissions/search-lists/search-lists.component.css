@@ -6,6 +6,11 @@
   gap: 0;
 }
 
+.doc-row-active {
+  background-color: #e8f0fe;
+  font-weight: 600;
+}
+
 .doc-name {
   width: 70px;
   flex-shrink: 0;
@@ -107,4 +112,48 @@ tr.shown {
 /* Vertical separators between the 3 columns */
 .doc-status-column.border-end {
   border-right: 1px solid #d0d0d0 !important;
+}
+
+::ng-deep .dataTables_scrollBody {
+  overflow-x: auto !important;
+}
+
+::ng-deep .dataTables_wrapper .dataTables_info
+{
+   padding-top: 0px !important ;
+}
+::ng-deep table.dataTable {
+  border: 1px solid #a3a6ad;
+  border-left-width: 0px;
+  border-bottom-width: 0px;
+  table-layout: fixed !important;
+  border-collapse: separate !important; /* required for position:sticky */
+}
+
+/* FixedColumns v4 sticky cells must be opaque to cover scrolled content */
+::ng-deep table.dataTable thead th.dtfc-fixed-left,
+::ng-deep table.dataTable tbody td.dtfc-fixed-left,
+::ng-deep table.dataTable thead th.dtfc-fixed-right,
+::ng-deep table.dataTable tbody td.dtfc-fixed-right {
+  background-color: #fff;
+  z-index: 2;
+}
+
+::ng-deep table.dataTable th.dtfc-fixed-left:last-of-type,
+::ng-deep table.dataTable td.dtfc-fixed-left:last-of-type {
+  box-shadow: 4px 0 6px -2px rgba(0, 0, 0, .2);
+}
+
+::ng-deep table.dataTable th.dtfc-fixed-right:first-of-type,
+::ng-deep table.dataTable td.dtfc-fixed-right:first-of-type {
+  box-shadow: -4px 0 6px -2px rgba(0, 0, 0, .2);
+}
+
+/* inset shadow renders inside the cell, avoiding overflow:hidden clip on the scroll head container */
+::ng-deep .dataTables_scrollHead table.dataTable thead th:last-child {
+  box-shadow: inset -1px 0 0 0 #a3a6ad;
+}
+
+::ng-deep table.dataTable tbody td.dataTables_empty {
+  background-color: #e9ecef;
 }

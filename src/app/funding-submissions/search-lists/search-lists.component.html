@@ -1,7 +1,7 @@
 <div class="ms-3">
 
-    <a routerLink="/funding-submissions/create" class="text-decoration-none small">
-        &lt; Back to Search Results
+    <a [routerLink]="backRoute" class="text-decoration-none small">
+        &lt; {{ backLabel }}
     </a>
 
     <!-- Page header -->
@@ -40,10 +40,11 @@
             <div class="doc-status-wrapper">
                 <div class="doc-status-column" *ngFor="let col of docStatusColumns; let last = last"
                     [class.border-end]="!last">
-                    <div class="doc-row" *ngFor="let d of col; let lastRow = last" [class.border-bottom]="!lastRow">
+                    <div class="doc-row" *ngFor="let d of col; let lastRow = last" [class.border-bottom]="!lastRow"
+                        [class.doc-row-active]="filteredDoc === d.doc">
                         <span class="doc-name">{{ d.doc }}</span>
 
-                        <a href="#" class="doc-count" (click)="$event.preventDefault()">
+                        <a href="#" class="doc-count" (click)="onDocCountClick(d.doc); $event.preventDefault()">
                             {{ d.count }}
                         </a>
 
@@ -137,7 +138,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let h of listHistory">
-                        <td>{{ h.date }}</td>
+                        <td>{{ h.date | date:'MM/dd/yyyy' }}</td>
                         <td>{{ h.status }}</td>
                         <td>{{ h.actionBy }}</td>
                     </tr>

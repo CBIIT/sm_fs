@@ -17,7 +17,7 @@
           [(ngModel)]="bulkFields.budgetCategories"
           [data]="budgetCategoryOptions"
           [allowClear]="true"
-          width="100%"
+          width="100%">
         </ng-select2>
       </div>
       <div class="col-4">
@@ -28,7 +28,7 @@
           [(ngModel)]="bulkFields.docDecision"
           [data]="decisionOptions"
           [allowClear]="true"
-          width="100%"
+          width="100%">
         </ng-select2>
       </div>
       <div class="col-4">
@@ -39,7 +39,7 @@
           [(ngModel)]="bulkFields.docNciSelection"
           [data]="docNciOptions"
           [allowClear]="true"
-          width="100%"
+          width="100%">
         </ng-select2>
       </div>
     </div>
@@ -53,7 +53,7 @@
           [(ngModel)]="bulkFields.annualFundingR01"
           [data]="yesNoOptions"
           [allowClear]="true"
-          width="100%"
+          width="100%">
         </ng-select2>
       </div>
       <div class="col-4">
@@ -64,7 +64,7 @@
           [(ngModel)]="bulkFields.annualOrMyf"
           [data]="annualMyfOptions"
           [allowClear]="true"
-          width="100%"
+          width="100%">
         </ng-select2>
       </div>
     </div>
@@ -77,7 +77,7 @@
           name="bulkDocNotes"
           [(ngModel)]="bulkFields.docNotes"
           rows="4"
-          maxlength="1000"
+          maxlength="1000">
         </textarea>
         <div class="text-end text-muted small">{{ bulkFields.docNotes?.length || 0 }}/1000</div>
       </div>
@@ -88,7 +88,7 @@
           name="bulkOefiaNotes"
           [(ngModel)]="bulkFields.oefiaNotes"
           rows="4"
-          maxlength="1000"
+          maxlength="1000">
         </textarea>
         <div class="text-end text-muted small">{{ bulkFields.oefiaNotes?.length || 0 }}/1000</div>
       </div>

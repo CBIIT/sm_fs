@@ -1,7 +1,4 @@
-:host {
-  display: block;
-  overflow-x: hidden;
-}
+/* Prevent Select2 choice tags from overflowing the DOC input */
 ::ng-deep lib-doc-dropdown .select2-selection__choice {
   max-width: 300px;
   overflow: hidden;
@@ -19,4 +16,8 @@
   display: inline-block;
   max-width: 300px;
   vertical-align: middle;
+}
+::ng-deep .dataTables_wrapper .dataTables_info
+{
+   padding-top: 0px !important ;
 }

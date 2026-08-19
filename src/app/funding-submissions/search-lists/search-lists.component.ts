@@ -1,12 +1,12 @@
 import { AfterViewInit, Component, EnvironmentInjector, OnDestroy, OnInit, TemplateRef, ViewChild, createComponent } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
-import { Subject } from 'rxjs';
+import { Subject, forkJoin } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { Select2OptionData } from 'ng-select2';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
-import { FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsControllerService, FundingSubmissionListGrantDto } from '@cbiit/i2efsws-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
@@ -30,6 +30,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   selectionDate = '';
   listId = 0;
   listStatus = '';
+  backLabel = 'Back to Search Results';
+  backRoute = '/funding-submissions/create';
   totalGrants = 0;
   docRecommendedTotal = 0;
 
@@ -42,6 +44,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectedViewDoc: string = null;
   selectedRows = new Map<number, any>();
+  filteredDoc: string | null = null;
+  private cachedGrants: FundingSubmissionListGrantDto[] = [];
   viewDocOptions: Select2OptionData[] = [
     { id: 'abstracts', text: 'Abstract(s)' },
     { id: 'summaries', text: 'Summary Statement(s)' },
@@ -66,6 +70,13 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (params['selectionDate']) {
         this.selectionDate = params['selectionDate'];
       }
+      if (params['from'] === 'lists') {
+        this.backLabel = 'Back to Search List View';
+        this.backRoute = '/funding-submissions/lists';
+      } else {
+        this.backLabel = 'Back to Search Results';
+        this.backRoute = '/funding-submissions/create';
+      }
     });
     $.fn.DataTable.ext.pager.numbers_length = 5;
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
@@ -74,24 +85,51 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadListMeta(): void {
-    this.fundingSubmissionsService.searchLists({ listId: this.listId, start: 0, length: 1 }).subscribe({
-      next: (result) => {
-        const list = result.data?.[0];
-        if (list) {
-          this.selectionDate = list.code || this.selectionDate;
-          this.listStatus = list.listStatus || '';
-        }
-        this.logger.debug('List metadata:', list);
+    forkJoin({
+      detail: this.fundingSubmissionsService.getListDetail(this.listId),
+      history: this.fundingSubmissionsService.getListStatusHistory(this.listId)
+    }).subscribe({
+      next: ({ detail, history }) => {
+        this.selectionDate = detail.listCode || this.selectionDate;
+        this.listStatus = detail.currentStatusDescrip || '';
+        this.totalGrants = detail.totalGrants ?? 0;
+        this.docRecommendedTotal = detail.totalDocRecAmt ?? 0;
+        this.cachedGrants = detail.grants || [];
+        this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
+        this.listHistory = history;
+        this.logger.debug('List detail:', detail);
+        this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
       },
-      error: (err) => this.logger.error('Failed to load list metadata', err)
+      error: (err) => this.logger.error('Failed to load list detail', err)
     });
+  }
+
+  private buildDocStatusColumns(grants: FundingSubmissionListGrantDto[]): any[][] {
+    const docMap = new Map<string, { doc: string; count: number; decided: number }>();
+    for (const g of grants) {
+      const doc = g.doc || 'Unknown';
+      if (!docMap.has(doc)) docMap.set(doc, { doc, count: 0, decided: 0 });
+      const entry = docMap.get(doc);
+      entry.count++;
+      if (g.docDecision) entry.decided++;
+    }
+    const items = Array.from(docMap.values()).map(e => ({
+      doc: e.doc,
+      count: e.count,
+      status: e.decided === 0 ? 'Pending Review' : e.decided === e.count ? 'Review Complete' : 'In Progress'
+    }));
+    const columns: any[][] = [];
+    for (let i = 0; i < items.length; i += 4) {
+      columns.push(items.slice(i, i + 4));
+    }
+    return columns;
   }
 
   ngAfterViewInit(): void {
     this.dtOptions = {
       pagingType: 'full_numbers',
       pageLength: 10,
-      serverSide: true,
+      serverSide: false,
       processing: false,
       ajax: (dataTablesParameters: any, callback) => {
         this.throttle.invoke(this, dataTablesParameters, callback, this.ajaxCall);
@@ -117,14 +155,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 0
         {
           title: 'Abs',
-          data: 'absFlag',
+          data: 'abstractAvailable',
           width: '40px',
           defaultContent: '',
           render: (data: boolean, _t: any, row: any) => data ? `<a href="${row.absUrl}" target="_blank">Y</a>` : ''
         }, // 1
         {
           title: 'SS',
-          data: 'ssFlag',
+          data: 'summaryStatementAvailable',
           width: '40px',
           defaultContent: '',
           render: (data: boolean, _t: any, row: any) => data ? `<a href="${row.ssUrl}" target="_blank">Y</a>` : ''
@@ -144,7 +182,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 4
         {
           title: 'Budget Categories',
-          data: 'budgetCategory',
+          data: 'budgetCategories',
           width: '110px',
           defaultContent: ''
         }, // 5
@@ -156,7 +194,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 6
         {
           title: 'IMPAC II Status',
-          data: 'i2Status',
+          data: 'impacStatus',
           width: '100px',
           defaultContent: ''
         }, // 7
@@ -192,7 +230,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 11
         {
           title: 'Application TC Est',
-          data: 'appTcEst',
+          data: 'applicationTotalCostEstimate',
           width: '110px',
           defaultContent: ''
         }, // 12
@@ -216,27 +254,27 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 15
         {
           title: 'DOC Rec. $',
-          data: 'docRecAmt',
+          data: 'docRecommendedAmount',
           width: '90px',
           defaultContent: '',
           render: (data: number) => data != null ? '$' + Number(data).toLocaleString('en-US') : ''
         }, // 16
         {
           title: 'DOC Rec. % Red.',
-          data: 'docRecPctRed',
+          data: 'docRecommendedReductionPct',
           width: '95px',
           defaultContent: '',
           render: (data: number) => data != null ? `${data}%` : ''
         }, // 17
         {
           title: 'DOC/NCI Sel',
-          data: 'docNciSel',
+          data: 'docNciSelection',
           width: '100px',
           defaultContent: ''
         }, // 18
         {
           title: 'Two-Year Annual Funding R01 (HRHR)?',
-          data: 'twoYrFunding',
+          data: 'twoYearAnnualFundingR01Flag',
           width: '160px',
           defaultContent: '',
           render: (data: any) => data ? 'Y' : ''
@@ -249,7 +287,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 20
         {
           title: 'Recused',
-          data: 'recused',
+          data: 'recusedFlag',
           width: '70px',
           defaultContent: '',
           render: (data: any) => data ? 'Y' : ''
@@ -279,7 +317,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 23
         {
           title: 'Added By',
-          data: 'addedBy',
+          data: 'addedByName',
           width: '80px',
           defaultContent: '',
           render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.addedByEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>` : ''
@@ -309,11 +347,15 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         });
         const $cb = $('.select-checkbox', row);
-        $cb.off('click').on('click', () => {
-          $cb.toggleClass('selected');
-          const applId = (data as any).applId;
-          $cb.hasClass('selected') ? this.selectedRows.set(applId, data) : this.selectedRows.delete(applId);
-        });
+        if ((data as any).selected) {
+          $cb.addClass('selected');
+        } else {
+          $cb.removeClass('selected');
+        }
+      },
+      headerCallback: (thead: Node, _data: any[]) => {
+        // Reset header checkbox state on every draw; re-wired in drawCallback using the full container
+        $('.select-checkbox', thead).removeClass('selected').off('click');
       },
       drawCallback: () => {
         setTimeout(() => {
@@ -323,6 +365,39 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
               dt.columns.adjust();
 
               dt.rows().count() > 0 ? (dt as any).button(0).enable() : (dt as any).button(0).disable();
+
+              // Use container so fixedColumns clones are included
+              const $container = $(dt.table(0).container());
+              $container.find('thead .select-checkbox').off('click').on('click', () => {
+                const $hdr = $container.find('thead .select-checkbox');
+                if ($hdr.first().hasClass('selected')) {
+                  $hdr.removeClass('selected');
+                  $container.find('tbody .select-checkbox').removeClass('selected');
+                  dt.rows().every(function() { (this.data() as any).selected = false; });
+                  this.selectedRows.clear();
+                } else {
+                  $hdr.addClass('selected');
+                  $container.find('tbody .select-checkbox').addClass('selected');
+                  dt.rows().every(function() {
+                    const d = this.data() as any;
+                    d.selected = true;
+                    this.selectedRows.set(d.applId, d);
+                  }.bind(this));
+                }
+              });
+
+              // Delegate from container so clone-table clicks resolve correctly
+              $container.off('click', 'tbody .select-checkbox').on('click', 'tbody .select-checkbox', (e) => {
+                const trIndex = $(e.currentTarget).closest('tr').index();
+                const rowIndexes = dt.rows({ page: 'current', order: 'current' }).indexes().toArray();
+                if (trIndex < 0 || trIndex >= rowIndexes.length) return;
+                const d = dt.row(rowIndexes[trIndex]).data() as any;
+                d.selected = !d.selected;
+                $container.find('tbody').each(function() {
+                  $(this).children('tr').eq(trIndex).find('.select-checkbox').toggleClass('selected', d.selected);
+                });
+                d.selected ? this.selectedRows.set(d.applId, d) : this.selectedRows.delete(d.applId);
+              });
 
               $(dt.table(0).body())
                 .off('click', '.toggle-details')
@@ -367,32 +442,18 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => this.dtTrigger.next(null));
   }
 
-  ajaxCall($this: SearchListsComponent, dataTablesParameters: any, callback: any): void {
-    if (!$this.listId) {
-      callback({ recordsTotal: 0, recordsFiltered: 0, data: [] });
-      return;
+  ajaxCall($this: SearchListsComponent, _dataTablesParameters: any, callback: any): void {
+    let grants = $this.cachedGrants;
+    if ($this.filteredDoc) {
+      grants = grants.filter(g => g.doc === $this.filteredDoc);
     }
-    const normalizeSearch = (s: any) => s ? { ...s, regex: s.regex === true || s.regex === 'true' } : s;
-    // listId is not in the DTO interface but accepted server-side to scope results to the list
-    const body = {
-      listId: $this.listId,
-      draw: dataTablesParameters.draw,
-      columns: (dataTablesParameters.columns || []).map((c: any) => ({ ...c, search: normalizeSearch(c.search) })),
-      order: dataTablesParameters.order,
-      start: dataTablesParameters.start,
-      length: dataTablesParameters.length,
-      search: normalizeSearch(dataTablesParameters.search)
-    } as any;
-    $this.fundingSubmissionsService.searchGrants(body).subscribe({
-      next: (result) => {
-        $this.totalGrants = result.recordsTotal ?? 0;
-        callback({ recordsTotal: result.recordsTotal, recordsFiltered: result.recordsFiltered, data: result.data });
-      },
-      error: (err) => {
-        $this.logger.error('Failed to load list grants', err);
-        callback({ recordsTotal: 0, recordsFiltered: 0, data: [] });
-      }
-    });
+    callback({ recordsTotal: grants.length, recordsFiltered: grants.length, data: grants });
+  }
+
+  onDocCountClick(doc: string): void {
+    this.filteredDoc = this.filteredDoc === doc ? null : doc;
+    this.throttle.reset();
+    this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
   }
 
   onRemoveSelected(): void {

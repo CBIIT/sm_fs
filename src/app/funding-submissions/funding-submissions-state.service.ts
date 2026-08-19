@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FundingSubmissionGrantSearchCriteriaDto, FundingSubmissionSearchResultDto } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionGrantSearchCriteriaDto, FundingSubmissionListSearchCriteriaDto, FundingSubmissionSearchResultDto } from '@cbiit/i2efsws-lib';
 
 export interface FundingListPageState {
   formValue: any;
@@ -13,9 +13,20 @@ export interface FundingListPageState {
   currentPage: number;
 }
 
+export interface SearchListsPageState {
+  formValue: any;
+  selectedDocs: string[];
+  selectedListStatus: string;
+  selectedSelectionDate: string;
+  listIdFilter: string;
+  searchCriteria: FundingSubmissionListSearchCriteriaDto;
+  showResults: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class FundingSubmissionsStateService {
   private listPageState: FundingListPageState | null = null;
+  private searchListsState: SearchListsPageState | null = null;
 
   saveListPageState(state: FundingListPageState): void {
     this.listPageState = state;
@@ -23,5 +34,13 @@ export class FundingSubmissionsStateService {
 
   getListPageState(): FundingListPageState | null {
     return this.listPageState;
+  }
+
+  saveSearchListsState(state: SearchListsPageState): void {
+    this.searchListsState = state;
+  }
+
+  getSearchListsState(): SearchListsPageState | null {
+    return this.searchListsState;
   }
 }
