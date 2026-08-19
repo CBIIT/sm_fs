@@ -70,19 +70,19 @@
             <!-- Action buttons -->
             <div class="d-flex gap-2 mb-3">
                 <!-- Bulk Edit -->
-                <button type="button" class="btn btn-primary me-3">
+                <button type="button" class="btn btn-primary me-3" (click)="onBulkEdit()" [disabled]="!selectedRows.size">
                     <i class="fas fa-pen me-2"></i>
                     Bulk Edit
                 </button>
 
                 <!-- Add Grants to List -->
-                <button type="button" class="btn btn-outline-primary me-3">
+                <button type="button" class="btn btn-outline-primary me-3" (click)="onAddGrantsToList()">
                     <i class="fas fa-plus me-2"></i>
                     Add Grants to List
                 </button>
 
                 <!-- Remove Selected Grants -->
-                <button type="button" class="btn btn-outline-danger">
+                <button type="button" class="btn btn-outline-danger" (click)="onRemoveSelected()" [disabled]="!selectedRows.size">
                     <i class="fas fa-minus-circle me-2"></i>
                     Remove Selected Grants
                 </button>

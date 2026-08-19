@@ -41,6 +41,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   throttle: DatatableThrottle = new DatatableThrottle();
 
   selectedViewDoc: string = null;
+  selectedRows = new Map<number, any>();
   viewDocOptions: Select2OptionData[] = [
     { id: 'abstracts', text: 'Abstract(s)' },
     { id: 'summaries', text: 'Summary Statement(s)' },
@@ -308,7 +309,11 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         });
         const $cb = $('.select-checkbox', row);
-        $cb.off('click').on('click', () => $cb.toggleClass('selected'));
+        $cb.off('click').on('click', () => {
+          $cb.toggleClass('selected');
+          const applId = (data as any).applId;
+          $cb.hasClass('selected') ? this.selectedRows.set(applId, data) : this.selectedRows.delete(applId);
+        });
       },
       drawCallback: () => {
         setTimeout(() => {
@@ -388,6 +393,29 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         callback({ recordsTotal: 0, recordsFiltered: 0, data: [] });
       }
     });
+  }
+
+  onRemoveSelected(): void {
+    const applIds = Array.from(this.selectedRows.keys());
+    if (!applIds.length) return;
+    this.fundingSubmissionsService.removeGrantsFromList(this.listId, applIds).subscribe({
+      next: () => {
+        this.selectedRows.clear();
+        this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+      },
+      error: (err) => this.logger.error('Remove grants from list failed', err)
+    });
+  }
+
+  onBulkEdit(): void {
+    const grants = Array.from(this.selectedRows.values());
+    this.router.navigate(['/funding-submissions/bulk-edit'], {
+      state: { grants, listId: this.listId, selectionDate: this.selectionDate }
+    });
+  }
+
+  onAddGrantsToList(): void {
+    this.router.navigate(['/funding-submissions/create']);
   }
 
   ngOnDestroy(): void {

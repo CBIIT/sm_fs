@@ -1,0 +1,259 @@
+import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { NGXLogger } from 'ngx-logger';
+import { forkJoin, Subject } from 'rxjs';
+import { FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
+import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+import { Select2OptionData } from 'ng-select2';
+import { DataTableDirective } from 'angular-datatables';
+import { FullGrantNumberCellRendererComponent } from '../../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+
+declare var $: any;
+
+@Component({
+  selector: 'app-bulk-edit',
+  templateUrl: './bulk-edit.component.html',
+  styleUrls: ['./bulk-edit.component.css']
+})
+export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
+  @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
+  @ViewChild('budgetCatRenderer')   budgetCatRenderer:   TemplateRef<any>;
+  @ViewChild('docDecisionRenderer') docDecisionRenderer: TemplateRef<any>;
+  @ViewChild('docNciSelRenderer')   docNciSelRenderer:   TemplateRef<any>;
+  @ViewChild('annualR01Renderer')   annualR01Renderer:   TemplateRef<any>;
+  @ViewChild('annualMyfRenderer')   annualMyfRenderer:   TemplateRef<any>;
+  @ViewChild('docNotesRenderer')    docNotesRenderer:    TemplateRef<any>;
+  @ViewChild('oefiaNotesRenderer')  oefiaNotesRenderer:  TemplateRef<any>;
+
+  listId = 0;
+  selectionDate = '';
+  grantViewerUrl = '';
+  eGrantsUrl = '';
+  i2eURL = '';
+  rows: any[] = [];
+  dtOptions: any = {};
+  dtTrigger: Subject<any> = new Subject<any>();
+
+  bulkFields: {
+    budgetCategories?: string; docDecision?: string; docNciSelection?: string;
+    annualFundingR01?: string; annualOrMyf?: string; docNotes?: string; oefiaNotes?: string;
+  } = {};
+
+  decisionOptions: Select2OptionData[] = [
+    { id: 'Fund',      text: 'Fund' },
+    { id: 'Defer',     text: 'Defer' },
+    { id: 'Delete',    text: 'Delete' },
+    { id: 'Withdrawn', text: 'Withdrawn' },
+    { id: 'Not Fund',  text: 'Not Fund' },
+  ];
+  docNciOptions: Select2OptionData[] = [
+    { id: 'DOC Selection', text: 'DOC Selection' },
+    { id: 'NCI Selection', text: 'NCI Selection' },
+  ];
+  yesNoOptions: Select2OptionData[] = [
+    { id: 'Yes', text: 'Yes' },
+    { id: 'No',  text: 'No' },
+  ];
+  annualMyfOptions: Select2OptionData[] = [
+    { id: 'Annual',            text: 'Annual' },
+    { id: 'Multi-Year Funding', text: 'Multi-Year Funding' },
+  ];
+  budgetCategoryOptions: Select2OptionData[] = [
+    { id: 'R01/R37', text: 'R01/R37' },
+    { id: 'R03',     text: 'R03' },
+    { id: 'R21',     text: 'R21' },
+    { id: 'R37',     text: 'R37' },
+    { id: 'U54',     text: 'U54' },
+  ];
+
+  constructor(
+    private router: Router,
+    private logger: NGXLogger,
+    private fundingSubmissionsService: FundingSubmissionsControllerService,
+    private propertiesService: AppPropertiesService
+  ) {}
+
+  ngOnInit(): void {
+    this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+    this.eGrantsUrl     = this.propertiesService.getProperty('EGRANTS_URL');
+    this.i2eURL         = this.propertiesService.getProperty('I2EWEB_URL').trim();
+    const state = history.state;
+    this.listId = state?.listId ?? 0;
+    this.selectionDate = state?.selectionDate ?? '';
+    const grants: any[] = state?.grants ?? [];
+    // Normalize DataTable row data field names to match FundingSubmBulkEditFieldsDto
+    this.rows = grants.map(g => ({
+      ...g,
+      budgetCategories: g.budgetCategory ?? '',
+      docDecision:      g.docDecision ?? '',
+      docNciSelection:  g.docNciSel ?? '',
+      annualFundingR01: g.twoYrFunding ?? '',
+      annualOrMyf:      g.annualOrMyf ?? '',
+      docNotes:         g.docNotes ?? '',
+      oefiaNotes:       g.oefiaNote ?? '',
+    }));
+  }
+
+  ngAfterViewInit(): void {
+    this.dtOptions = {
+      pagingType: 'full_numbers',
+      pageLength: 25,
+      scrollX: true,
+      autoWidth: false,
+      processing: false,
+      language: {
+        paginate: {
+          first: '<i class="far fa-chevron-double-left" title="First"></i>',
+          previous: '<i class="far fa-chevron-left" title="Previous"></i>',
+          next: '<i class="far fa-chevron-right" title="Next"></i>',
+          last: '<i class="far fa-chevron-double-right" title="Last"></i>'
+        }
+      },
+      ajax: (_params: any, callback: any) => {
+        callback({ data: this.rows, recordsTotal: this.rows.length, recordsFiltered: this.rows.length });
+      },
+      columns: [
+        {
+          title: 'Grant Number',
+          data: 'grantNumber',
+          width: '140px',
+          className: 'all',
+          defaultContent: '',
+          ngTemplateRef: { ref: this.fullGrantNumberRenderer }
+        }, // 0
+        {
+          title: 'PI',
+          data: 'piName',
+          width: '130px',
+          defaultContent: ''
+        }, // 1
+        {
+          title: 'Budget Categories',
+          data: 'budgetCategories',
+          width: '130px',
+          defaultContent: '',
+          ngTemplateRef: { ref: this.budgetCatRenderer }
+        }, // 2
+        {
+          title: 'DOC Decision',
+          data: 'docDecision',
+          width: '120px',
+          defaultContent: '',
+          ngTemplateRef: { ref: this.docDecisionRenderer }
+        }, // 3
+        {
+          title: 'DOC/NCI Selection',
+          data: 'docNciSelection',
+          width: '140px',
+          defaultContent: '',
+          ngTemplateRef: { ref: this.docNciSelRenderer }
+        }, // 4
+        {
+          title: 'Two-Year Annual Funding R01 (HRHR)',
+          data: 'annualFundingR01',
+          width: '100px',
+          defaultContent: '',
+          ngTemplateRef: { ref: this.annualR01Renderer }
+        }, // 5
+        {
+          title: 'Annual or MYF',
+          data: 'annualOrMyf',
+          width: '120px',
+          defaultContent: '',
+          ngTemplateRef: { ref: this.annualMyfRenderer }
+        }, // 6
+        {
+          title: 'DOC Notes',
+          data: 'docNotes',
+          width: '220px',
+          defaultContent: '',
+          ngTemplateRef: { ref: this.docNotesRenderer }
+        }, // 7
+        {
+          title: 'OEFIA Notes',
+          data: 'oefiaNotes',
+          width: '220px',
+          defaultContent: '',
+          ngTemplateRef: { ref: this.oefiaNotesRenderer }
+        }, // 8
+      ],
+      dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
+      rowCallback: (row: Node, _data: any) => {
+        // Remove stale elements left by DataTables before ngTemplateRef injects
+        this.dtOptions.columns.forEach((column: any, ind: number) => {
+          if (column.ngTemplateRef) {
+            const cell = row.childNodes.item(ind);
+            if (cell && cell.childNodes.length > 1) {
+              $(cell.childNodes.item(0)).remove();
+            }
+          }
+        });
+      },
+      drawCallback: () => {
+        setTimeout(() => {
+          this.dtElement?.dtInstance?.then((dt: DataTables.Api) => dt.columns.adjust());
+        }, 0);
+      },
+    };
+    setTimeout(() => this.dtTrigger.next(null));
+  }
+
+  ngOnDestroy(): void {
+    if (this.dtTrigger && !this.dtTrigger.closed) {
+      this.dtTrigger.unsubscribe();
+    }
+  }
+
+  onApplyChanges(): void {
+    const f = this.bulkFields;
+    for (const row of this.rows) {
+      if (f.budgetCategories) row.budgetCategories = f.budgetCategories;
+      if (f.docDecision)      row.docDecision      = f.docDecision;
+      if (f.docNciSelection)  row.docNciSelection  = f.docNciSelection;
+      if (f.annualFundingR01) row.annualFundingR01  = f.annualFundingR01;
+      if (f.annualOrMyf)      row.annualOrMyf      = f.annualOrMyf;
+      if (f.docNotes)         row.docNotes         = f.docNotes;
+      if (f.oefiaNotes)       row.oefiaNotes       = f.oefiaNotes;
+    }
+    this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+  }
+
+  onReset(): void {
+    this.bulkFields = {};
+  }
+
+  onSave(): void {
+    if (!this.rows.length) return;
+    const calls = this.rows.map(row =>
+      this.fundingSubmissionsService.bulkUpdateListGrants(
+        {
+          applIds: [row.applId],
+          fields: {
+            budgetCategories: row.budgetCategories,
+            docDecision:      row.docDecision,
+            docNciSelection:  row.docNciSelection,
+            annualFundingR01: row.annualFundingR01,
+            annualOrMyf:      row.annualOrMyf,
+            docNotes:         row.docNotes,
+            oefiaNotes:       row.oefiaNotes,
+          }
+        },
+        this.listId
+      )
+    );
+    forkJoin(calls).subscribe({
+      next: () => {
+        this.logger.debug('Bulk edit saved successfully');
+        this.goBack();
+      },
+      error: (err) => this.logger.error('Bulk edit save failed', err)
+    });
+  }
+
+  goBack(): void {
+    this.router.navigate(['/funding-submissions/search'], {
+      queryParams: { listId: this.listId, selectionDate: this.selectionDate }
+    });
+  }
+}

@@ -23,6 +23,7 @@ import { ManageDesignationsComponent } from './manage-designations/manage-design
 import { RetrievePlanComponent } from './funding-plan/retrieve-plan/retrieve-plan.component';
 import { CreateFundingListComponent } from './funding-submissions/create-funding-list/create-funding-list.component';
 import { SearchListsComponent } from './funding-submissions/search-lists/search-lists.component';
+import { BulkEditComponent } from './funding-submissions/search-lists/bulk-edit/bulk-edit.component';
 import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate-plan-step6';
 import { CanDeactivateRequestStep2 } from './funding-request/step2/can-deactivate-request-step2';
 import { CanDeactivatePlanStep3 } from './funding-plan/plan-step3/can-deactivate-plan-step3';
@@ -65,6 +66,7 @@ const routes: Routes = [
       {path: 'manage', component: ManageDesignationsComponent},
       {path: 'funding-submissions/create', component: CreateFundingListComponent, canActivate: [AuthGuard]},
       {path: 'funding-submissions/search', component: SearchListsComponent, canActivate: [AuthGuard]},
+      {path: 'funding-submissions/bulk-edit', component: BulkEditComponent, canActivate: [AuthGuard]},
     ]
   },
 

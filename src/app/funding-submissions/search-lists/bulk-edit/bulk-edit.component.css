@@ -1,0 +1,9 @@
+.notes-textarea {
+  min-width: 180px;
+}
+
+.char-count {
+  font-size: 0.7rem;
+  text-align: right;
+  color: #6c757d;
+}
