@@ -104,7 +104,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     }
     this.dtOptions = {
       pagingType: 'full_numbers',
-      pageLength: 10,
+      pageLength: 100,
       serverSide: true,
       processing: false,
       scrollX: true,
@@ -174,8 +174,8 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
         {
           extend: 'excel',
           className: 'btn-excel',
-          titleAttr: 'Export All Results',
-          text: 'Export All Results',
+          titleAttr: 'Export',
+          text: 'Export',
           filename: 'fs-funding-lists',
           title: null,
           header: true,
