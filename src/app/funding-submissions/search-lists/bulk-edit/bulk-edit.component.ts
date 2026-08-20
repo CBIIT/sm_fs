@@ -40,6 +40,15 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     annualFundingR01?: string; annualOrMyf?: string; docNotes?: string; oefiaNotes?: string;
   } = {};
 
+  canSave = false;
+  private lastSavedRows: any[] = [];
+
+  get hasAnyBulkFieldValue(): boolean {
+    const f = this.bulkFields;
+    return !!(f.budgetCategories || f.docDecision || f.docNciSelection ||
+              f.annualFundingR01 || f.annualOrMyf || f.docNotes || f.oefiaNotes);
+  }
+
   decisionOptions: Select2OptionData[] = [
     { id: 'Fund',      text: 'Fund' },
     { id: 'Defer',     text: 'Defer' },
@@ -47,9 +56,12 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     { id: 'Withdrawn', text: 'Withdrawn' },
     { id: 'Not Fund',  text: 'Not Fund' },
   ];
+  // Select2 `id` is the value sent/stored ("DOC"/"NCI", matching the backend's
+  // FUNDING_SUBM_LIST_GRANTS_T.DOC_NCI_SELECTION short-code convention); `text` is the
+  // full display label required by the spec ("Display 'DOC Selection' or 'NCI Selection'").
   docNciOptions: Select2OptionData[] = [
-    { id: 'DOC Selection', text: 'DOC Selection' },
-    { id: 'NCI Selection', text: 'NCI Selection' },
+    { id: 'DOC', text: 'DOC Selection' },
+    { id: 'NCI', text: 'NCI Selection' },
   ];
   yesNoOptions: Select2OptionData[] = [
     { id: 'Yes', text: 'Yes' },
@@ -93,6 +105,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       docNotes:         g.docNotes ?? '',
       oefiaNotes:       g.oefiaNote ?? '',
     }));
+    this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
   }
 
   ngAfterViewInit(): void {
@@ -110,6 +123,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
           last: '<i class="far fa-chevron-double-right" title="Last"></i>'
         }
       },
+      // Reads this.rows live via closure (not captured by value) — reassigning this.rows
+      // (e.g. in onReset()) followed by dt.ajax.reload() correctly re-renders with the new rows.
       ajax: (_params: any, callback: any) => {
         callback({ data: this.rows, recordsTotal: this.rows.length, recordsFiltered: this.rows.length });
       },
@@ -216,11 +231,15 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       if (f.docNotes)         row.docNotes         = f.docNotes;
       if (f.oefiaNotes)       row.oefiaNotes       = f.oefiaNotes;
     }
+    this.canSave = true;
     this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
   }
 
   onReset(): void {
     this.bulkFields = {};
+    this.rows = JSON.parse(JSON.stringify(this.lastSavedRows));
+    this.canSave = false;
+    this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
   }
 
   onSave(): void {
@@ -245,7 +264,9 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     forkJoin(calls).subscribe({
       next: () => {
         this.logger.debug('Bulk edit saved successfully');
-        this.goBack();
+        this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
+        this.canSave = false;
+        this.goBack(); // TODO(FS-2041 follow-up, not this prompt): should not auto-navigate; see prompt notes above.
       },
       error: (err) => this.logger.error('Bulk edit save failed', err)
     });
