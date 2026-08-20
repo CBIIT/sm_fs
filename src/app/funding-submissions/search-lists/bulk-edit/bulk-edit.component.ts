@@ -56,9 +56,12 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     { id: 'Withdrawn', text: 'Withdrawn' },
     { id: 'Not Fund',  text: 'Not Fund' },
   ];
+  // Select2 `id` is the value sent/stored ("DOC"/"NCI", matching the backend's
+  // FUNDING_SUBM_LIST_GRANTS_T.DOC_NCI_SELECTION short-code convention); `text` is the
+  // full display label required by the spec ("Display 'DOC Selection' or 'NCI Selection'").
   docNciOptions: Select2OptionData[] = [
-    { id: 'DOC Selection', text: 'DOC Selection' },
-    { id: 'NCI Selection', text: 'NCI Selection' },
+    { id: 'DOC', text: 'DOC Selection' },
+    { id: 'NCI', text: 'NCI Selection' },
   ];
   yesNoOptions: Select2OptionData[] = [
     { id: 'Yes', text: 'Yes' },
