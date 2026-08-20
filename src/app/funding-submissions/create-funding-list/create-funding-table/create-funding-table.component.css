@@ -8,6 +8,12 @@
   display: none !important;
   cursor: none !important;
 }
+::ng-deep table.dataTable tbody tr .select-checkbox.disabled {
+  cursor: not-allowed;
+}
+::ng-deep table.dataTable tbody tr .select-checkbox.disabled:before {
+  color: #ccc;
+}
 ::ng-deep .dataTables_wrapper .dataTables_info
 {
    padding-top: 0px !important ;
