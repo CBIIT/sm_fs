@@ -164,12 +164,14 @@
                 <div class="d-flex align-items-start gap-2 mb-1">
                   <label class="btn btn-sm btn-primary mb-0">
                     Choose File
-                    <input type="file" class="d-none" (change)="onFileChange($event)">
+                    <input type="file" class="d-none" (change)="onFileChange($event)"
+                      accept=".doc,.docx,.rtf,.xls,.xlsx,.pdf">
                   </label>
                   <span class="small text-muted mx-2">
                     {{justificationFile ? justificationFile.name : 'You may upload Microsoft Word, Rich Text Format, Microsoft Excel, or Adobe Acrobat document(s) only. Max file size is 10MB'}}
                   </span>
                 </div>
+                <div *ngIf="justificationFileError" class="small text-danger mb-1">{{justificationFileError}}</div>
                 <textarea class="form-control form-control-sm" rows="2"
                   name="justificationText" [(ngModel)]="formModel.justificationText" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.justificationText || '').length}}/1000</div>

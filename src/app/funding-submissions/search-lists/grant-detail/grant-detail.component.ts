@@ -19,6 +19,11 @@ export class GrantDetailComponent implements OnInit {
 
   formModel: FundingSubmBulkEditFieldsDto & { nciDecision?: string; justificationText?: string } = {};
   justificationFile: File | null = null;
+  justificationFileError: string | null = null;
+
+  // Client-side validation constants — mirror FsubJustificationConstants (sm_i2e_fs_ws)
+  private readonly MAX_JUSTIFICATION_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB, mirrors FsubJustificationConstants.MAX_FILE_SIZE_BYTES
+  private readonly ALLOWED_JUSTIFICATION_FILE_EXTENSIONS = ['doc', 'docx', 'rtf', 'xls', 'xlsx', 'pdf']; // mirrors FsubJustificationConstants.ALLOWED_FILE_EXTENSIONS
 
   decisionOptions: Select2OptionData[] = [
     { id: 'Fund',      text: 'Fund' },
@@ -80,6 +85,7 @@ export class GrantDetailComponent implements OnInit {
       justificationText:  this.data?.justificationText ?? '',
     };
     this.justificationFile = null;
+    this.justificationFileError = null;
     this.isEditMode = true;
     this.cdr.detectChanges();
   }
@@ -88,12 +94,44 @@ export class GrantDetailComponent implements OnInit {
     this.isEditMode = false;
     this.formModel = {};
     this.justificationFile = null;
+    this.justificationFileError = null;
     this.cdr.detectChanges();
   }
 
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.justificationFile = input.files?.[0] ?? null;
+    const file = input.files?.[0];
+
+    if (!file) {
+      this.justificationFile = null;
+      this.justificationFileError = null;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // Validate file extension (case-insensitive)
+    const fileNameParts = file.name.split('.');
+    const fileExtension = fileNameParts.length > 1 ? fileNameParts.pop()!.toLowerCase() : '';
+    if (!this.ALLOWED_JUSTIFICATION_FILE_EXTENSIONS.includes(fileExtension)) {
+      this.justificationFileError = 'Unsupported file type. Allowed types: Word, RTF, Excel, PDF.';
+      this.justificationFile = null;
+      input.value = ''; // Clear input so same file can be re-selected/detected
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // Validate file size
+    if (file.size > this.MAX_JUSTIFICATION_FILE_SIZE_BYTES) {
+      this.justificationFileError = 'File exceeds the 10 MB size limit.';
+      this.justificationFile = null;
+      input.value = ''; // Clear input so same file can be re-selected/detected
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // Valid file
+    this.justificationFileError = null;
+    this.justificationFile = file;
     this.cdr.detectChanges();
   }
 
