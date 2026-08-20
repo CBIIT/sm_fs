@@ -187,6 +187,13 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
         setTimeout(() => {
           this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
             dt.columns.adjust();
+            if (dt.rows().count() > 0) {
+              (dt as any).button(0).enable();
+              $((dt as any).button(0).node()).attr('title', 'Export');
+            } else {
+              (dt as any).button(0).disable();
+              $((dt as any).button(0).node()).attr('title', 'Nothing found in the results table for export.');
+            }
             $(dt.table(0).body())
               .off('click', '.view-list-link')
               .on('click', '.view-list-link', (e: any) => {
