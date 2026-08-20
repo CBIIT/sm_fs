@@ -499,7 +499,6 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
    exportGrantListResults() {
     this.logger.debug('Exporting grant search results');
-    this.logger.debug(this.fundingSubmissionsService.searchLists);
     const searchCriteria = JSON.parse(JSON.stringify(this.fundingSubmissionsService.getListDetail(this.listId)));
     searchCriteria.length = -1;
     this.loaderService.show();
