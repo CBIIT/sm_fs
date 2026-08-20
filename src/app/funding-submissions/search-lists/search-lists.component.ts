@@ -220,7 +220,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           render: (data: number) => data != null ? `${data}%` : ''
         }, // 9
         {
-          title: 'Priority Score',
+          title: 'PriScr',
           data: 'priorityScoreDisplay',
           width: '90px',
           defaultContent: ''
