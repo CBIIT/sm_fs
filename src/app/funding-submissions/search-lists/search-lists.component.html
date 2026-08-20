@@ -7,7 +7,7 @@
     <!-- Page header -->
     <div class="d-flex justify-content-between align-items-center my-3">
         <h2 class="mb-0">{{ selectionDate }}</h2>
-        <button class="btn btn-primary">Send Grants to Division Office Centers &gt;</button>
+        <button class="btn btn-primary">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
     </div>
 
     <!-- Overview -->
@@ -58,11 +58,11 @@
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title fw-bold my-3">Grants in this List</h5>
-            <p class="card-text text-muted mb-3">
-                View and edit grants in the table below by expanding the rows individually, or select multiple grants
-                and click "Bulk Edit".
-            </p>
-
+              <p class="alert alert-primary col-12"><i class="far fa-info-circle"></i> To apply sorting order to multiple columns, hold
+      down the <b>Shift</b> key and click the header of
+      each additional column that you want to sort. Please note, sorting by column headers will unselect any selected
+      rows.</p>
+      
             <!-- Action buttons -->
             <div class="d-flex gap-2 mb-3">
                 <!-- Bulk Edit -->
@@ -92,13 +92,16 @@
                         id="view-doc-type"
                         name="viewDocType"
                         [(ngModel)]="selectedViewDoc"
+                        (valueChanged)="onViewDocChange($event)"
                         [data]="viewDocOptions"
                         [allowClear]="true"
                         width="100%"
                         placeholder="Select document type">
                     </ng-select2>
                 </div>
-                <button class="btn btn-md btn-primary">View PDF</button>
+                <span ngbTooltip="Select grant(s)/application(s) and document to View PDF." [disableTooltip]="canViewPdf" container="body">
+                    <button type="button" class="btn btn-md btn-primary ms-1" [disabled]="!canViewPdf" (click)="viewPDF()">View PDF</button>
+                </span>
             </div>
 
             <!-- Grants DataTable -->
@@ -125,7 +128,7 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title fw-bold">List History</h5>
-            <table class="table table-sm table-bordered mb-0">
+            <table class="table table-sm table-bordered table-striped mb-0 list-history-table">
                 <thead class="table-light">
                     <tr>
                         <th>Date</th>
@@ -135,9 +138,9 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let h of listHistory">
-                        <td>{{ h.date | date:'MM/dd/yyyy' }}</td>
+                        <td>{{ h.date | date:'MM/dd/yyyy HH:mm' }}</td>
                         <td>{{ h.status }}</td>
-                        <td>{{ h.actionBy }}</td>
+                        <td><a href="mailto:{{ h.actionBy }}">{{ h.actionBy }}</a></td>
                     </tr>
                 </tbody>
             </table>
