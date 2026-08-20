@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { forkJoin, Subject } from 'rxjs';
@@ -27,6 +28,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('docNotesRenderer')    docNotesRenderer:    TemplateRef<any>;
   @ViewChild('oefiaNotesRenderer')  oefiaNotesRenderer:  TemplateRef<any>;
   @ViewChild('backToListWarningModal') private backToListWarningModalRef: TemplateRef<any>;
+  @ViewChild('bulkForm') bulkForm: NgForm;
 
   private modalRef: NgbModalRef;
 
@@ -242,6 +244,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onReset(): void {
+    this.bulkForm?.resetForm();
     this.bulkFields = {};
     this.rows = JSON.parse(JSON.stringify(this.lastSavedRows));
     this.canSave = false;
