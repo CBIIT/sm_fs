@@ -85,7 +85,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   ngAfterViewInit(): void {
     this.dtOptions = {
       pagingType: 'full_numbers',
-      pageLength: 10,
+      pageLength: 100,
       serverSide: true,
       processing: false,
       destroy: true,
@@ -124,7 +124,11 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
           width: '140px',
           defaultContent: '',
           render: (data, type, row) => {
-            return (!data) ? '' : `<a href="mailto:${row.piEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>`;
+            if (!data) return '';
+            // piName is "Lastname, Firstname" — subject should only use the last name
+            const piLastName = data.split(',')[0].trim();
+            const subject = encodeURIComponent(`${row.grantNumber} - ${piLastName}`);
+            return `<a href="mailto:${row.piEmail}?subject=${subject}">${data}</a>`;
           }
         }, // 2
         {
@@ -225,8 +229,8 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         {
           extend: 'excel',
           className: 'btn-excel btn-export-all',
-          titleAttr: 'Export All Results',
-          text: '</i>Export All Results',
+          titleAttr: 'Export',
+          text: '</i>Export',
           filename: 'fs-funding-list-grants',
           title: null,
           header: true,
@@ -249,6 +253,17 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         });
 
         const $checkbox = $('.select-checkbox', row);
+        $checkbox.off('click');
+
+        if (data.checkboxDisabled) {
+          data.selected = false;
+          this.selectedRows.delete(data.applId);
+          $checkbox.removeClass('selected').addClass('disabled')
+            .attr('title', 'Already exists in a list.');
+          return;
+        }
+
+        $checkbox.removeClass('disabled').removeAttr('title');
         // Restore from Map so selections survive page navigation
         data.selected = this.selectedRows.has(data.applId);
         if (data.selected) {
@@ -257,7 +272,6 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
           $checkbox.removeClass('selected');
         }
 
-        $checkbox.off('click');
         $checkbox.on('click', () => {
           data.selected = !data.selected;
           if (data.selected) {
@@ -290,20 +304,21 @@ initComplete: () => {
           }
           $node.off('click');
           $node.on('click', () => {
+            const selectableRows = data.filter(d => !d.checkboxDisabled);
             if ($node.hasClass('selected')) {
               $node.removeClass('selected');
-              for (const d of data) {
+              for (const d of selectableRows) {
                 d.selected = false;
                 this.selectedRows.delete(d.applId);
               }
-              $node.closest('table').find('.select-checkbox').removeClass('selected');
+              $node.closest('table').find('tbody .select-checkbox').not('.disabled').removeClass('selected');
             } else {
               $node.addClass('selected');
-              for (const d of data) {
+              for (const d of selectableRows) {
                 d.selected = true;
                 this.selectedRows.set(d.applId, d);
               }
-              $node.closest('table').find('.select-checkbox').addClass('selected');
+              $node.closest('table').find('tbody .select-checkbox').not('.disabled').addClass('selected');
             }
           });
         }
@@ -336,7 +351,8 @@ initComplete: () => {
   }
 
 allDataSelected(data: any[]): boolean {
-    return data?.length > 0 && data.every(row => this.selectedRows.has(row.applId));
+    const selectableRows = data?.filter(row => !row.checkboxDisabled) ?? [];
+    return selectableRows.length > 0 && selectableRows.every(row => this.selectedRows.has(row.applId));
   }
   clearResults(): void {
     this.showResults = false;
