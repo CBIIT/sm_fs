@@ -44,7 +44,7 @@
                         </a>
 
                         <span class="doc-status">
-                            <i class="fas fa-hourglass-half"></i>
+                            <i class="fas" [ngClass]="[getDocStatusIcon(d.status), getDocStatusClass(d.status)]"></i>
                             <span>{{ d.status }}</span>
                         </span>
                     </div>
