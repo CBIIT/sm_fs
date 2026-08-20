@@ -146,7 +146,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
           title: 'PI',
           data: 'piName',
           width: '130px',
-          defaultContent: ''
+          defaultContent: '',
+          render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.piEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>` : ''
         }, // 1
         {
           title: 'Budget Categories',
