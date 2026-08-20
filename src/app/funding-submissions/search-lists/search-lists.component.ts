@@ -1,5 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EnvironmentInjector, OnDestroy, OnInit, TemplateRef, ViewChild, createComponent } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { Subject, forkJoin } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
@@ -24,6 +25,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('foaCellRender') foaCellRender: TemplateRef<FoaCellRendererComponent>;
+  @ViewChild('removeGrantsWarningModal') private removeGrantsWarningModalRef: TemplateRef<any>;
+
+  private removeModalRef: NgbModalRef;
 
   i2eURL = '';
   grantViewerUrl = '';
@@ -64,7 +68,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     private propertiesService: AppPropertiesService,
     private cdr: ChangeDetectorRef,
     private fundingSubmissionsService: FundingSubmissionsControllerService,
-    private http: HttpClient
+    private http: HttpClient,
+    private modalService: NgbModal
   ) { }
 
   ngOnInit(): void {
@@ -534,14 +539,26 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onRemoveSelected(): void {
+    if (!this.selectedRows.size) return;
+    this.removeModalRef = this.modalService.open(this.removeGrantsWarningModalRef, { centered: true });
+  }
+
+  onCancelRemove(): void {
+    this.removeModalRef?.dismiss();
+  }
+
+  onConfirmRemove(): void {
     const applIds = Array.from(this.selectedRows.keys());
-    if (!applIds.length) return;
     this.fundingSubmissionsService.removeGrantsFromList(this.listId, applIds).subscribe({
       next: () => {
         this.selectedRows.clear();
-        this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+        this.removeModalRef?.close();
+        this.loadListMeta();
       },
-      error: (err) => this.logger.error('Remove grants from list failed', err)
+      error: (err) => {
+        this.logger.error('Remove grants from list failed', err);
+        this.removeModalRef?.close();
+      }
     });
   }
 
