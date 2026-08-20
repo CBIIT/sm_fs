@@ -473,11 +473,15 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
                   if (row.child.isShown()) {
                     row.child.hide();
                     tr.removeClass('shown');
+                    $(window).off('resize.detailSticky');
                     $(event.currentTarget).find('i').removeClass('fa-minus-circle').addClass('fa-plus-circle');
                   } else {
 
                     // Create Angular component host element
                     const hostElement = document.createElement('div');
+                    // Sticky/width goes on this plain div, not the <td> — table-layout:fixed
+                    // ignores inline width on colspanned cells, and sticky needs a non-table element
+                    hostElement.classList.add('detail-row-sticky');
 
                     // Create Angular component dynamically
                     const componentRef =
@@ -494,6 +498,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
                     // Give the Angular component to DataTables
                     row.child(hostElement).show();
                     tr.addClass('shown');
+                    // Pin the detail row to the visible scroll viewport so it stays
+                    // in view (and spans full width) while the parent table scrolls horizontally
+                    const applyStickyWidth = () => {
+                      const scrollBodyWidth = $container.find('.dataTables_scrollBody').width();
+                      if (scrollBodyWidth) $(hostElement).css('width', scrollBodyWidth + 'px');
+                    };
+                    applyStickyWidth();
+                    $(window).on('resize.detailSticky', applyStickyWidth);
                     $(event.currentTarget).find('i').removeClass('fa-plus-circle').addClass('fa-minus-circle');
                     // Store the ComponentRef so it can be destroyed later
                     (tr[0] as HTMLElement).dataset.componentRef =

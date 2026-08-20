@@ -51,6 +51,18 @@
   border-top: 2px solid #dee2e6;
 }
 
+/* Pins the expanded detail row to the visible scroll viewport so it stays fully
+   visible (rather than scrolling off-screen) when the parent table scrolls horizontally.
+   Applied to a plain div (not the <td>) since table-layout:fixed ignores inline
+   width set on colspanned cells. */
+::ng-deep .detail-row-sticky {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: #fff;
+  box-sizing: border-box;
+}
+
 tr.shown {
   background-color: #eef3ff !important;
 }
