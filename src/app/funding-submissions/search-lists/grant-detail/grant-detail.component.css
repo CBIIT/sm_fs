@@ -3,7 +3,7 @@
 }
 
 .grid-container {
-  
+  width: 98%
 }
 
 /* Remove all inner cell borders; outer borders stay on thead/tbody elements via inline style */
