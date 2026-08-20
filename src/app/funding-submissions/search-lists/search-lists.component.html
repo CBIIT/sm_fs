@@ -71,10 +71,12 @@
             <!-- Action buttons -->
             <div class="d-flex gap-2 mb-3">
                 <!-- Bulk Edit -->
-                <button type="button" class="btn btn-primary me-3" (click)="onBulkEdit()" [disabled]="!selectedRows.size">
-                    <i class="fas fa-pen me-2"></i>
-                    Bulk Edit
-                </button>
+                <span ngbTooltip="Select at least one grant to bulk edit." [disableTooltip]="!!selectedRows.size" container="body">
+                    <button type="button" class="btn btn-primary me-3" (click)="onBulkEdit()" [disabled]="!selectedRows.size">
+                        <i class="fas fa-pen me-2"></i>
+                        Bulk Edit
+                    </button>
+                </span>
 
                 <!-- Add Grants to List -->
                 <button type="button" class="btn btn-outline-primary me-3" (click)="onAddGrantsToList()">
