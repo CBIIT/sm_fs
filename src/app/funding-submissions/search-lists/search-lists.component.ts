@@ -108,18 +108,19 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private buildDocStatusColumns(grants: FundingSubmissionListGrantDto[]): any[][] {
-    const docMap = new Map<string, { doc: string; count: number; decided: number }>();
+    const docMap = new Map<string, { doc: string; count: number; docDecided: number; nciDecided: number }>();
     for (const g of grants) {
       const doc = g.doc || 'Unknown';
-      if (!docMap.has(doc)) docMap.set(doc, { doc, count: 0, decided: 0 });
+      if (!docMap.has(doc)) docMap.set(doc, { doc, count: 0, docDecided: 0, nciDecided: 0 });
       const entry = docMap.get(doc);
       entry.count++;
-      if (g.docDecision) entry.decided++;
+      if (g.docDecision) entry.docDecided++;
+      if (g.nciDecision) entry.nciDecided++;
     }
     const items = Array.from(docMap.values()).map(e => ({
       doc: e.doc,
       count: e.count,
-      status: e.decided === 0 ? 'Pending Review' : e.decided === e.count ? 'Review Complete' : 'In Progress'
+      status: this.deriveDocReviewStatus(e.count, e.docDecided, e.nciDecided)
     }));
     const columns: any[][] = [];
     for (let i = 0; i < items.length; i += 4) {
@@ -128,10 +129,33 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return columns;
   }
 
+  // Maps grant decision counts for a DOC to the 4 statuses the Review Status section supports
+  private deriveDocReviewStatus(count: number, docDecided: number, nciDecided: number): string {
+    if (this.listStatus?.toLowerCase() === 'draft') return 'Draft';
+    if (docDecided < count) return 'Under DOC Review';
+    if (nciDecided === 0) return 'Under Review';
+    return 'Under NCI Director Review';
+  }
+
+  private readonly docStatusIcons: Record<string, string> = {
+    'Draft': 'fa-hourglass-half',
+    'Under DOC Review': 'fa-user-clock',
+    'Under Review': 'fa-arrows-rotate',
+    'Under NCI Director Review': 'fa-gavel'
+  };
+
+  getDocStatusIcon(status: string): string {
+    return this.docStatusIcons[status] || 'fa-circle';
+  }
+
+  getDocStatusClass(status: string): string {
+    return 'status-' + (status || '').toLowerCase().replace(/\s+/g, '-');
+  }
+
   ngAfterViewInit(): void {
     this.dtOptions = {
       pagingType: 'full_numbers',
-      pageLength: 10,
+      pageLength: 100,
       serverSide: false,
       processing: false,
       ajax: (dataTablesParameters: any, callback) => {
