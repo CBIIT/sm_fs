@@ -3,11 +3,6 @@
   overflow-x: auto !important;
 }
 
-::ng-deep table.dataTable thead th.select-checkbox::before,
-::ng-deep table.dataTable thead th.select-checkbox::after {
-  display: none !important;
-  cursor: none !important;
-}
 ::ng-deep table.dataTable tbody tr .select-checkbox.disabled {
   cursor: not-allowed;
 }
