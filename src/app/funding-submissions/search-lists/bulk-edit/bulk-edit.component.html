@@ -1,8 +1,22 @@
 <div class="ms-3">
 
-  <a class="text-decoration-none small" href="javascript:void(0)" (click)="goBack()">
+  <a class="text-decoration-none small" href="javascript:void(0)" (click)="onBackToListClick()">
     &lt; Back to {{ selectionDate }}
   </a>
+
+  <ng-template #backToListWarningModal>
+    <div class="modal-header">
+      <h4 class="modal-title">WARNING!</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="onCancelNavigation()"></button>
+    </div>
+    <div class="modal-body">
+      <p class="mb-0">Are you sure you want to navigate from the page? All unsaved changes will be lost.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="onCancelNavigation()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="onConfirmNavigation()">OK, proceed</button>
+    </div>
+  </ng-template>
 
   <h2 class="mt-3 mb-4">Bulk Edit</h2>
 

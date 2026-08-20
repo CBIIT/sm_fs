@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { forkJoin, Subject } from 'rxjs';
 import { FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
@@ -25,6 +26,9 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('annualMyfRenderer')   annualMyfRenderer:   TemplateRef<any>;
   @ViewChild('docNotesRenderer')    docNotesRenderer:    TemplateRef<any>;
   @ViewChild('oefiaNotesRenderer')  oefiaNotesRenderer:  TemplateRef<any>;
+  @ViewChild('backToListWarningModal') private backToListWarningModalRef: TemplateRef<any>;
+
+  private modalRef: NgbModalRef;
 
   listId = 0;
   selectionDate = '';
@@ -83,7 +87,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private logger: NGXLogger,
     private fundingSubmissionsService: FundingSubmissionsControllerService,
-    private propertiesService: AppPropertiesService
+    private propertiesService: AppPropertiesService,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -276,5 +281,23 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/funding-submissions/search'], {
       queryParams: { listId: this.listId, selectionDate: this.selectionDate }
     });
+  }
+
+  onBackToListClick(): void {
+    if (!this.canSave) {
+      this.goBack();
+      return;
+    }
+    this.modalRef = this.modalService.open(this.backToListWarningModalRef, { centered: true });
+  }
+
+  onCancelNavigation(): void {
+    this.modalRef?.dismiss();
+  }
+
+  onConfirmNavigation(): void {
+    this.onReset();
+    this.modalRef?.close();
+    this.goBack();
   }
 }
