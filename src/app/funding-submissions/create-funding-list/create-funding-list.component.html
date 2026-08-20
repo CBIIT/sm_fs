@@ -25,7 +25,7 @@
       <app-pdname-dropdown label="PD Name" name="pdName" [broadcast]="true" [showInactiveToggle]="true" [syncWithCa]="true"></app-pdname-dropdown>
     </div>
     <div class="col-lg-4">
-      <lib-doc-dropdown [name]="'doc'" label="DOC" [maxSelection]="5" [selectedValue]="selectedDocs" (selectedValueChange)="onDocSelected($event)"></lib-doc-dropdown>
+      <lib-doc-dropdown [name]="'doc'" label="DOC" [selectedValue]="selectedDocs" (selectedValueChange)="onDocSelected($event)"></lib-doc-dropdown>
     </div>
     <div class="col-lg-4">
       <app-cancer-activities-dropdown
