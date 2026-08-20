@@ -18,7 +18,7 @@
                 <div class="criteria-item">ID: <strong>{{ listId }}</strong>
                 </div>
                 <div class="criteria-item">Status: <strong>{{ listStatus }}</strong></div>
-                <div class="criteria-item">Total Number of Grants::
+                <div class="criteria-item">Total Number of Grants:
                     <strong>{{ totalGrants }}</strong>
                 </div>
                 <div class="criteria-item">DOC Recommended Total: <strong>{{
@@ -32,11 +32,6 @@
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title fw-bold my-3">Review Status</h5>
-            <p class="card-text mb-3">
-                View the Division Office Centers involved in this grant list, the number of grants assigned to each
-                office, and the status of their review. Click a grant count to filter the table
-                below and view only the grants assigned to that DOC.
-            </p>
             <div class="doc-status-wrapper">
                 <div class="doc-status-column" *ngFor="let col of docStatusColumns; let last = last"
                     [class.border-end]="!last">
@@ -71,10 +66,12 @@
             <!-- Action buttons -->
             <div class="d-flex gap-2 mb-3">
                 <!-- Bulk Edit -->
-                <button type="button" class="btn btn-primary me-3" (click)="onBulkEdit()" [disabled]="!selectedRows.size">
-                    <i class="fas fa-pen me-2"></i>
-                    Bulk Edit
-                </button>
+                <span ngbTooltip="Select at least one grant to bulk edit." [disableTooltip]="!!selectedRows.size" container="body">
+                    <button type="button" class="btn btn-primary me-3" (click)="onBulkEdit()" [disabled]="!selectedRows.size">
+                        <i class="fas fa-pen me-2"></i>
+                        Bulk Edit
+                    </button>
+                </span>
 
                 <!-- Add Grants to List -->
                 <button type="button" class="btn btn-outline-primary me-3" (click)="onAddGrantsToList()">
