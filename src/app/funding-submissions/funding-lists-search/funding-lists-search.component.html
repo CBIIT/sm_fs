@@ -1,4 +1,4 @@
-<div class="ms-3">
+<div>
 
   <h2>Search Lists</h2>
 
@@ -10,7 +10,7 @@
   </div> -->
 
   <!-- Filters -->
-  <form #filterForm="ngForm" (ngSubmit)="search()">
+  <form #filterForm="ngForm" (ngSubmit)="search()" class="search-lists-filter-form">
 
     <div class="row mb-2">
       <div class="col-12 d-flex">
@@ -20,7 +20,7 @@
 
     <!-- Grant Number -->
     <div class="row form-group">
-      <div class="col-12 ms-3">
+      <div class="col-12">
         <lib-grantnumber-search-criteria [form]="filterForm"></lib-grantnumber-search-criteria>
       </div>
     </div>
