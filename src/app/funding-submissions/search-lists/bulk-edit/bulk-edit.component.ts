@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { forkJoin, Subject } from 'rxjs';
@@ -27,6 +28,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('docNotesRenderer')    docNotesRenderer:    TemplateRef<any>;
   @ViewChild('oefiaNotesRenderer')  oefiaNotesRenderer:  TemplateRef<any>;
   @ViewChild('backToListWarningModal') private backToListWarningModalRef: TemplateRef<any>;
+  @ViewChild('bulkForm') bulkForm: NgForm;
 
   private modalRef: NgbModalRef;
 
@@ -45,6 +47,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   } = {};
 
   canSave = false;
+  saveSuccessMessage = '';
   private lastSavedRows: any[] = [];
 
   get hasAnyBulkFieldValue(): boolean {
@@ -146,7 +149,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
           title: 'PI',
           data: 'piName',
           width: '130px',
-          defaultContent: ''
+          defaultContent: '',
+          render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.piEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>` : ''
         }, // 1
         {
           title: 'Budget Categories',
@@ -241,6 +245,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onReset(): void {
+    this.bulkForm?.resetForm();
     this.bulkFields = {};
     this.rows = JSON.parse(JSON.stringify(this.lastSavedRows));
     this.canSave = false;
@@ -271,7 +276,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
         this.logger.debug('Bulk edit saved successfully');
         this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
         this.canSave = false;
-        this.goBack(); // TODO(FS-2041 follow-up, not this prompt): should not auto-navigate; see prompt notes above.
+        this.saveSuccessMessage = 'Success! Bulk changes have been applied';
       },
       error: (err) => this.logger.error('Bulk edit save failed', err)
     });
