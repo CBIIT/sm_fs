@@ -285,43 +285,34 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
       },
 initComplete: () => {
         setTimeout(() => this.firstDraw.emit());
-      },
-      headerCallback: (thead: Node, data: any[]) => {
-        const $node = $('.select-checkbox', thead);
-        const $header = $('.sorting', thead);
-        if ($header) {
-          $header.on('click', () => {
-          })
-        }
-        // this.tableHtead = thead;
-        if ($node) {
-          // Check Map so header state is accurate after page navigation
-          if (this.allDataSelected(data)) {
-            $node.addClass('selected');
-          }
-          else {
-            $node.removeClass('selected');
-          }
-          $node.off('click');
-          $node.on('click', () => {
-            const selectableRows = data.filter(d => !d.checkboxDisabled);
-            if ($node.hasClass('selected')) {
-              $node.removeClass('selected');
-              for (const d of selectableRows) {
-                d.selected = false;
+        // scrollX clones thead into a separate .dataTables_scrollHead table, so the
+        // header checkbox click must be delegated off the container (bound once),
+        // not off the "thead" node DataTables passes into headerCallback each draw.
+        this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+          const $container = $(dt.table(0).container());
+          $container.off('click.selectAll', 'thead .select-checkbox');
+          $container.on('click.selectAll', 'thead .select-checkbox', () => {
+            const pageData = dt.rows({ page: 'current' }).data().toArray();
+            const nowSelected = !this.allDataSelected(pageData);
+            for (const d of pageData.filter((row: any) => !row.checkboxDisabled)) {
+              d.selected = nowSelected;
+              if (nowSelected) {
+                this.selectedRows.set(d.applId, d);
+              } else {
                 this.selectedRows.delete(d.applId);
               }
-              $node.closest('table').find('tbody .select-checkbox').not('.disabled').removeClass('selected');
-            } else {
-              $node.addClass('selected');
-              for (const d of selectableRows) {
-                d.selected = true;
-                this.selectedRows.set(d.applId, d);
-              }
-              $node.closest('table').find('tbody .select-checkbox').not('.disabled').addClass('selected');
             }
+            $container.find('thead .select-checkbox').toggleClass('selected', nowSelected);
+            $container.find('tbody .select-checkbox').not('.disabled').toggleClass('selected', nowSelected);
           });
-        }
+        });
+      },
+      headerCallback: (thead: Node, data: any[]) => {
+        // Sync both the visible scrollHead clone and the original thead
+        this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+          $(dt.table(0).container()).find('thead .select-checkbox')
+            .toggleClass('selected', this.allDataSelected(data));
+        });
       },
       drawCallback: () => {
         // Defer columns.adjust() so it runs AFTER FixedColumns' own draw.dt.dtfc
