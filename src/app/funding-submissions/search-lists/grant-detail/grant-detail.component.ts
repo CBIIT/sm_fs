@@ -20,6 +20,8 @@ export class GrantDetailComponent implements OnInit {
   formModel: FundingSubmBulkEditFieldsDto & { nciDecision?: string; justificationText?: string } = {};
   justificationFile: File | null = null;
   justificationFileError: string | null = null;
+  saveSuccessMessage = '';
+  saveValidationError: string | null = null;
 
   // Client-side validation constants — mirror FsubJustificationConstants (sm_i2e_fs_ws)
   private readonly MAX_JUSTIFICATION_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB, mirrors FsubJustificationConstants.MAX_FILE_SIZE_BYTES
@@ -86,6 +88,8 @@ export class GrantDetailComponent implements OnInit {
     };
     this.justificationFile = null;
     this.justificationFileError = null;
+    this.saveSuccessMessage = '';
+    this.saveValidationError = null;
     this.isEditMode = true;
     this.cdr.detectChanges();
   }
@@ -95,6 +99,8 @@ export class GrantDetailComponent implements OnInit {
     this.formModel = {};
     this.justificationFile = null;
     this.justificationFileError = null;
+    this.saveSuccessMessage = '';
+    this.saveValidationError = null;
     this.cdr.detectChanges();
   }
 
@@ -136,6 +142,11 @@ export class GrantDetailComponent implements OnInit {
   }
 
   onSave(): void {
+    this.saveValidationError = this.validateChangedValues();
+    if (this.saveValidationError) {
+      this.cdr.detectChanges();
+      return;
+    }
     this.logger.debug('GrantDetailComponent onSave()', this.formModel, 'listId:', this.listId);
     const { nciDecision, justificationText, ...fields } = this.formModel;
 
@@ -149,6 +160,7 @@ export class GrantDetailComponent implements OnInit {
         if (justificationText || this.justificationFile) {
           this.saveJustification(justificationText);
         } else {
+          this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
           this.isEditMode = false;
           this.cdr.detectChanges();
         }
@@ -157,12 +169,25 @@ export class GrantDetailComponent implements OnInit {
     });
   }
 
+  private validateChangedValues(): string | null {
+    const pct = this.formModel.docRecReductionPct;
+    if (pct != null && (pct < 0 || pct > 100)) {
+      return 'DOC Rec % Red must be between 0 and 100.';
+    }
+    const amt = this.formModel.docRecAmt;
+    if (amt != null && amt < 0) {
+      return 'DOC Rec $ cannot be negative.';
+    }
+    return null;
+  }
+
   private saveJustification(justificationText: string): void {
     this.fundingSubmissionsService.saveJustificationForm(
       this.listId, this.data.applId, this.justificationFile ?? undefined, justificationText
     ).subscribe({
       next: () => {
         this.data.justificationText = justificationText;
+        this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
         this.isEditMode = false;
         this.cdr.detectChanges();
       },

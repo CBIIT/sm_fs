@@ -1,4 +1,11 @@
 ﻿<div *ngIf="data" class="grant-detail-panel p-2">
+  <div class="row" *ngIf="saveSuccessMessage.length > 0">
+    <div class="col-12">
+      <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
+        <span><b>{{saveSuccessMessage}}</b></span>
+      </ngb-alert>
+    </div>
+  </div>
   <form #detailForm="ngForm" (ngSubmit)="onSave()">
     <div class="grid-container mt-2 me-2">
       <table class="table table-sm table-borderless table-striped">
@@ -184,6 +191,7 @@
 
       <!-- Buttons sit inside grid-container so they align with the table and stay visible -->
       <div class="d-flex justify-content-end gap-2 py-2 border-top">
+        <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationError">{{saveValidationError}}</div>
         <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode" (click)="onEdit()">Edit</button>
         <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode" (click)="onCancel()">Cancel</button>
         <button type="submit" class="btn btn-primary ms-3" *ngIf="isEditMode">Save</button>
