@@ -1,8 +1,4 @@
 /* Prevent Select2 choice tags from overflowing the DOC input */
-.search-lists-filter-form > .row {
-  margin-left: -15px;
-}
-
 ::ng-deep lib-doc-dropdown .select2-selection__choice {
   max-width: 300px;
   overflow: hidden;
