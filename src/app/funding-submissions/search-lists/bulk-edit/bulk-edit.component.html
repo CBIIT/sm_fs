@@ -20,6 +20,14 @@
 
   <h2 class="mt-3 mb-4">Bulk Edit</h2>
 
+  <div class="row" *ngIf="saveSuccessMessage.length > 0">
+    <div class="col-12">
+      <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
+        <span><b>{{saveSuccessMessage}}</b></span>
+      </ngb-alert>
+    </div>
+  </div>
+
   <!-- Bulk-apply form -->
   <form #bulkForm="ngForm">
     <div class="row mb-3">

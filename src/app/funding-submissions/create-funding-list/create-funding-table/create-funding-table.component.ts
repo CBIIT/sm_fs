@@ -322,6 +322,13 @@ initComplete: () => {
           this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
             this.currentPage = dt.page();
             dt.columns.adjust();
+            if (dt.rows().count() > 0) {
+              (dt as any).button(0).enable();
+              $((dt as any).button(0).node()).attr('title', 'Export');
+            } else {
+              (dt as any).button(0).disable();
+              $((dt as any).button(0).node()).attr('title', 'Nothing found in the results table for export.');
+            }
             if (this.pendingRestorePage !== null && this.pendingRestorePage > 0) {
               const page = this.pendingRestorePage;
               this.pendingRestorePage = null;

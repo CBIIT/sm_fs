@@ -1,5 +1,6 @@
-import { AfterViewInit, Component, EnvironmentInjector, OnDestroy, OnInit, TemplateRef, ViewChild, createComponent } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EnvironmentInjector, OnDestroy, OnInit, TemplateRef, ViewChild, createComponent } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { Subject, forkJoin } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
@@ -8,6 +9,7 @@ import { Select2OptionData } from 'ng-select2';
 import { FundingSubmissionsControllerService, FundingSubmissionListGrantDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
+import { openNewWindow } from '../../utils/utils';
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { HttpClient } from '@angular/common/http';
@@ -23,10 +25,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('foaCellRender') foaCellRender: TemplateRef<FoaCellRendererComponent>;
+  @ViewChild('removeGrantsWarningModal') private removeGrantsWarningModalRef: TemplateRef<any>;
+
+  private removeModalRef: NgbModalRef;
 
   i2eURL = '';
   grantViewerUrl = '';
   eGrantsUrl = '';
+  documentURL = '';
 
   selectionDate = '';
   listId = 0;
@@ -48,8 +54,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   filteredDoc: string | null = null;
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
   viewDocOptions: Select2OptionData[] = [
-    { id: 'abstracts', text: 'Abstract(s)' },
-    { id: 'summaries', text: 'Summary Statement(s)' },
+    { id: 'AB', text: 'Abstract(s)' },
+    { id: 'SS', text: 'Summary Statement(s)' },
     { id: 'both', text: 'Abstract(s) and Summary Statement(s)' },
   ];
 
@@ -60,8 +66,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     private logger: NGXLogger,
     private environmentInjector: EnvironmentInjector,
     private propertiesService: AppPropertiesService,
+    private cdr: ChangeDetectorRef,
     private fundingSubmissionsService: FundingSubmissionsControllerService,
-    private http: HttpClient
+    private http: HttpClient,
+    private modalService: NgbModal
   ) { }
 
   ngOnInit(): void {
@@ -85,6 +93,26 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
     this.i2eURL = this.propertiesService.getProperty('I2EWEB_URL').trim();
+    // TODO remove the card coded URL when property added to the service
+    this.documentURL = (this.propertiesService.getProperty('DOCVIEWER_URL') || '').trim()
+      || 'https://i2e-test.nci.nih.gov/documentviewer/';
+  }
+
+  get canViewPdf(): boolean {
+    return this.selectedRows.size > 0 && !!this.selectedViewDoc;
+  }
+
+  // ng-select2 fires its change via a jQuery-triggered event, not a template-bound
+  // Angular output, so the disabled-state binding on the View PDF button won't
+  // refresh unless we force change detection here.
+  onViewDocChange(value: string | string[]): void {
+    this.selectedViewDoc = Array.isArray(value) ? value[0] : value;
+    this.cdr.markForCheck();
+  }
+
+  viewPDF(): void {
+    const applIds = Array.from(this.selectedRows.keys()).join(',');
+    openNewWindow(`${this.documentURL}openGrantReport.action?docType=${this.selectedViewDoc}&applIds=${applIds}&resubmit=true`, 'session');
   }
 
   private loadListMeta(): void {
@@ -361,17 +389,23 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"B<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       buttons: [
         {
+          className: 'btn-reset',
+          titleAttr: 'Reset Table',
+          text: '<i class="fas fa-undo me-1"></i>Reset Table',
+          action: this.resetTable.bind(this)
+        },
+        {
           extend: 'excel',
           className: 'btn-excel btn-export-all',
-          titleAttr: 'Export All Results',
-          text: '</i>Export All Results',
+          titleAttr: 'Export',
+          text: '</i>Export',
           title: null,
           header: true,
           action: this.exportGrantListResults.bind(this),
           exportOptions: { columns: [1, 2, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26] }      
         }
       ],
-      order: [[3, 'asc']],
+      order: [[15, 'desc']],
       fixedColumns: { left: 1, right: 1 },
       rowCallback: (row: Node, data: any) => {
         this.dtOptions.columns.forEach((column: any, ind: number) => {
@@ -400,7 +434,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
               dt.columns.adjust();
 
-              dt.rows().count() > 0 ? (dt as any).button(0).enable() : (dt as any).button(0).disable();
+              // Export button is index 1 now that Reset Table occupies index 0
+              dt.rows().count() > 0 ? (dt as any).button(1).enable() : (dt as any).button(1).disable();
 
               // Use container so fixedColumns clones are included
               const $container = $(dt.table(0).container());
@@ -492,15 +527,38 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
   }
 
+  resetTable(): void {
+    this.filteredDoc = null;
+    this.selectedRows.clear();
+    this.cachedGrants.forEach((g: any) => g.selected = false);
+    this.throttle.reset();
+    this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+      dt.order([15, 'desc']).search('').columns().search('').page.len(100);
+      dt.ajax.reload();
+    });
+  }
+
   onRemoveSelected(): void {
+    if (!this.selectedRows.size) return;
+    this.removeModalRef = this.modalService.open(this.removeGrantsWarningModalRef, { centered: true });
+  }
+
+  onCancelRemove(): void {
+    this.removeModalRef?.dismiss();
+  }
+
+  onConfirmRemove(): void {
     const applIds = Array.from(this.selectedRows.keys());
-    if (!applIds.length) return;
     this.fundingSubmissionsService.removeGrantsFromList(this.listId, applIds).subscribe({
       next: () => {
         this.selectedRows.clear();
-        this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+        this.removeModalRef?.close();
+        this.loadListMeta();
       },
-      error: (err) => this.logger.error('Remove grants from list failed', err)
+      error: (err) => {
+        this.logger.error('Remove grants from list failed', err);
+        this.removeModalRef?.close();
+      }
     });
   }
 

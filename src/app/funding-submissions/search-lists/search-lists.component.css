@@ -2,6 +2,29 @@
   white-space: nowrap;
 }
 
+/* .table-light sets border-color to a near-white #f9fafa, which makes the
+   table-bordered header border effectively invisible */
+.list-history-table.table-bordered thead.table-light th {
+  border-color: #c1c2c9;
+}
+
+::ng-deep .dt-controls .dt-buttons .btn-reset {
+  color: #63666a;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+  display: inline-block;
+  background: transparent;
+  border: 1px solid #63666a;
+  margin-right: 0.5rem;
+}
+
+::ng-deep .dt-controls .dt-buttons .btn-reset:hover {
+  background: rgba(99, 102, 106, 0.15);
+  color: #3e4042;
+}
+
 .doc-row {
   gap: 0;
 }
