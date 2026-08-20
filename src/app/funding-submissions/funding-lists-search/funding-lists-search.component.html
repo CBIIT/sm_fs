@@ -1,107 +1,83 @@
 <div class="ms-3">
+  <h2>Search List</h2>
+</div>
 
-  <h2>Search Lists</h2>
-
-  <!-- Pending Review quick-filter badge -->
- <!--  <div class="mb-4">
+<!-- Pending Review quick-filter badge -->
+<!--  <div class="mb-4">
     <button type="button" class="btn btn-secondary" (click)="onPendingReviewClick()">
       Pending Review <span class="badge bg-dark ms-1">{{ pendingReviewCount }}</span>
     </button>
   </div> -->
 
-  <!-- Filters -->
-  <form #filterForm="ngForm" (ngSubmit)="search()">
+<div class="row mb-2">
+  <div class="col-12 d-flex">
+    <h3 class="d-inline-block">Filters</h3>
+  </div>
+</div>
 
-    <div class="row mb-2">
-      <div class="col-12 d-flex">
-        <h3 class="d-inline-block">Filters</h3>
-      </div>
+<!-- Filters -->
+<form #filterForm="ngForm" (ngSubmit)="search()">
+
+  <!-- Grant Number -->
+  <div class="row form-group">
+    <div class="col-12 ms-3">
+      <lib-grantnumber-search-criteria [form]="filterForm"></lib-grantnumber-search-criteria>
     </div>
-
-    <!-- Grant Number -->
-    <div class="row form-group">
-      <div class="col-12 ms-3">
-        <lib-grantnumber-search-criteria [form]="filterForm"></lib-grantnumber-search-criteria>
-      </div>
-    </div>
-
-    <!-- FY Range | Selection Date | List ID -->
-    <div class="row form-group">
-      <div class="col-lg-4">
-        <lib-fy-range [minYear]="2001" [maxYear]="fiscalYear" [form]="filterForm"></lib-fy-range>
-      </div>
-      <div class="col-lg-4">
-        <label class="form-label fw-semibold">Selection Date</label>
-        <ng-select2
-          id="selectionDate"
-          name="selectionDate"
-          [(ngModel)]="selectedSelectionDate"
-          [data]="selectionDateOptions"
-          [allowClear]="true"
-          width="100%">
-        </ng-select2>
-      </div>
-      <div class="col-lg-4">
-        <label class="form-label fw-semibold">List ID</label>
-        <ng-select2
-          id="listId"
-          name="listId"
-          [(ngModel)]="listIdFilter"
-          [data]="listIdOptions"
-          [allowClear]="true"
-          width="100%">
-        </ng-select2>
-      </div>
-    </div>
-
-    <!-- List Status | DOC -->
-    <div class="row form-group">
-      <div class="col-lg-4">
-        <label class="form-label fw-semibold">List Status</label>
-        <ng-select2
-          id="listStatus"
-          name="listStatus"
-          [(ngModel)]="selectedListStatus"
-          [data]="listStatusOptions"
-          [allowClear]="true"
-          width="100%">
-        </ng-select2>
-      </div>
-      <div class="col-lg-4">
-        <lib-doc-dropdown
-          [name]="'doc'"
-          label="DOC"
-          [maxSelection]="5"
-          [selectedValue]="selectedDocs"
-          (selectedValueChange)="onDocSelected($event)">
-        </lib-doc-dropdown>
-      </div>
-    </div>
-
-    <!-- Action buttons -->
-    <div class="d-flex justify-content-end gap-2 mb-4">
-      <button type="button" class="btn btn-outline-secondary" (click)="reset()">Reset</button>
-      <button type="submit" class="btn btn-primary ms-3" [disabled]="!hasSearchCriteria">Search</button>
-    </div>
-
-  </form>
-
-  <!-- Results -->
-  <div *ngIf="showResults">
-    <div class="d-flex align-items-center mb-3">
-      <h3 class="mb-0 me-3">Results</h3>
-      <hr class="flex-grow-1 border-2">
-    </div>
-     <p class="alert alert-primary col-12"><i class="far fa-info-circle"></i> To apply sorting order to multiple columns, hold
-      down the <b>Shift</b> key and click the header of
-      each additional column that you want to sort. Please note, sorting by column headers will unselect any selected
-      rows.</p>
-    <table datatable
-           [dtOptions]="dtOptions"
-           [dtTrigger]="dtTrigger"
-           class="row-border hover"
-           style="width: 100%">
-    </table>
   </div>
 
+  <!-- FY Range | Selection Date | List ID -->
+  <div class="row form-group">
+    <div class="col-lg-4">
+      <lib-fy-range [minYear]="2001" [maxYear]="fiscalYear" [form]="filterForm"></lib-fy-range>
+    </div>
+    <div class="col-lg-4">
+      <label class="form-label fw-semibold">Selection Date</label>
+      <ng-select2 id="selectionDate" name="selectionDate" [(ngModel)]="selectedSelectionDate"
+        [data]="selectionDateOptions" [allowClear]="true" width="100%">
+      </ng-select2>
+    </div>
+    <div class="col-lg-4">
+      <label class="form-label fw-semibold">List ID</label>
+      <ng-select2 id="listId" name="listId" [(ngModel)]="listIdFilter" [data]="listIdOptions" [allowClear]="true"
+        width="100%">
+      </ng-select2>
+    </div>
+  </div>
+
+  <!-- List Status | DOC -->
+  <div class="row form-group">
+    <div class="col-lg-4">
+      <label class="form-label fw-semibold">List Status</label>
+      <ng-select2 id="listStatus" name="listStatus" [(ngModel)]="selectedListStatus" [data]="listStatusOptions"
+        [allowClear]="true" width="100%">
+      </ng-select2>
+    </div>
+    <div class="col-lg-4">
+      <lib-doc-dropdown [name]="'doc'" label="DOC" [maxSelection]="5" [selectedValue]="selectedDocs"
+        (selectedValueChange)="onDocSelected($event)">
+      </lib-doc-dropdown>
+    </div>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="d-flex justify-content-end gap-2 mb-4">
+    <button type="button" class="btn btn-outline-secondary" (click)="reset()">Reset</button>
+    <button type="submit" class="btn btn-primary ms-3" [disabled]="!hasSearchCriteria">Search</button>
+  </div>
+
+</form>
+
+<!-- Results -->
+<div *ngIf="showResults">
+  <div class="d-flex align-items-center mb-3">
+    <h3 class="mb-0 me-3">Results</h3>
+    <hr class="flex-grow-1 border-2">
+  </div>
+  <p class="alert alert-primary col-12"><i class="far fa-info-circle"></i> To apply sorting order to multiple columns,
+    hold
+    down the <b>Shift</b> key and click the header of
+    each additional column that you want to sort. Please note, sorting by column headers will unselect any selected
+    rows.</p>
+  <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
+  </table>
 </div>
