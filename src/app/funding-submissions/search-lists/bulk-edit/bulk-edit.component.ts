@@ -47,6 +47,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   } = {};
 
   canSave = false;
+  saveSuccessMessage = '';
   private lastSavedRows: any[] = [];
 
   get hasAnyBulkFieldValue(): boolean {
@@ -275,7 +276,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
         this.logger.debug('Bulk edit saved successfully');
         this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
         this.canSave = false;
-        this.goBack(); // TODO(FS-2041 follow-up, not this prompt): should not auto-navigate; see prompt notes above.
+        this.saveSuccessMessage = 'Success! Bulk changes have been applied';
       },
       error: (err) => this.logger.error('Bulk edit save failed', err)
     });
