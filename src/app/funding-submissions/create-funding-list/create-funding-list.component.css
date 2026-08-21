@@ -20,3 +20,25 @@
   max-width: 300px;
   vertical-align: middle;
 }
+
+/* Apply the same truncation behavior for Cancer Activities selected chips */
+::ng-deep app-cancer-activities-dropdown .select2-selection__choice,
+::ng-deep lib-cancer-activities-dropdown .select2-selection__choice {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block !important;
+  vertical-align: middle;
+}
+
+/* Select2 4.1+ dedicated text span */
+::ng-deep app-cancer-activities-dropdown .select2-selection__choice__display,
+::ng-deep lib-cancer-activities-dropdown .select2-selection__choice__display {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  max-width: 300px;
+  vertical-align: middle;
+}
