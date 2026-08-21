@@ -590,10 +590,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
    exportGrantListResults() {
     this.logger.debug('Exporting grant search results');
-    const cachedGrants = JSON.parse(JSON.stringify(this.cachedGrants));
-    cachedGrants.length = -1;
     this.loaderService.show();
-    this.http.post('/i2efsws/api/v1/funding-submissions/lists/export', cachedGrants, { responseType: 'arraybuffer' }).subscribe(
+    this.http.post(`/i2efsws/api/v1/funding-submissions/lists/${this.listId}/grants/export`, null, { responseType: 'arraybuffer' }).subscribe(
 
       (response) => {
         this.loaderService.hide();
