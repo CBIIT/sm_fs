@@ -449,11 +449,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
                 } else {
                   $hdr.addClass('selected');
                   $container.find('tbody .select-checkbox').addClass('selected');
-                  dt.rows().every(function() {
-                    const d = this.data() as any;
-                    d.selected = true;
-                    this.selectedRows.set(d.applId, d);
-                  }.bind(this));
+                  dt.rows().every(function() { (this.data() as any).selected = true; });
+                  dt.rows().data().toArray().forEach((d: any) => this.selectedRows.set(d.applId, d));
                 }
               });
 
@@ -593,10 +590,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
    exportGrantListResults() {
     this.logger.debug('Exporting grant search results');
-    const cachedGrants = JSON.parse(JSON.stringify(this.cachedGrants));
-    cachedGrants.length = -1;
     this.loaderService.show();
-    this.http.post('/i2efsws/api/v1/funding-submissions/lists/export', cachedGrants, { responseType: 'arraybuffer' }).subscribe(
+    this.http.post(`/i2efsws/api/v1/funding-submissions/lists/${this.listId}/grants/export`, null, { responseType: 'arraybuffer' }).subscribe(
 
       (response) => {
         this.loaderService.hide();

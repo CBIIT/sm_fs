@@ -75,7 +75,7 @@ export class GrantDetailComponent implements OnInit {
       annualFundingR01:   this.data?.twoYearAnnualFundingR01Flag ?? null,
       budgetCategories:   this.data?.budgetCategories ?? null,
       docNotes:           this.data?.docNotes ?? '',
-      oefiaNotes:         this.data?.oefiaNote ?? '',
+      oefiaNotes:         this.data?.oefiaNotes ?? '',
       annualOrMyf:        this.data?.annualOrMyf ?? null,
       justificationText:  this.data?.justificationText ?? '',
     };
@@ -219,7 +219,7 @@ export class GrantDetailComponent implements OnInit {
     this.data.twoYearAnnualFundingR01Flag = this.formModel.annualFundingR01;
     this.data.budgetCategories            = this.formModel.budgetCategories;
     this.data.docNotes                    = this.formModel.docNotes;
-    this.data.oefiaNote                   = this.formModel.oefiaNotes;
+    this.data.oefiaNotes                  = this.formModel.oefiaNotes;
     this.data.annualOrMyf                 = this.formModel.annualOrMyf;
   }
 }

@@ -105,13 +105,13 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     // Normalize DataTable row data field names to match FundingSubmBulkEditFieldsDto
     this.rows = grants.map(g => ({
       ...g,
-      budgetCategories: g.budgetCategory ?? '',
+      budgetCategories: g.budgetCategories ?? '',
       docDecision:      g.docDecision ?? '',
-      docNciSelection:  g.docNciSel ?? '',
-      annualFundingR01: g.twoYrFunding ?? '',
+      docNciSelection:  g.docNciSelection ?? '',
+      annualFundingR01: g.twoYearAnnualFundingR01Flag ?? '',
       annualOrMyf:      g.annualOrMyf ?? '',
       docNotes:         g.docNotes ?? '',
-      oefiaNotes:       g.oefiaNote ?? '',
+      oefiaNotes:       g.oefiaNotes ?? '',
     }));
     this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
   }
