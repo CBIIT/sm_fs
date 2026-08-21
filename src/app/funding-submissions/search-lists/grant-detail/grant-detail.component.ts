@@ -1,8 +1,9 @@
-﻿import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+﻿import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { FundingSubmBulkEditFieldsDto, FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Select2OptionData } from 'ng-select2';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-grant-detail',
@@ -13,6 +14,7 @@ export class GrantDetailComponent implements OnInit {
   @Input() data: any = null;
   @Input() listId: number;
   @Output() close = new EventEmitter<void>();
+  @ViewChild('cancelEditWarningModal') private cancelEditWarningModalRef: TemplateRef<any>;
 
   isEditMode = false;
   grantViewerUrl = '';
@@ -22,6 +24,10 @@ export class GrantDetailComponent implements OnInit {
   justificationFileError: string | null = null;
   saveSuccessMessage = '';
   saveValidationError: string | null = null;
+  private initialFormSnapshot = '';
+  private cancelModalRef: NgbModalRef;
+  private savingInProgress = false;
+  private suppressNextLeavePrompt = false;
 
   // Client-side validation constants — mirror FsubJustificationConstants (sm_i2e_fs_ws)
   private readonly MAX_JUSTIFICATION_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB, mirrors FsubJustificationConstants.MAX_FILE_SIZE_BYTES
@@ -35,8 +41,8 @@ export class GrantDetailComponent implements OnInit {
     { id: 'Yes', text: 'Yes' },
   ];
   annualMyfOptions: Select2OptionData[] = [
-    { id: 'Annual Funding (AF)', text: 'Annual Funding (AF)' },
-    { id: 'Multi-year Funding (MYF)', text: 'Multi-year Funding (MYF)' },
+    { id: 'AF', text: 'Annual Funding (AF)' },
+    { id: 'MYF', text: 'Multi-year Funding (MYF)' },
   ];
   budgetCategoryOptions: Select2OptionData[] = [
     { id: 'DOC & OD', text: 'DOC & OD' },
@@ -58,7 +64,8 @@ export class GrantDetailComponent implements OnInit {
     private logger: NGXLogger,
     private fundingSubmissionsService: FundingSubmissionsControllerService,
     private propertiesService: AppPropertiesService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -75,7 +82,8 @@ export class GrantDetailComponent implements OnInit {
       annualFundingR01:   this.data?.twoYearAnnualFundingR01Flag ?? null,
       budgetCategories:   this.data?.budgetCategories ?? null,
       docNotes:           this.data?.docNotes ?? '',
-      oefiaNotes:         this.data?.oefiaNote ?? '',
+      // Prefer first non-empty source; some rows carry empty oefiaNotes with populated oefiaNote.
+      oefiaNotes:         this.data?.oefiaNotes || this.data?.oefiaNote || '',
       annualOrMyf:        this.data?.annualOrMyf ?? null,
       justificationText:  this.data?.justificationText ?? '',
     };
@@ -84,17 +92,30 @@ export class GrantDetailComponent implements OnInit {
     this.saveSuccessMessage = '';
     this.saveValidationError = null;
     this.isEditMode = true;
+    this.initialFormSnapshot = this.currentSnapshot();
     this.cdr.detectChanges();
   }
 
   onCancel(): void {
-    this.isEditMode = false;
-    this.formModel = {};
-    this.justificationFile = null;
-    this.justificationFileError = null;
-    this.saveSuccessMessage = '';
-    this.saveValidationError = null;
-    this.cdr.detectChanges();
+    if (!this.isEditMode) {
+      return;
+    }
+
+    if (!this.hasUnsavedChanges()) {
+      this.discardEditsAndClose();
+      return;
+    }
+
+    this.cancelModalRef = this.modalService.open(this.cancelEditWarningModalRef, { centered: true });
+  }
+
+  onCancelWarningClose(): void {
+    this.cancelModalRef?.dismiss();
+  }
+
+  onCancelWarningProceed(): void {
+    this.cancelModalRef?.close();
+    this.discardEditsAndClose();
   }
 
   onFileChange(event: Event): void {
@@ -135,16 +156,28 @@ export class GrantDetailComponent implements OnInit {
   }
 
   onSave(): void {
+    this.suppressNextLeavePrompt = true;
     this.saveValidationError = this.validateChangedValues();
     if (this.saveValidationError) {
       this.cdr.detectChanges();
       return;
     }
+
+    this.savingInProgress = true;
     this.logger.debug('GrantDetailComponent onSave()', this.formModel, 'listId:', this.listId);
     const { justificationText, ...fields } = this.formModel;
 
+    if (!this.hasUnsavedChanges() && !justificationText && !this.justificationFile) {
+      this.savingInProgress = false;
+      this.isEditMode = false;
+      this.initialFormSnapshot = '';
+      this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.fundingSubmissionsService.bulkUpdateListGrants(
-      { applIds: [this.data.applId], fields },
+      { applIds: [this.data.applId], fields: fields as FundingSubmBulkEditFieldsDto },
       this.listId
     ).subscribe({
       next: () => {
@@ -155,10 +188,15 @@ export class GrantDetailComponent implements OnInit {
         } else {
           this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
           this.isEditMode = false;
+          this.initialFormSnapshot = '';
+          this.savingInProgress = false;
           this.cdr.detectChanges();
         }
       },
-      error: (err) => this.logger.error('Grant detail save error', err)
+      error: (err) => {
+        this.savingInProgress = false;
+        this.logger.error('Grant detail save error', err);
+      }
     });
   }
 
@@ -204,9 +242,64 @@ export class GrantDetailComponent implements OnInit {
         this.data.justificationText = justificationText;
         this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
         this.isEditMode = false;
+        this.initialFormSnapshot = '';
+        this.savingInProgress = false;
         this.cdr.detectChanges();
       },
-      error: (err) => this.logger.error('Justification save error', err)
+      error: (err) => {
+        this.savingInProgress = false;
+        this.logger.error('Justification save error', err);
+      }
+    });
+  }
+
+  isSaveInProgress(): boolean {
+    return this.savingInProgress;
+  }
+
+  consumeSuppressNextLeavePrompt(): boolean {
+    const suppress = this.suppressNextLeavePrompt;
+    this.suppressNextLeavePrompt = false;
+    return suppress;
+  }
+
+  hasUnsavedChanges(): boolean {
+    if (!this.isEditMode) {
+      return false;
+    }
+    return this.currentSnapshot() !== this.initialFormSnapshot || !!this.justificationFile;
+  }
+
+  forceDiscardAndClose(): void {
+    this.discardEditsAndClose();
+  }
+
+  private discardEditsAndClose(): void {
+    this.isEditMode = false;
+    this.formModel = {};
+    this.justificationFile = null;
+    this.justificationFileError = null;
+    this.saveSuccessMessage = '';
+    this.saveValidationError = null;
+    this.initialFormSnapshot = '';
+    this.savingInProgress = false;
+    this.close.emit();
+    this.cdr.detectChanges();
+  }
+
+  private currentSnapshot(): string {
+    return JSON.stringify({
+      docDecision: this.formModel.docDecision ?? null,
+      docPriority: this.formModel.docPriority ?? null,
+      docRecAmt: this.formModel.docRecAmt ?? null,
+      docRecReductionPct: this.formModel.docRecReductionPct ?? null,
+      docNciSelection: this.formModel.docNciSelection ?? null,
+      annualFundingR01: this.formModel.annualFundingR01 ?? null,
+      budgetCategories: this.formModel.budgetCategories ?? null,
+      docNotes: this.formModel.docNotes ?? '',
+      oefiaNotes: this.formModel.oefiaNotes ?? '',
+      annualOrMyf: this.formModel.annualOrMyf ?? null,
+      justificationText: this.formModel.justificationText ?? ''
     });
   }
 
@@ -220,6 +313,8 @@ export class GrantDetailComponent implements OnInit {
     this.data.budgetCategories            = this.formModel.budgetCategories;
     this.data.docNotes                    = this.formModel.docNotes;
     this.data.oefiaNote                   = this.formModel.oefiaNotes;
+    this.data.oefiaNotes                  = this.formModel.oefiaNotes;
     this.data.annualOrMyf                 = this.formModel.annualOrMyf;
   }
+
 }

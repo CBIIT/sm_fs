@@ -1,4 +1,18 @@
 ﻿<div *ngIf="data" class="grant-detail-panel p-2">
+  <ng-template #cancelEditWarningModal>
+    <div class="modal-header">
+      <h4 class="modal-title">WARNING!</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="onCancelWarningClose()"></button>
+    </div>
+    <div class="modal-body">
+      <p class="mb-0">Are you sure you want to navigate away from funding allocation edits? All unsaved changes will be lost.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="onCancelWarningClose()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="onCancelWarningProceed()">Ok, proceed</button>
+    </div>
+  </ng-template>
+
   <div class="row" *ngIf="saveSuccessMessage.length > 0">
     <div class="col-12">
       <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
@@ -6,7 +20,7 @@
       </ngb-alert>
     </div>
   </div>
-  <form #detailForm="ngForm" (ngSubmit)="onSave()">
+  <form #detailForm="ngForm">
     <div class="grid-container mt-2 me-2">
       <table class="table table-sm table-borderless table-striped">
         <thead style="border:2px solid #aaa;background-color:#ebeff1;position:static;">
@@ -146,7 +160,7 @@
             <td class="grid-item">{{data.appTcEst || '-'}}</td>
             <td class="grid-label sep align-top pt-2">OEFIA Notes<br><span class="fw-normal">(Optional)</span></td>
             <td class="grid-item" colspan="3">
-              <span *ngIf="!isEditMode">{{data.oefiaNote || ''}}</span>
+              <span *ngIf="!isEditMode">{{data.oefiaNotes || data.oefiaNote || ''}}</span>
               <div *ngIf="isEditMode">
                 <textarea class="form-control form-control-sm" rows="2"
                   name="oefiaNotes" [(ngModel)]="formModel.oefiaNotes" maxlength="1000"></textarea>
@@ -191,7 +205,7 @@
         <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationError">{{saveValidationError}}</div>
         <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode" (click)="onEdit()">Edit</button>
         <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode" (click)="onCancel()">Cancel</button>
-        <button type="submit" class="btn btn-primary ms-3" *ngIf="isEditMode">Save</button>
+        <button type="button" class="btn btn-primary ms-3" *ngIf="isEditMode" (click)="onSave()">Save</button>
       </div>
     </div>
   </form>
