@@ -113,7 +113,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       budgetCategories: g.budgetCategories ?? '',
       docDecision:      g.docDecision ?? '',
       docNciSelection:  g.docNciSelection ?? '',
-      annualFundingR01: g.twoYearAnnualFundingR01Flag ?? '',
+      annualFundingR01: g.twoYearAnnualFundingR01Flag ? 'Yes' : 'No',
       annualOrMyf:      g.annualOrMyf ?? '',
       docNotes:         g.docNotes ?? '',
       oefiaNotes:       g.oefiaNotes ?? '',
