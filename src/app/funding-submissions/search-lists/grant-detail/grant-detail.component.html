@@ -160,7 +160,7 @@
             <td class="grid-item">{{data.appTcEst || '-'}}</td>
             <td class="grid-label sep align-top pt-2">OEFIA Notes<br><span class="fw-normal">(Optional)</span></td>
             <td class="grid-item" colspan="3">
-              <span *ngIf="!isEditMode">{{data.oefiaNotes || data.oefiaNote || ''}}</span>
+              <span *ngIf="!isEditMode">{{data.oefiaNotes || ''}}</span>
               <div *ngIf="isEditMode">
                 <textarea class="form-control form-control-sm" rows="2"
                   name="oefiaNotes" [(ngModel)]="formModel.oefiaNotes" maxlength="1000"></textarea>

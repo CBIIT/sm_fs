@@ -40,6 +40,9 @@ export class GrantDetailComponent implements OnInit {
   yesNoOptions: Select2OptionData[] = [
     { id: 'Yes', text: 'Yes' },
   ];
+  // Select2 `id` is the value sent/stored ("AF"/"MYF", matching the backend's
+  // FUNDING_SUBM_LIST_GRANTS_T.MYF_OR_AF_CODE short-code convention); `text` is the
+  // full display label shown to the user.
   annualMyfOptions: Select2OptionData[] = [
     { id: 'AF', text: 'Annual Funding (AF)' },
     { id: 'MYF', text: 'Multi-year Funding (MYF)' },

@@ -9,6 +9,7 @@ import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { Select2OptionData } from 'ng-select2';
 import { DataTableDirective } from 'angular-datatables';
 import { FullGrantNumberCellRendererComponent } from '../../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+import { logger } from 'codelyzer/util/logger';
 
 declare var $: any;
 
@@ -74,9 +75,12 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     { id: 'Yes', text: 'Yes' },
     { id: 'No',  text: 'No' },
   ];
+  // Select2 `id` is the value sent/stored ("AF"/"MYF", matching the backend's
+  // FUNDING_SUBM_LIST_GRANTS_T.MYF_OR_AF_CODE short-code convention); `text` is the
+  // full display label shown to the user.
   annualMyfOptions: Select2OptionData[] = [
-    { id: 'Annual',            text: 'Annual' },
-    { id: 'Multi-Year Funding', text: 'Multi-Year Funding' },
+    { id: 'AF',  text: 'Annual' },
+    { id: 'MYF', text: 'Multi-Year Funding' },
   ];
   budgetCategoryOptions: Select2OptionData[] = [
     { id: 'R01/R37', text: 'R01/R37' },
@@ -102,18 +106,20 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.listId = state?.listId ?? 0;
     this.selectionDate = state?.selectionDate ?? '';
     const grants: any[] = state?.grants ?? [];
+    this.logger.debug(JSON.stringify(grants));
     // Normalize DataTable row data field names to match FundingSubmBulkEditFieldsDto
     this.rows = grants.map(g => ({
       ...g,
-      budgetCategories: g.budgetCategory ?? '',
+      budgetCategories: g.budgetCategories ?? '',
       docDecision:      g.docDecision ?? '',
-      docNciSelection:  g.docNciSel ?? '',
-      annualFundingR01: g.twoYrFunding ?? '',
+      docNciSelection:  g.docNciSelection ?? '',
+      annualFundingR01: g.twoYearAnnualFundingR01Flag ?? '',
       annualOrMyf:      g.annualOrMyf ?? '',
       docNotes:         g.docNotes ?? '',
-      oefiaNotes:       g.oefiaNote ?? '',
+      oefiaNotes:       g.oefiaNotes ?? '',
     }));
     this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
+    this.logger.debug(JSON.stringify(this.rows));
   }
 
   ngAfterViewInit(): void {
@@ -227,6 +233,13 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.dtTrigger && !this.dtTrigger.closed) {
       this.dtTrigger.unsubscribe();
     }
+  }
+
+  // Called from the per-row DataTable cell renderers (bulk-edit.component.html) whenever a
+  // grant row's field is edited directly, so "Save" enables even without going through the
+  // shared "Apply Changes" flow.
+  onRowFieldChange(): void {
+    this.canSave = true;
   }
 
   onApplyChanges(): void {
