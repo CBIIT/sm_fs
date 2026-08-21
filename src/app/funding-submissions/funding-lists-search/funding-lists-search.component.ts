@@ -45,6 +45,10 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
 
+  private triggerTableInit(): void {
+    setTimeout(() => this.dtTrigger.next(null), 75);
+  }
+
   constructor(
     private router: Router,
     private logger: NGXLogger,
@@ -87,8 +91,12 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
 
   ngAfterViewInit(): void {
     this.libPdCaIntegratorService.caForDocEmitter.next({ code: [], channel: 'CA_DOC_DEFAULT_CHANNEL' });
+    const freshNavigation = this.stateService.consumeFreshNavigationRequest();
+    if (freshNavigation) {
+      this.reset();
+    }
     const saved = this.stateService.getSearchListsState();
-    if (saved) {
+    if (!freshNavigation && saved) {
       setTimeout(() => {
         this.selectedDocs = saved.selectedDocs;
         this.selectedListStatus = saved.selectedListStatus;
@@ -98,7 +106,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
         if (saved.showResults) {
           this.searchCriteria = saved.searchCriteria;
           this.showResults = true;
-          setTimeout(() => this.dtTrigger.next(null));
+          this.triggerTableInit();
         }
       });
     }
@@ -268,10 +276,13 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
 
     this.throttle.reset();
     if (this.showResults) {
-      this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+      this.dtElement?.dtInstance?.then(dt => dt.ajax.reload()).catch(() => {
+        // If the directive was recreated and instance isn't ready yet, trigger init path.
+        this.triggerTableInit();
+      });
     } else {
       this.showResults = true;
-      setTimeout(() => this.dtTrigger.next(null));
+      this.triggerTableInit();
     }
   }
 
@@ -284,16 +295,44 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     this.selectedDocs = docs || [];
   }
 
+  private destroyResultsTable(): Promise<void> {
+    if (!this.dtElement) {
+      return Promise.resolve();
+    }
+
+    return this.dtElement.dtInstance
+      .then((dt: DataTables.Api) => {
+        // Keep the original table element so angular-datatables can reinitialize
+        // cleanly on the next search after reset.
+        dt.destroy();
+      })
+      .catch((err) => {
+        this.logger.warn('Failed to destroy Search Lists DataTable during reset', err);
+      });
+  }
+
   reset(): void {
-    this.filterForm?.resetForm();
-    this.selectedDocs = [];
-    this.selectedListStatus = null;
-    this.selectedSelectionDate = null;
-    this.listIdFilter = null as any;
-    this.showResults = false;
+    this.destroyResultsTable().finally(() => {
+      if (this.dtTrigger && !this.dtTrigger.closed) {
+        this.dtTrigger.unsubscribe();
+      }
+      this.dtTrigger = new Subject<any>();
+      this.filterForm?.resetForm();
+      this.selectedDocs = [];
+      this.selectedListStatus = null;
+      this.selectedSelectionDate = null;
+      this.listIdFilter = null as any;
+      this.searchCriteria = {};
+      this.throttle.reset();
+      this.showResults = false;
+    });
   }
 
   ngOnDestroy(): void {
+    if (this.stateService.isFreshNavigationRequested()) {
+      return;
+    }
+
     this.stateService.saveSearchListsState({
       formValue: this.filterForm?.form.value,
       selectedDocs: this.selectedDocs,

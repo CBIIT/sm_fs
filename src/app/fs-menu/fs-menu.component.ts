@@ -3,6 +3,7 @@ import { AppUserSessionService } from '../service/app-user-session.service';
 import { PaylistControllerService } from '@cbiit/i2efsws-lib';
 import { roleNames } from '../service/role-names';
 import { NGXLogger } from "ngx-logger";
+import { FundingSubmissionsStateService } from '../funding-submissions/funding-submissions-state.service';
 
 @Component({
   selector: 'app-fs-menu',
@@ -27,7 +28,12 @@ export class FsMenuComponent implements OnInit {
   constructor(
     private userSessionService: AppUserSessionService,
     private paylistControllerService: PaylistControllerService,
-    private logger: NGXLogger) {
+    private logger: NGXLogger,
+    private fundingSubmissionsStateService: FundingSubmissionsStateService) {
+  }
+
+  onFundingSubmissionsMenuNavigate(): void {
+    this.fundingSubmissionsStateService.requestFreshNavigation();
   }
 
   ngOnInit(): void {

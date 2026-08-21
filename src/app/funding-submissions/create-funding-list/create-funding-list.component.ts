@@ -44,9 +44,13 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.libPdCaIntegratorService.caForDocEmitter.next({ code: [], channel: 'CA_DOC_DEFAULT_CHANNEL' });
+    const freshNavigation = this.stateService.consumeFreshNavigationRequest();
+    if (freshNavigation) {
+      this.reset();
+    }
 
     const state = this.stateService.getListPageState();
-    if (state) {
+    if (!freshNavigation && state) {
       setTimeout(() => {
         this.selectedDocs = state.selectedDocs;
         if (this.selectedDocs.length) {
@@ -88,6 +92,10 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.stateService.isFreshNavigationRequested()) {
+      return;
+    }
+
     const tableState = this.fundingTable?.getState();
     if (tableState) {
       this.stateService.saveListPageState({
