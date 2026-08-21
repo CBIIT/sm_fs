@@ -235,6 +235,13 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // Called from the per-row DataTable cell renderers (bulk-edit.component.html) whenever a
+  // grant row's field is edited directly, so "Save" enables even without going through the
+  // shared "Apply Changes" flow.
+  onRowFieldChange(): void {
+    this.canSave = true;
+  }
+
   onApplyChanges(): void {
     const f = this.bulkFields;
     for (const row of this.rows) {

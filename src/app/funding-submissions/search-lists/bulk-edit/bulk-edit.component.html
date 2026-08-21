@@ -148,6 +148,7 @@
         <ng-select2
           [id]="'bcat-' + data.applId"
           [(ngModel)]="data.budgetCategories"
+          (ngModelChange)="onRowFieldChange()"
           [data]="budgetCategoryOptions"
           [allowClear]="true"
           width="100%">
@@ -158,6 +159,7 @@
         <ng-select2
           [id]="'ddec-' + data.applId"
           [(ngModel)]="data.docDecision"
+          (ngModelChange)="onRowFieldChange()"
           [data]="decisionOptions"
           [allowClear]="true"
           width="100%">
@@ -168,6 +170,7 @@
         <ng-select2
           [id]="'dnci-' + data.applId"
           [(ngModel)]="data.docNciSelection"
+          (ngModelChange)="onRowFieldChange()"
           [data]="docNciOptions"
           [allowClear]="true"
           width="100%">
@@ -178,6 +181,7 @@
         <ng-select2
           [id]="'ar01-' + data.applId"
           [(ngModel)]="data.annualFundingR01"
+          (ngModelChange)="onRowFieldChange()"
           [data]="yesNoOptions"
           [allowClear]="true"
           width="100%">
@@ -188,6 +192,7 @@
         <ng-select2
           [id]="'amyf-' + data.applId"
           [(ngModel)]="data.annualOrMyf"
+          (ngModelChange)="onRowFieldChange()"
           [data]="annualMyfOptions"
           [allowClear]="true"
           width="100%">
@@ -198,6 +203,7 @@
         <div>
           <textarea class="form-control form-control-sm notes-textarea"
             [(ngModel)]="data.docNotes"
+            (ngModelChange)="onRowFieldChange()"
             rows="2"
             maxlength="2000">
           </textarea>
@@ -209,6 +215,7 @@
         <div>
           <textarea class="form-control form-control-sm notes-textarea"
             [(ngModel)]="data.oefiaNotes"
+            (ngModelChange)="onRowFieldChange()"
             rows="2"
             maxlength="2000">
           </textarea>
