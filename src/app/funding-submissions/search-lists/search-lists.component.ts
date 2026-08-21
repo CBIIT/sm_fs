@@ -449,11 +449,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
                 } else {
                   $hdr.addClass('selected');
                   $container.find('tbody .select-checkbox').addClass('selected');
-                  dt.rows().every(function() {
-                    const d = this.data() as any;
-                    d.selected = true;
-                    this.selectedRows.set(d.applId, d);
-                  }.bind(this));
+                  dt.rows().every(function() { (this.data() as any).selected = true; });
+                  dt.rows().data().toArray().forEach((d: any) => this.selectedRows.set(d.applId, d));
                 }
               });
 
