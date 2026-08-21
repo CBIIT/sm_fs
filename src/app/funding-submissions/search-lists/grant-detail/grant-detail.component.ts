@@ -17,7 +17,7 @@ export class GrantDetailComponent implements OnInit {
   isEditMode = false;
   grantViewerUrl = '';
 
-  formModel: FundingSubmBulkEditFieldsDto & { nciDecision?: string; justificationText?: string } = {};
+  formModel: FundingSubmBulkEditFieldsDto & { justificationText?: string } = {};
   justificationFile: File | null = null;
   justificationFileError: string | null = null;
   saveSuccessMessage = '';
@@ -28,36 +28,30 @@ export class GrantDetailComponent implements OnInit {
   private readonly ALLOWED_JUSTIFICATION_FILE_EXTENSIONS = ['doc', 'docx', 'rtf', 'xls', 'xlsx', 'pdf']; // mirrors FsubJustificationConstants.ALLOWED_FILE_EXTENSIONS
 
   decisionOptions: Select2OptionData[] = [
-    { id: 'Fund',      text: 'Fund' },
-    { id: 'Defer',     text: 'Defer' },
-    { id: 'Delete',    text: 'Delete' },
-    { id: 'Withdrawn', text: 'Withdrawn' },
-    { id: 'Not Fund',  text: 'Not Fund' },
-  ];
-  priorityOptions: Select2OptionData[] = [
-    { id: 'High',   text: 'High' },
-    { id: 'Medium', text: 'Medium' },
-    { id: 'Low',    text: 'Low' },
+    { id: 'Pay', text: 'Pay' },
+    { id: 'Do Not Pay', text: 'Do Not Pay' },
   ];
   yesNoOptions: Select2OptionData[] = [
     { id: 'Yes', text: 'Yes' },
-    { id: 'No',  text: 'No' },
   ];
   annualMyfOptions: Select2OptionData[] = [
-    { id: 'Annual',            text: 'Annual' },
-    { id: 'Multi-Year Funding', text: 'Multi-Year Funding' },
+    { id: 'Annual Funding (AF)', text: 'Annual Funding (AF)' },
+    { id: 'Multi-year Funding (MYF)', text: 'Multi-year Funding (MYF)' },
   ];
   budgetCategoryOptions: Select2OptionData[] = [
-    { id: 'R01/R37', text: 'R01/R37' },
-    { id: 'R03',     text: 'R03' },
-    { id: 'R21',     text: 'R21' },
-    { id: 'R37',     text: 'R37' },
-    { id: 'U54',     text: 'U54' },
+    { id: 'DOC & OD', text: 'DOC & OD' },
+    { id: 'ESI R37 T4', text: 'ESI R37 T4' },
+    { id: 'MISC', text: 'MISC' },
+    { id: 'Other R01', text: 'Other R01' },
+    { id: 'P01', text: 'P01' },
+    { id: "PAR U's", text: "PAR U's" },
+    { id: 'R34/U34', text: 'R34/U34' },
+    { id: 'R50', text: 'R50' },
+    { id: 'RFA', text: 'RFA' },
   ];
   selectionOptions: Select2OptionData[] = [
-    { id: 'Fund',   text: 'Fund' },
-    { id: 'Defer',  text: 'Defer' },
-    { id: 'Delete', text: 'Delete' },
+    { id: 'DOC Selection', text: 'DOC Selection' },
+    { id: 'NCI Selection', text: 'NCI Selection' },
   ];
 
   constructor(
@@ -73,17 +67,16 @@ export class GrantDetailComponent implements OnInit {
 
   onEdit(): void {
     this.formModel = {
-      nciDecision:        this.data?.nciDecision ?? '',
-      docDecision:        this.data?.docDecision ?? '',
-      docPriority:        this.data?.docPriority ?? '',
+      docDecision:        this.data?.docDecision ?? null,
+      docPriority:        this.data?.docPriority ?? null,
       docRecAmt:          this.data?.docRecommendedAmount ?? null,
       docRecReductionPct: this.data?.docRecommendedReductionPct ?? null,
-      docNciSelection:    this.data?.docNciSelection ?? '',
-      annualFundingR01:   this.data?.twoYearAnnualFundingR01Flag ?? '',
-      budgetCategories:   this.data?.budgetCategories ?? '',
+      docNciSelection:    this.data?.docNciSelection ?? null,
+      annualFundingR01:   this.data?.twoYearAnnualFundingR01Flag ?? null,
+      budgetCategories:   this.data?.budgetCategories ?? null,
       docNotes:           this.data?.docNotes ?? '',
       oefiaNotes:         this.data?.oefiaNote ?? '',
-      annualOrMyf:        this.data?.annualOrMyf ?? '',
+      annualOrMyf:        this.data?.annualOrMyf ?? null,
       justificationText:  this.data?.justificationText ?? '',
     };
     this.justificationFile = null;
@@ -148,7 +141,7 @@ export class GrantDetailComponent implements OnInit {
       return;
     }
     this.logger.debug('GrantDetailComponent onSave()', this.formModel, 'listId:', this.listId);
-    const { nciDecision, justificationText, ...fields } = this.formModel;
+    const { justificationText, ...fields } = this.formModel;
 
     this.fundingSubmissionsService.bulkUpdateListGrants(
       { applIds: [this.data.applId], fields },
@@ -156,7 +149,7 @@ export class GrantDetailComponent implements OnInit {
     ).subscribe({
       next: () => {
         this.logger.debug('Grant detail saved');
-        this.applyFormModelToData(nciDecision);
+        this.applyFormModelToData();
         if (justificationText || this.justificationFile) {
           this.saveJustification(justificationText);
         } else {
@@ -174,11 +167,33 @@ export class GrantDetailComponent implements OnInit {
     if (pct != null && (pct < 0 || pct > 100)) {
       return 'DOC Rec % Red must be between 0 and 100.';
     }
+
+    if (pct != null && !this.hasAtMostTwoDecimals(Number(pct))) {
+      return 'DOC Rec % Red must be a valid percentage with up to 2 decimal places.';
+    }
+
     const amt = this.formModel.docRecAmt;
     if (amt != null && amt < 0) {
       return 'DOC Rec $ cannot be negative.';
     }
+
+    if (amt != null && !this.hasAtMostTwoDecimals(Number(amt))) {
+      return 'DOC Rec $ must be a valid dollar amount with up to 2 decimal places.';
+    }
+
+    const priority = this.formModel.docPriority as any;
+    if (priority != null && priority !== '' && (!Number.isInteger(Number(priority)) || Number(priority) < 0)) {
+      return 'DOC Priority must be a non-negative whole number.';
+    }
+
     return null;
+  }
+
+  private hasAtMostTwoDecimals(value: number): boolean {
+    if (!Number.isFinite(value)) {
+      return false;
+    }
+    return Math.round(value * 100) === value * 100;
   }
 
   private saveJustification(justificationText: string): void {
@@ -195,8 +210,7 @@ export class GrantDetailComponent implements OnInit {
     });
   }
 
-  private applyFormModelToData(nciDecision: string): void {
-    this.data.nciDecision                 = nciDecision;
+  private applyFormModelToData(): void {
     this.data.docDecision                 = this.formModel.docDecision;
     this.data.docPriority                 = this.formModel.docPriority;
     this.data.docRecommendedAmount        = this.formModel.docRecAmt;
