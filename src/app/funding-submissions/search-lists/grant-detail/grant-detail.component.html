@@ -190,9 +190,17 @@
                     <input type="file" class="d-none" (change)="onFileChange($event)"
                       accept=".doc,.docx,.rtf,.xls,.xlsx,.pdf">
                   </label>
-                  <span class="small text-muted mx-2">
-                    {{justificationFile ? justificationFile.name : 'You may upload Microsoft Word, Rich Text Format, Microsoft Excel, or Adobe Acrobat document(s) only. Max file size is 10MB'}}
-                  </span>
+                </div>
+                <div class="small text-muted mb-1">
+                  You may upload Microsoft Word, Rich Text Format, Microsoft Excel, or Adobe Acrobat document(s) only. Max file size is 10MB
+                </div>
+                <div class="small text-muted mb-1" *ngIf="justificationDocumentNames">
+                  <i class="fas fa-paperclip me-1" aria-hidden="true"></i>
+                  <span>Attached file(s): {{justificationDocumentNames}}</span>
+                </div>
+                <div class="small text-muted mb-1" *ngIf="justificationFile?.name">
+                  <i class="fas fa-upload me-1" aria-hidden="true"></i>
+                  <span>Selected new file: {{justificationFile.name}}</span>
                 </div>
                 <div *ngIf="justificationFileError" class="small text-danger mb-1">{{justificationFileError}}</div>
                 <textarea class="form-control form-control-sm" rows="2"
