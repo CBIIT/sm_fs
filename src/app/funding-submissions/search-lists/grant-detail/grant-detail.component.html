@@ -13,7 +13,7 @@
     </div>
   </ng-template>
 
-  <div class="row" *ngIf="saveSuccessMessage.length > 0">
+  <div class="row g-0 save-success-row" *ngIf="saveSuccessMessage.length > 0">
     <div class="col-12">
       <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
         <span><b>{{saveSuccessMessage}}</b></span>
@@ -79,7 +79,7 @@
             <td class="grid-label">DOC:</td>
             <td class="grid-item">{{data.doc}}</td>
             <td class="grid-label">Institution:</td>
-            <td class="grid-item">{{data.orgName}}</td>
+            <td class="grid-item">{{data.institution}}</td>
             <td class="grid-label sep">DOC Priority:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docPriority || '-'}}</span>
