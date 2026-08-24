@@ -87,7 +87,14 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectionDate = state?.selectionDate ?? '';
     const grants: any[] = state?.grants ?? [];
     this.logger.debug(JSON.stringify(grants));
-    // Normalize DataTable row data field names to match FundingSubmBulkEditFieldsDto
+    // Normalize DataTable row data field names to match FundingSubmBulkEditFieldsDto.
+    // NOTE: bulkUpdateListGrants() on the backend does a full-overwrite of every field on
+    // FundingSubmBulkEditFieldsDto (including docRecAmt/docRecReductionPct/docPriority/recused)
+    // for every saved row — there is no "omitted = leave untouched" semantics. Bulk Edit's UI
+    // doesn't expose these fields, so they MUST be carried through unchanged from the source
+    // grant data here and in onSave()'s payload, or they will be silently nulled out on save
+    // (bug found 2026-08-24: "DOC Rec $" set via Individual Edit was wiped by a subsequent
+    // Bulk Edit save).
     this.rows = grants.map(g => ({
       ...g,
       budgetCategories: g.budgetCategories ?? '',
@@ -97,6 +104,10 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       annualOrMyf:      g.annualOrMyf ?? '',
       docNotes:         g.docNotes ?? '',
       oefiaNotes:       g.oefiaNotes ?? '',
+      docPriority:      g.docPriority ?? null,
+      docRecAmt:            g.docRecommendedAmount ?? null,
+      docRecReductionPct:   g.docRecommendedReductionPct ?? null,
+      recused:          g.recusedFlag ? 'Y' : 'N',
     }));
     this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
     this.logger.debug(JSON.stringify(this.rows));
@@ -282,6 +293,13 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
             annualOrMyf:      row.annualOrMyf,
             docNotes:         row.docNotes,
             oefiaNotes:       row.oefiaNotes,
+            // Not editable from this screen, but must be round-tripped — the backend does a
+            // full-overwrite of every field on this DTO, so omitting these would silently wipe
+            // them (see the comment in ngOnInit()'s row mapping above).
+            docPriority:        row.docPriority,
+            docRecAmt:          row.docRecAmt,
+            docRecReductionPct: row.docRecReductionPct,
+            recused:            row.recused,
           }
         },
         this.listId
