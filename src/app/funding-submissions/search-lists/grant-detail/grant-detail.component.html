@@ -124,7 +124,7 @@
             <td class="grid-item">{{data.esiFlag === true ? 'Yes' : data.esiFlag === false ? 'No' : ''}}</td>
             <td class="grid-label">Recused:</td>
             <td class="grid-item">{{data.recused || '-'}}</td>
-            <td class="grid-label sep">DOC/NCI Decision:</td>
+            <td class="grid-label sep">DOC/NCI Selection:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docNciSelection}}</span>
               <ng-select2 *ngIf="isEditMode" name="docNciSelection" [(ngModel)]="formModel.docNciSelection"
