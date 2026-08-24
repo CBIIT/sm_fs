@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, EnvironmentInjector, OnDes
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
-import { Subject, forkJoin } from 'rxjs';
+import { Observable, Subject, forkJoin } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { Select2OptionData } from 'ng-select2';
@@ -32,6 +32,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private unsavedWarningModalRef: NgbModalRef;
   private pendingGuardedAction: (() => void) | null = null;
   private pendingGuardCancelAction: (() => void) | null = null;
+  private pendingRouteLeaveDecision: ((allow: boolean) => void) | null = null;
   readonly unsavedChangesWarningMessage = 'WARNING! Are you sure you want to navigate away from funding allocations edits? All unsaved changes will be lost.';
   private detailComponentsByApplId = new Map<number, any>();
   private tableGuardContainerEl: HTMLElement | null = null;
@@ -684,14 +685,19 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onCancelUnsavedWarning(): void {
+    const routeDecision = this.pendingRouteLeaveDecision;
+    this.pendingRouteLeaveDecision = null;
     this.pendingGuardedAction = null;
     this.pendingGuardCancelAction?.();
     this.pendingGuardCancelAction = null;
     this.unsavedWarningModalRef?.dismiss();
     this.unsavedWarningModalRef = null;
+    routeDecision?.(false);
   }
 
   onConfirmUnsavedWarning(): void {
+    const routeDecision = this.pendingRouteLeaveDecision;
+    this.pendingRouteLeaveDecision = null;
     const action = this.pendingGuardedAction;
     this.pendingGuardedAction = null;
     this.pendingGuardCancelAction = null;
@@ -699,9 +705,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.unsavedWarningModalRef = null;
     this.discardUnsavedDetailEdits();
     action?.();
+    routeDecision?.(true);
   }
 
-  canDeactivate(): boolean {
+  canDeactivate(): boolean | Observable<boolean> {
     if (this.consumeChildLeavePromptSuppression()) {
       return true;
     }
@@ -710,11 +717,17 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       return true;
     }
 
-    const proceed = confirm('WARNING! Are you sure you want to navigate away from funding allocations edits? All unsaved changes will be lost.');
-    if (proceed) {
-      this.discardUnsavedDetailEdits();
+    if (this.unsavedWarningModalRef) {
+      return false;
     }
-    return proceed;
+
+    return new Observable<boolean>((observer) => {
+      this.pendingRouteLeaveDecision = (allow: boolean) => {
+        observer.next(allow);
+        observer.complete();
+      };
+      this.unsavedWarningModalRef = this.modalService.open(this.unsavedChangesWarningModalRef, { centered: true });
+    });
   }
 
   onDocCountClick(doc: string): void {
