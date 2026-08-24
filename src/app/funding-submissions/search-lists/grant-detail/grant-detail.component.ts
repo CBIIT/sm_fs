@@ -4,6 +4,8 @@ import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Select2OptionData } from 'ng-select2';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
+
 
 @Component({
   selector: 'app-grant-detail',
@@ -33,48 +35,52 @@ export class GrantDetailComponent implements OnInit {
   private readonly MAX_JUSTIFICATION_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB, mirrors FsubJustificationConstants.MAX_FILE_SIZE_BYTES
   private readonly ALLOWED_JUSTIFICATION_FILE_EXTENSIONS = ['doc', 'docx', 'rtf', 'xls', 'xlsx', 'pdf']; // mirrors FsubJustificationConstants.ALLOWED_FILE_EXTENSIONS
 
-  decisionOptions: Select2OptionData[] = [
-    { id: 'Pay', text: 'Pay' },
-    { id: 'Do Not Pay', text: 'Do Not Pay' },
-  ];
-  yesNoOptions: Select2OptionData[] = [
-    { id: 'Yes', text: 'Yes' },
-    { id: 'No', text: 'No' },
-  ];
-  // Select2 `id` is the value sent/stored ("AF"/"MYF", matching the backend's
-  // FUNDING_SUBM_LIST_GRANTS_T.MYF_OR_AF_CODE short-code convention); `text` is the
-  // full display label shown to the user.
-  annualMyfOptions: Select2OptionData[] = [
-    { id: 'AF', text: 'Annual Funding (AF)' },
-    { id: 'MYF', text: 'Multi-year Funding (MYF)' },
-  ];
-  budgetCategoryOptions: Select2OptionData[] = [
-    { id: 'DOC & OD', text: 'DOC & OD' },
-    { id: 'ESI R37 T4', text: 'ESI R37 T4' },
-    { id: 'MISC', text: 'MISC' },
-    { id: 'Other R01', text: 'Other R01' },
-    { id: 'P01', text: 'P01' },
-    { id: "PAR U's", text: "PAR U's" },
-    { id: 'R34/U34', text: 'R34/U34' },
-    { id: 'R50', text: 'R50' },
-    { id: 'RFA', text: 'RFA' },
-  ];
-  selectionOptions: Select2OptionData[] = [
-    { id: 'DOC Selection', text: 'DOC Selection' },
-    { id: 'NCI Selection', text: 'NCI Selection' },
-  ];
+  // Populated from the shared FundingSubmDropdownLookupService (2026-08-24 Individual/Bulk Edit
+  // dropdown consistency fix) so this screen and Bulk Edit always use the same value lists.
+  // Initialized empty and populated in ngOnInit(); see fetchDropdownOptions().
+  decisionOptions: Select2OptionData[] = [];
+  yesNoOptions: Select2OptionData[] = [];
+  annualMyfOptions: Select2OptionData[] = [];
+  budgetCategoryOptions: Select2OptionData[] = [];
+  selectionOptions: Select2OptionData[] = [];
 
   constructor(
     private logger: NGXLogger,
     private fundingSubmissionsService: FundingSubmissionsControllerService,
     private propertiesService: AppPropertiesService,
     private cdr: ChangeDetectorRef,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private dropdownLookupService: FundingSubmDropdownLookupService
   ) {}
 
   ngOnInit(): void {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+    this.fetchDropdownOptions();
   }
+
+  private fetchDropdownOptions(): void {
+    this.dropdownLookupService.getDocDecisions().subscribe({
+      next: options => { this.decisionOptions = options; this.cdr.detectChanges(); },
+      error: err => this.logger.error('Failed to load DOC Decision options', err)
+    });
+    this.dropdownLookupService.getAnnualFundingR01Options().subscribe({
+      next: options => { this.yesNoOptions = options; this.cdr.detectChanges(); },
+      error: err => this.logger.error('Failed to load Two-Year Annual Funding R01 options', err)
+    });
+    this.dropdownLookupService.getAnnualOrMyfOptions().subscribe({
+      next: options => { this.annualMyfOptions = options; this.cdr.detectChanges(); },
+      error: err => this.logger.error('Failed to load Annual or MYF options', err)
+    });
+    this.dropdownLookupService.getBudgetCategories().subscribe({
+      next: options => { this.budgetCategoryOptions = options; this.cdr.detectChanges(); },
+      error: err => this.logger.error('Failed to load Budget Categories options', err)
+    });
+    this.dropdownLookupService.getDocNciSelections().subscribe({
+      next: options => { this.selectionOptions = options; this.cdr.detectChanges(); },
+      error: err => this.logger.error('Failed to load DOC/NCI Selection options', err)
+    });
+  }
+
 
   onEdit(): void {
     this.formModel = {

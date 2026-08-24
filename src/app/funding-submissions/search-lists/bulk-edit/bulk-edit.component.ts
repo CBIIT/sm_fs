@@ -10,6 +10,8 @@ import { Select2OptionData } from 'ng-select2';
 import { DataTableDirective } from 'angular-datatables';
 import { FullGrantNumberCellRendererComponent } from '../../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { logger } from 'codelyzer/util/logger';
+import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
+
 
 declare var $: any;
 
@@ -57,51 +59,29 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
               f.annualFundingR01 || f.annualOrMyf || f.docNotes || f.oefiaNotes);
   }
 
-  decisionOptions: Select2OptionData[] = [
-    { id: 'Fund',      text: 'Fund' },
-    { id: 'Defer',     text: 'Defer' },
-    { id: 'Delete',    text: 'Delete' },
-    { id: 'Withdrawn', text: 'Withdrawn' },
-    { id: 'Not Fund',  text: 'Not Fund' },
-  ];
-  // Select2 `id` is the value sent/stored ("DOC"/"NCI", matching the backend's
-  // FUNDING_SUBM_LIST_GRANTS_T.DOC_NCI_SELECTION short-code convention); `text` is the
-  // full display label required by the spec ("Display 'DOC Selection' or 'NCI Selection'").
-  docNciOptions: Select2OptionData[] = [
-    { id: 'DOC', text: 'DOC Selection' },
-    { id: 'NCI', text: 'NCI Selection' },
-  ];
-  yesNoOptions: Select2OptionData[] = [
-    { id: 'Yes', text: 'Yes' },
-    { id: 'No',  text: 'No' },
-  ];
-  // Select2 `id` is the value sent/stored ("AF"/"MYF", matching the backend's
-  // FUNDING_SUBM_LIST_GRANTS_T.MYF_OR_AF_CODE short-code convention); `text` is the
-  // full display label shown to the user.
-  annualMyfOptions: Select2OptionData[] = [
-    { id: 'AF',  text: 'Annual' },
-    { id: 'MYF', text: 'Multi-Year Funding' },
-  ];
-  budgetCategoryOptions: Select2OptionData[] = [
-    { id: 'R01/R37', text: 'R01/R37' },
-    { id: 'R03',     text: 'R03' },
-    { id: 'R21',     text: 'R21' },
-    { id: 'R37',     text: 'R37' },
-    { id: 'U54',     text: 'U54' },
-  ];
+  // Populated from the shared FundingSubmDropdownLookupService (2026-08-24 Individual/Bulk Edit
+  // dropdown consistency fix) so this screen and Individual Edit always use the same value
+  // lists. Initialized empty and populated in ngOnInit(); see fetchDropdownOptions().
+  decisionOptions: Select2OptionData[] = [];
+  docNciOptions: Select2OptionData[] = [];
+  yesNoOptions: Select2OptionData[] = [];
+  annualMyfOptions: Select2OptionData[] = [];
+  budgetCategoryOptions: Select2OptionData[] = [];
 
   constructor(
     private router: Router,
     private logger: NGXLogger,
     private fundingSubmissionsService: FundingSubmissionsControllerService,
     private propertiesService: AppPropertiesService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private dropdownLookupService: FundingSubmDropdownLookupService
   ) {}
 
   ngOnInit(): void {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl     = this.propertiesService.getProperty('EGRANTS_URL');
     this.i2eURL         = this.propertiesService.getProperty('I2EWEB_URL').trim();
+    this.fetchDropdownOptions();
     const state = history.state;
     this.listId = state?.listId ?? 0;
     this.selectionDate = state?.selectionDate ?? '';
@@ -120,6 +100,29 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }));
     this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
     this.logger.debug(JSON.stringify(this.rows));
+  }
+
+  private fetchDropdownOptions(): void {
+    this.dropdownLookupService.getDocDecisions().subscribe({
+      next: options => this.decisionOptions = options,
+      error: err => this.logger.error('Failed to load DOC Decision options', err)
+    });
+    this.dropdownLookupService.getDocNciSelections().subscribe({
+      next: options => this.docNciOptions = options,
+      error: err => this.logger.error('Failed to load DOC/NCI Selection options', err)
+    });
+    this.dropdownLookupService.getAnnualFundingR01Options().subscribe({
+      next: options => this.yesNoOptions = options,
+      error: err => this.logger.error('Failed to load Two-Year Annual Funding R01 options', err)
+    });
+    this.dropdownLookupService.getAnnualOrMyfOptions().subscribe({
+      next: options => this.annualMyfOptions = options,
+      error: err => this.logger.error('Failed to load Annual or MYF options', err)
+    });
+    this.dropdownLookupService.getBudgetCategories().subscribe({
+      next: options => this.budgetCategoryOptions = options,
+      error: err => this.logger.error('Failed to load Budget Categories options', err)
+    });
   }
 
   ngAfterViewInit(): void {
