@@ -177,7 +177,12 @@
             <td>&nbsp;</td>
             <td class="grid-label sep align-top pt-2">Justification<br><span class="fw-normal">(Optional)</span></td>
             <td class="grid-item" colspan="3">
-              <span *ngIf="!isEditMode">{{data.justificationText || ''}}</span>
+              <div *ngIf="!isEditMode">
+                <div>{{data.justificationText || ''}}</div>
+                <div *ngIf="justificationDocumentNames" class="small text-muted mt-1">
+                  {{justificationDocumentNames}}
+                </div>
+              </div>
               <div *ngIf="isEditMode">
                 <div class="d-flex align-items-start gap-2 mb-1">
                   <label class="btn btn-sm btn-primary mb-0">
