@@ -255,7 +255,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         const $checkbox = $('.select-checkbox', row);
         $checkbox.off('click');
 
-        if (data.checkboxDisabled) {
+        if (!this.isRowSelectable(data)) {
           data.selected = false;
           this.selectedRows.delete(data.applId);
           $checkbox.removeClass('selected').addClass('disabled')
@@ -294,7 +294,7 @@ initComplete: () => {
           $container.on('click.selectAll', 'thead .select-checkbox', () => {
             const pageData = dt.rows({ page: 'current' }).data().toArray();
             const nowSelected = !this.allDataSelected(pageData);
-            for (const d of pageData.filter((row: any) => !row.checkboxDisabled)) {
+            for (const d of pageData.filter((row: any) => this.isRowSelectable(row))) {
               d.selected = nowSelected;
               if (nowSelected) {
                 this.selectedRows.set(d.applId, d);
@@ -349,8 +349,12 @@ initComplete: () => {
   }
 
 allDataSelected(data: any[]): boolean {
-    const selectableRows = data?.filter(row => !row.checkboxDisabled) ?? [];
+    const selectableRows = data?.filter(row => this.isRowSelectable(row)) ?? [];
     return selectableRows.length > 0 && selectableRows.every(row => this.selectedRows.has(row.applId));
+  }
+
+  private isRowSelectable(row: any): boolean {
+    return !row?.checkboxDisabled && !row?.existsInListSelectionDate;
   }
   clearResults(): void {
     this.showResults = false;
