@@ -146,7 +146,7 @@
               <span *ngIf="!isEditMode">{{data.docNotes || ''}}</span>
               <div *ngIf="isEditMode">
                 <textarea class="form-control form-control-sm" rows="2"
-                  name="docNotes" [(ngModel)]="formModel.docNotes" maxlength="1000"></textarea>
+                  name="docNotes" [(ngModel)]="formModel.docNotes" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.docNotes || '').length}}/1000</div>
               </div>
             </td>
@@ -163,7 +163,7 @@
               <span *ngIf="!isEditMode">{{data.oefiaNotes || ''}}</span>
               <div *ngIf="isEditMode">
                 <textarea class="form-control form-control-sm" rows="2"
-                  name="oefiaNotes" [(ngModel)]="formModel.oefiaNotes" maxlength="1000"></textarea>
+                  name="oefiaNotes" [(ngModel)]="formModel.oefiaNotes" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.oefiaNotes || '').length}}/1000</div>
               </div>
             </td>
@@ -204,7 +204,7 @@
                 </div>
                 <div *ngIf="justificationFileError" class="small text-danger mb-1">{{justificationFileError}}</div>
                 <textarea class="form-control form-control-sm" rows="2"
-                  name="justificationText" [(ngModel)]="formModel.justificationText" maxlength="1000"></textarea>
+                  name="justificationText" [(ngModel)]="formModel.justificationText" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.justificationText || '').length}}/1000</div>
               </div>
             </td>
