@@ -26,8 +26,18 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('foaCellRender') foaCellRender: TemplateRef<FoaCellRendererComponent>;
   @ViewChild('removeGrantsWarningModal') private removeGrantsWarningModalRef: TemplateRef<any>;
+  @ViewChild('unsavedChangesWarningModal') private unsavedChangesWarningModalRef: TemplateRef<any>;
 
   private removeModalRef: NgbModalRef;
+  private unsavedWarningModalRef: NgbModalRef;
+  private pendingGuardedAction: (() => void) | null = null;
+  private pendingGuardCancelAction: (() => void) | null = null;
+  readonly unsavedChangesWarningMessage = 'WARNING! Are you sure you want to navigate away from funding allocations edits? All unsaved changes will be lost.';
+  private detailComponentsByApplId = new Map<number, any>();
+  private tableGuardContainerEl: HTMLElement | null = null;
+  private tableGuardCaptureHandler: ((event: Event) => void) | null = null;
+  private readonly tablePageIntentSelector = '.dataTables_paginate .paginate_button, .dataTables_paginate .page-item, .dataTables_paginate a.page-link, .dt-paging-button';
+  private readonly tableSortIntentSelector = 'thead th.sorting, thead th.sorting_asc, thead th.sorting_desc';
 
   i2eURL = '';
   grantViewerUrl = '';
@@ -407,6 +417,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
       order: [[15, 'desc']],
       fixedColumns: { left: 1, right: 1 },
+      initComplete: () => {
+        this.dtElement?.dtInstance?.then((dt: DataTables.Api) => this.bindSimpleUnsavedTableGuard(dt));
+      },
       rowCallback: (row: Node, data: any) => {
         this.dtOptions.columns.forEach((column: any, ind: number) => {
           if (column.ngTemplateRef) {
@@ -433,12 +446,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
             this.dtElement.dtInstance.then((dt: DataTables.Api) => {
 
               dt.columns.adjust();
+              this.bindSimpleUnsavedTableGuard(dt);
 
               // Export button is index 1 now that Reset Table occupies index 0
               dt.rows().count() > 0 ? (dt as any).button(1).enable() : (dt as any).button(1).disable();
 
               // Use container so fixedColumns clones are included
               const $container = $(dt.table(0).container());
+
               $container.find('thead .select-checkbox').off('click').on('click', () => {
                 const $hdr = $container.find('thead .select-checkbox');
                 if ($hdr.first().hasClass('selected')) {
@@ -472,47 +487,63 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
                 .on('click', '.toggle-details', (event) => {
                   const tr = $(event.currentTarget).closest('tr');
                   const row = dt.row(tr);
-                  if (row.child.isShown()) {
-                    row.child.hide();
-                    tr.removeClass('shown');
-                    $(window).off('resize.detailSticky');
-                    $(event.currentTarget).find('i').removeClass('fa-minus-circle').addClass('fa-plus-circle');
-                  } else {
+                  const runToggle = () => {
+                    const rowData = row.data() as any;
+                    const applId = rowData?.applId;
 
-                    // Create Angular component host element
-                    const hostElement = document.createElement('div');
-                    // Sticky/width goes on this plain div, not the <td> — table-layout:fixed
-                    // ignores inline width on colspanned cells, and sticky needs a non-table element
-                    hostElement.classList.add('detail-row-sticky');
+                    if (row.child.isShown()) {
+                      this.detailComponentsByApplId.get(applId)?.destroy?.();
+                      this.detailComponentsByApplId.delete(applId);
+                      row.child.hide();
+                      tr.removeClass('shown');
+                      $(window).off('resize.detailSticky');
+                      $(event.currentTarget).find('i').removeClass('fa-minus-circle').addClass('fa-plus-circle');
+                    } else {
 
-                    // Create Angular component dynamically
-                    const componentRef =
-                      createComponent(GrantDetailComponent, {
-                        environmentInjector: this.environmentInjector,
-                        hostElement: hostElement
+                      // Create Angular component host element
+                      const hostElement = document.createElement('div');
+                      // Sticky/width goes on this plain div, not the <td> — table-layout:fixed
+                      // ignores inline width on colspanned cells, and sticky needs a non-table element
+                      hostElement.classList.add('detail-row-sticky');
+
+                      // Create Angular component dynamically
+                      const componentRef =
+                        createComponent(GrantDetailComponent, {
+                          environmentInjector: this.environmentInjector,
+                          hostElement: hostElement
+                        });
+                      componentRef.instance.data = rowData;
+                      componentRef.instance.listId = this.listId;
+                      componentRef.instance.close.subscribe(() => {
+                        componentRef.destroy();
+                        this.detailComponentsByApplId.delete(applId);
+                        if (row.child.isShown()) {
+                          row.child.hide();
+                          tr.removeClass('shown');
+                          $(event.currentTarget).find('i').removeClass('fa-minus-circle').addClass('fa-plus-circle');
+                        }
                       });
-                    // Optional: pass data to the component
-                    componentRef.instance.data = row.data();
-                    componentRef.instance.listId = this.listId;
-                    //row.data().grantNumber;
-                    // Run Angular change detection
-                    componentRef.changeDetectorRef.detectChanges();
-                    // Give the Angular component to DataTables
-                    row.child(hostElement).show();
-                    tr.addClass('shown');
-                    // Pin the detail row to the visible scroll viewport so it stays
-                    // in view (and spans full width) while the parent table scrolls horizontally
-                    const applyStickyWidth = () => {
-                      const scrollBodyWidth = $container.find('.dataTables_scrollBody').width();
-                      if (scrollBodyWidth) $(hostElement).css('width', scrollBodyWidth + 'px');
-                    };
-                    applyStickyWidth();
-                    $(window).on('resize.detailSticky', applyStickyWidth);
-                    $(event.currentTarget).find('i').removeClass('fa-plus-circle').addClass('fa-minus-circle');
-                    // Store the ComponentRef so it can be destroyed later
-                    (tr[0] as HTMLElement).dataset.componentRef =
-                      String(componentRef);
-                  }
+
+                      // Run Angular change detection
+                      componentRef.changeDetectorRef.detectChanges();
+                      this.detailComponentsByApplId.set(applId, componentRef);
+
+                      // Give the Angular component to DataTables
+                      row.child(hostElement).show();
+                      tr.addClass('shown');
+                      // Pin the detail row to the visible scroll viewport so it stays
+                      // in view (and spans full width) while the parent table scrolls horizontally
+                      const applyStickyWidth = () => {
+                        const scrollBodyWidth = $container.find('.dataTables_scrollBody').width();
+                        if (scrollBodyWidth) $(hostElement).css('width', scrollBodyWidth + 'px');
+                      };
+                      applyStickyWidth();
+                      $(window).on('resize.detailSticky', applyStickyWidth);
+                      $(event.currentTarget).find('i').removeClass('fa-plus-circle').addClass('fa-minus-circle');
+                    }
+                  };
+
+                  this.executeWithUnsavedGuard(runToggle);
                 });
             });
           }
@@ -530,10 +561,188 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     callback({ recordsTotal: grants.length, recordsFiltered: grants.length, data: grants });
   }
 
+  private hasUnsavedDetailEdits(): boolean {
+    for (const compRef of this.detailComponentsByApplId.values()) {
+      if (compRef?.instance?.isSaveInProgress?.()) {
+        continue;
+      }
+      if (compRef?.instance?.hasUnsavedChanges && compRef.instance.hasUnsavedChanges()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private consumeChildLeavePromptSuppression(): boolean {
+    for (const compRef of this.detailComponentsByApplId.values()) {
+      if (compRef?.instance?.consumeSuppressNextLeavePrompt?.()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private discardUnsavedDetailEdits(): void {
+    for (const compRef of this.detailComponentsByApplId.values()) {
+      if (compRef?.instance?.forceDiscardAndClose && compRef.instance.hasUnsavedChanges?.()) {
+        compRef.instance.forceDiscardAndClose();
+      }
+    }
+  }
+
+  private executeWithUnsavedGuard(action: () => void): void {
+    this.executeWithUnsavedGuardOptions(action);
+  }
+
+  private executeWithUnsavedGuardOptions(action: () => void, onCancel?: () => void): void {
+    if (!this.hasUnsavedDetailEdits()) {
+      action();
+      return;
+    }
+
+    this.pendingGuardedAction = action;
+    this.pendingGuardCancelAction = onCancel || null;
+    this.unsavedWarningModalRef = this.modalService.open(this.unsavedChangesWarningModalRef, { centered: true });
+  }
+
+  private bindSimpleUnsavedTableGuard(dt: DataTables.Api): void {
+    const container = dt.table(0).container();
+    if (!container) return;
+
+    if (this.tableGuardContainerEl && this.tableGuardCaptureHandler) {
+      this.tableGuardContainerEl.removeEventListener('click', this.tableGuardCaptureHandler, true);
+    }
+
+    this.tableGuardContainerEl = container as HTMLElement;
+    this.tableGuardCaptureHandler = (event: Event) => {
+      const clickedEl = event.target as HTMLElement;
+      if (!clickedEl) return;
+
+      const pageNode = clickedEl.closest(this.tablePageIntentSelector) as HTMLElement;
+      const sortHeader = clickedEl.closest(this.tableSortIntentSelector) as HTMLElement;
+      if (!pageNode && !sortHeader) return;
+
+      if (!this.hasUnsavedDetailEdits()) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      (event as any).stopImmediatePropagation?.();
+
+      if (this.unsavedWarningModalRef) {
+        return;
+      }
+
+      let action: (() => void) | null = null;
+      if (pageNode) {
+        if (pageNode.classList.contains('disabled') || pageNode.classList.contains('active')) return;
+        action = this.buildPaginationIntentAction(dt, pageNode);
+      } else if (sortHeader) {
+        action = this.buildSortIntentAction(dt, sortHeader);
+      }
+
+      if (!action) return;
+      this.executeWithUnsavedGuardOptions(action);
+    };
+
+    this.tableGuardContainerEl.addEventListener('click', this.tableGuardCaptureHandler, true);
+  }
+
+  private buildSortIntentAction(dt: DataTables.Api, sortHeader: HTMLElement): (() => void) | null {
+    const columnIndex = $(sortHeader).index();
+    if (columnIndex < 0) return null;
+
+    const nextDir: 'asc' | 'desc' = sortHeader.classList.contains('sorting_asc') ? 'desc' : 'asc';
+    return () => dt.order([columnIndex, nextDir]).draw(false);
+  }
+
+  private buildPaginationIntentAction(dt: DataTables.Api, pageNode: HTMLElement): (() => void) | null {
+    const pageIndexAttr = pageNode.getAttribute('data-dt-idx');
+    const label = (pageNode.textContent || '').trim().toLowerCase();
+    const className = pageNode.className || '';
+
+    const isFirst = className.includes('first') || label === 'first';
+    const isLast = className.includes('last') || label === 'last';
+    const isPrev = className.includes('previous') || label === 'previous';
+    const isNext = className.includes('next') || label === 'next';
+    const pageNum = Number(label);
+
+    if (isFirst) return () => dt.page('first').draw('page');
+    if (isLast) return () => dt.page('last').draw('page');
+    if (isPrev) return () => dt.page('previous').draw('page');
+    if (isNext) return () => dt.page('next').draw('page');
+
+    if (pageIndexAttr !== null) {
+      const idx = Number(pageIndexAttr);
+      if (!isNaN(idx)) return () => dt.page(idx).draw('page');
+    }
+
+    if (!isNaN(pageNum)) {
+      return () => dt.page(Math.max(pageNum - 1, 0)).draw('page');
+    }
+
+    return null;
+  }
+
+  onCancelUnsavedWarning(): void {
+    this.pendingGuardedAction = null;
+    this.pendingGuardCancelAction?.();
+    this.pendingGuardCancelAction = null;
+    this.unsavedWarningModalRef?.dismiss();
+    this.unsavedWarningModalRef = null;
+  }
+
+  onConfirmUnsavedWarning(): void {
+    const action = this.pendingGuardedAction;
+    this.pendingGuardedAction = null;
+    this.pendingGuardCancelAction = null;
+    this.unsavedWarningModalRef?.close();
+    this.unsavedWarningModalRef = null;
+    this.discardUnsavedDetailEdits();
+    action?.();
+  }
+
+  canDeactivate(): boolean {
+    if (this.consumeChildLeavePromptSuppression()) {
+      return true;
+    }
+
+    if (!this.hasUnsavedDetailEdits()) {
+      return true;
+    }
+
+    const proceed = confirm('WARNING! Are you sure you want to navigate away from funding allocations edits? All unsaved changes will be lost.');
+    if (proceed) {
+      this.discardUnsavedDetailEdits();
+    }
+    return proceed;
+  }
+
   onDocCountClick(doc: string): void {
-    this.filteredDoc = this.filteredDoc === doc ? null : doc;
-    this.throttle.reset();
-    this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+    this.executeWithUnsavedGuard(() => {
+      this.filteredDoc = this.filteredDoc === doc ? null : doc;
+      this.throttle.reset();
+      this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+    });
+  }
+
+  onBackToListClick(): void {
+    this.executeWithUnsavedGuard(() => this.router.navigate([this.backRoute]));
+  }
+
+  onSendGrantsInDraftClick(): void {
+    this.executeWithUnsavedGuard(() => this.logger.debug('Send Grants in Draft action requested'));
+  }
+
+  onBulkEditClick(): void {
+    this.executeWithUnsavedGuard(() => this.onBulkEdit());
+  }
+
+  onAddGrantsToListClick(): void {
+    this.executeWithUnsavedGuard(() => this.onAddGrantsToList());
+  }
+
+  onRemoveSelectedClick(): void {
+    this.executeWithUnsavedGuard(() => this.onRemoveSelected());
   }
 
   resetTable(): void {
@@ -583,6 +792,15 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.tableGuardContainerEl && this.tableGuardCaptureHandler) {
+      this.tableGuardContainerEl.removeEventListener('click', this.tableGuardCaptureHandler, true);
+      this.tableGuardContainerEl = null;
+      this.tableGuardCaptureHandler = null;
+    }
+    this.unsavedWarningModalRef?.close();
+    this.removeModalRef?.close();
+    this.detailComponentsByApplId.forEach((compRef) => compRef?.destroy?.());
+    this.detailComponentsByApplId.clear();
     if (this.dtTrigger && !this.dtTrigger.closed) {
       this.dtTrigger.unsubscribe();
     }

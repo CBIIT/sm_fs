@@ -12,16 +12,30 @@
   </div>
 </ng-template>
 
+<ng-template #unsavedChangesWarningModal>
+    <div class="modal-header">
+        <h4 class="modal-title">WARNING!</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="onCancelUnsavedWarning()"></button>
+    </div>
+    <div class="modal-body">
+        <p class="mb-0">{{ unsavedChangesWarningMessage }}</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancelUnsavedWarning()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onConfirmUnsavedWarning()">Ok, proceed</button>
+    </div>
+</ng-template>
+
 <div class="ms-3">
 
-    <a [routerLink]="backRoute" class="text-decoration-none small">
+    <a href="javascript:void(0)" class="text-decoration-none small" (click)="onBackToListClick()">
         &lt; {{ backLabel }}
     </a>
 
     <!-- Page header -->
     <div class="d-flex justify-content-between align-items-center my-3">
         <h2 class="mb-0">{{ selectionDate }}</h2>
-        <button class="btn btn-primary">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
+        <button class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
     </div>
 
     <!-- Overview -->
@@ -81,20 +95,20 @@
             <div class="d-flex gap-2 mb-3">
                 <!-- Bulk Edit -->
                 <span ngbTooltip="Select at least one grant to bulk edit." [disableTooltip]="!!selectedRows.size" container="body">
-                    <button type="button" class="btn btn-primary me-3" (click)="onBulkEdit()" [disabled]="!selectedRows.size">
+                    <button type="button" class="btn btn-primary me-3" (click)="onBulkEditClick()" [disabled]="!selectedRows.size">
                         <i class="fas fa-pen me-2"></i>
                         Bulk Edit
                     </button>
                 </span>
 
                 <!-- Add Grants to List -->
-                <button type="button" class="btn btn-outline-primary me-3" (click)="onAddGrantsToList()">
+                <button type="button" class="btn btn-outline-primary me-3" (click)="onAddGrantsToListClick()">
                     <i class="fas fa-plus me-2"></i>
                     Add Grants to List
                 </button>
 
                 <!-- Remove Selected Grants -->
-                <button type="button" class="btn btn-outline-danger" (click)="onRemoveSelected()" [disabled]="!selectedRows.size">
+                <button type="button" class="btn btn-outline-danger" (click)="onRemoveSelectedClick()" [disabled]="!selectedRows.size">
                     <i class="fas fa-minus-circle me-2"></i>
                     Remove Selected Grants
                 </button>
