@@ -39,6 +39,7 @@ export class GrantDetailComponent implements OnInit {
   ];
   yesNoOptions: Select2OptionData[] = [
     { id: 'Yes', text: 'Yes' },
+    { id: 'No', text: 'No' },
   ];
   // Select2 `id` is the value sent/stored ("AF"/"MYF", matching the backend's
   // FUNDING_SUBM_LIST_GRANTS_T.MYF_OR_AF_CODE short-code convention); `text` is the
@@ -82,7 +83,7 @@ export class GrantDetailComponent implements OnInit {
       docRecAmt:          this.data?.docRecommendedAmount ?? null,
       docRecReductionPct: this.data?.docRecommendedReductionPct ?? null,
       docNciSelection:    this.data?.docNciSelection ?? null,
-      annualFundingR01:   this.data?.twoYearAnnualFundingR01Flag ?? null,
+      annualFundingR01:   this.data ? (this.data.twoYearAnnualFundingR01Flag ? 'Yes' : 'No') : null,
       budgetCategories:   this.data?.budgetCategories ?? null,
       docNotes:           this.data?.docNotes ?? '',
       // Prefer first non-empty source; some rows carry empty oefiaNotes with populated oefiaNote.
