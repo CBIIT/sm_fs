@@ -39,7 +39,6 @@ export class GrantDetailComponent implements OnInit {
   ];
   yesNoOptions: Select2OptionData[] = [
     { id: 'Yes', text: 'Yes' },
-    { id: 'No', text: 'No' },
   ];
   // Select2 `id` is the value sent/stored ("AF"/"MYF", matching the backend's
   // FUNDING_SUBM_LIST_GRANTS_T.MYF_OR_AF_CODE short-code convention); `text` is the
@@ -86,8 +85,7 @@ export class GrantDetailComponent implements OnInit {
       annualFundingR01:   this.data ? (this.data.twoYearAnnualFundingR01Flag ? 'Yes' : 'No') : null,
       budgetCategories:   this.data?.budgetCategories ?? null,
       docNotes:           this.data?.docNotes ?? '',
-      // Prefer first non-empty source; some rows carry empty oefiaNotes with populated oefiaNote.
-      oefiaNotes:         this.data?.oefiaNotes || this.data?.oefiaNote || '',
+      oefiaNotes:         this.data?.oefiaNotes ?? '',
       annualOrMyf:        this.data?.annualOrMyf ?? null,
       justificationText:  this.data?.justificationText ?? '',
     };
@@ -316,7 +314,6 @@ export class GrantDetailComponent implements OnInit {
     this.data.twoYearAnnualFundingR01Flag = this.formModel.annualFundingR01;
     this.data.budgetCategories            = this.formModel.budgetCategories;
     this.data.docNotes                    = this.formModel.docNotes;
-    this.data.oefiaNote                   = this.formModel.oefiaNotes;
     this.data.oefiaNotes                  = this.formModel.oefiaNotes;
     this.data.annualOrMyf                 = this.formModel.annualOrMyf;
   }
