@@ -35,6 +35,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   // Client-side validation constants — mirror FsubJustificationConstants (sm_i2e_fs_ws)
   private readonly MAX_JUSTIFICATION_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB, mirrors FsubJustificationConstants.MAX_FILE_SIZE_BYTES
   private readonly ALLOWED_JUSTIFICATION_FILE_EXTENSIONS = ['doc', 'docx', 'rtf', 'xls', 'xlsx', 'pdf']; // mirrors FsubJustificationConstants.ALLOWED_FILE_EXTENSIONS
+  private readonly JUSTIFICATION_UPLOAD_GUIDANCE = 'You may upload Microsoft Word, Rich Text Format, Microsoft Excel, or Adobe Acrobat document(s) only. Max file size is 10MB';
 
   decisionOptions: Select2OptionData[] = [
     { id: 'Pay', text: 'Pay' },
@@ -302,6 +303,16 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       || this.data?.docFilename
       || this.data?.doc;
     return fallbackRowName || '';
+  }
+
+  get justificationUploadLabelText(): string {
+    if (this.justificationFile?.name) {
+      return this.justificationFile.name;
+    }
+    if (this.justificationDocumentNames) {
+      return `Current file(s): ${this.justificationDocumentNames}`;
+    }
+    return this.JUSTIFICATION_UPLOAD_GUIDANCE;
   }
 
   consumeSuppressNextLeavePrompt(): boolean {
