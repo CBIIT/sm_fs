@@ -154,6 +154,10 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   }
 
   search(): void {
+    if (this.filterForm?.invalid || !this.hasAnyCriteria) {
+      return;
+    }
+
     if (!this.fundingTable) {
       this.logger.error('CreateFundingListComponent: fundingTable ViewChild is not available');
       return;

@@ -108,8 +108,8 @@
   <div class="row form-group me-3">
     <div class="col-lg-12 d-flex justify-content-end align-items-end">
       <button type="button" class="btn btn-outline-secondary me-2" (click)="reset()">Reset</button>
-      <span [ngbTooltip]="hasAnyCriteria ? null : 'Search by selecting or providing at least one criteria.'" container="body">
-        <button type="button" class="btn btn-primary" [disabled]="!hasAnyCriteria" (click)="search()">Search</button>
+      <span [ngbTooltip]="(!hasAnyCriteria || filterForm?.invalid) ? 'Search by selecting or providing at least one criteria.' : null" container="body">
+        <button type="button" class="btn btn-primary" [disabled]="!hasAnyCriteria || !!filterForm?.invalid" (click)="search()">Search</button>
       </span>
     </div>
   </div>
