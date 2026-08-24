@@ -1,4 +1,4 @@
-﻿import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
+﻿import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { FundingSubmBulkEditFieldsDto, FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
@@ -6,13 +6,14 @@ import { Select2OptionData } from 'ng-select2';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
 
+import { DocumentsDto } from '@cbiit/i2efsws-lib/model/documentsDto';
 
 @Component({
   selector: 'app-grant-detail',
   templateUrl: './grant-detail.component.html',
   styleUrls: ['./grant-detail.component.css']
 })
-export class GrantDetailComponent implements OnInit {
+export class GrantDetailComponent implements OnInit, OnChanges {
   @Input() data: any = null;
   @Input() listId: number;
   @Output() close = new EventEmitter<void>();
@@ -23,10 +24,12 @@ export class GrantDetailComponent implements OnInit {
 
   formModel: FundingSubmBulkEditFieldsDto & { justificationText?: string } = {};
   justificationFile: File | null = null;
+  justificationDocuments: DocumentsDto[] = [];
   justificationFileError: string | null = null;
   saveSuccessMessage = '';
   saveValidationError: string | null = null;
   private initialFormSnapshot = '';
+  private initialFundingSnapshot = '';
   private cancelModalRef: NgbModalRef;
   private savingInProgress = false;
   private suppressNextLeavePrompt = false;
@@ -56,6 +59,13 @@ export class GrantDetailComponent implements OnInit {
   ngOnInit(): void {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.fetchDropdownOptions();
+    this.refreshJustificationData();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ((changes['listId'] || changes['data']) && this.listId && this.data?.applId) {
+      this.refreshJustificationData();
+    }
   }
 
   private fetchDropdownOptions(): void {
@@ -92,8 +102,7 @@ export class GrantDetailComponent implements OnInit {
       annualFundingR01:   this.data ? (this.data.twoYearAnnualFundingR01Flag ? 'Yes' : 'No') : null,
       budgetCategories:   this.data?.budgetCategories ?? null,
       docNotes:           this.data?.docNotes ?? '',
-      // Prefer first non-empty source; some rows carry empty oefiaNotes with populated oefiaNote.
-      oefiaNotes:         this.data?.oefiaNotes || this.data?.oefiaNote || '',
+      oefiaNotes:         this.data?.oefiaNotes ?? '',
       annualOrMyf:        this.data?.annualOrMyf ?? null,
       justificationText:  this.data?.justificationText ?? '',
     };
@@ -103,6 +112,7 @@ export class GrantDetailComponent implements OnInit {
     this.saveValidationError = null;
     this.isEditMode = true;
     this.initialFormSnapshot = this.currentSnapshot();
+    this.initialFundingSnapshot = this.currentFundingSnapshot();
     this.cdr.detectChanges();
   }
 
@@ -176,13 +186,21 @@ export class GrantDetailComponent implements OnInit {
     this.savingInProgress = true;
     this.logger.debug('GrantDetailComponent onSave()', this.formModel, 'listId:', this.listId);
     const { justificationText, ...fields } = this.formModel;
+    const hasFundingFieldChanges = this.currentFundingSnapshot() !== this.initialFundingSnapshot;
+    const hasJustificationChanges = !!this.justificationFile || !!justificationText;
 
-    if (!this.hasUnsavedChanges() && !justificationText && !this.justificationFile) {
+    if (!hasFundingFieldChanges && !hasJustificationChanges) {
       this.savingInProgress = false;
       this.isEditMode = false;
       this.initialFormSnapshot = '';
+      this.initialFundingSnapshot = '';
       this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
       this.cdr.detectChanges();
+      return;
+    }
+
+    if (!hasFundingFieldChanges && hasJustificationChanges) {
+      this.saveJustification(justificationText);
       return;
     }
 
@@ -244,17 +262,26 @@ export class GrantDetailComponent implements OnInit {
     return Math.round(value * 100) === value * 100;
   }
 
-  private saveJustification(justificationText: string): void {
+  private saveJustification(justificationText?: string): void {
+    const normalizedJustificationText = justificationText && justificationText.length > 0
+      ? justificationText
+      : undefined;
+
     this.fundingSubmissionsService.saveJustificationForm(
-      this.listId, this.data.applId, this.justificationFile ?? undefined, justificationText
+      this.listId, this.data.applId, this.justificationFile ?? undefined, normalizedJustificationText
     ).subscribe({
       next: () => {
-        this.data.justificationText = justificationText;
-        this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
-        this.isEditMode = false;
-        this.initialFormSnapshot = '';
-        this.savingInProgress = false;
-        this.cdr.detectChanges();
+        this.data.justificationText = normalizedJustificationText ?? '';
+        this.refreshJustificationData(() => {
+          this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
+          this.isEditMode = false;
+          this.initialFormSnapshot = '';
+          this.initialFundingSnapshot = '';
+          this.savingInProgress = false;
+          this.justificationFile = null;
+          this.justificationFileError = null;
+          this.cdr.detectChanges();
+        });
       },
       error: (err) => {
         this.savingInProgress = false;
@@ -265,6 +292,23 @@ export class GrantDetailComponent implements OnInit {
 
   isSaveInProgress(): boolean {
     return this.savingInProgress;
+  }
+
+  get justificationDocumentNames(): string {
+    const namesFromDocuments = this.justificationDocuments
+      .map((doc: any) => doc?.docFilename || doc?.doc || doc?.docDescription)
+      .filter((name): name is string => !!name)
+      .join(', ');
+
+    if (namesFromDocuments) {
+      return namesFromDocuments;
+    }
+
+    const fallbackRowName = this.data?.justificationFileName
+      || this.data?.justificationFilename
+      || this.data?.docFilename
+      || this.data?.doc;
+    return fallbackRowName || '';
   }
 
   consumeSuppressNextLeavePrompt(): boolean {
@@ -292,6 +336,7 @@ export class GrantDetailComponent implements OnInit {
     this.saveSuccessMessage = '';
     this.saveValidationError = null;
     this.initialFormSnapshot = '';
+    this.initialFundingSnapshot = '';
     this.savingInProgress = false;
     this.close.emit();
     this.cdr.detectChanges();
@@ -313,6 +358,21 @@ export class GrantDetailComponent implements OnInit {
     });
   }
 
+  private currentFundingSnapshot(): string {
+    return JSON.stringify({
+      docDecision: this.formModel.docDecision ?? null,
+      docPriority: this.formModel.docPriority ?? null,
+      docRecAmt: this.formModel.docRecAmt ?? null,
+      docRecReductionPct: this.formModel.docRecReductionPct ?? null,
+      docNciSelection: this.formModel.docNciSelection ?? null,
+      annualFundingR01: this.formModel.annualFundingR01 ?? null,
+      budgetCategories: this.formModel.budgetCategories ?? null,
+      docNotes: this.formModel.docNotes ?? '',
+      oefiaNotes: this.formModel.oefiaNotes ?? '',
+      annualOrMyf: this.formModel.annualOrMyf ?? null
+    });
+  }
+
   private applyFormModelToData(): void {
     this.data.docDecision                 = this.formModel.docDecision;
     this.data.docPriority                 = this.formModel.docPriority;
@@ -322,9 +382,36 @@ export class GrantDetailComponent implements OnInit {
     this.data.twoYearAnnualFundingR01Flag = this.formModel.annualFundingR01;
     this.data.budgetCategories            = this.formModel.budgetCategories;
     this.data.docNotes                    = this.formModel.docNotes;
-    this.data.oefiaNote                   = this.formModel.oefiaNotes;
     this.data.oefiaNotes                  = this.formModel.oefiaNotes;
     this.data.annualOrMyf                 = this.formModel.annualOrMyf;
+  }
+
+  private refreshJustificationData(onComplete?: () => void): void {
+    if (!this.listId || !this.data?.applId) {
+      onComplete?.();
+      return;
+    }
+
+    this.fundingSubmissionsService.getJustification(this.listId, this.data.applId).subscribe({
+      next: (justification) => {
+        const rawDocuments = (justification as any)?.documents
+          ?? (justification as any)?.document
+          ?? (justification as any)?.docs
+          ?? [];
+        this.justificationDocuments = Array.isArray(rawDocuments)
+          ? rawDocuments
+          : (rawDocuments ? [rawDocuments] : []);
+        if (justification?.justificationText != null) {
+          this.data.justificationText = justification.justificationText;
+        }
+        this.cdr.detectChanges();
+        onComplete?.();
+      },
+      error: (err) => {
+        this.logger.debug('Unable to load justification documents', err);
+        onComplete?.();
+      }
+    });
   }
 
 }

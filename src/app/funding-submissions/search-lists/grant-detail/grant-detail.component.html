@@ -41,11 +41,11 @@
             <td class="grid-item">{{data.piName}}</td>
             <td class="grid-label sep">NCI Decision:</td>
             <td class="grid-item">
-              <span>{{data.nciDecision || '-'}}</span>
+              <span>{{data.nciDecision}}</span>
             </td>
             <td class="grid-label">DOC Decision:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docDecision || '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.docDecision}}</span>
               <ng-select2 *ngIf="isEditMode" name="docDecision" [(ngModel)]="formModel.docDecision"
                 [data]="decisionOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>
@@ -60,14 +60,14 @@
             <td class="grid-item">{{data.percentile != null ? (data.percentile + '%') : ''}}</td>
             <td class="grid-label sep">DOC Rec % Red:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docRecommendedReductionPct != null ? (data.docRecommendedReductionPct + '%') : '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.docRecommendedReductionPct != null ? (data.docRecommendedReductionPct + '%') : ''}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecReductionPct" [(ngModel)]="formModel.docRecReductionPct"
                 placeholder="Enter Value" min="0" max="100" step="0.01">
             </td>
             <td class="grid-label">DOC Rec $:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docRecommendedAmount != null ? ('$' + (data.docRecommendedAmount | number)) : '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.docRecommendedAmount != null ? ('$' + (data.docRecommendedAmount | number)) : ''}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecAmt" [(ngModel)]="formModel.docRecAmt"
                 placeholder="Enter Value" min="0" step="0.01">
@@ -82,14 +82,14 @@
             <td class="grid-item">{{data.institution}}</td>
             <td class="grid-label sep">DOC Priority:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docPriority || '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.docPriority}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docPriority" [(ngModel)]="formModel.docPriority"
                 placeholder="Enter Value" min="0" step="1">
             </td>
             <td class="grid-label">2Y Annual Fnd R01:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.twoYearAnnualFundingR01Flag || '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.twoYearAnnualFundingR01Flag}}</span>
               <ng-select2 *ngIf="isEditMode" name="annualFundingR01" [(ngModel)]="formModel.annualFundingR01"
                 [data]="yesNoOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>
@@ -104,14 +104,14 @@
             <td class="grid-item">{{data.priorityScore}}</td>
             <td class="grid-label sep">Annual or MYF:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.annualOrMyf || '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.annualOrMyf}}</span>
               <ng-select2 *ngIf="isEditMode" name="annualOrMyf" [(ngModel)]="formModel.annualOrMyf"
                 [data]="annualMyfOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>
             </td>
             <td class="grid-label">Budget Categories:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.budgetCategories || '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.budgetCategories}}</span>
               <ng-select2 *ngIf="isEditMode" name="budgetCategories" [(ngModel)]="formModel.budgetCategories"
                 [data]="budgetCategoryOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>
@@ -126,7 +126,7 @@
             <td class="grid-item">{{data.recused || '-'}}</td>
             <td class="grid-label sep">DOC/NCI Decision:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docNciSelection || '-'}}</span>
+              <span *ngIf="!isEditMode">{{data.docNciSelection}}</span>
               <ng-select2 *ngIf="isEditMode" name="docNciSelection" [(ngModel)]="formModel.docNciSelection"
                 [data]="selectionOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>
@@ -177,7 +177,12 @@
             <td>&nbsp;</td>
             <td class="grid-label sep align-top pt-2">Justification<br><span class="fw-normal">(Optional)</span></td>
             <td class="grid-item" colspan="3">
-              <span *ngIf="!isEditMode">{{data.justificationText || ''}}</span>
+              <div *ngIf="!isEditMode">
+                <div>{{data.justificationText || ''}}</div>
+                <div *ngIf="justificationDocumentNames" class="small text-muted mt-1">
+                  {{justificationDocumentNames}}
+                </div>
+              </div>
               <div *ngIf="isEditMode">
                 <div class="d-flex align-items-start gap-2 mb-1">
                   <label class="btn btn-sm btn-primary mb-0">
