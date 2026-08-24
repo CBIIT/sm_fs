@@ -4,7 +4,7 @@ import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { forkJoin, Subject } from 'rxjs';
-import { FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsControllerService, FundingSubmBulkEditFieldsDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { Select2OptionData } from 'ng-select2';
 import { DataTableDirective } from 'angular-datatables';
@@ -44,10 +44,10 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
 
-  bulkFields: {
-    budgetCategories?: string; docDecision?: string; docNciSelection?: string;
-    annualFundingR01?: string; annualOrMyf?: string; docNotes?: string; oefiaNotes?: string;
-  } = {};
+  // Typed against the generated FundingSubmBulkEditFieldsDto (2026-08-24 stability-audit
+  // hardening) so a future field rename/addition on the DTO surfaces as a compile error here,
+  // instead of silently drifting the way the old hand-rolled inline type could.
+  bulkFields: Partial<FundingSubmBulkEditFieldsDto> = {};
 
   canSave = false;
   saveSuccessMessage = '';
