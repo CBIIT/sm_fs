@@ -188,4 +188,53 @@ describe('GrantDetailComponent', () => {
       expect(editModeExitedSpy).toHaveBeenCalledTimes(2);
     });
   });
+
+  // Bulk Edit / Grant Detail CODE-vs-NAME fix (2026-08-25): onEdit() must seed formModel from the
+  // grant's budgetCategoryCode (CODE), not the NAME-valued budgetCategories, so it matches the
+  // CODE-keyed budgetCategoryOptions Select2 and can pre-select the correct option.
+  describe('Budget Categories CODE-vs-NAME fix (2026-08-25)', () => {
+    it('onEdit() seeds formModel.budgetCategories from the grant\'s budgetCategoryCode, not the NAME-valued budgetCategories', () => {
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        justificationText: '',
+        budgetCategories: 'ESI R37 T4 Board Competing Transition',
+        budgetCategoryCode: 'ESIR37T4'
+      };
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+
+      component.onEdit();
+
+      expect(component.formModel.budgetCategories).toBe('ESIR37T4');
+    });
+
+    it('onSave() sends a CODE-shaped budgetCategories value in the bulkUpdateListGrants() payload', () => {
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        justificationText: '',
+        budgetCategories: 'ESI R37 T4 Board Competing Transition',
+        budgetCategoryCode: 'ESIR37T4',
+        twoYearAnnualFundingR01Flag: false
+      };
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+
+      component.onEdit();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      // Simulate saving after only a different field was touched (e.g. DOC Decision) — Budget
+      // Categories itself is left untouched, exactly the "unedited save" scenario the fix
+      // protects against: the CODE seeded in onEdit() must still flow through, not a NAME.
+      component.formModel.docDecision = 'Pay';
+
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.budgetCategories).toBe('ESIR37T4');
+    });
+  });
 });

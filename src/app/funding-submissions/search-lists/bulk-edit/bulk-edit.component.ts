@@ -97,7 +97,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     // Bulk Edit save).
     this.rows = grants.map(g => ({
       ...g,
-      budgetCategories: g.budgetCategories ?? '',
+      budgetCategories: g.budgetCategoryCode ?? '',
       docDecision:      g.docDecision ?? '',
       docNciSelection:  g.docNciSelection ?? '',
       annualFundingR01: g.twoYearAnnualFundingR01Flag ? 'Yes' : 'No',

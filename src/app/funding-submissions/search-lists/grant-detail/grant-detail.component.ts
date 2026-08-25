@@ -117,7 +117,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       docRecReductionPct: this.data?.docRecommendedReductionPct ?? null,
       docNciSelection:    this.data?.docNciSelection ?? null,
       annualFundingR01:   this.data ? (this.data.twoYearAnnualFundingR01Flag ? 'Yes' : 'No') : null,
-      budgetCategories:   this.data?.budgetCategories ?? null,
+      budgetCategories:   this.data?.budgetCategoryCode ?? null,
       docNotes:           this.data?.docNotes ?? '',
       oefiaNotes:         this.data?.oefiaNotes ?? '',
       annualOrMyf:        this.data?.annualOrMyf ?? null,
@@ -415,7 +415,13 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.data.docRecommendedReductionPct  = this.formModel.docRecReductionPct;
     this.data.docNciSelection             = this.formModel.docNciSelection;
     this.data.twoYearAnnualFundingR01Flag = this.formModel.annualFundingR01;
-    this.data.budgetCategories            = this.formModel.budgetCategories;
+    // budgetCategoryCode fix (2026-08-25): formModel.budgetCategories now holds the grant's
+    // budget category CODE (seeded in onEdit() from this.data.budgetCategoryCode, matching the
+    // CODE-keyed budgetCategoryOptions Select2), not the NAME the main grid displays. Sync
+    // budgetCategoryCode (not the NAME-valued budgetCategories) so a subsequent re-onEdit() on
+    // this same in-memory row still seeds the dropdown correctly without a full page reload;
+    // leaving budgetCategories (NAME) untouched here preserves the main grid's display value.
+    this.data.budgetCategoryCode          = this.formModel.budgetCategories;
     this.data.docNotes                    = this.formModel.docNotes;
     this.data.oefiaNotes                  = this.formModel.oefiaNotes;
     this.data.annualOrMyf                 = this.formModel.annualOrMyf;
