@@ -86,6 +86,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       error: (err) => this.logger.error('Failed to load selection dates', err)
     });
     this.fundingSubmissionsService.searchLists({ start: 0, length: 9999 }).subscribe({
+      
       next: (result) => {
         const data = result.data || [];
         this.listIdOptions = data.map(item => ({
