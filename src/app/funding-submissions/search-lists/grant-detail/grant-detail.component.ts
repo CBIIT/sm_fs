@@ -21,6 +21,11 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   isEditMode = false;
   grantViewerUrl = '';
+  // Guards onEdit() against pre-populating the form before the initial
+  // refreshJustificationData() fetch (triggered by ngOnInit()/ngOnChanges()) has resolved —
+  // otherwise the justification textarea could silently start blank/stale. Set true on both
+  // the success and error branches so a failed fetch never permanently locks out Edit mode.
+  justificationLoaded = false;
 
   formModel: FundingSubmBulkEditFieldsDto & { justificationText?: string } = {};
   justificationFile: File | null = null;
@@ -65,6 +70,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['listId'] || changes['data']) && this.listId && this.data?.applId) {
+      this.justificationLoaded = false;
       this.refreshJustificationData();
     }
   }
@@ -94,6 +100,12 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
 
   onEdit(): void {
+    // Guard against building formModel from stale/absent data while the initial
+    // justification fetch is still in flight — the template also disables the Edit button
+    // while !justificationLoaded, but this guard protects against any other trigger path.
+    if (!this.justificationLoaded) {
+      return;
+    }
     this.formModel = {
       docDecision:        this.data?.docDecision ?? null,
       docPriority:        this.data?.docPriority ?? null,
@@ -399,6 +411,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   private refreshJustificationData(onComplete?: () => void): void {
     if (!this.listId || !this.data?.applId) {
+      this.justificationLoaded = true;
       onComplete?.();
       return;
     }
@@ -415,11 +428,15 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         if (justification?.justificationText != null) {
           this.data.justificationText = justification.justificationText;
         }
+        this.justificationLoaded = true;
         this.cdr.detectChanges();
         onComplete?.();
       },
       error: (err) => {
         this.logger.debug('Unable to load justification documents', err);
+        // Still flip the flag on error so a failed fetch never permanently disables Edit.
+        this.justificationLoaded = true;
+        this.cdr.detectChanges();
         onComplete?.();
       }
     });
