@@ -105,8 +105,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
     this.i2eURL = this.propertiesService.getProperty('I2EWEB_URL').trim();
     // TODO remove the card coded URL when property added to the service
-    this.documentURL = (this.propertiesService.getProperty('DOCVIEWER_URL') || '').trim()
-      || 'https://i2e-test.nci.nih.gov/documentviewer/';
+    this.documentURL = (this.propertiesService.getProperty('DOCVIEWER_URL') || '').trim();
   }
 
   get canViewPdf(): boolean {
