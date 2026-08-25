@@ -448,6 +448,19 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.data.docNotes                    = this.formModel.docNotes;
     this.data.oefiaNotes                  = this.formModel.oefiaNotes;
     this.data.annualOrMyf                 = this.formModel.annualOrMyf;
+    // DOC/NCI Selection & Annual/MYF CODE-vs-NAME fix (2026-08-25): docNciSelectionName and
+    // annualOrMyfName are what Grant Detail's own read-only view AND the parent grid's columns
+    // actually render — mirrors the budgetCategories NAME write-back above. Resolve each NAME
+    // from the selected CODE by looking up selectionOptions/annualMyfOptions ({id, text} =
+    // {CODE, NAME}), falling back to null when unmatched/cleared (e.g. options not yet loaded).
+    const selectedDocNciSelectionOption = this.selectionOptions.find(
+      option => option.id === this.formModel.docNciSelection
+    );
+    this.data.docNciSelectionName          = selectedDocNciSelectionOption?.text ?? null;
+    const selectedAnnualOrMyfOption = this.annualMyfOptions.find(
+      option => option.id === this.formModel.annualOrMyf
+    );
+    this.data.annualOrMyfName              = selectedAnnualOrMyfOption?.text ?? null;
   }
 
   private refreshJustificationData(onComplete?: () => void): void {

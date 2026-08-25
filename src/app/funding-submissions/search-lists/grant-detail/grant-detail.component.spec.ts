@@ -338,4 +338,101 @@ describe('GrantDetailComponent', () => {
       expect(component.data.twoYearAnnualFundingR01Flag).toBe(false);
     });
   });
+
+  // Prompt - Display NAME for DOC-NCI Selection and Annual-MYF (2026-08-25): same bug class as
+  // Budget Categories, opposite direction — docNciSelection/annualOrMyf (CODE) must keep driving
+  // edit-mode dropdown pre-selection and the save payload unchanged, while Grant Detail's own
+  // read-only display and applyFormModelToData()'s write-back switch to the new NAME fields
+  // (docNciSelectionName/annualOrMyfName), resolved from selectionOptions/annualMyfOptions
+  // respectively (NOT docNciOptions/annualMyfOptions from bulk-edit.component.ts, which is a
+  // separate, out-of-scope component).
+  describe('DOC/NCI Selection & Annual/MYF CODE-vs-NAME fix (2026-08-25)', () => {
+    beforeEach(() => {
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        justificationText: '',
+        docNciSelection: 'NCI',
+        docNciSelectionName: 'National Cancer Institute',
+        annualOrMyf: 'MYF',
+        annualOrMyfName: 'Multi-Year Funding',
+        twoYearAnnualFundingR01Flag: false
+      };
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+
+      // Populate selectionOptions/annualMyfOptions the way fetchDropdownOptions() normally does,
+      // so the NAME-resolution lookup in applyFormModelToData() has something to match against.
+      (component as any).selectionOptions = [
+        { id: 'NCI', text: 'National Cancer Institute' },
+        { id: 'DOC', text: 'Division of Extramural Activities' }
+      ];
+      (component as any).annualMyfOptions = [
+        { id: 'MYF', text: 'Multi-Year Funding' },
+        { id: 'AF', text: 'Annual Funding' }
+      ];
+    });
+
+    it('onEdit() seeds formModel.docNciSelection/annualOrMyf from the CODE fields, not the NAME fields (regression check)', () => {
+      component.onEdit();
+
+      expect(component.formModel.docNciSelection).toBe('NCI');
+      expect(component.formModel.annualOrMyf).toBe('MYF');
+    });
+
+    it('onSave() sends CODE-shaped docNciSelection/annualOrMyf values in the bulkUpdateListGrants() payload (regression check)', () => {
+      component.onEdit();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      // Simulate saving after only a different field was touched — DOC/NCI Selection and
+      // Annual/MYF themselves are left untouched, exactly the "unedited save" scenario the fix
+      // protects against: the CODE seeded in onEdit() must still flow through, not a NAME.
+      component.formModel.docDecision = 'Pay';
+
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.docNciSelection).toBe('NCI');
+      expect(payload.fields.annualOrMyf).toBe('MYF');
+    });
+
+    it('applyFormModelToData() resolves and writes both docNciSelectionName and annualOrMyfName from the selected CODEs', () => {
+      component.onEdit();
+      component.formModel.docNciSelection = 'DOC';
+      component.formModel.annualOrMyf = 'AF';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onSave();
+
+      expect(component.data.docNciSelection).toBe('DOC');
+      expect(component.data.docNciSelectionName).toBe('Division of Extramural Activities');
+      expect(component.data.annualOrMyf).toBe('AF');
+      expect(component.data.annualOrMyfName).toBe('Annual Funding');
+    });
+
+    it('applyFormModelToData() gracefully falls back to null for both NAME fields when the selected CODE has no matching option', () => {
+      component.onEdit();
+      component.formModel.docNciSelection = 'UNKNOWN_CODE';
+      component.formModel.annualOrMyf = 'UNKNOWN_CODE';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      expect(() => component.onSave()).not.toThrow();
+
+      expect(component.data.docNciSelectionName).toBeNull();
+      expect(component.data.annualOrMyfName).toBeNull();
+    });
+
+    it('applyFormModelToData() gracefully clears both NAME fields when the selection is cleared (null)', () => {
+      component.onEdit();
+      component.formModel.docNciSelection = null;
+      component.formModel.annualOrMyf = null;
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      expect(() => component.onSave()).not.toThrow();
+
+      expect(component.data.docNciSelectionName).toBeNull();
+      expect(component.data.annualOrMyfName).toBeNull();
+    });
+  });
 });

@@ -334,7 +334,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 17
         {
           title: 'DOC/NCI Sel',
-          data: 'docNciSelection',
+          data: 'docNciSelectionName',
           width: '100px',
           defaultContent: ''
         }, // 18
@@ -347,7 +347,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 19
         {
           title: 'Annual or MYF',
-          data: 'annualOrMyf',
+          data: 'annualOrMyfName',
           width: '90px',
           defaultContent: ''
         }, // 20

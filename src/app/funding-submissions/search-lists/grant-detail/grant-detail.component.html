@@ -104,7 +104,7 @@
             <td class="grid-item">{{data.priorityScore}}</td>
             <td class="grid-label sep">Annual or MYF:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.annualOrMyf}}</span>
+              <span *ngIf="!isEditMode">{{data.annualOrMyfName}}</span>
               <ng-select2 *ngIf="isEditMode" name="annualOrMyf" [(ngModel)]="formModel.annualOrMyf"
                 [data]="annualMyfOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>
@@ -126,7 +126,7 @@
             <td class="grid-item">{{data.recused || '-'}}</td>
             <td class="grid-label sep">DOC/NCI Selection:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docNciSelection}}</span>
+              <span *ngIf="!isEditMode">{{data.docNciSelectionName}}</span>
               <ng-select2 *ngIf="isEditMode" name="docNciSelection" [(ngModel)]="formModel.docNciSelection"
                 [data]="selectionOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>

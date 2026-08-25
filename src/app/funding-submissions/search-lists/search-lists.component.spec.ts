@@ -289,4 +289,19 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(row.child.hide).not.toHaveBeenCalled();
     });
   });
+
+  // Prompt - Display NAME for DOC-NCI Selection and Annual-MYF (2026-08-25): the main grid's
+  // DOC/NCI Sel and Annual or MYF columns must display the NAME-valued fields, not the CODE
+  // fields used elsewhere for edit-dropdown pre-selection/save payload.
+  describe('DOC/NCI Selection & Annual/MYF CODE-vs-NAME fix (2026-08-25)', () => {
+    it('DOC/NCI Sel column binds to the NAME field (docNciSelectionName), not the CODE field', () => {
+      const column = (component.dtOptions.columns as any[]).find(col => col.title === 'DOC/NCI Sel');
+      expect(column.data).toBe('docNciSelectionName');
+    });
+
+    it('Annual or MYF column binds to the NAME field (annualOrMyfName), not the CODE field', () => {
+      const column = (component.dtOptions.columns as any[]).find(col => col.title === 'Annual or MYF');
+      expect(column.data).toBe('annualOrMyfName');
+    });
+  });
 });
