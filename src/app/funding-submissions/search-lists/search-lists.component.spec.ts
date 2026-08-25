@@ -75,7 +75,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     expect(component).toBeTruthy();
   });
 
-  it('warns with the funding-submissions copy (not a "funding allocations" copy-paste artifact)', () => {
+  it('warns with the funding-submissions copy (not a "funding submissionss" copy-paste artifact)', () => {
     expect((component as any).unsavedChangesWarningMessage).toBe(
       'WARNING! Are you sure you want to navigate away from funding submissions edits? All unsaved changes will be lost.'
     );
