@@ -5,7 +5,7 @@
       <button type="button" class="btn-close" aria-label="Close" (click)="onCancelWarningClose()"></button>
     </div>
     <div class="modal-body">
-      <p class="mb-0">Are you sure you want to navigate away from funding allocation edits? All unsaved changes will be lost.</p>
+      <p class="mb-0">Are you sure you want to navigate away from funding submissions edits? All unsaved changes will be lost.</p>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-secondary" (click)="onCancelWarningClose()">Cancel</button>
@@ -104,7 +104,7 @@
             <td class="grid-item">{{data.priorityScore}}</td>
             <td class="grid-label sep">Annual or MYF:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.annualOrMyf}}</span>
+              <span *ngIf="!isEditMode">{{data.annualOrMyfName}}</span>
               <ng-select2 *ngIf="isEditMode" name="annualOrMyf" [(ngModel)]="formModel.annualOrMyf"
                 [data]="annualMyfOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>
@@ -126,7 +126,7 @@
             <td class="grid-item">{{data.recused || '-'}}</td>
             <td class="grid-label sep">DOC/NCI Selection:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docNciSelection}}</span>
+              <span *ngIf="!isEditMode">{{data.docNciSelectionName}}</span>
               <ng-select2 *ngIf="isEditMode" name="docNciSelection" [(ngModel)]="formModel.docNciSelection"
                 [data]="selectionOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>
@@ -216,7 +216,9 @@
       <!-- Buttons sit inside grid-container so they align with the table and stay visible -->
       <div class="d-flex justify-content-end gap-2 py-2 border-top">
         <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationError">{{saveValidationError}}</div>
-        <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode" (click)="onEdit()">Edit</button>
+        <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode"
+          [disabled]="!justificationLoaded" [title]="!justificationLoaded ? 'Loading justification…' : ''"
+          (click)="onEdit()">Edit</button>
         <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode" (click)="onCancel()">Cancel</button>
         <button type="button" class="btn btn-primary ms-3" *ngIf="isEditMode" (click)="onSave()">Save</button>
       </div>

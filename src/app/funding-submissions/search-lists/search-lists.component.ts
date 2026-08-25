@@ -33,7 +33,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private pendingGuardedAction: (() => void) | null = null;
   private pendingGuardCancelAction: (() => void) | null = null;
   private pendingRouteLeaveDecision: ((allow: boolean) => void) | null = null;
-  readonly unsavedChangesWarningMessage = 'WARNING! Are you sure you want to navigate away from funding allocations edits? All unsaved changes will be lost.';
+  readonly unsavedChangesWarningMessage = 'WARNING! Are you sure you want to navigate away from funding submissions edits? All unsaved changes will be lost.';
   private detailComponentsByApplId = new Map<number, any>();
   private tableGuardContainerEl: HTMLElement | null = null;
   private tableGuardCaptureHandler: ((event: Event) => void) | null = null;
@@ -333,7 +333,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 17
         {
           title: 'DOC/NCI Sel',
-          data: 'docNciSelection',
+          data: 'docNciSelectionName',
           width: '100px',
           defaultContent: ''
         }, // 18
@@ -346,7 +346,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 19
         {
           title: 'Annual or MYF',
-          data: 'annualOrMyf',
+          data: 'annualOrMyfName',
           width: '90px',
           defaultContent: ''
         }, // 20
@@ -522,14 +522,20 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
                       componentRef.instance.data = rowData;
                       componentRef.instance.listId = this.listId;
                       componentRef.instance.close.subscribe(() => {
-                        componentRef.destroy();
-                        this.detailComponentsByApplId.delete(applId);
-                        if (row.child.isShown()) {
-                          row.child.hide();
-                          tr.removeClass('shown');
-                          $(event.currentTarget).find('i').removeClass('fa-minus-circle').addClass('fa-plus-circle');
-                        }
+                        this.handleDetailRowClose(componentRef, applId, row, tr, $(event.currentTarget).find('i'));
                       });
+                      // Cancel (either path) reverts GrantDetailComponent to read-only and
+                      // stays open — no row teardown here. Deliberately a no-op with respect to
+                      // DOM teardown: do NOT call componentRef.destroy(), row.child.hide(), or
+                      // tr.removeClass('shown'). The chevron-collapse `close` subscriber above
+                      // is unchanged and remains the only path that tears the row down.
+                      componentRef.instance.editModeExited.subscribe(() => this.handleDetailEditModeExited());
+                      // `saved` fires after every successful save (funding-fields and/or
+                      // justification-only) once GrantDetailComponent has fully mutated the
+                      // shared `rowData` object — redraw this row so the grid's own cells pick
+                      // up the change immediately, without a page reload. No teardown here: the
+                      // row must stay expanded, unlike the `close` (collapse) path above.
+                      componentRef.instance.saved.subscribe(() => this.handleDetailSaved(row));
 
                       // Run Angular change detection
                       componentRef.changeDetectorRef.detectChanges();
@@ -596,6 +602,39 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
   }
+
+  // GrantDetailComponent's `close` output means "tear this row down" — actual chevron-collapse
+  // teardown. Extracted (rather than left as an inline arrow function) so it can be unit-tested
+  // directly in isolation from the DataTables-driven `.toggle-details` click wiring.
+  private handleDetailRowClose(componentRef: any, applId: number, row: any, tr: JQuery, toggleIcon: JQuery): void {
+    componentRef.destroy();
+    this.detailComponentsByApplId.delete(applId);
+    if (row.child.isShown()) {
+      row.child.hide();
+      tr.removeClass('shown');
+      toggleIcon.removeClass('fa-minus-circle').addClass('fa-plus-circle');
+    }
+  }
+
+  // GrantDetailComponent's `editModeExited` output means "edit mode ended (Cancel), no teardown
+  // needed" — deliberately a no-op with respect to DOM teardown. See
+  // Prompt - Grant Detail Cancel Reverts to Read-Only.md.
+  private handleDetailEditModeExited(): void {
+    // Intentionally no-op: Cancel reverts GrantDetailComponent to read-only in place;
+    // the row/section must remain expanded, unlike the `close` (collapse) path above.
+  }
+
+  // GrantDetailComponent's `saved` output means "the row's underlying data object was just
+  // mutated in place" — DataTables caches rendered <td> content and does not auto-reflect
+  // in-place JS object mutation, so an explicit invalidate()+draw() is required to make the
+  // grid's own cells (and Grant Detail's own read-only view, via the same shared object) show
+  // the new values without a page reload. Extracted (matching handleDetailRowClose()/
+  // handleDetailEditModeExited()) for testability. Must NOT tear down or collapse the detail
+  // row — unlike handleDetailRowClose(), row.child/tr classes are left untouched.
+  private handleDetailSaved(row: any): void {
+    row.invalidate().draw(false);
+  }
+
 
   private executeWithUnsavedGuard(action: () => void): void {
     this.executeWithUnsavedGuardOptions(action);

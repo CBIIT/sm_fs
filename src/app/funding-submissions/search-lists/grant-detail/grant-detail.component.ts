@@ -17,10 +17,26 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   @Input() data: any = null;
   @Input() listId: number;
   @Output() close = new EventEmitter<void>();
+  // Emitted when edit mode ends without any row teardown (Cancel, either path) — distinct from
+  // `close`, which remains reserved for actual row-collapse/teardown (chevron toggle). See
+  // Prompt - Grant Detail Cancel Reverts to Read-Only.md for the fix this supports.
+  @Output() editModeExited = new EventEmitter<void>();
+  // Emitted after every successful save (funding-fields and/or justification-only), once
+  // `this.data` has been fully mutated with the saved values — lets the parent
+  // (search-lists.component.ts) redraw its DataTables row so the list reflects the change
+  // immediately without a full page reload. Distinct from `close` (row teardown) and
+  // `editModeExited` (Cancel-flow no-op in the parent). See
+  // Prompt - Grant Detail Save Refresh (List and Own Display).md for the fix this supports.
+  @Output() saved = new EventEmitter<void>();
   @ViewChild('cancelEditWarningModal') private cancelEditWarningModalRef: TemplateRef<any>;
 
   isEditMode = false;
   grantViewerUrl = '';
+  // Guards onEdit() against pre-populating the form before the initial
+  // refreshJustificationData() fetch (triggered by ngOnInit()/ngOnChanges()) has resolved —
+  // otherwise the justification textarea could silently start blank/stale. Set true on both
+  // the success and error branches so a failed fetch never permanently locks out Edit mode.
+  justificationLoaded = false;
 
   formModel: FundingSubmBulkEditFieldsDto & { justificationText?: string } = {};
   justificationFile: File | null = null;
@@ -65,6 +81,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['listId'] || changes['data']) && this.listId && this.data?.applId) {
+      this.justificationLoaded = false;
       this.refreshJustificationData();
     }
   }
@@ -94,14 +111,20 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
 
   onEdit(): void {
+    // Guard against building formModel from stale/absent data while the initial
+    // justification fetch is still in flight — the template also disables the Edit button
+    // while !justificationLoaded, but this guard protects against any other trigger path.
+    if (!this.justificationLoaded) {
+      return;
+    }
     this.formModel = {
       docDecision:        this.data?.docDecision ?? null,
       docPriority:        this.data?.docPriority ?? null,
       docRecAmt:          this.data?.docRecommendedAmount ?? null,
       docRecReductionPct: this.data?.docRecommendedReductionPct ?? null,
       docNciSelection:    this.data?.docNciSelection ?? null,
-      annualFundingR01:   this.data ? (this.data.twoYearAnnualFundingR01Flag ? 'Yes' : 'No') : null,
-      budgetCategories:   this.data?.budgetCategories ?? null,
+      annualFundingR01:   this.data?.twoYearAnnualFundingR01Flag ? 'Yes' : null,
+      budgetCategories:   this.data?.budgetCategoryCode ?? null,
       docNotes:           this.data?.docNotes ?? '',
       oefiaNotes:         this.data?.oefiaNotes ?? '',
       annualOrMyf:        this.data?.annualOrMyf ?? null,
@@ -196,6 +219,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       this.initialFormSnapshot = '';
       this.initialFundingSnapshot = '';
       this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
+      this.saved.emit();
       this.cdr.detectChanges();
       return;
     }
@@ -219,6 +243,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
           this.isEditMode = false;
           this.initialFormSnapshot = '';
           this.savingInProgress = false;
+          this.saved.emit();
           this.cdr.detectChanges();
         }
       },
@@ -281,6 +306,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
           this.savingInProgress = false;
           this.justificationFile = null;
           this.justificationFileError = null;
+          this.saved.emit();
           this.cdr.detectChanges();
         });
       },
@@ -353,7 +379,11 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.initialFormSnapshot = '';
     this.initialFundingSnapshot = '';
     this.savingInProgress = false;
-    this.close.emit();
+    // Cancel (either path — no-unsaved-changes fast path via onCancel(), or confirmed-discard
+    // via onCancelWarningProceed()) reverts to read-only and stays open, mirroring how Save
+    // reverts to read-only (isEditMode = false + detectChanges(), no output emitted at all).
+    // `close` is reserved for actual row-collapse/teardown; this signals edit-mode-only exit.
+    this.editModeExited.emit();
     this.cdr.detectChanges();
   }
 
@@ -394,15 +424,48 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.data.docRecommendedAmount        = this.formModel.docRecAmt;
     this.data.docRecommendedReductionPct  = this.formModel.docRecReductionPct;
     this.data.docNciSelection             = this.formModel.docNciSelection;
-    this.data.twoYearAnnualFundingR01Flag = this.formModel.annualFundingR01;
-    this.data.budgetCategories            = this.formModel.budgetCategories;
+    // R01 refresh fix (2026-08-25): twoYearAnnualFundingR01Flag started life as a boolean;
+    // formModel.annualFundingR01 is the Yes/No string the dropdown renders. Writing the raw
+    // string back left a truthy value for 'No' (the main grid renders `data ? 'Y' : ''`),
+    // showing 'Y' regardless of the selected value. Coerce to a real boolean here.
+    this.data.twoYearAnnualFundingR01Flag = this.formModel.annualFundingR01 === 'Yes';
+    // budgetCategoryCode fix (2026-08-25): formModel.budgetCategories now holds the grant's
+    // budget category CODE (seeded in onEdit() from this.data.budgetCategoryCode, matching the
+    // CODE-keyed budgetCategoryOptions Select2), not the NAME the main grid displays. Sync
+    // budgetCategoryCode (not the NAME-valued budgetCategories) so a subsequent re-onEdit() on
+    // this same in-memory row still seeds the dropdown correctly without a full page reload.
+    this.data.budgetCategoryCode          = this.formModel.budgetCategories;
+    // Refresh fix (2026-08-25): budgetCategories (NAME) is what Grant Detail's own read-only
+    // view AND the parent grid's column actually render — this was never written back, so both
+    // stayed stale after a Budget Categories edit. Resolve the NAME from the CODE by looking up
+    // the selected CODE against budgetCategoryOptions ({id, text} = {CODE, NAME}). If the
+    // selection is empty/cleared or no match is found (e.g. options not yet loaded — see
+    // Assumptions to Verify in the fix prompt), fall back to null rather than throwing.
+    const selectedBudgetCategoryOption = this.budgetCategoryOptions.find(
+      option => option.id === this.formModel.budgetCategories
+    );
+    this.data.budgetCategories             = selectedBudgetCategoryOption?.text ?? null;
     this.data.docNotes                    = this.formModel.docNotes;
     this.data.oefiaNotes                  = this.formModel.oefiaNotes;
     this.data.annualOrMyf                 = this.formModel.annualOrMyf;
+    // DOC/NCI Selection & Annual/MYF CODE-vs-NAME fix (2026-08-25): docNciSelectionName and
+    // annualOrMyfName are what Grant Detail's own read-only view AND the parent grid's columns
+    // actually render — mirrors the budgetCategories NAME write-back above. Resolve each NAME
+    // from the selected CODE by looking up selectionOptions/annualMyfOptions ({id, text} =
+    // {CODE, NAME}), falling back to null when unmatched/cleared (e.g. options not yet loaded).
+    const selectedDocNciSelectionOption = this.selectionOptions.find(
+      option => option.id === this.formModel.docNciSelection
+    );
+    this.data.docNciSelectionName          = selectedDocNciSelectionOption?.text ?? null;
+    const selectedAnnualOrMyfOption = this.annualMyfOptions.find(
+      option => option.id === this.formModel.annualOrMyf
+    );
+    this.data.annualOrMyfName              = selectedAnnualOrMyfOption?.text ?? null;
   }
 
   private refreshJustificationData(onComplete?: () => void): void {
     if (!this.listId || !this.data?.applId) {
+      this.justificationLoaded = true;
       onComplete?.();
       return;
     }
@@ -419,11 +482,15 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         if (justification?.justificationText != null) {
           this.data.justificationText = justification.justificationText;
         }
+        this.justificationLoaded = true;
         this.cdr.detectChanges();
         onComplete?.();
       },
       error: (err) => {
         this.logger.debug('Unable to load justification documents', err);
+        // Still flip the flag on error so a failed fetch never permanently disables Edit.
+        this.justificationLoaded = true;
+        this.cdr.detectChanges();
         onComplete?.();
       }
     });

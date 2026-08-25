@@ -20,11 +20,18 @@ interface LookupCodeDto {
  * the same backend base path directly via `HttpClient`, matching the existing precedent in
  * `document.service.ts` for endpoints not (yet) covered by the generated client.
  *
- * <p><b>All five backing endpoints currently return mock/placeholder data</b> pending BA/DBA
- * confirmation of the authoritative source for each field (see
- * `FundingSubmDropdownLookupConstants` in `sm_i2e_fs_ws`). Once the generated client is
- * regenerated to include these endpoints, this service can be removed in favor of
- * `FundingSubmissionsControllerService`.</p>
+ * <p><b>Backing endpoint data source, confirmed 2026-08-24 (stability audit):</b>
+ * {@code getBudgetCategories()}, {@code getDocNciSelections()}, and
+ * {@code getAnnualOrMyfOptions()} are now backed by real, DBA-provided lookup tables
+ * ({@code FUNDING_SUBM_BUD_CAT_CODES_T}/{@code FUNDING_SUBM_DOC_NCI_SEL_CODES_T}/
+ * {@code FUNDING_SUBM_MYF_AF_CODES_T} respectively, via `sm_i2e_fs_ws`'s
+ * `FundingSubmissionsServiceImpl`). {@code getDocDecisions()} and
+ * {@code getAnnualFundingR01Options()} remain mock/placeholder data
+ * ({@code FundingSubmDropdownLookupConstants} in `sm_i2e_fs_ws`) because no corresponding lookup
+ * table exists in the schema for DOC Decision or Two-Year Annual Funding R01 — this is a schema
+ * gap, not an oversight; confirm with BA/DBA before assuming these need wiring to a real table.
+ * Once the generated client is regenerated to include these endpoints, this service can be
+ * removed in favor of `FundingSubmissionsControllerService`.</p>
  */
 @Injectable({
   providedIn: 'root'
@@ -64,7 +71,9 @@ export class FundingSubmDropdownLookupService {
 
   getAnnualFundingR01Options(): Observable<Select2OptionData[]> {
     if (!this.annualFundingR01Options$) {
-      this.annualFundingR01Options$ = this.fetchAsSelect2Options(`${this.basePath}/annual-funding-r01-options`);
+      this.annualFundingR01Options$ = this.fetchAsSelect2Options(`${this.basePath}/annual-funding-r01-options`).pipe(
+        map(options => options.filter(option => option.id === 'Yes' || option.text === 'Yes'))
+      );
     }
     return this.annualFundingR01Options$;
   }
