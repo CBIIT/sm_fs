@@ -220,7 +220,7 @@
       <div class="d-flex justify-content-end gap-2 py-2 border-top">
         <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationError">{{saveValidationError}}</div>
         <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode"
-          [disabled]="!justificationLoaded" [title]="!justificationLoaded ? 'Loading justification…' : ''"
+          [disabled]="!justificationLoaded || !budgetCategoriesLoaded" [title]="(!justificationLoaded || !budgetCategoriesLoaded) ? 'Loading…' : ''"
           (click)="onEdit()">Edit</button>
         <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode" (click)="onCancel()">Cancel</button>
         <button type="button" class="btn btn-primary ms-3" *ngIf="isEditMode" (click)="onSave()">Save</button>

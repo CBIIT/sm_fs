@@ -14,23 +14,34 @@ describe('GrantDetailComponent', () => {
   let component: GrantDetailComponent;
   let fixture: ComponentFixture<GrantDetailComponent>;
   let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsControllerService>;
+  let dropdownLookupServiceSpy: jasmine.SpyObj<FundingSubmDropdownLookupService>;
   let getJustificationSubject: Subject<any>;
+  // Budget Categories Race Condition fix (2026-08-25): hoisted alongside getJustificationSubject
+  // (mirroring the FS-2043 test harness pattern) so individual tests can swap
+  // getBudgetCategories() to simulate an in-flight/delayed/errored fetch, exactly as
+  // getJustificationSubject already does for refreshJustificationData().
+  let getBudgetCategoriesSubject: Subject<any>;
 
   beforeEach(async () => {
     getJustificationSubject = new Subject<any>();
+    getBudgetCategoriesSubject = new Subject<any>();
 
     fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsControllerService', [
       'getJustification', 'saveJustificationForm', 'bulkUpdateListGrants'
     ]);
     fundingSubmissionsServiceSpy.getJustification.and.returnValue(getJustificationSubject.asObservable());
 
-    const dropdownLookupServiceSpy = jasmine.createSpyObj('FundingSubmDropdownLookupService', [
+    dropdownLookupServiceSpy = jasmine.createSpyObj('FundingSubmDropdownLookupService', [
       'getDocDecisions', 'getAnnualFundingR01Options', 'getAnnualOrMyfOptions',
       'getBudgetCategories', 'getDocNciSelections'
     ]);
     dropdownLookupServiceSpy.getDocDecisions.and.returnValue(of([]));
     dropdownLookupServiceSpy.getAnnualFundingR01Options.and.returnValue(of([]));
     dropdownLookupServiceSpy.getAnnualOrMyfOptions.and.returnValue(of([]));
+    // Default: synchronous resolution (matches pre-existing test harness behavior for the other
+    // four dropdowns) so existing tests that call onEdit() without caring about this race are
+    // unaffected. Individual Budget Categories race-condition tests below re-stub this to
+    // getBudgetCategoriesSubject.asObservable() to simulate an in-flight fetch.
     dropdownLookupServiceSpy.getBudgetCategories.and.returnValue(of([]));
     dropdownLookupServiceSpy.getDocNciSelections.and.returnValue(of([]));
 
@@ -126,6 +137,135 @@ describe('GrantDetailComponent', () => {
     getJustificationSubject.next({ justificationText: 'second row text' });
     getJustificationSubject.complete();
     expect(component.justificationLoaded).toBeTrue();
+  });
+
+  // Prompt - Grant Detail Edit Button Budget Categories Race Condition (2026-08-25): mirrors the
+  // FS-2043 tests above exactly, adapted for budgetCategoryOptions/budgetCategoriesLoaded — the
+  // getBudgetCategories() fetch races onEdit() the same way getJustification() did.
+  describe('Budget Categories Race Condition fix (2026-08-25)', () => {
+    it('should not populate the form from onEdit() until the initial Budget Categories fetch resolves', () => {
+      dropdownLookupServiceSpy.getBudgetCategories.and.returnValue(getBudgetCategoriesSubject.asObservable());
+
+      fixture.detectChanges(); // ngOnInit() -> fetchDropdownOptions() (in flight)
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+
+      expect(component.budgetCategoriesLoaded).toBeFalse();
+
+      // Simulate a click on the (still-disabled) Edit button before the fetch resolves.
+      component.onEdit();
+      expect(component.isEditMode).toBeFalse();
+
+      // Fetch resolves.
+      getBudgetCategoriesSubject.next([{ id: 'ESIR37T4', text: 'ESI R37 T4 Board Competing Transition' }]);
+      getBudgetCategoriesSubject.complete();
+
+      expect(component.budgetCategoriesLoaded).toBeTrue();
+
+      // Now Edit is expected to work.
+      component.onEdit();
+      expect(component.isEditMode).toBeTrue();
+    });
+
+    it('should populate the form correctly once a delayed Budget Categories fetch resolves', () => {
+      dropdownLookupServiceSpy.getBudgetCategories.and.returnValue(getBudgetCategoriesSubject.asObservable());
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        justificationText: '',
+        budgetCategories: 'ESI R37 T4 Board Competing Transition',
+        budgetCategoryCode: 'ESIR37T4'
+      };
+
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+
+      getBudgetCategoriesSubject.next([{ id: 'ESIR37T4', text: 'ESI R37 T4 Board Competing Transition' }]);
+      getBudgetCategoriesSubject.complete();
+
+      component.onEdit();
+
+      expect(component.formModel.budgetCategories).toBe('ESIR37T4');
+    });
+
+    it('should still allow Edit mode to be reached if the Budget Categories fetch errors out', () => {
+      dropdownLookupServiceSpy.getBudgetCategories.and.returnValue(getBudgetCategoriesSubject.asObservable());
+
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+
+      expect(component.budgetCategoriesLoaded).toBeFalse();
+
+      getBudgetCategoriesSubject.error(new Error('network error'));
+
+      expect(component.budgetCategoriesLoaded).toBeTrue();
+
+      component.onEdit();
+      expect(component.isEditMode).toBeTrue();
+    });
+
+    it('should NOT reset budgetCategoriesLoaded on ngOnChanges() for a new row', () => {
+      fixture.detectChanges(); // default of([]) resolves synchronously
+      getJustificationSubject.next({ justificationText: 'first row text' });
+      getJustificationSubject.complete();
+      expect(component.budgetCategoriesLoaded).toBeTrue();
+
+      getJustificationSubject = new Subject<any>();
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(getJustificationSubject.asObservable());
+
+      component.data = { applId: 200, grantNumber: '1R01CA654321-01', justificationText: '' };
+      component.ngOnChanges({ data: {} as any });
+
+      // justificationLoaded resets (existing behavior); budgetCategoriesLoaded must NOT — the
+      // Budget Categories lookup is grant-independent and fetched once per session (Task 2.3).
+      expect(component.justificationLoaded).toBeFalse();
+      expect(component.budgetCategoriesLoaded).toBeTrue();
+
+      getJustificationSubject.next({ justificationText: 'second row text' });
+      getJustificationSubject.complete();
+      expect(component.budgetCategoriesLoaded).toBeTrue();
+    });
+
+    it('should block onEdit() until Budget Categories resolves even after justification is already loaded, and onSave() then resolves the correct NAME (not null)', () => {
+      dropdownLookupServiceSpy.getBudgetCategories.and.returnValue(getBudgetCategoriesSubject.asObservable());
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        justificationText: '',
+        budgetCategories: 'ESI R37 T4 Board Competing Transition',
+        budgetCategoryCode: 'ESIR37T4',
+        twoYearAnnualFundingR01Flag: false
+      };
+
+      fixture.detectChanges();
+      // justificationLoaded resolves first; Budget Categories fetch is still pending.
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+      expect(component.justificationLoaded).toBeTrue();
+      expect(component.budgetCategoriesLoaded).toBeFalse();
+
+      // onEdit() attempted while Budget Categories is still pending must be blocked.
+      component.onEdit();
+      expect(component.isEditMode).toBeFalse();
+
+      // Budget Categories resolves.
+      getBudgetCategoriesSubject.next([{ id: 'ESIR37T4', text: 'ESI R37 T4 Board Competing Transition' }]);
+      getBudgetCategoriesSubject.complete();
+      expect(component.budgetCategoriesLoaded).toBeTrue();
+
+      // onEdit() now succeeds.
+      component.onEdit();
+      expect(component.isEditMode).toBeTrue();
+
+      // onSave() -> applyFormModelToData() must resolve the NAME, not fall back to null.
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      component.formModel.docDecision = 'Pay';
+      component.onSave();
+
+      expect(component.data.budgetCategories).toBe('ESI R37 T4 Board Competing Transition');
+    });
   });
 
   // Prompt - Grant Detail Cancel Reverts to Read-Only (2026-08-25): Cancel should revert to

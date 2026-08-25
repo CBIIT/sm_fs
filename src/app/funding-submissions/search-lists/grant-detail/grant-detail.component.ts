@@ -37,6 +37,18 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   // otherwise the justification textarea could silently start blank/stale. Set true on both
   // the success and error branches so a failed fetch never permanently locks out Edit mode.
   justificationLoaded = false;
+  // Guards onEdit() against pre-populating (and, downstream, onSave() against writing back) the
+  // Budget Categories field before the initial getBudgetCategories() fetch (triggered by
+  // fetchDropdownOptions(), from ngOnInit()) has resolved — otherwise applyFormModelToData()'s
+  // CODE->NAME .find() against budgetCategoryOptions can silently resolve to null (fallback
+  // already in place for a genuinely-unmatched code) purely due to load timing. Set true on both
+  // the success and error branches so a failed fetch never permanently locks out Edit mode — same
+  // rationale as justificationLoaded. Unlike justificationLoaded, this is NOT reset in
+  // ngOnChanges(): budgetCategoryOptions is a grant-independent lookup table fetched once per
+  // session (shareReplay(1) in FundingSubmDropdownLookupService), never re-fetched on a row
+  // switch, so resetting this flag would permanently re-disable Edit after the first row. See
+  // Prompt - Grant Detail Edit Button Budget Categories Race Condition.md.
+  budgetCategoriesLoaded = false;
 
   formModel: FundingSubmBulkEditFieldsDto & { justificationText?: string } = {};
   justificationFile: File | null = null;
@@ -100,8 +112,17 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       error: err => this.logger.error('Failed to load Annual or MYF options', err)
     });
     this.dropdownLookupService.getBudgetCategories().subscribe({
-      next: options => { this.budgetCategoryOptions = options; this.cdr.detectChanges(); },
-      error: err => this.logger.error('Failed to load Budget Categories options', err)
+      next: options => {
+        this.budgetCategoryOptions = options;
+        this.budgetCategoriesLoaded = true;
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        this.logger.error('Failed to load Budget Categories options', err);
+        // Still flip the flag on error so a failed fetch never permanently disables Edit.
+        this.budgetCategoriesLoaded = true;
+        this.cdr.detectChanges();
+      }
     });
     this.dropdownLookupService.getDocNciSelections().subscribe({
       next: options => { this.selectionOptions = options; this.cdr.detectChanges(); },
@@ -128,7 +149,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     // Guard against building formModel from stale/absent data while the initial
     // justification fetch is still in flight — the template also disables the Edit button
     // while !justificationLoaded, but this guard protects against any other trigger path.
-    if (!this.justificationLoaded) {
+    if (!this.justificationLoaded || !this.budgetCategoriesLoaded) {
       return;
     }
     this.formModel = {
