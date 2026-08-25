@@ -116,7 +116,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       docRecAmt:          this.data?.docRecommendedAmount ?? null,
       docRecReductionPct: this.data?.docRecommendedReductionPct ?? null,
       docNciSelection:    this.data?.docNciSelection ?? null,
-      annualFundingR01:   this.data ? (this.data.twoYearAnnualFundingR01Flag ? 'Yes' : 'No') : null,
+      annualFundingR01:   this.data?.twoYearAnnualFundingR01Flag ? 'Yes' : null,
       budgetCategories:   this.data?.budgetCategoryCode ?? null,
       docNotes:           this.data?.docNotes ?? '',
       oefiaNotes:         this.data?.oefiaNotes ?? '',
