@@ -83,7 +83,9 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       },
       error: (err) => this.logger.error('Failed to load list status codes', err)
     });
-    this.fundingSubmissionsService.searchLists({ listStatus: ['Pending Review'], start: 0, length: 0 }).subscribe({
+    // Backend pagination validation requires length >= 1 (or -1 for return-all).
+    // We only need recordsTotal here, so request the minimum valid page size.
+    this.fundingSubmissionsService.searchLists({ listStatus: ['Pending Review'], start: 0, length: 1 }).subscribe({
       next: (result) => this.pendingReviewCount = result.recordsTotal ?? 0,
       error: (err) => this.logger.error('Failed to load pending review count', err)
     });
