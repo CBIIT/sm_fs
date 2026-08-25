@@ -273,14 +273,8 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         }
 
         $checkbox.on('click', () => {
-          data.selected = !data.selected;
-          if (data.selected) {
-            $checkbox.addClass('selected');
-            this.selectedRows.set(data.applId, data);
-          } else {
-            $checkbox.removeClass('selected');
-            this.selectedRows.delete(data.applId);
-          }
+          const selected = this.toggleRowSelection(data);
+          $checkbox.toggleClass('selected', selected);
         });
       },
 initComplete: () => {
@@ -293,15 +287,7 @@ initComplete: () => {
           $container.off('click.selectAll', 'thead .select-checkbox');
           $container.on('click.selectAll', 'thead .select-checkbox', () => {
             const pageData = dt.rows({ page: 'current' }).data().toArray();
-            const nowSelected = !this.allDataSelected(pageData);
-            for (const d of pageData.filter((row: any) => this.isRowSelectable(row))) {
-              d.selected = nowSelected;
-              if (nowSelected) {
-                this.selectedRows.set(d.applId, d);
-              } else {
-                this.selectedRows.delete(d.applId);
-              }
-            }
+            const nowSelected = this.applySelectAllToggle(pageData);
             $container.find('thead .select-checkbox').toggleClass('selected', nowSelected);
             $container.find('tbody .select-checkbox').not('.disabled').toggleClass('selected', nowSelected);
           });
@@ -355,6 +341,44 @@ allDataSelected(data: any[]): boolean {
 
   private isRowSelectable(row: any): boolean {
     return !row?.checkboxDisabled && !row?.existsInListSelectionDate;
+  }
+
+  /**
+   * Toggles a single row's selection state and keeps `selectedRows` in sync. Extracted from the
+   * row checkbox's click handler (grid-testable seam, Grant Search Results checkbox disable
+   * feature, Compass item 10) so the selection bookkeeping can be unit-tested without a live
+   * jQuery/DataTables DOM. Returns the row's new `selected` value so the caller can update the
+   * checkbox's CSS class.
+   */
+  private toggleRowSelection(data: any): boolean {
+    data.selected = !data.selected;
+    if (data.selected) {
+      this.selectedRows.set(data.applId, data);
+    } else {
+      this.selectedRows.delete(data.applId);
+    }
+    return data.selected;
+  }
+
+  /**
+   * Toggles select-all for the given current-page rows: selects (or deselects) every row that
+   * `isRowSelectable()` allows, ignoring rows already excluded because they're already in another
+   * list (`checkboxDisabled`/`existsInListSelectionDate`). Extracted from the header checkbox's
+   * click handler (same rationale as `toggleRowSelection()` above) so the "only affects enabled
+   * rows on the current page" business rule is directly unit-testable. Returns the new
+   * select-all state so the caller can update the header/body checkbox CSS classes.
+   */
+  private applySelectAllToggle(pageData: any[]): boolean {
+    const nowSelected = !this.allDataSelected(pageData);
+    for (const d of pageData.filter((row: any) => this.isRowSelectable(row))) {
+      d.selected = nowSelected;
+      if (nowSelected) {
+        this.selectedRows.set(d.applId, d);
+      } else {
+        this.selectedRows.delete(d.applId);
+      }
+    }
+    return nowSelected;
   }
   clearResults(): void {
     this.showResults = false;
