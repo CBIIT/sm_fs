@@ -45,7 +45,7 @@
             </td>
             <td class="grid-label">DOC Decision:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docDecision}}</span>
+              <span *ngIf="!isEditMode">{{getDocDecisionDisplay(data.docDecision)}}</span>
               <ng-select2 *ngIf="isEditMode" name="docDecision" [(ngModel)]="formModel.docDecision"
                 [data]="decisionOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>
@@ -138,7 +138,10 @@
           <!-- Row 6 -->
           <tr>
             <td class="grid-label">NOFO:</td>
-            <td class="grid-item">{{data.nofo}}</td>
+            <td class="grid-item">
+              <a *ngIf="data.nofoUrl" [href]="data.nofoUrl" ngbTooltip="Click to view NOFO" target="_blank">{{data.nofo}}</a>
+              <span *ngIf="!data.nofoUrl">{{data.nofo}}</span>
+            </td>
             <td class="grid-label">Previous Score:</td>
             <td class="grid-item">{{data.previousScore}}</td>
             <td class="grid-label sep align-top pt-2">DOC Notes<br><span class="fw-normal">(Optional)</span></td>
@@ -217,7 +220,7 @@
       <div class="d-flex justify-content-end gap-2 py-2 border-top">
         <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationError">{{saveValidationError}}</div>
         <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode"
-          [disabled]="!justificationLoaded" [title]="!justificationLoaded ? 'Loading justification…' : ''"
+          [disabled]="!justificationLoaded || !budgetCategoriesLoaded" [title]="(!justificationLoaded || !budgetCategoriesLoaded) ? 'Loading…' : ''"
           (click)="onEdit()">Edit</button>
         <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode" (click)="onCancel()">Cancel</button>
         <button type="button" class="btn btn-primary ms-3" *ngIf="isEditMode" (click)="onSave()">Save</button>

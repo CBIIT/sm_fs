@@ -117,4 +117,26 @@ describe('BulkEditComponent', () => {
     expect(payload.fields.budgetCategories).toBe('ESIR37T4');
     expect(payload.fields.budgetCategories).not.toBe('ESI R37 T4 Board Competing Transition');
   });
+
+  it('always sends every FundingSubmBulkEditFieldsDto key in the save payload, even when a row has no value for it', () => {
+    // Hardcoded expected key list mirrors the generated `FundingSubmBulkEditFieldsDto` interface
+    // (node_modules/@cbiit/i2efsws-lib/model/fundingSubmBulkEditFieldsDto.d.ts). Every field on
+    // that interface is optional, so TypeScript's structural typing does NOT catch a future field
+    // being silently dropped from onSave()'s payload object literal at compile time — an object
+    // missing a key is still assignable to a type where every property is optional. This list
+    // must be manually kept in sync with the generated DTO until/unless a build-time contract
+    // check exists (see the cross-repo DTO/field-list contract enforcement thread).
+    const expectedDtoKeys = [
+      'budgetCategories', 'docDecision', 'docNciSelection', 'annualFundingR01', 'annualOrMyf',
+      'docNotes', 'oefiaNotes', 'docPriority', 'docRecAmt', 'docRecReductionPct', 'recused'
+    ];
+
+    seedHistoryStateAndInit([grant()]);
+    fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+    component.onSave();
+
+    const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+    expect(Object.keys(payload.fields).sort()).toEqual(expectedDtoKeys.sort());
+  });
 });

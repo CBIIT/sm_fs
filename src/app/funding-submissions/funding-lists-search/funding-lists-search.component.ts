@@ -49,6 +49,26 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     setTimeout(() => this.dtTrigger.next(null), 75);
   }
 
+  /**
+   * Formats the "Last Action Date" grid column. {@code lastActionDate} is a date-only string
+   * (e.g. "2026-08-25"). Parsing it with `new Date(data)` treats it as UTC midnight, so reading
+   * it back with local getters (getMonth/getDate/getFullYear) rolls the displayed date back one
+   * day in any timezone behind UTC (e.g. America/New_York) — FS-2163. Parse the date components
+   * directly instead of round-tripping through Date/UTC conversion.
+   */
+  static formatLastActionDate(data: string): string {
+    if (!data) return '';
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(data);
+    if (!match) {
+      const d = new Date(data);
+      return isNaN(d.getTime())
+        ? data
+        : `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`;
+    }
+    const [, yyyy, mm, dd] = match;
+    return `${mm}/${dd}/${yyyy}`;
+  }
+
   constructor(
     private router: Router,
     private logger: NGXLogger,
@@ -160,14 +180,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
           data: 'lastActionDate',
           width: '130px',
           defaultContent: '',
-          render: (data: string) => {
-            if (!data) return '';
-            const d = new Date(data);
-            if (isNaN(d.getTime())) return data;
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            return `${mm}/${dd}/${d.getFullYear()}`;
-          }
+          render: (data: string) => FundingListsSearchComponent.formatLastActionDate(data)
         }, // 4
         {
           title: 'Action',
