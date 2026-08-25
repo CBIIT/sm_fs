@@ -138,7 +138,10 @@
           <!-- Row 6 -->
           <tr>
             <td class="grid-label">NOFO:</td>
-            <td class="grid-item">{{data.nofo}}</td>
+            <td class="grid-item">
+              <a *ngIf="data.nofoUrl" [href]="data.nofoUrl" ngbTooltip="Click to view NOFO" target="_blank">{{data.nofo}}</a>
+              <span *ngIf="!data.nofoUrl">{{data.nofo}}</span>
+            </td>
             <td class="grid-label">Previous Score:</td>
             <td class="grid-item">{{data.previousScore}}</td>
             <td class="grid-label sep align-top pt-2">DOC Notes<br><span class="fw-normal">(Optional)</span></td>
