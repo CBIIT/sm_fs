@@ -455,6 +455,13 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
               // Use container so fixedColumns clones are included
               const $container = $(dt.table(0).container());
 
+              // Sorting by column headers should always clear current selections.
+              $container
+                .off('click.clearOnSort', 'thead th.sorting, thead th.sorting_asc, thead th.sorting_desc')
+                .on('click.clearOnSort', 'thead th.sorting, thead th.sorting_asc, thead th.sorting_desc', () => {
+                  this.clearSelections(dt, $container);
+                });
+
               $container.find('thead .select-checkbox').off('click').on('click', () => {
                 const $hdr = $container.find('thead .select-checkbox');
                 if ($hdr.first().hasClass('selected')) {
@@ -653,7 +660,24 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (columnIndex < 0) return null;
 
     const nextDir: 'asc' | 'desc' = sortHeader.classList.contains('sorting_asc') ? 'desc' : 'asc';
-    return () => dt.order([columnIndex, nextDir]).draw(false);
+    return () => {
+      this.clearSelections(dt);
+      dt.order([columnIndex, nextDir]).draw(false);
+    };
+  }
+
+  private clearSelections(dt: DataTables.Api, container?: JQuery<HTMLElement>): void {
+    this.selectedRows.clear();
+    dt.rows().every(function() {
+      const rowData = this.data() as any;
+      if (rowData) {
+        rowData.selected = false;
+      }
+    });
+
+    const $container = container || $(dt.table(0).container());
+    $container.find('thead .select-checkbox').removeClass('selected');
+    $container.find('tbody .select-checkbox').removeClass('selected');
   }
 
   private buildPaginationIntentAction(dt: DataTables.Api, pageNode: HTMLElement): (() => void) | null {

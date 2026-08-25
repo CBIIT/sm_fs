@@ -307,6 +307,10 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     return this.savingInProgress;
   }
 
+  onNotesModelChange(): void {
+    this.cdr.detectChanges();
+  }
+
   get justificationDocumentNames(): string {
     const namesFromDocuments = this.justificationDocuments
       .map((doc: any) => doc?.docFilename || doc?.doc || doc?.docDescription)
