@@ -196,4 +196,58 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(modalServiceSpy.open).not.toHaveBeenCalled();
     });
   });
+
+  // Prompt - Grant Detail Cancel Reverts to Read-Only (2026-08-25): GrantDetailComponent's
+  // `close` output (chevron collapse) must still fully tear the row down; the new
+  // `editModeExited` output (Cancel, either path) must be a no-op with respect to DOM teardown.
+  // These handlers are extracted onto the component precisely so they're unit-testable without
+  // going through the DataTables-driven `.toggle-details` click wiring (untestable in this spec
+  // today, since ngAfterViewInit/DataTables init is deliberately skipped — see beforeEach above).
+  describe('detail row output wiring (close vs. editModeExited)', () => {
+    function fakeRow(shown: boolean) {
+      return {
+        child: {
+          isShown: () => shown,
+          hide: jasmine.createSpy('hide')
+        }
+      };
+    }
+
+    function fakeJq() {
+      const jq: any = {
+        removeClass: jasmine.createSpy('removeClass').and.callFake(() => jq),
+        addClass: jasmine.createSpy('addClass').and.callFake(() => jq)
+      };
+      return jq;
+    }
+
+    it('handleDetailRowClose(): destroys the component, removes it from the map, and hides/collapses the row when shown', () => {
+      const componentRef = { destroy: jasmine.createSpy('destroy') };
+      const row = fakeRow(true);
+      const tr = fakeJq();
+      const toggleIcon = fakeJq();
+      (component as any).detailComponentsByApplId.set(100, componentRef);
+
+      (component as any).handleDetailRowClose(componentRef, 100, row, tr, toggleIcon);
+
+      expect(componentRef.destroy).toHaveBeenCalled();
+      expect((component as any).detailComponentsByApplId.has(100)).toBeFalse();
+      expect(row.child.hide).toHaveBeenCalled();
+      expect(tr.removeClass).toHaveBeenCalledWith('shown');
+      expect(toggleIcon.removeClass).toHaveBeenCalledWith('fa-minus-circle');
+      expect(toggleIcon.addClass).toHaveBeenCalledWith('fa-plus-circle');
+    });
+
+    it('handleDetailEditModeExited(): does not destroy the component, remove it from the map, or touch row/DOM teardown state', () => {
+      const componentRef = { destroy: jasmine.createSpy('destroy') };
+      const row = fakeRow(true);
+      (component as any).detailComponentsByApplId.set(100, componentRef);
+
+      (component as any).handleDetailEditModeExited();
+
+      expect(componentRef.destroy).not.toHaveBeenCalled();
+      expect((component as any).detailComponentsByApplId.has(100)).toBeTrue();
+      expect(row.child.hide).not.toHaveBeenCalled();
+    });
+  });
 });

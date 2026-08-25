@@ -127,4 +127,65 @@ describe('GrantDetailComponent', () => {
     getJustificationSubject.complete();
     expect(component.justificationLoaded).toBeTrue();
   });
+
+  // Prompt - Grant Detail Cancel Reverts to Read-Only (2026-08-25): Cancel should revert to
+  // read-only and stay open (isEditMode = false, editModeExited emitted), not tear the row down
+  // (close must NOT be emitted). Both Cancel paths must behave identically per operator
+  // confirmation — no special-casing.
+  describe('Cancel reverts to read-only (does not emit close)', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: 'Previously saved justification' });
+      getJustificationSubject.complete();
+      component.onEdit();
+      expect(component.isEditMode).toBeTrue();
+    });
+
+    it('onCancel() with no unsaved changes emits editModeExited, not close, and reverts to read-only', () => {
+      const closeSpy = jasmine.createSpy('close');
+      const editModeExitedSpy = jasmine.createSpy('editModeExited');
+      component.close.subscribe(closeSpy);
+      component.editModeExited.subscribe(editModeExitedSpy);
+
+      component.onCancel();
+
+      expect(component.isEditMode).toBeFalse();
+      expect(editModeExitedSpy).toHaveBeenCalledTimes(1);
+      expect(closeSpy).not.toHaveBeenCalled();
+    });
+
+    it('onCancelWarningProceed() (confirmed-discard path) emits editModeExited, not close, and reverts to read-only', () => {
+      const closeSpy = jasmine.createSpy('close');
+      const editModeExitedSpy = jasmine.createSpy('editModeExited');
+      component.close.subscribe(closeSpy);
+      component.editModeExited.subscribe(editModeExitedSpy);
+
+      // Simulate an unsaved change so this exercises the warning-modal path's proceed handler.
+      component.formModel.docNotes = 'changed';
+      expect(component.hasUnsavedChanges()).toBeTrue();
+
+      component.onCancelWarningProceed();
+
+      expect(component.isEditMode).toBeFalse();
+      expect(component.formModel).toEqual({});
+      expect(editModeExitedSpy).toHaveBeenCalledTimes(1);
+      expect(closeSpy).not.toHaveBeenCalled();
+    });
+
+    it('both Cancel paths behave identically: same end state, same output emitted', () => {
+      // Fast path (no unsaved changes)
+      const editModeExitedSpy = jasmine.createSpy('editModeExited');
+      component.editModeExited.subscribe(editModeExitedSpy);
+      component.onCancel();
+      expect(component.isEditMode).toBeFalse();
+      expect(editModeExitedSpy).toHaveBeenCalledTimes(1);
+
+      // Confirmed-discard path (re-enter edit mode, make a change, proceed)
+      component.onEdit();
+      component.formModel.docNotes = 'changed again';
+      component.onCancelWarningProceed();
+      expect(component.isEditMode).toBeFalse();
+      expect(editModeExitedSpy).toHaveBeenCalledTimes(2);
+    });
+  });
 });

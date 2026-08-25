@@ -523,14 +523,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
                       componentRef.instance.data = rowData;
                       componentRef.instance.listId = this.listId;
                       componentRef.instance.close.subscribe(() => {
-                        componentRef.destroy();
-                        this.detailComponentsByApplId.delete(applId);
-                        if (row.child.isShown()) {
-                          row.child.hide();
-                          tr.removeClass('shown');
-                          $(event.currentTarget).find('i').removeClass('fa-minus-circle').addClass('fa-plus-circle');
-                        }
+                        this.handleDetailRowClose(componentRef, applId, row, tr, $(event.currentTarget).find('i'));
                       });
+                      // Cancel (either path) reverts GrantDetailComponent to read-only and
+                      // stays open — no row teardown here. Deliberately a no-op with respect to
+                      // DOM teardown: do NOT call componentRef.destroy(), row.child.hide(), or
+                      // tr.removeClass('shown'). The chevron-collapse `close` subscriber above
+                      // is unchanged and remains the only path that tears the row down.
+                      componentRef.instance.editModeExited.subscribe(() => this.handleDetailEditModeExited());
 
                       // Run Angular change detection
                       componentRef.changeDetectorRef.detectChanges();
@@ -597,6 +597,28 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
   }
+
+  // GrantDetailComponent's `close` output means "tear this row down" — actual chevron-collapse
+  // teardown. Extracted (rather than left as an inline arrow function) so it can be unit-tested
+  // directly in isolation from the DataTables-driven `.toggle-details` click wiring.
+  private handleDetailRowClose(componentRef: any, applId: number, row: any, tr: JQuery, toggleIcon: JQuery): void {
+    componentRef.destroy();
+    this.detailComponentsByApplId.delete(applId);
+    if (row.child.isShown()) {
+      row.child.hide();
+      tr.removeClass('shown');
+      toggleIcon.removeClass('fa-minus-circle').addClass('fa-plus-circle');
+    }
+  }
+
+  // GrantDetailComponent's `editModeExited` output means "edit mode ended (Cancel), no teardown
+  // needed" — deliberately a no-op with respect to DOM teardown. See
+  // Prompt - Grant Detail Cancel Reverts to Read-Only.md.
+  private handleDetailEditModeExited(): void {
+    // Intentionally no-op: Cancel reverts GrantDetailComponent to read-only in place;
+    // the row/section must remain expanded, unlike the `close` (collapse) path above.
+  }
+
 
   private executeWithUnsavedGuard(action: () => void): void {
     this.executeWithUnsavedGuardOptions(action);

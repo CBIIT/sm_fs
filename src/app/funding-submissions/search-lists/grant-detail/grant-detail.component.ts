@@ -17,6 +17,10 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   @Input() data: any = null;
   @Input() listId: number;
   @Output() close = new EventEmitter<void>();
+  // Emitted when edit mode ends without any row teardown (Cancel, either path) — distinct from
+  // `close`, which remains reserved for actual row-collapse/teardown (chevron toggle). See
+  // Prompt - Grant Detail Cancel Reverts to Read-Only.md for the fix this supports.
+  @Output() editModeExited = new EventEmitter<void>();
   @ViewChild('cancelEditWarningModal') private cancelEditWarningModalRef: TemplateRef<any>;
 
   isEditMode = false;
@@ -365,7 +369,11 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.initialFormSnapshot = '';
     this.initialFundingSnapshot = '';
     this.savingInProgress = false;
-    this.close.emit();
+    // Cancel (either path — no-unsaved-changes fast path via onCancel(), or confirmed-discard
+    // via onCancelWarningProceed()) reverts to read-only and stays open, mirroring how Save
+    // reverts to read-only (isEditMode = false + detectChanges(), no output emitted at all).
+    // `close` is reserved for actual row-collapse/teardown; this signals edit-mode-only exit.
+    this.editModeExited.emit();
     this.cdr.detectChanges();
   }
 
