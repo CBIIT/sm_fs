@@ -531,6 +531,12 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
                       // tr.removeClass('shown'). The chevron-collapse `close` subscriber above
                       // is unchanged and remains the only path that tears the row down.
                       componentRef.instance.editModeExited.subscribe(() => this.handleDetailEditModeExited());
+                      // `saved` fires after every successful save (funding-fields and/or
+                      // justification-only) once GrantDetailComponent has fully mutated the
+                      // shared `rowData` object — redraw this row so the grid's own cells pick
+                      // up the change immediately, without a page reload. No teardown here: the
+                      // row must stay expanded, unlike the `close` (collapse) path above.
+                      componentRef.instance.saved.subscribe(() => this.handleDetailSaved(row));
 
                       // Run Angular change detection
                       componentRef.changeDetectorRef.detectChanges();
@@ -617,6 +623,17 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private handleDetailEditModeExited(): void {
     // Intentionally no-op: Cancel reverts GrantDetailComponent to read-only in place;
     // the row/section must remain expanded, unlike the `close` (collapse) path above.
+  }
+
+  // GrantDetailComponent's `saved` output means "the row's underlying data object was just
+  // mutated in place" — DataTables caches rendered <td> content and does not auto-reflect
+  // in-place JS object mutation, so an explicit invalidate()+draw() is required to make the
+  // grid's own cells (and Grant Detail's own read-only view, via the same shared object) show
+  // the new values without a page reload. Extracted (matching handleDetailRowClose()/
+  // handleDetailEditModeExited()) for testability. Must NOT tear down or collapse the detail
+  // row — unlike handleDetailRowClose(), row.child/tr classes are left untouched.
+  private handleDetailSaved(row: any): void {
+    row.invalidate().draw(false);
   }
 
 

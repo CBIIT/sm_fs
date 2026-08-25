@@ -21,6 +21,13 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   // `close`, which remains reserved for actual row-collapse/teardown (chevron toggle). See
   // Prompt - Grant Detail Cancel Reverts to Read-Only.md for the fix this supports.
   @Output() editModeExited = new EventEmitter<void>();
+  // Emitted after every successful save (funding-fields and/or justification-only), once
+  // `this.data` has been fully mutated with the saved values — lets the parent
+  // (search-lists.component.ts) redraw its DataTables row so the list reflects the change
+  // immediately without a full page reload. Distinct from `close` (row teardown) and
+  // `editModeExited` (Cancel-flow no-op in the parent). See
+  // Prompt - Grant Detail Save Refresh (List and Own Display).md for the fix this supports.
+  @Output() saved = new EventEmitter<void>();
   @ViewChild('cancelEditWarningModal') private cancelEditWarningModalRef: TemplateRef<any>;
 
   isEditMode = false;
@@ -212,6 +219,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       this.initialFormSnapshot = '';
       this.initialFundingSnapshot = '';
       this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
+      this.saved.emit();
       this.cdr.detectChanges();
       return;
     }
@@ -235,6 +243,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
           this.isEditMode = false;
           this.initialFormSnapshot = '';
           this.savingInProgress = false;
+          this.saved.emit();
           this.cdr.detectChanges();
         }
       },
@@ -297,6 +306,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
           this.savingInProgress = false;
           this.justificationFile = null;
           this.justificationFileError = null;
+          this.saved.emit();
           this.cdr.detectChanges();
         });
       },
@@ -414,14 +424,27 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.data.docRecommendedAmount        = this.formModel.docRecAmt;
     this.data.docRecommendedReductionPct  = this.formModel.docRecReductionPct;
     this.data.docNciSelection             = this.formModel.docNciSelection;
-    this.data.twoYearAnnualFundingR01Flag = this.formModel.annualFundingR01;
+    // R01 refresh fix (2026-08-25): twoYearAnnualFundingR01Flag started life as a boolean;
+    // formModel.annualFundingR01 is the Yes/No string the dropdown renders. Writing the raw
+    // string back left a truthy value for 'No' (the main grid renders `data ? 'Y' : ''`),
+    // showing 'Y' regardless of the selected value. Coerce to a real boolean here.
+    this.data.twoYearAnnualFundingR01Flag = this.formModel.annualFundingR01 === 'Yes';
     // budgetCategoryCode fix (2026-08-25): formModel.budgetCategories now holds the grant's
     // budget category CODE (seeded in onEdit() from this.data.budgetCategoryCode, matching the
     // CODE-keyed budgetCategoryOptions Select2), not the NAME the main grid displays. Sync
     // budgetCategoryCode (not the NAME-valued budgetCategories) so a subsequent re-onEdit() on
-    // this same in-memory row still seeds the dropdown correctly without a full page reload;
-    // leaving budgetCategories (NAME) untouched here preserves the main grid's display value.
+    // this same in-memory row still seeds the dropdown correctly without a full page reload.
     this.data.budgetCategoryCode          = this.formModel.budgetCategories;
+    // Refresh fix (2026-08-25): budgetCategories (NAME) is what Grant Detail's own read-only
+    // view AND the parent grid's column actually render — this was never written back, so both
+    // stayed stale after a Budget Categories edit. Resolve the NAME from the CODE by looking up
+    // the selected CODE against budgetCategoryOptions ({id, text} = {CODE, NAME}). If the
+    // selection is empty/cleared or no match is found (e.g. options not yet loaded — see
+    // Assumptions to Verify in the fix prompt), fall back to null rather than throwing.
+    const selectedBudgetCategoryOption = this.budgetCategoryOptions.find(
+      option => option.id === this.formModel.budgetCategories
+    );
+    this.data.budgetCategories             = selectedBudgetCategoryOption?.text ?? null;
     this.data.docNotes                    = this.formModel.docNotes;
     this.data.oefiaNotes                  = this.formModel.oefiaNotes;
     this.data.annualOrMyf                 = this.formModel.annualOrMyf;

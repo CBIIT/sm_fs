@@ -237,4 +237,105 @@ describe('GrantDetailComponent', () => {
       expect(payload.fields.budgetCategories).toBe('ESIR37T4');
     });
   });
+
+  // Prompt - Grant Detail Save Refresh (List and Own Display) (2026-08-25): onSave()/
+  // saveJustification() must emit `saved` once `this.data` mutation is complete, so the parent
+  // (search-lists.component.ts) can redraw its DataTables row. applyFormModelToData() must also
+  // resolve+write the Budget Categories NAME (not just CODE) and coerce the R01 flag to a real
+  // boolean.
+  describe('Save refresh fix (2026-08-25)', () => {
+    beforeEach(() => {
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        justificationText: '',
+        budgetCategories: 'ESI R37 T4 Board Competing Transition',
+        budgetCategoryCode: 'ESIR37T4',
+        twoYearAnnualFundingR01Flag: false
+      };
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+
+      // Populate budgetCategoryOptions the way fetchDropdownOptions() normally does, so the
+      // NAME-resolution lookup in applyFormModelToData() has something to match against.
+      (component as any).budgetCategoryOptions = [
+        { id: 'ESIR37T4', text: 'ESI R37 T4 Board Competing Transition' },
+        { id: 'OTHER', text: 'Other Category' }
+      ];
+    });
+
+    it('emits saved on a successful funding-fields save', () => {
+      component.onEdit();
+      component.formModel.docDecision = 'Pay';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      const savedSpy = jasmine.createSpy('saved');
+      component.saved.subscribe(savedSpy);
+
+      component.onSave();
+
+      expect(savedSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('emits saved on a successful justification-only save', () => {
+      component.onEdit();
+      component.formModel.justificationText = 'New justification text';
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
+      // saveJustification()'s success path re-fetches via refreshJustificationData() — return a
+      // fresh, already-resolved observable so its next() (and therefore the onComplete callback
+      // that emits `saved`) fires synchronously, since the initial getJustificationSubject used
+      // for ngOnInit()'s fetch has already completed.
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: 'New justification text' } as any));
+
+      const savedSpy = jasmine.createSpy('saved');
+      component.saved.subscribe(savedSpy);
+
+      component.onSave();
+
+      expect(savedSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('applyFormModelToData() resolves and writes both budgetCategories (NAME) and budgetCategoryCode (CODE)', () => {
+      component.onEdit();
+      component.formModel.budgetCategories = 'OTHER';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onSave();
+
+      expect(component.data.budgetCategoryCode).toBe('OTHER');
+      expect(component.data.budgetCategories).toBe('Other Category');
+    });
+
+    it('applyFormModelToData() gracefully clears both budget category fields when the selection has no matching option', () => {
+      component.onEdit();
+      component.formModel.budgetCategories = null;
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      expect(() => component.onSave()).not.toThrow();
+
+      expect(component.data.budgetCategories).toBeNull();
+    });
+
+    it('writes twoYearAnnualFundingR01Flag as a real boolean true when "Yes" is selected', () => {
+      component.onEdit();
+      component.formModel.annualFundingR01 = 'Yes';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onSave();
+
+      expect(component.data.twoYearAnnualFundingR01Flag).toBe(true);
+    });
+
+    it('writes twoYearAnnualFundingR01Flag as a real boolean false (not a truthy string) when "No" is selected', () => {
+      component.data.twoYearAnnualFundingR01Flag = true;
+      component.onEdit();
+      component.formModel.annualFundingR01 = 'No';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onSave();
+
+      expect(component.data.twoYearAnnualFundingR01Flag).toBe(false);
+    });
+  });
 });

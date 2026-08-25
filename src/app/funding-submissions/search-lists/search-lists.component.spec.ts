@@ -250,4 +250,43 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(row.child.hide).not.toHaveBeenCalled();
     });
   });
+
+  // Prompt - Grant Detail Save Refresh (List and Own Display) (2026-08-25): GrantDetailComponent's
+  // `saved` output means "the row's underlying data object was just mutated in place" — DataTables
+  // caches rendered <td> content and needs an explicit invalidate()+draw() to reflect it. This
+  // handler must NOT tear down or collapse the detail row (contrast with handleDetailRowClose()).
+  describe('detail row output wiring (saved)', () => {
+    function fakeInvalidatingRow(shown: boolean) {
+      const api = { draw: jasmine.createSpy('draw') };
+      return {
+        child: {
+          isShown: () => shown,
+          hide: jasmine.createSpy('hide')
+        },
+        invalidate: jasmine.createSpy('invalidate').and.returnValue(api),
+        drawApi: api
+      };
+    }
+
+    it('handleDetailSaved(): calls row.invalidate().draw(false) for the correct row', () => {
+      const row = fakeInvalidatingRow(true);
+
+      (component as any).handleDetailSaved(row);
+
+      expect(row.invalidate).toHaveBeenCalledTimes(1);
+      expect(row.drawApi.draw).toHaveBeenCalledWith(false);
+    });
+
+    it('handleDetailSaved(): does NOT tear down or collapse the detail row', () => {
+      const componentRef = { destroy: jasmine.createSpy('destroy') };
+      const row = fakeInvalidatingRow(true);
+      (component as any).detailComponentsByApplId.set(100, componentRef);
+
+      (component as any).handleDetailSaved(row);
+
+      expect(componentRef.destroy).not.toHaveBeenCalled();
+      expect((component as any).detailComponentsByApplId.has(100)).toBeTrue();
+      expect(row.child.hide).not.toHaveBeenCalled();
+    });
+  });
 });
