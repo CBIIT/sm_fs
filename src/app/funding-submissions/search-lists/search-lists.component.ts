@@ -33,7 +33,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private pendingGuardedAction: (() => void) | null = null;
   private pendingGuardCancelAction: (() => void) | null = null;
   private pendingRouteLeaveDecision: ((allow: boolean) => void) | null = null;
-  readonly unsavedChangesWarningMessage = 'WARNING! Are you sure you want to navigate away from funding allocations edits? All unsaved changes will be lost.';
+  readonly unsavedChangesWarningMessage = 'WARNING! Are you sure you want to navigate away from funding submissions edits? All unsaved changes will be lost.';
   private detailComponentsByApplId = new Map<number, any>();
   private tableGuardContainerEl: HTMLElement | null = null;
   private tableGuardCaptureHandler: ((event: Event) => void) | null = null;
