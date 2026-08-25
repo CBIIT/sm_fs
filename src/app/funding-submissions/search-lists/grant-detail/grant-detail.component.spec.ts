@@ -192,6 +192,32 @@ describe('GrantDetailComponent', () => {
   // Bulk Edit / Grant Detail CODE-vs-NAME fix (2026-08-25): onEdit() must seed formModel from the
   // grant's budgetCategoryCode (CODE), not the NAME-valued budgetCategories, so it matches the
   // CODE-keyed budgetCategoryOptions Select2 and can pre-select the correct option.
+  // Display CODE vs NAME Reconciliation (2026-08-25): Grant Detail's read-only "DOC Decision"
+  // span must resolve the raw CODE to its NAME via getDocDecisionDisplay(), falling back to the
+  // raw code for an unresolvable value, exactly like the docDecision DataTables column renderer
+  // on search-lists.component.ts.
+  describe('DOC Decision CODE-vs-NAME display fix (2026-08-25)', () => {
+    it('getDocDecisionDisplay() resolves a known CODE to its NAME via decisionOptions', () => {
+      component.decisionOptions = [{ id: 'Pay', text: 'Pay' }, { id: 'Do Not Pay', text: 'Do Not Pay' }];
+
+      expect(component.getDocDecisionDisplay('Pay')).toBe('Pay');
+      expect(component.getDocDecisionDisplay('Do Not Pay')).toBe('Do Not Pay');
+    });
+
+    it('getDocDecisionDisplay() falls back to the raw code for an unresolvable value instead of throwing or blanking out', () => {
+      component.decisionOptions = [{ id: 'Pay', text: 'Pay' }];
+
+      expect(component.getDocDecisionDisplay('Some Future Code')).toBe('Some Future Code');
+    });
+
+    it('getDocDecisionDisplay() returns an empty string for a null/blank code', () => {
+      component.decisionOptions = [{ id: 'Pay', text: 'Pay' }];
+
+      expect(component.getDocDecisionDisplay(null)).toBe('');
+      expect(component.getDocDecisionDisplay('')).toBe('');
+    });
+  });
+
   describe('Budget Categories CODE-vs-NAME fix (2026-08-25)', () => {
     it('onEdit() seeds formModel.budgetCategories from the grant\'s budgetCategoryCode, not the NAME-valued budgetCategories', () => {
       component.data = {

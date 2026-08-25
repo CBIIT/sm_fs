@@ -13,6 +13,7 @@ import { openNewWindow } from '../../utils/utils';
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { HttpClient } from '@angular/common/http';
+import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-lookup.service';
 
 declare var $: any;
 
@@ -70,6 +71,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     { id: 'both', text: 'Abstract(s) and Summary Statement(s)' },
   ];
 
+  // Display CODE vs NAME Reconciliation (2026-08-25): docDecision CODE → NAME lookup map,
+  // built once from FundingSubmDropdownLookupService's cached options (shared with Individual
+  // Edit / Bulk Edit, not a second/duplicate lookup-fetching mechanism). Populated in
+  // ngOnInit(); see resolveDocDecisionDisplay(). Future-proofing only — docDecision's mock data
+  // currently defines CODE and NAME as the same literal string, so this map has no live-visible
+  // effect today, but protects the grid if a real lookup table is ever introduced.
+  private docDecisionDisplayMap = new Map<string, string>();
+
   constructor(
     private loaderService: LoaderService,
     private route: ActivatedRoute,
@@ -80,10 +89,20 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private fundingSubmissionsService: FundingSubmissionsControllerService,
     private http: HttpClient,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private dropdownLookupService: FundingSubmDropdownLookupService
   ) { }
 
   ngOnInit(): void {
+    this.dropdownLookupService.getDocDecisions().subscribe({
+      next: options => {
+        this.docDecisionDisplayMap = new Map(options.map(option => [String(option.id), option.text]));
+        if (this.dtElement?.dtInstance) {
+          this.dtElement.dtInstance.then(dtInstance => dtInstance.rows().invalidate().draw(false));
+        }
+      },
+      error: err => this.logger.error('Failed to load DOC Decision options', err)
+    });
     this.route.queryParams.subscribe(params => {
       if (params['listId']) {
         this.listId = Number(params['listId']);
@@ -190,6 +209,19 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return 'status-' + (status || '').toLowerCase().replace(/\s+/g, '-');
   }
 
+  /**
+   * Display CODE vs NAME Reconciliation (2026-08-25): resolves a raw docDecision CODE to its
+   * human-readable NAME via docDecisionDisplayMap (built from FundingSubmDropdownLookupService's
+   * docDecision options), falling back to the raw code if no match is found so an unrecognized
+   * value never throws or renders blank.
+   */
+  private resolveDocDecisionDisplay(code: string): string {
+    if (!code) {
+      return '';
+    }
+    return this.docDecisionDisplayMap.get(code) ?? code;
+  }
+
   ngAfterViewInit(): void {
     this.dtOptions = {
       pagingType: 'full_numbers',
@@ -259,7 +291,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, // 6
         {
           title: 'IMPAC II Status',
-          data: 'impacStatus',
+          data: 'impacStatusDescrip',
           width: '100px',
           defaultContent: ''
         }, // 7
@@ -309,7 +341,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           title: 'DOC Decision',
           data: 'docDecision',
           width: '90px',
-          defaultContent: ''
+          defaultContent: '',
+          render: (data: string) => this.resolveDocDecisionDisplay(data)
         }, // 14
         {
           title: 'DOC Priority',

@@ -45,7 +45,7 @@
             </td>
             <td class="grid-label">DOC Decision:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.docDecision}}</span>
+              <span *ngIf="!isEditMode">{{getDocDecisionDisplay(data.docDecision)}}</span>
               <ng-select2 *ngIf="isEditMode" name="docDecision" [(ngModel)]="formModel.docDecision"
                 [data]="decisionOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>

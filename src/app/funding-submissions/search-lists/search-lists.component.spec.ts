@@ -9,6 +9,7 @@ import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { HttpClient } from '@angular/common/http';
 
 import { SearchListsComponent } from './search-lists.component';
+import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-lookup.service';
 
 describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-2045)', () => {
   let component: SearchListsComponent;
@@ -50,6 +51,12 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     const propertiesServiceSpy = jasmine.createSpyObj('AppPropertiesService', ['getProperty']);
     propertiesServiceSpy.getProperty.and.returnValue('http://example/');
 
+    const dropdownLookupServiceSpy = jasmine.createSpyObj('FundingSubmDropdownLookupService', ['getDocDecisions']);
+    dropdownLookupServiceSpy.getDocDecisions.and.returnValue(of([
+      { id: 'Pay', text: 'Pay' },
+      { id: 'Do Not Pay', text: 'Do Not Pay' }
+    ]));
+
     await TestBed.configureTestingModule({
       declarations: [SearchListsComponent],
       schemas: [NO_ERRORS_SCHEMA],
@@ -60,7 +67,8 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: FundingSubmissionsControllerService, useValue: fundingSubmissionsServiceSpy },
         { provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['post']) },
-        { provide: NgbModal, useValue: modalServiceSpy }
+        { provide: NgbModal, useValue: modalServiceSpy },
+        { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy }
       ]
     }).compileComponents();
 
@@ -302,6 +310,34 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     it('Annual or MYF column binds to the NAME field (annualOrMyfName), not the CODE field', () => {
       const column = (component.dtOptions.columns as any[]).find(col => col.title === 'Annual or MYF');
       expect(column.data).toBe('annualOrMyfName');
+    });
+  });
+
+  // Display CODE vs NAME Reconciliation (2026-08-25): the "Grants in this List" grid's IMPAC II
+  // Status column previously displayed impacStatus's raw opaque groupCode (e.g. "PA", "SR")
+  // verbatim; it must now bind to the additive impacStatusDescrip field instead, matching every
+  // other grid in sm_fs that shows an IMPAC II Status column.
+  describe('IMPAC II Status CODE-vs-NAME fix (2026-08-25)', () => {
+    it('IMPAC II Status column binds to the description field (impacStatusDescrip), not the raw code field', () => {
+      const column = (component.dtOptions.columns as any[]).find(col => col.title === 'IMPAC II Status');
+      expect(column.data).toBe('impacStatusDescrip');
+    });
+  });
+
+  // Display CODE vs NAME Reconciliation (2026-08-25): docDecision's mock data currently defines
+  // CODE and NAME as the same literal string, so this is future-proofing only, not a live-visible
+  // fix — but the DOC Decision column renderer must resolve via FundingSubmDropdownLookupService
+  // exactly like Grant Detail's read-only display, with the same fallback-to-raw-code behavior.
+  describe('DOC Decision CODE-vs-NAME display fix (2026-08-25)', () => {
+    it('DOC Decision column renders a known CODE as its NAME via docDecisionDisplayMap', () => {
+      const column = (component.dtOptions.columns as any[]).find(col => col.title === 'DOC Decision');
+      expect(column.render('Pay', null, {})).toBe('Pay');
+      expect(column.render('Do Not Pay', null, {})).toBe('Do Not Pay');
+    });
+
+    it('DOC Decision column falls back to the raw code for an unresolvable value instead of throwing or blanking out', () => {
+      const column = (component.dtOptions.columns as any[]).find(col => col.title === 'DOC Decision');
+      expect(column.render('Some Future Code', null, {})).toBe('Some Future Code');
     });
   });
 });

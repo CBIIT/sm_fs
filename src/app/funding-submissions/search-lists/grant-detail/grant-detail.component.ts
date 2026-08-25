@@ -109,6 +109,20 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     });
   }
 
+  /**
+   * Display CODE vs NAME Reconciliation (2026-08-25): resolves a raw docDecision CODE to its
+   * human-readable NAME using the same decisionOptions already fetched for the edit-mode
+   * Select2 dropdown, falling back to the raw code if no match is found so an unrecognized
+   * value never throws or renders blank.
+   */
+  getDocDecisionDisplay(code: string): string {
+    if (!code) {
+      return '';
+    }
+    const match = this.decisionOptions.find(option => option.id === code);
+    return match ? match.text : code;
+  }
+
 
   onEdit(): void {
     // Guard against building formModel from stale/absent data while the initial
