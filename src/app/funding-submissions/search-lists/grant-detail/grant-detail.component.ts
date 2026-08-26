@@ -360,6 +360,26 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.cdr.detectChanges();
   }
 
+  /**
+   * Router link for the PFR value's hyperlink (FS-2214 follow-up, 2026-08-26) — mirrors the
+   * existing "View" navigation used by search-result.component.ts's onOpenFundingRequest()/
+   * onOpenFundingPlan() (`['request/retrieve', frqId]` / `['plan/retrieve', fprId]`). Returns
+   * null when there's no PFR value or its type is unrecognized, so the template falls back to
+   * plain text.
+   */
+  get pfrRouterLink(): any[] | null {
+    if (!this.data?.pfr || !this.data?.pfrType) {
+      return null;
+    }
+    if (this.data.pfrType === 'Plan') {
+      return ['/plan/retrieve', this.data.pfr];
+    }
+    if (this.data.pfrType === 'Request') {
+      return ['/request/retrieve', this.data.pfr];
+    }
+    return null;
+  }
+
   get justificationDocumentNames(): string {
     const namesFromDocuments = this.justificationDocuments
       .map((doc: any) => doc?.docFilename || doc?.doc || doc?.docDescription)

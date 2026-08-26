@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of, Subject } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -49,7 +50,7 @@ describe('GrantDetailComponent', () => {
     propertiesServiceSpy.getProperty.and.returnValue('http://grant-viewer/');
 
     await TestBed.configureTestingModule({
-      imports: [FormsModule],
+      imports: [FormsModule, RouterTestingModule],
       declarations: [GrantDetailComponent],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
@@ -116,6 +117,57 @@ describe('GrantDetailComponent', () => {
     expect(text).toContain('Recused:');
     expect(text).toContain('PFR:');
     expect(text).toContain('-');
+  });
+
+  describe('PFR hyperlink (2026-08-26 follow-up)', () => {
+    it('pfrRouterLink resolves to /plan/retrieve for pfrType "Plan"', () => {
+      component.data = { applId: 100, pfr: 321, pfrType: 'Plan', justificationText: '' };
+      expect(component.pfrRouterLink).toEqual(['/plan/retrieve', 321]);
+    });
+
+    it('pfrRouterLink resolves to /request/retrieve for pfrType "Request"', () => {
+      component.data = { applId: 100, pfr: 654, pfrType: 'Request', justificationText: '' };
+      expect(component.pfrRouterLink).toEqual(['/request/retrieve', 654]);
+    });
+
+    it('pfrRouterLink is null when pfr is absent', () => {
+      component.data = { applId: 100, pfr: null, pfrType: 'Plan', justificationText: '' };
+      expect(component.pfrRouterLink).toBeNull();
+    });
+
+    it('pfrRouterLink is null when pfrType is absent or unrecognized', () => {
+      component.data = { applId: 100, pfr: 321, pfrType: null, justificationText: '' };
+      expect(component.pfrRouterLink).toBeNull();
+
+      component.data = { applId: 100, pfr: 321, pfrType: 'Bogus', justificationText: '' };
+      expect(component.pfrRouterLink).toBeNull();
+    });
+
+    it('renders PFR as a hyperlink when both pfr and pfrType are present', () => {
+      component.data = { applId: 100, pfr: 321, pfrType: 'Plan', justificationText: '' };
+
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+      fixture.detectChanges();
+
+      const link: HTMLAnchorElement = fixture.nativeElement.querySelector('a[href="/plan/retrieve/321"]');
+      expect(link).toBeTruthy();
+      expect(link.textContent).toContain('321');
+    });
+
+    it('renders PFR as plain text (no hyperlink) when pfrType is missing', () => {
+      component.data = { applId: 100, pfr: 321, pfrType: null, justificationText: '' };
+
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+      fixture.detectChanges();
+
+      const link = fixture.nativeElement.querySelector('a[href^="/plan/retrieve"], a[href^="/request/retrieve"]');
+      expect(link).toBeFalsy();
+      expect(fixture.nativeElement.textContent).toContain('321');
+    });
   });
 
   it('renders fields in read-only mode without entering edit mode controls', () => {
