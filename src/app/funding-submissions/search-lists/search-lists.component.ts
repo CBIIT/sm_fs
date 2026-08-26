@@ -34,10 +34,11 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private pendingGuardedAction: (() => void) | null = null;
   private pendingGuardCancelAction: (() => void) | null = null;
   private pendingRouteLeaveDecision: ((allow: boolean) => void) | null = null;
-  readonly unsavedChangesWarningMessage = 'WARNING! Are you sure you want to navigate away from funding submissions edits? All unsaved changes will be lost.';
+  readonly unsavedChangesWarningMessage = 'Are you sure you want to navigate away from funding submissions edits? All unsaved changes will be lost.';
   private detailComponentsByApplId = new Map<number, any>();
   private tableGuardContainerEl: HTMLElement | null = null;
   private tableGuardCaptureHandler: ((event: Event) => void) | null = null;
+  private globalAnchorGuardCaptureHandler: ((event: MouseEvent) => void) | null = null;
   private readonly tablePageIntentSelector = '.dataTables_paginate .paginate_button, .dataTables_paginate .page-item, .dataTables_paginate a.page-link, .dt-paging-button';
   private readonly tableSortIntentSelector = 'thead th.sorting, thead th.sorting_asc, thead th.sorting_desc';
 
@@ -94,6 +95,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    this.bindGlobalNavigationUnsavedGuard();
     this.dropdownLookupService.getDocDecisions().subscribe({
       next: options => {
         this.docDecisionDisplayMap = new Map(options.map(option => [String(option.id), option.text]));
@@ -684,6 +686,100 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.unsavedWarningModalRef = this.modalService.open(this.unsavedChangesWarningModalRef, { centered: true });
   }
 
+  private bindGlobalNavigationUnsavedGuard(): void {
+    if (this.globalAnchorGuardCaptureHandler) {
+      return;
+    }
+
+    this.globalAnchorGuardCaptureHandler = (event: MouseEvent) => {
+      this.handleGlobalAnchorNavigationIntent(event);
+    };
+    document.addEventListener('click', this.globalAnchorGuardCaptureHandler, true);
+  }
+
+  private handleGlobalAnchorNavigationIntent(event: MouseEvent): void {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+
+    const clickedEl = event.target as HTMLElement;
+    if (!clickedEl) {
+      return;
+    }
+
+    const anchor = clickedEl.closest('a[href]') as HTMLAnchorElement;
+    if (!anchor) {
+      return;
+    }
+
+    const navigationAction = this.buildGlobalAnchorNavigationAction(anchor);
+    if (!navigationAction) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    (event as any).stopImmediatePropagation?.();
+
+    if (this.unsavedWarningModalRef) {
+      return;
+    }
+
+    this.executeWithUnsavedGuardOptions(navigationAction);
+  }
+
+  private buildGlobalAnchorNavigationAction(anchor: HTMLAnchorElement): (() => void) | null {
+    if (!this.hasUnsavedDetailEdits()) {
+      return null;
+    }
+
+    if (!this.shouldGuardGlobalAnchorNavigation(anchor)) {
+      return null;
+    }
+
+    const destination = new URL(anchor.href, window.location.href);
+    return () => window.location.assign(destination.href);
+  }
+
+  private shouldGuardGlobalAnchorNavigation(anchor: HTMLAnchorElement): boolean {
+    if (anchor.hasAttribute('routerLink') || anchor.hasAttribute('ng-reflect-router-link')) {
+      return false;
+    }
+
+    if (anchor.hasAttribute('download')) {
+      return false;
+    }
+
+    const target = (anchor.getAttribute('target') || '').trim().toLowerCase();
+    if (target && target !== '_self') {
+      return false;
+    }
+
+    const rawHref = (anchor.getAttribute('href') || '').trim();
+    if (!rawHref) {
+      return false;
+    }
+
+    const loweredHref = rawHref.toLowerCase();
+    if (loweredHref.startsWith('javascript:') || loweredHref.startsWith('mailto:') || loweredHref.startsWith('tel:')) {
+      return false;
+    }
+
+    const destination = new URL(anchor.href, window.location.href);
+    const current = new URL(window.location.href);
+
+    if (destination.href === current.href) {
+      return false;
+    }
+
+    // Ignore same-page anchor toggles; they do not leave the current screen.
+    if (destination.pathname === current.pathname && destination.search === current.search && destination.hash !== current.hash) {
+      return false;
+    }
+
+    return true;
+  }
+
   private bindSimpleUnsavedTableGuard(dt: DataTables.Api): void {
     const container = dt.table(0).container();
     if (!container) return;
@@ -900,6 +996,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.globalAnchorGuardCaptureHandler) {
+      document.removeEventListener('click', this.globalAnchorGuardCaptureHandler, true);
+      this.globalAnchorGuardCaptureHandler = null;
+    }
     if (this.tableGuardContainerEl && this.tableGuardCaptureHandler) {
       this.tableGuardContainerEl.removeEventListener('click', this.tableGuardCaptureHandler, true);
       this.tableGuardContainerEl = null;

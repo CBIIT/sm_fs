@@ -15,14 +15,16 @@
 <ng-template #unsavedChangesWarningModal>
     <div class="modal-header">
         <h4 class="modal-title">WARNING!</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="onCancelUnsavedWarning()"></button>
     </div>
     <div class="modal-body">
-        <p class="mb-0">{{ unsavedChangesWarningMessage }}</p>
+        <ngb-alert type="warning" [dismissible]="false">
+            <p class="mb-0">{{ unsavedChangesWarningMessage }}</p>
+        </ngb-alert>
+        
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" (click)="onCancelUnsavedWarning()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="onConfirmUnsavedWarning()">Ok, proceed</button>
+    <div class="modal-footer d-flex justify-content-center">
+        <button type="button" class="btn btn-outline-secondary mx-5" (click)="onCancelUnsavedWarning()">Cancel</button>
+        <button type="button" class="btn btn-primary mx-5" (click)="onConfirmUnsavedWarning()">Ok, proceed</button>
     </div>
 </ng-template>
 

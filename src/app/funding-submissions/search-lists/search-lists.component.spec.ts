@@ -85,7 +85,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
   it('warns with the funding-submissions copy (not a "funding submissionss" copy-paste artifact)', () => {
     expect((component as any).unsavedChangesWarningMessage).toBe(
-      'WARNING! Are you sure you want to navigate away from funding submissions edits? All unsaved changes will be lost.'
+      'Are you sure you want to navigate away from funding submissions edits? All unsaved changes will be lost.'
     );
   });
 
@@ -189,6 +189,53 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
       expect(modalServiceSpy.open).not.toHaveBeenCalled();
       expect(routerSpy.navigate).toHaveBeenCalledWith([component.backRoute]);
+    });
+
+    it('global side-nav paylist href navigation is guarded and opens the warning modal', () => {
+      const anchor = document.createElement('a');
+      anchor.href = '/paylist/#side-nav-paylists';
+
+      const action = (component as any).buildGlobalAnchorNavigationAction(anchor);
+
+      expect(action).toEqual(jasmine.any(Function));
+      expect(modalServiceSpy.open).not.toHaveBeenCalled();
+
+      const fakeEvent = {
+        defaultPrevented: false,
+        button: 0,
+        metaKey: false,
+        ctrlKey: false,
+        shiftKey: false,
+        altKey: false,
+        target: anchor,
+        preventDefault: jasmine.createSpy('preventDefault'),
+        stopPropagation: jasmine.createSpy('stopPropagation'),
+        stopImmediatePropagation: jasmine.createSpy('stopImmediatePropagation')
+      } as any;
+
+      (component as any).handleGlobalAnchorNavigationIntent(fakeEvent);
+
+      expect(fakeEvent.preventDefault).toHaveBeenCalled();
+      expect(modalServiceSpy.open).toHaveBeenCalled();
+    });
+
+    it('does not globally guard routerLink anchors', () => {
+      const anchor = document.createElement('a');
+      anchor.href = '/funding-submissions/lists';
+      anchor.setAttribute('routerLink', '/funding-submissions/lists');
+
+      const action = (component as any).buildGlobalAnchorNavigationAction(anchor);
+
+      expect(action).toBeNull();
+    });
+
+    it('does not globally guard same-page hash-only anchors', () => {
+      const anchor = document.createElement('a');
+      anchor.href = window.location.pathname + window.location.search + '#nav-collapse-paylist';
+
+      const action = (component as any).buildGlobalAnchorNavigationAction(anchor);
+
+      expect(action).toBeNull();
     });
   });
 
