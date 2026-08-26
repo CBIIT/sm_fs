@@ -73,6 +73,75 @@ describe('GrantDetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('renders project title, previous score, pfr, and recusedFlag in read-only mode', () => {
+    component.data = {
+      applId: 100,
+      grantNumber: '1R01CA123456-01',
+      projectTitle: 'FS-2214 Title',
+      previousScore: 'n/a',
+      pfr: 321,
+      recusedFlag: 'Yes',
+      justificationText: ''
+    };
+
+    fixture.detectChanges();
+    getJustificationSubject.next({ justificationText: '' });
+    getJustificationSubject.complete();
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent;
+    expect(text).toContain('FS-2214 Title');
+    expect(text).toContain('n/a');
+    expect(text).toContain('321');
+    expect(text).toContain('Yes');
+  });
+
+  it('renders placeholder when recusedFlag or pfr is blank', () => {
+    component.data = {
+      applId: 100,
+      grantNumber: '1R01CA123456-01',
+      projectTitle: '',
+      previousScore: '',
+      pfr: null,
+      recusedFlag: '',
+      justificationText: ''
+    };
+
+    fixture.detectChanges();
+    getJustificationSubject.next({ justificationText: '' });
+    getJustificationSubject.complete();
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent;
+    expect(text).toContain('Recused:');
+    expect(text).toContain('PFR:');
+    expect(text).toContain('-');
+  });
+
+  it('renders fields in read-only mode without entering edit mode controls', () => {
+    component.isEditMode = false;
+    component.data = {
+      applId: 100,
+      grantNumber: '1R01CA123456-01',
+      projectTitle: 'Read Only Title',
+      previousScore: '15',
+      pfr: 555,
+      recusedFlag: 'No',
+      justificationText: ''
+    };
+
+    fixture.detectChanges();
+    getJustificationSubject.next({ justificationText: '' });
+    getJustificationSubject.complete();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain('Read Only Title');
+    expect(compiled.textContent).toContain('15');
+    expect(compiled.textContent).toContain('555');
+    expect(compiled.textContent).toContain('No');
+  });
+
   it('should not populate the form from onEdit() until the initial justification fetch resolves', () => {
     fixture.detectChanges(); // ngOnInit() -> refreshJustificationData() (in flight)
 
