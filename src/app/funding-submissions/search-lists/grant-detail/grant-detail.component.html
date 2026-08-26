@@ -124,7 +124,7 @@
             <td class="grid-label">ESI:</td>
             <td class="grid-item">{{data.esiFlag === true ? 'Yes' : data.esiFlag === false ? 'No' : ''}}</td>
             <td class="grid-label">Recused:</td>
-            <td class="grid-item">{{data.recused || '-'}}</td>
+            <td class="grid-item">{{data.recusedFlag || '-'}}</td>
             <td class="grid-label sep">DOC/NCI Selection:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docNciSelectionName}}</span>
@@ -176,7 +176,10 @@
           <!-- Row 8 -->
           <tr>
             <td class="grid-label">PFR:</td>
-            <td class="grid-item">{{data.pfr || '-'}}</td>
+            <td class="grid-item">
+              <a *ngIf="data.pfr && pfrRouterLink" [routerLink]="pfrRouterLink">{{data.pfr}}</a>
+              <span *ngIf="!data.pfr || !pfrRouterLink">{{data.pfr || '-'}}</span>
+            </td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td class="grid-label sep align-top pt-2">Justification<br><span class="fw-normal">(Optional)</span></td>

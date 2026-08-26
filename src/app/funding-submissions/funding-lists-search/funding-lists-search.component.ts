@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
@@ -5,7 +6,7 @@ import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { Select2OptionData } from 'ng-select2';
-import { PdCaIntegratorService as LibPdCaIntegratorService } from '@cbiit/i2ecui-lib';
+import { LoaderService, PdCaIntegratorService as LibPdCaIntegratorService } from '@cbiit/i2ecui-lib';
 import {
   FundingSubmissionsControllerService,
   FundingSubmissionListSearchCriteriaDto,
@@ -41,6 +42,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   listStatusOptions: Select2OptionData[] = [];
 
   private searchCriteria: FundingSubmissionListSearchCriteriaDto = {};
+  private lastSortOrder: any[] = [[4, 'desc']];
   private throttle = new DatatableThrottle();
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
@@ -72,8 +74,10 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   constructor(
     private router: Router,
     private logger: NGXLogger,
+    private http: HttpClient,
     private fundingSubmissionsService: FundingSubmissionsControllerService,
     private libPdCaIntegratorService: LibPdCaIntegratorService,
+    private loaderService: LoaderService,
     private stateService: FundingSubmissionsStateService
   ) {}
 
@@ -203,6 +207,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
           filename: 'fs-funding-lists',
           title: null,
           header: true,
+          action: this.exportListSearchResults.bind(this),
           exportOptions: { columns: [0, 1, 2, 3, 4] }
         }
       ],
@@ -234,6 +239,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
 
   ajaxCall($this: FundingListsSearchComponent, dataTablesParameters: any, callback: any): void {
     const normalizeSearch = (s: any) => s ? { ...s, regex: s.regex === true || s.regex === 'true' } : s;
+    $this.lastSortOrder = dataTablesParameters.order;
     const body: FundingSubmissionListSearchCriteriaDto = {
       ...$this.searchCriteria,
       draw: dataTablesParameters.draw,
@@ -252,6 +258,32 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
         callback({ recordsTotal: 0, recordsFiltered: 0, data: [] });
       }
     });
+  }
+
+  exportListSearchResults() {
+    this.logger.debug('Exporting list search results');
+    this.loaderService.show();
+    const body: FundingSubmissionListSearchCriteriaDto = {
+      ...this.searchCriteria,
+      order: this.lastSortOrder,
+      start: 0,
+      length: -1
+    };
+    this.http.post(`/i2efsws/api/v1/funding-submissions/lists/export`, body, { responseType: 'arraybuffer' }).subscribe(
+      (response) => {
+        this.loaderService.hide();
+        const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.download = 'funding_submissions_lists_result_all.xls';
+        anchor.href = url;
+        anchor.click();
+      },
+      (err) => {
+        this.loaderService.hide();
+        this.logger.error('List search export failed', err);
+      }
+    );
   }
 
   get hasSearchCriteria(): boolean {
