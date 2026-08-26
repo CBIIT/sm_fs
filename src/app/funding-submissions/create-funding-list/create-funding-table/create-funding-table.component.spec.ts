@@ -105,6 +105,14 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
     expect(component).toBeTruthy();
   });
 
+  it('binds the PrevScr column to previousScoreDisplay', () => {
+    const previousScoreColumn = component.dtOptions.columns.find((column: any) => column.title === 'PrevScr');
+
+    expect(previousScoreColumn).toBeTruthy();
+    expect(previousScoreColumn.data).toBe('previousScoreDisplay');
+    expect(previousScoreColumn.defaultContent).toBe('');
+  });
+
   describe('row checkbox: disabled state + tooltip (isRowSelectable / rowCallback)', () => {
     it('a grant with checkboxDisabled=true is not selectable', () => {
       expect((component as any).isRowSelectable({ applId: 1, checkboxDisabled: true })).toBeFalse();
