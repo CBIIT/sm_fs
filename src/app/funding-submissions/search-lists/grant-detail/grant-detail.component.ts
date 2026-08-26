@@ -373,7 +373,6 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     const fallbackRowName = this.data?.justificationFileName
       || this.data?.justificationFilename
       || this.data?.docFilename
-      || this.data?.doc;
     return fallbackRowName || '';
   }
 
