@@ -1,5 +1,5 @@
-﻿import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { FundingSubmBulkEditFieldsDto, FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { FundingSubmBulkEditFieldsDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Select2OptionData } from 'ng-select2';
@@ -78,7 +78,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   constructor(
     private logger: NGXLogger,
-    private fundingSubmissionsService: FundingSubmissionsControllerService,
+    private fundingSubmissionsService: FundingSubmissionsService,
     private propertiesService: AppPropertiesService,
     private cdr: ChangeDetectorRef,
     private modalService: NgbModal,
@@ -253,7 +253,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       this.isEditMode = false;
       this.initialFormSnapshot = '';
       this.initialFundingSnapshot = '';
-      this.saveSuccessMessage = `Success! You have successfully updated funding submissions for ${this.data.grantNumber}`;
+      this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
       this.saved.emit();
       this.cdr.detectChanges();
       return;
@@ -274,7 +274,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         if (justificationText || this.justificationFile) {
           this.saveJustification(justificationText);
         } else {
-          this.saveSuccessMessage = `Success! You have successfully updated funding submissions for ${this.data.grantNumber}`;
+          this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
           this.isEditMode = false;
           this.initialFormSnapshot = '';
           this.savingInProgress = false;
@@ -334,7 +334,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       next: () => {
         this.data.justificationText = normalizedJustificationText ?? '';
         this.refreshJustificationData(() => {
-          this.saveSuccessMessage = `Success! You have successfully updated funding submissions for ${this.data.grantNumber}`;
+          this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
           this.isEditMode = false;
           this.initialFormSnapshot = '';
           this.initialFundingSnapshot = '';

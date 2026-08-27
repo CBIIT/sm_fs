@@ -8,7 +8,7 @@ import { DataTableDirective } from 'angular-datatables';
 import { Select2OptionData } from 'ng-select2';
 import { LoaderService, PdCaIntegratorService as LibPdCaIntegratorService } from '@cbiit/i2ecui-lib';
 import {
-  FundingSubmissionsControllerService,
+  FundingSubmissionsService,
   FundingSubmissionListSearchCriteriaDto,
   SelectionDateCodeDto,
   FundingSubmStatusCodesTDto
@@ -75,7 +75,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     private router: Router,
     private logger: NGXLogger,
     private http: HttpClient,
-    private fundingSubmissionsService: FundingSubmissionsControllerService,
+    private fundingSubmissionsService: FundingSubmissionsService,
     private libPdCaIntegratorService: LibPdCaIntegratorService,
     private loaderService: LoaderService,
     private stateService: FundingSubmissionsStateService

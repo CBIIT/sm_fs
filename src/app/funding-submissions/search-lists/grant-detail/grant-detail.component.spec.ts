@@ -5,7 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of, Subject } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 
 import { GrantDetailComponent } from './grant-detail.component';
@@ -14,7 +14,7 @@ import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lo
 describe('GrantDetailComponent', () => {
   let component: GrantDetailComponent;
   let fixture: ComponentFixture<GrantDetailComponent>;
-  let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsControllerService>;
+  let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsService>;
   let dropdownLookupServiceSpy: jasmine.SpyObj<FundingSubmDropdownLookupService>;
   let getJustificationSubject: Subject<any>;
   // Budget Categories Race Condition fix (2026-08-25): hoisted alongside getJustificationSubject
@@ -27,7 +27,7 @@ describe('GrantDetailComponent', () => {
     getJustificationSubject = new Subject<any>();
     getBudgetCategoriesSubject = new Subject<any>();
 
-    fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsControllerService', [
+    fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
       'getJustification', 'saveJustificationForm', 'bulkUpdateListGrants'
     ]);
     fundingSubmissionsServiceSpy.getJustification.and.returnValue(getJustificationSubject.asObservable());
@@ -54,7 +54,7 @@ describe('GrantDetailComponent', () => {
       declarations: [GrantDetailComponent],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
-        { provide: FundingSubmissionsControllerService, useValue: fundingSubmissionsServiceSpy },
+        { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
         { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },

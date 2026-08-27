@@ -4,11 +4,11 @@
     <button type="button" class="btn-close" aria-label="Close" (click)="onCancelRemove()"></button>
   </div>
   <div class="modal-body">
-    <p class="mb-0">Are you sure you want to remove the selected grant(s) from this list?</p>
+    <p class="mb-0">Are you sure you want to remove {{ selectedRows.size }} grant(s) from {{ selectionDate }}?</p>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-secondary" (click)="onCancelRemove()">Cancel</button>
-    <button type="button" class="btn btn-primary" (click)="onConfirmRemove()">Yes, Remove</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="onCancelRemove()">No</button>
+    <button type="button" class="btn btn-primary" (click)="onConfirmRemove()">Yes</button>
   </div>
 </ng-template>
 

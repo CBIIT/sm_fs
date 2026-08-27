@@ -210,7 +210,7 @@
                   <span>Selected new file: {{justificationFile.name}}</span>
                 </div>
                 <div *ngIf="justificationFileError" class="small text-danger mb-1">{{justificationFileError}}</div>
-                <textarea class="form-control form-control-sm" rows="2"
+                <textarea class="form-control form-control-sm" rows="2" placeholder="Or enter justification text here..."
                   name="justificationText" [(ngModel)]="formModel.justificationText" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.justificationText || '').length}}/1000</div>
               </div>

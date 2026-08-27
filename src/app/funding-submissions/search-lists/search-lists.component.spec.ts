@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { HttpClient } from '@angular/common/http';
 
@@ -32,6 +32,15 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     };
   }
 
+  function renderRemoveGrantsWarningModal() {
+    const viewRef = (component as any).removeGrantsWarningModalRef.createEmbeddedView({});
+    viewRef.detectChanges();
+    const host = document.createElement('div');
+    viewRef.rootNodes.forEach((node: Node) => host.appendChild(node));
+    document.body.appendChild(host);
+    return { host, viewRef };
+  }
+
   beforeEach(async () => {
     // The component's ngOnInit() touches the global jQuery/DataTables plugin object
     // ($.fn.DataTable.ext.pager.numbers_length) which isn't loaded in the Karma test env.
@@ -42,7 +51,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     modalServiceSpy = jasmine.createSpyObj('NgbModal', ['open']);
     modalServiceSpy.open.and.returnValue(modalRefSpy);
 
-    const fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsControllerService', [
+    const fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
       'getListDetail', 'getListStatusHistory', 'removeGrantsFromList'
     ]);
     fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({}));
@@ -65,7 +74,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         { provide: Router, useValue: routerSpy },
         { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
-        { provide: FundingSubmissionsControllerService, useValue: fundingSubmissionsServiceSpy },
+        { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
         { provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['post']) },
         { provide: NgbModal, useValue: modalServiceSpy },
         { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy }
@@ -83,10 +92,62 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     expect(component).toBeTruthy();
   });
 
+  describe('Abs/SS plain text rendering (FS-2027)', () => {
+    it('renders plain Y or blank with no anchor markup for Abs and SS columns', () => {
+      component.ngAfterViewInit();
+      const columns = (component as any).dtOptions.columns;
+      const absRender = columns[1].render as (data: boolean) => string;
+      const ssRender = columns[2].render as (data: boolean) => string;
+
+      expect(absRender(true)).toBe('Y');
+      expect(absRender(false)).toBe('');
+      expect(ssRender(true)).toBe('Y');
+      expect(ssRender(false)).toBe('');
+      expect(absRender(true)).not.toContain('<a');
+      expect(ssRender(true)).not.toContain('<a');
+    });
+  });
+
   it('warns with the funding-submissions copy (not a "funding submissionss" copy-paste artifact)', () => {
     expect((component as any).unsavedChangesWarningMessage).toBe(
       'Are you sure you want to navigate away from funding submissions edits? All unsaved changes will be lost.'
     );
+  });
+
+  describe('remove-grants confirmation modal copy (FS-2219)', () => {
+    it('renders the exact interpolated count-and-list-name message', () => {
+      component.selectionDate = '9-May 19th';
+      component.selectedRows.set(100, {});
+      component.selectedRows.set(101, {});
+      component.selectedRows.set(102, {});
+
+      const { host, viewRef } = renderRemoveGrantsWarningModal();
+
+      expect(host.querySelector('.modal-body p')?.textContent?.trim())
+        .toBe('Are you sure you want to remove 3 grant(s) from 9-May 19th?');
+
+      viewRef.destroy();
+      host.remove();
+    });
+
+    it('renders Yes/No labels and keeps the existing confirm/cancel handlers wired to those buttons', () => {
+      const cancelSpy = spyOn(component, 'onCancelRemove');
+      const confirmSpy = spyOn(component, 'onConfirmRemove');
+
+      const { host, viewRef } = renderRemoveGrantsWarningModal();
+      const buttons = Array.from(host.querySelectorAll('.modal-footer button')) as HTMLButtonElement[];
+
+      expect(buttons.map(button => button.textContent?.trim())).toEqual(['No', 'Yes']);
+
+      buttons[0].click();
+      buttons[1].click();
+
+      expect(cancelSpy).toHaveBeenCalledTimes(1);
+      expect(confirmSpy).toHaveBeenCalledTimes(1);
+
+      viewRef.destroy();
+      host.remove();
+    });
   });
 
   describe('when a detail row has unsaved edits', () => {
