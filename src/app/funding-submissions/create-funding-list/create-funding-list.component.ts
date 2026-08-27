@@ -28,6 +28,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   i2Status: string | string[];
   excludeInList = true;
   searchCriteria: FundSelectSearchCriteria = {};
+  private readonly CA_DOC_CHANNEL = 'CA_DOC_DEFAULT_CHANNEL';
 
   constructor(
     private propertiesService: AppPropertiesService,
@@ -43,7 +44,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.libPdCaIntegratorService.caForDocEmitter.next({ code: [], channel: 'CA_DOC_DEFAULT_CHANNEL' });
+    //this.libPdCaIntegratorService.caForDocEmitter.next({ code: [], channel: 'CA_DOC_DEFAULT_CHANNEL' });
     const freshNavigation = this.stateService.consumeFreshNavigationRequest();
     if (freshNavigation) {
       this.reset();
@@ -112,6 +113,23 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   onDocSelected(docs: string[]): void {
     this.selectedDocs = docs || [];
     this.pdCaIntegratorService.docEmitter.next({ doc: this.selectedDocs.length ? this.selectedDocs : null, channel: PD_CA_DEFAULT_CHANNEL });
+  }
+
+  onCancerActivitiesSelected(cancerActivities: string[] | string): void {
+    this.selectedCancerActivities = cancerActivities || [];
+
+    // Ensure DOC dropdown refreshes against the latest CA selection.
+    // lib-doc-dropdown filters on caForDocEmitter only when its own selected DOCs are empty.
+    this.selectedDocs = [];
+
+    const caCodes = Array.isArray(cancerActivities)
+      ? cancerActivities.filter(Boolean)
+      : (cancerActivities ? [cancerActivities] : []);
+
+    this.libPdCaIntegratorService.caForDocEmitter.next({
+      code: caCodes.length ? caCodes : null,
+      channel: this.CA_DOC_CHANNEL
+    });
   }
 
   get hasAnyCriteria(): boolean {

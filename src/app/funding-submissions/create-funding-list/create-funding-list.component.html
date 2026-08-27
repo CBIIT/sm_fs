@@ -22,17 +22,16 @@
   <!-- Row 2: PD Name | Division Office Center | Cancer Activity -->
   <div class="row form-group">
     <div class="col-lg-4">
-      <app-pdname-dropdown label="PD Name" name="pdName" [broadcast]="true" [showInactiveToggle]="true" [syncWithCa]="true"></app-pdname-dropdown>
+     	<lib-pdname-dropdown [debug]="false" label="PD Name" name="pdName" [broadcast]="true" [showInactiveToggle]="true" [syncWithCa]="true" >
+			</lib-pdname-dropdown>
     </div>
     <div class="col-lg-4">
       <lib-doc-dropdown [name]="'doc'" label="DOC" [selectedValue]="selectedDocs" (selectedValueChange)="onDocSelected($event)"></lib-doc-dropdown>
     </div>
     <div class="col-lg-4">
-      <app-cancer-activities-dropdown
-        [(selectedValue)]="selectedCancerActivities"
-        [broadcast]="true" [syncWithPd]="true"
-				[activeOnly]="true" label="Cancer Activities">
-      </app-cancer-activities-dropdown>
+    <lib-cancer-activities-dropdown #assignedCas [debug]="false" [name]="'assignedCAs'" [broadcast]="true" [syncWithPd]="true"
+				(selectedValueChange)="onCancerActivitiesSelected($event)" [activeOnly]="true" label="Cancer Activities">
+			</lib-cancer-activities-dropdown>
     </div>
   </div>
 
