@@ -92,6 +92,22 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     expect(component).toBeTruthy();
   });
 
+  describe('Abs/SS plain text rendering (FS-2027)', () => {
+    it('renders plain Y or blank with no anchor markup for Abs and SS columns', () => {
+      component.ngAfterViewInit();
+      const columns = (component as any).dtOptions.columns;
+      const absRender = columns[1].render as (data: boolean) => string;
+      const ssRender = columns[2].render as (data: boolean) => string;
+
+      expect(absRender(true)).toBe('Y');
+      expect(absRender(false)).toBe('');
+      expect(ssRender(true)).toBe('Y');
+      expect(ssRender(false)).toBe('');
+      expect(absRender(true)).not.toContain('<a');
+      expect(ssRender(true)).not.toContain('<a');
+    });
+  });
+
   it('warns with the funding-submissions copy (not a "funding submissionss" copy-paste artifact)', () => {
     expect((component as any).unsavedChangesWarningMessage).toBe(
       'Are you sure you want to navigate away from funding submissions edits? All unsaved changes will be lost.'

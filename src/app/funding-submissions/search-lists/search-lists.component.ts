@@ -257,14 +257,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           data: 'abstractAvailable',
           width: '40px',
           defaultContent: '',
-          render: (data: boolean, _t: any, row: any) => data ? `<a href="${row.absUrl}" target="_blank">Y</a>` : ''
+          render: (data: boolean) => data ? 'Y' : ''
         }, // 1
         {
           title: 'SS',
           data: 'summaryStatementAvailable',
           width: '40px',
           defaultContent: '',
-          render: (data: boolean, _t: any, row: any) => data ? `<a href="${row.ssUrl}" target="_blank">Y</a>` : ''
+          render: (data: boolean) => data ? 'Y' : ''
         }, // 2
         {
           title: 'Grant Number',
