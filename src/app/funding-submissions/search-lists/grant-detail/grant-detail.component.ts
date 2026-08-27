@@ -253,7 +253,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       this.isEditMode = false;
       this.initialFormSnapshot = '';
       this.initialFundingSnapshot = '';
-      this.saveSuccessMessage = `Success! You have successfully updated funding submissions for ${this.data.grantNumber}`;
+      this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
       this.saved.emit();
       this.cdr.detectChanges();
       return;
@@ -274,7 +274,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         if (justificationText || this.justificationFile) {
           this.saveJustification(justificationText);
         } else {
-          this.saveSuccessMessage = `Success! You have successfully updated funding submissions for ${this.data.grantNumber}`;
+          this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
           this.isEditMode = false;
           this.initialFormSnapshot = '';
           this.savingInProgress = false;
@@ -334,7 +334,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       next: () => {
         this.data.justificationText = normalizedJustificationText ?? '';
         this.refreshJustificationData(() => {
-          this.saveSuccessMessage = `Success! You have successfully updated funding submissions for ${this.data.grantNumber}`;
+          this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
           this.isEditMode = false;
           this.initialFormSnapshot = '';
           this.initialFundingSnapshot = '';
