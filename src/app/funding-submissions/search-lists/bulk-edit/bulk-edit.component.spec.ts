@@ -5,7 +5,7 @@ import { of } from 'rxjs';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 
 import { BulkEditComponent } from './bulk-edit.component';
@@ -22,7 +22,7 @@ import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lo
 describe('BulkEditComponent', () => {
   let component: BulkEditComponent;
   let fixture: ComponentFixture<BulkEditComponent>;
-  let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsControllerService>;
+  let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsService>;
 
   function grant(overrides: Partial<any> = {}): any {
     return {
@@ -50,7 +50,7 @@ describe('BulkEditComponent', () => {
     // ngAfterViewInit() touches the global jQuery/DataTables plugin object; not loaded in Karma.
     (window as any).$ = (window as any).$ || { fn: { DataTable: { ext: { pager: {} } } } };
 
-    fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsControllerService', [
+    fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
       'bulkUpdateListGrants'
     ]);
 
@@ -76,7 +76,7 @@ describe('BulkEditComponent', () => {
       providers: [
         { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
         { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
-        { provide: FundingSubmissionsControllerService, useValue: fundingSubmissionsServiceSpy },
+        { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: NgbModal, useValue: jasmine.createSpyObj('NgbModal', ['open']) },
         { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy }

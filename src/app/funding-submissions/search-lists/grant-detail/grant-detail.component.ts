@@ -1,5 +1,5 @@
-﻿import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { FundingSubmBulkEditFieldsDto, FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { FundingSubmBulkEditFieldsDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Select2OptionData } from 'ng-select2';
@@ -78,7 +78,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   constructor(
     private logger: NGXLogger,
-    private fundingSubmissionsService: FundingSubmissionsControllerService,
+    private fundingSubmissionsService: FundingSubmissionsService,
     private propertiesService: AppPropertiesService,
     private cdr: ChangeDetectorRef,
     private modalService: NgbModal,

@@ -4,7 +4,7 @@ import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { forkJoin, Subject } from 'rxjs';
-import { FundingSubmissionsControllerService, FundingSubmBulkEditFieldsDto } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService, FundingSubmBulkEditFieldsDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { Select2OptionData } from 'ng-select2';
 import { DataTableDirective } from 'angular-datatables';
@@ -71,7 +71,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private router: Router,
     private logger: NGXLogger,
-    private fundingSubmissionsService: FundingSubmissionsControllerService,
+    private fundingSubmissionsService: FundingSubmissionsService,
     private propertiesService: AppPropertiesService,
     private modalService: NgbModal,
     private dropdownLookupService: FundingSubmDropdownLookupService

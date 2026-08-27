@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { HttpClient } from '@angular/common/http';
 
@@ -51,7 +51,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     modalServiceSpy = jasmine.createSpyObj('NgbModal', ['open']);
     modalServiceSpy.open.and.returnValue(modalRefSpy);
 
-    const fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsControllerService', [
+    const fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
       'getListDetail', 'getListStatusHistory', 'removeGrantsFromList'
     ]);
     fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({}));
@@ -74,7 +74,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         { provide: Router, useValue: routerSpy },
         { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
-        { provide: FundingSubmissionsControllerService, useValue: fundingSubmissionsServiceSpy },
+        { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
         { provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['post']) },
         { provide: NgbModal, useValue: modalServiceSpy },
         { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy }

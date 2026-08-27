@@ -4,7 +4,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Select2OptionData } from 'ng-select2';
 import { FoaCellRendererComponent } from '../../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import {
-  FundingSubmissionsControllerService,
+  FundingSubmissionsService,
   FundingSubmissionAddGrantsToListRequestDto,
   FundingSubmissionGrantSearchCriteriaDto,
   FundingSubmissionSearchResultDto,
@@ -62,7 +62,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   selectionDateOptions: Select2OptionData[] = [];
 
   constructor(
-    private fundingSubmissionsControllerService: FundingSubmissionsControllerService,
+    private FundingSubmissionsService: FundingSubmissionsService,
     private loaderService: LoaderService,
     private propertiesService: AppPropertiesService,
     private logger: NGXLogger,
@@ -73,7 +73,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
 
   ngOnInit(): void {
     $.fn.DataTable.ext.pager.numbers_length = 5;
-    this.fundingSubmissionsControllerService.getSelectionDateCodes().subscribe({
+    this.FundingSubmissionsService.getSelectionDateCodes().subscribe({
       next: (dates: SelectionDateCodeDto[]) => {
         this.selectionDateOptions = dates.map(d => ({ id: d.code, text: d.name || d.description || d.code }));
         this.logger.debug('selectionDateOptions:', this.selectionDateOptions);
@@ -430,7 +430,7 @@ allDataSelected(data: any[]): boolean {
     };
 
     $this.loaderService.show();
-    $this.fundingSubmissionsControllerService.searchGrants(body).subscribe(
+    $this.FundingSubmissionsService.searchGrants(body).subscribe(
       result => {
         $this.grantList = result.data || [];
         callback({
@@ -473,7 +473,7 @@ allDataSelected(data: any[]): boolean {
     };
     this.logger.debug('addGrantsToList request:', body);
     this.loaderService.show();
-    this.fundingSubmissionsControllerService.addGrantsToList(body).subscribe({
+    this.FundingSubmissionsService.addGrantsToList(body).subscribe({
       next: (result) => {
         this.loaderService.hide();
         this.logger.debug('addGrantsToList result:', result);
@@ -506,7 +506,7 @@ allDataSelected(data: any[]): boolean {
   }
 
   navigateToList(selectionDate: string): void {
-    this.fundingSubmissionsControllerService.searchLists({ selectionCode: [selectionDate], start: 0, length: 1 }).subscribe({
+    this.FundingSubmissionsService.searchLists({ selectionCode: [selectionDate], start: 0, length: 1 }).subscribe({
       next: (result) => {
         const listId = result.data?.[0]?.listId;
         if (listId) {

@@ -31,7 +31,7 @@ interface LookupCodeDto {
  * table exists in the schema for DOC Decision or Two-Year Annual Funding R01 — this is a schema
  * gap, not an oversight; confirm with BA/DBA before assuming these need wiring to a real table.
  * Once the generated client is regenerated to include these endpoints, this service can be
- * removed in favor of `FundingSubmissionsControllerService`.</p>
+ * removed in favor of `FundingSubmissionsService`.</p>
  */
 @Injectable({
   providedIn: 'root'

@@ -6,7 +6,7 @@ import { Observable, Subject, forkJoin } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { Select2OptionData } from 'ng-select2';
-import { FundingSubmissionsControllerService, FundingSubmissionListGrantDto } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService, FundingSubmissionListGrantDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { openNewWindow } from '../../utils/utils';
@@ -88,7 +88,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     private environmentInjector: EnvironmentInjector,
     private propertiesService: AppPropertiesService,
     private cdr: ChangeDetectorRef,
-    private fundingSubmissionsService: FundingSubmissionsControllerService,
+    private fundingSubmissionsService: FundingSubmissionsService,
     private http: HttpClient,
     private modalService: NgbModal,
     private dropdownLookupService: FundingSubmDropdownLookupService

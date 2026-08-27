@@ -11,7 +11,7 @@ describe('FundingListsSearchComponent.formatLastActionDate (FS-2163)', () => {
       jasmine.createSpyObj('Router', ['navigate']),
       jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
       jasmine.createSpyObj('HttpClient', ['post']),
-      jasmine.createSpyObj('FundingSubmissionsControllerService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes']),
+      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes']),
       { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
       jasmine.createSpyObj('LoaderService', ['show', 'hide']),
       jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState'])
@@ -53,7 +53,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
       jasmine.createSpyObj('Router', ['navigate']),
       loggerSpy,
       httpSpy,
-      jasmine.createSpyObj('FundingSubmissionsControllerService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes']),
+      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes']),
       { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
       loaderServiceSpy,
       jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState'])

@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FundingSubmissionsControllerService } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { HttpClient } from '@angular/common/http';
 
@@ -71,7 +71,7 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
     // spy and must not leak that spy into the next test's beforeEach.
     (window as any).$ = { fn: { DataTable: { ext: { pager: {} } } } };
 
-    const fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsControllerService', [
+    const fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
       'getSelectionDateCodes', 'searchGrants', 'addGrantsToList', 'searchLists'
     ]);
     fundingSubmissionsServiceSpy.getSelectionDateCodes.and.returnValue(of([]));
@@ -85,7 +85,7 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
       declarations: [CreateFundingTableComponent],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
-        { provide: FundingSubmissionsControllerService, useValue: fundingSubmissionsServiceSpy },
+        { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
         { provide: LoaderService, useValue: loaderServiceSpy },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']) },
