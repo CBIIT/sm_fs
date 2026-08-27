@@ -32,6 +32,15 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     };
   }
 
+  function renderRemoveGrantsWarningModal() {
+    const viewRef = (component as any).removeGrantsWarningModalRef.createEmbeddedView({});
+    viewRef.detectChanges();
+    const host = document.createElement('div');
+    viewRef.rootNodes.forEach((node: Node) => host.appendChild(node));
+    document.body.appendChild(host);
+    return { host, viewRef };
+  }
+
   beforeEach(async () => {
     // The component's ngOnInit() touches the global jQuery/DataTables plugin object
     // ($.fn.DataTable.ext.pager.numbers_length) which isn't loaded in the Karma test env.
@@ -87,6 +96,42 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     expect((component as any).unsavedChangesWarningMessage).toBe(
       'Are you sure you want to navigate away from funding submissions edits? All unsaved changes will be lost.'
     );
+  });
+
+  describe('remove-grants confirmation modal copy (FS-2219)', () => {
+    it('renders the exact interpolated count-and-list-name message', () => {
+      component.selectionDate = '9-May 19th';
+      component.selectedRows.set(100, {});
+      component.selectedRows.set(101, {});
+      component.selectedRows.set(102, {});
+
+      const { host, viewRef } = renderRemoveGrantsWarningModal();
+
+      expect(host.querySelector('.modal-body p')?.textContent?.trim())
+        .toBe('Are you sure you want to remove 3 grant(s) from 9-May 19th?');
+
+      viewRef.destroy();
+      host.remove();
+    });
+
+    it('renders Yes/No labels and keeps the existing confirm/cancel handlers wired to those buttons', () => {
+      const cancelSpy = spyOn(component, 'onCancelRemove');
+      const confirmSpy = spyOn(component, 'onConfirmRemove');
+
+      const { host, viewRef } = renderRemoveGrantsWarningModal();
+      const buttons = Array.from(host.querySelectorAll('.modal-footer button')) as HTMLButtonElement[];
+
+      expect(buttons.map(button => button.textContent?.trim())).toEqual(['No', 'Yes']);
+
+      buttons[0].click();
+      buttons[1].click();
+
+      expect(cancelSpy).toHaveBeenCalledTimes(1);
+      expect(confirmSpy).toHaveBeenCalledTimes(1);
+
+      viewRef.destroy();
+      host.remove();
+    });
   });
 
   describe('when a detail row has unsaved edits', () => {
