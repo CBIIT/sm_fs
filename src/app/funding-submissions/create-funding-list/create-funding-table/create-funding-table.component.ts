@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Select2OptionData } from 'ng-select2';
@@ -55,6 +55,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   private currentPage = 0;
   private pendingRestorePage: number | null = null;
   private pendingRestoreRows: Map<number, FundingSubmissionSearchResultDto> | null = null;
+  private pendingRealignFrame: number | null = null;
 
   private searchCriteria: FundingSubmissionGrantSearchCriteriaDto = {};
   private modalRef: NgbModalRef;
@@ -304,24 +305,22 @@ initComplete: () => {
         // Defer columns.adjust() so it runs AFTER FixedColumns' own draw.dt.dtfc
         // handler fires. FixedColumns applies position:sticky left-offsets on that
         // handler; if we adjust before it, header cells end up misaligned.
-        setTimeout(() => {
-          this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
-            this.currentPage = dt.page();
-            dt.columns.adjust();
-            if (dt.rows().count() > 0) {
-              (dt as any).button(0).enable();
-              $((dt as any).button(0).node()).attr('title', 'Export');
-            } else {
-              (dt as any).button(0).disable();
-              $((dt as any).button(0).node()).attr('title', 'Nothing found in the results table for export.');
-            }
-            if (this.pendingRestorePage !== null && this.pendingRestorePage > 0) {
-              const page = this.pendingRestorePage;
-              this.pendingRestorePage = null;
-              dt.page(page).draw('page');
-            }
-          });
-        }, 0);
+        this.realignDataTableColumns();
+        this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+          this.currentPage = dt.page();
+          if (dt.rows().count() > 0) {
+            (dt as any).button(0).enable();
+            $((dt as any).button(0).node()).attr('title', 'Export');
+          } else {
+            (dt as any).button(0).disable();
+            $((dt as any).button(0).node()).attr('title', 'Nothing found in the results table for export.');
+          }
+          if (this.pendingRestorePage !== null && this.pendingRestorePage > 0) {
+            const page = this.pendingRestorePage;
+            this.pendingRestorePage = null;
+            dt.page(page).draw('page');
+          }
+        });
       },
     };
     // DataTable is initialized on first search, not here, so that dtOptions
@@ -329,9 +328,35 @@ initComplete: () => {
   }
 
   ngOnDestroy(): void {
+    if (this.pendingRealignFrame !== null) {
+      window.cancelAnimationFrame(this.pendingRealignFrame);
+      this.pendingRealignFrame = null;
+    }
     if (this.dtTrigger && !this.dtTrigger.closed) {
       this.dtTrigger.unsubscribe();
     }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.realignDataTableColumns();
+  }
+
+  private realignDataTableColumns(): void {
+    if (this.pendingRealignFrame !== null) {
+      window.cancelAnimationFrame(this.pendingRealignFrame);
+    }
+
+    this.pendingRealignFrame = window.requestAnimationFrame(() => {
+      this.pendingRealignFrame = null;
+      this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+        dt.columns.adjust();
+        const fixedColumnsApi = (dt as any).fixedColumns?.();
+        if (fixedColumnsApi?.relayout) {
+          fixedColumnsApi.relayout();
+        }
+      });
+    });
   }
 
 allDataSelected(data: any[]): boolean {
@@ -441,9 +466,7 @@ allDataSelected(data: any[]): boolean {
         $this.loaderService.hide();
         setTimeout(() => {
           if ($this.dtElement?.dtInstance) {
-            $this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-              dtInstance.columns.adjust();
-            });
+            $this.realignDataTableColumns();
           }
         }, 0);
       },

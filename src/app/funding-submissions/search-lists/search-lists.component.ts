@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EnvironmentInjector, OnDestroy, OnInit, TemplateRef, ViewChild, createComponent } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EnvironmentInjector, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild, createComponent } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
@@ -39,6 +39,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private tableGuardContainerEl: HTMLElement | null = null;
   private tableGuardCaptureHandler: ((event: Event) => void) | null = null;
   private globalAnchorGuardCaptureHandler: ((event: MouseEvent) => void) | null = null;
+  private pendingRealignFrame: number | null = null;
   private readonly tablePageIntentSelector = '.dataTables_paginate .paginate_button, .dataTables_paginate .page-item, .dataTables_paginate a.page-link, .dt-paging-button';
   private readonly tableSortIntentSelector = 'thead th.sorting, thead th.sorting_asc, thead th.sorting_desc';
 
@@ -485,7 +486,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           if (this.dtElement?.dtInstance) {
             this.dtElement.dtInstance.then((dt: DataTables.Api) => {
 
-              dt.columns.adjust();
+              this.realignDataTableColumns();
               this.bindSimpleUnsavedTableGuard(dt);
 
               // Export button is index 1 now that Reset Table occupies index 0
@@ -1015,6 +1016,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.pendingRealignFrame !== null) {
+      window.cancelAnimationFrame(this.pendingRealignFrame);
+      this.pendingRealignFrame = null;
+    }
     if (this.globalAnchorGuardCaptureHandler) {
       document.removeEventListener('click', this.globalAnchorGuardCaptureHandler, true);
       this.globalAnchorGuardCaptureHandler = null;
@@ -1031,6 +1036,28 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.dtTrigger && !this.dtTrigger.closed) {
       this.dtTrigger.unsubscribe();
     }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.realignDataTableColumns();
+  }
+
+  private realignDataTableColumns(): void {
+    if (this.pendingRealignFrame !== null) {
+      window.cancelAnimationFrame(this.pendingRealignFrame);
+    }
+
+    this.pendingRealignFrame = window.requestAnimationFrame(() => {
+      this.pendingRealignFrame = null;
+      this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+        dt.columns.adjust();
+        const fixedColumnsApi = (dt as any).fixedColumns?.();
+        if (fixedColumnsApi?.relayout) {
+          fixedColumnsApi.relayout();
+        }
+      });
+    });
   }
 
    exportGrantListResults() {
