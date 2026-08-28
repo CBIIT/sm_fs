@@ -119,6 +119,22 @@ describe('GrantDetailComponent', () => {
     expect(text).toContain('-');
   });
 
+  it('renders applicationTotalCostEstimate as currency in read-only mode', () => {
+    component.data = {
+      applId: 100,
+      grantNumber: '1R01CA123456-01',
+      applicationTotalCostEstimate: 125000,
+      justificationText: ''
+    };
+
+    fixture.detectChanges();
+    getJustificationSubject.next({ justificationText: '' });
+    getJustificationSubject.complete();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('$125,000');
+  });
+
   describe('PFR hyperlink (2026-08-26 follow-up)', () => {
     it('pfrRouterLink resolves to /plan/retrieve for pfrType "Plan"', () => {
       component.data = { applId: 100, pfr: 321, pfrType: 'Plan', justificationText: '' };
