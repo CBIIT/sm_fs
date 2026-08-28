@@ -428,7 +428,12 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           orderable: false,
           width: '60px',
           className: 'all',
-          defaultContent: '<button class="btn btn-link p-0 toggle-details" title="Details"><i class="far fa-plus-circle fa-lg"></i></button>'
+          render: (_data: any, _type: any, row: any) => {
+            const expandedIcon = this.detailComponentsByApplId.has(row?.applId)
+              ? 'fa-minus-circle'
+              : 'fa-plus-circle';
+            return `<button class="btn btn-link p-0 toggle-details" title="Details"><i class="far ${expandedIcon} fa-lg"></i></button>`;
+          }
         }, // 25
       ],
       dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"B<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
