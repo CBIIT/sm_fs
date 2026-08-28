@@ -90,7 +90,7 @@
             </td>
             <td class="grid-label">2Y Annual Fnd R01:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.twoYearAnnualFundingR01Flag}}</span>
+              <span *ngIf="!isEditMode">{{data.twoYearAnnualFundingR01Flag ? 'Yes' : ''}}</span>
               <ng-select2 *ngIf="isEditMode" name="annualFundingR01" [(ngModel)]="formModel.annualFundingR01"
                 [data]="yesNoOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>
