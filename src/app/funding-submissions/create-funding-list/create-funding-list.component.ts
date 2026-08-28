@@ -16,6 +16,7 @@ import { FundingSubmissionsStateService } from '../funding-submissions-state.ser
 export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('filterForm') filterForm: NgForm;
+  @ViewChild('assignedCas') assignedCas: any;
   @ViewChild(CreateFundingTableComponent) fundingTable: CreateFundingTableComponent;
 
   fiscalYear: number;
@@ -57,7 +58,12 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
         if (this.selectedDocs.length) {
           this.onDocSelected(state.selectedDocs);
         }
-        this.selectedCancerActivities = state.selectedCancerActivities;
+        const restoredCancerActivities = Array.isArray(state.selectedCancerActivities)
+          ? state.selectedCancerActivities.filter(Boolean)
+          : state.selectedCancerActivities;
+        this.selectedCancerActivities = (Array.isArray(restoredCancerActivities)
+          ? (restoredCancerActivities.length ? restoredCancerActivities : '')
+          : (restoredCancerActivities || ''));
         this.i2Status = state.i2Status;
         this.excludeInList = state.excludeInList;
         this.filterForm?.form.patchValue(state.formValue);
@@ -116,15 +122,16 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   }
 
   onCancerActivitiesSelected(cancerActivities: string[] | string): void {
-    this.selectedCancerActivities = cancerActivities || [];
+    const normalizedCancerActivities = Array.isArray(cancerActivities)
+      ? cancerActivities.filter(Boolean)
+      : (cancerActivities ? [cancerActivities] : []);
+    this.selectedCancerActivities = normalizedCancerActivities.length ? normalizedCancerActivities : '';
 
     // Ensure DOC dropdown refreshes against the latest CA selection.
     // lib-doc-dropdown filters on caForDocEmitter only when its own selected DOCs are empty.
     this.selectedDocs = [];
 
-    const caCodes = Array.isArray(cancerActivities)
-      ? cancerActivities.filter(Boolean)
-      : (cancerActivities ? [cancerActivities] : []);
+    const caCodes = normalizedCancerActivities;
 
     this.libPdCaIntegratorService.caForDocEmitter.next({
       code: caCodes.length ? caCodes : null,
@@ -233,7 +240,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
 
   reset(): void {
     this.fundingTable?.clearResults();
-    this.selectedCancerActivities = [];
+    this.selectedCancerActivities = '';
     this.selectedDocs = [];
     this.i2Status = '';
     this.excludeInList = true;
@@ -267,5 +274,10 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
       irgPercentileRange: { fromIrgPercentile: null, toIrgPercentile: null },
       priorityScoreRange: { fromPriorityScore: null, toPriorityScore: null }
     });
+
+    // Clear CA UI selection without binding [selectedValue], to avoid input/output loops.
+    if (this.assignedCas) {
+      this.assignedCas.selectedValue = null;
+    }
   }
 }
