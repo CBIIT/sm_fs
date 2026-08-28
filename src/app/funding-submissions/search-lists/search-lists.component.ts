@@ -199,12 +199,12 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly docStatusIcons: Record<string, string> = {
     'Draft': 'fa-hourglass-half',
     'Under DOC Review': 'fa-user-clock',
-    'Under Review': 'fa-arrows-rotate',
+    'Under Review': 'fa-sync-alt',
     'Under NCI Director Review': 'fa-gavel'
   };
 
   getDocStatusIcon(status: string): string {
-    return this.docStatusIcons[status] || 'fa-circle';
+    return this.docStatusIcons[status] || 'fa-hourglass-half';
   }
 
   getDocStatusClass(status: string): string {
@@ -493,6 +493,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
               // Use container so fixedColumns clones are included
               const $container = $(dt.table(0).container());
+              this.stampCheckboxApplIds(dt, $container);
 
               // Sorting by column headers should always clear current selections.
               $container
@@ -518,14 +519,15 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
               // Delegate from container so clone-table clicks resolve correctly
               $container.off('click', 'tbody .select-checkbox').on('click', 'tbody .select-checkbox', (e) => {
-                const trIndex = $(e.currentTarget).closest('tr').index();
-                const rowIndexes = dt.rows({ page: 'current', order: 'current' }).indexes().toArray();
-                if (trIndex < 0 || trIndex >= rowIndexes.length) return;
-                const d = dt.row(rowIndexes[trIndex]).data() as any;
+                const applIdAttr = String($(e.currentTarget).attr('data-applid') || '').trim();
+                if (!applIdAttr) return;
+
+                const currentRows = dt.rows({ page: 'current', order: 'current', search: 'applied' }).data().toArray() as any[];
+                const d = currentRows.find((row: any) => String(row?.applId) === applIdAttr);
+                if (!d) return;
+
                 d.selected = !d.selected;
-                $container.find('tbody').each(function() {
-                  $(this).children('tr').eq(trIndex).find('.select-checkbox').toggleClass('selected', d.selected);
-                });
+                $container.find(`tbody .select-checkbox[data-applid="${applIdAttr}"]`).toggleClass('selected', d.selected);
                 d.selected ? this.selectedRows.set(d.applId, d) : this.selectedRows.delete(d.applId);
               });
 
@@ -850,6 +852,18 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     const $container = container || $(dt.table(0).container());
     $container.find('thead .select-checkbox').removeClass('selected');
     $container.find('tbody .select-checkbox').removeClass('selected');
+  }
+
+  private stampCheckboxApplIds(dt: DataTables.Api, container: JQuery<HTMLElement>): void {
+    const currentRows = dt.rows({ page: 'current', order: 'current', search: 'applied' }).data().toArray() as any[];
+    container.find('tbody').each(function() {
+      const $dataRows = $(this).children('tr').not('.child');
+      $dataRows.each((rowIndex: number, trEl: Element) => {
+        const applId = currentRows[rowIndex]?.applId;
+        const applIdValue = applId != null ? String(applId) : '';
+        $(trEl).find('.select-checkbox').attr('data-applid', applIdValue);
+      });
+    });
   }
 
   private buildPaginationIntentAction(dt: DataTables.Api, pageNode: HTMLElement): (() => void) | null {

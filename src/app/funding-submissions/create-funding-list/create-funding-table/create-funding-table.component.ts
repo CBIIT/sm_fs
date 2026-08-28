@@ -477,6 +477,10 @@ allDataSelected(data: any[]): boolean {
       next: (result) => {
         this.loaderService.hide();
         this.logger.debug('addGrantsToList result:', result);
+        // Do not retain prior selection after a successful save; returning to this page
+        // should start with zero "Grant(s) Added".
+        this.selectedRows.clear();
+        this.grantList.forEach((row: any) => row.selected = false);
         this.modalRef?.close();
         this.router.navigate(['/funding-submissions/search'], { queryParams: { listId: result.listId, from: 'create' } });
       },
