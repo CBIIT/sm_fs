@@ -13,24 +13,21 @@ interface LookupCodeDto {
 
 
 /**
- * Response row shape for the five dropdown lookup endpoints added 2026-08-24 (Individual/Bulk
- * Edit dropdown consistency fix). Mirrors `@cbiit/i2efsws-lib`'s generated `SelectionDateCodeDto`
- * (`code`/`name`/`description`) — these new endpoints were not yet available when this service
- * was written (the generated client had not been regenerated/republished), so this service calls
- * the same backend base path directly via `HttpClient`, matching the existing precedent in
- * `document.service.ts` for endpoints not (yet) covered by the generated client.
+ * Response row shape for the dropdown lookup endpoints added for Individual/Bulk Edit dropdown
+ * consistency. Mirrors `@cbiit/i2efsws-lib`'s generated `SelectionDateCodeDto`
+ * (`code`/`name`/`description`) — these endpoints predate the generated client's coverage, so
+ * this service calls the backend base path directly via `HttpClient`, matching the existing
+ * precedent in `document.service.ts` for endpoints not (yet) covered by the generated client.
  *
- * <p><b>Backing endpoint data source, confirmed 2026-08-24 (stability audit):</b>
- * {@code getBudgetCategories()}, {@code getDocNciSelections()}, and
- * {@code getAnnualOrMyfOptions()} are now backed by real, DBA-provided lookup tables
+ * <p><b>Backing data source:</b> {@code getBudgetCategories()}, {@code getDocNciSelections()},
+ * and {@code getAnnualOrMyfOptions()} are backed by real, DBA-provided lookup tables
  * ({@code FUNDING_SUBM_BUD_CAT_CODES_T}/{@code FUNDING_SUBM_DOC_NCI_SEL_CODES_T}/
  * {@code FUNDING_SUBM_MYF_AF_CODES_T} respectively, via `sm_i2e_fs_ws`'s
  * `FundingSubmissionsServiceImpl`). {@code getDocDecisions()} and
  * {@code getAnnualFundingR01Options()} remain mock/placeholder data
  * ({@code FundingSubmDropdownLookupConstants} in `sm_i2e_fs_ws`) because no corresponding lookup
  * table exists in the schema for DOC Decision or Two-Year Annual Funding R01 — this is a schema
- * gap, not an oversight; confirm with BA/DBA before assuming these need wiring to a real table.
- * Once the generated client is regenerated to include these endpoints, this service can be
+ * gap, not an oversight. Once the generated client covers these endpoints, this service can be
  * removed in favor of `FundingSubmissionsService`.</p>
  */
 @Injectable({
