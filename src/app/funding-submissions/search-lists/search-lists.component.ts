@@ -520,7 +520,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
               // Delegate from container so clone-table clicks resolve correctly
               $container.off('click', 'tbody .select-checkbox').on('click', 'tbody .select-checkbox', (e) => {
-                const applIdAttr = String($(e.currentTarget).attr('data-applid') || '').trim();
+                const applIdAttr = this.resolveCheckboxApplId(dt, e.currentTarget as Element);
                 if (!applIdAttr) return;
 
                 const currentRows = dt.rows({ page: 'current', order: 'current', search: 'applied' }).data().toArray() as any[];
@@ -858,13 +858,47 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private stampCheckboxApplIds(dt: DataTables.Api, container: JQuery<HTMLElement>): void {
     const currentRows = dt.rows({ page: 'current', order: 'current', search: 'applied' }).data().toArray() as any[];
     container.find('tbody').each(function() {
-      const $dataRows = $(this).children('tr').not('.child');
-      $dataRows.each((rowIndex: number, trEl: Element) => {
-        const applId = currentRows[rowIndex]?.applId;
-        const applIdValue = applId != null ? String(applId) : '';
-        $(trEl).find('.select-checkbox').attr('data-applid', applIdValue);
+      const $checkboxCells = $(this).find('td.select-checkbox');
+      $checkboxCells.each((checkboxIndex: number, cellEl: Element) => {
+        let applIdValue = '';
+        const $row = $(cellEl).closest('tr');
+        const dtRowIndexAttr = String($row.attr('data-dt-row') || '').trim();
+        if (dtRowIndexAttr && !isNaN(Number(dtRowIndexAttr))) {
+          const rowData = dt.row(Number(dtRowIndexAttr)).data() as any;
+          if (rowData?.applId != null) {
+            applIdValue = String(rowData.applId);
+          }
+        }
+
+        if (!applIdValue) {
+          const applId = currentRows[checkboxIndex]?.applId;
+          applIdValue = applId != null ? String(applId) : '';
+        }
+
+        $(cellEl).attr('data-applid', applIdValue);
       });
     });
+  }
+
+  private resolveCheckboxApplId(dt: DataTables.Api, checkboxEl: Element): string {
+    const stampedApplId = String($(checkboxEl).attr('data-applid') || '').trim();
+    if (stampedApplId) {
+      return stampedApplId;
+    }
+
+    const $row = $(checkboxEl).closest('tr');
+    const dtRowIndexAttr = String($row.attr('data-dt-row') || '').trim();
+    if (dtRowIndexAttr && !isNaN(Number(dtRowIndexAttr))) {
+      const rowData = dt.row(Number(dtRowIndexAttr)).data() as any;
+      if (rowData?.applId != null) {
+        return String(rowData.applId);
+      }
+    }
+
+    const checkboxIndex = $(checkboxEl).closest('tbody').find('td.select-checkbox').index(checkboxEl);
+    const currentRows = dt.rows({ page: 'current', order: 'current', search: 'applied' }).data().toArray() as any[];
+    const fallbackRow = checkboxIndex >= 0 ? currentRows[checkboxIndex] : null;
+    return fallbackRow?.applId != null ? String(fallbackRow.applId) : '';
   }
 
   private buildPaginationIntentAction(dt: DataTables.Api, pageNode: HTMLElement): (() => void) | null {
