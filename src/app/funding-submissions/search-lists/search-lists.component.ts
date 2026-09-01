@@ -126,7 +126,6 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
     this.i2eURL = this.propertiesService.getProperty('I2EWEB_URL').trim();
-    // TODO remove the card coded URL when property added to the service
     this.documentURL = (this.propertiesService.getProperty('DOCVIEWER_URL') || '').trim();
   }
 
@@ -660,8 +659,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // GrantDetailComponent's `editModeExited` output means "edit mode ended (Cancel), no teardown
-  // needed" — deliberately a no-op with respect to DOM teardown. See
-  // Prompt - Grant Detail Cancel Reverts to Read-Only.md.
+  // needed" — deliberately a no-op with respect to DOM teardown.
   private handleDetailEditModeExited(): void {
     // Intentionally no-op: Cancel reverts GrantDetailComponent to read-only in place;
     // the row/section must remain expanded, unlike the `close` (collapse) path above.
@@ -669,11 +667,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // GrantDetailComponent's `saved` output means "the row's underlying data object was just
   // mutated in place" — DataTables caches rendered <td> content and does not auto-reflect
-  // in-place JS object mutation, so an explicit invalidate()+draw() is required to make the
-  // grid's own cells (and Grant Detail's own read-only view, via the same shared object) show
-  // the new values without a page reload. Extracted (matching handleDetailRowClose()/
-  // handleDetailEditModeExited()) for testability. Must NOT tear down or collapse the detail
-  // row — unlike handleDetailRowClose(), row.child/tr classes are left untouched.
+  // in-place JS object mutation, so an explicit invalidate()+draw() is required. Must NOT tear
+  // down or collapse the detail row — unlike handleDetailRowClose(), row.child/tr classes are
+  // left untouched.
   private handleDetailSaved(row: any): void {
     row.invalidate().draw(false);
   }

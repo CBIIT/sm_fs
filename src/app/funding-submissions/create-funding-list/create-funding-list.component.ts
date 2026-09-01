@@ -45,7 +45,6 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    //this.libPdCaIntegratorService.caForDocEmitter.next({ code: [], channel: 'CA_DOC_DEFAULT_CHANNEL' });
     const freshNavigation = this.stateService.consumeFreshNavigationRequest();
     if (freshNavigation) {
       this.reset();

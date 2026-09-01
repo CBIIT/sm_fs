@@ -18,15 +18,13 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   @Input() listId: number;
   @Output() close = new EventEmitter<void>();
   // Emitted when edit mode ends without any row teardown (Cancel, either path) — distinct from
-  // `close`, which remains reserved for actual row-collapse/teardown (chevron toggle). See
-  // Prompt - Grant Detail Cancel Reverts to Read-Only.md for the fix this supports.
+  // `close`, which remains reserved for actual row-collapse/teardown (chevron toggle).
   @Output() editModeExited = new EventEmitter<void>();
   // Emitted after every successful save (funding-fields and/or justification-only), once
   // `this.data` has been fully mutated with the saved values — lets the parent
   // (search-lists.component.ts) redraw its DataTables row so the list reflects the change
   // immediately without a full page reload. Distinct from `close` (row teardown) and
-  // `editModeExited` (Cancel-flow no-op in the parent). See
-  // Prompt - Grant Detail Save Refresh (List and Own Display).md for the fix this supports.
+  // `editModeExited` (Cancel-flow no-op in the parent).
   @Output() saved = new EventEmitter<void>();
   @ViewChild('cancelEditWarningModal') private cancelEditWarningModalRef: TemplateRef<any>;
 
@@ -361,11 +359,10 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   /**
-   * Router link for the PFR value's hyperlink (FS-2214 follow-up, 2026-08-26) — mirrors the
-   * existing "View" navigation used by search-result.component.ts's onOpenFundingRequest()/
-   * onOpenFundingPlan() (`['request/retrieve', frqId]` / `['plan/retrieve', fprId]`). Returns
-   * null when there's no PFR value or its type is unrecognized, so the template falls back to
-   * plain text.
+   * Router link for the PFR value's hyperlink — mirrors the existing "View" navigation used by
+   * search-result.component.ts's onOpenFundingRequest()/onOpenFundingPlan()
+   * (`['request/retrieve', frqId]` / `['plan/retrieve', fprId]`). Returns null when there's no
+   * PFR value or its type is unrecognized, so the template falls back to plain text.
    */
   get pfrRouterLink(): any[] | null {
     if (!this.data?.pfr || !this.data?.pfrType) {
