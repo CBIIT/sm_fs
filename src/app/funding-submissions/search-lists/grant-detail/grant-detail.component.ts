@@ -234,6 +234,13 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   onSave(): void {
     this.suppressNextLeavePrompt = true;
+
+    // Business rule: when DOC Decision is Do Not Pay, dependent funding and
+    // justification fields are discarded before validation/persistence.
+    if (this.isDoNotPayDecisionSelected()) {
+      this.clearDoNotPayDependentFields();
+    }
+
     this.saveValidationError = this.validateChangedValues();
     if (this.saveValidationError) {
       this.cdr.detectChanges();
@@ -285,6 +292,34 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         this.logger.error('Grant detail save error', err);
       }
     });
+  }
+
+  private isDoNotPayDecisionSelected(): boolean {
+    const selectedDecision = this.formModel.docDecision;
+    if (!selectedDecision) {
+      return false;
+    }
+
+    if (String(selectedDecision).trim().toLowerCase() === 'do not pay') {
+      return true;
+    }
+
+    const selectedOption = this.decisionOptions.find(option => String(option.id) === String(selectedDecision));
+    return String(selectedOption?.text || '').trim().toLowerCase() === 'do not pay';
+  }
+
+  private clearDoNotPayDependentFields(): void {
+    this.formModel.docPriority = null;
+    this.formModel.docRecAmt = null;
+    this.formModel.docRecReductionPct = null;
+    this.formModel.annualFundingR01 = null;
+    this.formModel.annualOrMyf = null;
+    this.formModel.budgetCategories = null;
+    this.formModel.docNciSelection = null;
+    this.formModel.oefiaNotes = '';
+    this.formModel.justificationText = '';
+    this.justificationFile = null;
+    this.justificationFileError = null;
   }
 
   private validateChangedValues(): string | null {
@@ -470,6 +505,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   private applyFormModelToData(): void {
+    const doNotPaySelected = this.isDoNotPayDecisionSelected();
     this.data.docDecision                 = this.formModel.docDecision;
     this.data.docPriority                 = this.formModel.docPriority;
     this.data.docRecommendedAmount        = this.formModel.docRecAmt;
@@ -512,6 +548,16 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       option => option.id === this.formModel.annualOrMyf
     );
     this.data.annualOrMyfName              = selectedAnnualOrMyfOption?.text ?? null;
+
+    if (doNotPaySelected) {
+      this.data.justificationText = '';
+      this.justificationDocuments = [];
+      if (this.data) {
+        this.data.justificationFileName = null;
+        this.data.justificationFilename = null;
+        this.data.docFilename = null;
+      }
+    }
   }
 
   private refreshJustificationData(onComplete?: () => void): void {

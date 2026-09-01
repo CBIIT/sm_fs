@@ -640,6 +640,85 @@ describe('GrantDetailComponent', () => {
 
       expect(component.data.twoYearAnnualFundingR01Flag).toBe(false);
     });
+
+    it('when DOC Decision is Do Not Pay, clears dependent fields and justification before save while preserving DOC Notes', () => {
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        docDecision: 'Pay',
+        docPriority: 3,
+        docRecommendedAmount: 45000,
+        docRecommendedReductionPct: 25,
+        docNciSelection: 'NCI',
+        docNciSelectionName: 'National Cancer Institute',
+        twoYearAnnualFundingR01Flag: true,
+        annualOrMyf: 'MYF',
+        annualOrMyfName: 'Multi-Year Funding',
+        budgetCategoryCode: 'ESIR37T4',
+        budgetCategories: 'ESI R37 T4 Board Competing Transition',
+        docNotes: 'keep this note',
+        oefiaNotes: 'clear this note',
+        justificationText: 'remove this justification',
+        justificationFileName: 'old.pdf'
+      };
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: 'remove this justification' });
+      getJustificationSubject.complete();
+
+      (component as any).decisionOptions = [
+        { id: 'DNP', text: 'Do Not Pay' },
+        { id: 'Pay', text: 'Pay' }
+      ];
+      (component as any).selectionOptions = [{ id: 'NCI', text: 'National Cancer Institute' }];
+      (component as any).annualMyfOptions = [{ id: 'MYF', text: 'Multi-Year Funding' }];
+      (component as any).budgetCategoryOptions = [
+        { id: 'ESIR37T4', text: 'ESI R37 T4 Board Competing Transition' }
+      ];
+
+      component.onEdit();
+      component.formModel.docDecision = 'DNP';
+      component.formModel.docPriority = '99';
+      component.formModel.docRecAmt = 99999;
+      component.formModel.docRecReductionPct = 10;
+      component.formModel.annualFundingR01 = 'Yes';
+      component.formModel.annualOrMyf = 'MYF';
+      component.formModel.budgetCategories = 'ESIR37T4';
+      component.formModel.docNciSelection = 'NCI';
+      component.formModel.oefiaNotes = 'should be removed';
+      component.formModel.justificationText = 'new justification';
+      component.formModel.docNotes = 'keep this note';
+      component.justificationFile = new File(['x'], 'new.pdf', { type: 'application/pdf' });
+
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.docDecision).toBe('DNP');
+      expect(payload.fields.docPriority).toBeNull();
+      expect(payload.fields.docRecAmt).toBeNull();
+      expect(payload.fields.docRecReductionPct).toBeNull();
+      expect(payload.fields.annualFundingR01).toBeNull();
+      expect(payload.fields.annualOrMyf).toBeNull();
+      expect(payload.fields.budgetCategories).toBeNull();
+      expect(payload.fields.docNciSelection).toBeNull();
+      expect(payload.fields.oefiaNotes).toBe('');
+      expect(payload.fields.docNotes).toBe('keep this note');
+
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm).not.toHaveBeenCalled();
+      expect(component.data.docDecision).toBe('DNP');
+      expect(component.data.docNotes).toBe('keep this note');
+      expect(component.data.docPriority).toBeNull();
+      expect(component.data.oefiaNotes).toBe('');
+      expect(component.data.docRecommendedAmount).toBeNull();
+      expect(component.data.docRecommendedReductionPct).toBeNull();
+      expect(component.data.budgetCategories).toBeNull();
+      expect(component.data.docNciSelection).toBeNull();
+      expect(component.data.docNciSelectionName).toBeNull();
+      expect(component.data.annualOrMyf).toBeNull();
+      expect(component.data.annualOrMyfName).toBeNull();
+      expect(component.data.justificationText).toBe('');
+    });
   });
 
   // Prompt - Display NAME for DOC-NCI Selection and Annual-MYF (2026-08-25): same bug class as
