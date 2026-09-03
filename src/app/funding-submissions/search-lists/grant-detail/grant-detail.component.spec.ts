@@ -7,6 +7,8 @@ import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+import { AppUserSessionService } from '../../../service/app-user-session.service';
+import { roleNames } from '../../../service/role-names';
 
 import { GrantDetailComponent } from './grant-detail.component';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
@@ -16,6 +18,7 @@ describe('GrantDetailComponent', () => {
   let fixture: ComponentFixture<GrantDetailComponent>;
   let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsService>;
   let dropdownLookupServiceSpy: jasmine.SpyObj<FundingSubmDropdownLookupService>;
+  let userSessionServiceSpy: jasmine.SpyObj<AppUserSessionService>;
   let getJustificationSubject: Subject<any>;
   // Budget Categories Race Condition fix (2026-08-25): hoisted alongside getJustificationSubject
   // (mirroring the FS-2043 test harness pattern) so individual tests can swap
@@ -49,6 +52,9 @@ describe('GrantDetailComponent', () => {
     const propertiesServiceSpy = jasmine.createSpyObj('AppPropertiesService', ['getProperty']);
     propertiesServiceSpy.getProperty.and.returnValue('http://grant-viewer/');
 
+    userSessionServiceSpy = jasmine.createSpyObj('AppUserSessionService', ['hasRole']);
+    userSessionServiceSpy.hasRole.and.callFake((role: string) => role === roleNames.DOC_FUNDING_LIST_COR);
+
     await TestBed.configureTestingModule({
       imports: [FormsModule, RouterTestingModule],
       declarations: [GrantDetailComponent],
@@ -57,6 +63,7 @@ describe('GrantDetailComponent', () => {
         { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
         { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
+        { provide: AppUserSessionService, useValue: userSessionServiceSpy },
         { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
         { provide: NgbModal, useValue: jasmine.createSpyObj('NgbModal', ['open']) }
       ]
@@ -72,6 +79,32 @@ describe('GrantDetailComponent', () => {
     fixture.detectChanges();
     getJustificationSubject.complete();
     expect(component).toBeTruthy();
+  });
+
+  it('allows Edit when user does not have DOC role once data is loaded', () => {
+    fixture.detectChanges();
+    getJustificationSubject.next({ justificationText: '' });
+    getJustificationSubject.complete();
+
+    component.docFundingListCor = false;
+    component.listStatus = 'DOC Review';
+
+    component.onEdit();
+
+    expect(component.isEditMode).toBeTrue();
+  });
+
+  it('allows Edit when list status is not DOC Review once data is loaded', () => {
+    fixture.detectChanges();
+    getJustificationSubject.next({ justificationText: '' });
+    getJustificationSubject.complete();
+
+    component.docFundingListCor = true;
+    component.listStatus = 'Draft';
+
+    component.onEdit();
+
+    expect(component.isEditMode).toBeTrue();
   });
 
   it('renders project title, previous score, pfr, and recusedFlag in read-only mode', () => {
@@ -641,7 +674,7 @@ describe('GrantDetailComponent', () => {
       expect(component.data.twoYearAnnualFundingR01Flag).toBe(false);
     });
 
-    it('when DOC Decision is Do Not Pay, clears dependent fields and justification before save while preserving DOC Notes', () => {
+    it('when DOC Decision is Do Not Pay, clears disabled dependent fields and justification before save while preserving DOC Notes', () => {
       component.data = {
         applId: 100,
         grantNumber: '1R01CA123456-01',
@@ -702,14 +735,14 @@ describe('GrantDetailComponent', () => {
       expect(payload.fields.annualOrMyf).toBeNull();
       expect(payload.fields.budgetCategories).toBeNull();
       expect(payload.fields.docNciSelection).toBeNull();
-      expect(payload.fields.oefiaNotes).toBe('');
+      expect(payload.fields.oefiaNotes).toBe('clear this note');
       expect(payload.fields.docNotes).toBe('keep this note');
 
       expect(fundingSubmissionsServiceSpy.saveJustificationForm).not.toHaveBeenCalled();
       expect(component.data.docDecision).toBe('DNP');
       expect(component.data.docNotes).toBe('keep this note');
       expect(component.data.docPriority).toBeNull();
-      expect(component.data.oefiaNotes).toBe('');
+      expect(component.data.oefiaNotes).toBe('clear this note');
       expect(component.data.docRecommendedAmount).toBeNull();
       expect(component.data.docRecommendedReductionPct).toBeNull();
       expect(component.data.budgetCategories).toBeNull();
@@ -815,6 +848,79 @@ describe('GrantDetailComponent', () => {
 
       expect(component.data.docNciSelectionName).toBeNull();
       expect(component.data.annualOrMyfName).toBeNull();
+    });
+  });
+
+  describe('Do Not Pay placeholder addedByEmail gate', () => {
+    beforeEach(() => {
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        docDecision: 'Pay',
+        docNotes: '',
+        justificationText: '',
+        addedByGroup: 'OEFIA'
+      };
+
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+
+      component.decisionOptions = [
+        { id: 'Pay', text: 'Pay' },
+        { id: 'DNP', text: 'Do Not Pay' }
+      ];
+    });
+
+    it('requires DOC Notes when Do Not Pay is selected on an OEFIA-added row', () => {
+      component.onEdit();
+      component.formModel.docDecision = 'DNP';
+      component.formModel.docNotes = '   ';
+
+      component.onSave();
+
+      expect(component.saveValidationError).toBe('DOC Notes is required when DOC Decision is Do Not Pay.');
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
+
+    it('does not enforce DOC Notes when row was not added by OEFIA', () => {
+      component.data.addedByGroup = 'DOC';
+      component.onEdit();
+      component.formModel.docDecision = 'DNP';
+      component.formModel.docNotes = '   ';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onSave();
+
+      expect(component.saveValidationError).toBeNull();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalled();
+    });
+
+    it('does not activate the Do Not Pay lock for OEFIA users on OEFIA-added rows', () => {
+      component.OEFIACertifier = true;
+      component.onEdit();
+      component.formModel.docDecision = 'DNP';
+
+      component.onDocDecisionChange();
+
+      expect(component.doNotPayOefiaLockActive).toBeFalse();
+    });
+
+    it('preserves edited OEFIA Notes for OEFIA users when Do Not Pay is selected', () => {
+      component.OEFIACertifier = true;
+      component.data.oefiaNotes = 'original note';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onEdit();
+      component.formModel.docDecision = 'DNP';
+      component.formModel.oefiaNotes = 'updated by OEFIA';
+      component.formModel.docNotes = 'doc note';
+
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.oefiaNotes).toBe('updated by OEFIA');
+      expect(component.data.oefiaNotes).toBe('updated by OEFIA');
     });
   });
 });

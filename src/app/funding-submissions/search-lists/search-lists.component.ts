@@ -563,6 +563,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
                         });
                       componentRef.instance.data = rowData;
                       componentRef.instance.listId = this.listId;
+                      componentRef.instance.listStatus = this.listStatus;
                       componentRef.instance.close.subscribe(() => {
                         this.handleDetailRowClose(componentRef, applId, row, tr, $(event.currentTarget).find('i'));
                       });

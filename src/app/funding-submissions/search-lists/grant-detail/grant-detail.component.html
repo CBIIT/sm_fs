@@ -48,6 +48,7 @@
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{getDocDecisionDisplay(data.docDecision)}}</span>
               <ng-select2 *ngIf="isEditMode" name="docDecision" [(ngModel)]="formModel.docDecision"
+                (ngModelChange)="onDocDecisionChange()"
                 [data]="decisionOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
               </ng-select2>
             </td>
@@ -64,6 +65,7 @@
               <span *ngIf="!isEditMode">{{data.docRecommendedReductionPct != null ? (data.docRecommendedReductionPct + '%') : ''}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecReductionPct" [(ngModel)]="formModel.docRecReductionPct"
+                [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" max="100" step="0.01">
             </td>
             <td class="grid-label">DOC Rec $:</td>
@@ -71,6 +73,7 @@
               <span *ngIf="!isEditMode">{{data.docRecommendedAmount != null ? ('$' + (data.docRecommendedAmount | number)) : ''}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecAmt" [(ngModel)]="formModel.docRecAmt"
+                [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" step="0.01">
             </td>
           </tr>
@@ -86,13 +89,15 @@
               <span *ngIf="!isEditMode">{{data.docPriority}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docPriority" [(ngModel)]="formModel.docPriority"
+                 [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" step="1">
             </td>
             <td class="grid-label">2Y Annual Fnd R01:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.twoYearAnnualFundingR01Flag ? 'Yes' : ''}}</span>
               <ng-select2 *ngIf="isEditMode" name="annualFundingR01" [(ngModel)]="formModel.annualFundingR01"
-                [data]="yesNoOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
+                [data]="yesNoOptions" [allowClear]="true" [placeholder]="'Select'" width="100%"
+                [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
           </tr>
@@ -107,14 +112,16 @@
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.annualOrMyfName}}</span>
               <ng-select2 *ngIf="isEditMode" name="annualOrMyf" [(ngModel)]="formModel.annualOrMyf"
-                [data]="annualMyfOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
+                [data]="annualMyfOptions" [allowClear]="true" [placeholder]="'Select'" width="100%"
+                [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
             <td class="grid-label">Budget Categories:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.budgetCategories}}</span>
               <ng-select2 *ngIf="isEditMode" name="budgetCategories" [(ngModel)]="formModel.budgetCategories"
-                [data]="budgetCategoryOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
+                [data]="budgetCategoryOptions" [allowClear]="true" [placeholder]="'Select'" width="100%"
+                [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
           </tr>
@@ -129,7 +136,8 @@
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docNciSelectionName}}</span>
               <ng-select2 *ngIf="isEditMode" name="docNciSelection" [(ngModel)]="formModel.docNciSelection"
-                [data]="selectionOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
+                [data]="selectionOptions" [allowClear]="true" [placeholder]="'Select'" width="100%"
+                [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
             <td>&nbsp;</td>
@@ -145,13 +153,14 @@
             </td>
             <td class="grid-label">Previous Score:</td>
             <td class="grid-item">{{data.previousScore}}</td>
-            <td class="grid-label sep align-top pt-2">DOC Notes<br><span class="fw-normal">(Optional)</span></td>
+            <td class="grid-label sep align-top pt-2">DOC Notes<br><span class="fw-normal">{{ doNotPayOefiaLockActive ? '(Required)' : '(Optional)' }}</span></td>
             <td class="grid-item" colspan="3">
               <span *ngIf="!isEditMode">{{data.docNotes || ''}}</span>
               <div *ngIf="isEditMode">
                 <textarea class="form-control form-control-sm" rows="2"
                   name="docNotes" [(ngModel)]="formModel.docNotes" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.docNotes || '').length}}/1000</div>
+                 <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationError && (formModel.docNotes || '').length == 0">{{saveValidationError}}</div>
               </div>
             </td>
           </tr>
@@ -164,8 +173,8 @@
             <td class="grid-item">{{data.applicationTotalCostEstimate != null ? ('$' + (data.applicationTotalCostEstimate | number)) : '-'}}</td>
             <td class="grid-label sep align-top pt-2">OEFIA Notes<br><span class="fw-normal">(Optional)</span></td>
             <td class="grid-item" colspan="3">
-              <span *ngIf="!isEditMode">{{data.oefiaNotes || ''}}</span>
-              <div *ngIf="isEditMode">
+              <span *ngIf="!isEditMode || docFundingListCor">{{data.oefiaNotes || ''}}</span>
+              <div *ngIf="isEditMode && OEFIACertifier">
                 <textarea class="form-control form-control-sm" rows="2"
                   name="oefiaNotes" [(ngModel)]="formModel.oefiaNotes" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.oefiaNotes || '').length}}/1000</div>
@@ -192,9 +201,10 @@
               </div>
               <div *ngIf="isEditMode">
                 <div class="d-flex align-items-start gap-2 mb-1">
-                  <label class="btn btn-sm btn-primary mb-0">
+                  <label class="btn btn-sm btn-primary mb-0" [class.disabled]="doNotPayOefiaLockActive">
                     Choose File
                     <input type="file" class="d-none" (change)="onFileChange($event)"
+                      [disabled]="doNotPayOefiaLockActive"
                       accept=".doc,.docx,.rtf,.xls,.xlsx,.pdf">
                   </label>
                 </div>
@@ -211,7 +221,8 @@
                 </div>
                 <div *ngIf="justificationFileError" class="small text-danger mb-1">{{justificationFileError}}</div>
                 <textarea class="form-control form-control-sm" rows="2" placeholder="Or enter justification text here..."
-                  name="justificationText" [(ngModel)]="formModel.justificationText" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
+                  name="justificationText" [(ngModel)]="formModel.justificationText" (ngModelChange)="onNotesModelChange()" maxlength="1000"
+                  [disabled]="doNotPayOefiaLockActive"></textarea>
                 <div class="text-end small text-muted">{{(formModel.justificationText || '').length}}/1000</div>
               </div>
             </td>
@@ -222,9 +233,10 @@
 
       <!-- Buttons sit inside grid-container so they align with the table and stay visible -->
       <div class="d-flex justify-content-end gap-2 py-2 border-top">
-        <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationError">{{saveValidationError}}</div>
+       
         <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode"
-          [disabled]="!justificationLoaded || !budgetCategoriesLoaded" [title]="(!justificationLoaded || !budgetCategoriesLoaded) ? 'Loading…' : ''"
+          [disabled]="!justificationLoaded || !budgetCategoriesLoaded"
+          [title]="(!justificationLoaded || !budgetCategoriesLoaded) ? 'Loading…' : ''"
           (click)="onEdit()">Edit</button>
         <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode" (click)="onCancel()">Cancel</button>
         <button type="button" class="btn btn-primary ms-3" *ngIf="isEditMode" (click)="onSave()">Save</button>

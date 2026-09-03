@@ -1,7 +1,9 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { FundingSubmBulkEditFieldsDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+import { AppUserSessionService } from '../../../service/app-user-session.service';
 import { NGXLogger } from 'ngx-logger';
+import { roleNames } from '../../../service/role-names';
 import { Select2OptionData } from 'ng-select2';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
@@ -16,6 +18,7 @@ import { DocumentsDto } from '@cbiit/i2efsws-lib/model/documentsDto';
 export class GrantDetailComponent implements OnInit, OnChanges {
   @Input() data: any = null;
   @Input() listId: number;
+  @Input() listStatus = 'DOC Review';
   @Output() close = new EventEmitter<void>();
   // Emitted when edit mode ends without any row teardown (Cancel, either path) — distinct from
   // `close`, which remains reserved for actual row-collapse/teardown (chevron toggle).
@@ -53,6 +56,9 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   justificationDocuments: DocumentsDto[] = [];
   justificationFileError: string | null = null;
   saveSuccessMessage = '';
+  docFundingListCor = false;
+  OEFIACertifier = false;
+  doNotPayOefiaLockActive = false;
   saveValidationError: string | null = null;
   private initialFormSnapshot = '';
   private initialFundingSnapshot = '';
@@ -76,6 +82,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   constructor(
     private logger: NGXLogger,
+    private userSessionService: AppUserSessionService,
     private fundingSubmissionsService: FundingSubmissionsService,
     private propertiesService: AppPropertiesService,
     private cdr: ChangeDetectorRef,
@@ -85,6 +92,8 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
+    this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+    this.OEFIACertifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
     this.fetchDropdownOptions();
     this.refreshJustificationData();
   }
@@ -94,6 +103,8 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       this.justificationLoaded = false;
       this.refreshJustificationData();
     }
+
+    this.recomputeDoNotPayOefiaLock();
   }
 
   private fetchDropdownOptions(): void {
@@ -170,6 +181,12 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.isEditMode = true;
     this.initialFormSnapshot = this.currentSnapshot();
     this.initialFundingSnapshot = this.currentFundingSnapshot();
+    this.recomputeDoNotPayOefiaLock();
+    this.cdr.detectChanges();
+  }
+
+  onDocDecisionChange(): void {
+    this.recomputeDoNotPayOefiaLock();
     this.cdr.detectChanges();
   }
 
@@ -234,6 +251,12 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   onSave(): void {
     this.suppressNextLeavePrompt = true;
+
+    // For DOC users this field is view-only; ignore any client-side model tampering.
+    // OEFIA users can edit this field and their change must be preserved.
+    if (!this.OEFIACertifier) {
+      this.formModel.oefiaNotes = this.data?.oefiaNotes ?? '';
+    }
 
     // Business rule: when DOC Decision is Do Not Pay, dependent funding and
     // justification fields are discarded before validation/persistence.
@@ -316,13 +339,39 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.formModel.annualOrMyf = null;
     this.formModel.budgetCategories = null;
     this.formModel.docNciSelection = null;
-    this.formModel.oefiaNotes = '';
     this.formModel.justificationText = '';
     this.justificationFile = null;
     this.justificationFileError = null;
+    this.recomputeDoNotPayOefiaLock();
+  }
+
+  // Determines if the grant was added by OEFIA or if the addedByGroup is null. 
+  // addedByGroup null is treated as if the grant was added by OEFIA because prior added grants did not have this field set.
+  private isGrantAddedByOefia(): boolean {
+    const addedByGroup = this.data?.addedByGroup;
+    return addedByGroup == null || String(addedByGroup).trim().toUpperCase() === 'OEFIA';
+  }
+
+  private isDocReviewStatus(): boolean {
+    return String(this.listStatus || '').trim().toLowerCase().includes('doc review');
+  }
+
+  get canEditFundingSubmissionsSection(): boolean {
+    return this.docFundingListCor && this.isDocReviewStatus();
+  }
+
+  private recomputeDoNotPayOefiaLock(): void {
+    this.doNotPayOefiaLockActive = this.isEditMode
+      && !this.OEFIACertifier
+      && this.isGrantAddedByOefia()
+      && this.isDoNotPayDecisionSelected();
   }
 
   private validateChangedValues(): string | null {
+    if (this.doNotPayOefiaLockActive && !String(this.formModel.docNotes || '').trim()) {
+      return 'DOC Notes is required when DOC Decision is Do Not Pay.';
+    }
+
     const pct = this.formModel.docRecReductionPct;
     if (pct != null && (pct < 0 || pct > 100)) {
       return 'DOC Rec % Red must be between 0 and 100.';
@@ -462,6 +511,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.justificationFileError = null;
     this.saveSuccessMessage = '';
     this.saveValidationError = null;
+    this.doNotPayOefiaLockActive = false;
     this.initialFormSnapshot = '';
     this.initialFundingSnapshot = '';
     this.savingInProgress = false;
