@@ -632,21 +632,6 @@ describe('GrantDetailComponent', () => {
       expect(savedSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('saves an empty justification when the previously saved text is cleared', () => {
-      component.data.justificationText = 'Previously saved justification';
-      component.onEdit();
-      component.formModel.justificationText = '';
-      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
-      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: '' } as any));
-
-      component.onSave();
-
-      expect(fundingSubmissionsServiceSpy.saveJustificationForm).toHaveBeenCalledWith(
-        1, 100, undefined, ''
-      );
-      expect(component.data.justificationText).toBe('');
-    });
-
     it('applyFormModelToData() resolves and writes both budgetCategories (NAME) and budgetCategoryCode (CODE)', () => {
       component.onEdit();
       component.formModel.budgetCategories = 'OTHER';

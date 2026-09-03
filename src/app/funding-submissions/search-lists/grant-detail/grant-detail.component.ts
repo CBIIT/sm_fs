@@ -274,8 +274,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.logger.debug('GrantDetailComponent onSave()', this.formModel, 'listId:', this.listId);
     const { justificationText, ...fields } = this.formModel;
     const hasFundingFieldChanges = this.currentFundingSnapshot() !== this.initialFundingSnapshot;
-    const hasJustificationChanges = !!this.justificationFile
-      || (justificationText ?? '') !== (this.data?.justificationText ?? '');
+    const hasJustificationChanges = !!this.justificationFile || !!justificationText;
 
     if (!hasFundingFieldChanges && !hasJustificationChanges) {
       this.savingInProgress = false;
@@ -300,7 +299,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       next: () => {
         this.logger.debug('Grant detail saved');
         this.applyFormModelToData();
-        if (hasJustificationChanges) {
+        if (justificationText || this.justificationFile) {
           this.saveJustification(justificationText);
         } else {
           this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
@@ -407,8 +406,9 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   private saveJustification(justificationText?: string): void {
-    // Preserve an empty string so the API can remove an existing justification.
-    const normalizedJustificationText = justificationText ?? undefined;
+    const normalizedJustificationText = justificationText && justificationText.length > 0
+      ? justificationText
+      : undefined;
 
     this.fundingSubmissionsService.saveJustificationForm(
       this.listId, this.data.applId, this.justificationFile ?? undefined, normalizedJustificationText
