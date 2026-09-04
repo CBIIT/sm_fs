@@ -403,6 +403,23 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(component.canDeactivate()).toBe(true);
       expect(modalServiceSpy.open).not.toHaveBeenCalled();
     });
+
+    it('onBulkEdit() preserves `from=lists` in Bulk Edit navigation URL and state', () => {
+      (component as any).fromRoute = 'lists';
+      component.listId = 123;
+      component.selectionDate = 'SEL-1';
+      component.selectedRows.set(100, { applId: 100 });
+
+      component.onBulkEdit();
+
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
+        ['/funding-submissions/bulk-edit'],
+        jasmine.objectContaining({
+          queryParams: { from: 'lists' },
+          state: jasmine.objectContaining({ from: 'lists', listId: 123, selectionDate: 'SEL-1' })
+        })
+      );
+    });
   });
 
   // Prompt - Grant Detail Cancel Reverts to Read-Only (2026-08-25): GrantDetailComponent's

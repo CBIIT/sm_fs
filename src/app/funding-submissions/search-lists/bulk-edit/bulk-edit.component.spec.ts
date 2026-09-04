@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
@@ -75,6 +75,7 @@ describe('BulkEditComponent', () => {
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
+        { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: { get: () => null } } } },
         { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
         { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
@@ -138,5 +139,19 @@ describe('BulkEditComponent', () => {
 
     const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
     expect(Object.keys(payload.fields).sort()).toEqual(expectedDtoKeys.sort());
+  });
+
+  it('goBack() preserves from=lists when navigating back to Search Lists', () => {
+    seedHistoryStateAndInit([grant()]);
+    component.fromRoute = 'lists';
+    component.listId = 42;
+    component.selectionDate = 'SEL-42';
+    const router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+
+    component.goBack();
+
+    expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
+      queryParams: { listId: 42, selectionDate: 'SEL-42', from: 'lists' }
+    });
   });
 });

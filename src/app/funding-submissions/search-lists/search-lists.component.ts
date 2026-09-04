@@ -53,6 +53,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   selectionDate = '';
   listId = 0;
   listStatus = '';
+  fromRoute = '';
   backLabel = 'Back to Search Results';
   backRoute = '/funding-submissions/create';
   totalGrants = 0;
@@ -117,6 +118,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (params['selectionDate']) {
         this.selectionDate = params['selectionDate'];
       }
+      this.fromRoute = params['from'] || '';
       if (params['from'] === 'lists') {
         this.backLabel = 'Back to Search List View';
         this.backRoute = '/funding-submissions/lists';
@@ -1080,8 +1082,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onBulkEdit(): void {
     const grants = Array.from(this.selectedRows.values());
+    const queryParams = this.fromRoute ? { from: this.fromRoute } : undefined;
     this.router.navigate(['/funding-submissions/bulk-edit'], {
-      state: { grants, listId: this.listId, selectionDate: this.selectionDate }
+      queryParams,
+      state: { grants, listId: this.listId, selectionDate: this.selectionDate, from: this.fromRoute }
     });
   }
 

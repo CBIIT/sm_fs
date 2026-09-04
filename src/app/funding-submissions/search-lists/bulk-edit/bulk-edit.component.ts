@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
@@ -37,6 +37,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
   listId = 0;
   selectionDate = '';
+  fromRoute = '';
   grantViewerUrl = '';
   eGrantsUrl = '';
   i2eURL = '';
@@ -71,6 +72,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private logger: NGXLogger,
     private fundingSubmissionsService: FundingSubmissionsService,
     private propertiesService: AppPropertiesService,
@@ -86,6 +88,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     const state = history.state;
     this.listId = state?.listId ?? 0;
     this.selectionDate = state?.selectionDate ?? '';
+    this.fromRoute = state?.from || this.route.snapshot.queryParamMap.get('from') || '';
     const grants: any[] = state?.grants ?? [];
     this.logger.debug(JSON.stringify(grants));
     // Normalize DataTable row data field names to match FundingSubmBulkEditFieldsDto.
@@ -340,8 +343,12 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   goBack(): void {
+    const queryParams: any = { listId: this.listId, selectionDate: this.selectionDate };
+    if (this.fromRoute) {
+      queryParams.from = this.fromRoute;
+    }
     this.router.navigate(['/funding-submissions/search'], {
-      queryParams: { listId: this.listId, selectionDate: this.selectionDate }
+      queryParams
     });
   }
 
