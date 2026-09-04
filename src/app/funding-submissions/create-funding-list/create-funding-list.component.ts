@@ -17,12 +17,14 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('filterForm') filterForm: NgForm;
   @ViewChild('assignedCas') assignedCas: any;
+  @ViewChild('pdNameDropdown') pdNameDropdown: any;
   @ViewChild(CreateFundingTableComponent) fundingTable: CreateFundingTableComponent;
 
   fiscalYear: number;
   grantViewerUrl: string;
   eGrantsUrl: string;
   i2eURL: string;
+  isPdActive = false;
 
   selectedCancerActivities: string[] | string = [];
   selectedDocs: string[] = [];
@@ -215,6 +217,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
 
     criteria.piName = this.searchCriteria.piName;
     criteria.pdName = formValue.pdName;
+    criteria.includeInactivePd = this.isPdActive;
     criteria.divisionOfficeCenter = this.selectedDocs.length ? this.selectedDocs : undefined;
     criteria.cancerActivity = Array.isArray(this.selectedCancerActivities) && this.selectedCancerActivities.length
       ? (this.selectedCancerActivities as string[])
@@ -242,6 +245,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     this.selectedCancerActivities = '';
     this.selectedDocs = [];
     this.i2Status = '';
+    this.isPdActive = false;
     this.excludeInList = true;
     this.searchCriteria = {};
 
@@ -254,6 +258,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
         grantNumberYear: '',
         grantNumberSuffix: ''
       },
+      inactivePd: false,
       pdName: null,
       doc: null,
 
@@ -274,9 +279,35 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
       priorityScoreRange: { fromPriorityScore: null, toPriorityScore: null }
     });
 
+    this.filterForm?.form.get('inactivePd')?.setValue(false);
+
     // Clear CA UI selection without binding [selectedValue], to avoid input/output loops.
     if (this.assignedCas) {
       this.assignedCas.selectedValue = null;
     }
+
+    if (this.pdNameDropdown) {
+      // Reset PD/CA sync state in the child so it stops filtering by stale CA selections.
+      this.pdNameDropdown.selectedCayCodes = [];
+      this.pdNameDropdown.isPdActiveChecked = false;
+      this.pdNameDropdown.selectedValue = null;
+    }
+
+    // Some child controls emit async updates during reset; re-apply PD reset last so active-only
+    // values win deterministically.
+    setTimeout(() => {
+      this.filterForm?.form.get('inactivePd')?.setValue(false);
+      this.filterForm?.form.get('pdName')?.reset();
+      if (this.pdNameDropdown) {
+        this.pdNameDropdown.selectedCayCodes = [];
+        this.pdNameDropdown.isPdActiveChecked = false;
+        this.pdNameDropdown.selectedValue = null;
+      }
+    });
+  }
+  onPdActiveChecked(activeFlag: boolean): void {
+    this.isPdActive = !!activeFlag;
+    // PD list changes when inactive toggle changes; clear current selection to avoid stale value.
+    this.filterForm?.form.get('pdName')?.reset();
   }
 }

@@ -22,7 +22,7 @@
   <!-- Row 2: PD Name | Division Office Center | Cancer Activity -->
   <div class="row form-group">
     <div class="col-lg-4">
-     	<lib-pdname-dropdown [debug]="false" label="PD Name" name="pdName" [broadcast]="true" [showInactiveToggle]="true" [syncWithCa]="true" >
+	 	<lib-pdname-dropdown #pdNameDropdown [debug]="false" label="PD Name" name="pdName" [broadcast]="true" [showInactiveToggle]="true" [syncWithCa]="true" (isPdActive)="onPdActiveChecked($event)" [isPdActiveChecked]="isPdActive" >
 			</lib-pdname-dropdown>
     </div>
     <div class="col-lg-4">
