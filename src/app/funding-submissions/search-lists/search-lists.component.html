@@ -28,7 +28,26 @@
     </div>
 </ng-template>
 
+<ng-template #sendGrantsInDraftWarningModal>
+    <div class="modal-header">
+        <h4 class="modal-title">Send Grants to DOCs</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="onCancelSendGrantsInDraft()"></button>
+    </div>
+    <div class="modal-body">
+        <p>Clicking yes will send all grants currently in Draft status to the appropriate Division Offices and Centers (DOCs) for Review.</p>
+        <p class="mb-0">Are you sure you want to Continue?</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancelSendGrantsInDraft()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onConfirmSendGrantsInDraft()">Ok, proceed</button>
+    </div>
+</ng-template>
+
 <div class="ms-3">
+
+    <div *ngIf="sendGrantsToDocsSuccessMessage" class="alert alert-success" role="alert">
+        {{ sendGrantsToDocsSuccessMessage }}
+    </div>
 
     <a href="javascript:void(0)" class="text-decoration-none small" (click)="onBackToListClick()">
         &lt; {{ backLabel }}

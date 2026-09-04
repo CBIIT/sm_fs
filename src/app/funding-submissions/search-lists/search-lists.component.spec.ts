@@ -41,6 +41,15 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     return { host, viewRef };
   }
 
+  function renderSendGrantsInDraftWarningModal() {
+    const viewRef = (component as any).sendGrantsInDraftWarningModalRef.createEmbeddedView({});
+    viewRef.detectChanges();
+    const host = document.createElement('div');
+    viewRef.rootNodes.forEach((node: Node) => host.appendChild(node));
+    document.body.appendChild(host);
+    return { host, viewRef };
+  }
+
   beforeEach(async () => {
     // The component's ngOnInit() touches the global jQuery/DataTables plugin object
     // ($.fn.DataTable.ext.pager.numbers_length) which isn't loaded in the Karma test env.
@@ -52,10 +61,11 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     modalServiceSpy.open.and.returnValue(modalRefSpy);
 
     const fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
-      'getListDetail', 'getListStatusHistory', 'removeGrantsFromList'
+      'getListDetail', 'getListStatusHistory', 'removeGrantsFromList', 'sendListToDocsForReview'
     ]);
     fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({}));
     fundingSubmissionsServiceSpy.getListStatusHistory.and.returnValue(of([]));
+    fundingSubmissionsServiceSpy.sendListToDocsForReview.and.returnValue(of(1));
 
     const propertiesServiceSpy = jasmine.createSpyObj('AppPropertiesService', ['getProperty']);
     propertiesServiceSpy.getProperty.and.returnValue('http://example/');
@@ -150,6 +160,55 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     });
   });
 
+  describe('send-grants confirmation modal', () => {
+    it('renders expected title, explanatory copy, and Cancel/Ok, proceed buttons', () => {
+      const { host, viewRef } = renderSendGrantsInDraftWarningModal();
+
+      expect(host.querySelector('.modal-title')?.textContent?.trim()).toBe('Send Grants to DOCs');
+      expect(host.querySelector('.modal-body')?.textContent).toContain('Clicking yes will send all grants currently in Draft status');
+      expect(host.querySelector('.modal-body')?.textContent).toContain('Are you sure you want to Continue?');
+
+      const buttons = Array.from(host.querySelectorAll('.modal-footer button')) as HTMLButtonElement[];
+      expect(buttons.map(button => button.textContent?.trim())).toEqual(['Cancel', 'Ok, proceed']);
+
+      viewRef.destroy();
+      host.remove();
+    });
+
+    it('click handlers are wired: Cancel calls cancel and Ok, proceed calls confirm', () => {
+      const cancelSpy = spyOn(component, 'onCancelSendGrantsInDraft');
+      const confirmSpy = spyOn(component, 'onConfirmSendGrantsInDraft');
+      const { host, viewRef } = renderSendGrantsInDraftWarningModal();
+
+      const buttons = Array.from(host.querySelectorAll('.modal-footer button')) as HTMLButtonElement[];
+      buttons[0].click();
+      buttons[1].click();
+
+      expect(cancelSpy).toHaveBeenCalledTimes(1);
+      expect(confirmSpy).toHaveBeenCalledTimes(1);
+
+      viewRef.destroy();
+      host.remove();
+    });
+
+    it('onSendGrantsInDraftClick() opens the send-grants confirmation modal when there are no unsaved edits', () => {
+      component.onSendGrantsInDraftClick();
+
+      expect(modalServiceSpy.open).toHaveBeenCalledWith((component as any).sendGrantsInDraftWarningModalRef, { centered: true });
+    });
+
+    it('onConfirmSendGrantsInDraft() calls API and closes modal on success', () => {
+      (component as any).sendGrantsInDraftModalRef = modalRefSpy;
+
+      component.onConfirmSendGrantsInDraft();
+
+      const fundingSvc = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;
+      expect(fundingSvc.sendListToDocsForReview).toHaveBeenCalledWith(component.listId);
+      expect(modalRefSpy.close).toHaveBeenCalled();
+      expect(component.sendGrantsToDocsSuccessMessage).toBe('Success! The list has been sent to the assigned DOC contacts for review.');
+    });
+  });
+
   describe('when a detail row has unsaved edits', () => {
     beforeEach(() => {
       (component as any).detailComponentsByApplId.set(100, fakeDetailComponentRef(true));
@@ -161,7 +220,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(routerSpy.navigate).not.toHaveBeenCalled();
     });
 
-    it('Send Grants in Draft: the guard blocks the (stub) action until confirmed', () => {
+    it('Send Grants in Draft: the guard blocks opening the send-to-DOCs modal until confirmed', () => {
       component.onSendGrantsInDraftClick();
       expect(modalServiceSpy.open).toHaveBeenCalled();
     });

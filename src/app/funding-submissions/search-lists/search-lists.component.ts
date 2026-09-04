@@ -27,9 +27,11 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('foaCellRender') foaCellRender: TemplateRef<FoaCellRendererComponent>;
   @ViewChild('removeGrantsWarningModal') private removeGrantsWarningModalRef: TemplateRef<any>;
+  @ViewChild('sendGrantsInDraftWarningModal') private sendGrantsInDraftWarningModalRef: TemplateRef<any>;
   @ViewChild('unsavedChangesWarningModal') private unsavedChangesWarningModalRef: TemplateRef<any>;
 
   private removeModalRef: NgbModalRef;
+  private sendGrantsInDraftModalRef: NgbModalRef;
   private unsavedWarningModalRef: NgbModalRef;
   private pendingGuardedAction: (() => void) | null = null;
   private pendingGuardCancelAction: (() => void) | null = null;
@@ -66,6 +68,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedViewDoc: string = null;
   selectedRows = new Map<number, any>();
   filteredDoc: string | null = null;
+  sendGrantsToDocsSuccessMessage = '';
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
   viewDocOptions: Select2OptionData[] = [
     { id: 'AB', text: 'Abstract(s)' },
@@ -985,7 +988,33 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSendGrantsInDraftClick(): void {
-    this.executeWithUnsavedGuard(() => this.logger.debug('Send Grants in Draft action requested'));
+    this.executeWithUnsavedGuard(() => this.onSendGrantsInDraft());
+  }
+
+  private onSendGrantsInDraft(): void {
+    this.sendGrantsInDraftModalRef = this.modalService.open(this.sendGrantsInDraftWarningModalRef, { centered: true });
+  }
+
+  onCancelSendGrantsInDraft(): void {
+    this.sendGrantsInDraftModalRef?.dismiss();
+  }
+
+  onConfirmSendGrantsInDraft(): void {
+    this.fundingSubmissionsService.sendListToDocsForReview(this.listId).subscribe({
+      next: () => {
+        // Reflect the transition immediately in the UI, then rehydrate from server.
+        this.listStatus = 'DOC Review';
+        this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
+        this.sendGrantsToDocsSuccessMessage = 'Success! The list has been sent to the assigned DOC contacts for review.';
+        this.sendGrantsInDraftModalRef?.close();
+        this.cdr.detectChanges();
+        this.loadListMeta();
+      },
+      error: (err) => {
+        this.logger.error('Send list to DOCs for review failed', err);
+        this.sendGrantsInDraftModalRef?.close();
+      }
+    });
   }
 
   onBulkEditClick(): void {
@@ -1062,6 +1091,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.unsavedWarningModalRef?.close();
     this.removeModalRef?.close();
+    this.sendGrantsInDraftModalRef?.close();
     this.detailComponentsByApplId.forEach((compRef) => compRef?.destroy?.());
     this.detailComponentsByApplId.clear();
     if (this.dtTrigger && !this.dtTrigger.closed) {
