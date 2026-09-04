@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -52,6 +52,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   canSave = false;
   saveSuccessMessage = '';
   private lastSavedRows: any[] = [];
+  private pendingRealignFrame: number | null = null;
 
   get hasAnyBulkFieldValue(): boolean {
     const f = this.bulkFields;
@@ -244,9 +245,31 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.pendingRealignFrame !== null) {
+      window.cancelAnimationFrame(this.pendingRealignFrame);
+      this.pendingRealignFrame = null;
+    }
     if (this.dtTrigger && !this.dtTrigger.closed) {
       this.dtTrigger.unsubscribe();
     }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.realignDataTableColumns();
+  }
+
+  private realignDataTableColumns(): void {
+    if (this.pendingRealignFrame !== null) {
+      window.cancelAnimationFrame(this.pendingRealignFrame);
+    }
+
+    this.pendingRealignFrame = window.requestAnimationFrame(() => {
+      this.pendingRealignFrame = null;
+      this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+        dt.columns.adjust();
+      });
+    });
   }
 
   // Called from the per-row DataTable cell renderers (bulk-edit.component.html) whenever a
