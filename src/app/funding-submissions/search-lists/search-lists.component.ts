@@ -445,7 +445,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           className: 'btn-reset',
           titleAttr: 'Reset Table',
           text: '<i class="fas fa-undo me-1"></i>Reset Table',
-          action: this.resetTable.bind(this)
+          action: this.onResetTableClick.bind(this)
         },
         {
           extend: 'excel',
@@ -1029,12 +1029,26 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.executeWithUnsavedGuard(() => this.onRemoveSelected());
   }
 
+  onResetTableClick(): void {
+    this.executeWithUnsavedGuard(() => this.resetTable());
+  }
+
   resetTable(): void {
     this.filteredDoc = null;
     this.selectedRows.clear();
     this.cachedGrants.forEach((g: any) => g.selected = false);
+    this.detailComponentsByApplId.forEach((compRef) => compRef?.destroy?.());
+    this.detailComponentsByApplId.clear();
     this.throttle.reset();
     this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+      dt.rows().every(function() {
+        if (this.child && this.child.isShown()) {
+          this.child.hide();
+        }
+      });
+      const $body = $(dt.table(0).body());
+      $body.find('tr.shown').removeClass('shown');
+      $body.find('.toggle-details i').removeClass('fa-minus-circle').addClass('fa-plus-circle');
       dt.order([15, 'desc']).search('').columns().search('').page.len(100);
       dt.ajax.reload();
     });

@@ -243,6 +243,15 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(modalServiceSpy.open).toHaveBeenCalledTimes(1);
     });
 
+    it('Reset Table: is guarded and does not reset until confirmed', () => {
+      const resetSpy = spyOn(component, 'resetTable');
+
+      component.onResetTableClick();
+
+      expect(modalServiceSpy.open).toHaveBeenCalled();
+      expect(resetSpy).not.toHaveBeenCalled();
+    });
+
     it('canDeactivate(): blocks route navigation and opens the warning modal', () => {
       const result = component.canDeactivate();
       expect(result).not.toBe(true);
@@ -274,6 +283,30 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(detailRef.instance.forceDiscardAndClose).not.toHaveBeenCalled();
       expect(routerSpy.navigate).not.toHaveBeenCalled();
       expect(modalRefSpy.dismiss).toHaveBeenCalled();
+    });
+
+    it('Reset Table: cancel keeps editing state and does not run reset action', () => {
+      const detailRef = (component as any).detailComponentsByApplId.get(100);
+      const resetSpy = spyOn(component, 'resetTable');
+
+      component.onResetTableClick();
+      component.onCancelUnsavedWarning();
+
+      expect(detailRef.instance.forceDiscardAndClose).not.toHaveBeenCalled();
+      expect(resetSpy).not.toHaveBeenCalled();
+      expect(modalRefSpy.dismiss).toHaveBeenCalled();
+    });
+
+    it('Reset Table: confirm discards edits and runs reset action', () => {
+      const detailRef = (component as any).detailComponentsByApplId.get(100);
+      const resetSpy = spyOn(component, 'resetTable');
+
+      component.onResetTableClick();
+      component.onConfirmUnsavedWarning();
+
+      expect(detailRef.instance.forceDiscardAndClose).toHaveBeenCalled();
+      expect(resetSpy).toHaveBeenCalledTimes(1);
+      expect(modalRefSpy.close).toHaveBeenCalled();
     });
 
     it('canDeactivate(): confirming the warning resolves the observable with true (allow navigation)', (done) => {
@@ -462,6 +495,16 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(componentRef.destroy).not.toHaveBeenCalled();
       expect((component as any).detailComponentsByApplId.has(100)).toBeTrue();
       expect(row.child.hide).not.toHaveBeenCalled();
+    });
+
+    it('resetTable(): tears down expanded detail components and clears tracking map', () => {
+      const componentRef = { destroy: jasmine.createSpy('destroy') };
+      (component as any).detailComponentsByApplId.set(100, componentRef);
+
+      component.resetTable();
+
+      expect(componentRef.destroy).toHaveBeenCalled();
+      expect((component as any).detailComponentsByApplId.size).toBe(0);
     });
   });
 
