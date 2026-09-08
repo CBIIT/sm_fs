@@ -7,3 +7,7 @@
   text-align: right;
   color: #6c757d;
 }
+::ng-deep .dataTables_wrapper .dataTables_info
+{
+   padding-top: 0px !important ;
+}

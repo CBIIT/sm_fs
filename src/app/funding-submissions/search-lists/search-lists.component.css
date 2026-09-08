@@ -138,7 +138,7 @@ tr.shown {
 }
 
 .doc-status i.status-draft { color: #f0ad00; }
-.doc-status i.status-under-doc-review { color: #0084d6; }
+.doc-status i.status-doc-review { color: #8f6b1f; }
 .doc-status i.status-under-review { color: #279242; }
 .doc-status i.status-under-nci-director-review { color: #6f42c1; }
 

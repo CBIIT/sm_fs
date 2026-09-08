@@ -158,7 +158,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }).subscribe({
       next: ({ detail, history }) => {
         this.selectionDate = detail.listCode || this.selectionDate;
-        this.listStatus = detail.currentStatusDescrip || '';
+        this.listStatus = this.listStatus || '';// TODO backend doesn't have it 
         this.totalGrants = detail.totalGrants ?? 0;
         this.docRecommendedTotal = detail.totalDocRecAmt ?? 0;
         this.cachedGrants = detail.grants || [];
@@ -195,15 +195,16 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Maps grant decision counts for a DOC to the 4 statuses the Review Status section supports
   private deriveDocReviewStatus(count: number, docDecided: number, nciDecided: number): string {
-    if (this.listStatus?.toLowerCase() === 'draft') return 'Draft';
-    if (docDecided < count) return 'Under DOC Review';
-    if (nciDecided === 0) return 'Under Review';
-    return 'Under NCI Director Review';
+    if (this.listStatus?.toLowerCase() === 'draft' || !this.listStatus) return 'Draft';
+    if (this.listStatus?.toLowerCase() === 'doc review') return 'DOC Review';
+    else {
+      return 'Under NCI Director Review';
+    }
   }
 
   private readonly docStatusIcons: Record<string, string> = {
     'Draft': 'fa-hourglass-half',
-    'Under DOC Review': 'fa-user-clock',
+    'DOC Review': 'fa-user-clock',
     'Under Review': 'fa-sync-alt',
     'Under NCI Director Review': 'fa-gavel'
   };

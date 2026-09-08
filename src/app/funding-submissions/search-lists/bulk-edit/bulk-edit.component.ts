@@ -143,7 +143,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.dtOptions = {
       pagingType: 'full_numbers',
-      pageLength: 25,
+      pageLength: 100,
       scrollX: true,
       autoWidth: false,
       processing: false,
