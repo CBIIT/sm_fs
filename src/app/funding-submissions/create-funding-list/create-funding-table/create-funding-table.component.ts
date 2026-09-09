@@ -10,7 +10,7 @@ import {
   FundingSubmissionSearchResultDto,
   SelectionDateCodeDto
 } from '@cbiit/i2efsws-lib';
-import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
+import { AppPropertiesService , LoaderService, NameRenderComponent } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
@@ -34,6 +34,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('foaCellRender') foaCellRender: TemplateRef<FoaCellRendererComponent>;
   @ViewChild('nosiCellRender') nosiCellRender: TemplateRef<FoaCellRendererComponent>;
+  @ViewChild('pdNameRender') pdNameRender: TemplateRef<NameRenderComponent>;
   @ViewChild('addToListModal') private addToListModalRef: TemplateRef<any>;
   @ViewChild('cancerActivityRenderer') cancerActivityRenderer: TemplateRef<CancerActivityCellRendererComponent>;
   @ViewChild('existsInListRenderer') existsInListRenderer: TemplateRef<any>;
@@ -49,6 +50,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   isDtInitialized = false;
   showResults = false;
   selectAll = false;
+  saveSuccessMessage = '';
   grantList: FundingSubmissionSearchResultDto[] = [];
   throttle: DatatableThrottle = new DatatableThrottle();
   selectedRows: Map<number, FundingSubmissionSearchResultDto> = new Map();
@@ -138,18 +140,24 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
           width: '150px',
           defaultContent: ''
         }, // 3
+         {
+          title: 'PD',
+          data: 'pdName',
+          width: '150px',
+          ngTemplateRef:{ ref: this.pdNameRender }
+        }, // 4
         {
           title: 'Project Title',
           data: 'projectTitle',
           width: '200px',
           defaultContent: ''
-        }, // 4
+        }, // 5
         {
           title: 'DOC',
           data: 'doc',
           width: '40px',
           defaultContent: ''
-        }, // 5
+        }, // 6
         {
           title: 'NCAB',
           data: 'ncabDate',
@@ -160,38 +168,38 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
             const d = new Date(data);
             return isNaN(d.getTime()) ? data : `${d.getMonth() + 1}/${d.getFullYear()}`;
           }
-        }, // 6
+        }, // 7
         {
           title: 'NOFO',
           data: 'nofo',
           width: '50px',
           ngTemplateRef: { ref: this.foaCellRender },
-        }, // 7
+        }, // 8
         {
           title: 'NOSI',
           data: 'nosi',
           width: '40px',
           ngTemplateRef: { ref: this.nosiCellRender },
-        }, // 8
+        }, // 9
         {
           title: 'Pctl',
           data: 'percentile',
           width: '30px',
           defaultContent: '',
           render: (data) => (data != null && data !== '') ? `${data}%` : ''
-        }, // 9
+        }, // 10
         {
           title: 'PriScr',
           data: 'priorityScoreDisplay',
           width: '40px',
           defaultContent: ''
-        }, // 10
+        }, // 11
         {
           title: 'PrevScr',
           data: 'previousScoreDisplay',
           width: '50px',
           defaultContent: ''
-        }, // 11
+        }, // 12
         {
           title: 'PI Req. Total',
           data: 'piRequestedTotal',
@@ -203,26 +211,31 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
             }
             return data ?? '';
           }
-        }, // 12
+        }, // 13
         {
           title: 'Exists in List',
           data: 'existsInListSelectionDate',
           width: '50px',
-          defaultContent: '',
           ngTemplateRef: { ref: this.existsInListRenderer },
-        }, // 13
+        }, // 14
         {
           title: 'ESI',
           data: 'esiFlag',
           width: '30px',
           render: (data) => data === true ? 'Y' : data === false ? 'N' : ''
-        }, // 14
+        }, // 15
         {
           title: 'CA',
           data: 'cancerActivity',
           width: '30px',
           ngTemplateRef: { ref: this.cancerActivityRenderer },
-        }, // 15
+        }, // 16
+        {
+          title: 'IMPAC II status',
+          data: 'impacStatusDescrip',
+          width: '90px',
+          defaultContent: '',
+        }, // 17
       ],
 
       dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"B<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
@@ -236,7 +249,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
           title: null,
           header: true,
           action: this.exportGrantSearchResults.bind(this),
-          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] }      
+          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] }      
         }
       ],
       order: [[1, 'desc']],
@@ -502,10 +515,11 @@ allDataSelected(data: any[]): boolean {
         this.logger.debug('addGrantsToList result:', result);
         // Do not retain prior selection after a successful save; returning to this page
         // should start with zero "Grant(s) Added".
+        this.saveSuccessMessage = `Success! ${result.grantsAdded} out of ${this.selectedRows.size} were successfully added to the list.`;
         this.selectedRows.clear();
         this.grantList.forEach((row: any) => row.selected = false);
-        this.modalRef?.close();
-        this.router.navigate(['/funding-submissions/search'], { queryParams: { listId: result.listId, from: 'create' } });
+        this.modalRef?.close();    
+        this.router.navigate(['/funding-submissions/search'], { queryParams: { listId: result.listId, from: 'create' }, state: {successMessage: this.saveSuccessMessage} });
       },
       error: (err) => {
         this.loaderService.hide();

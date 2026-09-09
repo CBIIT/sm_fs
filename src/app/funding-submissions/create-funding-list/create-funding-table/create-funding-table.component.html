@@ -71,6 +71,9 @@
         [i2eURL]="i2eURL">
       </app-full-grant-number-cell-renderer>
     </ng-template>
+    <ng-template #pdNameRender let-data="adtData">
+    <lib-name-render [data]="data" [firstName]="data.pdName"  [email]="data.pdEmail" [grantNumber]="data.grantNumber" [subject]="data.grantNumber+' - ' + data.pdName"></lib-name-render>
+  </ng-template>
     <ng-template #foaCellRender let-data="adtData">
   <app-foa-cell-renderer [data]="data" [mode] ="'NOFO'"></app-foa-cell-renderer>
 </ng-template>

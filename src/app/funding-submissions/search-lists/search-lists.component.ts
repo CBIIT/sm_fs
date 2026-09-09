@@ -58,6 +58,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   backRoute = '/funding-submissions/create';
   totalGrants = 0;
   docRecommendedTotal = 0;
+  saveSuccessMessage = '';
 
   docStatusColumns: any[][] = [];
   listHistory: any[] = [];
@@ -131,6 +132,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
     this.i2eURL = this.propertiesService.getProperty('I2EWEB_URL').trim();
     this.documentURL = (this.propertiesService.getProperty('DOCVIEWER_URL') || '').trim();
+    let state = history.state;
+    if(state && state.successMessage) {
+      this.saveSuccessMessage = state.successMessage
+    }
   }
 
   get canViewPdf(): boolean {

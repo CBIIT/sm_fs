@@ -48,6 +48,13 @@
     <div *ngIf="sendGrantsToDocsSuccessMessage" class="alert alert-success" role="alert">
         {{ sendGrantsToDocsSuccessMessage }}
     </div>
+      <div class="row g-0 save-success-row" *ngIf="saveSuccessMessage.length > 0">
+    <div class="col-12">
+      <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
+        <span><b>{{saveSuccessMessage}}</b></span>
+      </ngb-alert>
+    </div>
+  </div>
 
     <a href="javascript:void(0)" class="text-decoration-none small" (click)="onBackToListClick()">
         &lt; {{ backLabel }}
