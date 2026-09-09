@@ -61,7 +61,6 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   docStatusColumns: any[][] = [];
   listHistory: any[] = [];
-
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
   throttle: DatatableThrottle = new DatatableThrottle();
@@ -205,8 +204,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly docStatusIcons: Record<string, string> = {
     'Draft': 'fa-hourglass-half',
     'DOC Review': 'fa-user-clock',
-    'Under Review': 'fa-sync-alt',
-    'Under NCI Director Review': 'fa-gavel'
+    'OEFIA Review': 'fa-sync-alt',
+    'NCI Director Review': 'fa-gavel'
   };
 
   getDocStatusIcon(status: string): string {

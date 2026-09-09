@@ -32,6 +32,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   excludeInList = true;
   searchCriteria: FundSelectSearchCriteria = {};
   private readonly CA_DOC_CHANNEL = 'CA_DOC_DEFAULT_CHANNEL';
+  excludImpact2StatusOptions =['T','C','N','W','SR','U','A']
 
   constructor(
     private propertiesService: AppPropertiesService,
