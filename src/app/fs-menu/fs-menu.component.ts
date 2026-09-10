@@ -17,6 +17,7 @@ export class FsMenuComponent implements OnInit {
   paylistSearchUrl: string;
 
   oefiaCertifier: boolean;
+  financialAnalyst: boolean;
   docFunListCor: boolean;
   splCertifier: boolean;
   pd: boolean;
@@ -49,6 +50,7 @@ export class FsMenuComponent implements OnInit {
     this.docFunListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
     this.paylistReadOnlyRole = this.userSessionService.hasRole(roleNames.PAYLIST_READ_ONLY);
     this.gmLeadership = this.userSessionService.hasRole(roleNames.GM_LEADERSHIP);
+    this.financialAnalyst = this.userSessionService.hasRole(roleNames.FINANCIAL_ANALYST);
     this.pd = this.userSessionService.isPD();
     this.pa = this.userSessionService.isPA();
 
