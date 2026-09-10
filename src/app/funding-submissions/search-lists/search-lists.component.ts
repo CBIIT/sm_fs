@@ -185,7 +185,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private buildDocStatusColumns(grants: FundingSubmissionListGrantDto[]): any[][] {
     const docMap = new Map<string, { doc: string; count: number; statusRank: number }>();
     for (const g of grants) {
-      const doc = g.doc || 'Unknown';
+      const doc = g.doc || '';
       const status = this.normalizeGrantReviewStatus((g as any).reviewStatus);
       const statusRank = this.getReviewStatusRank(status);
       if (!docMap.has(doc)) docMap.set(doc, { doc, count: 0, statusRank });
@@ -233,10 +233,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private readonly docStatusIcons: Record<string, string> = {
-    'Draft': 'fa-hourglass-half',
-    'DOC Review': 'fa-user-clock',
-    'OEFIA Review': 'fa-sync-alt',
-    'NCI Director Review': 'fa-gavel'
+    'Draft': 'fa-pencil-alt',
+    'DOC Review': 'fa-hourglass-half',
+    'OEFIA Review': 'fa-thumbs-up',
+    'NCI Director Review': 'fa-arrow-right'
   };
 
   getDocStatusIcon(status: string): string {
