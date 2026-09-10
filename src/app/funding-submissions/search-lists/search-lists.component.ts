@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { Observable, Subject, forkJoin } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { Select2OptionData } from 'ng-select2';
@@ -52,7 +53,6 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectionDate = '';
   listId = 0;
-  listStatus = '';
   fromRoute = '';
   backLabel = 'Back to Search Results';
   backRoute = '/funding-submissions/create';
@@ -61,6 +61,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   saveSuccessMessage = '';
 
   docStatusColumns: any[][] = [];
+  isCurrentStatusDraft = false;
+  listStatus = ''
   listHistory: any[] = [];
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
@@ -70,11 +72,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedRows = new Map<number, any>();
   filteredDoc: string | null = null;
   sendGrantsToDocsSuccessMessage = '';
+  sendGrantsToDocsErrorMessage = '';
+  isSendGrantsInDraftInProgress = false;
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
   viewDocOptions: Select2OptionData[] = [
     { id: 'AB', text: 'Abstract(s)' },
     { id: 'SS', text: 'Summary Statement(s)' },
     { id: 'both', text: 'Abstract(s) and Summary Statement(s)' },
+    { id: 'JST', text: 'Justification(s)' }
   ];
 
   // Display CODE vs NAME Reconciliation (2026-08-25): docDecision CODE → NAME lookup map,
@@ -132,9 +137,11 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
     this.i2eURL = this.propertiesService.getProperty('I2EWEB_URL').trim();
     this.documentURL = (this.propertiesService.getProperty('DOCVIEWER_URL') || '').trim();
-    let state = history.state;
-    if(state && state.successMessage) {
-      this.saveSuccessMessage = state.successMessage
+    const state = history.state;
+    if (state?.successMessage) {
+      this.saveSuccessMessage = state.successMessage;
+      // Consume transient navigation state so browser refresh does not re-show success toast.
+      history.replaceState({}, document.title);
     }
   }
 
@@ -162,9 +169,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }).subscribe({
       next: ({ detail, history }) => {
         this.selectionDate = detail.listCode || this.selectionDate;
-        this.listStatus = this.listStatus || '';// TODO backend doesn't have it 
         this.totalGrants = detail.totalGrants ?? 0;
         this.docRecommendedTotal = detail.totalDocRecAmt ?? 0;
+        this.listStatus = detail.currentStatusDescrip;
         this.cachedGrants = detail.grants || [];
         this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
         this.listHistory = history;
@@ -176,20 +183,23 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private buildDocStatusColumns(grants: FundingSubmissionListGrantDto[]): any[][] {
-    const docMap = new Map<string, { doc: string; count: number; docDecided: number; nciDecided: number }>();
+    const docMap = new Map<string, { doc: string; count: number; statusRank: number }>();
     for (const g of grants) {
       const doc = g.doc || 'Unknown';
-      if (!docMap.has(doc)) docMap.set(doc, { doc, count: 0, docDecided: 0, nciDecided: 0 });
+      const status = this.normalizeGrantReviewStatus((g as any).reviewStatus);
+      const statusRank = this.getReviewStatusRank(status);
+      if (!docMap.has(doc)) docMap.set(doc, { doc, count: 0, statusRank });
       const entry = docMap.get(doc);
       entry.count++;
-      if (g.docDecision) entry.docDecided++;
-      if (g.nciDecision) entry.nciDecided++;
+      entry.statusRank = Math.max(entry.statusRank, statusRank);
     }
     const items = Array.from(docMap.values()).map(e => ({
       doc: e.doc,
       count: e.count,
-      status: this.deriveDocReviewStatus(e.count, e.docDecided, e.nciDecided)
+      status: this.getReviewStatusByRank(e.statusRank)
     }));
+    const nonDraftItem = items.find(item => item.status != null && item.status.toLowerCase() !== 'draft');
+    this.isCurrentStatusDraft = !nonDraftItem;
     const columns: any[][] = [];
     for (let i = 0; i < items.length; i += 4) {
       columns.push(items.slice(i, i + 4));
@@ -197,13 +207,29 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return columns;
   }
 
-  // Maps grant decision counts for a DOC to the 4 statuses the Review Status section supports
-  private deriveDocReviewStatus(count: number, docDecided: number, nciDecided: number): string {
-    if (this.listStatus?.toLowerCase() === 'draft' || !this.listStatus) return 'Draft';
-    if (this.listStatus?.toLowerCase() === 'doc review') return 'DOC Review';
-    else {
-      return 'Under NCI Director Review';
-    }
+  // Normalizes backend grant-level review status text (e.g. "Under DOC Review") to the
+  // 4 statuses supported by the Review Status card.
+  private normalizeGrantReviewStatus(reviewStatus: string | null | undefined): string {
+    const normalized = (reviewStatus || '').trim().toLowerCase();
+    if (!normalized || normalized.includes('draft')) return 'Draft';
+    if (normalized.includes('oefia')) return 'OEFIA Review';
+    if (normalized.includes('director')) return 'NCI Director Review';
+    if (normalized.includes('doc')) return 'DOC Review';
+    return 'Draft';
+  }
+
+  private getReviewStatusRank(status: string): number {
+    if (status === 'DOC Review') return 1;
+    if (status === 'OEFIA Review') return 2;
+    if (status === 'NCI Director Review') return 3;
+    return 0;
+  }
+
+  private getReviewStatusByRank(rank: number): string {
+    if (rank === 1) return 'DOC Review';
+    if (rank === 2) return 'OEFIA Review';
+    if (rank === 3) return 'NCI Director Review';
+    return 'Draft';
   }
 
   private readonly docStatusIcons: Record<string, string> = {
@@ -277,6 +303,13 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           render: (data: boolean) => data ? 'Y' : ''
         }, // 2
         {
+          title: 'Jus.',
+          data: 'justificationAvailable',
+          width: '40px',
+          defaultContent: '',
+          render: (data: boolean) => data == true ? 'Y' : ''
+        }, // 2
+        {
           title: 'Grant Number',
           data: 'grantNumber',
           width: '140px',
@@ -287,6 +320,12 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           title: 'DOC',
           data: 'doc',
           width: '50px',
+          defaultContent: ''
+        }, // 4
+        {
+          title: 'Review status',
+          data: 'reviewStatus',
+          width: '100px',
           defaultContent: ''
         }, // 4
         {
@@ -685,6 +724,11 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     row.invalidate().draw(false);
   }
 
+  private blurActiveElement(): void {
+    const activeElement = document.activeElement as HTMLElement | null;
+    activeElement?.blur?.();
+  }
+
 
   private executeWithUnsavedGuard(action: () => void): void {
     this.executeWithUnsavedGuardOptions(action);
@@ -698,6 +742,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.pendingGuardedAction = action;
     this.pendingGuardCancelAction = onCancel || null;
+    this.blurActiveElement();
     this.unsavedWarningModalRef = this.modalService.open(this.unsavedChangesWarningModalRef, { centered: true });
   }
 
@@ -978,6 +1023,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         observer.next(allow);
         observer.complete();
       };
+      this.blurActiveElement();
       this.unsavedWarningModalRef = this.modalService.open(this.unsavedChangesWarningModalRef, { centered: true });
     });
   }
@@ -999,6 +1045,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private onSendGrantsInDraft(): void {
+    this.blurActiveElement();
     this.sendGrantsInDraftModalRef = this.modalService.open(this.sendGrantsInDraftWarningModalRef, { centered: true });
   }
 
@@ -1007,19 +1054,30 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onConfirmSendGrantsInDraft(): void {
-    this.fundingSubmissionsService.sendListToDocsForReview(this.listId).subscribe({
+    if (this.isSendGrantsInDraftInProgress) {
+      return;
+    }
+
+    this.isSendGrantsInDraftInProgress = true;
+    this.sendGrantsToDocsSuccessMessage = '';
+    this.sendGrantsToDocsErrorMessage = '';
+    this.sendGrantsInDraftModalRef?.close();
+
+    this.fundingSubmissionsService.sendListToDocsForReview(this.listId).pipe(
+      finalize(() => {
+        this.isSendGrantsInDraftInProgress = false;
+      })
+    ).subscribe({
       next: () => {
         // Reflect the transition immediately in the UI, then rehydrate from server.
-        this.listStatus = 'DOC Review';
         this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
         this.sendGrantsToDocsSuccessMessage = 'Success! The list has been sent to the assigned DOC contacts for review.';
-        this.sendGrantsInDraftModalRef?.close();
         this.cdr.detectChanges();
         this.loadListMeta();
       },
       error: (err) => {
         this.logger.error('Send list to DOCs for review failed', err);
-        this.sendGrantsInDraftModalRef?.close();
+        this.sendGrantsToDocsErrorMessage = 'Unable to send the list to DOCs right now. Please try again.';
       }
     });
   }
@@ -1063,6 +1121,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onRemoveSelected(): void {
     if (!this.selectedRows.size) return;
+    this.blurActiveElement();
     this.removeModalRef = this.modalService.open(this.removeGrantsWarningModalRef, { centered: true });
   }
 

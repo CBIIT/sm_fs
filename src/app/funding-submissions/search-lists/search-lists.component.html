@@ -48,6 +48,9 @@
     <div *ngIf="sendGrantsToDocsSuccessMessage" class="alert alert-success" role="alert">
         {{ sendGrantsToDocsSuccessMessage }}
     </div>
+    <div *ngIf="sendGrantsToDocsErrorMessage" class="alert alert-danger" role="alert">
+        {{ sendGrantsToDocsErrorMessage }}
+    </div>
       <div class="row g-0 save-success-row" *ngIf="saveSuccessMessage.length > 0">
     <div class="col-12">
       <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
@@ -63,7 +66,7 @@
     <!-- Page header -->
     <div class="d-flex justify-content-between align-items-center my-3">
         <h2 class="mb-0">{{ selectionDate }}</h2>
-        <button class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
+        <button *ngIf="isCurrentStatusDraft" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
     </div>
 
     <!-- Overview -->

@@ -518,8 +518,23 @@ allDataSelected(data: any[]): boolean {
         this.saveSuccessMessage = `Success! ${result.grantsAdded} out of ${this.selectedRows.size} were successfully added to the list.`;
         this.selectedRows.clear();
         this.grantList.forEach((row: any) => row.selected = false);
-        this.modalRef?.close();    
-        this.router.navigate(['/funding-submissions/search'], { queryParams: { listId: result.listId, from: 'create' }, state: {successMessage: this.saveSuccessMessage} });
+        this.modalRef?.close();
+
+        const targetSelectionCode = result.listCode || this.selectedDate;
+        if (targetSelectionCode) {
+          this.navigateToList(targetSelectionCode, this.saveSuccessMessage, result.listId);
+          return;
+        }
+
+        if (result.listId) {
+          this.router.navigate(['/funding-submissions/search'], {
+            queryParams: { listId: result.listId, from: 'create' },
+            state: { successMessage: this.saveSuccessMessage }
+          });
+          return;
+        }
+
+        this.logger.warn('addGrantsToList returned neither listCode nor listId', result);
       },
       error: (err) => {
         this.loaderService.hide();
@@ -546,17 +561,33 @@ allDataSelected(data: any[]): boolean {
     this.pendingRestorePage = currentPage > 0 ? currentPage : null;
   }
 
-  navigateToList(selectionDate: string): void {
+  navigateToList(selectionDate: string, successMessage?: string, fallbackListId?: number): void {
     this.FundingSubmissionsService.searchLists({ selectionCode: [selectionDate], start: 0, length: 1 }).subscribe({
       next: (result) => {
         const listId = result.data?.[0]?.listId;
         if (listId) {
-          this.router.navigate(['/funding-submissions/search'], { queryParams: { listId, from: 'create' } });
+          this.router.navigate(['/funding-submissions/search'], {
+            queryParams: { listId, from: 'create' },
+            state: successMessage ? { successMessage } : undefined
+          });
+        } else if (fallbackListId) {
+          this.router.navigate(['/funding-submissions/search'], {
+            queryParams: { listId: fallbackListId, from: 'create' },
+            state: successMessage ? { successMessage } : undefined
+          });
         } else {
           this.logger.warn('No list found for selection date', selectionDate);
         }
       },
-      error: (err) => this.logger.error('Failed to find list for selection date', err)
+      error: (err) => {
+        this.logger.error('Failed to find list for selection date', err);
+        if (fallbackListId) {
+          this.router.navigate(['/funding-submissions/search'], {
+            queryParams: { listId: fallbackListId, from: 'create' },
+            state: successMessage ? { successMessage } : undefined
+          });
+        }
+      }
     });
   }
 
