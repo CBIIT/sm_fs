@@ -137,9 +137,9 @@ tr.shown {
   text-align: center;
 }
 
-.doc-status i.status-draft { color: #f0ad00; }
-.doc-status i.status-doc-review { color: #8f6b1f; }
-.doc-status i.status-under-review { color: #279242; }
+.doc-status i.status-draft { color: #5a95da; }
+.doc-status i.status-doc-review { color: #f0ad00; }
+.doc-status i.status-oefia-review { color: #279242; }
 .doc-status i.status-under-nci-director-review { color: #6f42c1; }
 
 .doc-status span {
