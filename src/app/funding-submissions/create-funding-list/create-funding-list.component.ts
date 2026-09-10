@@ -129,9 +129,8 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
       : (cancerActivities ? [cancerActivities] : []);
     this.selectedCancerActivities = normalizedCancerActivities.length ? normalizedCancerActivities : '';
 
-    // Ensure DOC dropdown refreshes against the latest CA selection.
-    // lib-doc-dropdown filters on caForDocEmitter only when its own selected DOCs are empty.
-    this.selectedDocs = [];
+    // Preserve user DOC selection while CA refreshes downstream dropdown options.
+    const previousDocs = [...this.selectedDocs];
 
     const caCodes = normalizedCancerActivities;
 
@@ -139,6 +138,19 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
       code: caCodes.length ? caCodes : null,
       channel: this.CA_DOC_CHANNEL
     });
+
+    // Some dropdown refreshes emit a transient empty selection; restore previous DOC value.
+    if (previousDocs.length) {
+      setTimeout(() => {
+        if (!this.selectedDocs.length) {
+          this.selectedDocs = previousDocs;
+          this.pdCaIntegratorService.docEmitter.next({
+            doc: this.selectedDocs,
+            channel: PD_CA_DEFAULT_CHANNEL
+          });
+        }
+      });
+    }
   }
 
   get hasAnyCriteria(): boolean {
