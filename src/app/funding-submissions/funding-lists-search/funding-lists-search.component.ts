@@ -11,7 +11,9 @@ import {
   FundingSubmissionsService,
   FundingSubmissionListSearchCriteriaDto,
   SelectionDateCodeDto,
-  FundingSubmStatusCodesTDto
+  FundingSubmStatusCodesTDto,
+  Column,
+  Order
 } from '@cbiit/i2efsws-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { getCurrentFiscalYear } from '../../utils/utils';
@@ -42,7 +44,12 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   listStatusOptions: Select2OptionData[] = [];
 
   private searchCriteria: FundingSubmissionListSearchCriteriaDto = {};
-  private lastSortOrder: any[] = [[4, 'desc']];
+  // FS-2033: retain the latest normalized DataTables sort context so the export request can reproduce
+  // the live grid's ordering. The backend resolves each order's columnName from the matching
+  // columns[] entry, so columns[] and order[] must travel together. Default matches the configured
+  // table order (column 4 descending).
+  private latestColumns: Column[] = [];
+  private latestOrder: Order[] = [{ column: 4, dir: 'desc' }];
   private throttle = new DatatableThrottle();
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
@@ -237,12 +244,15 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
 
   ajaxCall($this: FundingListsSearchComponent, dataTablesParameters: any, callback: any): void {
     const normalizeSearch = (s: any) => s ? { ...s, regex: s.regex === true || s.regex === 'true' } : s;
-    $this.lastSortOrder = dataTablesParameters.order;
+    const columns: Column[] = (dataTablesParameters.columns || []).map((c: any) => ({ ...c, search: normalizeSearch(c.search) }));
+    const order: Order[] = dataTablesParameters.order;
+    $this.latestColumns = columns;
+    $this.latestOrder = order;
     const body: FundingSubmissionListSearchCriteriaDto = {
       ...$this.searchCriteria,
       draw: dataTablesParameters.draw,
-      columns: (dataTablesParameters.columns || []).map((c: any) => ({ ...c, search: normalizeSearch(c.search) })),
-      order: dataTablesParameters.order,
+      columns,
+      order,
       start: dataTablesParameters.start,
       length: dataTablesParameters.length,
       search: normalizeSearch(dataTablesParameters.search)
@@ -261,9 +271,12 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   exportListSearchResults() {
     this.logger.debug('Exporting list search results');
     this.loaderService.show();
+    // FS-2033: send the current business filters together with the retained normalized columns[] and
+    // order[] so the backend can resolve each order's columnName and reproduce the live grid's sort.
     const body: FundingSubmissionListSearchCriteriaDto = {
       ...this.searchCriteria,
-      order: this.lastSortOrder,
+      columns: this.latestColumns,
+      order: this.latestOrder,
       start: 0,
       length: -1
     };

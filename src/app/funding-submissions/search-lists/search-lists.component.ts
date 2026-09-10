@@ -7,7 +7,7 @@ import { finalize } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { Select2OptionData } from 'ng-select2';
-import { FundingSubmissionsService, FundingSubmissionListGrantDto } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService, FundingSubmissionListGrantDto, FundingSubmissionListGrantExportRequestDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { openNewWindow } from '../../utils/utils';
@@ -501,7 +501,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           title: null,
           header: true,
           action: this.exportGrantListResults.bind(this),
-          exportOptions: { columns: [1, 2, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26] }      
+          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26] }      
         }
       ],
       order: [[15, 'desc']],
@@ -1204,20 +1204,50 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
    exportGrantListResults() {
-    this.logger.debug('Exporting grant search results');
+    this.logger.debug('Exporting grant list results');
     this.loaderService.show();
-    this.http.post(`/i2efsws/api/v1/funding-submissions/lists/${this.listId}/grants/export`, null, { responseType: 'arraybuffer' }).subscribe(
 
-      (response) => {
+    const dtInstance = this.dtElement?.dtInstance;
+    if (!dtInstance) {
+      this.logger.error('Grant list export failed: DataTables instance is not available');
+      this.loaderService.hide();
+      return;
+    }
+
+    dtInstance.then(
+      (dt: DataTables.Api) => {
+        // FS-2107: submit every row in the List View's current sort order (all rows, not just the
+        // current page, selected rows, or DataTables-search-filtered rows). The backend treats this
+        // sequence as an advisory ordering signal for the 26-column spreadsheet.
+        const rows: any[] = dt.rows({ order: 'current', search: 'none' }).data().toArray();
+        const orderedApplIds: number[] = rows
+          .map(row => row?.applId)
+          .filter((applId): applId is number => applId !== null && applId !== undefined);
+
+        const body: FundingSubmissionListGrantExportRequestDto = { orderedApplIds };
+
+        this.http
+          .post(`/i2efsws/api/v1/funding-submissions/lists/${this.listId}/grants/export`, body, { responseType: 'arraybuffer' })
+          .subscribe({
+            next: (response) => {
+              this.loaderService.hide();
+              const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
+              const url = window.URL.createObjectURL(blob);
+              const anchor = document.createElement('a');
+              anchor.download = 'funding_submissions_lists_result_all.xls';
+              anchor.href = url;
+              anchor.click();
+            },
+            error: (error) => {
+              this.loaderService.hide();
+              this.logger.error('Grant list export failed', error);
+            }
+          });
+      },
+      (error) => {
+        this.logger.error('Grant list export failed: unable to resolve DataTables instance', error);
         this.loaderService.hide();
-        const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
-        const url = window.URL.createObjectURL(blob);
-        const anchor = document.createElement('a');
-        anchor.download = 'funding_submissions_lists_result_all.xls';
-        anchor.href = url;
-        anchor.click();
       }
-
     );
   }
 }

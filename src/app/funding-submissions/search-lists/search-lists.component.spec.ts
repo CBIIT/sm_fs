@@ -1,11 +1,11 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
-import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { HttpClient } from '@angular/common/http';
 
 import { SearchListsComponent } from './search-lists.component';
@@ -565,6 +565,131 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     it('DOC Decision column falls back to the raw code for an unresolvable value instead of throwing or blanking out', () => {
       const column = (component.dtOptions.columns as any[]).find(col => col.title === 'DOC Decision');
       expect(column.render('Some Future Code', null, {})).toBe('Some Future Code');
+    });
+  });
+
+  // FS-2107: the List View export must POST every row's APPL_ID in the current sort order (all rows,
+  // not selected rows, the current page, or DataTables-search-filtered rows).
+  describe('exportGrantListResults (FS-2107)', () => {
+    let httpSpy: jasmine.SpyObj<HttpClient>;
+    let loaderService: LoaderService;
+    let loggerSpy: jasmine.SpyObj<NGXLogger>;
+
+    function fakeDt(rows: any[]) {
+      return {
+        rows: jasmine.createSpy('rows').and.returnValue({
+          data: () => ({ toArray: () => rows })
+        })
+      };
+    }
+
+    beforeEach(() => {
+      httpSpy = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
+      loggerSpy = TestBed.inject(NGXLogger) as jasmine.SpyObj<NGXLogger>;
+      loaderService = TestBed.inject(LoaderService);
+      spyOn(loaderService, 'show');
+      spyOn(loaderService, 'hide');
+      component.listId = 123;
+    });
+
+    it('reads rows({ order: "current", search: "none" }) and posts every non-null APPL_ID in exact row order', fakeAsync(() => {
+      const dt = fakeDt([{ applId: 5 }, { applId: null }, { applId: 9 }, { applId: undefined }, { applId: 2 }]);
+      component.dtElement = { dtInstance: Promise.resolve(dt) } as any;
+      // Populate selected rows / a divergent "current page" to prove they are NOT the export source.
+      component.selectedRows = new Map<number, any>([[999, { applId: 999 }]]);
+      httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+      spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+      const anchor = { click: jasmine.createSpy('click'), download: '', href: '' } as any;
+      spyOn(document, 'createElement').and.returnValue(anchor);
+
+      component.exportGrantListResults();
+      tick();
+
+      expect(dt.rows).toHaveBeenCalledWith({ order: 'current', search: 'none' });
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        '/i2efsws/api/v1/funding-submissions/lists/123/grants/export',
+        { orderedApplIds: [5, 9, 2] },
+        jasmine.objectContaining({ responseType: 'arraybuffer' as any })
+      );
+      expect(loaderService.show).toHaveBeenCalled();
+      expect(loaderService.hide).toHaveBeenCalled();
+      expect(anchor.download).toBe('funding_submissions_lists_result_all.xls');
+      expect(anchor.click).toHaveBeenCalled();
+    }));
+
+    it('does not derive the exported IDs from selectedRows', fakeAsync(() => {
+      const dt = fakeDt([{ applId: 5 }, { applId: 9 }]);
+      component.dtElement = { dtInstance: Promise.resolve(dt) } as any;
+      component.selectedRows = new Map<number, any>([[999, { applId: 999 }]]);
+      httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+      spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+      spyOn(document, 'createElement').and.returnValue({ click: () => {}, download: '', href: '' } as any);
+
+      component.exportGrantListResults();
+      tick();
+
+      const body = httpSpy.post.calls.mostRecent().args[1] as any;
+      expect(body.orderedApplIds).toEqual([5, 9]);
+      expect(body.orderedApplIds).not.toContain(999);
+    }));
+
+    it('remains valid for an empty table (orderedApplIds: [])', fakeAsync(() => {
+      const dt = fakeDt([]);
+      component.dtElement = { dtInstance: Promise.resolve(dt) } as any;
+      httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+      spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+      spyOn(document, 'createElement').and.returnValue({ click: () => {}, download: '', href: '' } as any);
+
+      component.exportGrantListResults();
+      tick();
+
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        '/i2efsws/api/v1/funding-submissions/lists/123/grants/export',
+        { orderedApplIds: [] },
+        jasmine.objectContaining({ responseType: 'arraybuffer' as any })
+      );
+    }));
+
+    it('hides the loader and logs when the HTTP export fails', fakeAsync(() => {
+      const dt = fakeDt([{ applId: 5 }]);
+      component.dtElement = { dtInstance: Promise.resolve(dt) } as any;
+      const error = new Error('boom');
+      httpSpy.post.and.returnValue(throwError(() => error));
+
+      component.exportGrantListResults();
+      tick();
+
+      expect(loaderService.hide).toHaveBeenCalled();
+      expect(loggerSpy.error).toHaveBeenCalledWith('Grant list export failed', error);
+    }));
+
+    it('hides the loader and logs when the DataTables instance rejects, without posting', fakeAsync(() => {
+      const error = new Error('no dt');
+      component.dtElement = { dtInstance: Promise.reject(error) } as any;
+
+      component.exportGrantListResults();
+      tick();
+
+      expect(httpSpy.post).not.toHaveBeenCalled();
+      expect(loaderService.hide).toHaveBeenCalled();
+      expect(loggerSpy.error).toHaveBeenCalledWith('Grant list export failed: unable to resolve DataTables instance', error);
+    }));
+
+    it('hides the loader and logs when the DataTables instance is unavailable, without posting', () => {
+      component.dtElement = undefined as any;
+
+      component.exportGrantListResults();
+
+      expect(httpSpy.post).not.toHaveBeenCalled();
+      expect(loaderService.hide).toHaveBeenCalled();
+      expect(loggerSpy.error).toHaveBeenCalledWith('Grant list export failed: DataTables instance is not available');
+    });
+
+    it('declares exportOptions.columns as exactly 1 through 26 (checkbox 0 and Action 27 excluded)', () => {
+      component.ngAfterViewInit();
+      const exportButton = (component.dtOptions.buttons as any[]).find(b => (b.className || '').includes('btn-export-all'));
+      expect(exportButton).toBeTruthy();
+      expect(exportButton.exportOptions.columns).toEqual(Array.from({ length: 26 }, (_, i) => i + 1));
     });
   });
 });

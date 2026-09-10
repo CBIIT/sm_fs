@@ -60,7 +60,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     );
   });
 
-  it('POSTs the current criteria with export-all overrides and triggers a download on success', () => {
+  it('POSTs the current criteria with retained columns[]/order[] and export-all overrides, and triggers a download on success', () => {
     const response = new ArrayBuffer(8);
     httpSpy.post.and.returnValue(of(response));
     (component as any).searchCriteria = {
@@ -69,7 +69,8 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
       listStatus: ['Pending Review'],
       divisionOfficeCenter: ['DOC1']
     };
-    (component as any).lastSortOrder = [[1, 'asc']];
+    (component as any).latestColumns = [{ data: 'code', search: { value: '', regex: false } }];
+    (component as any).latestOrder = [{ column: 4, dir: 'asc' }, { column: 1, dir: 'desc' }];
 
     const createObjectUrlSpy = spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
     const anchor = { click: jasmine.createSpy('click'), download: '', href: '' } as any;
@@ -85,7 +86,8 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
         listId: 123,
         listStatus: ['Pending Review'],
         divisionOfficeCenter: ['DOC1'],
-        order: [[1, 'asc']],
+        columns: [{ data: 'code', search: { value: '', regex: false } }],
+        order: [{ column: 4, dir: 'asc' }, { column: 1, dir: 'desc' }],
         start: 0,
         length: -1
       },
@@ -97,6 +99,53 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     expect(anchor.download).toBe('funding_submissions_lists_result_all.xls');
     expect(anchor.href).toBe('blob:test');
     expect(anchor.click).toHaveBeenCalled();
+  });
+
+  it('ajaxCall normalizes and retains the current columns[] and order[] and sends them in the search request', () => {
+    const searchLists = jasmine.createSpy('searchLists').and.returnValue(of({ recordsTotal: 0, recordsFiltered: 0, data: [] }));
+    (component as any).fundingSubmissionsService = { searchLists };
+    const params = {
+      draw: 2,
+      columns: [
+        { data: 'code', search: { value: '', regex: 'true' } },
+        { data: 'lastActionDate', search: { value: '', regex: false } }
+      ],
+      order: [{ column: 1, dir: 'asc' }, { column: 4, dir: 'desc' }],
+      start: 0,
+      length: 25,
+      search: { value: '', regex: false }
+    };
+
+    component.ajaxCall(component, params, () => { /* noop */ });
+
+    expect((component as any).latestColumns).toEqual([
+      { data: 'code', search: { value: '', regex: true } },
+      { data: 'lastActionDate', search: { value: '', regex: false } }
+    ]);
+    expect((component as any).latestOrder).toEqual([{ column: 1, dir: 'asc' }, { column: 4, dir: 'desc' }]);
+    const searchBody = searchLists.calls.mostRecent().args[0] as any;
+    expect(searchBody.columns).toEqual((component as any).latestColumns);
+    expect(searchBody.order).toEqual((component as any).latestOrder);
+  });
+
+  it('does not mutate searchCriteria or the retained columns/order arrays while building the export request', () => {
+    const criteria = { grantType: 'R01' };
+    const columns = [{ data: 'code', search: { value: '', regex: false } }];
+    const order = [{ column: 4, dir: 'desc' }];
+    (component as any).searchCriteria = criteria;
+    (component as any).latestColumns = columns;
+    (component as any).latestOrder = order;
+    httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+    spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+    spyOn(document, 'createElement').and.returnValue({ click: () => {}, download: '', href: '' } as any);
+
+    component.exportListSearchResults();
+
+    expect(criteria).toEqual({ grantType: 'R01' });
+    expect((criteria as any).start).toBeUndefined();
+    expect((criteria as any).length).toBeUndefined();
+    expect(columns).toEqual([{ data: 'code', search: { value: '', regex: false } }]);
+    expect(order).toEqual([{ column: 4, dir: 'desc' }]);
   });
 
   it('hides the loader and logs on export failure', () => {
