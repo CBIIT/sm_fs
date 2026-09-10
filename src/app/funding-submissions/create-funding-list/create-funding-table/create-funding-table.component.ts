@@ -8,7 +8,9 @@ import {
   FundingSubmissionAddGrantsToListRequestDto,
   FundingSubmissionGrantSearchCriteriaDto,
   FundingSubmissionSearchResultDto,
-  SelectionDateCodeDto
+  SelectionDateCodeDto,
+  Column,
+  Order
 } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService , LoaderService, NameRenderComponent } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
@@ -60,6 +62,10 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   private pendingRealignFrame: number | null = null;
 
   private searchCriteria: FundingSubmissionGrantSearchCriteriaDto = {};
+  // FS-2026: retain the latest normalized DataTables sort context so the export request can reproduce
+  // the live grid's ordering. Default matches the configured table order (column 1 descending).
+  private latestColumns: Column[] = [];
+  private latestOrder: Order[] = [{ column: 1, dir: 'desc' }];
   private modalRef: NgbModalRef;
   selectedDate = '';
   selectionDateOptions: Select2OptionData[] = [];
@@ -457,11 +463,16 @@ allDataSelected(data: any[]): boolean {
     }
     const normalizeSearch = (s: any) => s ? { ...s, regex: s.regex === true || s.regex === 'true' } : s;
 
+    const columns: Column[] = (dataTablesParameters.columns || []).map((c: any) => ({ ...c, search: normalizeSearch(c.search) }));
+    const order: Order[] = dataTablesParameters.order;
+    $this.latestColumns = columns;
+    $this.latestOrder = order;
+
     const body: FundingSubmissionGrantSearchCriteriaDto = {
       ...$this.searchCriteria,
       draw: dataTablesParameters.draw,
-      columns: (dataTablesParameters.columns || []).map((c: any) => ({ ...c, search: normalizeSearch(c.search) })),
-      order: dataTablesParameters.order,
+      columns,
+      order,
       start: dataTablesParameters.start,
       length: dataTablesParameters.length,
       search: normalizeSearch(dataTablesParameters.search)
@@ -594,12 +605,19 @@ allDataSelected(data: any[]): boolean {
    exportGrantSearchResults() {
     this.logger.debug('Exporting grant search results');
     this.logger.debug(this.searchCriteria);
-    const searchCriteria = JSON.parse(JSON.stringify(this.searchCriteria));
-    searchCriteria.length = -1;
     this.loaderService.show();
-    this.http.post('/i2efsws/api/v1/funding-submissions/grants/export', searchCriteria, { responseType: 'arraybuffer' }).subscribe(
-
-      (response) => {
+    // FS-2026: reproduce the live grid's sort by sending the current business filters together with
+    // the retained normalized columns[] and order[]. The backend resolves each order's columnName
+    // from the matching columns[] entry, so both must travel together.
+    const body: FundingSubmissionGrantSearchCriteriaDto = {
+      ...this.searchCriteria,
+      columns: this.latestColumns,
+      order: this.latestOrder,
+      start: 0,
+      length: -1
+    };
+    this.http.post('/i2efsws/api/v1/funding-submissions/grants/export', body, { responseType: 'arraybuffer' }).subscribe({
+      next: (response) => {
         this.loaderService.hide();
         const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
         const url = window.URL.createObjectURL(blob);
@@ -607,8 +625,11 @@ allDataSelected(data: any[]): boolean {
         anchor.download = 'funding_submissions_grants_result_all.xls';
         anchor.href = url;
         anchor.click();
+      },
+      error: (error) => {
+        this.loaderService.hide();
+        this.logger.error('Grant search export failed', error);
       }
-
-    );
+    });
   }
 }

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -220,6 +220,109 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
       expect(component.allDataSelected(currentPageData)).toBeTrue();
       // The other page's selection is untouched either way.
       expect(component.selectedRows.has(99)).toBeTrue();
+    });
+  });
+
+  // FS-2026: the Grant Search export must reproduce the live grid's sort by sending the current
+  // business filters together with the retained normalized columns[] and order[].
+  describe('Grant Search export retains live sort context (FS-2026)', () => {
+    let httpSpy: jasmine.SpyObj<HttpClient>;
+    let loaderSpy: jasmine.SpyObj<LoaderService>;
+    let loggerSpy: jasmine.SpyObj<NGXLogger>;
+    let fundingSvc: jasmine.SpyObj<FundingSubmissionsService>;
+
+    beforeEach(() => {
+      httpSpy = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
+      loaderSpy = TestBed.inject(LoaderService) as jasmine.SpyObj<LoaderService>;
+      loggerSpy = TestBed.inject(NGXLogger) as jasmine.SpyObj<NGXLogger>;
+      fundingSvc = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;
+      component.showResults = true;
+    });
+
+    it('ajaxCall normalizes columns[].search.regex and retains the current columns[] and order[]', () => {
+      fundingSvc.searchGrants.and.returnValue(of({ recordsTotal: 0, recordsFiltered: 0, data: [] }) as any);
+      const params = {
+        draw: 3,
+        columns: [
+          { data: 'grantNumber', search: { value: '', regex: 'true' } },
+          { data: 'pi', search: { value: 'x', regex: false } }
+        ],
+        order: [{ column: 2, dir: 'asc' }, { column: 1, dir: 'desc' }],
+        start: 0,
+        length: 25,
+        search: { value: '', regex: false }
+      };
+
+      component.ajaxCall(component, params, () => { /* noop */ });
+
+      expect((component as any).latestColumns).toEqual([
+        { data: 'grantNumber', search: { value: '', regex: true } },
+        { data: 'pi', search: { value: 'x', regex: false } }
+      ]);
+      expect((component as any).latestOrder).toEqual([{ column: 2, dir: 'asc' }, { column: 1, dir: 'desc' }]);
+      const searchBody = fundingSvc.searchGrants.calls.mostRecent().args[0] as any;
+      expect(searchBody.columns).toEqual((component as any).latestColumns);
+      expect(searchBody.order).toEqual((component as any).latestOrder);
+    });
+
+    it('export posts the business filters + retained columns/order (multi-column, in sequence) with start=0, length=-1', () => {
+      (component as any).searchCriteria = { grantType: 'R01', icCode: 'CA' };
+      (component as any).latestColumns = [{ data: 'grantNumber', search: { value: '', regex: false } }];
+      (component as any).latestOrder = [{ column: 2, dir: 'asc' }, { column: 1, dir: 'desc' }];
+      httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+      spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+      const anchor = { click: jasmine.createSpy('click'), download: '', href: '' } as any;
+      spyOn(document, 'createElement').and.returnValue(anchor);
+
+      component.exportGrantSearchResults();
+
+      expect(loaderSpy.show).toHaveBeenCalled();
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        '/i2efsws/api/v1/funding-submissions/grants/export',
+        {
+          grantType: 'R01',
+          icCode: 'CA',
+          columns: [{ data: 'grantNumber', search: { value: '', regex: false } }],
+          order: [{ column: 2, dir: 'asc' }, { column: 1, dir: 'desc' }],
+          start: 0,
+          length: -1
+        },
+        jasmine.objectContaining({ responseType: 'arraybuffer' as any })
+      );
+      expect(loaderSpy.hide).toHaveBeenCalled();
+      expect(anchor.download).toBe('funding_submissions_grants_result_all.xls');
+      expect(anchor.click).toHaveBeenCalled();
+    });
+
+    it('does not mutate searchCriteria or the retained columns/order arrays while building the export request', () => {
+      const criteria = { grantType: 'R01' };
+      const columns = [{ data: 'grantNumber', search: { value: '', regex: false } }];
+      const order = [{ column: 2, dir: 'asc' }];
+      (component as any).searchCriteria = criteria;
+      (component as any).latestColumns = columns;
+      (component as any).latestOrder = order;
+      httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+      spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+      spyOn(document, 'createElement').and.returnValue({ click: () => {}, download: '', href: '' } as any);
+
+      component.exportGrantSearchResults();
+
+      expect(criteria).toEqual({ grantType: 'R01' });
+      expect((criteria as any).start).toBeUndefined();
+      expect((criteria as any).length).toBeUndefined();
+      expect(columns).toEqual([{ data: 'grantNumber', search: { value: '', regex: false } }]);
+      expect(order).toEqual([{ column: 2, dir: 'asc' }]);
+    });
+
+    it('hides the loader and logs when the HTTP export fails', () => {
+      const error = new Error('boom');
+      httpSpy.post.and.returnValue(throwError(() => error));
+
+      component.exportGrantSearchResults();
+
+      expect(loaderSpy.show).toHaveBeenCalled();
+      expect(loaderSpy.hide).toHaveBeenCalled();
+      expect(loggerSpy.error).toHaveBeenCalledWith('Grant search export failed', error);
     });
   });
 });
