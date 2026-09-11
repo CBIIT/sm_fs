@@ -43,8 +43,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private tableGuardCaptureHandler: ((event: Event) => void) | null = null;
   private globalAnchorGuardCaptureHandler: ((event: MouseEvent) => void) | null = null;
   private pendingRealignFrame: number | null = null;
+  private dragScrollContainerEl: HTMLElement | null = null;
+  private dragScrollBodyEl: HTMLElement | null = null;
+  private dragPointerId: number | null = null;
+  private dragStartX = 0;
+  private dragStartScrollLeft = 0;
   private readonly tablePageIntentSelector = '.dataTables_paginate .paginate_button, .dataTables_paginate .page-item, .dataTables_paginate a.page-link, .dt-paging-button';
   private readonly tableSortIntentSelector = 'thead th.sorting, thead th.sorting_asc, thead th.sorting_desc';
+  private readonly dragScrollIgnoreSelector = 'a, button, input, select, textarea, label, .select-checkbox, .toggle-details';
 
   i2eURL = '';
   grantViewerUrl = '';
@@ -90,6 +96,43 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   // currently defines CODE and NAME as the same literal string, so this map has no live-visible
   // effect today, but protects the grid if a real lookup table is ever introduced.
   private docDecisionDisplayMap = new Map<string, string>();
+
+  private readonly onHorizontalDragPointerDown = (event: PointerEvent): void => {
+    if (!this.dragScrollBodyEl || !this.dragScrollContainerEl) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+    const target = event.target as HTMLElement | null;
+    if (target?.closest(this.dragScrollIgnoreSelector)) {
+      return;
+    }
+
+    this.dragPointerId = event.pointerId;
+    this.dragStartX = event.clientX;
+    this.dragStartScrollLeft = this.dragScrollBodyEl.scrollLeft;
+    this.dragScrollBodyEl.classList.add('dragging');
+    this.dragScrollContainerEl.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  };
+
+  private readonly onHorizontalDragPointerMove = (event: PointerEvent): void => {
+    if (!this.dragScrollBodyEl) return;
+    if (this.dragPointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - this.dragStartX;
+    this.dragScrollBodyEl.scrollLeft = this.dragStartScrollLeft - deltaX;
+    event.preventDefault();
+  };
+
+  private readonly onHorizontalDragPointerEnd = (event: PointerEvent): void => {
+    if (!this.dragScrollBodyEl || !this.dragScrollContainerEl) return;
+    if (this.dragPointerId !== event.pointerId) return;
+
+    this.dragScrollBodyEl.classList.remove('dragging');
+    if (this.dragScrollContainerEl.hasPointerCapture(event.pointerId)) {
+      this.dragScrollContainerEl.releasePointerCapture(event.pointerId);
+    }
+    this.dragPointerId = null;
+  };
 
   constructor(
     private loaderService: LoaderService,
@@ -508,7 +551,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       order: [[15, 'desc']],
       fixedColumns: { left: 1, right: 1 },
       initComplete: () => {
-        this.dtElement?.dtInstance?.then((dt: DataTables.Api) => this.bindSimpleUnsavedTableGuard(dt));
+        this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+          this.bindSimpleUnsavedTableGuard(dt);
+          this.bindHorizontalDragScroll(dt);
+        });
       },
       rowCallback: (row: Node, data: any) => {
         this.dtOptions.columns.forEach((column: any, ind: number) => {
@@ -537,6 +583,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
               this.realignDataTableColumns();
               this.bindSimpleUnsavedTableGuard(dt);
+              this.bindHorizontalDragScroll(dt);
 
               // Export button is index 1 now that Reset Table occupies index 0
               dt.rows().count() > 0 ? (dt as any).button(1).enable() : (dt as any).button(1).disable();
@@ -1165,6 +1212,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       window.cancelAnimationFrame(this.pendingRealignFrame);
       this.pendingRealignFrame = null;
     }
+    this.unbindHorizontalDragScroll();
     if (this.globalAnchorGuardCaptureHandler) {
       document.removeEventListener('click', this.globalAnchorGuardCaptureHandler, true);
       this.globalAnchorGuardCaptureHandler = null;
@@ -1204,6 +1252,40 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     });
+  }
+
+  private bindHorizontalDragScroll(dt: DataTables.Api): void {
+    const container = dt.table(0).container() as HTMLElement | null;
+    const nextScrollBody = container?.querySelector('.dataTables_scrollBody') as HTMLElement | null;
+    const nextDragContainer = container as HTMLElement | null;
+    if (!nextScrollBody || !nextDragContainer) return;
+    if (this.dragScrollBodyEl === nextScrollBody && this.dragScrollContainerEl === nextDragContainer) return;
+
+    this.unbindHorizontalDragScroll();
+    this.dragScrollContainerEl = nextDragContainer;
+    this.dragScrollBodyEl = nextScrollBody;
+    this.dragScrollBodyEl.classList.add('drag-scroll-enabled');
+    this.dragScrollContainerEl.addEventListener('pointerdown', this.onHorizontalDragPointerDown);
+    this.dragScrollContainerEl.addEventListener('pointermove', this.onHorizontalDragPointerMove);
+    this.dragScrollContainerEl.addEventListener('pointerup', this.onHorizontalDragPointerEnd);
+    this.dragScrollContainerEl.addEventListener('pointercancel', this.onHorizontalDragPointerEnd);
+    this.dragScrollContainerEl.addEventListener('lostpointercapture', this.onHorizontalDragPointerEnd);
+  }
+
+  private unbindHorizontalDragScroll(): void {
+    if (!this.dragScrollBodyEl && !this.dragScrollContainerEl) return;
+
+    this.dragScrollBodyEl?.classList.remove('dragging');
+    this.dragScrollBodyEl?.classList.remove('drag-scroll-enabled');
+    this.dragScrollContainerEl?.removeEventListener('pointerdown', this.onHorizontalDragPointerDown);
+    this.dragScrollContainerEl?.removeEventListener('pointermove', this.onHorizontalDragPointerMove);
+    this.dragScrollContainerEl?.removeEventListener('pointerup', this.onHorizontalDragPointerEnd);
+    this.dragScrollContainerEl?.removeEventListener('pointercancel', this.onHorizontalDragPointerEnd);
+    this.dragScrollContainerEl?.removeEventListener('lostpointercapture', this.onHorizontalDragPointerEnd);
+
+    this.dragScrollContainerEl = null;
+    this.dragScrollBodyEl = null;
+    this.dragPointerId = null;
   }
 
    exportGrantListResults() {

@@ -156,6 +156,15 @@ tr.shown {
   overflow-x: auto !important;
 }
 
+::ng-deep .dataTables_scrollBody.drag-scroll-enabled {
+  cursor: grab;
+}
+
+::ng-deep .dataTables_scrollBody.drag-scroll-enabled.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
 ::ng-deep .dataTables_wrapper .dataTables_info
 {
    padding-top: 0px !important ;
