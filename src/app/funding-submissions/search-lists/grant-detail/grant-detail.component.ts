@@ -62,6 +62,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   saveValidationError: string | null = null;
   private initialFormSnapshot = '';
   private initialFundingSnapshot = '';
+  private initialJustificationText = '';
   private cancelModalRef: NgbModalRef;
   private savingInProgress = false;
   private suppressNextLeavePrompt = false;
@@ -181,6 +182,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.isEditMode = true;
     this.initialFormSnapshot = this.currentSnapshot();
     this.initialFundingSnapshot = this.currentFundingSnapshot();
+    this.initialJustificationText = this.formModel.justificationText ?? '';
     this.recomputeDoNotPayOefiaLock();
     this.cdr.detectChanges();
   }
@@ -274,13 +276,15 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.logger.debug('GrantDetailComponent onSave()', this.formModel, 'listId:', this.listId);
     const { justificationText, ...fields } = this.formModel;
     const hasFundingFieldChanges = this.currentFundingSnapshot() !== this.initialFundingSnapshot;
-    const hasJustificationChanges = !!this.justificationFile || !!justificationText;
+    const hasJustificationTextChange = (justificationText ?? '') !== this.initialJustificationText;
+    const hasJustificationChanges = !!this.justificationFile || hasJustificationTextChange;
 
     if (!hasFundingFieldChanges && !hasJustificationChanges) {
       this.savingInProgress = false;
       this.isEditMode = false;
       this.initialFormSnapshot = '';
       this.initialFundingSnapshot = '';
+      this.initialJustificationText = '';
       this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
       this.saved.emit();
       this.cdr.detectChanges();
@@ -288,7 +292,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     }
 
     if (!hasFundingFieldChanges && hasJustificationChanges) {
-      this.saveJustification(justificationText);
+      this.saveJustification(hasJustificationTextChange ? justificationText : undefined);
       return;
     }
 
@@ -299,12 +303,13 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       next: () => {
         this.logger.debug('Grant detail saved');
         this.applyFormModelToData();
-        if (justificationText || this.justificationFile) {
-          this.saveJustification(justificationText);
+        if (hasJustificationChanges) {
+          this.saveJustification(hasJustificationTextChange ? justificationText : undefined);
         } else {
           this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
           this.isEditMode = false;
           this.initialFormSnapshot = '';
+          this.initialJustificationText = '';
           this.savingInProgress = false;
           this.saved.emit();
           this.cdr.detectChanges();
@@ -406,9 +411,9 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   private saveJustification(justificationText?: string): void {
-    const normalizedJustificationText = justificationText && justificationText.length > 0
-      ? justificationText
-      : undefined;
+    const normalizedJustificationText = justificationText === undefined
+      ? undefined
+      : justificationText.length > 0 ? justificationText : '';
 
     this.fundingSubmissionsService.saveJustificationForm(
       this.listId, this.data.applId, this.justificationFile ?? undefined, normalizedJustificationText
@@ -420,6 +425,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
           this.isEditMode = false;
           this.initialFormSnapshot = '';
           this.initialFundingSnapshot = '';
+          this.initialJustificationText = '';
           this.savingInProgress = false;
           this.justificationFile = null;
           this.justificationFileError = null;
@@ -514,6 +520,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.doNotPayOefiaLockActive = false;
     this.initialFormSnapshot = '';
     this.initialFundingSnapshot = '';
+    this.initialJustificationText = '';
     this.savingInProgress = false;
     // Cancel (either path — no-unsaved-changes fast path via onCancel(), or confirmed-discard
     // via onCancelWarningProceed()) reverts to read-only and stays open, mirroring how Save

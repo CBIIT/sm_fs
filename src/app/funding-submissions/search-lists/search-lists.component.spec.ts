@@ -7,6 +7,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { HttpClient } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { SearchListsComponent } from './search-lists.component';
 import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-lookup.service';
@@ -673,7 +674,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       tick();
 
       expect(dt.rows).toHaveBeenCalledWith({ order: 'current', search: 'none' });
-      expect(httpSpy.post).toHaveBeenCalledWith(
+      expect((httpSpy.post as any)).toHaveBeenCalledWith(
         '/i2efsws/api/v1/funding-submissions/lists/123/grants/export',
         { orderedApplIds: [5, 9, 2] },
         jasmine.objectContaining({ responseType: 'arraybuffer' as any })
@@ -710,7 +711,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       component.exportGrantListResults();
       tick();
 
-      expect(httpSpy.post).toHaveBeenCalledWith(
+      expect((httpSpy.post as any)).toHaveBeenCalledWith(
         '/i2efsws/api/v1/funding-submissions/lists/123/grants/export',
         { orderedApplIds: [] },
         jasmine.objectContaining({ responseType: 'arraybuffer' as any })
@@ -757,6 +758,98 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       const exportButton = (component.dtOptions.buttons as any[]).find(b => (b.className || '').includes('btn-export-all'));
       expect(exportButton).toBeTruthy();
       expect(exportButton.exportOptions.columns).toEqual(Array.from({ length: 26 }, (_, i) => i + 1));
+    });
+
+    describe('viewPDF Justification delivery (FS-2215)', () => {
+      let httpSpy: jasmine.SpyObj<HttpClient>;
+      let loaderService: LoaderService;
+
+      beforeEach(() => {
+        httpSpy = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
+        loaderService = TestBed.inject(LoaderService);
+        (loaderService.show as any).calls.reset();
+        (loaderService.hide as any).calls.reset();
+        component.listId = 42;
+        component.selectedRows = new Map<number, any>([[9, {}], [3, {}]]);
+      });
+
+      it('keeps legacy Document Viewer URL behavior for AB', () => {
+        component.selectedViewDoc = 'AB';
+        spyOn(window, 'open').and.returnValue(null);
+        component.viewPDF();
+        expect(window.open).toHaveBeenCalledWith(
+          'http://example/openGrantReport.action?docType=AB&applIds=9,3&resubmit=true',
+          'session',
+          'menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700');
+      });
+
+      it('posts ordered numeric IDs for JST and opens/revokes the returned PDF blob', fakeAsync(() => {
+        component.selectedViewDoc = 'JST';
+        const response = new Blob(['pdf'], { type: 'application/pdf' });
+        httpSpy.post.and.returnValue(of(response) as any);
+        spyOn(window, 'open');
+        spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+        spyOn(window.URL, 'revokeObjectURL');
+
+        component.viewPDF();
+        tick();
+
+        expect((httpSpy.post as any)).toHaveBeenCalledWith(
+          '/i2efsws/api/v1/funding-submissions/lists/42/justification-pdf',
+          { applIds: [9, 3] }, { responseType: 'blob' });
+        expect(window.open).toHaveBeenCalledWith('blob:test', 'session');
+        tick();
+        expect(window.URL.revokeObjectURL).toHaveBeenCalledWith('blob:test');
+        expect(loaderService.show).toHaveBeenCalled();
+        expect(loaderService.hide).toHaveBeenCalled();
+      }));
+
+      it('sets justificationWarningMessage on empty response (204) and does not open a window', fakeAsync(() => {
+        component.selectedViewDoc = 'JST';
+        const emptyBlob = new Blob([], { type: 'application/pdf' });
+        httpSpy.post.and.returnValue(of(emptyBlob) as any);
+        spyOn(window, 'open');
+
+        component.viewPDF();
+        tick();
+
+        expect(window.open).not.toHaveBeenCalled();
+        expect(component.justificationWarningMessage).toBe('No justifications found for the selected grant(s).');
+        expect(loaderService.hide).toHaveBeenCalled();
+      }));
+
+      it('decodes the blob 404 message to justificationWarningMessage and does not open a window or trigger window.alert', async () => {
+        component.selectedViewDoc = 'JST';
+        const message = 'No justifications found for the selected grant(s).';
+        httpSpy.post.and.returnValue(throwError(() => new HttpErrorResponse({
+          status: 404, error: new Blob([message], { type: 'text/plain' })
+        })) as any);
+        spyOn(window, 'open');
+        spyOn(window, 'alert');
+
+        component.viewPDF();
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(window.open).not.toHaveBeenCalled();
+        expect(window.alert).not.toHaveBeenCalled();
+        expect(component.justificationWarningMessage).toBe(message);
+        expect(loaderService.hide).toHaveBeenCalled();
+      });
+
+      it('sets justificationWarningMessage on unexpected HTTP error and does not trigger window.alert', fakeAsync(() => {
+        component.selectedViewDoc = 'JST';
+        httpSpy.post.and.returnValue(throwError(() => new HttpErrorResponse({ status: 500 })) as any);
+        spyOn(window, 'open');
+        spyOn(window, 'alert');
+
+        component.viewPDF();
+        tick();
+
+        expect(window.open).not.toHaveBeenCalled();
+        expect(window.alert).not.toHaveBeenCalled();
+        expect(component.justificationWarningMessage).toBe('Unable to generate the selected justification PDF.');
+        expect(loaderService.hide).toHaveBeenCalled();
+      }));
     });
   });
 });

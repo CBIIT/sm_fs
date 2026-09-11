@@ -632,6 +632,85 @@ describe('GrantDetailComponent', () => {
       expect(savedSpy).toHaveBeenCalledTimes(1);
     });
 
+    it('sends an explicit blank when previously saved justification text is cleared', () => {
+      component.data.justificationText = 'Previously saved justification';
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: 'Previously saved justification' });
+      getJustificationSubject.complete();
+      component.onEdit();
+      component.formModel.justificationText = '';
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: '' } as any));
+      const savedSpy = jasmine.createSpy('saved');
+      component.saved.subscribe(savedSpy);
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm)
+        .toHaveBeenCalledWith(1, 100, undefined, '');
+      expect(component.isEditMode).toBeFalse();
+      expect(component.data.justificationText).toBe('');
+      expect(savedSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('saves funding fields before clearing justification text in the same save', () => {
+      component.data.justificationText = 'Previously saved justification';
+      component.justificationLoaded = true;
+      component.onEdit();
+      component.formModel.justificationText = '';
+      component.formModel.docDecision = 'Pay';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({
+        justificationText: ''
+      } as any));
+      const savedSpy = jasmine.createSpy('saved');
+      component.saved.subscribe(savedSpy);
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm)
+        .toHaveBeenCalledWith(1, 100, undefined, '');
+      expect((fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.first() as any).invocationOrder)
+        .toBeLessThan((fundingSubmissionsServiceSpy.saveJustificationForm.calls.first() as any).invocationOrder);
+      expect(savedSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not send justification data for a true no-op save', () => {
+      component.onEdit();
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm).not.toHaveBeenCalled();
+    });
+
+    it('passes undefined text for a file-only upload when text is unchanged', () => {
+      component.justificationLoaded = true;
+      component.onEdit();
+      component.justificationFile = new File(['content'], 'justification.pdf', { type: 'application/pdf' });
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: '' } as any));
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm)
+        .toHaveBeenCalledWith(1, 100, jasmine.any(File), undefined);
+    });
+
+    it('keeps an existing text value when a file is selected, leaving mutual exclusion to the backend', () => {
+      component.data.justificationText = 'Existing text';
+      component.justificationLoaded = true;
+      component.onEdit();
+      component.justificationFile = new File(['content'], 'justification.pdf', { type: 'application/pdf' });
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: 'Existing text' } as any));
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm)
+        .toHaveBeenCalledWith(1, 100, jasmine.any(File), undefined);
+    });
+
     it('applyFormModelToData() resolves and writes both budgetCategories (NAME) and budgetCategoryCode (CODE)', () => {
       component.onEdit();
       component.formModel.budgetCategories = 'OTHER';
@@ -723,6 +802,8 @@ describe('GrantDetailComponent', () => {
       component.justificationFile = new File(['x'], 'new.pdf', { type: 'application/pdf' });
 
       fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: '' } as any));
 
       component.onSave();
 
@@ -738,7 +819,8 @@ describe('GrantDetailComponent', () => {
       expect(payload.fields.oefiaNotes).toBe('clear this note');
       expect(payload.fields.docNotes).toBe('keep this note');
 
-      expect(fundingSubmissionsServiceSpy.saveJustificationForm).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm)
+        .toHaveBeenCalledWith(1, 100, undefined, '');
       expect(component.data.docDecision).toBe('DNP');
       expect(component.data.docNotes).toBe('keep this note');
       expect(component.data.docPriority).toBeNull();

@@ -13,7 +13,7 @@ import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { openNewWindow } from '../../utils/utils';
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-lookup.service';
 
 declare var $: any;
@@ -79,6 +79,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   filteredDoc: string | null = null;
   sendGrantsToDocsSuccessMessage = '';
   sendGrantsToDocsErrorMessage = '';
+  justificationWarningMessage = '';
   isSendGrantsInDraftInProgress = false;
   blockedGrantNumbers: string[] = [];
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
@@ -202,8 +203,41 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   viewPDF(): void {
-    const applIds = Array.from(this.selectedRows.keys()).join(',');
-    openNewWindow(`${this.documentURL}openGrantReport.action?docType=${this.selectedViewDoc}&applIds=${applIds}&resubmit=true`, 'session');
+    const applIds = Array.from(this.selectedRows.keys());
+    if (this.selectedViewDoc !== 'JST') {
+      openNewWindow(`${this.documentURL}openGrantReport.action?docType=${this.selectedViewDoc}&applIds=${applIds.join(',')}&resubmit=true`, 'session');
+      return;
+    }
+
+    this.justificationWarningMessage = '';
+    this.loaderService.show();
+    this.http.post('/i2efsws/api/v1/funding-submissions/lists/' + this.listId + '/justification-pdf',
+      { applIds }, { responseType: 'blob' }).pipe(
+        finalize(() => this.loaderService.hide())
+      ).subscribe({
+        next: (blob: Blob) => {
+          if (!blob || blob.size === 0) {
+            this.justificationWarningMessage = 'No justifications found for the selected grant(s).';
+            this.cdr.markForCheck();
+            return;
+          }
+          const pdfBlob = blob.type === 'application/pdf' ? blob : new Blob([blob], { type: 'application/pdf' });
+          const url = window.URL.createObjectURL(pdfBlob);
+          window.open(url, 'session');
+          window.setTimeout(() => window.URL.revokeObjectURL(url), 0);
+        },
+        error: async (error: HttpErrorResponse) => {
+          if (error.status === 404 && error.error instanceof Blob) {
+            const message = await error.error.text();
+            this.justificationWarningMessage = message || 'No justifications found for the selected grant(s).';
+            this.cdr.markForCheck();
+            return;
+          }
+          this.logger.error('Justification PDF request failed', error);
+          this.justificationWarningMessage = 'Unable to generate the selected justification PDF.';
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   private loadListMeta(): void {
