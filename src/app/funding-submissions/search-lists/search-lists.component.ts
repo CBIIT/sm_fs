@@ -73,6 +73,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   filteredDoc: string | null = null;
   sendGrantsToDocsSuccessMessage = '';
   sendGrantsToDocsErrorMessage = '';
+  justificationWarningMessage = '';
   isSendGrantsInDraftInProgress = false;
   blockedGrantNumbers: string[] = [];
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
@@ -165,12 +166,18 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    this.justificationWarningMessage = '';
     this.loaderService.show();
     this.http.post('/i2efsws/api/v1/funding-submissions/lists/' + this.listId + '/justification-pdf',
       { applIds }, { responseType: 'blob' }).pipe(
         finalize(() => this.loaderService.hide())
       ).subscribe({
         next: (blob: Blob) => {
+          if (!blob || blob.size === 0) {
+            this.justificationWarningMessage = 'No justifications found for the selected grant(s).';
+            this.cdr.markForCheck();
+            return;
+          }
           const pdfBlob = blob.type === 'application/pdf' ? blob : new Blob([blob], { type: 'application/pdf' });
           const url = window.URL.createObjectURL(pdfBlob);
           window.open(url, 'session');
@@ -179,12 +186,13 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         error: async (error: HttpErrorResponse) => {
           if (error.status === 404 && error.error instanceof Blob) {
             const message = await error.error.text();
-            this.logger.error('Justification PDF unavailable', error);
-            window.alert(message || 'No justifications found for the selected grant(s).');
+            this.justificationWarningMessage = message || 'No justifications found for the selected grant(s).';
+            this.cdr.markForCheck();
             return;
           }
           this.logger.error('Justification PDF request failed', error);
-          window.alert('Unable to generate the selected justification PDF.');
+          this.justificationWarningMessage = 'Unable to generate the selected justification PDF.';
+          this.cdr.markForCheck();
         }
       });
   }

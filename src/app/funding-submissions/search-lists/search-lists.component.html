@@ -51,6 +51,10 @@
     <div *ngIf="sendGrantsToDocsErrorMessage" class="alert alert-danger" role="alert">
         {{ sendGrantsToDocsErrorMessage }}
     </div>
+    <div *ngIf="justificationWarningMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ justificationWarningMessage }}
+        <button type="button" class="btn-close" aria-label="Close" (click)="justificationWarningMessage = ''"></button>
+    </div>
     <div *ngIf="blockedGrantNumbers.length > 0" class="alert alert-warning" role="alert">
         The following grants were added by OEFIA and cannot be removed. You should select "Do Not Pay" instead for these grants: {{ blockedGrantNumbers.join(', ') }}
     </div>

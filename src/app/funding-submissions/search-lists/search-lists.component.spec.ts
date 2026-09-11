@@ -804,18 +804,50 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         expect(loaderService.hide).toHaveBeenCalled();
       }));
 
-      it('decodes the blob 404 message and does not open a window', fakeAsync(() => {
+      it('sets justificationWarningMessage on empty response (204) and does not open a window', fakeAsync(() => {
         component.selectedViewDoc = 'JST';
-        const message = 'No justifications found for the selected grant(s).';
-        httpSpy.post.and.returnValue(throwError(() => new HttpErrorResponse({
-          status: 404, error: new Blob([message], { type: 'text/plain' })
-        })) as any);
+        const emptyBlob = new Blob([], { type: 'application/pdf' });
+        httpSpy.post.and.returnValue(of(emptyBlob) as any);
         spyOn(window, 'open');
 
         component.viewPDF();
         tick();
 
         expect(window.open).not.toHaveBeenCalled();
+        expect(component.justificationWarningMessage).toBe('No justifications found for the selected grant(s).');
+        expect(loaderService.hide).toHaveBeenCalled();
+      }));
+
+      it('decodes the blob 404 message to justificationWarningMessage and does not open a window or trigger window.alert', async () => {
+        component.selectedViewDoc = 'JST';
+        const message = 'No justifications found for the selected grant(s).';
+        httpSpy.post.and.returnValue(throwError(() => new HttpErrorResponse({
+          status: 404, error: new Blob([message], { type: 'text/plain' })
+        })) as any);
+        spyOn(window, 'open');
+        spyOn(window, 'alert');
+
+        component.viewPDF();
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(window.open).not.toHaveBeenCalled();
+        expect(window.alert).not.toHaveBeenCalled();
+        expect(component.justificationWarningMessage).toBe(message);
+        expect(loaderService.hide).toHaveBeenCalled();
+      });
+
+      it('sets justificationWarningMessage on unexpected HTTP error and does not trigger window.alert', fakeAsync(() => {
+        component.selectedViewDoc = 'JST';
+        httpSpy.post.and.returnValue(throwError(() => new HttpErrorResponse({ status: 500 })) as any);
+        spyOn(window, 'open');
+        spyOn(window, 'alert');
+
+        component.viewPDF();
+        tick();
+
+        expect(window.open).not.toHaveBeenCalled();
+        expect(window.alert).not.toHaveBeenCalled();
+        expect(component.justificationWarningMessage).toBe('Unable to generate the selected justification PDF.');
         expect(loaderService.hide).toHaveBeenCalled();
       }));
     });
