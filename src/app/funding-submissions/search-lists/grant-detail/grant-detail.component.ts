@@ -254,7 +254,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
     // For DOC users this field is view-only; ignore any client-side model tampering.
     // OEFIA users can edit this field and their change must be preserved.
-    if (!this.OEFIACertifier) {
+    if (this.docFundingListCor) {
       this.formModel.oefiaNotes = this.data?.oefiaNotes ?? '';
     }
 
@@ -362,7 +362,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   private recomputeDoNotPayOefiaLock(): void {
     this.doNotPayOefiaLockActive = this.isEditMode
-      && !this.OEFIACertifier
+      && this.docFundingListCor
       && this.isGrantAddedByOefia()
       && this.isDoNotPayDecisionSelected();
   }

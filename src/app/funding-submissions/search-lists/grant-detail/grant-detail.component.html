@@ -174,7 +174,7 @@
             <td class="grid-label sep align-top pt-2">OEFIA Notes<br><span class="fw-normal">(Optional)</span></td>
             <td class="grid-item" colspan="3">
               <span *ngIf="!isEditMode || docFundingListCor">{{data.oefiaNotes || ''}}</span>
-              <div *ngIf="isEditMode && OEFIACertifier">
+              <div *ngIf="isEditMode && !docFundingListCor">
                 <textarea class="form-control form-control-sm" rows="2"
                   name="oefiaNotes" [(ngModel)]="formModel.oefiaNotes" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.oefiaNotes || '').length}}/1000</div>
