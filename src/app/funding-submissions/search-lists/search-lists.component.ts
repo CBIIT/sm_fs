@@ -74,6 +74,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   sendGrantsToDocsSuccessMessage = '';
   sendGrantsToDocsErrorMessage = '';
   isSendGrantsInDraftInProgress = false;
+  blockedGrantNumbers: string[] = [];
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
   viewDocOptions: Select2OptionData[] = [
     { id: 'AB', text: 'Abstract(s)' },
@@ -1122,6 +1123,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   onRemoveSelected(): void {
     if (!this.selectedRows.size) return;
     this.blurActiveElement();
+    this.blockedGrantNumbers = [];
     this.removeModalRef = this.modalService.open(this.removeGrantsWarningModalRef, { centered: true });
   }
 
@@ -1132,7 +1134,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   onConfirmRemove(): void {
     const applIds = Array.from(this.selectedRows.keys());
     this.fundingSubmissionsService.removeGrantsFromList(this.listId, applIds).subscribe({
-      next: () => {
+      next: (result) => {
+        this.blockedGrantNumbers = result?.blockedGrantNumbers ?? [];
         this.selectedRows.clear();
         this.removeModalRef?.close();
         this.loadListMeta();

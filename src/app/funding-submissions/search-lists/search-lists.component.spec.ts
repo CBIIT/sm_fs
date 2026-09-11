@@ -17,6 +17,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
   let routerSpy: jasmine.SpyObj<Router>;
   let modalServiceSpy: jasmine.SpyObj<NgbModal>;
   let modalRefSpy: jasmine.SpyObj<any>;
+  let fundingSubmissionsServiceSpy: any;
 
   // Minimal stand-in for the dynamically created GrantDetailComponent ComponentRef
   // that executeWithUnsavedGuard()/hasUnsavedDetailEdits() actually query.
@@ -60,12 +61,12 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     modalServiceSpy = jasmine.createSpyObj('NgbModal', ['open']);
     modalServiceSpy.open.and.returnValue(modalRefSpy);
 
-    const fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
+    fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
       'getListDetail', 'getListStatusHistory', 'removeGrantsFromList', 'sendListToDocsForReview'
     ]);
-    fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({}));
-    fundingSubmissionsServiceSpy.getListStatusHistory.and.returnValue(of([]));
-    fundingSubmissionsServiceSpy.sendListToDocsForReview.and.returnValue(of(1));
+    fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({} as any));
+    fundingSubmissionsServiceSpy.getListStatusHistory.and.returnValue(of([] as any));
+    fundingSubmissionsServiceSpy.sendListToDocsForReview.and.returnValue(of(1 as any));
 
     const propertiesServiceSpy = jasmine.createSpyObj('AppPropertiesService', ['getProperty']);
     propertiesServiceSpy.getProperty.and.returnValue('http://example/');
@@ -157,6 +158,72 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
       viewRef.destroy();
       host.remove();
+    });
+  });
+
+  describe('DOC grant removal validation (FS-2244)', () => {
+    beforeEach(() => {
+      component.selectedRows.set(100, {});
+      component.selectedRows.set(101, {});
+      (component as any).removeModalRef = modalRefSpy;
+    });
+
+    it('displays the exact FS-2244 warning with every blocked grant number when the response reports blocked grants', () => {
+      fundingSubmissionsServiceSpy.removeGrantsFromList.and.returnValue(of({
+        removedGrantNumbers: ['1R01CA200001-01'],
+        blockedGrantNumbers: ['1R01CA200002-01', '1R01CA200003-01'],
+        grantsRemoved: 1,
+        grantsBlocked: 2
+      } as any));
+
+      component.onConfirmRemove();
+      fixture.detectChanges();
+
+      expect(component.blockedGrantNumbers).toEqual(['1R01CA200002-01', '1R01CA200003-01']);
+      const warning = fixture.nativeElement.querySelector('.alert-warning');
+      expect(warning?.textContent).toContain(
+        'The following grants were added by OEFIA and cannot be removed. You should select "Do Not Pay" instead for these grants'
+      );
+      expect(warning?.textContent).toContain('1R01CA200002-01');
+      expect(warning?.textContent).toContain('1R01CA200003-01');
+    });
+
+    it('displays no warning when every selected grant was removed', () => {
+      fundingSubmissionsServiceSpy.removeGrantsFromList.and.returnValue(of({
+        removedGrantNumbers: ['1R01CA200001-01', '1R01CA200002-01'],
+        blockedGrantNumbers: [],
+        grantsRemoved: 2,
+        grantsBlocked: 0
+      } as any));
+
+      component.onConfirmRemove();
+      fixture.detectChanges();
+
+      expect(component.blockedGrantNumbers).toEqual([]);
+      expect(fixture.nativeElement.querySelector('.alert-warning')).toBeNull();
+    });
+
+    it('clears selection, closes the modal, and refreshes the list on a mixed result', () => {
+      fundingSubmissionsServiceSpy.removeGrantsFromList.and.returnValue(of({
+        removedGrantNumbers: ['1R01CA200001-01'],
+        blockedGrantNumbers: ['1R01CA200002-01'],
+        grantsRemoved: 1,
+        grantsBlocked: 1
+      } as any));
+
+      component.onConfirmRemove();
+
+      expect(component.selectedRows.size).toBe(0);
+      expect(modalRefSpy.close).toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalled();
+    });
+
+    it('clears any prior blocked-grant warning when a new removal is initiated', () => {
+      component.blockedGrantNumbers = ['1R01CA200002-01'];
+
+      component.onRemoveSelected();
+
+      expect(component.blockedGrantNumbers).toEqual([]);
     });
   });
 

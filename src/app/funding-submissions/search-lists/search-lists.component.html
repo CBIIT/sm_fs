@@ -51,6 +51,9 @@
     <div *ngIf="sendGrantsToDocsErrorMessage" class="alert alert-danger" role="alert">
         {{ sendGrantsToDocsErrorMessage }}
     </div>
+    <div *ngIf="blockedGrantNumbers.length > 0" class="alert alert-warning" role="alert">
+        The following grants were added by OEFIA and cannot be removed. You should select "Do Not Pay" instead for these grants: {{ blockedGrantNumbers.join(', ') }}
+    </div>
       <div class="row g-0 save-success-row" *ngIf="saveSuccessMessage.length > 0">
     <div class="col-12">
       <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
