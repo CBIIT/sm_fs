@@ -60,15 +60,57 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   private pendingRestorePage: number | null = null;
   private pendingRestoreRows: Map<number, FundingSubmissionSearchResultDto> | null = null;
   private pendingRealignFrame: number | null = null;
+  private dragScrollBodyEl: HTMLElement | null = null;
+  private dragPointerId: number | null = null;
+  private dragStartX = 0;
+  private dragStartScrollLeft = 0;
 
   private searchCriteria: FundingSubmissionGrantSearchCriteriaDto = {};
   // FS-2026: retain the latest normalized DataTables sort context so the export request can reproduce
   // the live grid's ordering. Default matches the configured table order (column 1 descending).
   private latestColumns: Column[] = [];
   private latestOrder: Order[] = [{ column: 1, dir: 'desc' }];
+  private readonly dragScrollIgnoreSelector = 'a, button, input, select, textarea, label, .select-checkbox';
   private modalRef: NgbModalRef;
   selectedDate = '';
   selectionDateOptions: Select2OptionData[] = [];
+
+  private readonly onHorizontalDragPointerDown = (event: PointerEvent): void => {
+    if (!this.dragScrollBodyEl) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+    const target = event.target as HTMLElement | null;
+    if (target?.closest(this.dragScrollIgnoreSelector)) {
+      return;
+    }
+
+    this.dragPointerId = event.pointerId;
+    this.dragStartX = event.clientX;
+    this.dragStartScrollLeft = this.dragScrollBodyEl.scrollLeft;
+    this.dragScrollBodyEl.classList.add('dragging');
+    this.dragScrollBodyEl.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  };
+
+  private readonly onHorizontalDragPointerMove = (event: PointerEvent): void => {
+    if (!this.dragScrollBodyEl) return;
+    if (this.dragPointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - this.dragStartX;
+    this.dragScrollBodyEl.scrollLeft = this.dragStartScrollLeft - deltaX;
+    event.preventDefault();
+  };
+
+  private readonly onHorizontalDragPointerEnd = (event: PointerEvent): void => {
+    if (!this.dragScrollBodyEl) return;
+    if (this.dragPointerId !== event.pointerId) return;
+
+    this.dragScrollBodyEl.classList.remove('dragging');
+    if (this.dragScrollBodyEl.hasPointerCapture(event.pointerId)) {
+      this.dragScrollBodyEl.releasePointerCapture(event.pointerId);
+    }
+    this.dragPointerId = null;
+  };
 
   constructor(
     private FundingSubmissionsService: FundingSubmissionsService,
@@ -99,6 +141,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
       processing: false,
       destroy: true,
       scrollX: true,
+      scrollY: '70vh',
       autoWidth: false,
       language: {
         paginate: {
@@ -303,6 +346,7 @@ initComplete: () => {
         // header checkbox click must be delegated off the container (bound once),
         // not off the "thead" node DataTables passes into headerCallback each draw.
         this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+          this.bindHorizontalDragScroll(dt);
           const $container = $(dt.table(0).container());
           $container.off('click.selectAll', 'thead .select-checkbox');
           $container.on('click.selectAll', 'thead .select-checkbox', () => {
@@ -326,6 +370,7 @@ initComplete: () => {
         // handler; if we adjust before it, header cells end up misaligned.
         this.realignDataTableColumns();
         this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+          this.bindHorizontalDragScroll(dt);
           this.currentPage = dt.page();
           if (dt.rows().count() > 0) {
             (dt as any).button(0).enable();
@@ -351,6 +396,7 @@ initComplete: () => {
       window.cancelAnimationFrame(this.pendingRealignFrame);
       this.pendingRealignFrame = null;
     }
+    this.unbindHorizontalDragScroll();
     if (this.dtTrigger && !this.dtTrigger.closed) {
       this.dtTrigger.unsubscribe();
     }
@@ -376,6 +422,37 @@ initComplete: () => {
         }
       });
     });
+  }
+
+  private bindHorizontalDragScroll(dt: DataTables.Api): void {
+    const container = dt.table(0).container() as HTMLElement | null;
+    const nextScrollBody = container?.querySelector('.dataTables_scrollBody') as HTMLElement | null;
+    if (!nextScrollBody) return;
+    if (this.dragScrollBodyEl === nextScrollBody) return;
+
+    this.unbindHorizontalDragScroll();
+    this.dragScrollBodyEl = nextScrollBody;
+    this.dragScrollBodyEl.classList.add('drag-scroll-enabled');
+    this.dragScrollBodyEl.addEventListener('pointerdown', this.onHorizontalDragPointerDown);
+    this.dragScrollBodyEl.addEventListener('pointermove', this.onHorizontalDragPointerMove);
+    this.dragScrollBodyEl.addEventListener('pointerup', this.onHorizontalDragPointerEnd);
+    this.dragScrollBodyEl.addEventListener('pointercancel', this.onHorizontalDragPointerEnd);
+    this.dragScrollBodyEl.addEventListener('lostpointercapture', this.onHorizontalDragPointerEnd);
+  }
+
+  private unbindHorizontalDragScroll(): void {
+    if (!this.dragScrollBodyEl) return;
+
+    this.dragScrollBodyEl.classList.remove('dragging');
+    this.dragScrollBodyEl.classList.remove('drag-scroll-enabled');
+    this.dragScrollBodyEl.removeEventListener('pointerdown', this.onHorizontalDragPointerDown);
+    this.dragScrollBodyEl.removeEventListener('pointermove', this.onHorizontalDragPointerMove);
+    this.dragScrollBodyEl.removeEventListener('pointerup', this.onHorizontalDragPointerEnd);
+    this.dragScrollBodyEl.removeEventListener('pointercancel', this.onHorizontalDragPointerEnd);
+    this.dragScrollBodyEl.removeEventListener('lostpointercapture', this.onHorizontalDragPointerEnd);
+
+    this.dragScrollBodyEl = null;
+    this.dragPointerId = null;
   }
 
 allDataSelected(data: any[]): boolean {

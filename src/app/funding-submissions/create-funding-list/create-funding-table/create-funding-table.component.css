@@ -3,6 +3,15 @@
   overflow-x: auto !important;
 }
 
+::ng-deep .dataTables_scrollBody.drag-scroll-enabled {
+  cursor: grab;
+}
+
+::ng-deep .dataTables_scrollBody.drag-scroll-enabled.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
 ::ng-deep table.dataTable tbody tr .select-checkbox.disabled {
   cursor: not-allowed;
 }
@@ -21,13 +30,27 @@
   border-collapse: separate !important; /* required for position:sticky */
 }
 
-/* FixedColumns v4 sticky cells must be opaque to cover scrolled content */
+/* FixedColumns v4 sticky headers should stay opaque */
 ::ng-deep table.dataTable thead th.dtfc-fixed-left,
-::ng-deep table.dataTable tbody td.dtfc-fixed-left,
-::ng-deep table.dataTable thead th.dtfc-fixed-right,
-::ng-deep table.dataTable tbody td.dtfc-fixed-right {
+::ng-deep table.dataTable thead th.dtfc-fixed-right {
   background-color: #fff;
   z-index: 2;
+}
+
+/* Keep fixed body cells visually aligned with striped/non-fixed rows */
+::ng-deep table.dataTable tbody tr.even td.dtfc-fixed-left,
+::ng-deep table.dataTable tbody tr.even td.dtfc-fixed-right {
+  background-color: #ffffff;
+}
+
+::ng-deep table.dataTable tbody tr.odd td.dtfc-fixed-left,
+::ng-deep table.dataTable tbody tr.odd td.dtfc-fixed-right {
+  background-color: #f9f9f9;
+}
+
+::ng-deep table.dataTable.hover tbody tr:hover td.dtfc-fixed-left,
+::ng-deep table.dataTable.hover tbody tr:hover td.dtfc-fixed-right {
+  background-color: #f6f6f6;
 }
 
 ::ng-deep table.dataTable th.dtfc-fixed-left:last-of-type,
