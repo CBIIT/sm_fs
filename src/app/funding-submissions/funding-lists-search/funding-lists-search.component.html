@@ -62,7 +62,7 @@
   <!-- Action buttons -->
   <div class="d-flex justify-content-end gap-2 mb-4">
     <button type="button" class="btn btn-outline-secondary" (click)="reset()">Reset</button>
-    <button type="submit" class="btn btn-primary ms-3" [disabled]="!hasSearchCriteria">Search</button>
+    <button type="submit" class="btn btn-primary ms-3" [disabled]="!hasSearchCriteria || !!filterForm?.invalid">Search</button>
   </div>
 
 </form>

@@ -313,6 +313,10 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   }
 
   search(): void {
+    if (this.filterForm?.invalid || !this.hasSearchCriteria) {
+      return;
+    }
+
     const formValue = this.filterForm?.form.value || {};
     const grantNumber = formValue.grantNumber || {};
     const fyRange = formValue.fyRange || {};
