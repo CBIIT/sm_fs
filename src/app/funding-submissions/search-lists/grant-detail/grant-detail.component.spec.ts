@@ -1018,6 +1018,17 @@ describe('GrantDetailComponent', () => {
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalled();
     });
 
+    it('activates the Do Not Pay lock for DOC-only users on OEFIA-added rows', () => {
+      component.OEFIACertifier = false;
+      component.onEdit();
+      component.formModel.docDecision = 'DNP';
+
+      component.onDocDecisionChange();
+
+      expect(component.doNotPayOefiaLockActive).toBeTrue();
+      expect(component.canEditOefiaNotes()).toBeFalse();
+    });
+
     it('does not activate the Do Not Pay lock for OEFIA users on OEFIA-added rows', () => {
       component.OEFIACertifier = true;
       component.onEdit();
@@ -1026,6 +1037,7 @@ describe('GrantDetailComponent', () => {
       component.onDocDecisionChange();
 
       expect(component.doNotPayOefiaLockActive).toBeFalse();
+      expect(component.canEditOefiaNotes()).toBeTrue();
     });
 
     it('preserves edited OEFIA Notes for OEFIA users when Do Not Pay is selected', () => {
