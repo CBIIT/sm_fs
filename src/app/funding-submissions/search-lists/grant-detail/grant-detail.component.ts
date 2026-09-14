@@ -60,7 +60,6 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   OEFIACertifier = false;
   doNotPayOefiaLockActive = false;
   saveValidationError: string | null = null;
-  saveValidationErrors: Record<string, string> = {};
   private initialFormSnapshot = '';
   private initialFundingSnapshot = '';
   private initialJustificationText = '';
@@ -179,7 +178,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.justificationFile = null;
     this.justificationFileError = null;
     this.saveSuccessMessage = '';
-    this.clearValidationErrors();
+    this.saveValidationError = null;
     this.isEditMode = true;
     this.initialFormSnapshot = this.currentSnapshot();
     this.initialFundingSnapshot = this.currentFundingSnapshot();
@@ -190,12 +189,6 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   onDocDecisionChange(): void {
     this.recomputeDoNotPayOefiaLock();
-    this.updateValidationErrorsLive();
-    this.cdr.detectChanges();
-  }
-
-  onValidationFieldChange(): void {
-    this.updateValidationErrorsLive();
     this.cdr.detectChanges();
   }
 
@@ -273,9 +266,8 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       this.clearDoNotPayDependentFields();
     }
 
-    this.saveValidationErrors = this.validateChangedValues();
-    this.saveValidationError = this.getFirstValidationError(this.saveValidationErrors);
-    if (Object.keys(this.saveValidationErrors).length > 0) {
+    this.saveValidationError = this.validateChangedValues();
+    if (this.saveValidationError) {
       this.cdr.detectChanges();
       return;
     }
@@ -380,47 +372,35 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       && this.isDoNotPayDecisionSelected();
   }
 
-  private validateChangedValues(): Record<string, string> {
-    const errors: Record<string, string> = {};
-
+  private validateChangedValues(): string | null {
     if (this.doNotPayOefiaLockActive && !String(this.formModel.docNotes || '').trim()) {
-      errors.docNotes = 'DOC Notes is required when DOC Decision is Do Not Pay.';
+      return 'DOC Notes is required when DOC Decision is Do Not Pay.';
     }
 
     const pct = this.formModel.docRecReductionPct;
     if (pct != null && (pct < 0 || pct > 100)) {
-      errors.docRecReductionPct = 'DOC Rec % Red must be between 0 and 100.';
+      return 'DOC Rec % Red must be between 0 and 100.';
     }
 
-    if (!errors.docRecReductionPct && pct != null && !this.hasAtMostTwoDecimals(Number(pct))) {
-      errors.docRecReductionPct = 'DOC Rec % Red must be a valid percentage with up to 2 decimal places.';
+    if (pct != null && !this.hasAtMostTwoDecimals(Number(pct))) {
+      return 'DOC Rec % Red must be a valid percentage with up to 2 decimal places.';
     }
 
     const amt = this.formModel.docRecAmt;
     if (amt != null && amt < 0) {
-      errors.docRecAmt = 'DOC Rec $ cannot be negative.';
+      return 'DOC Rec $ cannot be negative.';
     }
 
-    if (!errors.docRecAmt && amt != null && !this.hasAtMostTwoDecimals(Number(amt))) {
-      errors.docRecAmt = 'DOC Rec $ must be a valid dollar amount with up to 2 decimal places.';
+    if (amt != null && !this.hasAtMostTwoDecimals(Number(amt))) {
+      return 'DOC Rec $ must be a valid dollar amount with up to 2 decimal places.';
     }
 
     const priority = this.formModel.docPriority as any;
     if (priority != null && priority !== '' && (!Number.isInteger(Number(priority)) || Number(priority) < 0)) {
-      errors.docPriority = 'DOC Priority must be a non-negative whole number.';
+      return 'DOC Priority must be a non-negative whole number.';
     }
 
-    return errors;
-  }
-
-  private getFirstValidationError(errors: Record<string, string>): string | null {
-    const firstKey = Object.keys(errors)[0];
-    return firstKey ? errors[firstKey] : null;
-  }
-
-  private clearValidationErrors(): void {
-    this.saveValidationError = null;
-    this.saveValidationErrors = {};
+    return null;
   }
 
   private hasAtMostTwoDecimals(value: number): boolean {
@@ -465,20 +445,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   onNotesModelChange(): void {
-    this.updateValidationErrorsLive();
     this.cdr.detectChanges();
-  }
-
-  private updateValidationErrorsLive(): void {
-    if (!this.isEditMode) {
-      return;
-    }
-    if (!Object.keys(this.saveValidationErrors || {}).length && !this.saveValidationError) {
-      return;
-    }
-
-    this.saveValidationErrors = this.validateChangedValues();
-    this.saveValidationError = this.getFirstValidationError(this.saveValidationErrors);
   }
 
   /**
@@ -549,7 +516,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.justificationFile = null;
     this.justificationFileError = null;
     this.saveSuccessMessage = '';
-    this.clearValidationErrors();
+    this.saveValidationError = null;
     this.doNotPayOefiaLockActive = false;
     this.initialFormSnapshot = '';
     this.initialFundingSnapshot = '';

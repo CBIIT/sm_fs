@@ -684,6 +684,46 @@ describe('GrantDetailComponent', () => {
       expect(fundingSubmissionsServiceSpy.saveJustificationForm).not.toHaveBeenCalled();
     });
 
+    it('shows the exact success message and makes it visible after a no-op save', () => {
+      component.onEdit();
+      const visibilitySpy = spyOn<any>(component, 'makeSaveSuccessMessageVisible');
+
+      component.onSave();
+
+      expect(component.saveSuccessMessage)
+        .toBe('Success! You have successfully updated Grant Selection for 1R01CA123456-01');
+      expect(visibilitySpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows the exact success message and makes it visible after a funding-fields save', () => {
+      component.onEdit();
+      component.formModel.docDecision = 'Pay';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      const visibilitySpy = spyOn<any>(component, 'makeSaveSuccessMessageVisible');
+
+      component.onSave();
+
+      expect(component.saveSuccessMessage)
+        .toBe('Success! You have successfully updated Grant Selection for 1R01CA123456-01');
+      expect(visibilitySpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows the exact success message and makes it visible after a justification save', () => {
+      component.onEdit();
+      component.formModel.justificationText = 'New justification text';
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({
+        justificationText: 'New justification text'
+      } as any));
+      const visibilitySpy = spyOn<any>(component, 'makeSaveSuccessMessageVisible');
+
+      component.onSave();
+
+      expect(component.saveSuccessMessage)
+        .toBe('Success! You have successfully updated Grant Selection for 1R01CA123456-01');
+      expect(visibilitySpy).toHaveBeenCalledTimes(1);
+    });
+
     it('passes undefined text for a file-only upload when text is unchanged', () => {
       component.justificationLoaded = true;
       component.onEdit();
@@ -753,7 +793,7 @@ describe('GrantDetailComponent', () => {
       expect(component.data.twoYearAnnualFundingR01Flag).toBe(false);
     });
 
-    it('when DOC Decision is Do Not Pay, clears disabled dependent fields and justification before save while preserving DOC Notes', () => {
+    it('when DOC Decision is Do Not Pay, clears only dependent fields and justification while preserving both note fields in the payload', () => {
       component.data = {
         applId: 100,
         grantNumber: '1R01CA123456-01',
@@ -769,7 +809,7 @@ describe('GrantDetailComponent', () => {
         budgetCategoryCode: 'ESIR37T4',
         budgetCategories: 'ESI R37 T4 Board Competing Transition',
         docNotes: 'keep this note',
-        oefiaNotes: 'clear this note',
+        oefiaNotes: 'keep this OEFIA note',
         justificationText: 'remove this justification',
         justificationFileName: 'old.pdf'
       };
@@ -796,7 +836,7 @@ describe('GrantDetailComponent', () => {
       component.formModel.annualOrMyf = 'MYF';
       component.formModel.budgetCategories = 'ESIR37T4';
       component.formModel.docNciSelection = 'NCI';
-      component.formModel.oefiaNotes = 'should be removed';
+      component.formModel.oefiaNotes = 'attempted OEFIA note change';
       component.formModel.justificationText = 'new justification';
       component.formModel.docNotes = 'keep this note';
       component.justificationFile = new File(['x'], 'new.pdf', { type: 'application/pdf' });
@@ -816,7 +856,7 @@ describe('GrantDetailComponent', () => {
       expect(payload.fields.annualOrMyf).toBeNull();
       expect(payload.fields.budgetCategories).toBeNull();
       expect(payload.fields.docNciSelection).toBeNull();
-      expect(payload.fields.oefiaNotes).toBe('clear this note');
+      expect(payload.fields.oefiaNotes).toBe('keep this OEFIA note');
       expect(payload.fields.docNotes).toBe('keep this note');
 
       expect(fundingSubmissionsServiceSpy.saveJustificationForm)
@@ -824,7 +864,7 @@ describe('GrantDetailComponent', () => {
       expect(component.data.docDecision).toBe('DNP');
       expect(component.data.docNotes).toBe('keep this note');
       expect(component.data.docPriority).toBeNull();
-      expect(component.data.oefiaNotes).toBe('clear this note');
+      expect(component.data.oefiaNotes).toBe('keep this OEFIA note');
       expect(component.data.docRecommendedAmount).toBeNull();
       expect(component.data.docRecommendedReductionPct).toBeNull();
       expect(component.data.budgetCategories).toBeNull();
@@ -978,6 +1018,17 @@ describe('GrantDetailComponent', () => {
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalled();
     });
 
+    it('activates the Do Not Pay lock for DOC-only users on OEFIA-added rows', () => {
+      component.OEFIACertifier = false;
+      component.onEdit();
+      component.formModel.docDecision = 'DNP';
+
+      component.onDocDecisionChange();
+
+      expect(component.doNotPayOefiaLockActive).toBeTrue();
+      expect(component.canEditOefiaNotes()).toBeFalse();
+    });
+
     it('does not activate the Do Not Pay lock for OEFIA users on OEFIA-added rows', () => {
       component.OEFIACertifier = true;
       component.onEdit();
@@ -986,6 +1037,7 @@ describe('GrantDetailComponent', () => {
       component.onDocDecisionChange();
 
       expect(component.doNotPayOefiaLockActive).toBeFalse();
+      expect(component.canEditOefiaNotes()).toBeTrue();
     });
 
     it('preserves edited OEFIA Notes for OEFIA users when Do Not Pay is selected', () => {

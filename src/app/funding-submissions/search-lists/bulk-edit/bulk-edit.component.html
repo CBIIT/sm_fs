@@ -105,14 +105,18 @@
       </div>
       <div class="col-6">
         <label class="form-label fw-semibold">OEFIA Notes</label>
-        <textarea
-          class="form-control"
-          name="bulkOefiaNotes"
-          [(ngModel)]="bulkFields.oefiaNotes"
-          rows="4"
-          maxlength="1000">
-        </textarea>
-        <div class="text-end text-muted small">{{ bulkFields.oefiaNotes?.length || 0 }}/1000</div>
+        <textarea *ngIf="!canEditOefiaNotes()" class="form-control bg-light" rows="4"
+          aria-label="OEFIA Notes" readonly></textarea>
+        <div *ngIf="canEditOefiaNotes()">
+          <textarea
+            class="form-control"
+            name="bulkOefiaNotes"
+            [(ngModel)]="bulkFields.oefiaNotes"
+            rows="4"
+            maxlength="1000">
+          </textarea>
+          <div class="text-end text-muted small">{{ bulkFields.oefiaNotes?.length || 0 }}/1000</div>
+        </div>
       </div>
     </div>
 
@@ -213,13 +217,16 @@
 
       <ng-template #oefiaNotesRenderer let-data="adtData">
         <div>
-          <textarea class="form-control form-control-sm notes-textarea"
-            [(ngModel)]="data.oefiaNotes"
-            (ngModelChange)="onRowFieldChange()"
-            rows="2"
-            maxlength="2000">
-          </textarea>
-          <div class="char-count">{{ data.oefiaNotes?.length || 0 }}/2000</div>
+          <span *ngIf="!canEditOefiaNotes()">{{ data.oefiaNotes || '' }}</span>
+          <div *ngIf="canEditOefiaNotes()">
+            <textarea class="form-control form-control-sm notes-textarea"
+              [(ngModel)]="data.oefiaNotes"
+              (ngModelChange)="onRowFieldChange()"
+              rows="2"
+              maxlength="2000">
+            </textarea>
+            <div class="char-count">{{ data.oefiaNotes?.length || 0 }}/2000</div>
+          </div>
         </div>
       </ng-template>
     </div>

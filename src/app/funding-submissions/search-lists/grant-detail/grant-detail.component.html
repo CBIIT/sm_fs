@@ -65,20 +65,16 @@
               <span *ngIf="!isEditMode">{{data.docRecommendedReductionPct != null ? (data.docRecommendedReductionPct + '%') : ''}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecReductionPct" [(ngModel)]="formModel.docRecReductionPct"
-                (ngModelChange)="onValidationFieldChange()"
                 [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" max="100" step="0.01">
-              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docRecReductionPct">{{saveValidationErrors.docRecReductionPct}}</div>
             </td>
             <td class="grid-label">DOC Rec $:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docRecommendedAmount != null ? ('$' + (data.docRecommendedAmount | number)) : ''}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecAmt" [(ngModel)]="formModel.docRecAmt"
-                (ngModelChange)="onValidationFieldChange()"
                 [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" step="0.01">
-              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docRecAmt">{{saveValidationErrors.docRecAmt}}</div>
             </td>
           </tr>
 
@@ -93,10 +89,8 @@
               <span *ngIf="!isEditMode">{{data.docPriority}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docPriority" [(ngModel)]="formModel.docPriority"
-                (ngModelChange)="onValidationFieldChange()"
                  [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" step="1">
-              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docPriority">{{saveValidationErrors.docPriority}}</div>
             </td>
             <td class="grid-label">2Y Annual Fnd R01:</td>
             <td class="grid-item">
@@ -166,7 +160,7 @@
                 <textarea class="form-control form-control-sm" rows="2"
                   name="docNotes" [(ngModel)]="formModel.docNotes" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.docNotes || '').length}}/1000</div>
-                <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationErrors.docNotes">{{saveValidationErrors.docNotes}}</div>
+                 <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationError && (formModel.docNotes || '').length == 0">{{saveValidationError}}</div>
               </div>
             </td>
           </tr>

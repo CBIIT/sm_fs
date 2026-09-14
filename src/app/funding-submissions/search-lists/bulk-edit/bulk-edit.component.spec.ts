@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, forwardRef, Input, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
@@ -10,6 +10,29 @@ import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 
 import { BulkEditComponent } from './bulk-edit.component';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
+import { AppUserSessionService } from '../../../service/app-user-session.service';
+import { roleNames } from '../../../service/role-names';
+
+@Component({
+  selector: 'ng-select2',
+  template: '',
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => FakeNgSelect2Component),
+    multi: true
+  }]
+})
+class FakeNgSelect2Component implements ControlValueAccessor {
+  @Input() id = '';
+  @Input() data: any[] = [];
+  @Input() allowClear = false;
+  @Input() width = '';
+
+  writeValue(_value: any): void {}
+  registerOnChange(_fn: any): void {}
+  registerOnTouched(_fn: any): void {}
+  setDisabledState(_isDisabled: boolean): void {}
+}
 
 // Bulk Edit Budget Categories CODE-vs-NAME Mismatch fix (2026-08-25): the per-row
 // `budgetCategories` field on `this.rows` must be seeded from the grant's `budgetCategoryCode`
@@ -23,6 +46,7 @@ describe('BulkEditComponent', () => {
   let component: BulkEditComponent;
   let fixture: ComponentFixture<BulkEditComponent>;
   let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsService>;
+  let userSessionServiceSpy: jasmine.SpyObj<AppUserSessionService>;
 
   function grant(overrides: Partial<any> = {}): any {
     return {
@@ -53,6 +77,8 @@ describe('BulkEditComponent', () => {
     fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
       'bulkUpdateListGrants'
     ]);
+    userSessionServiceSpy = jasmine.createSpyObj('AppUserSessionService', ['hasRole']);
+    userSessionServiceSpy.hasRole.and.returnValue(false);
 
     const dropdownLookupServiceSpy = jasmine.createSpyObj('FundingSubmDropdownLookupService', [
       'getDocDecisions', 'getDocNciSelections', 'getAnnualFundingR01Options',
@@ -71,7 +97,7 @@ describe('BulkEditComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [BulkEditComponent],
+      declarations: [BulkEditComponent, FakeNgSelect2Component],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
@@ -80,7 +106,8 @@ describe('BulkEditComponent', () => {
         { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: NgbModal, useValue: jasmine.createSpyObj('NgbModal', ['open']) },
-        { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy }
+        { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy },
+        { provide: AppUserSessionService, useValue: userSessionServiceSpy }
       ]
     }).compileComponents();
 
@@ -91,6 +118,18 @@ describe('BulkEditComponent', () => {
   function seedHistoryStateAndInit(grants: any[]): void {
     spyOnProperty(history, 'state', 'get').and.returnValue({ listId: 1, selectionDate: '', grants });
     component.ngOnInit();
+  }
+
+  function setRoles(docFundingListCor: boolean, oefiaCertifier: boolean): void {
+    userSessionServiceSpy.hasRole.and.callFake((role: string) => {
+      if (role === roleNames.DOC_FUNDING_LIST_COR) {
+        return docFundingListCor;
+      }
+      if (role === roleNames.OEFIA_CERTIFIER) {
+        return oefiaCertifier;
+      }
+      return false;
+    });
   }
 
   it('seeds the per-row budgetCategories field from the grant\'s budgetCategoryCode (CODE), not the NAME-valued budgetCategories', () => {
@@ -106,12 +145,16 @@ describe('BulkEditComponent', () => {
     expect(component.rows[0].budgetCategories).toBe('');
   });
 
-  it('sends a CODE-shaped budgetCategories value (not the free-text NAME) in an unedited row\'s save payload', () => {
+  it('sends a CODE-shaped budgetCategories value (not the free-text NAME) in a dirty row\'s save payload', () => {
     seedHistoryStateAndInit([grant()]);
     fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
 
-    // Unedited save: no dropdown touched by the operator, matching the exact silent-wipe
-    // scenario this fix protects against.
+    // FS-2277: onSave() now requires a real dirty row (canSave === true) before it will call
+    // bulkUpdateListGrants(); establish that via a genuine field edit + onRowFieldChange(),
+    // leaving budgetCategories untouched so this payload assertion still reflects the
+    // CODE-vs-NAME fix.
+    component.rows[0].docNotes = 'edited note';
+    component.onRowFieldChange();
     component.onSave();
 
     const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
@@ -135,6 +178,10 @@ describe('BulkEditComponent', () => {
     seedHistoryStateAndInit([grant()]);
     fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
 
+    // FS-2277: establish a real dirty row before onSave(), since the corrected no-op guard
+    // now blocks a clean/untouched save.
+    component.rows[0].docNotes = 'edited note';
+    component.onRowFieldChange();
     component.onSave();
 
     const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
@@ -152,6 +199,297 @@ describe('BulkEditComponent', () => {
 
     expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
       queryParams: { listId: 42, selectionDate: 'SEL-42', from: 'lists' }
+    });
+  });
+  describe('FS-2277 — Bulk Edit Save dirty-state derivation', () => {
+    it('initializes with selected grants and canSave === false', () => {
+      seedHistoryStateAndInit([grant()]);
+
+      expect(component.rows.length).toBe(1);
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('calling onRowFieldChange() without changing row data keeps canSave === false (covers initial render/binding emissions)', () => {
+      seedHistoryStateAndInit([grant()]);
+
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('a real row edit followed by onRowFieldChange() sets canSave === true', () => {
+      seedHistoryStateAndInit([grant()]);
+
+      component.rows[0].docNotes = 'a real edit';
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeTrue();
+    });
+
+    it('onSave() with canSave === false does not call bulkUpdateListGrants()', () => {
+      seedHistoryStateAndInit([grant()]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
+
+    it('onApplyChanges() with a shared value that changes at least one row sets canSave === true', () => {
+      seedHistoryStateAndInit([grant({ docNotes: '' })]);
+
+      component.bulkFields = { docNotes: 'shared note' };
+      component.onApplyChanges();
+
+      expect(component.rows[0].docNotes).toBe('shared note');
+      expect(component.canSave).toBeTrue();
+    });
+
+    it('onApplyChanges() with a shared value equal to every current row value keeps canSave === false', () => {
+      seedHistoryStateAndInit([grant({ docNotes: 'shared note' })]);
+
+      component.bulkFields = { docNotes: 'shared note' };
+      component.onApplyChanges();
+
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('edit-then-revert: restoring a row value to its snapshot disables Save again', () => {
+      seedHistoryStateAndInit([grant({ docNotes: 'original note' })]);
+
+      component.rows[0].docNotes = 'changed note';
+      component.onRowFieldChange();
+      expect(component.canSave).toBeTrue();
+
+      component.rows[0].docNotes = 'original note';
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('onReset() clears any displayed save success message', () => {
+      seedHistoryStateAndInit([grant({ docNotes: 'original note' })]);
+
+      component.saveSuccessMessage = 'Success! Bulk changes have been applied';
+      component.rows[0].docNotes = 'changed note';
+      component.onRowFieldChange();
+
+      component.onReset();
+
+      expect(component.saveSuccessMessage).toBe('');
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('after a successful save, Save disables, lastSavedRows refreshes, and a subsequent no-op onRowFieldChange() keeps Save disabled', () => {
+      seedHistoryStateAndInit([grant({ docNotes: 'original note' })]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.rows[0].docNotes = 'updated note';
+      component.onRowFieldChange();
+      expect(component.canSave).toBeTrue();
+
+      component.onSave();
+
+      expect(component.canSave).toBeFalse();
+
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('payload preservation: a normal editable-field update still carries through docPriority, docRecAmt, docRecReductionPct, and recused unchanged', () => {
+      seedHistoryStateAndInit([grant({
+        docPriority: '3',
+        docRecommendedAmount: 500000,
+        docRecommendedReductionPct: 10,
+        recusedFlag: true
+      })]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.rows[0].docNotes = 'edited note';
+      component.onRowFieldChange();
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.docPriority).toBe('3');
+      expect(payload.fields.docRecAmt).toBe(500000);
+      expect(payload.fields.docRecReductionPct).toBe(10);
+      expect(payload.fields.recused).toBe('Y');
+    });
+
+    it('back-navigation: clean state navigates immediately without opening the unsaved-changes modal', () => {
+      seedHistoryStateAndInit([grant()]);
+      const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+      const router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+
+      component.onBackToListClick();
+
+      expect(modalService.open).not.toHaveBeenCalled();
+      expect(router.navigate).toHaveBeenCalled();
+    });
+
+    it('back-navigation: dirty state opens the unsaved-changes warning modal instead of navigating', () => {
+      seedHistoryStateAndInit([grant()]);
+      const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+      const router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+
+      component.rows[0].docNotes = 'edited note';
+      component.onRowFieldChange();
+      component.onBackToListClick();
+
+      expect(modalService.open).toHaveBeenCalled();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('FS-2108 — DOC Bulk Edit OEFIA Notes read-only behavior', () => {
+    it('ngOnInit() reads DOC and OEFIA roles and treats DOC-only users as unable to edit OEFIA Notes', () => {
+      setRoles(true, false);
+
+      seedHistoryStateAndInit([grant()]);
+
+      expect(userSessionServiceSpy.hasRole).toHaveBeenCalledWith(roleNames.DOC_FUNDING_LIST_COR);
+      expect(userSessionServiceSpy.hasRole).toHaveBeenCalledWith(roleNames.OEFIA_CERTIFIER);
+      expect(component.docFundingListCor).toBeTrue();
+      expect(component.OEFIACertifier).toBeFalse();
+      expect(component.canEditOefiaNotes()).toBeFalse();
+    });
+
+    it('does not grant OEFIA Notes edit capability to unexpected non-DOC/non-OEFIA users', () => {
+      setRoles(false, false);
+
+      seedHistoryStateAndInit([grant()]);
+
+      expect(component.canEditOefiaNotes()).toBeFalse();
+    });
+
+    it('DOC-only: shared OEFIA Notes does not count as an applicable bulk value', () => {
+      setRoles(true, false);
+      seedHistoryStateAndInit([grant()]);
+
+      component.bulkFields = { oefiaNotes: 'tampered shared OEFIA note' };
+
+      expect(component.hasAnyBulkFieldValue).toBeFalse();
+    });
+
+    it('DOC-only: onApplyChanges() ignores tampered shared OEFIA Notes and keeps Save disabled', () => {
+      setRoles(true, false);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+
+      component.bulkFields = { oefiaNotes: 'tampered shared OEFIA note' };
+      component.onApplyChanges();
+
+      expect(component.rows[0].oefiaNotes).toBe('original OEFIA note');
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('DOC-only: direct row OEFIA Notes tampering does not make the row dirty', () => {
+      setRoles(true, false);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+
+      component.rows[0].oefiaNotes = 'tampered row OEFIA note';
+      component.onRowFieldChange();
+
+      expect(component.rows[0].oefiaNotes).toBe('original OEFIA note');
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('DOC-only: saving another legitimate DOC edit preserves the original OEFIA Notes payload value', () => {
+      setRoles(true, false);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.rows[0].oefiaNotes = 'tampered row OEFIA note';
+      component.rows[0].docNotes = 'legitimate DOC edit';
+      component.onRowFieldChange();
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.docNotes).toBe('legitimate DOC edit');
+      expect(payload.fields.oefiaNotes).toBe('original OEFIA note');
+    });
+
+    it('DOC-only: multiple-row save preserves each row\'s own original OEFIA Notes payload value', () => {
+      setRoles(true, false);
+      seedHistoryStateAndInit([
+        grant({ applId: 100, oefiaNotes: 'first original OEFIA note' }),
+        grant({ applId: 200, oefiaNotes: 'second original OEFIA note' })
+      ]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.rows[0].oefiaNotes = 'first tampered OEFIA note';
+      component.rows[1].oefiaNotes = 'second tampered OEFIA note';
+      component.rows[0].docNotes = 'legitimate DOC edit';
+      component.onRowFieldChange();
+      component.onSave();
+
+      const firstPayload = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.argsFor(0)[0];
+      const secondPayload = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.argsFor(1)[0];
+      expect(firstPayload.fields.oefiaNotes).toBe('first original OEFIA note');
+      expect(secondPayload.fields.oefiaNotes).toBe('second original OEFIA note');
+    });
+
+    it('OEFIA-capable: shared OEFIA Notes can be applied and enables Save', () => {
+      setRoles(false, true);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+
+      component.bulkFields = { oefiaNotes: 'shared OEFIA note' };
+      component.onApplyChanges();
+
+      expect(component.hasAnyBulkFieldValue).toBeTrue();
+      expect(component.rows[0].oefiaNotes).toBe('shared OEFIA note');
+      expect(component.canSave).toBeTrue();
+    });
+
+    it('OEFIA-capable: direct per-row OEFIA Notes edit enables Save and reverting disables Save', () => {
+      setRoles(false, true);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+
+      component.rows[0].oefiaNotes = 'changed OEFIA note';
+      component.onRowFieldChange();
+      expect(component.canSave).toBeTrue();
+
+      component.rows[0].oefiaNotes = 'original OEFIA note';
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('dual-role: OEFIA Notes remains editable and participates in dirty-state calculation', () => {
+      setRoles(true, true);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+
+      expect(component.canEditOefiaNotes()).toBeTrue();
+
+      component.rows[0].oefiaNotes = 'dual-role OEFIA edit';
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeTrue();
+    });
+
+    it('DOC-only: shared OEFIA Notes is rendered as an empty read-only textarea', () => {
+      setRoles(true, false);
+      spyOnProperty(history, 'state', 'get').and.returnValue({ listId: 1, selectionDate: '', grants: [grant()] });
+
+      fixture.detectChanges();
+
+      const bulkOefiaTextarea = fixture.nativeElement.querySelector('textarea[name="bulkOefiaNotes"]');
+      const readOnlyOefiaTextarea = fixture.nativeElement.querySelector('textarea[aria-label="OEFIA Notes"]');
+      expect(bulkOefiaTextarea).toBeNull();
+      expect(readOnlyOefiaTextarea).not.toBeNull();
+      expect(readOnlyOefiaTextarea.readOnly).toBeTrue();
+      expect(readOnlyOefiaTextarea.value).toBe('');
+      expect(fixture.nativeElement.textContent).not.toContain('View only');
+    });
+
+    it('OEFIA-capable: shared OEFIA Notes is rendered as an editable textarea', () => {
+      setRoles(false, true);
+      spyOnProperty(history, 'state', 'get').and.returnValue({ listId: 1, selectionDate: '', grants: [grant()] });
+
+      fixture.detectChanges();
+
+      const bulkOefiaTextarea = fixture.nativeElement.querySelector('textarea[name="bulkOefiaNotes"]');
+      expect(bulkOefiaTextarea).not.toBeNull();
     });
   });
 });

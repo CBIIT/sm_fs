@@ -619,6 +619,88 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     });
   });
 
+  describe('horizontal drag-scroll Select2 clickability (FS-2262)', () => {
+    function bindDragScrollFixture() {
+      const host = document.createElement('div');
+      const scrollBody = document.createElement('div');
+      scrollBody.className = 'dataTables_scrollBody';
+      host.appendChild(scrollBody);
+      document.body.appendChild(host);
+
+      (host as any).setPointerCapture = jasmine.createSpy('setPointerCapture');
+      (host as any).hasPointerCapture = jasmine.createSpy('hasPointerCapture').and.returnValue(true);
+      (host as any).releasePointerCapture = jasmine.createSpy('releasePointerCapture');
+
+      const dt = {
+        table: () => ({
+          container: () => host
+        })
+      };
+      (component as any).bindHorizontalDragScroll(dt);
+
+      return { host, scrollBody };
+    }
+
+    function pointerDown(target: HTMLElement): PointerEvent {
+      const event = new PointerEvent('pointerdown', {
+        bubbles: true,
+        cancelable: true,
+        pointerId: 9,
+        pointerType: 'mouse',
+        button: 0,
+        clientX: 120
+      });
+      spyOn(event, 'preventDefault').and.callThrough();
+      target.dispatchEvent(event);
+      return event;
+    }
+
+    afterEach(() => {
+      (component as any).unbindHorizontalDragScroll();
+    });
+
+    it('ignores pointer-down on rendered Select2 elements instead of starting drag-scroll', () => {
+      const { host, scrollBody } = bindDragScrollFixture();
+      const select2 = document.createElement('span');
+      select2.className = 'select2 select2-container';
+      const selection = document.createElement('span');
+      selection.className = 'select2-selection';
+      const rendered = document.createElement('span');
+      rendered.className = 'select2-selection__rendered';
+      const arrow = document.createElement('span');
+      arrow.className = 'select2-selection__arrow';
+      selection.appendChild(rendered);
+      selection.appendChild(arrow);
+      select2.appendChild(selection);
+      scrollBody.appendChild(select2);
+
+      [select2, selection, rendered, arrow].forEach(target => {
+        (host as any).setPointerCapture.calls.reset();
+        const event = pointerDown(target);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(scrollBody.classList.contains('dragging')).toBeFalse();
+        expect((host as any).setPointerCapture).not.toHaveBeenCalled();
+      });
+
+      host.remove();
+    });
+
+    it('still starts horizontal drag-scroll from a non-interactive table area', () => {
+      const { host, scrollBody } = bindDragScrollFixture();
+      const tableCell = document.createElement('td');
+      scrollBody.appendChild(tableCell);
+
+      const event = pointerDown(tableCell);
+
+      expect(event.preventDefault).toHaveBeenCalled();
+      expect(scrollBody.classList.contains('dragging')).toBeTrue();
+      expect((host as any).setPointerCapture).toHaveBeenCalledWith(9);
+
+      host.remove();
+    });
+  });
+
   // Display CODE vs NAME Reconciliation (2026-08-25): docDecision's mock data currently defines
   // CODE and NAME as the same literal string, so this is future-proofing only, not a live-visible
   // fix — but the DOC Decision column renderer must resolve via FundingSubmDropdownLookupService
