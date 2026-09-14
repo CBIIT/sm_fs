@@ -137,7 +137,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     this.libPdCaIntegratorService.caForDocEmitter.next({ code: [], channel: 'CA_DOC_DEFAULT_CHANNEL' });
     const freshNavigation = this.stateService.consumeFreshNavigationRequest();
     if (freshNavigation) {
-      this.reset();
+      this.clearSearchState();
     }
     const saved = this.stateService.getSearchListsState();
     this.hasSavedSearchListsState = !freshNavigation && !!saved;
@@ -438,16 +438,20 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
         this.dtTrigger.unsubscribe();
       }
       this.dtTrigger = new Subject<any>();
-      this.filterForm?.resetForm();
-      this.selectedDocs = [];
-      this.selectedListStatus = null;
-      this.selectedSelectionDate = null;
-      this.listIdFilter = null as any;
-      this.pendingReviewOnly = false;
-      this.searchCriteria = {};
-      this.throttle.reset();
-      this.showResults = false;
+      this.clearSearchState();
     });
+  }
+
+  private clearSearchState(): void {
+    this.filterForm?.resetForm();
+    this.selectedDocs = [];
+    this.selectedListStatus = null;
+    this.selectedSelectionDate = null;
+    this.listIdFilter = null as any;
+    this.pendingReviewOnly = false;
+    this.searchCriteria = {};
+    this.throttle.reset();
+    this.showResults = false;
   }
 
   ngOnDestroy(): void {

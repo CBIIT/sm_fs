@@ -240,6 +240,29 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     expect((component as any).defaultPendingReviewApplied).toBeTrue();
   });
 
+  it('preserves the DOC default across the microtask boundary on fresh navigation', async () => {
+    const stateService = (component as any).stateService;
+    stateService.consumeFreshNavigationRequest.and.returnValue(true);
+    stateService.getSearchListsState.and.returnValue(null);
+    (component as any).userSessionService.hasRole.and.returnValue(true);
+    (component as any).filterForm = {
+      resetForm: jasmine.createSpy('resetForm'),
+      form: { value: {} }
+    };
+    component.pendingReviewCount = 2;
+    (component as any).pendingReviewCountLoaded = true;
+    spyOn<any>(component, 'triggerTableInit');
+
+    component.ngAfterViewInit();
+    expect((component as any).searchCriteria).toEqual({ pendingReviewOnly: true });
+    expect(component.showResults).toBeTrue();
+
+    await Promise.resolve();
+
+    expect((component as any).searchCriteria).toEqual({ pendingReviewOnly: true });
+    expect(component.showResults).toBeTrue();
+  });
+
   it('does not default a non-DOC user or a user with saved state', () => {
     const userSession = (component as any).userSessionService;
     userSession.hasRole.and.returnValue(false);
