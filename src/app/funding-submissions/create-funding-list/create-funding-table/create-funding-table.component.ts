@@ -195,17 +195,29 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
           ngTemplateRef:{ ref: this.pdNameRender }
         }, // 4
         {
+          title: 'CA',
+          data: 'cancerActivity',
+          width: '30px',
+          ngTemplateRef: { ref: this.cancerActivityRenderer },
+        }, // 5
+        {
+          title: 'IMPAC II Status',
+          data: 'impacStatusDescrip',
+          width: '90px',
+          defaultContent: '',
+        }, // 6
+        {
           title: 'Project Title',
           data: 'projectTitle',
           width: '200px',
           defaultContent: ''
-        }, // 5
+        }, // 7
         {
           title: 'DOC',
           data: 'doc',
           width: '40px',
           defaultContent: ''
-        }, // 6
+        }, // 8
         {
           title: 'NCAB',
           data: 'ncabDate',
@@ -216,38 +228,38 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
             const d = new Date(data);
             return isNaN(d.getTime()) ? data : `${d.getMonth() + 1}/${d.getFullYear()}`;
           }
-        }, // 7
+        }, // 9
         {
           title: 'NOFO',
           data: 'nofo',
           width: '50px',
           ngTemplateRef: { ref: this.foaCellRender },
-        }, // 8
+        }, // 10
         {
           title: 'NOSI',
           data: 'nosi',
           width: '40px',
           ngTemplateRef: { ref: this.nosiCellRender },
-        }, // 9
+        }, // 11
         {
           title: 'Pctl',
           data: 'percentile',
           width: '30px',
           defaultContent: '',
           render: (data) => (data != null && data !== '') ? `${data}%` : ''
-        }, // 10
+        }, // 12
         {
           title: 'PriScr',
           data: 'priorityScoreDisplay',
           width: '40px',
           defaultContent: ''
-        }, // 11
+        }, // 13
         {
           title: 'PrevScr',
           data: 'previousScoreDisplay',
           width: '50px',
           defaultContent: ''
-        }, // 12
+        }, // 14
         {
           title: 'PI Req. Total',
           data: 'piRequestedTotal',
@@ -259,30 +271,18 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
             }
             return data ?? '';
           }
-        }, // 13
+        }, // 15
         {
           title: 'Exists in List',
           data: 'existsInListSelectionDate',
           width: '50px',
           ngTemplateRef: { ref: this.existsInListRenderer },
-        }, // 14
+        }, // 16
         {
           title: 'ESI',
           data: 'esiFlag',
           width: '30px',
           render: (data) => data === true ? 'Y' : data === false ? 'N' : ''
-        }, // 15
-        {
-          title: 'CA',
-          data: 'cancerActivity',
-          width: '30px',
-          ngTemplateRef: { ref: this.cancerActivityRenderer },
-        }, // 16
-        {
-          title: 'IMPAC II status',
-          data: 'impacStatusDescrip',
-          width: '90px',
-          defaultContent: '',
         }, // 17
       ],
 

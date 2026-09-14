@@ -113,6 +113,36 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
     expect(previousScoreColumn.defaultContent).toBe('');
   });
 
+  it('places CA and IMPAC II Status directly after PD in the grid and export sequence', () => {
+    const columns = component.dtOptions.columns as any[];
+    const titles = columns.slice(1).map((column: any) => column.title);
+
+    expect(titles).toEqual([
+      'Grant Number',
+      'PI',
+      'Institution',
+      'PD',
+      'CA',
+      'IMPAC II Status',
+      'Project Title',
+      'DOC',
+      'NCAB',
+      'NOFO',
+      'NOSI',
+      'Pctl',
+      'PriScr',
+      'PrevScr',
+      'PI Req. Total',
+      'Exists in List',
+      'ESI'
+    ]);
+    expect(columns[5].data).toBe('cancerActivity');
+    expect(columns[6].data).toBe('impacStatusDescrip');
+
+    const exportButton = component.dtOptions.buttons.find((button: any) => button.extend === 'excel');
+    expect(exportButton.exportOptions.columns).toEqual(Array.from({ length: 17 }, (_, index) => index + 1));
+  });
+
   describe('row checkbox: disabled state + tooltip (isRowSelectable / rowCallback)', () => {
     it('a grant with checkboxDisabled=true is not selectable', () => {
       expect((component as any).isRowSelectable({ applId: 1, checkboxDisabled: true })).toBeFalse();
