@@ -11,6 +11,8 @@ import { DataTableDirective } from 'angular-datatables';
 import { FullGrantNumberCellRendererComponent } from '../../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { logger } from 'codelyzer/util/logger';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
+import { AppUserSessionService } from '../../../service/app-user-session.service';
+import { roleNames } from '../../../service/role-names';
 
 
 declare var $: any;
@@ -52,13 +54,16 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
   canSave = false;
   saveSuccessMessage = '';
+  docFundingListCor = false;
+  OEFIACertifier = false;
   private lastSavedRows: any[] = [];
   private pendingRealignFrame: number | null = null;
 
   get hasAnyBulkFieldValue(): boolean {
     const f = this.bulkFields;
     return !!(f.budgetCategories || f.docDecision || f.docNciSelection ||
-              f.annualFundingR01 || f.annualOrMyf || f.docNotes || f.oefiaNotes);
+              f.annualFundingR01 || f.annualOrMyf || f.docNotes ||
+              (this.canEditOefiaNotes() && f.oefiaNotes));
   }
 
   // Populated from the shared FundingSubmDropdownLookupService (2026-08-24 Individual/Bulk Edit
@@ -77,13 +82,16 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     private fundingSubmissionsService: FundingSubmissionsService,
     private propertiesService: AppPropertiesService,
     private modalService: NgbModal,
-    private dropdownLookupService: FundingSubmDropdownLookupService
+    private dropdownLookupService: FundingSubmDropdownLookupService,
+    private userSessionService: AppUserSessionService
   ) {}
 
   ngOnInit(): void {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.eGrantsUrl     = this.propertiesService.getProperty('EGRANTS_URL');
     this.i2eURL         = this.propertiesService.getProperty('I2EWEB_URL').trim();
+    this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+    this.OEFIACertifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
     this.fetchDropdownOptions();
     const state = history.state;
     this.listId = state?.listId ?? 0;
@@ -289,11 +297,40 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!saved) {
       return true;
     }
-    return BulkEditComponent.PERSISTED_FIELDS.some(field => row[field] !== saved[field]);
+    return BulkEditComponent.PERSISTED_FIELDS.some(field => {
+      if (field === 'oefiaNotes' && !this.canEditOefiaNotes()) {
+        return false;
+      }
+      return row[field] !== saved[field];
+    });
   }
 
   private recomputeCanSave(): void {
     this.canSave = this.rows.some(row => this.isRowDirty(row));
+  }
+
+  private isDocOnlyUser(): boolean {
+    return this.docFundingListCor && !this.OEFIACertifier;
+  }
+
+  canEditOefiaNotes(): boolean {
+    return !this.isDocOnlyUser() && this.OEFIACertifier;
+  }
+
+  private getLastSavedRow(row: any): any {
+    return this.lastSavedRows.find(r => r.applId === row.applId);
+  }
+
+  private restoreReadOnlyOefiaNotes(): void {
+    if (this.canEditOefiaNotes()) {
+      return;
+    }
+    for (const row of this.rows) {
+      const saved = this.getLastSavedRow(row);
+      if (saved) {
+        row.oefiaNotes = saved.oefiaNotes;
+      }
+    }
   }
 
   // Called from the per-row DataTable cell renderers (bulk-edit.component.html) whenever a
@@ -301,6 +338,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   // shared "Apply Changes" flow. Recomputes dirty state instead of latching true so
   // initialization/binding emissions with no actual value change leave Save disabled (FS-2277).
   onRowFieldChange(): void {
+    this.restoreReadOnlyOefiaNotes();
     this.recomputeCanSave();
   }
 
@@ -313,8 +351,9 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       if (f.annualFundingR01) row.annualFundingR01  = f.annualFundingR01;
       if (f.annualOrMyf)      row.annualOrMyf      = f.annualOrMyf;
       if (f.docNotes)         row.docNotes         = f.docNotes;
-      if (f.oefiaNotes)       row.oefiaNotes       = f.oefiaNotes;
+      if (this.canEditOefiaNotes() && f.oefiaNotes) row.oefiaNotes = f.oefiaNotes;
     }
+    this.restoreReadOnlyOefiaNotes();
     // Apply Changes only enables Save when it actually changed at least one row's persisted
     // value; it must not leave a stale canSave=true when the shared values matched every row.
     this.recomputeCanSave();
@@ -331,6 +370,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onSave(): void {
     if (!this.rows.length || !this.canSave) return;
+    this.restoreReadOnlyOefiaNotes();
     const calls = this.rows.map(row =>
       this.fundingSubmissionsService.bulkUpdateListGrants(
         {

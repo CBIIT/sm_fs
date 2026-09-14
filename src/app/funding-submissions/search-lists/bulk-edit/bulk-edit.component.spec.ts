@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, forwardRef, Input, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
@@ -10,6 +10,29 @@ import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 
 import { BulkEditComponent } from './bulk-edit.component';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
+import { AppUserSessionService } from '../../../service/app-user-session.service';
+import { roleNames } from '../../../service/role-names';
+
+@Component({
+  selector: 'ng-select2',
+  template: '',
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => FakeNgSelect2Component),
+    multi: true
+  }]
+})
+class FakeNgSelect2Component implements ControlValueAccessor {
+  @Input() id = '';
+  @Input() data: any[] = [];
+  @Input() allowClear = false;
+  @Input() width = '';
+
+  writeValue(_value: any): void {}
+  registerOnChange(_fn: any): void {}
+  registerOnTouched(_fn: any): void {}
+  setDisabledState(_isDisabled: boolean): void {}
+}
 
 // Bulk Edit Budget Categories CODE-vs-NAME Mismatch fix (2026-08-25): the per-row
 // `budgetCategories` field on `this.rows` must be seeded from the grant's `budgetCategoryCode`
@@ -23,6 +46,7 @@ describe('BulkEditComponent', () => {
   let component: BulkEditComponent;
   let fixture: ComponentFixture<BulkEditComponent>;
   let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsService>;
+  let userSessionServiceSpy: jasmine.SpyObj<AppUserSessionService>;
 
   function grant(overrides: Partial<any> = {}): any {
     return {
@@ -53,6 +77,8 @@ describe('BulkEditComponent', () => {
     fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
       'bulkUpdateListGrants'
     ]);
+    userSessionServiceSpy = jasmine.createSpyObj('AppUserSessionService', ['hasRole']);
+    userSessionServiceSpy.hasRole.and.returnValue(false);
 
     const dropdownLookupServiceSpy = jasmine.createSpyObj('FundingSubmDropdownLookupService', [
       'getDocDecisions', 'getDocNciSelections', 'getAnnualFundingR01Options',
@@ -71,7 +97,7 @@ describe('BulkEditComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [BulkEditComponent],
+      declarations: [BulkEditComponent, FakeNgSelect2Component],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
@@ -80,7 +106,8 @@ describe('BulkEditComponent', () => {
         { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: NgbModal, useValue: jasmine.createSpyObj('NgbModal', ['open']) },
-        { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy }
+        { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy },
+        { provide: AppUserSessionService, useValue: userSessionServiceSpy }
       ]
     }).compileComponents();
 
@@ -91,6 +118,18 @@ describe('BulkEditComponent', () => {
   function seedHistoryStateAndInit(grants: any[]): void {
     spyOnProperty(history, 'state', 'get').and.returnValue({ listId: 1, selectionDate: '', grants });
     component.ngOnInit();
+  }
+
+  function setRoles(docFundingListCor: boolean, oefiaCertifier: boolean): void {
+    userSessionServiceSpy.hasRole.and.callFake((role: string) => {
+      if (role === roleNames.DOC_FUNDING_LIST_COR) {
+        return docFundingListCor;
+      }
+      if (role === roleNames.OEFIA_CERTIFIER) {
+        return oefiaCertifier;
+      }
+      return false;
+    });
   }
 
   it('seeds the per-row budgetCategories field from the grant\'s budgetCategoryCode (CODE), not the NAME-valued budgetCategories', () => {
@@ -287,6 +326,153 @@ describe('BulkEditComponent', () => {
 
       expect(modalService.open).toHaveBeenCalled();
       expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('FS-2108 — DOC Bulk Edit OEFIA Notes read-only behavior', () => {
+    it('ngOnInit() reads DOC and OEFIA roles and treats DOC-only users as unable to edit OEFIA Notes', () => {
+      setRoles(true, false);
+
+      seedHistoryStateAndInit([grant()]);
+
+      expect(userSessionServiceSpy.hasRole).toHaveBeenCalledWith(roleNames.DOC_FUNDING_LIST_COR);
+      expect(userSessionServiceSpy.hasRole).toHaveBeenCalledWith(roleNames.OEFIA_CERTIFIER);
+      expect(component.docFundingListCor).toBeTrue();
+      expect(component.OEFIACertifier).toBeFalse();
+      expect(component.canEditOefiaNotes()).toBeFalse();
+    });
+
+    it('does not grant OEFIA Notes edit capability to unexpected non-DOC/non-OEFIA users', () => {
+      setRoles(false, false);
+
+      seedHistoryStateAndInit([grant()]);
+
+      expect(component.canEditOefiaNotes()).toBeFalse();
+    });
+
+    it('DOC-only: shared OEFIA Notes does not count as an applicable bulk value', () => {
+      setRoles(true, false);
+      seedHistoryStateAndInit([grant()]);
+
+      component.bulkFields = { oefiaNotes: 'tampered shared OEFIA note' };
+
+      expect(component.hasAnyBulkFieldValue).toBeFalse();
+    });
+
+    it('DOC-only: onApplyChanges() ignores tampered shared OEFIA Notes and keeps Save disabled', () => {
+      setRoles(true, false);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+
+      component.bulkFields = { oefiaNotes: 'tampered shared OEFIA note' };
+      component.onApplyChanges();
+
+      expect(component.rows[0].oefiaNotes).toBe('original OEFIA note');
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('DOC-only: direct row OEFIA Notes tampering does not make the row dirty', () => {
+      setRoles(true, false);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+
+      component.rows[0].oefiaNotes = 'tampered row OEFIA note';
+      component.onRowFieldChange();
+
+      expect(component.rows[0].oefiaNotes).toBe('original OEFIA note');
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('DOC-only: saving another legitimate DOC edit preserves the original OEFIA Notes payload value', () => {
+      setRoles(true, false);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.rows[0].oefiaNotes = 'tampered row OEFIA note';
+      component.rows[0].docNotes = 'legitimate DOC edit';
+      component.onRowFieldChange();
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.docNotes).toBe('legitimate DOC edit');
+      expect(payload.fields.oefiaNotes).toBe('original OEFIA note');
+    });
+
+    it('DOC-only: multiple-row save preserves each row\'s own original OEFIA Notes payload value', () => {
+      setRoles(true, false);
+      seedHistoryStateAndInit([
+        grant({ applId: 100, oefiaNotes: 'first original OEFIA note' }),
+        grant({ applId: 200, oefiaNotes: 'second original OEFIA note' })
+      ]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.rows[0].oefiaNotes = 'first tampered OEFIA note';
+      component.rows[1].oefiaNotes = 'second tampered OEFIA note';
+      component.rows[0].docNotes = 'legitimate DOC edit';
+      component.onRowFieldChange();
+      component.onSave();
+
+      const firstPayload = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.argsFor(0)[0];
+      const secondPayload = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.argsFor(1)[0];
+      expect(firstPayload.fields.oefiaNotes).toBe('first original OEFIA note');
+      expect(secondPayload.fields.oefiaNotes).toBe('second original OEFIA note');
+    });
+
+    it('OEFIA-capable: shared OEFIA Notes can be applied and enables Save', () => {
+      setRoles(false, true);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+
+      component.bulkFields = { oefiaNotes: 'shared OEFIA note' };
+      component.onApplyChanges();
+
+      expect(component.hasAnyBulkFieldValue).toBeTrue();
+      expect(component.rows[0].oefiaNotes).toBe('shared OEFIA note');
+      expect(component.canSave).toBeTrue();
+    });
+
+    it('OEFIA-capable: direct per-row OEFIA Notes edit enables Save and reverting disables Save', () => {
+      setRoles(false, true);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+
+      component.rows[0].oefiaNotes = 'changed OEFIA note';
+      component.onRowFieldChange();
+      expect(component.canSave).toBeTrue();
+
+      component.rows[0].oefiaNotes = 'original OEFIA note';
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('dual-role: OEFIA Notes remains editable and participates in dirty-state calculation', () => {
+      setRoles(true, true);
+      seedHistoryStateAndInit([grant({ oefiaNotes: 'original OEFIA note' })]);
+
+      expect(component.canEditOefiaNotes()).toBeTrue();
+
+      component.rows[0].oefiaNotes = 'dual-role OEFIA edit';
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeTrue();
+    });
+
+    it('DOC-only: shared OEFIA Notes is not rendered as an editable textarea', () => {
+      setRoles(true, false);
+      spyOnProperty(history, 'state', 'get').and.returnValue({ listId: 1, selectionDate: '', grants: [grant()] });
+
+      fixture.detectChanges();
+
+      const bulkOefiaTextarea = fixture.nativeElement.querySelector('textarea[name="bulkOefiaNotes"]');
+      expect(bulkOefiaTextarea).toBeNull();
+      expect(fixture.nativeElement.textContent).toContain('View only');
+    });
+
+    it('OEFIA-capable: shared OEFIA Notes is rendered as an editable textarea', () => {
+      setRoles(false, true);
+      spyOnProperty(history, 'state', 'get').and.returnValue({ listId: 1, selectionDate: '', grants: [grant()] });
+
+      fixture.detectChanges();
+
+      const bulkOefiaTextarea = fixture.nativeElement.querySelector('textarea[name="bulkOefiaNotes"]');
+      expect(bulkOefiaTextarea).not.toBeNull();
     });
   });
 });
