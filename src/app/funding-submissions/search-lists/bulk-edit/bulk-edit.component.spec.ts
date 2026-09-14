@@ -267,6 +267,19 @@ describe('BulkEditComponent', () => {
       expect(component.canSave).toBeFalse();
     });
 
+    it('onReset() clears any displayed save success message', () => {
+      seedHistoryStateAndInit([grant({ docNotes: 'original note' })]);
+
+      component.saveSuccessMessage = 'Success! Bulk changes have been applied';
+      component.rows[0].docNotes = 'changed note';
+      component.onRowFieldChange();
+
+      component.onReset();
+
+      expect(component.saveSuccessMessage).toBe('');
+      expect(component.canSave).toBeFalse();
+    });
+
     it('after a successful save, Save disables, lastSavedRows refreshes, and a subsequent no-op onRowFieldChange() keeps Save disabled', () => {
       seedHistoryStateAndInit([grant({ docNotes: 'original note' })]);
       fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));

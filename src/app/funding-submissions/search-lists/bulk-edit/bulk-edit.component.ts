@@ -365,6 +365,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.bulkFields = {};
     this.rows = JSON.parse(JSON.stringify(this.lastSavedRows));
     this.canSave = false;
+    this.saveSuccessMessage = '';
     this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
   }
 
