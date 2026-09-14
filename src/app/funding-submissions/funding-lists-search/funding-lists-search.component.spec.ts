@@ -4,6 +4,7 @@ import { LoaderService } from '@cbiit/i2ecui-lib';
 import { HttpClient } from '@angular/common/http';
 
 import { FundingListsSearchComponent } from './funding-lists-search.component';
+import { roleNames } from '../../service/role-names';
 
 describe('FundingListsSearchComponent.formatLastActionDate (FS-2163)', () => {
   function instantiateComponent(): FundingListsSearchComponent {
@@ -11,10 +12,11 @@ describe('FundingListsSearchComponent.formatLastActionDate (FS-2163)', () => {
       jasmine.createSpyObj('Router', ['navigate']),
       jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
       jasmine.createSpyObj('HttpClient', ['post']),
-      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes']),
+      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount']),
       { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
       jasmine.createSpyObj('LoaderService', ['show', 'hide']),
-      jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState'])
+      jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
+      jasmine.createSpyObj('AppUserSessionService', ['hasRole'])
     );
   }
   it('returns empty string for falsy input', () => {
@@ -53,10 +55,11 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
       jasmine.createSpyObj('Router', ['navigate']),
       loggerSpy,
       httpSpy,
-      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes']),
+      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount']),
       { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
       loaderServiceSpy,
-      jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState'])
+      jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
+      jasmine.createSpyObj('AppUserSessionService', ['hasRole'])
     );
   });
 
@@ -157,5 +160,110 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     expect(loaderServiceSpy.show).toHaveBeenCalled();
     expect(loaderServiceSpy.hide).toHaveBeenCalled();
     expect(loggerSpy.error).toHaveBeenCalledWith('List search export failed', error);
+  });
+
+  it('sends only pendingReviewOnly for the Pending Review quick filter', () => {
+    const searchLists = jasmine.createSpy('searchLists').and.returnValue(of({ recordsTotal: 1, recordsFiltered: 1, data: [] }));
+    (component as any).fundingSubmissionsService = { searchLists };
+    component.pendingReviewCount = 1;
+
+    component.onPendingReviewClick();
+    component.ajaxCall(component, {
+      draw: 1,
+      columns: [],
+      order: [],
+      start: 0,
+      length: 10,
+      search: { value: '', regex: false }
+    }, () => { /* noop */ });
+
+    const body = searchLists.calls.mostRecent().args[0] as any;
+    expect(body.pendingReviewOnly).toBeTrue();
+    expect(body.listStatus).toBeUndefined();
+    expect(component.selectedListStatus).toBeNull();
+  });
+
+  it('includes pendingReviewOnly in export criteria for pending-review results', () => {
+    const searchLists = jasmine.createSpy('searchLists').and.returnValue(of({ recordsTotal: 1, recordsFiltered: 1, data: [] }));
+    (component as any).fundingSubmissionsService = { searchLists };
+    component.pendingReviewCount = 1;
+    component.onPendingReviewClick();
+    httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+    spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+    spyOn(document, 'createElement').and.returnValue({ click: () => {}, download: '', href: '' } as any);
+
+    component.exportListSearchResults();
+
+    expect(httpSpy.post.calls.mostRecent().args[1].pendingReviewOnly).toBeTrue();
+    expect(httpSpy.post.calls.mostRecent().args[1].listStatus).toBeUndefined();
+  });
+
+  it('deactivates pending review before building a normal filter search', () => {
+    (component as any).filterForm = {
+      invalid: false,
+      form: {
+        value: { grantNumber: {}, fyRange: {} }
+      }
+    };
+    component.selectedListStatus = 'Active';
+    (component as any).pendingReviewOnly = true;
+
+    component.search();
+
+    expect((component as any).searchCriteria.pendingReviewOnly).toBeUndefined();
+    expect((component as any).searchCriteria.listStatus).toEqual(['Active']);
+  });
+
+  it('clears pending review state and criteria on reset', async () => {
+    (component as any).pendingReviewOnly = true;
+    (component as any).searchCriteria = { pendingReviewOnly: true };
+
+    component.reset();
+    await Promise.resolve();
+
+    expect((component as any).pendingReviewOnly).toBeFalse();
+    expect((component as any).searchCriteria).toEqual({});
+  });
+
+  it('defaults a DOC user with pending reviews exactly once when initialization is ready', () => {
+    const userSession = (component as any).userSessionService;
+    userSession.hasRole.and.callFake((role: string) => role === roleNames.DOC_FUNDING_LIST_COR);
+    component.pendingReviewCount = 2;
+    (component as any).pendingReviewCountLoaded = true;
+    (component as any).searchListsInitialized = true;
+
+    (component as any).applyDefaultPendingReviewIfReady();
+    (component as any).applyDefaultPendingReviewIfReady();
+
+    expect((component as any).searchCriteria).toEqual({ pendingReviewOnly: true });
+    expect(component.showResults).toBeTrue();
+    expect((component as any).defaultPendingReviewApplied).toBeTrue();
+  });
+
+  it('does not default a non-DOC user or a user with saved state', () => {
+    const userSession = (component as any).userSessionService;
+    userSession.hasRole.and.returnValue(false);
+    component.pendingReviewCount = 2;
+    (component as any).pendingReviewCountLoaded = true;
+    (component as any).searchListsInitialized = true;
+    (component as any).applyDefaultPendingReviewIfReady();
+    expect(component.showResults).toBeFalse();
+
+    userSession.hasRole.and.returnValue(true);
+    (component as any).hasSavedSearchListsState = true;
+    (component as any).applyDefaultPendingReviewIfReady();
+    expect(component.showResults).toBeFalse();
+  });
+
+  it('does not send a nihNetworkId for ordinary pending-review searches', () => {
+    const searchLists = jasmine.createSpy('searchLists').and.returnValue(of({ recordsTotal: 0, recordsFiltered: 0, data: [] }));
+    (component as any).fundingSubmissionsService = { searchLists };
+    component.pendingReviewCount = 1;
+    component.onPendingReviewClick();
+    component.ajaxCall(component, {
+      draw: 1, columns: [], order: [], start: 0, length: 10, search: { value: '', regex: false }
+    }, () => { /* noop */ });
+
+    expect(searchLists.calls.mostRecent().args[0].nihNetworkId).toBeUndefined();
   });
 });

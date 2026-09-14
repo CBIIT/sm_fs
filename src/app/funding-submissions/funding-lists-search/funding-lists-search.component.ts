@@ -18,6 +18,8 @@ import {
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { FundingSubmissionsStateService } from '../funding-submissions-state.service';
+import { AppUserSessionService } from '../../service/app-user-session.service';
+import { roleNames } from '../../service/role-names';
 
 declare var $: any;
 
@@ -38,6 +40,11 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   selectedListStatus: string = null;
   selectedSelectionDate: string = null;
   listIdFilter: string = null;
+  private pendingReviewOnly = false;
+  private pendingReviewCountLoaded = false;
+  private searchListsInitialized = false;
+  private hasSavedSearchListsState = false;
+  private defaultPendingReviewApplied = false;
 
   selectionDateOptions: Select2OptionData[] = [];
   listIdOptions: Select2OptionData[] = [];
@@ -85,7 +92,8 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     private fundingSubmissionsService: FundingSubmissionsService,
     private libPdCaIntegratorService: LibPdCaIntegratorService,
     private loaderService: LoaderService,
-    private stateService: FundingSubmissionsStateService
+    private stateService: FundingSubmissionsStateService,
+    private userSessionService: AppUserSessionService
   ) {}
 
   ngOnInit(): void {
@@ -116,7 +124,11 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       error: (err) => this.logger.error('Failed to load list status codes', err)
     });
     this.fundingSubmissionsService.getPendingReviewListCount().subscribe({
-      next: (count) => this.pendingReviewCount = count ?? 0,
+      next: (count) => {
+        this.pendingReviewCount = count ?? 0;
+        this.pendingReviewCountLoaded = true;
+        this.applyDefaultPendingReviewIfReady();
+      },
       error: (err) => this.logger.error('Failed to load pending review count', err)
     });
   }
@@ -128,15 +140,26 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       this.reset();
     }
     const saved = this.stateService.getSearchListsState();
+    this.hasSavedSearchListsState = !freshNavigation && !!saved;
     if (!freshNavigation && saved) {
       setTimeout(() => {
         this.selectedDocs = saved.selectedDocs;
-        this.selectedListStatus = saved.selectedListStatus;
+        const savedCriteria = saved.searchCriteria || {};
+        const stalePendingStatus = saved.selectedListStatus === 'Pending Review'
+          || savedCriteria.listStatus?.includes('Pending Review');
+        this.selectedListStatus = stalePendingStatus ? null : saved.selectedListStatus;
         this.selectedSelectionDate = saved.selectedSelectionDate;
         this.listIdFilter = saved.listIdFilter;
         this.filterForm?.form.patchValue(saved.formValue);
         if (saved.showResults) {
-          this.searchCriteria = saved.searchCriteria;
+          const { nihNetworkId: _nihNetworkId, ...criteria } = savedCriteria;
+          this.pendingReviewOnly = stalePendingStatus || criteria.pendingReviewOnly === true;
+          if (stalePendingStatus && criteria.listStatus?.includes('Pending Review')) {
+            criteria.listStatus = criteria.listStatus.filter(status => status !== 'Pending Review');
+          }
+          this.searchCriteria = this.pendingReviewOnly
+            ? { ...criteria, pendingReviewOnly: true }
+            : criteria;
           this.showResults = true;
           this.triggerTableInit();
         }
@@ -240,6 +263,28 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
         }, 0);
       },
     };
+    this.searchListsInitialized = true;
+    this.applyDefaultPendingReviewIfReady();
+  }
+
+  private applyDefaultPendingReviewIfReady(): void {
+    if (
+      !this.searchListsInitialized
+      || !this.pendingReviewCountLoaded
+      || this.defaultPendingReviewApplied
+      || this.hasSavedSearchListsState
+      || !this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR)
+      || this.pendingReviewCount <= 0
+    ) {
+      return;
+    }
+
+    this.defaultPendingReviewApplied = true;
+    this.pendingReviewOnly = true;
+    this.selectedListStatus = null;
+    this.searchCriteria = { pendingReviewOnly: true };
+    this.showResults = true;
+    this.triggerTableInit();
   }
 
   ajaxCall($this: FundingListsSearchComponent, dataTablesParameters: any, callback: any): void {
@@ -317,6 +362,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       return;
     }
 
+    this.pendingReviewOnly = false;
     const formValue = this.filterForm?.form.value || {};
     const grantNumber = formValue.grantNumber || {};
     const fyRange = formValue.fyRange || {};
@@ -350,8 +396,20 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   }
 
   onPendingReviewClick(): void {
-    this.selectedListStatus = 'Pending Review';
-    this.search();
+    if (this.pendingReviewCount <= 0) {
+      return;
+    }
+
+    this.pendingReviewOnly = true;
+    this.selectedListStatus = null;
+    this.searchCriteria = { pendingReviewOnly: true };
+    this.throttle.reset();
+    if (this.showResults) {
+      this.dtElement?.dtInstance?.then(dt => dt.ajax.reload()).catch(() => this.triggerTableInit());
+    } else {
+      this.showResults = true;
+      this.triggerTableInit();
+    }
   }
 
   onDocSelected(docs: string[]): void {
@@ -385,6 +443,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       this.selectedListStatus = null;
       this.selectedSelectionDate = null;
       this.listIdFilter = null as any;
+      this.pendingReviewOnly = false;
       this.searchCriteria = {};
       this.throttle.reset();
       this.showResults = false;

@@ -4,7 +4,7 @@
 
 <!-- Pending Review quick-filter badge -->
 <div class="row my-4 ms-3">
-    <button type="button" class="btn btn-secondary btn-lg" (click)="onPendingReviewClick()">
+    <button type="button" class="btn btn-secondary btn-lg" [disabled]="pendingReviewCount === 0" (click)="onPendingReviewClick()">
       <span class="badge bg-dark me-1">{{ pendingReviewCount }}</span> Pending Review 
     </button>
   </div> 
