@@ -105,7 +105,8 @@
       </div>
       <div class="col-6">
         <label class="form-label fw-semibold">OEFIA Notes</label>
-        <div *ngIf="!canEditOefiaNotes()" class="form-control bg-light text-muted">View only</div>
+        <textarea *ngIf="!canEditOefiaNotes()" class="form-control bg-light" rows="4"
+          aria-label="OEFIA Notes" readonly></textarea>
         <div *ngIf="canEditOefiaNotes()">
           <textarea
             class="form-control"

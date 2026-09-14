@@ -454,15 +454,19 @@ describe('BulkEditComponent', () => {
       expect(component.canSave).toBeTrue();
     });
 
-    it('DOC-only: shared OEFIA Notes is not rendered as an editable textarea', () => {
+    it('DOC-only: shared OEFIA Notes is rendered as an empty read-only textarea', () => {
       setRoles(true, false);
       spyOnProperty(history, 'state', 'get').and.returnValue({ listId: 1, selectionDate: '', grants: [grant()] });
 
       fixture.detectChanges();
 
       const bulkOefiaTextarea = fixture.nativeElement.querySelector('textarea[name="bulkOefiaNotes"]');
+      const readOnlyOefiaTextarea = fixture.nativeElement.querySelector('textarea[aria-label="OEFIA Notes"]');
       expect(bulkOefiaTextarea).toBeNull();
-      expect(fixture.nativeElement.textContent).toContain('View only');
+      expect(readOnlyOefiaTextarea).not.toBeNull();
+      expect(readOnlyOefiaTextarea.readOnly).toBeTrue();
+      expect(readOnlyOefiaTextarea.value).toBe('');
+      expect(fixture.nativeElement.textContent).not.toContain('View only');
     });
 
     it('OEFIA-capable: shared OEFIA Notes is rendered as an editable textarea', () => {
