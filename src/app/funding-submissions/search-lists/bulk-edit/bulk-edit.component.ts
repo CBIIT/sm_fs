@@ -275,11 +275,33 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  // Exact persisted payload fields sent to bulkUpdateListGrants() (FS-2277). Save enablement is
+  // derived from whether any of these fields differs from the last-saved snapshot, rather than
+  // from a one-way "something changed" event latch, so initial-render/binding emissions that
+  // fire without an actual value change do not enable Save.
+  private static readonly PERSISTED_FIELDS: string[] = [
+    'budgetCategories', 'docDecision', 'docNciSelection', 'annualFundingR01', 'annualOrMyf',
+    'docNotes', 'oefiaNotes', 'docPriority', 'docRecAmt', 'docRecReductionPct', 'recused'
+  ];
+
+  private isRowDirty(row: any): boolean {
+    const saved = this.lastSavedRows.find(r => r.applId === row.applId);
+    if (!saved) {
+      return true;
+    }
+    return BulkEditComponent.PERSISTED_FIELDS.some(field => row[field] !== saved[field]);
+  }
+
+  private recomputeCanSave(): void {
+    this.canSave = this.rows.some(row => this.isRowDirty(row));
+  }
+
   // Called from the per-row DataTable cell renderers (bulk-edit.component.html) whenever a
   // grant row's field is edited directly, so "Save" enables even without going through the
-  // shared "Apply Changes" flow.
+  // shared "Apply Changes" flow. Recomputes dirty state instead of latching true so
+  // initialization/binding emissions with no actual value change leave Save disabled (FS-2277).
   onRowFieldChange(): void {
-    this.canSave = true;
+    this.recomputeCanSave();
   }
 
   onApplyChanges(): void {
@@ -293,7 +315,9 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       if (f.docNotes)         row.docNotes         = f.docNotes;
       if (f.oefiaNotes)       row.oefiaNotes       = f.oefiaNotes;
     }
-    this.canSave = true;
+    // Apply Changes only enables Save when it actually changed at least one row's persisted
+    // value; it must not leave a stale canSave=true when the shared values matched every row.
+    this.recomputeCanSave();
     this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
   }
 
@@ -306,7 +330,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSave(): void {
-    if (!this.rows.length) return;
+    if (!this.rows.length || !this.canSave) return;
     const calls = this.rows.map(row =>
       this.fundingSubmissionsService.bulkUpdateListGrants(
         {

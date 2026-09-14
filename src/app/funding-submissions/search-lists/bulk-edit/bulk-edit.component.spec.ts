@@ -106,12 +106,16 @@ describe('BulkEditComponent', () => {
     expect(component.rows[0].budgetCategories).toBe('');
   });
 
-  it('sends a CODE-shaped budgetCategories value (not the free-text NAME) in an unedited row\'s save payload', () => {
+  it('sends a CODE-shaped budgetCategories value (not the free-text NAME) in a dirty row\'s save payload', () => {
     seedHistoryStateAndInit([grant()]);
     fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
 
-    // Unedited save: no dropdown touched by the operator, matching the exact silent-wipe
-    // scenario this fix protects against.
+    // FS-2277: onSave() now requires a real dirty row (canSave === true) before it will call
+    // bulkUpdateListGrants(); establish that via a genuine field edit + onRowFieldChange(),
+    // leaving budgetCategories untouched so this payload assertion still reflects the
+    // CODE-vs-NAME fix.
+    component.rows[0].docNotes = 'edited note';
+    component.onRowFieldChange();
     component.onSave();
 
     const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
@@ -135,6 +139,10 @@ describe('BulkEditComponent', () => {
     seedHistoryStateAndInit([grant()]);
     fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
 
+    // FS-2277: establish a real dirty row before onSave(), since the corrected no-op guard
+    // now blocks a clean/untouched save.
+    component.rows[0].docNotes = 'edited note';
+    component.onRowFieldChange();
     component.onSave();
 
     const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
@@ -152,6 +160,133 @@ describe('BulkEditComponent', () => {
 
     expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
       queryParams: { listId: 42, selectionDate: 'SEL-42', from: 'lists' }
+    });
+  });
+  describe('FS-2277 — Bulk Edit Save dirty-state derivation', () => {
+    it('initializes with selected grants and canSave === false', () => {
+      seedHistoryStateAndInit([grant()]);
+
+      expect(component.rows.length).toBe(1);
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('calling onRowFieldChange() without changing row data keeps canSave === false (covers initial render/binding emissions)', () => {
+      seedHistoryStateAndInit([grant()]);
+
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('a real row edit followed by onRowFieldChange() sets canSave === true', () => {
+      seedHistoryStateAndInit([grant()]);
+
+      component.rows[0].docNotes = 'a real edit';
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeTrue();
+    });
+
+    it('onSave() with canSave === false does not call bulkUpdateListGrants()', () => {
+      seedHistoryStateAndInit([grant()]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
+
+    it('onApplyChanges() with a shared value that changes at least one row sets canSave === true', () => {
+      seedHistoryStateAndInit([grant({ docNotes: '' })]);
+
+      component.bulkFields = { docNotes: 'shared note' };
+      component.onApplyChanges();
+
+      expect(component.rows[0].docNotes).toBe('shared note');
+      expect(component.canSave).toBeTrue();
+    });
+
+    it('onApplyChanges() with a shared value equal to every current row value keeps canSave === false', () => {
+      seedHistoryStateAndInit([grant({ docNotes: 'shared note' })]);
+
+      component.bulkFields = { docNotes: 'shared note' };
+      component.onApplyChanges();
+
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('edit-then-revert: restoring a row value to its snapshot disables Save again', () => {
+      seedHistoryStateAndInit([grant({ docNotes: 'original note' })]);
+
+      component.rows[0].docNotes = 'changed note';
+      component.onRowFieldChange();
+      expect(component.canSave).toBeTrue();
+
+      component.rows[0].docNotes = 'original note';
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('after a successful save, Save disables, lastSavedRows refreshes, and a subsequent no-op onRowFieldChange() keeps Save disabled', () => {
+      seedHistoryStateAndInit([grant({ docNotes: 'original note' })]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.rows[0].docNotes = 'updated note';
+      component.onRowFieldChange();
+      expect(component.canSave).toBeTrue();
+
+      component.onSave();
+
+      expect(component.canSave).toBeFalse();
+
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('payload preservation: a normal editable-field update still carries through docPriority, docRecAmt, docRecReductionPct, and recused unchanged', () => {
+      seedHistoryStateAndInit([grant({
+        docPriority: '3',
+        docRecommendedAmount: 500000,
+        docRecommendedReductionPct: 10,
+        recusedFlag: true
+      })]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.rows[0].docNotes = 'edited note';
+      component.onRowFieldChange();
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.docPriority).toBe('3');
+      expect(payload.fields.docRecAmt).toBe(500000);
+      expect(payload.fields.docRecReductionPct).toBe(10);
+      expect(payload.fields.recused).toBe('Y');
+    });
+
+    it('back-navigation: clean state navigates immediately without opening the unsaved-changes modal', () => {
+      seedHistoryStateAndInit([grant()]);
+      const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+      const router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+
+      component.onBackToListClick();
+
+      expect(modalService.open).not.toHaveBeenCalled();
+      expect(router.navigate).toHaveBeenCalled();
+    });
+
+    it('back-navigation: dirty state opens the unsaved-changes warning modal instead of navigating', () => {
+      seedHistoryStateAndInit([grant()]);
+      const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+      const router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+
+      component.rows[0].docNotes = 'edited note';
+      component.onRowFieldChange();
+      component.onBackToListClick();
+
+      expect(modalService.open).toHaveBeenCalled();
+      expect(router.navigate).not.toHaveBeenCalled();
     });
   });
 });
