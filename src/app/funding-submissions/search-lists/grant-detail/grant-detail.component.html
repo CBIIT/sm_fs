@@ -16,7 +16,7 @@
 
   <div class="row g-0 save-success-row" *ngIf="saveSuccessMessage.length > 0">
     <div class="col-12">
-      <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
+      <ngb-alert #saveSuccessAlert type="success" [dismissible]="true" tabindex="-1" (closed)="saveSuccessMessage = ''">
         <span><b>{{saveSuccessMessage}}</b></span>
       </ngb-alert>
     </div>

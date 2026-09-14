@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { FundingSubmBulkEditFieldsDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from '../../../service/app-user-session.service';
@@ -30,6 +30,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   // `editModeExited` (Cancel-flow no-op in the parent).
   @Output() saved = new EventEmitter<void>();
   @ViewChild('cancelEditWarningModal') private cancelEditWarningModalRef: TemplateRef<any>;
+  @ViewChild('saveSuccessAlert') private saveSuccessAlertRef?: ElementRef<HTMLElement>;
 
   isEditMode = false;
   grantViewerUrl = '';
@@ -285,9 +286,8 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       this.initialFormSnapshot = '';
       this.initialFundingSnapshot = '';
       this.initialJustificationText = '';
-      this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
+      this.showSaveSuccessMessage();
       this.saved.emit();
-      this.cdr.detectChanges();
       return;
     }
 
@@ -306,13 +306,12 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         if (hasJustificationChanges) {
           this.saveJustification(hasJustificationTextChange ? justificationText : undefined);
         } else {
-          this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
+          this.showSaveSuccessMessage();
           this.isEditMode = false;
           this.initialFormSnapshot = '';
           this.initialJustificationText = '';
           this.savingInProgress = false;
           this.saved.emit();
-          this.cdr.detectChanges();
         }
       },
       error: (err) => {
@@ -421,7 +420,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       next: () => {
         this.data.justificationText = normalizedJustificationText ?? '';
         this.refreshJustificationData(() => {
-          this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
+          this.showSaveSuccessMessage();
           this.isEditMode = false;
           this.initialFormSnapshot = '';
           this.initialFundingSnapshot = '';
@@ -430,7 +429,6 @@ export class GrantDetailComponent implements OnInit, OnChanges {
           this.justificationFile = null;
           this.justificationFileError = null;
           this.saved.emit();
-          this.cdr.detectChanges();
         });
       },
       error: (err) => {
@@ -446,6 +444,22 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   onNotesModelChange(): void {
     this.cdr.detectChanges();
+  }
+
+  private showSaveSuccessMessage(): void {
+    this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
+    this.cdr.detectChanges();
+    this.makeSaveSuccessMessageVisible();
+  }
+
+  private makeSaveSuccessMessageVisible(): void {
+    const saveSuccessAlert = this.saveSuccessAlertRef?.nativeElement;
+    if (!saveSuccessAlert) {
+      return;
+    }
+
+    saveSuccessAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    saveSuccessAlert.focus();
   }
 
   /**
