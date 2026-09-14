@@ -55,6 +55,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   justificationFile: File | null = null;
   justificationDocuments: DocumentsDto[] = [];
   justificationFileError: string | null = null;
+  justificationSaveError: string | null = null;
   saveSuccessMessage = '';
   docFundingListCor = false;
   OEFIACertifier = false;
@@ -178,6 +179,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     };
     this.justificationFile = null;
     this.justificationFileError = null;
+    this.justificationSaveError = null;
     this.saveSuccessMessage = '';
     this.clearValidationErrors();
     this.isEditMode = true;
@@ -222,6 +224,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   onFileChange(event: Event): void {
+    this.justificationSaveError = null;
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
 
@@ -260,6 +263,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   onSave(): void {
     this.suppressNextLeavePrompt = true;
+    this.justificationSaveError = null;
 
     // For DOC users this field is view-only; ignore any client-side model tampering.
     // OEFIA users can edit this field and their change must be preserved.
@@ -439,6 +443,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       this.listId, this.data.applId, this.justificationFile ?? undefined, normalizedJustificationText
     ).subscribe({
       next: () => {
+        this.justificationSaveError = null;
         this.data.justificationText = normalizedJustificationText ?? '';
         this.refreshJustificationData(() => {
           this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
@@ -455,9 +460,21 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       },
       error: (err) => {
         this.savingInProgress = false;
+        this.justificationSaveError = this.getJustificationSaveError(err);
         this.logger.error('Justification save error', err);
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  private getJustificationSaveError(error: any): string {
+    if (typeof error?.error === 'string' && error.error.trim()) {
+      return error.error;
+    }
+    return error?.error?.errorMessage
+      || error?.error?.message
+      || error?.message
+      || 'Unable to save the justification.';
   }
 
   isSaveInProgress(): boolean {
@@ -465,6 +482,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   onNotesModelChange(): void {
+    this.justificationSaveError = null;
     this.updateValidationErrorsLive();
     this.cdr.detectChanges();
   }
@@ -550,6 +568,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.formModel = {};
     this.justificationFile = null;
     this.justificationFileError = null;
+    this.justificationSaveError = null;
     this.saveSuccessMessage = '';
     this.clearValidationErrors();
     this.doNotPayOefiaLockActive = false;

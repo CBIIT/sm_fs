@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
-import { of, Subject } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
@@ -749,6 +749,33 @@ describe('GrantDetailComponent', () => {
 
       expect(fundingSubmissionsServiceSpy.saveJustificationForm)
         .toHaveBeenCalledWith(1, 100, jasmine.any(File), undefined);
+    });
+
+    it('displays the backend mixed-mode validation message near the justification controls', () => {
+      const message = 'Provide either justification text or justification files, not both.';
+      component.justificationLoaded = true;
+      component.onEdit();
+      component.formModel.justificationText = 'Entered text';
+      component.justificationFile = new File(['content'], 'justification.pdf', { type: 'application/pdf' });
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(throwError(() => ({
+        status: 400,
+        error: message
+      })));
+
+      component.onSave();
+      fixture.detectChanges();
+
+      expect(component.justificationSaveError).toBe(message);
+      expect(component.isSaveInProgress()).toBeFalse();
+      expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent.trim()).toBe(message);
+    });
+
+    it('clears a displayed justification save error when the user changes the justification input', () => {
+      component.justificationSaveError = 'Previous save error';
+
+      component.onNotesModelChange();
+
+      expect(component.justificationSaveError).toBeNull();
     });
 
     it('applyFormModelToData() resolves and writes both budgetCategories (NAME) and budgetCategoryCode (CODE)', () => {

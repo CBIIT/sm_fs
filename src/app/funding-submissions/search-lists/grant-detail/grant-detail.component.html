@@ -226,6 +226,9 @@
                   <span>Selected new file: {{justificationFile.name}}</span>
                 </div>
                 <div *ngIf="justificationFileError" class="small text-danger mb-1">{{justificationFileError}}</div>
+                <div *ngIf="justificationSaveError" class="small text-danger mb-1" role="alert">
+                  {{justificationSaveError}}
+                </div>
                 <textarea class="form-control form-control-sm" rows="2" placeholder="Or enter justification text here..."
                   name="justificationText" [(ngModel)]="formModel.justificationText" (ngModelChange)="onNotesModelChange()" maxlength="1000"
                   [disabled]="doNotPayOefiaLockActive"></textarea>
