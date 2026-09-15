@@ -7,7 +7,7 @@ import { finalize } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { Select2OptionData } from 'ng-select2';
-import { FundingSubmissionsService, FundingSubmissionListGrantDto, FundingSubmissionListGrantExportRequestDto } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService, FundingSubmissionListGrantDto, FundingSubmissionListGrantExportRequestDto, DocAggregateDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { openNewWindow } from '../../utils/utils';
@@ -251,7 +251,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.docRecommendedTotal = detail.totalDocRecAmt ?? 0;
         this.listStatus = detail.currentStatusDescrip;
         this.cachedGrants = detail.grants || [];
-        this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
+        this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants, detail.docs);
         this.listHistory = history;
         this.logger.debug('List detail:', detail);
         this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
@@ -260,7 +260,26 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private buildDocStatusColumns(grants: FundingSubmissionListGrantDto[]): any[][] {
+  // `docs` is the backend's per-DOC aggregate (already scoped server-side to the caller's
+  // DOC(s), or list-wide for OEFIA/FA). `docs === undefined` means the payload never included
+  // the field (e.g. an older cached response) — fall back to the legacy per-grant aggregation.
+  // `docs === []` is an explicit, present-but-empty result and must render an empty Review
+  // Status section, never a fallback to the grants-derived list.
+  private buildDocStatusColumns(grants: FundingSubmissionListGrantDto[], docs?: DocAggregateDto[]): any[][] {
+    if (docs === undefined) {
+      return this.buildDocStatusColumnsFromGrants(grants);
+    }
+    const items = docs.map(doc => ({
+      doc: doc.docAbbrev || doc.docName,
+      count: doc.grantCount,
+      status: this.normalizeDocStatus(doc.currentStatusDescrip)
+    }));
+    const nonDraftItem = items.find(item => item.status != null && item.status.toLowerCase() !== 'draft');
+    this.isCurrentStatusDraft = !nonDraftItem;
+    return this.chunkIntoColumns(items);
+  }
+
+  private buildDocStatusColumnsFromGrants(grants: FundingSubmissionListGrantDto[]): any[][] {
     const docMap = new Map<string, { doc: string; count: number; statusRank: number }>();
     for (const g of grants) {
       const doc = g.doc || '';
@@ -278,6 +297,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }));
     const nonDraftItem = items.find(item => item.status != null && item.status.toLowerCase() !== 'draft');
     this.isCurrentStatusDraft = !nonDraftItem;
+    return this.chunkIntoColumns(items);
+  }
+
+  private chunkIntoColumns(items: any[]): any[][] {
     const columns: any[][] = [];
     for (let i = 0; i < items.length; i += 4) {
       columns.push(items.slice(i, i + 4));
@@ -289,6 +312,17 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   // 4 statuses supported by the Review Status card.
   private normalizeGrantReviewStatus(reviewStatus: string | null | undefined): string {
     const normalized = (reviewStatus || '').trim().toLowerCase();
+    if (!normalized || normalized.includes('draft')) return 'Draft';
+    if (normalized.includes('oefia')) return 'OEFIA Review';
+    if (normalized.includes('director')) return 'NCI Director Review';
+    if (normalized.includes('doc')) return 'DOC Review';
+    return 'Draft';
+  }
+
+  // Normalizes backend per-DOC aggregate status text (docs[].currentStatusDescrip) to the same
+  // 4 statuses supported by the Review Status card.
+  private normalizeDocStatus(currentStatusDescrip: string | null | undefined): string {
+    const normalized = (currentStatusDescrip || '').trim().toLowerCase();
     if (!normalized || normalized.includes('draft')) return 'Draft';
     if (normalized.includes('oefia')) return 'OEFIA Review';
     if (normalized.includes('director')) return 'NCI Director Review';
