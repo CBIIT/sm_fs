@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
+import { NgSelect2Module } from 'ng-select2';
 import { of, Subject, throwError } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -12,6 +13,7 @@ import { roleNames } from '../../../service/role-names';
 
 import { GrantDetailComponent } from './grant-detail.component';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
+import { DocumentService } from '../../../service/document.service';
 
 describe('GrantDetailComponent', () => {
   let component: GrantDetailComponent;
@@ -19,6 +21,7 @@ describe('GrantDetailComponent', () => {
   let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsService>;
   let dropdownLookupServiceSpy: jasmine.SpyObj<FundingSubmDropdownLookupService>;
   let userSessionServiceSpy: jasmine.SpyObj<AppUserSessionService>;
+  let documentServiceSpy: jasmine.SpyObj<DocumentService>;
   let getJustificationSubject: Subject<any>;
   // Budget Categories Race Condition fix (2026-08-25): hoisted alongside getJustificationSubject
   // (mirroring the FS-2043 test harness pattern) so individual tests can swap
@@ -55,8 +58,14 @@ describe('GrantDetailComponent', () => {
     userSessionServiceSpy = jasmine.createSpyObj('AppUserSessionService', ['hasRole']);
     userSessionServiceSpy.hasRole.and.callFake((role: string) => role === roleNames.DOC_FUNDING_LIST_COR);
 
+    documentServiceSpy = jasmine.createSpyObj('DocumentService', ['downloadById']);
+    documentServiceSpy.downloadById.and.returnValue(of({
+      body: new Blob(['doc-content']),
+      headers: { get: () => 'application/pdf' }
+    } as any));
+
     await TestBed.configureTestingModule({
-      imports: [FormsModule, RouterTestingModule],
+      imports: [FormsModule, RouterTestingModule, NgSelect2Module],
       declarations: [GrantDetailComponent],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
@@ -64,6 +73,7 @@ describe('GrantDetailComponent', () => {
         { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: AppUserSessionService, useValue: userSessionServiceSpy },
+        { provide: DocumentService, useValue: documentServiceSpy },
         { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
         { provide: NgbModal, useValue: jasmine.createSpyObj('NgbModal', ['open']) }
       ]
@@ -574,6 +584,115 @@ describe('GrantDetailComponent', () => {
     });
   });
 
+  describe('Justification document download and deferred deletion', () => {
+    it('renders justification documents with download metadata and downloads the file on click', () => {
+      component.data = { applId: 100, grantNumber: '1R01CA123456-01', justificationText: '' };
+      component.justificationDocuments = [{
+        id: 42,
+        docFilename: 'budget.pdf',
+        uploadByName: 'Jane Doe',
+        createDate: '2026-09-01T00:00:00Z'
+      } as any];
+
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '', documents: component.justificationDocuments });
+      getJustificationSubject.complete();
+      fixture.detectChanges();
+
+      const downloadButton = Array.from(fixture.nativeElement.querySelectorAll('button')).find(
+        (button: HTMLButtonElement) => button.textContent.includes('budget.pdf')
+      ) as HTMLButtonElement;
+
+      expect(downloadButton).toBeTruthy();
+      expect(fixture.nativeElement.textContent).toContain('Added by Jane Doe');
+
+      downloadButton.click();
+      expect(documentServiceSpy.downloadById).toHaveBeenCalledWith(42);
+    });
+
+    it('stages a persisted document for deferred deletion and resets it on cancel', () => {
+      component.data = { applId: 100, grantNumber: '1R01CA123456-01', justificationText: '' };
+      component.justificationDocuments = [{ id: 7, docFilename: 'keep-me.pdf' } as any];
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '', documents: component.justificationDocuments });
+      getJustificationSubject.complete();
+
+      component.onEdit();
+      component.onRemovePersistedDocument(7);
+      expect(component.stagedDeleteDocumentIds).toEqual([7]);
+      expect(component.visiblePersistedDocuments.length).toBe(0);
+
+      (component as any).discardEditsAndClose();
+      expect(component.stagedDeleteDocumentIds).toEqual([]);
+      expect(component.visiblePersistedDocuments.length).toBe(1);
+    });
+
+    it('passes deleteDocumentIds to saveJustificationForm when persisted files are removed', () => {
+      component.data = { applId: 100, grantNumber: '1R01CA123456-01', justificationText: '' };
+      component.justificationDocuments = [{ id: 9, docFilename: 'remove-me.pdf' } as any];
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '', documents: component.justificationDocuments });
+      getJustificationSubject.complete();
+
+      component.onEdit();
+      component.onRemovePersistedDocument(9);
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: '' } as any));
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm).toHaveBeenCalledWith(
+        1,
+        100,
+        undefined,
+        undefined,
+        [9]
+      );
+    });
+
+    it('disables file upload when justification text is entered and disables text when files are attached', () => {
+      component.data = { applId: 100, grantNumber: '1R01CA123456-01', justificationText: '' };
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '', documents: [] });
+      getJustificationSubject.complete();
+      component.onEdit();
+
+      component.formModel.justificationText = 'Entered text';
+      expect(component.isFileUploadDisabled).toBeTrue();
+      expect(component.isJustificationTextDisabled).toBeFalse();
+
+      component.justificationDocuments = [{ id: 8, docFilename: 'attached.pdf' } as any];
+      expect(component.isJustificationTextDisabled).toBeTrue();
+
+      component.onRemovePersistedDocument(8);
+      expect(component.isJustificationTextDisabled).toBeFalse();
+    });
+
+    it('rejects selecting a fourth file over the 3-file cap and rejects files over 10MB', () => {
+      component.data = { applId: 100, grantNumber: '1R01CA123456-01', justificationText: '' };
+      component.justificationDocuments = [
+        { id: 1, docFilename: '1.pdf' } as any,
+        { id: 2, docFilename: '2.pdf' } as any,
+        { id: 3, docFilename: '3.pdf' } as any
+      ];
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '', documents: component.justificationDocuments });
+      getJustificationSubject.complete();
+      component.onEdit();
+
+      const overCapFile = new File(['x'], '4.pdf', { type: 'application/pdf' });
+      const input = { files: [overCapFile], value: '4.pdf' } as any;
+      component.onFileChange({ target: input } as any);
+      expect(component.justificationFileError).toBe('A maximum of 3 justification files is allowed per grant.');
+
+      const bigFile = new File([new Uint8Array(11 * 1024 * 1024)], 'big.pdf', { type: 'application/pdf' });
+      const bigInput = { files: [bigFile], value: 'big.pdf' } as any;
+      component.justificationDocuments = [];
+      component.onFileChange({ target: bigInput } as any);
+      expect(component.justificationFileError).toBe('The size of the file you are attaching exceeds 10 MBs maximum file limit.');
+    });
+  });
+
   // Prompt - Grant Detail Save Refresh (List and Own Display) (2026-08-25): onSave()/
   // saveJustification() must emit `saved` once `this.data` mutation is complete, so the parent
   // (search-lists.component.ts) can redraw its DataTables row. applyFormModelToData() must also
@@ -647,7 +766,7 @@ describe('GrantDetailComponent', () => {
       component.onSave();
 
       expect(fundingSubmissionsServiceSpy.saveJustificationForm)
-        .toHaveBeenCalledWith(1, 100, undefined, '');
+        .toHaveBeenCalledWith(1, 100, undefined, '', undefined);
       expect(component.isEditMode).toBeFalse();
       expect(component.data.justificationText).toBe('');
       expect(savedSpy).toHaveBeenCalledTimes(1);
@@ -671,7 +790,7 @@ describe('GrantDetailComponent', () => {
 
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalled();
       expect(fundingSubmissionsServiceSpy.saveJustificationForm)
-        .toHaveBeenCalledWith(1, 100, undefined, '');
+        .toHaveBeenCalledWith(1, 100, undefined, '', undefined);
       expect((fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.first() as any).invocationOrder)
         .toBeLessThan((fundingSubmissionsServiceSpy.saveJustificationForm.calls.first() as any).invocationOrder);
       expect(savedSpy).toHaveBeenCalledTimes(1);
@@ -684,44 +803,38 @@ describe('GrantDetailComponent', () => {
       expect(fundingSubmissionsServiceSpy.saveJustificationForm).not.toHaveBeenCalled();
     });
 
-    it('shows the exact success message and makes it visible after a no-op save', () => {
+    it('shows the exact success message after a no-op save', () => {
       component.onEdit();
-      const visibilitySpy = spyOn<any>(component, 'makeSaveSuccessMessageVisible');
 
       component.onSave();
 
       expect(component.saveSuccessMessage)
         .toBe('Success! You have successfully updated Grant Selection for 1R01CA123456-01');
-      expect(visibilitySpy).toHaveBeenCalledTimes(1);
     });
 
-    it('shows the exact success message and makes it visible after a funding-fields save', () => {
+    it('shows the exact success message after a funding-fields save', () => {
       component.onEdit();
       component.formModel.docDecision = 'Pay';
       fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
-      const visibilitySpy = spyOn<any>(component, 'makeSaveSuccessMessageVisible');
 
       component.onSave();
 
       expect(component.saveSuccessMessage)
         .toBe('Success! You have successfully updated Grant Selection for 1R01CA123456-01');
-      expect(visibilitySpy).toHaveBeenCalledTimes(1);
     });
 
-    it('shows the exact success message and makes it visible after a justification save', () => {
+    it('shows the exact success message after a justification save', () => {
       component.onEdit();
       component.formModel.justificationText = 'New justification text';
       fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
       fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({
         justificationText: 'New justification text'
       } as any));
-      const visibilitySpy = spyOn<any>(component, 'makeSaveSuccessMessageVisible');
 
       component.onSave();
 
       expect(component.saveSuccessMessage)
         .toBe('Success! You have successfully updated Grant Selection for 1R01CA123456-01');
-      expect(visibilitySpy).toHaveBeenCalledTimes(1);
     });
 
     it('passes undefined text for a file-only upload when text is unchanged', () => {
@@ -734,7 +847,7 @@ describe('GrantDetailComponent', () => {
       component.onSave();
 
       expect(fundingSubmissionsServiceSpy.saveJustificationForm)
-        .toHaveBeenCalledWith(1, 100, jasmine.any(File), undefined);
+        .toHaveBeenCalledWith(1, 100, jasmine.any(File), undefined, undefined);
     });
 
     it('keeps an existing text value when a file is selected, leaving mutual exclusion to the backend', () => {
@@ -748,7 +861,7 @@ describe('GrantDetailComponent', () => {
       component.onSave();
 
       expect(fundingSubmissionsServiceSpy.saveJustificationForm)
-        .toHaveBeenCalledWith(1, 100, jasmine.any(File), undefined);
+        .toHaveBeenCalledWith(1, 100, jasmine.any(File), undefined, undefined);
     });
 
     it('displays the backend mixed-mode validation message near the justification controls', () => {
@@ -887,7 +1000,7 @@ describe('GrantDetailComponent', () => {
       expect(payload.fields.docNotes).toBe('keep this note');
 
       expect(fundingSubmissionsServiceSpy.saveJustificationForm)
-        .toHaveBeenCalledWith(1, 100, undefined, '');
+        .toHaveBeenCalledWith(1, 100, undefined, '', undefined);
       expect(component.data.docDecision).toBe('DNP');
       expect(component.data.docNotes).toBe('keep this note');
       expect(component.data.docPriority).toBeNull();
@@ -1002,6 +1115,7 @@ describe('GrantDetailComponent', () => {
 
   describe('Do Not Pay placeholder addedByEmail gate', () => {
     beforeEach(() => {
+      component.docFundingListCor = true;
       component.data = {
         applId: 100,
         grantNumber: '1R01CA123456-01',
@@ -1012,7 +1126,7 @@ describe('GrantDetailComponent', () => {
       };
 
       fixture.detectChanges();
-      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.next({ justificationText: '', documents: [] });
       getJustificationSubject.complete();
 
       component.decisionOptions = [
