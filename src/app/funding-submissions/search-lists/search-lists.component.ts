@@ -50,7 +50,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private dragStartScrollLeft = 0;
   private readonly tablePageIntentSelector = '.dataTables_paginate .paginate_button, .dataTables_paginate .page-item, .dataTables_paginate a.page-link, .dt-paging-button';
   private readonly tableSortIntentSelector = 'thead th.sorting, thead th.sorting_asc, thead th.sorting_desc';
-  private readonly dragScrollIgnoreSelector = 'a, button, input, select, textarea, label, .select-checkbox, .toggle-details, .select2, .select2-container, .select2-selection, .select2-selection__rendered, .select2-selection__arrow';
+  private readonly dragScrollIgnoreSelector = 'a, button, input, select, textarea, label, .select-checkbox, .toggle-details, .select2, .select2-container, .select2-selection, .select2-selection__rendered, .select2-selection__arrow, th, thead, thead *, .dataTables_scrollHead *, .DTFC_LeftHeadWrapper *, .DTFC_RightHeadWrapper *';
 
   i2eURL = '';
   grantViewerUrl = '';

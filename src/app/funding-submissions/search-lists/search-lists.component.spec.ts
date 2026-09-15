@@ -699,6 +699,32 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
       host.remove();
     });
+
+    it('ignores pointer-down on sortable table header elements instead of starting drag-scroll (FS header sort fix)', () => {
+      const { host, scrollBody } = bindDragScrollFixture();
+      const scrollHead = document.createElement('div');
+      scrollHead.className = 'dataTables_scrollHead';
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      const th = document.createElement('th');
+      const sortSpan = document.createElement('span');
+      th.appendChild(sortSpan);
+      headerRow.appendChild(th);
+      thead.appendChild(headerRow);
+      scrollHead.appendChild(thead);
+      host.appendChild(scrollHead);
+
+      [thead, headerRow, th, sortSpan].forEach(target => {
+        (host as any).setPointerCapture.calls.reset();
+        const event = pointerDown(target);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(scrollBody.classList.contains('dragging')).toBeFalse();
+        expect((host as any).setPointerCapture).not.toHaveBeenCalled();
+      });
+
+      host.remove();
+    });
   });
 
   // Display CODE vs NAME Reconciliation (2026-08-25): docDecision's mock data currently defines
