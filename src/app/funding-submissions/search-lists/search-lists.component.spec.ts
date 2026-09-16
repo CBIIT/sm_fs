@@ -55,7 +55,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
   beforeEach(async () => {
     // The component's ngOnInit() touches the global jQuery/DataTables plugin object
     // ($.fn.DataTable.ext.pager.numbers_length) which isn't loaded in the Karma test env.
-    (window as any).$ = (window as any).$ || { fn: { DataTable: { ext: { pager: {} } } } };
+    (window as any).$ = { fn: { DataTable: { ext: { pager: {} } } } };
 
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     modalRefSpy = jasmine.createSpyObj('NgbModalRef', ['close', 'dismiss']);
