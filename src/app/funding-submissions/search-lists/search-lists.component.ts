@@ -616,7 +616,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26] }      
         }
       ],
-      order: [[15, 'desc']],
+      order: [[17, 'desc']],
       fixedColumns: { left: 1, right: 1 },
       initComplete: () => {
         this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
