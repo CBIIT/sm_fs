@@ -7,7 +7,7 @@ import { finalize } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { Select2OptionData } from 'ng-select2';
-import { FundingSubmissionsService, FundingSubmissionListGrantDto, FundingSubmissionListGrantExportRequestDto, DocAggregateDto } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService, FundingSubmissionListGrantDto, FundingSubmissionListGrantExportRequestDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { openNewWindow } from '../../utils/utils';
@@ -50,7 +50,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private dragStartScrollLeft = 0;
   private readonly tablePageIntentSelector = '.dataTables_paginate .paginate_button, .dataTables_paginate .page-item, .dataTables_paginate a.page-link, .dt-paging-button';
   private readonly tableSortIntentSelector = 'thead th.sorting, thead th.sorting_asc, thead th.sorting_desc';
-  private readonly dragScrollIgnoreSelector = 'a, button, input, select, textarea, label, .select-checkbox, .toggle-details, .select2, .select2-container, .select2-selection, .select2-selection__rendered, .select2-selection__arrow, th, thead, thead *, .dataTables_scrollHead *, .DTFC_LeftHeadWrapper *, .DTFC_RightHeadWrapper *';
+  private readonly dragScrollIgnoreSelector = 'a, button, input, select, textarea, label, thead, th, .dataTables_paginate, .dataTables_paginate *, .dt-paging-button, .select-checkbox, .toggle-details, .select2, .select2-container, .select2-selection, .select2-selection__rendered, .select2-selection__arrow';
 
   i2eURL = '';
   grantViewerUrl = '';
@@ -251,7 +251,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.docRecommendedTotal = detail.totalDocRecAmt ?? 0;
         this.listStatus = detail.currentStatusDescrip;
         this.cachedGrants = detail.grants || [];
-        this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants, detail.docs);
+        this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
         this.listHistory = history;
         this.logger.debug('List detail:', detail);
         this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
@@ -260,26 +260,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // `docs` is the backend's per-DOC aggregate (already scoped server-side to the caller's
-  // DOC(s), or list-wide for OEFIA/FA). `docs === undefined` means the payload never included
-  // the field (e.g. an older cached response) — fall back to the legacy per-grant aggregation.
-  // `docs === []` is an explicit, present-but-empty result and must render an empty Review
-  // Status section, never a fallback to the grants-derived list.
-  private buildDocStatusColumns(grants: FundingSubmissionListGrantDto[], docs?: DocAggregateDto[]): any[][] {
-    if (docs === undefined) {
-      return this.buildDocStatusColumnsFromGrants(grants);
-    }
-    const items = docs.map(doc => ({
-      doc: doc.docAbbrev || doc.docName,
-      count: doc.grantCount,
-      status: this.normalizeDocStatus(doc.currentStatusDescrip)
-    }));
-    const nonDraftItem = items.find(item => item.status != null && item.status.toLowerCase() !== 'draft');
-    this.isCurrentStatusDraft = !nonDraftItem;
-    return this.chunkIntoColumns(items);
-  }
-
-  private buildDocStatusColumnsFromGrants(grants: FundingSubmissionListGrantDto[]): any[][] {
+  private buildDocStatusColumns(grants: FundingSubmissionListGrantDto[]): any[][] {
     const docMap = new Map<string, { doc: string; count: number; statusRank: number }>();
     for (const g of grants) {
       const doc = g.doc || '';
@@ -297,10 +278,6 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }));
     const nonDraftItem = items.find(item => item.status != null && item.status.toLowerCase() !== 'draft');
     this.isCurrentStatusDraft = !nonDraftItem;
-    return this.chunkIntoColumns(items);
-  }
-
-  private chunkIntoColumns(items: any[]): any[][] {
     const columns: any[][] = [];
     for (let i = 0; i < items.length; i += 4) {
       columns.push(items.slice(i, i + 4));
@@ -312,17 +289,6 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   // 4 statuses supported by the Review Status card.
   private normalizeGrantReviewStatus(reviewStatus: string | null | undefined): string {
     const normalized = (reviewStatus || '').trim().toLowerCase();
-    if (!normalized || normalized.includes('draft')) return 'Draft';
-    if (normalized.includes('oefia')) return 'OEFIA Review';
-    if (normalized.includes('director')) return 'NCI Director Review';
-    if (normalized.includes('doc')) return 'DOC Review';
-    return 'Draft';
-  }
-
-  // Normalizes backend per-DOC aggregate status text (docs[].currentStatusDescrip) to the same
-  // 4 statuses supported by the Review Status card.
-  private normalizeDocStatus(currentStatusDescrip: string | null | undefined): string {
-    const normalized = (currentStatusDescrip || '').trim().toLowerCase();
     if (!normalized || normalized.includes('draft')) return 'Draft';
     if (normalized.includes('oefia')) return 'OEFIA Review';
     if (normalized.includes('director')) return 'NCI Director Review';
@@ -999,8 +965,18 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private buildSortIntentAction(dt: DataTables.Api, sortHeader: HTMLElement): (() => void) | null {
-    const columnIndex = $(sortHeader).index();
-    if (columnIndex < 0) return null;
+    // With FixedColumns enabled, clicks can come from cloned headers where
+    // index() is clone-local. Prefer DataTables' original column index.
+    const dtColumnAttr = sortHeader.getAttribute('data-dt-column');
+    const parsedDtColumn = dtColumnAttr != null ? Number(dtColumnAttr) : NaN;
+    const fallbackIndex = $(sortHeader).index();
+    const columnIndex = !isNaN(parsedDtColumn) ? parsedDtColumn : fallbackIndex;
+    if (columnIndex < 0 || isNaN(columnIndex)) return null;
+
+    const settings = dt.settings()[0] as any;
+    if (settings?.aoColumns?.[columnIndex]?.bSortable === false) {
+      return null;
+    }
 
     const nextDir: 'asc' | 'desc' = sortHeader.classList.contains('sorting_asc') ? 'desc' : 'asc';
     return () => {

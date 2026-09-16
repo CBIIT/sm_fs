@@ -475,6 +475,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         this.justificationFile = null;
         this.justificationFileError = null;
         this.refreshJustificationData(() => {
+          this.syncJustificationAvailableFlag();
           this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
           this.isEditMode = false;
           this.initialFormSnapshot = '';
@@ -746,7 +747,14 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         this.data.justificationFilename = null;
         this.data.docFilename = null;
       }
+      this.syncJustificationAvailableFlag();
     }
+  }
+
+  private syncJustificationAvailableFlag(): void {
+    const textPresent = !!String(this.data?.justificationText ?? '').trim();
+    const documentPresent = (this.justificationDocuments?.length ?? 0) > 0;
+    this.data.justificationAvailable = textPresent || documentPresent;
   }
 
   private refreshJustificationData(onComplete?: () => void): void {
@@ -768,6 +776,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         if (justification?.justificationText != null) {
           this.data.justificationText = justification.justificationText;
         }
+        this.syncJustificationAvailableFlag();
         this.justificationLoaded = true;
         this.cdr.detectChanges();
         onComplete?.();
