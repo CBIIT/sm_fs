@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -33,6 +33,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('docNotesRenderer')    docNotesRenderer:    TemplateRef<any>;
   @ViewChild('oefiaNotesRenderer')  oefiaNotesRenderer:  TemplateRef<any>;
   @ViewChild('backToListWarningModal') private backToListWarningModalRef: TemplateRef<any>;
+  @ViewChild('saveSuccessAlert') saveSuccessAlert: ElementRef<HTMLElement>;
   @ViewChild('bulkForm') bulkForm: NgForm;
 
   private modalRef: NgbModalRef;
@@ -53,6 +54,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   bulkFields: Partial<FundingSubmBulkEditFieldsDto> = {};
 
   canSave = false;
+  isSaving = false;
   saveSuccessMessage = '';
   docFundingListCor = false;
   OEFIACertifier = false;
@@ -370,7 +372,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSave(): void {
-    if (!this.rows.length || !this.canSave) return;
+    if (!this.rows.length || !this.canSave || this.isSaving) return;
+    this.isSaving = true;
     this.restoreReadOnlyOefiaNotes();
     const calls = this.rows.map(row =>
       this.fundingSubmissionsService.bulkUpdateListGrants(
@@ -402,9 +405,27 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
         this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
         this.canSave = false;
         this.saveSuccessMessage = 'Success! Bulk changes have been applied';
+        this.isSaving = false;
+        this.scrollToSuccessMessage();
       },
-      error: (err) => this.logger.error('Bulk edit save failed', err)
+      error: (err) => {
+        this.isSaving = false;
+        this.logger.error('Bulk edit save failed', err);
+      }
     });
+  }
+
+  private scrollToSuccessMessage(): void {
+    // Wait for *ngIf to render the alert, then move viewport and focus for accessibility.
+    setTimeout(() => {
+      const alertEl = this.saveSuccessAlert?.nativeElement;
+      if (!alertEl) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      alertEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      alertEl.focus({ preventScroll: true });
+    }, 0);
   }
 
   goBack(): void {
