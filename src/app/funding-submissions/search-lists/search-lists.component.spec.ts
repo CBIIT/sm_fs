@@ -55,7 +55,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
   beforeEach(async () => {
     // The component's ngOnInit() touches the global jQuery/DataTables plugin object
     // ($.fn.DataTable.ext.pager.numbers_length) which isn't loaded in the Karma test env.
-    (window as any).$ = (window as any).$ || { fn: { DataTable: { ext: { pager: {} } } } };
+    (window as any).$ = { fn: { DataTable: { ext: { pager: {} } } } };
 
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     modalRefSpy = jasmine.createSpyObj('NgbModalRef', ['close', 'dismiss']);
@@ -699,6 +699,32 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
       host.remove();
     });
+
+    it('ignores pointer-down on sortable table header elements instead of starting drag-scroll (FS header sort fix)', () => {
+      const { host, scrollBody } = bindDragScrollFixture();
+      const scrollHead = document.createElement('div');
+      scrollHead.className = 'dataTables_scrollHead';
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      const th = document.createElement('th');
+      const sortSpan = document.createElement('span');
+      th.appendChild(sortSpan);
+      headerRow.appendChild(th);
+      thead.appendChild(headerRow);
+      scrollHead.appendChild(thead);
+      host.appendChild(scrollHead);
+
+      [thead, headerRow, th, sortSpan].forEach(target => {
+        (host as any).setPointerCapture.calls.reset();
+        const event = pointerDown(target);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(scrollBody.classList.contains('dragging')).toBeFalse();
+        expect((host as any).setPointerCapture).not.toHaveBeenCalled();
+      });
+
+      host.remove();
+    });
   });
 
   // Display CODE vs NAME Reconciliation (2026-08-25): docDecision's mock data currently defines
@@ -932,6 +958,115 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         expect(component.justificationWarningMessage).toBe('Unable to generate the selected justification PDF.');
         expect(loaderService.hide).toHaveBeenCalled();
       }));
+    });
+  });
+
+  describe('Review Status docs[] consumption (FS-2106 §12)', () => {
+    it('OEFIA/FA case: a zero-grant-count DOC entry in docs[] is still rendered in Review Status', () => {
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+        listCode: '9-May 19th',
+        totalGrants: 5,
+        totalDocRecAmt: 12345,
+        currentStatusDescrip: 'Under DOC Review',
+        grants: [
+          { applId: 1, doc: 'DCB', reviewStatus: 'Under DOC Review' },
+          { applId: 2, doc: 'DCP', reviewStatus: 'Under DOC Review' }
+        ],
+        docs: [
+          { docAbbrev: 'DCB', grantCount: 5, currentStatusDescrip: 'Under DOC Review' },
+          { docAbbrev: 'DTP', grantCount: 0, currentStatusDescrip: 'Draft' }
+        ]
+      } as any));
+
+      (component as any).loadListMeta();
+
+      const items = ((component as any).docStatusColumns as any[][]).reduce((acc, col) => acc.concat(col), []);
+      expect(items.length).toBe(2);
+      const zeroCountEntry = items.find(item => item.doc === 'DTP');
+      expect(zeroCountEntry).withContext('zero-grant-count DOC entry should still be rendered').toBeTruthy();
+      expect(zeroCountEntry.count).toBe(0);
+      expect(zeroCountEntry.status).toBe('Draft');
+    });
+
+    it('multi-DOC DOCFSCRD case: loadListMeta() renders every backend-scoped docs[] entry without any client-side re-filtering', () => {
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+        listCode: '9-May 19th',
+        totalGrants: 7,
+        totalDocRecAmt: 54321,
+        currentStatusDescrip: 'Under DOC Review',
+        grants: [
+          { applId: 1, doc: 'DCB', reviewStatus: 'Under DOC Review' },
+          { applId: 2, doc: 'DCB', reviewStatus: 'Under DOC Review' },
+          { applId: 3, doc: 'DCB', reviewStatus: 'Under DOC Review' },
+          { applId: 4, doc: 'DCP', reviewStatus: 'OEFIA Review' },
+          { applId: 5, doc: 'DCP', reviewStatus: 'OEFIA Review' },
+          { applId: 6, doc: 'DCP', reviewStatus: 'OEFIA Review' },
+          { applId: 7, doc: 'DCP', reviewStatus: 'OEFIA Review' }
+        ],
+        docs: [
+          { docAbbrev: 'DCB', grantCount: 3, currentStatusDescrip: 'Under DOC Review' },
+          { docAbbrev: 'DCP', grantCount: 4, currentStatusDescrip: 'OEFIA Review' }
+        ],
+        callerDocNonIds: [111, 222]
+      } as any));
+
+      (component as any).loadListMeta();
+
+      // Backend already pre-scoped grants/docs/totals for this caller's full (combined,
+      // multi-DOC) set — the component must consume them as-is with no re-filtering.
+      expect(component.totalGrants).toBe(7);
+      expect(component.docRecommendedTotal).toBe(54321);
+      expect((component as any).cachedGrants.length).toBe(7);
+
+      const items = ((component as any).docStatusColumns as any[][]).reduce((acc, col) => acc.concat(col), []);
+      expect(items.length).toBe(2);
+      expect(items.find(item => item.doc === 'DCB')?.count).toBe(3);
+      expect(items.find(item => item.doc === 'DCP')?.count).toBe(4);
+    });
+
+    it('docs[] absent (undefined) falls back to the legacy per-grant aggregation', () => {
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+        listCode: '9-May 19th',
+        totalGrants: 2,
+        totalDocRecAmt: 100,
+        currentStatusDescrip: 'Draft',
+        grants: [
+          { applId: 1, doc: 'DCB', reviewStatus: 'Draft' },
+          { applId: 2, doc: 'DCB', reviewStatus: 'Draft' }
+        ]
+        // docs intentionally omitted
+      } as any));
+
+      (component as any).loadListMeta();
+
+      const items = ((component as any).docStatusColumns as any[][]).reduce((acc, col) => acc.concat(col), []);
+      expect(items.length).toBe(1);
+      expect(items[0].doc).toBe('DCB');
+      expect(items[0].count).toBe(2);
+      expect(items[0].status).toBe('Draft');
+    });
+
+    it('docs[] explicitly empty ([]) renders an empty Review Status section, never a fallback', () => {
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+        listCode: '9-May 19th',
+        totalGrants: 0,
+        totalDocRecAmt: 0,
+        currentStatusDescrip: 'Draft',
+        grants: [
+          { applId: 1, doc: 'DCB', reviewStatus: 'Draft' }
+        ],
+        docs: []
+      } as any));
+
+      (component as any).loadListMeta();
+
+      expect((component as any).docStatusColumns).toEqual([]);
+    });
+
+    it('no leftover reference to the removed applyCallerDocScope/resolveCallerDocLabel methods or the old scalar callerDocNonId field remains', () => {
+      expect((component as any).applyCallerDocScope).toBeUndefined();
+      expect((component as any).resolveCallerDocLabel).toBeUndefined();
+      expect((component as any).callerDocNonId).toBeUndefined();
     });
   });
 });

@@ -50,7 +50,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private dragStartScrollLeft = 0;
   private readonly tablePageIntentSelector = '.dataTables_paginate .paginate_button, .dataTables_paginate .page-item, .dataTables_paginate a.page-link, .dt-paging-button';
   private readonly tableSortIntentSelector = 'thead th.sorting, thead th.sorting_asc, thead th.sorting_desc';
-  private readonly dragScrollIgnoreSelector = 'a, button, input, select, textarea, label, thead, th, .dataTables_paginate, .dataTables_paginate *, .dt-paging-button, .select-checkbox, .toggle-details, .select2, .select2-container, .select2-selection, .select2-selection__rendered, .select2-selection__arrow';
+  private readonly dragScrollIgnoreSelector = 'a, button, input, select, textarea, label, .select-checkbox, .toggle-details, .select2, .select2-container, .select2-selection, .select2-selection__rendered, .select2-selection__arrow';
 
   i2eURL = '';
   grantViewerUrl = '';
@@ -965,18 +965,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private buildSortIntentAction(dt: DataTables.Api, sortHeader: HTMLElement): (() => void) | null {
-    // With FixedColumns enabled, header clicks can come from cloned tables where
-    // jQuery index() is local to the clone. Prefer DataTables' original column id.
-    const dtColumnAttr = sortHeader.getAttribute('data-dt-column');
-    const parsedDtColumn = dtColumnAttr != null ? Number(dtColumnAttr) : NaN;
-    const fallbackIndex = $(sortHeader).index();
-    const columnIndex = !isNaN(parsedDtColumn) ? parsedDtColumn : fallbackIndex;
-    if (columnIndex < 0 || isNaN(columnIndex)) return null;
-
-    const settings = dt.settings()[0] as any;
-    if (settings?.aoColumns?.[columnIndex]?.bSortable === false) {
-      return null;
-    }
+    const columnIndex = $(sortHeader).index();
+    if (columnIndex < 0) return null;
 
     const nextDir: 'asc' | 'desc' = sortHeader.classList.contains('sorting_asc') ? 'desc' : 'asc';
     return () => {
