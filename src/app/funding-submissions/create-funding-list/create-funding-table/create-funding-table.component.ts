@@ -141,6 +141,8 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
       processing: false,
       destroy: true,
       scrollX: true,
+      scrollY: '70vh',
+      scrollCollapse: true,
       autoWidth: false,
       language: {
         paginate: {

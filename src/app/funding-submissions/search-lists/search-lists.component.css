@@ -154,6 +154,8 @@ tr.shown {
 
 ::ng-deep .dataTables_scrollBody {
   overflow-x: auto !important;
+  overflow-y: auto !important;
+  max-height: 70vh !important;
 }
 
 ::ng-deep .dataTables_scrollBody.drag-scroll-enabled {

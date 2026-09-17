@@ -348,6 +348,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.throttle.invoke(this, dataTablesParameters, callback, this.ajaxCall);
       },
       scrollX: true,
+      scrollY: '70vh',
+      scrollCollapse: true,
       autoWidth: false,
       language: {
         paginate: {
