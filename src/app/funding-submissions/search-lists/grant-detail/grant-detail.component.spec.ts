@@ -772,6 +772,32 @@ describe('GrantDetailComponent', () => {
       expect(savedSpy).toHaveBeenCalledTimes(1);
     });
 
+    it('atomically replaces previously saved justification text with a selected file', () => {
+      component.data.justificationText = 'Previously saved justification';
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: 'Previously saved justification' });
+      getJustificationSubject.complete();
+      component.onEdit();
+      component.formModel.justificationText = '';
+      component.justificationFile = new File(['content'], 'justification.pdf', { type: 'application/pdf' });
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({
+        justificationText: '',
+        documents: [{ id: 99, docFilename: 'justification.pdf' }]
+      } as any));
+      const savedSpy = jasmine.createSpy('saved');
+      component.saved.subscribe(savedSpy);
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm)
+        .toHaveBeenCalledWith(1, 100, jasmine.any(File), '', undefined);
+      expect(component.isEditMode).toBeFalse();
+      expect(component.data.justificationText).toBe('');
+      expect(component.justificationDocuments).toEqual([{ id: 99, docFilename: 'justification.pdf' }]);
+      expect(savedSpy).toHaveBeenCalledTimes(1);
+    });
+
     it('saves funding fields before clearing justification text in the same save', () => {
       component.data.justificationText = 'Previously saved justification';
       component.justificationLoaded = true;
