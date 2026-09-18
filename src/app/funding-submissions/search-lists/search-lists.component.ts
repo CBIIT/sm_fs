@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EnvironmentInjector, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild, createComponent } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EnvironmentInjector, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild, createComponent } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
@@ -30,6 +30,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('removeGrantsWarningModal') private removeGrantsWarningModalRef: TemplateRef<any>;
   @ViewChild('sendGrantsInDraftWarningModal') private sendGrantsInDraftWarningModalRef: TemplateRef<any>;
   @ViewChild('unsavedChangesWarningModal') private unsavedChangesWarningModalRef: TemplateRef<any>;
+  @ViewChild('justificationWarningAlert') private justificationWarningAlertRef: ElementRef<HTMLElement>;
 
   private removeModalRef: NgbModalRef;
   private sendGrantsInDraftModalRef: NgbModalRef;
@@ -209,7 +210,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.justificationWarningMessage = '';
+    this.setJustificationWarningMessage('');
     this.loaderService.show();
     this.http.post('/i2efsws/api/v1/funding-submissions/lists/' + this.listId + '/justification-pdf',
       { applIds }, { responseType: 'blob' }).pipe(
@@ -217,7 +218,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       ).subscribe({
         next: (blob: Blob) => {
           if (!blob || blob.size === 0) {
-            this.justificationWarningMessage = 'No justifications found for the selected grant(s).';
+            this.setJustificationWarningMessage('No justifications found for the selected grant(s).');
             this.cdr.markForCheck();
             return;
           }
@@ -229,15 +230,27 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         error: async (error: HttpErrorResponse) => {
           if (error.status === 404 && error.error instanceof Blob) {
             const message = await error.error.text();
-            this.justificationWarningMessage = message || 'No justifications found for the selected grant(s).';
+            this.setJustificationWarningMessage(message || 'No justifications found for the selected grant(s).');
             this.cdr.markForCheck();
             return;
           }
           this.logger.error('Justification PDF request failed', error);
-          this.justificationWarningMessage = 'Unable to generate the selected justification PDF.';
+          this.setJustificationWarningMessage('Unable to generate the selected justification PDF.');
           this.cdr.markForCheck();
         }
       });
+  }
+
+  private setJustificationWarningMessage(message: string): void {
+    this.justificationWarningMessage = message;
+
+    if (!message) {
+      return;
+    }
+
+    setTimeout(() => {
+      this.justificationWarningAlertRef?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
   }
 
   private loadListMeta(): void {

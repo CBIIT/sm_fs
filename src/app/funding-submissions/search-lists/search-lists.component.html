@@ -51,7 +51,7 @@
     <div *ngIf="sendGrantsToDocsErrorMessage" class="alert alert-danger" role="alert">
         {{ sendGrantsToDocsErrorMessage }}
     </div>
-    <div *ngIf="justificationWarningMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
+    <div #justificationWarningAlert *ngIf="justificationWarningMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
         {{ justificationWarningMessage }}
         <button type="button" class="btn-close" aria-label="Close" (click)="justificationWarningMessage = ''"></button>
     </div>
