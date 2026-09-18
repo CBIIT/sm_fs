@@ -91,6 +91,39 @@ describe('GrantDetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('ngOnInit eagerly subscribes and loads justification data', () => {
+    component.ngOnInit();
+
+    expect(fundingSubmissionsServiceSpy.getJustification).toHaveBeenCalledWith(1, 100);
+
+    getJustificationSubject.next({
+      justificationText: 'Loaded during initialization',
+      documents: [{ id: 1, docFilename: 'initial.pdf' }]
+    });
+
+    expect(component.justificationLoaded).toBeTrue();
+    expect(component.data.justificationText).toBe('Loaded during initialization');
+    expect(component.justificationDocuments).toEqual([{ id: 1, docFilename: 'initial.pdf' }]);
+  });
+
+  it('ngOnChanges eagerly subscribes and loads justification data for a changed row', () => {
+    component.justificationLoaded = true;
+
+    component.ngOnChanges({ data: {} as any });
+
+    expect(component.justificationLoaded).toBeFalse();
+    expect(fundingSubmissionsServiceSpy.getJustification).toHaveBeenCalledWith(1, 100);
+
+    getJustificationSubject.next({
+      justificationText: 'Loaded after row change',
+      documents: [{ id: 2, docFilename: 'changed-row.pdf' }]
+    });
+
+    expect(component.justificationLoaded).toBeTrue();
+    expect(component.data.justificationText).toBe('Loaded after row change');
+    expect(component.justificationDocuments).toEqual([{ id: 2, docFilename: 'changed-row.pdf' }]);
+  });
+
   it('allows Edit when user does not have DOC role once data is loaded', () => {
     fixture.detectChanges();
     getJustificationSubject.next({ justificationText: '' });

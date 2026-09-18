@@ -8,7 +8,7 @@ import { Select2OptionData } from 'ng-select2';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
 import { saveAs } from 'file-saver';
-import { catchError, concatMap, from, map, Observable, tap } from 'rxjs';
+import { catchError, concatMap, from, map, Observable, of, tap } from 'rxjs';
 
 import { DocumentsDto } from '@cbiit/i2efsws-lib/model/documentsDto';
 import { DocumentService } from '../../../service/document.service';
@@ -103,13 +103,13 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
     this.OEFIACertifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
     this.fetchDropdownOptions();
-    this.refreshJustificationData().subscribe();
+    this.refreshJustificationData();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['listId'] || changes['data']) && this.listId && this.data?.applId) {
       this.justificationLoaded = false;
-      this.refreshJustificationData().subscribe();
+      this.refreshJustificationData();
     }
 
     this.recomputeDoNotPayOefiaLock();
@@ -477,7 +477,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     ).subscribe({
       complete: () => {
         this.justificationFileError = null;
-        this.refreshJustificationData().subscribe(refreshed => {
+        this.loadJustificationData().subscribe(refreshed => {
           if (!refreshed) {
             this.savingInProgress = false;
             this.justificationSaveError = 'Justification changes were saved, but the justification data could not be refreshed.';
@@ -499,7 +499,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         this.savingInProgress = false;
         this.justificationSaveError = this.getJustificationSaveError(err);
         this.logger.error('Justification save error', err);
-        this.refreshJustificationData().subscribe(() => this.cdr.detectChanges());
+        this.loadJustificationData().subscribe(() => this.cdr.detectChanges());
       }
     });
   }
@@ -793,13 +793,14 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.data.justificationAvailable = textPresent || documentPresent;
   }
 
-  private refreshJustificationData(): Observable<boolean> {
+  private refreshJustificationData(): void {
+    this.loadJustificationData().subscribe();
+  }
+
+  private loadJustificationData(): Observable<boolean> {
     if (!this.listId || !this.data?.applId) {
       this.justificationLoaded = true;
-      return new Observable(subscriber => {
-        subscriber.next(true);
-        subscriber.complete();
-      });
+      return of(true);
     }
 
     return this.fundingSubmissionsService.getJustification(this.listId, this.data.applId).pipe(
@@ -824,10 +825,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         // Still flip the flag on error so a failed fetch never permanently disables Edit.
         this.justificationLoaded = true;
         this.cdr.detectChanges();
-        return new Observable<boolean>(subscriber => {
-          subscriber.next(false);
-          subscriber.complete();
-        });
+        return of(false);
       })
     );
   }
