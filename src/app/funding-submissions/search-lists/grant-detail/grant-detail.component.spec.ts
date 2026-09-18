@@ -91,6 +91,39 @@ describe('GrantDetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('ngOnInit eagerly subscribes and loads justification data', () => {
+    component.ngOnInit();
+
+    expect(fundingSubmissionsServiceSpy.getJustification).toHaveBeenCalledWith(1, 100);
+
+    getJustificationSubject.next({
+      justificationText: 'Loaded during initialization',
+      documents: [{ id: 1, docFilename: 'initial.pdf' }]
+    });
+
+    expect(component.justificationLoaded).toBeTrue();
+    expect(component.data.justificationText).toBe('Loaded during initialization');
+    expect(component.justificationDocuments).toEqual([{ id: 1, docFilename: 'initial.pdf' }]);
+  });
+
+  it('ngOnChanges eagerly subscribes and loads justification data for a changed row', () => {
+    component.justificationLoaded = true;
+
+    component.ngOnChanges({ data: {} as any });
+
+    expect(component.justificationLoaded).toBeFalse();
+    expect(fundingSubmissionsServiceSpy.getJustification).toHaveBeenCalledWith(1, 100);
+
+    getJustificationSubject.next({
+      justificationText: 'Loaded after row change',
+      documents: [{ id: 2, docFilename: 'changed-row.pdf' }]
+    });
+
+    expect(component.justificationLoaded).toBeTrue();
+    expect(component.data.justificationText).toBe('Loaded after row change');
+    expect(component.justificationDocuments).toEqual([{ id: 2, docFilename: 'changed-row.pdf' }]);
+  });
+
   it('allows Edit when user does not have DOC role once data is loaded', () => {
     fixture.detectChanges();
     getJustificationSubject.next({ justificationText: '' });
@@ -772,6 +805,32 @@ describe('GrantDetailComponent', () => {
       expect(savedSpy).toHaveBeenCalledTimes(1);
     });
 
+    it('atomically replaces previously saved justification text with a selected file', () => {
+      component.data.justificationText = 'Previously saved justification';
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: 'Previously saved justification' });
+      getJustificationSubject.complete();
+      component.onEdit();
+      component.formModel.justificationText = '';
+      component.justificationFiles = [new File(['content'], 'justification.pdf', { type: 'application/pdf' })];
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({
+        justificationText: '',
+        documents: [{ id: 99, docFilename: 'justification.pdf' }]
+      } as any));
+      const savedSpy = jasmine.createSpy('saved');
+      component.saved.subscribe(savedSpy);
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm)
+        .toHaveBeenCalledWith(1, 100, jasmine.any(File), '', undefined);
+      expect(component.isEditMode).toBeFalse();
+      expect(component.data.justificationText).toBe('');
+      expect(component.justificationDocuments).toEqual([{ id: 99, docFilename: 'justification.pdf' }]);
+      expect(savedSpy).toHaveBeenCalledTimes(1);
+    });
+
     it('saves funding fields before clearing justification text in the same save', () => {
       component.data.justificationText = 'Previously saved justification';
       component.justificationLoaded = true;
@@ -840,7 +899,7 @@ describe('GrantDetailComponent', () => {
     it('passes undefined text for a file-only upload when text is unchanged', () => {
       component.justificationLoaded = true;
       component.onEdit();
-      component.justificationFile = new File(['content'], 'justification.pdf', { type: 'application/pdf' });
+      component.justificationFiles = [new File(['content'], 'justification.pdf', { type: 'application/pdf' })];
       fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
       fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: '' } as any));
 
@@ -854,7 +913,7 @@ describe('GrantDetailComponent', () => {
       component.data.justificationText = 'Existing text';
       component.justificationLoaded = true;
       component.onEdit();
-      component.justificationFile = new File(['content'], 'justification.pdf', { type: 'application/pdf' });
+      component.justificationFiles = [new File(['content'], 'justification.pdf', { type: 'application/pdf' })];
       fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
       fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: 'Existing text' } as any));
 
@@ -869,7 +928,7 @@ describe('GrantDetailComponent', () => {
       component.justificationLoaded = true;
       component.onEdit();
       component.formModel.justificationText = 'Entered text';
-      component.justificationFile = new File(['content'], 'justification.pdf', { type: 'application/pdf' });
+      component.justificationFiles = [new File(['content'], 'justification.pdf', { type: 'application/pdf' })];
       fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(throwError(() => ({
         status: 400,
         error: message
@@ -979,7 +1038,7 @@ describe('GrantDetailComponent', () => {
       component.formModel.oefiaNotes = 'attempted OEFIA note change';
       component.formModel.justificationText = 'new justification';
       component.formModel.docNotes = 'keep this note';
-      component.justificationFile = new File(['x'], 'new.pdf', { type: 'application/pdf' });
+      component.justificationFiles = [new File(['x'], 'new.pdf', { type: 'application/pdf' })];
 
       fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
       fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
@@ -1110,6 +1169,171 @@ describe('GrantDetailComponent', () => {
 
       expect(component.data.docNciSelectionName).toBeNull();
       expect(component.data.annualOrMyfName).toBeNull();
+    });
+  });
+
+  describe('FS-2359 staged justification files', () => {
+    const createFile = (name: string) => new File(['content'], name, { type: 'application/pdf' });
+
+    beforeEach(() => {
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '', documents: [] });
+      getJustificationSubject.complete();
+      component.onEdit();
+    });
+
+    it('preserves two valid selected files in selection order and renders each unsaved file', () => {
+      const first = createFile('first.pdf');
+      const second = createFile('second.pdf');
+      component.onFileChange({ target: { files: [first], value: 'first.pdf' } } as any);
+      component.onFileChange({ target: { files: [second], value: 'second.pdf' } } as any);
+      fixture.detectChanges();
+
+      expect(component.justificationFiles).toEqual([first, second]);
+      expect(fixture.nativeElement.textContent).toContain('first.pdf');
+      expect(fixture.nativeElement.textContent).toContain('second.pdf');
+      expect(fixture.nativeElement.querySelectorAll('[title="Remove file"]').length).toBe(2);
+    });
+
+    it('removes only the selected staged file and treats every staged file as dirty', () => {
+      const first = createFile('first.pdf');
+      const second = createFile('second.pdf');
+      component.justificationFiles = [first, second];
+
+      component.onRemoveStagedFile(0);
+
+      expect(component.justificationFiles).toEqual([second]);
+      expect(component.hasUnsavedChanges()).toBeTrue();
+    });
+
+    it('discards all staged files on cancel and counts staged plus visible persisted files for capacity', () => {
+      const first = createFile('first.pdf');
+      component.justificationDocuments = [{ id: 1, docFilename: 'persisted.pdf' } as any];
+      component.justificationFiles = [first, createFile('second.pdf')];
+
+      expect(component.visibleAttachedFileCount).toBe(3);
+      expect(component.isFileUploadDisabled).toBeTrue();
+
+      (component as any).discardEditsAndClose();
+
+      expect(component.justificationFiles).toEqual([]);
+      expect(component.visiblePersistedDocuments.length).toBe(1);
+    });
+
+    it('preserves earlier staged files after an over-cap selection', () => {
+      const first = createFile('first.pdf');
+      component.justificationDocuments = [
+        { id: 1, docFilename: 'persisted-1.pdf' } as any,
+        { id: 2, docFilename: 'persisted-2.pdf' } as any
+      ];
+      component.justificationFiles = [first];
+
+      component.onFileChange({ target: { files: [createFile('over-cap.pdf')], value: 'over-cap.pdf' } } as any);
+
+      expect(component.justificationFiles).toEqual([first]);
+      expect(component.justificationFileError).toBe('A maximum of 3 justification files is allowed per grant.');
+    });
+
+    it('saves staged files sequentially, putting text and deletions only on the first request', () => {
+      const first = createFile('first.pdf');
+      const second = createFile('second.pdf');
+      component.data.justificationText = 'previously saved';
+      component.onEdit();
+      component.formModel.justificationText = '';
+      component.stagedDeleteDocumentIds = [9];
+      component.justificationFiles = [first, second];
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValues(
+        of({ id: 10, docFilename: 'first.pdf' } as any),
+        of({ id: 11, docFilename: 'second.pdf' } as any)
+      );
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: '', documents: [] } as any));
+      const savedSpy = jasmine.createSpy('saved');
+      component.saved.subscribe(savedSpy);
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm.calls.allArgs()).toEqual([
+        [1, 100, first, '', [9]],
+        [1, 100, second, undefined, undefined]
+      ]);
+      expect(component.justificationFiles).toEqual([]);
+      expect(savedSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps failed and unattempted files staged after an explicit rejection and retries only those files', () => {
+      const first = createFile('first.pdf');
+      const second = createFile('second.pdf');
+      const third = createFile('third.pdf');
+      component.justificationFiles = [first, second, third];
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValues(
+        of({ id: 10, docFilename: 'first.pdf' } as any),
+        throwError(() => ({ status: 400, error: 'Rejected file' })),
+        of({ id: 11, docFilename: 'second.pdf' } as any),
+        of({ id: 12, docFilename: 'third.pdf' } as any)
+      );
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({
+        justificationText: '',
+        documents: [{ id: 10, docFilename: 'first.pdf' }]
+      } as any));
+
+      component.onSave();
+
+      expect(component.justificationFiles).toEqual([second, third]);
+      expect(component.justificationDocuments).toContain(jasmine.objectContaining({ id: 10 }));
+      expect(component.isEditMode).toBeTrue();
+      expect(component.justificationSaveError).toBe('Rejected file');
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm.calls.allArgs().slice(2)).toEqual([
+        [1, 100, second, undefined, undefined],
+        [1, 100, third, undefined, undefined]
+      ]);
+    });
+
+    it('does not repeat an acknowledged funding update when a later upload fails and is retried', () => {
+      const first = createFile('first.pdf');
+      const second = createFile('second.pdf');
+      component.formModel.docDecision = 'Pay';
+      component.justificationFiles = [first, second];
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValues(
+        of({ id: 10, docFilename: 'first.pdf' } as any),
+        throwError(() => ({ status: 400, error: 'Rejected file' })),
+        of({ id: 11, docFilename: 'second.pdf' } as any)
+      );
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({
+        justificationText: '',
+        documents: [{ id: 10, docFilename: 'first.pdf' }]
+      } as any));
+
+      component.onSave();
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm.calls.allArgs().slice(2)).toEqual([
+        [1, 100, second, undefined, undefined]
+      ]);
+    });
+
+    it('retains an ambiguously failed upload and locally acknowledged documents when recovery refresh fails', () => {
+      const first = createFile('first.pdf');
+      const second = createFile('second.pdf');
+      component.justificationFiles = [first, second];
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValues(
+        of({ id: 10, docFilename: 'first.pdf' } as any),
+        throwError(() => ({ status: 0, message: 'Network error' }))
+      );
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(throwError(() => new Error('refresh failed')));
+      const savedSpy = jasmine.createSpy('saved');
+      component.saved.subscribe(savedSpy);
+
+      component.onSave();
+
+      expect(component.justificationDocuments).toContain(jasmine.objectContaining({ id: 10 }));
+      expect(component.justificationFiles).toEqual([second]);
+      expect(component.isEditMode).toBeTrue();
+      expect(savedSpy).not.toHaveBeenCalled();
     });
   });
 

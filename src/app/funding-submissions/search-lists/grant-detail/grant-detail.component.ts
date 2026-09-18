@@ -8,6 +8,7 @@ import { Select2OptionData } from 'ng-select2';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
 import { saveAs } from 'file-saver';
+import { catchError, concatMap, from, map, Observable, of, tap } from 'rxjs';
 
 import { DocumentsDto } from '@cbiit/i2efsws-lib/model/documentsDto';
 import { DocumentService } from '../../../service/document.service';
@@ -54,7 +55,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   budgetCategoriesLoaded = false;
 
   formModel: FundingSubmBulkEditFieldsDto & { justificationText?: string } = {};
-  justificationFile: File | null = null;
+  justificationFiles: File[] = [];
   justificationDocuments: DocumentsDto[] = [];
   stagedDeleteDocumentIds: number[] = [];
   justificationFileError: string | null = null;
@@ -181,7 +182,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       annualOrMyf:        this.data?.annualOrMyf ?? null,
       justificationText:  this.data?.justificationText ?? '',
     };
-    this.justificationFile = null;
+    this.justificationFiles = [];
     this.justificationFileError = null;
     this.justificationSaveError = null;
     this.stagedDeleteDocumentIds = [];
@@ -234,7 +235,6 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     const file = input.files?.[0];
 
     if (!file) {
-      this.justificationFile = null;
       this.justificationFileError = null;
       this.cdr.detectChanges();
       return;
@@ -242,7 +242,6 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
     if (this.visibleAttachedFileCount >= 3) {
       this.justificationFileError = 'A maximum of 3 justification files is allowed per grant.';
-      this.justificationFile = null;
       input.value = '';
       this.cdr.detectChanges();
       return;
@@ -253,7 +252,6 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     const fileExtension = fileNameParts.length > 1 ? fileNameParts.pop()!.toLowerCase() : '';
     if (!this.ALLOWED_JUSTIFICATION_FILE_EXTENSIONS.includes(fileExtension)) {
       this.justificationFileError = 'Unsupported file type. Allowed types: Word, RTF, Excel, PDF.';
-      this.justificationFile = null;
       input.value = ''; // Clear input so same file can be re-selected/detected
       this.cdr.detectChanges();
       return;
@@ -262,7 +260,6 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     // Validate file size
     if (file.size > this.MAX_JUSTIFICATION_FILE_SIZE_BYTES) {
       this.justificationFileError = 'The size of the file you are attaching exceeds 10 MBs maximum file limit.';
-      this.justificationFile = null;
       input.value = ''; // Clear input so same file can be re-selected/detected
       this.cdr.detectChanges();
       return;
@@ -270,7 +267,8 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
     // Valid file
     this.justificationFileError = null;
-    this.justificationFile = file;
+    this.justificationFiles = [...this.justificationFiles, file];
+    input.value = '';
     this.cdr.detectChanges();
   }
 
@@ -302,7 +300,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     const { justificationText, ...fields } = this.formModel;
     const hasFundingFieldChanges = this.currentFundingSnapshot() !== this.initialFundingSnapshot;
     const hasJustificationTextChange = (justificationText ?? '') !== this.initialJustificationText;
-    const hasJustificationChanges = !!this.justificationFile || hasJustificationTextChange || this.stagedDeleteDocumentIds.length > 0;
+    const hasJustificationChanges = this.justificationFiles.length > 0 || hasJustificationTextChange || this.stagedDeleteDocumentIds.length > 0;
 
     if (!hasFundingFieldChanges && !hasJustificationChanges) {
       this.savingInProgress = false;
@@ -328,6 +326,8 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       next: () => {
         this.logger.debug('Grant detail saved');
         this.applyFormModelToData();
+        this.initialFundingSnapshot = this.currentFundingSnapshot();
+        this.initialFormSnapshot = this.currentSnapshot();
         if (hasJustificationChanges) {
           this.saveJustification(hasJustificationTextChange ? justificationText : undefined);
         } else {
@@ -370,7 +370,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.formModel.budgetCategories = null;
     this.formModel.docNciSelection = null;
     this.formModel.justificationText = '';
-    this.justificationFile = null;
+    this.justificationFiles = [];
     this.justificationFileError = null;
     this.stagedDeleteDocumentIds = this.justificationDocuments
       .map(doc => doc.id)
@@ -460,21 +460,30 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       ? undefined
       : justificationText.length > 0 ? justificationText : '';
     const deleteDocumentIds = this.stagedDeleteDocumentIds.length > 0 ? this.stagedDeleteDocumentIds : undefined;
+    const filesToSave: Array<File | undefined> = this.justificationFiles.length > 0
+      ? [...this.justificationFiles]
+      : [undefined];
 
-    this.fundingSubmissionsService.saveJustificationForm(
-      this.listId,
-      this.data.applId,
-      this.justificationFile ?? undefined,
-      normalizedJustificationText,
-      deleteDocumentIds
+    from(filesToSave).pipe(
+      concatMap((file, index) => this.fundingSubmissionsService.saveJustificationForm(
+        this.listId,
+        this.data.applId,
+        file,
+        index === 0 ? normalizedJustificationText : undefined,
+        index === 0 ? deleteDocumentIds : undefined
+      ).pipe(
+        tap(document => this.acknowledgeJustificationSave(file, document, index === 0, normalizedJustificationText))
+      ))
     ).subscribe({
-      next: () => {
-        this.justificationSaveError = null;
-        this.data.justificationText = normalizedJustificationText ?? '';
-        this.stagedDeleteDocumentIds = [];
-        this.justificationFile = null;
+      complete: () => {
         this.justificationFileError = null;
-        this.refreshJustificationData(() => {
+        this.loadJustificationData().subscribe(refreshed => {
+          if (!refreshed) {
+            this.savingInProgress = false;
+            this.justificationSaveError = 'Justification changes were saved, but the justification data could not be refreshed.';
+            this.cdr.detectChanges();
+            return;
+          }
           this.syncJustificationAvailableFlag();
           this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
           this.isEditMode = false;
@@ -486,13 +495,40 @@ export class GrantDetailComponent implements OnInit, OnChanges {
           this.cdr.detectChanges();
         });
       },
-      error: (err) => {
+      error: err => {
         this.savingInProgress = false;
         this.justificationSaveError = this.getJustificationSaveError(err);
         this.logger.error('Justification save error', err);
-        this.cdr.detectChanges();
+        this.loadJustificationData().subscribe(() => this.cdr.detectChanges());
       }
     });
+  }
+
+  private acknowledgeJustificationSave(
+    file: File | undefined,
+    document: DocumentsDto,
+    isFirstRequest: boolean,
+    normalizedJustificationText?: string
+  ): void {
+    if (file) {
+      const fileIndex = this.justificationFiles.indexOf(file);
+      if (fileIndex >= 0) {
+        this.justificationFiles = this.justificationFiles.filter((_, index) => index !== fileIndex);
+      }
+      if (document?.id && !this.justificationDocuments.some(existing => existing.id === document.id)) {
+        this.justificationDocuments = [...this.justificationDocuments, document];
+      }
+    }
+
+    if (isFirstRequest) {
+      if (normalizedJustificationText !== undefined) {
+        this.data.justificationText = normalizedJustificationText;
+      }
+      this.stagedDeleteDocumentIds = [];
+      this.initialJustificationText = this.formModel.justificationText ?? '';
+      this.initialFormSnapshot = this.currentSnapshot();
+      this.syncJustificationAvailableFlag();
+    }
   }
 
   private getJustificationSaveError(error: any): string {
@@ -565,8 +601,8 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   get justificationUploadLabelText(): string {
-    if (this.justificationFile?.name) {
-      return this.justificationFile.name;
+    if (this.justificationFiles.length > 0) {
+      return this.justificationFiles.map(file => file.name).join(', ');
     }
     if (this.justificationDocumentNames) {
       return `Current file(s): ${this.justificationDocumentNames}`;
@@ -585,7 +621,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   get visibleAttachedFileCount(): number {
-    return this.visiblePersistedDocuments.length + (this.justificationFile ? 1 : 0);
+    return this.visiblePersistedDocuments.length + this.justificationFiles.length;
   }
 
   get isFileUploadDisabled(): boolean {
@@ -606,8 +642,8 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.cdr.detectChanges();
   }
 
-  onRemoveStagedFile(): void {
-    this.justificationFile = null;
+  onRemoveStagedFile(index: number): void {
+    this.justificationFiles = this.justificationFiles.filter((_, fileIndex) => fileIndex !== index);
     this.justificationFileError = null;
     this.cdr.detectChanges();
   }
@@ -633,7 +669,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       return false;
     }
     return this.currentSnapshot() !== this.initialFormSnapshot
-      || !!this.justificationFile
+      || this.justificationFiles.length > 0
       || this.stagedDeleteDocumentIds.length > 0;
   }
 
@@ -644,7 +680,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   private discardEditsAndClose(): void {
     this.isEditMode = false;
     this.formModel = {};
-    this.justificationFile = null;
+    this.justificationFiles = [];
     this.justificationFileError = null;
     this.justificationSaveError = null;
     this.stagedDeleteDocumentIds = [];
@@ -757,15 +793,18 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.data.justificationAvailable = textPresent || documentPresent;
   }
 
-  private refreshJustificationData(onComplete?: () => void): void {
+  private refreshJustificationData(): void {
+    this.loadJustificationData().subscribe();
+  }
+
+  private loadJustificationData(): Observable<boolean> {
     if (!this.listId || !this.data?.applId) {
       this.justificationLoaded = true;
-      onComplete?.();
-      return;
+      return of(true);
     }
 
-    this.fundingSubmissionsService.getJustification(this.listId, this.data.applId).subscribe({
-      next: (justification) => {
+    return this.fundingSubmissionsService.getJustification(this.listId, this.data.applId).pipe(
+      map(justification => {
         const rawDocuments = (justification as any)?.documents
           ?? (justification as any)?.document
           ?? (justification as any)?.docs
@@ -779,16 +818,16 @@ export class GrantDetailComponent implements OnInit, OnChanges {
         this.syncJustificationAvailableFlag();
         this.justificationLoaded = true;
         this.cdr.detectChanges();
-        onComplete?.();
-      },
-      error: (err) => {
+        return true;
+      }),
+      catchError(err => {
         this.logger.debug('Unable to load justification documents', err);
         // Still flip the flag on error so a failed fetch never permanently disables Edit.
         this.justificationLoaded = true;
         this.cdr.detectChanges();
-        onComplete?.();
-      }
-    });
+        return of(false);
+      })
+    );
   }
 
 }
