@@ -31,6 +31,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('sendGrantsInDraftWarningModal') private sendGrantsInDraftWarningModalRef: TemplateRef<any>;
   @ViewChild('unsavedChangesWarningModal') private unsavedChangesWarningModalRef: TemplateRef<any>;
   @ViewChild('justificationWarningAlert') private justificationWarningAlertRef: ElementRef<HTMLElement>;
+  @ViewChild('blockedGrantWarningAlert') private blockedGrantWarningAlertRef: ElementRef<HTMLElement>;
 
   private removeModalRef: NgbModalRef;
   private sendGrantsInDraftModalRef: NgbModalRef;
@@ -250,6 +251,24 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     setTimeout(() => {
       this.justificationWarningAlertRef?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }
+
+  private setBlockedGrantNumbers(grantNumbers: string[]): void {
+    this.blockedGrantNumbers = grantNumbers;
+
+    if (!grantNumbers?.length) {
+      return;
+    }
+
+    setTimeout(() => {
+      const alertEl = this.blockedGrantWarningAlertRef?.nativeElement;
+      if (!alertEl) {
+        return;
+      }
+
+      alertEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      alertEl.focus({ preventScroll: true });
     }, 0);
   }
 
@@ -1229,7 +1248,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   onRemoveSelected(): void {
     if (!this.selectedRows.size) return;
     this.blurActiveElement();
-    this.blockedGrantNumbers = [];
+    this.setBlockedGrantNumbers([]);
     this.removeModalRef = this.modalService.open(this.removeGrantsWarningModalRef, { centered: true });
   }
 
@@ -1241,7 +1260,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     const applIds = Array.from(this.selectedRows.keys());
     this.fundingSubmissionsService.removeGrantsFromList(this.listId, applIds).subscribe({
       next: (result) => {
-        this.blockedGrantNumbers = result?.blockedGrantNumbers ?? [];
+        this.setBlockedGrantNumbers(result?.blockedGrantNumbers ?? []);
         this.selectedRows.clear();
         this.removeModalRef?.close();
         this.loadListMeta();
