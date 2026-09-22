@@ -56,7 +56,10 @@
         <button type="button" class="btn-close" aria-label="Close" (click)="justificationWarningMessage = ''"></button>
     </div>
     <div #blockedGrantWarningAlert *ngIf="blockedGrantNumbers.length > 0" class="alert alert-warning" role="alert" tabindex="-1">
-        The following grants were added by OEFIA and cannot be removed. You should select "Do Not Pay" instead for these grants: {{ blockedGrantNumbers.join(', ') }}
+        The following grants were added by OEFIA and cannot be removed. You should select "Do Not Pay" instead for these grants.
+        <ul>
+            <li *ngFor="let grantNumber of blockedGrantNumbers">{{ grantNumber }}</li>
+        </ul>
     </div>
       <div class="row g-0 save-success-row" *ngIf="saveSuccessMessage.length > 0">
     <div class="col-12">
