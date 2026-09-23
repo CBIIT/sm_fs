@@ -11,10 +11,12 @@ import { FundingSubmissionsService, FundingSubmissionListGrantDto, FundingSubmis
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { openNewWindow } from '../../utils/utils';
+import { roleNames } from '../../service/role-names';
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-lookup.service';
+import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
 declare var $: any;
 
@@ -83,6 +85,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   sendGrantsToDocsErrorMessage = '';
   justificationWarningMessage = '';
   isSendGrantsInDraftInProgress = false;
+  docFundingListCor = false;
   blockedGrantNumbers: string[] = [];
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
   viewDocOptions: Select2OptionData[] = [
@@ -141,6 +144,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     private loaderService: LoaderService,
     private route: ActivatedRoute,
     private router: Router,
+     private userSessionService: AppUserSessionService,
     private logger: NGXLogger,
     private environmentInjector: EnvironmentInjector,
     private propertiesService: AppPropertiesService,
@@ -153,6 +157,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.bindGlobalNavigationUnsavedGuard();
+    this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
     this.dropdownLookupService.getDocDecisions().subscribe({
       next: options => {
         this.docDecisionDisplayMap = new Map(options.map(option => [String(option.id), option.text]));

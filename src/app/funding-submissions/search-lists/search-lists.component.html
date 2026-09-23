@@ -76,7 +76,7 @@
     <!-- Page header -->
     <div class="d-flex justify-content-between align-items-center my-3">
         <h2 class="mb-0">{{ selectionDate }}</h2>
-        <button *ngIf="isCurrentStatusDraft" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
+        <button *ngIf="isCurrentStatusDraft && !docFundingListCor" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
     </div>
 
     <!-- Overview -->
