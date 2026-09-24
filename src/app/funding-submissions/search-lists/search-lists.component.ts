@@ -458,11 +458,23 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.piEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>` : ''
         }, // 6
         {
+          title: 'Institution',
+          data: 'institution',
+          width: '150px',
+          defaultContent: ''
+        }, // 7
+        {
+          title: 'Project Title',
+          data: 'projectTitle',
+          width: '180px',
+          defaultContent: ''
+        }, // 8
+        {
           title: 'IMPAC II Status',
           data: 'impacStatusDescrip',
           width: '100px',
           defaultContent: ''
-        }, // 7
+        }, // 9
         {
           title: 'NCAB',
           data: 'ncabDate',
@@ -618,10 +630,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           title: null,
           header: true,
           action: this.exportGrantListResults.bind(this),
-          exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26] }      
+          exportOptions: { columns: Array.from({ length: 28 }, (_, i) => i + 1) }
         }
       ],
-      order: [[17, 'desc']],
+      order: [[19, 'desc']],
       fixedColumns: { left: 1, right: 1 },
       initComplete: () => {
         this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
@@ -1245,7 +1257,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       const $body = $(dt.table(0).body());
       $body.find('tr.shown').removeClass('shown');
       $body.find('.toggle-details i').removeClass('fa-minus-circle').addClass('fa-plus-circle');
-      dt.order([15, 'desc']).search('').columns().search('').page.len(100);
+      dt.order([17, 'desc']).search('').columns().search('').page.len(100);
       dt.ajax.reload();
     });
   }
@@ -1386,7 +1398,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       (dt: DataTables.Api) => {
         // FS-2107: submit every row in the List View's current sort order (all rows, not just the
         // current page, selected rows, or DataTables-search-filtered rows). The backend treats this
-        // sequence as an advisory ordering signal for the 26-column spreadsheet.
+        // sequence as an advisory ordering signal for the 28-column spreadsheet.
         const rows: any[] = dt.rows({ order: 'current', search: 'none' }).data().toArray();
         const orderedApplIds: number[] = rows
           .map(row => row?.applId)
