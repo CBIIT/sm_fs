@@ -105,6 +105,23 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
     expect(component).toBeTruthy();
   });
 
+  it('renders the Save Grant List modal copy with the "List Name" label text', () => {
+    const modalView = (component as any).addToListModalRef.createEmbeddedView({});
+    modalView.detectChanges();
+    const rendered = modalView.rootNodes
+      .map((node: any) => node.textContent || '')
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const renderedHtml = modalView.rootNodes
+      .map((node: any) => node.outerHTML || '')
+      .join(' ');
+
+    expect(rendered).toContain('Choose a list name from the drop-down to add the selected grant(s) to the list.');
+    expect(rendered).toContain('List Name');
+    expect(renderedHtml).toContain('Select a List Name.');
+  });
+
   it('binds the PrevScr column to previousScoreDisplay', () => {
     const previousScoreColumn = component.dtOptions.columns.find((column: any) => column.title === 'PrevScr');
 

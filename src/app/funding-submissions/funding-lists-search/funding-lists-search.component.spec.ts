@@ -290,3 +290,23 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     expect(searchLists.calls.mostRecent().args[0].nihNetworkId).toBeUndefined();
   });
 });
+
+describe('FundingListsSearchComponent list-name labels (FS-2273)', () => {
+  it('labels the search results code column as "List Name"', () => {
+    const component = new FundingListsSearchComponent(
+      jasmine.createSpyObj('Router', ['navigate']),
+      jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
+      jasmine.createSpyObj('HttpClient', ['post']),
+      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount']),
+      { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
+      jasmine.createSpyObj('LoaderService', ['show', 'hide']),
+      jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
+      jasmine.createSpyObj('AppUserSessionService', ['hasRole'])
+    );
+
+    component.ngAfterViewInit();
+
+    expect(component.dtOptions.columns[2].title).toBe('List Name');
+    expect(component.dtOptions.columns[2].data).toBe('code');
+  });
+});
