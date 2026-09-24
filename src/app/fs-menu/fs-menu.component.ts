@@ -19,6 +19,7 @@ export class FsMenuComponent implements OnInit {
   oefiaCertifier: boolean;
   financialAnalyst: boolean;
   docFunListCor: boolean;
+  nciDirector: boolean;
   splCertifier: boolean;
   pd: boolean;
   pa: boolean;
@@ -48,6 +49,7 @@ export class FsMenuComponent implements OnInit {
     this.oefiaCertifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
     this.splCertifier = this.userSessionService.hasRole(roleNames.SPL_CERTIFIER);
     this.docFunListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+    this.nciDirector = this.userSessionService.hasRole(roleNames.NCI_DIRECTOR);
     this.paylistReadOnlyRole = this.userSessionService.hasRole(roleNames.PAYLIST_READ_ONLY);
     this.gmLeadership = this.userSessionService.hasRole(roleNames.GM_LEADERSHIP);
     this.financialAnalyst = this.userSessionService.hasRole(roleNames.FINANCIAL_ANALYST);
@@ -62,5 +64,9 @@ export class FsMenuComponent implements OnInit {
         this.logger.error('retrieveFundingRequest failed ', error);
       }
     );
+  }
+
+  hasUserFSAccess(): boolean {
+    return this.oefiaCertifier || this.docFunListCor || this.financialAnalyst || this.nciDirector;
   }
 }
