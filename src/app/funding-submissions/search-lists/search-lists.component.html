@@ -5,6 +5,9 @@
   </div>
   <div class="modal-body">
     <p class="mb-0">Are you sure you want to remove {{ selectedRows.size }} grant(s) from {{ selectionDate }}?</p>
+    <div *ngIf="removeGrantsErrorMessage" class="alert alert-danger mt-3 mb-0" role="alert">
+      {{ removeGrantsErrorMessage }}
+    </div>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="onCancelRemove()">No</button>

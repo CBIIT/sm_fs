@@ -30,6 +30,7 @@ import { CreateFundingTableComponent } from './create-funding-table.component';
 describe('CreateFundingTableComponent — Grant Search Results checkbox disable (Compass item 10)', () => {
   let component: CreateFundingTableComponent;
   let fixture: ComponentFixture<CreateFundingTableComponent>;
+  let modalRefSpy: jasmine.SpyObj<any>;
 
   /** Minimal chainable jQuery stand-in that records calls and lets tests fire a captured handler. */
   function fakeJq() {
@@ -79,7 +80,9 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
     const loaderServiceSpy = jasmine.createSpyObj('LoaderService', ['show', 'hide']);
     const propertiesServiceSpy = jasmine.createSpyObj('AppPropertiesService', ['getProperty']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    modalRefSpy = jasmine.createSpyObj('NgbModalRef', ['close', 'dismiss']);
     const modalServiceSpy = jasmine.createSpyObj('NgbModal', ['open']);
+    modalServiceSpy.open.and.returnValue(modalRefSpy);
 
     await TestBed.configureTestingModule({
       declarations: [CreateFundingTableComponent],
@@ -120,6 +123,64 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
     expect(rendered).toContain('Choose a list name from the drop-down to add the selected grant(s) to the list.');
     expect(rendered).toContain('List Name');
     expect(renderedHtml).toContain('Select a List Name.');
+  });
+
+  describe('Save Grant List modal errors (FS-2220)', () => {
+    beforeEach(() => {
+      component.selectedRows.set(100, { applId: 100 } as any);
+      component.selectedRows.set(101, { applId: 101 } as any);
+      component.grantList = [{ selected: true }, { selected: true }] as any;
+      (component as any).modalRef = modalRefSpy;
+      component.selectedDate = '202608';
+    });
+
+    it('keeps the modal open and shows the plain-text 400 error when a new list would contain zero grants', () => {
+      const selectedRowsBefore = Array.from(component.selectedRows.entries());
+      const grantSelectionsBefore = component.grantList.map((row: any) => row.selected);
+      const serviceSpy = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;
+      serviceSpy.addGrantsToList.and.returnValue(throwError(() => ({
+        status: 400,
+        error: 'A Funding List must contain at least one grant.'
+      })));
+
+      component.saveToList();
+
+      expect(component.saveToListErrorMessage).toBe('A Funding List must contain at least one grant.');
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
+      expect(Array.from(component.selectedRows.entries())).toEqual(selectedRowsBefore);
+      expect(component.grantList.map((row: any) => row.selected)).toEqual(grantSelectionsBefore);
+    });
+
+    it('clears any prior error message on successful save', () => {
+      component.saveToListErrorMessage = 'A Funding List must contain at least one grant.';
+      const serviceSpy = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;
+      serviceSpy.addGrantsToList.and.returnValue(of({
+        grantsAdded: 2,
+        listCode: '202608',
+        listId: 55
+      } as any));
+      const navigateToListSpy = spyOn(component, 'navigateToList');
+
+      component.saveToList();
+
+      expect(component.saveToListErrorMessage).toBe('');
+      expect(modalRefSpy.close).toHaveBeenCalled();
+      expect(component.selectedRows.size).toBe(0);
+      expect(navigateToListSpy).toHaveBeenCalledWith('202608', jasmine.any(String), 55);
+    });
+
+    it('clears the modal error when reopened or cancelled', () => {
+      component.saveToListErrorMessage = 'A Funding List must contain at least one grant.';
+
+      component.addSelectedToList();
+      expect(component.saveToListErrorMessage).toBe('');
+
+      component.saveToListErrorMessage = 'A Funding List must contain at least one grant.';
+      component.cancelModal();
+
+      expect(component.saveToListErrorMessage).toBe('');
+      expect(modalRefSpy.dismiss).toHaveBeenCalled();
+    });
   });
 
   it('binds the PrevScr column to previousScoreDisplay', () => {

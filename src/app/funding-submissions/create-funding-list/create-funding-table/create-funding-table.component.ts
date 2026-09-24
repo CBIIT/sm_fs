@@ -53,6 +53,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   showResults = false;
   selectAll = false;
   saveSuccessMessage = '';
+  saveToListErrorMessage = '';
   grantList: FundingSubmissionSearchResultDto[] = [];
   throttle: DatatableThrottle = new DatatableThrottle();
   selectedRows: Map<number, FundingSubmissionSearchResultDto> = new Map();
@@ -582,10 +583,12 @@ allDataSelected(data: any[]): boolean {
 
   addSelectedToList(): void {
     this.selectedDate = '';
+    this.saveToListErrorMessage = '';
     this.modalRef = this.modalService.open(this.addToListModalRef, { size: 'lg', centered: true });
   }
 
   cancelModal(): void {
+    this.saveToListErrorMessage = '';
     this.modalRef?.dismiss();
   }
 
@@ -604,6 +607,7 @@ allDataSelected(data: any[]): boolean {
         this.logger.debug('addGrantsToList result:', result);
         // Do not retain prior selection after a successful save; returning to this page
         // should start with zero "Grant(s) Added".
+        this.saveToListErrorMessage = '';
         this.saveSuccessMessage = `Success! ${result.grantsAdded} out of ${this.selectedRows.size} were successfully added to the list.`;
         this.selectedRows.clear();
         this.grantList.forEach((row: any) => row.selected = false);
@@ -628,8 +632,19 @@ allDataSelected(data: any[]): boolean {
       error: (err) => {
         this.loaderService.hide();
         this.logger.error('addGrantsToList error', err?.status, err?.error, body);
+        this.saveToListErrorMessage = this.getSaveToListError(err);
       }
     });
+  }
+
+  private getSaveToListError(error: any): string {
+    if (typeof error?.error === 'string' && error.error.trim()) {
+      return error.error;
+    }
+    return error?.error?.errorMessage
+      || error?.error?.message
+      || error?.message
+      || 'Unable to save the grant list.';
   }
 
   get hasSelectedGrants(): boolean {

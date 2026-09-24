@@ -11,6 +11,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { SearchListsComponent } from './search-lists.component';
 import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-lookup.service';
+import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
 describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-2045)', () => {
   let component: SearchListsComponent;
@@ -71,6 +72,9 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
     const propertiesServiceSpy = jasmine.createSpyObj('AppPropertiesService', ['getProperty']);
     propertiesServiceSpy.getProperty.and.returnValue('http://example/');
+    const loaderServiceSpy = jasmine.createSpyObj('LoaderService', ['show', 'hide']);
+    const userSessionServiceSpy = jasmine.createSpyObj('AppUserSessionService', ['hasRole']);
+    userSessionServiceSpy.hasRole.and.returnValue(false);
 
     const dropdownLookupServiceSpy = jasmine.createSpyObj('FundingSubmDropdownLookupService', ['getDocDecisions']);
     dropdownLookupServiceSpy.getDocDecisions.and.returnValue(of([
@@ -85,11 +89,13 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
         { provide: Router, useValue: routerSpy },
         { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
+        { provide: LoaderService, useValue: loaderServiceSpy },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
         { provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['post']) },
         { provide: NgbModal, useValue: modalServiceSpy },
-        { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy }
+        { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy },
+        { provide: AppUserSessionService, useValue: userSessionServiceSpy }
       ]
     }).compileComponents();
 
@@ -205,6 +211,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     });
 
     it('clears selection, closes the modal, and refreshes the list on a mixed result', () => {
+      component.removeGrantsErrorMessage = 'A Funding List must contain at least one grant.';
       fundingSubmissionsServiceSpy.removeGrantsFromList.and.returnValue(of({
         removedGrantNumbers: ['1R01CA200001-01'],
         blockedGrantNumbers: ['1R01CA200002-01'],
@@ -215,16 +222,46 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       component.onConfirmRemove();
 
       expect(component.selectedRows.size).toBe(0);
+      expect(component.removeGrantsErrorMessage).toBe('');
       expect(modalRefSpy.close).toHaveBeenCalled();
       expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalled();
     });
 
     it('clears any prior blocked-grant warning when a new removal is initiated', () => {
       component.blockedGrantNumbers = ['1R01CA200002-01'];
+      component.removeGrantsErrorMessage = 'A Funding List must contain at least one grant.';
 
       component.onRemoveSelected();
 
       expect(component.blockedGrantNumbers).toEqual([]);
+      expect(component.removeGrantsErrorMessage).toBe('');
+    });
+
+    it('keeps the modal open and shows the plain-text 400 error when removal would empty the list', () => {
+      const selectedRowsBefore = new Map(component.selectedRows);
+      fundingSubmissionsServiceSpy.removeGrantsFromList.and.returnValue(
+        throwError(() => new HttpErrorResponse({
+          status: 400,
+          error: 'A Funding List must contain at least one grant.'
+        }))
+      );
+
+      component.onConfirmRemove();
+
+      expect(component.removeGrantsErrorMessage).toBe('A Funding List must contain at least one grant.');
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
+      expect(modalRefSpy.dismiss).not.toHaveBeenCalled();
+      expect(Array.from(component.selectedRows.entries())).toEqual(Array.from(selectedRowsBefore.entries()));
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+    });
+
+    it('clears the error message when the remove modal is cancelled', () => {
+      component.removeGrantsErrorMessage = 'A Funding List must contain at least one grant.';
+
+      component.onCancelRemove();
+
+      expect(component.removeGrantsErrorMessage).toBe('');
+      expect(modalRefSpy.dismiss).toHaveBeenCalled();
     });
   });
 

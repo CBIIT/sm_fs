@@ -83,6 +83,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   filteredDoc: string | null = null;
   sendGrantsToDocsSuccessMessage = '';
   sendGrantsToDocsErrorMessage = '';
+  removeGrantsErrorMessage = '';
   justificationWarningMessage = '';
   isSendGrantsInDraftInProgress = false;
   docFundingListCor = false;
@@ -1266,10 +1267,12 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.selectedRows.size) return;
     this.blurActiveElement();
     this.setBlockedGrantNumbers([]);
+    this.removeGrantsErrorMessage = '';
     this.removeModalRef = this.modalService.open(this.removeGrantsWarningModalRef, { centered: true });
   }
 
   onCancelRemove(): void {
+    this.removeGrantsErrorMessage = '';
     this.removeModalRef?.dismiss();
   }
 
@@ -1277,6 +1280,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     const applIds = Array.from(this.selectedRows.keys());
     this.fundingSubmissionsService.removeGrantsFromList(this.listId, applIds).subscribe({
       next: (result) => {
+        this.removeGrantsErrorMessage = '';
         this.setBlockedGrantNumbers(result?.blockedGrantNumbers ?? []);
         this.selectedRows.clear();
         this.removeModalRef?.close();
@@ -1284,9 +1288,24 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         this.logger.error('Remove grants from list failed', err);
+        if (err?.status === 400) {
+          this.removeGrantsErrorMessage = this.getRemoveGrantsError(err);
+          return;
+        }
+        this.removeGrantsErrorMessage = '';
         this.removeModalRef?.close();
       }
     });
+  }
+
+  private getRemoveGrantsError(error: any): string {
+    if (typeof error?.error === 'string' && error.error.trim()) {
+      return error.error;
+    }
+    return error?.error?.errorMessage
+      || error?.error?.message
+      || error?.message
+      || 'Unable to remove grants from the list.';
   }
 
   onBulkEdit(): void {
