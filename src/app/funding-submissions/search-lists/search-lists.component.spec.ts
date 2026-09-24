@@ -602,6 +602,23 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(column.data).toBe('docNciSelectionName');
     });
 
+    describe('List View Institution and Project Title columns (FS-2325)', () => {
+      it('places Institution and Project Title after PI with blank-safe bindings', () => {
+        const columns = component.dtOptions.columns as any[];
+        const titles = columns.map(column => column.title);
+        const piIndex = titles.indexOf('PI');
+        expect(titles.slice(piIndex, piIndex + 4)).toEqual(['PI', 'Institution', 'Project Title', 'IMPAC II Status']);
+        expect(columns[piIndex + 1].data).toBe('institution');
+        expect(columns[piIndex + 1].defaultContent).toBe('');
+        expect(columns[piIndex + 2].data).toBe('projectTitle');
+        expect(columns[piIndex + 2].defaultContent).toBe('');
+      });
+
+      it('preserves the logical DOC/NCI Sel sort column after the inserted columns', () => {
+        expect(component.dtOptions.order).toEqual([[19, 'desc']]);
+      });
+    });
+
     it('Annual or MYF column binds to the NAME field (annualOrMyfName), not the CODE field', () => {
       const column = (component.dtOptions.columns as any[]).find(col => col.title === 'Annual or MYF');
       expect(column.data).toBe('annualOrMyfName');
@@ -861,11 +878,11 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(loggerSpy.error).toHaveBeenCalledWith('Grant list export failed: DataTables instance is not available');
     });
 
-    it('declares exportOptions.columns as exactly 1 through 26 (checkbox 0 and Action 27 excluded)', () => {
+    it('declares exportOptions.columns as exactly 1 through 28 (checkbox 0 and Action 29 excluded)', () => {
       component.ngAfterViewInit();
       const exportButton = (component.dtOptions.buttons as any[]).find(b => (b.className || '').includes('btn-export-all'));
       expect(exportButton).toBeTruthy();
-      expect(exportButton.exportOptions.columns).toEqual(Array.from({ length: 26 }, (_, i) => i + 1));
+      expect(exportButton.exportOptions.columns).toEqual(Array.from({ length: 28 }, (_, i) => i + 1));
     });
 
     describe('viewPDF Justification delivery (FS-2215)', () => {
