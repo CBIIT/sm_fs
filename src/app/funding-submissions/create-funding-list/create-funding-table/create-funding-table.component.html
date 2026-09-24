@@ -28,17 +28,17 @@
   </div>
   <div class="modal-body">
     <p>
-      Choose a code from the drop-down to add the selected grant(s) to the selection date. Clicking <strong>Save</strong> will add those grants to the list and take you to the list view.
+      Choose a code from the drop-down to add the selected grant(s) to the List Name. Clicking <strong>Save</strong> will add those grants to the list and take you to the list view.
     </p>
     <div class="mb-3">
-      <label for="selectionDate" class="form-label fw-semibold">Selection Date</label>
+      <label for="selectionDate" class="form-label fw-semibold">List Name</label>
       <ng-select2
         id="selectionDate"
         name="selectionDate"
         [data]="selectionDateOptions"
         [(ngModel)]="selectedDate"
         [allowClear]="true"
-        placeholder="Select date"
+        placeholder="Select List Name"
         class="w-100">
       </ng-select2>
     </div>
@@ -47,7 +47,7 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="cancelModal()">Cancel</button>
     <!-- span receives mouse events so the tooltip works on a disabled button -->
-    <span ngbTooltip="Select a Selection Date." [disableTooltip]="!!selectedDate" container="body">
+    <span ngbTooltip="Select a List Name." [disableTooltip]="!!selectedDate" container="body">
       <button type="button" class="btn btn-primary" [disabled]="!selectedDate" (click)="saveToList()">Save</button>
     </span>
   </div>
