@@ -58,6 +58,14 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
       }
   }
 
+  private getEffectiveDocs(): string[] {
+    if (this.selectedDocs?.length) {
+      return this.selectedDocs;
+    }
+
+    return this.docFundingListCor ? (this.userDocs || []) : [];
+  }
+
   ngAfterViewInit(): void {
     const freshNavigation = this.stateService.consumeFreshNavigationRequest();
     if (freshNavigation) {
@@ -176,6 +184,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     const nofoArray = formValue.rfaPa;
     const mechArray = formValue.mechSelect;
     const typeArray = formValue.typeSelect;
+    const effectiveDocs = this.getEffectiveDocs();
     return !!(
       grantNumber.grantNumberType ||
       grantNumber.grantNumberMech ||
@@ -184,7 +193,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
       grantNumber.grantNumberYear ||
       grantNumber.grantNumberSuffix ||
       formValue.pdName ||
-      this.selectedDocs.length > 0 ||
+      effectiveDocs.length > 0 ||
       (Array.isArray(caArray) ? caArray.length > 0 : !!caArray) ||
       (Array.isArray(i2Array) ? i2Array.length > 0 : !!i2Array) ||
       this.searchCriteria?.piName ||
@@ -242,7 +251,8 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     criteria.piName = this.searchCriteria.piName;
     criteria.pdName = formValue.pdName;
     criteria.includeInactivePd = this.isPdActive;
-    criteria.divisionOfficeCenter = this.selectedDocs.length ? this.selectedDocs : undefined;
+    const effectiveDocs = this.getEffectiveDocs();
+    criteria.divisionOfficeCenter = effectiveDocs.length ? effectiveDocs : undefined;
     criteria.cancerActivity = Array.isArray(this.selectedCancerActivities) && this.selectedCancerActivities.length
       ? (this.selectedCancerActivities as string[])
       : (this.selectedCancerActivities && !Array.isArray(this.selectedCancerActivities) ? [this.selectedCancerActivities as string] : undefined);
