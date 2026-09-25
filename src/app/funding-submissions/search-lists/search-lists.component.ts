@@ -683,11 +683,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
               this.bindHorizontalDragScroll(dt);
 
               // Export button is index 1 now that Reset Table occupies index 0.
-              if (!this.isNciDirector) {
-                dt.rows().count() > 0 ? (dt as any).button(1).enable() : (dt as any).button(1).disable();
-              } else {
-                return;
-              }
+              this.updateExportButtonState(dt);
 
               // Use container so fixedColumns clones are included
               const $container = $(dt.table(0).container());
@@ -806,10 +802,18 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     };
     if (this.isNciDirector) {
       this.dtOptions.columns = this.dtOptions.columns.slice(1, -1);
-      this.dtOptions.buttons = this.dtOptions.buttons.slice(0, 1);
+      const exportButton = (this.dtOptions.buttons as any[])
+        .find(button => (button.className || '').includes('btn-export-all'));
+      exportButton.exportOptions.columns = Array.from(
+        { length: this.dtOptions.columns.length }, (_, index) => index);
       this.dtOptions.fixedColumns = { left: 0, right: 0 };
     }
     setTimeout(() => this.dtTrigger.next(null));
+  }
+
+  private updateExportButtonState(dt: DataTables.Api): void {
+    const exportButton = (dt as any).button(1);
+    dt.rows().count() > 0 ? exportButton.enable() : exportButton.disable();
   }
 
   ajaxCall($this: SearchListsComponent, _dataTablesParameters: any, callback: any): void {

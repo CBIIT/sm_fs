@@ -867,6 +867,93 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     });
   });
 
+  describe('NDIRD list export parity (FS-2326)', () => {
+    it('keeps Export and maps the sliced 28-column contract to indices 0 through 27', fakeAsync(() => {
+      component.isNciDirector = true;
+      spyOn(component.dtTrigger, 'next');
+      component.ngAfterViewInit();
+
+      const buttons = component.dtOptions.buttons as any[];
+      const exportButton = buttons.find(button => (button.className || '').includes('btn-export-all'));
+      expect(buttons.length).toBe(2);
+      expect(exportButton).toBeTruthy();
+      expect(exportButton.exportOptions.columns).toEqual(Array.from({ length: 28 }, (_, index) => index));
+      expect((component.dtOptions.columns as any[]).length).toBe(28);
+      tick(100);
+    }));
+
+    it('selects the identical 28 exported headers in the identical order as non-NDIRD', fakeAsync(() => {
+      const nonNciFixture = TestBed.createComponent(SearchListsComponent);
+      nonNciFixture.detectChanges();
+      const nonNciComponent = nonNciFixture.componentInstance;
+      spyOn(nonNciComponent.dtTrigger, 'next');
+      nonNciComponent.ngAfterViewInit();
+      const nonNciButton = (nonNciComponent.dtOptions.buttons as any[])
+        .find(button => (button.className || '').includes('btn-export-all'));
+      const nonNciColumns = nonNciComponent.dtOptions.columns as any[];
+      const nonNciHeaders = nonNciButton.exportOptions.columns.map((index: number) => nonNciColumns[index].title);
+
+      component.isNciDirector = true;
+      spyOn(component.dtTrigger, 'next');
+      component.ngAfterViewInit();
+      const nciButton = (component.dtOptions.buttons as any[])
+        .find(button => (button.className || '').includes('btn-export-all'));
+      const nciColumns = component.dtOptions.columns as any[];
+      const nciHeaders = nciButton.exportOptions.columns.map((index: number) => nciColumns[index].title);
+
+      expect(nciHeaders).toEqual(nonNciHeaders);
+      expect(nciHeaders.length).toBe(28);
+      tick(100);
+      nonNciFixture.destroy();
+    }));
+
+    it('enables or disables Export by row count exactly as for other callers', () => {
+      component.isNciDirector = true;
+      const button = jasmine.createSpyObj('exportButton', ['enable', 'disable']);
+      const rowCount = jasmine.createSpy('count').and.returnValue(1);
+      const dt = {
+        rows: () => ({ count: rowCount }),
+        button: jasmine.createSpy('button').and.returnValue(button)
+      } as any;
+
+      (component as any).updateExportButtonState(dt);
+      expect(dt.button).toHaveBeenCalledWith(1);
+      expect(button.enable).toHaveBeenCalled();
+      expect(button.disable).not.toHaveBeenCalled();
+
+      rowCount.and.returnValue(0);
+      (component as any).updateExportButtonState(dt);
+      expect(button.disable).toHaveBeenCalled();
+    });
+
+    it('uses the unchanged ordered-row request payload and file name', fakeAsync(() => {
+      component.isNciDirector = true;
+      component.listId = 123;
+      const dt = {
+        rows: jasmine.createSpy('rows').and.returnValue({
+          data: () => ({ toArray: () => [{ applId: 9 }, { applId: 5 }] })
+        })
+      };
+      component.dtElement = { dtInstance: Promise.resolve(dt) } as any;
+      const httpSpy = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
+      httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+      spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+      const anchor = { click: jasmine.createSpy('click'), download: '', href: '' } as any;
+      spyOn(document, 'createElement').and.returnValue(anchor);
+
+      component.exportGrantListResults();
+      tick();
+
+      expect(dt.rows).toHaveBeenCalledWith({ order: 'current', search: 'none' });
+      expect((httpSpy.post as any)).toHaveBeenCalledWith(
+        '/i2efsws/api/v1/funding-submissions/lists/123/grants/export',
+        { orderedApplIds: [9, 5] },
+        jasmine.objectContaining({ responseType: 'arraybuffer' as any })
+      );
+      expect(anchor.download).toBe('funding_submissions_lists_result_all.xls');
+    }));
+  });
+
   // FS-2107: the List View export must POST every row's APPL_ID in the current sort order (all rows,
   // not selected rows, the current page, or DataTables-search-filtered rows).
   describe('exportGrantListResults (FS-2107)', () => {
