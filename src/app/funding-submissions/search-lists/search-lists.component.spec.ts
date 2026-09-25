@@ -106,6 +106,64 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     fixture.detectChanges();
   });
 
+  describe('SearchListsComponent — NDIRD review tabs (FS-2271)', () => {
+    let component: SearchListsComponent;
+
+    beforeEach(() => {
+      component = Object.create(SearchListsComponent.prototype) as SearchListsComponent;
+      component.isNciDirector = true;
+      component.selectedNciTab = 'all';
+      component.selectedRows = new Map<number, any>();
+      (component as any).detailComponentsByApplId = new Map();
+      (component as any).cachedGrants = [
+        { applId: 1, nciDecision: null, recusedFlag: false },
+        { applId: 2, nciDecision: undefined, recusedFlag: false },
+        { applId: 3, nciDecision: 'Approve', recusedFlag: false },
+        { applId: 4, nciDecision: 'Hold', recusedFlag: true },
+        { applId: 5, nciDecision: 'Decline', recusedFlag: false }
+      ];
+    });
+
+    function filteredRows(tab: string): any[] {
+      component.selectedNciTab = tab;
+      let result: any[];
+      component.ajaxCall(component, {}, response => result = response.data);
+      return result;
+    }
+
+    it('filters using raw API decisions and treats null and undefined as pending', () => {
+      expect(filteredRows('all').map(row => row.applId)).toEqual([1, 2, 3, 4, 5]);
+      expect(filteredRows('pending').map(row => row.applId)).toEqual([1, 2]);
+      expect(filteredRows('approved').map(row => row.applId)).toEqual([3]);
+      expect(filteredRows('hold').map(row => row.applId)).toEqual([4]);
+      expect(filteredRows('rejected').map(row => row.applId)).toEqual([5]);
+    });
+
+    it('keeps recusals as an overlapping category', () => {
+      expect(filteredRows('recusals').map(row => row.applId)).toEqual([4]);
+    });
+
+    it('clears selections and expanded details when the tab changes', () => {
+      const detailRef = { destroy: jasmine.createSpy('destroy') };
+      (component as any).detailComponentsByApplId.set(4, detailRef);
+      component.selectedRows.set(4, (component as any).cachedGrants[3]);
+      const dt = {
+        rows: () => ({ every: () => undefined }),
+        table: () => ({ container: () => document.createElement('div') }),
+        ajax: { reload: jasmine.createSpy('reload') }
+      };
+      (component as any).dtElement = {
+        dtInstance: Promise.resolve(dt)
+      };
+
+      component.onNciTabChange('approved');
+
+      expect(component.selectedRows.size).toBe(0);
+      expect(detailRef.destroy).toHaveBeenCalled();
+      expect(component.selectedNciTab).toBe('approved');
+    });
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });

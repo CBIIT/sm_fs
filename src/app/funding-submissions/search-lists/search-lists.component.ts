@@ -87,6 +87,16 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   justificationWarningMessage = '';
   isSendGrantsInDraftInProgress = false;
   docFundingListCor = false;
+  isNciDirector = false;
+  readonly nciTabs = [
+    { id: 'all', label: 'All Grants' },
+    { id: 'pending', label: 'Pending Review' },
+    { id: 'approved', label: 'Approved' },
+    { id: 'hold', label: 'On Hold' },
+    { id: 'rejected', label: 'Rejected' },
+    { id: 'recusals', label: 'Recusals' }
+  ];
+  selectedNciTab = 'all';
   blockedGrantNumbers: string[] = [];
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
   viewDocOptions: Select2OptionData[] = [
@@ -159,6 +169,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.bindGlobalNavigationUnsavedGuard();
     this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+    this.isNciDirector = this.userSessionService.hasRole(roleNames.NCI_DIRECTOR);
     this.dropdownLookupService.getDocDecisions().subscribe({
       next: options => {
         this.docDecisionDisplayMap = new Map(options.map(option => [String(option.id), option.text]));
@@ -671,8 +682,12 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
               this.bindSimpleUnsavedTableGuard(dt);
               this.bindHorizontalDragScroll(dt);
 
-              // Export button is index 1 now that Reset Table occupies index 0
-              dt.rows().count() > 0 ? (dt as any).button(1).enable() : (dt as any).button(1).disable();
+              // Export button is index 1 now that Reset Table occupies index 0.
+              if (!this.isNciDirector) {
+                dt.rows().count() > 0 ? (dt as any).button(1).enable() : (dt as any).button(1).disable();
+              } else {
+                return;
+              }
 
               // Use container so fixedColumns clones are included
               const $container = $(dt.table(0).container());
@@ -789,15 +804,60 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, 100);
       }
     };
+    if (this.isNciDirector) {
+      this.dtOptions.columns = this.dtOptions.columns.slice(1, -1);
+      this.dtOptions.buttons = this.dtOptions.buttons.slice(0, 1);
+      this.dtOptions.fixedColumns = { left: 0, right: 0 };
+    }
     setTimeout(() => this.dtTrigger.next(null));
   }
 
   ajaxCall($this: SearchListsComponent, _dataTablesParameters: any, callback: any): void {
     let grants = $this.cachedGrants;
+    if ($this.isNciDirector) {
+      grants = grants.filter(grant => $this.matchesNciTab(grant));
+    }
     if ($this.filteredDoc) {
       grants = grants.filter(g => g.doc === $this.filteredDoc);
     }
     callback({ recordsTotal: grants.length, recordsFiltered: grants.length, data: grants });
+  }
+
+  private matchesNciTab(grant: FundingSubmissionListGrantDto): boolean {
+    switch (this.selectedNciTab) {
+      case 'pending':
+        return grant.nciDecision === null || grant.nciDecision === undefined;
+      case 'approved':
+        return grant.nciDecision === 'Approve';
+      case 'hold':
+        return grant.nciDecision === 'Hold';
+      case 'rejected':
+        return grant.nciDecision === 'Decline';
+      case 'recusals':
+        return grant.recusedFlag === true;
+      default:
+        return true;
+    }
+  }
+
+  onNciTabChange(tabId: string): void {
+    if (!this.isNciDirector || this.selectedNciTab === tabId) {
+      return;
+    }
+    this.selectedNciTab = tabId;
+    this.filteredDoc = null;
+    this.selectedRows.clear();
+    this.cachedGrants.forEach((grant: any) => grant.selected = false);
+    this.clearExpandedDetails();
+    this.dtElement?.dtInstance?.then(dt => {
+      this.clearSelections(dt);
+      dt.ajax.reload();
+    });
+  }
+
+  private clearExpandedDetails(): void {
+    this.detailComponentsByApplId.forEach(componentRef => componentRef?.destroy?.());
+    this.detailComponentsByApplId.clear();
   }
 
   private hasUnsavedDetailEdits(): boolean {
