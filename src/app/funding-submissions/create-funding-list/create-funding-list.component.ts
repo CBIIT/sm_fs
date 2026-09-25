@@ -7,6 +7,8 @@ import { NgForm } from '@angular/forms';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { CreateFundingTableComponent } from './create-funding-table/create-funding-table.component';
 import { FundingSubmissionsStateService } from '../funding-submissions-state.service';
+import { roleNames } from 'src/app/service/role-names';
+import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
 @Component({
   selector: 'app-create-funding-list',
@@ -29,6 +31,8 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   selectedCancerActivities: string[] | string = [];
   selectedDocs: string[] = [];
   i2Status: string | string[];
+  docFundingListCor = false;
+  userDocs: string[] = [];
   excludeInList = true;
   searchCriteria: FundSelectSearchCriteria = {};
   private readonly CA_DOC_CHANNEL = 'CA_DOC_DEFAULT_CHANNEL';
@@ -37,6 +41,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   constructor(
     private propertiesService: AppPropertiesService,
     private libPdCaIntegratorService: LibPdCaIntegratorService,
+    private userSessionService: AppUserSessionService,
     private pdCaIntegratorService: PdCaIntegratorService,
     private logger: NGXLogger,
     private stateService: FundingSubmissionsStateService
@@ -45,6 +50,12 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
     this.i2eURL = this.propertiesService.getProperty('I2EWEB_URL').trim();
     this.fiscalYear = getCurrentFiscalYear();
+  }
+  ngOnInit(): void {
+      this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+      if(this.docFundingListCor) {
+        this.userDocs = this.userSessionService.getDocFundingSubmissionCoordinatorDocAbbrevs();
+      }
   }
 
   ngAfterViewInit(): void {

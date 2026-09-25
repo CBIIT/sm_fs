@@ -37,6 +37,8 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   showResults = false;
 
   selectedDocs: string[] = [];
+  docFundingListCor = false;
+  userDocs: string[] = [];
   selectedListStatus: string = null;
   selectedSelectionDate: string = null;
   listIdFilter: string = null;
@@ -131,6 +133,10 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       },
       error: (err) => this.logger.error('Failed to load pending review count', err)
     });
+      this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+      if(this.docFundingListCor) {
+        this.userDocs = this.userSessionService.getDocFundingSubmissionCoordinatorDocAbbrevs();
+      }
   }
 
   ngAfterViewInit(): void {
