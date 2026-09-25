@@ -116,7 +116,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       component.selectedRows = new Map<number, any>();
       (component as any).detailComponentsByApplId = new Map();
       (component as any).cachedGrants = [
-        { applId: 1, nciDecision: null, recusedFlag: false },
+        { applId: 1, nciDecision: null, recusedFlag: false, reviewStatusCode: 'DIRECTORREVIEW' },
         { applId: 2, nciDecision: undefined, recusedFlag: false },
         { applId: 3, nciDecision: 'Approve', recusedFlag: false },
         { applId: 4, nciDecision: 'Hold', recusedFlag: true },
@@ -141,6 +141,10 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
     it('keeps recusals as an overlapping category', () => {
       expect(filteredRows('recusals').map(row => row.applId)).toEqual([4]);
+    });
+
+    it('preserves the typed review status code in the authorized row payload', () => {
+      expect(filteredRows('all')[0].reviewStatusCode).toBe('DIRECTORREVIEW');
     });
 
     it('clears selections and expanded details when the tab changes', () => {
