@@ -10,7 +10,6 @@ import { Select2OptionData } from 'ng-select2';
 import { FundingSubmissionsService, FundingSubmissionListGrantDto, FundingSubmissionListGrantExportRequestDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
-import { openNewWindow } from '../../utils/utils';
 import { roleNames } from '../../service/role-names';
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
@@ -223,20 +222,22 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   viewPDF(): void {
     const applIds = Array.from(this.selectedRows.keys());
-    if (this.selectedViewDoc !== 'JST') {
-      openNewWindow(`${this.documentURL}openGrantReport.action?docType=${this.selectedViewDoc}&applIds=${applIds.join(',')}&resubmit=true`, 'session');
-      return;
-    }
+    const isJustification = this.selectedViewDoc === 'JST';
+    const endpoint = isJustification ? 'justification-pdf' : 'document-report';
+    const body = isJustification ? { applIds } : { applIds, docType: this.selectedViewDoc };
+    this.downloadPdf(endpoint, body, isJustification);
+  }
 
+  private downloadPdf(endpoint: string, body: { applIds: number[]; docType?: string }, isJustification: boolean): void {
     this.setJustificationWarningMessage('');
     this.loaderService.show();
-    this.http.post('/i2efsws/api/v1/funding-submissions/lists/' + this.listId + '/justification-pdf',
-      { applIds }, { responseType: 'blob' }).pipe(
+    this.http.post('/i2efsws/api/v1/funding-submissions/lists/' + this.listId + '/' + endpoint,
+      body, { responseType: 'blob' }).pipe(
         finalize(() => this.loaderService.hide())
       ).subscribe({
         next: (blob: Blob) => {
           if (!blob || blob.size === 0) {
-            this.setJustificationWarningMessage('No justifications found for the selected grant(s).');
+            this.setJustificationWarningMessage(isJustification ? 'No justifications found for the selected grant(s).' : 'No documents found for the selected grant(s).');
             this.cdr.markForCheck();
             return;
           }
@@ -248,17 +249,16 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         error: async (error: HttpErrorResponse) => {
           if (error.status === 404 && error.error instanceof Blob) {
             const message = await error.error.text();
-            this.setJustificationWarningMessage(message || 'No justifications found for the selected grant(s).');
+            this.setJustificationWarningMessage(message || (isJustification ? 'No justifications found for the selected grant(s).' : 'No documents found for the selected grant(s).'));
             this.cdr.markForCheck();
             return;
           }
-          this.logger.error('Justification PDF request failed', error);
-          this.setJustificationWarningMessage('Unable to generate the selected justification PDF.');
+          this.logger.error(isJustification ? 'Justification PDF request failed' : 'Document PDF request failed', error);
+          this.setJustificationWarningMessage(isJustification ? 'Unable to generate the selected justification PDF.' : 'Unable to generate the selected document PDF.');
           this.cdr.markForCheck();
         }
       });
   }
-
   private setJustificationWarningMessage(message: string): void {
     this.justificationWarningMessage = message;
 

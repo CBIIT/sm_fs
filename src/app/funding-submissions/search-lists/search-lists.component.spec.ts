@@ -1091,15 +1091,26 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         component.selectedRows = new Map<number, any>([[9, {}], [3, {}]]);
       });
 
-      it('keeps legacy Document Viewer URL behavior for AB', () => {
-        component.selectedViewDoc = 'AB';
-        spyOn(window, 'open').and.returnValue(null);
-        component.viewPDF();
-        expect(window.open).toHaveBeenCalledWith(
-          'http://example/openGrantReport.action?docType=AB&applIds=9,3&resubmit=true',
-          'session',
-          'menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700');
-      });
+      for (const docType of ['AB', 'SS', 'both']) {
+        it(`posts ${docType} through the FS document report broker`, fakeAsync(() => {
+          component.selectedViewDoc = docType;
+          const response = new Blob(['pdf'], { type: 'application/pdf' });
+          httpSpy.post.and.returnValue(of(response) as any);
+          spyOn(window, 'open');
+          spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+          spyOn(window.URL, 'revokeObjectURL');
+
+          component.viewPDF();
+          tick();
+
+          expect((httpSpy.post as any)).toHaveBeenCalledWith(
+            '/i2efsws/api/v1/funding-submissions/lists/42/document-report',
+            { applIds: [9, 3], docType }, { responseType: 'blob' });
+          expect(window.open).toHaveBeenCalledWith('blob:test', 'session');
+          tick();
+          expect(window.URL.revokeObjectURL).toHaveBeenCalledWith('blob:test');
+        }));
+      }
 
       it('posts ordered numeric IDs for JST and opens/revokes the returned PDF blob', fakeAsync(() => {
         component.selectedViewDoc = 'JST';
