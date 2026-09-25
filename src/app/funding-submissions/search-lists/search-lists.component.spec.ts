@@ -164,6 +164,13 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     });
   });
 
+  it('hides the Review Status card for NDIRD users', () => {
+    component.isNciDirector = true;
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).not.toContain('Review Status');
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
