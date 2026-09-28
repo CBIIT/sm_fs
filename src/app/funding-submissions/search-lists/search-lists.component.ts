@@ -1345,6 +1345,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.fundingSubmissionsService.removeGrantsFromList(this.listId, applIds).subscribe({
       next: (result) => {
         this.removeGrantsErrorMessage = '';
+        this.saveSuccessMessage = 'Success! The selected grant(s) have been removed from this list.';
         this.setBlockedGrantNumbers(result?.blockedGrantNumbers ?? []);
         this.selectedRows.clear();
         this.removeModalRef?.close();
