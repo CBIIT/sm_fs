@@ -7,6 +7,8 @@ import { NgForm } from '@angular/forms';
 import { getCurrentFiscalYear } from '../../utils/utils';
 import { CreateFundingTableComponent } from './create-funding-table/create-funding-table.component';
 import { FundingSubmissionsStateService } from '../funding-submissions-state.service';
+import { roleNames } from 'src/app/service/role-names';
+import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
 @Component({
   selector: 'app-create-funding-list',
@@ -29,6 +31,8 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   selectedCancerActivities: string[] | string = [];
   selectedDocs: string[] = [];
   i2Status: string | string[];
+  docFundingListCor = false;
+  userDocs: string[] = [];
   excludeInList = true;
   searchCriteria: FundSelectSearchCriteria = {};
   private readonly CA_DOC_CHANNEL = 'CA_DOC_DEFAULT_CHANNEL';
@@ -37,6 +41,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   constructor(
     private propertiesService: AppPropertiesService,
     private libPdCaIntegratorService: LibPdCaIntegratorService,
+    private userSessionService: AppUserSessionService,
     private pdCaIntegratorService: PdCaIntegratorService,
     private logger: NGXLogger,
     private stateService: FundingSubmissionsStateService
@@ -45,6 +50,20 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     this.eGrantsUrl = this.propertiesService.getProperty('EGRANTS_URL');
     this.i2eURL = this.propertiesService.getProperty('I2EWEB_URL').trim();
     this.fiscalYear = getCurrentFiscalYear();
+  }
+  ngOnInit(): void {
+      this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+      if(this.docFundingListCor) {
+        this.userDocs = this.userSessionService.getDocFundingSubmissionCoordinatorDocAbbrevs();
+      }
+  }
+
+  private getEffectiveDocs(): string[] {
+    if (this.selectedDocs?.length) {
+      return this.selectedDocs;
+    }
+
+    return this.docFundingListCor ? (this.userDocs || []) : [];
   }
 
   ngAfterViewInit(): void {
@@ -165,6 +184,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     const nofoArray = formValue.rfaPa;
     const mechArray = formValue.mechSelect;
     const typeArray = formValue.typeSelect;
+    const effectiveDocs = this.getEffectiveDocs();
     return !!(
       grantNumber.grantNumberType ||
       grantNumber.grantNumberMech ||
@@ -173,7 +193,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
       grantNumber.grantNumberYear ||
       grantNumber.grantNumberSuffix ||
       formValue.pdName ||
-      this.selectedDocs.length > 0 ||
+      effectiveDocs.length > 0 ||
       (Array.isArray(caArray) ? caArray.length > 0 : !!caArray) ||
       (Array.isArray(i2Array) ? i2Array.length > 0 : !!i2Array) ||
       this.searchCriteria?.piName ||
@@ -231,7 +251,8 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     criteria.piName = this.searchCriteria.piName;
     criteria.pdName = formValue.pdName;
     criteria.includeInactivePd = this.isPdActive;
-    criteria.divisionOfficeCenter = this.selectedDocs.length ? this.selectedDocs : undefined;
+    const effectiveDocs = this.getEffectiveDocs();
+    criteria.divisionOfficeCenter = effectiveDocs.length ? effectiveDocs : undefined;
     criteria.cancerActivity = Array.isArray(this.selectedCancerActivities) && this.selectedCancerActivities.length
       ? (this.selectedCancerActivities as string[])
       : (this.selectedCancerActivities && !Array.isArray(this.selectedCancerActivities) ? [this.selectedCancerActivities as string] : undefined);

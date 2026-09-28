@@ -26,7 +26,7 @@
 			</lib-pdname-dropdown>
     </div>
     <div class="col-lg-4">
-      <lib-doc-dropdown [name]="'doc'" label="DOC" [selectedValue]="selectedDocs" (selectedValueChange)="onDocSelected($event)"></lib-doc-dropdown>
+      <lib-doc-dropdown [name]="'doc'" [lockedDocs]="userDocs" label="DOC" [selectedValue]="selectedDocs" (selectedValueChange)="onDocSelected($event)"></lib-doc-dropdown>
     </div>
     <div class="col-lg-4">
     <lib-cancer-activities-dropdown #assignedCas [debug]="false" [name]="'assignedCAs'" [broadcast]="true" [syncWithPd]="true"
