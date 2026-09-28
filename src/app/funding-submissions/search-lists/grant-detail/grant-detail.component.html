@@ -39,7 +39,7 @@
               <a href="{{grantViewerUrl}}{{data.applId}}" target="yourgrant">{{data.grantNumber}}</a>
             </td>
             <td class="grid-label">PI:</td>
-            <td class="grid-item">{{data.piName}}</td>
+            <td class="grid-item"><a *ngIf="data.piEmail" href="mailto:{{data.piEmail}}?subject={{data.grantNumber}} - {{data.piName}}">{{data.piName}}</a></td>
             <td class="grid-label sep">NCI Decision:</td>
             <td class="grid-item">
               <span>{{data.nciDecision}}</span>
@@ -192,7 +192,7 @@
           <tr>
             <td class="grid-label">PFR:</td>
             <td class="grid-item">
-              <a *ngIf="data.pfr && pfrRouterLink" [routerLink]="pfrRouterLink">{{data.pfr}}</a>
+              <a *ngIf="data.pfr && pfrRouterLink" [routerLink]="pfrRouterLink" target="_blank" rel="noopener noreferrer">{{data.pfr}}</a>
               <span *ngIf="!data.pfr || !pfrRouterLink">{{data.pfr || '-'}}</span>
             </td>
             <td>&nbsp;</td>
