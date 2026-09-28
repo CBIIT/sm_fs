@@ -56,16 +56,23 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   canSave = false;
   isSaving = false;
   saveSuccessMessage = '';
+  bulkDocNotesValidationErrorMessage = '';
   docFundingListCor = false;
   OEFIACertifier = false;
   private lastSavedRows: any[] = [];
   private pendingRealignFrame: number | null = null;
+  private readonly doNotPayDocNotesErrorMessage = 'DOC Notes is required when DOC Decision is Do Not Pay.';
+  private doNotPayDocNotesErrorRowIds = new Set<number>();
 
   get hasAnyBulkFieldValue(): boolean {
     const f = this.bulkFields;
     return !!(f.budgetCategories || f.docDecision || f.docNciSelection ||
               f.annualFundingR01 || f.annualOrMyf || f.docNotes ||
               (this.canEditOefiaNotes() && f.oefiaNotes));
+  }
+
+  get hasValidationErrors(): boolean {
+    return !!this.bulkDocNotesValidationErrorMessage || this.doNotPayDocNotesErrorRowIds.size > 0;
   }
 
   // Populated from the shared FundingSubmDropdownLookupService (2026-08-24 Individual/Bulk Edit
@@ -335,17 +342,128 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  private isDoNotPayDecisionValue(decision: any): boolean {
+    const normalizedDecision = String(Array.isArray(decision) ? decision[0] : (decision ?? '')).trim().toLowerCase();
+    if (!normalizedDecision) {
+      return false;
+    }
+
+    if (
+      normalizedDecision === 'do not pay'
+      || normalizedDecision.includes('do not pay')
+    ) {
+      return true;
+    }
+
+    const selectedOption = this.decisionOptions.find(option => String(option.id) === String(decision));
+    const optionText = String(selectedOption?.text ?? '').trim().toLowerCase();
+    const optionId = String(selectedOption?.id ?? '').trim().toLowerCase();
+
+    return (
+      optionText.includes('do not pay')
+    );
+  }
+
+  isDoNotPayDecisionSelected(decision: string | null | undefined): boolean {
+    return this.isDoNotPayDecisionValue(decision);
+  }
+
+  private clearDoNotPayDependentFields(target: any): void {
+    target.budgetCategories = null;
+    target.docNciSelection = null;
+    target.annualFundingR01 = null;
+    target.annualOrMyf = null;
+  }
+
+  private enforceDoNotPayRulesForRows(): void {
+    this.rows.forEach(row => {
+      if (this.isDoNotPayDecisionValue(row.docDecision)) {
+        this.clearDoNotPayDependentFields(row);
+      }
+    });
+  }
+
+  private updateDoNotPayDocNotesValidationErrors(): boolean {
+    this.doNotPayDocNotesErrorRowIds.clear();
+    this.rows.forEach(row => {
+      if (this.isDoNotPayDecisionValue(row.docDecision) && !String(row.docNotes || '').trim()) {
+        this.doNotPayDocNotesErrorRowIds.add(Number(row.applId));
+      }
+    });
+    return this.doNotPayDocNotesErrorRowIds.size === 0;
+  }
+
+  hasDoNotPayDocNotesError(row: any): boolean {
+    return this.doNotPayDocNotesErrorRowIds.has(Number(row?.applId));
+  }
+
+  getDoNotPayDocNotesErrorMessage(): string {
+    return this.doNotPayDocNotesErrorMessage;
+  }
+
+  private clearSaveMessages(): void {
+    this.saveSuccessMessage = '';
+  }
+
+  private validateBulkDocNotesBeforeApply(): boolean {
+    if (!this.isDoNotPayDecisionValue(this.bulkFields.docDecision)) {
+      this.bulkDocNotesValidationErrorMessage = '';
+      return true;
+    }
+
+    if (!String(this.bulkFields.docNotes || '').trim()) {
+      this.bulkDocNotesValidationErrorMessage = this.doNotPayDocNotesErrorMessage;
+      return false;
+    }
+
+    this.bulkDocNotesValidationErrorMessage = '';
+    return true;
+  }
+
   // Called from the per-row DataTable cell renderers (bulk-edit.component.html) whenever a
   // grant row's field is edited directly, so "Save" enables even without going through the
   // shared "Apply Changes" flow. Recomputes dirty state instead of latching true so
   // initialization/binding emissions with no actual value change leave Save disabled (FS-2277).
   onRowFieldChange(): void {
     this.restoreReadOnlyOefiaNotes();
+    this.updateDoNotPayDocNotesValidationErrors();
     this.recomputeCanSave();
+  }
+
+  onRowDocDecisionChange(row: any): void {
+    if (this.isDoNotPayDecisionValue(row?.docDecision)) {
+      this.clearDoNotPayDependentFields(row);
+    }
+    this.onRowFieldChange();
+  }
+
+  onBulkDocDecisionChange(): void {
+    if (this.isDoNotPayDecisionValue(this.bulkFields.docDecision)) {
+      this.clearDoNotPayDependentFields(this.bulkFields);
+      return;
+    }
+    this.bulkDocNotesValidationErrorMessage = '';
+  }
+
+  onBulkDocNotesChange(): void {
+    if (!this.bulkDocNotesValidationErrorMessage) {
+      return;
+    }
+    if (!this.isDoNotPayDecisionValue(this.bulkFields.docDecision)) {
+      this.bulkDocNotesValidationErrorMessage = '';
+      return;
+    }
+    if (String(this.bulkFields.docNotes || '').trim()) {
+      this.bulkDocNotesValidationErrorMessage = '';
+    }
   }
 
   onApplyChanges(): void {
     const f = this.bulkFields;
+    this.clearSaveMessages();
+    if (!this.validateBulkDocNotesBeforeApply()) {
+      return;
+    }
     for (const row of this.rows) {
       if (f.budgetCategories) row.budgetCategories = f.budgetCategories;
       if (f.docDecision)      row.docDecision      = f.docDecision;
@@ -354,8 +472,12 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       if (f.annualOrMyf)      row.annualOrMyf      = f.annualOrMyf;
       if (f.docNotes)         row.docNotes         = f.docNotes;
       if (this.canEditOefiaNotes() && f.oefiaNotes) row.oefiaNotes = f.oefiaNotes;
+      if (this.isDoNotPayDecisionValue(row.docDecision)) {
+        this.clearDoNotPayDependentFields(row);
+      }
     }
     this.restoreReadOnlyOefiaNotes();
+    this.updateDoNotPayDocNotesValidationErrors();
     // Apply Changes only enables Save when it actually changed at least one row's persisted
     // value; it must not leave a stale canSave=true when the shared values matched every row.
     this.recomputeCanSave();
@@ -365,16 +487,26 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   onReset(): void {
     this.bulkForm?.resetForm();
     this.bulkFields = {};
+    this.bulkDocNotesValidationErrorMessage = '';
     this.rows = JSON.parse(JSON.stringify(this.lastSavedRows));
+    this.doNotPayDocNotesErrorRowIds.clear();
     this.canSave = false;
-    this.saveSuccessMessage = '';
+    this.clearSaveMessages();
     this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
   }
 
   onSave(): void {
     if (!this.rows.length || !this.canSave || this.isSaving) return;
+    this.clearSaveMessages();
     this.isSaving = true;
     this.restoreReadOnlyOefiaNotes();
+    this.enforceDoNotPayRulesForRows();
+    const hasNoDoNotPayErrors = this.updateDoNotPayDocNotesValidationErrors();
+    if (!hasNoDoNotPayErrors) {
+      this.isSaving = false;
+      this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+      return;
+    }
     const calls = this.rows.map(row =>
       this.fundingSubmissionsService.bulkUpdateListGrants(
         {

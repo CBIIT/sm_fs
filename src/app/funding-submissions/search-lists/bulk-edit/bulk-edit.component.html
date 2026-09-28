@@ -35,18 +35,21 @@
         <div class="col-4">
           <label class="form-label fw-semibold">Budget Categories</label>
           <ng-select2 id="bulk-budget-cat" name="bulkBudgetCategories" [(ngModel)]="bulkFields.budgetCategories"
+            [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
           </ng-select2>
         </div>
         <div class="col-4">
           <label class="form-label fw-semibold">DOC Decision</label>
           <ng-select2 id="bulk-doc-decision" name="bulkDocDecision" [(ngModel)]="bulkFields.docDecision"
+            (ngModelChange)="onBulkDocDecisionChange()"
             [data]="decisionOptions" [allowClear]="true" width="100%">
           </ng-select2>
         </div>
         <div class="col-4">
           <label class="form-label fw-semibold">DOC / NCI Selection</label>
           <ng-select2 id="bulk-doc-nci-sel" name="bulkDocNciSelection" [(ngModel)]="bulkFields.docNciSelection"
+            [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="docNciOptions" [allowClear]="true" width="100%">
           </ng-select2>
         </div>
@@ -56,12 +59,14 @@
         <div class="col-4">
           <label class="form-label fw-semibold">Two-Year Annual Funding R01 (HRHR)</label>
           <ng-select2 id="bulk-annual-r01" name="bulkAnnualFundingR01" [(ngModel)]="bulkFields.annualFundingR01"
+            [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="yesNoOptions" [allowClear]="true" width="100%">
           </ng-select2>
         </div>
         <div class="col-4">
           <label class="form-label fw-semibold">Annual or MYF</label>
           <ng-select2 id="bulk-annual-myf" name="bulkAnnualOrMyf" [(ngModel)]="bulkFields.annualOrMyf"
+            [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="annualMyfOptions" [allowClear]="true" width="100%">
           </ng-select2>
         </div>
@@ -70,9 +75,12 @@
       <div class="row mb-3">
         <div class="col-6">
           <label class="form-label fw-semibold">DOC Notes</label>
-          <textarea class="form-control" name="bulkDocNotes" [(ngModel)]="bulkFields.docNotes" rows="4"
+          <textarea class="form-control" name="bulkDocNotes" [(ngModel)]="bulkFields.docNotes" (ngModelChange)="onBulkDocNotesChange()" rows="4"
             maxlength="1000">
         </textarea>
+          <div *ngIf="bulkDocNotesValidationErrorMessage.length > 0" class="text-danger small mt-1">
+            {{ bulkDocNotesValidationErrorMessage }}
+          </div>
           <div class="text-end text-muted small">{{ bulkFields.docNotes?.length || 0 }}/1000</div>
         </div>
         <div class="col-6">
@@ -113,31 +121,31 @@
 
         <ng-template #budgetCatRenderer let-data="adtData">
           <ng-select2 [id]="'bcat-' + data.applId" [(ngModel)]="data.budgetCategories"
-            (ngModelChange)="onRowFieldChange()" [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
+            (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
           </ng-select2>
         </ng-template>
 
         <ng-template #docDecisionRenderer let-data="adtData">
-          <ng-select2 [id]="'ddec-' + data.applId" [(ngModel)]="data.docDecision" (ngModelChange)="onRowFieldChange()"
+          <ng-select2 [id]="'ddec-' + data.applId" [(ngModel)]="data.docDecision" (ngModelChange)="onRowDocDecisionChange(data)"
             [data]="decisionOptions" [allowClear]="true" width="100%">
           </ng-select2>
         </ng-template>
 
         <ng-template #docNciSelRenderer let-data="adtData">
           <ng-select2 [id]="'dnci-' + data.applId" [(ngModel)]="data.docNciSelection"
-            (ngModelChange)="onRowFieldChange()" [data]="docNciOptions" [allowClear]="true" width="100%">
+            (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" [allowClear]="true" width="100%">
           </ng-select2>
         </ng-template>
 
         <ng-template #annualR01Renderer let-data="adtData">
           <ng-select2 [id]="'ar01-' + data.applId" [(ngModel)]="data.annualFundingR01"
-            (ngModelChange)="onRowFieldChange()" [data]="yesNoOptions" [allowClear]="true" width="100%">
+            (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" [allowClear]="true" width="100%">
           </ng-select2>
         </ng-template>
 
         <ng-template #annualMyfRenderer let-data="adtData">
           <ng-select2 [id]="'amyf-' + data.applId" [(ngModel)]="data.annualOrMyf" (ngModelChange)="onRowFieldChange()"
-            [data]="annualMyfOptions" [allowClear]="true" width="100%">
+            [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" [allowClear]="true" width="100%">
           </ng-select2>
         </ng-template>
 
@@ -146,6 +154,9 @@
             <textarea class="form-control form-control-sm notes-textarea" [(ngModel)]="data.docNotes"
               (ngModelChange)="onRowFieldChange()" rows="2" maxlength="2000">
           </textarea>
+            <div *ngIf="hasDoNotPayDocNotesError(data)" class="text-danger small mt-1">
+              {{ getDoNotPayDocNotesErrorMessage() }}
+            </div>
             <div class="char-count">{{ data.docNotes?.length || 0 }}/2000</div>
           </div>
         </ng-template>
@@ -171,7 +182,7 @@
       </span>
       <span ngbTooltip="Apply changes prior to saving" [disableTooltip]="canSave" container="body">
         <button type="button" class="btn btn-primary" (click)="onSave()"
-          [disabled]="!rows.length || !canSave || isSaving">
+          [disabled]="!rows.length || !canSave || isSaving || hasValidationErrors">
           <span *ngIf="!isSaving">Save</span>
           <span *ngIf="isSaving">Saving...</span>
         </button>
