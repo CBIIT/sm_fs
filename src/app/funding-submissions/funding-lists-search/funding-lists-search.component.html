@@ -56,13 +56,16 @@
       <lib-doc-dropdown [name]="'doc'" [lockedDocs]="userDocs" label="DOC" [selectedValue]="selectedDocs"
         (selectedValueChange)="onDocSelected($event)">
       </lib-doc-dropdown>
+      <div *ngIf="isDocRequiredMissing" class="text-danger mt-1">DOC is required.</div>
     </div>
   </div>
 
   <!-- Action buttons -->
   <div class="d-flex justify-content-end gap-2 mb-4">
     <button type="button" class="btn btn-outline-secondary" (click)="reset()">Reset</button>
-    <button type="submit" class="btn btn-primary ms-3" [disabled]="!hasSearchCriteria || !!filterForm?.invalid">Search</button>
+    <span [ngbTooltip]="isDocRequiredMissing ? 'DOC is required for DOC Funding List Coordinator users.' : null" container="body">
+      <button type="submit" class="btn btn-primary ms-3" [disabled]="isDocRequiredMissing || !hasSearchCriteria || !!filterForm?.invalid">Search</button>
+    </span>
   </div>
 
 </form>

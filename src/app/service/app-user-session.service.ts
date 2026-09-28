@@ -152,7 +152,12 @@ export class AppUserSessionService {
     const roles = this.loggedOnUser?.roles || [];
     const docAbbrevs = roles
       .filter((role: any) => role?.roleCode === roleNames.DOC_FUNDING_LIST_COR)
-      .map((role: any) => (role?.docAbbrev || '').trim())
+      .map((role: any) => {
+        const rawDocAbbrev = role?.docAbbrev;
+        return (typeof rawDocAbbrev === 'string'
+          ? rawDocAbbrev
+          : String(rawDocAbbrev ?? '')).trim();
+      })
       .filter((docAbbrev: string) => !!docAbbrev);
 
     return Array.from(new Set(docAbbrevs));

@@ -3,7 +3,8 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { NGXLogger } from 'ngx-logger';
-import { Subject } from 'rxjs';
+import { of, Subject } from 'rxjs';
+import { catchError, timeout } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { Select2OptionData } from 'ng-select2';
 import { LoaderService, PdCaIntegratorService as LibPdCaIntegratorService } from '@cbiit/i2ecui-lib';
@@ -47,6 +48,8 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   private searchListsInitialized = false;
   private hasSavedSearchListsState = false;
   private defaultPendingReviewApplied = false;
+  private readonly INIT_API_TIMEOUT_MS = 15000;
+  private readonly LIST_ID_PRELOAD_LIMIT = 100;
 
   selectionDateOptions: Select2OptionData[] = [];
   listIdOptions: Select2OptionData[] = [];
@@ -99,14 +102,39 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   ) {}
 
   ngOnInit(): void {
+    this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+    if (this.docFundingListCor) {
+      this.userDocs = this.userSessionService.getDocFundingSubmissionCoordinatorDocAbbrevs();
+      const saved = this.stateService.getSearchListsState();
+      if (!saved?.selectedDocs?.length) {
+        this.applyDefaultDocSelection();
+      }
+    }
     $.fn.DataTable.ext.pager.numbers_length = 5;
-    this.fundingSubmissionsService.getSelectionDateCodes().subscribe({
+    this.fundingSubmissionsService.getSelectionDateCodes().pipe(
+      timeout(this.INIT_API_TIMEOUT_MS),
+      catchError((err) => {
+        this.logger.error('Failed to load selection dates', err);
+        return of([] as SelectionDateCodeDto[]);
+      })
+    ).subscribe({
       next: (dates: SelectionDateCodeDto[]) => {
         this.selectionDateOptions = dates.map(d => ({ id: d.code, text: d.name || d.description || d.code }));
       },
-      error: (err) => this.logger.error('Failed to load selection dates', err)
     });
-    this.fundingSubmissionsService.searchLists({ start: 0, length: 9999 }).subscribe({
+
+    const initialListSearchCriteria: FundingSubmissionListSearchCriteriaDto = {
+      start: 0,
+      length: this.LIST_ID_PRELOAD_LIMIT,
+    };
+
+    this.fundingSubmissionsService.searchLists(initialListSearchCriteria).pipe(
+      timeout(this.INIT_API_TIMEOUT_MS),
+      catchError((err) => {
+        this.logger.error('Failed to load dropdown options', err);
+        return of({ data: [] } as any);
+      })
+    ).subscribe({
       
       next: (result) => {
         const data = result.data || [];
@@ -115,28 +143,36 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
           text: String(item.listId)
         }));
       },
-      error: (err) => this.logger.error('Failed to load dropdown options', err)
     });
-    this.fundingSubmissionsService.getListStatusCodes().subscribe({
+
+    this.fundingSubmissionsService.getListStatusCodes().pipe(
+      timeout(this.INIT_API_TIMEOUT_MS),
+      catchError((err) => {
+        this.logger.error('Failed to load list status codes', err);
+        return of([] as FundingSubmStatusCodesTDto[]);
+      })
+    ).subscribe({
       next: (codes: FundingSubmStatusCodesTDto[]) => {
         this.listStatusOptions = codes
           .filter(c => c.activeFlag)
           .map(c => ({ id: c.code, text: c.description }));
       },
-      error: (err) => this.logger.error('Failed to load list status codes', err)
     });
-    this.fundingSubmissionsService.getPendingReviewListCount().subscribe({
+
+    this.fundingSubmissionsService.getPendingReviewListCount().pipe(
+      timeout(this.INIT_API_TIMEOUT_MS),
+      catchError((err) => {
+        this.logger.error('Failed to load pending review count', err);
+        return of(0);
+      })
+    ).subscribe({
       next: (count) => {
         this.pendingReviewCount = count ?? 0;
         this.pendingReviewCountLoaded = true;
         this.applyDefaultPendingReviewIfReady();
       },
-      error: (err) => this.logger.error('Failed to load pending review count', err)
     });
-      this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
-      if(this.docFundingListCor) {
-        this.userDocs = this.userSessionService.getDocFundingSubmissionCoordinatorDocAbbrevs();
-      }
+
   }
 
   ngAfterViewInit(): void {
@@ -149,7 +185,10 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     this.hasSavedSearchListsState = !freshNavigation && !!saved;
     if (!freshNavigation && saved) {
       setTimeout(() => {
-        this.selectedDocs = saved.selectedDocs;
+        this.onDocSelected(saved.selectedDocs || []);
+        if (!this.selectedDocs?.length) {
+          this.applyDefaultDocSelection();
+        }
         const savedCriteria = saved.searchCriteria || {};
         const stalePendingStatus = saved.selectedListStatus === 'Pending Review'
           || savedCriteria.listStatus?.includes('Pending Review');
@@ -348,19 +387,15 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     );
   }
 
-  private getEffectiveDocs(): string[] {
-    if (this.selectedDocs?.length) {
-      return this.selectedDocs;
-    }
-
-    return this.docFundingListCor ? (this.userDocs || []) : [];
+  private getDocsForQuery(): string[] {
+    return (this.selectedDocs || []).filter(Boolean);
   }
 
   get hasSearchCriteria(): boolean {
     const fv = this.filterForm?.form?.value || {};
     const gn = fv.grantNumber || {};
     const fy = fv.fyRange || {};
-    const effectiveDocs = this.getEffectiveDocs();
+    const effectiveDocs = this.getDocsForQuery();
     return !!(
       this.selectedSelectionDate ||
       this.listIdFilter ||
@@ -372,8 +407,12 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     );
   }
 
+  get isDocRequiredMissing(): boolean {
+    return this.docFundingListCor && !(this.selectedDocs?.length);
+  }
+
   search(): void {
-    if (this.filterForm?.invalid || !this.hasSearchCriteria) {
+    if (this.filterForm?.invalid || !this.hasSearchCriteria || this.isDocRequiredMissing) {
       return;
     }
 
@@ -383,6 +422,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     const fyRange = formValue.fyRange || {};
     const toNum = (v: any): number | undefined => (v !== '' && v != null) ? Number(v) : undefined;
 
+    const docsForQuery = this.getDocsForQuery();
     this.searchCriteria = {
       grantType:            grantNumber.grantNumberType   || undefined,
       grantNumberMech:      grantNumber.grantNumberMech   || undefined,
@@ -395,7 +435,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       selectionCode:        this.selectedSelectionDate ? [this.selectedSelectionDate] : undefined,
       listId:               this.listIdFilter ? Number(this.listIdFilter) : undefined,
       listStatus:           this.selectedListStatus ? [this.selectedListStatus] : undefined,
-      divisionOfficeCenter: this.getEffectiveDocs().length ? this.getEffectiveDocs() : undefined,
+      divisionOfficeCenter: docsForQuery.length ? docsForQuery : undefined,
     };
 
     this.throttle.reset();
@@ -428,7 +468,25 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   }
 
   onDocSelected(docs: string[]): void {
-    this.selectedDocs = docs || [];
+    const normalizedDocs = (docs || []).filter(Boolean);
+    if (this.selectedDocs.length === normalizedDocs.length
+      && this.selectedDocs.every((value, index) => value === normalizedDocs[index])) {
+      return;
+    }
+    this.selectedDocs = normalizedDocs;
+  }
+
+  private applyDefaultDocSelection(): void {
+    if (!this.docFundingListCor || this.selectedDocs.length) {
+      return;
+    }
+
+    const defaultDocs = (this.userDocs || []).filter(Boolean);
+    if (!defaultDocs.length) {
+      return;
+    }
+
+    this.selectedDocs = defaultDocs;
   }
 
   private destroyResultsTable(): Promise<void> {
@@ -460,6 +518,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   private clearSearchState(): void {
     this.filterForm?.resetForm();
     this.selectedDocs = [];
+    this.applyDefaultDocSelection();
     this.selectedListStatus = null;
     this.selectedSelectionDate = null;
     this.listIdFilter = null as any;

@@ -36,6 +36,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   excludeInList = true;
   searchCriteria: FundSelectSearchCriteria = {};
   private readonly CA_DOC_CHANNEL = 'CA_DOC_DEFAULT_CHANNEL';
+  private suppressDocBroadcast = false;
   excludImpact2StatusOptions =['T','C','N','W','SR','U','A']
 
   constructor(
@@ -52,18 +53,28 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     this.fiscalYear = getCurrentFiscalYear();
   }
   ngOnInit(): void {
-      this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
-      if(this.docFundingListCor) {
-        this.userDocs = this.userSessionService.getDocFundingSubmissionCoordinatorDocAbbrevs();
-      }
+    this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+    if (this.docFundingListCor) {
+      this.userDocs = this.userSessionService.getDocFundingSubmissionCoordinatorDocAbbrevs();
+      this.applyDefaultDocSelection();
+    }
   }
 
-  private getEffectiveDocs(): string[] {
-    if (this.selectedDocs?.length) {
-      return this.selectedDocs;
+  private applyDefaultDocSelection(): void {
+    if (!this.docFundingListCor || this.selectedDocs.length) {
+      return;
     }
 
-    return this.docFundingListCor ? (this.userDocs || []) : [];
+    const defaultDocs = (this.userDocs || []).filter(Boolean);
+    if (!defaultDocs.length) {
+      return;
+    }
+
+    this.onDocSelected(defaultDocs);
+  }
+
+  private getDocsForQuery(): string[] {
+    return (this.selectedDocs || []).filter(Boolean);
   }
 
   ngAfterViewInit(): void {
@@ -75,9 +86,10 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     const state = this.stateService.getListPageState();
     if (!freshNavigation && state) {
       setTimeout(() => {
-        this.selectedDocs = state.selectedDocs;
-        if (this.selectedDocs.length) {
+        if (state.selectedDocs?.length) {
           this.onDocSelected(state.selectedDocs);
+        } else {
+          this.applyDefaultDocSelection();
         }
         const restoredCancerActivities = Array.isArray(state.selectedCancerActivities)
           ? state.selectedCancerActivities.filter(Boolean)
@@ -137,8 +149,30 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  private normalizeDocs(docs: string[] | null | undefined): string[] {
+    return (docs || []).filter(Boolean);
+  }
+
+  private areSameDocs(left: string[] | null | undefined, right: string[] | null | undefined): boolean {
+    const normalizedLeft = this.normalizeDocs(left);
+    const normalizedRight = this.normalizeDocs(right);
+    if (normalizedLeft.length !== normalizedRight.length) {
+      return false;
+    }
+    return normalizedLeft.every((value, index) => value === normalizedRight[index]);
+  }
+
   onDocSelected(docs: string[]): void {
-    this.selectedDocs = docs || [];
+    const normalizedDocs = this.normalizeDocs(docs);
+    if (this.areSameDocs(this.selectedDocs, normalizedDocs)) {
+      return;
+    }
+
+    this.selectedDocs = normalizedDocs;
+    if (this.suppressDocBroadcast) {
+      return;
+    }
+
     this.pdCaIntegratorService.docEmitter.next({ doc: this.selectedDocs.length ? this.selectedDocs : null, channel: PD_CA_DEFAULT_CHANNEL });
   }
 
@@ -160,14 +194,17 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
 
     // Some dropdown refreshes emit a transient empty selection; restore previous DOC value.
     if (previousDocs.length) {
+      this.suppressDocBroadcast = true;
       setTimeout(() => {
         if (!this.selectedDocs.length) {
           this.selectedDocs = previousDocs;
-          this.pdCaIntegratorService.docEmitter.next({
-            doc: this.selectedDocs,
-            channel: PD_CA_DEFAULT_CHANNEL
-          });
         }
+
+        this.suppressDocBroadcast = false;
+        this.pdCaIntegratorService.docEmitter.next({
+          doc: this.selectedDocs.length ? this.selectedDocs : null,
+          channel: PD_CA_DEFAULT_CHANNEL
+        });
       });
     }
   }
@@ -184,7 +221,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     const nofoArray = formValue.rfaPa;
     const mechArray = formValue.mechSelect;
     const typeArray = formValue.typeSelect;
-    const effectiveDocs = this.getEffectiveDocs();
+    const effectiveDocs = this.getDocsForQuery();
     return !!(
       grantNumber.grantNumberType ||
       grantNumber.grantNumberMech ||
@@ -212,8 +249,12 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     );
   }
 
+  get isDocRequiredMissing(): boolean {
+    return this.docFundingListCor && !(this.selectedDocs?.length);
+  }
+
   search(): void {
-    if (this.filterForm?.invalid || !this.hasAnyCriteria) {
+    if (this.filterForm?.invalid || !this.hasAnyCriteria || this.isDocRequiredMissing) {
       return;
     }
 
@@ -251,8 +292,8 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     criteria.piName = this.searchCriteria.piName;
     criteria.pdName = formValue.pdName;
     criteria.includeInactivePd = this.isPdActive;
-    const effectiveDocs = this.getEffectiveDocs();
-    criteria.divisionOfficeCenter = effectiveDocs.length ? effectiveDocs : undefined;
+    const docsForQuery = this.getDocsForQuery();
+    criteria.divisionOfficeCenter = docsForQuery.length ? docsForQuery : undefined;
     criteria.cancerActivity = Array.isArray(this.selectedCancerActivities) && this.selectedCancerActivities.length
       ? (this.selectedCancerActivities as string[])
       : (this.selectedCancerActivities && !Array.isArray(this.selectedCancerActivities) ? [this.selectedCancerActivities as string] : undefined);
@@ -278,6 +319,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     this.fundingTable?.clearResults();
     this.selectedCancerActivities = '';
     this.selectedDocs = [];
+    this.applyDefaultDocSelection();
     this.i2Status = '';
     this.isPdActive = false;
     this.excludeInList = true;
