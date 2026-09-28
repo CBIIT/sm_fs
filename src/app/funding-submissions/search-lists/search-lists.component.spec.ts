@@ -4,7 +4,7 @@ import { of, throwError } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { HttpClient } from '@angular/common/http';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -177,6 +177,69 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('Review status date display (FS-2341)', () => {
+    it('formats the review status date as a zero-padded calendar date', () => {
+      expect(SearchListsComponent.formatReviewStatusWithDate('DOC Review', '2026-03-04'))
+        .toBe('DOC Review 03/04/2026');
+    });
+
+    it('supports backend LocalDateTime, date-only, Date, and offset-bearing ISO values', () => {
+      expect(SearchListsComponent.formatReviewStatusWithDate('OEFIA Review', '2026-11-09T14:20:07.123456'))
+        .toBe('OEFIA Review 11/09/2026');
+      expect(SearchListsComponent.formatReviewStatusWithDate('OEFIA Review', '2026-01-02'))
+        .toBe('OEFIA Review 01/02/2026');
+      expect(SearchListsComponent.formatReviewStatusWithDate('OEFIA Review', new Date(2026, 0, 2)))
+        .toBe('OEFIA Review 01/02/2026');
+      expect(SearchListsComponent.formatReviewStatusWithDate('OEFIA Review', '2026-01-02T00:30:00+14:00'))
+        .toBe('OEFIA Review 01/02/2026');
+    });
+
+    it('validates leap years and returns status only for malformed or impossible dates', () => {
+      expect(SearchListsComponent.formatReviewStatusWithDate('DOC Review', '2024-02-29'))
+        .toBe('DOC Review 02/29/2024');
+      ['not-a-date', '2025-02-29', '1900-02-29', '2026-01-02T25:00:00'].forEach(date => {
+        expect(SearchListsComponent.formatReviewStatusWithDate('DOC Review', date)).toBe('DOC Review');
+      });
+    });
+
+    it('returns status only for missing dates and an empty string for a missing status', () => {
+      [null, undefined, ''].forEach(date => {
+        expect(SearchListsComponent.formatReviewStatusWithDate('NCI Director Review', date))
+          .toBe('NCI Director Review');
+      });
+      expect(SearchListsComponent.formatReviewStatusWithDate('', '2026-01-02')).toBe('');
+      expect(SearchListsComponent.formatReviewStatusWithDate(null, '2026-01-02')).toBe('');
+      expect(SearchListsComponent.formatReviewStatusWithDate(undefined, '2026-01-02')).toBe('');
+    });
+
+    it('renders escaped display text and combined filter text while sorting by raw status', () => {
+      const column = (component.dtOptions.columns as any[])
+        .find(candidate => candidate.title === 'Review status');
+      const row: FundingSubmissionListGrantDto = { reviewStatusDate: new Date(2026, 0, 2) };
+      const status = '<img src=x onerror=alert(1)>';
+
+      expect(column.render(status, 'display', row)).toBe('&lt;img src=x onerror=alert(1)&gt; 01/02/2026');
+      expect(column.render(status, 'display', row)).not.toContain('<img');
+      expect(column.render(status, 'filter', row)).toBe(`${status} 01/02/2026`);
+      expect(column.render(status, 'sort', row)).toBe(status);
+      expect(column.render(status, 'type', row)).toBe(status);
+      expect(column.render(status, 'unknown', row)).toBe(status);
+    });
+
+    it('retains the same Review status renderer in the NCI Director/Designee sliced columns', fakeAsync(() => {
+      component.isNciDirector = true;
+      spyOn(component.dtTrigger, 'next');
+      component.ngAfterViewInit();
+
+      const column = (component.dtOptions.columns as any[])
+        .find(candidate => candidate.title === 'Review status');
+      expect(column.render('NCI Director Review', 'display', {
+        reviewStatusDate: new Date(2026, 0, 2)
+      })).toBe('NCI Director Review 01/02/2026');
+      tick(100);
+    }));
   });
 
   describe('Abs/SS plain text rendering (FS-2027)', () => {
