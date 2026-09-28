@@ -56,11 +56,13 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
     if (this.docFundingListCor) {
       this.userDocs = this.userSessionService.getDocFundingSubmissionCoordinatorDocAbbrevs();
-      this.applyDefaultDocSelection();
+      // Seed default DOC selection without broadcasting yet; child dropdown listeners
+      // may not be ready until after view init.
+      this.applyDefaultDocSelection(false);
     }
   }
 
-  private applyDefaultDocSelection(): void {
+  private applyDefaultDocSelection(emitSelection = true): void {
     if (!this.docFundingListCor || this.selectedDocs.length) {
       return;
     }
@@ -70,7 +72,19 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    this.onDocSelected(defaultDocs);
+    if (emitSelection) {
+      this.onDocSelected(defaultDocs);
+      return;
+    }
+
+    this.selectedDocs = defaultDocs;
+  }
+
+  private emitCurrentDocSelection(): void {
+    this.pdCaIntegratorService.docEmitter.next({
+      doc: this.selectedDocs.length ? this.selectedDocs : null,
+      channel: PD_CA_DEFAULT_CHANNEL
+    });
   }
 
   private getDocsForQuery(): string[] {
@@ -104,7 +118,15 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
           this.fundingTable?.restoreState(state.selectedRows, state.currentPage);
           this.fundingTable?.search(state.searchCriteria);
         }
+
+        // Re-emit once after restore to keep CA/DOC sync stable even when dedupe
+        // guards skip onDocSelected due to same-value assignments.
+        this.emitCurrentDocSelection();
       });
+    } else {
+      // Ensure CA receives current DOC selection on first navigation after child
+      // listeners are wired.
+      setTimeout(() => this.emitCurrentDocSelection());
     }
   }
 
