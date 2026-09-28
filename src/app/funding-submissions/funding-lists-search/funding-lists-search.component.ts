@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { NGXLogger } from 'ngx-logger';
@@ -32,6 +32,7 @@ declare var $: any;
 export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('filterForm') filterForm: NgForm;
   @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
+  @ViewChild('fundingListActionRenderer') fundingListActionRenderer: TemplateRef<any>;
 
   fiscalYear = getCurrentFiscalYear();
   pendingReviewCount = 0;
@@ -39,6 +40,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
 
   selectedDocs: string[] = [];
   docFundingListCor = false;
+  isNciDirector = false;
   userDocs: string[] = [];
   selectedListStatus: string = null;
   selectedSelectionDate: string = null;
@@ -103,6 +105,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
 
   ngOnInit(): void {
     this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+    this.isNciDirector = this.userSessionService.hasRole(roleNames.NCI_DIRECTOR);
     if (this.docFundingListCor) {
       this.userDocs = this.userSessionService.getDocFundingSubmissionCoordinatorDocAbbrevs();
       const saved = this.stateService.getSearchListsState();
@@ -262,12 +265,16 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
         }, // 4
         {
           title: 'Action',
-          data: 'listId',
+          data: null,
           orderable: false,
           width: '80px',
           defaultContent: '',
-          render: (_data: number, _type: any, row: any) =>
-            `<a href="javascript:void(0)" class="view-list-link" data-listid="${row.listId}" data-code="${row.code || ''}">View List</a>`
+          ...(this.fundingListActionRenderer
+            ? { ngTemplateRef: { ref: this.fundingListActionRenderer } }
+            : {
+                render: (_data: number, _type: any, row: any) =>
+                  `<a href="javascript:void(0)" class="view-list-link-fallback" data-listid="${row.listId}" data-code="${row.code || ''}">View List</a>`
+              })
         }, // 5
       ],
       dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"B<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
@@ -296,13 +303,13 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
               (dt as any).button(0).disable();
               $((dt as any).button(0).node()).attr('title', 'Nothing found in the results table for export.');
             }
+
+            // Defensive fallback in case ngTemplateRef is not available at initialization time.
             $(dt.table(0).body())
-              .off('click', '.view-list-link')
-              .on('click', '.view-list-link', (e: any) => {
+              .off('click', '.view-list-link-fallback')
+              .on('click', '.view-list-link-fallback', (e: any) => {
                 const $el = $(e.currentTarget);
-                this.router.navigate(['/funding-submissions/search'], {
-                  queryParams: { listId: $el.data('listid'), selectionDate: $el.data('code'), from: 'lists' }
-                });
+                this.onViewList({ listId: $el.data('listid'), code: $el.data('code') });
               });
           });
         }, 0);
@@ -310,6 +317,15 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     };
     this.searchListsInitialized = true;
     this.applyDefaultPendingReviewIfReady();
+  }
+
+  onViewList(row: any): void {
+    const targetRoute = this.isNciDirector
+      ? '/funding-submissions/funding-lists'
+      : '/funding-submissions/search';
+    this.router.navigate([targetRoute], {
+      queryParams: { listId: row?.listId, selectionDate: row?.code || '', from: 'lists' }
+    });
   }
 
   private applyDefaultPendingReviewIfReady(): void {

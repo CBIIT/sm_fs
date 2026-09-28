@@ -1,0 +1,101 @@
+<div class="funding-lists-page ms-3 me-3">
+  <a class="text-decoration-none small" routerLink="/funding-submissions/lists">
+    <i class="far fa-chevron-left me-1"></i>Back to Lists
+  </a>
+
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-4">
+    <h1 class="mb-0">{{ pageTitle }}</h1>
+    <button type="button" class="btn btn-success confirm-btn">
+      <i class="far fa-lock me-1"></i>Confirm Approvals and Rejections
+    </button>
+  </div>
+
+  <section class="overview card mb-4">
+    <div class="card-body">
+      <h2 class="h3 mb-3">Overview</h2>
+      <div class="overview-grid">
+        <div><span class="label">ID:</span> {{ listId }}</div>
+        <div><span class="label">Status:</span> {{ status }}</div>
+        <div><span class="label">Total Number of Grants:</span> {{ totalNumberOfGrants }}</div>
+        <div><span class="label">DOC Recommended Total:</span> {{ docRecommendedTotal }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tabs mb-4">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="selectedTab === tab.id"
+      *ngFor="let tab of tabs"
+      (click)="selectTab(tab.id)">
+      {{ tab.label }}
+      <span class="ms-1 fw-semibold">{{ getTabCount(tab.id) }}</span>
+    </button>
+  </section>
+
+  <section class="doc-filters mb-4">
+    <button
+      type="button"
+      class="doc-tile"
+      [class.active]="selectedDoc === doc"
+      *ngFor="let doc of availableDocs"
+      (click)="selectDoc(doc)">
+      <div class="count">{{ getDocCount(doc) }}</div>
+      <div class="name">{{ doc }}</div>
+    </button>
+  </section>
+
+  <section class="doc-summary mb-4" *ngIf="showSelectedDocSummary">
+    <div class="doc-summary-item">
+      <span class="label">{{ selectedDocSummary.doc }} Recommended Total:</span>
+      <span>{{ selectedDocSummary.recommendedTotal | currency:'USD':'symbol':'1.0-0' }}</span>
+    </div>
+    <div class="doc-summary-item">
+      <span class="label">Approved:</span>
+      <span>{{ selectedDocSummary.approvedCount }}</span>
+    </div>
+    <div class="doc-summary-item">
+      <span class="label">Rejected:</span>
+      <span>{{ selectedDocSummary.rejectedCount }}</span>
+    </div>
+    <div class="doc-summary-item">
+      <span class="label">On Hold:</span>
+      <span>{{ selectedDocSummary.onHoldCount }}</span>
+    </div>
+  </section>
+
+  <section class="results card mb-5">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="h3 mb-0">{{ tabTitle }}</h2>
+      </div>
+
+      <div class="mb-3">
+        <button type="button" class="btn btn-primary">
+          <i class="far fa-gavel me-1"></i>Bulk Decision
+        </button>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div style="width: 380px">
+          <ng-select2
+            id="view-doc-type"
+            name="viewDocType"
+            [(ngModel)]="selectedViewDoc"
+            (valueChanged)="onViewDocChange($event)"
+            [data]="viewDocOptions"
+            [allowClear]="true"
+            width="100%"
+            placeholder="Select document type">
+          </ng-select2>
+        </div>
+        <span ngbTooltip="Select grant(s)/application(s) and document to View PDF." [disableTooltip]="canViewPdf" container="body">
+          <button type="button" class="btn btn-md btn-primary ms-1" [disabled]="!canViewPdf" (click)="viewPDF()">View PDF</button>
+        </span>
+      </div>
+
+      <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%"></table>
+    </div>
+  </section>
+</div>

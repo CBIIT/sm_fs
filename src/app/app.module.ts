@@ -244,6 +244,7 @@ import { GrantFundedOnceValidatorDirective } from './validators/grant-funded-onc
 import {
   SearchGrantExistInPaylistCellRendererComponent
 } from './search/search-result/search-grant-exist-in-paylist-cell-renderer/search-grant-exist-in-paylist-cell-renderer.component';
+import { FundingListActionCellRendererComponent } from './table-cell-renderers/funding-list-action-cell-renderer/funding-list-action-cell-renderer.component';
 import {
   FpWorkflowWarningModalComponent
 } from './funding-plan/fp-workflow/fp-warning-modal/fp-workflow-warning-modal.component';
@@ -266,6 +267,7 @@ import { SearchListsComponent } from './funding-submissions/search-lists/search-
 import { GrantDetailComponent } from './funding-submissions/search-lists/grant-detail/grant-detail.component';
 import { BulkEditComponent } from './funding-submissions/search-lists/bulk-edit/bulk-edit.component';
 import { FundingListsSearchComponent } from './funding-submissions/funding-lists-search/funding-lists-search.component';
+import { FundingListsComponent } from './funding-submissions/funding-lists/funding-lists.component';
 import { SavedProjectedCanComponent } from './cans/saved-projected-can/saved-projected-can.component';
 
 declare var $: any;
@@ -509,6 +511,7 @@ export function combinedInitializerFactory(
         OneFundedGrantValidatorDirective,
         GrantFundedOnceValidatorDirective,
         SearchGrantExistInPaylistCellRendererComponent,
+        FundingListActionCellRendererComponent,
         ErrorComponent,
         SearchFundingRequestApprvlRoleComponent,
         R00PdNameRequiredValidatorDirective,
@@ -524,6 +527,7 @@ export function combinedInitializerFactory(
         GrantDetailComponent,
         BulkEditComponent,
         FundingListsSearchComponent,
+        FundingListsComponent,
         SavedProjectedCanComponent
     ],
     bootstrap: [AppComponent],

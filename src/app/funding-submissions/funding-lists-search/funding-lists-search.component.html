@@ -70,6 +70,10 @@
 
 </form>
 
+<ng-template #fundingListActionRenderer let-data="adtData">
+  <app-funding-list-action-cell-renderer [data]="data" (viewList)="onViewList($event)"></app-funding-list-action-cell-renderer>
+</ng-template>
+
 <!-- Results -->
 <div *ngIf="showResults">
   <div class="d-flex align-items-center mb-3">
