@@ -10,7 +10,6 @@ import { Select2OptionData } from 'ng-select2';
 import { FundingSubmissionsService, FundingSubmissionListGrantDto, FundingSubmissionListGrantExportRequestDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
-import { openNewWindow } from '../../utils/utils';
 import { roleNames } from '../../service/role-names';
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
@@ -87,6 +86,16 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   justificationWarningMessage = '';
   isSendGrantsInDraftInProgress = false;
   docFundingListCor = false;
+  isNciDirector = false;
+  readonly nciTabs = [
+    { id: 'all', label: 'All Grants' },
+    { id: 'pending', label: 'Pending Review' },
+    { id: 'approved', label: 'Approved' },
+    { id: 'hold', label: 'On Hold' },
+    { id: 'rejected', label: 'Rejected' },
+    { id: 'recusals', label: 'Recusals' }
+  ];
+  selectedNciTab = 'all';
   blockedGrantNumbers: string[] = [];
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
   viewDocOptions: Select2OptionData[] = [
@@ -159,6 +168,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.bindGlobalNavigationUnsavedGuard();
     this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+    this.isNciDirector = this.userSessionService.hasRole(roleNames.NCI_DIRECTOR);
     this.dropdownLookupService.getDocDecisions().subscribe({
       next: options => {
         this.docDecisionDisplayMap = new Map(options.map(option => [String(option.id), option.text]));
@@ -212,20 +222,22 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   viewPDF(): void {
     const applIds = Array.from(this.selectedRows.keys());
-    if (this.selectedViewDoc !== 'JST') {
-      openNewWindow(`${this.documentURL}openGrantReport.action?docType=${this.selectedViewDoc}&applIds=${applIds.join(',')}&resubmit=true`, 'session');
-      return;
-    }
+    const isJustification = this.selectedViewDoc === 'JST';
+    const endpoint = isJustification ? 'justification-pdf' : 'document-report';
+    const body = isJustification ? { applIds } : { applIds, docType: this.selectedViewDoc };
+    this.downloadPdf(endpoint, body, isJustification);
+  }
 
+  private downloadPdf(endpoint: string, body: { applIds: number[]; docType?: string }, isJustification: boolean): void {
     this.setJustificationWarningMessage('');
     this.loaderService.show();
-    this.http.post('/i2efsws/api/v1/funding-submissions/lists/' + this.listId + '/justification-pdf',
-      { applIds }, { responseType: 'blob' }).pipe(
+    this.http.post('/i2efsws/api/v1/funding-submissions/lists/' + this.listId + '/' + endpoint,
+      body, { responseType: 'blob' }).pipe(
         finalize(() => this.loaderService.hide())
       ).subscribe({
         next: (blob: Blob) => {
           if (!blob || blob.size === 0) {
-            this.setJustificationWarningMessage('No justifications found for the selected grant(s).');
+            this.setJustificationWarningMessage(isJustification ? 'No justifications found for the selected grant(s).' : 'No documents found for the selected grant(s).');
             this.cdr.markForCheck();
             return;
           }
@@ -237,17 +249,16 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         error: async (error: HttpErrorResponse) => {
           if (error.status === 404 && error.error instanceof Blob) {
             const message = await error.error.text();
-            this.setJustificationWarningMessage(message || 'No justifications found for the selected grant(s).');
+            this.setJustificationWarningMessage(message || (isJustification ? 'No justifications found for the selected grant(s).' : 'No documents found for the selected grant(s).'));
             this.cdr.markForCheck();
             return;
           }
-          this.logger.error('Justification PDF request failed', error);
-          this.setJustificationWarningMessage('Unable to generate the selected justification PDF.');
+          this.logger.error(isJustification ? 'Justification PDF request failed' : 'Document PDF request failed', error);
+          this.setJustificationWarningMessage(isJustification ? 'Unable to generate the selected justification PDF.' : 'Unable to generate the selected document PDF.');
           this.cdr.markForCheck();
         }
       });
   }
-
   private setJustificationWarningMessage(message: string): void {
     this.justificationWarningMessage = message;
 
@@ -671,8 +682,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
               this.bindSimpleUnsavedTableGuard(dt);
               this.bindHorizontalDragScroll(dt);
 
-              // Export button is index 1 now that Reset Table occupies index 0
-              dt.rows().count() > 0 ? (dt as any).button(1).enable() : (dt as any).button(1).disable();
+              // Export button is index 1 now that Reset Table occupies index 0.
+              this.updateExportButtonState(dt);
 
               // Use container so fixedColumns clones are included
               const $container = $(dt.table(0).container());
@@ -789,15 +800,68 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         }, 100);
       }
     };
+    if (this.isNciDirector) {
+      this.dtOptions.columns = this.dtOptions.columns.slice(1, -1);
+      const exportButton = (this.dtOptions.buttons as any[])
+        .find(button => (button.className || '').includes('btn-export-all'));
+      exportButton.exportOptions.columns = Array.from(
+        { length: this.dtOptions.columns.length }, (_, index) => index);
+      this.dtOptions.fixedColumns = { left: 0, right: 0 };
+    }
     setTimeout(() => this.dtTrigger.next(null));
+  }
+
+  private updateExportButtonState(dt: DataTables.Api): void {
+    const exportButton = (dt as any).button(1);
+    dt.rows().count() > 0 ? exportButton.enable() : exportButton.disable();
   }
 
   ajaxCall($this: SearchListsComponent, _dataTablesParameters: any, callback: any): void {
     let grants = $this.cachedGrants;
+    if ($this.isNciDirector) {
+      grants = grants.filter(grant => $this.matchesNciTab(grant));
+    }
     if ($this.filteredDoc) {
       grants = grants.filter(g => g.doc === $this.filteredDoc);
     }
     callback({ recordsTotal: grants.length, recordsFiltered: grants.length, data: grants });
+  }
+
+  private matchesNciTab(grant: FundingSubmissionListGrantDto): boolean {
+    switch (this.selectedNciTab) {
+      case 'pending':
+        return grant.nciDecision === null || grant.nciDecision === undefined;
+      case 'approved':
+        return grant.nciDecision === 'Approve';
+      case 'hold':
+        return grant.nciDecision === 'Hold';
+      case 'rejected':
+        return grant.nciDecision === 'Decline';
+      case 'recusals':
+        return grant.recusedFlag === true;
+      default:
+        return true;
+    }
+  }
+
+  onNciTabChange(tabId: string): void {
+    if (!this.isNciDirector || this.selectedNciTab === tabId) {
+      return;
+    }
+    this.selectedNciTab = tabId;
+    this.filteredDoc = null;
+    this.selectedRows.clear();
+    this.cachedGrants.forEach((grant: any) => grant.selected = false);
+    this.clearExpandedDetails();
+    this.dtElement?.dtInstance?.then(dt => {
+      this.clearSelections(dt);
+      dt.ajax.reload();
+    });
+  }
+
+  private clearExpandedDetails(): void {
+    this.detailComponentsByApplId.forEach(componentRef => componentRef?.destroy?.());
+    this.detailComponentsByApplId.clear();
   }
 
   private hasUnsavedDetailEdits(): boolean {

@@ -106,6 +106,75 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     fixture.detectChanges();
   });
 
+  describe('SearchListsComponent — NDIRD review tabs (FS-2271)', () => {
+    let component: SearchListsComponent;
+
+    beforeEach(() => {
+      component = Object.create(SearchListsComponent.prototype) as SearchListsComponent;
+      component.isNciDirector = true;
+      component.selectedNciTab = 'all';
+      component.selectedRows = new Map<number, any>();
+      (component as any).detailComponentsByApplId = new Map();
+      (component as any).cachedGrants = [
+        { applId: 1, nciDecision: null, recusedFlag: false, reviewStatusCode: 'DIRECTORREVIEW' },
+        { applId: 2, nciDecision: undefined, recusedFlag: false },
+        { applId: 3, nciDecision: 'Approve', recusedFlag: false },
+        { applId: 4, nciDecision: 'Hold', recusedFlag: true },
+        { applId: 5, nciDecision: 'Decline', recusedFlag: false }
+      ];
+    });
+
+    function filteredRows(tab: string): any[] {
+      component.selectedNciTab = tab;
+      let result: any[];
+      component.ajaxCall(component, {}, response => result = response.data);
+      return result;
+    }
+
+    it('filters using raw API decisions and treats null and undefined as pending', () => {
+      expect(filteredRows('all').map(row => row.applId)).toEqual([1, 2, 3, 4, 5]);
+      expect(filteredRows('pending').map(row => row.applId)).toEqual([1, 2]);
+      expect(filteredRows('approved').map(row => row.applId)).toEqual([3]);
+      expect(filteredRows('hold').map(row => row.applId)).toEqual([4]);
+      expect(filteredRows('rejected').map(row => row.applId)).toEqual([5]);
+    });
+
+    it('keeps recusals as an overlapping category', () => {
+      expect(filteredRows('recusals').map(row => row.applId)).toEqual([4]);
+    });
+
+    it('preserves the typed review status code in the authorized row payload', () => {
+      expect(filteredRows('all')[0].reviewStatusCode).toBe('DIRECTORREVIEW');
+    });
+
+    it('clears selections and expanded details when the tab changes', () => {
+      const detailRef = { destroy: jasmine.createSpy('destroy') };
+      (component as any).detailComponentsByApplId.set(4, detailRef);
+      component.selectedRows.set(4, (component as any).cachedGrants[3]);
+      const dt = {
+        rows: () => ({ every: () => undefined }),
+        table: () => ({ container: () => document.createElement('div') }),
+        ajax: { reload: jasmine.createSpy('reload') }
+      };
+      (component as any).dtElement = {
+        dtInstance: Promise.resolve(dt)
+      };
+
+      component.onNciTabChange('approved');
+
+      expect(component.selectedRows.size).toBe(0);
+      expect(detailRef.destroy).toHaveBeenCalled();
+      expect(component.selectedNciTab).toBe('approved');
+    });
+  });
+
+  it('hides the Review Status card for NDIRD users', () => {
+    component.isNciDirector = true;
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).not.toContain('Review Status');
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -798,6 +867,93 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     });
   });
 
+  describe('NDIRD list export parity (FS-2326)', () => {
+    it('keeps Export and maps the sliced 28-column contract to indices 0 through 27', fakeAsync(() => {
+      component.isNciDirector = true;
+      spyOn(component.dtTrigger, 'next');
+      component.ngAfterViewInit();
+
+      const buttons = component.dtOptions.buttons as any[];
+      const exportButton = buttons.find(button => (button.className || '').includes('btn-export-all'));
+      expect(buttons.length).toBe(2);
+      expect(exportButton).toBeTruthy();
+      expect(exportButton.exportOptions.columns).toEqual(Array.from({ length: 28 }, (_, index) => index));
+      expect((component.dtOptions.columns as any[]).length).toBe(28);
+      tick(100);
+    }));
+
+    it('selects the identical 28 exported headers in the identical order as non-NDIRD', fakeAsync(() => {
+      const nonNciFixture = TestBed.createComponent(SearchListsComponent);
+      nonNciFixture.detectChanges();
+      const nonNciComponent = nonNciFixture.componentInstance;
+      spyOn(nonNciComponent.dtTrigger, 'next');
+      nonNciComponent.ngAfterViewInit();
+      const nonNciButton = (nonNciComponent.dtOptions.buttons as any[])
+        .find(button => (button.className || '').includes('btn-export-all'));
+      const nonNciColumns = nonNciComponent.dtOptions.columns as any[];
+      const nonNciHeaders = nonNciButton.exportOptions.columns.map((index: number) => nonNciColumns[index].title);
+
+      component.isNciDirector = true;
+      spyOn(component.dtTrigger, 'next');
+      component.ngAfterViewInit();
+      const nciButton = (component.dtOptions.buttons as any[])
+        .find(button => (button.className || '').includes('btn-export-all'));
+      const nciColumns = component.dtOptions.columns as any[];
+      const nciHeaders = nciButton.exportOptions.columns.map((index: number) => nciColumns[index].title);
+
+      expect(nciHeaders).toEqual(nonNciHeaders);
+      expect(nciHeaders.length).toBe(28);
+      tick(100);
+      nonNciFixture.destroy();
+    }));
+
+    it('enables or disables Export by row count exactly as for other callers', () => {
+      component.isNciDirector = true;
+      const button = jasmine.createSpyObj('exportButton', ['enable', 'disable']);
+      const rowCount = jasmine.createSpy('count').and.returnValue(1);
+      const dt = {
+        rows: () => ({ count: rowCount }),
+        button: jasmine.createSpy('button').and.returnValue(button)
+      } as any;
+
+      (component as any).updateExportButtonState(dt);
+      expect(dt.button).toHaveBeenCalledWith(1);
+      expect(button.enable).toHaveBeenCalled();
+      expect(button.disable).not.toHaveBeenCalled();
+
+      rowCount.and.returnValue(0);
+      (component as any).updateExportButtonState(dt);
+      expect(button.disable).toHaveBeenCalled();
+    });
+
+    it('uses the unchanged ordered-row request payload and file name', fakeAsync(() => {
+      component.isNciDirector = true;
+      component.listId = 123;
+      const dt = {
+        rows: jasmine.createSpy('rows').and.returnValue({
+          data: () => ({ toArray: () => [{ applId: 9 }, { applId: 5 }] })
+        })
+      };
+      component.dtElement = { dtInstance: Promise.resolve(dt) } as any;
+      const httpSpy = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
+      httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+      spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+      const anchor = { click: jasmine.createSpy('click'), download: '', href: '' } as any;
+      spyOn(document, 'createElement').and.returnValue(anchor);
+
+      component.exportGrantListResults();
+      tick();
+
+      expect(dt.rows).toHaveBeenCalledWith({ order: 'current', search: 'none' });
+      expect((httpSpy.post as any)).toHaveBeenCalledWith(
+        '/i2efsws/api/v1/funding-submissions/lists/123/grants/export',
+        { orderedApplIds: [9, 5] },
+        jasmine.objectContaining({ responseType: 'arraybuffer' as any })
+      );
+      expect(anchor.download).toBe('funding_submissions_lists_result_all.xls');
+    }));
+  });
+
   // FS-2107: the List View export must POST every row's APPL_ID in the current sort order (all rows,
   // not selected rows, the current page, or DataTables-search-filtered rows).
   describe('exportGrantListResults (FS-2107)', () => {
@@ -935,15 +1091,26 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         component.selectedRows = new Map<number, any>([[9, {}], [3, {}]]);
       });
 
-      it('keeps legacy Document Viewer URL behavior for AB', () => {
-        component.selectedViewDoc = 'AB';
-        spyOn(window, 'open').and.returnValue(null);
-        component.viewPDF();
-        expect(window.open).toHaveBeenCalledWith(
-          'http://example/openGrantReport.action?docType=AB&applIds=9,3&resubmit=true',
-          'session',
-          'menubar=yes,scrollbars=yes,resizable=yes,width=850,height=700');
-      });
+      for (const docType of ['AB', 'SS', 'both']) {
+        it(`posts ${docType} through the FS document report broker`, fakeAsync(() => {
+          component.selectedViewDoc = docType;
+          const response = new Blob(['pdf'], { type: 'application/pdf' });
+          httpSpy.post.and.returnValue(of(response) as any);
+          spyOn(window, 'open');
+          spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+          spyOn(window.URL, 'revokeObjectURL');
+
+          component.viewPDF();
+          tick();
+
+          expect((httpSpy.post as any)).toHaveBeenCalledWith(
+            '/i2efsws/api/v1/funding-submissions/lists/42/document-report',
+            { applIds: [9, 3], docType }, { responseType: 'blob' });
+          expect(window.open).toHaveBeenCalledWith('blob:test', 'session');
+          tick();
+          expect(window.URL.revokeObjectURL).toHaveBeenCalledWith('blob:test');
+        }));
+      }
 
       it('posts ordered numeric IDs for JST and opens/revokes the returned PDF blob', fakeAsync(() => {
         component.selectedViewDoc = 'JST';

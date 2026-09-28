@@ -79,11 +79,11 @@
     <!-- Page header -->
     <div class="d-flex justify-content-between align-items-center my-3">
         <h2 class="mb-0">{{ selectionDate }}</h2>
-        <button *ngIf="isCurrentStatusDraft && !docFundingListCor" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
+        <button *ngIf="isCurrentStatusDraft && !docFundingListCor && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
     </div>
 
     <!-- Overview -->
-    <div class="card mb-3">
+    <div class="card mb-3" *ngIf="!isNciDirector">
         <div class="card-body">
             <h5 class="card-title fw-bold">Overview</h5>
             <div class="d-flex align-items-center criteria-bar my-4">
@@ -101,7 +101,7 @@
     </div>
 
     <!-- Review Status -->
-    <div class="card mb-3">
+    <div class="card mb-3" *ngIf="!isNciDirector">
         <div class="card-body">
             <h5 class="card-title fw-bold my-3">Review Status</h5>
             <div class="doc-status-wrapper">
@@ -130,13 +130,21 @@
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title fw-bold my-3">Grants in the List</h5>
+            <div *ngIf="isNciDirector" class="btn-group mb-3" role="tablist" aria-label="NCI grant review categories">
+                <button *ngFor="let tab of nciTabs" type="button" class="btn"
+                    [class.btn-primary]="selectedNciTab === tab.id"
+                    [class.btn-outline-primary]="selectedNciTab !== tab.id"
+                    (click)="onNciTabChange(tab.id)">
+                    {{ tab.label }}
+                </button>
+            </div>
               <p class="alert alert-primary col-12"><i class="far fa-info-circle"></i> To apply sorting order to multiple columns, hold
       down the <b>Shift</b> key and click the header of
       each additional column that you want to sort. Please note, sorting by column headers will unselect any selected
       rows.</p>
       
             <!-- Action buttons -->
-            <div class="d-flex gap-2 mb-3">
+            <div class="d-flex gap-2 mb-3" *ngIf="!isNciDirector">
                 <!-- Bulk Edit -->
                 <span ngbTooltip="Select at least one grant to bulk edit." [disableTooltip]="!!selectedRows.size" container="body">
                     <button type="button" class="btn btn-primary me-3" (click)="onBulkEditClick()" [disabled]="!selectedRows.size">
@@ -158,7 +166,7 @@
                 </button>
             </div>
 
-            <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="d-flex align-items-center gap-2 mb-3" *ngIf="!isNciDirector">
                 <div style="width: 380px">
                     <ng-select2
                         id="view-doc-type"
