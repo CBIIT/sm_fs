@@ -124,7 +124,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       ];
     });
 
-    function filteredRows(tab: string): any[] {
+    function filteredRows(tab: SearchListsComponent['selectedNciTab']): any[] {
       component.selectedNciTab = tab;
       let result: any[];
       component.ajaxCall(component, {}, response => result = response.data);
@@ -989,7 +989,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(button.disable).toHaveBeenCalled();
     });
 
-    it('uses the unchanged ordered-row request payload and file name', fakeAsync(() => {
+    it('includes the selected NCI tab with the ordered-row request and preserves the file name', fakeAsync(() => {
       component.isNciDirector = true;
       component.listId = 123;
       const dt = {
@@ -1010,7 +1010,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(dt.rows).toHaveBeenCalledWith({ order: 'current', search: 'none' });
       expect((httpSpy.post as any)).toHaveBeenCalledWith(
         '/i2efsws/api/v1/funding-submissions/lists/123/grants/export',
-        { orderedApplIds: [9, 5] },
+        { orderedApplIds: [9, 5], nciTab: 'all' },
         jasmine.objectContaining({ responseType: 'arraybuffer' as any })
       );
       expect(anchor.download).toBe('funding_submissions_lists_result_all.xls');
@@ -1036,8 +1036,8 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       httpSpy = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
       loggerSpy = TestBed.inject(NGXLogger) as jasmine.SpyObj<NGXLogger>;
       loaderService = TestBed.inject(LoaderService);
-      spyOn(loaderService, 'show');
-      spyOn(loaderService, 'hide');
+      (loaderService.show as jasmine.Spy).calls.reset();
+      (loaderService.hide as jasmine.Spy).calls.reset();
       component.listId = 123;
     });
 
@@ -1064,6 +1064,44 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(loaderService.hide).toHaveBeenCalled();
       expect(anchor.download).toBe('funding_submissions_lists_result_all.xls');
       expect(anchor.click).toHaveBeenCalled();
+    }));
+
+    it('sends the selected NCI tab and DOC filter with every current-order row across pages', fakeAsync(() => {
+      const dt = fakeDt([{ applId: 9 }, { applId: 5 }, { applId: 4 }, { applId: 2 }]);
+      component.dtElement = { dtInstance: Promise.resolve(dt) } as any;
+      component.isNciDirector = true;
+      component.selectedNciTab = 'rejected';
+      component.filteredDoc = 'DCB';
+      httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+      spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+      spyOn(document, 'createElement').and.returnValue({ click: () => {}, download: '', href: '' } as any);
+
+      component.exportGrantListResults();
+      tick();
+
+      expect(dt.rows).toHaveBeenCalledWith({ order: 'current', search: 'none' });
+      expect((httpSpy.post as any).calls.mostRecent().args[1]).toEqual({
+        orderedApplIds: [9, 5, 4, 2],
+        nciTab: 'rejected',
+        docAbbreviation: 'DCB'
+      });
+    }));
+
+    it('keeps the OEFIA and DOC request shape unchanged', fakeAsync(() => {
+      const dt = fakeDt([{ applId: 9 }, { applId: 5 }]);
+      component.dtElement = { dtInstance: Promise.resolve(dt) } as any;
+      component.isNciDirector = false;
+      component.docFundingListCor = true;
+      component.selectedNciTab = 'approved';
+      component.filteredDoc = 'DCB';
+      httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+      spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+      spyOn(document, 'createElement').and.returnValue({ click: () => {}, download: '', href: '' } as any);
+
+      component.exportGrantListResults();
+      tick();
+
+      expect((httpSpy.post as any).calls.mostRecent().args[1]).toEqual({ orderedApplIds: [9, 5] });
     }));
 
     it('does not derive the exported IDs from selectedRows', fakeAsync(() => {
@@ -1138,6 +1176,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       component.ngAfterViewInit();
       const exportButton = (component.dtOptions.buttons as any[]).find(b => (b.className || '').includes('btn-export-all'));
       expect(exportButton).toBeTruthy();
+      expect(component.dtOptions.serverSide).toBeFalse();
       expect(exportButton.exportOptions.columns).toEqual(Array.from({ length: 28 }, (_, i) => i + 1));
     });
 
