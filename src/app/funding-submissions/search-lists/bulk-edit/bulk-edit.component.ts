@@ -160,6 +160,76 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    const columns: any[] = [
+      {
+        title: 'Grant Number',
+        data: 'grantNumber',
+        width: '140px',
+        className: 'all',
+        defaultContent: '',
+        ngTemplateRef: { ref: this.fullGrantNumberRenderer }
+      }, // 0
+      {
+        title: 'PI',
+        data: 'piName',
+        width: '130px',
+        defaultContent: '',
+        render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.piEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>` : ''
+      }, // 1
+      {
+        title: 'Budget Categories',
+        data: 'budgetCategories',
+        width: '130px',
+        defaultContent: '',
+        ngTemplateRef: { ref: this.budgetCatRenderer }
+      }, // 2
+      {
+        title: 'DOC Decision',
+        data: 'docDecision',
+        width: '120px',
+        defaultContent: '',
+        ngTemplateRef: { ref: this.docDecisionRenderer }
+      }, // 3
+      {
+        title: 'DOC/NCI Selection',
+        data: 'docNciSelection',
+        width: '140px',
+        defaultContent: '',
+        ngTemplateRef: { ref: this.docNciSelRenderer }
+      }, // 4
+      {
+        title: 'Two-Year Annual Funding R01 (HRHR)',
+        data: 'annualFundingR01',
+        width: '100px',
+        defaultContent: '',
+        ngTemplateRef: { ref: this.annualR01Renderer }
+      }, // 5
+      {
+        title: 'Annual or MYF',
+        data: 'annualOrMyf',
+        width: '120px',
+        defaultContent: '',
+        ngTemplateRef: { ref: this.annualMyfRenderer }
+      }, // 6
+      {
+        title: 'DOC Notes',
+        data: 'docNotes',
+        width: '220px',
+        defaultContent: '',
+        ngTemplateRef: { ref: this.docNotesRenderer }
+      }, // 7
+    ];
+
+    if (!this.docFundingListCor) {
+      columns.push({
+        title: 'OEFIA Notes',
+        data: 'oefiaNotes',
+        width: '220px',
+        defaultContent: '',
+        ngTemplateRef: { ref: this.oefiaNotesRenderer }
+      });
+    }
+
     this.dtOptions = {
       pagingType: 'full_numbers',
       pageLength: 100,
@@ -179,72 +249,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       ajax: (_params: any, callback: any) => {
         callback({ data: this.rows, recordsTotal: this.rows.length, recordsFiltered: this.rows.length });
       },
-      columns: [
-        {
-          title: 'Grant Number',
-          data: 'grantNumber',
-          width: '140px',
-          className: 'all',
-          defaultContent: '',
-          ngTemplateRef: { ref: this.fullGrantNumberRenderer }
-        }, // 0
-        {
-          title: 'PI',
-          data: 'piName',
-          width: '130px',
-          defaultContent: '',
-          render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.piEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>` : ''
-        }, // 1
-        {
-          title: 'Budget Categories',
-          data: 'budgetCategories',
-          width: '130px',
-          defaultContent: '',
-          ngTemplateRef: { ref: this.budgetCatRenderer }
-        }, // 2
-        {
-          title: 'DOC Decision',
-          data: 'docDecision',
-          width: '120px',
-          defaultContent: '',
-          ngTemplateRef: { ref: this.docDecisionRenderer }
-        }, // 3
-        {
-          title: 'DOC/NCI Selection',
-          data: 'docNciSelection',
-          width: '140px',
-          defaultContent: '',
-          ngTemplateRef: { ref: this.docNciSelRenderer }
-        }, // 4
-        {
-          title: 'Two-Year Annual Funding R01 (HRHR)',
-          data: 'annualFundingR01',
-          width: '100px',
-          defaultContent: '',
-          ngTemplateRef: { ref: this.annualR01Renderer }
-        }, // 5
-        {
-          title: 'Annual or MYF',
-          data: 'annualOrMyf',
-          width: '120px',
-          defaultContent: '',
-          ngTemplateRef: { ref: this.annualMyfRenderer }
-        }, // 6
-        {
-          title: 'DOC Notes',
-          data: 'docNotes',
-          width: '220px',
-          defaultContent: '',
-          ngTemplateRef: { ref: this.docNotesRenderer }
-        }, // 7
-        {
-          title: 'OEFIA Notes',
-          data: 'oefiaNotes',
-          width: '220px',
-          defaultContent: '',
-          ngTemplateRef: { ref: this.oefiaNotesRenderer }
-        }, // 8
-      ],
+      columns,
       dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       rowCallback: (row: Node, _data: any) => {
         // Remove stale elements left by DataTables before ngTemplateRef injects
@@ -376,6 +381,26 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     return !addedByGroup || addedByGroup.includes('OEFIA');
   }
 
+  private isDoNotPayOption(option: Select2OptionData): boolean {
+    const optionText = String(option?.text ?? '').trim().toLowerCase();
+    return optionText.includes('do not pay');
+  }
+
+  private shouldDisableDoNotPayForRow(row: any): boolean {
+    return this.isDocOnlyUser() && this.isGrantAddedByDoc(row);
+  }
+
+  getDocDecisionOptionsForRow(row: any): Select2OptionData[] {
+    if (!this.shouldDisableDoNotPayForRow(row)) {
+      return this.decisionOptions;
+    }
+
+    return this.decisionOptions.map(option => ({
+      ...option,
+      disabled: this.isDoNotPayOption(option) ? true : (option as any).disabled
+    }));
+  }
+
   private shouldWarnDoNotPayForMixedSources(): boolean {
     if (!this.isDocOnlyUser()) {
       return false;
@@ -484,6 +509,10 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onRowDocDecisionChange(row: any): void {
+    if (this.shouldDisableDoNotPayForRow(row) && this.isDoNotPayDecisionValue(row?.docDecision)) {
+      row.docDecision = null;
+    }
+
     if (this.isDoNotPayDecisionValue(row?.docDecision)) {
       this.clearDoNotPayDependentFields(row);
     }

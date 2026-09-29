@@ -99,7 +99,7 @@
           </div>
           <div class="text-end text-muted small">{{ bulkFields.docNotes?.length || 0 }}/1000</div>
         </div>
-        <div class="col-6">
+        <div class="col-6" *ngIf="!docFundingListCor">
           <label class="form-label fw-semibold">OEFIA Notes</label>
           <textarea *ngIf="!canEditOefiaNotes()" class="form-control bg-light" rows="4" aria-label="OEFIA Notes"
             readonly></textarea>
@@ -143,7 +143,7 @@
 
         <ng-template #docDecisionRenderer let-data="adtData">
           <ng-select2 [id]="'ddec-' + data.applId" [(ngModel)]="data.docDecision" (ngModelChange)="onRowDocDecisionChange(data)"
-            [data]="decisionOptions" [allowClear]="true" width="100%">
+            [data]="getDocDecisionOptionsForRow(data)" [allowClear]="true" width="100%">
           </ng-select2>
         </ng-template>
 
