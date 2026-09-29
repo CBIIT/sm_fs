@@ -33,10 +33,12 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('docNotesRenderer')    docNotesRenderer:    TemplateRef<any>;
   @ViewChild('oefiaNotesRenderer')  oefiaNotesRenderer:  TemplateRef<any>;
   @ViewChild('backToListWarningModal') private backToListWarningModalRef: TemplateRef<any>;
+  @ViewChild('doNotPayWarningModal') private doNotPayWarningModalTpl: TemplateRef<any>;
   @ViewChild('saveSuccessAlert') saveSuccessAlert: ElementRef<HTMLElement>;
   @ViewChild('bulkForm') bulkForm: NgForm;
 
   private modalRef: NgbModalRef;
+  private doNotPayWarningModalRef: NgbModalRef;
 
   listId = 0;
   selectionDate = '';
@@ -364,6 +366,57 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  private isGrantAddedByDoc(row: any): boolean {
+    const addedByGroup = String(row?.addedByGroup ?? '').trim().toUpperCase();
+    return !!addedByGroup && addedByGroup.includes('DOC');
+  }
+
+  private isGrantAddedByOefia(row: any): boolean {
+    const addedByGroup = String(row?.addedByGroup ?? '').trim().toUpperCase();
+    return !addedByGroup || addedByGroup.includes('OEFIA');
+  }
+
+  private shouldWarnDoNotPayForMixedSources(): boolean {
+    if (!this.isDocOnlyUser()) {
+      return false;
+    }
+
+    if (!this.isDoNotPayDecisionValue(this.bulkFields.docDecision)) {
+      return false;
+    }
+
+    const hasDocAdded = this.rows.some(row => this.isGrantAddedByDoc(row));
+    const hasOefiaAdded = this.rows.some(row => this.isGrantAddedByOefia(row));
+    return hasDocAdded && hasOefiaAdded;
+  }
+
+  private applyBulkChanges(skipDoNotPayForDocAdded: boolean): void {
+    const f = this.bulkFields;
+    for (const row of this.rows) {
+      const skipRowDoNotPay = skipDoNotPayForDocAdded
+        && this.isDoNotPayDecisionValue(f.docDecision)
+        && this.isGrantAddedByDoc(row);
+
+      if (f.budgetCategories) row.budgetCategories = f.budgetCategories;
+      if (f.docDecision && !skipRowDoNotPay) row.docDecision = f.docDecision;
+      if (f.docNciSelection) row.docNciSelection = f.docNciSelection;
+      if (f.annualFundingR01) row.annualFundingR01 = f.annualFundingR01;
+      if (f.annualOrMyf) row.annualOrMyf = f.annualOrMyf;
+      if (f.docNotes) row.docNotes = f.docNotes;
+      if (this.canEditOefiaNotes() && f.oefiaNotes) row.oefiaNotes = f.oefiaNotes;
+      if (this.isDoNotPayDecisionValue(row.docDecision)) {
+        this.clearDoNotPayDependentFields(row);
+      }
+    }
+
+    this.restoreReadOnlyOefiaNotes();
+    this.updateDoNotPayDocNotesValidationErrors();
+    // Apply Changes only enables Save when it actually changed at least one row's persisted
+    // value; it must not leave a stale canSave=true when the shared values matched every row.
+    this.recomputeCanSave();
+    this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+  }
+
   isDoNotPayDecisionSelected(decision: string | null | undefined): boolean {
     return this.isDoNotPayDecisionValue(decision);
   }
@@ -459,29 +512,31 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onApplyChanges(): void {
-    const f = this.bulkFields;
     this.clearSaveMessages();
+    if (this.shouldWarnDoNotPayForMixedSources()) {
+      this.doNotPayWarningModalRef = this.modalService.open(this.doNotPayWarningModalTpl, { centered: true });
+      return;
+    }
+
     if (!this.validateBulkDocNotesBeforeApply()) {
       return;
     }
-    for (const row of this.rows) {
-      if (f.budgetCategories) row.budgetCategories = f.budgetCategories;
-      if (f.docDecision)      row.docDecision      = f.docDecision;
-      if (f.docNciSelection)  row.docNciSelection  = f.docNciSelection;
-      if (f.annualFundingR01) row.annualFundingR01  = f.annualFundingR01;
-      if (f.annualOrMyf)      row.annualOrMyf      = f.annualOrMyf;
-      if (f.docNotes)         row.docNotes         = f.docNotes;
-      if (this.canEditOefiaNotes() && f.oefiaNotes) row.oefiaNotes = f.oefiaNotes;
-      if (this.isDoNotPayDecisionValue(row.docDecision)) {
-        this.clearDoNotPayDependentFields(row);
-      }
+
+    this.applyBulkChanges(false);
+  }
+
+  onProceedDoNotPayWarning(): void {
+    this.doNotPayWarningModalRef?.close();
+
+    if (!this.validateBulkDocNotesBeforeApply()) {
+      return;
     }
-    this.restoreReadOnlyOefiaNotes();
-    this.updateDoNotPayDocNotesValidationErrors();
-    // Apply Changes only enables Save when it actually changed at least one row's persisted
-    // value; it must not leave a stale canSave=true when the shared values matched every row.
-    this.recomputeCanSave();
-    this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+
+    this.applyBulkChanges(true);
+  }
+
+  onCancelDoNotPayWarning(): void {
+    this.doNotPayWarningModalRef?.dismiss();
   }
 
   onReset(): void {
