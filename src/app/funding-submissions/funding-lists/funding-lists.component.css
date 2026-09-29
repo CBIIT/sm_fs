@@ -80,8 +80,15 @@
 }
 
 .doc-tile.active {
+  background: #0f82c0;
+  color: #fff;
   border-color: #0f82c0;
-  box-shadow: 0 0 0 2px rgba(15, 130, 192, 0.15);
+  box-shadow: none;
+}
+
+.doc-tile.active .count,
+.doc-tile.active .name {
+  color: #fff;
 }
 
 .doc-tile .count {

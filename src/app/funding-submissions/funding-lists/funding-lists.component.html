@@ -17,7 +17,7 @@
         <div><span class="label">ID:</span> {{ listId }}</div>
         <div><span class="label">Status:</span> {{ status }}</div>
         <div><span class="label">Total Number of Grants:</span> {{ totalNumberOfGrants }}</div>
-        <div><span class="label">DOC Recommended Total:</span> {{ docRecommendedTotal }}</div>
+        <div><span class="label">DOC Recommended Total:</span> {{ docRecommendedTotal | currency:'USD':'symbol':'1.0-0' }}</div>
       </div>
     </div>
   </section>
