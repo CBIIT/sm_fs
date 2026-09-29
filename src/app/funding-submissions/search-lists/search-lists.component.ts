@@ -19,6 +19,8 @@ import { AppUserSessionService } from 'src/app/service/app-user-session.service'
 
 declare var $: any;
 
+type NciTabId = 'all' | 'pending' | 'approved' | 'hold' | 'rejected' | 'recusals';
+
 @Component({
   selector: 'app-search-lists',
   templateUrl: './search-lists.component.html',
@@ -87,7 +89,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   isSendGrantsInDraftInProgress = false;
   docFundingListCor = false;
   isNciDirector = false;
-  readonly nciTabs = [
+  readonly nciTabs: { id: NciTabId; label: string }[] = [
     { id: 'all', label: 'All Grants' },
     { id: 'pending', label: 'Pending Review' },
     { id: 'approved', label: 'Approved' },
@@ -95,7 +97,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     { id: 'rejected', label: 'Rejected' },
     { id: 'recusals', label: 'Recusals' }
   ];
-  selectedNciTab = 'all';
+  selectedNciTab: NciTabId = 'all';
   blockedGrantNumbers: string[] = [];
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
   viewDocOptions: Select2OptionData[] = [
@@ -914,7 +916,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onNciTabChange(tabId: string): void {
+  onNciTabChange(tabId: NciTabId): void {
     if (!this.isNciDirector || this.selectedNciTab === tabId) {
       return;
     }
@@ -1559,6 +1561,12 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           .filter((applId): applId is number => applId !== null && applId !== undefined);
 
         const body: FundingSubmissionListGrantExportRequestDto = { orderedApplIds };
+        if (this.isNciDirector) {
+          body.nciTab = this.selectedNciTab;
+          if (this.filteredDoc !== null) {
+            body.docAbbreviation = this.filteredDoc;
+          }
+        }
 
         this.http
           .post(`/i2efsws/api/v1/funding-submissions/lists/${this.listId}/grants/export`, body, { responseType: 'arraybuffer' })
