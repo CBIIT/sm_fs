@@ -159,12 +159,13 @@
             </td>
             <td class="grid-label">Previous Score:</td>
             <td class="grid-item">{{data.previousScore}}</td>
-            <td class="grid-label sep align-top pt-2">DOC Notes<br><span class="fw-normal">{{ doNotPayOefiaLockActive ? '(Required)' : '(Optional)' }}</span></td>
+            <td class="grid-label sep align-top pt-2">DOC Notes<br><span class="fw-normal">{{ doNotPayOefiaLockActive && !canEditOefiaNotes() ? '(Required)' : '(Optional)' }}</span></td>
             <td class="grid-item" colspan="3">
               <span *ngIf="!isEditMode">{{data.docNotes || ''}}</span>
               <div *ngIf="isEditMode">
                 <textarea class="form-control form-control-sm" rows="2"
-                  name="docNotes" [(ngModel)]="formModel.docNotes" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
+                  name="docNotes" [(ngModel)]="formModel.docNotes" (ngModelChange)="onNotesModelChange()" maxlength="1000"
+                  [disabled]="doNotPayOefiaLockActive && canEditOefiaNotes()"></textarea>
                 <div class="text-end small text-muted">{{(formModel.docNotes || '').length}}/1000</div>
                 <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationErrors.docNotes">{{saveValidationErrors.docNotes}}</div>
               </div>
@@ -177,13 +178,14 @@
             <td class="grid-item">{{data.gt2mNihSupport || '-'}}</td>
             <td class="grid-label">App Tc Est:</td>
             <td class="grid-item">{{data.applicationTotalCostEstimate != null ? ('$' + (data.applicationTotalCostEstimate | number)) : '-'}}</td>
-            <td class="grid-label sep align-top pt-2">OEFIA Notes<br><span class="fw-normal">(Optional)</span></td>
+            <td class="grid-label sep align-top pt-2">OEFIA Notes<br><span class="fw-normal">{{ doNotPayOefiaLockActive && canEditOefiaNotes() ? '(Required)' : '(Optional)' }}</span></td>
             <td class="grid-item" colspan="3">
-              <span *ngIf="!isEditMode || docFundingListCor">{{data.oefiaNotes || ''}}</span>
-              <div *ngIf="isEditMode && !docFundingListCor">
+              <span *ngIf="!isEditMode || !canEditOefiaNotes()">{{data.oefiaNotes || ''}}</span>
+              <div *ngIf="isEditMode && canEditOefiaNotes()">
                 <textarea class="form-control form-control-sm" rows="2"
                   name="oefiaNotes" [(ngModel)]="formModel.oefiaNotes" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.oefiaNotes || '').length}}/1000</div>
+                <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationErrors.oefiaNotes">{{saveValidationErrors.oefiaNotes}}</div>
               </div>
             </td>
           </tr>

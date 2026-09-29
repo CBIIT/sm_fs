@@ -63,6 +63,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   saveSuccessMessage = '';
   docFundingListCor = false;
   OEFIACertifier = false;
+  financialAnalyst = false;
   doNotPayOefiaLockActive = false;
   saveValidationError: string | null = null;
   saveValidationErrors: Record<string, string> = {};
@@ -102,6 +103,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
     this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
     this.OEFIACertifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
+    this.financialAnalyst = this.userSessionService.hasRole(roleNames.FINANCIAL_ANALYST);
     this.fetchDropdownOptions();
     this.refreshJustificationData();
   }
@@ -278,7 +280,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
     // For DOC users this field is view-only; ignore any client-side model tampering.
     // OEFIA users can edit this field and their change must be preserved.
-    if (this.docFundingListCor && !this.OEFIACertifier) {
+    if (this.docFundingListCor && !this.canEditOefiaNotes()) {
       this.formModel.oefiaNotes = this.data?.oefiaNotes ?? '';
     }
 
@@ -394,22 +396,32 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   canEditOefiaNotes(): boolean {
-    return this.OEFIACertifier && !this.doNotPayOefiaLockActive;
+    return this.OEFIACertifier || this.financialAnalyst;
   }
 
   private recomputeDoNotPayOefiaLock(): void {
-    this.doNotPayOefiaLockActive = this.isEditMode
-      && this.docFundingListCor
+    const doNotPaySelected = this.isDoNotPayDecisionSelected();
+    const docShouldLock = this.docFundingListCor
       && this.isGrantAddedByOefia()
-      && !this.OEFIACertifier
-      && this.isDoNotPayDecisionSelected();
+      && !this.canEditOefiaNotes();
+    const oefiaShouldLock = this.canEditOefiaNotes();
+
+    this.doNotPayOefiaLockActive = this.isEditMode
+      && doNotPaySelected
+      && (docShouldLock || oefiaShouldLock);
   }
 
   private validateChangedValues(): Record<string, string> {
     const errors: Record<string, string> = {};
 
-    if (this.doNotPayOefiaLockActive && !String(this.formModel.docNotes || '').trim()) {
-      errors.docNotes = 'DOC Notes is required when DOC Decision is Do Not Pay.';
+    if (this.doNotPayOefiaLockActive) {
+      if (this.canEditOefiaNotes()) {
+        if (!String(this.formModel.oefiaNotes || '').trim()) {
+          errors.oefiaNotes = 'OEFIA Notes is required when DOC Decision is Do Not Pay.';
+        }
+      } else if (!String(this.formModel.docNotes || '').trim()) {
+        errors.docNotes = 'DOC Notes is required when DOC Decision is Do Not Pay.';
+      }
     }
 
     const pct = this.formModel.docRecReductionPct;
