@@ -1,7 +1,10 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { Select2OptionData } from 'ng-select2';
+import { FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 
 declare var $: any;
 
@@ -33,11 +36,11 @@ interface DocSummary {
 export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
 
-  pageTitle = 'July 23';
-  listId = 32124;
-  status = 'In Progress';
-  totalNumberOfGrants = 402;
-  docRecommendedTotal = '$18,000,000';
+  pageTitle = '';
+  listId = 0;
+  status = '';
+  totalNumberOfGrants = 0;
+  docRecommendedTotal = 0;
 
   selectedTab = 'all';
   selectedDoc = 'All DOCs';
@@ -59,86 +62,36 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     { id: 'pending', label: 'Pending Review' },
     { id: 'approved', label: 'Approved' },
     { id: 'hold', label: 'On Hold' },
-    { id: 'rejected', label: 'Rejected' }
+    { id: 'rejected', label: 'Rejected' },
+    { id: 'recusals', label: 'Recusal Institutions' }
   ];
 
-  readonly docs = ['DCB', 'CCG', 'CCT', 'CRCHD', 'OCC', 'SBIR'];
-
-  // Placeholder static totals for scaffolding. Replace with API-provided totals when available.
-  readonly docRecommendedTotals: { [doc: string]: number } = {
-    DCB: 25000,
-    CCG: 18000,
-    CCT: 22000,
-    CRCHD: 15000,
-    OCC: 17000,
-    SBIR: 30000
-  };
-
-  readonly grants: FundingListGrantRow[] = [
-    {
-      grantNumber: '2R01CA259365-06',
-      abs: true,
-      ss: true,
-      justification: true,
-      doc: 'DCB',
-      reviewStatus: 'Pending Review',
-      budgetCategories: 'R01/R37',
-      pi: 'Housley',
-      impacStatus: '-'
-    },
-    {
-      grantNumber: '1R01CA123456-01',
-      abs: true,
-      ss: false,
-      justification: true,
-      doc: 'CCG',
-      reviewStatus: 'Approved',
-      budgetCategories: 'R21',
-      pi: 'Nguyen',
-      impacStatus: 'Awarded'
-    },
-    {
-      grantNumber: '3P30CA987654-04',
-      abs: true,
-      ss: true,
-      justification: false,
-      doc: 'OCC',
-      reviewStatus: 'On Hold',
-      budgetCategories: 'P30',
-      pi: 'Patel',
-      impacStatus: 'In Review'
-    },
-    {
-      grantNumber: '5U01CA456789-03',
-      abs: false,
-      ss: true,
-      justification: true,
-      doc: 'SBIR',
-      reviewStatus: 'Rejected',
-      budgetCategories: 'U01',
-      pi: 'Garcia',
-      impacStatus: 'Closed'
-    },
-    {
-      grantNumber: '1K08CA222222-02',
-      abs: true,
-      ss: true,
-      justification: true,
-      doc: 'CRCHD',
-      reviewStatus: 'Recusal',
-      budgetCategories: 'K08',
-      pi: 'Ali',
-      impacStatus: 'Pending'
-    }
-  ];
+  docRecommendedTotals: { [doc: string]: number } = {};
+  grants: FundingListGrantRow[] = [];
 
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private logger: NGXLogger,
+    private fundingSubmissionsService: FundingSubmissionsService
+  ) {}
 
   ngOnInit(): void {
-    // Intentionally static demo data for initial scaffolding.
+    this.route.queryParams.subscribe(params => {
+      const routeListId = Number(params['listId']);
+      if (!Number.isNaN(routeListId) && routeListId > 0) {
+        this.listId = routeListId;
+      }
+
+      this.pageTitle = params['selectionDate'] || this.pageTitle;
+
+      if (this.listId > 0) {
+        this.loadListMeta();
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -322,6 +275,10 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return current ? current.label : 'All Grants';
   }
 
+  get docs(): string[] {
+    return Array.from(new Set(this.grants.map(grant => grant.doc).filter(doc => !!doc))).sort();
+  }
+
   get availableDocs(): string[] {
     const docsForTab = this.docs.filter(doc => this.getDocCount(doc) > 0);
     return ['All DOCs', ...docsForTab];
@@ -391,11 +348,75 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (tabId === 'rejected') {
       return status === this.normalizeValue('Rejected');
     }
+    if (tabId === 'recusals') {
+      return status === this.normalizeValue('Recusal');
+    }
     return true;
   }
 
   private normalizeValue(value: string): string {
     return (value || '').trim().toUpperCase();
+  }
+
+  private loadListMeta(): void {
+    this.fundingSubmissionsService.getListDetail(this.listId).subscribe({
+      next: (detail: any) => {
+        this.pageTitle = detail.listCode || this.pageTitle;
+        this.status = detail.currentStatusDescrip || '';
+        this.totalNumberOfGrants = detail.totalGrants ?? 0;
+        this.docRecommendedTotal = detail.totalDocRecAmt ?? 0;
+
+        const detailGrants = (detail.grants || []) as FundingSubmissionListGrantDto[];
+        this.grants = detailGrants.map(grant => this.mapGrantToRow(grant));
+        this.docRecommendedTotals = this.buildDocRecommendedTotals(detailGrants);
+
+        this.ensureSelectedDocIsAvailableForTab();
+        this.reloadTable();
+      },
+      error: err => {
+        this.logger.error('Failed to load funding list detail', err);
+      }
+    });
+  }
+
+  private mapGrantToRow(grant: FundingSubmissionListGrantDto): FundingListGrantRow {
+    const decision = String((grant as any).nciDecision || '').trim().toLowerCase();
+    let reviewStatus: FundingListGrantRow['reviewStatus'] = 'Pending Review';
+    if (decision === 'approve') {
+      reviewStatus = 'Approved';
+    } else if (decision === 'hold') {
+      reviewStatus = 'On Hold';
+    } else if (decision === 'decline' || decision === 'reject' || decision === 'rejected') {
+      reviewStatus = 'Rejected';
+    }
+
+    if ((grant as any).recusedFlag === true) {
+      reviewStatus = 'Recusal';
+    }
+
+    return {
+      grantNumber: String((grant as any).grantNumber || ''),
+      abs: !!(grant as any).abstractAvailable,
+      ss: !!(grant as any).summaryStatementAvailable,
+      justification: !!(grant as any).justificationAvailable,
+      doc: String((grant as any).doc || ''),
+      reviewStatus,
+      budgetCategories: String((grant as any).budgetCategories || ''),
+      pi: String((grant as any).piName || ''),
+      impacStatus: String((grant as any).impacStatusDescrip || '')
+    };
+  }
+
+  private buildDocRecommendedTotals(grants: FundingSubmissionListGrantDto[]): { [doc: string]: number } {
+    return grants.reduce((acc: { [doc: string]: number }, grant: any) => {
+      const doc = String(grant.doc || '').trim();
+      if (!doc) {
+        return acc;
+      }
+      const amount = Number(grant.docRecommendedAmount ?? 0);
+      acc[doc] = (acc[doc] || 0) + (Number.isFinite(amount) ? amount : 0);
+      return acc;
+    }, {});
   }
 
   private ensureSelectedDocIsAvailableForTab(): void {
