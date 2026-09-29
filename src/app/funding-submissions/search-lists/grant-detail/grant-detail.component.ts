@@ -70,6 +70,8 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   private initialFormSnapshot = '';
   private initialFundingSnapshot = '';
   private initialJustificationText = '';
+  private referenceDocRecAmount: number | null = null;
+  private referenceDocRecReductionPct: number | null = null;
   private cancelModalRef: NgbModalRef;
   private savingInProgress = false;
   private suppressNextLeavePrompt = false;
@@ -194,6 +196,10 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.initialFormSnapshot = this.currentSnapshot();
     this.initialFundingSnapshot = this.currentFundingSnapshot();
     this.initialJustificationText = this.formModel.justificationText ?? '';
+    this.referenceDocRecAmount = this.toFiniteNumberOrNull(this.formModel.docRecAmt);
+    this.referenceDocRecReductionPct = (this.referenceDocRecAmount != null && this.referenceDocRecAmount > 0)
+      ? (this.toFiniteNumberOrNull(this.formModel.docRecReductionPct) ?? 0)
+      : 0;
     this.recomputeDoNotPayOefiaLock();
     this.cdr.detectChanges();
   }
@@ -206,6 +212,53 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   onValidationFieldChange(): void {
     this.updateValidationErrorsLive();
+    this.cdr.detectChanges();
+  }
+
+  onDocRecReductionPctChange(): void {
+    this.ensureDocRecReferenceFromCurrentAmount();
+    const reductionPct = this.toFiniteNumberOrNull(this.formModel.docRecReductionPct);
+    if (this.referenceDocRecAmount != null
+      && this.referenceDocRecAmount > 0
+      && reductionPct != null
+      && this.isValidReductionPctForCalculation(reductionPct)) {
+      const referencePct = this.referenceDocRecReductionPct ?? 0;
+      const pctDelta = referencePct - reductionPct;
+      const updatedAmount = this.referenceDocRecAmount * (1 + pctDelta / 100);
+      this.formModel.docRecAmt = this.roundToTwoDecimals(Math.max(updatedAmount, 0));
+    }
+
+    this.updateDocRecValidationLive();
+    this.cdr.detectChanges();
+  }
+
+  onDocRecAmtChange(): void {
+    const updatedAmount = this.toFiniteNumberOrNull(this.formModel.docRecAmt);
+
+    // If the row started with a zero/null recommended amount, treat the first entered
+    // positive DOC Rec $ as the reference amount for subsequent % reduction math.
+    if ((this.referenceDocRecAmount == null || this.referenceDocRecAmount <= 0)
+      && updatedAmount != null
+      && updatedAmount > 0) {
+      this.referenceDocRecAmount = updatedAmount;
+      // Ignore previously carried/seeded % Red when the row had no usable DOC Rec $ baseline.
+      this.referenceDocRecReductionPct = 0;
+      this.formModel.docRecReductionPct = this.referenceDocRecReductionPct;
+      this.updateDocRecValidationLive();
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (this.referenceDocRecAmount != null
+      && this.referenceDocRecAmount > 0
+      && updatedAmount != null) {
+      const referencePct = this.referenceDocRecReductionPct ?? 0;
+      const pctAdjustment = ((this.referenceDocRecAmount - updatedAmount) / this.referenceDocRecAmount) * 100;
+      const rawPct = referencePct + pctAdjustment;
+      this.formModel.docRecReductionPct = this.roundToTwoDecimals(rawPct);
+    }
+
+    this.updateDocRecValidationLive();
     this.cdr.detectChanges();
   }
 
@@ -425,12 +478,9 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     }
 
     const pct = this.formModel.docRecReductionPct;
-    if (pct != null && (pct < 0 || pct > 100)) {
-      errors.docRecReductionPct = 'DOC Rec % Red must be between 0 and 100.';
-    }
-
-    if (!errors.docRecReductionPct && pct != null && !this.hasAtMostTwoDecimals(Number(pct))) {
-      errors.docRecReductionPct = 'DOC Rec % Red must be a valid percentage with up to 2 decimal places.';
+    const numericPct = this.toFiniteNumberOrNull(pct);
+    if (pct != null && !this.isValidReductionPctForCalculation(numericPct)) {
+      errors.docRecReductionPct = 'Enter a numeric value between 0 and 99, with at most 2 decimal places.';
     }
 
     const amt = this.formModel.docRecAmt;
@@ -465,6 +515,41 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       return false;
     }
     return Math.round(value * 100) === value * 100;
+  }
+
+  private toFiniteNumberOrNull(value: any): number | null {
+    if (value == null || value === '') {
+      return null;
+    }
+
+    // Accept formatted user/backend values like "$100,000.50" or "10%".
+    const normalizedValue = typeof value === 'string'
+      ? value.replace(/[$,%\s]/g, '').replace(/,/g, '')
+      : value;
+
+    const numericValue = Number(normalizedValue);
+    return Number.isFinite(numericValue) ? numericValue : null;
+  }
+
+  private ensureDocRecReferenceFromCurrentAmount(): void {
+    if (this.referenceDocRecAmount != null && this.referenceDocRecAmount > 0) {
+      return;
+    }
+
+    const currentAmount = this.toFiniteNumberOrNull(this.formModel.docRecAmt);
+    if (currentAmount != null && currentAmount > 0) {
+      this.referenceDocRecAmount = currentAmount;
+      // Ignore pre-existing % Red when there was no valid DOC Rec $ reference amount.
+      this.referenceDocRecReductionPct = 0;
+    }
+  }
+
+  private isValidReductionPctForCalculation(value: number | null): boolean {
+    return value != null && value >= 0 && value < 100 && this.hasAtMostTwoDecimals(value);
+  }
+
+  private roundToTwoDecimals(value: number): number {
+    return Math.round(value * 100) / 100;
   }
 
   private saveJustification(justificationText?: string): void {
@@ -574,6 +659,30 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     }
 
     this.saveValidationErrors = this.validateChangedValues();
+    this.saveValidationError = this.getFirstValidationError(this.saveValidationErrors);
+  }
+
+  private updateDocRecValidationLive(): void {
+    if (!this.isEditMode) {
+      return;
+    }
+
+    const errors = this.validateChangedValues();
+    const nextErrors: Record<string, string> = { ...this.saveValidationErrors };
+
+    if (errors.docRecReductionPct) {
+      nextErrors.docRecReductionPct = errors.docRecReductionPct;
+    } else {
+      delete nextErrors.docRecReductionPct;
+    }
+
+    if (errors.docRecAmt) {
+      nextErrors.docRecAmt = errors.docRecAmt;
+    } else {
+      delete nextErrors.docRecAmt;
+    }
+
+    this.saveValidationErrors = nextErrors;
     this.saveValidationError = this.getFirstValidationError(this.saveValidationErrors);
   }
 

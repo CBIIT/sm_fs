@@ -65,9 +65,9 @@
               <span *ngIf="!isEditMode">{{data.docRecommendedReductionPct != null ? (data.docRecommendedReductionPct + '%') : ''}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecReductionPct" [(ngModel)]="formModel.docRecReductionPct"
-                (ngModelChange)="onValidationFieldChange()"
+                (ngModelChange)="onDocRecReductionPctChange()"
                 [disabled]="doNotPayOefiaLockActive"
-                placeholder="Enter Value" min="0" max="100" step="0.01">
+                placeholder="Enter Value" min="0" max="99.99" step="0.01">
               <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docRecReductionPct">{{saveValidationErrors.docRecReductionPct}}</div>
             </td>
             <td class="grid-label">DOC Rec $:</td>
@@ -75,7 +75,7 @@
               <span *ngIf="!isEditMode">{{data.docRecommendedAmount != null ? ('$' + (data.docRecommendedAmount | number)) : ''}}</span>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecAmt" [(ngModel)]="formModel.docRecAmt"
-                (ngModelChange)="onValidationFieldChange()"
+                (ngModelChange)="onDocRecAmtChange()"
                 [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" step="0.01">
               <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docRecAmt">{{saveValidationErrors.docRecAmt}}</div>
