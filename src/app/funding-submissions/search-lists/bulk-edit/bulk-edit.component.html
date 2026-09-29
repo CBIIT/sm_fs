@@ -7,14 +7,15 @@
   <ng-template #backToListWarningModal>
     <div class="modal-header">
       <h4 class="modal-title">WARNING!</h4>
-      <button type="button" class="btn-close" aria-label="Close" (click)="onCancelNavigation()"></button>
     </div>
     <div class="modal-body">
-      <p class="mb-0">Are you sure you want to navigate from the page? All unsaved changes will be lost.</p>
+      <ngb-alert type="warning" [dismissible]="false">
+        <p class="mb-0">Are you sure you want to navigate from the page? All unsaved changes will be lost.</p>
+      </ngb-alert>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline-secondary" (click)="onCancelNavigation()">Cancel</button>
-      <button type="button" class="btn btn-primary" (click)="onConfirmNavigation()">OK, proceed</button>
+    <div class="modal-footer d-flex justify-content-center">
+      <button type="button" class="btn btn-outline-secondary mx-5" (click)="onCancelNavigation()">Cancel</button>
+      <button type="button" class="btn btn-primary mx-5" (click)="onConfirmNavigation()">OK, proceed</button>
     </div>
   </ng-template>
 
