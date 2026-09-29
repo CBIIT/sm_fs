@@ -1560,7 +1560,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           .map(row => row?.applId)
           .filter((applId): applId is number => applId !== null && applId !== undefined);
 
-        const body: FundingSubmissionListGrantExportRequestDto = { orderedApplIds };
+        const body: FundingSubmissionListGrantExportRequestDto & {
+          nciTab?: NciTabId;
+          docAbbreviation?: string;
+        } = { orderedApplIds };
         if (this.isNciDirector) {
           body.nciTab = this.selectedNciTab;
           if (this.filteredDoc !== null) {
