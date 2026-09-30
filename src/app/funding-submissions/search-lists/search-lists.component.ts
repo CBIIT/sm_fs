@@ -87,8 +87,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   removeGrantsErrorMessage = '';
   justificationWarningMessage = '';
   isSendGrantsInDraftInProgress = false;
+  currentReviewStatus = 'Draft';
   docFundingListCor = false;
   isNciDirector = false;
+  isOEFIACerifier = false;
   readonly nciTabs: { id: NciTabId; label: string }[] = [
     { id: 'all', label: 'All Grants' },
     { id: 'pending', label: 'Pending Review' },
@@ -170,6 +172,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.bindGlobalNavigationUnsavedGuard();
     this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+    this.isOEFIACerifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
     this.isNciDirector = this.userSessionService.hasRole(roleNames.NCI_DIRECTOR);
     this.dropdownLookupService.getDocDecisions().subscribe({
       next: options => {
@@ -327,13 +330,25 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       count: e.count,
       status: this.getReviewStatusByRank(e.statusRank)
     }));
-    const nonDraftItem = items.find(item => item.status != null && item.status.toLowerCase() !== 'draft');
-    this.isCurrentStatusDraft = !nonDraftItem;
+    const currentReviewStatus = this.getCurrentReviewStatus(grants);
+    this.currentReviewStatus = currentReviewStatus;
+    this.isCurrentStatusDraft = currentReviewStatus === 'Draft';
     const columns: any[][] = [];
     for (let i = 0; i < items.length; i += 4) {
       columns.push(items.slice(i, i + 4));
     }
     return columns;
+  }
+
+  // Computes the overall current review status from all grants using precedence:
+  // NCI Director Review > OEFIA Review > DOC Review > Draft.
+  private getCurrentReviewStatus(grants: FundingSubmissionListGrantDto[]): string {
+    let highestStatusRank = 0;
+    for (const grant of grants || []) {
+      const status = this.normalizeGrantReviewStatus((grant as any).reviewStatus);
+      highestStatusRank = Math.max(highestStatusRank, this.getReviewStatusRank(status));
+    }
+    return this.getReviewStatusByRank(highestStatusRank);
   }
 
   // Normalizes backend grant-level review status text (e.g. "Under DOC Review") to the
