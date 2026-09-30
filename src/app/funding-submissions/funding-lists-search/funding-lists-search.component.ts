@@ -3,7 +3,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } f
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { NGXLogger } from 'ngx-logger';
-import { of, Subject } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { Select2OptionData } from 'ng-select2';
@@ -67,6 +67,41 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   private throttle = new DatatableThrottle();
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
+
+  private getPendingReviewTypeForCurrentUser(): 'DOC' | 'OEFIA' | 'NCI_DIRECTOR' | undefined {
+    if (this.userSessionService.hasRole(roleNames.NCI_DIRECTOR)) {
+      return 'NCI_DIRECTOR';
+    }
+    if (
+      this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER)
+      || this.userSessionService.hasRole(roleNames.FINANCIAL_ANALYST)
+    ) {
+      return 'OEFIA';
+    }
+    if (this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR)) {
+      return 'DOC';
+    }
+    return undefined;
+  }
+
+  private getPendingReviewCountRequest(): Observable<number> {
+    const pendingReviewType = this.getPendingReviewTypeForCurrentUser();
+    if (pendingReviewType === 'NCI_DIRECTOR') {
+      return this.fundingSubmissionsService.getNciDirectorPendingReviewListCount();
+    }
+    if (pendingReviewType === 'OEFIA') {
+      return this.fundingSubmissionsService.getOefiaPendingReviewListCount();
+    }
+    return this.fundingSubmissionsService.getPendingReviewListCount();
+  }
+
+  private buildPendingReviewCriteria(existingCriteria?: FundingSubmissionListSearchCriteriaDto): FundingSubmissionListSearchCriteriaDto {
+    const pendingReviewType = this.getPendingReviewTypeForCurrentUser();
+    const baseCriteria = { ...(existingCriteria || {}), pendingReviewOnly: true };
+    return pendingReviewType
+      ? { ...baseCriteria, pendingReviewType }
+      : baseCriteria;
+  }
 
   private triggerTableInit(): void {
     setTimeout(() => this.dtTrigger.next(null), 75);
@@ -162,7 +197,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       },
     });
 
-    this.fundingSubmissionsService.getPendingReviewListCount().pipe(
+    this.getPendingReviewCountRequest().pipe(
       timeout(this.INIT_API_TIMEOUT_MS),
       catchError((err) => {
         this.logger.error('Failed to load pending review count', err);
@@ -206,7 +241,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
             criteria.listStatus = criteria.listStatus.filter(status => status !== 'Pending Review');
           }
           this.searchCriteria = this.pendingReviewOnly
-            ? { ...criteria, pendingReviewOnly: true }
+            ? this.buildPendingReviewCriteria(criteria)
             : criteria;
           this.showResults = true;
           this.triggerTableInit();
@@ -329,12 +364,13 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   }
 
   private applyDefaultPendingReviewIfReady(): void {
+    const pendingReviewType = this.getPendingReviewTypeForCurrentUser();
     if (
       !this.searchListsInitialized
       || !this.pendingReviewCountLoaded
       || this.defaultPendingReviewApplied
       || this.hasSavedSearchListsState
-      || !this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR)
+      || !pendingReviewType
       || this.pendingReviewCount <= 0
     ) {
       return;
@@ -343,7 +379,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     this.defaultPendingReviewApplied = true;
     this.pendingReviewOnly = true;
     this.selectedListStatus = null;
-    this.searchCriteria = { pendingReviewOnly: true };
+    this.searchCriteria = this.buildPendingReviewCriteria();
     this.showResults = true;
     this.triggerTableInit();
   }
@@ -473,7 +509,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
 
     this.pendingReviewOnly = true;
     this.selectedListStatus = null;
-    this.searchCriteria = { pendingReviewOnly: true };
+    this.searchCriteria = this.buildPendingReviewCriteria();
     this.throttle.reset();
     if (this.showResults) {
       this.dtElement?.dtInstance?.then(dt => dt.ajax.reload()).catch(() => this.triggerTableInit());

@@ -12,7 +12,7 @@ describe('FundingListsSearchComponent.formatLastActionDate (FS-2163)', () => {
       jasmine.createSpyObj('Router', ['navigate']),
       jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
       jasmine.createSpyObj('HttpClient', ['post']),
-      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount']),
+      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount', 'getOefiaPendingReviewListCount', 'getNciDirectorPendingReviewListCount']),
       { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
       jasmine.createSpyObj('LoaderService', ['show', 'hide']),
       jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
@@ -55,7 +55,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
       jasmine.createSpyObj('Router', ['navigate']),
       loggerSpy,
       httpSpy,
-      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount']),
+      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount', 'getOefiaPendingReviewListCount', 'getNciDirectorPendingReviewListCount']),
       { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
       loaderServiceSpy,
       jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
@@ -162,9 +162,10 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     expect(loggerSpy.error).toHaveBeenCalledWith('List search export failed', error);
   });
 
-  it('sends only pendingReviewOnly for the Pending Review quick filter', () => {
+  it('sends pendingReviewOnly and pendingReviewType for the Pending Review quick filter', () => {
     const searchLists = jasmine.createSpy('searchLists').and.returnValue(of({ recordsTotal: 1, recordsFiltered: 1, data: [] }));
     (component as any).fundingSubmissionsService = { searchLists };
+    (component as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.DOC_FUNDING_LIST_COR);
     component.pendingReviewCount = 1;
 
     component.onPendingReviewClick();
@@ -179,6 +180,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
 
     const body = searchLists.calls.mostRecent().args[0] as any;
     expect(body.pendingReviewOnly).toBeTrue();
+    expect(body.pendingReviewType).toBe('DOC');
     expect(body.listStatus).toBeUndefined();
     expect(component.selectedListStatus).toBeNull();
   });
@@ -186,6 +188,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
   it('includes pendingReviewOnly in export criteria for pending-review results', () => {
     const searchLists = jasmine.createSpy('searchLists').and.returnValue(of({ recordsTotal: 1, recordsFiltered: 1, data: [] }));
     (component as any).fundingSubmissionsService = { searchLists };
+    (component as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.DOC_FUNDING_LIST_COR);
     component.pendingReviewCount = 1;
     component.onPendingReviewClick();
     httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
@@ -195,6 +198,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     component.exportListSearchResults();
 
     expect(httpSpy.post.calls.mostRecent().args[1].pendingReviewOnly).toBeTrue();
+    expect(httpSpy.post.calls.mostRecent().args[1].pendingReviewType).toBe('DOC');
     expect(httpSpy.post.calls.mostRecent().args[1].listStatus).toBeUndefined();
   });
 
@@ -235,7 +239,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     (component as any).applyDefaultPendingReviewIfReady();
     (component as any).applyDefaultPendingReviewIfReady();
 
-    expect((component as any).searchCriteria).toEqual({ pendingReviewOnly: true });
+    expect((component as any).searchCriteria).toEqual({ pendingReviewOnly: true, pendingReviewType: 'DOC' });
     expect(component.showResults).toBeTrue();
     expect((component as any).defaultPendingReviewApplied).toBeTrue();
   });
@@ -254,12 +258,12 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     spyOn<any>(component, 'triggerTableInit');
 
     component.ngAfterViewInit();
-    expect((component as any).searchCriteria).toEqual({ pendingReviewOnly: true });
+    expect((component as any).searchCriteria).toEqual({ pendingReviewOnly: true, pendingReviewType: 'DOC' });
     expect(component.showResults).toBeTrue();
 
     await Promise.resolve();
 
-    expect((component as any).searchCriteria).toEqual({ pendingReviewOnly: true });
+    expect((component as any).searchCriteria).toEqual({ pendingReviewOnly: true, pendingReviewType: 'DOC' });
     expect(component.showResults).toBeTrue();
   });
 
@@ -281,6 +285,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
   it('does not send a nihNetworkId for ordinary pending-review searches', () => {
     const searchLists = jasmine.createSpy('searchLists').and.returnValue(of({ recordsTotal: 0, recordsFiltered: 0, data: [] }));
     (component as any).fundingSubmissionsService = { searchLists };
+    (component as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.DOC_FUNDING_LIST_COR);
     component.pendingReviewCount = 1;
     component.onPendingReviewClick();
     component.ajaxCall(component, {
@@ -288,6 +293,216 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     }, () => { /* noop */ });
 
     expect(searchLists.calls.mostRecent().args[0].nihNetworkId).toBeUndefined();
+  });
+
+  it('loads OEFIA pending-review count for OEFIA users', () => {
+    const fundingSubmissionsService = (component as any).fundingSubmissionsService;
+    fundingSubmissionsService.getSelectionDateCodes.and.returnValue(of([]));
+    fundingSubmissionsService.searchLists.and.returnValue(of({ data: [] } as any));
+    fundingSubmissionsService.getListStatusCodes.and.returnValue(of([]));
+    fundingSubmissionsService.getPendingReviewListCount.and.returnValue(of(0));
+    fundingSubmissionsService.getOefiaPendingReviewListCount.and.returnValue(of(3));
+    fundingSubmissionsService.getNciDirectorPendingReviewListCount.and.returnValue(of(0));
+
+    const userSession = (component as any).userSessionService;
+    userSession.hasRole.and.callFake((role: string) => role === roleNames.OEFIA_CERTIFIER);
+    userSession.getDocFundingSubmissionCoordinatorDocAbbrevs = jasmine.createSpy('getDocFundingSubmissionCoordinatorDocAbbrevs').and.returnValue([]);
+
+    component.ngOnInit();
+
+    expect(fundingSubmissionsService.getOefiaPendingReviewListCount).toHaveBeenCalled();
+    expect(fundingSubmissionsService.getPendingReviewListCount).not.toHaveBeenCalled();
+    expect(fundingSubmissionsService.getNciDirectorPendingReviewListCount).not.toHaveBeenCalled();
+    expect(component.pendingReviewCount).toBe(3);
+  });
+
+  it('loads NCI Director pending-review count for NCI Director users', () => {
+    const fundingSubmissionsService = (component as any).fundingSubmissionsService;
+    fundingSubmissionsService.getSelectionDateCodes.and.returnValue(of([]));
+    fundingSubmissionsService.searchLists.and.returnValue(of({ data: [] } as any));
+    fundingSubmissionsService.getListStatusCodes.and.returnValue(of([]));
+    fundingSubmissionsService.getPendingReviewListCount.and.returnValue(of(0));
+    fundingSubmissionsService.getOefiaPendingReviewListCount.and.returnValue(of(0));
+    fundingSubmissionsService.getNciDirectorPendingReviewListCount.and.returnValue(of(5));
+
+    const userSession = (component as any).userSessionService;
+    userSession.hasRole.and.callFake((role: string) => role === roleNames.NCI_DIRECTOR);
+    userSession.getDocFundingSubmissionCoordinatorDocAbbrevs = jasmine.createSpy('getDocFundingSubmissionCoordinatorDocAbbrevs').and.returnValue([]);
+
+    component.ngOnInit();
+
+    expect(fundingSubmissionsService.getNciDirectorPendingReviewListCount).toHaveBeenCalled();
+    expect(fundingSubmissionsService.getPendingReviewListCount).not.toHaveBeenCalled();
+    expect(fundingSubmissionsService.getOefiaPendingReviewListCount).not.toHaveBeenCalled();
+    expect(component.pendingReviewCount).toBe(5);
+  });
+
+  it('uses OEFIA audience pendingReviewType on Pending Review click', () => {
+    const searchLists = jasmine.createSpy('searchLists').and.returnValue(of({ recordsTotal: 1, recordsFiltered: 1, data: [] }));
+    (component as any).fundingSubmissionsService = { searchLists };
+    (component as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.OEFIA_CERTIFIER);
+    component.pendingReviewCount = 1;
+
+    component.onPendingReviewClick();
+    component.ajaxCall(component, {
+      draw: 1,
+      columns: [],
+      order: [],
+      start: 0,
+      length: 10,
+      search: { value: '', regex: false }
+    }, () => { /* noop */ });
+
+    const body = searchLists.calls.mostRecent().args[0] as any;
+    expect(body.pendingReviewOnly).toBeTrue();
+    expect(body.pendingReviewType).toBe('OEFIA');
+  });
+
+  it('uses OEFIA audience pendingReviewType on Pending Review click for FA users', () => {
+    const searchLists = jasmine.createSpy('searchLists').and.returnValue(of({ recordsTotal: 1, recordsFiltered: 1, data: [] }));
+    (component as any).fundingSubmissionsService = { searchLists };
+    (component as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.FINANCIAL_ANALYST);
+    component.pendingReviewCount = 1;
+
+    component.onPendingReviewClick();
+    component.ajaxCall(component, {
+      draw: 1,
+      columns: [],
+      order: [],
+      start: 0,
+      length: 10,
+      search: { value: '', regex: false }
+    }, () => { /* noop */ });
+
+    const body = searchLists.calls.mostRecent().args[0] as any;
+    expect(body.pendingReviewOnly).toBeTrue();
+    expect(body.pendingReviewType).toBe('OEFIA');
+  });
+
+  it('uses NCI_DIRECTOR audience pendingReviewType on Pending Review click', () => {
+    const searchLists = jasmine.createSpy('searchLists').and.returnValue(of({ recordsTotal: 1, recordsFiltered: 1, data: [] }));
+    (component as any).fundingSubmissionsService = { searchLists };
+    (component as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.NCI_DIRECTOR);
+    component.pendingReviewCount = 1;
+
+    component.onPendingReviewClick();
+    component.ajaxCall(component, {
+      draw: 1,
+      columns: [],
+      order: [],
+      start: 0,
+      length: 10,
+      search: { value: '', regex: false }
+    }, () => { /* noop */ });
+
+    const body = searchLists.calls.mostRecent().args[0] as any;
+    expect(body.pendingReviewOnly).toBeTrue();
+    expect(body.pendingReviewType).toBe('NCI_DIRECTOR');
+  });
+
+  it('uses OEFIA pending count endpoint for OEFIA users in ngOnInit', () => {
+    const fundingSubmissionsService = jasmine.createSpyObj('FundingSubmissionsService', [
+      'getSelectionDateCodes',
+      'searchLists',
+      'getListStatusCodes',
+      'getPendingReviewListCount',
+      'getOefiaPendingReviewListCount',
+      'getNciDirectorPendingReviewListCount'
+    ]);
+    fundingSubmissionsService.getSelectionDateCodes.and.returnValue(of([]));
+    fundingSubmissionsService.searchLists.and.returnValue(of({ data: [] }));
+    fundingSubmissionsService.getListStatusCodes.and.returnValue(of([]));
+    fundingSubmissionsService.getOefiaPendingReviewListCount.and.returnValue(of(3));
+    fundingSubmissionsService.getPendingReviewListCount.and.returnValue(of(0));
+    fundingSubmissionsService.getNciDirectorPendingReviewListCount.and.returnValue(of(0));
+
+    const localComponent = new FundingListsSearchComponent(
+      jasmine.createSpyObj('Router', ['navigate']),
+      jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
+      jasmine.createSpyObj('HttpClient', ['post']),
+      fundingSubmissionsService,
+      { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
+      jasmine.createSpyObj('LoaderService', ['show', 'hide']),
+      jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
+      jasmine.createSpyObj('AppUserSessionService', ['hasRole'])
+    );
+    (localComponent as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.OEFIA_CERTIFIER);
+
+    localComponent.ngOnInit();
+
+    expect(fundingSubmissionsService.getOefiaPendingReviewListCount).toHaveBeenCalled();
+    expect(fundingSubmissionsService.getPendingReviewListCount).not.toHaveBeenCalled();
+    expect(fundingSubmissionsService.getNciDirectorPendingReviewListCount).not.toHaveBeenCalled();
+  });
+
+  it('uses OEFIA pending count endpoint for FA users in ngOnInit', () => {
+    const fundingSubmissionsService = jasmine.createSpyObj('FundingSubmissionsService', [
+      'getSelectionDateCodes',
+      'searchLists',
+      'getListStatusCodes',
+      'getPendingReviewListCount',
+      'getOefiaPendingReviewListCount',
+      'getNciDirectorPendingReviewListCount'
+    ]);
+    fundingSubmissionsService.getSelectionDateCodes.and.returnValue(of([]));
+    fundingSubmissionsService.searchLists.and.returnValue(of({ data: [] }));
+    fundingSubmissionsService.getListStatusCodes.and.returnValue(of([]));
+    fundingSubmissionsService.getOefiaPendingReviewListCount.and.returnValue(of(4));
+    fundingSubmissionsService.getPendingReviewListCount.and.returnValue(of(0));
+    fundingSubmissionsService.getNciDirectorPendingReviewListCount.and.returnValue(of(0));
+
+    const localComponent = new FundingListsSearchComponent(
+      jasmine.createSpyObj('Router', ['navigate']),
+      jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
+      jasmine.createSpyObj('HttpClient', ['post']),
+      fundingSubmissionsService,
+      { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
+      jasmine.createSpyObj('LoaderService', ['show', 'hide']),
+      jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
+      jasmine.createSpyObj('AppUserSessionService', ['hasRole'])
+    );
+    (localComponent as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.FINANCIAL_ANALYST);
+
+    localComponent.ngOnInit();
+
+    expect(fundingSubmissionsService.getOefiaPendingReviewListCount).toHaveBeenCalled();
+    expect(fundingSubmissionsService.getPendingReviewListCount).not.toHaveBeenCalled();
+    expect(fundingSubmissionsService.getNciDirectorPendingReviewListCount).not.toHaveBeenCalled();
+  });
+
+  it('uses NCI Director pending count endpoint for NCI Director users in ngOnInit', () => {
+    const fundingSubmissionsService = jasmine.createSpyObj('FundingSubmissionsService', [
+      'getSelectionDateCodes',
+      'searchLists',
+      'getListStatusCodes',
+      'getPendingReviewListCount',
+      'getOefiaPendingReviewListCount',
+      'getNciDirectorPendingReviewListCount'
+    ]);
+    fundingSubmissionsService.getSelectionDateCodes.and.returnValue(of([]));
+    fundingSubmissionsService.searchLists.and.returnValue(of({ data: [] }));
+    fundingSubmissionsService.getListStatusCodes.and.returnValue(of([]));
+    fundingSubmissionsService.getNciDirectorPendingReviewListCount.and.returnValue(of(2));
+    fundingSubmissionsService.getPendingReviewListCount.and.returnValue(of(0));
+    fundingSubmissionsService.getOefiaPendingReviewListCount.and.returnValue(of(0));
+
+    const localComponent = new FundingListsSearchComponent(
+      jasmine.createSpyObj('Router', ['navigate']),
+      jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
+      jasmine.createSpyObj('HttpClient', ['post']),
+      fundingSubmissionsService,
+      { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
+      jasmine.createSpyObj('LoaderService', ['show', 'hide']),
+      jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
+      jasmine.createSpyObj('AppUserSessionService', ['hasRole'])
+    );
+    (localComponent as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.NCI_DIRECTOR);
+
+    localComponent.ngOnInit();
+
+    expect(fundingSubmissionsService.getNciDirectorPendingReviewListCount).toHaveBeenCalled();
+    expect(fundingSubmissionsService.getPendingReviewListCount).not.toHaveBeenCalled();
+    expect(fundingSubmissionsService.getOefiaPendingReviewListCount).not.toHaveBeenCalled();
   });
 });
 
@@ -297,7 +512,7 @@ describe('FundingListsSearchComponent list-name labels (FS-2273)', () => {
       jasmine.createSpyObj('Router', ['navigate']),
       jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
       jasmine.createSpyObj('HttpClient', ['post']),
-      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount']),
+      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount', 'getOefiaPendingReviewListCount', 'getNciDirectorPendingReviewListCount']),
       { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
       jasmine.createSpyObj('LoaderService', ['show', 'hide']),
       jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
