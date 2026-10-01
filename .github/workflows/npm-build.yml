@@ -69,7 +69,7 @@ jobs:
           echo "Angular: $(ng version)"
 
       - name: Build application
-        run: ng build --configuration=dev --base-href=${{ env.app_base_href }}
+        run: ng build --configuration=production --base-href=${{ env.app_base_href }}
 
       - name: Log build output
         run: |
