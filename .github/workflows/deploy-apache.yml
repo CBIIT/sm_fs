@@ -1,5 +1,6 @@
-name: Deploy Angular Application to Apache Server
-run-name: Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} from Build ${{ inputs.run_num || inputs.run_id }} to ${{ inputs.environment}} - Run #${{ github.run_number }}
+name: Deploy to Apache Server
+run-name: Deploy Build ${{ inputs.run_num }} to ${{ inputs.environment}} 
+
 on:
   workflow_dispatch:
     inputs:
@@ -47,8 +48,7 @@ jobs:
     runs-on: 
       group: cbiit-test-automation-runners
       labels: fargate-al2023-s-nonprod
-#      group: cbiit-global-runners
-#      labels: self-hosted
+
     steps:
       - name: Set target server based on environment selection  
         run: |

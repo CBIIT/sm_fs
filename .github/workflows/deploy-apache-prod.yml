@@ -1,5 +1,6 @@
-name: Deploy to Production Apache Server
-run-name: Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} from Build ${{ inputs.run_num || inputs.run_id }} to Production
+name: Deploy to Production Server
+run-name: Deploy Build ${{ inputs.run_num }} to Production
+
 on:
   workflow_dispatch:
     inputs:
@@ -11,11 +12,6 @@ on:
         required: true
         type: string
         description: 'Enter "fs-production" to confirm production deployment'
-      production_approval:
-        required: false
-        type: boolean
-        description: 'Require manual approval for production deploys'
-        default: false
 
 jobs:
   validate-code:
