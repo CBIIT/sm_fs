@@ -1,5 +1,5 @@
-name: Build Angular Application and Deploy to Dev
-run-name: Build and Deploy ${{ fromJson(vars.APP_PROPERTIES).application}} - Run #${{ github.run_number }} on ${{ github.ref_name }}
+name: Build and Deploy to Dev
+run-name: Build Number ${{ github.run_number }}
 
 on:
   workflow_dispatch:
