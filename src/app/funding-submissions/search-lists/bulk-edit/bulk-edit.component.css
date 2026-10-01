@@ -7,6 +7,20 @@
   text-align: right;
   color: #6c757d;
 }
+
+.field-with-inline-error {
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.validation-inline-error {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  margin: 0;
+  line-height: 1;
+}
+
 ::ng-deep .dataTables_wrapper .dataTables_info
 {
    padding-top: 0px !important ;

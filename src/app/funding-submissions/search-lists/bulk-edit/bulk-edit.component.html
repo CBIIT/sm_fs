@@ -49,42 +49,61 @@
     <form #bulkForm="ngForm">
       <div class="row mb-3">
         <div class="col-4">
+          <div class="field-with-inline-error">
           <label class="form-label fw-semibold">Budget Categories</label>
           <ng-select2 id="bulk-budget-cat" name="bulkBudgetCategories" [(ngModel)]="bulkFields.budgetCategories"
+            (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
           </ng-select2>
+          <div *ngIf="hasBulkMandatoryFieldError('budgetCategories')" class="text-danger small validation-inline-error">{{ getMandatoryFieldErrorMessage('Budget Categories') }}</div>
+          </div>
         </div>
         <div class="col-4">
+          <div class="field-with-inline-error">
           <label class="form-label fw-semibold">DOC Decision</label>
           <ng-select2 id="bulk-doc-decision" name="bulkDocDecision" [(ngModel)]="bulkFields.docDecision"
             (ngModelChange)="onBulkDocDecisionChange()"
             [data]="decisionOptions" [allowClear]="true" width="100%">
           </ng-select2>
+          <div *ngIf="hasBulkMandatoryFieldError('docDecision')" class="text-danger small validation-inline-error">{{ getMandatoryFieldErrorMessage('DOC Decision') }}</div>
+          </div>
         </div>
         <div class="col-4">
+          <div class="field-with-inline-error">
           <label class="form-label fw-semibold">DOC / NCI Selection</label>
           <ng-select2 id="bulk-doc-nci-sel" name="bulkDocNciSelection" [(ngModel)]="bulkFields.docNciSelection"
+            (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="docNciOptions" [allowClear]="true" width="100%">
           </ng-select2>
+          <div *ngIf="hasBulkMandatoryFieldError('docNciSelection')" class="text-danger small validation-inline-error">{{ getMandatoryFieldErrorMessage('DOC/NCI Selection') }}</div>
+          </div>
         </div>
       </div>
 
       <div class="row mb-3">
         <div class="col-4">
+          <div class="field-with-inline-error">
           <label class="form-label fw-semibold">Two-Year Annual Funding R01 (HRHR)</label>
           <ng-select2 id="bulk-annual-r01" name="bulkAnnualFundingR01" [(ngModel)]="bulkFields.annualFundingR01"
+            (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="yesNoOptions" [allowClear]="true" width="100%">
           </ng-select2>
+          <div *ngIf="hasBulkMandatoryFieldError('annualFundingR01')" class="text-danger small validation-inline-error">{{ getMandatoryFieldErrorMessage('Two-Year Annual Funding R01 (HRHR)') }}</div>
+          </div>
         </div>
         <div class="col-4">
+          <div class="field-with-inline-error">
           <label class="form-label fw-semibold">Annual or MYF</label>
           <ng-select2 id="bulk-annual-myf" name="bulkAnnualOrMyf" [(ngModel)]="bulkFields.annualOrMyf"
+            (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="annualMyfOptions" [allowClear]="true" width="100%">
           </ng-select2>
+          <div *ngIf="hasBulkMandatoryFieldError('annualOrMyf')" class="text-danger small validation-inline-error">{{ getMandatoryFieldErrorMessage('Annual or MYF') }}</div>
+          </div>
         </div>
       </div>
 
@@ -94,10 +113,10 @@
           <textarea class="form-control" name="bulkDocNotes" [(ngModel)]="bulkFields.docNotes" (ngModelChange)="onBulkDocNotesChange()" rows="4"
             maxlength="1000">
         </textarea>
+          <div class="text-end text-muted small">{{ bulkFields.docNotes?.length || 0 }}/1000</div>
           <div *ngIf="bulkDocNotesValidationErrorMessage.length > 0" class="text-danger small mt-1">
             {{ bulkDocNotesValidationErrorMessage }}
           </div>
-          <div class="text-end text-muted small">{{ bulkFields.docNotes?.length || 0 }}/1000</div>
         </div>
         <div class="col-6" *ngIf="!docFundingListCor">
           <label class="form-label fw-semibold">OEFIA Notes</label>
@@ -136,33 +155,59 @@
         </ng-template>
 
         <ng-template #budgetCatRenderer let-data="adtData">
-          <ng-select2 [id]="'bcat-' + data.applId" [(ngModel)]="data.budgetCategories"
-            (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
-          </ng-select2>
+          <div class="field-with-inline-error">
+            <ng-select2 [id]="'bcat-' + data.applId" [(ngModel)]="data.budgetCategories"
+              (ngModelChange)="onRowRequiredFieldChange(data, 'budgetCategories')" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
+            </ng-select2>
+            <div *ngIf="hasMandatoryFieldError(data, 'budgetCategories')" class="text-danger small validation-inline-error">
+              Required.
+            </div>
+          </div>
         </ng-template>
 
         <ng-template #docDecisionRenderer let-data="adtData">
-          <ng-select2 [id]="'ddec-' + data.applId" [(ngModel)]="data.docDecision" (ngModelChange)="onRowDocDecisionChange(data)"
-            [data]="getDocDecisionOptionsForRow(data)" [allowClear]="true" width="100%">
-          </ng-select2>
+          <div class="field-with-inline-error">
+            <ng-select2 [id]="'ddec-' + data.applId" [(ngModel)]="data.docDecision" (ngModelChange)="onRowDocDecisionChange(data)"
+              [data]="getDocDecisionOptionsForRow(data)" [allowClear]="true" width="100%">
+            </ng-select2>
+            <div *ngIf="hasMandatoryFieldError(data, 'docDecision')" class="text-danger small validation-inline-error">
+              Required.
+            </div>
+          </div>
         </ng-template>
 
         <ng-template #docNciSelRenderer let-data="adtData">
-          <ng-select2 [id]="'dnci-' + data.applId" [(ngModel)]="data.docNciSelection"
-            (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" [allowClear]="true" width="100%">
-          </ng-select2>
+          <div class="field-with-inline-error">
+            <ng-select2 [id]="'dnci-' + data.applId" [(ngModel)]="data.docNciSelection"
+              (ngModelChange)="onRowRequiredFieldChange(data, 'docNciSelection')" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" [allowClear]="true" width="100%">
+            </ng-select2>
+            <div *ngIf="hasMandatoryFieldError(data, 'docNciSelection')" class="text-danger small validation-inline-error">
+              Required.
+            </div>
+          </div>
         </ng-template>
 
         <ng-template #annualR01Renderer let-data="adtData">
-          <ng-select2 [id]="'ar01-' + data.applId" [(ngModel)]="data.annualFundingR01"
-            (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" [allowClear]="true" width="100%">
-          </ng-select2>
+          <div class="field-with-inline-error">
+            <ng-select2 [id]="'ar01-' + data.applId" [(ngModel)]="data.annualFundingR01"
+              (ngModelChange)="onRowRequiredFieldChange(data, 'annualFundingR01')" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" [allowClear]="true" width="100%">
+            </ng-select2>
+            <div *ngIf="hasMandatoryFieldError(data, 'annualFundingR01')" class="text-danger small validation-inline-error">
+              Required.
+            </div>
+          </div>
         </ng-template>
 
         <ng-template #annualMyfRenderer let-data="adtData">
-          <ng-select2 [id]="'amyf-' + data.applId" [(ngModel)]="data.annualOrMyf" (ngModelChange)="onRowFieldChange()"
-            [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" [allowClear]="true" width="100%">
-          </ng-select2>
+          <div class="field-with-inline-error">
+            <ng-select2 [id]="'amyf-' + data.applId" [(ngModel)]="data.annualOrMyf"
+              (ngModelChange)="onRowRequiredFieldChange(data, 'annualOrMyf')"
+              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" [allowClear]="true" width="100%">
+            </ng-select2>
+            <div *ngIf="hasMandatoryFieldError(data, 'annualOrMyf')" class="text-danger small validation-inline-error">
+              Required.
+            </div>
+          </div>
         </ng-template>
 
         <ng-template #docNotesRenderer let-data="adtData">
@@ -170,10 +215,10 @@
             <textarea class="form-control form-control-sm notes-textarea" [(ngModel)]="data.docNotes"
               (ngModelChange)="onRowFieldChange()" rows="2" maxlength="2000">
           </textarea>
-            <div *ngIf="hasDoNotPayDocNotesError(data)" class="text-danger small mt-1">
+            <div class="char-count">{{ data.docNotes?.length || 0 }}/2000</div>
+                <div *ngIf="hasDoNotPayDocNotesError(data)" class="text-danger small mt-1">
               {{ getDoNotPayDocNotesErrorMessage() }}
             </div>
-            <div class="char-count">{{ data.docNotes?.length || 0 }}/2000</div>
           </div>
         </ng-template>
 
