@@ -1,0 +1,44 @@
+.director-bulk-edit-page {
+  color: #111;
+}
+
+.bulk-form textarea {
+  resize: vertical;
+}
+
+.notes-cell-wrapper {
+  min-width: 260px;
+}
+
+:host ::ng-deep .dataTables_wrapper .dataTables_length,
+:host ::ng-deep .dataTables_wrapper .dataTables_info,
+:host ::ng-deep .dataTables_wrapper .dataTables_paginate {
+  margin-bottom: 0.5rem;
+}
+
+:host ::ng-deep .dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 0.25rem 0.5rem;
+}
+
+:host ::ng-deep table.dataTable thead th {
+  background-color: #f4f5f7;
+  font-weight: 700;
+}
+
+:host ::ng-deep table.dataTable tbody td {
+  vertical-align: middle;
+}
+
+:host ::ng-deep .dataTables_wrapper table.dataTable {
+  width: 100% !important;
+}
+
+:host ::ng-deep .dataTables_wrapper table.dataTable th,
+:host ::ng-deep .dataTables_wrapper table.dataTable td {
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .dataTables_wrapper table.dataTable td .select2-container,
+:host ::ng-deep .dataTables_wrapper table.dataTable td textarea {
+  width: 100% !important;
+}

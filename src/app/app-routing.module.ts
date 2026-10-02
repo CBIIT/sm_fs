@@ -26,6 +26,7 @@ import { SearchListsComponent } from './funding-submissions/search-lists/search-
 import { BulkEditComponent } from './funding-submissions/search-lists/bulk-edit/bulk-edit.component';
 import { FundingListsSearchComponent } from './funding-submissions/funding-lists-search/funding-lists-search.component';
 import { FundingListsComponent } from './funding-submissions/funding-lists/funding-lists.component';
+import { DirectorBulkEditComponent } from './funding-submissions/funding-lists/bulk-edit/director-bulk-edit.component';
 import { CanDeactivateSearchLists } from './funding-submissions/search-lists/can-deactivate-search-lists';
 import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate-plan-step6';
 import { CanDeactivateRequestStep2 } from './funding-request/step2/can-deactivate-request-step2';
@@ -70,6 +71,7 @@ const routes: Routes = [
       {path: 'funding-submissions/create', component: CreateFundingListComponent, canActivate: [AuthGuard]},
       {path: 'funding-submissions/search', component: SearchListsComponent, canActivate: [AuthGuard], canDeactivate: [CanDeactivateSearchLists]},
       {path: 'funding-submissions/bulk-edit', component: BulkEditComponent, canActivate: [AuthGuard]},
+      {path: 'funding-submissions/director-bulk-edit', component: DirectorBulkEditComponent, canActivate: [AuthGuard]},
       {path: 'funding-submissions/lists', component: FundingListsSearchComponent, canActivate: [AuthGuard]},
       {path: 'funding-submissions/funding-lists', component: FundingListsComponent, canActivate: [AuthGuard]},
     ]

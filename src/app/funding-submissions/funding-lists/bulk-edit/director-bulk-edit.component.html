@@ -1,0 +1,85 @@
+<div class="director-bulk-edit-page ms-3 me-3 pb-4">
+  <a class="text-decoration-none small" href="javascript:void(0)" (click)="onBackClick()">
+    <i class="far fa-chevron-left me-1"></i>{{ backLabel }}
+  </a>
+
+  <h1 class="mt-4 mb-4">Bulk Decision</h1>
+
+  <div class="row" *ngIf="saveSuccessMessage.length > 0">
+    <div class="col-12">
+      <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
+        <span><b>{{saveSuccessMessage}}</b></span>
+      </ngb-alert>
+    </div>
+  </div>
+
+  <section class="bulk-form mb-4">
+    <div class="mb-4" style="max-width: 390px;">
+      <label class="form-label fw-semibold" for="bulk-nci-decision">NCI Decision</label>
+      <ng-select2
+        id="bulk-nci-decision"
+        name="bulkNciDecision"
+        [(ngModel)]="bulkDecision"
+        [data]="decisionOptions"
+        [allowClear]="true"
+        width="100%"
+        placeholder="Field Placeholder">
+      </ng-select2>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-semibold" for="bulk-nci-notes">NCI Director Notes</label>
+      <textarea
+        id="bulk-nci-notes"
+        class="form-control"
+        rows="5"
+        maxlength="2000"
+        placeholder="Enter text here..."
+        [(ngModel)]="bulkNotes"></textarea>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+      <button type="button" class="btn btn-outline-secondary" (click)="resetBulkForm()">Reset</button>
+      <button type="button" class="btn btn-primary ms-3" (click)="applyChanges()" [disabled]="!hasAnyBulkFieldValue">Apply Changes</button>
+    </div>
+  </section>
+
+  <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%"></table>
+
+  <ng-template #fullGrantNumberRenderer let-data="adtData">
+    <app-full-grant-number-cell-renderer
+      [data]="data"
+      [eGrantsUrl]="eGrantsUrl"
+      [grantViewerUrl]="grantViewerUrl"
+      [i2eURL]="i2eURL">
+    </app-full-grant-number-cell-renderer>
+  </ng-template>
+
+  <ng-template #nciDecisionRenderer let-data="adtData">
+    <ng-select2
+      [id]="'nci-decision-' + data.applId"
+      [(ngModel)]="data.nciDecision"
+      (ngModelChange)="onRowChange()"
+      [data]="decisionOptions"
+      [allowClear]="true"
+      width="100%"
+      placeholder="Select">
+    </ng-select2>
+  </ng-template>
+
+  <ng-template #nciNotesRenderer let-data="adtData">
+    <div class="notes-cell-wrapper">
+      <textarea
+        class="form-control form-control-sm"
+        rows="2"
+        maxlength="2000"
+        [(ngModel)]="data.nciDirectorNotes"
+        (ngModelChange)="onRowChange()"></textarea>
+      <div class="text-end small text-muted">{{ (data.nciDirectorNotes || '').length }}/2000</div>
+    </div>
+  </ng-template>
+
+  <div class="d-flex justify-content-end mt-3 mb-4">
+    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="!rows.length || !canSave">Save</button>
+  </div>
+</div>

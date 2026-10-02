@@ -268,6 +268,7 @@ import { GrantDetailComponent } from './funding-submissions/search-lists/grant-d
 import { BulkEditComponent } from './funding-submissions/search-lists/bulk-edit/bulk-edit.component';
 import { FundingListsSearchComponent } from './funding-submissions/funding-lists-search/funding-lists-search.component';
 import { FundingListsComponent } from './funding-submissions/funding-lists/funding-lists.component';
+import { DirectorBulkEditComponent } from './funding-submissions/funding-lists/bulk-edit/director-bulk-edit.component';
 import { SavedProjectedCanComponent } from './cans/saved-projected-can/saved-projected-can.component';
 
 declare var $: any;
@@ -528,6 +529,7 @@ export function combinedInitializerFactory(
         BulkEditComponent,
         FundingListsSearchComponent,
         FundingListsComponent,
+        DirectorBulkEditComponent,
         SavedProjectedCanComponent
     ],
     bootstrap: [AppComponent],

@@ -1,5 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EnvironmentInjector, OnDestroy, OnInit, TemplateRef, ViewChild, createComponent } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
@@ -82,6 +83,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
+    private router: Router,
     private http: HttpClient,
     private logger: NGXLogger,
     private environmentInjector: EnvironmentInjector,
@@ -446,6 +448,25 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     setTimeout(() => this.dtTrigger.next(null));
+  }
+
+  goToDirectorBulkEdit(): void {
+    const selectedGrants = Array.from(this.selectedRows.values());
+    if (!selectedGrants.length) {
+      return;
+    }
+
+    this.router.navigate(['/funding-submissions/director-bulk-edit'], {
+      queryParams: {
+        listId: this.listId,
+        selectionDate: this.pageTitle
+      },
+      state: {
+        listId: this.listId,
+        selectionDate: this.pageTitle,
+        grants: selectedGrants
+      }
+    });
   }
 
   ngOnDestroy(): void {
