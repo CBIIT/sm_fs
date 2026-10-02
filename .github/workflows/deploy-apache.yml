@@ -119,13 +119,14 @@ jobs:
                 mkdir -p ${DEPLOY_PATH}
               fi &&
               cd ${DEPLOY_PATH} &&
-              cp /tmp/${ARTIFACT_FILENAME} . &&
               mkdir -p backups &&
-              if [ -f index.html ] || [ -n "\$(ls -A . 2>/dev/null)" ]; then
+              if [ -n "\$(find . -mindepth 1 -maxdepth 1 ! -name backups -print -quit)" ]; then
                 BACKUP_NAME='${{ env.app_name }}-backup-'"\$(date +%Y%m%d_%H%M%S)"
-                mkdir -p "backups/$BACKUP_NAME" &&
-                find . -maxdepth 1 -not -name backups -not -name . -not -name "\${ARTIFACT_FILENAME}" -exec mv {} "backups/$BACKUP_NAME/" \;
+                echo "Backing up existing files to backups/\$BACKUP_NAME"
+                mkdir -p "backups/\$BACKUP_NAME" &&
+                find . -mindepth 1 -maxdepth 1 ! -name backups -exec mv {} "backups/\$BACKUP_NAME/" \;
               fi &&
+              cp /tmp/${ARTIFACT_FILENAME} . &&
               unzip -o ${ARTIFACT_FILENAME} &&
               chmod -R 755 . &&
               find . -type f -name "*.html" -exec chmod 644 {} \; &&
