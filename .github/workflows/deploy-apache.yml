@@ -121,7 +121,7 @@ jobs:
               cd ${DEPLOY_PATH} &&
               cp /tmp/${ARTIFACT_FILENAME} . &&
               mkdir -p backups &&
-              if [ -f index.html ] || [ $(ls -A . 2>/dev/null) ]; then
+              if [ -f index.html ] || [ \$(ls -A . 2>/dev/null) ]; then
                 BACKUP_NAME=${{ env.app_name }}-backup-$(date +%Y%m%d_%H%M%S) &&
                 mkdir -p backups/$BACKUP_NAME &&
                 find . -maxdepth 1 -not -name backups -not -name . -not -name ${ARTIFACT_FILENAME} -exec mv {} backups/$BACKUP_NAME/ \;
