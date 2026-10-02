@@ -145,7 +145,8 @@ jobs:
               }" > deployment-info.json &&
               
               rm -f ${ARTIFACT_FILENAME} &&
-              cd backups && ls -t gpmats-backup-* 2>/dev/null | tail -n +6 | xargs -r rm -rf && cd .. &&
+              # Clean up old backups, keeping the 5 most recent ones
+              cd backups && ls -t ${{ env.app_name }}-backup-* 2>/dev/null | tail -n +6 | xargs -r rm -rf && cd .. &&
               rm -f /tmp/${ARTIFACT_FILENAME}
           EOF
           
