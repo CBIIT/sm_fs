@@ -1384,6 +1384,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onBulkEditClick(): void {
+    if (!this.canBulkEditByStatus) {
+      return;
+    }
     this.executeWithUnsavedGuard(() => this.onBulkEdit());
   }
 
@@ -1467,12 +1470,43 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onBulkEdit(): void {
+    if (!this.canBulkEditByStatus) {
+      return;
+    }
     const grants = Array.from(this.selectedRows.values());
     const queryParams = this.fromRoute ? { from: this.fromRoute } : undefined;
     this.router.navigate(['/funding-submissions/bulk-edit'], {
       queryParams,
       state: { grants, listId: this.listId, selectionDate: this.selectionDate, from: this.fromRoute }
     });
+  }
+
+  get canBulkEditByStatus(): boolean {
+    if (!this.docFundingListCor) {
+      return true;
+    }
+
+    return this.isDocReviewListStatus();
+  }
+
+  get canBulkEdit(): boolean {
+    return this.canBulkEditByStatus && this.selectedRows.size > 0;
+  }
+
+  get bulkEditTooltipMessage(): string {
+    if (!this.canBulkEditByStatus) {
+      return 'Bulk Edit is available only while list status is DOC Review.';
+    }
+    return 'Select at least one grant to bulk edit.';
+  }
+
+  private isDocReviewListStatus(): boolean {
+    const normalized = this.getNormalizedListStatusText();
+    return normalized.includes('doc review');
+  }
+
+  private getNormalizedListStatusText(): string {
+    return `${this.listStatus || ''} ${this.currentReviewStatus || ''}`.trim().toLowerCase();
   }
 
   onAddGrantsToList(): void {

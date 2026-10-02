@@ -150,8 +150,8 @@
             <!-- Action buttons -->
             <div class="d-flex gap-2 mb-3" *ngIf="!isNciDirector">
                 <!-- Bulk Edit -->
-                <span ngbTooltip="Select at least one grant to bulk edit." [disableTooltip]="!!selectedRows.size" container="body">
-                    <button type="button" class="btn btn-primary me-3" (click)="onBulkEditClick()" [disabled]="!selectedRows.size">
+                <span [ngbTooltip]="bulkEditTooltipMessage" [disableTooltip]="canBulkEdit" container="body">
+                    <button type="button" class="btn btn-primary me-3" (click)="onBulkEditClick()" [disabled]="!canBulkEdit">
                         <i class="fas fa-pen me-2"></i>
                         Bulk Edit
                     </button>

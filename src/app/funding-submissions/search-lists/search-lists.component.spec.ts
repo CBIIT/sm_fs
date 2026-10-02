@@ -657,6 +657,47 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         })
       );
     });
+
+    it('DOC role: enables Bulk Edit in DOC Review status', () => {
+      component.docFundingListCor = true;
+      component.listStatus = 'DOC Review';
+      component.currentReviewStatus = 'DOC Review';
+      component.selectedRows.set(100, { applId: 100 });
+
+      expect(component.canBulkEditByStatus).toBeTrue();
+      expect(component.canBulkEdit).toBeTrue();
+    });
+
+    it('DOC role: disables Bulk Edit in OEFIA Review status', () => {
+      component.docFundingListCor = true;
+      component.listStatus = 'OEFIA Review';
+      component.currentReviewStatus = 'OEFIA Review';
+      component.selectedRows.set(100, { applId: 100 });
+
+      expect(component.canBulkEditByStatus).toBeFalse();
+      expect(component.canBulkEdit).toBeFalse();
+    });
+
+    it('DOC role: disables Bulk Edit in NCI Director Review status', () => {
+      component.docFundingListCor = true;
+      component.listStatus = 'NCI Director Review';
+      component.currentReviewStatus = 'NCI Director Review';
+      component.selectedRows.set(100, { applId: 100 });
+
+      expect(component.canBulkEditByStatus).toBeFalse();
+      expect(component.canBulkEdit).toBeFalse();
+    });
+
+    it('DOC role: onBulkEditClick does not navigate when status disallows bulk edit', () => {
+      component.docFundingListCor = true;
+      component.listStatus = 'OEFIA Review';
+      component.currentReviewStatus = 'OEFIA Review';
+      component.selectedRows.set(100, { applId: 100 });
+
+      component.onBulkEditClick();
+
+      expect(routerSpy.navigate).not.toHaveBeenCalled();
+    });
   });
 
   // Prompt - Grant Detail Cancel Reverts to Read-Only (2026-08-25): GrantDetailComponent's

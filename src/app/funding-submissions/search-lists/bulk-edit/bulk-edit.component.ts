@@ -171,7 +171,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       {
         title: 'Grant Number',
         data: 'grantNumber',
-        width: '140px',
+        width: '130px',
         className: 'all',
         defaultContent: '',
         ngTemplateRef: { ref: this.fullGrantNumberRenderer }
