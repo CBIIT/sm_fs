@@ -261,7 +261,7 @@
       <!-- Buttons sit inside grid-container so they align with the table and stay visible -->
       <div class="d-flex justify-content-end gap-2 py-2 border-top">
        
-        <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode"
+        <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode && canEnterEditMode"
           [disabled]="!justificationLoaded || !budgetCategoriesLoaded"
           [title]="(!justificationLoaded || !budgetCategoriesLoaded) ? 'Loading…' : ''"
           (click)="onEdit()">Edit</button>

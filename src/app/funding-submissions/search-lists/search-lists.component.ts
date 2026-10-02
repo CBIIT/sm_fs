@@ -304,6 +304,12 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.totalGrants = detail.totalGrants ?? 0;
         this.docRecommendedTotal = detail.totalDocRecAmt ?? 0;
         this.listStatus = detail.currentStatusDescrip;
+        // Keep already-expanded Grant Detail rows in sync when list metadata arrives
+        // after the row was opened (status gating controls Edit button visibility).
+        this.detailComponentsByApplId.forEach(componentRef => {
+          componentRef.instance.listStatus = this.listStatus;
+          componentRef.changeDetectorRef.detectChanges();
+        });
         this.cachedGrants = detail.grants || [];
         this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
         this.listHistory = history;

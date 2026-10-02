@@ -173,6 +173,10 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     if (!this.justificationLoaded || !this.budgetCategoriesLoaded) {
       return;
     }
+    // DOC users can only edit while list status is DOC Review.
+    if (!this.canEnterEditMode) {
+      return;
+    }
     this.formModel = {
       docDecision:        this.data?.docDecision ?? null,
       docPriority:        this.data?.docPriority ?? null,
@@ -444,8 +448,22 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     return String(this.listStatus || '').trim().toLowerCase().includes('doc review');
   }
 
+  private isReadOnlyDocStatusForDocUser(): boolean {
+    const status = String(this.listStatus || '').trim().toLowerCase();
+    return status.includes('oefia review') || status.includes('nci director review');
+  }
+
+  get canEnterEditMode(): boolean {
+    // Requirement: DOC users are read-only in OEFIA Review and NCI Director Review.
+    if (this.docFundingListCor) {
+      return !this.isReadOnlyDocStatusForDocUser();
+    }
+
+    return true;
+  }
+
   get canEditFundingSubmissionsSection(): boolean {
-    return this.docFundingListCor && this.isDocReviewStatus();
+    return this.canEnterEditMode;
   }
 
   canEditOefiaNotes(): boolean {

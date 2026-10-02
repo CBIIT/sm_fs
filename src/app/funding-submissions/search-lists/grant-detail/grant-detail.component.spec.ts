@@ -137,7 +137,7 @@ describe('GrantDetailComponent', () => {
     expect(component.isEditMode).toBeTrue();
   });
 
-  it('allows Edit when list status is not DOC Review once data is loaded', () => {
+  it('allows Edit for DOC role when list status is not OEFIA/NCI Director Review once data is loaded', () => {
     fixture.detectChanges();
     getJustificationSubject.next({ justificationText: '' });
     getJustificationSubject.complete();
@@ -148,6 +148,47 @@ describe('GrantDetailComponent', () => {
     component.onEdit();
 
     expect(component.isEditMode).toBeTrue();
+  });
+
+  it('shows enabled Edit button for DOC role when list status is DOC Review', () => {
+    component.docFundingListCor = true;
+    component.listStatus = 'DOC Review';
+
+    fixture.detectChanges();
+    getJustificationSubject.next({ justificationText: '' });
+    getJustificationSubject.complete();
+    fixture.detectChanges();
+
+    const editButton: HTMLButtonElement | null = fixture.nativeElement.querySelector('button.btn-outline-primary');
+    expect(editButton).not.toBeNull();
+    expect(editButton?.textContent?.trim()).toBe('Edit');
+    expect(editButton?.disabled).toBeFalse();
+  });
+
+  it('hides Edit button for DOC role when list status is OEFIA Review', () => {
+    component.docFundingListCor = true;
+    component.listStatus = 'OEFIA Review';
+
+    fixture.detectChanges();
+    getJustificationSubject.next({ justificationText: '' });
+    getJustificationSubject.complete();
+    fixture.detectChanges();
+
+    const editButton: HTMLButtonElement | null = fixture.nativeElement.querySelector('button.btn-outline-primary');
+    expect(editButton).toBeNull();
+  });
+
+  it('hides Edit button for DOC role when list status is NCI Director Review', () => {
+    component.docFundingListCor = true;
+    component.listStatus = 'NCI Director Review';
+
+    fixture.detectChanges();
+    getJustificationSubject.next({ justificationText: '' });
+    getJustificationSubject.complete();
+    fixture.detectChanges();
+
+    const editButton: HTMLButtonElement | null = fixture.nativeElement.querySelector('button.btn-outline-primary');
+    expect(editButton).toBeNull();
   });
 
   it('renders project title, previous score, pfr, and recusedFlag in read-only mode', () => {
