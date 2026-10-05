@@ -129,9 +129,9 @@
     <div class="d-flex justify-content-between align-items-center my-3">
         <h2 class="mb-0">{{ selectionDate }}</h2>
         <button *ngIf="isCurrentStatusDraft && !docFundingListCor && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
-        <button *ngIf="currentReviewStatus === 'DOC Review' && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsByDocClick()">Send Grants by DOC <i class="fas fa-angle-right ms-1"></i></button>
+        <button *ngIf="currentReviewStatus === 'OEFIA Review' && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsByDocClick()">Send Grants by DOC <i class="fas fa-angle-right ms-1"></i></button>
         <button *ngIf="hasDocReviewGrants && docFundingListCor && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsToOefiaClick()">Send Grants to OEFIA <i class="fas fa-angle-right ms-1"></i></button>
-        <button *ngIf="currentReviewStatus === 'OEFIA Review' && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send Grants to NCI Director <i class="fas fa-angle-right ms-1"></i></button>
+        <button *ngIf="currentReviewStatus === '' && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send Grants to NCI Director <i class="fas fa-angle-right ms-1"></i></button>
        
     </div>
 
