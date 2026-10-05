@@ -60,6 +60,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   stagedDeleteDocumentIds: number[] = [];
   justificationFileError: string | null = null;
   justificationSaveError: string | null = null;
+  fundingSaveError: string | null = null;
   saveSuccessMessage = '';
   docFundingListCor = false;
   OEFIACertifier = false;
@@ -70,8 +71,6 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   private initialFormSnapshot = '';
   private initialFundingSnapshot = '';
   private initialJustificationText = '';
-  private referenceDocRecAmount: number | null = null;
-  private referenceDocRecReductionPct: number | null = null;
   private cancelModalRef: NgbModalRef;
   private savingInProgress = false;
   private suppressNextLeavePrompt = false;
@@ -200,10 +199,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.initialFormSnapshot = this.currentSnapshot();
     this.initialFundingSnapshot = this.currentFundingSnapshot();
     this.initialJustificationText = this.formModel.justificationText ?? '';
-    this.referenceDocRecAmount = this.toFiniteNumberOrNull(this.formModel.docRecAmt);
-    this.referenceDocRecReductionPct = (this.referenceDocRecAmount != null && this.referenceDocRecAmount > 0)
-      ? (this.toFiniteNumberOrNull(this.formModel.docRecReductionPct) ?? 0)
-      : 0;
+    this.fundingSaveError = null;
     this.recomputeDoNotPayOefiaLock();
     this.cdr.detectChanges();
   }
@@ -220,16 +216,18 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   onDocRecReductionPctChange(): void {
-    this.ensureDocRecReferenceFromCurrentAmount();
     const reductionPct = this.toFiniteNumberOrNull(this.formModel.docRecReductionPct);
-    if (this.referenceDocRecAmount != null
-      && this.referenceDocRecAmount > 0
+    const baseAmount = this.parseExactDecimal(this.data?.originalRequestedTotal);
+    const parsedReductionPct = this.parseExactDecimal(this.formModel.docRecReductionPct);
+    if (baseAmount != null
+      && baseAmount.coefficient > 0n
       && reductionPct != null
+      && parsedReductionPct != null
       && this.isValidReductionPctForCalculation(reductionPct)) {
-      const referencePct = this.referenceDocRecReductionPct ?? 0;
-      const pctDelta = referencePct - reductionPct;
-      const updatedAmount = this.referenceDocRecAmount * (1 + pctDelta / 100);
-      this.formModel.docRecAmt = this.roundToTwoDecimals(Math.max(updatedAmount, 0));
+      const pctScale = 10n ** BigInt(parsedReductionPct.scale);
+      const numerator = baseAmount.coefficient * (100n * pctScale - parsedReductionPct.coefficient);
+      const denominator = 10n ** BigInt(baseAmount.scale) * pctScale;
+      this.formModel.docRecAmt = Number(this.roundHalfUpDivision(numerator, denominator)) / 100;
     }
 
     this.updateDocRecValidationLive();
@@ -238,28 +236,19 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   onDocRecAmtChange(): void {
     const updatedAmount = this.toFiniteNumberOrNull(this.formModel.docRecAmt);
-
-    // If the row started with a zero/null recommended amount, treat the first entered
-    // positive DOC Rec $ as the reference amount for subsequent % reduction math.
-    if ((this.referenceDocRecAmount == null || this.referenceDocRecAmount <= 0)
+    const baseAmount = this.parseExactDecimal(this.data?.originalRequestedTotal);
+    const parsedAmount = this.parseExactDecimal(this.formModel.docRecAmt);
+    if (baseAmount != null
+      && baseAmount.coefficient > 0n
       && updatedAmount != null
-      && updatedAmount > 0) {
-      this.referenceDocRecAmount = updatedAmount;
-      // Ignore previously carried/seeded % Red when the row had no usable DOC Rec $ baseline.
-      this.referenceDocRecReductionPct = 0;
-      this.formModel.docRecReductionPct = this.referenceDocRecReductionPct;
-      this.updateDocRecValidationLive();
-      this.cdr.detectChanges();
-      return;
-    }
-
-    if (this.referenceDocRecAmount != null
-      && this.referenceDocRecAmount > 0
-      && updatedAmount != null) {
-      const referencePct = this.referenceDocRecReductionPct ?? 0;
-      const pctAdjustment = ((this.referenceDocRecAmount - updatedAmount) / this.referenceDocRecAmount) * 100;
-      const rawPct = referencePct + pctAdjustment;
-      this.formModel.docRecReductionPct = this.roundToTwoDecimals(rawPct);
+      && updatedAmount >= 0
+      && this.hasAtMostTwoDecimals(updatedAmount)
+      && parsedAmount != null) {
+      const commonScale = Math.max(baseAmount.scale, parsedAmount.scale);
+      const scaledBase = baseAmount.coefficient * (10n ** BigInt(commonScale - baseAmount.scale));
+      const scaledAmount = parsedAmount.coefficient * (10n ** BigInt(commonScale - parsedAmount.scale));
+      const reductionHundredths = this.roundHalfUpDivision((scaledBase - scaledAmount) * 10000n, scaledBase);
+      this.formModel.docRecReductionPct = Number(reductionHundredths) / 100;
     }
 
     this.updateDocRecValidationLive();
@@ -334,6 +323,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   onSave(): void {
     this.suppressNextLeavePrompt = true;
     this.justificationSaveError = null;
+    this.fundingSaveError = null;
 
     // For DOC users this field is view-only; ignore any client-side model tampering.
     // OEFIA users can edit this field and their change must be preserved.
@@ -401,7 +391,9 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       },
       error: (err) => {
         this.savingInProgress = false;
+        this.fundingSaveError = this.getSaveErrorMessage(err, 'Unable to save the grant changes. Please try again.');
         this.logger.error('Grant detail save error', err);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -566,25 +558,43 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     return Number.isFinite(numericValue) ? numericValue : null;
   }
 
-  private ensureDocRecReferenceFromCurrentAmount(): void {
-    if (this.referenceDocRecAmount != null && this.referenceDocRecAmount > 0) {
-      return;
+  private parseExactDecimal(value: unknown): { coefficient: bigint; scale: number } | null {
+    if (value == null || value === '') {
+      return null;
     }
 
-    const currentAmount = this.toFiniteNumberOrNull(this.formModel.docRecAmt);
-    if (currentAmount != null && currentAmount > 0) {
-      this.referenceDocRecAmount = currentAmount;
-      // Ignore pre-existing % Red when there was no valid DOC Rec $ reference amount.
-      this.referenceDocRecReductionPct = 0;
+    const normalizedValue = String(value).replace(/[$,%\s,]/g, '');
+    const match = /^([+-]?)(\d*)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$/.exec(normalizedValue);
+    if (!match || (!match[2] && !match[3])) {
+      return null;
     }
+
+    const exponent = Number(match[4] ?? 0);
+    if (!Number.isSafeInteger(exponent) || Math.abs(exponent) > 1000) {
+      return null;
+    }
+    const fraction = match[3] ?? '';
+    const digits = `${match[2] || '0'}${fraction}`;
+    let coefficient = BigInt(`${match[1] === '-' ? '-' : ''}${digits}`);
+    let scale = fraction.length - exponent;
+    if (scale < 0) {
+      coefficient *= 10n ** BigInt(-scale);
+      scale = 0;
+    }
+    return { coefficient, scale };
+  }
+
+  private roundHalfUpDivision(numerator: bigint, denominator: bigint): bigint {
+    const negative = numerator < 0n;
+    const absoluteNumerator = negative ? -numerator : numerator;
+    const quotient = absoluteNumerator / denominator;
+    const remainder = absoluteNumerator % denominator;
+    const rounded = quotient + (remainder * 2n >= denominator ? 1n : 0n);
+    return negative ? -rounded : rounded;
   }
 
   private isValidReductionPctForCalculation(value: number | null): boolean {
     return value != null && value >= 0 && value < 100 && this.hasAtMostTwoDecimals(value);
-  }
-
-  private roundToTwoDecimals(value: number): number {
-    return Math.round(value * 100) / 100;
   }
 
   private saveJustification(justificationText?: string): void {
@@ -663,14 +673,29 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     }
   }
 
-  private getJustificationSaveError(error: any): string {
-    if (typeof error?.error === 'string' && error.error.trim()) {
-      return error.error;
+  private getSaveErrorMessage(error: unknown, fallback: string): string {
+    if (typeof error !== 'object' || error === null) {
+      return fallback;
     }
-    return error?.error?.errorMessage
-      || error?.error?.message
-      || error?.message
-      || 'Unable to save the justification.';
+    const response = error as { error?: unknown; message?: unknown };
+    if (typeof response.error === 'string' && response.error.trim()) {
+      return response.error;
+    }
+    if (typeof response.error === 'object' && response.error !== null) {
+      const body = response.error as { errorMessage?: unknown; detail?: unknown; message?: unknown };
+      const serverMessage = [body.errorMessage, body.detail, body.message]
+        .find((message): message is string => typeof message === 'string' && Boolean(message.trim()));
+      if (serverMessage) {
+        return serverMessage;
+      }
+    }
+    return typeof response.message === 'string' && response.message.trim()
+      ? response.message
+      : fallback;
+  }
+
+  private getJustificationSaveError(error: any): string {
+    return this.getSaveErrorMessage(error, 'Unable to save the justification.');
   }
 
   isSaveInProgress(): boolean {
@@ -839,6 +864,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.justificationFiles = [];
     this.justificationFileError = null;
     this.justificationSaveError = null;
+    this.fundingSaveError = null;
     this.stagedDeleteDocumentIds = [];
     this.saveSuccessMessage = '';
     this.clearValidationErrors();

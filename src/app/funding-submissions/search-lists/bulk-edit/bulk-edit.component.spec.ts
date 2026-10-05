@@ -571,14 +571,18 @@ describe('BulkEditComponent', () => {
       component.rows[0].docNotes = 'pending change';
       component.onRowFieldChange();
       fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(
-        throwError(() => new Error('save failed'))
+        throwError(() => ({ error: { detail: 'DOC reduction pair is inconsistent.' } }))
       );
 
       component.onSave();
 
       expect(component.saveSuccessMessage).toBe('');
+      expect(component.saveErrorMessage).toBe('DOC reduction pair is inconsistent.');
       expect(component.canSave).toBeTrue();
       expect(component.rows[0].docNotes).toBe('pending change');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent.trim())
+        .toBe('DOC reduction pair is inconsistent.');
 
       component.rows[0].docNotes = 'original note';
       component.onRowFieldChange();
@@ -591,8 +595,27 @@ describe('BulkEditComponent', () => {
       component.onSave();
 
       expect(component.saveSuccessMessage).toBe('Success! Bulk changes have been applied');
+      expect(component.saveErrorMessage).toBe('');
       expect(component.canSave).toBeFalse();
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+    });
+
+    it('shows a generic error when the server provides no save message', () => {
+      seedHistoryStateAndInit([grant({ docNotes: 'original note' })]);
+      component.rows[0].docNotes = 'pending change';
+      component.onRowFieldChange();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(
+        throwError(() => ({ status: 500 }))
+      );
+
+      component.onSave();
+
+      expect(component.saveErrorMessage).toBe('Unable to save the grant changes. Please try again.');
+      expect(component.canSave).toBeTrue();
+      expect(component.rows[0].docNotes).toBe('pending change');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent.trim())
+        .toBe('Unable to save the grant changes. Please try again.');
     });
 
     it('shows exact success copy, blocks duplicate saves, and compares future edits with the saved baseline', () => {

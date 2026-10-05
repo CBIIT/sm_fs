@@ -1495,4 +1495,148 @@ describe('GrantDetailComponent', () => {
       expect(component.data.oefiaNotes).toBe('updated by OEFIA');
     });
   });
+
+  describe('FS-2248 DOC reduction calculations', () => {
+    beforeEach(() => {
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        originalRequestedTotal: 100000
+      };
+      component.formModel = {};
+    });
+
+    it('calculates DOC Rec $ from the original requested total and preserves the typed percentage', () => {
+      component.formModel.docRecReductionPct = 10;
+
+      component.onDocRecReductionPctChange();
+
+      expect(component.formModel.docRecAmt).toBe(90000);
+      expect(component.formModel.docRecReductionPct).toBe(10);
+    });
+
+    it('calculates DOC Rec $ at zero and maximum valid reduction percentages', () => {
+      component.formModel.docRecReductionPct = 0;
+      component.onDocRecReductionPctChange();
+      expect(component.formModel.docRecAmt).toBe(100000);
+
+      component.formModel.docRecReductionPct = 99.99;
+      component.onDocRecReductionPctChange();
+      expect(component.formModel.docRecAmt).toBe(10);
+    });
+
+    it('uses the original requested total rather than the stored DOC pair as the calculation base', () => {
+      component.data.docRecommendedAmount = 83000;
+      component.data.docRecommendedReductionPct = 17;
+      component.formModel.docRecAmt = 83000;
+      component.formModel.docRecReductionPct = 10;
+
+      component.onDocRecReductionPctChange();
+
+      expect(component.formModel.docRecAmt).toBe(90000);
+      expect(component.formModel.docRecReductionPct).toBe(10);
+    });
+
+    it('rounds exact DOC Rec $ half-cent ties HALF_UP', () => {
+      component.data.originalRequestedTotal = 1.15;
+      component.formModel.docRecReductionPct = 50;
+      component.onDocRecReductionPctChange();
+      expect(component.formModel.docRecAmt).toBe(0.58);
+
+      component.data.originalRequestedTotal = 0.25;
+      component.formModel.docRecReductionPct = 50;
+      component.onDocRecReductionPctChange();
+      expect(component.formModel.docRecAmt).toBe(0.13);
+    });
+
+    it('calculates DOC Rec % from DOC Rec $ and preserves the typed amount', () => {
+      component.formModel.docRecAmt = 90000;
+
+      component.onDocRecAmtChange();
+
+      expect(component.formModel.docRecReductionPct).toBe(10);
+      expect(component.formModel.docRecAmt).toBe(90000);
+    });
+
+    it('calculates zero reduction when DOC Rec $ equals the original requested total', () => {
+      component.formModel.docRecAmt = 100000;
+
+      component.onDocRecAmtChange();
+
+      expect(component.formModel.docRecReductionPct).toBe(0);
+    });
+
+    it('rounds exact DOC Rec % half-hundredth ties HALF_UP', () => {
+      component.data.originalRequestedTotal = 800;
+      component.formModel.docRecAmt = 799.96;
+
+      component.onDocRecAmtChange();
+
+      expect(component.formModel.docRecReductionPct).toBe(0.01);
+    });
+
+    it('does not calculate when the original requested total is null or zero', () => {
+      for (const originalRequestedTotal of [null, 0]) {
+        component.data.originalRequestedTotal = originalRequestedTotal;
+        component.formModel.docRecAmt = 42;
+        component.formModel.docRecReductionPct = 10;
+
+        component.onDocRecReductionPctChange();
+        expect(component.formModel.docRecAmt).toBe(42);
+
+        component.formModel.docRecReductionPct = 10;
+        component.formModel.docRecAmt = 42;
+        component.onDocRecAmtChange();
+        expect(component.formModel.docRecReductionPct).toBe(10);
+      }
+    });
+
+    it('does not calculate a percentage for negative or over-precision DOC Rec $ input', () => {
+      for (const docRecAmt of [-1, 799.999]) {
+        component.formModel.docRecReductionPct = 12;
+        component.formModel.docRecAmt = docRecAmt;
+
+        component.onDocRecAmtChange();
+
+        expect(component.formModel.docRecAmt).toBe(docRecAmt);
+        expect(component.formModel.docRecReductionPct).toBe(12);
+      }
+    });
+
+    it('shows the server save error and keeps edited fields open for correction', () => {
+      component.justificationLoaded = true;
+      component.budgetCategoriesLoaded = true;
+      component.onEdit();
+      component.formModel.docNotes = 'pending change';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(
+        throwError(() => ({ error: { detail: 'DOC reduction pair is inconsistent.' } }))
+      );
+
+      component.onSave();
+      fixture.detectChanges();
+
+      expect(component.fundingSaveError).toBe('DOC reduction pair is inconsistent.');
+      expect(component.isEditMode).toBeTrue();
+      expect(component.formModel.docNotes).toBe('pending change');
+      expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent.trim())
+        .toBe('DOC reduction pair is inconsistent.');
+    });
+
+    it('shows the generic funding save error when the server provides no message', () => {
+      component.justificationLoaded = true;
+      component.budgetCategoriesLoaded = true;
+      component.onEdit();
+      component.formModel.docNotes = 'pending change';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(
+        throwError(() => ({ status: 500 }))
+      );
+
+      component.onSave();
+      fixture.detectChanges();
+
+      expect(component.fundingSaveError).toBe('Unable to save the grant changes. Please try again.');
+      expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent.trim())
+        .toBe('Unable to save the grant changes. Please try again.');
+    });
+  });
 });

@@ -58,6 +58,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   canSave = false;
   isSaving = false;
   saveSuccessMessage = '';
+  saveErrorMessage = '';
   docFundingListCor = false;
   OEFIACertifier = false;
   private lastSavedRows: any[] = [];
@@ -539,6 +540,28 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private clearSaveMessages(): void {
     this.saveSuccessMessage = '';
+    this.saveErrorMessage = '';
+  }
+
+  private getSaveErrorMessage(error: unknown): string {
+    if (typeof error !== 'object' || error === null) {
+      return 'Unable to save the grant changes. Please try again.';
+    }
+    const response = error as { error?: unknown; message?: unknown };
+    if (typeof response.error === 'string' && response.error.trim()) {
+      return response.error;
+    }
+    if (typeof response.error === 'object' && response.error !== null) {
+      const body = response.error as { errorMessage?: unknown; detail?: unknown; message?: unknown };
+      const serverMessage = [body.errorMessage, body.detail, body.message]
+        .find((message): message is string => typeof message === 'string' && Boolean(message.trim()));
+      if (serverMessage) {
+        return serverMessage;
+      }
+    }
+    return typeof response.message === 'string' && response.message.trim()
+      ? response.message
+      : 'Unable to save the grant changes. Please try again.';
   }
 
   // Called from the per-row DataTable cell renderers (bulk-edit.component.html) whenever a
@@ -663,6 +686,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         this.isSaving = false;
+        this.saveErrorMessage = this.getSaveErrorMessage(err);
         this.logger.error('Bulk edit save failed', err);
       }
     });

@@ -259,6 +259,13 @@
       </table>
 
       <!-- Buttons sit inside grid-container so they align with the table and stay visible -->
+      <div class="row g-0 save-error-row" *ngIf="isEditMode && fundingSaveError">
+        <div class="col-12">
+          <ngb-alert type="danger" [dismissible]="true" (closed)="fundingSaveError = null" role="alert">
+            {{fundingSaveError}}
+          </ngb-alert>
+        </div>
+      </div>
       <div class="d-flex justify-content-end gap-2 py-2 border-top">
        
         <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode && canEnterEditMode"
