@@ -33,12 +33,12 @@
 
 <ng-template #sendGrantsInDraftWarningModal>
     <div class="modal-header">
-        <h4 class="modal-title">Send Grants to DOCs</h4>
+        <h4 class="modal-title">{{ sendGrantsModalTitle }}</h4>
         <button type="button" class="btn-close" aria-label="Close" (click)="onCancelSendGrantsInDraft()"></button>
     </div>
     <div class="modal-body">
-        <p>Clicking yes will send all grants currently in Draft status to the appropriate Division Offices and Centers (DOCs) for Review.</p>
-        <p class="mb-0">Are you sure you want to Continue?</p>
+        <p>{{ sendGrantsModalDescription }}</p>
+        <p class="mb-0">{{ sendGrantsModalQuestion }}</p>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" (click)="onCancelSendGrantsInDraft()">Cancel</button>
@@ -60,6 +60,35 @@
     </div>
 </ng-template>
 
+<ng-template #sendGrantsByDocWarningModal>
+    <div class="modal-header">
+        <h4 class="modal-title">Send Grants by DOC</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="onCancelSendGrantsByDoc()"></button>
+    </div>
+    <div class="modal-body mx-3">
+        <p class="mb-4">
+            All grants returned by the Divisions, Offices, and Centers (DOCs) are selected by default. Review the available grants before sending them to the NCI Director.
+            To exclude grants from being sent, uncheck the box next to that DOC. When ready, click <b>"Send Grants to NCI Director"</b>
+        </p>
+        <div class="send-by-doc-grid">
+            <label *ngFor="let item of sendByDocDocs" class="send-by-doc-card">
+                <input
+                    type="checkbox"
+                    class="send-by-doc-checkbox"
+                    [checked]="item.selected"
+                    (change)="onToggleSendByDoc(item.doc)">
+                <div class="send-by-doc-card-content">
+                    <div class="send-by-doc-doc">{{ item.doc }}</div>
+                    <div class="send-by-doc-count">{{ item.count }} Grants</div>
+                </div>
+            </label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancelSendGrantsByDoc()">Cancel</button>
+        <button type="button" class="btn btn-primary" [disabled]="!hasSelectedSendByDoc || isSendGrantsInDraftInProgress" (click)="onConfirmSendGrantsByDoc()">Send Grants to NCI Director</button>
+    </div>
+</ng-template>
 <div class="ms-3">
 
     <div *ngIf="sendGrantsToDocsSuccessMessage" class="alert alert-success" role="alert">
@@ -100,7 +129,7 @@
     <div class="d-flex justify-content-between align-items-center my-3">
         <h2 class="mb-0">{{ selectionDate }}</h2>
         <button *ngIf="isCurrentStatusDraft && !docFundingListCor && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
-        <button *ngIf="currentReviewStatus === 'DOC Review' && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send Grants by DOC <i class="fas fa-angle-right ms-1"></i></button>
+        <button *ngIf="currentReviewStatus === 'DOC Review' && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsByDocClick()">Send Grants by DOC <i class="fas fa-angle-right ms-1"></i></button>
         <button *ngIf="hasDocReviewGrants && docFundingListCor && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsToOefiaClick()">Send Grants to OEFIA <i class="fas fa-angle-right ms-1"></i></button>
         <button *ngIf="currentReviewStatus === 'OEFIA Review' && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send Grants to NCI Director <i class="fas fa-angle-right ms-1"></i></button>
        

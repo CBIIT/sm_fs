@@ -2,6 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, EnvironmentInjector, OnDes
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { Subject } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -39,6 +40,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('foaCellRender') foaCellRender: TemplateRef<FoaCellRendererComponent>;
+  @ViewChild('confirmDecisionsWarningModal') private confirmDecisionsWarningModalRef: TemplateRef<any>;
 
   pageTitle = '';
   listId = 0;
@@ -77,6 +79,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
+  private confirmDecisionsModalRef: NgbModalRef;
 
   private detailComponentsByApplId = new Map<number, any>();
 
@@ -89,7 +92,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     private environmentInjector: EnvironmentInjector,
     private propertiesService: AppPropertiesService,
     private loaderService: LoaderService,
-    private fundingSubmissionsService: FundingSubmissionsService
+    private fundingSubmissionsService: FundingSubmissionsService,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -469,7 +473,22 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  onConfirmDecisionsClick(): void {
+    this.confirmDecisionsModalRef = this.modalService.open(this.confirmDecisionsWarningModalRef, { centered: true });
+  }
+
+  onCancelConfirmDecisions(): void {
+    this.confirmDecisionsModalRef?.dismiss();
+  }
+
+  onProceedConfirmDecisions(): void {
+    // Confirmation only for now; locking decisions is handled by the backend flow
+    // once the endpoint is available for this page.
+    this.confirmDecisionsModalRef?.close();
+  }
+
   ngOnDestroy(): void {
+    this.confirmDecisionsModalRef?.close();
     this.detailComponentsByApplId.forEach(componentRef => componentRef?.destroy?.());
     this.detailComponentsByApplId.clear();
 
