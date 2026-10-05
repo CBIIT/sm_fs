@@ -341,11 +341,11 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     this.fundingTable?.clearResults();
     this.selectedCancerActivities = '';
     this.selectedDocs = [];
-    this.applyDefaultDocSelection();
     this.i2Status = '';
     this.isPdActive = false;
     this.excludeInList = true;
     this.searchCriteria = {};
+    this.suppressDocBroadcast = true;
 
     this.filterForm?.form.patchValue({
       grantNumber: {
@@ -401,6 +401,13 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
         this.pdNameDropdown.isPdActiveChecked = false;
         this.pdNameDropdown.selectedValue = null;
       }
+
+      // Re-apply DOC defaults after child reset emissions to avoid transient empty
+      // values leaving DOC coordinators in a required-error state.
+      this.selectedDocs = [];
+      this.applyDefaultDocSelection(false);
+      this.suppressDocBroadcast = false;
+      this.emitCurrentDocSelection();
     });
   }
   onPdActiveChecked(activeFlag: boolean): void {
