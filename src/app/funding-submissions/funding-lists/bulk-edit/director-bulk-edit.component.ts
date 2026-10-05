@@ -56,7 +56,7 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
   decisionOptions: Select2OptionData[] = [
     { id: 'Approve', text: 'Approve' },
     { id: 'Hold', text: 'On Hold' },
-    { id: 'Decline', text: 'Reject' }
+    { id: 'Rejected', text: 'Reject' }
   ];
 
   ngOnInit(): void {

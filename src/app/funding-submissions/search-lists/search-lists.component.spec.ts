@@ -120,7 +120,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         { applId: 2, nciDecision: undefined, recusedFlag: false },
         { applId: 3, nciDecision: 'Approve', recusedFlag: false },
         { applId: 4, nciDecision: 'Hold', recusedFlag: true },
-        { applId: 5, nciDecision: 'Decline', recusedFlag: false }
+        { applId: 5, nciDecision: 'Rejected', recusedFlag: false }
       ];
     });
 

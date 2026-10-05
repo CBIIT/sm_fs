@@ -929,7 +929,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       case 'hold':
         return grant.nciDecision === 'Hold';
       case 'rejected':
-        return grant.nciDecision === 'Decline';
+        return grant.nciDecision === 'Rejected';
       case 'recusals':
         return grant.recusedFlag === true;
       default:

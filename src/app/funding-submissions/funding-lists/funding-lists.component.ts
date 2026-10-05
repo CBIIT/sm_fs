@@ -19,7 +19,7 @@ type NciTabId = 'all' | 'pending' | 'approved' | 'hold' | 'rejected' | 'recusals
 
 interface ProcessOption {
   label: 'Approve' | 'On Hold' | 'Reject';
-  value: 'Approve' | 'Hold' | 'Decline';
+  value: 'Approve' | 'Hold' | 'Rejected';
 }
 
 interface DocSummary {
@@ -561,14 +561,14 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     const normalizedDoc = this.normalizeValue(selectedDoc);
     const docRows = this.grants.filter(grant => this.normalizeValue(grant.doc) === normalizedDoc);
 
-    const countByDecision = (decision: 'Approve' | 'Decline' | 'Hold'): number =>
+    const countByDecision = (decision: 'Approve' | 'Rejected' | 'Hold'): number =>
       docRows.filter(grant => this.normalizeValue(grant.nciDecision) === this.normalizeValue(decision)).length;
 
     return {
       doc: selectedDoc,
       recommendedTotal: this.docRecommendedTotals[selectedDoc] || 0,
       approvedCount: countByDecision('Approve'),
-      rejectedCount: countByDecision('Decline'),
+      rejectedCount: countByDecision('Rejected'),
       onHoldCount: countByDecision('Hold')
     };
   }
@@ -581,7 +581,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (tabId === 'pending') return !decision;
     if (tabId === 'approved') return decision === 'APPROVE';
     if (tabId === 'hold') return decision === 'HOLD';
-    if (tabId === 'rejected') return decision === 'DECLINE';
+    if (tabId === 'rejected') return decision === 'REJECTED';
     if (tabId === 'recusals') return recused;
     return true;
   }
@@ -659,7 +659,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private createMockGrants(): FundingSubmissionListGrantDto[] {
     const now = new Date();
     const docs = ['DCP', 'DCCPS', 'DCTD', 'DCEG'];
-    const decisions: Array<'Approve' | 'Hold' | 'Decline' | ''> = ['Approve', 'Hold', 'Decline', '', 'Approve', 'Hold', '', 'Decline', 'Approve', ''];
+    const decisions: Array<'Approve' | 'Hold' | 'Rejected' | ''> = ['Approve', 'Hold', 'Rejected', '', 'Approve', 'Hold', '', 'Rejected', 'Approve', ''];
     const reviewStatuses = ['Reviewed', 'Deferred', 'Pending', 'Reviewed', 'Reviewed', 'Deferred', 'Pending', 'Reviewed', 'Reviewed', 'Pending'];
 
     return Array.from({ length: 10 }, (_v, index) => {
@@ -835,7 +835,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         const applId = Number($option.data('appl-id'));
         const decision = String($option.data('decision') || '');
 
-        this.onProcessDecisionSelect(applId, decision as 'Approve' | 'Hold' | 'Decline');
+        this.onProcessDecisionSelect(applId, decision as 'Approve' | 'Hold' | 'Rejected');
         $option.closest('.process-menu').removeClass('show');
         $option.closest('td').removeClass('menu-open');
         this.cdr.markForCheck();
@@ -891,7 +891,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     const allOptions: ProcessOption[] = [
       { label: 'Approve', value: 'Approve' },
       { label: 'On Hold', value: 'Hold' },
-      { label: 'Reject', value: 'Decline' }
+      { label: 'Reject', value: 'Rejected' }
     ];
 
     let options = allOptions;
@@ -900,14 +900,14 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (this.selectedTab === 'hold') {
       options = allOptions.filter(option => option.value !== 'Hold');
     } else if (this.selectedTab === 'rejected') {
-      options = allOptions.filter(option => option.value !== 'Decline');
+      options = allOptions.filter(option => option.value !== 'Rejected');
     }
 
     const currentDecision = this.normalizeValue(grant?.nciDecision);
     return options.filter(option => this.normalizeValue(option.value) !== currentDecision);
   }
 
-  private onProcessDecisionSelect(applId: number, decision: 'Approve' | 'Hold' | 'Decline'): void {
+  private onProcessDecisionSelect(applId: number, decision: 'Approve' | 'Hold' | 'Rejected'): void {
     if (!Number.isFinite(applId)) {
       return;
     }

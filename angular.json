@@ -65,6 +65,9 @@
               "./node_modules/datatables.net-buttons/js/buttons.print.js",
               "src/js/ngselect-autofocus.js",
               "node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js"
+            ],
+            "allowedCommonJsDependencies": [
+              "file-saver"
             ]
           },
           "configurations": {
