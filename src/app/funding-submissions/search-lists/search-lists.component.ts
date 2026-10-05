@@ -97,7 +97,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   sendGrantsModalTitle = 'Send Grants to DOCs';
   sendGrantsModalDescription = 'Clicking yes will send all grants currently in Draft status to the appropriate Division Offices and Centers (DOCs) for Review.';
   sendGrantsModalQuestion = 'Are you sure you want to Continue?';
-  private sendGrantsFlow: 'docs' | 'oefia' | 'byDoc' = 'docs';
+  private sendGrantsFlow: 'docs' | 'byDoc' = 'docs';
   sendByDocDocs: Array<{ doc: string; count: number; selected: boolean }> = [];
   currentReviewStatus = 'Draft';
   docFundingListCor = false;
@@ -1427,7 +1427,41 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSendGrantsToOefiaClick(): void {
-    this.executeWithUnsavedGuard(() => this.onSendGrantsToOefia());
+    this.executeWithUnsavedGuard(() => {
+      this.blurActiveElement();
+      this.sendGrantsToOefiaModalRef = this.modalService.open(this.sendGrantsToOefiaModalTemplate, { centered: true });
+    });
+  }
+
+  onCancelSendGrantsToOefia(): void {
+    this.sendGrantsToOefiaModalRef?.dismiss();
+  }
+
+  onConfirmSendGrantsToOefia(): void {
+    if (this.isSendGrantsToOefiaInProgress) {
+      return;
+    }
+
+    this.isSendGrantsToOefiaInProgress = true;
+    this.sendGrantsToOefiaSuccessMessage = '';
+    this.sendGrantsToOefiaErrorMessage = '';
+    this.sendGrantsToOefiaModalRef?.close();
+
+    this.fundingSubmissionsService.sendListToOefiaForReview(this.listId).pipe(
+      finalize(() => {
+        this.isSendGrantsToOefiaInProgress = false;
+      })
+    ).subscribe({
+      next: () => {
+        this.sendGrantsToOefiaSuccessMessage = 'Success! The list has been successfully sent to OEFIA. An email notification will be sent to the OEFIA analysts to review the list. If any updates will be needed to your list, contact the NCI OEFIA Analysts <NCIOEFIAAnalysts-l@mail.nih.gov>';
+        this.cdr.detectChanges();
+        this.loadListMeta();
+      },
+      error: (err) => {
+        this.logger.error('Send grants to OEFIA failed', err);
+        this.sendGrantsToOefiaErrorMessage = 'Unable to send grants to OEFIA right now. Please try again.';
+      }
+    });
   }
 
   onSendGrantsByDocClick(): void {
@@ -1438,15 +1472,6 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sendGrantsModalTitle = 'Send Grants to DOCs';
     this.sendGrantsModalDescription = 'Clicking yes will send all grants currently in Draft status to the appropriate Division Offices and Centers (DOCs) for Review.';
     this.sendGrantsModalQuestion = 'Are you sure you want to Continue?';
-    this.blurActiveElement();
-    this.sendGrantsInDraftModalRef = this.modalService.open(this.sendGrantsInDraftWarningModalRef, { centered: true });
-  }
-
-  private onSendGrantsToOefia(): void {
-    this.sendGrantsFlow = 'oefia';
-    this.sendGrantsModalTitle = 'Send Grants to OEFIA';
-    this.sendGrantsModalDescription = 'Clicking Yes will send all grants in this list back to OEFIA for review.';
-    this.sendGrantsModalQuestion = 'Are you sure you want to continue?';
     this.blurActiveElement();
     this.sendGrantsInDraftModalRef = this.modalService.open(this.sendGrantsInDraftWarningModalRef, { centered: true });
   }
@@ -1536,20 +1561,16 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       next: () => {
         // Reflect the transition immediately in the UI, then rehydrate from server.
         this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
-        this.sendGrantsToDocsSuccessMessage = this.sendGrantsFlow === 'oefia'
-          ? 'Success! The list has been sent back to OEFIA for review.'
-          : this.sendGrantsFlow === 'byDoc'
-            ? 'Success! Selected DOC grants have been sent to NCI Director for review.'
+        this.sendGrantsToDocsSuccessMessage = this.sendGrantsFlow === 'byDoc'
+          ? 'Success! Selected DOC grants have been sent to NCI Director for review.'
           : 'Success! The list has been sent to the assigned DOC contacts for review.';
         this.cdr.detectChanges();
         this.loadListMeta();
       },
       error: (err) => {
         this.logger.error('Send list to DOCs for review failed', err);
-        this.sendGrantsToDocsErrorMessage = this.sendGrantsFlow === 'oefia'
-          ? 'Unable to send the list to OEFIA right now. Please try again.'
-          : this.sendGrantsFlow === 'byDoc'
-            ? 'Unable to send selected DOC grants to NCI Director right now. Please try again.'
+        this.sendGrantsToDocsErrorMessage = this.sendGrantsFlow === 'byDoc'
+          ? 'Unable to send selected DOC grants to NCI Director right now. Please try again.'
           : 'Unable to send the list to DOCs right now. Please try again.';
       }
     });
