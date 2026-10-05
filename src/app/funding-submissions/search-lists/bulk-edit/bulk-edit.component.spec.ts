@@ -1,10 +1,11 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Component, forwardRef, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbTooltip, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { By } from '@angular/platform-browser';
 import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 
@@ -64,7 +65,7 @@ describe('BulkEditComponent', () => {
       docPriority: 1,
       docRecommendedAmount: null,
       docRecommendedReductionPct: null,
-      twoYearAnnualFundingR01Flag: false,
+      twoYearAnnualFundingR01Flag: true,
       recusedFlag: false,
       ...overrides
     };
@@ -96,7 +97,7 @@ describe('BulkEditComponent', () => {
     propertiesServiceSpy.getProperty.and.returnValue('http://example/');
 
     await TestBed.configureTestingModule({
-      imports: [FormsModule],
+      imports: [FormsModule, NgbTooltipModule],
       declarations: [BulkEditComponent, FakeNgSelect2Component],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
@@ -339,6 +340,289 @@ describe('BulkEditComponent', () => {
 
       expect(modalService.open).toHaveBeenCalled();
       expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Req. 35 AC6 (FS-2356) and AC7 (FS-2357) — Save validation', () => {
+    it('applies a partial shared-field edit and validates the resulting row only when Save is selected', () => {
+      seedHistoryStateAndInit([grant({ twoYearAnnualFundingR01Flag: false })]);
+      component.bulkFields = { docNotes: 'partial shared edit' };
+      component.onBulkFieldChange();
+
+      component.onApplyChanges();
+
+      expect(component.rows[0].docNotes).toBe('partial shared edit');
+      expect(component.canSave).toBeTrue();
+      expect(component.hasMandatoryFieldError(component.rows[0], 'annualFundingR01')).toBeFalse();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+
+      component.onSave();
+
+      expect(component.hasMandatoryFieldError(component.rows[0], 'annualFundingR01')).toBeTrue();
+      expect(component.getMandatoryFieldErrorMessage('Two-Year Annual Funding R01 (HRHR)'))
+        .toBe('Two-Year Annual Funding R01 (HRHR) is required');
+      expect(component.canSave).toBeTrue();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
+
+    [
+      { key: 'budgetCategories', label: 'Budget Categories', makeBlank: (row: any) => row.budgetCategories = '  ' },
+      { key: 'docDecision', label: 'DOC Decision', makeBlank: (row: any) => row.docDecision = '\t' },
+      { key: 'docNciSelection', label: 'DOC/NCI Selection', makeBlank: (row: any) => row.docNciSelection = ' ' },
+      {
+        key: 'annualFundingR01',
+        label: 'Two-Year Annual Funding R01 (HRHR)',
+        makeBlank: (row: any) => row.annualFundingR01 = null
+      },
+      { key: 'annualOrMyf', label: 'Annual or MYF', makeBlank: (row: any) => row.annualOrMyf = '  ' }
+    ].forEach(({ key, label, makeBlank }) => {
+      it(`blocks Save with the exact row error when ${label} is blank`, () => {
+        seedHistoryStateAndInit([grant()]);
+        makeBlank(component.rows[0]);
+        component.rows[0].docNotes = 'unsaved edit';
+        component.onRowFieldChange();
+
+        component.onSave();
+
+        expect(component.hasMandatoryFieldError(component.rows[0], key)).toBeTrue();
+        expect(component.getMandatoryFieldErrorMessage(label)).toBe(`${label} is required`);
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+        expect(component.rows[0].docNotes).toBe('unsaved edit');
+        expect(component.canSave).toBeTrue();
+      });
+    });
+
+    it('shows all missing field errors for their own grant rows and keeps valid rows error-free', () => {
+      seedHistoryStateAndInit([grant({ applId: 100 }), grant({ applId: 200 })]);
+      component.rows[0].budgetCategories = '';
+      component.rows[1].docNciSelection = ' ';
+      component.rows[0].docNotes = 'changed first row';
+      component.onRowFieldChange();
+
+      component.onSave();
+
+      expect(component.hasMandatoryFieldError(component.rows[0], 'budgetCategories')).toBeTrue();
+      expect(component.hasMandatoryFieldError(component.rows[1], 'docNciSelection')).toBeTrue();
+      expect(component.hasMandatoryFieldError(component.rows[0], 'docNciSelection')).toBeFalse();
+      expect(component.hasMandatoryFieldError(component.rows[1], 'budgetCategories')).toBeFalse();
+      expect(component.getMandatoryFieldErrorMessage('Budget Categories')).toBe('Budget Categories is required');
+      expect(component.getMandatoryFieldErrorMessage('DOC/NCI Selection')).toBe('DOC/NCI Selection is required');
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
+
+    it('reports every missing AC6 field together on the affected row', () => {
+      seedHistoryStateAndInit([grant({ twoYearAnnualFundingR01Flag: false })]);
+      const row = component.rows[0];
+      row.budgetCategories = '';
+      row.docDecision = null;
+      row.docNciSelection = ' ';
+      row.annualOrMyf = '';
+      row.docNotes = 'unsaved edit';
+      component.onRowFieldChange();
+
+      component.onSave();
+
+      [
+        ['budgetCategories', 'Budget Categories'],
+        ['docDecision', 'DOC Decision'],
+        ['docNciSelection', 'DOC/NCI Selection'],
+        ['annualFundingR01', 'Two-Year Annual Funding R01 (HRHR)'],
+        ['annualOrMyf', 'Annual or MYF']
+      ].forEach(([field, label]) => {
+        expect(component.hasMandatoryFieldError(row, field)).toBeTrue();
+        expect(component.getMandatoryFieldErrorMessage(label)).toBe(`${label} is required`);
+      });
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
+
+    it('retains invalid values and clears each error only after its row value is corrected', () => {
+      seedHistoryStateAndInit([grant()]);
+      component.rows[0].annualOrMyf = ' ';
+      component.rows[0].docNotes = 'unsaved edit';
+      component.onRowFieldChange();
+      component.onSave();
+      expect(component.hasMandatoryFieldError(component.rows[0], 'annualOrMyf')).toBeTrue();
+
+      component.rows[0].annualOrMyf = 'Annual';
+      component.onRowFieldChange();
+
+      expect(component.hasMandatoryFieldError(component.rows[0], 'annualOrMyf')).toBeFalse();
+      expect(component.rows[0].docNotes).toBe('unsaved edit');
+    });
+
+    it('requires nonblank DOC Notes for Do Not Pay and saves only the decision, note, and cleared dependent fields', () => {
+      seedHistoryStateAndInit([grant({
+        budgetCategoryCode: 'ESIR37T4',
+        docDecision: 'Pay',
+        docNciSelection: 'DOC',
+        twoYearAnnualFundingR01Flag: true,
+        annualOrMyf: 'MYF',
+        docNotes: '   '
+      })]);
+      const row = component.rows[0];
+      row.docDecision = 'Do Not Pay';
+      component.onRowDocDecisionChange(row);
+
+      expect(component.isDoNotPayDecisionSelected(row.docDecision)).toBeTrue();
+      expect(row.budgetCategories).toBeNull();
+      expect(row.docNciSelection).toBeNull();
+      expect(row.annualFundingR01).toBeNull();
+      expect(row.annualOrMyf).toBeNull();
+      expect(component.canSave).toBeTrue();
+
+      row.budgetCategories = 'STALE';
+      row.docNciSelection = 'STALE';
+      row.annualFundingR01 = 'STALE';
+      row.annualOrMyf = 'STALE';
+      component.onSave();
+
+      expect(component.hasDoNotPayDocNotesError(row)).toBeTrue();
+      expect(row.budgetCategories).toBeNull();
+      expect(row.docNciSelection).toBeNull();
+      expect(row.annualFundingR01).toBeNull();
+      expect(row.annualOrMyf).toBeNull();
+      expect(component.getDoNotPayDocNotesErrorMessage())
+        .toBe('DOC Notes is required when DOC Decision is Do Not Pay.');
+      expect(component.hasMandatoryFieldError(row, 'budgetCategories')).toBeFalse();
+      expect(component.hasMandatoryFieldError(row, 'docNciSelection')).toBeFalse();
+      expect(component.hasMandatoryFieldError(row, 'annualFundingR01')).toBeFalse();
+      expect(component.hasMandatoryFieldError(row, 'annualOrMyf')).toBeFalse();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+
+      row.docNotes = 'Do Not Pay justification';
+      component.onRowFieldChange();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.docDecision).toBe('Do Not Pay');
+      expect(payload.fields.docNotes).toBe('Do Not Pay justification');
+      expect(payload.fields.budgetCategories).toBeNull();
+      expect(payload.fields.docNciSelection).toBeNull();
+      expect(payload.fields.annualFundingR01).toBeNull();
+      expect(payload.fields.annualOrMyf).toBeNull();
+    });
+
+    it('preserves Do Not Pay option origin gating and mixed-source warning before applying', () => {
+      setRoles(true, false);
+      seedHistoryStateAndInit([
+        grant({ applId: 100, addedByGroup: 'DOC' }),
+        grant({ applId: 200, addedByGroup: 'OEFIA' })
+      ]);
+      component.decisionOptions = [{ id: 'DNP', text: 'Do Not Pay' }];
+      const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+      modalService.open.and.returnValue({ close: jasmine.createSpy('close') } as any);
+
+      expect(component.getDocDecisionOptionsForRow(component.rows[0])[0].disabled).toBeTrue();
+      component.bulkFields = { docDecision: 'Do Not Pay' };
+      component.onApplyChanges();
+
+      expect(modalService.open).toHaveBeenCalled();
+      expect(component.rows[0].docDecision).toBe('Pay');
+      expect(component.rows[1].docDecision).toBe('Pay');
+
+      component.onProceedDoNotPayWarning();
+
+      expect(component.rows[0].docDecision).toBe('Pay');
+      expect(component.rows[1].docDecision).toBe('Do Not Pay');
+      expect(component.rows[1].budgetCategories).toBeNull();
+      expect(component.rows[1].docNciSelection).toBeNull();
+    });
+
+    it('exposes the exact tooltip by hover and keyboard focus while shared values are unapplied', fakeAsync(() => {
+      spyOnProperty(history, 'state', 'get').and.returnValue({ listId: 1, selectionDate: '', grants: [grant()] });
+      fixture.detectChanges();
+      component.bulkFields = { docNotes: 'unapplied shared note' };
+      component.onBulkFieldChange();
+      fixture.detectChanges();
+
+      const tooltipDebugElement = fixture.debugElement.queryAll(By.directive(NgbTooltip))
+        .find(element => element.injector.get(NgbTooltip).ngbTooltip === 'Apply changes prior to saving');
+      expect(tooltipDebugElement).toBeDefined();
+      const tooltip = tooltipDebugElement!.injector.get(NgbTooltip);
+      const wrapper = tooltipDebugElement!.nativeElement as HTMLElement;
+      const saveButton = wrapper.querySelector('button') as HTMLButtonElement;
+
+      expect(tooltip.ngbTooltip).toBe('Apply changes prior to saving');
+      expect(tooltip.triggers).toBe('hover focus');
+      expect(tooltip.disableTooltip).toBeFalse();
+      expect(wrapper.tabIndex).toBe(0);
+      expect(saveButton.disabled).toBeTrue();
+
+      wrapper.focus();
+      tick();
+      fixture.detectChanges();
+      expect(document.body.querySelector('.tooltip-inner')?.textContent?.trim())
+        .toBe('Apply changes prior to saving');
+      tooltip.close();
+      fixture.detectChanges();
+
+      wrapper.dispatchEvent(new MouseEvent('mouseenter'));
+      tick();
+      fixture.detectChanges();
+      expect(document.body.querySelector('.tooltip-inner')?.textContent?.trim())
+        .toBe('Apply changes prior to saving');
+      tooltip.close();
+      discardPeriodicTasks();
+    }));
+
+    it('does not refresh dirty state or show success after a failed save, and permits retry', () => {
+      seedHistoryStateAndInit([grant({ docNotes: 'original note' })]);
+      component.rows[0].docNotes = 'pending change';
+      component.onRowFieldChange();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(
+        throwError(() => new Error('save failed'))
+      );
+
+      component.onSave();
+
+      expect(component.saveSuccessMessage).toBe('');
+      expect(component.canSave).toBeTrue();
+      expect(component.rows[0].docNotes).toBe('pending change');
+
+      component.rows[0].docNotes = 'original note';
+      component.onRowFieldChange();
+      expect(component.canSave).toBeFalse();
+
+      component.rows[0].docNotes = 'corrected change';
+      component.onRowFieldChange();
+      expect(component.canSave).toBeTrue();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      component.onSave();
+
+      expect(component.saveSuccessMessage).toBe('Success! Bulk changes have been applied');
+      expect(component.canSave).toBeFalse();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+    });
+
+    it('shows exact success copy, blocks duplicate saves, and compares future edits with the saved baseline', () => {
+      seedHistoryStateAndInit([grant({ docNotes: 'original note' })]);
+      component.rows[0].docNotes = 'saved note';
+      component.onRowFieldChange();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onSave();
+
+      expect(component.saveSuccessMessage).toBe('Success! Bulk changes have been applied');
+      expect(component.canSave).toBeFalse();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+
+      component.rows[0].docNotes = 'original note';
+      component.onRowFieldChange();
+
+      expect(component.canSave).toBeTrue();
+    });
+
+    it('only shows the unapplied-shared-value tooltip while Save is unavailable', () => {
+      seedHistoryStateAndInit([grant()]);
+      component.bulkFields = { docNotes: 'shared value' };
+      component.onBulkFieldChange();
+      expect(component.showApplyBeforeSaveTooltip).toBeTrue();
+
+      component.onApplyChanges();
+      expect(component.showApplyBeforeSaveTooltip).toBeFalse();
     });
   });
 

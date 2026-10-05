@@ -58,7 +58,6 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   canSave = false;
   isSaving = false;
   saveSuccessMessage = '';
-  bulkDocNotesValidationErrorMessage = '';
   docFundingListCor = false;
   OEFIACertifier = false;
   private lastSavedRows: any[] = [];
@@ -66,10 +65,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly doNotPayDocNotesErrorMessage = 'DOC Notes is required when DOC Decision is Do Not Pay.';
   private doNotPayDocNotesErrorRowIds = new Set<number>();
   private mandatoryFieldErrorRowMap = new Map<number, Set<string>>();
-  private rowTouchedRequiredFieldMap = new Map<number, Set<string>>();
   private rowRequiredValidationEnabled = false;
-  private bulkMandatoryFieldErrors = new Set<string>();
-  private showBulkMandatoryFieldErrors = false;
+  private bulkFieldsApplied = false;
 
   get hasAnyBulkFieldValue(): boolean {
     const f = this.bulkFields;
@@ -78,10 +75,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
               (this.canEditOefiaNotes() && f.oefiaNotes));
   }
 
-  get hasValidationErrors(): boolean {
-    return !!this.bulkDocNotesValidationErrorMessage
-      || this.doNotPayDocNotesErrorRowIds.size > 0
-      || this.mandatoryFieldErrorRowMap.size > 0;
+  get showApplyBeforeSaveTooltip(): boolean {
+    return this.hasAnyBulkFieldValue && !this.bulkFieldsApplied && !this.canSave && !this.isSaving;
   }
 
   // Populated from the shared FundingSubmDropdownLookupService (2026-08-24 Individual/Bulk Edit
@@ -442,7 +437,11 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.restoreReadOnlyOefiaNotes();
-    this.updateDoNotPayDocNotesValidationErrors();
+    this.bulkFieldsApplied = true;
+    if (this.rowRequiredValidationEnabled) {
+      this.updateDoNotPayDocNotesValidationErrors();
+      this.updateMandatoryFieldValidationErrors();
+    }
     // Apply Changes only enables Save when it actually changed at least one row's persisted
     // value; it must not leave a stale canSave=true when the shared values matched every row.
     this.recomputeCanSave();
@@ -522,21 +521,16 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const applId = Number(row?.applId);
-    const touchedFields = this.rowTouchedRequiredFieldMap.get(applId);
-    if (!touchedFields || !touchedFields.has(field)) {
-      return false;
-    }
-
     const rowErrors = this.mandatoryFieldErrorRowMap.get(applId);
     return !!rowErrors && rowErrors.has(field);
   }
 
   getMandatoryFieldErrorMessage(fieldLabel: string): string {
-    return `${fieldLabel} field is required`;
+    return `${fieldLabel} is required`;
   }
 
   hasDoNotPayDocNotesError(row: any): boolean {
-    return this.doNotPayDocNotesErrorRowIds.has(Number(row?.applId));
+    return this.rowRequiredValidationEnabled && this.doNotPayDocNotesErrorRowIds.has(Number(row?.applId));
   }
 
   getDoNotPayDocNotesErrorMessage(): string {
@@ -547,90 +541,20 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.saveSuccessMessage = '';
   }
 
-  private validateBulkDocNotesBeforeApply(): boolean {
-    if (!this.isDoNotPayDecisionValue(this.bulkFields.docDecision)) {
-      this.bulkDocNotesValidationErrorMessage = '';
-      return true;
-    }
-
-    if (!String(this.bulkFields.docNotes || '').trim()) {
-      this.bulkDocNotesValidationErrorMessage = this.doNotPayDocNotesErrorMessage;
-      return false;
-    }
-
-    this.bulkDocNotesValidationErrorMessage = '';
-    return true;
-  }
-
-  private updateBulkMandatoryFieldErrors(): boolean {
-    this.bulkMandatoryFieldErrors.clear();
-
-    const docDecisionMissing = this.isBlankSelection(this.bulkFields.docDecision);
-    if (docDecisionMissing) {
-      this.bulkMandatoryFieldErrors.add('docDecision');
-    }
-
-    const doNotPaySelected = this.isDoNotPayDecisionValue(this.bulkFields.docDecision);
-    if (doNotPaySelected) {
-      return true;
-    }
-
-    if (this.isBlankSelection(this.bulkFields.budgetCategories)) {
-      this.bulkMandatoryFieldErrors.add('budgetCategories');
-    }
-    if (this.isBlankSelection(this.bulkFields.docNciSelection)) {
-      this.bulkMandatoryFieldErrors.add('docNciSelection');
-    }
-    if (this.isBlankSelection(this.bulkFields.annualFundingR01)) {
-      this.bulkMandatoryFieldErrors.add('annualFundingR01');
-    }
-    if (this.isBlankSelection(this.bulkFields.annualOrMyf)) {
-      this.bulkMandatoryFieldErrors.add('annualOrMyf');
-    }
-
-    return this.bulkMandatoryFieldErrors.size === 0;
-  }
-
-  hasBulkMandatoryFieldError(field: string): boolean {
-    if (!this.showBulkMandatoryFieldErrors) {
-      return false;
-    }
-    return this.bulkMandatoryFieldErrors.has(field);
-  }
-
   // Called from the per-row DataTable cell renderers (bulk-edit.component.html) whenever a
   // grant row's field is edited directly, so "Save" enables even without going through the
   // shared "Apply Changes" flow. Recomputes dirty state instead of latching true so
   // initialization/binding emissions with no actual value change leave Save disabled (FS-2277).
   onRowFieldChange(): void {
     this.restoreReadOnlyOefiaNotes();
-    this.updateDoNotPayDocNotesValidationErrors();
-    this.updateMandatoryFieldValidationErrors();
+    if (this.rowRequiredValidationEnabled) {
+      this.updateDoNotPayDocNotesValidationErrors();
+      this.updateMandatoryFieldValidationErrors();
+    }
     this.recomputeCanSave();
   }
 
-  onRowRequiredFieldChange(row: any, field: string): void {
-    if (this.rowRequiredValidationEnabled) {
-      const applId = Number(row?.applId);
-      if (Number.isFinite(applId)) {
-        const touchedFields = this.rowTouchedRequiredFieldMap.get(applId) || new Set<string>();
-        touchedFields.add(field);
-        this.rowTouchedRequiredFieldMap.set(applId, touchedFields);
-      }
-    }
-    this.onRowFieldChange();
-  }
-
   onRowDocDecisionChange(row: any): void {
-    if (this.rowRequiredValidationEnabled) {
-      const applId = Number(row?.applId);
-      if (Number.isFinite(applId)) {
-        const touchedFields = this.rowTouchedRequiredFieldMap.get(applId) || new Set<string>();
-        touchedFields.add('docDecision');
-        this.rowTouchedRequiredFieldMap.set(applId, touchedFields);
-      }
-    }
-
     if (this.shouldDisableDoNotPayForRow(row) && this.isDoNotPayDecisionValue(row?.docDecision)) {
       row.docDecision = null;
     }
@@ -642,73 +566,31 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onBulkDocDecisionChange(): void {
-    if (this.showBulkMandatoryFieldErrors) {
-      this.updateBulkMandatoryFieldErrors();
-    }
+    this.bulkFieldsApplied = false;
 
     if (this.isDoNotPayDecisionValue(this.bulkFields.docDecision)) {
       this.clearDoNotPayDependentFields(this.bulkFields);
-      return;
-    }
-    this.bulkDocNotesValidationErrorMessage = '';
-  }
-
-  onBulkDocNotesChange(): void {
-    if (!this.bulkDocNotesValidationErrorMessage) {
-      return;
-    }
-    if (!this.isDoNotPayDecisionValue(this.bulkFields.docDecision)) {
-      this.bulkDocNotesValidationErrorMessage = '';
-      return;
-    }
-    if (String(this.bulkFields.docNotes || '').trim()) {
-      this.bulkDocNotesValidationErrorMessage = '';
     }
   }
 
   onBulkFieldChange(): void {
-    if (this.showBulkMandatoryFieldErrors) {
-      this.updateBulkMandatoryFieldErrors();
-    }
+    this.bulkFieldsApplied = false;
   }
 
   onApplyChanges(): void {
     this.clearSaveMessages();
-    this.rowRequiredValidationEnabled = true;
-
-    this.showBulkMandatoryFieldErrors = true;
-    if (!this.updateBulkMandatoryFieldErrors()) {
-      return;
-    }
 
     if (this.shouldWarnDoNotPayForMixedSources()) {
       this.doNotPayWarningModalRef = this.modalService.open(this.doNotPayWarningModalTpl, { centered: true });
       return;
     }
 
-    if (!this.validateBulkDocNotesBeforeApply()) {
-      return;
-    }
-
     this.applyBulkChanges(false);
-    this.updateMandatoryFieldValidationErrors();
   }
 
   onProceedDoNotPayWarning(): void {
     this.doNotPayWarningModalRef?.close();
-    this.rowRequiredValidationEnabled = true;
-
-    this.showBulkMandatoryFieldErrors = true;
-    if (!this.updateBulkMandatoryFieldErrors()) {
-      return;
-    }
-
-    if (!this.validateBulkDocNotesBeforeApply()) {
-      return;
-    }
-
     this.applyBulkChanges(true);
-    this.updateMandatoryFieldValidationErrors();
   }
 
   onCancelDoNotPayWarning(): void {
@@ -718,13 +600,10 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   onReset(): void {
     this.bulkForm?.resetForm();
     this.bulkFields = {};
-    this.bulkDocNotesValidationErrorMessage = '';
-    this.bulkMandatoryFieldErrors.clear();
-    this.showBulkMandatoryFieldErrors = false;
+    this.bulkFieldsApplied = false;
     this.rows = JSON.parse(JSON.stringify(this.lastSavedRows));
     this.doNotPayDocNotesErrorRowIds.clear();
     this.mandatoryFieldErrorRowMap.clear();
-    this.rowTouchedRequiredFieldMap.clear();
     this.rowRequiredValidationEnabled = false;
     this.canSave = false;
     this.clearSaveMessages();
@@ -735,30 +614,14 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.rows.length || !this.canSave || this.isSaving) return;
     this.clearSaveMessages();
     this.isSaving = true;
+    this.rowRequiredValidationEnabled = true;
     this.restoreReadOnlyOefiaNotes();
     this.enforceDoNotPayRulesForRows();
     const hasNoDoNotPayErrors = this.updateDoNotPayDocNotesValidationErrors();
-    if (!hasNoDoNotPayErrors) {
-      this.isSaving = false;
-      this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
-      return;
-    }
-
     const hasNoMandatoryFieldErrors = this.updateMandatoryFieldValidationErrors();
-    if (!hasNoMandatoryFieldErrors) {
-      this.rowRequiredValidationEnabled = true;
-      this.rows.forEach(row => {
-        const applId = Number(row?.applId);
-        if (!Number.isFinite(applId)) return;
-        const touchedFields = this.rowTouchedRequiredFieldMap.get(applId) || new Set<string>();
-        touchedFields.add('docDecision');
-        touchedFields.add('budgetCategories');
-        touchedFields.add('docNciSelection');
-        touchedFields.add('annualFundingR01');
-        touchedFields.add('annualOrMyf');
-        this.rowTouchedRequiredFieldMap.set(applId, touchedFields);
-      });
+    if (!hasNoDoNotPayErrors || !hasNoMandatoryFieldErrors) {
       this.isSaving = false;
+      this.recomputeCanSave();
       this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
       return;
     }
@@ -792,7 +655,6 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
         this.logger.debug('Bulk edit saved successfully');
         this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
         this.mandatoryFieldErrorRowMap.clear();
-        this.rowTouchedRequiredFieldMap.clear();
         this.rowRequiredValidationEnabled = false;
         this.canSave = false;
         this.saveSuccessMessage = 'Success! Bulk changes have been applied';

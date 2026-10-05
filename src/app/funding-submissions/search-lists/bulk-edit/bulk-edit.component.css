@@ -10,14 +10,11 @@
 
 .field-with-inline-error {
   position: relative;
-  padding-bottom: 1rem;
+  padding-bottom: 0.25rem;
 }
 
 .validation-inline-error {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  margin: 0;
+  margin: 0 0 0.25rem;
   line-height: 1;
 }
 
