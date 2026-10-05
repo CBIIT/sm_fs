@@ -1,11 +1,29 @@
 <div class="funding-lists-page ms-3 me-3">
+  <ng-template #confirmDecisionsWarningModal>
+    <div class="modal-header">
+      <h4 class="modal-title">Confirm Decisions</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="onCancelConfirmDecisions()"></button>
+    </div>
+    <div class="modal-body">
+      <p>
+        Clicking <b>Ok, proceed</b> will lock the decisions for all “Approved” and “Rejected” grants. After this you
+        will no longer be able to change the NCI Director Decision.
+      </p>
+      <p class="mb-0">Are you sure you want to continue?</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="onCancelConfirmDecisions()">Cancel</button>
+      <button type="button" class="btn btn-success" (click)="onProceedConfirmDecisions()">Ok, proceed</button>
+    </div>
+  </ng-template>
+
   <a class="text-decoration-none small" routerLink="/funding-submissions/lists">
     <i class="far fa-chevron-left me-1"></i>Back to Lists
   </a>
 
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-4">
     <h1 class="mb-0">{{ pageTitle }}</h1>
-    <button type="button" class="btn btn-success confirm-btn">
+    <button type="button" class="btn btn-success confirm-btn" (click)="onConfirmDecisionsClick()">
       <i class="far fa-lock me-1"></i>Confirm Approvals and Rejections
     </button>
   </div>

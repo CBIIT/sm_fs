@@ -147,6 +147,44 @@ tr.shown {
   font-size: 14px;
 }
 
+.send-by-doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.send-by-doc-card {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cfd4dc;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.send-by-doc-checkbox {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0 0.75rem 0 0;
+  flex: 0 0 auto;
+}
+
+.send-by-doc-card-content {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.send-by-doc-doc {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.send-by-doc-count {
+  color: #2f3640;
+}
+
 /* Vertical separators between the 3 columns */
 .doc-status-column.border-end {
   border-right: 1px solid #d0d0d0 !important;
