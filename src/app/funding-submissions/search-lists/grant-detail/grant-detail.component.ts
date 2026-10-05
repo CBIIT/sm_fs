@@ -532,7 +532,10 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     if (!Number.isFinite(value)) {
       return false;
     }
-    return Math.round(value * 100) === value * 100;
+    // Avoid false negatives from IEEE-754 precision (e.g., 17.4 * 100 may be
+    // 1739.9999999999998 instead of 1740).
+    const scaled = value * 100;
+    return Math.abs(scaled - Math.round(scaled)) < 1e-8;
   }
 
   private toFiniteNumberOrNull(value: any): number | null {
