@@ -32,12 +32,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('foaCellRender') foaCellRender: TemplateRef<FoaCellRendererComponent>;
   @ViewChild('removeGrantsWarningModal') private removeGrantsWarningModalRef: TemplateRef<any>;
   @ViewChild('sendGrantsInDraftWarningModal') private sendGrantsInDraftWarningModalRef: TemplateRef<any>;
+  @ViewChild('sendGrantsToOefiaModal') private sendGrantsToOefiaModalTemplate: TemplateRef<any>;
   @ViewChild('unsavedChangesWarningModal') private unsavedChangesWarningModalRef: TemplateRef<any>;
   @ViewChild('justificationWarningAlert') private justificationWarningAlertRef: ElementRef<HTMLElement>;
   @ViewChild('blockedGrantWarningAlert') private blockedGrantWarningAlertRef: ElementRef<HTMLElement>;
 
   private removeModalRef: NgbModalRef;
   private sendGrantsInDraftModalRef: NgbModalRef;
+  private sendGrantsToOefiaModalRef: NgbModalRef;
   private unsavedWarningModalRef: NgbModalRef;
   private pendingGuardedAction: (() => void) | null = null;
   private pendingGuardCancelAction: (() => void) | null = null;
@@ -84,13 +86,17 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   filteredDoc: string | null = null;
   sendGrantsToDocsSuccessMessage = '';
   sendGrantsToDocsErrorMessage = '';
+  sendGrantsToOefiaSuccessMessage = '';
+  sendGrantsToOefiaErrorMessage = '';
   removeGrantsErrorMessage = '';
   justificationWarningMessage = '';
   isSendGrantsInDraftInProgress = false;
+  isSendGrantsToOefiaInProgress = false;
   currentReviewStatus = 'Draft';
   docFundingListCor = false;
   isNciDirector = false;
   isOEFIACerifier = false;
+  isFinancialAnalyst = false;
   readonly nciTabs: { id: NciTabId; label: string }[] = [
     { id: 'all', label: 'All Grants' },
     { id: 'pending', label: 'Pending Review' },
@@ -174,6 +180,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
     this.isOEFIACerifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
     this.isNciDirector = this.userSessionService.hasRole(roleNames.NCI_DIRECTOR);
+    this.isFinancialAnalyst = this.userSessionService.hasRole(roleNames.FINANCIAL_ANALYST);
     this.dropdownLookupService.getDocDecisions().subscribe({
       next: options => {
         this.docDecisionDisplayMap = new Map(options.map(option => [String(option.id), option.text]));
@@ -304,13 +311,26 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.totalGrants = detail.totalGrants ?? 0;
         this.docRecommendedTotal = detail.totalDocRecAmt ?? 0;
         this.listStatus = detail.currentStatusDescrip;
-        // Keep already-expanded Grant Detail rows in sync when list metadata arrives
-        // after the row was opened (status gating controls Edit button visibility).
-        this.detailComponentsByApplId.forEach(componentRef => {
+        const selectedApplIds = new Set(this.selectedRows.keys());
+        this.cachedGrants = detail.grants || [];
+        this.selectedRows.clear();
+        this.cachedGrants.forEach(grant => {
+          if (selectedApplIds.has(grant.applId)) {
+            const selectedGrant = grant as FundingSubmissionListGrantDto & { selected?: boolean };
+            selectedGrant.selected = true;
+            this.selectedRows.set(selectedGrant.applId, selectedGrant);
+          }
+        });
+        // Rebind expanded rows to the refreshed grant DTO so their per-grant stage gates
+        // cannot keep using the pre-refresh review status.
+        this.detailComponentsByApplId.forEach((componentRef, applId) => {
+          const refreshedGrant = this.cachedGrants.find(grant => grant.applId === applId);
+          if (refreshedGrant) {
+            componentRef.instance.data = refreshedGrant;
+          }
           componentRef.instance.listStatus = this.listStatus;
           componentRef.changeDetectorRef.detectChanges();
         });
-        this.cachedGrants = detail.grants || [];
         this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
         this.listHistory = history;
         this.logger.debug('List detail:', detail);
@@ -1345,6 +1365,98 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.executeWithUnsavedGuard(() => this.onSendGrantsInDraft());
   }
 
+  get hasDocReviewGrants(): boolean {
+    return this.cachedGrants.some(grant => {
+      const reviewStatusCode = String(grant.reviewStatusCode || '').trim().toUpperCase();
+      return reviewStatusCode
+        ? reviewStatusCode === 'DOCREVIEW'
+        : this.normalizeGrantReviewStatus(grant.reviewStatus) === 'DOC Review';
+    });
+  }
+
+  private isDocOnlyUser(): boolean {
+    return this.docFundingListCor
+      && !this.isOEFIACerifier
+      && !this.isFinancialAnalyst
+      && !this.isNciDirector;
+  }
+
+  isDocStageReadOnly(grant: FundingSubmissionListGrantDto | any): boolean {
+    if (!this.isDocOnlyUser()) {
+      return false;
+    }
+
+    const reviewStatusCode = String(grant?.reviewStatusCode || '').trim().toUpperCase();
+    if (reviewStatusCode) {
+      return reviewStatusCode === 'OEFIAREVIEW' || reviewStatusCode === 'DIRECTORREVIEW';
+    }
+
+    const status = this.normalizeGrantReviewStatus(grant?.reviewStatus);
+    return status === 'OEFIA Review' || status === 'NCI Director Review';
+  }
+
+  get canAddGrantsToList(): boolean {
+    if (!this.isDocOnlyUser() || !this.cachedGrants.length) {
+      return true;
+    }
+
+    return this.cachedGrants.some(grant => {
+      const reviewStatusCode = String(grant.reviewStatusCode || '').trim().toUpperCase();
+      if (reviewStatusCode) {
+        return reviewStatusCode === 'DRAFT' || reviewStatusCode === 'DOCREVIEW';
+      }
+      const reviewStatus = String(grant.reviewStatus || '').trim();
+      if (!reviewStatus) {
+        return false;
+      }
+      const status = this.normalizeGrantReviewStatus(reviewStatus);
+      return status === 'Draft' || status === 'DOC Review';
+    });
+  }
+
+  get canRemoveSelectedGrants(): boolean {
+    return this.selectedRows.size > 0
+      && (!this.isDocOnlyUser() || !Array.from(this.selectedRows.values()).some(grant => this.isDocStageReadOnly(grant)));
+  }
+
+  onSendGrantsToOefiaClick(): void {
+    this.executeWithUnsavedGuard(() => {
+      this.blurActiveElement();
+      this.sendGrantsToOefiaModalRef = this.modalService.open(this.sendGrantsToOefiaModalTemplate, { centered: true });
+    });
+  }
+
+  onCancelSendGrantsToOefia(): void {
+    this.sendGrantsToOefiaModalRef?.dismiss();
+  }
+
+  onConfirmSendGrantsToOefia(): void {
+    if (this.isSendGrantsToOefiaInProgress) {
+      return;
+    }
+
+    this.isSendGrantsToOefiaInProgress = true;
+    this.sendGrantsToOefiaSuccessMessage = '';
+    this.sendGrantsToOefiaErrorMessage = '';
+    this.sendGrantsToOefiaModalRef?.close();
+
+    this.fundingSubmissionsService.sendListToOefiaForReview(this.listId).pipe(
+      finalize(() => {
+        this.isSendGrantsToOefiaInProgress = false;
+      })
+    ).subscribe({
+      next: () => {
+        this.sendGrantsToOefiaSuccessMessage = 'Success! The list has been successfully sent to OEFIA. An email notification will be sent to the OEFIA analysts to review the list. If any updates will be needed to your list, contact the NCI OEFIA Analysts <NCIOEFIAAnalysts-l@mail.nih.gov>';
+        this.cdr.detectChanges();
+        this.loadListMeta();
+      },
+      error: (err) => {
+        this.logger.error('Send grants to OEFIA failed', err);
+        this.sendGrantsToOefiaErrorMessage = 'Unable to send grants to OEFIA right now. Please try again.';
+      }
+    });
+  }
+
   private onSendGrantsInDraft(): void {
     this.blurActiveElement();
     this.sendGrantsInDraftModalRef = this.modalService.open(this.sendGrantsInDraftWarningModalRef, { centered: true });
@@ -1424,7 +1536,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onRemoveSelected(): void {
-    if (!this.selectedRows.size) return;
+    if (!this.canRemoveSelectedGrants) return;
     this.blurActiveElement();
     this.setBlockedGrantNumbers([]);
     this.removeGrantsErrorMessage = '';
@@ -1482,11 +1594,11 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get canBulkEditByStatus(): boolean {
-    if (!this.docFundingListCor) {
+    if (!this.isDocOnlyUser()) {
       return true;
     }
 
-    return this.isDocReviewListStatus();
+    return !Array.from(this.selectedRows.values()).some(grant => this.isDocStageReadOnly(grant));
   }
 
   get canBulkEdit(): boolean {
@@ -1495,21 +1607,15 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get bulkEditTooltipMessage(): string {
     if (!this.canBulkEditByStatus) {
-      return 'Bulk Edit is available only while list status is DOC Review.';
+      return 'Bulk Edit is unavailable because one or more selected grants are in OEFIA Review or NCI Director Review.';
     }
     return 'Select at least one grant to bulk edit.';
   }
 
-  private isDocReviewListStatus(): boolean {
-    const normalized = this.getNormalizedListStatusText();
-    return normalized.includes('doc review');
-  }
-
-  private getNormalizedListStatusText(): string {
-    return `${this.listStatus || ''} ${this.currentReviewStatus || ''}`.trim().toLowerCase();
-  }
-
   onAddGrantsToList(): void {
+    if (!this.canAddGrantsToList) {
+      return;
+    }
     this.router.navigate(['/funding-submissions/create']);
   }
 

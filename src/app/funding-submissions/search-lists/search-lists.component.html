@@ -46,6 +46,20 @@
     </div>
 </ng-template>
 
+<ng-template #sendGrantsToOefiaModal>
+    <div class="modal-header">
+        <h4 class="modal-title">Send Grants to OEFIA</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="onCancelSendGrantsToOefia()"></button>
+    </div>
+    <div class="modal-body">
+        <p class="mb-0">Clicking Yes will send all grants assigned to your DOC in this list to OEFIA for review. Are you sure you want to continue?</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancelSendGrantsToOefia()">Cancel</button>
+        <button type="button" class="btn btn-primary" [disabled]="isSendGrantsToOefiaInProgress" (click)="onConfirmSendGrantsToOefia()">OK</button>
+    </div>
+</ng-template>
+
 <div class="ms-3">
 
     <div *ngIf="sendGrantsToDocsSuccessMessage" class="alert alert-success" role="alert">
@@ -53,6 +67,12 @@
     </div>
     <div *ngIf="sendGrantsToDocsErrorMessage" class="alert alert-danger" role="alert">
         {{ sendGrantsToDocsErrorMessage }}
+    </div>
+    <div *ngIf="sendGrantsToOefiaSuccessMessage" class="alert alert-success" role="alert">
+        {{ sendGrantsToOefiaSuccessMessage }}
+    </div>
+    <div *ngIf="sendGrantsToOefiaErrorMessage" class="alert alert-danger" role="alert">
+        {{ sendGrantsToOefiaErrorMessage }}
     </div>
     <div #justificationWarningAlert *ngIf="justificationWarningMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
         {{ justificationWarningMessage }}
@@ -81,7 +101,7 @@
         <h2 class="mb-0">{{ selectionDate }}</h2>
         <button *ngIf="isCurrentStatusDraft && !docFundingListCor && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
         <button *ngIf="currentReviewStatus === 'DOC Review' && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send Grants by DOC <i class="fas fa-angle-right ms-1"></i></button>
-        <button *ngIf="currentReviewStatus === 'DOC Review' && docFundingListCor && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send Grants to OEFIA <i class="fas fa-angle-right ms-1"></i></button>
+        <button *ngIf="hasDocReviewGrants && docFundingListCor && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsToOefiaClick()">Send Grants to OEFIA <i class="fas fa-angle-right ms-1"></i></button>
         <button *ngIf="currentReviewStatus === 'OEFIA Review' && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send Grants to NCI Director <i class="fas fa-angle-right ms-1"></i></button>
        
     </div>
@@ -158,13 +178,13 @@
                 </span>
 
                 <!-- Add Grants to List -->
-                <button type="button" class="btn btn-outline-primary me-3" (click)="onAddGrantsToListClick()">
+                <button type="button" class="btn btn-outline-primary me-3" (click)="onAddGrantsToListClick()" [disabled]="!canAddGrantsToList">
                     <i class="fas fa-plus me-2"></i>
                     Add Grants to List
                 </button>
 
                 <!-- Remove Selected Grants -->
-                <button type="button" class="btn btn-outline-danger" (click)="onRemoveSelectedClick()" [disabled]="!selectedRows.size">
+                <button type="button" class="btn btn-outline-danger" (click)="onRemoveSelectedClick()" [disabled]="!canRemoveSelectedGrants">
                     <i class="fas fa-minus-circle me-2"></i>
                     Remove Selected Grants
                 </button>

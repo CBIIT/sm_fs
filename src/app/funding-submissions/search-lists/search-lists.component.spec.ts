@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -53,6 +53,15 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     return { host, viewRef };
   }
 
+  function renderSendGrantsToOefiaModal() {
+    const viewRef = (component as any).sendGrantsToOefiaModalTemplate.createEmbeddedView({});
+    viewRef.detectChanges();
+    const host = document.createElement('div');
+    viewRef.rootNodes.forEach((node: Node) => host.appendChild(node));
+    document.body.appendChild(host);
+    return { host, viewRef };
+  }
+
   beforeEach(async () => {
     // The component's ngOnInit() touches the global jQuery/DataTables plugin object
     // ($.fn.DataTable.ext.pager.numbers_length) which isn't loaded in the Karma test env.
@@ -64,11 +73,13 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     modalServiceSpy.open.and.returnValue(modalRefSpy);
 
     fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
-      'getListDetail', 'getListStatusHistory', 'removeGrantsFromList', 'sendListToDocsForReview'
+      'getListDetail', 'getListStatusHistory', 'removeGrantsFromList', 'sendListToDocsForReview',
+      'sendListToOefiaForReview'
     ]);
     fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({} as any));
     fundingSubmissionsServiceSpy.getListStatusHistory.and.returnValue(of([] as any));
     fundingSubmissionsServiceSpy.sendListToDocsForReview.and.returnValue(of(1 as any));
+    fundingSubmissionsServiceSpy.sendListToOefiaForReview.and.returnValue(of(1 as any));
 
     const propertiesServiceSpy = jasmine.createSpyObj('AppPropertiesService', ['getProperty']);
     propertiesServiceSpy.getProperty.and.returnValue('http://example/');
@@ -444,6 +455,108 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(modalRefSpy.close).toHaveBeenCalled();
       expect(component.sendGrantsToDocsSuccessMessage).toBe('Success! The list has been sent to the assigned DOC contacts for review.');
     });
+
+    it('shows Send Grants to OEFIA when at least one caller DOC is in DOC Review', () => {
+      component.docFundingListCor = true;
+      (component as any).cachedGrants = [
+        { applId: 1, reviewStatusCode: 'OEFIAREVIEW', reviewStatus: 'OEFIA Review' },
+        { applId: 2, reviewStatusCode: 'DOCREVIEW', reviewStatus: 'DOC Review' }
+      ];
+
+      fixture.detectChanges();
+
+      const button = Array.from(fixture.nativeElement.querySelectorAll('button'))
+        .find((element: HTMLButtonElement) => element.textContent.includes('Send Grants to OEFIA'));
+      expect(button).toBeTruthy();
+    });
+
+    it('hides Send Grants to OEFIA when no caller DOC is in DOC Review', () => {
+      component.docFundingListCor = true;
+      (component as any).cachedGrants = [
+        { applId: 1, reviewStatusCode: 'OEFIAREVIEW', reviewStatus: 'OEFIA Review' }
+      ];
+
+      fixture.detectChanges();
+
+      const button = Array.from(fixture.nativeElement.querySelectorAll('button'))
+        .find((element: HTMLButtonElement) => element.textContent.includes('Send Grants to OEFIA'));
+      expect(button).toBeUndefined();
+    });
+
+    it('opens the distinct Send Grants to OEFIA modal with the required copy and Cancel/OK actions', () => {
+      component.docFundingListCor = true;
+      component.onSendGrantsToOefiaClick();
+
+      expect(modalServiceSpy.open).toHaveBeenCalledWith(
+        (component as any).sendGrantsToOefiaModalTemplate,
+        { centered: true }
+      );
+      expect(modalServiceSpy.open).not.toHaveBeenCalledWith(
+        (component as any).sendGrantsInDraftWarningModalRef,
+        jasmine.anything()
+      );
+
+      const { host, viewRef } = renderSendGrantsToOefiaModal();
+      expect(host.querySelector('.modal-title')?.textContent?.trim()).toBe('Send Grants to OEFIA');
+      expect(host.querySelector('.modal-body')?.textContent?.trim())
+        .toBe('Clicking Yes will send all grants assigned to your DOC in this list to OEFIA for review. Are you sure you want to continue?');
+      const buttons = Array.from(host.querySelectorAll('.modal-footer button')) as HTMLButtonElement[];
+      expect(buttons.map(button => button.textContent.trim())).toEqual(['Cancel', 'OK']);
+      buttons[0].click();
+      expect(modalRefSpy.dismiss).toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.sendListToOefiaForReview).not.toHaveBeenCalled();
+
+      viewRef.destroy();
+      host.remove();
+    });
+
+    it('sends to OEFIA and displays the required success message only after success', () => {
+      (component as any).sendGrantsToOefiaModalRef = modalRefSpy;
+
+      component.onConfirmSendGrantsToOefia();
+
+      expect(fundingSubmissionsServiceSpy.sendListToOefiaForReview).toHaveBeenCalledWith(component.listId);
+      expect(fundingSubmissionsServiceSpy.sendListToDocsForReview).not.toHaveBeenCalled();
+      expect(modalRefSpy.close).toHaveBeenCalled();
+      expect(component.sendGrantsToOefiaSuccessMessage)
+        .toBe('Success! The list has been successfully sent to OEFIA. An email notification will be sent to the OEFIA analysts to review the list. If any updates will be needed to your list, contact the NCI OEFIA Analysts <NCIOEFIAAnalysts-l@mail.nih.gov>');
+      expect(component.sendGrantsToOefiaErrorMessage).toBe('');
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledWith(component.listId);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('.alert-success')?.textContent?.trim())
+        .toBe(component.sendGrantsToOefiaSuccessMessage);
+    });
+
+    [403, 409].forEach(status => {
+      it(`shows an error and never success when the OEFIA send returns ${status}`, () => {
+        fundingSubmissionsServiceSpy.sendListToOefiaForReview.and.returnValue(
+          throwError(() => ({ status }))
+        );
+
+        component.onConfirmSendGrantsToOefia();
+
+        expect(component.sendGrantsToOefiaErrorMessage)
+          .toBe('Unable to send grants to OEFIA right now. Please try again.');
+        expect(component.sendGrantsToOefiaSuccessMessage).toBe('');
+        fixture.detectChanges();
+        const errorBanners = Array.from(fixture.nativeElement.querySelectorAll('.alert-danger'))
+          .map((element: HTMLElement) => element.textContent?.trim());
+        expect(errorBanners).toContain(component.sendGrantsToOefiaErrorMessage);
+      });
+    });
+
+    it('prevents duplicate OEFIA submissions while the request is in progress', () => {
+      const response = new Subject<number>();
+      fundingSubmissionsServiceSpy.sendListToOefiaForReview.and.returnValue(response);
+
+      component.onConfirmSendGrantsToOefia();
+      component.onConfirmSendGrantsToOefia();
+
+      expect(fundingSubmissionsServiceSpy.sendListToOefiaForReview).toHaveBeenCalledTimes(1);
+      expect(component.isSendGrantsToOefiaInProgress).toBeTrue();
+      response.complete();
+      expect(component.isSendGrantsToOefiaInProgress).toBeFalse();
+    });
   });
 
   describe('when a detail row has unsaved edits', () => {
@@ -658,45 +771,70 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       );
     });
 
-    it('DOC role: enables Bulk Edit in DOC Review status', () => {
+    it('DOC role: enables Bulk Edit for a selected grant in DOC Review', () => {
       component.docFundingListCor = true;
       component.listStatus = 'DOC Review';
       component.currentReviewStatus = 'DOC Review';
-      component.selectedRows.set(100, { applId: 100 });
+      component.selectedRows.set(100, { applId: 100, reviewStatusCode: 'DOCREVIEW' });
 
       expect(component.canBulkEditByStatus).toBeTrue();
       expect(component.canBulkEdit).toBeTrue();
     });
 
-    it('DOC role: disables Bulk Edit in OEFIA Review status', () => {
+    it('DOC role: disables Bulk Edit and Remove for a selected grant in OEFIA Review', () => {
       component.docFundingListCor = true;
-      component.listStatus = 'OEFIA Review';
-      component.currentReviewStatus = 'OEFIA Review';
-      component.selectedRows.set(100, { applId: 100 });
+      component.listStatus = 'DOC Review';
+      component.currentReviewStatus = 'DOC Review';
+      component.selectedRows.set(100, { applId: 100, reviewStatusCode: 'OEFIAREVIEW' });
 
       expect(component.canBulkEditByStatus).toBeFalse();
       expect(component.canBulkEdit).toBeFalse();
+      expect(component.canRemoveSelectedGrants).toBeFalse();
     });
 
-    it('DOC role: disables Bulk Edit in NCI Director Review status', () => {
+    it('DOC role: disables Bulk Edit and Remove for a selected grant in NCI Director Review', () => {
       component.docFundingListCor = true;
-      component.listStatus = 'NCI Director Review';
-      component.currentReviewStatus = 'NCI Director Review';
-      component.selectedRows.set(100, { applId: 100 });
+      component.listStatus = 'DOC Review';
+      component.currentReviewStatus = 'DOC Review';
+      component.selectedRows.set(100, { applId: 100, reviewStatusCode: 'DIRECTORREVIEW' });
 
       expect(component.canBulkEditByStatus).toBeFalse();
       expect(component.canBulkEdit).toBeFalse();
+      expect(component.canRemoveSelectedGrants).toBeFalse();
     });
 
-    it('DOC role: onBulkEditClick does not navigate when status disallows bulk edit', () => {
+    it('DOC role: allows Bulk Edit and Remove for a DOC Review selection even when other statuses differ', () => {
       component.docFundingListCor = true;
       component.listStatus = 'OEFIA Review';
       component.currentReviewStatus = 'OEFIA Review';
-      component.selectedRows.set(100, { applId: 100 });
+      component.selectedRows.set(100, { applId: 100, reviewStatus: 'Under DOC Review' });
 
-      component.onBulkEditClick();
+      expect(component.canBulkEdit).toBeTrue();
+      expect(component.canRemoveSelectedGrants).toBeTrue();
+    });
 
-      expect(routerSpy.navigate).not.toHaveBeenCalled();
+    it('OEFIA users are not restricted by DOC-stage Bulk Edit and Remove rules', () => {
+      component.docFundingListCor = true;
+      component.isOEFIACerifier = true;
+      component.selectedRows.set(100, { applId: 100, reviewStatusCode: 'OEFIAREVIEW' });
+
+      expect(component.canBulkEdit).toBeTrue();
+      expect(component.canRemoveSelectedGrants).toBeTrue();
+    });
+
+    it('disables Add Grants only when every caller grant has advanced beyond DOC Review', () => {
+      component.docFundingListCor = true;
+      (component as any).cachedGrants = [
+        { applId: 1, reviewStatusCode: 'OEFIAREVIEW' },
+        { applId: 2, reviewStatusCode: 'DIRECTORREVIEW' }
+      ];
+      expect(component.canAddGrantsToList).toBeFalse();
+
+      (component as any).cachedGrants.push({ applId: 3, reviewStatusCode: 'DOCREVIEW' });
+      expect(component.canAddGrantsToList).toBeTrue();
+
+      component.isOEFIACerifier = true;
+      expect(component.canAddGrantsToList).toBeTrue();
     });
   });
 

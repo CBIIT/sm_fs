@@ -191,6 +191,38 @@ describe('GrantDetailComponent', () => {
     expect(editButton).toBeNull();
   });
 
+  it('uses the grant review code to block DOC editing even when the list status is DOC Review', () => {
+    component.docFundingListCor = true;
+    component.listStatus = 'DOC Review';
+    component.data = { applId: 100, reviewStatusCode: 'OEFIAREVIEW', reviewStatus: 'OEFIA Review' };
+
+    expect(component.canEnterEditMode).toBeFalse();
+  });
+
+  it('blocks DOC editing for a grant in NCI Director Review even when the list status is DOC Review', () => {
+    component.docFundingListCor = true;
+    component.listStatus = 'DOC Review';
+    component.data = { applId: 100, reviewStatusCode: 'DIRECTORREVIEW', reviewStatus: 'NCI Director Review' };
+
+    expect(component.canEnterEditMode).toBeFalse();
+  });
+
+  it('allows DOC editing when the grant review code is DOCREVIEW even if the list status differs', () => {
+    component.docFundingListCor = true;
+    component.listStatus = 'OEFIA Review';
+    component.data = { applId: 100, reviewStatusCode: 'DOCREVIEW', reviewStatus: 'DOC Review' };
+
+    expect(component.canEnterEditMode).toBeTrue();
+  });
+
+  it('falls back to the grant review text before the list status for DOC edit gating', () => {
+    component.docFundingListCor = true;
+    component.listStatus = 'DOC Review';
+    component.data = { applId: 100, reviewStatus: 'NCI Director Review' };
+
+    expect(component.canEnterEditMode).toBeFalse();
+  });
+
   it('renders project title, previous score, pfr, and recusedFlag in read-only mode', () => {
     component.data = {
       applId: 100,

@@ -449,6 +449,20 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   private isReadOnlyDocStatusForDocUser(): boolean {
+    if (this.canEditOefiaNotes()) {
+      return false;
+    }
+
+    const reviewStatusCode = String(this.data?.reviewStatusCode || '').trim().toUpperCase();
+    if (reviewStatusCode) {
+      return reviewStatusCode === 'OEFIAREVIEW' || reviewStatusCode === 'DIRECTORREVIEW';
+    }
+
+    const reviewStatus = String(this.data?.reviewStatus || '').trim().toLowerCase();
+    if (reviewStatus) {
+      return reviewStatus.includes('oefia review') || reviewStatus.includes('nci director review');
+    }
+
     const status = String(this.listStatus || '').trim().toLowerCase();
     return status.includes('oefia review') || status.includes('nci director review');
   }
