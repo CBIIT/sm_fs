@@ -512,7 +512,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       errors.docRecAmt = 'DOC Rec $ cannot be negative.';
     }
 
-    if (!errors.docRecAmt && amt != null && !this.hasAtMostTwoDecimals(Number(amt))) {
+    if (!errors.docRecAmt && amt != null && !this.hasAtMostTwoDecimals(amt)) {
       errors.docRecAmt = 'DOC Rec $ must be a valid dollar amount with up to 2 decimal places.';
     }
 
@@ -534,14 +534,9 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.saveValidationErrors = {};
   }
 
-  private hasAtMostTwoDecimals(value: number): boolean {
-    if (!Number.isFinite(value)) {
-      return false;
-    }
-    // Avoid false negatives from IEEE-754 precision (e.g., 17.4 * 100 may be
-    // 1739.9999999999998 instead of 1740).
-    const scaled = value * 100;
-    return Math.abs(scaled - Math.round(scaled)) < 1e-8;
+  private hasAtMostTwoDecimals(value: unknown): boolean {
+    const parsed = this.parseExactDecimal(value);
+    return parsed != null && parsed.scale <= 2;
   }
 
   private toFiniteNumberOrNull(value: any): number | null {
