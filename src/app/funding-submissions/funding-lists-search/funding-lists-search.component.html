@@ -75,7 +75,7 @@
 </ng-template>
 
 <!-- Results -->
-<div *ngIf="showResults">
+<div *ngIf="showResults" class="funding-lists-search-page">
   <div class="d-flex align-items-center mb-3">
     <h3 class="mb-0 me-3">Results</h3>
     <hr class="flex-grow-1 border-2">
@@ -85,6 +85,6 @@
     down the <b>Shift</b> key and click the header of
     each additional column that you want to sort. Please note, sorting by column headers will unselect any selected
     rows.</p>
-  <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover" style="width: 100%">
+  <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover nowrap" style="width: 100%">
   </table>
 </div>

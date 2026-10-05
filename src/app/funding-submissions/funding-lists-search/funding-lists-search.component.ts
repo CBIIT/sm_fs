@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { NGXLogger } from 'ngx-logger';
@@ -65,6 +65,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   private latestColumns: Column[] = [];
   private latestOrder: Order[] = [{ column: 4, dir: 'desc' }];
   private throttle = new DatatableThrottle();
+  private pendingRealignFrame: number | null = null;
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
 
@@ -254,6 +255,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       serverSide: true,
       processing: false,
       scrollX: true,
+      scrollCollapse: true,
       autoWidth: false,
       language: {
         paginate: {
@@ -328,9 +330,9 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       ],
       order: [[4, 'desc']],
       drawCallback: () => {
+        this.realignDataTableColumns();
         setTimeout(() => {
           this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
-            dt.columns.adjust();
             if (dt.rows().count() > 0) {
               (dt as any).button(0).enable();
               $((dt as any).button(0).node()).attr('title', 'Export');
@@ -348,6 +350,9 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
               });
           });
         }, 0);
+      },
+      initComplete: () => {
+        this.realignDataTableColumns();
       },
     };
     this.searchListsInitialized = true;
@@ -581,6 +586,11 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   }
 
   ngOnDestroy(): void {
+    if (this.pendingRealignFrame !== null) {
+      window.cancelAnimationFrame(this.pendingRealignFrame);
+      this.pendingRealignFrame = null;
+    }
+
     if (this.stateService.isFreshNavigationRequested()) {
       return;
     }
@@ -597,5 +607,23 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     if (this.dtTrigger && !this.dtTrigger.closed) {
       this.dtTrigger.unsubscribe();
     }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.realignDataTableColumns();
+  }
+
+  private realignDataTableColumns(): void {
+    if (this.pendingRealignFrame !== null) {
+      window.cancelAnimationFrame(this.pendingRealignFrame);
+    }
+
+    this.pendingRealignFrame = window.requestAnimationFrame(() => {
+      this.pendingRealignFrame = null;
+      this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+        dt.columns.adjust();
+      });
+    });
   }
 }
