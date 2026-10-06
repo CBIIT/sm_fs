@@ -1715,7 +1715,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const listReviewStatus = this.getListReviewStatusForBulkEdit();
-    return listReviewStatus === 'DOC Review';
+    return listReviewStatus !== 'OEFIA Review' && listReviewStatus !== 'NCI Director Review';
   }
 
   get canBulkEdit(): boolean {
