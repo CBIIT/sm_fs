@@ -227,7 +227,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       const pctScale = 10n ** BigInt(parsedReductionPct.scale);
       const numerator = baseAmount.coefficient * (100n * pctScale - parsedReductionPct.coefficient);
       const denominator = 10n ** BigInt(baseAmount.scale) * pctScale;
-      this.formModel.docRecAmt = Number(this.roundHalfUpDivision(numerator, denominator)) / 100;
+      this.formModel.docRecAmt = Number(this.roundHalfUpDivision(numerator, denominator * 100n));
     }
 
     this.updateDocRecValidationLive();
@@ -242,7 +242,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       && baseAmount.coefficient > 0n
       && updatedAmount != null
       && updatedAmount >= 0
-      && this.hasAtMostTwoDecimals(updatedAmount)
+      && this.isWholeDollarAmount(this.formModel.docRecAmt)
       && parsedAmount != null) {
       const commonScale = Math.max(baseAmount.scale, parsedAmount.scale);
       const scaledBase = baseAmount.coefficient * (10n ** BigInt(commonScale - baseAmount.scale));
@@ -549,8 +549,8 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       errors.docRecAmt = 'DOC Rec $ cannot be negative.';
     }
 
-    if (!errors.docRecAmt && amt != null && !this.hasAtMostTwoDecimals(amt)) {
-      errors.docRecAmt = 'DOC Rec $ must be a valid dollar amount with up to 2 decimal places.';
+    if (!errors.docRecAmt && amt != null && !this.isWholeDollarAmount(amt)) {
+      errors.docRecAmt = 'DOC Rec $ must be a whole dollar amount.';
     }
 
     const priority = this.formModel.docPriority as any;
@@ -569,6 +569,11 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   private clearValidationErrors(): void {
     this.saveValidationError = null;
     this.saveValidationErrors = {};
+  }
+
+  private isWholeDollarAmount(value: unknown): boolean {
+    const parsed = this.parseExactDecimal(value);
+    return parsed != null && parsed.coefficient % (10n ** BigInt(parsed.scale)) === 0n;
   }
 
   private hasAtMostTwoDecimals(value: unknown): boolean {

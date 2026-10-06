@@ -1554,16 +1554,23 @@ describe('GrantDetailComponent', () => {
       expect(component.formModel.docRecReductionPct).toBe(10);
     });
 
-    it('rounds exact DOC Rec $ half-cent ties HALF_UP', () => {
-      component.data.originalRequestedTotal = 1.15;
+    it('rounds exact DOC Rec $ half-dollar ties HALF_UP', () => {
+      component.data.originalRequestedTotal = 1001;
       component.formModel.docRecReductionPct = 50;
       component.onDocRecReductionPctChange();
-      expect(component.formModel.docRecAmt).toBe(0.58);
+      expect(component.formModel.docRecAmt).toBe(501);
+    });
 
-      component.data.originalRequestedTotal = 0.25;
-      component.formModel.docRecReductionPct = 50;
+    it('rounds year-one DOC amounts to whole dollars', () => {
+      component.data.originalRequestedTotal = 590210;
+      component.formModel.docRecReductionPct = 10;
       component.onDocRecReductionPctChange();
-      expect(component.formModel.docRecAmt).toBe(0.13);
+      expect(component.formModel.docRecAmt).toBe(531189);
+
+      component.data.originalRequestedTotal = 343125;
+      component.formModel.docRecReductionPct = 17;
+      component.onDocRecReductionPctChange();
+      expect(component.formModel.docRecAmt).toBe(284794);
     });
 
     it('calculates DOC Rec % from DOC Rec $ and preserves the typed amount', () => {
@@ -1583,13 +1590,25 @@ describe('GrantDetailComponent', () => {
       expect(component.formModel.docRecReductionPct).toBe(0);
     });
 
-    it('rounds exact DOC Rec % half-hundredth ties HALF_UP', () => {
-      component.data.originalRequestedTotal = 800;
-      component.formModel.docRecAmt = 799.96;
+    it('calculates DOC Rec % to two decimals from a whole-dollar amount', () => {
+      component.data.originalRequestedTotal = 343125;
+      component.formModel.docRecAmt = 284794;
 
       component.onDocRecAmtChange();
 
-      expect(component.formModel.docRecReductionPct).toBe(0.01);
+      expect(component.formModel.docRecReductionPct).toBe(17);
+      expect(component.formModel.docRecAmt).toBe(284794);
+    });
+
+    it('rejects amounts with cents without calculating a percentage', () => {
+      component.isEditMode = true;
+      component.formModel.docRecAmt = 531189.50;
+      component.formModel.docRecReductionPct = 12;
+
+      component.onDocRecAmtChange();
+
+      expect(component.formModel.docRecReductionPct).toBe(12);
+      expect(component.saveValidationErrors.docRecAmt).toBe('DOC Rec $ must be a whole dollar amount.');
     });
 
     it('does not calculate when the original requested total is null or zero', () => {
