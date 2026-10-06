@@ -1714,7 +1714,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       return true;
     }
 
-    return !Array.from(this.selectedRows.values()).some(grant => this.isDocStageReadOnly(grant));
+    const listReviewStatus = this.getListReviewStatusForBulkEdit();
+    return listReviewStatus === 'DOC Review';
   }
 
   get canBulkEdit(): boolean {
@@ -1723,9 +1724,34 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get bulkEditTooltipMessage(): string {
     if (!this.canBulkEditByStatus) {
-      return 'Bulk Edit is unavailable because one or more selected grants are in OEFIA Review or NCI Director Review.';
+      return 'Bulk Edit is unavailable because the list status is OEFIA Review or NCI Director Review.';
     }
     return 'Select at least one grant to bulk edit.';
+  }
+
+  private getListReviewStatusForBulkEdit(): string {
+    const fromListStatus = this.normalizeListReviewStatus(this.listStatus);
+    if (fromListStatus) {
+      return fromListStatus;
+    }
+    return this.currentReviewStatus;
+  }
+
+  private normalizeListReviewStatus(status: string | null | undefined): string {
+    const normalized = String(status || '').trim().toLowerCase();
+    if (!normalized) {
+      return '';
+    }
+    if (normalized.includes('doc')) {
+      return 'DOC Review';
+    }
+    if (normalized.includes('oefia')) {
+      return 'OEFIA Review';
+    }
+    if (normalized.includes('director')) {
+      return 'NCI Director Review';
+    }
+    return '';
   }
 
   onAddGrantsToList(): void {

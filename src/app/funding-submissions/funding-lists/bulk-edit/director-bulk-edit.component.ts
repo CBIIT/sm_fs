@@ -5,6 +5,8 @@ import { Subject } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { FullGrantNumberCellRendererComponent } from '../../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+import { FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
+import { NGXLogger } from 'ngx-logger';
 
 declare var $: any;
 
@@ -45,6 +47,7 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
   bulkDecision: string | null = null;
   bulkNotes = '';
   saveSuccessMessage = '';
+  loadErrorMessage = '';
   canSave = false;
 
   rows: DirectorBulkGrantRow[] = [];
@@ -66,14 +69,20 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
 
     const state = history.state;
     const stateGrants = Array.isArray(state?.grants) ? state.grants : [];
-    this.rows = stateGrants.length ? this.mapSelectedGrants(stateGrants) : this.buildMockRows();
-    this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
+    if (stateGrants.length) {
+      this.setRows(this.mapSelectedGrants(stateGrants));
+      return;
+    }
+
+    this.loadSelectedGrantsFromApi();
   }
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private propertiesService: AppPropertiesService
+    private propertiesService: AppPropertiesService,
+    private fundingSubmissionsService: FundingSubmissionsService,
+    private logger: NGXLogger
   ) {
     this.route.queryParams.subscribe(params => {
       this.listId = Number(params['listId'] || 0);
@@ -336,28 +345,49 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
     }));
   }
 
-  private buildMockRows(): DirectorBulkGrantRow[] {
-    return Array.from({ length: 10 }, (_value, index) => {
-      const grantBase = 259365 + index;
-      const applId = 810000 + index;
-      return {
-        applId,
-        grantNumber: `2R01CA${grantBase}-06`,
-        piEmail: 'pi@example.org',
-        institution: 'Example University',
-        institutionCity: 'Bethesda',
-        institutionState: 'MD',
-        recused: '-',
-        doc: 'DCB',
-        pi: index % 2 === 0 ? 'Housley' : 'Lytle',
-        percentile: 13,
-        priorityScore: 29,
-        esi: 'No',
-        docPriority: 2,
-        docRecAmt: 120000,
-        nciDecision: null,
-        nciDirectorNotes: ''
-      };
+  private loadSelectedGrantsFromApi(): void {
+    if (!this.listId) {
+      this.loadErrorMessage = 'Missing list id. Unable to load selected grants.';
+      this.setRows([]);
+      return;
+    }
+
+    this.loadErrorMessage = '';
+    this.fundingSubmissionsService.getListDetail(this.listId).subscribe({
+      next: (detail: any) => {
+        const grants = this.extractGrantsFromDetail(detail);
+        this.setRows(this.mapSelectedGrants(grants));
+      },
+      error: (err) => {
+        this.logger.error('Failed to load grants for Director Bulk Edit', err);
+        this.loadErrorMessage = 'Unable to load selected grants right now. Please return to the list and try again.';
+        this.setRows([]);
+      }
     });
+  }
+
+  private extractGrantsFromDetail(detail: any): FundingSubmissionListGrantDto[] {
+    const candidates = [
+      detail?.grants,
+      detail?.fundingSubmissionListGrants,
+      detail?.fundingSubmissionListGrantDtos,
+      detail?.listGrants,
+      detail?.items
+    ];
+
+    for (const candidate of candidates) {
+      if (Array.isArray(candidate)) {
+        return candidate as FundingSubmissionListGrantDto[];
+      }
+    }
+
+    return [];
+  }
+
+  private setRows(rows: DirectorBulkGrantRow[]): void {
+    this.rows = rows;
+    this.lastSavedRows = JSON.parse(JSON.stringify(rows));
+    this.canSave = false;
+    this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
   }
 }

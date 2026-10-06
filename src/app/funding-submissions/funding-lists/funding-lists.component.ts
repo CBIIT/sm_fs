@@ -46,6 +46,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   listId = 0;
   status = '';
   listStatus = '';
+  loadErrorMessage = '';
   totalNumberOfGrants = 0;
   docRecommendedTotal = 0;
 
@@ -110,9 +111,11 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.pageTitle = params['selectionDate'] || this.pageTitle;
 
       if (this.listId > 0) {
+        this.loadErrorMessage = '';
         this.loadListMeta();
       } else {
-        this.applyMockData('Missing listId in route params');
+        this.loadErrorMessage = 'Missing list id. Unable to load funding list.';
+        this.clearListData();
       }
     });
   }
@@ -413,7 +416,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           extend: 'excel',
           className: 'btn-excel btn-export-all',
           titleAttr: 'Export',
-          text: '<i class="far fa-file-excel me-1"></i>Export',
+          text: 'Export',
           title: null,
           header: true,
           exportOptions: {
@@ -612,17 +615,12 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private loadListMeta(): void {
     this.fundingSubmissionsService.getListDetail(this.listId).subscribe({
       next: (detail: any) => {
+        this.loadErrorMessage = '';
         this.pageTitle = detail.listCode || this.pageTitle;
         this.status = detail.currentStatusDescrip || '';
         this.listStatus = detail.currentStatusDescrip || '';
         const grants = this.extractGrantsFromDetail(detail);
         this.totalNumberOfGrants = detail.totalGrants ?? grants.length;
-
-        if (!grants.length) {
-          this.applyMockData('Backend returned no grants');
-          return;
-        }
-
         this.grants = grants;
         this.docRecommendedTotals = this.buildDocRecommendedTotals(this.grants);
         this.docRecommendedTotal = detail.totalDocRecAmt ?? Object.values(this.docRecommendedTotals).reduce((sum, amount) => sum + amount, 0);
@@ -632,7 +630,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: err => {
         this.logger.error('Failed to load funding list detail', err);
-        this.applyMockData('Backend list detail endpoint is unavailable');
+        this.loadErrorMessage = 'Unable to load funding list data right now. Please try again.';
+        this.clearListData();
       }
     });
   }
@@ -659,76 +658,16 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return [];
   }
 
-  private applyMockData(reason: string): void {
-    this.logger.warn(`Funding Lists using mock data: ${reason}`);
-
-    const mockGrants = this.createMockGrants();
-    this.pageTitle = this.pageTitle || 'Mock Selection Date';
-    this.status = 'Mock Data';
-    this.listStatus = 'Mock Data';
-    this.totalNumberOfGrants = mockGrants.length;
-    this.grants = mockGrants;
-    this.docRecommendedTotals = this.buildDocRecommendedTotals(mockGrants);
-    this.docRecommendedTotal = Object.values(this.docRecommendedTotals).reduce((sum, amount) => sum + amount, 0);
-
+  private clearListData(): void {
+    this.status = '';
+    this.listStatus = '';
+    this.totalNumberOfGrants = 0;
+    this.docRecommendedTotal = 0;
+    this.grants = [];
+    this.docRecommendedTotals = {};
+    this.clearSelections();
     this.ensureSelectedDocIsAvailableForTab();
     this.reloadTable();
-  }
-
-  private createMockGrants(): FundingSubmissionListGrantDto[] {
-    const now = new Date();
-    const docs = ['DCP', 'DCCPS', 'DCTD', 'DCEG'];
-    const decisions: Array<'Approve' | 'Hold' | 'Rejected' | ''> = ['Approve', 'Hold', 'Rejected', '', 'Approve', 'Hold', '', 'Rejected', 'Approve', ''];
-    const reviewStatuses = ['Reviewed', 'Deferred', 'Pending', 'Reviewed', 'Reviewed', 'Deferred', 'Pending', 'Reviewed', 'Reviewed', 'Pending'];
-
-    return Array.from({ length: 10 }, (_v, index) => {
-      const applId = 810000 + index + 1;
-      const addedDate = new Date(now.getTime() - index * 86400000);
-      const reviewDate = new Date(now.getTime() - (index + 1) * 86400000);
-      const decision = decisions[index];
-      const doc = docs[index % docs.length];
-      const annualOrMyf = index % 2 === 0 ? 'A' : 'M';
-      const reductionPct = index % 4 === 0 ? 5 : index % 4 === 1 ? 10 : index % 4 === 2 ? 15 : 0;
-      const docRecommendedAmount = 1200000 - index * 45000;
-      const applicationTotalCostEstimate = 1500000 - index * 50000;
-
-      return {
-        applId,
-        grantNumber: `R01CA${(100000 + index).toString()}`,
-        doc,
-        piName: `MockPI${index + 1}, Test`,
-        piEmail: `mockpi${index + 1}@nih.gov`,
-        institution: `Mock University ${index + 1}`,
-        projectTitle: `Mock Cancer Research Project ${index + 1}`,
-        abstractAvailable: index % 5 !== 0,
-        summaryStatementAvailable: index % 3 !== 0,
-        justificationAvailable: index % 2 === 0,
-        reviewStatus: reviewStatuses[index],
-        reviewStatusDate: reviewDate,
-        budgetCategories: index % 2 === 0 ? 'Competing' : 'Non-competing',
-        impacStatusDescrip: index % 3 === 0 ? 'Awarded' : 'Pending',
-        ncabDate: new Date(2026, (index % 12), 1),
-        percentile: 3 + index,
-        priorityScoreDisplay: `${20 + index}`,
-        esiFlag: index % 2 === 0,
-        applicationTotalCostEstimate,
-        nciDecision: decision,
-        docDecision: index % 2 === 0 ? 'DOC Recommended' : 'DOC Deferred',
-        docPriority: index + 1,
-        docRecommendedAmount,
-        docRecommendedReductionPct: reductionPct,
-        docNciSelection: index % 2 === 0 ? 'D' : 'N',
-        docNciSelectionName: index % 2 === 0 ? 'DOC Selection' : 'NCI Selection',
-        twoYearAnnualFundingR01Flag: index % 3 === 0,
-        annualOrMyf,
-        annualOrMyfName: annualOrMyf === 'A' ? 'Annual Funding' : 'Multi-Year Funding',
-        recusedFlag: index % 4 === 0,
-        nofo: `RFA-CA-26-${(100 + index).toString()}`,
-        dateAdded: addedDate,
-        addedByName: `Analyst ${index + 1}`,
-        addedByEmail: `analyst${index + 1}@nih.gov`
-      } as FundingSubmissionListGrantDto;
-    });
   }
 
   private buildDocRecommendedTotals(grants: FundingSubmissionListGrantDto[]): { [doc: string]: number } {

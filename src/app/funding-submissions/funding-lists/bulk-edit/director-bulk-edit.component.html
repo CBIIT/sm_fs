@@ -13,6 +13,14 @@
     </div>
   </div>
 
+  <div class="row" *ngIf="loadErrorMessage.length > 0">
+    <div class="col-12">
+      <ngb-alert type="danger" [dismissible]="true" (closed)="loadErrorMessage = ''">
+        <span><b>{{loadErrorMessage}}</b></span>
+      </ngb-alert>
+    </div>
+  </div>
+
   <section class="bulk-form mb-4">
     <div class="mb-4" style="max-width: 390px;">
       <label class="form-label fw-semibold" for="bulk-nci-decision">NCI Decision</label>
