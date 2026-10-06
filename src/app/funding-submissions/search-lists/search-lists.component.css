@@ -161,6 +161,7 @@ tr.shown {
   padding: 12px;
   margin: 0;
   cursor: pointer;
+  max-width: 200px;
 }
 
 .send-by-doc-checkbox {

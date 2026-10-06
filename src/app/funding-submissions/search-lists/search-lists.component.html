@@ -67,8 +67,7 @@
     </div>
     <div class="modal-body mx-3">
         <p class="mb-4">
-            All grants returned by the Divisions, Offices, and Centers (DOCs) are selected by default. Review the available grants before sending them to the NCI Director.
-            To exclude grants from being sent, uncheck the box next to that DOC. When ready, click <b>"Send Grants to NCI Director"</b>
+           All grants returned by the Divisions, Offices, and Centers (DOCs) are selected by default. To exclude grants from being sent, uncheck the box next to that DOC. When ready, click "Send Grants to NCI Director". Note: Only grants selected for pay within the selected DOCs will be sent to the NCI Director.
         </p>
         <div class="send-by-doc-grid">
             <label *ngFor="let item of sendByDocDocs" class="send-by-doc-card">
@@ -129,10 +128,8 @@
     <div class="d-flex justify-content-between align-items-center my-3">
         <h2 class="mb-0">{{ selectionDate }}</h2>
         <button *ngIf="isCurrentStatusDraft && !docFundingListCor && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send List to DOCs <i class="fas fa-angle-right ms-1"></i></button>
-        <button *ngIf="currentReviewStatus === 'OEFIA Review' && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsByDocClick()">Send Grants by DOC <i class="fas fa-angle-right ms-1"></i></button>
-        <button *ngIf="hasDocReviewGrants && docFundingListCor && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsToOefiaClick()">Send Grants to OEFIA <i class="fas fa-angle-right ms-1"></i></button>
-        <button *ngIf="currentReviewStatus === '' && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsInDraftClick()">Send Grants to NCI Director <i class="fas fa-angle-right ms-1"></i></button>
-       
+        <button *ngIf="hasSendByDocEligibleGrants && isOEFIACerifier && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsByDocClick()">Send Grants by DOC <i class="fas fa-angle-right ms-1"></i></button>
+        <button *ngIf="hasDocReviewGrants && docFundingListCor && !isNciDirector" class="btn btn-primary" (click)="onSendGrantsToOefiaClick()">Send Grants to OEFIA <i class="fas fa-angle-right ms-1"></i></button>  
     </div>
 
     <!-- Overview -->

@@ -347,6 +347,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.savingInProgress = true;
     this.logger.debug('GrantDetailComponent onSave()', this.formModel, 'listId:', this.listId);
     const { justificationText, ...fields } = this.formModel;
+    const saveFields = this.normalizeFieldsForSave(fields as FundingSubmBulkEditFieldsDto);
     const hasFundingFieldChanges = this.currentFundingSnapshot() !== this.initialFundingSnapshot;
     const hasJustificationTextChange = (justificationText ?? '') !== this.initialJustificationText;
     const hasJustificationChanges = this.justificationFiles.length > 0 || hasJustificationTextChange || this.stagedDeleteDocumentIds.length > 0;
@@ -369,7 +370,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     }
 
     this.fundingSubmissionsService.bulkUpdateListGrants(
-      { applIds: [this.data.applId], fields: fields as FundingSubmBulkEditFieldsDto },
+      { applIds: [this.data.applId], fields: saveFields },
       this.listId
     ).subscribe({
       next: () => {
@@ -427,6 +428,42 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       .map(doc => doc.id)
       .filter((id): id is number => !!id);
     this.recomputeDoNotPayOefiaLock();
+  }
+
+  private normalizeFieldsForSave(fields: FundingSubmBulkEditFieldsDto): FundingSubmBulkEditFieldsDto {
+    return {
+      ...fields,
+      // API expects code values; UI/model can occasionally hold display text.
+      docDecision: this.normalizeOptionValueToId(fields.docDecision, this.decisionOptions),
+      docNciSelection: this.normalizeOptionValueToId(fields.docNciSelection, this.selectionOptions),
+      annualOrMyf: this.normalizeOptionValueToId(fields.annualOrMyf, this.annualMyfOptions),
+      budgetCategories: this.normalizeOptionValueToId(fields.budgetCategories, this.budgetCategoryOptions)
+    };
+  }
+
+  private normalizeOptionValueToId(
+    value: string | null | undefined,
+    options: Select2OptionData[] | null | undefined
+  ): string | null {
+    const rawValue = String(value ?? '').trim();
+    if (!rawValue) {
+      return null;
+    }
+
+    const normalizedRawValue = rawValue.toLowerCase();
+    const optionList = options ?? [];
+
+    const idMatch = optionList.find(option => String(option?.id ?? '').trim().toLowerCase() === normalizedRawValue);
+    if (idMatch) {
+      return String(idMatch.id);
+    }
+
+    const textMatch = optionList.find(option => String(option?.text ?? '').trim().toLowerCase() === normalizedRawValue);
+    if (textMatch) {
+      return String(textMatch.id);
+    }
+
+    return rawValue;
   }
 
   // Determines if the grant was added by OEFIA or if the addedByGroup is null. 

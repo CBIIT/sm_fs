@@ -1381,6 +1381,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  get hasSendByDocEligibleGrants(): boolean {
+    return this.cachedGrants.some(grant => this.isSendByDocEligibleGrant(grant));
+  }
+
   private isDocOnlyUser(): boolean {
     return this.docFundingListCor
       && !this.isOEFIACerifier
@@ -1479,6 +1483,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private onSendGrantsByDoc(): void {
     const byDocCounts = new Map<string, number>();
     for (const grant of this.cachedGrants || []) {
+      if (!this.isSendByDocEligibleGrant(grant)) {
+        continue;
+      }
+
       const doc = String(grant?.doc || '').trim();
       if (!doc) {
         continue;
@@ -1492,6 +1500,33 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.blurActiveElement();
     this.sendGrantsByDocModalRef = this.modalService.open(this.sendGrantsByDocWarningModalRef, { centered: true, size: 'lg' });
+  }
+
+  private isSendByDocEligibleGrant(grant: FundingSubmissionListGrantDto | any): boolean {
+    return this.isGrantInOefiaReview(grant) && this.isGrantDocDecisionPay(grant);
+  }
+
+  private isGrantInOefiaReview(grant: FundingSubmissionListGrantDto | any): boolean {
+    const reviewStatusCode = String(grant?.reviewStatusCode || '').trim().toUpperCase();
+    if (reviewStatusCode) {
+      return reviewStatusCode === 'OEFIAREVIEW';
+    }
+
+    return this.normalizeGrantReviewStatus(grant?.reviewStatus) === 'OEFIA Review';
+  }
+
+  private isGrantDocDecisionPay(grant: FundingSubmissionListGrantDto | any): boolean {
+    const rawDecision = String(grant?.docDecision || '').trim();
+    if (!rawDecision) {
+      return false;
+    }
+
+    if (rawDecision.toUpperCase() === 'PAY') {
+      return true;
+    }
+
+    const displayDecision = String(this.resolveDocDecisionDisplay(rawDecision) || '').trim().toUpperCase();
+    return displayDecision === 'PAY';
   }
 
   onCancelSendGrantsInDraft(): void {

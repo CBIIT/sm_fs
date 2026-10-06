@@ -1206,6 +1206,23 @@ describe('GrantDetailComponent', () => {
       expect(payload.fields.annualOrMyf).toBe('MYF');
     });
 
+    it('onSave() normalizes display-text DOC Decision to the option CODE in payload', () => {
+      component.onEdit();
+      (component as any).decisionOptions = [
+        { id: 'DNP', text: 'Do Not Pay' },
+        { id: 'PAY', text: 'Pay' }
+      ];
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.formModel.docDecision = 'Do Not Pay';
+      component.formModel.docNotes = 'reason entered';
+
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.docDecision).toBe('DNP');
+    });
+
     it('applyFormModelToData() resolves and writes both docNciSelectionName and annualOrMyfName from the selected CODEs', () => {
       component.onEdit();
       component.formModel.docNciSelection = 'DOC';
