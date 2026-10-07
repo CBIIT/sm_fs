@@ -31,7 +31,7 @@
         [data]="decisionOptions"
         [allowClear]="true"
         width="100%"
-        placeholder="Field Placeholder">
+        placeholder="NCI Decision Placeholder">
       </ng-select2>
     </div>
 
@@ -41,9 +41,10 @@
         id="bulk-nci-notes"
         class="form-control"
         rows="5"
-        maxlength="2000"
-        placeholder="Enter text here..."
+        maxlength="1000"
+        placeholder="Enter NCI Director Notes here..."
         [(ngModel)]="bulkNotes"></textarea>
+      <div class="text-end text-muted small">{{ (bulkNotes || '').length }}/1000</div>
     </div>
 
     <div class="d-flex justify-content-end gap-2">
@@ -80,10 +81,10 @@
       <textarea
         class="form-control form-control-sm"
         rows="2"
-        maxlength="2000"
+        maxlength="1000"
         [(ngModel)]="data.nciDirectorNotes"
         (ngModelChange)="onRowChange()"></textarea>
-      <div class="text-end small text-muted">{{ (data.nciDirectorNotes || '').length }}/2000</div>
+      <div class="text-end small text-muted">{{ (data.nciDirectorNotes || '').length }}/1000</div>
     </div>
   </ng-template>
 

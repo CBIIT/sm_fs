@@ -429,15 +429,21 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    const selectedApplIds = selectedGrants
+      .map(grant => Number(grant?.applId))
+      .filter(applId => Number.isFinite(applId) && applId > 0);
+
     this.router.navigate(['/funding-submissions/director-bulk-edit'], {
       queryParams: {
         listId: this.listId,
-        selectionDate: this.pageTitle
+        selectionDate: this.pageTitle,
+        selectedApplIds: selectedApplIds.join(',')
       },
       state: {
         listId: this.listId,
         selectionDate: this.pageTitle,
-        grants: selectedGrants
+        grants: selectedGrants,
+        selectedApplIds
       }
     });
   }

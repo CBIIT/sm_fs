@@ -55,6 +55,7 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
   dtTrigger: Subject<any> = new Subject<any>();
   private lastSavedRows: DirectorBulkGrantRow[] = [];
   private pendingRealignFrame: number | null = null;
+  private selectedApplIds = new Set<number>();
 
   decisionOptions: Select2OptionData[] = [
     { id: 'Approve', text: 'Approve' },
@@ -68,9 +69,20 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
     this.i2eURL = (this.propertiesService.getProperty('I2EWEB_URL') || '').trim();
 
     const state = history.state;
+    this.selectedApplIds = this.parseSelectedApplIds(state?.selectedApplIds);
+    if (!this.selectedApplIds.size) {
+      this.selectedApplIds = this.parseSelectedApplIdsFromCsv(this.route.snapshot.queryParamMap.get('selectedApplIds'));
+    }
+
     const stateGrants = Array.isArray(state?.grants) ? state.grants : [];
     if (stateGrants.length) {
-      this.setRows(this.mapSelectedGrants(stateGrants));
+      this.setRows(this.mapSelectedGrants(this.filterSelectedGrants(stateGrants)));
+      return;
+    }
+
+    if (!this.selectedApplIds.size) {
+      this.loadErrorMessage = 'No selected grants were provided. Please return to the list and select one or more grants.';
+      this.setRows([]);
       return;
     }
 
@@ -355,7 +367,7 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
     this.loadErrorMessage = '';
     this.fundingSubmissionsService.getListDetail(this.listId).subscribe({
       next: (detail: any) => {
-        const grants = this.extractGrantsFromDetail(detail);
+        const grants = this.filterSelectedGrants(this.extractGrantsFromDetail(detail));
         this.setRows(this.mapSelectedGrants(grants));
       },
       error: (err) => {
@@ -382,6 +394,38 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
     }
 
     return [];
+  }
+
+  private parseSelectedApplIds(candidate: any): Set<number> {
+    if (Array.isArray(candidate)) {
+      return new Set(
+        candidate
+          .map(value => Number(value))
+          .filter(value => Number.isFinite(value) && value > 0)
+      );
+    }
+    return new Set<number>();
+  }
+
+  private parseSelectedApplIdsFromCsv(csv: string | null): Set<number> {
+    if (!csv) {
+      return new Set<number>();
+    }
+
+    return new Set(
+      csv
+        .split(',')
+        .map(token => Number(token.trim()))
+        .filter(value => Number.isFinite(value) && value > 0)
+    );
+  }
+
+  private filterSelectedGrants(grants: any[]): any[] {
+    if (!this.selectedApplIds.size) {
+      return grants || [];
+    }
+
+    return (grants || []).filter(grant => this.selectedApplIds.has(Number(grant?.applId)));
   }
 
   private setRows(rows: DirectorBulkGrantRow[]): void {
