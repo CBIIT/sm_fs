@@ -62,10 +62,6 @@
   margin-bottom: 0.4rem;
 }
 
-.doc-summary-item:first-child {
-  padding-left: 0;
-}
-
 .doc-summary-item:last-child {
   border-right: none;
 }
@@ -83,7 +79,6 @@
   background: #0f82c0;
   color: #fff;
   border-color: #0f82c0;
-  box-shadow: none;
 }
 
 .doc-tile.active .count,
@@ -130,10 +125,6 @@ tr.shown {
 
 ::ng-deep .funding-lists-page .dataTables_wrapper .dataTables_info {
   padding-top: 0 !important;
-}
-
-::ng-deep .funding-lists-page .dataTables_wrapper .dataTables_paginate .paginate_button {
-  padding: 0.15rem 0.55rem;
 }
 
 ::ng-deep .funding-lists-page table.dataTable > tbody > tr:not(.child) > td {
@@ -193,39 +184,9 @@ tr.shown {
   z-index: 50 !important;
 }
 
-::ng-deep .funding-lists-page table.dataTable th.dtfc-fixed-left:last-of-type,
-::ng-deep .funding-lists-page table.dataTable td.dtfc-fixed-left:last-of-type {
-  box-shadow: 4px 0 6px -2px rgba(0, 0, 0, .2);
-}
-
-::ng-deep .funding-lists-page table.dataTable th.dtfc-fixed-right:first-of-type,
-::ng-deep .funding-lists-page table.dataTable td.dtfc-fixed-right:first-of-type {
-  box-shadow: -4px 0 6px -2px rgba(0, 0, 0, .2);
-}
-
-::ng-deep .funding-lists-page .dataTables_scrollHead table.dataTable thead th:last-child {
-  box-shadow: inset -1px 0 0 0 #a3a6ad;
-}
-
 ::ng-deep .funding-lists-page table.dataTable thead th.select-checkbox,
 ::ng-deep .funding-lists-page table.dataTable tbody td.select-checkbox {
   text-align: center;
-}
-
-::ng-deep .funding-lists-page .action-cell-wrap .toggle-details {
-  line-height: 1;
-}
-
-::ng-deep .funding-lists-page .action-cell-wrap {
-  padding: 0.35rem 0;
-}
-
-::ng-deep .funding-lists-page .action-cell-wrap .toggle-details i {
-  color: #0f82c0;
-}
-
-::ng-deep .funding-lists-page .action-cell-wrap .process-dropdown-wrap {
-  margin-top: 0.35rem;
 }
 
 ::ng-deep .funding-lists-page .process-dropdown-wrap {
@@ -243,10 +204,4 @@ tr.shown {
 
 ::ng-deep .funding-lists-page .process-dropdown-wrap .process-menu.show {
   display: block;
-}
-
-::ng-deep .funding-lists-page .action-detail-row {
-  background: #f8fafc;
-  border: 1px solid #dbe3ec;
-  border-radius: 0.25rem;
 }
