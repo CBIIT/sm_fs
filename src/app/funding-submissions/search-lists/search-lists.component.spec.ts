@@ -74,12 +74,13 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
     fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
       'getListDetail', 'getListStatusHistory', 'removeGrantsFromList', 'sendListToDocsForReview',
-      'sendListToOefiaForReview'
+      'sendListToOefiaForReview', 'sendListToNciDirectorForReview'
     ]);
     fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({} as any));
     fundingSubmissionsServiceSpy.getListStatusHistory.and.returnValue(of([] as any));
     fundingSubmissionsServiceSpy.sendListToDocsForReview.and.returnValue(of(1 as any));
     fundingSubmissionsServiceSpy.sendListToOefiaForReview.and.returnValue(of(1 as any));
+    fundingSubmissionsServiceSpy.sendListToNciDirectorForReview.and.returnValue(of(1 as any));
 
     const propertiesServiceSpy = jasmine.createSpyObj('AppPropertiesService', ['getProperty']);
     propertiesServiceSpy.getProperty.and.returnValue('http://example/');
@@ -454,6 +455,22 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(fundingSvc.sendListToDocsForReview).toHaveBeenCalledWith(component.listId);
       expect(modalRefSpy.close).toHaveBeenCalled();
       expect(component.sendGrantsToDocsSuccessMessage).toBe('Success! The list has been sent to the assigned DOC contacts for review.');
+    });
+
+    it('onConfirmSendGrantsByDoc() calls sendListToNciDirectorForReview with selected docNonIds', () => {
+      (component as any).sendGrantsByDocModalRef = modalRefSpy;
+      component.sendByDocDocs = [
+        { doc: 'DCB', count: 2, selected: true, docNonIds: [111] },
+        { doc: 'DCP', count: 2, selected: false, docNonIds: [222] },
+        { doc: 'DCEG', count: 1, selected: true, docNonIds: [333] }
+      ];
+
+      component.onConfirmSendGrantsByDoc();
+
+      expect(fundingSubmissionsServiceSpy.sendListToNciDirectorForReview)
+        .toHaveBeenCalledWith({ docNonIds: [111, 333] }, component.listId);
+      expect(fundingSubmissionsServiceSpy.sendListToDocsForReview).not.toHaveBeenCalled();
+      expect(modalRefSpy.close).toHaveBeenCalled();
     });
 
     it('shows Send Grants to OEFIA when at least one caller DOC is in DOC Review', () => {

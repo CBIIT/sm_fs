@@ -106,6 +106,24 @@
   border: 1px solid #d8dee6;
 }
 
+.grant-detail-container {
+  background: #f8f9fa;
+  border-top: 2px solid #dee2e6;
+}
+
+/* Keep expanded detail content pinned to the visible scroll viewport. */
+::ng-deep .funding-lists-page .detail-row-sticky {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+tr.shown {
+  background-color: #eef3ff !important;
+}
+
 .table thead th {
   white-space: nowrap;
 }
@@ -118,15 +136,32 @@
   padding: 0.15rem 0.55rem;
 }
 
-::ng-deep .funding-lists-page .dataTables_wrapper td,
-::ng-deep .funding-lists-page .dataTables_wrapper th {
-  white-space: nowrap;
+::ng-deep .funding-lists-page table.dataTable > tbody > tr:not(.child) > td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+::ng-deep .funding-lists-page .detail-row-sticky td,
+::ng-deep .funding-lists-page .detail-row-sticky th {
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 ::ng-deep .funding-lists-page .dataTables_scrollBody {
   overflow-x: auto !important;
   overflow-y: auto !important;
   max-height: 70vh !important;
+}
+
+::ng-deep .funding-lists-page .dataTables_scrollBody.drag-scroll-enabled {
+  cursor: grab;
+}
+
+::ng-deep .funding-lists-page .dataTables_scrollBody.drag-scroll-enabled.dragging {
+  cursor: grabbing;
+  user-select: none;
 }
 
 ::ng-deep .funding-lists-page table.dataTable {
@@ -170,6 +205,11 @@
 
 ::ng-deep .funding-lists-page .dataTables_scrollHead table.dataTable thead th:last-child {
   box-shadow: inset -1px 0 0 0 #a3a6ad;
+}
+
+::ng-deep .funding-lists-page table.dataTable thead th.select-checkbox,
+::ng-deep .funding-lists-page table.dataTable tbody td.select-checkbox {
+  text-align: center;
 }
 
 ::ng-deep .funding-lists-page .action-cell-wrap .toggle-details {

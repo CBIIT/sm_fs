@@ -7,7 +7,7 @@ import { finalize } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { Select2OptionData } from 'ng-select2';
-import { FundingSubmissionsService, FundingSubmissionListGrantDto, FundingSubmissionListGrantExportRequestDto } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService, FundingSubmissionListGrantDto, FundingSubmissionListGrantExportRequestDto, FundingSubmissionSendToNciDirectorRequestDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { roleNames } from '../../service/role-names';
@@ -98,7 +98,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   sendGrantsModalDescription = 'Clicking yes will send all grants currently in Draft status to the appropriate Division Offices and Centers (DOCs) for Review.';
   sendGrantsModalQuestion = 'Are you sure you want to Continue?';
   private sendGrantsFlow: 'docs' | 'byDoc' = 'docs';
-  sendByDocDocs: Array<{ doc: string; count: number; selected: boolean }> = [];
+  sendByDocDocs: Array<{ doc: string; count: number; selected: boolean; docNonIds: number[] }> = [];
   currentReviewStatus = 'Draft';
   docFundingListCor = false;
   isNciDirector = false;
@@ -361,7 +361,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     const items = Array.from(docMap.values()).map(e => ({
       doc: e.doc,
       count: e.count,
-      status: this.getReviewStatusByRank(e.statusRank)
+      status: this.getReviewStatusByRank(e.statusRank),
+      countDisplay: this.getDocStatusCountDisplay(e.doc, e.count, this.getReviewStatusByRank(e.statusRank), grants)
     }));
     const currentReviewStatus = this.getCurrentReviewStatus(grants);
     this.currentReviewStatus = currentReviewStatus;
@@ -371,6 +372,24 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       columns.push(items.slice(i, i + 4));
     }
     return columns;
+  }
+
+  private getDocStatusCountDisplay(
+    doc: string,
+    totalCount: number,
+    status: string,
+    grants: FundingSubmissionListGrantDto[]
+  ): string {
+    if (status !== 'NCI Director Review') {
+      return String(totalCount);
+    }
+
+    const directorReviewCount = (grants || []).filter(grant => {
+      const sameDoc = String(grant?.doc || '').trim() === doc;
+      return sameDoc && this.normalizeGrantReviewStatus(grant?.reviewStatus) === 'NCI Director Review';
+    }).length;
+
+    return `${directorReviewCount}/${totalCount}`;
   }
 
   // Computes the overall current review status from all grants using precedence:
@@ -1482,7 +1501,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private onSendGrantsByDoc(): void {
-    const byDocCounts = new Map<string, number>();
+    const byDoc = new Map<string, { count: number; docNonIds: Set<number> }>();
     for (const grant of this.cachedGrants || []) {
       if (!this.isSendByDocEligibleGrant(grant)) {
         continue;
@@ -1492,11 +1511,25 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!doc) {
         continue;
       }
-      byDocCounts.set(doc, (byDocCounts.get(doc) || 0) + 1);
+
+      const existing = byDoc.get(doc) || { count: 0, docNonIds: new Set<number>() };
+      existing.count += 1;
+
+      const docNonId = Number(grant?.docNonId);
+      if (Number.isFinite(docNonId) && docNonId > 0) {
+        existing.docNonIds.add(docNonId);
+      }
+
+      byDoc.set(doc, existing);
     }
 
-    this.sendByDocDocs = Array.from(byDocCounts.entries())
-      .map(([doc, count]) => ({ doc, count, selected: true }))
+    this.sendByDocDocs = Array.from(byDoc.entries())
+      .map(([doc, value]) => ({
+        doc,
+        count: value.count,
+        selected: true,
+        docNonIds: Array.from(value.docNonIds.values())
+      }))
       .sort((a, b) => a.doc.localeCompare(b.doc));
 
     this.blurActiveElement();
@@ -1555,20 +1588,36 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    const selectedDocNonIds = Array.from(new Set(
+      this.sendByDocDocs
+        .filter(doc => doc.selected)
+        .flatMap(doc => doc.docNonIds)
+        .filter(docNonId => Number.isFinite(docNonId) && docNonId > 0)
+    ));
+
+    if (!selectedDocNonIds.length) {
+      this.sendGrantsToDocsSuccessMessage = '';
+      this.sendGrantsToDocsErrorMessage = 'Unable to send selected DOC grants to NCI Director right now. Please try again.';
+      return;
+    }
+
+    const request: FundingSubmissionSendToNciDirectorRequestDto = {
+      docNonIds: selectedDocNonIds
+    };
+
     this.sendGrantsFlow = 'byDoc';
     this.isSendGrantsInDraftInProgress = true;
     this.sendGrantsToDocsSuccessMessage = '';
     this.sendGrantsToDocsErrorMessage = '';
     this.sendGrantsByDocModalRef?.close();
-    //TODO Consider passing the selected DOCs to the service instead of sending the entire list.
-    this.fundingSubmissionsService.sendListToDocsForReview(this.listId).pipe(
+    this.fundingSubmissionsService.sendListToNciDirectorForReview(request, this.listId).pipe(
       finalize(() => {
         this.isSendGrantsInDraftInProgress = false;
       })
     ).subscribe({
       next: () => {
         this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
-        this.sendGrantsToDocsSuccessMessage = 'Success! Selected DOC grants have been sent to NCI Director for review.';
+        this.sendGrantsToDocsSuccessMessage = 'Success! The selected grants have been sent to the NCI Director for review.';
         this.cdr.detectChanges();
         this.loadListMeta();
       },
@@ -1598,7 +1647,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         // Reflect the transition immediately in the UI, then rehydrate from server.
         this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
         this.sendGrantsToDocsSuccessMessage = this.sendGrantsFlow === 'byDoc'
-          ? 'Success! Selected DOC grants have been sent to NCI Director for review.'
+          ? 'Success! The selected grants have been sent to the NCI Director for review.'
           : 'Success! The list has been sent to the assigned DOC contacts for review.';
         this.cdr.detectChanges();
         this.loadListMeta();

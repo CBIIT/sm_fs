@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EnvironmentInjector, OnDestroy, OnInit, TemplateRef, ViewChild, createComponent } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EnvironmentInjector, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild, createComponent } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -89,6 +89,49 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private decisionsLocked = false;
 
   private detailComponentsByApplId = new Map<number, any>();
+  private dragScrollContainerEl: HTMLElement | null = null;
+  private dragScrollBodyEl: HTMLElement | null = null;
+  private dragPointerId: number | null = null;
+  private dragStartX = 0;
+  private dragStartScrollLeft = 0;
+  private readonly dragScrollIgnoreSelector = 'a, button, input, select, textarea, label, thead, th, .dataTables_paginate, .dataTables_paginate *, .dt-paging-button, .select-checkbox, .toggle-details, .process-toggle, .process-option, .select2, .select2-container, .select2-selection, .select2-selection__rendered, .select2-selection__arrow';
+
+  private readonly onHorizontalDragPointerDown = (event: PointerEvent): void => {
+    if (!this.dragScrollBodyEl || !this.dragScrollContainerEl) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+    const target = event.target as HTMLElement | null;
+    if (target?.closest(this.dragScrollIgnoreSelector)) {
+      return;
+    }
+
+    this.dragPointerId = event.pointerId;
+    this.dragStartX = event.clientX;
+    this.dragStartScrollLeft = this.dragScrollBodyEl.scrollLeft;
+    this.dragScrollBodyEl.classList.add('dragging');
+    this.dragScrollContainerEl.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  };
+
+  private readonly onHorizontalDragPointerMove = (event: PointerEvent): void => {
+    if (!this.dragScrollBodyEl) return;
+    if (this.dragPointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - this.dragStartX;
+    this.dragScrollBodyEl.scrollLeft = this.dragStartScrollLeft - deltaX;
+    event.preventDefault();
+  };
+
+  private readonly onHorizontalDragPointerEnd = (event: PointerEvent): void => {
+    if (!this.dragScrollBodyEl || !this.dragScrollContainerEl) return;
+    if (this.dragPointerId !== event.pointerId) return;
+
+    this.dragScrollBodyEl.classList.remove('dragging');
+    if (this.dragScrollContainerEl.hasPointerCapture(event.pointerId)) {
+      this.dragScrollContainerEl.releasePointerCapture(event.pointerId);
+    }
+    this.dragPointerId = null;
+  };
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -158,9 +201,9 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           data: 'applId',
           orderable: false,
           width: '30px',
-          className: 'all',
+          className: 'all select-checkbox',
           defaultContent: '',
-          render: (data: number) => `<input type="checkbox" class="grant-select-checkbox" data-appl-id="${data ?? ''}" aria-label="Select grant">`
+          render: () => ''
         },
         {
           title: 'DOC',
@@ -349,21 +392,31 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         });
 
-        const checkbox = (row as HTMLElement).querySelector('.grant-select-checkbox') as HTMLInputElement | null;
-        if (checkbox) {
-          checkbox.checked = this.selectedRows.has(Number((data as any).applId));
+        const $cb = $('.select-checkbox', row);
+        if (this.selectedRows.has(Number((data as any).applId))) {
+          $cb.addClass('selected');
+        } else {
+          $cb.removeClass('selected');
         }
+      },
+      headerCallback: (thead: Node, _data: any[]) => {
+        $('.select-checkbox', thead).removeClass('selected').off('click');
       },
       drawCallback: () => {
         this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
           dt.columns.adjust();
+          this.syncExpandedDetailWidths(dt);
+          this.bindHorizontalDragScroll(dt);
           this.bindSelectionEvents(dt);
           this.bindActionEvents(dt);
           this.bindDocLinkEvents(dt);
         });
       },
       initComplete: () => {
-        this.dtElement?.dtInstance?.then((dt: DataTables.Api) => dt.columns.adjust());
+        this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+          dt.columns.adjust();
+          this.bindHorizontalDragScroll(dt);
+        });
       }
     };
 
@@ -406,6 +459,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.unbindHorizontalDragScroll();
     this.confirmDecisionsModalRef?.close();
     this.grantDecisionModalRef?.close();
     this.detailComponentsByApplId.forEach(componentRef => componentRef?.destroy?.());
@@ -414,6 +468,14 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.dtTrigger && !this.dtTrigger.closed) {
       this.dtTrigger.unsubscribe();
     }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+      dt.columns.adjust();
+      this.syncExpandedDetailWidths(dt);
+    });
   }
 
   selectTab(tabId: NciTabId): void {
@@ -624,28 +686,125 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private bindSelectionEvents(dt: DataTables.Api): void {
-    const $tableBody = $(dt.table(0).body());
-    $tableBody
-      .off('change', '.grant-select-checkbox')
-      .on('change', '.grant-select-checkbox', (event: any) => {
-        const checkbox = event.currentTarget as HTMLInputElement;
-        const applId = Number(checkbox?.getAttribute('data-appl-id'));
+    const $container = $(dt.table(0).container());
+    this.stampCheckboxApplIds(dt, $container);
+
+    $container
+      .off('click.fundingSelectAll', 'thead .select-checkbox')
+      .on('click.fundingSelectAll', 'thead .select-checkbox', () => {
+        const $headers = $container.find('thead .select-checkbox');
+        const shouldSelectAll = !$headers.first().hasClass('selected');
+
+        if (!shouldSelectAll) {
+          $headers.removeClass('selected');
+          $container.find('tbody .select-checkbox').removeClass('selected');
+          this.selectedRows.clear();
+          this.cdr.markForCheck();
+          return;
+        }
+
+        $headers.addClass('selected');
+        $container.find('tbody .select-checkbox').addClass('selected');
+
+        this.selectedRows.clear();
+        const rows = dt.rows({ search: 'applied' }).data().toArray() as FundingSubmissionListGrantDto[];
+        rows.forEach((row: FundingSubmissionListGrantDto) => {
+          const applId = Number(row?.applId);
+          if (Number.isFinite(applId)) {
+            this.selectedRows.set(applId, row);
+          }
+        });
+
+        this.cdr.markForCheck();
+      });
+
+    $container
+      .off('click.fundingSelectRow', 'tbody .select-checkbox')
+      .on('click.fundingSelectRow', 'tbody .select-checkbox', (event: any) => {
+        const cell = event.currentTarget as HTMLElement;
+        const applIdAttr = this.resolveCheckboxApplId(dt, cell);
+        const applId = Number(applIdAttr);
         if (!Number.isFinite(applId)) {
           return;
         }
 
-        const row = this.grants.find(grant => Number(grant.applId) === applId);
-        if (!row) {
+        const currentRows = dt.rows({ search: 'applied' }).data().toArray() as FundingSubmissionListGrantDto[];
+        const rowData = currentRows.find((row: FundingSubmissionListGrantDto) => Number(row?.applId) === applId);
+        if (!rowData) {
           return;
         }
 
-        if (checkbox.checked) {
-          this.selectedRows.set(applId, row);
+        const shouldSelect = !$(cell).hasClass('selected');
+        $container.find(`tbody .select-checkbox[data-applid="${applId}"]`).toggleClass('selected', shouldSelect);
+
+        if (shouldSelect) {
+          this.selectedRows.set(applId, rowData);
         } else {
           this.selectedRows.delete(applId);
         }
+
+        this.syncHeaderSelectionState(dt, $container);
         this.cdr.markForCheck();
       });
+
+    this.syncHeaderSelectionState(dt, $container);
+  }
+
+  private syncHeaderSelectionState(dt: DataTables.Api, container: JQuery<HTMLElement>): void {
+    const rows = dt.rows({ search: 'applied' }).data().toArray() as FundingSubmissionListGrantDto[];
+    const hasRows = rows.length > 0;
+    const allSelected = hasRows && rows.every((row: FundingSubmissionListGrantDto) => {
+      const applId = Number(row?.applId);
+      return Number.isFinite(applId) && this.selectedRows.has(applId);
+    });
+
+    container.find('thead .select-checkbox').toggleClass('selected', allSelected);
+  }
+
+  private stampCheckboxApplIds(dt: DataTables.Api, container: JQuery<HTMLElement>): void {
+    const currentRows = dt.rows({ page: 'current', order: 'current', search: 'applied' }).data().toArray() as FundingSubmissionListGrantDto[];
+    container.find('tbody').each(function() {
+      const $checkboxCells = $(this).find('td.select-checkbox');
+      $checkboxCells.each((checkboxIndex: number, cellEl: Element) => {
+        let applIdValue = '';
+        const $row = $(cellEl).closest('tr');
+        const dtRowIndexAttr = String($row.attr('data-dt-row') || '').trim();
+        if (dtRowIndexAttr && !isNaN(Number(dtRowIndexAttr))) {
+          const rowData = dt.row(Number(dtRowIndexAttr)).data() as FundingSubmissionListGrantDto;
+          if (rowData?.applId != null) {
+            applIdValue = String(rowData.applId);
+          }
+        }
+
+        if (!applIdValue) {
+          const applId = currentRows[checkboxIndex]?.applId;
+          applIdValue = applId != null ? String(applId) : '';
+        }
+
+        $(cellEl).attr('data-applid', applIdValue);
+      });
+    });
+  }
+
+  private resolveCheckboxApplId(dt: DataTables.Api, checkboxEl: Element): string {
+    const stampedApplId = String($(checkboxEl).attr('data-applid') || '').trim();
+    if (stampedApplId) {
+      return stampedApplId;
+    }
+
+    const $row = $(checkboxEl).closest('tr');
+    const dtRowIndexAttr = String($row.attr('data-dt-row') || '').trim();
+    if (dtRowIndexAttr && !isNaN(Number(dtRowIndexAttr))) {
+      const rowData = dt.row(Number(dtRowIndexAttr)).data() as FundingSubmissionListGrantDto;
+      if (rowData?.applId != null) {
+        return String(rowData.applId);
+      }
+    }
+
+    const checkboxIndex = $(checkboxEl).closest('tbody').find('td.select-checkbox').index(checkboxEl);
+    const currentRows = dt.rows({ page: 'current', order: 'current', search: 'applied' }).data().toArray() as FundingSubmissionListGrantDto[];
+    const fallbackRow = checkboxIndex >= 0 ? currentRows[checkboxIndex] : null;
+    return fallbackRow?.applId != null ? String(fallbackRow.applId) : '';
   }
 
   private bindDocLinkEvents(dt: DataTables.Api): void {
@@ -708,13 +867,6 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         if ($toggle.hasClass('disabled')) {
           return;
         }
-        const applId = Number($toggle.data('appl-id'));
-        const tr = $toggle.closest('tr');
-        if (Number.isFinite(applId)) {
-          const row = dt.row(tr as any);
-          const rowData = row.data() as FundingSubmissionListGrantDto;
-          this.ensureGrantRowExpanded(applId, row, tr, rowData);
-        }
         const $menu = $toggle.siblings('.process-menu');
         $tableBody.find('.process-menu').not($menu).removeClass('show');
         $tableBody.find('td').removeClass('menu-open');
@@ -739,7 +891,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         const row = dt.row(tr as any);
         const rowData = row.data() as FundingSubmissionListGrantDto;
 
-        this.onProcessDecisionSelect(applId, decision as 'Approve' | 'Hold' | 'Rejected', row, tr, rowData);
+        this.onProcessDecisionSelect(applId, decision as 'Approve' | 'Hold' | 'Rejected', undefined, undefined, rowData);
         $option.closest('.process-menu').removeClass('show');
         $option.closest('td').removeClass('menu-open');
         this.cdr.markForCheck();
@@ -782,12 +934,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getAnnualOrMyfDisplay(row: FundingSubmissionListGrantDto): string {
     const code = this.normalizeValue(row?.annualOrMyf);
-    if (code === 'A') return 'AF';
-    if (code === 'M') return 'MYF';
-
-    const name = this.normalizeValue(row?.annualOrMyfName);
-    if (name.includes('ANNUAL')) return 'AF';
-    if (name.includes('MYF')) return 'MYF';
+    if (code === 'AF') return 'AF';
+    if (code === 'MYF') return 'MYF';
     return '';
   }
 
@@ -949,6 +1097,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     row.child(hostElement).show();
     tr.addClass('shown');
+    this.syncExpandedDetailWidths();
     toggleIcon.removeClass('fa-plus-circle').addClass('fa-minus-circle');
   }
 
@@ -995,6 +1144,69 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private reloadTable(): void {
     this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+  }
+
+  private syncExpandedDetailWidths(dt?: DataTables.Api): void {
+    const applyWidth = (container: HTMLElement | null): void => {
+      if (!container) {
+        return;
+      }
+
+      const scrollBody = container.querySelector('.dataTables_scrollBody') as HTMLElement | null;
+      const detailRows = container.querySelectorAll('.detail-row-sticky') as NodeListOf<HTMLElement>;
+      const width = scrollBody?.clientWidth || 0;
+
+      if (!width || !detailRows.length) {
+        return;
+      }
+
+      detailRows.forEach((detailRow: HTMLElement) => {
+        detailRow.style.width = `${width}px`;
+      });
+    };
+
+    if (dt) {
+      applyWidth(dt.table(0).container() as HTMLElement | null);
+      return;
+    }
+
+    this.dtElement?.dtInstance?.then((dtInstance: DataTables.Api) => {
+      applyWidth(dtInstance.table(0).container() as HTMLElement | null);
+    });
+  }
+
+  private bindHorizontalDragScroll(dt: DataTables.Api): void {
+    const container = dt.table(0).container() as HTMLElement | null;
+    const nextScrollBody = container?.querySelector('.dataTables_scrollBody') as HTMLElement | null;
+    const nextDragContainer = container as HTMLElement | null;
+    if (!nextScrollBody || !nextDragContainer) return;
+    if (this.dragScrollBodyEl === nextScrollBody && this.dragScrollContainerEl === nextDragContainer) return;
+
+    this.unbindHorizontalDragScroll();
+    this.dragScrollContainerEl = nextDragContainer;
+    this.dragScrollBodyEl = nextScrollBody;
+    this.dragScrollBodyEl.classList.add('drag-scroll-enabled');
+    this.dragScrollContainerEl.addEventListener('pointerdown', this.onHorizontalDragPointerDown);
+    this.dragScrollContainerEl.addEventListener('pointermove', this.onHorizontalDragPointerMove);
+    this.dragScrollContainerEl.addEventListener('pointerup', this.onHorizontalDragPointerEnd);
+    this.dragScrollContainerEl.addEventListener('pointercancel', this.onHorizontalDragPointerEnd);
+    this.dragScrollContainerEl.addEventListener('lostpointercapture', this.onHorizontalDragPointerEnd);
+  }
+
+  private unbindHorizontalDragScroll(): void {
+    if (!this.dragScrollBodyEl && !this.dragScrollContainerEl) return;
+
+    this.dragScrollBodyEl?.classList.remove('dragging');
+    this.dragScrollBodyEl?.classList.remove('drag-scroll-enabled');
+    this.dragScrollContainerEl?.removeEventListener('pointerdown', this.onHorizontalDragPointerDown);
+    this.dragScrollContainerEl?.removeEventListener('pointermove', this.onHorizontalDragPointerMove);
+    this.dragScrollContainerEl?.removeEventListener('pointerup', this.onHorizontalDragPointerEnd);
+    this.dragScrollContainerEl?.removeEventListener('pointercancel', this.onHorizontalDragPointerEnd);
+    this.dragScrollContainerEl?.removeEventListener('lostpointercapture', this.onHorizontalDragPointerEnd);
+
+    this.dragScrollContainerEl = null;
+    this.dragScrollBodyEl = null;
+    this.dragPointerId = null;
   }
 
   private static formatReviewStatusWithDate(
