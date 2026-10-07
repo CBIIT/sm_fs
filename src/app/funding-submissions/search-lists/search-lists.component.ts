@@ -1646,7 +1646,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       const $body = $(dt.table(0).body());
       $body.find('tr.shown').removeClass('shown');
       $body.find('.toggle-details i').removeClass('fa-minus-circle').addClass('fa-plus-circle');
-      dt.order([17, 'desc']).search('').columns().search('').page.len(100);
+      dt.order([19, 'desc']).search('').columns().search('').page.len(100);
       dt.ajax.reload();
     });
   }
