@@ -26,9 +26,6 @@ interface ProcessOption {
 interface DocSummary {
   doc: string;
   recommendedTotal: number;
-  approvedCount: number;
-  rejectedCount: number;
-  onHoldCount: number;
 }
 
 @Component({
@@ -55,7 +52,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   i2eURL = '';
 
   selectedTab: NciTabId = 'all';
-  selectedDoc = 'All DOCs';
+  selectedDoc = '';
   selectedViewDoc: string = null;
   selectedRows = new Map<number, FundingSubmissionListGrantDto>();
 
@@ -72,7 +69,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     { id: 'approved', label: 'Approved' },
     { id: 'hold', label: 'On Hold' },
     { id: 'rejected', label: 'Rejected' },
-    { id: 'recusals', label: 'Recusal Institutions' }
+    { id: 'recusals', label: 'Recusals' }
   ];
 
   grants: FundingSubmissionListGrantDto[] = [];
@@ -157,6 +154,42 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           render: (data: number) => `<input type="checkbox" class="grant-select-checkbox" data-appl-id="${data ?? ''}" aria-label="Select grant">`
         },
         {
+          title: 'DOC',
+          data: 'doc',
+          width: '50px',
+          defaultContent: ''
+        },
+        {
+          title: 'PI',
+          data: 'piName',
+          width: '130px',
+          defaultContent: '',
+          render: (data: string, _t: any, row: any) => {
+            if (!data) return '';
+            const subject = this.getPiMailSubject(row);
+            return `<a href="mailto:${row.piEmail}?subject=${encodeURIComponent(subject)}">${data}</a>`;
+          }
+        },
+        {
+          title: 'Grant Number',
+          data: 'grantNumber',
+          width: '140px',
+          ngTemplateRef: { ref: this.fullGrantNumberRenderer },
+          className: 'all'
+        },
+        {
+          title: 'Institution',
+          data: 'institution',
+          width: '150px',
+          defaultContent: ''
+        },
+        {
+          title: 'Project Title',
+          data: 'projectTitle',
+          width: '180px',
+          defaultContent: ''
+        },
+        {
           title: 'Abs',
           data: 'abstractAvailable',
           width: '40px',
@@ -173,25 +206,12 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
             data ? `<a href="#" class="doc-open-link" data-doc-type="SS" data-appl-id="${row.applId}">Y</a>` : ''
         },
         {
-          title: 'Jus.',
+          title: 'Justification',
           data: 'justificationAvailable',
-          width: '40px',
+          width: '90px',
           defaultContent: '',
           render: (data: boolean, _t: any, row: any) =>
             data ? `<a href="#" class="doc-open-link" data-doc-type="JST" data-appl-id="${row.applId}">Y</a>` : ''
-        },
-        {
-          title: 'Grant Number',
-          data: 'grantNumber',
-          width: '140px',
-          ngTemplateRef: { ref: this.fullGrantNumberRenderer },
-          className: 'all'
-        },
-        {
-          title: 'DOC',
-          data: 'doc',
-          width: '50px',
-          defaultContent: ''
         },
         {
           title: 'Review status',
@@ -217,76 +237,11 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         },
         {
-          title: 'Budget Categories',
-          data: 'budgetCategories',
-          width: '110px',
-          defaultContent: ''
-        },
-        {
-          title: 'PI',
-          data: 'piName',
-          width: '130px',
-          defaultContent: '',
-          render: (data: string, _t: any, row: any) => {
-            if (!data) return '';
-            const subject = this.getPiMailSubject(row);
-            return `<a href="mailto:${row.piEmail}?subject=${encodeURIComponent(subject)}">${data}</a>`;
-          }
-        },
-        {
-          title: 'Institution',
-          data: 'institution',
-          width: '150px',
-          defaultContent: ''
-        },
-        {
-          title: 'Project Title',
-          data: 'projectTitle',
-          width: '180px',
-          defaultContent: ''
-        },
-        {
-          title: 'IMPAC II Status',
-          data: 'impacStatusDescrip',
-          width: '100px',
-          defaultContent: ''
-        },
-        {
-          title: 'NCAB',
-          data: 'ncabDate',
-          width: '70px',
-          defaultContent: '',
-          render: (data: any) => {
-            if (!data) return '';
-            const d = new Date(data);
-            return Number.isNaN(d.getTime()) ? data : `${d.getMonth() + 1}/${d.getFullYear()}`;
-          }
-        },
-        {
-          title: 'Pctl',
-          data: 'percentile',
-          width: '50px',
-          defaultContent: '',
-          render: (data: number) => data != null ? `${data}%` : ''
-        },
-        {
-          title: 'PriScr',
-          data: 'priorityScoreDisplay',
-          width: '90px',
-          defaultContent: ''
-        },
-        {
           title: 'ESI',
           data: 'esiFlag',
           width: '50px',
           defaultContent: '',
           render: (data: boolean) => data === true ? 'Yes' : data === false ? 'No' : ''
-        },
-        {
-          title: 'Application TC Est',
-          data: 'applicationTotalCostEstimate',
-          width: '110px',
-          defaultContent: ''
         },
         {
           title: 'NCI Decision',
@@ -307,32 +262,11 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           defaultContent: ''
         },
         {
-          title: 'DOC Rec. $',
-          data: 'docRecommendedAmount',
-          width: '90px',
-          defaultContent: '',
-          render: (data: number) => data != null ? '$' + Number(data).toLocaleString('en-US') : ''
-        },
-        {
-          title: 'DOC Rec. % Red.',
-          data: 'docRecommendedReductionPct',
-          width: '95px',
-          defaultContent: '',
-          render: (data: number) => data != null ? `${data}%` : ''
-        },
-        {
           title: 'DOC/NCI Sel',
           data: 'docNciSelectionName',
           width: '100px',
           defaultContent: '',
           render: (_data: string, _t: any, row: FundingSubmissionListGrantDto) => this.getDocNciSelectionDisplay(row)
-        },
-        {
-          title: 'Two-Year Annual Funding R01 (HRHR)?',
-          data: 'twoYearAnnualFundingR01Flag',
-          width: '160px',
-          defaultContent: '',
-          render: (data: boolean) => data ? 'Y' : ''
         },
         {
           title: 'Annual or MYF',
@@ -347,36 +281,6 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           width: '70px',
           defaultContent: '',
           render: (data: boolean) => data ? 'Y' : ''
-        },
-        {
-          title: 'NOFO',
-          data: 'nofo',
-          width: '80px',
-          defaultContent: '',
-          ngTemplateRef: { ref: this.foaCellRender }
-        },
-        {
-          title: 'Date Added',
-          data: 'dateAdded',
-          width: '120px',
-          defaultContent: '',
-          render: (data: any) => {
-            if (!data) return '';
-            const d = new Date(data);
-            if (Number.isNaN(d.getTime())) return data;
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            const hh = String(d.getHours()).padStart(2, '0');
-            const min = String(d.getMinutes()).padStart(2, '0');
-            return `${mm}/${dd}/${d.getFullYear()} ${hh}:${min}`;
-          }
-        },
-        {
-          title: 'Added By',
-          data: 'addedByName',
-          width: '80px',
-          defaultContent: '',
-          render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.addedByEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>` : ''
         },
         {
           title: 'Action',
@@ -420,11 +324,11 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           title: null,
           header: true,
           exportOptions: {
-            columns: Array.from({ length: 28 }, (_v, i) => i + 1)
+            columns: Array.from({ length: 17 }, (_v, i) => i + 1)
           }
         }
       ],
-      order: [[9, 'desc']],
+      order: [[13, 'asc']],
       fixedColumns: { left: 1, right: 1 },
       rowCallback: (row: Node, data: FundingSubmissionListGrantDto) => {
         this.dtOptions.columns.forEach((column: any, ind: number) => {
@@ -542,18 +446,21 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get docs(): string[] {
-    return Array.from(new Set(this.grants.map(grant => String(grant.doc || '').trim()).filter(doc => !!doc))).sort();
+    const docsForTab = this.grants
+      .filter(grant => this.matchesTab(grant))
+      .map(grant => String(grant.doc || '').trim())
+      .filter(doc => !!doc);
+    return Array.from(new Set(docsForTab)).sort();
   }
 
   get availableDocs(): string[] {
-    const docsForTab = this.docs.filter(doc => this.getDocCount(doc) > 0);
-    return ['All DOCs', ...docsForTab];
+    return this.docs.filter(doc => this.getDocCount(doc) > 0);
   }
 
   get filteredGrants(): FundingSubmissionListGrantDto[] {
     return this.grants.filter(grant => {
       const tabMatch = this.matchesTab(grant);
-      const docMatch = this.selectedDoc === 'All DOCs' || this.normalizeValue(grant.doc) === this.normalizeValue(this.selectedDoc);
+      const docMatch = !this.selectedDoc || this.normalizeValue(grant.doc) === this.normalizeValue(this.selectedDoc);
       return tabMatch && docMatch;
     });
   }
@@ -563,9 +470,6 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getDocCount(doc: string): number {
-    if (doc === 'All DOCs') {
-      return this.grants.filter(grant => this.matchesTab(grant)).length;
-    }
     const normalizedDoc = this.normalizeValue(doc);
     return this.grants.filter(grant => {
       const tabMatch = this.matchesTab(grant);
@@ -575,27 +479,31 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get showSelectedDocSummary(): boolean {
-    return this.selectedDoc !== 'All DOCs';
+    return !!this.selectedDoc;
   }
 
   get selectedDocSummary(): DocSummary {
     const selectedDoc = this.selectedDoc;
     const normalizedDoc = this.normalizeValue(selectedDoc);
-    const docRows = this.grants.filter(grant => this.normalizeValue(grant.doc) === normalizedDoc);
-
-    const countByDecision = (decision: 'Approve' | 'Rejected' | 'Hold'): number =>
-      docRows.filter(grant => this.normalizeValue(grant.nciDecision) === this.normalizeValue(decision)).length;
+    const docRows = this.grants.filter(grant =>
+      this.isInNciDirectorReview(grant) && this.normalizeValue(grant.doc) === normalizedDoc
+    );
+    const recommendedTotal = docRows.reduce((sum, grant) => {
+      const amount = Number(grant.docRecommendedAmount ?? 0);
+      return sum + (Number.isFinite(amount) ? amount : 0);
+    }, 0);
 
     return {
       doc: selectedDoc,
-      recommendedTotal: this.docRecommendedTotals[selectedDoc] || 0,
-      approvedCount: countByDecision('Approve'),
-      rejectedCount: countByDecision('Rejected'),
-      onHoldCount: countByDecision('Hold')
+      recommendedTotal
     };
   }
 
   private matchesTab(grant: FundingSubmissionListGrantDto, tabId: NciTabId = this.selectedTab): boolean {
+    if (!this.isInNciDirectorReview(grant)) {
+      return false;
+    }
+
     const decision = this.normalizeValue(grant.nciDecision);
     const recused = grant.recusedFlag === true;
 
@@ -606,6 +514,16 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (tabId === 'rejected') return decision === 'REJECTED';
     if (tabId === 'recusals') return recused;
     return true;
+  }
+
+  private isInNciDirectorReview(grant: FundingSubmissionListGrantDto): boolean {
+    const reviewStatusCode = this.normalizeValue((grant as any)?.reviewStatusCode);
+    if (reviewStatusCode) {
+      return reviewStatusCode === 'DIRECTORREVIEW';
+    }
+
+    const reviewStatus = this.normalizeValue(grant?.reviewStatus);
+    return reviewStatus.includes('DIRECTOR');
   }
 
   private normalizeValue(value: string | null | undefined): string {
@@ -625,6 +543,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.docRecommendedTotals = this.buildDocRecommendedTotals(this.grants);
         this.docRecommendedTotal = detail.totalDocRecAmt ?? Object.values(this.docRecommendedTotals).reduce((sum, amount) => sum + amount, 0);
 
+        this.selectDefaultDirectorTab();
         this.ensureSelectedDocIsAvailableForTab();
         this.reloadTable();
       },
@@ -672,6 +591,10 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private buildDocRecommendedTotals(grants: FundingSubmissionListGrantDto[]): { [doc: string]: number } {
     return grants.reduce((acc: { [doc: string]: number }, grant: FundingSubmissionListGrantDto) => {
+      if (!this.isInNciDirectorReview(grant)) {
+        return acc;
+      }
+
       const doc = String(grant.doc || '').trim();
       if (!doc) {
         return acc;
@@ -683,14 +606,14 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private ensureSelectedDocIsAvailableForTab(): void {
-    if (this.selectedDoc === 'All DOCs') {
-      return;
-    }
-
     const availableSet = new Set(this.availableDocs.map(doc => this.normalizeValue(doc)));
-    if (!availableSet.has(this.normalizeValue(this.selectedDoc))) {
-      this.selectedDoc = 'All DOCs';
+    if (!this.selectedDoc || !availableSet.has(this.normalizeValue(this.selectedDoc))) {
+      this.selectedDoc = this.availableDocs.length ? this.availableDocs[0] : '';
     }
+  }
+
+  private selectDefaultDirectorTab(): void {
+    this.selectedTab = this.getTabCount('pending') > 0 ? 'pending' : 'all';
   }
 
   private bindSelectionEvents(dt: DataTables.Api): void {

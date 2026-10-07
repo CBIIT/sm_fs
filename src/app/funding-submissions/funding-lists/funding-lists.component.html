@@ -18,7 +18,7 @@
   </ng-template>
 
   <a class="text-decoration-none small" routerLink="/funding-submissions/lists">
-    <i class="far fa-chevron-left me-1"></i>Back to Lists
+    <i class="far fa-chevron-left me-1"></i>Back to Search Lists View
   </a>
 
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-4">
@@ -69,18 +69,6 @@
       <span class="label">{{ selectedDocSummary.doc }} Recommended Total:</span>
       <span>{{ selectedDocSummary.recommendedTotal | currency:'USD':'symbol':'1.0-0' }}</span>
     </div>
-    <div class="doc-summary-item">
-      <span class="label">Approved:</span>
-      <span>{{ selectedDocSummary.approvedCount }}</span>
-    </div>
-    <div class="doc-summary-item">
-      <span class="label">Rejected:</span>
-      <span>{{ selectedDocSummary.rejectedCount }}</span>
-    </div>
-    <div class="doc-summary-item">
-      <span class="label">On Hold:</span>
-      <span>{{ selectedDocSummary.onHoldCount }}</span>
-    </div>
   </section>
 
   <section class="results card mb-5">
@@ -88,6 +76,11 @@
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h2 class="h3 mb-0">{{ tabTitle }}</h2>
       </div>
+
+      <p class="alert alert-primary col-12">
+        <i class="far fa-info-circle"></i>
+        To apply sorting order to multiple columns, hold down the <b>Shift</b> key and click the header of each additional column that you want to sort. Please note, sorting by column headers will unselect any selected rows.
+      </p>
 
       <div class="mb-3">
         <button type="button" class="btn btn-primary" (click)="goToDirectorBulkEdit()" [disabled]="selectedRows.size === 0">

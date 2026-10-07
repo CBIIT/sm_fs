@@ -1559,7 +1559,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sendGrantsToDocsSuccessMessage = '';
     this.sendGrantsToDocsErrorMessage = '';
     this.sendGrantsByDocModalRef?.close();
-
+    //TODO Consider passing the selected DOCs to the service instead of sending the entire list.
     this.fundingSubmissionsService.sendListToDocsForReview(this.listId).pipe(
       finalize(() => {
         this.isSendGrantsInDraftInProgress = false;
