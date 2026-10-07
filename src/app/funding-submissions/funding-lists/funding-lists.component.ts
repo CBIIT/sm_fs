@@ -38,6 +38,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('foaCellRender') foaCellRender: TemplateRef<FoaCellRendererComponent>;
   @ViewChild('confirmDecisionsWarningModal') private confirmDecisionsWarningModalRef: TemplateRef<any>;
+  @ViewChild('grantDecisionModal') private grantDecisionModalTemplateRef: TemplateRef<any>;
 
   pageTitle = '';
   listId = 0;
@@ -46,6 +47,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   loadErrorMessage = '';
   totalNumberOfGrants = 0;
   docRecommendedTotal = 0;
+  decisionSuccessMessage = '';
 
   grantViewerUrl = '';
   eGrantsUrl = '';
@@ -78,6 +80,13 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
   private confirmDecisionsModalRef: NgbModalRef;
+  private grantDecisionModalRef: NgbModalRef;
+  private pendingDecision: ProcessOption['value'] | null = null;
+  private pendingDecisionGrant: FundingSubmissionListGrantDto | null = null;
+  private pendingDecisionGrantNumber = '';
+  pendingDecisionNote = '';
+  pendingDecisionValidationMessage = '';
+  private decisionsLocked = false;
 
   private detailComponentsByApplId = new Map<number, any>();
 
@@ -391,11 +400,14 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   onProceedConfirmDecisions(): void {
     // Confirmation only for now; locking decisions is handled by the backend flow
     // once the endpoint is available for this page.
+    this.decisionsLocked = true;
     this.confirmDecisionsModalRef?.close();
+    this.reloadTable();
   }
 
   ngOnDestroy(): void {
     this.confirmDecisionsModalRef?.close();
+    this.grantDecisionModalRef?.close();
     this.detailComponentsByApplId.forEach(componentRef => componentRef?.destroy?.());
     this.detailComponentsByApplId.clear();
 
@@ -689,9 +701,19 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
       .on('click', '.process-toggle', (event: any) => {
         event.preventDefault();
         event.stopPropagation();
+        if (this.decisionsLocked) {
+          return;
+        }
         const $toggle = $(event.currentTarget);
         if ($toggle.hasClass('disabled')) {
           return;
+        }
+        const applId = Number($toggle.data('appl-id'));
+        const tr = $toggle.closest('tr');
+        if (Number.isFinite(applId)) {
+          const row = dt.row(tr as any);
+          const rowData = row.data() as FundingSubmissionListGrantDto;
+          this.ensureGrantRowExpanded(applId, row, tr, rowData);
         }
         const $menu = $toggle.siblings('.process-menu');
         $tableBody.find('.process-menu').not($menu).removeClass('show');
@@ -707,11 +729,17 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
       .on('click', '.process-option', (event: any) => {
         event.preventDefault();
         event.stopPropagation();
+        if (this.decisionsLocked) {
+          return;
+        }
         const $option = $(event.currentTarget);
         const applId = Number($option.data('appl-id'));
         const decision = String($option.data('decision') || '');
+        const tr = $option.closest('tr');
+        const row = dt.row(tr as any);
+        const rowData = row.data() as FundingSubmissionListGrantDto;
 
-        this.onProcessDecisionSelect(applId, decision as 'Approve' | 'Hold' | 'Rejected');
+        this.onProcessDecisionSelect(applId, decision as 'Approve' | 'Hold' | 'Rejected', row, tr, rowData);
         $option.closest('.process-menu').removeClass('show');
         $option.closest('td').removeClass('menu-open');
         this.cdr.markForCheck();
@@ -764,6 +792,10 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getProcessOptionsForGrant(grant: FundingSubmissionListGrantDto): ProcessOption[] {
+    if (this.decisionsLocked) {
+      return [];
+    }
+
     const allOptions: ProcessOption[] = [
       { label: 'Approve', value: 'Approve' },
       { label: 'On Hold', value: 'Hold' },
@@ -783,18 +815,105 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return options.filter(option => this.normalizeValue(option.value) !== currentDecision);
   }
 
-  private onProcessDecisionSelect(applId: number, decision: 'Approve' | 'Hold' | 'Rejected'): void {
-    if (!Number.isFinite(applId)) {
+  private onProcessDecisionSelect(
+    applId: number,
+    decision: 'Approve' | 'Hold' | 'Rejected',
+    row?: any,
+    tr?: JQuery,
+    rowData?: FundingSubmissionListGrantDto
+  ): void {
+    if (!Number.isFinite(applId) || this.decisionsLocked) {
       return;
     }
 
-    const row = this.grants.find(grant => Number(grant.applId) === applId);
-    if (!row) {
+    const grantRow = rowData || this.grants.find(grant => Number(grant.applId) === applId);
+    if (!grantRow) {
       return;
     }
 
-    row.nciDecision = decision;
+    if (row && tr) {
+      this.ensureGrantRowExpanded(applId, row, tr, grantRow);
+    }
+
+    this.openGrantDecisionModal(grantRow, decision);
+  }
+
+  onCancelGrantDecision(): void {
+    this.pendingDecision = null;
+    this.pendingDecisionGrant = null;
+    this.pendingDecisionGrantNumber = '';
+    this.pendingDecisionNote = '';
+    this.pendingDecisionValidationMessage = '';
+    this.grantDecisionModalRef?.dismiss();
+  }
+
+  onConfirmGrantDecision(): void {
+    if (!this.pendingDecision || !this.pendingDecisionGrant) {
+      return;
+    }
+
+    if ((this.pendingDecision === 'Hold' || this.pendingDecision === 'Rejected')
+      && !String(this.pendingDecisionNote || '').trim()) {
+      this.pendingDecisionValidationMessage = 'NCI Director Note is required.';
+      return;
+    }
+
+    this.pendingDecisionValidationMessage = '';
+
+    this.pendingDecisionGrant.nciDecision = this.pendingDecision;
+    (this.pendingDecisionGrant as any).nciDirectorNotes = String(this.pendingDecisionNote || '').trim();
+
+    const decisionText = this.pendingDecision === 'Approve'
+      ? 'approved'
+      : this.pendingDecision === 'Hold'
+        ? 'placed on hold'
+        : 'rejected';
+    this.decisionSuccessMessage = `Success! Grant ${this.pendingDecisionGrantNumber} has been ${decisionText}.`;
+
+    this.grantDecisionModalRef?.close();
     this.reloadTable();
+  }
+
+  get grantDecisionModalTitle(): string {
+    if (this.pendingDecision === 'Approve') return 'Approve Grant';
+    if (this.pendingDecision === 'Hold') return 'Place Grant On Hold';
+    if (this.pendingDecision === 'Rejected') return 'Reject Grant';
+    return 'Grant Decision';
+  }
+
+  get grantDecisionModalMessage(): string {
+    if (this.pendingDecision === 'Approve') {
+      return 'Clicking OK will approve this grant for funding. Are you sure you want to continue?';
+    }
+    if (this.pendingDecision === 'Hold') {
+      return 'Clicking OK will place this grant on hold. Are you sure you want to continue?';
+    }
+    if (this.pendingDecision === 'Rejected') {
+      return 'Clicking OK will reject this grant for funding. Are you sure you want to continue?';
+    }
+    return '';
+  }
+
+  get grantDecisionNotesLabel(): string {
+    return this.pendingDecision === 'Approve' ? 'Add Notes (optional)' : 'Add Notes';
+  }
+
+  private openGrantDecisionModal(grant: FundingSubmissionListGrantDto, decision: ProcessOption['value']): void {
+    this.pendingDecision = decision;
+    this.pendingDecisionGrant = grant;
+    this.pendingDecisionGrantNumber = String(grant?.grantNumber || '').trim();
+    this.pendingDecisionNote = String((grant as any)?.nciDirectorNotes || '').trim();
+    this.pendingDecisionValidationMessage = '';
+    this.grantDecisionModalRef = this.modalService.open(this.grantDecisionModalTemplateRef, { centered: true });
+  }
+
+  private ensureGrantRowExpanded(applId: number, row: any, tr: JQuery, rowData: FundingSubmissionListGrantDto): void {
+    if (row.child && row.child.isShown && row.child.isShown()) {
+      return;
+    }
+
+    const toggleIcon = tr.find('.toggle-details i');
+    this.expandDetailRow(applId, row, tr, rowData, toggleIcon);
   }
 
   private expandDetailRow(

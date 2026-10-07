@@ -17,6 +17,33 @@
     </div>
   </ng-template>
 
+  <ng-template #grantDecisionModal>
+    <div class="modal-header">
+      <h4 class="modal-title">{{ grantDecisionModalTitle }}</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="onCancelGrantDecision()"></button>
+    </div>
+    <div class="modal-body">
+      <p>{{ grantDecisionModalMessage }}</p>
+      <div class="mb-2">
+        <label for="grant-decision-notes" class="form-label">{{ grantDecisionNotesLabel }}</label>
+        <textarea
+          id="grant-decision-notes"
+          class="form-control"
+          rows="4"
+          maxlength="2000"
+          [(ngModel)]="pendingDecisionNote"
+          (ngModelChange)="pendingDecisionValidationMessage = ''"></textarea>
+      </div>
+      <div *ngIf="pendingDecisionValidationMessage" class="text-danger small">
+        {{ pendingDecisionValidationMessage }}
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="onCancelGrantDecision()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="onConfirmGrantDecision()">OK</button>
+    </div>
+  </ng-template>
+
   <a class="text-decoration-none small" routerLink="/funding-submissions/lists">
     <i class="far fa-chevron-left me-1"></i>Back to Search Lists View
   </a>
@@ -26,6 +53,14 @@
     <button type="button" class="btn btn-success confirm-btn" (click)="onConfirmDecisionsClick()">
       <i class="far fa-lock me-1"></i>Confirm Approvals and Rejections
     </button>
+  </div>
+
+  <div class="row" *ngIf="decisionSuccessMessage.length > 0">
+    <div class="col-12">
+      <ngb-alert type="success" [dismissible]="true" (closed)="decisionSuccessMessage = ''">
+        <span><b>{{ decisionSuccessMessage }}</b></span>
+      </ngb-alert>
+    </div>
   </div>
 
   <section class="overview card mb-4">
