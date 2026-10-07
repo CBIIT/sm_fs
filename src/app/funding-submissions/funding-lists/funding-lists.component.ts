@@ -258,7 +258,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         {
           title: 'DOC Priority',
           data: 'docPriority',
-          width: '80px',
+          width: '90px',
           defaultContent: ''
         },
         {
@@ -438,11 +438,6 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.openGrantDocuments(applIds, 'document-report', this.selectedViewDoc);
-  }
-
-  get tabTitle(): string {
-    const current = this.tabs.find(tab => tab.id === this.selectedTab);
-    return current ? current.label : 'All Grants';
   }
 
   get docs(): string[] {
