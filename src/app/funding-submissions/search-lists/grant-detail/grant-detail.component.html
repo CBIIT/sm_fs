@@ -77,7 +77,7 @@
                 name="docRecAmt" [(ngModel)]="formModel.docRecAmt"
                 (ngModelChange)="onDocRecAmtChange()"
                 [disabled]="doNotPayOefiaLockActive"
-                placeholder="Enter Value" min="0" step="0.01">
+                placeholder="Enter Value" min="0" step="1">
               <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docRecAmt">{{saveValidationErrors.docRecAmt}}</div>
             </td>
           </tr>

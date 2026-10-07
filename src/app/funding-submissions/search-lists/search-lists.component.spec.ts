@@ -771,6 +771,17 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       );
     });
 
+    it('DOC role: enables Bulk Edit for a selected grant in Draft', () => {
+      component.docFundingListCor = true;
+      component.listStatus = 'Draft';
+      component.currentReviewStatus = 'Draft';
+      component.selectedRows.set(100, { applId: 100, reviewStatusCode: 'DRAFT' });
+
+      expect(component.canBulkEditByStatus).toBeTrue();
+      expect(component.canBulkEdit).toBeTrue();
+      expect(component.canRemoveSelectedGrants).toBeTrue();
+    });
+
     it('DOC role: enables Bulk Edit for a selected grant in DOC Review', () => {
       component.docFundingListCor = true;
       component.listStatus = 'DOC Review';
@@ -779,12 +790,13 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
       expect(component.canBulkEditByStatus).toBeTrue();
       expect(component.canBulkEdit).toBeTrue();
+      expect(component.canRemoveSelectedGrants).toBeTrue();
     });
 
     it('DOC role: disables Bulk Edit and Remove for a selected grant in OEFIA Review', () => {
       component.docFundingListCor = true;
-      component.listStatus = 'DOC Review';
-      component.currentReviewStatus = 'DOC Review';
+      component.listStatus = 'OEFIA Review';
+      component.currentReviewStatus = 'OEFIA Review';
       component.selectedRows.set(100, { applId: 100, reviewStatusCode: 'OEFIAREVIEW' });
 
       expect(component.canBulkEditByStatus).toBeFalse();
@@ -794,28 +806,32 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
     it('DOC role: disables Bulk Edit and Remove for a selected grant in NCI Director Review', () => {
       component.docFundingListCor = true;
-      component.listStatus = 'DOC Review';
-      component.currentReviewStatus = 'DOC Review';
+      component.listStatus = 'NCI Director Review';
+      component.currentReviewStatus = 'NCI Director Review';
       component.selectedRows.set(100, { applId: 100, reviewStatusCode: 'DIRECTORREVIEW' });
 
       expect(component.canBulkEditByStatus).toBeFalse();
       expect(component.canBulkEdit).toBeFalse();
       expect(component.canRemoveSelectedGrants).toBeFalse();
+      expect(component.bulkEditTooltipMessage)
+        .toBe('Bulk Edit is unavailable because the list status is OEFIA Review or NCI Director Review.');
     });
 
-    it('DOC role: allows Bulk Edit and Remove for a DOC Review selection even when other statuses differ', () => {
+    it('DOC role: disables Bulk Edit without selected rows in Draft', () => {
       component.docFundingListCor = true;
-      component.listStatus = 'OEFIA Review';
-      component.currentReviewStatus = 'OEFIA Review';
-      component.selectedRows.set(100, { applId: 100, reviewStatus: 'Under DOC Review' });
+      component.listStatus = 'Draft';
+      component.currentReviewStatus = 'Draft';
 
-      expect(component.canBulkEdit).toBeTrue();
-      expect(component.canRemoveSelectedGrants).toBeTrue();
+      expect(component.canBulkEditByStatus).toBeTrue();
+      expect(component.canBulkEdit).toBeFalse();
+      expect(component.bulkEditTooltipMessage).toBe('Select at least one grant to bulk edit.');
     });
 
     it('OEFIA users are not restricted by DOC-stage Bulk Edit and Remove rules', () => {
       component.docFundingListCor = true;
       component.isOEFIACerifier = true;
+      component.listStatus = 'OEFIA Review';
+      component.currentReviewStatus = 'OEFIA Review';
       component.selectedRows.set(100, { applId: 100, reviewStatusCode: 'OEFIAREVIEW' });
 
       expect(component.canBulkEdit).toBeTrue();
