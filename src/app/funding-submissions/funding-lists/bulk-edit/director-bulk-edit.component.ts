@@ -175,20 +175,7 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
           ngTemplateRef: { ref: this.nciNotesRenderer }
         }
       ],
-      dom: '<"dt-controls dt-top"l<"ms-3"i><"ms-auto"B<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
-      buttons: [
-        {
-          extend: 'excel',
-          className: 'btn-export-all btn btn-outline-secondary btn-sm',
-          titleAttr: 'Export All Results',
-          text: 'Export All Results <i class="far fa-file-excel ms-1"></i>',
-          title: null,
-          header: true,
-          exportOptions: {
-            columns: Array.from({ length: 11 }, (_value, index) => index)
-          }
-        }
-      ],
+      dom: '<"dt-controls dt-top"l<"ms-3"i><"ms-auto"<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       rowCallback: (row: Node) => {
         this.dtOptions.columns.forEach((column: any, index: number) => {
           if (column.ngTemplateRef) {
@@ -201,13 +188,11 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
       },
       drawCallback: () => {
         setTimeout(() => {
-          this.dtElement?.dtInstance?.then((dt: DataTables.Api) => this.updateExportButtonState(dt));
           this.realignDataTableColumns();
         }, 0);
       },
       initComplete: () => {
         setTimeout(() => {
-          this.dtElement?.dtInstance?.then((dt: DataTables.Api) => this.updateExportButtonState(dt));
           this.realignDataTableColumns();
         }, 0);
       }
@@ -245,14 +230,6 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
         dt.columns.adjust();
       });
     });
-  }
-
-  private updateExportButtonState(dt: DataTables.Api): void {
-    const exportButton = (dt as any).button('.btn-export-all');
-    if (!exportButton || typeof exportButton.enable !== 'function') {
-      return;
-    }
-    dt.rows().count() > 0 ? exportButton.enable() : exportButton.disable();
   }
 
   get backLabel(): string {

@@ -32,6 +32,9 @@
 :host ::ng-deep .dataTables_wrapper table.dataTable {
   width: 100% !important;
 }
+:host ::ng-deep .dataTables_wrapper .dataTables_info {
+  padding-top: 0 !important;
+}
 
 :host ::ng-deep .dataTables_wrapper table.dataTable th,
 :host ::ng-deep .dataTables_wrapper table.dataTable td {
