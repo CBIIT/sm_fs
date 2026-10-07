@@ -511,6 +511,8 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     });
 
     it('sends to OEFIA and displays the required success message only after success', () => {
+      const response = new Subject<number>();
+      fundingSubmissionsServiceSpy.sendListToOefiaForReview.and.returnValue(response);
       (component as any).sendGrantsToOefiaModalRef = modalRefSpy;
 
       component.onConfirmSendGrantsToOefia();
@@ -518,13 +520,23 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(fundingSubmissionsServiceSpy.sendListToOefiaForReview).toHaveBeenCalledWith(component.listId);
       expect(fundingSubmissionsServiceSpy.sendListToDocsForReview).not.toHaveBeenCalled();
       expect(modalRefSpy.close).toHaveBeenCalled();
-      expect(component.sendGrantsToOefiaSuccessMessage)
-        .toBe('Success! The list has been successfully sent to OEFIA. An email notification will be sent to the OEFIA analysts to review the list. If any updates will be needed to your list, contact the NCI OEFIA Analysts <NCIOEFIAAnalysts-l@mail.nih.gov>');
+      expect(component.sendGrantsToOefiaSuccess).toBeFalse();
       expect(component.sendGrantsToOefiaErrorMessage).toBe('');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('.alert-success')).toBeNull();
+      expect(fixture.nativeElement.querySelector('a[href="mailto:NCIOEFIAAnalysts-l@mail.nih.gov"]')).toBeNull();
+
+      response.next(1);
+      expect(component.sendGrantsToOefiaSuccess).toBeTrue();
       expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledWith(component.listId);
       fixture.detectChanges();
-      expect(fixture.nativeElement.querySelector('.alert-success')?.textContent?.trim())
-        .toBe(component.sendGrantsToOefiaSuccessMessage);
+      const successAlert = fixture.nativeElement.querySelector('.alert-success') as HTMLElement;
+      expect(successAlert).not.toBeNull();
+      expect(successAlert.textContent.replace(/\s+/g, ' ').trim())
+        .toBe('Success! The list has been successfully sent to OEFIA. An email notification will be sent to the OEFIA analysts to review the list. If any updates will be needed to your list, contact the NCI OEFIA Analysts <NCIOEFIAAnalysts-l@mail.nih.gov>');
+      const links = successAlert.querySelectorAll('a[href="mailto:NCIOEFIAAnalysts-l@mail.nih.gov"]');
+      expect(links.length).toBe(1);
+      expect(links[0].textContent).toBe('NCIOEFIAAnalysts-l@mail.nih.gov');
     });
 
     [403, 409].forEach(status => {
@@ -537,8 +549,9 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
         expect(component.sendGrantsToOefiaErrorMessage)
           .toBe('Unable to send grants to OEFIA right now. Please try again.');
-        expect(component.sendGrantsToOefiaSuccessMessage).toBe('');
+        expect(component.sendGrantsToOefiaSuccess).toBeFalse();
         fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('.alert-success')).toBeNull();
         const errorBanners = Array.from(fixture.nativeElement.querySelectorAll('.alert-danger'))
           .map((element: HTMLElement) => element.textContent?.trim());
         expect(errorBanners).toContain(component.sendGrantsToOefiaErrorMessage);
