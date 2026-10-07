@@ -10,6 +10,15 @@
   width: 98%;
 }
 
+.detail-grid-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.detail-grid-table col.detail-grid-col {
+  width: 12.5%;
+}
+
 /* Remove all inner cell borders; outer borders stay on thead/tbody elements via inline style */
 .grid-container table td,
 .grid-container table th {
@@ -25,7 +34,6 @@
 .grid-label {
   font-weight: 600;
   white-space: nowrap;
-  width: 1%;
   padding-right: 0.5rem;
   font-size: 0.875rem;
 }
