@@ -96,8 +96,8 @@
     <div *ngIf="sendGrantsToDocsErrorMessage" class="alert alert-danger" role="alert">
         {{ sendGrantsToDocsErrorMessage }}
     </div>
-    <div *ngIf="sendGrantsToOefiaSuccessMessage" class="alert alert-success" role="alert">
-        {{ sendGrantsToOefiaSuccessMessage }}
+    <div *ngIf="sendGrantsToOefiaSuccess" class="alert alert-success" role="alert">
+        Success! The list has been successfully sent to OEFIA. An email notification will be sent to the OEFIA analysts to review the list. If any updates will be needed to your list, contact the <a href="mailto:NCIOEFIAAnalysts-l@mail.nih.gov">NCI OEFIA Analysts</a>
     </div>
     <div *ngIf="sendGrantsToOefiaErrorMessage" class="alert alert-danger" role="alert">
         {{ sendGrantsToOefiaErrorMessage }}

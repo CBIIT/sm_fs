@@ -88,7 +88,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   filteredDoc: string | null = null;
   sendGrantsToDocsSuccessMessage = '';
   sendGrantsToDocsErrorMessage = '';
-  sendGrantsToOefiaSuccessMessage = '';
+  sendGrantsToOefiaSuccess = false;
   sendGrantsToOefiaErrorMessage = '';
   removeGrantsErrorMessage = '';
   justificationWarningMessage = '';
@@ -1447,7 +1447,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.isSendGrantsToOefiaInProgress = true;
-    this.sendGrantsToOefiaSuccessMessage = '';
+    this.sendGrantsToOefiaSuccess = false;
     this.sendGrantsToOefiaErrorMessage = '';
     this.sendGrantsToOefiaModalRef?.close();
 
@@ -1457,12 +1457,13 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       })
     ).subscribe({
       next: () => {
-        this.sendGrantsToOefiaSuccessMessage = 'Success! The list has been successfully sent to OEFIA. An email notification will be sent to the OEFIA analysts to review the list. If any updates will be needed to your list, contact the NCI OEFIA Analysts <NCIOEFIAAnalysts-l@mail.nih.gov>';
+        this.sendGrantsToOefiaSuccess = true;
         this.cdr.detectChanges();
         this.loadListMeta();
       },
       error: (err) => {
         this.logger.error('Send grants to OEFIA failed', err);
+        this.sendGrantsToOefiaSuccess = false;
         this.sendGrantsToOefiaErrorMessage = 'Unable to send grants to OEFIA right now. Please try again.';
       }
     });
