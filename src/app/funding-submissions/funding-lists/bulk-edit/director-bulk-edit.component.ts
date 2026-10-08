@@ -5,7 +5,12 @@ import { Subject } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { FullGrantNumberCellRendererComponent } from '../../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
-import { FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
+import {
+  FundingSubmissionListGrantDto,
+  FundingSubmissionNciDecisionRequestDto,
+  FundingSubmissionsService,
+  Item as NciDecisionItem
+} from '@cbiit/i2efsws-lib';
 import { NGXLogger } from 'ngx-logger';
 
 declare var $: any;
@@ -49,6 +54,7 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
   saveSuccessMessage = '';
   loadErrorMessage = '';
   canSave = false;
+  savingInProgress = false;
 
   rows: DirectorBulkGrantRow[] = [];
   dtOptions: any = {};
@@ -285,13 +291,85 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   onSave(): void {
-    if (!this.canSave) {
+    if (!this.canSave || this.savingInProgress) {
       return;
     }
 
-    this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
-    this.canSave = false;
-    this.saveSuccessMessage = 'Success! Bulk changes have been applied';
+    this.saveSuccessMessage = '';
+    this.loadErrorMessage = '';
+
+    const items = this.buildNciDecisionUpdateItems();
+    if (!items.length) {
+      this.canSave = false;
+      return;
+    }
+
+    const missingDecisionRow = items.find(item => !item.nciDecision);
+    if (missingDecisionRow) {
+      const row = this.rows.find(entry => entry.applId === missingDecisionRow.applId);
+      const grantLabel = row?.grantNumber ? ` for grant ${row.grantNumber}` : '';
+      this.loadErrorMessage = `Please select an NCI Decision${grantLabel} before saving.`;
+      return;
+    }
+
+    const request: FundingSubmissionNciDecisionRequestDto = { items };
+    this.savingInProgress = true;
+
+    this.fundingSubmissionsService.saveNciDecisions(request, this.listId).subscribe({
+      next: () => {
+        this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
+        this.canSave = false;
+        this.saveSuccessMessage = 'Success! Bulk changes have been applied';
+        this.savingInProgress = false;
+      },
+      error: (err) => {
+        this.logger.error('Failed to save Director Bulk Edit decisions', err);
+        this.loadErrorMessage = this.getSaveErrorMessage(err);
+        this.savingInProgress = false;
+      }
+    });
+  }
+
+  private buildNciDecisionUpdateItems(): NciDecisionItem[] {
+    return this.rows.reduce((updates: NciDecisionItem[], row: DirectorBulkGrantRow) => {
+      const savedRow = this.lastSavedRows.find(item => item.applId === row.applId);
+      const decisionChanged = !savedRow || row.nciDecision !== savedRow.nciDecision;
+      const notesChanged = !savedRow || row.nciDirectorNotes !== savedRow.nciDirectorNotes;
+
+      if (!decisionChanged && !notesChanged) {
+        return updates;
+      }
+
+      const nciDecision = this.toNciDecisionEnum(row.nciDecision);
+      const update: NciDecisionItem = {
+        applId: row.applId,
+        nciDecision: nciDecision as NciDecisionItem.NciDecisionEnum
+      };
+
+      if (notesChanged) {
+        update.nciDirectorNotes = row.nciDirectorNotes ?? '';
+      }
+
+      updates.push(update);
+      return updates;
+    }, []);
+  }
+
+  private toNciDecisionEnum(value: string | null): NciDecisionItem.NciDecisionEnum | null {
+    if (value === 'Approve' || value === 'Hold' || value === 'Rejected') {
+      return value;
+    }
+
+    return null;
+  }
+
+  private getSaveErrorMessage(err: any): string {
+    const status = Number(err?.status);
+    if (status === 400) return 'Unable to save. Please review NCI Decision/Notes values and try again.';
+    if (status === 403) return 'You are not authorized to save NCI Director decisions.';
+    if (status === 404) return 'Funding list or active membership was not found.';
+    if (status === 409) return 'One or more grants are locked or no longer eligible for updates.';
+    return 'Unable to save Director Bulk Edit changes right now. Please try again.';
   }
 
   private recomputeCanSave(): void {
