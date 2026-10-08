@@ -218,3 +218,15 @@ tr.shown {
 ::ng-deep .funding-lists-page .process-dropdown-wrap .process-menu.show {
   display: block;
 }
+
+::ng-deep .funding-lists-page .process-dropdown-wrap .process-toggle.locked,
+::ng-deep .funding-lists-page .process-dropdown-wrap .process-toggle.locked:disabled {
+  background-color: #e6f7e9;
+  border-color: #088f27;
+  color: #000;
+  opacity: 1;
+}
+
+::ng-deep .funding-lists-page .process-dropdown-wrap .process-toggle.locked .fa-lock {
+  color: #000;
+}
