@@ -282,6 +282,9 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
               }
               return `<div>${statusText}</div><div class="text-muted">${FundingListsComponent.escapeReviewStatusHtml(dateText)}</div>`;
             }
+            if (type === 'export') {
+              return FundingListsComponent.formatReviewStatusWithDate(data, row?.reviewStatusDate);
+            }
             if (type === 'filter') {
               return FundingListsComponent.formatReviewStatusWithDate(data, row?.reviewStatusDate);
             }
@@ -376,7 +379,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           title: null,
           header: true,
           exportOptions: {
-            columns: Array.from({ length: 17 }, (_v, i) => i + 1)
+            columns: [],
+            orthogonal: 'export'
           }
         }
       ],
@@ -405,6 +409,12 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
       drawCallback: () => {
         this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
           dt.columns.adjust();
+          const exportButton = (dt as any).button('.btn-export-all');
+          if (dt.rows({ search: 'applied' }).count() > 0) {
+            exportButton.enable();
+          } else {
+            exportButton.disable();
+          }
           this.syncExpandedDetailWidths(dt);
           this.bindHorizontalDragScroll(dt);
           this.bindSelectionEvents(dt);
@@ -419,6 +429,11 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     };
+
+    this.dtOptions.buttons[0].exportOptions.columns = this.dtOptions.columns
+      .map((column: { title?: string }, index: number) => ({ column, index }))
+      .filter(({ column }: { column: { title?: string } }) => Boolean(column.title) && column.title !== 'Action')
+      .map(({ index }: { index: number }) => index);
 
     setTimeout(() => this.dtTrigger.next(null));
   }
@@ -1227,13 +1242,40 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private static formatReviewStatusDate(reviewStatusDate: Date | string | null | undefined): string | null {
     if (reviewStatusDate == null || reviewStatusDate === '') return null;
 
-    const date = reviewStatusDate instanceof Date ? reviewStatusDate : new Date(reviewStatusDate);
-    if (Number.isNaN(date.getTime())) return null;
+    let year: number;
+    let month: number;
+    let day: number;
 
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    const yyyy = String(date.getFullYear()).padStart(4, '0');
-    return `${mm}/${dd}/${yyyy}`;
+    if (reviewStatusDate instanceof Date) {
+      if (Number.isNaN(reviewStatusDate.getTime())) return null;
+      year = reviewStatusDate.getFullYear();
+      month = reviewStatusDate.getMonth() + 1;
+      day = reviewStatusDate.getDate();
+    } else {
+      const match = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?(?:Z|([+-])(\d{2}):(\d{2}))?)?$/.exec(reviewStatusDate);
+      if (!match) return null;
+
+      year = Number(match[1]);
+      month = Number(match[2]);
+      day = Number(match[3]);
+      if (match[4] !== undefined
+        && (Number(match[4]) > 23 || Number(match[5]) > 59 || Number(match[6]) > 59)) return null;
+      if (match[8] !== undefined) {
+        const offsetHours = Number(match[9]);
+        const offsetMinutes = Number(match[10]);
+        if (offsetHours > 18 || offsetMinutes > 59 || (offsetHours === 18 && offsetMinutes !== 0)) return null;
+      }
+    }
+
+    if (!FundingListsComponent.isValidReviewStatusDate(year, month, day)) return null;
+    return `${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}/${String(year).padStart(4, '0')}`;
+  }
+
+  private static isValidReviewStatusDate(year: number, month: number, day: number): boolean {
+    if (year < 0 || year > 9999 || month < 1 || month > 12 || day < 1) return false;
+    const isLeapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    const daysInMonth = [31, isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    return day <= daysInMonth[month - 1];
   }
 
   private static escapeReviewStatusHtml(value: string): string {
