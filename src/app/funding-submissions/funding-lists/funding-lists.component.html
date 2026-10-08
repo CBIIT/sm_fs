@@ -102,14 +102,14 @@
   <section class="doc-summary mb-4" *ngIf="showSelectedDocSummary">
     <div class="doc-summary-item">
       <span class="label">{{ selectedDocSummary.doc }} Recommended Total:</span>
-      <span>{{ selectedDocSummary.recommendedTotal | currency:'USD':'symbol':'1.0-0' }}</span>
+      <span class="ms-3">{{ selectedDocSummary.recommendedTotal | currency:'USD':'symbol':'1.0-0' }}</span>
     </div>
   </section>
 
   <section class="results card mb-5">
     <div class="card-body">
       <div class="d-flex align-items-center justify-content-between mb-3">
-        <h2 class="h3 mb-0">Pending Review</h2>
+        <h2 class="h3 mb-0">{{ selectedTabLabel }}</h2>
       </div>
 
       <p class="alert alert-primary col-12">

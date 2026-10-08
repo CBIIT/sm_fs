@@ -74,6 +74,11 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     { id: 'recusals', label: 'Recusals' }
   ];
 
+  get selectedTabLabel(): string {
+    const selected = this.tabs.find(tab => tab.id === this.selectedTab);
+    return selected?.label || 'Pending Review';
+  }
+
   grants: FundingSubmissionListGrantDto[] = [];
   docRecommendedTotals: { [doc: string]: number } = {};
 
@@ -94,6 +99,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private dragPointerId: number | null = null;
   private dragStartX = 0;
   private dragStartScrollLeft = 0;
+  private readonly processMenuOutsideClickNamespace = 'click.fundingListsProcessMenuOutside';
   private readonly dragScrollIgnoreSelector = 'a, button, input, select, textarea, label, thead, th, .dataTables_paginate, .dataTables_paginate *, .dt-paging-button, .select-checkbox, .toggle-details, .process-toggle, .process-option, .select2, .select2-container, .select2-selection, .select2-selection__rendered, .select2-selection__arrow';
 
   private readonly onHorizontalDragPointerDown = (event: PointerEvent): void => {
@@ -350,11 +356,11 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
             return `
               <div class="d-flex flex-column align-items-center gap-1 action-cell-wrap">
-                <button class="btn btn-link p-0 toggle-details d-block mx-auto" title="Details" data-appl-id="${applId}">
+                <button class="btn btn-link p-0 toggle-details d-block mx-auto mb-3" title="Details" data-appl-id="${applId}">
                   <i class="far ${expandedIcon} fa-lg"></i>
                 </button>
                 <div class="btn-group process-dropdown-wrap">
-                  <button type="button" class="btn btn-sm btn-outline-secondary process-toggle${disabledClass}" data-appl-id="${applId}">
+                  <button type="button" class="btn btn-sm btn-outline-primary process-toggle${disabledClass}" data-appl-id="${applId}">
                     Process <i class="far fa-chevron-down"></i>
                   </button>
                   <div class="dropdown-menu process-menu">
@@ -466,6 +472,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.unbindHorizontalDragScroll();
+    $(document).off(this.processMenuOutsideClickNamespace);
     this.confirmDecisionsModalRef?.close();
     this.grantDecisionModalRef?.close();
     this.detailComponentsByApplId.forEach(componentRef => componentRef?.destroy?.());
@@ -841,6 +848,17 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private bindActionEvents(dt: DataTables.Api): void {
     const $tableBody = $(dt.table(0).body());
 
+    $(document)
+      .off(this.processMenuOutsideClickNamespace)
+      .on(this.processMenuOutsideClickNamespace, (event: any) => {
+        const target = event?.target as HTMLElement | null;
+        if (target?.closest('.process-dropdown-wrap')) {
+          return;
+        }
+
+        this.closeOpenProcessMenus();
+      });
+
     $tableBody
       .off('click', '.toggle-details')
       .on('click', '.toggle-details', (event: any) => {
@@ -873,6 +891,18 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         if ($toggle.hasClass('disabled')) {
           return;
         }
+
+        const tr = $toggle.closest('tr');
+        const row = dt.row(tr as any);
+        const applId = Number($toggle.data('appl-id'));
+        const rowData = row.data() as FundingSubmissionListGrantDto;
+
+        if (Number.isFinite(applId)
+          && rowData
+          && this.shouldExpandDetailForProcessDropdown(dt, tr)) {
+          this.ensureGrantRowExpanded(applId, row, tr, rowData);
+        }
+
         const $menu = $toggle.siblings('.process-menu');
         $tableBody.find('.process-menu').not($menu).removeClass('show');
         $tableBody.find('td').removeClass('menu-open');
@@ -906,9 +936,33 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     $tableBody
       .off('click', 'td')
       .on('click', 'td', () => {
-        $tableBody.find('.process-menu').removeClass('show');
-        $tableBody.find('td').removeClass('menu-open');
+        this.closeOpenProcessMenus();
       });
+  }
+
+  private closeOpenProcessMenus(): void {
+    $('.funding-lists-page .process-menu').removeClass('show');
+    $('.funding-lists-page td.menu-open').removeClass('menu-open');
+  }
+
+  private shouldExpandDetailForProcessDropdown(dt: DataTables.Api, tr: JQuery): boolean {
+    const currentRowElement = tr.get(0) as HTMLElement | undefined;
+    if (!currentRowElement) {
+      return false;
+    }
+
+    const visibleRows = (dt.rows({ search: 'applied' }).nodes().toArray() as HTMLElement[])
+      .filter(rowEl => !rowEl.classList.contains('child'));
+
+    if (!visibleRows.length) {
+      return false;
+    }
+
+    if (visibleRows.length === 1) {
+      return true;
+    }
+
+    return visibleRows[visibleRows.length - 1] === currentRowElement;
   }
 
   private getPiMailSubject(row: FundingSubmissionListGrantDto): string {
@@ -931,18 +985,15 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (name) {
       return name;
     }
-
-    const code = this.normalizeValue(row?.docNciSelection);
-    if (code === 'D') return 'DOC Selection';
-    if (code === 'N') return 'NCI Selection';
     return '';
   }
 
   private getAnnualOrMyfDisplay(row: FundingSubmissionListGrantDto): string {
     const code = this.normalizeValue(row?.annualOrMyf);
-    if (code === 'AF') return 'AF';
-    if (code === 'MYF') return 'MYF';
-    return '';
+    if (code) return code;
+    else {
+      return '';
+    }
   }
 
   private getProcessOptionsForGrant(grant: FundingSubmissionListGrantDto): ProcessOption[] {
@@ -1104,6 +1155,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     row.child(hostElement).show();
     tr.addClass('shown');
     this.syncExpandedDetailWidths();
+    this.scheduleTableLayoutSync();
     toggleIcon.removeClass('fa-plus-circle').addClass('fa-minus-circle');
   }
 
@@ -1114,8 +1166,29 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (row.child.isShown()) {
       row.child.hide();
       tr.removeClass('shown');
+      this.scheduleTableLayoutSync();
       toggleIcon.removeClass('fa-minus-circle').addClass('fa-plus-circle');
     }
+  }
+
+  private scheduleTableLayoutSync(): void {
+    this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+      const relayout = (): void => {
+        dt.columns.adjust();
+        this.syncExpandedDetailWidths(dt);
+
+        const fixedColumnsApi = (dt as any).fixedColumns?.();
+        if (fixedColumnsApi && typeof fixedColumnsApi.relayout === 'function') {
+          fixedColumnsApi.relayout();
+        }
+      };
+
+      // Run twice to cover the moment the vertical scrollbar is introduced/removed.
+      requestAnimationFrame(() => {
+        relayout();
+        requestAnimationFrame(() => relayout());
+      });
+    });
   }
 
   private openGrantDocuments(applIds: number[], endpoint: 'document-report' | 'justification-pdf', docType?: string): void {
