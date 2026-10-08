@@ -81,11 +81,6 @@
   border-color: #0f82c0;
 }
 
-.doc-tile.active .count,
-.doc-tile.active .name {
-  color: #fff;
-}
-
 .doc-tile .count {
   font-size: 1.5rem;
   font-weight: 700;
@@ -101,11 +96,6 @@
   border: 1px solid #d8dee6;
 }
 
-.grant-detail-container {
-  background: #f8f9fa;
-  border-top: 2px solid #dee2e6;
-}
-
 ::ng-deep .funding-lists-page .detail-row-sticky {
   position: sticky;
   left: 0;
@@ -116,10 +106,6 @@
 
 tr.shown {
   background-color: #eef3ff !important;
-}
-
-.table thead th {
-  white-space: nowrap;
 }
 
 ::ng-deep .funding-lists-page .dataTables_wrapper .dataTables_info {
@@ -213,10 +199,6 @@ tr.shown {
   right: 0;
   left: auto;
   z-index: 2000;
-}
-
-::ng-deep .funding-lists-page .process-dropdown-wrap .process-menu.show {
-  display: block;
 }
 
 ::ng-deep .funding-lists-page .process-dropdown-wrap .process-toggle.locked,
