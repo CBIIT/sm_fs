@@ -761,7 +761,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
             const expandedIcon = this.detailComponentsByApplId.has(row?.applId)
               ? 'fa-minus-circle'
               : 'fa-plus-circle';
-            return `<button class="btn btn-link p-0 toggle-details d-block mx-auto" title="Details"><i class="far ${expandedIcon} fa-lg"></i></button>`;
+            return `<button class="btn btn-link p-0 toggle-details d-block mx-auto mb-3" title="Details"><i class="far ${expandedIcon} fa-lg"></i></button>`;
           }
         }, // 25
       ],
