@@ -352,10 +352,16 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           render: (_data: any, _type: any, row: FundingSubmissionListGrantDto) => {
             const applId = Number(row?.applId);
             const expandedIcon = this.detailComponentsByApplId.has(applId) ? 'fa-minus-circle' : 'fa-plus-circle';
-            const options = this.getProcessOptionsForGrant(row)
-              .map(option => `<button type="button" class="dropdown-item process-option" data-appl-id="${applId}" data-decision="${option.value}">${option.label}</button>`)
-              .join('');
+            const isLocked = this.decisionsLocked;
+            const options = isLocked
+              ? ''
+              : this.getProcessOptionsForGrant(row)
+                .map(option => `<button type="button" class="dropdown-item process-option" data-appl-id="${applId}" data-decision="${option.value}">${option.label}</button>`)
+                .join('');
             const disabledClass = options ? '' : ' disabled';
+            const actionButtonHtml = isLocked
+              ? `<button type="button" class="btn btn-sm btn-outline-success process-toggle locked" disabled aria-disabled="true">Locked <i class="fas fa-lock ms-1"></i></button>`
+              : `<button type="button" class="btn btn-sm btn-outline-primary process-toggle${disabledClass}" data-appl-id="${applId}">Process <i class="far fa-chevron-down"></i></button>`;
 
             return `
               <div class="d-flex flex-column align-items-center gap-1 action-cell-wrap">
@@ -363,9 +369,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
                   <i class="far ${expandedIcon} fa-lg"></i>
                 </button>
                 <div class="btn-group process-dropdown-wrap">
-                  <button type="button" class="btn btn-sm btn-outline-primary process-toggle${disabledClass}" data-appl-id="${applId}">
-                    Process <i class="far fa-chevron-down"></i>
-                  </button>
+                  ${actionButtonHtml}
                   <div class="dropdown-menu process-menu">
                     ${options}
                   </div>
