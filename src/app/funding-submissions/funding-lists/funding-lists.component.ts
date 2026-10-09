@@ -9,7 +9,12 @@ import { finalize } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { Select2OptionData } from 'ng-select2';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
-import { FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
+import {
+  FundingSubmissionListGrantDto,
+  FundingSubmissionNciDecisionRequestDto,
+  FundingSubmissionsService,
+  Item as NciDecisionItem
+} from '@cbiit/i2efsws-lib';
 import { GrantDetailComponent } from '../search-lists/grant-detail/grant-detail.component';
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
@@ -916,9 +921,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         const applId = Number($toggle.data('appl-id'));
         const rowData = row.data() as FundingSubmissionListGrantDto;
 
-        if (Number.isFinite(applId)
-          && rowData
-          && this.shouldExpandDetailForProcessDropdown(dt, tr)) {
+        if (Number.isFinite(applId) && rowData) {
           this.ensureGrantRowExpanded(applId, row, tr, rowData);
         }
 
@@ -1084,18 +1087,63 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.pendingDecisionValidationMessage = '';
 
-    this.pendingDecisionGrant.nciDecision = this.pendingDecision;
-    (this.pendingDecisionGrant as any).nciDirectorNotes = String(this.pendingDecisionNote || '').trim();
+    const nciDecision = this.toNciDecisionEnum(this.pendingDecision);
+    if (!nciDecision) {
+      this.pendingDecisionValidationMessage = 'Invalid NCI Director decision selected.';
+      return;
+    }
 
-    const decisionText = this.pendingDecision === 'Approve'
-      ? 'approved'
-      : this.pendingDecision === 'Hold'
-        ? 'placed on hold'
-        : 'rejected';
-    this.decisionSuccessMessage = `Success! Grant ${this.pendingDecisionGrantNumber} has been ${decisionText}.`;
+    const item: NciDecisionItem = {
+      applId: Number(this.pendingDecisionGrant.applId),
+      nciDecision
+    };
 
-    this.grantDecisionModalRef?.close();
-    this.reloadTable();
+    // Backend contract: empty string clears note for Approve, non-empty required for Hold/Rejected.
+    item.nciDirectorNotes = String(this.pendingDecisionNote || '').trim();
+
+    const request: FundingSubmissionNciDecisionRequestDto = { items: [item] };
+
+    this.fundingSubmissionsService.saveNciDecisions(request, this.listId).subscribe({
+      next: () => {
+        this.pendingDecisionGrant!.nciDecision = this.pendingDecision!;
+        (this.pendingDecisionGrant as any).nciDirectorNotes = item.nciDirectorNotes;
+
+        const decisionText = this.pendingDecision === 'Approve'
+          ? 'approved'
+          : this.pendingDecision === 'Hold'
+            ? 'placed on hold'
+            : 'rejected';
+        this.decisionSuccessMessage = `Success! Grant ${this.pendingDecisionGrantNumber} has been ${decisionText}.`;
+        this.scrollToTopForDecisionFeedback();
+
+        this.grantDecisionModalRef?.close();
+        this.reloadTable();
+      },
+      error: (err) => {
+        this.logger.error('Failed to save NCI Director process decision', err);
+        this.pendingDecisionValidationMessage = this.getNciDecisionSaveErrorMessage(err);
+      }
+    });
+  }
+
+  private scrollToTopForDecisionFeedback(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  private toNciDecisionEnum(value: ProcessOption['value'] | null): NciDecisionItem.NciDecisionEnum | null {
+    if (value === 'Approve' || value === 'Hold' || value === 'Rejected') {
+      return value;
+    }
+    return null;
+  }
+
+  private getNciDecisionSaveErrorMessage(err: any): string {
+    const status = Number(err?.status);
+    if (status === 400) return 'Unable to save. Please review NCI Decision/Notes values and try again.';
+    if (status === 403) return 'You are not authorized to save NCI Director decisions.';
+    if (status === 404) return 'Funding list or active membership was not found.';
+    if (status === 409) return 'This grant is locked or no longer eligible for updates.';
+    return 'Unable to save NCI Director decision right now. Please try again.';
   }
 
   get grantDecisionModalTitle(): string {
