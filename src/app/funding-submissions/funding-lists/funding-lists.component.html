@@ -6,14 +6,14 @@
     </div>
     <div class="modal-body">
       <p>
-        Clicking <b>Ok, proceed</b> will lock the decisions for all “Approved” and “Rejected” grants. After this you
-        will no longer be able to change the NCI Director Decision.
+        Clicking Yes will lock the NCI Director Decision for all grants in this list with a decision of Approve or
+        Reject. Once locked, these decisions cannot be changed by any user.
       </p>
       <p class="mb-0">Are you sure you want to continue?</p>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-secondary" (click)="onCancelConfirmDecisions()">Cancel</button>
-      <button type="button" class="btn btn-success" (click)="onProceedConfirmDecisions()">Ok, proceed</button>
+      <button type="button" class="btn btn-success" [disabled]="isLockingDecisions" (click)="onProceedConfirmDecisions()">Yes</button>
     </div>
   </ng-template>
 
@@ -50,15 +50,25 @@
 
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-4">
     <h1 class="mb-0">{{ pageTitle }}</h1>
-    <button type="button" class="btn btn-success confirm-btn" (click)="onConfirmDecisionsClick()">
-      <i class="far fa-lock me-1"></i>Confirm Approvals and Rejections
-    </button>
+    <span ngbTooltip="There are no Approve or Reject decisions available to lock." [disableTooltip]="hasLockableDecisions" container="body">
+      <button type="button" class="btn btn-success confirm-btn" [disabled]="isLockActionDisabled" (click)="onConfirmDecisionsClick()">
+        <i class="far fa-lock me-1"></i>Lock Approvals and Rejections
+      </button>
+    </span>
   </div>
 
   <div class="row" *ngIf="decisionSuccessMessage.length > 0">
     <div class="col-12">
       <ngb-alert type="success" [dismissible]="true" (closed)="decisionSuccessMessage = ''">
         <span><b>{{ decisionSuccessMessage }}</b></span>
+      </ngb-alert>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="lockErrorMessage.length > 0">
+    <div class="col-12">
+      <ngb-alert type="danger" [dismissible]="true" (closed)="lockErrorMessage = ''">
+        <span><b>{{ lockErrorMessage }}</b></span>
       </ngb-alert>
     </div>
   </div>
@@ -118,7 +128,7 @@
       </p>
 
       <div class="mb-3">
-        <button type="button" class="btn btn-primary" (click)="goToDirectorBulkEdit()" [disabled]="selectedRows.size === 0">
+        <button type="button" class="btn btn-primary" (click)="goToDirectorBulkEdit()" [disabled]="selectedRows.size === 0 || hasLockedGrantSelected">
           <i class="far fa-gavel me-1"></i>Bulk Decision
         </button>
       </div>

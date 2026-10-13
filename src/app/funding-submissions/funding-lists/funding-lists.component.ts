@@ -33,6 +33,10 @@ interface DocSummary {
   recommendedTotal: number;
 }
 
+// Mirrors the server-side lock eligibility predicate (FS-2343); the backend remains the authority.
+const LOCKABLE_NCI_DECISIONS = new Set(['APPROVE', 'REJECTED', 'DECLINE']);
+const LOCKABLE_DOC_DECISION = 'PAY';
+
 @Component({
   selector: 'app-funding-lists',
   templateUrl: './funding-lists.component.html',
@@ -53,6 +57,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   totalNumberOfGrants = 0;
   docRecommendedTotal = 0;
   decisionSuccessMessage = '';
+  lockErrorMessage = '';
+  isLockingDecisions = false;
 
   grantViewerUrl = '';
   eGrantsUrl = '';
@@ -96,7 +102,6 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private pendingDecisionGrantNumber = '';
   pendingDecisionNote = '';
   pendingDecisionValidationMessage = '';
-  private decisionsLocked = false;
 
   private detailComponentsByApplId = new Map<number, any>();
   private dragScrollContainerEl: HTMLElement | null = null;
@@ -357,7 +362,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           render: (_data: any, _type: any, row: FundingSubmissionListGrantDto) => {
             const applId = Number(row?.applId);
             const expandedIcon = this.detailComponentsByApplId.has(applId) ? 'fa-minus-circle' : 'fa-plus-circle';
-            const isLocked = this.decisionsLocked;
+            const isLocked = this.isGrantLocked(row);
             const options = isLocked
               ? ''
               : this.getProcessOptionsForGrant(row)
@@ -453,9 +458,21 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => this.dtTrigger.next(null));
   }
 
+  get hasLockedGrantSelected(): boolean {
+    return Array.from(this.selectedRows.keys()).some(applId => this.isApplIdLocked(applId));
+  }
+
+  get hasLockableDecisions(): boolean {
+    return this.grants.some(grant => this.isLockableDecision(grant));
+  }
+
+  get isLockActionDisabled(): boolean {
+    return !this.hasLockableDecisions || this.isLockingDecisions;
+  }
+
   goToDirectorBulkEdit(): void {
     const selectedGrants = Array.from(this.selectedRows.values());
-    if (!selectedGrants.length) {
+    if (!selectedGrants.length || this.hasLockedGrantSelected) {
       return;
     }
 
@@ -479,6 +496,9 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onConfirmDecisionsClick(): void {
+    if (this.isLockActionDisabled) {
+      return;
+    }
     this.confirmDecisionsModalRef = this.modalService.open(this.confirmDecisionsWarningModalRef, { centered: true });
   }
 
@@ -487,11 +507,39 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onProceedConfirmDecisions(): void {
-    // Confirmation only for now; locking decisions is handled by the backend flow
-    // once the endpoint is available for this page.
-    this.decisionsLocked = true;
-    this.confirmDecisionsModalRef?.close();
-    this.reloadTable();
+    if (this.isLockingDecisions) {
+      return;
+    }
+
+    this.isLockingDecisions = true;
+    this.lockErrorMessage = '';
+    this.fundingSubmissionsService.confirmApprovalsAndRejections(this.listId)
+      .pipe(finalize(() => this.isLockingDecisions = false))
+      .subscribe({
+        next: () => {
+          this.confirmDecisionsModalRef?.close();
+          this.decisionSuccessMessage =
+            'Success! All Approved and Rejected grants have been confirmed and their decisions can no longer be changed.';
+          this.loadListMeta();
+        },
+        error: (err) => {
+          this.logger.error('Failed to lock NCI Director decisions', err);
+          this.confirmDecisionsModalRef?.close();
+          this.decisionSuccessMessage = '';
+          this.lockErrorMessage = this.getLockDecisionsErrorMessage(err);
+          if (Number(err?.status) === 409) {
+            // A competing lock may have succeeded; show the server's lock state rather than guessing.
+            this.loadListMeta();
+          }
+        }
+      });
+  }
+
+  private getLockDecisionsErrorMessage(err: any): string {
+    const status = Number(err?.status);
+    if (status === 403) return 'You are not authorized to lock NCI Director decisions.';
+    if (status === 409) return 'There are no Approve or Reject decisions available to lock. They may already be locked.';
+    return 'Unable to lock NCI Director decisions right now. Please try again.';
   }
 
   ngOnDestroy(): void {
@@ -630,6 +678,21 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const reviewStatus = this.normalizeValue(grant?.reviewStatus);
     return reviewStatus.includes('DIRECTOR');
+  }
+
+  private isGrantLocked(grant: FundingSubmissionListGrantDto | null | undefined): boolean {
+    return !!grant?.lockedDate;
+  }
+
+  private isApplIdLocked(applId: number): boolean {
+    return this.isGrantLocked(this.grants.find(grant => Number(grant?.applId) === applId));
+  }
+
+  private isLockableDecision(grant: FundingSubmissionListGrantDto): boolean {
+    return !this.isGrantLocked(grant)
+      && this.normalizeValue(grant?.docDecision) === LOCKABLE_DOC_DECISION
+      && this.isInNciDirectorReview(grant)
+      && LOCKABLE_NCI_DECISIONS.has(this.normalizeValue(grant?.nciDecision));
   }
 
   private normalizeValue(value: string | null | undefined): string {
@@ -908,9 +971,6 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
       .on('click', '.process-toggle', (event: any) => {
         event.preventDefault();
         event.stopPropagation();
-        if (this.decisionsLocked) {
-          return;
-        }
         const $toggle = $(event.currentTarget);
         if ($toggle.hasClass('disabled')) {
           return;
@@ -920,6 +980,9 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         const row = dt.row(tr as any);
         const applId = Number($toggle.data('appl-id'));
         const rowData = row.data() as FundingSubmissionListGrantDto;
+        if (this.isGrantLocked(rowData) || this.isApplIdLocked(applId)) {
+          return;
+        }
 
         if (Number.isFinite(applId) && rowData) {
           this.ensureGrantRowExpanded(applId, row, tr, rowData);
@@ -939,15 +1002,15 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
       .on('click', '.process-option', (event: any) => {
         event.preventDefault();
         event.stopPropagation();
-        if (this.decisionsLocked) {
-          return;
-        }
         const $option = $(event.currentTarget);
         const applId = Number($option.data('appl-id'));
         const decision = String($option.data('decision') || '');
         const tr = $option.closest('tr');
         const row = dt.row(tr as any);
         const rowData = row.data() as FundingSubmissionListGrantDto;
+        if (this.isGrantLocked(rowData) || this.isApplIdLocked(applId)) {
+          return;
+        }
 
         this.onProcessDecisionSelect(applId, decision as 'Approve' | 'Hold' | 'Rejected', undefined, undefined, rowData);
         $option.closest('.process-menu').removeClass('show');
@@ -1019,7 +1082,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getProcessOptionsForGrant(grant: FundingSubmissionListGrantDto): ProcessOption[] {
-    if (this.decisionsLocked) {
+    if (this.isGrantLocked(grant)) {
       return [];
     }
 
@@ -1049,12 +1112,12 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     tr?: JQuery,
     rowData?: FundingSubmissionListGrantDto
   ): void {
-    if (!Number.isFinite(applId) || this.decisionsLocked) {
+    if (!Number.isFinite(applId)) {
       return;
     }
 
     const grantRow = rowData || this.grants.find(grant => Number(grant.applId) === applId);
-    if (!grantRow) {
+    if (!grantRow || this.isGrantLocked(grantRow) || this.isApplIdLocked(applId)) {
       return;
     }
 
