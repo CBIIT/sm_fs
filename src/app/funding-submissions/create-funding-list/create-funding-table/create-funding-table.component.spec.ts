@@ -151,6 +151,34 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
       expect(component.grantList.map((row: any) => row.selected)).toEqual(grantSelectionsBefore);
     });
 
+    it('shows a safe conflict message and preserves the modal context after a 409', () => {
+      const selectedRowsBefore = Array.from(component.selectedRows.entries());
+      const grantSelectionsBefore = component.grantList.map((row: any) => row.selected);
+      const selectedDateBefore = component.selectedDate;
+      const loaderServiceSpy = TestBed.inject(LoaderService) as jasmine.SpyObj<LoaderService>;
+      const serviceSpy = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;
+      serviceSpy.addGrantsToList.and.returnValue(throwError(() => ({
+        status: 409,
+        url: '/i2efsws/api/v1/funding-submissions/lists',
+        message: 'Http failure response for /i2efsws/api/v1/funding-submissions/lists: 409 409'
+      })));
+
+      component.saveToList();
+
+      expect(component.saveToListErrorMessage).toBe(
+        'The selected grants could not be added to this list. Please review the list or contact support for assistance.'
+      );
+      expect(component.saveToListErrorMessage).not.toContain('/i2efsws');
+      expect(component.saveToListErrorMessage).not.toContain('409');
+      expect(component.saveToListErrorMessage).not.toContain('Http failure');
+      expect(loaderServiceSpy.hide).toHaveBeenCalled();
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
+      expect(modalRefSpy.dismiss).not.toHaveBeenCalled();
+      expect(component.selectedDate).toBe(selectedDateBefore);
+      expect(Array.from(component.selectedRows.entries())).toEqual(selectedRowsBefore);
+      expect(component.grantList.map((row: any) => row.selected)).toEqual(grantSelectionsBefore);
+    });
+
     it('clears any prior error message on successful save', () => {
       component.saveToListErrorMessage = 'A Funding List must contain at least one grant.';
       const serviceSpy = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;

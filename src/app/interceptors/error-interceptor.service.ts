@@ -82,6 +82,12 @@ export class ErrorInterceptor implements HttpInterceptor {
           return throwError(error);
         }
 
+        // Add-grants conflicts are displayed in the Save Grant List modal.
+        if (error.status === 409 && this.isAddGrantsToListRequest(req)) {
+          if (this.debugMode) this.logger.debug('409 from add-grants-to-list: let it pass');
+          return throwError(error);
+        }
+
         // Let the logger handle its own problems
         if (error.url.includes('logs') || req.url.includes('logs')) {
           if (this.debugMode) this.logger.debug('Let the logger handle its own messes');
@@ -100,6 +106,18 @@ export class ErrorInterceptor implements HttpInterceptor {
         this.handlingError = false;
       })
     );
+  }
+
+  private isAddGrantsToListRequest(req: HttpRequest<any>): boolean {
+    if (req.method !== 'POST') {
+      return false;
+    }
+
+    try {
+      return new URL(req.url, 'http://localhost').pathname === '/i2efsws/api/v1/funding-submissions/lists';
+    } catch {
+      return false;
+    }
   }
 
   private handleAllOtherErrors(req: HttpRequest<any>, error) {
