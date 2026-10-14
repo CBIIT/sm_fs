@@ -517,6 +517,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectTab(tabId: NciTabId): void {
     this.selectedTab = tabId;
+    // Requirement: on tab change, default to the first doc from the sorted list for that tab.
+    this.selectedDoc = '';
     this.ensureSelectedDocIsAvailableForTab();
     this.clearSelections();
     this.reloadTable();
