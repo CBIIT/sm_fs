@@ -565,6 +565,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectTab(tabId: NciTabId): void {
     this.selectedTab = tabId;
+    // Requirement: on tab change, default to the first doc from the sorted list for that tab.
+    this.selectedDoc = '';
     this.ensureSelectedDocIsAvailableForTab();
     this.clearSelections();
     this.reloadTable();
@@ -787,7 +789,14 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private bindSelectionEvents(dt: DataTables.Api): void {
     const $container = $(dt.table(0).container());
+    const $tableNode = $(dt.table(0).node());
     this.stampCheckboxApplIds(dt, $container);
+
+    $tableNode
+      .off('order.dt.fundingClearSelections')
+      .on('order.dt.fundingClearSelections', () => {
+        this.clearSelectedRows($container);
+      });
 
     $container
       .off('click.fundingSelectAll', 'thead .select-checkbox')
@@ -848,6 +857,15 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
     this.syncHeaderSelectionState(dt, $container);
+  }
+
+  private clearSelectedRows(container?: JQuery<HTMLElement>): void {
+    this.selectedRows.clear();
+    if (container) {
+      container.find('thead .select-checkbox').removeClass('selected');
+      container.find('tbody .select-checkbox').removeClass('selected');
+    }
+    this.cdr.markForCheck();
   }
 
   private syncHeaderSelectionState(dt: DataTables.Api, container: JQuery<HTMLElement>): void {
