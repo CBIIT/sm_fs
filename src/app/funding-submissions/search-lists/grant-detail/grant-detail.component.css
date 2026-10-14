@@ -10,15 +10,6 @@
   width: 98%;
 }
 
-.detail-grid-table {
-  width: 100%;
-  table-layout: fixed;
-}
-
-.detail-grid-table col.detail-grid-col {
-  width: 12.5%;
-}
-
 /* Remove all inner cell borders; outer borders stay on thead/tbody elements via inline style */
 .grid-container table td,
 .grid-container table th {
@@ -45,4 +36,59 @@
 
 .grid-label.sep {
   padding-left: 0.75rem;
+}
+
+@media (max-width: 1366px) and (min-width: 769px) {
+  .grid-label {
+    font-size: 0.74rem;
+    white-space: normal;
+    line-height: 1.1;
+    padding-right: 0.25rem;
+  }
+
+  .grid-label.sep {
+    padding-left: 0.35rem;
+  }
+
+  .grid-item {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-label {
+    font-size: 0.68rem;
+  }
+
+  .grid-item {
+    font-size: 0.68rem;
+  }
+
+  .grid-container .form-control {
+    font-size: 0.68rem;
+    padding: 0.15rem 0.3rem;
+    min-height: 1.6rem;
+  }
+
+  .grid-container textarea.form-control {
+    line-height: 1.2;
+  }
+
+  :host ::ng-deep .grid-container .select2-container .select2-selection--single {
+    min-height: 1.6rem !important;
+    font-size: 0.68rem;
+  }
+
+  :host ::ng-deep .grid-container .select2-container .select2-selection__rendered {
+    font-size: 0.68rem;
+    line-height: 1.6rem !important;
+  }
+
+  :host ::ng-deep .grid-container .select2-container .select2-selection__arrow {
+    height: 1.6rem !important;
+  }
+
+  .grid-container .small {
+    font-size: 0.64rem !important;
+  }
 }

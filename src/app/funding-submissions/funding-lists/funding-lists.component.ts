@@ -375,7 +375,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
             return `
               <div class="d-flex flex-column align-items-center gap-1 action-cell-wrap">
-                <button class="btn btn-link p-0 toggle-details d-block mx-auto mb-3" title="Details" data-appl-id="${applId}">
+                <button class="btn btn-link p-0 toggle-details d-block mx-auto mb-1" title="Details" data-appl-id="${applId}">
                   <i class="far ${expandedIcon} fa-lg"></i>
                 </button>
                 <div class="btn-group process-dropdown-wrap">
