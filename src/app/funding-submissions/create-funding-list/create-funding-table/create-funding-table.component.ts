@@ -632,7 +632,9 @@ allDataSelected(data: any[]): boolean {
       error: (err) => {
         this.loaderService.hide();
         this.logger.error('addGrantsToList error', err?.status, err?.error, body);
-        this.saveToListErrorMessage = this.getSaveToListError(err);
+        this.saveToListErrorMessage = err?.status === 409
+          ? 'The selected grants could not be added to this list. Please review the list or contact support for assistance.'
+          : this.getSaveToListError(err);
       }
     });
   }
