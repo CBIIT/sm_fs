@@ -151,6 +151,45 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
       expect(component.grantList.map((row: any) => row.selected)).toEqual(grantSelectionsBefore);
     });
 
+    it('uses neutral copy for a structured or unrecognized local 400 response', () => {
+      const serviceSpy = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;
+      serviceSpy.addGrantsToList.and.returnValue(throwError(() => ({
+        status: 400,
+        url: '/i2efsws/api/v1/funding-submissions/lists',
+        error: {
+          status: 400,
+          error: 'Bad Request',
+          path: '/i2efsws/api/v1/funding-submissions/lists',
+          message: 'Unverified framework detail'
+        },
+        message: 'Http failure response for /i2efsws/api/v1/funding-submissions/lists: 400'
+      })));
+
+      component.saveToList();
+
+      expect(component.saveToListErrorMessage).toBe('Unable to save the grant list.');
+      expect(component.saveToListErrorMessage).not.toContain('/i2efsws');
+      expect(component.saveToListErrorMessage).not.toContain('400');
+      expect(component.saveToListErrorMessage).not.toContain('Unverified');
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
+      expect(modalRefSpy.dismiss).not.toHaveBeenCalled();
+    });
+
+    it('uses neutral copy for an unrecognized plain-text local 400 response', () => {
+      const serviceSpy = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;
+      serviceSpy.addGrantsToList.and.returnValue(throwError(() => ({
+        status: 400,
+        error: 'Unverified server validation text.'
+      })));
+
+      component.saveToList();
+
+      expect(component.saveToListErrorMessage).toBe('Unable to save the grant list.');
+      expect(component.saveToListErrorMessage).not.toContain('Unverified');
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
+      expect(modalRefSpy.dismiss).not.toHaveBeenCalled();
+    });
+
     it('shows a safe conflict message and preserves the modal context after a 409', () => {
       const selectedRowsBefore = Array.from(component.selectedRows.entries());
       const grantSelectionsBefore = component.grantList.map((row: any) => row.selected);
@@ -177,6 +216,26 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
       expect(component.selectedDate).toBe(selectedDateBefore);
       expect(Array.from(component.selectedRows.entries())).toEqual(selectedRowsBefore);
       expect(component.grantList.map((row: any) => row.selected)).toEqual(grantSelectionsBefore);
+    });
+
+    it('dismisses the modal and clears transport text for a globally handled error', () => {
+      const loaderServiceSpy = TestBed.inject(LoaderService) as jasmine.SpyObj<LoaderService>;
+      const serviceSpy = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;
+      component.saveToListErrorMessage = 'Http failure response for /i2efsws/api/v1/funding-submissions/lists: 500';
+      serviceSpy.addGrantsToList.and.returnValue(throwError(() => ({
+        status: 500,
+        url: '/i2efsws/api/v1/funding-submissions/lists',
+        message: 'Http failure response for /i2efsws/api/v1/funding-submissions/lists: 500'
+      })));
+
+      component.saveToList();
+
+      expect(loaderServiceSpy.hide).toHaveBeenCalled();
+      expect(component.saveToListErrorMessage).toBe('');
+      expect(component.saveToListErrorMessage).not.toContain('/i2efsws');
+      expect(component.saveToListErrorMessage).not.toContain('500');
+      expect(modalRefSpy.dismiss).toHaveBeenCalled();
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
     });
 
     it('clears any prior error message on successful save', () => {

@@ -72,7 +72,7 @@ export class FullGrantNumberCellRendererComponent implements OnInit {
   }
 
   private buildInstituteTooltip(): string {
-    const orgName = this.data?.orgName?.trim();
+    const orgName = (this.data?.orgName ?? this.data?.institution)?.trim();
     const city = this.data?.institutionCity?.trim();
     const state = this.data?.institutionState?.trim();
 
