@@ -263,7 +263,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           width: '40px',
           defaultContent: '',
           render: (data: boolean, _t: any, row: any) =>
-            data ? `<a href="#" class="doc-open-link" data-doc-type="AB" data-appl-id="${row.applId}">Y</a>` : ''
+            data ? `<span>Y</span>` : ''
         },
         {
           title: 'SS',
@@ -271,7 +271,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           width: '40px',
           defaultContent: '',
           render: (data: boolean, _t: any, row: any) =>
-            data ? `<a href="#" class="doc-open-link" data-doc-type="SS" data-appl-id="${row.applId}">Y</a>` : ''
+            data ? `<span>Y</span>` : ''
         },
         {
           title: 'Justification',
@@ -279,7 +279,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           width: '90px',
           defaultContent: '',
           render: (data: boolean, _t: any, row: any) =>
-            data ? `<a href="#" class="doc-open-link" data-doc-type="JST" data-appl-id="${row.applId}">Y</a>` : ''
+            data ? `<span>Y</span>` : ''
         },
         {
           title: 'Review status',
