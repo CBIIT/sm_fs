@@ -68,13 +68,7 @@
           "configurations": {
             "dev": {
               "optimization": false,
-              "sourceMap": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.dev.ts"
-                }
-              ]
+              "sourceMap": true
             },
             "test": {
               "optimization": false,
@@ -82,7 +76,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.test.ts"
+                  "with": "src/environments/environment.nonprod.ts"
                 }
               ]
             },
@@ -92,7 +86,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.stage.ts"
+                  "with": "src/environments/environment.nonprod.ts"
                 }
               ]
             },
@@ -127,7 +121,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.test.ts"
+                  "with": "src/environments/environment.nonprod.ts"
                 }
               ],
               "optimization": true,
@@ -156,7 +150,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.local.ts"
+                  "with": "src/environments/environment.nonprod.ts"
                 }
               ]
             },
@@ -167,7 +161,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.local.ts"
+                  "with": "src/environments/environment.nonprod.ts"
                 }
               ]
             }
