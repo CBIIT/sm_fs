@@ -1015,6 +1015,125 @@ describe('GrantDetailComponent', () => {
       expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent.trim()).toBe(message);
     });
 
+    [
+      ['GRANT_NOT_ACTIVE', 'Grant membership is no longer active and cannot be changed.'],
+      ['GRANT_LOCKED', 'This grant is decision-locked and cannot be changed.'],
+      ['DOC_STAGE_READ_ONLY', 'DOC grants in OEFIA Review or NCI Director Review are view-only.']
+    ].forEach(([reasonCode, message]) => {
+      it(`shows the safe server message for ${reasonCode}`, () => {
+        component.justificationLoaded = true;
+        component.budgetCategoriesLoaded = true;
+        component.data.justificationText = '';
+        component.onEdit();
+        component.formModel.justificationText = 'pending text';
+        const transportText = 'Http failure response for https://api.example.test/private: 409 Conflict';
+        fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(throwError(() => ({
+          status: 409,
+          message: transportText,
+          url: 'https://api.example.test/private',
+          error: {
+            errorCode: '409',
+            errorMessage: message,
+            additionalData: { reasonCode }
+          }
+        })));
+        fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: '' } as any));
+
+        component.onSave();
+        fixture.detectChanges();
+
+        expect(component.justificationSaveError).toBe(message);
+        expect(component.isSaveInProgress()).toBeFalse();
+        expect(component.isEditMode).toBeTrue();
+        expect(component.formModel.justificationText).toBe('pending text');
+        const alertText = fixture.nativeElement.querySelector('[role="alert"]')?.textContent.trim();
+        expect(alertText).toBe(message);
+        expect(alertText).not.toContain(transportText);
+      });
+    });
+
+    it('uses a safe fallback for unknown or malformed 409 payloads', () => {
+      component.justificationLoaded = true;
+      component.budgetCategoriesLoaded = true;
+      component.data.justificationText = '';
+      component.onEdit();
+      component.formModel.justificationText = 'pending text';
+      const unsafeTransportText = 'Http failure response for https://api.example.test/private: 409 Conflict';
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(throwError(() => ({
+        status: 409,
+        message: unsafeTransportText,
+        url: 'https://api.example.test/private',
+        error: {
+          errorMessage: 'Exception: private stack and payload',
+          additionalData: { reasonCode: 'UNRECOGNIZED' }
+        }
+      })));
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: '' } as any));
+
+      component.onSave();
+      fixture.detectChanges();
+
+      expect(component.justificationSaveError)
+        .toBe('The justification could not be saved because its status changed. Refresh and try again.');
+      const alertText = fixture.nativeElement.querySelector('[role="alert"]')?.textContent.trim();
+      expect(alertText).toBe(component.justificationSaveError);
+      expect(alertText).not.toContain('api.example.test');
+      expect(alertText).not.toContain('private stack');
+      expect(alertText).not.toContain('409 Conflict');
+    });
+
+    it('keeps only the unsaved files after a later sequential upload receives 409', () => {
+      const firstFile = new File(['first'], 'first.pdf', { type: 'application/pdf' });
+      const remainingFile = new File(['second'], 'remaining.pdf', { type: 'application/pdf' });
+      component.justificationLoaded = true;
+      component.budgetCategoriesLoaded = true;
+      component.data.justificationText = 'previous text';
+      component.justificationDocuments = [{ id: 88, docFilename: 'removed.pdf' } as any];
+      component.onEdit();
+      component.formModel.justificationText = '';
+      component.justificationFiles = [firstFile, remainingFile];
+      component.stagedDeleteDocumentIds = [88];
+
+      const conflict = {
+        status: 409,
+        message: 'Http failure response for https://api.example.test: 409 Conflict',
+        error: {
+          errorCode: '409',
+          errorMessage: 'The grant is locked.',
+          additionalData: { reasonCode: 'GRANT_LOCKED' }
+        }
+      };
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValues(
+        of({ id: 99, docFilename: 'first.pdf' } as any),
+        throwError(() => conflict)
+      );
+      fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({
+        justificationText: '',
+        documents: [{ id: 99, docFilename: 'first.pdf' }]
+      } as any));
+
+      component.onSave();
+      fixture.detectChanges();
+
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm).toHaveBeenCalledTimes(2);
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm.calls.argsFor(0))
+        .toEqual([1, 100, firstFile, '', [88]]);
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm.calls.argsFor(1))
+        .toEqual([1, 100, remainingFile, undefined, undefined]);
+      expect(component.justificationFiles).toEqual([remainingFile]);
+      expect(component.justificationUploadLabelText).toBe('remaining.pdf');
+      expect(component.visiblePersistedDocuments.map(document => document.id)).toEqual([99]);
+      expect(component.stagedDeleteDocumentIds).toEqual([]);
+      expect(component.data.justificationText).toBe('');
+      expect(component.formModel.justificationText).toBe('');
+      expect(component.hasUnsavedChanges()).toBeTrue();
+      expect(component.isEditMode).toBeTrue();
+      expect(component.isSaveInProgress()).toBeFalse();
+      expect(component.justificationSaveError).toBe('The grant is locked.');
+      expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent.trim())
+        .toBe('The grant is locked.');
+    });
+
     it('clears a displayed justification save error when the user changes the justification input', () => {
       component.justificationSaveError = 'Previous save error';
 

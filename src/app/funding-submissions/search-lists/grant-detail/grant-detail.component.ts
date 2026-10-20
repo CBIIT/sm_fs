@@ -732,6 +732,15 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   private getJustificationSaveError(error: any): string {
+    if (error?.status === 409) {
+      const body = error.error;
+      const reasonCode = body?.additionalData?.reasonCode;
+      const recognizedReason = ['GRANT_NOT_ACTIVE', 'GRANT_LOCKED', 'DOC_STAGE_READ_ONLY'].includes(reasonCode);
+      if (recognizedReason && typeof body?.errorMessage === 'string' && body.errorMessage.trim()) {
+        return body.errorMessage.trim();
+      }
+      return 'The justification could not be saved because its status changed. Refresh and try again.';
+    }
     return this.getSaveErrorMessage(error, 'Unable to save the justification.');
   }
 

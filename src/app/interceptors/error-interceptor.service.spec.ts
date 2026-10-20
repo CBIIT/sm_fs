@@ -126,4 +126,38 @@ describe('ErrorInterceptor add-grants conflict handling', () => {
     expect(errorHandler.registerNewError).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
   });
+
+  describe('justification conflict handling', () => {
+    const justificationUrl = '/i2efsws/api/v1/funding-submissions/lists/123/grants/456/justification';
+
+    it('rethrows a 409 from the exact justification-save POST without global handling', () => {
+      const { interceptor, errorHandler, router } = createHarness();
+
+      sendError(interceptor, justificationUrl, 'POST', 409);
+
+      expect(errorHandler.registerNewError).not.toHaveBeenCalled();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('matches the exact path with an absolute API URL and query string', () => {
+      const { interceptor, errorHandler, router } = createHarness();
+
+      sendError(interceptor, `https://api.example.test${justificationUrl}?source=grant-detail`, 'POST', 409);
+
+      expect(errorHandler.registerNewError).not.toHaveBeenCalled();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('keeps global handling for other methods and non-exact justification routes', () => {
+      const { interceptor, errorHandler, router } = createHarness();
+
+      sendError(interceptor, justificationUrl, 'GET', 409);
+      sendError(interceptor, `${justificationUrl}/metadata`, 'POST', 409);
+      sendError(interceptor, '/i2efsws/api/v1/funding-submissions/lists/123/grants/other/justification', 'POST', 409);
+      sendError(interceptor, '/i2efsws/api/v1/funding-submissions/lists/123/grants/456/justification/archive', 'POST', 409);
+
+      expect(errorHandler.registerNewError).toHaveBeenCalledTimes(4);
+      expect(router.navigate).toHaveBeenCalledTimes(4);
+    });
+  });
 });

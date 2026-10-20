@@ -88,6 +88,11 @@ export class ErrorInterceptor implements HttpInterceptor {
           return throwError(error);
         }
 
+        if (error.status === 409 && this.isJustificationSaveRequest(req)) {
+          if (this.debugMode) this.logger.debug('409 from justification save: let it pass');
+          return throwError(error);
+        }
+
         // Let the logger handle its own problems
         if (error.url.includes('logs') || req.url.includes('logs')) {
           if (this.debugMode) this.logger.debug('Let the logger handle its own messes');
@@ -115,6 +120,19 @@ export class ErrorInterceptor implements HttpInterceptor {
 
     try {
       return new URL(req.url, 'http://localhost').pathname === '/i2efsws/api/v1/funding-submissions/lists';
+    } catch {
+      return false;
+    }
+  }
+
+  private isJustificationSaveRequest(req: HttpRequest<any>): boolean {
+    if (req.method !== 'POST') {
+      return false;
+    }
+
+    try {
+      return /\/funding-submissions\/lists\/\d+\/grants\/\d+\/justification$/
+        .test(new URL(req.url, 'http://localhost').pathname);
     } catch {
       return false;
     }
