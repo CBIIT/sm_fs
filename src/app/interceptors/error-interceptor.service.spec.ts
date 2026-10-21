@@ -44,12 +44,14 @@ describe('ErrorInterceptor add-grants conflict handling', () => {
   function sendError(
     interceptor: ErrorInterceptor,
     url: string,
-    method: 'GET' | 'POST',
+    method: 'GET' | 'POST' | 'DELETE',
     status: number
   ): HttpErrorResponse {
     const request = method === 'POST'
       ? new HttpRequest('POST', url, {})
-      : new HttpRequest('GET', url);
+      : method === 'DELETE'
+        ? new HttpRequest('DELETE', url)
+        : new HttpRequest('GET', url);
     const error = new HttpErrorResponse({ status, url });
     const handler: HttpHandler = {
       handle: jasmine.createSpy('handle').and.returnValue(throwError(() => error))
@@ -125,6 +127,40 @@ describe('ErrorInterceptor add-grants conflict handling', () => {
 
     expect(errorHandler.registerNewError).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  describe('remove-grants conflict handling', () => {
+    const removeGrantsUrl = '/i2efsws/api/v1/funding-submissions/lists/123/grants';
+
+    it('rethrows a 409 from the exact remove-grants DELETE with a query string', () => {
+      const { interceptor, errorHandler, router } = createHarness();
+
+      sendError(interceptor, `${removeGrantsUrl}?applIds=111&applIds=222`, 'DELETE', 409);
+
+      expect(errorHandler.registerNewError).not.toHaveBeenCalled();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('matches the exact path on an absolute API URL', () => {
+      const { interceptor, errorHandler, router } = createHarness();
+
+      sendError(interceptor, `https://api.example.test${removeGrantsUrl}?applIds=111`, 'DELETE', 409);
+
+      expect(errorHandler.registerNewError).not.toHaveBeenCalled();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('keeps global handling for other methods, suffix paths, and unrelated 409s', () => {
+      const { interceptor, errorHandler, router } = createHarness();
+
+      sendError(interceptor, removeGrantsUrl, 'GET', 409);
+      sendError(interceptor, `${removeGrantsUrl}/export`, 'DELETE', 409);
+      sendError(interceptor, '/i2efsws/api/v1/funding-submissions/lists/not-a-number/grants', 'DELETE', 409);
+      sendError(interceptor, '/i2efsws/api/v1/funding-submissions/other', 'DELETE', 409);
+
+      expect(errorHandler.registerNewError).toHaveBeenCalledTimes(4);
+      expect(router.navigate).toHaveBeenCalledTimes(4);
+    });
   });
 
   describe('justification conflict handling', () => {

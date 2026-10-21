@@ -1727,7 +1727,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         this.logger.error('Remove grants from list failed', err);
-        if (err?.status === 400) {
+        if (err?.status === 400 || err?.status === 409) {
           this.removeGrantsErrorMessage = this.getRemoveGrantsError(err);
           return;
         }
@@ -1738,6 +1738,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getRemoveGrantsError(error: any): string {
+    if (error?.status === 409) {
+      return this.getRemoveGrantsConflictError(error);
+    }
     if (typeof error?.error === 'string' && error.error.trim()) {
       return error.error;
     }
@@ -1745,6 +1748,37 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       || error?.error?.message
       || error?.message
       || 'Unable to remove grants from the list.';
+  }
+
+  private getRemoveGrantsConflictError(error: any): string {
+    const additionalData = error?.error?.additionalData;
+    const reasonCode = additionalData?.reasonCode;
+    const isLocked = reasonCode === 'GRANT_LOCKED';
+    const isDocStageReadOnly = reasonCode === 'DOC_STAGE_READ_ONLY';
+    if ((!isLocked && !isDocStageReadOnly) || !Array.isArray(additionalData?.grants)) {
+      return 'The selected grants could not be removed because their status changed. Refresh and try again.';
+    }
+
+    const serverMessage = error?.error?.errorMessage;
+    if (typeof serverMessage !== 'string' || !serverMessage.trim()) {
+      return 'The selected grants could not be removed because their status changed. Refresh and try again.';
+    }
+
+    const grants = additionalData.grants;
+    const grantNumbers: string[] = [];
+    for (const grant of grants) {
+      if (!grant || typeof grant.grantNumber !== 'string' || !grant.grantNumber.trim()) {
+        return 'The selected grants could not be removed because their status changed. Refresh and try again.';
+      }
+      if (isDocStageReadOnly && !['OEFIAREVIEW', 'DIRECTORREVIEW'].includes(grant.reviewStatusCode)) {
+        return 'The selected grants could not be removed because their status changed. Refresh and try again.';
+      }
+      grantNumbers.push(grant.grantNumber.trim());
+    }
+
+    return grantNumbers.length > 0
+      ? `${serverMessage.trim()} Affected grants: ${grantNumbers.join(', ')}.`
+      : serverMessage.trim();
   }
 
   onBulkEdit(): void {
