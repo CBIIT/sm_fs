@@ -399,6 +399,86 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
     });
 
+    it('keeps the modal open and reports locked grant numbers without changing the selection', () => {
+      const selectedRowsBefore = new Map(component.selectedRows);
+      fundingSubmissionsServiceSpy.removeGrantsFromList.and.returnValue(
+        throwError(() => new HttpErrorResponse({
+          status: 409,
+          error: {
+            errorCode: '409',
+            errorMessage: 'One or more selected grants are locked and cannot be changed.',
+            additionalData: {
+              reasonCode: 'GRANT_LOCKED',
+              grants: [{ grantNumber: '1R01CA200002-01' }, { grantNumber: '1R01CA200003-01' }]
+            }
+          }
+        }))
+      );
+
+      component.onConfirmRemove();
+
+      expect(component.removeGrantsErrorMessage).toBe(
+        'One or more selected grants are locked and cannot be changed. Affected grants: 1R01CA200002-01, 1R01CA200003-01.'
+      );
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
+      expect(modalRefSpy.dismiss).not.toHaveBeenCalled();
+      expect(Array.from(component.selectedRows.entries())).toEqual(Array.from(selectedRowsBefore.entries()));
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+    });
+
+    it('keeps the modal open and reports per-grant DOC review stages and grant numbers', () => {
+      fundingSubmissionsServiceSpy.removeGrantsFromList.and.returnValue(
+        throwError(() => new HttpErrorResponse({
+          status: 409,
+          error: {
+            errorCode: '409',
+            errorMessage: 'DOC grants in OEFIA Review or NCI Director Review are view-only.',
+            additionalData: {
+              reasonCode: 'DOC_STAGE_READ_ONLY',
+              grants: [
+                { grantNumber: '1R01CA200002-01', reviewStatusCode: 'OEFIAREVIEW' },
+                { grantNumber: '1R01CA200003-01', reviewStatusCode: 'DIRECTORREVIEW' }
+              ]
+            }
+          }
+        }))
+      );
+
+      component.onConfirmRemove();
+
+      expect(component.removeGrantsErrorMessage).toContain(
+        'DOC grants in OEFIA Review or NCI Director Review are view-only.'
+      );
+      expect(component.removeGrantsErrorMessage).toContain('1R01CA200002-01');
+      expect(component.removeGrantsErrorMessage).toContain('1R01CA200003-01');
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
+      expect(Array.from(component.selectedRows.keys())).toEqual([100, 101]);
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+    });
+
+    it('uses a safe fallback for unknown or malformed 409 payloads', () => {
+      fundingSubmissionsServiceSpy.removeGrantsFromList.and.returnValue(
+        throwError(() => new HttpErrorResponse({
+          status: 409,
+          error: {
+            errorMessage: 'private transport text',
+            message: 'raw exception details',
+            additionalData: { reasonCode: 'UNRECOGNIZED_REASON' }
+          }
+        }))
+      );
+
+      component.onConfirmRemove();
+
+      expect(component.removeGrantsErrorMessage)
+        .toBe('The selected grants could not be removed because their status changed. Refresh and try again.');
+      expect(component.removeGrantsErrorMessage).not.toContain('private transport text');
+      expect(component.removeGrantsErrorMessage).not.toContain('raw exception details');
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
+      expect(Array.from(component.selectedRows.keys())).toEqual([100, 101]);
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+    });
+
     it('clears the error message when the remove modal is cancelled', () => {
       component.removeGrantsErrorMessage = 'A Funding List must contain at least one grant.';
 

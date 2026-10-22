@@ -93,6 +93,11 @@ export class ErrorInterceptor implements HttpInterceptor {
           return throwError(error);
         }
 
+        if (error.status === 409 && this.isRemoveGrantsRequest(req)) {
+          if (this.debugMode) this.logger.debug('409 from remove-grants: let it pass');
+          return throwError(error);
+        }
+
         // Let the logger handle its own problems
         if (error.url.includes('logs') || req.url.includes('logs')) {
           if (this.debugMode) this.logger.debug('Let the logger handle its own messes');
@@ -132,6 +137,19 @@ export class ErrorInterceptor implements HttpInterceptor {
 
     try {
       return /\/funding-submissions\/lists\/\d+\/grants\/\d+\/justification$/
+        .test(new URL(req.url, 'http://localhost').pathname);
+    } catch {
+      return false;
+    }
+  }
+
+  private isRemoveGrantsRequest(req: HttpRequest<any>): boolean {
+    if (req.method !== 'DELETE') {
+      return false;
+    }
+
+    try {
+      return /\/i2efsws\/api\/v1\/funding-submissions\/lists\/\d+\/grants$/
         .test(new URL(req.url, 'http://localhost').pathname);
     } catch {
       return false;
