@@ -541,7 +541,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     const pct = this.formModel.docRecReductionPct;
     const numericPct = this.toFiniteNumberOrNull(pct);
     if (pct != null && !this.isValidReductionPctForCalculation(numericPct)) {
-      errors.docRecReductionPct = 'Enter a numeric value between 0 and 99, with at most 2 decimal places.';
+      errors.docRecReductionPct = 'Enter a numeric value between 0 and 99.99, with at most 2 decimal places.';
     }
 
     const amt = this.formModel.docRecAmt;
