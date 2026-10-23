@@ -388,7 +388,7 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
       return '';
     }
     const parts = trimmed.split(/[\s,]+/).filter(Boolean);
-    return parts.length ? parts[parts.length - 1] : trimmed;
+    return parts.length ? parts[0] : trimmed;
   }
 
   private mapSelectedGrants(grants: any[]): DirectorBulkGrantRow[] {
