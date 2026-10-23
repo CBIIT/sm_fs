@@ -496,7 +496,21 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     return status.includes('oefia review') || status.includes('nci director review');
   }
 
+  private hasConfirmedAndLockedApproveRejectDecision(): boolean {
+    if (!this.data?.lockedDate) {
+      return false;
+    }
+
+    const nciDecision = String(this.data?.nciDecision || '').trim().toUpperCase();
+    return nciDecision === 'APPROVE' || nciDecision === 'REJECTED' || nciDecision === 'REJECT';
+  }
+
   get canEnterEditMode(): boolean {
+    // Confirmed/locked Approve/Reject director decisions are immutable.
+    if (this.hasConfirmedAndLockedApproveRejectDecision() && this.canEditOefiaNotes()) {
+      return false;
+    }
+
     // Requirement: DOC users are read-only in OEFIA Review and NCI Director Review.
     if (this.docFundingListCor) {
       return !this.isReadOnlyDocStatusForDocUser();

@@ -137,6 +137,40 @@ describe('GrantDetailComponent', () => {
     expect(component.isEditMode).toBeTrue();
   });
 
+  it('hides Edit for OEFIA users', () => {
+    fixture.detectChanges();
+    getJustificationSubject.next({ justificationText: '' });
+    getJustificationSubject.complete();
+
+    component.docFundingListCor = false;
+    component.OEFIACertifier = true;
+    component.financialAnalyst = false;
+    component.listStatus = 'DOC Review';
+
+    fixture.detectChanges();
+
+    expect(component.canEnterEditMode).toBeFalse();
+    const editButton: HTMLButtonElement | null = fixture.nativeElement.querySelector('button.btn-outline-primary');
+    expect(editButton).toBeNull();
+  });
+
+  it('hides Edit for Financial Analyst users', () => {
+    fixture.detectChanges();
+    getJustificationSubject.next({ justificationText: '' });
+    getJustificationSubject.complete();
+
+    component.docFundingListCor = false;
+    component.OEFIACertifier = false;
+    component.financialAnalyst = true;
+    component.listStatus = 'DOC Review';
+
+    fixture.detectChanges();
+
+    expect(component.canEnterEditMode).toBeFalse();
+    const editButton: HTMLButtonElement | null = fixture.nativeElement.querySelector('button.btn-outline-primary');
+    expect(editButton).toBeNull();
+  });
+
   it('allows Edit for DOC role when list status is not OEFIA/NCI Director Review once data is loaded', () => {
     fixture.detectChanges();
     getJustificationSubject.next({ justificationText: '' });
@@ -219,6 +253,30 @@ describe('GrantDetailComponent', () => {
     component.docFundingListCor = true;
     component.listStatus = 'DOC Review';
     component.data = { applId: 100, reviewStatus: 'NCI Director Review' };
+
+    expect(component.canEnterEditMode).toBeFalse();
+  });
+
+  it('blocks editing when an approved NCI decision is confirmed and locked', () => {
+    component.docFundingListCor = false;
+    component.listStatus = 'DOC Review';
+    component.data = {
+      applId: 100,
+      nciDecision: 'Approve',
+      lockedDate: new Date('2026-10-23T00:00:00Z')
+    };
+
+    expect(component.canEnterEditMode).toBeFalse();
+  });
+
+  it('blocks editing when a rejected NCI decision is confirmed and locked', () => {
+    component.docFundingListCor = false;
+    component.listStatus = 'DOC Review';
+    component.data = {
+      applId: 100,
+      nciDecision: 'Rejected',
+      lockedDate: new Date('2026-10-23T00:00:00Z')
+    };
 
     expect(component.canEnterEditMode).toBeFalse();
   });
