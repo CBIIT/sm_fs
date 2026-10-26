@@ -61,7 +61,7 @@
           <ng-select2 id="bulk-budget-cat" name="bulkBudgetCategories" [(ngModel)]="bulkFields.budgetCategories"
             (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
-            [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
+            [data]="budgetCategoryOptions"  width="100%">
           </ng-select2>
           </div>
         </div>
@@ -70,7 +70,7 @@
           <label class="form-label fw-semibold">DOC Decision</label>
           <ng-select2 id="bulk-doc-decision" name="bulkDocDecision" [(ngModel)]="bulkFields.docDecision"
             (ngModelChange)="onBulkDocDecisionChange()"
-            [data]="decisionOptions" [allowClear]="true" width="100%">
+            [data]="decisionOptions" width="100%">
           </ng-select2>
           </div>
         </div>
@@ -80,7 +80,7 @@
           <ng-select2 id="bulk-doc-nci-sel" name="bulkDocNciSelection" [(ngModel)]="bulkFields.docNciSelection"
             (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
-            [data]="docNciOptions" [allowClear]="true" width="100%">
+            [data]="docNciOptions" width="100%">
           </ng-select2>
           </div>
         </div>
@@ -93,7 +93,7 @@
           <ng-select2 id="bulk-annual-r01" name="bulkAnnualFundingR01" [(ngModel)]="bulkFields.annualFundingR01"
             (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
-            [data]="yesNoOptions" [allowClear]="true" width="100%">
+            [data]="yesNoOptions" width="100%">
           </ng-select2>
           </div>
         </div>
@@ -103,7 +103,7 @@
           <ng-select2 id="bulk-annual-myf" name="bulkAnnualOrMyf" [(ngModel)]="bulkFields.annualOrMyf"
             (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
-            [data]="annualMyfOptions" [allowClear]="true" width="100%">
+            [data]="annualMyfOptions" width="100%">
           </ng-select2>
           </div>
         </div>
