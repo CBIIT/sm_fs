@@ -52,7 +52,7 @@
               <span *ngIf="!isEditMode">{{getDocDecisionDisplay(data.docDecision)}}</span>
               <ng-select2 *ngIf="isEditMode" name="docDecision" [(ngModel)]="formModel.docDecision"
                 (ngModelChange)="onDocDecisionChange()"
-                [data]="decisionOptions" [allowClear]="true" [placeholder]="'Select'" width="100%">
+                [data]="decisionOptions" [placeholder]="'Select'" width="100%">
               </ng-select2>
             </td>
           </tr>
@@ -105,7 +105,7 @@
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.twoYearAnnualFundingR01Flag ? 'Yes' : ''}}</span>
               <ng-select2 *ngIf="isEditMode" name="annualFundingR01" [(ngModel)]="formModel.annualFundingR01"
-                [data]="yesNoOptions" [allowClear]="true" [placeholder]="'Select'" width="100%"
+                [data]="yesNoOptions" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
@@ -119,17 +119,17 @@
             <td class="grid-item">{{data.priorityScore}}</td>
             <td class="grid-label sep">Annual or MYF:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.annualOrMyfName}}</span>
-              <ng-select2 *ngIf="isEditMode" name="annualOrMyf" [(ngModel)]="formModel.annualOrMyf"
-                [data]="annualMyfOptions" [allowClear]="true" [placeholder]="'Select'" width="100%"
+              <span *ngIf="!isEditMode || docFundingListCor">{{data.annualOrMyfName}}</span>
+              <ng-select2 *ngIf="isEditMode && !docFundingListCor" name="annualOrMyf" [(ngModel)]="formModel.annualOrMyf"
+                [data]="annualMyfOptions" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
             <td class="grid-label">Budget Categories:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode">{{data.budgetCategories}}</span>
-              <ng-select2 *ngIf="isEditMode" name="budgetCategories" [(ngModel)]="formModel.budgetCategories"
-                [data]="budgetCategoryOptions" [allowClear]="true" [placeholder]="'Select'" width="100%"
+              <span *ngIf="!isEditMode || docFundingListCor">{{data.budgetCategories}}</span>
+              <ng-select2 *ngIf="isEditMode && !docFundingListCor" name="budgetCategories" [(ngModel)]="formModel.budgetCategories"
+                [data]="budgetCategoryOptions" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
@@ -145,7 +145,7 @@
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docNciSelectionName}}</span>
               <ng-select2 *ngIf="isEditMode" name="docNciSelection" [(ngModel)]="formModel.docNciSelection"
-                [data]="selectionOptions" [allowClear]="true" [placeholder]="'Select'" width="100%"
+                [data]="selectionOptions" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>

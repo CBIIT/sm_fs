@@ -55,7 +55,7 @@
     <!-- Bulk-apply form -->
     <form #bulkForm="ngForm">
       <div class="row mb-3">
-        <div class="col-4">
+        <div class="col-4" *ngIf="!docFundingListCor">
           <div class="field-with-inline-error">
           <label class="form-label fw-semibold">Budget Categories</label>
           <ng-select2 id="bulk-budget-cat" name="bulkBudgetCategories" [(ngModel)]="bulkFields.budgetCategories"
@@ -97,7 +97,7 @@
           </ng-select2>
           </div>
         </div>
-        <div class="col-4">
+        <div class="col-4" *ngIf="!docFundingListCor">
           <div class="field-with-inline-error">
           <label class="form-label fw-semibold">Annual or MYF</label>
           <ng-select2 id="bulk-annual-myf" name="bulkAnnualOrMyf" [(ngModel)]="bulkFields.annualOrMyf"
