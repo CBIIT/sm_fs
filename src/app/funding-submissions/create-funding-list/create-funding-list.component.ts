@@ -94,6 +94,13 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     return (this.selectedDocs || []).filter(Boolean);
   }
 
+  private getFullGrantNumbers(): string[] {
+    return String(this.multipleGrantNumbers || '')
+      .split(/[,\s]+/)
+      .map((grantNumber) => grantNumber.trim())
+      .filter((grantNumber) => grantNumber.length > 0);
+  }
+
   ngAfterViewInit(): void {
     const freshNavigation = this.stateService.consumeFreshNavigationRequest();
     if (freshNavigation) {
@@ -116,6 +123,8 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
           : (restoredCancerActivities || ''));
         this.i2Status = state.i2Status;
         this.excludeInList = state.excludeInList;
+        this.grantNumberSearchMode = state.grantNumberSearchMode ?? 'single';
+        this.multipleGrantNumbers = state.multipleGrantNumbers ?? '';
         this.filterForm?.form.patchValue(state.formValue);
         if (state.showResults) {
           this.fundingTable?.restoreState(state.selectedRows, state.currentPage);
@@ -169,6 +178,8 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
         selectedDocs: this.selectedDocs,
         i2Status: this.i2Status,
         excludeInList: this.excludeInList,
+        grantNumberSearchMode: this.grantNumberSearchMode,
+        multipleGrantNumbers: this.multipleGrantNumbers,
         ...tableState
       });
     }
@@ -245,7 +256,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
       grantNumber.grantNumberYear ||
       grantNumber.grantNumberSuffix
     );
-    const hasMultipleGrantNumbers = !!String(this.multipleGrantNumbers || '').trim();
+    const hasMultipleGrantNumbers = this.getFullGrantNumbers().length > 0;
     const hasGrantNumberCriteria = this.grantNumberSearchMode === 'multiple'
       ? hasMultipleGrantNumbers
       : hasSingleGrantNumberCriteria;
@@ -286,6 +297,13 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   }
 
   search(): void {
+    const fullGrantNumbers = this.grantNumberSearchMode === 'multiple'
+      ? this.getFullGrantNumbers()
+      : undefined;
+    if (this.grantNumberSearchMode === 'multiple' && !fullGrantNumbers?.length) {
+      return;
+    }
+
     if (this.filterForm?.invalid || !this.hasAnyCriteria || this.isDocRequiredMissing) {
       return;
     }
@@ -299,8 +317,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
 
     const criteria: FundingSubmissionGrantSearchCriteriaDto = {};
     if (this.grantNumberSearchMode === 'multiple') {
-      // API has no dedicated multiple-grant-number field; use serialNumber as the raw comma-separated value.
-      criteria.serialNumber = String(this.multipleGrantNumbers || '').trim() || undefined;
+      criteria.fullGrantNumbers = fullGrantNumbers;
     } else {
       criteria.grantType = grantNumberForm.grantNumberType;
       criteria.grantNumberMech = grantNumberForm.grantNumberMech;

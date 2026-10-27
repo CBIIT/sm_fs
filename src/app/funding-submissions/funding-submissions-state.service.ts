@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FundingSubmissionGrantSearchCriteriaDto, FundingSubmissionListSearchCriteriaDto, FundingSubmissionSearchResultDto } from '@cbiit/i2efsws-lib';
+import { GrantNumberSearchMode } from '../shared/grant-number-search-mode/grant-number-search-mode.component';
 
 export interface FundingListPageState {
   formValue: any;
@@ -7,6 +8,8 @@ export interface FundingListPageState {
   selectedDocs: string[];
   i2Status: string | string[];
   excludeInList: boolean;
+  grantNumberSearchMode?: GrantNumberSearchMode;
+  multipleGrantNumbers?: string;
   searchCriteria: FundingSubmissionGrantSearchCriteriaDto;
   selectedRows: Map<number, FundingSubmissionSearchResultDto>;
   showResults: boolean;
