@@ -270,6 +270,7 @@ import { FundingListsSearchComponent } from './funding-submissions/funding-lists
 import { FundingListsComponent } from './funding-submissions/funding-lists/funding-lists.component';
 import { DirectorBulkEditComponent } from './funding-submissions/funding-lists/bulk-edit/director-bulk-edit.component';
 import { SavedProjectedCanComponent } from './cans/saved-projected-can/saved-projected-can.component';
+import { GrantNumberSearchModeComponent } from './shared/grant-number-search-mode/grant-number-search-mode.component';
 
 declare var $: any;
 
@@ -530,7 +531,8 @@ export function combinedInitializerFactory(
         FundingListsSearchComponent,
         FundingListsComponent,
         DirectorBulkEditComponent,
-        SavedProjectedCanComponent
+        SavedProjectedCanComponent,
+        GrantNumberSearchModeComponent
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule, NgbAccordionModule,

@@ -9,6 +9,7 @@ import { CreateFundingTableComponent } from './create-funding-table/create-fundi
 import { FundingSubmissionsStateService } from '../funding-submissions-state.service';
 import { roleNames } from 'src/app/service/role-names';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
+import { GrantNumberSearchMode } from '../../shared/grant-number-search-mode/grant-number-search-mode.component';
 
 @Component({
   selector: 'app-create-funding-list',
@@ -31,6 +32,8 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   selectedCancerActivities: string[] | string = [];
   selectedDocs: string[] = [];
   i2Status: string | string[];
+  grantNumberSearchMode: GrantNumberSearchMode = 'single';
+  multipleGrantNumbers = '';
   docFundingListCor = false;
   userDocs: string[] = [];
   excludeInList = true;
@@ -234,6 +237,18 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   get hasAnyCriteria(): boolean {
     const formValue = this.filterForm?.form.value || {};
     const grantNumber = formValue.grantNumber || {};
+    const hasSingleGrantNumberCriteria = !!(
+      grantNumber.grantNumberType ||
+      grantNumber.grantNumberMech ||
+      grantNumber.grantNumberIC ||
+      grantNumber.grantNumberSerial ||
+      grantNumber.grantNumberYear ||
+      grantNumber.grantNumberSuffix
+    );
+    const hasMultipleGrantNumbers = !!String(this.multipleGrantNumbers || '').trim();
+    const hasGrantNumberCriteria = this.grantNumberSearchMode === 'multiple'
+      ? hasMultipleGrantNumbers
+      : hasSingleGrantNumberCriteria;
     const ncabRange = formValue.ncabRange || {};
     const fyRange = formValue.fyRange || {};
     const irgRange = formValue.irgPercentileRange || {};
@@ -245,12 +260,7 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     const typeArray = formValue.typeSelect;
     const effectiveDocs = this.getDocsForQuery();
     return !!(
-      grantNumber.grantNumberType ||
-      grantNumber.grantNumberMech ||
-      grantNumber.grantNumberIC ||
-      grantNumber.grantNumberSerial ||
-      grantNumber.grantNumberYear ||
-      grantNumber.grantNumberSuffix ||
+      hasGrantNumberCriteria ||
       formValue.pdName ||
       effectiveDocs.length > 0 ||
       (Array.isArray(caArray) ? caArray.length > 0 : !!caArray) ||
@@ -288,18 +298,23 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     const grantNumberForm = formValue.grantNumber || {};
 
     const criteria: FundingSubmissionGrantSearchCriteriaDto = {};
-    criteria.grantType = grantNumberForm.grantNumberType;
-    criteria.grantNumberMech = grantNumberForm.grantNumberMech;
+    if (this.grantNumberSearchMode === 'multiple') {
+      // API has no dedicated multiple-grant-number field; use serialNumber as the raw comma-separated value.
+      criteria.serialNumber = String(this.multipleGrantNumbers || '').trim() || undefined;
+    } else {
+      criteria.grantType = grantNumberForm.grantNumberType;
+      criteria.grantNumberMech = grantNumberForm.grantNumberMech;
+      criteria.icCode = grantNumberForm.grantNumberIC;
+      criteria.serialNumber = grantNumberForm.grantNumberSerial;
+      criteria.supportYear = grantNumberForm.grantNumberYear;
+      criteria.suffixCode = grantNumberForm.grantNumberSuffix;
+    }
     criteria.grantTypeCodes = Array.isArray(formValue.typeSelect) && formValue.typeSelect.length
       ? formValue.typeSelect.map((v: string) => Number(v)).filter((n: number) => !isNaN(n))
       : undefined;
     criteria.mechanismCodes = Array.isArray(formValue.mechSelect) && formValue.mechSelect.length
       ? formValue.mechSelect
       : undefined;
-    criteria.icCode = grantNumberForm.grantNumberIC;
-    criteria.serialNumber = grantNumberForm.grantNumberSerial;
-    criteria.supportYear = grantNumberForm.grantNumberYear;
-    criteria.suffixCode = grantNumberForm.grantNumberSuffix;
 
     const toNum = (v: any): number | undefined => (v !== '' && v != null) ? Number(v) : undefined;
 
@@ -342,6 +357,8 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     this.selectedCancerActivities = '';
     this.selectedDocs = [];
     this.i2Status = '';
+    this.grantNumberSearchMode = 'single';
+    this.multipleGrantNumbers = '';
     this.isPdActive = false;
     this.excludeInList = true;
     this.searchCriteria = {};

@@ -12,12 +12,13 @@
 
 <form #filterForm="ngForm" (ngSubmit)="search()">
 
-  <!-- Row 1: Grant Number (full width) -->
-  <div class="row form-group">
-    <div class="col-12 ms-3">
-      <lib-grantnumber-search-criteria [form]="filterForm"></lib-grantnumber-search-criteria>
-    </div>
-  </div>
+  <app-grant-number-search-mode
+    [form]="filterForm"
+    [mode]="grantNumberSearchMode"
+    (modeChange)="grantNumberSearchMode = $event"
+    [multipleGrantNumbers]="multipleGrantNumbers"
+    (multipleGrantNumbersChange)="multipleGrantNumbers = $event">
+  </app-grant-number-search-mode>
 
   <!-- Row 2: PD Name | Division Office Center | Cancer Activity -->
   <div class="row form-group">
