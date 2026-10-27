@@ -257,6 +257,26 @@ describe('CreateFundingListComponent grant-number search template', () => {
     );
   });
 
+  it('keeps the textarea full-width and validation feedback below it in the flex layout', () => {
+    render();
+    selectMultipleMode();
+
+    const textarea = fixture.nativeElement.querySelector('#multipleGrantNumbers') as HTMLTextAreaElement;
+    const inputWrap = fixture.nativeElement.querySelector('.grant-number-text-input-wrap') as HTMLElement;
+    const feedback = fixture.nativeElement.querySelector('#multipleGrantNumbersFeedback') as HTMLElement;
+    const label = fixture.nativeElement.querySelector('label[for="multipleGrantNumbers"]') as HTMLElement;
+    const textWrap = fixture.nativeElement.querySelector('.grant-number-text-wrap') as HTMLElement;
+    const textareaRect = textarea.getBoundingClientRect();
+    const inputWrapRect = inputWrap.getBoundingClientRect();
+    const feedbackRect = feedback.getBoundingClientRect();
+
+    expect(inputWrap.parentElement).toBe(textWrap);
+    expect(inputWrapRect.width).toBeGreaterThan(label.getBoundingClientRect().width);
+    expect(textareaRect.width).toBeGreaterThan(label.getBoundingClientRect().width);
+    expect(feedback.parentElement).toBe(inputWrap);
+    expect(feedbackRect.top).toBeGreaterThanOrEqual(textareaRect.bottom);
+  });
+
   it('counts separated occurrences including duplicates and disables Search for invalid input despite other criteria', () => {
     render();
     fixture.componentInstance.searchCriteria.piName = 'Smith';

@@ -52,13 +52,13 @@
           <div id="multipleGrantNumbersCounter" class="grant-number-counter small">
             {{ multipleGrantNumberCount }}/1000
           </div>
-        </div>
-        <div
-          *ngIf="multipleGrantNumberValidationMessage as validationMessage"
-          id="multipleGrantNumbersFeedback"
-          class="invalid-feedback d-block"
-        >
-          {{ validationMessage }}
+          <div
+            *ngIf="multipleGrantNumberValidationMessage as validationMessage"
+            id="multipleGrantNumbersFeedback"
+            class="invalid-feedback d-block"
+          >
+            {{ validationMessage }}
+          </div>
         </div>
       </div>
     </div>
