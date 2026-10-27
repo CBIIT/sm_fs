@@ -86,7 +86,7 @@ jobs:
           echo "=================================="
           
       - name: Download Build Artifact
-        uses: dawidd6/action-download-artifact@v11
+        uses: dawidd6/action-download-artifact@v27
         with:
           workflow: npm-build.yml
           name: ${{ env.artifact_name }}
