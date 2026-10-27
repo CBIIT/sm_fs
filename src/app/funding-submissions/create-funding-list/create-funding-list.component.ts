@@ -10,6 +10,10 @@ import { FundingSubmissionsStateService } from '../funding-submissions-state.ser
 import { roleNames } from 'src/app/service/role-names';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { GrantNumberSearchMode } from '../../shared/grant-number-search-mode/grant-number-search-mode.component';
+import {
+  MAX_GRANT_NUMBER_COUNT,
+  parseGrantNumbers
+} from '../../shared/grant-number-search-mode/grant-number-parser';
 
 @Component({
   selector: 'app-create-funding-list',
@@ -95,10 +99,16 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
   }
 
   private getFullGrantNumbers(): string[] {
-    return String(this.multipleGrantNumbers || '')
-      .split(/[,\s]+/)
-      .map((grantNumber) => grantNumber.trim())
-      .filter((grantNumber) => grantNumber.length > 0);
+    return parseGrantNumbers(this.multipleGrantNumbers || '');
+  }
+
+  get hasInvalidMultipleGrantNumbers(): boolean {
+    if (this.grantNumberSearchMode !== 'multiple') {
+      return false;
+    }
+
+    const count = this.getFullGrantNumbers().length;
+    return count === 0 || count > MAX_GRANT_NUMBER_COUNT;
   }
 
   ngAfterViewInit(): void {
@@ -300,7 +310,8 @@ export class CreateFundingListComponent implements AfterViewInit, OnDestroy {
     const fullGrantNumbers = this.grantNumberSearchMode === 'multiple'
       ? this.getFullGrantNumbers()
       : undefined;
-    if (this.grantNumberSearchMode === 'multiple' && !fullGrantNumbers?.length) {
+    if (this.grantNumberSearchMode === 'multiple'
+      && (!fullGrantNumbers?.length || fullGrantNumbers.length > MAX_GRANT_NUMBER_COUNT)) {
       return;
     }
 
