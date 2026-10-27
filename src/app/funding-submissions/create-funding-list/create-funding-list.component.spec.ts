@@ -266,15 +266,23 @@ describe('CreateFundingListComponent grant-number search template', () => {
     const feedback = fixture.nativeElement.querySelector('#multipleGrantNumbersFeedback') as HTMLElement;
     const label = fixture.nativeElement.querySelector('label[for="multipleGrantNumbers"]') as HTMLElement;
     const textWrap = fixture.nativeElement.querySelector('.grant-number-text-wrap') as HTMLElement;
+    const metaRow = fixture.nativeElement.querySelector('.grant-number-text-meta') as HTMLElement;
+    const counter = fixture.nativeElement.querySelector('#multipleGrantNumbersCounter') as HTMLElement;
     const textareaRect = textarea.getBoundingClientRect();
     const inputWrapRect = inputWrap.getBoundingClientRect();
     const feedbackRect = feedback.getBoundingClientRect();
+    const metaRowRect = metaRow.getBoundingClientRect();
 
     expect(inputWrap.parentElement).toBe(textWrap);
     expect(inputWrapRect.width).toBeGreaterThan(label.getBoundingClientRect().width);
     expect(textareaRect.width).toBeGreaterThan(label.getBoundingClientRect().width);
-    expect(feedback.parentElement).toBe(inputWrap);
+    expect(metaRow.parentElement).toBe(inputWrap);
+    expect(feedback.parentElement).toBe(metaRow);
     expect(feedbackRect.top).toBeGreaterThanOrEqual(textareaRect.bottom);
+    expect(feedbackRect.top - textareaRect.bottom).toBeLessThanOrEqual(8);
+    expect(counter.parentElement).toBe(metaRow);
+    expect(Math.abs(feedback.getBoundingClientRect().top - counter.getBoundingClientRect().top)).toBeLessThanOrEqual(4);
+    expect(metaRowRect.top - textareaRect.bottom).toBeLessThanOrEqual(8);
   });
 
   it('counts separated occurrences including duplicates and disables Search for invalid input despite other criteria', () => {

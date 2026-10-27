@@ -84,6 +84,19 @@
   color: #6c757d;
 }
 
+.grant-number-text-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.grant-number-validation-feedback {
+  width: auto;
+  margin-top: 0;
+}
+
 @media (max-width: 768px) {
   .grant-mode-radio-group {
     align-items: stretch;

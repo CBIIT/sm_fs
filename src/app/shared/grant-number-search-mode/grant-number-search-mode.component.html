@@ -49,15 +49,17 @@
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onMultipleGrantNumbersChange($event)"
           ></textarea>
-          <div id="multipleGrantNumbersCounter" class="grant-number-counter small">
-            {{ multipleGrantNumberCount }}/1000
-          </div>
-          <div
-            *ngIf="multipleGrantNumberValidationMessage as validationMessage"
-            id="multipleGrantNumbersFeedback"
-            class="invalid-feedback d-block"
-          >
-            {{ validationMessage }}
+          <div class="grant-number-text-meta">
+            <div
+              *ngIf="multipleGrantNumberValidationMessage as validationMessage"
+              id="multipleGrantNumbersFeedback"
+              class="invalid-feedback d-block grant-number-validation-feedback"
+            >
+              {{ validationMessage }}
+            </div>
+            <div id="multipleGrantNumbersCounter" class="grant-number-counter small">
+              {{ multipleGrantNumberCount }}/1000
+            </div>
           </div>
         </div>
       </div>
