@@ -126,7 +126,10 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       budgetCategories: g.budgetCategoryCode ?? '',
       docDecision:      g.docDecision ?? '',
       docNciSelection:  g.docNciSelection ?? '',
-      annualFundingR01: g.twoYearAnnualFundingR01Flag ? 'Yes' : null,
+      annualFundingR01: g.annualFundingR01 === undefined
+        ? (g.twoYearAnnualFundingR01Flag ? 'Yes' : null)
+        : g.annualFundingR01,
+      annualFundingR01IsExplicitNull: g.annualFundingR01 === null,
       annualOrMyf:      g.annualOrMyf ?? '',
       docNotes:         g.docNotes ?? '',
       oefiaNotes:       g.oefiaNotes ?? '',
@@ -485,6 +488,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private updateMandatoryFieldValidationErrors(): boolean {
     this.mandatoryFieldErrorRowMap.clear();
+    const savedRowsByApplId = new Map<number, any>();
+    this.lastSavedRows.forEach(savedRow => savedRowsByApplId.set(savedRow.applId, savedRow));
 
     this.rows.forEach(row => {
       const rowErrors = new Set<string>();
@@ -500,7 +505,11 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.isBlankSelection(row.docNciSelection)) {
           rowErrors.add('docNciSelection');
         }
-        if (this.isBlankSelection(row.annualFundingR01)) {
+        const savedRow = savedRowsByApplId.get(row.applId);
+        const unchangedLegacyNullAnnualFundingR01 = row.annualFundingR01 === null
+          && savedRow?.annualFundingR01 === null
+          && savedRow?.annualFundingR01IsExplicitNull === true;
+        if (this.isBlankSelection(row.annualFundingR01) && !unchangedLegacyNullAnnualFundingR01) {
           rowErrors.add('annualFundingR01');
         }
         if (this.isBlankSelection(row.annualOrMyf)) {

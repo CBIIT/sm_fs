@@ -1242,6 +1242,94 @@ describe('GrantDetailComponent', () => {
       expect(component.data.twoYearAnnualFundingR01Flag).toBe(false);
     });
 
+    it('hydrates raw annual R01 values, including explicit No and legacy null', () => {
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+      component.docFundingListCor = false;
+      component.listStatus = 'DOC Review';
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        annualFundingR01: 'No',
+        twoYearAnnualFundingR01Flag: false
+      };
+
+      component.onEdit();
+      expect(component.formModel.annualFundingR01).toBe('No');
+
+      component.data.annualFundingR01 = null;
+      component.onEdit();
+      expect(component.formModel.annualFundingR01).toBeNull();
+
+      component.data.annualFundingR01 = undefined;
+      component.data.twoYearAnnualFundingR01Flag = true;
+      component.onEdit();
+      expect(component.formModel.annualFundingR01).toBe('Yes');
+
+      component.data.twoYearAnnualFundingR01Flag = false;
+      component.onEdit();
+      expect(component.formModel.annualFundingR01).toBeNull();
+    });
+
+    it('round-trips an unchanged explicit No to the service and in-memory grant after save', () => {
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+      component.docFundingListCor = false;
+      component.listStatus = 'DOC Review';
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        docDecision: 'Pay',
+        docPriority: 3,
+        docRecommendedAmount: 75000,
+        docRecommendedReductionPct: 10,
+        annualFundingR01: 'No',
+        twoYearAnnualFundingR01Flag: false,
+        docNotes: ''
+      };
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onEdit();
+      component.formModel.docNotes = 'Updated notes';
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.annualFundingR01).toBe('No');
+      expect(component.data.annualFundingR01).toBe('No');
+      expect(component.data.twoYearAnnualFundingR01Flag).toBeFalse();
+    });
+
+    it('round-trips an unchanged legacy null and keeps the in-memory raw value null after save', () => {
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+      component.docFundingListCor = false;
+      component.listStatus = 'DOC Review';
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        docDecision: 'Pay',
+        docPriority: 3,
+        docRecommendedAmount: 75000,
+        docRecommendedReductionPct: 10,
+        annualFundingR01: null,
+        twoYearAnnualFundingR01Flag: false,
+        docNotes: ''
+      };
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onEdit();
+      component.formModel.docNotes = 'Updated notes';
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.annualFundingR01).toBeNull();
+      expect(component.data.annualFundingR01).toBeNull();
+      expect(component.data.twoYearAnnualFundingR01Flag).toBeFalse();
+    });
+
     it('when DOC Decision is Do Not Pay, clears only dependent fields and justification while preserving both note fields in the payload', () => {
       component.data = {
         applId: 100,
@@ -1303,6 +1391,8 @@ describe('GrantDetailComponent', () => {
       expect(payload.fields.docRecReductionPct).toBeNull();
       expect(payload.fields.annualFundingR01).toBeNull();
       expect(payload.fields.annualOrMyf).toBeNull();
+      expect(component.data.annualFundingR01).toBeNull();
+      expect(component.data.twoYearAnnualFundingR01Flag).toBeFalse();
       expect(payload.fields.budgetCategories).toBeNull();
       expect(payload.fields.docNciSelection).toBeNull();
       expect(payload.fields.oefiaNotes).toBe('keep this OEFIA note');
