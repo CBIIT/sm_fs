@@ -349,10 +349,26 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  private get assignedDocAbbrevs(): string[] {
+    return Array.from(new Set(
+      (this.userSessionService.getDocFundingSubmissionCoordinatorDocAbbrevs() || [])
+        .map(doc => doc.trim().toUpperCase())
+        .filter(Boolean)
+    ));
+  }
+
+  get showReviewStatus(): boolean {
+    return !this.isNciDirector && (!this.docFundingListCor || this.assignedDocAbbrevs.length > 1);
+  }
+
   private buildDocStatusColumns(grants: FundingSubmissionListGrantDto[]): any[][] {
+    const assignedDocs = this.docFundingListCor ? new Set(this.assignedDocAbbrevs) : null;
     const docMap = new Map<string, { doc: string; count: number; statusRank: number }>();
     for (const g of grants) {
       const doc = g.doc || '';
+      if (assignedDocs && !assignedDocs.has(doc.trim().toUpperCase())) {
+        continue;
+      }
       const status = this.normalizeGrantReviewStatus((g as any).reviewStatus);
       const statusRank = this.getReviewStatusRank(status);
       if (!docMap.has(doc)) docMap.set(doc, { doc, count: 0, statusRank });
@@ -364,7 +380,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       doc: e.doc,
       count: e.count,
       status: this.getReviewStatusByRank(e.statusRank),
-      countDisplay: this.getDocStatusCountDisplay(e.doc, e.count, this.getReviewStatusByRank(e.statusRank), grants)
+      countDisplay: this.docFundingListCor
+        ? String(e.count)
+        : this.getDocStatusCountDisplay(e.doc, e.count, this.getReviewStatusByRank(e.statusRank), grants)
     }));
     const currentReviewStatus = this.getCurrentReviewStatus(grants);
     this.currentReviewStatus = currentReviewStatus;

@@ -85,8 +85,11 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     const propertiesServiceSpy = jasmine.createSpyObj('AppPropertiesService', ['getProperty']);
     propertiesServiceSpy.getProperty.and.returnValue('http://example/');
     const loaderServiceSpy = jasmine.createSpyObj('LoaderService', ['show', 'hide']);
-    const userSessionServiceSpy = jasmine.createSpyObj('AppUserSessionService', ['hasRole']);
+    const userSessionServiceSpy = jasmine.createSpyObj('AppUserSessionService', [
+      'hasRole', 'getDocFundingSubmissionCoordinatorDocAbbrevs'
+    ]);
     userSessionServiceSpy.hasRole.and.returnValue(false);
+    userSessionServiceSpy.getDocFundingSubmissionCoordinatorDocAbbrevs.and.returnValue([]);
 
     const dropdownLookupServiceSpy = jasmine.createSpyObj('FundingSubmDropdownLookupService', ['getDocDecisions']);
     dropdownLookupServiceSpy.getDocDecisions.and.returnValue(of([
@@ -1622,6 +1625,75 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         expect(component.justificationWarningMessage).toBe('Unable to generate the selected justification PDF.');
         expect(loaderService.hide).toHaveBeenCalled();
       }));
+    });
+  });
+
+  describe('Review Status for DOC assignments', () => {
+    let userSessionServiceSpy: jasmine.SpyObj<AppUserSessionService>;
+
+    beforeEach(() => {
+      userSessionServiceSpy = TestBed.inject(AppUserSessionService) as jasmine.SpyObj<AppUserSessionService>;
+      component.docFundingListCor = true;
+      component.isNciDirector = false;
+    });
+
+    function loadGrants(grants: any[]): void {
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants }));
+      (component as any).loadListMeta();
+      fixture.detectChanges();
+    }
+
+    it('hides Review Status for a single distinct assigned DOC', () => {
+      userSessionServiceSpy.getDocFundingSubmissionCoordinatorDocAbbrevs.and.returnValue(['DCB', ' dcb ', '']);
+      loadGrants([{ applId: 1, doc: 'DCB', reviewStatus: 'DOC Review' }]);
+
+      expect(component.showReviewStatus).toBeFalse();
+      expect(fixture.nativeElement.textContent).not.toContain('Review Status');
+    });
+
+    it('shows Review Status for multiple assignments even when only one has grants', () => {
+      userSessionServiceSpy.getDocFundingSubmissionCoordinatorDocAbbrevs.and.returnValue(['DCB', 'DCP']);
+      loadGrants([
+        { applId: 1, doc: 'DCB', reviewStatus: 'DOC Review' },
+        { applId: 2, doc: 'DTP', reviewStatus: 'OEFIA Review' }
+      ]);
+
+      expect(component.showReviewStatus).toBeTrue();
+      expect(fixture.nativeElement.textContent).toContain('Review Status');
+      const rows: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.doc-row'));
+      expect(rows.length).toBe(1);
+      expect(rows[0].querySelector('.doc-name')?.textContent?.trim()).toBe('DCB');
+      expect(rows[0].querySelector('.doc-count')?.textContent?.trim()).toBe('1');
+    });
+
+    it('renders all review stages with total counts and filters by the clicked DOC', () => {
+      userSessionServiceSpy.getDocFundingSubmissionCoordinatorDocAbbrevs.and.returnValue(['DCB', 'DCP', 'DTP']);
+      loadGrants([
+        { applId: 1, doc: 'DCB', reviewStatus: 'Under DOC Review' },
+        { applId: 2, doc: 'DCP', reviewStatus: 'OEFIA Review' },
+        { applId: 3, doc: 'DTP', reviewStatus: 'NCI Director Review' },
+        { applId: 4, doc: 'DTP', reviewStatus: 'OEFIA Review' }
+      ]);
+
+      const rows: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.doc-row'));
+      expect(rows.map(row => row.querySelector('.doc-status')?.textContent?.trim()))
+        .toEqual(['DOC Review', 'OEFIA Review', 'NCI Director Review']);
+      expect(rows.map(row => row.querySelector('.doc-count')?.textContent?.trim())).toEqual(['1', '1', '2']);
+
+      (rows[2].querySelector('.doc-count') as HTMLAnchorElement).click();
+      const callback = jasmine.createSpy('callback');
+      component.ajaxCall(component, {}, callback);
+
+      expect(component.filteredDoc).toBe('DTP');
+      expect(callback.calls.mostRecent().args[0].data.map(grant => grant.applId)).toEqual([3, 4]);
+      expect(callback.calls.mostRecent().args[0].recordsFiltered).toBe(2);
+    });
+
+    it('preserves non-DOC visibility and the NCI Director exclusion', () => {
+      component.docFundingListCor = false;
+      expect(component.showReviewStatus).toBeTrue();
+      component.isNciDirector = true;
+      expect(component.showReviewStatus).toBeFalse();
     });
   });
 
