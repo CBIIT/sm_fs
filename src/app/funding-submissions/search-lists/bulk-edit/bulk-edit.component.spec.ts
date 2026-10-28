@@ -146,6 +146,62 @@ describe('BulkEditComponent', () => {
     expect(component.rows[0].budgetCategories).toBe('');
   });
 
+  it('hydrates persisted No and preserves explicit legacy null without defaulting false to No', () => {
+    seedHistoryStateAndInit([
+      grant({ annualFundingR01: 'No', twoYearAnnualFundingR01Flag: false }),
+      grant({ applId: 200, annualFundingR01: null, twoYearAnnualFundingR01Flag: false }),
+      grant({ applId: 300, annualFundingR01: undefined, twoYearAnnualFundingR01Flag: false })
+    ]);
+
+    expect(component.rows.map(row => row.annualFundingR01)).toEqual(['No', null, null]);
+  });
+
+  it('sends an unchanged persisted No in the bulk edit save payload', () => {
+    seedHistoryStateAndInit([grant({ annualFundingR01: 'No', twoYearAnnualFundingR01Flag: false })]);
+    fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+    component.rows[0].docNotes = 'edited note';
+    component.onRowFieldChange();
+    component.onSave();
+
+    const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+    expect(payload.fields.annualFundingR01).toBe('No');
+  });
+
+  it('preserves explicit legacy null but blocks Pay save until the required annual R01 value is supplied', () => {
+    seedHistoryStateAndInit([grant({ annualFundingR01: null, twoYearAnnualFundingR01Flag: false })]);
+    fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+    component.rows[0].docNotes = 'edited note';
+    component.onRowFieldChange();
+    component.onSave();
+
+    expect(component.rows[0].annualFundingR01).toBeNull();
+    expect(component.rows[0].docNotes).toBe('edited note');
+    expect(component.hasMandatoryFieldError(component.rows[0], 'annualFundingR01')).toBeTrue();
+    expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+
+    component.rows[0].annualFundingR01 = 'No';
+    component.onRowFieldChange();
+    component.onSave();
+
+    const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+    expect(payload.fields.annualFundingR01).toBe('No');
+    expect(component.hasMandatoryFieldError(component.rows[0], 'annualFundingR01')).toBeFalse();
+  });
+
+  it('still rejects clearing a previously persisted annual R01 value', () => {
+    seedHistoryStateAndInit([grant({ annualFundingR01: 'No', twoYearAnnualFundingR01Flag: false })]);
+    fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+    component.rows[0].annualFundingR01 = null;
+    component.onRowFieldChange();
+    component.onSave();
+
+    expect(component.hasMandatoryFieldError(component.rows[0], 'annualFundingR01')).toBeTrue();
+    expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+  });
+
   it('sends a CODE-shaped budgetCategories value (not the free-text NAME) in a dirty row\'s save payload', () => {
     seedHistoryStateAndInit([grant()]);
     fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));

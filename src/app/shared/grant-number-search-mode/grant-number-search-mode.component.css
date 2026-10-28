@@ -80,6 +80,7 @@
 }
 
 .grant-number-counter {
+  margin-left: auto;
   text-align: right;
   color: #6c757d;
 }

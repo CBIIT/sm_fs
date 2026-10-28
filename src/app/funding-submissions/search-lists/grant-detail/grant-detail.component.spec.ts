@@ -326,6 +326,33 @@ describe('GrantDetailComponent', () => {
     expect(text).toContain('-');
   });
 
+  describe('FS-2391 raw annual R01 detail display', () => {
+    [
+      { raw: 'Yes', flag: false, expected: 'Yes' },
+      { raw: 'No', flag: false, expected: 'No' },
+      { raw: 'No', flag: true, expected: 'No' },
+      { raw: null, flag: false, expected: '' },
+      { raw: null, flag: true, expected: '' },
+      { raw: undefined, flag: true, expected: 'Yes' },
+      { raw: undefined, flag: false, expected: '' }
+    ].forEach(({ raw, flag, expected }) => {
+      it(`renders raw ${String(raw)} with legacy flag ${flag} as "${expected}"`, () => {
+        component.data.annualFundingR01 = raw;
+        component.data.twoYearAnnualFundingR01Flag = flag;
+        fixture.detectChanges();
+        getJustificationSubject.next({ justificationText: '' });
+        getJustificationSubject.complete();
+        fixture.detectChanges();
+
+        const element: HTMLElement = fixture.nativeElement;
+        const label = Array.from(element.querySelectorAll('td.grid-label'))
+          .find(cell => cell.textContent.trim() === '2Y Annual Fnd R01:');
+        expect(label).toBeDefined();
+        expect(label.nextElementSibling.textContent.trim()).toBe(expected);
+      });
+    });
+  });
+
   it('renders applicationTotalCostEstimate as currency in read-only mode', () => {
     component.data = {
       applId: 100,
@@ -1242,6 +1269,118 @@ describe('GrantDetailComponent', () => {
       expect(component.data.twoYearAnnualFundingR01Flag).toBe(false);
     });
 
+    it('hydrates raw annual R01 values, including explicit No and legacy null', () => {
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+      component.docFundingListCor = false;
+      component.listStatus = 'DOC Review';
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        annualFundingR01: 'No',
+        twoYearAnnualFundingR01Flag: false
+      };
+
+      component.onEdit();
+      expect(component.formModel.annualFundingR01).toBe('No');
+
+      component.data.annualFundingR01 = null;
+      component.onEdit();
+      expect(component.formModel.annualFundingR01).toBeNull();
+
+      component.data.annualFundingR01 = undefined;
+      component.data.twoYearAnnualFundingR01Flag = true;
+      component.onEdit();
+      expect(component.formModel.annualFundingR01).toBe('Yes');
+
+      component.data.twoYearAnnualFundingR01Flag = false;
+      component.onEdit();
+      expect(component.formModel.annualFundingR01).toBeNull();
+    });
+
+    it('round-trips an unchanged explicit No to the service and in-memory grant after save', () => {
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+      component.docFundingListCor = false;
+      component.listStatus = 'DOC Review';
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        docDecision: 'Pay',
+        docPriority: 3,
+        docRecommendedAmount: 75000,
+        docRecommendedReductionPct: 10,
+        annualFundingR01: 'No',
+        twoYearAnnualFundingR01Flag: false,
+        budgetCategoryCode: 'ESIR37T4',
+        docNciSelection: 'DOC',
+        annualOrMyf: 'MYF',
+        docNotes: ''
+      };
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onEdit();
+      component.formModel.docNotes = 'Updated notes';
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.annualFundingR01).toBe('No');
+      expect(component.data.annualFundingR01).toBe('No');
+      expect(component.data.twoYearAnnualFundingR01Flag).toBeFalse();
+      expect(component.isEditMode).toBeFalse();
+      const element: HTMLElement = fixture.nativeElement;
+      const label = Array.from(element.querySelectorAll('td.grid-label'))
+        .find(cell => cell.textContent.trim() === '2Y Annual Fnd R01:');
+      expect(label.nextElementSibling.textContent.trim()).toBe('No');
+
+      component.onEdit();
+      expect(component.formModel.annualFundingR01).toBe('No');
+    });
+
+    it('preserves legacy null without claiming a successful save when the service rejects the required field', () => {
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+      component.docFundingListCor = false;
+      component.listStatus = 'DOC Review';
+      component.data = {
+        applId: 100,
+        grantNumber: '1R01CA123456-01',
+        docDecision: 'Pay',
+        docPriority: 3,
+        docRecommendedAmount: 75000,
+        docRecommendedReductionPct: 10,
+        annualFundingR01: null,
+        twoYearAnnualFundingR01Flag: false,
+        budgetCategoryCode: 'ESIR37T4',
+        docNciSelection: 'DOC',
+        annualOrMyf: 'MYF',
+        docNotes: ''
+      };
+      const message = 'Two-Year Annual Funding R01 (HRHR) is required.';
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(throwError(() => ({
+        status: 400,
+        error: { errorMessage: message }
+      })));
+      spyOn(component.saved, 'emit');
+
+      component.onEdit();
+      component.formModel.docNotes = 'Updated notes';
+      component.onSave();
+
+      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
+      expect(payload.fields.annualFundingR01).toBeNull();
+      expect(component.data.annualFundingR01).toBeNull();
+      expect(component.data.twoYearAnnualFundingR01Flag).toBeFalse();
+      expect(component.isEditMode).toBeTrue();
+      expect(component.formModel.annualFundingR01).toBeNull();
+      expect(component.fundingSaveError).toBe(message);
+      expect(component.saveSuccessMessage).toBe('');
+      expect(component.saved.emit).not.toHaveBeenCalled();
+    });
+
     it('when DOC Decision is Do Not Pay, clears only dependent fields and justification while preserving both note fields in the payload', () => {
       component.data = {
         applId: 100,
@@ -1303,6 +1442,8 @@ describe('GrantDetailComponent', () => {
       expect(payload.fields.docRecReductionPct).toBeNull();
       expect(payload.fields.annualFundingR01).toBeNull();
       expect(payload.fields.annualOrMyf).toBeNull();
+      expect(component.data.annualFundingR01).toBeNull();
+      expect(component.data.twoYearAnnualFundingR01Flag).toBeFalse();
       expect(payload.fields.budgetCategories).toBeNull();
       expect(payload.fields.docNciSelection).toBeNull();
       expect(payload.fields.oefiaNotes).toBe('keep this OEFIA note');

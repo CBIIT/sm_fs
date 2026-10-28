@@ -183,7 +183,9 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       docRecAmt:          this.data?.docRecommendedAmount ?? null,
       docRecReductionPct: this.data?.docRecommendedReductionPct ?? null,
       docNciSelection:    this.data?.docNciSelection ?? null,
-      annualFundingR01:   this.data?.twoYearAnnualFundingR01Flag ? 'Yes' : null,
+      annualFundingR01:   this.data?.annualFundingR01 === undefined
+        ? (this.data?.twoYearAnnualFundingR01Flag ? 'Yes' : null)
+        : this.data.annualFundingR01,
       budgetCategories:   this.data?.budgetCategoryCode ?? null,
       docNotes:           this.data?.docNotes ?? '',
       oefiaNotes:         this.data?.oefiaNotes ?? '',
@@ -993,6 +995,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     // formModel.annualFundingR01 is the Yes/No string the dropdown renders. Writing the raw
     // string back left a truthy value for 'No' (the main grid renders `data ? 'Y' : ''`),
     // showing 'Y' regardless of the selected value. Coerce to a real boolean here.
+    this.data.annualFundingR01 = this.formModel.annualFundingR01;
     this.data.twoYearAnnualFundingR01Flag = this.formModel.annualFundingR01 === 'Yes';
     // budgetCategoryCode fix (2026-08-25): formModel.budgetCategories now holds the grant's
     // budget category CODE (seeded in onEdit() from this.data.budgetCategoryCode, matching the
