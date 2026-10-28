@@ -68,6 +68,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   doNotPayOefiaLockActive = false;
   saveValidationError: string | null = null;
   saveValidationErrors: Record<string, string> = {};
+  private touchedRequiredFields = new Set<string>();
   private initialFormSnapshot = '';
   private initialFundingSnapshot = '';
   private initialJustificationText = '';
@@ -211,11 +212,23 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   onValidationFieldChange(): void {
+    this.touchedRequiredFields.add('docPriority');
     this.updateValidationErrorsLive();
     this.cdr.detectChanges();
   }
 
+  onRequiredFieldBlur(field: 'docRecReductionPct' | 'docRecAmt' | 'docPriority'): void {
+    this.touchedRequiredFields.add(field);
+    this.updateValidationErrorsLive();
+    this.cdr.detectChanges();
+  }
+
+  get hasSaveValidationErrors(): boolean {
+    return Object.keys(this.validateChangedValues()).length > 0 || !!this.justificationFileError;
+  }
+
   onDocRecReductionPctChange(): void {
+    this.touchedRequiredFields.add('docRecReductionPct');
     const reductionPct = this.toFiniteNumberOrNull(this.formModel.docRecReductionPct);
     const baseAmount = this.parseExactDecimal(this.data?.originalRequestedTotal);
     const parsedReductionPct = this.parseExactDecimal(this.formModel.docRecReductionPct);
@@ -235,6 +248,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   onDocRecAmtChange(): void {
+    this.touchedRequiredFields.add('docRecAmt');
     const updatedAmount = this.toFiniteNumberOrNull(this.formModel.docRecAmt);
     const baseAmount = this.parseExactDecimal(this.data?.originalRequestedTotal);
     const parsedAmount = this.parseExactDecimal(this.formModel.docRecAmt);
@@ -321,6 +335,9 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   onSave(): void {
+    if (this.savingInProgress || this.justificationFileError) {
+      return;
+    }
     this.suppressNextLeavePrompt = true;
     this.justificationSaveError = null;
     this.fundingSaveError = null;
@@ -539,7 +556,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       && (docShouldLock || oefiaShouldLock);
   }
 
-  private validateChangedValues(): Record<string, string> {
+  private validateChangedValues(includeUntouchedRequired = true): Record<string, string> {
     const errors: Record<string, string> = {};
 
     if (this.doNotPayOefiaLockActive) {
@@ -552,9 +569,26 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       }
     }
 
+    if (this.isDoNotPayDecisionSelected()) {
+      return errors;
+    }
+
+    const requiredFields = {
+      docRecReductionPct: 'DOC Rec % Red',
+      docRecAmt: 'DOC Rec $',
+      docPriority: 'DOC Priority'
+    };
+    for (const field of Object.keys(requiredFields)) {
+      const value = this.formModel[field];
+      if ((value == null || String(value).trim() === '')
+        && (includeUntouchedRequired || this.touchedRequiredFields.has(field))) {
+        errors[field] = `${requiredFields[field]} is required`;
+      }
+    }
+
     const pct = this.formModel.docRecReductionPct;
     const numericPct = this.toFiniteNumberOrNull(pct);
-    if (pct != null && !this.isValidReductionPctForCalculation(numericPct)) {
+    if (!errors.docRecReductionPct && pct != null && String(pct).trim() !== '' && !this.isValidReductionPctForCalculation(numericPct)) {
       errors.docRecReductionPct = 'Enter a numeric value between 0 and 99.99, with at most 2 decimal places.';
     }
 
@@ -563,7 +597,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       errors.docRecAmt = 'DOC Rec $ cannot be negative.';
     }
 
-    if (!errors.docRecAmt && amt != null && !this.isWholeDollarAmount(amt)) {
+    if (!errors.docRecAmt && amt != null && String(amt).trim() !== '' && !this.isWholeDollarAmount(amt)) {
       errors.docRecAmt = 'DOC Rec $ must be a whole dollar amount.';
     }
 
@@ -581,6 +615,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   }
 
   private clearValidationErrors(): void {
+    this.touchedRequiredFields.clear();
     this.saveValidationError = null;
     this.saveValidationErrors = {};
   }
@@ -773,37 +808,12 @@ export class GrantDetailComponent implements OnInit, OnChanges {
       return;
     }
 
-    // Re-validate only after at least one save attempt has produced messages.
-    if (!Object.keys(this.saveValidationErrors || {}).length && !this.saveValidationError) {
-      return;
-    }
-
-    this.saveValidationErrors = this.validateChangedValues();
+    this.saveValidationErrors = this.validateChangedValues(false);
     this.saveValidationError = this.getFirstValidationError(this.saveValidationErrors);
   }
 
   private updateDocRecValidationLive(): void {
-    if (!this.isEditMode) {
-      return;
-    }
-
-    const errors = this.validateChangedValues();
-    const nextErrors: Record<string, string> = { ...this.saveValidationErrors };
-
-    if (errors.docRecReductionPct) {
-      nextErrors.docRecReductionPct = errors.docRecReductionPct;
-    } else {
-      delete nextErrors.docRecReductionPct;
-    }
-
-    if (errors.docRecAmt) {
-      nextErrors.docRecAmt = errors.docRecAmt;
-    } else {
-      delete nextErrors.docRecAmt;
-    }
-
-    this.saveValidationErrors = nextErrors;
-    this.saveValidationError = this.getFirstValidationError(this.saveValidationErrors);
+    this.updateValidationErrorsLive();
   }
 
   /**

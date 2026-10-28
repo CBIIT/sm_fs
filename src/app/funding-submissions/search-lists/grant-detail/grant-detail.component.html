@@ -66,22 +66,24 @@
             <td class="grid-label sep">DOC Rec % Red:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docRecommendedReductionPct != null ? (data.docRecommendedReductionPct + '%') : ''}}</span>
+              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docRecReductionPct">{{saveValidationErrors.docRecReductionPct}}</div>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecReductionPct" [(ngModel)]="formModel.docRecReductionPct"
+                (blur)="onRequiredFieldBlur('docRecReductionPct')"
                 (ngModelChange)="onDocRecReductionPctChange()"
                 [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" max="99.99" step="0.01">
-              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docRecReductionPct">{{saveValidationErrors.docRecReductionPct}}</div>
             </td>
             <td class="grid-label">DOC Rec $:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docRecommendedAmount != null ? ('$' + (data.docRecommendedAmount | number)) : ''}}</span>
+              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docRecAmt">{{saveValidationErrors.docRecAmt}}</div>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecAmt" [(ngModel)]="formModel.docRecAmt"
+                (blur)="onRequiredFieldBlur('docRecAmt')"
                 (ngModelChange)="onDocRecAmtChange()"
                 [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" step="1">
-              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docRecAmt">{{saveValidationErrors.docRecAmt}}</div>
             </td>
           </tr>
 
@@ -94,12 +96,13 @@
             <td class="grid-label sep">DOC Priority:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docPriority}}</span>
+              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docPriority">{{saveValidationErrors.docPriority}}</div>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docPriority" [(ngModel)]="formModel.docPriority"
+                (blur)="onRequiredFieldBlur('docPriority')"
                 (ngModelChange)="onValidationFieldChange()"
                  [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" step="1">
-              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docPriority">{{saveValidationErrors.docPriority}}</div>
             </td>
             <td class="grid-label">2Y Annual Fnd R01:</td>
             <td class="grid-item">
@@ -276,7 +279,12 @@
           [title]="(!justificationLoaded || !budgetCategoriesLoaded) ? 'Loading…' : ''"
           (click)="onEdit()">Edit</button>
         <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode" (click)="onCancel()">Cancel</button>
-        <button type="button" class="btn btn-primary ms-3" *ngIf="isEditMode" (click)="onSave()">Save</button>
+        <span *ngIf="isEditMode" class="d-inline-block ms-3"
+          [ngbTooltip]="hasSaveValidationErrors ? 'Complete all required fields before saving.' : null" container="body">
+          <button type="button" class="btn btn-primary" (click)="onSave()"
+            [disabled]="hasSaveValidationErrors || isSaveInProgress()"
+            [style.pointer-events]="hasSaveValidationErrors || isSaveInProgress() ? 'none' : null">Save</button>
+        </span>
       </div>
     </div>
   </form>

@@ -1,11 +1,11 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NgSelect2Module } from 'ng-select2';
 import { of, Subject, throwError } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from '../../../service/app-user-session.service';
@@ -65,7 +65,7 @@ describe('GrantDetailComponent', () => {
     } as any));
 
     await TestBed.configureTestingModule({
-      imports: [FormsModule, RouterTestingModule, NgSelect2Module],
+      imports: [FormsModule, RouterTestingModule, NgSelect2Module, NgbTooltipModule],
       declarations: [GrantDetailComponent],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
@@ -1687,6 +1687,161 @@ describe('GrantDetailComponent', () => {
       const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
       expect(payload.fields.oefiaNotes).toBe('updated by OEFIA');
       expect(component.data.oefiaNotes).toBe('updated by OEFIA');
+    });
+  });
+
+  describe('Individual Edit mandatory fields', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+      component.onEdit();
+    });
+
+    it('disables Save for blank fields without showing untouched required messages', () => {
+      fixture.detectChanges();
+
+      expect(component.hasSaveValidationErrors).toBeTrue();
+      expect(component.saveValidationErrors).toEqual({});
+      expect(fixture.nativeElement.querySelector('button.btn-primary').disabled).toBeTrue();
+    });
+
+    for (const { name, label } of [
+      { name: 'docRecReductionPct', label: 'DOC Rec % Red' },
+      { name: 'docRecAmt', label: 'DOC Rec $' },
+      { name: 'docPriority', label: 'DOC Priority' }
+    ]) {
+      it(`shows ${label} required immediately when cleared without blur`, async () => {
+        component.formModel = { docRecReductionPct: 10, docRecAmt: 100, docPriority: '1' };
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        const input: HTMLInputElement = fixture.nativeElement.querySelector(`input[name="${name}"]`);
+        input.value = '';
+        input.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+
+        expect(input.previousElementSibling?.textContent?.trim()).toBe(`${label} is required`);
+        expect(component.hasSaveValidationErrors).toBeTrue();
+
+        input.value = '1';
+        input.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+
+        expect(component.saveValidationErrors[name]).toBeUndefined();
+        expect(component.hasSaveValidationErrors).toBeFalse();
+      });
+    }
+
+    it('shows each required message above its field after blur even without a value change', () => {
+      const fields = [
+        { name: 'docRecReductionPct', label: 'DOC Rec % Red' },
+        { name: 'docRecAmt', label: 'DOC Rec $' },
+        { name: 'docPriority', label: 'DOC Priority' }
+      ];
+      fixture.detectChanges();
+
+      fields.forEach(({ name, label }, index) => {
+        const input: HTMLInputElement = fixture.nativeElement.querySelector(`input[name="${name}"]`);
+        input.dispatchEvent(new Event('blur'));
+        fixture.detectChanges();
+
+        expect(input.previousElementSibling?.textContent?.trim()).toBe(`${label} is required`);
+        expect(Object.keys(component.saveValidationErrors).length).toBe(index + 1);
+      });
+    });
+
+    it('shows the exact tooltip on hover over disabled Save', fakeAsync(() => {
+      fixture.detectChanges();
+      tick();
+      const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector('button.btn-primary');
+      expect(saveButton.disabled).toBeTrue();
+      expect(saveButton.style.pointerEvents).toBe('none');
+      saveButton.parentElement.dispatchEvent(new Event('mouseenter'));
+      tick(500);
+      fixture.detectChanges();
+      expect(document.querySelector('ngb-tooltip-window')?.textContent?.trim())
+        .toBe('Complete all required fields before saving.');
+      saveButton.parentElement.dispatchEvent(new Event('mouseleave'));
+      tick(500);
+    }));
+
+    for (const role of ['DOC', 'OEFIA']) {
+      for (const field of ['docRecReductionPct', 'docRecAmt', 'docPriority']) {
+        it(`blocks ${role} Save when only ${field} is blank`, () => {
+          component.docFundingListCor = role === 'DOC';
+          component.OEFIACertifier = role === 'OEFIA';
+          component.formModel = { docRecReductionPct: 0, docRecAmt: 100, docPriority: '0' };
+          component.formModel[field] = null;
+          fixture.detectChanges();
+
+          expect(component.canEnterEditMode).toBeTrue();
+          expect(fixture.nativeElement.querySelector('button.btn-primary').disabled).toBeTrue();
+          component.onSave();
+          expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+          expect(fundingSubmissionsServiceSpy.saveJustificationForm).not.toHaveBeenCalled();
+        });
+      }
+    }
+
+    it('clears corrected messages and enables Save for valid values including zero', () => {
+      component.onRequiredFieldBlur('docRecReductionPct');
+      component.onRequiredFieldBlur('docRecAmt');
+      component.onRequiredFieldBlur('docPriority');
+      component.formModel.docRecReductionPct = 0;
+      component.formModel.docRecAmt = 100;
+      component.onDocRecReductionPctChange();
+
+      expect(component.saveValidationErrors.docRecReductionPct).toBeUndefined();
+      expect(component.saveValidationErrors.docRecAmt).toBeUndefined();
+      expect(component.hasSaveValidationErrors).toBeTrue();
+
+      component.formModel.docPriority = '0';
+      component.onValidationFieldChange();
+      fixture.detectChanges();
+
+      expect(component.saveValidationErrors).toEqual({});
+      expect(component.hasSaveValidationErrors).toBeFalse();
+      expect(fixture.nativeElement.querySelector('button.btn-primary').disabled).toBeFalse();
+    });
+
+    it('keeps Save disabled for invalid numeric values and blocks direct saves with blanks', () => {
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm).not.toHaveBeenCalled();
+
+      for (const invalidFields of [
+        { docRecReductionPct: 100 },
+        { docRecReductionPct: 1.234 },
+        { docRecAmt: -1 },
+        { docRecAmt: 1.5 },
+        { docPriority: '-1' },
+        { docPriority: '1.5' }
+      ]) {
+        component.formModel = { docRecReductionPct: 0, docRecAmt: 100, docPriority: '0', ...invalidFields };
+        expect(component.hasSaveValidationErrors).toBeTrue();
+      }
+    });
+
+    it('respects Do Not Pay notes validation instead of requiring cleared funding fields', () => {
+      component.formModel.docDecision = 'Do Not Pay';
+      component.onDocDecisionChange();
+      expect(component.hasSaveValidationErrors).toBeTrue();
+
+      component.formModel.docNotes = 'Not recommended';
+      component.onNotesModelChange();
+      expect(component.hasSaveValidationErrors).toBeFalse();
+    });
+
+    it('applies mandatory validation to authorized OEFIA users and other validation errors', () => {
+      component.docFundingListCor = false;
+      component.OEFIACertifier = true;
+      expect(component.hasSaveValidationErrors).toBeTrue();
+
+      component.formModel = { docRecReductionPct: 0, docRecAmt: 100, docPriority: '0' };
+      expect(component.hasSaveValidationErrors).toBeFalse();
+      component.justificationFileError = 'Unsupported file type.';
+      expect(component.hasSaveValidationErrors).toBeTrue();
     });
   });
 
