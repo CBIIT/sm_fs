@@ -1,4 +1,10 @@
 <div class="row form-group">
+<div *ngIf="saveSuccessMessage" class="alert alert-success" role="alert">
+  {{ saveSuccessMessage }}
+  <ul *ngIf="originalAmendmentConflictMessages.length">
+    <li *ngFor="let message of originalAmendmentConflictMessages">{{ message }}</li>
+  </ul>
+</div>
 
 <div *ngIf="showResults" class="row mb-2">
   <div class="row mb-2">
@@ -27,6 +33,12 @@
     <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()"></button>
   </div>
   <div class="modal-body">
+    <div *ngIf="saveRejectedSummaryMessage" class="alert alert-info" role="status">
+      {{ saveRejectedSummaryMessage }}
+    </div>
+    <ul *ngIf="saveRejectedSummaryMessage && originalAmendmentConflictMessages.length" class="alert alert-warning">
+      <li *ngFor="let message of originalAmendmentConflictMessages">{{ message }}</li>
+    </ul>
     <div *ngIf="saveToListErrorMessage" class="alert alert-danger" role="alert">
       {{ saveToListErrorMessage }}
     </div>

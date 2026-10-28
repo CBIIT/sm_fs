@@ -270,6 +270,196 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
     });
   });
 
+  describe('Original/Amendment batch feedback (FS-2411)', () => {
+    const pairs = [
+      { originalGrantNumber: '1R01CA000001-01', amendmentGrantNumber: '1R01CA000001-01A1' },
+      { originalGrantNumber: '<b>Original</b>', amendmentGrantNumber: '<img src=x onerror=alert(1)>' }
+    ];
+    const messages = pairs.map(pair =>
+      'The following applications were not added because an Original and Amendment application for the same grant cannot be included in the same Funding List: '
+      + `${pair.originalGrantNumber} and ${pair.amendmentGrantNumber}.`);
+    const rejection = {
+      reasonCode: 'ORIGINAL_AMENDMENT_BATCH_CONFLICT',
+      grantsAdded: 0,
+      message: 'A Funding List must contain at least one grant.',
+      originalAmendmentConflicts: pairs
+    };
+    let service: jasmine.SpyObj<FundingSubmissionsService>;
+    let router: jasmine.SpyObj<Router>;
+
+    beforeEach(() => {
+      service = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;
+      router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+      component.selectedDate = '202608';
+      for (let id = 1; id <= 5; id++) {
+        component.selectedRows.set(id, { applId: id });
+      }
+      component.grantList = [{ applId: 1, selected: true }] as any;
+      (component as any).modalRef = modalRefSpy;
+    });
+
+    function renderModal() {
+      const view = (component as any).addToListModalRef.createEmbeddedView({});
+      view.detectChanges();
+      const host = document.createElement('div');
+      view.rootNodes.forEach((node: Node) => host.appendChild(node));
+      return { host, view };
+    }
+
+    it('shows the generic count plus all exact pair messages and transports them to the found list', () => {
+      service.addGrantsToList.and.returnValue(of({
+        grantsAdded: 1, listCode: '202608', listId: 55, originalAmendmentConflicts: pairs
+      }) as any);
+      service.searchLists.and.returnValue(of({ data: [{ listId: 55 }] }) as any);
+
+      component.saveToList();
+      fixture.detectChanges();
+
+      expect(component.saveSuccessMessage).toBe('Success! 1 out of 5 were successfully added to the list.');
+      expect(component.originalAmendmentConflictMessages).toEqual(messages);
+      expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
+        queryParams: { listId: 55, from: 'create' },
+        state: { successMessage: component.saveSuccessMessage, originalAmendmentConflictMessages: messages }
+      });
+      expect(modalRefSpy.close).toHaveBeenCalled();
+      expect(component.selectedRows.size).toBe(0);
+      const host: HTMLElement = fixture.nativeElement;
+      expect(Array.from(host.querySelectorAll('.alert-success li')).map(li => li.textContent)).toEqual(messages);
+      expect(host.querySelector('.alert-success b')).toBeNull();
+      expect(host.querySelector('.alert-success img')).toBeNull();
+    });
+
+    [
+      { name: 'empty search result', result: of({ data: [] }) },
+      { name: 'failed list lookup', result: throwError(() => ({ status: 500 })) }
+    ].forEach(testCase => {
+      it(`retains every message on the ${testCase.name} fallback`, () => {
+        service.addGrantsToList.and.returnValue(of({
+          grantsAdded: 1, listCode: '202608', listId: 55, originalAmendmentConflicts: pairs
+        }) as any);
+        service.searchLists.and.returnValue(testCase.result as any);
+
+        component.saveToList();
+
+        expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
+          queryParams: { listId: 55, from: 'create' },
+          state: { successMessage: component.saveSuccessMessage, originalAmendmentConflictMessages: messages }
+        });
+      });
+    });
+
+    it('retains all feedback on direct listId navigation without a selection code', () => {
+      component.selectedDate = '';
+      service.addGrantsToList.and.returnValue(of({
+        grantsAdded: 1, listId: 55, originalAmendmentConflicts: pairs
+      }) as any);
+
+      component.saveToList();
+
+      expect(service.searchLists).not.toHaveBeenCalled();
+      expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
+        queryParams: { listId: 55, from: 'create' },
+        state: { successMessage: component.saveSuccessMessage, originalAmendmentConflictMessages: messages }
+      });
+    });
+
+    [4, 5].forEach(requestCount => {
+      it(`keeps a recognized pair-aware 400 open with all messages for ${requestCount} selected candidates`, () => {
+        if (requestCount === 4) component.selectedRows.delete(5);
+        const selectedBefore = new Map(component.selectedRows);
+        service.addGrantsToList.and.returnValue(throwError(() => ({ status: 400, error: rejection })));
+
+        component.saveToList();
+        const { host, view } = renderModal();
+
+        expect(component.saveRejectedSummaryMessage).toBe(`0 out of ${requestCount} were added to the list.`);
+        expect(component.saveSuccessMessage).toBe('');
+        expect(host.textContent).not.toContain('Success!');
+        expect(host.textContent).toContain(component.saveRejectedSummaryMessage);
+        expect(Array.from(host.querySelectorAll('li')).map(li => li.textContent)).toEqual(messages);
+        expect(host.textContent).toContain(rejection.message);
+        expect(host.querySelector('img')).toBeNull();
+        expect(host.textContent).toContain('<b>Original</b>');
+        expect(modalRefSpy.close).not.toHaveBeenCalled();
+        expect(modalRefSpy.dismiss).not.toHaveBeenCalled();
+        expect(router.navigate).not.toHaveBeenCalled();
+        expect(component.selectedRows).toEqual(selectedBefore);
+        expect((component.grantList[0] as any).selected).toBeTrue();
+        expect(component.selectedDate).toBe('202608');
+        expect(TestBed.inject(LoaderService).hide).toHaveBeenCalled();
+        view.destroy();
+      });
+    });
+
+    const malformedPayloads: unknown[] = [
+      null, 'untrusted message', {},
+      { ...rejection, reasonCode: 'UNKNOWN' },
+      { ...rejection, grantsAdded: 1 },
+      { ...rejection, grantsAdded: '0' },
+      { ...rejection, message: 'Untrusted backend detail' },
+      { ...rejection, originalAmendmentConflicts: [] },
+      { ...rejection, originalAmendmentConflicts: null },
+      { ...rejection, originalAmendmentConflicts: {} },
+      { ...rejection, originalAmendmentConflicts: [null] },
+      { ...rejection, originalAmendmentConflicts: [{ originalGrantNumber: 'original' }] },
+      { ...rejection, originalAmendmentConflicts: [pairs[0], { originalGrantNumber: 7, amendmentGrantNumber: 'A1' }] },
+      { ...rejection, originalAmendmentConflicts: [{ originalGrantNumber: 'original', amendmentGrantNumber: false }] }
+    ];
+    malformedPayloads.forEach((payload, index) => {
+      it(`uses the safe fallback for malformed pair payload ${index + 1}`, () => {
+        component.originalAmendmentConflictMessages = ['stale'];
+        component.saveRejectedSummaryMessage = 'stale';
+        service.addGrantsToList.and.returnValue(throwError(() => ({ status: 400, error: payload })));
+
+        component.saveToList();
+
+        expect(component.saveToListErrorMessage).toBe('Unable to save the grant list.');
+        expect(component.originalAmendmentConflictMessages).toEqual([]);
+        expect(component.saveRejectedSummaryMessage).toBe('');
+        expect(component.selectedRows.size).toBe(5);
+        expect(router.navigate).not.toHaveBeenCalled();
+      });
+    });
+
+    it('does not recognize the pair payload on an unrelated HTTP status', () => {
+      service.addGrantsToList.and.returnValue(throwError(() => ({ status: 409, error: rejection })));
+      component.saveToList();
+      expect(component.originalAmendmentConflictMessages).toEqual([]);
+      expect(component.saveRejectedSummaryMessage).toBe('');
+      expect(component.saveToListErrorMessage).toContain('The selected grants could not be added');
+    });
+
+    [undefined, []].forEach(noConflicts => {
+      it(`clears stale pair feedback on a no-conflict success (${noConflicts ? 'empty' : 'absent'})`, () => {
+        component.originalAmendmentConflictMessages = messages;
+        component.saveRejectedSummaryMessage = 'stale';
+        service.addGrantsToList.and.returnValue(of({
+          grantsAdded: 5, listId: 55, originalAmendmentConflicts: noConflicts
+        }) as any);
+        service.searchLists.and.returnValue(of({ data: [{ listId: 55 }] }) as any);
+
+        component.saveToList();
+
+        expect(component.originalAmendmentConflictMessages).toEqual([]);
+        expect(component.saveRejectedSummaryMessage).toBe('');
+        expect(component.saveSuccessMessage).toBe('Success! 5 out of 5 were successfully added to the list.');
+        expect(router.navigate.calls.mostRecent().args[1].state['originalAmendmentConflictMessages']).toEqual([]);
+      });
+    });
+
+    it('retains success feedback for an existing-list zero-add result without treating it as a 400', () => {
+      service.addGrantsToList.and.returnValue(of({
+        grantsAdded: 0, listCode: '202608', listId: 55, originalAmendmentConflicts: pairs
+      }) as any);
+      service.searchLists.and.returnValue(of({ data: [{ listId: 55 }] }) as any);
+      component.saveToList();
+      expect(component.saveSuccessMessage).toBe('Success! 0 out of 5 were successfully added to the list.');
+      expect(component.originalAmendmentConflictMessages).toEqual(messages);
+      expect(component.saveRejectedSummaryMessage).toBe('');
+      expect(modalRefSpy.close).toHaveBeenCalled();
+    });
+  });
+
   it('binds the PrevScr column to previousScoreDisplay', () => {
     const previousScoreColumn = component.dtOptions.columns.find((column: any) => column.title === 'PrevScr');
 

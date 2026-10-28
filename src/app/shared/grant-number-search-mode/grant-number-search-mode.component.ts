@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { MAX_GRANT_NUMBER_COUNT, parseGrantNumbers } from './grant-number-parser';
 
 export type GrantNumberSearchMode = 'single' | 'multiple';
 
@@ -25,6 +26,19 @@ export class GrantNumberSearchModeComponent {
   }
 
   get multipleGrantNumberCount(): number {
-    return this.multipleGrantNumbers?.length || 0;
+    return parseGrantNumbers(this.multipleGrantNumbers || '').length;
+  }
+
+  get multipleGrantNumberValidationMessage(): string | null {
+    const count = this.multipleGrantNumberCount;
+    if (count === 0) {
+      return 'At least one Grant Number is required.';
+    }
+
+    if (count > MAX_GRANT_NUMBER_COUNT) {
+      return 'Do not exceed 1,000 Grant Numbers.';
+    }
+
+    return null;
   }
 }

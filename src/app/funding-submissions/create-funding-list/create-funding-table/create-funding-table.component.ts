@@ -6,6 +6,8 @@ import { FoaCellRendererComponent } from '../../../table-cell-renderers/foa-cell
 import {
   FundingSubmissionsService,
   FundingSubmissionAddGrantsToListRequestDto,
+  FundingSubmissionAddGrantsPairConflictErrorDto,
+  FundingSubmissionOriginalAmendmentConflictDto,
   FundingSubmissionGrantSearchCriteriaDto,
   FundingSubmissionSearchResultDto,
   SelectionDateCodeDto,
@@ -54,6 +56,8 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   selectAll = false;
   saveSuccessMessage = '';
   saveToListErrorMessage = '';
+  saveRejectedSummaryMessage = '';
+  originalAmendmentConflictMessages: string[] = [];
   grantList: FundingSubmissionSearchResultDto[] = [];
   throttle: DatatableThrottle = new DatatableThrottle();
   selectedRows: Map<number, FundingSubmissionSearchResultDto> = new Map();
@@ -584,15 +588,20 @@ allDataSelected(data: any[]): boolean {
   addSelectedToList(): void {
     this.selectedDate = '';
     this.saveToListErrorMessage = '';
+    this.saveRejectedSummaryMessage = '';
     this.modalRef = this.modalService.open(this.addToListModalRef, { size: 'lg', centered: true });
   }
 
   cancelModal(): void {
     this.saveToListErrorMessage = '';
+    this.saveRejectedSummaryMessage = '';
     this.modalRef?.dismiss();
   }
 
   saveToList(): void {
+    this.saveSuccessMessage = '';
+    this.saveRejectedSummaryMessage = '';
+    this.originalAmendmentConflictMessages = [];
     // Coerce to Number — DataTables can return applId as string at runtime
     const applIds = Array.from(this.selectedRows.keys()).map(id => Number(id));
     const body: FundingSubmissionAddGrantsToListRequestDto = {
@@ -609,6 +618,7 @@ allDataSelected(data: any[]): boolean {
         // should start with zero "Grant(s) Added".
         this.saveToListErrorMessage = '';
         this.saveSuccessMessage = `Success! ${result.grantsAdded} out of ${this.selectedRows.size} were successfully added to the list.`;
+        this.originalAmendmentConflictMessages = this.getPairConflictMessages(result.originalAmendmentConflicts);
         this.selectedRows.clear();
         this.grantList.forEach((row: any) => row.selected = false);
         this.modalRef?.close();
@@ -622,7 +632,10 @@ allDataSelected(data: any[]): boolean {
         if (result.listId) {
           this.router.navigate(['/funding-submissions/search'], {
             queryParams: { listId: result.listId, from: 'create' },
-            state: { successMessage: this.saveSuccessMessage }
+            state: {
+              successMessage: this.saveSuccessMessage,
+              originalAmendmentConflictMessages: this.originalAmendmentConflictMessages
+            }
           });
           return;
         }
@@ -633,6 +646,12 @@ allDataSelected(data: any[]): boolean {
         this.loaderService.hide();
         this.logger.error('addGrantsToList error', err?.status, err?.error, body);
         if (err?.status === 400) {
+          if (this.isPairConflictError(err.error)) {
+            this.saveRejectedSummaryMessage = `0 out of ${this.selectedRows.size} were added to the list.`;
+            this.originalAmendmentConflictMessages = this.getPairConflictMessages(err.error.originalAmendmentConflicts);
+            this.saveToListErrorMessage = err.error.message;
+            return;
+          }
           this.saveToListErrorMessage = this.getSaveToListError(err);
           return;
         }
@@ -646,6 +665,26 @@ allDataSelected(data: any[]): boolean {
         this.modalRef?.dismiss();
       }
     });
+  }
+
+  private isPairConflictError(value: unknown): value is FundingSubmissionAddGrantsPairConflictErrorDto {
+    return typeof value === 'object' && value !== null
+      && 'reasonCode' in value && value.reasonCode === 'ORIGINAL_AMENDMENT_BATCH_CONFLICT'
+      && 'grantsAdded' in value && value.grantsAdded === 0
+      && 'message' in value && value.message === 'A Funding List must contain at least one grant.'
+      && 'originalAmendmentConflicts' in value
+      && Array.isArray(value.originalAmendmentConflicts)
+      && value.originalAmendmentConflicts.length > 0
+      && value.originalAmendmentConflicts.every((pair: unknown) =>
+        typeof pair === 'object' && pair !== null
+        && 'originalGrantNumber' in pair && typeof pair.originalGrantNumber === 'string'
+        && 'amendmentGrantNumber' in pair && typeof pair.amendmentGrantNumber === 'string');
+  }
+
+  private getPairConflictMessages(pairs: FundingSubmissionOriginalAmendmentConflictDto[] = []): string[] {
+    return pairs.map(pair =>
+      'The following applications were not added because an Original and Amendment application for the same grant cannot be included in the same Funding List: '
+      + `${pair.originalGrantNumber} and ${pair.amendmentGrantNumber}.`);
   }
 
   private getSaveToListError(error: any): string {
@@ -674,18 +713,22 @@ allDataSelected(data: any[]): boolean {
   }
 
   navigateToList(selectionDate: string, successMessage?: string, fallbackListId?: number): void {
+    const state = successMessage ? {
+      successMessage,
+      originalAmendmentConflictMessages: [...this.originalAmendmentConflictMessages]
+    } : undefined;
     this.FundingSubmissionsService.searchLists({ selectionCode: [selectionDate], start: 0, length: 1 }).subscribe({
       next: (result) => {
         const listId = result.data?.[0]?.listId;
         if (listId) {
           this.router.navigate(['/funding-submissions/search'], {
             queryParams: { listId, from: 'create' },
-            state: successMessage ? { successMessage } : undefined
+            state
           });
         } else if (fallbackListId) {
           this.router.navigate(['/funding-submissions/search'], {
             queryParams: { listId: fallbackListId, from: 'create' },
-            state: successMessage ? { successMessage } : undefined
+            state
           });
         } else {
           this.logger.warn('No list found for selection date', selectionDate);
@@ -696,7 +739,7 @@ allDataSelected(data: any[]): boolean {
         if (fallbackListId) {
           this.router.navigate(['/funding-submissions/search'], {
             queryParams: { listId: fallbackListId, from: 'create' },
-            state: successMessage ? { successMessage } : undefined
+            state
           });
         }
       }

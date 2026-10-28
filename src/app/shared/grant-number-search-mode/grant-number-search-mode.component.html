@@ -31,21 +31,36 @@
     </div>
 
     <div *ngIf="mode === 'multiple'" class="mt-3">
-      <p class="mb-3">Enter or paste Grant Numbers below. Separate them with a comma, a space, or by entering each Grant Number on a new line.</p>
+      <p id="multipleGrantNumbersHelp" class="mb-3">
+        Enter or paste Grant Numbers below. Separate them with a comma, a space, or by entering each Grant Number on a new line.
+      </p>
       <div class="grant-number-text-wrap">
-        <label for="multipleGrantNumbers" class="grant-number-text-label">Grant Number(s)</label>
+        <label for="multipleGrantNumbers" class="grant-number-text-label">Grant Numbers</label>
         <div class="grant-number-text-input-wrap">
           <textarea
             id="multipleGrantNumbers"
             name="multipleGrantNumbers"
             class="form-control grant-number-textarea"
             rows="2"
-            maxlength="1000"
+            placeholder="1R01CA111111-01, 2U01CA222222-02"
+            [attr.aria-describedby]="'multipleGrantNumbersHelp multipleGrantNumbersCounter' + (multipleGrantNumberValidationMessage ? ' multipleGrantNumbersFeedback' : '')"
+            [attr.aria-invalid]="multipleGrantNumberValidationMessage ? 'true' : null"
             [ngModel]="multipleGrantNumbers"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onMultipleGrantNumbersChange($event)"
           ></textarea>
-          <div class="grant-number-counter small">{{ multipleGrantNumberCount }}/1000</div>
+          <div class="grant-number-text-meta">
+            <div
+              *ngIf="multipleGrantNumberValidationMessage as validationMessage"
+              id="multipleGrantNumbersFeedback"
+              class="invalid-feedback d-block grant-number-validation-feedback"
+            >
+              {{ validationMessage }}
+            </div>
+            <div id="multipleGrantNumbersCounter" class="grant-number-counter small">
+              {{ multipleGrantNumberCount }}/1000
+            </div>
+          </div>
         </div>
       </div>
     </div>

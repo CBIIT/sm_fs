@@ -1,9 +1,14 @@
 name: Build and Deploy to Dev
-run-name: Build Number ${{ github.run_number }}
+run-name: Build Number ${{ github.run_number }} for ${{ inputs.prod_build && 'Production' || 'Non-Production' }}
 
 on:
   workflow_dispatch:
     inputs:
+      prod_build:
+        required: false
+        type: boolean
+        description: 'Build for Production Deployment?'
+        default: false
       dev_deploy:
         required: false
         type: boolean
@@ -25,6 +30,14 @@ jobs:
       labels: fargate-al2023-s-nonprod
 
     steps:
+      - name: Output Inputs and Environment Variables
+        run: |
+          echo "Workflow INPUTS & ENVIRONMENT VARIABLES"
+          echo "=========================================="
+          echo "Inputs: ${{ toJson(inputs) }}"
+          echo "Environment Variables: ${{ toJson(env) }}"
+          echo "=========================================="
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -41,8 +54,6 @@ jobs:
           echo "Run Number:    ${{ github.run_number }}"
           echo "Run ID:        ${{ github.run_id }}"
           echo "Runner OS:     ${{ runner.os }}"
-          echo "Node Version:  ${{ env.NODE_VERSION }}"
-          echo "Angular CLI:   ${{ env.ANGULAR_CLI_VERSION }}"
           echo "Timestamp:     $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
           echo "========================================="
 
@@ -69,7 +80,7 @@ jobs:
           echo "Angular: $(ng version)"
 
       - name: Build application
-        run: ng build --configuration=production --base-href=${{ env.app_base_href }}
+        run: ng build --configuration=${{ inputs.prod_build && 'production' || 'non-prod' }} --base-href=${{ env.app_base_href }}
 
       - name: Log build output
         run: |
@@ -88,11 +99,11 @@ jobs:
         with:
           name: ${{ env.artifact_name }}
           path: ${{ env.build_base_path }}
-          retention-days: 7
+          retention-days: 30
 
   deploy-to-dev:
     needs: npm-build
-    if: ${{ inputs.dev_deploy }}
+    if: ${{ inputs.dev_deploy && inputs.prod_build == false }}
     # Call the reusable workflow defined in .github/workflows/multi-deploy.yml
     uses: ./.github/workflows/deploy-apache.yml
     with:
