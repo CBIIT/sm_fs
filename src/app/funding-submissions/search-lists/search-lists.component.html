@@ -114,8 +114,11 @@
     </div>
     <div class="row g-0 save-success-row" *ngIf="saveSuccessMessage.length > 0 && blockedGrantNumbers.length === 0">
     <div class="col-12">
-      <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
+      <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''; originalAmendmentConflictMessages = []">
         <span><b>{{saveSuccessMessage}}</b></span>
+        <ul *ngIf="originalAmendmentConflictMessages.length">
+          <li *ngFor="let message of originalAmendmentConflictMessages">{{ message }}</li>
+        </ul>
       </ngb-alert>
     </div>
   </div>

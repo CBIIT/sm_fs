@@ -118,6 +118,42 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     fixture.detectChanges();
   });
 
+  describe('add-grants destination feedback (FS-2411)', () => {
+    it('captures summary and all pairs before clearing history and renders each as text', () => {
+      const summary = 'Success! 1 out of 5 were successfully added to the list.';
+      const messages = [
+        'The following applications were not added because an Original and Amendment application for the same grant cannot be included in the same Funding List: Original1 and Amendment1.',
+        'The following applications were not added because an Original and Amendment application for the same grant cannot be included in the same Funding List: <img src=x> and <b>Amendment2</b>.'
+      ];
+      history.replaceState({ successMessage: summary, originalAmendmentConflictMessages: messages }, document.title);
+      const replaceState = spyOn(history, 'replaceState').and.callThrough();
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.saveSuccessMessage).toBe(summary);
+      expect(component.originalAmendmentConflictMessages).toEqual(messages);
+      expect(replaceState).toHaveBeenCalledWith({}, document.title);
+      expect(history.state.successMessage).toBeUndefined();
+      expect(history.state.originalAmendmentConflictMessages).toBeUndefined();
+      const alert: HTMLElement = fixture.nativeElement.querySelector('.save-success-row');
+      expect(alert.textContent).toContain(summary);
+      expect(Array.from(alert.querySelectorAll('li')).map(li => li.textContent)).toEqual(messages);
+      expect(alert.querySelector('img')).toBeNull();
+      expect(alert.querySelector('li b')).toBeNull();
+    });
+
+    it('retains the existing summary-only behavior and clears stale pair feedback', () => {
+      component.originalAmendmentConflictMessages = ['stale'];
+      history.replaceState({ successMessage: 'Success! 2 out of 2 were successfully added to the list.' }, document.title);
+      component.ngOnInit();
+      fixture.detectChanges();
+      expect(component.originalAmendmentConflictMessages).toEqual([]);
+      expect(fixture.nativeElement.querySelector('.save-success-row').textContent).toContain('Success! 2 out of 2');
+      expect(fixture.nativeElement.querySelector('.save-success-row li')).toBeNull();
+    });
+  });
+
   describe('SearchListsComponent — NDIRD review tabs (FS-2271)', () => {
     let component: SearchListsComponent;
 

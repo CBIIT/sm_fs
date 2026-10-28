@@ -74,6 +74,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   totalGrants = 0;
   docRecommendedTotal = 0;
   saveSuccessMessage = '';
+  originalAmendmentConflictMessages: string[] = [];
 
   docStatusColumns: any[][] = [];
   isCurrentStatusDraft = false;
@@ -222,6 +223,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     const state = history.state;
     if (state?.successMessage) {
       this.saveSuccessMessage = state.successMessage;
+      this.originalAmendmentConflictMessages = state.originalAmendmentConflictMessages || [];
       // Consume transient navigation state so browser refresh does not re-show success toast.
       history.replaceState({}, document.title);
     }
@@ -1720,6 +1722,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (result) => {
         this.removeGrantsErrorMessage = '';
         this.saveSuccessMessage = 'Success! The selected grant(s) have been removed from this list.';
+        this.originalAmendmentConflictMessages = [];
         this.setBlockedGrantNumbers(result?.blockedGrantNumbers ?? []);
         this.selectedRows.clear();
         this.removeModalRef?.close();
