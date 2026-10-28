@@ -168,7 +168,7 @@ describe('BulkEditComponent', () => {
     expect(payload.fields.annualFundingR01).toBe('No');
   });
 
-  it('preserves an unchanged legacy null in the bulk edit save payload', () => {
+  it('preserves explicit legacy null but blocks Pay save until the required annual R01 value is supplied', () => {
     seedHistoryStateAndInit([grant({ annualFundingR01: null, twoYearAnnualFundingR01Flag: false })]);
     fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
 
@@ -176,8 +176,17 @@ describe('BulkEditComponent', () => {
     component.onRowFieldChange();
     component.onSave();
 
+    expect(component.rows[0].annualFundingR01).toBeNull();
+    expect(component.rows[0].docNotes).toBe('edited note');
+    expect(component.hasMandatoryFieldError(component.rows[0], 'annualFundingR01')).toBeTrue();
+    expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+
+    component.rows[0].annualFundingR01 = 'No';
+    component.onRowFieldChange();
+    component.onSave();
+
     const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
-    expect(payload.fields.annualFundingR01).toBeNull();
+    expect(payload.fields.annualFundingR01).toBe('No');
     expect(component.hasMandatoryFieldError(component.rows[0], 'annualFundingR01')).toBeFalse();
   });
 
