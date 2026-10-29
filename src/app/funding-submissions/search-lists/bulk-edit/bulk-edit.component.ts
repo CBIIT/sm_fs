@@ -254,7 +254,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       ajax: (_params: any, callback: any) => {
         callback({ data: this.rows, recordsTotal: this.rows.length, recordsFiltered: this.rows.length });
       },
-      columns,
+      columns: columns.filter(column => !this.docFundingListCor
+        || !['budgetCategories', 'annualOrMyf'].includes(column.data)),
       dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       rowCallback: (row: Node, _data: any) => {
         // Remove stale elements left by DataTables before ngTemplateRef injects
