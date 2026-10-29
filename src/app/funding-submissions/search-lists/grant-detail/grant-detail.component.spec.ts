@@ -1778,17 +1778,53 @@ describe('GrantDetailComponent', () => {
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
     });
 
-    it('does not enforce DOC Notes when row was not added by OEFIA', () => {
+    it('blocks Do Not Pay for a DOC-added grant without clearing dependent fields', () => {
       component.data.addedByGroup = 'DOC';
       component.onEdit();
       component.formModel.docDecision = 'DNP';
+      component.formModel.docRecAmt = 100;
       component.formModel.docNotes = '   ';
       fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
 
       component.onSave();
 
-      expect(component.saveValidationError).toBeNull();
-      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalled();
+      expect(component.saveValidationError).toBe('Do Not Pay is not available for grants added by a DOC user.');
+      expect(component.formModel.docRecAmt).toBe(100);
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm).not.toHaveBeenCalled();
+    });
+
+    it('keeps Do Not Pay visible but disabled for DOC-added grants without mutating lookup options', () => {
+      component.data.addedByGroup = ' doc ';
+      component.onEdit();
+
+      expect(component.isEditMode).toBeTrue();
+      expect(component.docDecisionOptions).toContain(jasmine.objectContaining({ id: 'DNP', text: 'Do Not Pay', disabled: true }));
+      expect(component.docDecisionOptions.find(option => option.id === 'Pay')?.disabled).toBeFalsy();
+      expect(component.decisionOptions.find(option => option.id === 'DNP')?.disabled).toBeFalsy();
+    });
+
+    for (const addedByGroup of ['OEFIA', null, undefined]) {
+      it(`leaves Do Not Pay enabled for non-DOC provenance ${addedByGroup}`, () => {
+        component.data.addedByGroup = addedByGroup;
+        component.onEdit();
+
+        expect(component.docDecisionOptions.find(option => option.id === 'DNP')?.disabled).toBeFalsy();
+        component.formModel.docDecision = 'DNP';
+        component.onDocDecisionChange();
+        expect(component.formModel.docDecision).toBe('DNP');
+        expect(component.saveValidationErrors.docDecision).toBeUndefined();
+      });
+    }
+
+    it('preserves other option restrictions and non-DOC user behavior', () => {
+      component.data.addedByGroup = 'DOC';
+      component.decisionOptions[0].disabled = true;
+      expect(component.docDecisionOptions[0].disabled).toBeTrue();
+
+      component.docFundingListCor = false;
+      component.OEFIACertifier = true;
+      expect(component.docDecisionOptions.find(option => option.id === 'DNP')?.disabled).toBeFalsy();
     });
 
     it('activates the Do Not Pay lock for DOC-only users on OEFIA-added rows', () => {

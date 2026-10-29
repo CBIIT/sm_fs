@@ -213,6 +213,24 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.cdr.detectChanges();
   }
 
+  private get isDoNotPayRestricted(): boolean {
+    const addedByGroup = String(this.data?.addedByGroup ?? '').trim().toUpperCase();
+    return this.docFundingListCor && addedByGroup.includes('DOC');
+  }
+
+  get docDecisionOptions(): Select2OptionData[] {
+    if (!this.isDoNotPayRestricted) {
+      return this.decisionOptions;
+    }
+
+    return this.decisionOptions.map(option => ({
+      ...option,
+      disabled: String(option.text || '').trim().toLowerCase() === 'do not pay'
+        || String(option.id || '').trim().toLowerCase() === 'do not pay'
+        || option.disabled
+    }));
+  }
+
   onValidationFieldChange(): void {
     this.touchedRequiredFields.add('docPriority');
     this.updateValidationErrorsLive();
@@ -352,7 +370,7 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
     // Business rule: when DOC Decision is Do Not Pay, dependent funding and
     // justification fields are discarded before validation/persistence.
-    if (this.isDoNotPayDecisionSelected()) {
+    if (this.isDoNotPayDecisionSelected() && !this.isDoNotPayRestricted) {
       this.clearDoNotPayDependentFields();
     }
 
@@ -560,6 +578,10 @@ export class GrantDetailComponent implements OnInit, OnChanges {
 
   private validateChangedValues(includeUntouchedRequired = true): Record<string, string> {
     const errors: Record<string, string> = {};
+
+    if (this.isDoNotPayRestricted && this.isDoNotPayDecisionSelected()) {
+      errors.docDecision = 'Do Not Pay is not available for grants added by a DOC user.';
+    }
 
     if (this.doNotPayOefiaLockActive) {
       if (this.canEditOefiaNotes()) {

@@ -50,9 +50,12 @@
             <td class="grid-label">DOC Decision:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{getDocDecisionDisplay(data.docDecision)}}</span>
+              <div *ngIf="isEditMode && saveValidationErrors.docDecision" class="text-danger small">
+                {{saveValidationErrors.docDecision}}
+              </div>
               <ng-select2 *ngIf="isEditMode" name="docDecision" [(ngModel)]="formModel.docDecision"
                 (ngModelChange)="onDocDecisionChange()"
-                [data]="decisionOptions" [placeholder]="'Select'" width="100%">
+                [data]="docDecisionOptions" [placeholder]="'Select'" width="100%">
               </ng-select2>
             </td>
           </tr>
