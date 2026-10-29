@@ -157,7 +157,7 @@
         <ng-template #budgetCatRenderer let-data="adtData">
           <div class="field-with-inline-error">
             <ng-select2 [id]="'bcat-' + data.applId" [(ngModel)]="data.budgetCategories"
-              (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" width="100%">
+              (ngModelChange)="onRowFieldChange()" [disabled]="docFundingListCor || isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'budgetCategories')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('Budget Categories') }}
@@ -202,7 +202,7 @@
           <div class="field-with-inline-error">
             <ng-select2 [id]="'amyf-' + data.applId" [(ngModel)]="data.annualOrMyf"
               (ngModelChange)="onRowFieldChange()"
-              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" width="100%">
+              [disabled]="docFundingListCor || isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'annualOrMyf')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('Annual or MYF') }}
