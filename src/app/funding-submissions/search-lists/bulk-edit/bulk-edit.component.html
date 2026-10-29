@@ -61,7 +61,7 @@
           <ng-select2 id="bulk-budget-cat" name="bulkBudgetCategories" [(ngModel)]="bulkFields.budgetCategories"
             (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
-            [data]="budgetCategoryOptions"  width="100%">
+            [data]="budgetCategoryOptions" [allowClear]="true"  width="100%">
           </ng-select2>
           </div>
         </div>
@@ -70,7 +70,7 @@
           <label class="form-label fw-semibold">DOC Decision</label>
           <ng-select2 id="bulk-doc-decision" name="bulkDocDecision" [(ngModel)]="bulkFields.docDecision"
             (ngModelChange)="onBulkDocDecisionChange()"
-            [data]="decisionOptions" width="100%">
+            [data]="decisionOptions" [allowClear]="true" width="100%">
           </ng-select2>
           </div>
         </div>
@@ -80,7 +80,7 @@
           <ng-select2 id="bulk-doc-nci-sel" name="bulkDocNciSelection" [(ngModel)]="bulkFields.docNciSelection"
             (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
-            [data]="docNciOptions" width="100%">
+            [data]="docNciOptions" [allowClear]="true" width="100%">
           </ng-select2>
           </div>
         </div>
@@ -93,7 +93,7 @@
           <ng-select2 id="bulk-annual-r01" name="bulkAnnualFundingR01" [(ngModel)]="bulkFields.annualFundingR01"
             (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
-            [data]="yesNoOptions" width="100%">
+            [data]="yesNoOptions" [allowClear]="true" width="100%">
           </ng-select2>
           </div>
         </div>
@@ -103,7 +103,7 @@
           <ng-select2 id="bulk-annual-myf" name="bulkAnnualOrMyf" [(ngModel)]="bulkFields.annualOrMyf"
             (ngModelChange)="onBulkFieldChange()"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
-            [data]="annualMyfOptions" width="100%">
+            [data]="annualMyfOptions" [allowClear]="true" width="100%">
           </ng-select2>
           </div>
         </div>
@@ -160,7 +160,7 @@
               {{ getMandatoryFieldErrorMessage('Budget Categories') }}
             </div>
             <ng-select2 [id]="'bcat-' + data.applId" [(ngModel)]="data.budgetCategories"
-              (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
+              (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" width="100%">
             </ng-select2>
           </div>
         </ng-template>
@@ -171,7 +171,7 @@
               {{ getMandatoryFieldErrorMessage('DOC Decision') }}
             </div>
             <ng-select2 [id]="'ddec-' + data.applId" [(ngModel)]="data.docDecision" (ngModelChange)="onRowDocDecisionChange(data)"
-              [data]="getDocDecisionOptionsForRow(data)" [allowClear]="true" width="100%">
+              [data]="getDocDecisionOptionsForRow(data)" width="100%">
             </ng-select2>
           </div>
         </ng-template>
@@ -182,7 +182,7 @@
               {{ getMandatoryFieldErrorMessage('DOC/NCI Selection') }}
             </div>
             <ng-select2 [id]="'dnci-' + data.applId" [(ngModel)]="data.docNciSelection"
-              (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" [allowClear]="true" width="100%">
+              (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" width="100%">
             </ng-select2>
           </div>
         </ng-template>
@@ -193,7 +193,7 @@
               {{ getMandatoryFieldErrorMessage('Two-Year Annual Funding R01 (HRHR)') }}
             </div>
             <ng-select2 [id]="'ar01-' + data.applId" [(ngModel)]="data.annualFundingR01"
-              (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" [allowClear]="true" width="100%">
+              (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" width="100%">
             </ng-select2>
           </div>
         </ng-template>
@@ -205,7 +205,7 @@
             </div>
             <ng-select2 [id]="'amyf-' + data.applId" [(ngModel)]="data.annualOrMyf"
               (ngModelChange)="onRowFieldChange()"
-              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" [allowClear]="true" width="100%">
+              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" width="100%">
             </ng-select2>
           </div>
         </ng-template>
