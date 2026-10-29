@@ -50,13 +50,13 @@
             <td class="grid-label">DOC Decision:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{getDocDecisionDisplay(data.docDecision)}}</span>
-              <div *ngIf="isEditMode && saveValidationErrors.docDecision" class="text-danger small">
-                {{saveValidationErrors.docDecision}}
-              </div>
               <ng-select2 *ngIf="isEditMode" name="docDecision" [(ngModel)]="formModel.docDecision"
                 (ngModelChange)="onDocDecisionChange()"
                 [data]="docDecisionOptions" [placeholder]="'Select'" width="100%">
               </ng-select2>
+              <div *ngIf="isEditMode && saveValidationErrors.docDecision" class="text-danger small mt-1">
+                {{saveValidationErrors.docDecision}}
+              </div>
             </td>
           </tr>
 
@@ -69,24 +69,24 @@
             <td class="grid-label sep">DOC Rec % Red:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docRecommendedReductionPct != null ? (data.docRecommendedReductionPct + '%') : ''}}</span>
-              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docRecReductionPct">{{saveValidationErrors.docRecReductionPct}}</div>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecReductionPct" [(ngModel)]="formModel.docRecReductionPct"
                 (blur)="onRequiredFieldBlur('docRecReductionPct')"
                 (ngModelChange)="onDocRecReductionPctChange()"
                 [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" max="99.99" step="0.01">
+              <div class="text-danger small mt-1" *ngIf="isEditMode && saveValidationErrors.docRecReductionPct">{{saveValidationErrors.docRecReductionPct}}</div>
             </td>
             <td class="grid-label">DOC Rec $:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docRecommendedAmount != null ? ('$' + (data.docRecommendedAmount | number)) : ''}}</span>
-              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docRecAmt">{{saveValidationErrors.docRecAmt}}</div>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docRecAmt" [(ngModel)]="formModel.docRecAmt"
                 (blur)="onRequiredFieldBlur('docRecAmt')"
                 (ngModelChange)="onDocRecAmtChange()"
                 [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" step="1">
+              <div class="text-danger small mt-1" *ngIf="isEditMode && saveValidationErrors.docRecAmt">{{saveValidationErrors.docRecAmt}}</div>
             </td>
           </tr>
 
@@ -99,13 +99,13 @@
             <td class="grid-label sep">DOC Priority:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docPriority}}</span>
-              <div class="text-danger small" *ngIf="isEditMode && saveValidationErrors.docPriority">{{saveValidationErrors.docPriority}}</div>
               <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
                 name="docPriority" [(ngModel)]="formModel.docPriority"
                 (blur)="onRequiredFieldBlur('docPriority')"
                 (ngModelChange)="onValidationFieldChange()"
                  [disabled]="doNotPayOefiaLockActive"
                 placeholder="Enter Value" min="0" step="1">
+              <div class="text-danger small mt-1" *ngIf="isEditMode && saveValidationErrors.docPriority">{{saveValidationErrors.docPriority}}</div>
             </td>
             <td class="grid-label">2Y Annual Fnd R01:</td>
             <td class="grid-item">
