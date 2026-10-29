@@ -133,6 +133,20 @@ describe('BulkEditComponent', () => {
     });
   }
 
+  for (const isDocUser of [true, false]) {
+    it(`${isDocUser ? 'hides' : 'retains'} Budget Categories and Annual or MYF table columns for ${isDocUser ? 'DOC' : 'non-DOC'} users`, () => {
+      setRoles(isDocUser, !isDocUser);
+      seedHistoryStateAndInit([grant()]);
+      component.ngAfterViewInit();
+
+      const fields = (component.dtOptions.columns as any[]).map(column => column.data);
+      expect(fields.includes('budgetCategories')).toBe(!isDocUser);
+      expect(fields.includes('annualOrMyf')).toBe(!isDocUser);
+      expect(fields).toContain('docDecision');
+      expect(fields).toContain('annualFundingR01');
+    });
+  }
+
   it('seeds the per-row budgetCategories field from the grant\'s budgetCategoryCode (CODE), not the NAME-valued budgetCategories', () => {
     seedHistoryStateAndInit([grant()]);
 
