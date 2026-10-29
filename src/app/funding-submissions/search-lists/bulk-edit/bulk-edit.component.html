@@ -156,57 +156,57 @@
 
         <ng-template #budgetCatRenderer let-data="adtData">
           <div class="field-with-inline-error">
-            <div *ngIf="hasMandatoryFieldError(data, 'budgetCategories')" class="text-danger small validation-inline-error">
-              {{ getMandatoryFieldErrorMessage('Budget Categories') }}
-            </div>
             <ng-select2 [id]="'bcat-' + data.applId" [(ngModel)]="data.budgetCategories"
               (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" width="100%">
             </ng-select2>
+            <div *ngIf="hasMandatoryFieldError(data, 'budgetCategories')" class="text-danger small validation-inline-error">
+              {{ getMandatoryFieldErrorMessage('Budget Categories') }}
+            </div>
           </div>
         </ng-template>
 
         <ng-template #docDecisionRenderer let-data="adtData">
           <div class="field-with-inline-error">
-            <div *ngIf="hasMandatoryFieldError(data, 'docDecision')" class="text-danger small validation-inline-error">
-              {{ getMandatoryFieldErrorMessage('DOC Decision') }}
-            </div>
             <ng-select2 [id]="'ddec-' + data.applId" [(ngModel)]="data.docDecision" (ngModelChange)="onRowDocDecisionChange(data)"
               [data]="getDocDecisionOptionsForRow(data)" width="100%">
             </ng-select2>
+            <div *ngIf="hasMandatoryFieldError(data, 'docDecision')" class="text-danger small validation-inline-error">
+              {{ getMandatoryFieldErrorMessage('DOC Decision') }}
+            </div>
           </div>
         </ng-template>
 
         <ng-template #docNciSelRenderer let-data="adtData">
           <div class="field-with-inline-error">
-            <div *ngIf="hasMandatoryFieldError(data, 'docNciSelection')" class="text-danger small validation-inline-error">
-              {{ getMandatoryFieldErrorMessage('DOC/NCI Selection') }}
-            </div>
             <ng-select2 [id]="'dnci-' + data.applId" [(ngModel)]="data.docNciSelection"
               (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" width="100%">
             </ng-select2>
+            <div *ngIf="hasMandatoryFieldError(data, 'docNciSelection')" class="text-danger small validation-inline-error">
+              {{ getMandatoryFieldErrorMessage('DOC/NCI Selection') }}
+            </div>
           </div>
         </ng-template>
 
         <ng-template #annualR01Renderer let-data="adtData">
           <div class="field-with-inline-error">
-            <div *ngIf="hasMandatoryFieldError(data, 'annualFundingR01')" class="text-danger small validation-inline-error">
-              {{ getMandatoryFieldErrorMessage('Two-Year Annual Funding R01 (HRHR)') }}
-            </div>
             <ng-select2 [id]="'ar01-' + data.applId" [(ngModel)]="data.annualFundingR01"
               (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" width="100%">
             </ng-select2>
+            <div *ngIf="hasMandatoryFieldError(data, 'annualFundingR01')" class="text-danger small validation-inline-error">
+              {{ getMandatoryFieldErrorMessage('Two-Year Annual Funding R01 (HRHR)') }}
+            </div>
           </div>
         </ng-template>
 
         <ng-template #annualMyfRenderer let-data="adtData">
           <div class="field-with-inline-error">
-            <div *ngIf="hasMandatoryFieldError(data, 'annualOrMyf')" class="text-danger small validation-inline-error">
-              {{ getMandatoryFieldErrorMessage('Annual or MYF') }}
-            </div>
             <ng-select2 [id]="'amyf-' + data.applId" [(ngModel)]="data.annualOrMyf"
               (ngModelChange)="onRowFieldChange()"
               [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" width="100%">
             </ng-select2>
+            <div *ngIf="hasMandatoryFieldError(data, 'annualOrMyf')" class="text-danger small validation-inline-error">
+              {{ getMandatoryFieldErrorMessage('Annual or MYF') }}
+            </div>
           </div>
         </ng-template>
 

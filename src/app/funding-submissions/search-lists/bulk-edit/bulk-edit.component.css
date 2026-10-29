@@ -14,7 +14,7 @@
 }
 
 .validation-inline-error {
-  margin: 0 0 0.25rem;
+  margin: 0.25rem 0 0;
   line-height: 1;
 }
 
