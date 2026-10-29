@@ -102,6 +102,7 @@ import { ActiveInitialPayValidatorDirective } from './validators/active-initial-
 import { OefiaTypesComponent } from './cans/oefia-types/oefia-types.component';
 import { ProjectedCanComponent } from './cans/projected-can/projected-can.component';
 import { CanSelectorComponent } from './cans/can-selector/can-selector.component';
+import { NciDecisionCellRendererComponent } from './table-cell-renderers/nci-decision-cell-renderer/nci-decision-cell-renderer.component';
 import {
   FullGrantNumberCellRendererComponent
 } from './table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
@@ -434,6 +435,7 @@ export function combinedInitializerFactory(
         ProjectedCanComponent,
         CanSelectorComponent,
         FullGrantNumberCellRendererComponent,
+        NciDecisionCellRendererComponent,
         FoaCellRendererComponent,
         CancerActivityCellRendererComponent,
         ExistingRequestsCellRendererComponent,

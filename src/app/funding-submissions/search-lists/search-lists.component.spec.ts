@@ -13,6 +13,75 @@ import { SearchListsComponent } from './search-lists.component';
 import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-lookup.service';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 
+describe('NCI Decision column formatting', () => {
+  for (const nciDecision of ['Approve', 'Rejected', 'Hold'] as const) {
+    it(`displays unlocked ${nciDecision} with the decision-maker and date`, () => {
+      expect(SearchListsComponent.formatNciDecision({
+        nciDecision,
+        nciDecisionByName: 'Example, Alex',
+        nciDecisionDate: '2026-10-29T00:00:00Z'
+      })).toBe(`${nciDecision} by Example, Alex on 10/29/2026`);
+    });
+  }
+
+  it('uses lock metadata instead of decision metadata when locked', () => {
+    expect(SearchListsComponent.formatNciDecision({
+      nciDecision: 'Approve',
+      nciDecisionByName: 'Example, Alex',
+      nciDecisionDate: '2026-10-28',
+      lockedBy: 'Example, Jordan',
+      lockedDate: new Date(2026, 9, 29)
+    })).toBe('Approve and locked by Example, Jordan on 10/29/2026');
+  });
+
+  it('renders nothing without a decision even when unlocked metadata exists', () => {
+    expect(SearchListsComponent.formatNciDecision({
+      nciDecisionByName: 'Example, Alex', nciDecisionDate: '2026-10-29'
+    })).toBe('');
+  });
+
+  it('does not display incomplete or invalid unlocked metadata', () => {
+    expect(SearchListsComponent.formatNciDecision({
+      nciDecision: 'Hold', nciDecisionDate: '2026-10-29'
+    })).toBe('Hold');
+    expect(SearchListsComponent.formatNciDecision({
+      nciDecision: 'Hold', nciDecisionByName: 'Example, Alex', nciDecisionDate: '2026-02-30'
+    })).toBe('Hold');
+  });
+
+  it('displays the locked decision, recorded user, and date', () => {
+    expect(SearchListsComponent.formatNciDecision({
+      nciDecision: 'Approve', lockedBy: 'Example, Alex', lockedDate: new Date(2026, 9, 29)
+    })).toBe('Approve and locked by Example, Alex on 10/29/2026');
+  });
+
+  it('preserves the calendar date from the API timestamp', () => {
+    expect(SearchListsComponent.formatNciDecision({
+      nciDecision: 'Rejected', lockedBy: 'Example, Alex', lockedDate: '2026-10-29T00:00:00Z'
+    } as any)).toBe('Rejected and locked by Example, Alex on 10/29/2026');
+  });
+
+  it('renders nothing without a decision even when lock metadata exists', () => {
+    expect(SearchListsComponent.formatNciDecision({
+      lockedBy: 'Example, Alex', lockedDate: new Date(2026, 9, 29)
+    })).toBe('');
+    expect(SearchListsComponent.formatNciDecision(null)).toBe('');
+  });
+
+  it('retains unlocked decisions when decision metadata is unavailable', () => {
+    expect(SearchListsComponent.formatNciDecision({ nciDecision: 'Hold' })).toBe('Hold');
+  });
+
+  it('does not display incomplete or invalid lock metadata', () => {
+    expect(SearchListsComponent.formatNciDecision({
+      nciDecision: 'Approve', lockedDate: new Date(2026, 9, 29)
+    })).toBe('Approve');
+    expect(SearchListsComponent.formatNciDecision({
+      nciDecision: 'Approve', lockedBy: 'Example, Alex', lockedDate: '2026-02-30'
+    } as any)).toBe('Approve');
+  });
+});
+
 describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-2045)', () => {
   let component: SearchListsComponent;
   let fixture: ComponentFixture<SearchListsComponent>;

@@ -16,6 +16,8 @@ import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-lookup.service';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
+import { NciDecisionCellRendererComponent } from '../../table-cell-renderers/nci-decision-cell-renderer/nci-decision-cell-renderer.component';
+import { formatFundingSubmissionDate, formatNciDecision, NciDecisionGrant } from '../../utils/funding-submission-format';
 
 declare var $: any;
 
@@ -30,6 +32,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('foaCellRender') foaCellRender: TemplateRef<FoaCellRendererComponent>;
+  @ViewChild('nciDecisionRenderer') nciDecisionRenderer: TemplateRef<NciDecisionCellRendererComponent>;
   @ViewChild('removeGrantsWarningModal') private removeGrantsWarningModalRef: TemplateRef<any>;
   @ViewChild('sendGrantsInDraftWarningModal') private sendGrantsInDraftWarningModalRef: TemplateRef<any>;
   @ViewChild('sendGrantsToOefiaModal') private sendGrantsToOefiaModalTemplate: TemplateRef<any>;
@@ -476,52 +479,17 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.docDecisionDisplayMap.get(code) ?? code;
   }
 
+  static formatNciDecision(grant: NciDecisionGrant): string {
+    return formatNciDecision(grant);
+  }
+
   static formatReviewStatusWithDate(
     reviewStatus: string | null | undefined,
     reviewStatusDate: Date | string | null | undefined
   ): string {
     if (!reviewStatus) return '';
-    const formattedDate = SearchListsComponent.formatReviewStatusDate(reviewStatusDate);
+    const formattedDate = formatFundingSubmissionDate(reviewStatusDate);
     return formattedDate ? `${reviewStatus} ${formattedDate}` : reviewStatus;
-  }
-
-  private static formatReviewStatusDate(reviewStatusDate: Date | string | null | undefined): string | null {
-    if (reviewStatusDate == null || reviewStatusDate === '') return null;
-
-    let year: number;
-    let month: number;
-    let day: number;
-
-    if (reviewStatusDate instanceof Date) {
-      if (Number.isNaN(reviewStatusDate.getTime())) return null;
-      year = reviewStatusDate.getFullYear();
-      month = reviewStatusDate.getMonth() + 1;
-      day = reviewStatusDate.getDate();
-    } else {
-      const match = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?(?:Z|([+-])(\d{2}):(\d{2}))?)?$/.exec(reviewStatusDate);
-      if (!match) return null;
-
-      year = Number(match[1]);
-      month = Number(match[2]);
-      day = Number(match[3]);
-      if (match[4] !== undefined
-        && (Number(match[4]) > 23 || Number(match[5]) > 59 || Number(match[6]) > 59)) return null;
-      if (match[8] !== undefined) {
-        const offsetHours = Number(match[9]);
-        const offsetMinutes = Number(match[10]);
-        if (offsetHours > 18 || offsetMinutes > 59 || (offsetHours === 18 && offsetMinutes !== 0)) return null;
-      }
-    }
-
-    if (!SearchListsComponent.isValidReviewStatusDate(year, month, day)) return null;
-    return `${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}/${String(year).padStart(4, '0')}`;
-  }
-
-  private static isValidReviewStatusDate(year: number, month: number, day: number): boolean {
-    if (year < 0 || year > 9999 || month < 1 || month > 12 || day < 1) return false;
-    const isLeapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
-    const daysInMonth = [31, isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    return day <= daysInMonth[month - 1];
   }
 
   private static escapeReviewStatusHtml(value: string): string {
@@ -685,8 +653,18 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         {
           title: 'NCI Decision',
           data: 'nciDecision',
-          width: '90px',
-          defaultContent: ''
+          width: '250px',
+          defaultContent: '',
+          ngTemplateRef: { ref: this.nciDecisionRenderer },
+          render: (data: string | null | undefined, type: string, row: FundingSubmissionListGrantDto) => {
+            if (type === 'display') {
+              return '';
+            }
+            if (type === 'filter') {
+              return SearchListsComponent.formatNciDecision(row);
+            }
+            return data;
+          }
         }, // 13
         {
           title: 'DOC Decision',
