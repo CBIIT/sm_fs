@@ -362,6 +362,38 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     }));
   });
 
+  describe('Two-Year Annual Funding R01 rendering (FS-2391)', () => {
+    let render: (data: boolean, type: string, row: { annualFundingR01?: string | null }) => boolean | string;
+
+    beforeEach(() => {
+      component.ngAfterViewInit();
+      const column = ((component as any).dtOptions.columns as any[])
+        .find(candidate => candidate.title === 'Two-Year Annual Funding R01 (HRHR)?');
+      expect(column.data).toBe('twoYearAnnualFundingR01Flag');
+      render = column.render;
+    });
+
+    it('renders stored Yes and No from the raw value, and leaves null or blank empty', () => {
+      expect(render(false, 'display', { annualFundingR01: 'Yes' })).toBe('Y');
+      expect(render(true, 'display', { annualFundingR01: 'No' })).toBe('N');
+      expect(render(false, 'display', { annualFundingR01: null })).toBe('');
+      expect(render(true, 'display', { annualFundingR01: '' })).toBe('');
+    });
+
+    it('uses the legacy boolean only when the raw field is undefined', () => {
+      expect(render(true, 'display', {})).toBe('Y');
+      expect(render(false, 'display', {})).toBe('');
+      expect(render(true, 'display', { annualFundingR01: undefined })).toBe('Y');
+      expect(render(false, 'display', { annualFundingR01: undefined })).toBe('');
+    });
+
+    it('preserves the legacy boolean for DataTables sort, filter, and other render types', () => {
+      expect(render(true, 'sort', { annualFundingR01: 'No' })).toBeTrue();
+      expect(render(false, 'filter', { annualFundingR01: 'Yes' })).toBeFalse();
+      expect(render(true, 'type', { annualFundingR01: null })).toBeTrue();
+    });
+  });
+
   describe('Abs/SS plain text rendering (FS-2027)', () => {
     it('renders plain Y or blank with no anchor markup for Abs and SS columns', () => {
       component.ngAfterViewInit();
