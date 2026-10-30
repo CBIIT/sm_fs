@@ -220,13 +220,13 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           className: 'all select-checkbox',
           defaultContent: '',
           render: () => ''
-        },
+        },//0
         {
           title: 'DOC',
           data: 'doc',
           width: '50px',
           defaultContent: ''
-        },
+        },//1
         {
           title: 'PI',
           data: 'piName',
@@ -237,26 +237,26 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
             const subject = this.getPiMailSubject(row);
             return `<a href="mailto:${row.piEmail}?subject=${encodeURIComponent(subject)}">${data}</a>`;
           }
-        },
+        },//2
         {
           title: 'Grant Number',
           data: 'grantNumber',
           width: '140px',
           ngTemplateRef: { ref: this.fullGrantNumberRenderer },
           className: 'all'
-        },
+        },//3
         {
           title: 'Institution',
           data: 'institution',
           width: '150px',
           defaultContent: ''
-        },
+        },//4
         {
           title: 'Project Title',
           data: 'projectTitle',
           width: '180px',
           defaultContent: ''
-        },
+        },//5
         {
           title: 'Abs',
           data: 'abstractAvailable',
@@ -264,7 +264,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           defaultContent: '',
           render: (data: boolean, _t: any, row: any) =>
             data ? `<span>Y</span>` : ''
-        },
+        },//6
         {
           title: 'SS',
           data: 'summaryStatementAvailable',
@@ -272,7 +272,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           defaultContent: '',
           render: (data: boolean, _t: any, row: any) =>
             data ? `<span>Y</span>` : ''
-        },
+        },//7
         {
           title: 'Justification',
           data: 'justificationAvailable',
@@ -280,7 +280,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           defaultContent: '',
           render: (data: boolean, _t: any, row: any) =>
             data ? `<span>Y</span>` : ''
-        },
+        },//8
         {
           title: 'Review status',
           data: 'reviewStatus',
@@ -306,53 +306,53 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             return data;
           }
-        },
+        },//9
         {
           title: 'ESI',
           data: 'esiFlag',
           width: '50px',
           defaultContent: '',
           render: (data: boolean) => data === true ? 'Yes' : data === false ? 'No' : ''
-        },
+        },//10
         {
           title: 'NCI Decision',
           data: 'nciDecision',
           width: '90px',
           defaultContent: ''
-        },
+        },//11
         {
           title: 'DOC Decision',
           data: 'docDecision',
           width: '90px',
           defaultContent: ''
-        },
+        },//12
         {
           title: 'DOC Priority',
           data: 'docPriority',
           width: '90px',
           defaultContent: ''
-        },
+        },//13
         {
           title: 'DOC/NCI Sel',
           data: 'docNciSelectionName',
           width: '100px',
           defaultContent: '',
           render: (_data: string, _t: any, row: FundingSubmissionListGrantDto) => this.getDocNciSelectionDisplay(row)
-        },
+        },//14
         {
           title: 'Annual or MYF',
           data: 'annualOrMyfName',
           width: '90px',
           defaultContent: '',
           render: (_data: string, _t: any, row: FundingSubmissionListGrantDto) => this.getAnnualOrMyfDisplay(row)
-        },
+        },//15
         {
           title: 'Recused',
           data: 'recusedFlag',
           width: '70px',
           defaultContent: '',
           render: (data: boolean) => data ? 'Y' : ''
-        },
+        },//16
         {
           title: 'Action',
           data: null,
@@ -387,7 +387,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
               </div>
             `;
           }
-        }
+        }//17
       ],
       dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"B<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       buttons: [
@@ -404,7 +404,10 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         }
       ],
-      order: [[13, 'asc']],
+      order: [
+        [1, 'asc'],
+        [13, 'asc']
+      ],
       fixedColumns: { left: 1, right: 1 },
       rowCallback: (row: Node, data: FundingSubmissionListGrantDto) => {
         this.dtOptions.columns.forEach((column: any, ind: number) => {

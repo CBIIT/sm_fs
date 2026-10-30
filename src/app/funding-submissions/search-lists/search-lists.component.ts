@@ -553,20 +553,20 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           width: '40px',
           defaultContent: '',
           render: (data: boolean) => data == true ? 'Y' : ''
-        }, // 2
+        }, // 3
         {
           title: 'Grant Number',
           data: 'grantNumber',
           width: '140px',
           ngTemplateRef: { ref: this.fullGrantNumberRenderer },
           className: 'all'
-        }, // 3
+        }, // 4
         {
           title: 'DOC',
           data: 'doc',
           width: '50px',
           defaultContent: ''
-        }, // 4
+        }, // 5
         {
           title: 'Review status',
           data: 'reviewStatus',
@@ -583,37 +583,37 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             return data;
           }
-        }, // 4
+        }, // 6
         {
           title: 'Budget Categories',
           data: 'budgetCategories',
           width: '110px',
           defaultContent: ''
-        }, // 5
+        }, // 7
         {
           title: 'PI',
           data: 'piName',
           width: '130px',
           render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.piEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>` : ''
-        }, // 6
+        }, // 8
         {
           title: 'Institution',
           data: 'institution',
           width: '150px',
           defaultContent: ''
-        }, // 7
+        }, // 9
         {
           title: 'Project Title',
           data: 'projectTitle',
           width: '180px',
           defaultContent: ''
-        }, // 8
+        }, // 10
         {
           title: 'IMPAC II Status',
           data: 'impacStatusDescrip',
           width: '100px',
           defaultContent: ''
-        }, // 9
+        }, // 11
         {
           title: 'NCAB',
           data: 'ncabDate',
@@ -624,32 +624,32 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
             const d = new Date(data);
             return isNaN(d.getTime()) ? data : `${d.getMonth() + 1}/${d.getFullYear()}`;
           }
-        }, // 8
+        }, // 12
         {
           title: 'Pctl',
           data: 'percentile',
           width: '50px',
           defaultContent: '',
           render: (data: number) => data != null ? `${data}%` : ''
-        }, // 9
+        }, // 13
         {
           title: 'PriScr',
           data: 'priorityScoreDisplay',
           width: '90px',
           defaultContent: ''
-        }, // 10
+        }, // 14
         {
           title: 'ESI',
           data: 'esiFlag',
           width: '50px',
           render: (data: boolean) => data === true ? 'Yes' : data === false ? 'No' : ''
-        }, // 11
+        }, // 15
         {
           title: 'Application TC Est',
           data: 'applicationTotalCostEstimate',
           width: '110px',
           defaultContent: ''
-        }, // 12
+        }, // 16
         {
           title: 'NCI Decision',
           data: 'nciDecision',
@@ -665,67 +665,67 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             return data;
           }
-        }, // 13
+        }, // 17
         {
           title: 'DOC Decision',
           data: 'docDecision',
           width: '90px',
           defaultContent: '',
           render: (data: string) => this.resolveDocDecisionDisplay(data)
-        }, // 14
+        }, // 18
         {
           title: 'DOC Priority',
           data: 'docPriority',
           width: '80px',
           defaultContent: ''
-        }, // 15
+        }, // 19
         {
           title: 'DOC Rec. $',
           data: 'docRecommendedAmount',
           width: '90px',
           defaultContent: '',
           render: (data: number) => data != null ? '$' + Number(data).toLocaleString('en-US') : ''
-        }, // 16
+        }, // 20
         {
           title: 'DOC Rec. % Red.',
           data: 'docRecommendedReductionPct',
           width: '95px',
           defaultContent: '',
           render: (data: number) => data != null ? `${data}%` : ''
-        }, // 17
+        }, // 21
         {
           title: 'DOC/NCI Sel',
           data: 'docNciSelectionName',
           width: '100px',
           defaultContent: ''
-        }, // 18
+        }, // 22
         {
           title: 'Two-Year Annual Funding R01 (HRHR)?',
           data: 'twoYearAnnualFundingR01Flag',
           width: '160px',
           defaultContent: '',
           render: (data: any) => data ? 'Y' : ''
-        }, // 19
+        }, // 23
         {
           title: 'Annual or MYF',
           data: 'annualOrMyfName',
           width: '90px',
           defaultContent: ''
-        }, // 20
+        }, // 24
         {
           title: 'Recused',
           data: 'recusedFlag',
           width: '70px',
           defaultContent: '',
           render: (data: any) => data ? 'Y' : ''
-        }, // 21
+        }, // 25
         {
           title: 'NOFO',
           data: 'nofo',
           width: '80px',
           defaultContent: '',
           ngTemplateRef: { ref: this.foaCellRender }
-        }, // 22
+        }, // 26
         {
           title: 'Date Added',
           data: 'dateAdded',
@@ -741,14 +741,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
             const min = String(d.getMinutes()).padStart(2, '0');
             return `${mm}/${dd}/${d.getFullYear()} ${hh}:${min}`;
           }
-        }, // 23
+        }, // 27
         {
           title: 'Added By',
           data: 'addedByName',
           width: '80px',
           defaultContent: '',
           render: (data: string, _t: any, row: any) => data ? `<a href="mailto:${row.addedByEmail}?subject=${row.grantNumber} - ${row.piName}">${data}</a>` : ''
-        }, // 24
+        }, // 28
         {
           title: 'Action',
           data: null,
@@ -761,7 +761,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
               : 'fa-plus-circle';
             return `<button class="btn btn-link p-0 toggle-details d-block mx-auto mb-3" title="Details"><i class="far ${expandedIcon} fa-lg"></i></button>`;
           }
-        }, // 25
+        }, // 29
       ],
       dom: '<"dt-controls dt-top"l<"ms-4"i><"ms-auto"B<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
       buttons: [
@@ -782,7 +782,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           exportOptions: { columns: Array.from({ length: 28 }, (_, i) => i + 1) }
         }
       ],
-      order: [[19, 'desc']],
+      order: [
+        [5, 'asc'],
+        [19, 'asc']
+      ],
       fixedColumns: { left: 1, right: 1 },
       initComplete: () => {
         this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
