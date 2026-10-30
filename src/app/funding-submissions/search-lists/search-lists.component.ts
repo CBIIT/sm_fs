@@ -704,7 +704,20 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           data: 'twoYearAnnualFundingR01Flag',
           width: '160px',
           defaultContent: '',
-          render: (data: any) => data ? 'Y' : ''
+          render: (data: any, type: string, row: FundingSubmissionListGrantDto) => {
+            if (type !== 'display') {
+              return data;
+            }
+
+            const rawValue = row?.annualFundingR01;
+            if (rawValue === undefined) {
+              return data ? 'Y' : '';
+            }
+            if (rawValue === 'Yes') {
+              return 'Y';
+            }
+            return rawValue === 'No' ? 'N' : '';
+          }
         }, // 23
         {
           title: 'Annual or MYF',
