@@ -19,7 +19,7 @@ describe('NCI Decision column formatting', () => {
       expect(SearchListsComponent.formatNciDecision({
         nciDecision,
         nciDecisionByName: 'Example, Alex',
-        nciDecisionDate: '2026-10-29T00:00:00Z'
+        nciDecisionDate: new Date(2026, 9, 29)
       })).toBe(`${nciDecision} by Example, Alex on 10/29/2026`);
     });
   }
@@ -28,7 +28,7 @@ describe('NCI Decision column formatting', () => {
     expect(SearchListsComponent.formatNciDecision({
       nciDecision: 'Approve',
       nciDecisionByName: 'Example, Alex',
-      nciDecisionDate: '2026-10-28',
+      nciDecisionDate: new Date(2026, 9, 28),
       lockedBy: 'Example, Jordan',
       lockedDate: new Date(2026, 9, 29)
     })).toBe('Approve and locked by Example, Jordan on 10/29/2026');
@@ -36,17 +36,17 @@ describe('NCI Decision column formatting', () => {
 
   it('renders nothing without a decision even when unlocked metadata exists', () => {
     expect(SearchListsComponent.formatNciDecision({
-      nciDecisionByName: 'Example, Alex', nciDecisionDate: '2026-10-29'
+      nciDecisionByName: 'Example, Alex', nciDecisionDate: new Date(2026, 9, 29)
     })).toBe('');
   });
 
   it('does not display incomplete or invalid unlocked metadata', () => {
     expect(SearchListsComponent.formatNciDecision({
-      nciDecision: 'Hold', nciDecisionDate: '2026-10-29'
+      nciDecision: 'Hold', nciDecisionDate: new Date(2026, 9, 29)
     })).toBe('Hold');
     expect(SearchListsComponent.formatNciDecision({
       nciDecision: 'Hold', nciDecisionByName: 'Example, Alex', nciDecisionDate: '2026-02-30'
-    })).toBe('Hold');
+    } as unknown as FundingSubmissionListGrantDto)).toBe('Hold');
   });
 
   it('displays the locked decision, recorded user, and date', () => {

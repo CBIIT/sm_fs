@@ -1,11 +1,6 @@
 import { FundingSubmissionListGrantDto } from '@cbiit/i2efsws-lib';
 
-export type NciDecisionGrant = FundingSubmissionListGrantDto & {
-  nciDecisionByName?: string;
-  nciDecisionDate?: Date | string;
-};
-
-export function formatNciDecision(grant: NciDecisionGrant): string {
+export function formatNciDecision(grant: FundingSubmissionListGrantDto): string {
   const decision = String(grant?.nciDecision || '').trim();
   if (!decision) return '';
 

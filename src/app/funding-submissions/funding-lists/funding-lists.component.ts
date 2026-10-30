@@ -18,6 +18,8 @@ import {
 import { GrantDetailComponent } from '../search-lists/grant-detail/grant-detail.component';
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
+import { NciDecisionCellRendererComponent } from '../../table-cell-renderers/nci-decision-cell-renderer/nci-decision-cell-renderer.component';
+import { formatNciDecision } from '../../utils/funding-submission-format';
 
 declare var $: any;
 
@@ -46,6 +48,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(DataTableDirective, { static: false }) dtElement: DataTableDirective;
   @ViewChild('fullGrantNumberRenderer') fullGrantNumberRenderer: TemplateRef<FullGrantNumberCellRendererComponent>;
   @ViewChild('foaCellRender') foaCellRender: TemplateRef<FoaCellRendererComponent>;
+  @ViewChild('nciDecisionRenderer') nciDecisionRenderer: TemplateRef<NciDecisionCellRendererComponent>;
   @ViewChild('confirmDecisionsWarningModal') private confirmDecisionsWarningModalRef: TemplateRef<any>;
   @ViewChild('grantDecisionModal') private grantDecisionModalTemplateRef: TemplateRef<any>;
 
@@ -317,8 +320,18 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         {
           title: 'NCI Decision',
           data: 'nciDecision',
-          width: '90px',
-          defaultContent: ''
+          width: '250px',
+          defaultContent: '',
+          ngTemplateRef: { ref: this.nciDecisionRenderer },
+          render: (data: string | null | undefined, type: string, row: FundingSubmissionListGrantDto) => {
+            if (type === 'display') {
+              return '';
+            }
+            if (type === 'filter' || type === 'export') {
+              return formatNciDecision(row);
+            }
+            return data;
+          }
         },//11
         {
           title: 'DOC Decision',

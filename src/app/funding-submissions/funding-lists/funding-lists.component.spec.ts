@@ -102,6 +102,31 @@ describe('FundingListsComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('uses the NCI Decision template and formats search and export values while preserving raw sorting', () => {
+    const column = component.dtOptions.columns.find((candidate: any) => candidate.title === 'NCI Decision');
+    const grant = buildGrant({
+      nciDecision: 'Hold',
+      nciDecisionByName: 'Example, Alex',
+      nciDecisionDate: new Date(2026, 9, 29)
+    });
+
+    expect(column.ngTemplateRef).toEqual({ ref: component.nciDecisionRenderer });
+    expect(column.render(grant.nciDecision, 'display', grant)).toBe('');
+    expect(column.render(grant.nciDecision, 'filter', grant)).toBe('Hold by Example, Alex on 10/29/2026');
+    expect(column.render(grant.nciDecision, 'export', grant)).toBe('Hold by Example, Alex on 10/29/2026');
+    expect(column.render(grant.nciDecision, 'sort', grant)).toBe('Hold');
+    expect(column.render(grant.nciDecision, 'type', grant)).toBe('Hold');
+  });
+
+  it('formats locked NCI Decision metadata and leaves missing decisions blank', () => {
+    const column = component.dtOptions.columns.find((candidate: any) => candidate.title === 'NCI Decision');
+    const grant = buildGrant({ lockedBy: 'Example, Jordan', lockedDate: new Date(2026, 9, 30) });
+
+    expect(column.render(grant.nciDecision, 'export', grant))
+      .toBe('Approve and locked by Example, Jordan on 10/30/2026');
+    expect(column.render(null, 'filter', buildGrant({ nciDecision: null }))).toBe('');
+  });
+
   it('exports the 16 visible data columns in table order without checkbox or Action', () => {
     const columns = component.dtOptions.columns;
     const exportIndexes = component.dtOptions.buttons[0].exportOptions.columns;

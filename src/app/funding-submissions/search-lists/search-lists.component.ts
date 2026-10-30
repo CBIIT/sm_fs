@@ -17,7 +17,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-lookup.service';
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { NciDecisionCellRendererComponent } from '../../table-cell-renderers/nci-decision-cell-renderer/nci-decision-cell-renderer.component';
-import { formatFundingSubmissionDate, formatNciDecision, NciDecisionGrant } from '../../utils/funding-submission-format';
+import { formatFundingSubmissionDate, formatNciDecision } from '../../utils/funding-submission-format';
 
 declare var $: any;
 
@@ -479,7 +479,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.docDecisionDisplayMap.get(code) ?? code;
   }
 
-  static formatNciDecision(grant: NciDecisionGrant): string {
+  static formatNciDecision(grant: FundingSubmissionListGrantDto): string {
     return formatNciDecision(grant);
   }
 
