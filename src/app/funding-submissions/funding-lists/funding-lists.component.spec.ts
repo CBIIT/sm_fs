@@ -90,7 +90,7 @@ describe('FundingListsComponent', () => {
         }
       ]
     });
-    TestBed.overrideComponent(FundingListsComponent, { set: { template: '' } });
+    TestBed.overrideComponent(FundingListsComponent, { set: { template: '<ng-template #nciDecisionRenderer></ng-template>' } });
     await testingModule.compileComponents();
 
     fixture = TestBed.createComponent(FundingListsComponent);
@@ -110,7 +110,8 @@ describe('FundingListsComponent', () => {
       nciDecisionDate: new Date(2026, 9, 29)
     });
 
-    expect(column.ngTemplateRef).toEqual({ ref: component.nciDecisionRenderer });
+    expect(component.nciDecisionRenderer).toBeDefined();
+    expect(column.ngTemplateRef.ref).toBe(component.nciDecisionRenderer);
     expect(column.render(grant.nciDecision, 'display', grant)).toBe('');
     expect(column.render(grant.nciDecision, 'filter', grant)).toBe('Hold by Example, Alex on 10/29/2026');
     expect(column.render(grant.nciDecision, 'export', grant)).toBe('Hold by Example, Alex on 10/29/2026');
