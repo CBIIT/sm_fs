@@ -89,6 +89,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectedViewDoc: string = null;
   selectedRows = new Map<number, any>();
+  private pendingSelectedApplIds: number[] = [];
   filteredDoc: string | null = null;
   sendGrantsToDocsSuccessMessage = '';
   sendGrantsToDocsErrorMessage = '';
@@ -187,6 +188,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    const navigationState = history.state;
     this.bindGlobalNavigationUnsavedGuard();
     this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
     this.isOEFIACerifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
@@ -204,6 +206,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.route.queryParams.subscribe(params => {
       if (params['listId']) {
         this.listId = Number(params['listId']);
+        this.pendingSelectedApplIds = navigationState?.selectionListId === this.listId
+          ? navigationState.selectedApplIds || []
+          : [];
         this.loadListMeta();
       }
       if (params['selectionDate']) {
@@ -323,7 +328,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.totalGrants = detail.totalGrants ?? 0;
         this.docRecommendedTotal = detail.totalDocRecAmt ?? 0;
         this.listStatus = detail.currentStatusDescrip;
-        const selectedApplIds = new Set(this.selectedRows.keys());
+        const selectedApplIds = new Set([...this.selectedRows.keys(), ...this.pendingSelectedApplIds]);
+        this.pendingSelectedApplIds = [];
         this.cachedGrants = detail.grants || [];
         this.selectedRows.clear();
         this.cachedGrants.forEach(grant => {
@@ -1802,6 +1808,11 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const grants = Array.from(this.selectedRows.values());
     const queryParams = this.fromRoute ? { from: this.fromRoute } : undefined;
+    history.replaceState({
+      ...history.state,
+      selectionListId: this.listId,
+      selectedApplIds: Array.from(this.selectedRows.keys())
+    }, document.title);
     this.router.navigate(['/funding-submissions/bulk-edit'], {
       queryParams,
       state: { grants, listId: this.listId, selectionDate: this.selectionDate, from: this.fromRoute }

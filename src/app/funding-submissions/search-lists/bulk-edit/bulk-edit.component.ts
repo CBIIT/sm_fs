@@ -714,7 +714,11 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       queryParams.from = this.fromRoute;
     }
     this.router.navigate(['/funding-submissions/search'], {
-      queryParams
+      queryParams,
+      state: {
+        selectionListId: this.listId,
+        selectedApplIds: this.rows.map(row => row.applId)
+      }
     });
   }
 

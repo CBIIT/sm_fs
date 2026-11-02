@@ -259,8 +259,8 @@ describe('BulkEditComponent', () => {
     expect(Object.keys(payload.fields).sort()).toEqual(expectedDtoKeys.sort());
   });
 
-  it('goBack() preserves from=lists when navigating back to Search Lists', () => {
-    seedHistoryStateAndInit([grant()]);
+  it('goBack() preserves from=lists and selected IDs when navigating back to Search Lists', () => {
+    seedHistoryStateAndInit([grant(), grant({ applId: 200 })]);
     component.fromRoute = 'lists';
     component.listId = 42;
     component.selectionDate = 'SEL-42';
@@ -269,7 +269,8 @@ describe('BulkEditComponent', () => {
     component.goBack();
 
     expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
-      queryParams: { listId: 42, selectionDate: 'SEL-42', from: 'lists' }
+      queryParams: { listId: 42, selectionDate: 'SEL-42', from: 'lists' },
+      state: { selectionListId: 42, selectedApplIds: [100, 200] }
     });
   });
   describe('FS-2277 — Bulk Edit Save dirty-state derivation', () => {

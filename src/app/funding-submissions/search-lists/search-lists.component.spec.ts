@@ -190,6 +190,65 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     fixture.detectChanges();
   });
 
+  describe('Bulk Edit selection restoration', () => {
+    it('saves selected IDs on the current history entry for browser Back', () => {
+      const replaceState = spyOn(history, 'replaceState');
+      component.listId = 42;
+      component.selectedRows.set(100, { applId: 100 });
+      component.selectedRows.set(200, { applId: 200 });
+
+      component.onBulkEdit();
+
+      expect(replaceState).toHaveBeenCalledWith(jasmine.objectContaining({
+        selectionListId: 42,
+        selectedApplIds: [100, 200]
+      }), document.title);
+      expect(routerSpy.navigate).toHaveBeenCalled();
+    });
+
+    it('restores matching rows from fresh list data and drops missing IDs', () => {
+      spyOnProperty(history, 'state', 'get').and.returnValue({
+        selectionListId: 42,
+        selectedApplIds: [100, 200, 999]
+      });
+      TestBed.inject(ActivatedRoute).queryParams = of({ listId: '42' });
+      const grants = [
+        { applId: 100, doc: 'DCB', docNotes: 'Saved bulk edit' },
+        { applId: 200, doc: 'DCB' },
+        { applId: 300, doc: 'DCB' }
+      ];
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants }));
+
+      component.ngOnInit();
+
+      expect(Array.from(component.selectedRows.keys())).toEqual([100, 200]);
+      expect(component.selectedRows.get(100)).toBe(grants[0]);
+      expect(component.selectedRows.get(100).docNotes).toBe('Saved bulk edit');
+      const callback = jasmine.createSpy('callback');
+      component.ajaxCall(component, {}, callback);
+      expect(callback.calls.mostRecent().args[0].data.map(grant => !!grant.selected))
+        .toEqual([true, true, false]);
+
+      component.resetTable();
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [{ applId: 100 }] }));
+      (component as any).loadListMeta();
+      expect(component.selectedRows.size).toBe(0);
+    });
+
+    it('does not restore selection from a different list', () => {
+      spyOnProperty(history, 'state', 'get').and.returnValue({
+        selectionListId: 41,
+        selectedApplIds: [100]
+      });
+      TestBed.inject(ActivatedRoute).queryParams = of({ listId: '42' });
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [{ applId: 100 }] }));
+
+      component.ngOnInit();
+
+      expect(component.selectedRows.size).toBe(0);
+    });
+  });
+
   describe('add-grants destination feedback (FS-2411)', () => {
     it('captures summary and all pairs before clearing history and renders each as text', () => {
       const summary = 'Success! 1 out of 5 were successfully added to the list.';
