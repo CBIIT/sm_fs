@@ -386,7 +386,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       countDisplay: this.docFundingListCor
         ? String(e.count)
         : this.getDocStatusCountDisplay(e.doc, e.count, this.getReviewStatusByRank(e.statusRank), grants)
-    }));
+    })).sort((left, right) => left.doc.localeCompare(right.doc));
     const currentReviewStatus = this.getCurrentReviewStatus(grants);
     this.currentReviewStatus = currentReviewStatus;
     this.isCurrentStatusDraft = currentReviewStatus === 'Draft';

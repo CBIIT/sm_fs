@@ -1799,6 +1799,21 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
   });
 
   describe('Review Status docs[] consumption (FS-2106 §12)', () => {
+    it('orders Review Status alphabetically by DOC before splitting into columns', () => {
+      component.docFundingListCor = false;
+      const grants = ['DTP', 'DCP', 'DCTD', 'DCB', 'DCCPS', 'DCB'].map(doc => ({
+        doc,
+        reviewStatus: 'DOC Review'
+      }));
+
+      const columns = (component as any).buildDocStatusColumns(grants);
+
+      expect(columns.map(column => column.map(item => item.doc)))
+        .toEqual([['DCB', 'DCCPS', 'DCP', 'DCTD'], ['DTP']]);
+      expect(columns[0][0].count).toBe(2);
+      expect(columns[0][0].status).toBe('DOC Review');
+    });
+
     it('OEFIA/FA case: a zero-grant-count DOC entry in docs[] is still rendered in Review Status', () => {
       fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
         listCode: '9-May 19th',
