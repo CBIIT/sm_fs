@@ -10,6 +10,14 @@
   border: 1px solid #d8dee6;
 }
 
+.overview-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
 .overview-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -94,6 +102,9 @@
 
 .results {
   border: 1px solid #d8dee6;
+}
+.card {
+  border: 1px solid #ccc !important;
 }
 
 ::ng-deep .funding-lists-page .detail-row-sticky {

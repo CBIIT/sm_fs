@@ -187,6 +187,10 @@ tr.shown {
   color: #2f3640;
 }
 
+.card {
+  border: 1px solid #ccc !important;
+}
+
 /* Vertical separators between the 3 columns */
 .doc-status-column.border-end {
   border-right: 1px solid #d0d0d0 !important;
