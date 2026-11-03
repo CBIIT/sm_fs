@@ -191,6 +191,36 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
   });
 
   describe('Bulk Edit selection restoration', () => {
+    it('consumes selection state so a refreshed page does not restore it again', () => {
+      const previousState = history.state;
+      const refreshedFixture = TestBed.createComponent(SearchListsComponent);
+      try {
+        history.replaceState({
+          navigationId: 7,
+          selectionListId: 42,
+          selectedApplIds: [100]
+        }, document.title);
+        TestBed.inject(ActivatedRoute).queryParams = of({ listId: '42' });
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [{ applId: 100 }] }));
+
+        component.ngOnInit();
+
+        expect(component.selectedRows.has(100)).toBeTrue();
+        expect(history.state).toEqual({ navigationId: 7 });
+
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [{ applId: 100 }] }));
+        refreshedFixture.componentInstance.ngOnInit();
+
+        expect(refreshedFixture.componentInstance.selectedRows.size).toBe(0);
+        const callback = jasmine.createSpy('callback');
+        refreshedFixture.componentInstance.ajaxCall(refreshedFixture.componentInstance, {}, callback);
+        expect(callback.calls.mostRecent().args[0].data[0].selected).toBeFalsy();
+      } finally {
+        refreshedFixture.destroy();
+        history.replaceState(previousState, document.title);
+      }
+    });
+
     it('saves selected IDs on the current history entry for browser Back', () => {
       const replaceState = spyOn(history, 'replaceState');
       component.listId = 42;

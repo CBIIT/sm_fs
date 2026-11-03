@@ -188,7 +188,13 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    const navigationState = history.state;
+    let navigationState = history.state;
+    if (navigationState?.selectionListId !== undefined || navigationState?.selectedApplIds !== undefined) {
+      const remainingState = { ...navigationState };
+      delete remainingState.selectionListId;
+      delete remainingState.selectedApplIds;
+      history.replaceState(remainingState, document.title);
+    }
     this.bindGlobalNavigationUnsavedGuard();
     this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
     this.isOEFIACerifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
@@ -209,6 +215,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.pendingSelectedApplIds = navigationState?.selectionListId === this.listId
           ? navigationState.selectedApplIds || []
           : [];
+        navigationState = null;
         this.loadListMeta();
       }
       if (params['selectionDate']) {
