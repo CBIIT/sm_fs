@@ -133,6 +133,24 @@ describe('BulkEditComponent', () => {
     });
   }
 
+  function initializeFixtureWithGrants(grants: any[]): void {
+    spyOnProperty(history, 'state', 'get').and.returnValue({ listId: 1, selectionDate: '', grants });
+    fixture.detectChanges();
+  }
+
+  function getSaveButton(): HTMLButtonElement {
+    return Array.from(fixture.nativeElement.querySelectorAll('button'))
+      .find((button: HTMLButtonElement) => button.textContent?.trim() === 'Save') as HTMLButtonElement;
+  }
+
+  function renderDocNotesCell(row: any): string {
+    const view = component.docNotesRenderer.createEmbeddedView({ adtData: row });
+    view.detectChanges();
+    const text = view.rootNodes.map((node: any) => node.textContent || '').join(' ');
+    view.destroy();
+    return text;
+  }
+
   for (const isDocUser of [true, false]) {
     it(`${isDocUser ? 'hides' : 'retains'} Budget Categories and Annual or MYF table columns for ${isDocUser ? 'DOC' : 'non-DOC'} users`, () => {
       setRoles(isDocUser, !isDocUser);
@@ -545,6 +563,7 @@ describe('BulkEditComponent', () => {
       expect(row.annualFundingR01).toBeNull();
       expect(row.annualOrMyf).toBeNull();
       expect(component.canSave).toBeTrue();
+      expect(component.hasDoNotPayDocNotesError(row)).toBeTrue();
 
       expect(row.docPriority).toBeNull();
       expect(row.docRecAmt).toBeNull();
@@ -567,7 +586,7 @@ describe('BulkEditComponent', () => {
       expect(row.annualFundingR01).toBeNull();
       expect(row.annualOrMyf).toBeNull();
       expect(component.getDoNotPayDocNotesErrorMessage())
-        .toBe('DOC Notes is required when DOC Decision is Do Not Pay.');
+        .toBe('DOC Notes is required when DOC decision is Do Not Pay.');
       expect(component.hasMandatoryFieldError(row, 'budgetCategories')).toBeFalse();
       expect(component.hasMandatoryFieldError(row, 'docNciSelection')).toBeFalse();
       expect(component.hasMandatoryFieldError(row, 'annualFundingR01')).toBeFalse();
@@ -592,6 +611,161 @@ describe('BulkEditComponent', () => {
       expect(payload.fields.docRecReductionPct).toBeNull();
       expect(payload.fields.recused).toBeNull();
       expect(payload.fields.oefiaNotes).toBe('Existing OEFIA notes');
+    });
+
+    it('shows bulk and per-row Do Not Pay notes errors before Save for OEFIA bulk edits', () => {
+      setRoles(false, true);
+      initializeFixtureWithGrants([grant({ applId: 100 }), grant({ applId: 200 })]);
+      component.bulkFields = { docDecision: 'Do Not Pay', docNotes: '   ' };
+
+      component.onApplyChanges();
+      fixture.detectChanges();
+
+      const message = 'DOC Notes is required when DOC decision is Do Not Pay.';
+      expect(component.rows.every(row => component.hasDoNotPayDocNotesError(row))).toBeTrue();
+      expect(component.showBulkDoNotPayDocNotesError).toBeTrue();
+      expect(fixture.nativeElement.textContent).toContain(message);
+      expect(renderDocNotesCell(component.rows[0])).toContain(message);
+      expect(renderDocNotesCell(component.rows[1])).toContain(message);
+      expect(getSaveButton().disabled).toBeTrue();
+      expect(component.showApplyBeforeSaveTooltip).toBeTrue();
+
+      const tooltipDebugElement = fixture.debugElement.queryAll(By.directive(NgbTooltip))
+        .find(element => element.injector.get(NgbTooltip).ngbTooltip === 'Apply changes prior to saving');
+      expect(tooltipDebugElement).toBeDefined();
+      expect(tooltipDebugElement!.injector.get(NgbTooltip).disableTooltip).toBeFalse();
+      expect((tooltipDebugElement!.nativeElement as HTMLElement).tabIndex).toBe(0);
+    });
+
+    it('shows a row-only error and disables Save for an individual Do Not Pay decision', () => {
+      initializeFixtureWithGrants([grant()]);
+      const row = component.rows[0];
+      row.docDecision = 'Do Not Pay';
+
+      component.onRowDocDecisionChange(row);
+      fixture.detectChanges();
+
+      expect(component.hasDoNotPayDocNotesError(row)).toBeTrue();
+      expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+      expect(renderDocNotesCell(row)).toContain(component.getDoNotPayDocNotesErrorMessage());
+      expect(getSaveButton().disabled).toBeTrue();
+      expect(component.showApplyBeforeSaveTooltip).toBeTrue();
+    });
+
+    it('clears row and bulk errors and enables Save after every affected row gets notes', () => {
+      setRoles(false, true);
+      initializeFixtureWithGrants([grant({ applId: 100 }), grant({ applId: 200 })]);
+      component.bulkFields = { docDecision: 'Do Not Pay', docNotes: '' };
+      component.onApplyChanges();
+      fixture.detectChanges();
+
+      component.rows.forEach((row, index) => {
+        row.docNotes = `Justification ${index + 1}`;
+      });
+      component.onRowFieldChange();
+      fixture.detectChanges();
+
+      expect(component.hasDoNotPayDocNotesErrors).toBeFalse();
+      expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+      expect(component.rows.every(row => !component.hasDoNotPayDocNotesError(row))).toBeTrue();
+      expect(getSaveButton().disabled).toBeFalse();
+      expect(component.canSave).toBeTrue();
+    });
+
+    it('does not show Do Not Pay notes errors when bulk DOC Notes is nonblank', () => {
+      setRoles(false, true);
+      initializeFixtureWithGrants([grant()]);
+      component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'Bulk justification' };
+
+      component.onApplyChanges();
+      fixture.detectChanges();
+
+      expect(component.hasDoNotPayDocNotesErrors).toBeFalse();
+      expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+      expect(component.rows[0].docNotes).toBe('Bulk justification');
+      expect(getSaveButton().disabled).toBeFalse();
+    });
+
+    it('only shows errors for OEFIA-added rows after DOC-only mixed-source confirmation', () => {
+      setRoles(true, false);
+      initializeFixtureWithGrants([
+        grant({ applId: 100, addedByGroup: 'DOC' }),
+        grant({ applId: 200, addedByGroup: 'OEFIA' })
+      ]);
+      component.bulkFields = { docDecision: 'Do Not Pay', docNotes: '' };
+
+      component.onApplyChanges();
+      component.onProceedDoNotPayWarning();
+      fixture.detectChanges();
+
+      expect(component.hasDoNotPayDocNotesError(component.rows[0])).toBeFalse();
+      expect(component.hasDoNotPayDocNotesError(component.rows[1])).toBeTrue();
+      expect(renderDocNotesCell(component.rows[0])).not.toContain(component.getDoNotPayDocNotesErrorMessage());
+      expect(renderDocNotesCell(component.rows[1])).toContain(component.getDoNotPayDocNotesErrorMessage());
+      expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+      expect(getSaveButton().disabled).toBeTrue();
+    });
+
+    it('clears the bulk message on nonblank notes, decision change, and Reset but not OEFIA Notes edits', () => {
+      setRoles(false, true);
+      initializeFixtureWithGrants([grant()]);
+      const applyBlankDoNotPay = () => {
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: '' };
+        component.onApplyChanges();
+        fixture.detectChanges();
+        expect(component.showBulkDoNotPayDocNotesError).toBeTrue();
+      };
+
+      applyBlankDoNotPay();
+      component.bulkFields.oefiaNotes = 'OEFIA update';
+      component.onBulkFieldChange();
+      expect(component.showBulkDoNotPayDocNotesError).toBeTrue();
+
+      component.bulkFields.docNotes = 'Entered notes';
+      component.onBulkFieldChange();
+      expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+
+      applyBlankDoNotPay();
+      component.bulkFields.docDecision = 'Pay';
+      component.onBulkDocDecisionChange();
+      expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+
+      applyBlankDoNotPay();
+      component.onReset();
+      expect(component.hasDoNotPayDocNotesErrors).toBeFalse();
+      expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+    });
+
+    it('clears the bulk-message state after a successful save', () => {
+      setRoles(false, true);
+      initializeFixtureWithGrants([grant()]);
+      component.bulkFields = { docDecision: 'Do Not Pay', docNotes: '' };
+      component.onApplyChanges();
+      component.rows[0].docNotes = 'Justification';
+      component.onRowFieldChange();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+
+      component.onSave();
+
+      expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+      component.rows[0].docNotes = '';
+      component.onRowFieldChange();
+      expect(component.hasDoNotPayDocNotesErrors).toBeTrue();
+      expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+    });
+
+    it('shows row errors but no bulk message for DOC-only users', () => {
+      setRoles(true, false);
+      initializeFixtureWithGrants([grant()]);
+      component.bulkFields = { docDecision: 'Do Not Pay', docNotes: '' };
+
+      component.onApplyChanges();
+      fixture.detectChanges();
+
+      expect(component.hasDoNotPayDocNotesError(component.rows[0])).toBeTrue();
+      expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+      expect(renderDocNotesCell(component.rows[0])).toContain(component.getDoNotPayDocNotesErrorMessage());
+      expect(getSaveButton().disabled).toBeTrue();
     });
 
     it('preserves Do Not Pay option origin gating and mixed-source warning before applying', () => {
