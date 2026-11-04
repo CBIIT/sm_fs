@@ -99,12 +99,12 @@
             <td class="grid-label sep">DOC Priority:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docPriority}}</span>
-              <input *ngIf="isEditMode" type="number" class="form-control form-control-sm"
-                name="docPriority" [(ngModel)]="formModel.docPriority"
+              <ng-select2 *ngIf="isEditMode" name="docPriority" [(ngModel)]="formModel.docPriority"
+                [data]="docPriorityOptions" [placeholder]="'Select'" width="100%"
                 (blur)="onRequiredFieldBlur('docPriority')"
                 (ngModelChange)="onValidationFieldChange()"
-                 [disabled]="doNotPayOefiaLockActive"
-                placeholder="Enter Value" min="0" step="1">
+                [disabled]="doNotPayOefiaLockActive">
+              </ng-select2>
               <div class="text-danger small mt-1" *ngIf="isEditMode && saveValidationErrors.docPriority">{{saveValidationErrors.docPriority}}</div>
             </td>
             <td class="grid-label">2Y Annual Fnd R01:</td>

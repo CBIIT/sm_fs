@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EnvironmentInj
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
-import { Observable, Subject, forkJoin } from 'rxjs';
+import { Observable, Subject, Subscription, forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
@@ -120,6 +120,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedNciTab: NciTabId = 'all';
   blockedGrantNumbers: string[] = [];
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
+  private priorityRefreshSubscription: Subscription;
   viewDocOptions: Select2OptionData[] = [
     { id: 'AB', text: 'Abstract(s)' },
     { id: 'SS', text: 'Summary Statement(s)' },
@@ -137,10 +138,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private readonly onHorizontalDragPointerDown = (event: PointerEvent): void => {
     if (!this.dragScrollBodyEl || !this.dragScrollContainerEl) return;
-    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
 
     const target = event.target as HTMLElement | null;
-    if (target?.closest(this.dragScrollIgnoreSelector)) {
+    if (!target
+      || target === this.dragScrollBodyEl
+      || !this.dragScrollBodyEl.contains(target)
+      || target.closest('.detail-row-sticky')
+      || target.closest(this.dragScrollIgnoreSelector)) {
       return;
     }
 
@@ -326,6 +331,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadListMeta(): void {
+    if (this.priorityRefreshSubscription && !this.priorityRefreshSubscription.closed) {
+      this.priorityRefreshSubscription.unsubscribe();
+    }
     forkJoin({
       detail: this.fundingSubmissionsService.getListDetail(this.listId),
       history: this.fundingSubmissionsService.getListStatusHistory(this.listId)
@@ -1086,6 +1094,41 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   // left untouched.
   private handleDetailSaved(row: any): void {
     row.invalidate().draw(false);
+    if (this.priorityRefreshSubscription && !this.priorityRefreshSubscription.closed) {
+      this.priorityRefreshSubscription.unsubscribe();
+    }
+    const listId = this.listId;
+    this.priorityRefreshSubscription = this.fundingSubmissionsService.getListDetail(listId).subscribe({
+      next: detail => {
+        if (this.listId !== listId) {
+          return;
+        }
+        const priorities = new Map((detail.grants || []).map(grant => [grant.applId, grant.docPriority]));
+        const updatePriority = (grant: FundingSubmissionListGrantDto): void => {
+          if (grant && priorities.has(grant.applId)) {
+            grant.docPriority = priorities.get(grant.applId);
+          }
+        };
+        this.cachedGrants.forEach(updatePriority);
+        this.selectedRows.forEach(updatePriority);
+        this.detailComponentsByApplId.forEach(componentRef => {
+          if (componentRef.instance?.data) {
+            updatePriority(componentRef.instance.data);
+            componentRef.changeDetectorRef.detectChanges();
+          }
+        });
+        this.dtElement?.dtInstance?.then(dt => {
+          if (this.listId !== listId) {
+            return;
+          }
+          dt.rows().every(function() {
+            updatePriority(this.data() as FundingSubmissionListGrantDto);
+          });
+          dt.rows().invalidate().draw(false);
+        });
+      },
+      error: error => this.logger.error('Failed to refresh DOC priorities after saving grant', error, { listId })
+    });
   }
 
   private blurActiveElement(): void {
@@ -1879,6 +1922,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.priorityRefreshSubscription && !this.priorityRefreshSubscription.closed) {
+      this.priorityRefreshSubscription.unsubscribe();
+    }
     if (this.pendingRealignFrame !== null) {
       window.cancelAnimationFrame(this.pendingRealignFrame);
       this.pendingRealignFrame = null;

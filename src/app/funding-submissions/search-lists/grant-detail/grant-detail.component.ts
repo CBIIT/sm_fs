@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { FundingSubmBulkEditFieldsDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from '../../../service/app-user-session.service';
@@ -8,7 +8,7 @@ import { Select2OptionData } from 'ng-select2';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
 import { saveAs } from 'file-saver';
-import { catchError, concatMap, from, map, Observable, of, tap } from 'rxjs';
+import { catchError, concatMap, from, map, Observable, of, Subscription, tap } from 'rxjs';
 
 import { DocumentsDto } from '@cbiit/i2efsws-lib/model/documentsDto';
 import { DocumentService } from '../../../service/document.service';
@@ -18,7 +18,7 @@ import { DocumentService } from '../../../service/document.service';
   templateUrl: './grant-detail.component.html',
   styleUrls: ['./grant-detail.component.css']
 })
-export class GrantDetailComponent implements OnInit, OnChanges {
+export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   @Input() data: any = null;
   @Input() listId: number;
   @Input() listStatus = 'DOC Review';
@@ -89,6 +89,8 @@ export class GrantDetailComponent implements OnInit, OnChanges {
   annualMyfOptions: Select2OptionData[] = [];
   budgetCategoryOptions: Select2OptionData[] = [];
   selectionOptions: Select2OptionData[] = [];
+  docPriorityOptions: Select2OptionData[] = [];
+  private docPriorityOptionsSubscription: Subscription;
 
   constructor(
     private logger: NGXLogger,
@@ -177,9 +179,10 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     if (!this.canEnterEditMode) {
       return;
     }
+    this.fetchDocPriorityOptions();
     this.formModel = {
       docDecision:        this.data?.docDecision ?? null,
-      docPriority:        this.data?.docPriority ?? null,
+      docPriority:        this.data?.docPriority != null ? String(this.data.docPriority) : null,
       docRecAmt:          this.data?.docRecommendedAmount ?? null,
       docRecReductionPct: this.data?.docRecommendedReductionPct ?? null,
       docNciSelection:    this.data?.docNciSelection ?? null,
@@ -205,6 +208,32 @@ export class GrantDetailComponent implements OnInit, OnChanges {
     this.fundingSaveError = null;
     this.recomputeDoNotPayOefiaLock();
     this.cdr.detectChanges();
+  }
+
+  private fetchDocPriorityOptions(): void {
+    if (this.docPriorityOptionsSubscription && !this.docPriorityOptionsSubscription.closed) {
+      this.docPriorityOptionsSubscription.unsubscribe();
+    }
+    const listId = this.listId;
+    const applId = this.data?.applId;
+    this.docPriorityOptions = [];
+    if (!listId || !applId) {
+      return;
+    }
+
+    this.docPriorityOptionsSubscription = this.fundingSubmissionsService.getDocPriorityOptions(listId, applId).subscribe({
+      next: priorities => {
+        this.docPriorityOptions = priorities.map(priority => ({ id: String(priority), text: String(priority) }));
+        this.cdr.detectChanges();
+      },
+      error: error => this.logger.error('Failed to load DOC Priority options', error, { listId, applId })
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.docPriorityOptionsSubscription && !this.docPriorityOptionsSubscription.closed) {
+      this.docPriorityOptionsSubscription.unsubscribe();
+    }
   }
 
   onDocDecisionChange(): void {

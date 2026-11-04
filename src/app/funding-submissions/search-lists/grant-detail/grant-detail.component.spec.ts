@@ -1,5 +1,6 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NgSelect2Module } from 'ng-select2';
@@ -34,9 +35,10 @@ describe('GrantDetailComponent', () => {
     getBudgetCategoriesSubject = new Subject<any>();
 
     fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
-      'getJustification', 'saveJustificationForm', 'bulkUpdateListGrants'
+      'getJustification', 'saveJustificationForm', 'bulkUpdateListGrants', 'getDocPriorityOptions'
     ]);
     fundingSubmissionsServiceSpy.getJustification.and.returnValue(getJustificationSubject.asObservable());
+    (fundingSubmissionsServiceSpy.getDocPriorityOptions as jasmine.Spy).and.returnValue(of([]));
 
     dropdownLookupServiceSpy = jasmine.createSpyObj('FundingSubmDropdownLookupService', [
       'getDocDecisions', 'getAnnualFundingR01Options', 'getAnnualOrMyfOptions',
@@ -89,6 +91,71 @@ describe('GrantDetailComponent', () => {
     fixture.detectChanges();
     getJustificationSubject.complete();
     expect(component).toBeTruthy();
+  });
+
+  it('maps DOC Priority numbers from the generated API to dropdown options when Edit opens', () => {
+    (fundingSubmissionsServiceSpy.getDocPriorityOptions as jasmine.Spy).and.returnValue(of([1, 2, 3, 4, 5]));
+    component.data.docPriority = 3;
+    component.ngOnInit();
+    getJustificationSubject.next({ justificationText: '' });
+
+    component.onEdit();
+
+    expect(fundingSubmissionsServiceSpy.getDocPriorityOptions).toHaveBeenCalledWith(1, 100);
+    expect(component.docPriorityOptions).toEqual([
+      { id: '1', text: '1' }, { id: '2', text: '2' }, { id: '3', text: '3' },
+      { id: '4', text: '4' }, { id: '5', text: '5' }
+    ]);
+    expect(component.formModel.docPriority).toBe('3');
+    const dropdown = fixture.debugElement.query(By.css('ng-select2[name="docPriority"]'));
+    expect(dropdown).not.toBeNull();
+    expect(dropdown.componentInstance.data).toEqual(component.docPriorityOptions);
+    expect(fixture.nativeElement.querySelector('input[name="docPriority"]')).toBeNull();
+  });
+
+  it('updates DOC Priority and validation through the dropdown and preserves its lock', () => {
+    component.ngOnInit();
+    getJustificationSubject.next({ justificationText: '' });
+    component.onEdit();
+    const dropdown = fixture.debugElement.query(By.css('ng-select2[name="docPriority"]'));
+    const validate = spyOn(component, 'onValidationFieldChange').and.callThrough();
+
+    dropdown.triggerEventHandler('ngModelChange', '5');
+
+    expect(component.formModel.docPriority).toBe('5');
+    expect(validate).toHaveBeenCalled();
+    dropdown.triggerEventHandler('ngModelChange', null);
+    expect(component.formModel.docPriority).toBeNull();
+    component.doNotPayOefiaLockActive = true;
+    fixture.detectChanges();
+    expect(dropdown.componentInstance.disabled).toBeTrue();
+  });
+
+  it('clears stale DOC Priority options and preserves the current value when loading fails', () => {
+    fundingSubmissionsServiceSpy.getDocPriorityOptions.and.returnValue(throwError(() => new Error('Unavailable')));
+    component.docPriorityOptions = [{ id: '9', text: '9' }];
+    component.data.docPriority = 3;
+    component.ngOnInit();
+    getJustificationSubject.next({ justificationText: '' });
+
+    component.onEdit();
+
+    expect(component.docPriorityOptions).toEqual([]);
+    expect(component.formModel.docPriority).toBe('3');
+    expect(TestBed.inject(NGXLogger).error).toHaveBeenCalled();
+  });
+
+  it('cancels the DOC Priority options request when the detail component is destroyed', () => {
+    const response = new Subject<number[]>();
+    (fundingSubmissionsServiceSpy.getDocPriorityOptions as jasmine.Spy).and.returnValue(response);
+    component.ngOnInit();
+    getJustificationSubject.next({ justificationText: '' });
+    component.onEdit();
+    expect(response.observers.length).toBe(1);
+
+    component.ngOnDestroy();
+
+    expect(response.observers.length).toBe(0);
   });
 
   it('ngOnInit eagerly subscribes and loads justification data', () => {

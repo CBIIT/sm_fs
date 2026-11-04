@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of, Subject, throwError } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -1273,6 +1273,144 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(row.drawApi.draw).toHaveBeenCalledWith(false);
     });
 
+    it('refreshes all server-renumbered priorities after a detail save', fakeAsync(() => {
+      component.listId = 42;
+      const grants = [
+        { applId: 100, doc: 'DCB', docPriority: 1 },
+        { applId: 200, doc: 'DCB', docPriority: 2 },
+        { applId: 300, doc: 'DCB', docPriority: 1 },
+        { applId: 400, doc: 'DCP', docPriority: 1 }
+      ];
+      (component as any).cachedGrants = grants;
+      component.selectedRows.set(100, { ...grants[0] });
+      const detailRef = {
+        instance: {
+          data: { ...grants[1] },
+          formModel: { docPriority: '2', docNotes: 'Unsaved notes' },
+          isEditMode: true
+        },
+        changeDetectorRef: { detectChanges: jasmine.createSpy('detectChanges') },
+        destroy: jasmine.createSpy('destroy')
+      };
+      (component as any).detailComponentsByApplId.set(200, detailRef);
+      const rowsApi = {
+        every: jasmine.createSpy('every').and.callFake(callback => {
+          grants.forEach(grant => callback.call({ data: () => grant }));
+        }),
+        invalidate: jasmine.createSpy('invalidate').and.callFake(() => rowsApi),
+        draw: jasmine.createSpy('draw')
+      };
+      component.dtElement = { dtInstance: Promise.resolve({ rows: () => rowsApi }) } as any;
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [
+        { applId: 100, docPriority: 2 },
+        { applId: 200, docPriority: 3 },
+        { applId: 300, docPriority: 1 },
+        { applId: 400, docPriority: 1 }
+      ] }));
+
+      (component as any).handleDetailSaved(fakeInvalidatingRow(true));
+      flushMicrotasks();
+
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledWith(42);
+      expect(grants.map(grant => grant.docPriority)).toEqual([2, 3, 1, 1]);
+      expect(component.selectedRows.get(100).docPriority).toBe(2);
+      expect(detailRef.instance.data.docPriority).toBe(3);
+      expect(detailRef.instance.formModel).toEqual({ docPriority: '2', docNotes: 'Unsaved notes' });
+      expect(detailRef.instance.isEditMode).toBeTrue();
+      expect(detailRef.destroy).not.toHaveBeenCalled();
+      expect(rowsApi.invalidate).toHaveBeenCalled();
+      expect(rowsApi.draw).toHaveBeenCalledWith(false);
+    }));
+
+    it('does not apply a late priority response to a different list', () => {
+      component.listId = 42;
+      const response = new Subject<any>();
+      const grant = { applId: 100, docPriority: 1 };
+      (component as any).cachedGrants = [grant];
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(response);
+
+      (component as any).handleDetailSaved(fakeInvalidatingRow(true));
+      component.listId = 43;
+      response.next({ grants: [{ applId: 100, docPriority: 2 }] });
+      response.complete();
+
+      expect(grant.docPriority).toBe(1);
+    });
+
+    it('cancels the previous refresh on another save and the current refresh on destroy', () => {
+      const firstResponse = new Subject<any>();
+      const secondResponse = new Subject<any>();
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValues(firstResponse, secondResponse);
+
+      (component as any).handleDetailSaved(fakeInvalidatingRow(true));
+      expect(firstResponse.observers.length).toBe(1);
+      (component as any).handleDetailSaved(fakeInvalidatingRow(true));
+      expect(firstResponse.observers.length).toBe(0);
+      expect(secondResponse.observers.length).toBe(1);
+      component.ngOnDestroy();
+      expect(secondResponse.observers.length).toBe(0);
+    });
+
+    it('cancels a pending priority refresh when the full list is reloaded', () => {
+      const response = new Subject<any>();
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValues(response, of({ grants: [] }));
+      (component as any).handleDetailSaved(fakeInvalidatingRow(true));
+      expect(response.observers.length).toBe(1);
+
+      (component as any).loadListMeta();
+
+      expect(response.observers.length).toBe(0);
+    });
+
+    it('keeps the saved row visible when the priority refresh fails', () => {
+      const row = fakeInvalidatingRow(true);
+      const error = new Error('Refresh unavailable');
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(throwError(() => error));
+
+      (component as any).handleDetailSaved(row);
+
+      expect(row.drawApi.draw).toHaveBeenCalledWith(false);
+      expect(row.child.hide).not.toHaveBeenCalled();
+      expect(TestBed.inject(NGXLogger).error).toHaveBeenCalledWith(
+        'Failed to refresh DOC priorities after saving grant', error, { listId: component.listId }
+      );
+    });
+
+    it('reloads remaining server-renumbered grants only after removal succeeds', fakeAsync(() => {
+      component.listId = 42;
+      const grants = [1, 2, 3, 4, 5].map(priority => ({
+        applId: priority * 100, doc: 'DCB', docPriority: priority
+      }));
+      (component as any).cachedGrants = grants;
+      component.selectedRows.set(200, grants[1]);
+      const response = new Subject<any>();
+      fundingSubmissionsServiceSpy.removeGrantsFromList.and.returnValue(response);
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [
+        { applId: 100, doc: 'DCB', docPriority: 1 },
+        { applId: 300, doc: 'DCB', docPriority: 2 },
+        { applId: 400, doc: 'DCB', docPriority: 3 },
+        { applId: 500, doc: 'DCB', docPriority: 4 }
+      ] }));
+      const callback = jasmine.createSpy('callback');
+      const reload = jasmine.createSpy('reload').and.callFake(() => component.ajaxCall(component, {}, callback));
+      component.dtElement = { dtInstance: Promise.resolve({ ajax: { reload } }) } as any;
+
+      component.onConfirmRemove();
+
+      expect(fundingSubmissionsServiceSpy.removeGrantsFromList).toHaveBeenCalledWith(42, [200]);
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+      response.next({ grantsRemoved: 1 });
+      response.complete();
+      flushMicrotasks();
+
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledWith(42);
+      expect(reload).toHaveBeenCalled();
+      const displayedGrants = callback.calls.mostRecent().args[0].data;
+      expect(displayedGrants.map(grant => grant.applId)).toEqual([100, 300, 400, 500]);
+      expect(displayedGrants.map(grant => grant.docPriority)).toEqual([1, 2, 3, 4]);
+      expect(component.selectedRows.size).toBe(0);
+    }));
+
     it('handleDetailSaved(): does NOT tear down or collapse the detail row', () => {
       const componentRef = { destroy: jasmine.createSpy('destroy') };
       const row = fakeInvalidatingRow(true);
@@ -1361,12 +1499,12 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       return { host, scrollBody };
     }
 
-    function pointerDown(target: HTMLElement): PointerEvent {
+    function pointerDown(target: HTMLElement, pointerType = 'mouse'): PointerEvent {
       const event = new PointerEvent('pointerdown', {
         bubbles: true,
         cancelable: true,
         pointerId: 9,
-        pointerType: 'mouse',
+        pointerType,
         button: 0,
         clientX: 120
       });
@@ -1377,6 +1515,55 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
     afterEach(() => {
       (component as any).unbindHorizontalDragScroll();
+    });
+
+    it('leaves the native scrollbar and outer container free of pointer capture', () => {
+      const { host, scrollBody } = bindDragScrollFixture();
+
+      [scrollBody, host].forEach(target => {
+        const event = pointerDown(target);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(scrollBody.classList.contains('dragging')).toBeFalse();
+        expect((host as any).setPointerCapture).not.toHaveBeenCalled();
+      });
+
+      host.remove();
+    });
+
+    it('does not capture gestures inside expanded grant details', () => {
+      const { host, scrollBody } = bindDragScrollFixture();
+      const detail = document.createElement('div');
+      detail.className = 'detail-row-sticky';
+      const detailCell = document.createElement('td');
+      detail.appendChild(detailCell);
+      scrollBody.appendChild(detail);
+
+      [detail, detailCell].forEach(target => {
+        const event = pointerDown(target);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(scrollBody.classList.contains('dragging')).toBeFalse();
+        expect((host as any).setPointerCapture).not.toHaveBeenCalled();
+      });
+
+      host.remove();
+    });
+
+    it('preserves native touch and pen scrolling on table content', () => {
+      const { host, scrollBody } = bindDragScrollFixture();
+      const tableCell = document.createElement('td');
+      scrollBody.appendChild(tableCell);
+
+      ['touch', 'pen'].forEach(pointerType => {
+        const event = pointerDown(tableCell, pointerType);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(scrollBody.classList.contains('dragging')).toBeFalse();
+        expect((host as any).setPointerCapture).not.toHaveBeenCalled();
+      });
+
+      host.remove();
     });
 
     it('ignores pointer-down on rendered Select2 elements instead of starting drag-scroll', () => {
