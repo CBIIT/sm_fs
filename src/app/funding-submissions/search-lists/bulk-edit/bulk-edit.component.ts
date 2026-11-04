@@ -63,11 +63,12 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   OEFIACertifier = false;
   private lastSavedRows: any[] = [];
   private pendingRealignFrame: number | null = null;
-  private readonly doNotPayDocNotesErrorMessage = 'DOC Notes is required when DOC Decision is Do Not Pay.';
+  private readonly doNotPayDocNotesErrorMessage = 'DOC Notes is required when DOC decision is Do Not Pay.';
   private doNotPayDocNotesErrorRowIds = new Set<number>();
   private mandatoryFieldErrorRowMap = new Map<number, Set<string>>();
   private rowRequiredValidationEnabled = false;
   private bulkFieldsApplied = false;
+  private bulkDoNotPayWithBlankDocNotesApplied = false;
 
   get hasAnyBulkFieldValue(): boolean {
     const f = this.bulkFields;
@@ -77,7 +78,18 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get showApplyBeforeSaveTooltip(): boolean {
-    return this.hasAnyBulkFieldValue && !this.bulkFieldsApplied && !this.canSave && !this.isSaving;
+    return (this.hasAnyBulkFieldValue && !this.bulkFieldsApplied && !this.canSave && !this.isSaving)
+      || (this.hasDoNotPayDocNotesErrors && !this.isSaving);
+  }
+
+  get hasDoNotPayDocNotesErrors(): boolean {
+    return this.doNotPayDocNotesErrorRowIds.size > 0;
+  }
+
+  get showBulkDoNotPayDocNotesError(): boolean {
+    return !this.isDocOnlyUser()
+      && this.bulkDoNotPayWithBlankDocNotesApplied
+      && this.hasDoNotPayDocNotesErrors;
   }
 
   // Populated from the shared FundingSubmDropdownLookupService (2026-08-24 Individual/Bulk Edit
@@ -423,6 +435,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private applyBulkChanges(skipDoNotPayForDocAdded: boolean): void {
     const f = this.bulkFields;
+    this.bulkDoNotPayWithBlankDocNotesApplied = this.isDoNotPayDecisionValue(f.docDecision)
+      && !String(f.docNotes ?? '').trim();
     for (const row of this.rows) {
       const skipRowDoNotPay = skipDoNotPayForDocAdded
         && this.isDoNotPayDecisionValue(f.docDecision)
@@ -442,8 +456,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.restoreReadOnlyOefiaNotes();
     this.bulkFieldsApplied = true;
+    this.updateDoNotPayDocNotesValidationErrors();
     if (this.rowRequiredValidationEnabled) {
-      this.updateDoNotPayDocNotesValidationErrors();
       this.updateMandatoryFieldValidationErrors();
     }
     // Apply Changes only enables Save when it actually changed at least one row's persisted
@@ -534,7 +548,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   hasDoNotPayDocNotesError(row: any): boolean {
-    return this.rowRequiredValidationEnabled && this.doNotPayDocNotesErrorRowIds.has(Number(row?.applId));
+    return this.doNotPayDocNotesErrorRowIds.has(Number(row?.applId));
   }
 
   getDoNotPayDocNotesErrorMessage(): string {
@@ -573,8 +587,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   // initialization/binding emissions with no actual value change leave Save disabled (FS-2277).
   onRowFieldChange(): void {
     this.restoreReadOnlyOefiaNotes();
+    this.updateDoNotPayDocNotesValidationErrors();
     if (this.rowRequiredValidationEnabled) {
-      this.updateDoNotPayDocNotesValidationErrors();
       this.updateMandatoryFieldValidationErrors();
     }
     this.recomputeCanSave();
@@ -593,6 +607,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onBulkDocDecisionChange(): void {
     this.bulkFieldsApplied = false;
+    this.bulkDoNotPayWithBlankDocNotesApplied = false;
 
     if (this.isDoNotPayDecisionValue(this.bulkFields.docDecision)) {
       this.clearDoNotPayDependentFields(this.bulkFields);
@@ -601,6 +616,9 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onBulkFieldChange(): void {
     this.bulkFieldsApplied = false;
+    if (String(this.bulkFields.docNotes ?? '').trim()) {
+      this.bulkDoNotPayWithBlankDocNotesApplied = false;
+    }
   }
 
   onApplyChanges(): void {
@@ -627,6 +645,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.bulkForm?.resetForm();
     this.bulkFields = {};
     this.bulkFieldsApplied = false;
+    this.bulkDoNotPayWithBlankDocNotesApplied = false;
     this.rows = JSON.parse(JSON.stringify(this.lastSavedRows));
     this.doNotPayDocNotesErrorRowIds.clear();
     this.mandatoryFieldErrorRowMap.clear();
@@ -680,6 +699,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       next: () => {
         this.logger.debug('Bulk edit saved successfully');
         this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
+        this.bulkDoNotPayWithBlankDocNotesApplied = false;
         this.mandatoryFieldErrorRowMap.clear();
         this.rowRequiredValidationEnabled = false;
         this.canSave = false;
