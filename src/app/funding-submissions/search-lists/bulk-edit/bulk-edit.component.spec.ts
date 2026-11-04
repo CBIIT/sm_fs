@@ -528,7 +528,12 @@ describe('BulkEditComponent', () => {
         docNciSelection: 'DOC',
         twoYearAnnualFundingR01Flag: true,
         annualOrMyf: 'MYF',
-        docNotes: '   '
+        docNotes: '   ',
+        oefiaNotes: 'Existing OEFIA notes',
+        recusedFlag: true,
+        docPriority: 3,
+        docRecommendedAmount: 90000,
+        docRecommendedReductionPct: 10
       })]);
       const row = component.rows[0];
       row.docDecision = 'Do Not Pay';
@@ -541,6 +546,14 @@ describe('BulkEditComponent', () => {
       expect(row.annualOrMyf).toBeNull();
       expect(component.canSave).toBeTrue();
 
+      expect(row.docPriority).toBeNull();
+      expect(row.docRecAmt).toBeNull();
+      expect(row.docRecReductionPct).toBeNull();
+      expect(row.recused).toBeNull();
+      row.recused = 'Y';
+      row.docPriority = 3;
+      row.docRecAmt = 90000;
+      row.docRecReductionPct = 10;
       row.budgetCategories = 'STALE';
       row.docNciSelection = 'STALE';
       row.annualFundingR01 = 'STALE';
@@ -548,6 +561,7 @@ describe('BulkEditComponent', () => {
       component.onSave();
 
       expect(component.hasDoNotPayDocNotesError(row)).toBeTrue();
+      expect(row.recused).toBeNull();
       expect(row.budgetCategories).toBeNull();
       expect(row.docNciSelection).toBeNull();
       expect(row.annualFundingR01).toBeNull();
@@ -561,6 +575,7 @@ describe('BulkEditComponent', () => {
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
 
       row.docNotes = 'Do Not Pay justification';
+      row.recused = 'Y';
       component.onRowFieldChange();
       fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
       component.onSave();
@@ -572,6 +587,11 @@ describe('BulkEditComponent', () => {
       expect(payload.fields.docNciSelection).toBeNull();
       expect(payload.fields.annualFundingR01).toBeNull();
       expect(payload.fields.annualOrMyf).toBeNull();
+      expect(payload.fields.docPriority).toBeNull();
+      expect(payload.fields.docRecAmt).toBeNull();
+      expect(payload.fields.docRecReductionPct).toBeNull();
+      expect(payload.fields.recused).toBeNull();
+      expect(payload.fields.oefiaNotes).toBe('Existing OEFIA notes');
     });
 
     it('preserves Do Not Pay option origin gating and mixed-source warning before applying', () => {

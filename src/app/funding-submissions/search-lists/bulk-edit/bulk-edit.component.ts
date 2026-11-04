@@ -457,6 +457,10 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private clearDoNotPayDependentFields(target: any): void {
+    target.recused = null;
+    target.docPriority = null;
+    target.docRecAmt = null;
+    target.docRecReductionPct = null;
     target.budgetCategories = null;
     target.docNciSelection = null;
     target.annualFundingR01 = null;
