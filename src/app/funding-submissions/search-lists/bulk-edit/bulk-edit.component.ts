@@ -463,7 +463,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       if (f.docNciSelection) row.docNciSelection = f.docNciSelection;
       if (f.annualFundingR01) row.annualFundingR01 = f.annualFundingR01;
       if (f.annualOrMyf) row.annualOrMyf = f.annualOrMyf;
-      if (f.docNotes) row.docNotes = f.docNotes;
+      if (f.docNotes && !skipRowDoNotPay) row.docNotes = f.docNotes;
       if (this.canEditOefiaNotes() && f.oefiaNotes) row.oefiaNotes = f.oefiaNotes;
       if (this.isDoNotPayDecisionValue(row.docDecision)) {
         this.clearDoNotPayDependentFields(row);

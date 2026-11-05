@@ -1157,6 +1157,206 @@ describe('BulkEditComponent', () => {
       expect(component.rows[1].docNciSelection).toBeNull();
     });
 
+    describe('FS-2120 — mixed-origin Do Not Pay DOC Notes', () => {
+      function mixedOriginRows(docOverrides: Partial<any> = {}, oefiaOverrides: Partial<any> = {}): any[] {
+        return [
+          grant({ applId: 100, addedByGroup: 'DOC', ...docOverrides }),
+          grant({ applId: 200, addedByGroup: 'OEFIA', ...oefiaOverrides })
+        ];
+      }
+
+      function applyAndProceedDoNotPay(notes: string): void {
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        modalService.open.and.returnValue({
+          close: jasmine.createSpy('close'),
+          dismiss: jasmine.createSpy('dismiss')
+        } as any);
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: notes };
+
+        component.onApplyChanges();
+        expect(modalService.open).toHaveBeenCalled();
+
+        component.onProceedDoNotPayWarning();
+      }
+
+      it('applies shared notes only to the eligible row and saves each row with its current note', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows(
+          { docNotes: 'saved DOC note' },
+          { docNotes: 'saved OEFIA note' }
+        ));
+        component.rows[0].docNotes = 'unsaved DOC note';
+        component.onRowFieldChange();
+
+        applyAndProceedDoNotPay('shared DOC note');
+
+        expect(component.rows[0].docDecision).toBe('Pay');
+        expect(component.rows[0].docNotes).toBe('unsaved DOC note');
+        expect(component.rows[1].docDecision).toBe('Do Not Pay');
+        expect(component.rows[1].docNotes).toBe('shared DOC note');
+        expect(component.canSave).toBeTrue();
+
+        fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+        component.onSave();
+
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+        const requests = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.allArgs()
+          .map(([request]) => ({ applId: request.applIds[0], fields: request.fields }));
+        expect(requests).toEqual([
+          jasmine.objectContaining({
+            applId: 100,
+            fields: jasmine.objectContaining({ docDecision: 'Pay', docNotes: 'unsaved DOC note' })
+          }),
+          jasmine.objectContaining({
+            applId: 200,
+            fields: jasmine.objectContaining({ docDecision: 'Do Not Pay', docNotes: 'shared DOC note' })
+          })
+        ]);
+      });
+
+      it('uses this action’s eligibility when both rows already have Do Not Pay', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows(
+          { docDecision: 'Do Not Pay', docNotes: 'DOC-owned note' },
+          { docDecision: 'Do Not Pay', docNotes: 'prior OEFIA note' }
+        ));
+
+        applyAndProceedDoNotPay('new shared note');
+
+        expect(component.rows[0].docDecision).toBe('Do Not Pay');
+        expect(component.rows[0].docNotes).toBe('DOC-owned note');
+        expect(component.rows[1].docDecision).toBe('Do Not Pay');
+        expect(component.rows[1].docNotes).toBe('new shared note');
+      });
+
+      it('leaves decisions and notes unchanged when the mixed-source warning is cancelled', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows(
+          { docNotes: 'DOC note' },
+          { docNotes: 'OEFIA note' }
+        ));
+        const before = component.rows.map(row => ({ docDecision: row.docDecision, docNotes: row.docNotes }));
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        const dismiss = jasmine.createSpy('dismiss');
+        modalService.open.and.returnValue({ close: jasmine.createSpy('close'), dismiss } as any);
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared note' };
+
+        component.onApplyChanges();
+        component.onCancelDoNotPayWarning();
+
+        expect(modalService.open).toHaveBeenCalled();
+        expect(dismiss).toHaveBeenCalled();
+        expect(component.rows.map(row => ({ docDecision: row.docDecision, docNotes: row.docNotes }))).toEqual(before);
+        expect(component.canSave).toBeFalse();
+      });
+
+      it('does not assign empty shared notes and validates every resulting Do Not Pay row', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows(
+          { docDecision: 'Do Not Pay', docNotes: '' },
+          { docDecision: 'Pay', docNotes: 'existing eligible note' }
+        ));
+
+        applyAndProceedDoNotPay('');
+        fixture.detectChanges();
+
+        expect(component.rows[0].docNotes).toBe('');
+        expect(component.rows[1].docDecision).toBe('Do Not Pay');
+        expect(component.rows[1].docNotes).toBe('existing eligible note');
+        expect(component.hasDoNotPayDocNotesError(component.rows[0])).toBeTrue();
+        expect(component.hasDoNotPayDocNotesError(component.rows[1])).toBeFalse();
+        expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+        expect(getSaveButton().disabled).toBeTrue();
+      });
+
+      it('assigns whitespace-only notes to eligible rows but treats them as blank for validation', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows(
+          { docDecision: 'Do Not Pay', docNotes: '' },
+          { docDecision: 'Pay', docNotes: 'existing eligible note' }
+        ));
+
+        applyAndProceedDoNotPay('   ');
+        fixture.detectChanges();
+
+        expect(component.rows[0].docNotes).toBe('');
+        expect(component.rows[1].docNotes).toBe('   ');
+        expect(component.hasDoNotPayDocNotesError(component.rows[0])).toBeTrue();
+        expect(component.hasDoNotPayDocNotesError(component.rows[1])).toBeTrue();
+        expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+        expect(getSaveButton().disabled).toBeTrue();
+      });
+
+      it('keeps DOC-only notes-only and Pay-with-notes application available for both origins', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows());
+
+        component.bulkFields = { docNotes: 'notes-only update' };
+        component.onApplyChanges();
+
+        expect(component.rows.map(row => row.docNotes)).toEqual(['notes-only update', 'notes-only update']);
+        expect(component.rows.map(row => row.docDecision)).toEqual(['Pay', 'Pay']);
+
+        component.bulkFields = { docDecision: 'Pay', docNotes: 'Pay note' };
+        component.onApplyChanges();
+
+        expect(component.rows.map(row => row.docDecision)).toEqual(['Pay', 'Pay']);
+        expect(component.rows.map(row => row.docNotes)).toEqual(['Pay note', 'Pay note']);
+      });
+
+      it('keeps OEFIA-only Do Not Pay application available for both origins', () => {
+        setRoles(false, true);
+        initializeFixtureWithGrants(mixedOriginRows());
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'authorized shared note' };
+
+        component.onApplyChanges();
+
+        expect(modalService.open).not.toHaveBeenCalled();
+        expect(component.rows.map(row => row.docDecision)).toEqual(['Do Not Pay', 'Do Not Pay']);
+        expect(component.rows.map(row => row.docNotes)).toEqual(['authorized shared note', 'authorized shared note']);
+      });
+
+      it('keeps dual-role Do Not Pay application available for both origins', () => {
+        setRoles(true, true);
+        initializeFixtureWithGrants(mixedOriginRows());
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'authorized shared note' };
+
+        component.onApplyChanges();
+
+        expect(modalService.open).not.toHaveBeenCalled();
+        expect(component.rows.map(row => row.docDecision)).toEqual(['Do Not Pay', 'Do Not Pay']);
+        expect(component.rows.map(row => row.docNotes)).toEqual(['authorized shared note', 'authorized shared note']);
+      });
+
+      it('applies Do Not Pay and notes without a warning for an eligible-only selection', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants([grant({ addedByGroup: 'OEFIA' })]);
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'eligible note' };
+
+        component.onApplyChanges();
+
+        expect(modalService.open).not.toHaveBeenCalled();
+        expect(component.rows[0].docDecision).toBe('Do Not Pay');
+        expect(component.rows[0].docNotes).toBe('eligible note');
+      });
+
+      it('keeps Save disabled after a no-op application to clean rows', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants([
+          grant({ addedByGroup: 'OEFIA', docNotes: 'existing note' })
+        ]);
+        component.bulkFields = { docNotes: 'existing note' };
+
+        component.onApplyChanges();
+
+        expect(component.canSave).toBeFalse();
+        expect(getSaveButton().disabled).toBeTrue();
+      });
+    });
+
     it('exposes the exact tooltip by hover and keyboard focus while shared values are unapplied', fakeAsync(() => {
       spyOnProperty(history, 'state', 'get').and.returnValue({ listId: 1, selectionDate: '', grants: [grant()] });
       fixture.detectChanges();
