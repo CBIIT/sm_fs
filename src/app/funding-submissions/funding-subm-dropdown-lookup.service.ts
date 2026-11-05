@@ -68,9 +68,7 @@ export class FundingSubmDropdownLookupService {
 
   getAnnualFundingR01Options(): Observable<Select2OptionData[]> {
     if (!this.annualFundingR01Options$) {
-      this.annualFundingR01Options$ = this.fetchAsSelect2Options(`${this.basePath}/annual-funding-r01-options`).pipe(
-        map(options => options.filter(option => option.id === 'Yes' || option.text === 'Yes'))
-      );
+      this.annualFundingR01Options$ = this.fetchAsSelect2Options(`${this.basePath}/annual-funding-r01-options`);
     }
     return this.annualFundingR01Options$;
   }

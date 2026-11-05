@@ -4,10 +4,10 @@ import { By } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NgSelect2Module } from 'ng-select2';
-import { of, Subject, throwError } from 'rxjs';
+import { Observable, of, Subject, throwError } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionBulkEditRequestDto, FundingSubmissionDocPayDefaultsDto, FundingSubmissionListDetailDto, FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from '../../../service/app-user-session.service';
 import { roleNames } from '../../../service/role-names';
@@ -19,7 +19,12 @@ import { DocumentService } from '../../../service/document.service';
 describe('GrantDetailComponent', () => {
   let component: GrantDetailComponent;
   let fixture: ComponentFixture<GrantDetailComponent>;
-  let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsService>;
+  let fundingSubmissionsServiceSpy: jasmine.SpyObj<Omit<FundingSubmissionsService,
+    'getDocPayDefaults' | 'getListDetail' | 'bulkUpdateListGrants'> & {
+      getDocPayDefaults(listId: number, applIds: number[]): Observable<FundingSubmissionDocPayDefaultsDto[]>;
+      getListDetail(listId: number): Observable<FundingSubmissionListDetailDto>;
+      bulkUpdateListGrants(body: FundingSubmissionBulkEditRequestDto, listId: number): Observable<number>;
+    }>;
   let dropdownLookupServiceSpy: jasmine.SpyObj<FundingSubmDropdownLookupService>;
   let userSessionServiceSpy: jasmine.SpyObj<AppUserSessionService>;
   let documentServiceSpy: jasmine.SpyObj<DocumentService>;
@@ -35,10 +40,31 @@ describe('GrantDetailComponent', () => {
     getBudgetCategoriesSubject = new Subject<any>();
 
     fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
-      'getJustification', 'saveJustificationForm', 'bulkUpdateListGrants', 'getDocPriorityOptions'
+      'getJustification', 'saveJustificationForm', 'bulkUpdateListGrants', 'getDocPriorityOptions',
+      'getDocPayDefaults', 'getListDetail'
     ]);
     fundingSubmissionsServiceSpy.getJustification.and.returnValue(getJustificationSubject.asObservable());
     (fundingSubmissionsServiceSpy.getDocPriorityOptions as jasmine.Spy).and.returnValue(of([]));
+    fundingSubmissionsServiceSpy.getListDetail.and.callFake(() => {
+      const fields = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0].fields;
+      return of({ grants: [{
+        ...component.data,
+        docDecision: fields.docDecision,
+        docPriority: fields.docPriority == null ? null : Number(fields.docPriority),
+        docRecommendedAmount: fields.docRecAmt,
+        docRecommendedReductionPct: fields.docRecReductionPct,
+        budgetCategoryCode: fields.budgetCategories,
+        budgetCategories: component.budgetCategoryOptions.find(option => option.id === fields.budgetCategories)?.text ?? null,
+        docNciSelection: fields.docNciSelection,
+        docNciSelectionName: component.selectionOptions.find(option => option.id === fields.docNciSelection)?.text ?? null,
+        annualOrMyf: fields.annualOrMyf,
+        annualOrMyfName: component.annualMyfOptions.find(option => option.id === fields.annualOrMyf)?.text ?? null,
+        annualFundingR01: fields.annualFundingR01,
+        twoYearAnnualFundingR01Flag: fields.annualFundingR01 === 'Yes',
+        docNotes: fields.docNotes,
+        oefiaNotes: fields.oefiaNotes
+      }] });
+    });
 
     dropdownLookupServiceSpy = jasmine.createSpyObj('FundingSubmDropdownLookupService', [
       'getDocDecisions', 'getAnnualFundingR01Options', 'getAnnualOrMyfOptions',
@@ -91,6 +117,345 @@ describe('GrantDetailComponent', () => {
     fixture.detectChanges();
     getJustificationSubject.complete();
     expect(component).toBeTruthy();
+  });
+
+  describe('FS-2679 DOC Pay defaults and saved readback', () => {
+    let defaultsResponse: Subject<FundingSubmissionDocPayDefaultsDto[]>;
+    const resolvedDefaults: FundingSubmissionDocPayDefaultsDto = {
+      applId: 100, transitionEligible: true,
+      budgetCategories: 'R01R37', budgetCategoriesName: 'R01/R37',
+      docNciSelection: 'DOC', docNciSelectionName: 'DOC',
+      annualFundingR01: 'No', annualOrMyf: 'MYF Alloc', annualOrMyfName: 'MYF'
+    };
+
+    function choosePay(): void {
+      component.formModel.docDecision = 'Pay';
+      component.onDocDecisionChange();
+    }
+
+    function validRecommendation(): void {
+      component.formModel.docPriority = '1';
+      component.formModel.docRecAmt = 90000;
+      component.formModel.docRecReductionPct = 10;
+    }
+
+    function persistedGrant(overrides: Partial<FundingSubmissionListGrantDto> = {}): FundingSubmissionListGrantDto {
+      return {
+        applId: 100, grantNumber: '1R01CA123456-01', docDecision: 'Pay',
+        docPriority: 1, docRecommendedAmount: 90000, docRecommendedReductionPct: 10,
+        budgetCategoryCode: 'SAVED', budgetCategories: 'Saved category',
+        docNciSelection: 'NCI', docNciSelectionName: 'Saved selection',
+        annualOrMyf: 'AF Alloc', annualOrMyfName: 'Saved Annual',
+        annualFundingR01: 'Yes', twoYearAnnualFundingR01Flag: true,
+        recusedFlag: true, docNotes: 'Saved note', oefiaNotes: 'Stored OEFIA note',
+        ...overrides
+      };
+    }
+
+    beforeEach(() => {
+      defaultsResponse = new Subject<FundingSubmissionDocPayDefaultsDto[]>();
+      fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(defaultsResponse);
+      component.data = {
+        applId: 100, grantNumber: '1R01CA123456-01', docDecision: 'Do Not Pay',
+        addedByGroup: 'OEFIA', originalRequestedTotal: 100000,
+        annualFundingR01: null, budgetCategoryCode: null, budgetCategories: null,
+        docNciSelection: null, annualOrMyf: null, annualOrMyfName: null,
+        docNotes: 'Stored note', oefiaNotes: 'Stored OEFIA note', recusedFlag: true
+      };
+      dropdownLookupServiceSpy.getDocDecisions.and.returnValue(of([
+        { id: 'Pay', text: 'Pay' }, { id: 'Do Not Pay', text: 'Do Not Pay' }
+      ]));
+      dropdownLookupServiceSpy.getAnnualFundingR01Options.and.returnValue(of([
+        { id: 'Yes', text: 'Yes' }, { id: 'No', text: 'No' }
+      ]));
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      component.onEdit();
+      validRecommendation();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+    });
+
+    it('loads authoritative defaults before Save, displays DOC read-only names, and leaves the persisted row untouched', () => {
+      choosePay();
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).toHaveBeenCalledWith(1, [100]);
+      expect(component.docPayDefaultsLoading).toBeTrue();
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+
+      defaultsResponse.next([resolvedDefaults]);
+      expect(component.formModel).toEqual(jasmine.objectContaining({
+        budgetCategories: 'R01R37', docNciSelection: 'DOC', annualFundingR01: 'No', annualOrMyf: 'MYF Alloc'
+      }));
+      expect(component.data.budgetCategoryCode).toBeNull();
+      expect(component.data.annualOrMyf).toBeNull();
+      expect(component.budgetCategoriesDisplay).toBe('R01/R37');
+      expect(component.annualOrMyfDisplay).toBe('MYF');
+      expect(fixture.nativeElement.textContent).toContain('R01/R37');
+      expect(fixture.nativeElement.textContent).toContain('MYF');
+      expect(fixture.nativeElement.querySelector('ng-select2[name="budgetCategories"]')).toBeNull();
+      expect(fixture.nativeElement.querySelector('ng-select2[name="annualOrMyf"]')).toBeNull();
+      expect(component.yesNoOptions.map(option => option.id)).toEqual(['Yes', 'No']);
+      expect(component.hasSaveValidationErrors).toBeFalse();
+    });
+
+    it('preserves the reported explicit 2Y Yes while restoring the other three selections', () => {
+      component.formModel.annualFundingR01 = 'Yes';
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      expect(component.formModel.annualFundingR01).toBe('Yes');
+      component.onSave();
+      const fields = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0].fields;
+      expect(fields).toEqual(jasmine.objectContaining({
+        budgetCategories: 'R01R37', docNciSelection: 'DOC', annualOrMyf: 'MYF Alloc', annualFundingR01: 'Yes'
+      }));
+      expect(Object.prototype.hasOwnProperty.call(fields, 'recused')).toBeFalse();
+    });
+
+    for (const annualFundingR01 of ['Yes', 'No']) {
+      it(`preserves every populated submitted selection including NCI and 2Y ${annualFundingR01}`, () => {
+        Object.assign(component.formModel, {
+          budgetCategories: 'EXPLICIT', docNciSelection: 'NCI', annualFundingR01, annualOrMyf: 'AF Alloc'
+        });
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        expect(component.formModel).toEqual(jasmine.objectContaining({
+          budgetCategories: 'EXPLICIT', docNciSelection: 'NCI', annualFundingR01, annualOrMyf: 'AF Alloc'
+        }));
+      });
+    }
+
+    it('uses stored-value preservation supplied by the service instead of replacing it with a generated default', () => {
+      choosePay();
+      defaultsResponse.next([{
+        ...resolvedDefaults, budgetCategories: 'STORED', budgetCategoriesName: 'Stored category',
+        docNciSelection: 'NCI', annualFundingR01: 'Yes', annualOrMyf: 'AF Alloc', annualOrMyfName: 'Annual'
+      }]);
+      expect(component.formModel.budgetCategories).toBe('STORED');
+      expect(component.formModel.docNciSelection).toBe('NCI');
+      expect(component.formModel.annualFundingR01).toBe('Yes');
+      expect(component.formModel.annualOrMyf).toBe('AF Alloc');
+    });
+
+    for (const activity of ['R03', 'R15', 'U01', 'missing activity']) {
+      it(`leaves 2Y blank for ${activity} and retains the service's required-field rejection`, () => {
+        choosePay();
+        defaultsResponse.next([{
+          ...resolvedDefaults, annualFundingR01: null,
+          annualOrMyf: ['R03', 'R15'].includes(activity) ? 'MYF Alloc' : 'AF Alloc'
+        }]);
+        expect(component.formModel.annualFundingR01).toBeNull();
+        fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(throwError(() => ({
+          status: 400, error: { errorMessage: 'Two-Year Annual Funding R01 (HRHR) is required.' }
+        })));
+        component.onSave();
+        expect(component.fundingSaveError).toBe('Two-Year Annual Funding R01 (HRHR) is required.');
+        expect(component.isEditMode).toBeTrue();
+        expect(component.saveSuccessMessage).toBe('');
+      });
+    }
+
+    it('does not replace a newer selection or a selection explicitly cleared while defaults are delayed', () => {
+      choosePay();
+      component.formModel.docNciSelection = 'NCI';
+      component.onDocPaySelectionChange('docNciSelection');
+      component.formModel.annualFundingR01 = 'Yes';
+      component.onDocPaySelectionChange('annualFundingR01');
+      component.formModel.annualFundingR01 = null;
+      component.onDocPaySelectionChange('annualFundingR01');
+      defaultsResponse.next([resolvedDefaults]);
+      expect(component.formModel.docNciSelection).toBe('NCI');
+      expect(component.formModel.annualFundingR01).toBeNull();
+    });
+
+    it('does not mistake unchanged Select2 binding emissions for newer selections', () => {
+      choosePay();
+      component.onDocPaySelectionChange('docNciSelection');
+      component.onDocPaySelectionChange('annualFundingR01');
+      defaultsResponse.next([resolvedDefaults]);
+      expect(component.formModel.docNciSelection).toBe('DOC');
+      expect(component.formModel.annualFundingR01).toBe('No');
+    });
+
+    it('also resolves defaults before a direct Save that bypassed the decision-change handler', () => {
+      component.formModel.docDecision = 'Pay';
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).toHaveBeenCalledWith(1, [100]);
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      defaultsResponse.next([resolvedDefaults]);
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+    });
+
+    for (const change of ['decision', 'cancel/reopen', 'different grant', 'different list', 'destroy']) {
+      it(`ignores defaults delayed past ${change}`, () => {
+        choosePay();
+        const originalForm = component.formModel;
+        if (change === 'decision') {
+          component.formModel.docDecision = 'Do Not Pay';
+          component.onDocDecisionChange();
+        } else if (change === 'cancel/reopen') {
+          component.forceDiscardAndClose();
+          component.onEdit();
+        } else if (change === 'different grant') {
+          component.data = { ...component.data, applId: 200 };
+          component.ngOnChanges({ data: {} as any });
+        } else if (change === 'different list') {
+          component.listId = 2;
+        } else {
+          component.ngOnDestroy();
+        }
+        defaultsResponse.next([resolvedDefaults]);
+        expect(originalForm.budgetCategories).toBeNull();
+        expect(component.data.budgetCategoryCode).toBeNull();
+      });
+    }
+
+    it('discards older defaults when a newer Pay transition starts', () => {
+      choosePay();
+      const newerResponse = new Subject<FundingSubmissionDocPayDefaultsDto[]>();
+      fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(newerResponse);
+      component.formModel.docDecision = 'Do Not Pay';
+      component.onDocDecisionChange();
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      expect(component.formModel.budgetCategories).toBeNull();
+      newerResponse.next([{ ...resolvedDefaults, budgetCategories: 'NEW' }]);
+      expect(component.formModel.budgetCategories).toBe('NEW');
+    });
+
+    it('reverts preview names and selections on Cancel without mutating the grid row', () => {
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      component.forceDiscardAndClose();
+      expect(component.budgetCategoriesDisplay).toBeNull();
+      expect(component.annualOrMyfDisplay).toBeNull();
+      component.onEdit();
+      expect(component.formModel.docDecision).toBe('Do Not Pay');
+      expect(component.formModel.budgetCategories).toBeNull();
+    });
+
+    for (const role of ['DOC/OEFIA', 'DOC/Financial Analyst']) {
+      it(`resolves defaults for a ${role} dual-role caller while keeping the DOC fields read-only`, () => {
+        component.OEFIACertifier = role === 'DOC/OEFIA';
+        component.financialAnalyst = role === 'DOC/Financial Analyst';
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        expect(component.formModel.annualOrMyf).toBe('MYF Alloc');
+        expect(fixture.nativeElement.querySelector('ng-select2[name="annualOrMyf"]')).toBeNull();
+      });
+    }
+
+    it('does not request defaults for OEFIA-only callers or an unrelated persisted Pay edit', () => {
+      component.docFundingListCor = false;
+      component.OEFIACertifier = true;
+      choosePay();
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).not.toHaveBeenCalled();
+      component.docFundingListCor = true;
+      component.data.docDecision = 'Pay';
+      choosePay();
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).not.toHaveBeenCalled();
+    });
+
+    for (const result of ['error', 'missing row', 'ineligible', 'unresolved lookup']) {
+      it(`blocks Save, preserves edits, and offers a defaults retry on ${result}`, () => {
+        choosePay();
+        if (result === 'error') defaultsResponse.error(new Error('Lookup unavailable'));
+        if (result === 'missing row') defaultsResponse.next([]);
+        if (result === 'ineligible') defaultsResponse.next([{ ...resolvedDefaults, transitionEligible: false }]);
+        if (result === 'unresolved lookup') defaultsResponse.next([{ ...resolvedDefaults, annualOrMyf: null }]);
+        expect(component.docPayDefaultsError).toBeTruthy();
+        expect(component.formModel.docRecAmt).toBe(90000);
+        expect(component.hasUnsavedChanges()).toBeTrue();
+        component.onSave();
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+        fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(of([resolvedDefaults]));
+        component.loadDocPayDefaults();
+        expect(component.docPayDefaultsError).toBeNull();
+        expect(component.formModel.budgetCategories).toBe('R01R37');
+      });
+    }
+
+    it('redraws the shared grid row only after actual saved readback and seeds subsequent edits from those values', () => {
+      const row = component.data;
+      const readbackResponse = new Subject<{ grants: FundingSubmissionListGrantDto[] }>();
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(readbackResponse);
+      const saved = jasmine.createSpy('redraw grid');
+      component.saved.subscribe(saved);
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      component.onSave();
+      expect(saved).not.toHaveBeenCalled();
+      expect(row.docDecision).toBe('Do Not Pay');
+      readbackResponse.next({ grants: [persistedGrant()] });
+      expect(saved).toHaveBeenCalledTimes(1);
+      expect(component.data).toBe(row);
+      expect(row.budgetCategoryCode).toBe('SAVED');
+      expect(row.budgetCategories).toBe('Saved category');
+      expect(row.annualOrMyfName).toBe('Saved Annual');
+      expect(row.recusedFlag).toBeTrue();
+      expect(component.isEditMode).toBeFalse();
+      component.onEdit();
+      expect(component.formModel.budgetCategories).toBe('SAVED');
+      expect(component.formModel.docNciSelection).toBe('NCI');
+      expect(component.formModel.annualOrMyf).toBe('AF Alloc');
+      expect(component.formModel.annualFundingR01).toBe('Yes');
+    });
+
+    it('preserves newer edits during saved readback and uses actual persisted values as the dirty baseline', () => {
+      const response = new Subject<{ grants: FundingSubmissionListGrantDto[] }>();
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(response);
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      component.onSave();
+      component.formModel.docNotes = 'Newer unsaved note';
+      component.formModel.docNciSelection = 'NEWER';
+      component.onDocPaySelectionChange('docNciSelection');
+      response.next({ grants: [persistedGrant()] });
+      expect(component.data.docNciSelection).toBe('NCI');
+      expect(component.formModel.docNciSelection).toBe('NEWER');
+      expect(component.formModel.docNotes).toBe('Newer unsaved note');
+      expect(component.formModel.budgetCategories).toBe('SAVED');
+      expect(component.isEditMode).toBeTrue();
+      expect(component.hasUnsavedChanges()).toBeTrue();
+      expect(component.saveSuccessMessage).toContain('Your newer edits have not been saved.');
+    });
+
+    for (const failure of ['read error', 'missing saved row']) {
+      it(`distinguishes a persisted save from ${failure} and retries only the read`, () => {
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(failure === 'read error'
+          ? throwError(() => new Error('Read unavailable')) : of({ grants: [] }));
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        component.onSave();
+        expect(component.fundingRefreshError).toContain('Grant changes were saved');
+        expect(component.data.docDecision).toBe('Do Not Pay');
+        component.onSave();
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [persistedGrant()] }));
+        component.refreshSavedFunding();
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+        expect(component.fundingRefreshError).toBeNull();
+        expect(component.data.budgetCategoryCode).toBe('SAVED');
+      });
+    }
+
+    for (const change of ['different grant', 'discard/reopen', 'destroy']) {
+      it(`ignores saved readback after ${change}`, () => {
+        const response = new Subject<{ grants: FundingSubmissionListGrantDto[] }>();
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(response);
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        component.onSave();
+        if (change === 'different grant') component.data = { ...component.data, applId: 200 };
+        if (change === 'discard/reopen') {
+          component.forceDiscardAndClose();
+          component.onEdit();
+        }
+        if (change === 'destroy') component.ngOnDestroy();
+        response.next({ grants: [persistedGrant()] });
+        expect(component.data.budgetCategoryCode).toBeNull();
+      });
+    }
   });
 
   it('maps DOC Priority numbers from the generated API to dropdown options when Edit opens', () => {
