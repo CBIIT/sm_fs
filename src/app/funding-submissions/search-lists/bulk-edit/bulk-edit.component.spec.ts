@@ -1357,6 +1357,169 @@ describe('BulkEditComponent', () => {
       });
     });
 
+    describe('FS-2120 — all-DOC-added Do Not Pay selection', () => {
+      function allDocRows(): any[] {
+        return [
+          grant({ applId: 100, addedByGroup: 'DOC', docNotes: 'first DOC note' }),
+          grant({ applId: 200, addedByGroup: 'DOC', docNotes: 'second DOC note' })
+        ];
+      }
+
+      function stubWarningModal(): { open: jasmine.Spy; close: jasmine.Spy; dismiss: jasmine.Spy } {
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        const close = jasmine.createSpy('close');
+        const dismiss = jasmine.createSpy('dismiss');
+        modalService.open.and.returnValue({ close, dismiss } as any);
+        return { open: modalService.open, close, dismiss };
+      }
+
+      function rowSnapshot(): any[] {
+        return component.rows.map(row => ({
+          docDecision: row.docDecision,
+          docNotes: row.docNotes,
+          budgetCategories: row.budgetCategories,
+          docNciSelection: row.docNciSelection,
+          annualOrMyf: row.annualOrMyf,
+          docPriority: row.docPriority,
+          recused: row.recused
+        }));
+      }
+
+      it('warns a DOC-only user and skips every DOC-added row on proceed', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(allDocRows());
+        const before = rowSnapshot();
+        const modal = stubWarningModal();
+        const loadDocPayDefaults = spyOn(component, 'loadDocPayDefaults').and.callThrough();
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared DOC note' };
+
+        component.onApplyChanges();
+
+        expect(modal.open).toHaveBeenCalled();
+        expect(rowSnapshot()).toEqual(before);
+
+        component.onProceedDoNotPayWarning();
+
+        expect(modal.close).toHaveBeenCalled();
+        expect(rowSnapshot()).toEqual(before);
+        expect(component.rows.some(row => row.docDecision === 'Do Not Pay')).toBeFalse();
+        expect(loadDocPayDefaults).toHaveBeenCalled();
+        expect(component.canSave).toBeFalse();
+      });
+
+      it('leaves every row unchanged when the warning is cancelled', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(allDocRows());
+        const before = rowSnapshot();
+        const modal = stubWarningModal();
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared DOC note' };
+
+        component.onApplyChanges();
+        component.onCancelDoNotPayWarning();
+
+        expect(modal.open).toHaveBeenCalled();
+        expect(modal.dismiss).toHaveBeenCalled();
+        expect(rowSnapshot()).toEqual(before);
+        expect(component.canSave).toBeFalse();
+      });
+
+      ['', '   '].forEach(notes => {
+        it(`produces no Do Not Pay rows or note errors on proceed with notes ${JSON.stringify(notes)}`, () => {
+          setRoles(true, false);
+          initializeFixtureWithGrants(allDocRows());
+          const before = rowSnapshot();
+          stubWarningModal();
+          component.bulkFields = { docDecision: 'Do Not Pay', docNotes: notes };
+
+          component.onApplyChanges();
+          component.onProceedDoNotPayWarning();
+          fixture.detectChanges();
+
+          expect(rowSnapshot()).toEqual(before);
+          expect(component.hasDoNotPayDocNotesErrors).toBeFalse();
+          expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+          expect(component.canSave).toBeFalse();
+          expect(getSaveButton().disabled).toBeTrue();
+        });
+      });
+
+      it('keeps dependent fields on a skipped DOC-added row already at Do Not Pay', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants([
+          grant({ applId: 100, addedByGroup: 'DOC', docDecision: 'Do Not Pay', docNotes: 'DOC-owned note' }),
+          grant({ applId: 200, addedByGroup: 'OEFIA' })
+        ]);
+        const docRowBefore = rowSnapshot()[0];
+        expect(docRowBefore.budgetCategories).not.toBeNull();
+        expect(docRowBefore.docNciSelection).not.toBeNull();
+        expect(docRowBefore.annualOrMyf).not.toBeNull();
+        expect(docRowBefore.docPriority).not.toBeNull();
+        const modal = stubWarningModal();
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared note' };
+
+        component.onApplyChanges();
+        component.onProceedDoNotPayWarning();
+
+        expect(modal.open).toHaveBeenCalled();
+        expect(rowSnapshot()[0]).toEqual(docRowBefore);
+        expect(component.rows[1].docDecision).toBe('Do Not Pay');
+        expect(component.rows[1].docNotes).toBe('shared note');
+        expect(component.rows[1].budgetCategories).toBeNull();
+        expect(component.rows[1].docNciSelection).toBeNull();
+        expect(component.rows[1].docPriority).toBeNull();
+      });
+
+      it('warns for DOC-added plus blank-origin rows and applies Do Not Pay only to the blank-origin row', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants([
+          grant({ applId: 100, addedByGroup: 'DOC', docNotes: 'DOC note' }),
+          grant({ applId: 200, addedByGroup: '' })
+        ]);
+        const modal = stubWarningModal();
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared note' };
+
+        component.onApplyChanges();
+        expect(modal.open).toHaveBeenCalled();
+        component.onProceedDoNotPayWarning();
+
+        expect(component.rows[0].docDecision).toBe('Pay');
+        expect(component.rows[0].docNotes).toBe('DOC note');
+        expect(component.rows[1].docDecision).toBe('Do Not Pay');
+        expect(component.rows[1].docNotes).toBe('shared note');
+      });
+
+      it('applies Do Not Pay without a warning for a blank-origin-only selection', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants([grant({ applId: 200, addedByGroup: null })]);
+        const modal = stubWarningModal();
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared note' };
+
+        component.onApplyChanges();
+
+        expect(modal.open).not.toHaveBeenCalled();
+        expect(component.rows[0].docDecision).toBe('Do Not Pay');
+        expect(component.rows[0].docNotes).toBe('shared note');
+      });
+
+      [
+        { label: 'OEFIA-only', doc: false, oefia: true },
+        { label: 'dual-role', doc: true, oefia: true }
+      ].forEach(({ label, doc, oefia }) => {
+        it(`applies Do Not Pay to an all-DOC-added selection without a warning for ${label} users`, () => {
+          setRoles(doc, oefia);
+          initializeFixtureWithGrants(allDocRows());
+          const modal = stubWarningModal();
+          component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'authorized note' };
+
+          component.onApplyChanges();
+
+          expect(modal.open).not.toHaveBeenCalled();
+          expect(component.rows.map(row => row.docDecision)).toEqual(['Do Not Pay', 'Do Not Pay']);
+          expect(component.rows.map(row => row.docNotes)).toEqual(['authorized note', 'authorized note']);
+        });
+      });
+    });
+
     it('exposes the exact tooltip by hover and keyboard focus while shared values are unapplied', fakeAsync(() => {
       spyOnProperty(history, 'state', 'get').and.returnValue({ listId: 1, selectionDate: '', grants: [grant()] });
       fixture.detectChanges();

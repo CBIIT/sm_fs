@@ -435,7 +435,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }));
   }
 
-  private shouldWarnDoNotPayForMixedSources(): boolean {
+  private shouldWarnDoNotPayForDocAddedGrants(): boolean {
     if (!this.isDocOnlyUser()) {
       return false;
     }
@@ -444,9 +444,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       return false;
     }
 
-    const hasDocAdded = this.rows.some(row => this.isGrantAddedByDoc(row));
-    const hasOefiaAdded = this.rows.some(row => this.isGrantAddedByOefia(row));
-    return hasDocAdded && hasOefiaAdded;
+    return this.rows.some(row => this.isGrantAddedByDoc(row));
   }
 
   private applyBulkChanges(skipDoNotPayForDocAdded: boolean): void {
@@ -465,7 +463,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       if (f.annualOrMyf) row.annualOrMyf = f.annualOrMyf;
       if (f.docNotes && !skipRowDoNotPay) row.docNotes = f.docNotes;
       if (this.canEditOefiaNotes() && f.oefiaNotes) row.oefiaNotes = f.oefiaNotes;
-      if (this.isDoNotPayDecisionValue(row.docDecision)) {
+      if (!skipRowDoNotPay && this.isDoNotPayDecisionValue(row.docDecision)) {
         this.clearDoNotPayDependentFields(row);
       }
     }
@@ -655,7 +653,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   onApplyChanges(): void {
     this.clearSaveMessages();
 
-    if (this.shouldWarnDoNotPayForMixedSources()) {
+    if (this.shouldWarnDoNotPayForDocAddedGrants()) {
       this.doNotPayWarningModalRef = this.modalService.open(this.doNotPayWarningModalTpl, { centered: true });
       return;
     }
