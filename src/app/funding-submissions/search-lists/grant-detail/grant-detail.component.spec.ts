@@ -4,7 +4,7 @@ import { By } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NgSelect2Module } from 'ng-select2';
-import { Observable, of, Subject, throwError } from 'rxjs';
+import { EMPTY, Observable, of, Subject, throwError } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmissionBulkEditRequestDto, FundingSubmissionDocPayDefaultsDto, FundingSubmissionListDetailDto, FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
@@ -15,13 +15,17 @@ import { roleNames } from '../../../service/role-names';
 import { GrantDetailComponent } from './grant-detail.component';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
 import { DocumentService } from '../../../service/document.service';
+import { UserSelect2ChangeDirective } from '../../user-select2-change.directive';
+import { FUNDING_WRITE_RECOVERY_STORAGE, FundingWriteRecoveryService } from '../../funding-write-recovery.service';
+import { MemoryStorage } from '../../testing/memory-storage';
 
 describe('GrantDetailComponent', () => {
   let component: GrantDetailComponent;
   let fixture: ComponentFixture<GrantDetailComponent>;
   let fundingSubmissionsServiceSpy: jasmine.SpyObj<Omit<FundingSubmissionsService,
-    'getDocPayDefaults' | 'getListDetail' | 'bulkUpdateListGrants'> & {
+    'getDocPayDefaults' | 'getDocPriorityOptions' | 'getListDetail' | 'bulkUpdateListGrants'> & {
       getDocPayDefaults(listId: number, applIds: number[]): Observable<FundingSubmissionDocPayDefaultsDto[]>;
+      getDocPriorityOptions(listId: number, applId: number): Observable<number[]>;
       getListDetail(listId: number): Observable<FundingSubmissionListDetailDto>;
       bulkUpdateListGrants(body: FundingSubmissionBulkEditRequestDto, listId: number): Observable<number>;
     }>;
@@ -44,7 +48,7 @@ describe('GrantDetailComponent', () => {
       'getDocPayDefaults', 'getListDetail'
     ]);
     fundingSubmissionsServiceSpy.getJustification.and.returnValue(getJustificationSubject.asObservable());
-    (fundingSubmissionsServiceSpy.getDocPriorityOptions as jasmine.Spy).and.returnValue(of([]));
+    (fundingSubmissionsServiceSpy.getDocPriorityOptions as jasmine.Spy).and.returnValue(of([1, 2, 3, 4, 5]));
     fundingSubmissionsServiceSpy.getListDetail.and.callFake(() => {
       const fields = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0].fields;
       return of({ grants: [{
@@ -94,7 +98,7 @@ describe('GrantDetailComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [FormsModule, RouterTestingModule, NgSelect2Module, NgbTooltipModule],
-      declarations: [GrantDetailComponent],
+      declarations: [GrantDetailComponent, UserSelect2ChangeDirective],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
@@ -102,6 +106,7 @@ describe('GrantDetailComponent', () => {
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: AppUserSessionService, useValue: userSessionServiceSpy },
         { provide: DocumentService, useValue: documentServiceSpy },
+        { provide: FUNDING_WRITE_RECOVERY_STORAGE, useValue: new MemoryStorage() },
         { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
         { provide: NgbModal, useValue: jasmine.createSpyObj('NgbModal', ['open']) }
       ]
@@ -125,7 +130,8 @@ describe('GrantDetailComponent', () => {
       applId: 100, transitionEligible: true,
       budgetCategories: 'R01R37', budgetCategoriesName: 'R01/R37',
       docNciSelection: 'DOC', docNciSelectionName: 'DOC',
-      annualFundingR01: 'No', annualOrMyf: 'MYF Alloc', annualOrMyfName: 'MYF'
+      annualFundingR01: 'No', annualOrMyf: 'MYF Alloc', annualOrMyfName: 'MYF',
+      docPriority: '1', docRecAmt: 90000, docRecReductionPct: 10
     };
 
     function choosePay(): void {
@@ -345,19 +351,154 @@ describe('GrantDetailComponent', () => {
       });
     }
 
-    it('does not request defaults for OEFIA-only callers or an unrelated persisted Pay edit', () => {
+    for (const role of ['DOC', 'OEFIA', 'Financial Analyst', 'DOC/OEFIA', 'DOC/Financial Analyst']) {
+      it(`sends automatic per-row provenance and shows persisted values for ${role}`, () => {
+        component.docFundingListCor = role.includes('DOC');
+        component.OEFIACertifier = role.includes('OEFIA');
+        component.financialAnalyst = role.includes('Financial Analyst');
+        Object.assign(component.formModel, { docPriority: null, docRecAmt: null, docRecReductionPct: null });
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+          grants: [persistedGrant({ docPriority: 4, docRecommendedAmount: 73000, docRecommendedReductionPct: 27 })]
+        }));
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        expect(component.formModel).toEqual(jasmine.objectContaining({
+          docPriority: '1', docRecAmt: 90000, docRecReductionPct: 10
+        }));
+        component.onSave();
+        const request = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0];
+        expect(request.transitionIntents).toEqual([{ applId: 100, priorityMode: 'AUTO', editedFields: [] }]);
+        expect(component.data).toEqual(jasmine.objectContaining({
+          docPriority: 4, docRecommendedAmount: 73000, docRecommendedReductionPct: 27
+        }));
+      });
+    }
+
+    it('does not replace delayed manual priority or recommendation edits, including a deliberate clear', () => {
+      Object.assign(component.formModel, { docPriority: null, docRecAmt: null, docRecReductionPct: null });
+      choosePay();
+      component.onUserSelectChange('docPriority', '2');
+      component.formModel.docRecAmt = 50000;
+      component.onDocRecAmtChange();
+      component.formModel.docRecAmt = null;
+      component.onDocRecAmtChange();
+      component.onUserSelectChange('annualFundingR01', 'Yes');
+      component.onUserSelectChange('annualFundingR01', null);
+      defaultsResponse.next([resolvedDefaults]);
+      expect(component.formModel).toEqual(jasmine.objectContaining({
+        docPriority: '2', docRecAmt: null, docRecReductionPct: 50, annualFundingR01: null
+      }));
+      expect(component.hasSaveValidationErrors).toBeTrue();
+      component.formModel.docRecAmt = 80000;
+      component.onDocRecAmtChange();
+      component.onSave();
+      const request = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0];
+      expect(request.transitionIntents).toEqual([{
+        applId: 100, priorityMode: 'SUBMITTED', editedFields: ['docRecAmt', 'annualFundingR01']
+      }]);
+      expect(request.fields.docRecReductionPct).toBe(20);
+      expect(request.fields.annualFundingR01).toBeNull();
+    });
+
+    it('does not restore a user-cleared priority or combine an existing recommendation half with a preview', () => {
+      Object.assign(component.formModel, { docPriority: null, docRecAmt: 0, docRecReductionPct: null });
+      choosePay();
+      component.onUserSelectChange('docPriority', '2');
+      component.onUserSelectChange('docPriority', null);
+      defaultsResponse.next([resolvedDefaults]);
+      expect(component.formModel.docPriority).toBeNull();
+      expect(component.formModel.docRecAmt).toBe(0);
+      expect(component.formModel.docRecReductionPct).toBeNull();
+      component.onSave();
+      expect(component.saveValidationErrors.docPriority).toBeTruthy();
+      expect(component.saveValidationErrors.docRecReductionPct).toBeTruthy();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
+
+    it('preserves an automatic zero recommendation pair and AUTO through repeated previews', () => {
+      Object.assign(component.formModel, { docPriority: null, docRecAmt: null, docRecReductionPct: null });
+      const zeroDefaults = { ...resolvedDefaults, docRecAmt: 0, docRecReductionPct: 0 };
+      fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(of([zeroDefaults]));
+      choosePay();
+      choosePay();
+      expect(component.formModel.docRecAmt).toBe(0);
+      expect(component.formModel.docRecReductionPct).toBe(0);
+      component.onSave();
+      const request = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0];
+      expect(request.fields.docRecAmt).toBe(0);
+      expect(request.fields.docRecReductionPct).toBe(0);
+      expect(request.transitionIntents).toEqual([{ applId: 100, priorityMode: 'AUTO', editedFields: [] }]);
+    });
+
+    it('waits for priority options arriving after the preview without losing the automatic value', () => {
+      component.forceDiscardAndClose();
+      const priorities = new Subject<number[]>();
+      fundingSubmissionsServiceSpy.getDocPriorityOptions.and.returnValue(priorities);
+      component.onEdit();
+      Object.assign(component.formModel, { docPriority: null, docRecAmt: null, docRecReductionPct: null });
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      fixture.detectChanges();
+      expect(component.formModel.docPriority).toBe('1');
+      expect(component.docPriorityOptionsLoading).toBeTrue();
+      expect(fixture.nativeElement.querySelector('ng-select2[name="docPriority"]')).toBeNull();
+      priorities.next([1, 2, 3]);
+      fixture.detectChanges();
+      expect(component.docPriorityOptionsError).toBeNull();
+      expect(component.formModel.docPriority).toBe('1');
+      expect(fixture.nativeElement.querySelector('ng-select2[name="docPriority"]')).not.toBeNull();
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0].transitionIntents[0].priorityMode)
+        .toBe('AUTO');
+    });
+
+    for (const response of ['error', 'empty', 'missing priority']) {
+      it(`surfaces ${response} priority options and permits a retry`, () => {
+        component.forceDiscardAndClose();
+        fundingSubmissionsServiceSpy.getDocPriorityOptions.and.returnValue(response === 'error'
+          ? throwError(() => new Error('Options unavailable')) : response === 'empty' ? EMPTY : of([2, 3]));
+        component.onEdit();
+        Object.assign(component.formModel, { docPriority: null, docRecAmt: null, docRecReductionPct: null });
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        expect(component.docPriorityOptionsError).toBeTruthy();
+        component.onSave();
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+        fundingSubmissionsServiceSpy.getDocPriorityOptions.and.returnValue(of([1, 2, 3]));
+        component.fetchDocPriorityOptions();
+        expect(component.docPriorityOptionsError).toBeNull();
+        expect(component.formModel.docPriority).toBe('1');
+      });
+    }
+
+    it('does not block a non-transition edit solely because priority options failed to load', () => {
+      component.forceDiscardAndClose();
+      component.data.docDecision = 'Pay';
+      fundingSubmissionsServiceSpy.getDocPriorityOptions.and.returnValue(
+        throwError(() => new Error('Options unavailable'))
+      );
+      component.onEdit();
+      validRecommendation();
+      component.formModel.docNotes = 'Updated note';
+      expect(component.docPriorityOptionsError).toBeTruthy();
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+    });
+
+    it('requests defaults for OEFIA-only callers but not an unrelated persisted Pay edit', () => {
       component.docFundingListCor = false;
       component.OEFIACertifier = true;
       choosePay();
-      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).toHaveBeenCalledTimes(1);
       component.docFundingListCor = true;
       component.data.docDecision = 'Pay';
       choosePay();
-      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).toHaveBeenCalledTimes(1);
     });
 
-    for (const result of ['error', 'missing row', 'ineligible', 'unresolved lookup']) {
+    for (const result of ['error', 'empty', 'missing row', 'ineligible', 'unresolved lookup']) {
       it(`blocks Save, preserves edits, and offers a defaults retry on ${result}`, () => {
+        if (result === 'empty') fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(EMPTY);
         choosePay();
         if (result === 'error') defaultsResponse.error(new Error('Lookup unavailable'));
         if (result === 'missing row') defaultsResponse.next([]);
@@ -374,6 +515,71 @@ describe('GrantDetailComponent', () => {
         expect(component.formModel.budgetCategories).toBe('R01R37');
       });
     }
+
+    it('refreshes a stale transition conflict without retrying its rejected write', () => {
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(of([resolvedDefaults]));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(throwError(() => ({ status: 409 })));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+        grants: [persistedGrant({ docDecision: 'Do Not Pay', docPriority: null })]
+      }));
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(1);
+      expect(component.fundingRecoveryState).toBeNull();
+      expect(component.formModel.docDecision).toBe('Pay');
+      expect(component.fundingSaveError).toContain('Review your unsaved changes');
+      expect(component.isEditMode).toBeTrue();
+    });
+
+    it('keeps an ambiguous write across reopen until support confirmation and an authoritative read', () => {
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(throwError(() => ({ status: 500 })));
+      component.onSave();
+      expect(component.fundingRecoveryState).toBe('unknown');
+      component.onSave();
+      component.refreshSavedFunding();
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+      component.forceDiscardAndClose();
+      component.onEdit();
+      expect(component.fundingRecoveryState).toBe('unknown');
+      component.recoverUnknownFunding();
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+      const response = new Subject<FundingSubmissionListDetailDto>();
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(response);
+      component.unknownOutcomeConfirmed = true;
+      component.recoverUnknownFunding();
+      expect(component.fundingRecoveryState).toBe('unknown');
+      response.next({ grants: [persistedGrant({ docPriority: 5 })] });
+      expect(component.fundingRecoveryState).toBeNull();
+      expect(component.data.docPriority).toBe(5);
+      expect(component.fundingSaveError).toContain('Review your unsaved changes');
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+    });
+
+    it('recognizes a recovery marker created by another open editor before sending a write', () => {
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      TestBed.inject(FundingWriteRecoveryService).begin(1, 100);
+      component.onSave();
+      expect(component.fundingRecoveryState).toBe('unknown');
+      expect(component.fundingRecoveryError).toBeNull();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
+
+    it('retains an unknown recovery marker when a pending write is cancelled by destruction', () => {
+      const write = new Subject<number>();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(write);
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      component.onSave();
+      component.ngOnDestroy();
+      write.next(1);
+      expect(TestBed.inject(FundingWriteRecoveryService).get(1, 100)?.state).toBe('unknown');
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+    });
 
     it('redraws the shared grid row only after actual saved readback and seeds subsequent edits from those values', () => {
       const row = component.data;
@@ -420,10 +626,10 @@ describe('GrantDetailComponent', () => {
       expect(component.saveSuccessMessage).toContain('Your newer edits have not been saved.');
     });
 
-    for (const failure of ['read error', 'missing saved row']) {
+    for (const failure of ['read error', 'empty read', 'missing saved row']) {
       it(`distinguishes a persisted save from ${failure} and retries only the read`, () => {
         fundingSubmissionsServiceSpy.getListDetail.and.returnValue(failure === 'read error'
-          ? throwError(() => new Error('Read unavailable')) : of({ grants: [] }));
+          ? throwError(() => new Error('Read unavailable')) : failure === 'empty read' ? EMPTY : of({ grants: [] }));
         choosePay();
         defaultsResponse.next([resolvedDefaults]);
         component.onSave();
@@ -485,11 +691,11 @@ describe('GrantDetailComponent', () => {
     const dropdown = fixture.debugElement.query(By.css('ng-select2[name="docPriority"]'));
     const validate = spyOn(component, 'onValidationFieldChange').and.callThrough();
 
-    dropdown.triggerEventHandler('ngModelChange', '5');
+    dropdown.triggerEventHandler('appUserSelect2Change', '5');
 
     expect(component.formModel.docPriority).toBe('5');
     expect(validate).toHaveBeenCalled();
-    dropdown.triggerEventHandler('ngModelChange', null);
+    dropdown.triggerEventHandler('appUserSelect2Change', null);
     expect(component.formModel.docPriority).toBeNull();
     component.doNotPayOefiaLockActive = true;
     fixture.detectChanges();
@@ -1063,7 +1269,7 @@ describe('GrantDetailComponent', () => {
       expect(component.isEditMode).toBeTrue();
 
       // onSave() -> applyFormModelToData() must resolve the NAME, not fall back to null.
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
       component.formModel.docDecision = 'Pay';
       component.onSave();
 
@@ -1193,7 +1399,7 @@ describe('GrantDetailComponent', () => {
       getJustificationSubject.complete();
 
       component.onEdit();
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       // Simulate saving after only a different field was touched (e.g. DOC Decision) — Budget
       // Categories itself is left untouched, exactly the "unedited save" scenario the fix
@@ -1346,7 +1552,7 @@ describe('GrantDetailComponent', () => {
     it('emits saved on a successful funding-fields save', () => {
       component.onEdit();
       component.formModel.docDecision = 'Pay';
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       const savedSpy = jasmine.createSpy('saved');
       component.saved.subscribe(savedSpy);
@@ -1427,7 +1633,7 @@ describe('GrantDetailComponent', () => {
       component.onEdit();
       component.formModel.justificationText = '';
       component.formModel.docDecision = 'Pay';
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
       fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
       fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({
         justificationText: ''
@@ -1464,7 +1670,7 @@ describe('GrantDetailComponent', () => {
     it('shows the exact success message after a funding-fields save', () => {
       component.onEdit();
       component.formModel.docDecision = 'Pay';
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       component.onSave();
 
@@ -1662,7 +1868,7 @@ describe('GrantDetailComponent', () => {
     it('applyFormModelToData() resolves and writes both budgetCategories (NAME) and budgetCategoryCode (CODE)', () => {
       component.onEdit();
       component.formModel.budgetCategories = 'OTHER';
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       component.onSave();
 
@@ -1673,7 +1879,7 @@ describe('GrantDetailComponent', () => {
     it('applyFormModelToData() gracefully clears both budget category fields when the selection has no matching option', () => {
       component.onEdit();
       component.formModel.budgetCategories = null;
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       expect(() => component.onSave()).not.toThrow();
 
@@ -1683,7 +1889,7 @@ describe('GrantDetailComponent', () => {
     it('writes twoYearAnnualFundingR01Flag as a real boolean true when "Yes" is selected', () => {
       component.onEdit();
       component.formModel.annualFundingR01 = 'Yes';
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       component.onSave();
 
@@ -1694,7 +1900,7 @@ describe('GrantDetailComponent', () => {
       component.data.twoYearAnnualFundingR01Flag = true;
       component.onEdit();
       component.formModel.annualFundingR01 = 'No';
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       component.onSave();
 
@@ -1751,7 +1957,7 @@ describe('GrantDetailComponent', () => {
         annualOrMyf: 'MYF',
         docNotes: ''
       };
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       component.onEdit();
       component.formModel.docNotes = 'Updated notes';
@@ -1861,7 +2067,7 @@ describe('GrantDetailComponent', () => {
       component.formModel.docNotes = 'keep this note';
       component.justificationFiles = [new File(['x'], 'new.pdf', { type: 'application/pdf' })];
 
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
       fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(of({} as any));
       fundingSubmissionsServiceSpy.getJustification.and.returnValue(of({ justificationText: '' } as any));
 
@@ -1942,7 +2148,7 @@ describe('GrantDetailComponent', () => {
 
     it('onSave() sends CODE-shaped docNciSelection/annualOrMyf values in the bulkUpdateListGrants() payload (regression check)', () => {
       component.onEdit();
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       // Simulate saving after only a different field was touched — DOC/NCI Selection and
       // Annual/MYF themselves are left untouched, exactly the "unedited save" scenario the fix
@@ -1962,7 +2168,7 @@ describe('GrantDetailComponent', () => {
         { id: 'DNP', text: 'Do Not Pay' },
         { id: 'PAY', text: 'Pay' }
       ];
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       component.formModel.docDecision = 'Do Not Pay';
       component.formModel.docNotes = 'reason entered';
@@ -1977,7 +2183,7 @@ describe('GrantDetailComponent', () => {
       component.onEdit();
       component.formModel.docNciSelection = 'DOC';
       component.formModel.annualOrMyf = 'AF';
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       component.onSave();
 
@@ -1991,7 +2197,7 @@ describe('GrantDetailComponent', () => {
       component.onEdit();
       component.formModel.docNciSelection = 'UNKNOWN_CODE';
       component.formModel.annualOrMyf = 'UNKNOWN_CODE';
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       expect(() => component.onSave()).not.toThrow();
 
@@ -2003,7 +2209,7 @@ describe('GrantDetailComponent', () => {
       component.onEdit();
       component.formModel.docNciSelection = null;
       component.formModel.annualOrMyf = null;
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       expect(() => component.onSave()).not.toThrow();
 
@@ -2136,7 +2342,7 @@ describe('GrantDetailComponent', () => {
       const second = createFile('second.pdf');
       component.formModel.docDecision = 'Pay';
       component.justificationFiles = [first, second];
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
       fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValues(
         of({ id: 10, docFilename: 'first.pdf' } as any),
         throwError(() => ({ status: 400, error: 'Rejected file' })),
@@ -2216,7 +2422,7 @@ describe('GrantDetailComponent', () => {
       component.formModel.docDecision = 'DNP';
       component.formModel.docRecAmt = 100;
       component.formModel.docNotes = '   ';
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       component.onSave();
 
@@ -2284,7 +2490,7 @@ describe('GrantDetailComponent', () => {
     it('preserves edited OEFIA Notes for OEFIA users when Do Not Pay is selected', () => {
       component.OEFIACertifier = true;
       component.data.oefiaNotes = 'original note';
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of({} as any));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
 
       component.onEdit();
       component.formModel.docDecision = 'DNP';

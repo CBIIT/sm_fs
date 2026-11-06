@@ -267,6 +267,8 @@ import { CreateFundingTableComponent } from './funding-submissions/create-fundin
 import { SearchListsComponent } from './funding-submissions/search-lists/search-lists.component';
 import { GrantDetailComponent } from './funding-submissions/search-lists/grant-detail/grant-detail.component';
 import { BulkEditComponent } from './funding-submissions/search-lists/bulk-edit/bulk-edit.component';
+import { UserSelect2ChangeDirective } from './funding-submissions/user-select2-change.directive';
+import { FundingRequestErrorScopeInterceptor } from './funding-submissions/funding-request-error-scope.service';
 import { FundingListsSearchComponent } from './funding-submissions/funding-lists-search/funding-lists-search.component';
 import { FundingListsComponent } from './funding-submissions/funding-lists/funding-lists.component';
 import { DirectorBulkEditComponent } from './funding-submissions/funding-lists/bulk-edit/director-bulk-edit.component';
@@ -530,6 +532,7 @@ export function combinedInitializerFactory(
         SearchListsComponent,
         GrantDetailComponent,
         BulkEditComponent,
+        UserSelect2ChangeDirective,
         FundingListsSearchComponent,
         FundingListsComponent,
         DirectorBulkEditComponent,
@@ -572,6 +575,7 @@ export function combinedInitializerFactory(
         MsalService,
         MsalGuard,
         MsalBroadcastService,
+        { provide: HTTP_INTERCEPTORS, useClass: FundingRequestErrorScopeInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: ChangeUserInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },

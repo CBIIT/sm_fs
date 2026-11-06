@@ -50,8 +50,8 @@
             <td class="grid-label">DOC Decision:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{getDocDecisionDisplay(data.docDecision)}}</span>
-              <ng-select2 *ngIf="isEditMode" name="docDecision" [(ngModel)]="formModel.docDecision"
-                (ngModelChange)="onDocDecisionChange()"
+              <ng-select2 *ngIf="isEditMode" appUserSelect2Change name="docDecision" [ngModel]="formModel.docDecision"
+                (appUserSelect2Change)="onUserSelectChange('docDecision', $event)"
                 [data]="docDecisionOptions" [placeholder]="'Select'" width="100%">
               </ng-select2>
               <div *ngIf="isEditMode && saveValidationErrors.docDecision" class="text-danger small mt-1">
@@ -99,20 +99,26 @@
             <td class="grid-label sep">DOC Priority:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docPriority}}</span>
-              <ng-select2 *ngIf="isEditMode" name="docPriority" [(ngModel)]="formModel.docPriority"
-                [data]="docPriorityOptions" [placeholder]="'Select'" width="100%"
+              <ng-select2 *ngIf="isEditMode && !docPriorityOptionsLoading && !docPriorityOptionsError"
+                appUserSelect2Change name="docPriority" [ngModel]="formModel.docPriority"
+                [data]="docPriorityOptions" [placeholder]="'Select'" [allowClear]="true" width="100%"
                 (blur)="onRequiredFieldBlur('docPriority')"
-                (ngModelChange)="onValidationFieldChange()"
+                (appUserSelect2Change)="onUserSelectChange('docPriority', $event)"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
+              <div *ngIf="isEditMode && docPriorityOptionsLoading" class="text-muted small" role="status">Loading priorities...</div>
+              <div *ngIf="isEditMode && docPriorityOptionsError" class="text-danger small" role="alert">
+                {{docPriorityOptionsError}}
+                <button type="button" class="btn btn-link btn-sm" (click)="fetchDocPriorityOptions()">Retry options</button>
+              </div>
               <div class="text-danger small mt-1" *ngIf="isEditMode && saveValidationErrors.docPriority">{{saveValidationErrors.docPriority}}</div>
             </td>
             <td class="grid-label">2Y Annual Fnd R01:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.annualFundingR01 === undefined ? (data.twoYearAnnualFundingR01Flag ? 'Yes' : '') : data.annualFundingR01}}</span>
-              <ng-select2 *ngIf="isEditMode" name="annualFundingR01" [(ngModel)]="formModel.annualFundingR01"
-                (ngModelChange)="onDocPaySelectionChange('annualFundingR01')"
-                [data]="yesNoOptions" [placeholder]="'Select'" width="100%"
+              <ng-select2 *ngIf="isEditMode" appUserSelect2Change name="annualFundingR01" [ngModel]="formModel.annualFundingR01"
+                (appUserSelect2Change)="onUserSelectChange('annualFundingR01', $event)"
+                [data]="yesNoOptions" [placeholder]="'Select'" [allowClear]="true" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
@@ -127,18 +133,18 @@
             <td class="grid-label sep">Annual or MYF:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode || docFundingListCor">{{annualOrMyfDisplay}}</span>
-              <ng-select2 *ngIf="isEditMode && !docFundingListCor" name="annualOrMyf" [(ngModel)]="formModel.annualOrMyf"
-                (ngModelChange)="onDocPaySelectionChange('annualOrMyf')"
-                [data]="annualMyfOptions" [placeholder]="'Select'" width="100%"
+              <ng-select2 *ngIf="isEditMode && !docFundingListCor" appUserSelect2Change name="annualOrMyf" [ngModel]="formModel.annualOrMyf"
+                (appUserSelect2Change)="onUserSelectChange('annualOrMyf', $event)"
+                [data]="annualMyfOptions" [placeholder]="'Select'" [allowClear]="true" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
             <td class="grid-label">Budget Categories:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode || docFundingListCor">{{budgetCategoriesDisplay}}</span>
-              <ng-select2 *ngIf="isEditMode && !docFundingListCor" name="budgetCategories" [(ngModel)]="formModel.budgetCategories"
-                (ngModelChange)="onDocPaySelectionChange('budgetCategories')"
-                [data]="budgetCategoryOptions" [placeholder]="'Select'" width="100%"
+              <ng-select2 *ngIf="isEditMode && !docFundingListCor" appUserSelect2Change name="budgetCategories" [ngModel]="formModel.budgetCategories"
+                (appUserSelect2Change)="onUserSelectChange('budgetCategories', $event)"
+                [data]="budgetCategoryOptions" [placeholder]="'Select'" [allowClear]="true" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
@@ -153,9 +159,9 @@
             <td class="grid-label sep">DOC/NCI Selection:</td>
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docNciSelectionName}}</span>
-              <ng-select2 *ngIf="isEditMode" name="docNciSelection" [(ngModel)]="formModel.docNciSelection"
-                (ngModelChange)="onDocPaySelectionChange('docNciSelection')"
-                [data]="selectionOptions" [placeholder]="'Select'" width="100%"
+              <ng-select2 *ngIf="isEditMode" appUserSelect2Change name="docNciSelection" [ngModel]="formModel.docNciSelection"
+                (appUserSelect2Change)="onUserSelectChange('docNciSelection', $event)"
+                [data]="selectionOptions" [placeholder]="'Select'" [allowClear]="true" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
@@ -177,7 +183,7 @@
               <span *ngIf="!isEditMode">{{data.docNotes || ''}}</span>
               <div *ngIf="isEditMode">
                 <textarea class="form-control form-control-sm" rows="2"
-                  name="docNotes" [(ngModel)]="formModel.docNotes" (ngModelChange)="onNotesModelChange()" maxlength="1000"
+                  name="docNotes" [(ngModel)]="formModel.docNotes" (ngModelChange)="onNotesModelChange('docNotes')" maxlength="1000"
                   [disabled]="doNotPayOefiaLockActive && canEditOefiaNotes()"></textarea>
                 <div class="text-end small text-muted">{{(formModel.docNotes || '').length}}/1000</div>
                 <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationErrors.docNotes">{{saveValidationErrors.docNotes}}</div>
@@ -196,7 +202,7 @@
               <span *ngIf="!isEditMode || !canEditOefiaNotes()">{{data.oefiaNotes || ''}}</span>
               <div *ngIf="isEditMode && canEditOefiaNotes()">
                 <textarea class="form-control form-control-sm" rows="2"
-                  name="oefiaNotes" [(ngModel)]="formModel.oefiaNotes" (ngModelChange)="onNotesModelChange()" maxlength="1000"></textarea>
+                  name="oefiaNotes" [(ngModel)]="formModel.oefiaNotes" (ngModelChange)="onNotesModelChange('oefiaNotes')" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.oefiaNotes || '').length}}/1000</div>
                 <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationErrors.oefiaNotes">{{saveValidationErrors.oefiaNotes}}</div>
               </div>
@@ -261,7 +267,7 @@
                   {{justificationSaveError}}
                 </div>
                 <textarea class="form-control form-control-sm" rows="2" placeholder="Or enter justification text here..."
-                  name="justificationText" [(ngModel)]="formModel.justificationText" (ngModelChange)="onNotesModelChange()" maxlength="1000"
+                  name="justificationText" [(ngModel)]="formModel.justificationText" (ngModelChange)="onNotesModelChange('justificationText')" maxlength="1000"
                   [disabled]="isJustificationTextDisabled"></textarea>
                 <div class="text-end small text-muted">{{(formModel.justificationText || '').length}}/1000</div>
               </div>
@@ -282,6 +288,21 @@
       <div *ngIf="fundingRefreshError" class="text-danger small py-2" role="alert">
         {{fundingRefreshError}}
         <button type="button" class="btn btn-link btn-sm" (click)="refreshSavedFunding()">Retry refresh</button>
+      </div>
+      <div *ngIf="isEditMode && fundingRecoveryError" class="text-danger small py-2" role="alert">
+        {{fundingRecoveryError}}
+      </div>
+      <div *ngIf="isEditMode && fundingRecoveryState === 'unknown'" class="alert alert-warning" role="alert">
+        The previous funding save may still be running. Do not retry it until support confirms that it has
+        completed or rolled back and cannot commit later.
+        <div>
+          <label>
+            <input type="checkbox" name="unknownOutcomeConfirmed" [(ngModel)]="unknownOutcomeConfirmed">
+            Support has confirmed the previous save is final.
+          </label>
+          <button type="button" class="btn btn-link btn-sm" (click)="recoverUnknownFunding()"
+            [disabled]="!unknownOutcomeConfirmed || isSaveInProgress()">Refresh confirmed outcome</button>
+        </div>
       </div>
       <div class="row g-0 save-error-row" *ngIf="isEditMode && fundingSaveError">
         <div class="col-12">

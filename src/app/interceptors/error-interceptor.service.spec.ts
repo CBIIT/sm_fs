@@ -8,6 +8,7 @@ import { NGXLogger } from 'ngx-logger';
 import { of, Subject, throwError } from 'rxjs';
 import { ErrorHandlerService } from '../error/error-handler.service';
 import { ErrorInterceptor } from './error-interceptor.service';
+import { HANDLE_FUNDING_REQUEST_ERROR_LOCALLY } from '../funding-submissions/funding-request-error-scope.service';
 
 describe('ErrorInterceptor add-grants conflict handling', () => {
   const addGrantsUrl = '/i2efsws/api/v1/funding-submissions/lists';
@@ -125,6 +126,21 @@ describe('ErrorInterceptor add-grants conflict handling', () => {
 
     sendError(interceptor, addGrantsUrl, 'POST', 400);
 
+    expect(errorHandler.registerNewError).not.toHaveBeenCalled();
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('propagates a scoped funding failure even while another error is being handled', () => {
+    const { interceptor, errorHandler, router } = createHarness();
+    (interceptor as any).handlingError = true;
+    const url = '/i2efsws/api/v1/funding-submissions/lists/1/grants/bulk-update';
+    const request = new HttpRequest('POST', url, {});
+    request.context.set(HANDLE_FUNDING_REQUEST_ERROR_LOCALLY, true);
+    const error = new HttpErrorResponse({ status: 500, url });
+    const handler: HttpHandler = { handle: () => throwError(() => error) };
+    let received: HttpErrorResponse;
+    interceptor.intercept(request, handler).subscribe({ error: err => received = err });
+    expect(received).toBe(error);
     expect(errorHandler.registerNewError).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
   });

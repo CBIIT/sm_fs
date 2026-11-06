@@ -48,15 +48,33 @@
       <div class="col-12">
         <ngb-alert type="danger" [dismissible]="true" (closed)="saveErrorMessage = ''">
           {{saveErrorMessage}}
-          <button *ngIf="savedChangesNeedRefresh" type="button" class="btn btn-link btn-sm"
-            (click)="refreshSavedFunding()" [disabled]="isSaving">Retry refresh</button>
         </ngb-alert>
       </div>
-      <div *ngIf="docPayDefaultsLoading" class="text-muted small mb-2" role="status">Loading DOC Pay defaults...</div>
-      <div *ngIf="docPayDefaultsError" class="text-danger small mb-2" role="alert">
-        {{docPayDefaultsError}}
-        <button type="button" class="btn btn-link btn-sm" (click)="loadDocPayDefaults()">Retry defaults</button>
+    </div>
+    <div *ngIf="bulkWriteOutcomeMessage" class="alert alert-warning" role="alert">{{bulkWriteOutcomeMessage}}</div>
+    <div *ngIf="fundingRecoveryError" class="alert alert-danger" role="alert">{{fundingRecoveryError}}</div>
+    <div *ngIf="savedChangesNeedRefresh" class="alert alert-warning" role="alert">
+      Some grants require a saved-value refresh before they can be saved again.
+      <button type="button" class="btn btn-link btn-sm" (click)="refreshSavedFunding()" [disabled]="isSaving">
+        Retry refresh
+      </button>
+    </div>
+    <div *ngFor="let row of unknownRecoveryRows" class="alert alert-warning" role="alert">
+      The previous save for {{row.grantNumber || row.applId}} may still be running. Do not retry until support
+      confirms that it has completed or rolled back and cannot commit later.
+      <div>
+        <label>
+          <input type="checkbox" [(ngModel)]="confirmedUnknownRows[row.applId]" [ngModelOptions]="{standalone: true}">
+          Support has confirmed the previous save is final.
+        </label>
+        <button type="button" class="btn btn-link btn-sm" (click)="recoverUnknownRow(row)"
+          [disabled]="!confirmedUnknownRows[row.applId] || isSaving">Refresh confirmed outcome</button>
       </div>
+    </div>
+    <div *ngIf="docPayDefaultsLoading" class="text-muted small mb-2" role="status">Loading DOC Pay defaults...</div>
+    <div *ngIf="docPayDefaultsError" class="text-danger small mb-2" role="alert">
+      {{docPayDefaultsError}}
+      <button type="button" class="btn btn-link btn-sm" (click)="loadDocPayDefaults()">Retry defaults</button>
     </div>
 
     <!-- Bulk-apply form -->
@@ -65,8 +83,8 @@
         <div class="col-4" *ngIf="!docFundingListCor">
           <div class="field-with-inline-error">
           <label class="form-label fw-semibold">Budget Categories</label>
-          <ng-select2 id="bulk-budget-cat" name="bulkBudgetCategories" [(ngModel)]="bulkFields.budgetCategories"
-            (ngModelChange)="onBulkFieldChange()"
+          <ng-select2 appUserSelect2Change id="bulk-budget-cat" name="bulkBudgetCategories" [ngModel]="bulkFields.budgetCategories"
+            (appUserSelect2Change)="onUserBulkSelectChange('budgetCategories', $event)"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="budgetCategoryOptions" [allowClear]="true"  width="100%">
           </ng-select2>
@@ -75,8 +93,8 @@
         <div class="col-4">
           <div class="field-with-inline-error">
           <label class="form-label fw-semibold">DOC Decision</label>
-          <ng-select2 id="bulk-doc-decision" name="bulkDocDecision" [(ngModel)]="bulkFields.docDecision"
-            (ngModelChange)="onBulkDocDecisionChange()"
+          <ng-select2 appUserSelect2Change id="bulk-doc-decision" name="bulkDocDecision" [ngModel]="bulkFields.docDecision"
+            (appUserSelect2Change)="onUserBulkSelectChange('docDecision', $event)"
             [data]="decisionOptions" [allowClear]="true" width="100%">
           </ng-select2>
           </div>
@@ -84,8 +102,8 @@
         <div class="col-4">
           <div class="field-with-inline-error">
           <label class="form-label fw-semibold">DOC / NCI Selection</label>
-          <ng-select2 id="bulk-doc-nci-sel" name="bulkDocNciSelection" [(ngModel)]="bulkFields.docNciSelection"
-            (ngModelChange)="onBulkFieldChange()"
+          <ng-select2 appUserSelect2Change id="bulk-doc-nci-sel" name="bulkDocNciSelection" [ngModel]="bulkFields.docNciSelection"
+            (appUserSelect2Change)="onUserBulkSelectChange('docNciSelection', $event)"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="docNciOptions" [allowClear]="true" width="100%">
           </ng-select2>
@@ -97,8 +115,8 @@
         <div class="col-4">
           <div class="field-with-inline-error">
           <label class="form-label fw-semibold">Two-Year Annual Funding R01 (HRHR)</label>
-          <ng-select2 id="bulk-annual-r01" name="bulkAnnualFundingR01" [(ngModel)]="bulkFields.annualFundingR01"
-            (ngModelChange)="onBulkFieldChange()"
+          <ng-select2 appUserSelect2Change id="bulk-annual-r01" name="bulkAnnualFundingR01" [ngModel]="bulkFields.annualFundingR01"
+            (appUserSelect2Change)="onUserBulkSelectChange('annualFundingR01', $event)"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="yesNoOptions" [allowClear]="true" width="100%">
           </ng-select2>
@@ -107,8 +125,8 @@
         <div class="col-4" *ngIf="!docFundingListCor">
           <div class="field-with-inline-error">
           <label class="form-label fw-semibold">Annual or MYF</label>
-          <ng-select2 id="bulk-annual-myf" name="bulkAnnualOrMyf" [(ngModel)]="bulkFields.annualOrMyf"
-            (ngModelChange)="onBulkFieldChange()"
+          <ng-select2 appUserSelect2Change id="bulk-annual-myf" name="bulkAnnualOrMyf" [ngModel]="bulkFields.annualOrMyf"
+            (appUserSelect2Change)="onUserBulkSelectChange('annualOrMyf', $event)"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
             [data]="annualMyfOptions" [allowClear]="true" width="100%">
           </ng-select2>
@@ -147,7 +165,7 @@
         <span ngbTooltip="Enter or select at least one value to apply." [disableTooltip]="hasAnyBulkFieldValue"
           container="body">
           <button type="button" class="btn btn-primary ms-3" (click)="onApplyChanges()"
-            [disabled]="!hasAnyBulkFieldValue || isSaving || savedChangesNeedRefresh">Apply Changes</button>
+            [disabled]="!hasAnyBulkFieldValue || isSaving">Apply Changes</button>
         </span>
       </div>
     </form>
@@ -167,8 +185,9 @@
 
         <ng-template #budgetCatRenderer let-data="adtData">
           <div class="field-with-inline-error">
-            <ng-select2 [id]="'bcat-' + data.applId" [(ngModel)]="data.budgetCategories"
-              (ngModelChange)="onRowFieldChange(data, 'budgetCategories')" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" width="100%">
+            <ng-select2 appUserSelect2Change [id]="'bcat-' + data.applId" [ngModel]="data.budgetCategories"
+              (appUserSelect2Change)="onUserRowSelectChange(data, 'budgetCategories', $event)"
+              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'budgetCategories')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('Budget Categories') }}
@@ -178,7 +197,8 @@
 
         <ng-template #docDecisionRenderer let-data="adtData">
           <div class="field-with-inline-error">
-            <ng-select2 [id]="'ddec-' + data.applId" [(ngModel)]="data.docDecision" (ngModelChange)="onRowDocDecisionChange(data)"
+            <ng-select2 appUserSelect2Change [id]="'ddec-' + data.applId" [ngModel]="data.docDecision"
+              (appUserSelect2Change)="onUserRowSelectChange(data, 'docDecision', $event)"
               [data]="getDocDecisionOptionsForRow(data)" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'docDecision')" class="text-danger small validation-inline-error">
@@ -189,8 +209,9 @@
 
         <ng-template #docNciSelRenderer let-data="adtData">
           <div class="field-with-inline-error">
-            <ng-select2 [id]="'dnci-' + data.applId" [(ngModel)]="data.docNciSelection"
-              (ngModelChange)="onRowFieldChange(data, 'docNciSelection')" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" width="100%">
+            <ng-select2 appUserSelect2Change [id]="'dnci-' + data.applId" [ngModel]="data.docNciSelection"
+              (appUserSelect2Change)="onUserRowSelectChange(data, 'docNciSelection', $event)"
+              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" [allowClear]="true" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'docNciSelection')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('DOC/NCI Selection') }}
@@ -200,8 +221,9 @@
 
         <ng-template #annualR01Renderer let-data="adtData">
           <div class="field-with-inline-error">
-            <ng-select2 [id]="'ar01-' + data.applId" [(ngModel)]="data.annualFundingR01"
-              (ngModelChange)="onRowFieldChange(data, 'annualFundingR01')" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" width="100%">
+            <ng-select2 appUserSelect2Change [id]="'ar01-' + data.applId" [ngModel]="data.annualFundingR01"
+              (appUserSelect2Change)="onUserRowSelectChange(data, 'annualFundingR01', $event)"
+              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" [allowClear]="true" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'annualFundingR01')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('Two-Year Annual Funding R01 (HRHR)') }}
@@ -211,9 +233,9 @@
 
         <ng-template #annualMyfRenderer let-data="adtData">
           <div class="field-with-inline-error">
-            <ng-select2 [id]="'amyf-' + data.applId" [(ngModel)]="data.annualOrMyf"
-              (ngModelChange)="onRowFieldChange(data, 'annualOrMyf')"
-              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" width="100%">
+            <ng-select2 appUserSelect2Change [id]="'amyf-' + data.applId" [ngModel]="data.annualOrMyf"
+              (appUserSelect2Change)="onUserRowSelectChange(data, 'annualOrMyf', $event)"
+              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" [allowClear]="true" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'annualOrMyf')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('Annual or MYF') }}
@@ -224,7 +246,7 @@
         <ng-template #docNotesRenderer let-data="adtData">
           <div>
             <textarea class="form-control form-control-sm notes-textarea" [(ngModel)]="data.docNotes"
-              (ngModelChange)="onRowFieldChange()" rows="2" maxlength="1000">
+              (ngModelChange)="onUserRowNotesChange(data, 'docNotes')" rows="2" maxlength="1000">
           </textarea>
             <div class="char-count">{{ data.docNotes?.length || 0 }}/1000</div>
                 <div *ngIf="hasDoNotPayDocNotesError(data)" class="text-danger small mt-1">
@@ -238,7 +260,7 @@
             <span *ngIf="!canEditOefiaNotes()">{{ data.oefiaNotes || '' }}</span>
             <div *ngIf="canEditOefiaNotes()">
               <textarea class="form-control form-control-sm notes-textarea" [(ngModel)]="data.oefiaNotes"
-                (ngModelChange)="onRowFieldChange()" rows="2" maxlength="1000">
+                (ngModelChange)="onUserRowNotesChange(data, 'oefiaNotes')" rows="2" maxlength="1000">
             </textarea>
               <div class="char-count">{{ data.oefiaNotes?.length || 0 }}/1000</div>
             </div>
@@ -257,7 +279,7 @@
         [attr.tabindex]="showApplyBeforeSaveTooltip ? 0 : null" container="body">
         <button type="button" class="btn btn-primary" (click)="onSave()"
           [disabled]="!rows.length || !canSave || hasDoNotPayDocNotesErrors || isSaving
-            || docPayDefaultsLoading || !!docPayDefaultsError || savedChangesNeedRefresh">
+            || docPayDefaultsLoading || !!docPayDefaultsError || !!fundingRecoveryError">
           <span *ngIf="!isSaving">Save</span>
           <span *ngIf="isSaving">Saving...</span>
         </button>

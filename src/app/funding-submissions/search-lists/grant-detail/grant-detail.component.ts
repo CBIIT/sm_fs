@@ -8,11 +8,18 @@ import { Select2OptionData } from 'ng-select2';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
 import { saveAs } from 'file-saver';
-import { catchError, concatMap, from, map, Observable, of, Subscription, take, tap } from 'rxjs';
+import { catchError, concatMap, defaultIfEmpty, from, map, Observable, of, Subscription, take, tap } from 'rxjs';
 
 import { DocumentsDto } from '@cbiit/i2efsws-lib/model/documentsDto';
 import { DocumentService } from '../../../service/document.service';
-import { applyDocPayDefaults, DOC_PAY_SELECTION_FIELDS, DocPaySelectionField, DocPaySelections, isPayDecision, requireDocPayDefaults } from '../../doc-pay-defaults';
+import {
+  applyDocPayDefaults, DOC_PAY_SELECTION_FIELDS, DocPayDefaultField, DocPayProvenance,
+  DocPaySelectionField, DocPaySelections, isBlankSelection, isPayDecision, requireDocPayDefaults
+} from '../../doc-pay-defaults';
+import { FundingRequestErrorScopeService } from '../../funding-request-error-scope.service';
+import {
+  FundingWriteRecoveryService, FundingWriteRecoveryState, isDefiniteFundingWriteRejection
+} from '../../funding-write-recovery.service';
 
 type GrantEditFormModel = FundingSubmBulkEditFieldsDto & { justificationText?: string };
 
@@ -21,7 +28,10 @@ interface FundingSaveReadback {
   listId: number;
   editVersion: number;
   submittedForm: GrantEditFormModel;
+  baselineForm: GrantEditFormModel;
+  fieldVersions: Map<string, number>;
   submittedSnapshot: string;
+  outcome: FundingWriteRecoveryState;
   hasJustificationChanges: boolean;
   justificationText?: string;
   files: File[];
@@ -63,16 +73,22 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   formModel: GrantEditFormModel = {};
   docPayDefaultsLoading = false;
   docPayDefaultsError: string | null = null;
+  docPriorityOptionsLoading = false;
+  docPriorityOptionsError: string | null = null;
   fundingRefreshError: string | null = null;
+  fundingRecoveryState: FundingWriteRecoveryState | null = null;
+  fundingRecoveryError: string | null = null;
+  unknownOutcomeConfirmed = false;
   private docPayDefaults: FundingSubmissionDocPayDefaultsDto;
   private docPayDefaultsResolved = false;
   private docPayDefaultsSubscription: Subscription;
   private fundingReadbackSubscription: Subscription;
   private fundingSaveSubscription: Subscription;
   private pendingFundingReadback: FundingSaveReadback;
+  private unknownFundingReadback: FundingSaveReadback;
   private editVersion = 0;
   private defaultsRequestVersion = 0;
-  private selectionVersions = new Map<DocPaySelectionField, number>();
+  private provenance = new DocPayProvenance({});
   private observedSelections: DocPaySelections = {};
   private static readonly FUNDING_FIELDS = [
     'docDecision', 'docPriority', 'docRecAmt', 'docRecReductionPct', 'docNciSelection',
@@ -123,7 +139,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     private cdr: ChangeDetectorRef,
     private modalService: NgbModal,
     private dropdownLookupService: FundingSubmDropdownLookupService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private fundingWriteRecovery: FundingWriteRecoveryService,
+    private fundingErrorScope: FundingRequestErrorScopeService
   ) {}
 
   ngOnInit(): void {
@@ -205,9 +223,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
     this.invalidateFundingRequests();
-    this.selectionVersions.clear();
-    this.fetchDocPriorityOptions();
     this.formModel = this.formModelFromGrant(this.data);
+    this.provenance = new DocPayProvenance(this.formModel);
     this.observedSelections = { ...this.formModel };
     this.justificationFiles = [];
     this.justificationFileError = null;
@@ -220,28 +237,71 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.initialFundingSnapshot = this.currentFundingSnapshot();
     this.initialJustificationText = this.formModel.justificationText ?? '';
     this.fundingSaveError = null;
+    this.unknownOutcomeConfirmed = false;
+    this.loadFundingRecoveryState();
+    if (this.fundingRecoveryState === 'saved' || this.fundingRecoveryState === 'conflict') {
+      this.pendingFundingReadback = this.createRecoveryReadback(this.fundingRecoveryState);
+      this.fundingRefreshError = 'A previous funding save must be refreshed before this grant can be saved again.';
+    } else if (this.fundingRecoveryState === 'unknown') {
+      this.unknownFundingReadback = this.createRecoveryReadback('unknown');
+    }
+    this.fetchDocPriorityOptions();
     this.recomputeDoNotPayOefiaLock();
     this.cdr.detectChanges();
   }
 
-  private fetchDocPriorityOptions(): void {
+  fetchDocPriorityOptions(): void {
     if (this.docPriorityOptionsSubscription && !this.docPriorityOptionsSubscription.closed) {
       this.docPriorityOptionsSubscription.unsubscribe();
     }
     const listId = this.listId;
     const applId = this.data?.applId;
+    const editVersion = this.editVersion;
     this.docPriorityOptions = [];
+    this.docPriorityOptionsError = null;
     if (!listId || !applId) {
       return;
     }
 
-    this.docPriorityOptionsSubscription = this.fundingSubmissionsService.getDocPriorityOptions(listId, applId).subscribe({
+    this.docPriorityOptionsLoading = true;
+    this.docPriorityOptionsSubscription = this.fundingErrorScope.handleLocally(
+      this.fundingSubmissionsService.getDocPriorityOptions(listId, applId)
+    ).pipe(
+      defaultIfEmpty(null),
+      map(priorities => {
+        if (!Array.isArray(priorities)) throw new Error('DOC Priority options were not returned.');
+        return priorities;
+      }),
+      take(1)
+    ).subscribe({
       next: priorities => {
+        if (!this.isEditMode || this.editVersion !== editVersion || this.listId !== listId
+          || this.data?.applId !== applId) return;
         this.docPriorityOptions = priorities.map(priority => ({ id: String(priority), text: String(priority) }));
+        this.docPriorityOptionsLoading = false;
+        this.checkPreviewPriorityOption();
         this.cdr.detectChanges();
       },
-      error: error => this.logger.error('Failed to load DOC Priority options', error, { listId, applId })
+      error: error => {
+        if (!this.isEditMode || this.editVersion !== editVersion || this.listId !== listId
+          || this.data?.applId !== applId) return;
+        this.docPriorityOptionsLoading = false;
+        this.docPriorityOptionsError = 'Unable to load DOC Priority options. Retry to select a priority.';
+        this.logger.error('Failed to load DOC Priority options', error, { listId, applId });
+        this.cdr.detectChanges();
+      }
     });
+  }
+
+  private checkPreviewPriorityOption(): void {
+    if (this.docPriorityOptionsLoading || !this.needsDocPayDefaults() || !this.docPayDefaultsResolved
+      || this.provenance.intent(this.data.applId).priorityMode !== 'AUTO'
+      || isBlankSelection(this.formModel.docPriority)) {
+      return;
+    }
+    if (!this.docPriorityOptions.some(option => String(option.id) === String(this.formModel.docPriority))) {
+      this.docPriorityOptionsError = 'The previewed DOC Priority is not in the current options. Retry the options.';
+    }
   }
 
   ngOnDestroy(): void {
@@ -263,8 +323,21 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   onDocPaySelectionChange(field: DocPaySelectionField): void {
     if (this.formModel[field] !== this.observedSelections[field]) {
-      this.selectionVersions.set(field, (this.selectionVersions.get(field) ?? 0) + 1);
+      this.provenance.recordUserEdit(field);
       this.observedSelections[field] = this.formModel[field];
+    }
+  }
+
+  onUserSelectChange(field: DocPaySelectionField | 'docPriority' | 'docDecision', value: string | null): void {
+    this.formModel[field] = value;
+    this.provenance.recordUserEdit(field);
+    if (field === 'docDecision') {
+      this.onDocDecisionChange();
+    } else if (field === 'docPriority') {
+      this.onValidationFieldChange();
+    } else {
+      this.observedSelections[field] = value;
+      this.updateValidationErrorsLive();
     }
   }
 
@@ -286,6 +359,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       this.fundingReadbackSubscription.unsubscribe();
     }
     this.pendingFundingReadback = undefined;
+    this.unknownFundingReadback = undefined;
     this.fundingRefreshError = null;
     this.savingInProgress = false;
   }
@@ -300,8 +374,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     const listId = this.listId;
     const form = this.formModel;
     const requestedFields = { ...form };
+    this.provenance.preparePreview(form);
     this.observedSelections = { ...form };
-    const versions = new Map(this.selectionVersions);
+    const versions = this.provenance.snapshot();
     const requestVersion = this.defaultsRequestVersion;
     const editVersion = this.editVersion;
     const isCurrent = () => this.isEditMode && this.data === data && this.listId === listId
@@ -310,19 +385,24 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       && isPayDecision(form.docDecision, this.decisionOptions);
 
     this.docPayDefaultsLoading = true;
-    this.docPayDefaultsSubscription = this.fundingSubmissionsService.getDocPayDefaults(listId, [data.applId]).pipe(
+    this.docPayDefaultsSubscription = this.fundingErrorScope.handleLocally(
+      this.fundingSubmissionsService.getDocPayDefaults(listId, [data.applId])
+    ).pipe(
+      defaultIfEmpty([]),
       map(defaults => requireDocPayDefaults(defaults, data.applId)),
       take(1)
     ).subscribe({
       next: defaults => {
         if (!isCurrent()) return;
-        applyDocPayDefaults(form, defaults, field =>
+        const appliedPriority = applyDocPayDefaults(form, defaults, field =>
           form[field] === requestedFields[field]
-          && (this.selectionVersions.get(field) ?? 0) === (versions.get(field) ?? 0));
+          && this.provenance.mayApplyDefault(field, versions));
+        if (appliedPriority) this.provenance.markAutomaticPriorityApplied();
         for (const field of DOC_PAY_SELECTION_FIELDS) this.observedSelections[field] = form[field];
         this.docPayDefaults = defaults;
         this.docPayDefaultsResolved = true;
         this.docPayDefaultsLoading = false;
+        this.checkPreviewPriorityOption();
         this.updateValidationErrorsLive();
         this.cdr.detectChanges();
       },
@@ -337,8 +417,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private needsDocPayDefaults(): boolean {
-    return this.isEditMode && this.docFundingListCor
-      && this.isDoNotPayDecisionValue(this.data?.docDecision)
+    return this.isEditMode && this.isDoNotPayDecisionValue(this.data?.docDecision)
       && isPayDecision(this.formModel.docDecision, this.decisionOptions);
   }
 
@@ -390,10 +469,13 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   get hasSaveValidationErrors(): boolean {
     return Object.keys(this.validateChangedValues()).length > 0 || !!this.justificationFileError
-      || this.docPayDefaultsLoading || !!this.docPayDefaultsError || !!this.pendingFundingReadback;
+      || this.docPayDefaultsLoading || !!this.docPayDefaultsError || !!this.pendingFundingReadback
+      || !!this.fundingRecoveryState || !!this.fundingRecoveryError
+      || (this.needsDocPayDefaults() && (this.docPriorityOptionsLoading || !!this.docPriorityOptionsError));
   }
 
   onDocRecReductionPctChange(): void {
+    this.provenance.recordUserEdit('docRecReductionPct');
     this.touchedRequiredFields.add('docRecReductionPct');
     const reductionPct = this.toFiniteNumberOrNull(this.formModel.docRecReductionPct);
     const baseAmount = this.parseExactDecimal(this.data?.originalRequestedTotal);
@@ -406,7 +488,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       const pctScale = 10n ** BigInt(parsedReductionPct.scale);
       const numerator = baseAmount.coefficient * (100n * pctScale - parsedReductionPct.coefficient);
       const denominator = 10n ** BigInt(baseAmount.scale) * pctScale;
-      this.formModel.docRecAmt = Number(this.roundHalfUpDivision(numerator, denominator * 100n));
+      const amount = Number(this.roundHalfUpDivision(numerator, denominator * 100n));
+      if (this.formModel.docRecAmt !== amount) this.provenance.recordChange('docRecAmt');
+      this.formModel.docRecAmt = amount;
     }
 
     this.updateDocRecValidationLive();
@@ -414,6 +498,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onDocRecAmtChange(): void {
+    this.provenance.recordUserEdit('docRecAmt');
     this.touchedRequiredFields.add('docRecAmt');
     const updatedAmount = this.toFiniteNumberOrNull(this.formModel.docRecAmt);
     const baseAmount = this.parseExactDecimal(this.data?.originalRequestedTotal);
@@ -428,7 +513,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       const scaledBase = baseAmount.coefficient * (10n ** BigInt(commonScale - baseAmount.scale));
       const scaledAmount = parsedAmount.coefficient * (10n ** BigInt(commonScale - parsedAmount.scale));
       const reductionHundredths = this.roundHalfUpDivision((scaledBase - scaledAmount) * 10000n, scaledBase);
-      this.formModel.docRecReductionPct = Number(reductionHundredths) / 100;
+      const reduction = Number(reductionHundredths) / 100;
+      if (this.formModel.docRecReductionPct !== reduction) this.provenance.recordChange('docRecReductionPct');
+      this.formModel.docRecReductionPct = reduction;
     }
 
     this.updateDocRecValidationLive();
@@ -502,7 +589,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   onSave(): void {
     if (this.savingInProgress || this.justificationFileError || this.docPayDefaultsLoading
-      || this.docPayDefaultsError || this.pendingFundingReadback) {
+      || this.docPayDefaultsError || this.pendingFundingReadback || this.fundingRecoveryState
+      || this.fundingRecoveryError
+      || (this.needsDocPayDefaults() && (this.docPriorityOptionsLoading || this.docPriorityOptionsError))) {
       return;
     }
     if (this.needsDocPayDefaults() && !this.docPayDefaultsResolved) {
@@ -562,32 +651,103 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       listId: this.listId,
       editVersion: this.editVersion,
       submittedForm: { ...this.formModel },
+      baselineForm: this.formModelFromGrant(this.data),
+      fieldVersions: this.provenance.snapshot(),
       submittedSnapshot: this.currentSnapshot(),
+      outcome: 'unknown',
       hasJustificationChanges,
       justificationText: hasJustificationTextChange ? justificationText : undefined,
       files: [...this.justificationFiles],
       deleteDocumentIds: [...this.stagedDeleteDocumentIds]
     };
-    this.fundingSaveSubscription = this.fundingSubmissionsService.bulkUpdateListGrants(
-      { applIds: [this.data.applId], fields: saveFields },
-      this.listId
-    ).subscribe({
-      next: () => {
+    try {
+      this.fundingWriteRecovery.begin(this.listId, this.data.applId);
+      this.fundingRecoveryState = 'unknown';
+    } catch (error) {
+      this.savingInProgress = false;
+      this.loadFundingRecoveryState();
+      if (this.fundingRecoveryState) {
+        readback.outcome = this.fundingRecoveryState;
+        if (this.fundingRecoveryState === 'unknown') {
+          this.unknownFundingReadback = readback;
+          this.fundingSaveError = 'A previous funding save has an unknown outcome. Do not retry until support confirms it is final.';
+        } else {
+          this.pendingFundingReadback = readback;
+          this.fundingRefreshError = 'A previous funding save must be refreshed before this grant can be saved again.';
+        }
+      } else if (!this.fundingRecoveryError) {
+        this.fundingRecoveryError = this.getSaveErrorMessage(error, 'Funding save recovery is unavailable.');
+      }
+      this.logger.error('Unable to prepare funding save recovery', error);
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const request = {
+      applIds: [this.data.applId],
+      fields: saveFields,
+      ...(this.needsDocPayDefaults() ? { transitionIntents: [this.provenance.intent(this.data.applId)] } : {})
+    };
+    this.fundingSaveSubscription = this.fundingErrorScope.handleLocally(
+      this.fundingSubmissionsService.bulkUpdateListGrants(request, this.listId)
+    ).pipe(defaultIfEmpty(null), take(1)).subscribe({
+      next: count => {
+        if (count !== 1) {
+          this.handleFundingWriteFailure(readback, new Error('The funding save returned an unexpected response.'));
+          return;
+        }
+        try {
+          this.fundingWriteRecovery.mark(readback.listId, readback.data.applId, 'saved');
+        } catch (error) {
+          this.handleFundingWriteFailure(readback, error);
+          return;
+        }
         if (!this.isCurrentFundingSave(readback)) return;
         this.logger.debug('Grant detail saved');
+        readback.outcome = 'saved';
+        this.fundingRecoveryState = 'saved';
         this.initialFundingSnapshot = this.currentFundingSnapshot(readback.submittedForm);
         this.initialFormSnapshot = readback.submittedSnapshot;
         this.pendingFundingReadback = readback;
         this.refreshSavedFunding();
       },
-      error: (err) => {
-        if (!this.isCurrentFundingSave(readback)) return;
-        this.savingInProgress = false;
-        this.fundingSaveError = this.getSaveErrorMessage(err, 'Unable to save the grant changes. Please try again.');
-        this.logger.error('Grant detail save error', err);
-        this.cdr.detectChanges();
-      }
+      error: error => this.handleFundingWriteFailure(readback, error)
     });
+  }
+
+  private handleFundingWriteFailure(readback: FundingSaveReadback, error: unknown): void {
+    let state: FundingWriteRecoveryState | null = 'unknown';
+    try {
+      if (typeof error === 'object' && error !== null && 'status' in error && error.status === 409) {
+        this.fundingWriteRecovery.mark(readback.listId, readback.data.applId, 'conflict');
+        state = 'conflict';
+      } else if (isDefiniteFundingWriteRejection(error)) {
+        this.fundingWriteRecovery.clear(readback.listId, readback.data.applId);
+        state = null;
+      }
+    } catch (storageError) {
+      this.logger.error('Unable to update funding save recovery state', storageError);
+      if (this.isCurrentFundingSave(readback)) {
+        this.fundingRecoveryError = this.getSaveErrorMessage(storageError, 'Funding save recovery is unavailable.');
+      }
+    }
+    if (!this.isCurrentFundingSave(readback)) return;
+
+    this.fundingRecoveryState = state;
+    this.savingInProgress = false;
+    this.logger.error('Grant detail save error', error);
+    if (state === 'conflict') {
+      readback.outcome = 'conflict';
+      this.pendingFundingReadback = readback;
+      this.fundingSaveError = 'The grant changed on the server. Refresh and review your changes before saving.';
+      this.refreshSavedFunding();
+    } else if (state === 'unknown') {
+      this.unknownFundingReadback = readback;
+      this.fundingSaveError = 'The funding save outcome is unknown. Do not retry until support confirms it is final.';
+    } else {
+      this.fundingSaveError = this.getSaveErrorMessage(error, 'Unable to save the grant changes. Please try again.');
+    }
+    this.cdr.detectChanges();
   }
 
   private isDoNotPayDecisionSelected(): boolean {
@@ -978,7 +1138,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     return this.savingInProgress;
   }
 
-  onNotesModelChange(): void {
+  onNotesModelChange(field?: 'docNotes' | 'oefiaNotes' | 'justificationText'): void {
+    if (field) this.provenance.recordUserEdit(field);
     this.justificationSaveError = null;
     this.updateValidationErrorsLive();
     this.cdr.detectChanges();
@@ -1187,6 +1348,40 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       && this.data === readback.data && this.listId === readback.listId;
   }
 
+  private loadFundingRecoveryState(): void {
+    this.fundingRecoveryError = null;
+    try {
+      this.fundingRecoveryState = this.fundingWriteRecovery.get(this.listId, this.data.applId)?.state ?? null;
+    } catch (error) {
+      this.fundingRecoveryState = null;
+      this.fundingRecoveryError = this.getSaveErrorMessage(error, 'Funding save recovery is unavailable.');
+      this.logger.error('Unable to load funding save recovery state', error);
+    }
+  }
+
+  private createRecoveryReadback(outcome: FundingWriteRecoveryState): FundingSaveReadback {
+    return {
+      data: this.data,
+      listId: this.listId,
+      editVersion: this.editVersion,
+      submittedForm: { ...this.formModel },
+      baselineForm: this.formModelFromGrant(this.data),
+      fieldVersions: this.provenance.snapshot(),
+      submittedSnapshot: this.currentSnapshot(),
+      outcome,
+      hasJustificationChanges: false,
+      files: [...this.justificationFiles],
+      deleteDocumentIds: [...this.stagedDeleteDocumentIds]
+    };
+  }
+
+  recoverUnknownFunding(): void {
+    if (this.fundingRecoveryState !== 'unknown' || !this.unknownOutcomeConfirmed || this.fundingRecoveryError) return;
+    this.pendingFundingReadback = this.unknownFundingReadback ?? this.createRecoveryReadback('unknown');
+    this.pendingFundingReadback.outcome = 'unknown';
+    this.refreshSavedFunding();
+  }
+
   refreshSavedFunding(): void {
     const readback = this.pendingFundingReadback;
     if (!readback || !this.isCurrentFundingSave(readback)
@@ -1195,9 +1390,12 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     }
     this.savingInProgress = true;
     this.fundingRefreshError = null;
-    this.fundingReadbackSubscription = this.fundingSubmissionsService.getListDetail(readback.listId).pipe(
+    this.fundingReadbackSubscription = this.fundingErrorScope.handleLocally(
+      this.fundingSubmissionsService.getListDetail(readback.listId)
+    ).pipe(
+      defaultIfEmpty(null),
       map(detail => {
-        const grant = detail.grants?.find(row => row.applId === readback.data.applId);
+        const grant = detail?.grants?.find(row => row.applId === readback.data.applId);
         if (!grant) throw new Error('The saved grant is not present in the refreshed list.');
         return grant;
       }),
@@ -1205,25 +1403,59 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     ).subscribe({
       next: grant => {
         if (!this.isCurrentFundingSave(readback) || this.pendingFundingReadback !== readback) return;
+        try {
+          this.fundingWriteRecovery.clear(readback.listId, readback.data.applId);
+        } catch (error) {
+          this.savingInProgress = false;
+          this.fundingRefreshError = this.getSaveErrorMessage(error, 'Funding save recovery could not be cleared.');
+          this.logger.error('Unable to complete funding save recovery', error);
+          this.cdr.detectChanges();
+          return;
+        }
         const unchanged = this.currentSnapshot() === readback.submittedSnapshot
+          && GrantDetailComponent.FUNDING_FIELDS.every(field => this.provenance.unchangedSince(field, readback.fieldVersions))
           && this.justificationFiles.length === readback.files.length
           && this.justificationFiles.every((file, index) => file === readback.files[index])
           && JSON.stringify(this.stagedDeleteDocumentIds) === JSON.stringify(readback.deleteDocumentIds);
         const persistedForm = this.formModelFromGrant(grant);
         Object.assign(this.data, grant);
-        // Reconcile only fields the user has not changed since the write began.
         for (const field of GrantDetailComponent.FUNDING_FIELDS) {
-          if (this.formModel[field] === readback.submittedForm[field]) {
+          const changedSinceSubmit = !this.provenance.unchangedSince(field, readback.fieldVersions)
+            || this.formModel[field] !== readback.submittedForm[field];
+          const isDefaultField = [...DOC_PAY_SELECTION_FIELDS, 'docPriority', 'docRecAmt', 'docRecReductionPct']
+            .includes(field as DocPayDefaultField);
+          const changedBeforeSubmit = !this.provenance.unchangedSince(field, new Map())
+            || (!isDefaultField && this.formModel[field] !== readback.baselineForm[field]);
+          if (!changedSinceSubmit && (readback.outcome === 'saved' || !changedBeforeSubmit)) {
             Object.assign(this.formModel, { [field]: persistedForm[field] });
           }
         }
+        this.provenance = this.provenance.rebase(
+          persistedForm, readback.fieldVersions, readback.outcome !== 'saved'
+        );
+        this.observedSelections = { ...this.formModel };
         this.docPayDefaults = undefined;
         this.initialFundingSnapshot = this.currentFundingSnapshot(persistedForm);
         this.initialFormSnapshot = this.currentSnapshot(persistedForm);
         this.initialJustificationText = persistedForm.justificationText;
         this.pendingFundingReadback = undefined;
-        if (unchanged && readback.hasJustificationChanges) {
+        this.unknownFundingReadback = undefined;
+        this.fundingRecoveryState = null;
+        this.unknownOutcomeConfirmed = false;
+        this.fundingRefreshError = null;
+        if (readback.outcome === 'saved' && unchanged && readback.hasJustificationChanges) {
           this.saveJustification(readback.justificationText);
+          return;
+        }
+        if (readback.outcome !== 'saved') {
+          this.fundingSaveError = 'Server values were refreshed. Review your unsaved changes before saving.';
+          this.savingInProgress = false;
+          this.cancelDocPayDefaults();
+          this.fetchDocPriorityOptions();
+          if (this.needsDocPayDefaults()) this.loadDocPayDefaults();
+          this.updateValidationErrorsLive();
+          this.saved.emit();
+          this.cdr.detectChanges();
           return;
         }
         this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
@@ -1242,7 +1474,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       error: error => {
         if (!this.isCurrentFundingSave(readback) || this.pendingFundingReadback !== readback) return;
         this.savingInProgress = false;
-        this.fundingRefreshError = 'Grant changes were saved, but the saved values could not be refreshed. Retry refresh before saving again.';
+        this.fundingRefreshError = readback.outcome === 'saved'
+          ? 'Grant changes were saved, but the saved values could not be refreshed. Retry refresh before saving again.'
+          : 'The grant could not be refreshed. Retry refresh before saving again.';
         this.logger.error('Failed to refresh saved grant changes', error);
         this.cdr.detectChanges();
       }
