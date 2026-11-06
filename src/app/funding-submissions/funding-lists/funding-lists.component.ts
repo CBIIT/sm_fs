@@ -496,6 +496,14 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
       .map(grant => Number(grant?.applId))
       .filter(applId => Number.isFinite(applId) && applId > 0);
 
+    const fundingListViewState = {
+      listId: this.listId,
+      selectedTab: this.selectedTab,
+      selectedDoc: this.selectedDoc,
+      selectedApplIds
+    };
+    history.replaceState({ ...history.state, fundingListViewState }, document.title);
+
     this.router.navigate(['/funding-submissions/director-bulk-edit'], {
       queryParams: {
         listId: this.listId,
@@ -506,7 +514,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         listId: this.listId,
         selectionDate: this.pageTitle,
         grants: selectedGrants,
-        selectedApplIds
+        selectedApplIds,
+        fundingListViewState
       }
     });
   }
@@ -730,8 +739,10 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.docRecommendedTotals = this.buildDocRecommendedTotals(this.grants);
         this.docRecommendedTotal = detail.totalDocRecAmt ?? Object.values(this.docRecommendedTotals).reduce((sum, amount) => sum + amount, 0);
 
-        this.selectDefaultDirectorTab();
-        this.ensureSelectedDocIsAvailableForTab();
+        if (!this.restoreFundingListViewState()) {
+          this.selectDefaultDirectorTab();
+          this.ensureSelectedDocIsAvailableForTab();
+        }
         this.reloadTable();
       },
       error: err => {
@@ -803,15 +814,46 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedTab = this.getTabCount('pending') > 0 ? 'pending' : 'all';
   }
 
+  private restoreFundingListViewState(): boolean {
+    const navigationState = history.state;
+    const viewState = navigationState?.fundingListViewState;
+    if (viewState?.listId !== this.listId
+      || !this.tabs.some(tab => tab.id === viewState.selectedTab)
+      || typeof viewState.selectedDoc !== 'string'
+      || !Array.isArray(viewState.selectedApplIds)) {
+      return false;
+    }
+
+    this.selectedTab = viewState.selectedTab;
+    this.selectedDoc = viewState.selectedDoc;
+    this.ensureSelectedDocIsAvailableForTab();
+    const selectedApplIds = new Set(viewState.selectedApplIds);
+    this.selectedRows.clear();
+    this.filteredGrants.forEach(grant => {
+      const applId = Number(grant.applId);
+      if (selectedApplIds.has(applId)) {
+        this.selectedRows.set(applId, grant);
+      }
+    });
+    const { fundingListViewState, ...remainingState } = navigationState;
+    history.replaceState(remainingState, document.title);
+    return true;
+  }
+
   private bindSelectionEvents(dt: DataTables.Api): void {
     const $container = $(dt.table(0).container());
     const $tableNode = $(dt.table(0).node());
     this.stampCheckboxApplIds(dt, $container);
+    let previousOrder = JSON.stringify(dt.order());
 
     $tableNode
       .off('order.dt.fundingClearSelections')
       .on('order.dt.fundingClearSelections', () => {
-        this.clearSelectedRows($container);
+        const currentOrder = JSON.stringify(dt.order());
+        if (currentOrder !== previousOrder) {
+          previousOrder = currentOrder;
+          this.clearSelectedRows($container);
+        }
       });
 
     $container

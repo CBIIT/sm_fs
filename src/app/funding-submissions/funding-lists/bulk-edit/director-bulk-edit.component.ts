@@ -251,6 +251,9 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
       queryParams: {
         listId: this.listId,
         selectionDate: this.selectionDate
+      },
+      state: {
+        fundingListViewState: history.state?.fundingListViewState
       }
     });
   }

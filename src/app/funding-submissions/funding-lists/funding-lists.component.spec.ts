@@ -8,6 +8,7 @@ import { NgbAlertModule, NgbModal, NgbTooltip, NgbTooltipModule } from '@ng-boot
 import { NGXLogger } from 'ngx-logger';
 import { of, Subject, throwError } from 'rxjs';
 import { FundingListsComponent } from './funding-lists.component';
+import { DirectorBulkEditComponent } from './bulk-edit/director-bulk-edit.component';
 import { FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DataTableDirective } from 'angular-datatables';
@@ -100,6 +101,161 @@ describe('FundingListsComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('carries the selected tab, DOC, and row IDs through Bulk Decision and its Back button', () => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.returnValue(Promise.resolve(true));
+    const historyState = spyOnProperty(history, 'state', 'get').and.returnValue({ navigationId: 6 });
+    const replaceState = spyOn(history, 'replaceState');
+    component.listId = 39;
+    component.pageTitle = '11/06/2026';
+    component.selectedTab = 'hold';
+    component.selectedDoc = 'DCTD';
+    component.grants = [buildGrant({ applId: 42, doc: 'DCTD', nciDecision: 'Hold' })];
+    component.selectedRows.set(42, component.grants[0]);
+
+    component.goToDirectorBulkEdit();
+
+    expect(navigate).toHaveBeenCalledWith(['/funding-submissions/director-bulk-edit'], jasmine.objectContaining({
+      state: jasmine.objectContaining({
+        fundingListViewState: { listId: 39, selectedTab: 'hold', selectedDoc: 'DCTD', selectedApplIds: [42] }
+      })
+    }));
+    const outboundState = navigate.calls.mostRecent().args[1].state;
+    expect(replaceState).toHaveBeenCalledWith({
+      navigationId: 6,
+      fundingListViewState: outboundState.fundingListViewState
+    }, document.title);
+
+    historyState.and.returnValue(outboundState);
+    const bulkComponent = new DirectorBulkEditComponent(
+      TestBed.inject(ActivatedRoute), TestBed.inject(Router), TestBed.inject(AppPropertiesService),
+      fundingSubmissionsServiceSpy, TestBed.inject(NGXLogger)
+    );
+    bulkComponent.listId = 39;
+    bulkComponent.selectionDate = component.pageTitle;
+
+    bulkComponent.onBackClick();
+
+    expect(navigate).toHaveBeenCalledWith(['/funding-submissions/funding-lists'], {
+      queryParams: { listId: 39, selectionDate: component.pageTitle },
+      state: { fundingListViewState: outboundState.fundingListViewState }
+    });
+  });
+
+  it('restores the returned tab, DOC, and selections using fresh API rows', () => {
+    const historyState = spyOnProperty(history, 'state', 'get').and.returnValue({
+      navigationId: 7,
+      fundingListViewState: { listId: 39, selectedTab: 'hold', selectedDoc: 'DCTD', selectedApplIds: [42, 99] }
+    });
+    const replaceState = spyOn(history, 'replaceState').and.callFake(state => historyState.and.returnValue(state));
+    component.listId = 39;
+    const freshGrant = buildGrant({ applId: 42, doc: 'DCTD', nciDecision: 'Hold', nciDirectorNotes: 'Saved note' });
+    fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+      ...emptyListDetail(),
+      grants: [buildGrant({ applId: 1, doc: 'DCB', nciDecision: null }), freshGrant]
+    }));
+
+    (component as any).loadListMeta();
+
+    expect(component.selectedTab).toBe('hold');
+    expect(component.selectedDoc).toBe('DCTD');
+    expect(Array.from(component.selectedRows.keys())).toEqual([42]);
+    expect(component.selectedRows.get(42)).toBe(freshGrant);
+    expect(replaceState).toHaveBeenCalledWith({ navigationId: 7 }, document.title);
+
+    component.selectTab('all');
+    expect((component as any).restoreFundingListViewState()).toBeFalse();
+    expect(component.selectedTab).toBe('all');
+    expect(component.selectedRows.size).toBe(0);
+  });
+
+  it('uses the default tab and DOC for a different list instead of restoring stale selections', () => {
+    spyOnProperty(history, 'state', 'get').and.returnValue({
+      fundingListViewState: { listId: 38, selectedTab: 'hold', selectedDoc: 'DCTD', selectedApplIds: [42] }
+    });
+    component.listId = 39;
+    fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+      ...emptyListDetail(),
+      grants: [buildGrant({ applId: 1, nciDecision: null }), buildGrant({ applId: 42, doc: 'DCTD', nciDecision: 'Hold' })]
+    }));
+
+    (component as any).loadListMeta();
+
+    expect(component.selectedTab).toBe('pending');
+    expect(component.selectedDoc).toBe('DCB');
+    expect(component.selectedRows.size).toBe(0);
+  });
+
+  it('does not reselect grants moved out of the restored tab after Bulk Decision saves', () => {
+    spyOnProperty(history, 'state', 'get').and.returnValue({
+      fundingListViewState: { listId: 39, selectedTab: 'pending', selectedDoc: 'DCTD', selectedApplIds: [42] }
+    });
+    spyOn(history, 'replaceState');
+    component.listId = 39;
+    fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+      ...emptyListDetail(),
+      grants: [buildGrant({ applId: 42, doc: 'DCTD', nciDecision: 'Approve' }), buildGrant({ applId: 43, doc: 'DCTD', nciDecision: null })]
+    }));
+
+    (component as any).loadListMeta();
+
+    expect(component.selectedTab).toBe('pending');
+    expect(component.selectedDoc).toBe('DCTD');
+    expect(component.filteredGrants.map(grant => grant.applId)).toEqual([43]);
+    expect(component.selectedRows.size).toBe(0);
+  });
+
+  it('falls back to an available DOC without selecting grants hidden by that filter', () => {
+    spyOnProperty(history, 'state', 'get').and.returnValue({
+      fundingListViewState: { listId: 39, selectedTab: 'hold', selectedDoc: 'DCTD', selectedApplIds: [42] }
+    });
+    spyOn(history, 'replaceState');
+    component.listId = 39;
+    fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+      ...emptyListDetail(),
+      grants: [buildGrant({ applId: 1, nciDecision: 'Hold' }), buildGrant({ applId: 42, doc: 'DCTD', nciDecision: 'Approve' })]
+    }));
+
+    (component as any).loadListMeta();
+
+    expect(component.selectedTab).toBe('hold');
+    expect(component.selectedDoc).toBe('DCB');
+    expect(component.selectedRows.size).toBe(0);
+  });
+
+  it('keeps restored selections on redraw but clears them when table ordering changes', () => {
+    const originalJquery = (window as any).$;
+    const handlers: { [event: string]: () => void } = {};
+    const tableNode = {
+      off: jasmine.createSpy('off').and.callFake(() => tableNode),
+      on: jasmine.createSpy('on').and.callFake((event, handler) => {
+        handlers[event] = handler;
+        return tableNode;
+      })
+    };
+    const container = { off: () => container, on: () => container };
+    const dt = {
+      table: () => ({ container: () => container, node: () => tableNode }),
+      order: jasmine.createSpy('order').and.returnValue([[1, 'asc'], [13, 'asc']])
+    };
+    spyOn<any>(component, 'stampCheckboxApplIds');
+    spyOn<any>(component, 'syncHeaderSelectionState');
+    const clear = spyOn<any>(component, 'clearSelectedRows');
+    component.selectedRows.set(42, buildGrant({ applId: 42 }));
+    (window as any).$ = target => target;
+    try {
+      (component as any).bindSelectionEvents(dt);
+      handlers['order.dt.fundingClearSelections']();
+      expect(clear).not.toHaveBeenCalled();
+      expect(component.selectedRows.has(42)).toBeTrue();
+
+      dt.order.and.returnValue([[1, 'desc']]);
+      handlers['order.dt.fundingClearSelections']();
+      expect(clear).toHaveBeenCalledWith(container);
+    } finally {
+      (window as any).$ = originalJquery;
+    }
   });
 
   it('uses the NCI Decision template and formats search and export values while preserving raw sorting', () => {
