@@ -39,8 +39,10 @@ export class FundingRequestErrorScopeInterceptor implements HttpInterceptor {
     const path = new URL(req.url, 'http://localhost').pathname;
     return (req.method === 'POST'
       && /\/funding-submissions\/lists\/\d+\/grants\/bulk-update$/.test(path))
+      || (req.method === 'DELETE'
+        && /\/funding-submissions\/lists\/\d+\/grants$/.test(path))
       || (req.method === 'GET'
-        && /\/funding-submissions\/lists\/\d+(?:\/grants\/(?:doc-pay-defaults|\d+\/doc-priority-options))?$/
+        && /\/funding-submissions\/lists\/\d+(?:\/status-history|\/grants\/(?:doc-pay-defaults|\d+\/doc-priority-options))?$/
           .test(path));
   }
 }

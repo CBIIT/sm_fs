@@ -292,6 +292,9 @@
       <div *ngIf="isEditMode && fundingRecoveryError" class="text-danger small py-2" role="alert">
         {{fundingRecoveryError}}
       </div>
+      <div *ngIf="isEditMode && prioritySaveBlocked" class="text-muted small py-2" role="status">
+        Another list update or its refresh must finish before this grant can be saved.
+      </div>
       <div *ngIf="isEditMode && fundingRecoveryState === 'unknown'" class="alert alert-warning" role="alert">
         The previous funding save may still be running. Do not retry it until support confirms that it has
         completed or rolled back and cannot commit later.
@@ -322,8 +325,8 @@
         <span *ngIf="isEditMode" class="d-inline-block ms-3"
           [ngbTooltip]="hasSaveValidationErrors ? 'Complete all required fields before saving.' : null" container="body">
           <button type="button" class="btn btn-primary" (click)="onSave()"
-            [disabled]="hasSaveValidationErrors || isSaveInProgress()"
-            [style.pointer-events]="hasSaveValidationErrors || isSaveInProgress() ? 'none' : null">Save</button>
+            [disabled]="hasSaveValidationErrors || isSaveInProgress() || prioritySaveBlocked"
+            [style.pointer-events]="hasSaveValidationErrors || isSaveInProgress() || prioritySaveBlocked ? 'none' : null">Save</button>
         </span>
       </div>
     </div>

@@ -35,6 +35,24 @@ describe('FundingWriteRecoveryService', () => {
     expect(service.get(1, 200)?.state).toBe('conflict');
   });
 
+  it('finds and validates pending recovery records for only the requested list', () => {
+    service.begin(1, 100);
+    service.begin(1, 200);
+    service.begin(10, 300);
+    storage.setItem('unrelated', 'value');
+    expect(service.pendingApplIds(1)).toEqual([100, 200]);
+    service.clear(1, 100);
+    expect(service.pendingApplIds(1)).toEqual([200]);
+    storage.setItem('fs.funding-submissions.write.1.400', '{bad');
+    expect(() => service.pendingApplIds(1)).toThrowError(/invalid/);
+  });
+
+  it('fails closed when the recovery index cannot be inspected', () => {
+    spyOn(storage, 'key').and.throwError('Storage unavailable');
+    storage.setItem('unrelated', 'value');
+    expect(() => service.pendingApplIds(1)).toThrowError(/unavailable/);
+  });
+
   it('fails closed when the recovery record is corrupt or storage cannot be written', () => {
     storage.setItem('fs.funding-submissions.write.1.100', '{bad');
     expect(() => service.get(1, 100)).toThrowError(/invalid/);

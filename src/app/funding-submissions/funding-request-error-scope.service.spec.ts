@@ -47,4 +47,39 @@ describe('FundingRequestErrorScopeInterceptor', () => {
       .subscribe();
     expect(requests.map(request => request.context.get(HANDLE_FUNDING_REQUEST_ERROR_LOCALLY))).toEqual([false, false]);
   });
+
+  it('scopes status history failures only when the removal readback opts in', () => {
+    const requests: HttpRequest<unknown>[] = [];
+    const handler: HttpHandler = {
+      handle: request => {
+        requests.push(request);
+        return new Observable(subscriber => subscriber.complete());
+      }
+    };
+    const history = new HttpRequest('GET', '/i2efsws/api/v1/funding-submissions/lists/1/status-history');
+
+    interceptor.intercept(history, handler).subscribe();
+    const scopedHistory = new HttpRequest('GET', '/i2efsws/api/v1/funding-submissions/lists/1/status-history');
+    scope.handleLocally(new Observable(subscriber => interceptor.intercept(scopedHistory, handler).subscribe(subscriber)))
+      .subscribe();
+
+    expect(requests.map(request => request.context.get(HANDLE_FUNDING_REQUEST_ERROR_LOCALLY))).toEqual([false, true]);
+  });
+
+  it('scopes the opted-in removal without capturing unrelated DELETE requests', () => {
+    const requests: HttpRequest<unknown>[] = [];
+    const handler: HttpHandler = {
+      handle: request => {
+        requests.push(request);
+        return new Observable(subscriber => subscriber.complete());
+      }
+    };
+    const removal = new HttpRequest('DELETE', '/i2efsws/api/v1/funding-submissions/lists/1/grants');
+    const unrelated = new HttpRequest('DELETE', '/i2efsws/api/v1/other');
+    scope.handleLocally(new Observable(subscriber => interceptor.intercept(removal, handler).subscribe(subscriber)))
+      .subscribe();
+    scope.handleLocally(new Observable(subscriber => interceptor.intercept(unrelated, handler).subscribe(subscriber)))
+      .subscribe();
+    expect(requests.map(request => request.context.get(HANDLE_FUNDING_REQUEST_ERROR_LOCALLY))).toEqual([true, false]);
+  });
 });

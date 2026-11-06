@@ -102,6 +102,29 @@
     <div *ngIf="sendGrantsToOefiaErrorMessage" class="alert alert-danger" role="alert">
         {{ sendGrantsToOefiaErrorMessage }}
     </div>
+    <div *ngIf="removalRefreshError" class="alert alert-danger" role="alert">
+        {{ removalRefreshError }}
+        <button type="button" class="btn btn-link btn-sm" (click)="retryRemovalRefresh()">Retry refresh</button>
+    </div>
+    <div *ngIf="removalOutcomeUnknown" class="alert alert-warning" role="alert">
+        The removal may still be running. Do not retry it or leave this page until support confirms it has
+        completed or rolled back and cannot commit later.
+        <div>
+            <label>
+                <input type="checkbox" name="unknownRemovalConfirmed" [(ngModel)]="unknownRemovalConfirmed">
+                Support has confirmed the removal is final.
+            </label>
+            <button type="button" class="btn btn-link btn-sm" (click)="recoverUnknownRemoval()"
+                [disabled]="!unknownRemovalConfirmed">Refresh confirmed outcome</button>
+        </div>
+    </div>
+    <div *ngIf="fundingRecoveryError" class="alert alert-danger" role="alert">
+        {{ fundingRecoveryError }}
+        <button type="button" class="btn btn-link btn-sm" (click)="loadPendingFundingRecoveries()">Retry recovery check</button>
+    </div>
+    <div *ngIf="pendingFundingGrantLabels.length" class="alert alert-warning" role="status">
+        Funding save pending for {{ pendingFundingGrantLabels.join(', ') }}. If it does not finish, reopen the grant and follow its recovery instructions before saving another grant.
+    </div>
     <div #justificationWarningAlert *ngIf="justificationWarningMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
         {{ justificationWarningMessage }}
         <button type="button" class="btn-close" aria-label="Close" (click)="justificationWarningMessage = ''"></button>

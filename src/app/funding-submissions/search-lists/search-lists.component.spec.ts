@@ -1264,6 +1264,14 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       };
     }
 
+    it('derives DOC priority ordering from the configured columns for both table layouts', fakeAsync(() => {
+      expect((component as any).docPriorityOrder()).toEqual([[5, 'asc'], [19, 'asc']]);
+      component.isNciDirector = true;
+      component.ngAfterViewInit();
+      expect((component as any).docPriorityOrder()).toEqual([[4, 'asc'], [18, 'asc']]);
+      tick(100);
+    }));
+
     it('handleDetailSaved(): calls row.invalidate().draw(false) for the correct row', () => {
       const row = fakeInvalidatingRow(true);
 
@@ -1273,8 +1281,9 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(row.drawApi.draw).toHaveBeenCalledWith(false);
     });
 
-    it('refreshes all server-renumbered priorities after a detail save', fakeAsync(() => {
+    it('rebases open forms and redraws all server-renumbered priorities after a detail readback', fakeAsync(() => {
       component.listId = 42;
+      component.dtOptions.columns = [{ data: 'doc' }, { data: 'docPriority' }];
       const grants = [
         { applId: 100, doc: 'DCB', docPriority: 1 },
         { applId: 200, doc: 'DCB', docPriority: 2 },
@@ -1287,7 +1296,11 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         instance: {
           data: { ...grants[1] },
           formModel: { docPriority: '2', docNotes: 'Unsaved notes' },
-          isEditMode: true
+          isEditMode: true,
+          rebaseDocPriority(priority: number) {
+            this.data.docPriority = priority;
+            this.formModel.docPriority = String(priority);
+          }
         },
         changeDetectorRef: { detectChanges: jasmine.createSpy('detectChanges') },
         destroy: jasmine.createSpy('destroy')
@@ -1300,80 +1313,80 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         invalidate: jasmine.createSpy('invalidate').and.callFake(() => rowsApi),
         draw: jasmine.createSpy('draw')
       };
-      component.dtElement = { dtInstance: Promise.resolve({ rows: () => rowsApi }) } as any;
-      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [
+      const order = jasmine.createSpy('order');
+      component.dtElement = { dtInstance: Promise.resolve({ rows: () => rowsApi, order }) } as any;
+      const detail = { grants: [
         { applId: 100, docPriority: 2 },
         { applId: 200, docPriority: 3 },
         { applId: 300, docPriority: 1 },
         { applId: 400, docPriority: 1 }
-      ] }));
+      ] };
 
-      (component as any).handleDetailSaved(fakeInvalidatingRow(true));
+      (component as any).priorityCoordinator.applyReadback(42, 300, detail, true);
       flushMicrotasks();
 
-      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledWith(42);
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
       expect(grants.map(grant => grant.docPriority)).toEqual([2, 3, 1, 1]);
       expect(component.selectedRows.get(100).docPriority).toBe(2);
       expect(detailRef.instance.data.docPriority).toBe(3);
-      expect(detailRef.instance.formModel).toEqual({ docPriority: '2', docNotes: 'Unsaved notes' });
+      expect(detailRef.instance.formModel).toEqual({ docPriority: '3', docNotes: 'Unsaved notes' });
       expect(detailRef.instance.isEditMode).toBeTrue();
       expect(detailRef.destroy).not.toHaveBeenCalled();
+      expect(order).toHaveBeenCalledWith([[0, 'asc'], [1, 'asc']]);
       expect(rowsApi.invalidate).toHaveBeenCalled();
       expect(rowsApi.draw).toHaveBeenCalledWith(false);
     }));
 
-    it('does not apply a late priority response to a different list', () => {
+    it('does not apply a late priority readback to a different list', () => {
       component.listId = 42;
-      const response = new Subject<any>();
       const grant = { applId: 100, docPriority: 1 };
       (component as any).cachedGrants = [grant];
-      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(response);
-
-      (component as any).handleDetailSaved(fakeInvalidatingRow(true));
       component.listId = 43;
-      response.next({ grants: [{ applId: 100, docPriority: 2 }] });
-      response.complete();
 
+      expect(() => (component as any).priorityCoordinator.applyReadback(
+        42, 100, { grants: [{ applId: 100, docPriority: 2 }] }, false
+      )).toThrowError('The list changed before DOC priorities could be refreshed.');
       expect(grant.docPriority).toBe(1);
     });
 
-    it('cancels the previous refresh on another save and the current refresh on destroy', () => {
+    it('cancels an older metadata request and the current request on destroy', () => {
       const firstResponse = new Subject<any>();
       const secondResponse = new Subject<any>();
       fundingSubmissionsServiceSpy.getListDetail.and.returnValues(firstResponse, secondResponse);
 
-      (component as any).handleDetailSaved(fakeInvalidatingRow(true));
+      (component as any).loadListMeta();
       expect(firstResponse.observers.length).toBe(1);
-      (component as any).handleDetailSaved(fakeInvalidatingRow(true));
+      (component as any).loadListMeta();
       expect(firstResponse.observers.length).toBe(0);
       expect(secondResponse.observers.length).toBe(1);
       component.ngOnDestroy();
       expect(secondResponse.observers.length).toBe(0);
     });
 
-    it('cancels a pending priority refresh when the full list is reloaded', () => {
+    it('defers a pending metadata refresh until a detail write is reconciled', () => {
+      component.listId = 42;
       const response = new Subject<any>();
       fundingSubmissionsServiceSpy.getListDetail.and.returnValues(response, of({ grants: [] }));
-      (component as any).handleDetailSaved(fakeInvalidatingRow(true));
+      (component as any).loadListMeta();
       expect(response.observers.length).toBe(1);
 
-      (component as any).loadListMeta();
+      const coordinator = (component as any).priorityCoordinator;
+      expect(coordinator.beginWrite(42, 100)).toBeTrue();
 
       expect(response.observers.length).toBe(0);
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(1);
+      coordinator.finishWrite(42, 100);
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(2);
     });
 
-    it('keeps the saved row visible when the priority refresh fails', () => {
+    it('keeps a saved row visible without issuing a second priority readback', () => {
       const row = fakeInvalidatingRow(true);
-      const error = new Error('Refresh unavailable');
-      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(throwError(() => error));
 
       (component as any).handleDetailSaved(row);
 
       expect(row.drawApi.draw).toHaveBeenCalledWith(false);
       expect(row.child.hide).not.toHaveBeenCalled();
-      expect(TestBed.inject(NGXLogger).error).toHaveBeenCalledWith(
-        'Failed to refresh DOC priorities after saving grant', error, { listId: component.listId }
-      );
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
     });
 
     it('reloads remaining server-renumbered grants only after removal succeeds', fakeAsync(() => {
@@ -1393,7 +1406,9 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       ] }));
       const callback = jasmine.createSpy('callback');
       const reload = jasmine.createSpy('reload').and.callFake(() => component.ajaxCall(component, {}, callback));
-      component.dtElement = { dtInstance: Promise.resolve({ ajax: { reload } }) } as any;
+      const order = jasmine.createSpy('order');
+      component.dtOptions.columns = [{ data: 'doc' }, { data: 'docPriority' }];
+      component.dtElement = { dtInstance: Promise.resolve({ ajax: { reload }, order }) } as any;
 
       component.onConfirmRemove();
 
@@ -1408,6 +1423,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       const displayedGrants = callback.calls.mostRecent().args[0].data;
       expect(displayedGrants.map(grant => grant.applId)).toEqual([100, 300, 400, 500]);
       expect(displayedGrants.map(grant => grant.docPriority)).toEqual([1, 2, 3, 4]);
+      expect(order).toHaveBeenCalledWith([[0, 'asc'], [1, 'asc']]);
       expect(component.selectedRows.size).toBe(0);
     }));
 

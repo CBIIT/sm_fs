@@ -48,6 +48,26 @@ export class FundingWriteRecoveryService {
     return record;
   }
 
+  pendingApplIds(listId: number): number[] {
+    const prefix = `${this.keyPrefix}${listId}.`;
+    const applIds: number[] = [];
+    try {
+      for (let index = 0; index < this.storage.length; index++) {
+        const key = this.storage.key(index);
+        if (!key?.startsWith(prefix)) continue;
+        const suffix = key.slice(prefix.length);
+        if (!/^\d+$/.test(suffix) || !Number.isSafeInteger(Number(suffix)) || Number(suffix) <= 0) {
+          throw new Error('Funding save recovery state is invalid. Contact support before saving.');
+        }
+        applIds.push(Number(suffix));
+      }
+    } catch (error) {
+      this.logger.error('Unable to inspect funding save recovery state', error);
+      throw new Error('Funding save recovery is unavailable or invalid. Contact support before saving.');
+    }
+    return applIds.filter(applId => this.get(listId, applId) !== null);
+  }
+
   begin(listId: number, applId: number): void {
     if (this.get(listId, applId)) {
       throw new Error('This grant has a previous save that must be resolved before saving again.');

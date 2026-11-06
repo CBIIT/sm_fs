@@ -62,6 +62,10 @@ export class DocPayProvenance {
     return (this.versions.get(field) ?? 0) === (snapshot.get(field) ?? 0);
   }
 
+  hasUserEdit(field: string): boolean {
+    return this.userEditVersions.has(field);
+  }
+
   mayApplyDefault(field: DocPayDefaultField, snapshot: Map<string, number>): boolean {
     if (!this.unchangedSince(field, snapshot)) {
       return false;

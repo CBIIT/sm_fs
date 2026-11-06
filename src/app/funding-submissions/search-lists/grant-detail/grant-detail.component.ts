@@ -20,6 +20,7 @@ import { FundingRequestErrorScopeService } from '../../funding-request-error-sco
 import {
   FundingWriteRecoveryService, FundingWriteRecoveryState, isDefiniteFundingWriteRejection
 } from '../../funding-write-recovery.service';
+import { DetailPriorityCoordinator } from '../detail-priority-coordinator';
 
 type GrantEditFormModel = FundingSubmBulkEditFieldsDto & { justificationText?: string };
 
@@ -47,6 +48,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   @Input() data: any = null;
   @Input() listId: number;
   @Input() listStatus = 'DOC Review';
+  @Input() priorityCoordinator: DetailPriorityCoordinator | null = null;
   @Output() close = new EventEmitter<void>();
   // Emitted when edit mode ends without any row teardown (Cancel, either path) — distinct from
   // `close`, which remains reserved for actual row-collapse/teardown (chevron toggle).
@@ -239,6 +241,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.fundingSaveError = null;
     this.unknownOutcomeConfirmed = false;
     this.loadFundingRecoveryState();
+    if (this.fundingRecoveryState) {
+      this.priorityCoordinator?.trackRecovery(this.listId, this.data.applId);
+    }
     if (this.fundingRecoveryState === 'saved' || this.fundingRecoveryState === 'conflict') {
       this.pendingFundingReadback = this.createRecoveryReadback(this.fundingRecoveryState);
       this.fundingRefreshError = 'A previous funding save must be refreshed before this grant can be saved again.';
@@ -357,6 +362,11 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.cancelDocPayDefaults();
     if (this.fundingReadbackSubscription && !this.fundingReadbackSubscription.closed) {
       this.fundingReadbackSubscription.unsubscribe();
+    }
+    if (this.pendingFundingReadback) {
+      this.priorityCoordinator?.endReadback(
+        this.pendingFundingReadback.listId, this.pendingFundingReadback.data.applId
+      );
     }
     this.pendingFundingReadback = undefined;
     this.unknownFundingReadback = undefined;
@@ -590,7 +600,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   onSave(): void {
     if (this.savingInProgress || this.justificationFileError || this.docPayDefaultsLoading
       || this.docPayDefaultsError || this.pendingFundingReadback || this.fundingRecoveryState
-      || this.fundingRecoveryError
+      || this.fundingRecoveryError || this.prioritySaveBlocked
       || (this.needsDocPayDefaults() && (this.docPriorityOptionsLoading || this.docPriorityOptionsError))) {
       return;
     }
@@ -646,6 +656,12 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
+    if (this.priorityCoordinator && !this.priorityCoordinator.beginWrite(this.listId, this.data.applId)) {
+      this.savingInProgress = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
     const readback: FundingSaveReadback = {
       data: this.data,
       listId: this.listId,
@@ -677,6 +693,12 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
         }
       } else if (!this.fundingRecoveryError) {
         this.fundingRecoveryError = this.getSaveErrorMessage(error, 'Funding save recovery is unavailable.');
+      }
+      if (!this.fundingRecoveryState) {
+        if (this.fundingRecoveryError) {
+          this.priorityCoordinator?.setRecoveryUnavailable(this.listId, true);
+        }
+        this.priorityCoordinator?.finishWrite(this.listId, this.data.applId);
       }
       this.logger.error('Unable to prepare funding save recovery', error);
       this.cdr.detectChanges();
@@ -730,6 +752,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       if (this.isCurrentFundingSave(readback)) {
         this.fundingRecoveryError = this.getSaveErrorMessage(storageError, 'Funding save recovery is unavailable.');
       }
+    }
+    if (state === null) {
+      this.priorityCoordinator?.finishWrite(readback.listId, readback.data.applId);
     }
     if (!this.isCurrentFundingSave(readback)) return;
 
@@ -1138,6 +1163,10 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     return this.savingInProgress;
   }
 
+  get prioritySaveBlocked(): boolean {
+    return !!this.priorityCoordinator?.isBlocked(this.listId, this.data?.applId);
+  }
+
   onNotesModelChange(field?: 'docNotes' | 'oefiaNotes' | 'justificationText'): void {
     if (field) this.provenance.recordUserEdit(field);
     this.justificationSaveError = null;
@@ -1325,6 +1354,31 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
+  rebaseDocPriority(priority: number | null, refreshAutomaticPreview = false): void {
+    const persistedPriority = priority == null ? null : String(priority);
+    if (this.isEditMode && this.initialFundingSnapshot && this.initialFormSnapshot) {
+      const fundingBaseline: GrantEditFormModel = JSON.parse(this.initialFundingSnapshot);
+      const formBaseline: GrantEditFormModel = JSON.parse(this.initialFormSnapshot);
+      const automaticPreview = this.needsDocPayDefaults()
+        && this.provenance.intent(this.data.applId).priorityMode === 'AUTO';
+      const untouched = !this.provenance.hasUserEdit('docPriority')
+        && (automaticPreview || this.formModel.docPriority === fundingBaseline.docPriority);
+      if (untouched && (!automaticPreview || refreshAutomaticPreview)
+        && this.formModel.docPriority !== persistedPriority) {
+        this.formModel.docPriority = persistedPriority;
+        this.provenance.recordChange('docPriority');
+      }
+      fundingBaseline.docPriority = persistedPriority;
+      formBaseline.docPriority = persistedPriority;
+      this.initialFundingSnapshot = this.currentFundingSnapshot(fundingBaseline);
+      this.initialFormSnapshot = this.currentSnapshot(formBaseline);
+      if (untouched && automaticPreview && refreshAutomaticPreview) {
+        this.loadDocPayDefaults();
+      }
+    }
+    this.data.docPriority = priority;
+  }
+
   private formModelFromGrant(grant: FundingSubmissionListGrantDto): GrantEditFormModel {
     return {
       docDecision: grant.docDecision ?? null,
@@ -1388,6 +1442,12 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       || (this.fundingReadbackSubscription && !this.fundingReadbackSubscription.closed)) {
       return;
     }
+    if (this.priorityCoordinator
+      && !this.priorityCoordinator.beginReadback(readback.listId, readback.data.applId)) {
+      this.fundingRefreshError = 'Another grant is being refreshed. Retry refresh when it completes.';
+      this.cdr.detectChanges();
+      return;
+    }
     this.savingInProgress = true;
     this.fundingRefreshError = null;
     this.fundingReadbackSubscription = this.fundingErrorScope.handleLocally(
@@ -1397,11 +1457,18 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       map(detail => {
         const grant = detail?.grants?.find(row => row.applId === readback.data.applId);
         if (!grant) throw new Error('The saved grant is not present in the refreshed list.');
+        if (this.isCurrentFundingSave(readback) && this.pendingFundingReadback === readback) {
+          const previousPriority = readback.baselineForm.docPriority;
+          const moved = !isBlankSelection(previousPriority) && !isBlankSelection(grant.docPriority)
+            && String(previousPriority) !== String(grant.docPriority);
+          this.priorityCoordinator?.applyReadback(readback.listId, readback.data.applId, detail, moved);
+        }
         return grant;
       }),
       take(1)
     ).subscribe({
       next: grant => {
+        this.priorityCoordinator?.endReadback(readback.listId, readback.data.applId);
         if (!this.isCurrentFundingSave(readback) || this.pendingFundingReadback !== readback) return;
         try {
           this.fundingWriteRecovery.clear(readback.listId, readback.data.applId);
@@ -1443,6 +1510,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
         this.fundingRecoveryState = null;
         this.unknownOutcomeConfirmed = false;
         this.fundingRefreshError = null;
+        this.priorityCoordinator?.finishWrite(readback.listId, readback.data.applId);
         if (readback.outcome === 'saved' && unchanged && readback.hasJustificationChanges) {
           this.saveJustification(readback.justificationText);
           return;
@@ -1472,6 +1540,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
         this.cdr.detectChanges();
       },
       error: error => {
+        this.priorityCoordinator?.endReadback(readback.listId, readback.data.applId);
         if (!this.isCurrentFundingSave(readback) || this.pendingFundingReadback !== readback) return;
         this.savingInProgress = false;
         this.fundingRefreshError = readback.outcome === 'saved'
