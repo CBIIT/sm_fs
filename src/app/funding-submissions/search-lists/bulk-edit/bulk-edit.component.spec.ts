@@ -1,12 +1,12 @@
 import { ComponentFixture, discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Component, forwardRef, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { of, throwError } from 'rxjs';
+import { Observable, of, Subject, throwError } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal, NgbTooltip, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { By } from '@angular/platform-browser';
-import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionBulkEditRequestDto, FundingSubmissionDocPayDefaultsDto, FundingSubmissionListDetailDto, FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 
 import { BulkEditComponent } from './bulk-edit.component';
@@ -46,7 +46,12 @@ class FakeNgSelect2Component implements ControlValueAccessor {
 describe('BulkEditComponent', () => {
   let component: BulkEditComponent;
   let fixture: ComponentFixture<BulkEditComponent>;
-  let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsService>;
+  let fundingSubmissionsServiceSpy: jasmine.SpyObj<Omit<FundingSubmissionsService,
+    'getDocPayDefaults' | 'getListDetail' | 'bulkUpdateListGrants'> & {
+      getDocPayDefaults(listId: number, applIds: number[]): Observable<FundingSubmissionDocPayDefaultsDto[]>;
+      getListDetail(listId: number): Observable<FundingSubmissionListDetailDto>;
+      bulkUpdateListGrants(body: FundingSubmissionBulkEditRequestDto, listId: number): Observable<number>;
+    }>;
   let userSessionServiceSpy: jasmine.SpyObj<AppUserSessionService>;
 
   function grant(overrides: Partial<any> = {}): any {
@@ -76,8 +81,30 @@ describe('BulkEditComponent', () => {
     (window as any).$ = (window as any).$ || { fn: { DataTable: { ext: { pager: {} } } } };
 
     fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
-      'bulkUpdateListGrants'
+      'bulkUpdateListGrants', 'getDocPayDefaults', 'getListDetail'
     ]);
+    fundingSubmissionsServiceSpy.getListDetail.and.callFake(() => of({
+      grants: component.rows.map(row => {
+        const fields = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.allArgs()
+          .slice().reverse().find(([request]) => request.applIds.includes(row.applId))[0].fields;
+        return {
+          ...row,
+          docDecision: fields.docDecision,
+          docPriority: fields.docPriority == null ? null : Number(fields.docPriority),
+          docRecommendedAmount: fields.docRecAmt,
+          docRecommendedReductionPct: fields.docRecReductionPct,
+          budgetCategoryCode: fields.budgetCategories,
+          budgetCategories: component.budgetCategoryOptions.find(option => option.id === fields.budgetCategories)?.text ?? null,
+          docNciSelection: fields.docNciSelection,
+          annualFundingR01: fields.annualFundingR01,
+          twoYearAnnualFundingR01Flag: fields.annualFundingR01 === 'Yes',
+          annualOrMyf: fields.annualOrMyf,
+          docNotes: fields.docNotes,
+          oefiaNotes: fields.oefiaNotes,
+          recusedFlag: fields.recused === 'Y'
+        };
+      })
+    }));
     userSessionServiceSpy = jasmine.createSpyObj('AppUserSessionService', ['hasRole']);
     userSessionServiceSpy.hasRole.and.returnValue(false);
 
@@ -150,6 +177,342 @@ describe('BulkEditComponent', () => {
     view.destroy();
     return text;
   }
+
+  describe('FS-2679 per-grant DOC Pay defaults and saved readback', () => {
+    let defaultsResponse: Subject<FundingSubmissionDocPayDefaultsDto[]>;
+    const defaultRows: FundingSubmissionDocPayDefaultsDto[] = [
+      {
+        applId: 100, transitionEligible: true, budgetCategories: 'R01R37', budgetCategoriesName: 'R01/R37',
+        docNciSelection: 'DOC', annualFundingR01: 'No', annualOrMyf: 'MYF Alloc', annualOrMyfName: 'MYF'
+      },
+      {
+        applId: 200, transitionEligible: true, budgetCategories: 'PARU', budgetCategoriesName: "PAR U's",
+        docNciSelection: 'DOC', annualFundingR01: null, annualOrMyf: 'AF Alloc', annualOrMyfName: 'Annual'
+      }
+    ];
+
+    function doNotPayGrant(applId: number): any {
+      return grant({
+        applId, addedByGroup: 'OEFIA', docDecision: 'Do Not Pay',
+        budgetCategoryCode: null, annualOrMyf: null, annualFundingR01: null,
+        docNciSelection: null, docPriority: null, docRecommendedAmount: null,
+        docRecommendedReductionPct: null, recusedFlag: false
+      });
+    }
+
+    function applyPay(): void {
+      component.bulkFields = { docDecision: 'Pay' };
+      component.onApplyChanges();
+    }
+
+    function savedGrants(): FundingSubmissionListGrantDto[] {
+      return [
+        {
+          applId: 100, docDecision: 'Pay', budgetCategoryCode: 'SAVEDR01', budgetCategories: 'Saved R01',
+          docNciSelection: 'NCI', docNciSelectionName: 'NCI', annualFundingR01: 'Yes',
+          twoYearAnnualFundingR01Flag: true, annualOrMyf: 'AF Alloc', annualOrMyfName: 'Saved Annual',
+          recusedFlag: true, docNotes: 'Saved note'
+        },
+        {
+          applId: 200, docDecision: 'Pay', budgetCategoryCode: 'SAVEDU', budgetCategories: 'Saved U',
+          docNciSelection: 'DOC', annualFundingR01: 'No', twoYearAnnualFundingR01Flag: false,
+          annualOrMyf: 'MYF Alloc', annualOrMyfName: 'Saved MYF', recusedFlag: false, docNotes: 'Other saved note'
+        }
+      ];
+    }
+
+    beforeEach(() => {
+      setRoles(true, false);
+      initializeFixtureWithGrants([doNotPayGrant(100), doNotPayGrant(200)]);
+      defaultsResponse = new Subject<FundingSubmissionDocPayDefaultsDto[]>();
+      fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(defaultsResponse);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: savedGrants() }));
+    });
+
+    it('resolves each eligible row before required checks and keeps DOC Budget Categories and Annual/MYF hidden', () => {
+      applyPay();
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).toHaveBeenCalledWith(1, [100, 200]);
+      expect(component.docPayDefaultsLoading).toBeTrue();
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      defaultsResponse.next(defaultRows);
+      expect(component.rows[0].budgetCategories).toBe('R01R37');
+      expect(component.rows[1].budgetCategories).toBe('PARU');
+      expect(component.rows.map(row => row.annualOrMyf)).toEqual(['MYF Alloc', 'AF Alloc']);
+      expect(component.rows.map(row => row.annualFundingR01)).toEqual(['No', null]);
+      component.ngAfterViewInit();
+      const fields = component.dtOptions.columns.map(column => column.data);
+      expect(fields).not.toContain('budgetCategories');
+      expect(fields).not.toContain('annualOrMyf');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('#bulk-budget-cat')).toBeNull();
+      expect(fixture.nativeElement.querySelector('#bulk-annual-myf')).toBeNull();
+      component.onSave();
+      expect(component.hasMandatoryFieldError(component.rows[1], 'annualFundingR01')).toBeTrue();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      component.rows[1].annualFundingR01 = 'No';
+      component.onRowFieldChange(component.rows[1], 'annualFundingR01');
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.allArgs().map(([request]) => request.fields))
+        .toEqual([
+          jasmine.objectContaining({ budgetCategories: 'R01R37', annualOrMyf: 'MYF Alloc', annualFundingR01: 'No' }),
+          jasmine.objectContaining({ budgetCategories: 'PARU', annualOrMyf: 'AF Alloc', annualFundingR01: 'No' })
+        ]);
+    });
+
+    it('resolves a direct per-row transition without applying defaults to a still-Do-Not-Pay row', () => {
+      component.rows[0].docDecision = 'Pay';
+      component.onRowDocDecisionChange(component.rows[0]);
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).toHaveBeenCalledWith(1, [100]);
+      defaultsResponse.next([defaultRows[0]]);
+      expect(component.rows[0].budgetCategories).toBe('R01R37');
+      expect(component.rows[1].budgetCategories).toBe('');
+      expect(component.rows[1].docDecision).toBe('Do Not Pay');
+    });
+
+    it('does not reuse defaults from an eligible row for an unrelated persisted Pay row in a mixed selection', () => {
+      const existing = grant({ applId: 300, budgetCategoryCode: 'EXISTING', annualOrMyf: 'EXISTING' });
+      component.rows.push({ ...existing, budgetCategories: 'EXISTING', annualFundingR01: 'Yes' });
+      (component as any).lastSavedRows.push({ ...component.rows[2] });
+      applyPay();
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).toHaveBeenCalledWith(1, [100, 200]);
+      defaultsResponse.next(defaultRows);
+      expect(component.rows[2].budgetCategories).toBe('EXISTING');
+      expect(component.rows[2].annualOrMyf).toBe('EXISTING');
+    });
+
+    for (const annualFundingR01 of ['Yes', 'No']) {
+      it(`preserves explicit bulk selections including NCI and 2Y ${annualFundingR01}`, () => {
+        component.bulkFields = {
+          docDecision: 'Pay', budgetCategories: 'EXPLICIT', docNciSelection: 'NCI',
+          annualFundingR01, annualOrMyf: 'AF Alloc'
+        };
+        component.onApplyChanges();
+        defaultsResponse.next(defaultRows);
+        for (const row of component.rows) {
+          expect(row.budgetCategories).toBe('EXPLICIT');
+          expect(row.docNciSelection).toBe('NCI');
+          expect(row.annualFundingR01).toBe(annualFundingR01);
+          expect(row.annualOrMyf).toBe('AF Alloc');
+        }
+      });
+    }
+
+    it('does not overwrite newer per-row selections or explicitly cleared values with delayed defaults', () => {
+      applyPay();
+      const row = component.rows[0];
+      row.docNciSelection = 'NCI';
+      component.onRowFieldChange(row, 'docNciSelection');
+      row.annualFundingR01 = 'Yes';
+      component.onRowFieldChange(row, 'annualFundingR01');
+      row.annualFundingR01 = null;
+      component.onRowFieldChange(row, 'annualFundingR01');
+      defaultsResponse.next(defaultRows);
+      expect(row.docNciSelection).toBe('NCI');
+      expect(row.annualFundingR01).toBeNull();
+    });
+
+    it('does not mistake unchanged DataTables binding emissions for newer selections', () => {
+      applyPay();
+      const row = component.rows[0];
+      component.onRowFieldChange(row, 'docNciSelection');
+      component.onRowFieldChange(row, 'annualFundingR01');
+      defaultsResponse.next(defaultRows);
+      expect(row.docNciSelection).toBe('DOC');
+      expect(row.annualFundingR01).toBe('No');
+    });
+
+    it('also resolves defaults before direct Save when a row decision handler was bypassed', () => {
+      component.rows[0].docDecision = 'Pay';
+      component.rows[0].annualFundingR01 = 'Yes';
+      component.rows[1].docNotes = 'Required Do Not Pay note';
+      component.onRowFieldChange();
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).toHaveBeenCalledWith(1, [100]);
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      defaultsResponse.next([defaultRows[0]]);
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+    });
+
+    for (const change of ['decision', 'Reset', 'different list', 'destroy']) {
+      it(`ignores defaults delayed past ${change}`, () => {
+        applyPay();
+        const row = component.rows[0];
+        if (change === 'decision') {
+          component.bulkFields.docDecision = 'Do Not Pay';
+          component.onApplyChanges();
+        }
+        if (change === 'Reset') component.onReset();
+        if (change === 'different list') component.listId = 2;
+        if (change === 'destroy') component.ngOnDestroy();
+        defaultsResponse.next(defaultRows);
+        expect(row.budgetCategories).not.toBe('R01R37');
+        expect(component.rows[0].budgetCategories).not.toBe('R01R37');
+      });
+    }
+
+    it('ignores an older response when a newer shared Pay selection is applied', () => {
+      applyPay();
+      fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(of([
+        { ...defaultRows[0], budgetCategories: 'NEW' }, defaultRows[1]
+      ]));
+      component.bulkFields = { docDecision: 'Pay', docNciSelection: 'NCI' };
+      component.onApplyChanges();
+      defaultsResponse.next(defaultRows);
+      expect(component.rows[0].budgetCategories).toBe('NEW');
+      expect(component.rows[0].docNciSelection).toBe('NCI');
+    });
+
+    it('leaves all rows unchanged when any required default lookup is unresolved', () => {
+      applyPay();
+      defaultsResponse.next([defaultRows[0], { ...defaultRows[1], annualOrMyf: null }]);
+      expect(component.docPayDefaultsError).toBeTruthy();
+      expect(component.rows[0].budgetCategories).toBe('');
+      expect(component.rows[1].budgetCategories).toBe('');
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
+
+    it('preserves dirty edits after a defaults error and retries only defaults before saving', () => {
+      applyPay();
+      component.rows[0].docNotes = 'New note';
+      defaultsResponse.error(new Error('Defaults unavailable'));
+      expect(component.docPayDefaultsError).toBe('Defaults unavailable');
+      expect(component.canSave).toBeTrue();
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(of(defaultRows));
+      component.loadDocPayDefaults();
+      expect(component.docPayDefaultsError).toBe('');
+      expect(component.rows[0].docNotes).toBe('New note');
+      expect(component.rows[0].budgetCategories).toBe('R01R37');
+    });
+
+    it('applies the DOC rule to dual-role callers but not OEFIA-only callers', () => {
+      component.OEFIACertifier = true;
+      applyPay();
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).toHaveBeenCalledTimes(1);
+      defaultsResponse.next(defaultRows);
+      component.onReset();
+      component.docFundingListCor = false;
+      applyPay();
+      expect(fundingSubmissionsServiceSpy.getDocPayDefaults).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not restore FS-2664-cleared priority, recommendations or recused during preview', () => {
+      component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'Required' };
+      component.onApplyChanges();
+      applyPay();
+      defaultsResponse.next(defaultRows);
+      expect(component.rows[0]).toEqual(jasmine.objectContaining({
+        docPriority: null, docRecAmt: null, docRecReductionPct: null, recused: null
+      }));
+    });
+
+    it('keeps one write per row and reads actual saved codes, names and flags into rows and Reset baseline', () => {
+      const response = new Subject<{ grants: FundingSubmissionListGrantDto[] }>();
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(response);
+      component.bulkFields = { docDecision: 'Pay', annualFundingR01: 'No' };
+      component.onApplyChanges();
+      defaultsResponse.next(defaultRows);
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledWith(1);
+      expect(component.rows[0].budgetCategories).toBe('R01R37');
+      expect(component.isSaving).toBeTrue();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.first().args[0].fields.recused).toBe('N');
+      response.next({ grants: savedGrants() });
+      expect(component.rows.map(row => row.budgetCategories)).toEqual(['SAVEDR01', 'SAVEDU']);
+      expect(component.rows.map(row => row.annualOrMyfName)).toEqual(['Saved Annual', 'Saved MYF']);
+      expect(component.rows.map(row => row.annualFundingR01)).toEqual(['Yes', 'No']);
+      expect(component.rows.map(row => row.recusedFlag)).toEqual([true, false]);
+      expect(component.canSave).toBeFalse();
+      component.rows[0].docNciSelection = 'UNSAVED';
+      component.onRowFieldChange();
+      component.onReset();
+      expect(component.rows[0].docNciSelection).toBe('NCI');
+      expect(component.rows[0].budgetCategories).toBe('SAVEDR01');
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('preserves newer row edits during write and refresh without marking them saved', () => {
+      const write = new Subject<number>();
+      const response = new Subject<{ grants: FundingSubmissionListGrantDto[] }>();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(write);
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(response);
+      component.bulkFields = { docDecision: 'Pay', annualFundingR01: 'No' };
+      component.onApplyChanges();
+      defaultsResponse.next(defaultRows);
+      component.onSave();
+      component.rows[0].docNotes = 'Edited during write';
+      write.next(1);
+      write.complete();
+      component.rows[1].docNciSelection = 'NEWER';
+      component.onRowFieldChange(component.rows[1], 'docNciSelection');
+      response.next({ grants: savedGrants() });
+      expect(component.rows[0].docNotes).toBe('Edited during write');
+      expect(component.rows[1].docNciSelection).toBe('NEWER');
+      expect(component.rows[0].budgetCategories).toBe('SAVEDR01');
+      expect(component.canSave).toBeTrue();
+      expect(component.saveSuccessMessage).toContain('Your newer edits have not been saved.');
+      component.onReset();
+      expect(component.rows[0].docNotes).toBe('Saved note');
+      expect(component.rows[1].docNciSelection).toBe('DOC');
+    });
+
+    for (const failure of ['read error', 'missing saved row']) {
+      it(`distinguishes a persisted bulk save from ${failure} and never retries the writes`, () => {
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(failure === 'read error'
+          ? throwError(() => new Error('Read unavailable')) : of({ grants: [savedGrants()[0]] }));
+        component.bulkFields = { docDecision: 'Pay', annualFundingR01: 'No' };
+        component.onApplyChanges();
+        defaultsResponse.next(defaultRows);
+        component.onSave();
+        expect(component.saveErrorMessage).toContain('Bulk changes were saved');
+        expect(component.savedChangesNeedRefresh).toBeTrue();
+        component.onSave();
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: savedGrants() }));
+        component.refreshSavedFunding();
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+        expect(component.saveErrorMessage).toBe('');
+        expect(component.savedChangesNeedRefresh).toBeFalse();
+        expect(component.rows[0].budgetCategories).toBe('SAVEDR01');
+      });
+    }
+
+    for (const change of ['different list', 'destroy']) {
+      it(`ignores saved readback after ${change}`, () => {
+        const response = new Subject<{ grants: FundingSubmissionListGrantDto[] }>();
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(response);
+        component.bulkFields = { docDecision: 'Pay', annualFundingR01: 'No' };
+        component.onApplyChanges();
+        defaultsResponse.next(defaultRows);
+        component.onSave();
+        if (change === 'different list') component.listId = 2;
+        if (change === 'destroy') component.ngOnDestroy();
+        response.next({ grants: savedGrants() });
+        expect(component.rows[0].budgetCategories).toBe('R01R37');
+      });
+    }
+
+    it('ignores a delayed write completion after Reset instead of marking the reset rows saved', () => {
+      const write = new Subject<number>();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(write);
+      component.bulkFields = { docDecision: 'Pay', annualFundingR01: 'No' };
+      component.onApplyChanges();
+      defaultsResponse.next(defaultRows);
+      component.onSave();
+      component.onReset();
+      write.next(1);
+      write.complete();
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+      expect(component.rows[0].docDecision).toBe('Do Not Pay');
+      expect(component.saveSuccessMessage).toBe('');
+    });
+  });
 
   for (const isDocUser of [true, false]) {
     it(`${isDocUser ? 'hides' : 'retains'} Budget Categories and Annual or MYF table columns for ${isDocUser ? 'DOC' : 'non-DOC'} users`, () => {
@@ -792,6 +1155,369 @@ describe('BulkEditComponent', () => {
       expect(component.rows[1].docDecision).toBe('Do Not Pay');
       expect(component.rows[1].budgetCategories).toBeNull();
       expect(component.rows[1].docNciSelection).toBeNull();
+    });
+
+    describe('FS-2120 — mixed-origin Do Not Pay DOC Notes', () => {
+      function mixedOriginRows(docOverrides: Partial<any> = {}, oefiaOverrides: Partial<any> = {}): any[] {
+        return [
+          grant({ applId: 100, addedByGroup: 'DOC', ...docOverrides }),
+          grant({ applId: 200, addedByGroup: 'OEFIA', ...oefiaOverrides })
+        ];
+      }
+
+      function applyAndProceedDoNotPay(notes: string): void {
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        modalService.open.and.returnValue({
+          close: jasmine.createSpy('close'),
+          dismiss: jasmine.createSpy('dismiss')
+        } as any);
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: notes };
+
+        component.onApplyChanges();
+        expect(modalService.open).toHaveBeenCalled();
+
+        component.onProceedDoNotPayWarning();
+      }
+
+      it('applies shared notes only to the eligible row and saves each row with its current note', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows(
+          { docNotes: 'saved DOC note' },
+          { docNotes: 'saved OEFIA note' }
+        ));
+        component.rows[0].docNotes = 'unsaved DOC note';
+        component.onRowFieldChange();
+
+        applyAndProceedDoNotPay('shared DOC note');
+
+        expect(component.rows[0].docDecision).toBe('Pay');
+        expect(component.rows[0].docNotes).toBe('unsaved DOC note');
+        expect(component.rows[1].docDecision).toBe('Do Not Pay');
+        expect(component.rows[1].docNotes).toBe('shared DOC note');
+        expect(component.canSave).toBeTrue();
+
+        fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+        component.onSave();
+
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+        const requests = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.allArgs()
+          .map(([request]) => ({ applId: request.applIds[0], fields: request.fields }));
+        expect(requests).toEqual([
+          jasmine.objectContaining({
+            applId: 100,
+            fields: jasmine.objectContaining({ docDecision: 'Pay', docNotes: 'unsaved DOC note' })
+          }),
+          jasmine.objectContaining({
+            applId: 200,
+            fields: jasmine.objectContaining({ docDecision: 'Do Not Pay', docNotes: 'shared DOC note' })
+          })
+        ]);
+      });
+
+      it('uses this action’s eligibility when both rows already have Do Not Pay', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows(
+          { docDecision: 'Do Not Pay', docNotes: 'DOC-owned note' },
+          { docDecision: 'Do Not Pay', docNotes: 'prior OEFIA note' }
+        ));
+
+        applyAndProceedDoNotPay('new shared note');
+
+        expect(component.rows[0].docDecision).toBe('Do Not Pay');
+        expect(component.rows[0].docNotes).toBe('DOC-owned note');
+        expect(component.rows[1].docDecision).toBe('Do Not Pay');
+        expect(component.rows[1].docNotes).toBe('new shared note');
+      });
+
+      it('leaves decisions and notes unchanged when the mixed-source warning is cancelled', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows(
+          { docNotes: 'DOC note' },
+          { docNotes: 'OEFIA note' }
+        ));
+        const before = component.rows.map(row => ({ docDecision: row.docDecision, docNotes: row.docNotes }));
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        const dismiss = jasmine.createSpy('dismiss');
+        modalService.open.and.returnValue({ close: jasmine.createSpy('close'), dismiss } as any);
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared note' };
+
+        component.onApplyChanges();
+        component.onCancelDoNotPayWarning();
+
+        expect(modalService.open).toHaveBeenCalled();
+        expect(dismiss).toHaveBeenCalled();
+        expect(component.rows.map(row => ({ docDecision: row.docDecision, docNotes: row.docNotes }))).toEqual(before);
+        expect(component.canSave).toBeFalse();
+      });
+
+      it('does not assign empty shared notes and validates every resulting Do Not Pay row', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows(
+          { docDecision: 'Do Not Pay', docNotes: '' },
+          { docDecision: 'Pay', docNotes: 'existing eligible note' }
+        ));
+
+        applyAndProceedDoNotPay('');
+        fixture.detectChanges();
+
+        expect(component.rows[0].docNotes).toBe('');
+        expect(component.rows[1].docDecision).toBe('Do Not Pay');
+        expect(component.rows[1].docNotes).toBe('existing eligible note');
+        expect(component.hasDoNotPayDocNotesError(component.rows[0])).toBeTrue();
+        expect(component.hasDoNotPayDocNotesError(component.rows[1])).toBeFalse();
+        expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+        expect(getSaveButton().disabled).toBeTrue();
+      });
+
+      it('assigns whitespace-only notes to eligible rows but treats them as blank for validation', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows(
+          { docDecision: 'Do Not Pay', docNotes: '' },
+          { docDecision: 'Pay', docNotes: 'existing eligible note' }
+        ));
+
+        applyAndProceedDoNotPay('   ');
+        fixture.detectChanges();
+
+        expect(component.rows[0].docNotes).toBe('');
+        expect(component.rows[1].docNotes).toBe('   ');
+        expect(component.hasDoNotPayDocNotesError(component.rows[0])).toBeTrue();
+        expect(component.hasDoNotPayDocNotesError(component.rows[1])).toBeTrue();
+        expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+        expect(getSaveButton().disabled).toBeTrue();
+      });
+
+      it('keeps DOC-only notes-only and Pay-with-notes application available for both origins', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(mixedOriginRows());
+
+        component.bulkFields = { docNotes: 'notes-only update' };
+        component.onApplyChanges();
+
+        expect(component.rows.map(row => row.docNotes)).toEqual(['notes-only update', 'notes-only update']);
+        expect(component.rows.map(row => row.docDecision)).toEqual(['Pay', 'Pay']);
+
+        component.bulkFields = { docDecision: 'Pay', docNotes: 'Pay note' };
+        component.onApplyChanges();
+
+        expect(component.rows.map(row => row.docDecision)).toEqual(['Pay', 'Pay']);
+        expect(component.rows.map(row => row.docNotes)).toEqual(['Pay note', 'Pay note']);
+      });
+
+      it('keeps OEFIA-only Do Not Pay application available for both origins', () => {
+        setRoles(false, true);
+        initializeFixtureWithGrants(mixedOriginRows());
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'authorized shared note' };
+
+        component.onApplyChanges();
+
+        expect(modalService.open).not.toHaveBeenCalled();
+        expect(component.rows.map(row => row.docDecision)).toEqual(['Do Not Pay', 'Do Not Pay']);
+        expect(component.rows.map(row => row.docNotes)).toEqual(['authorized shared note', 'authorized shared note']);
+      });
+
+      it('keeps dual-role Do Not Pay application available for both origins', () => {
+        setRoles(true, true);
+        initializeFixtureWithGrants(mixedOriginRows());
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'authorized shared note' };
+
+        component.onApplyChanges();
+
+        expect(modalService.open).not.toHaveBeenCalled();
+        expect(component.rows.map(row => row.docDecision)).toEqual(['Do Not Pay', 'Do Not Pay']);
+        expect(component.rows.map(row => row.docNotes)).toEqual(['authorized shared note', 'authorized shared note']);
+      });
+
+      it('applies Do Not Pay and notes without a warning for an eligible-only selection', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants([grant({ addedByGroup: 'OEFIA' })]);
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'eligible note' };
+
+        component.onApplyChanges();
+
+        expect(modalService.open).not.toHaveBeenCalled();
+        expect(component.rows[0].docDecision).toBe('Do Not Pay');
+        expect(component.rows[0].docNotes).toBe('eligible note');
+      });
+
+      it('keeps Save disabled after a no-op application to clean rows', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants([
+          grant({ addedByGroup: 'OEFIA', docNotes: 'existing note' })
+        ]);
+        component.bulkFields = { docNotes: 'existing note' };
+
+        component.onApplyChanges();
+
+        expect(component.canSave).toBeFalse();
+        expect(getSaveButton().disabled).toBeTrue();
+      });
+    });
+
+    describe('FS-2120 — all-DOC-added Do Not Pay selection', () => {
+      function allDocRows(): any[] {
+        return [
+          grant({ applId: 100, addedByGroup: 'DOC', docNotes: 'first DOC note' }),
+          grant({ applId: 200, addedByGroup: 'DOC', docNotes: 'second DOC note' })
+        ];
+      }
+
+      function stubWarningModal(): { open: jasmine.Spy; close: jasmine.Spy; dismiss: jasmine.Spy } {
+        const modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
+        const close = jasmine.createSpy('close');
+        const dismiss = jasmine.createSpy('dismiss');
+        modalService.open.and.returnValue({ close, dismiss } as any);
+        return { open: modalService.open, close, dismiss };
+      }
+
+      function rowSnapshot(): any[] {
+        return component.rows.map(row => ({
+          docDecision: row.docDecision,
+          docNotes: row.docNotes,
+          budgetCategories: row.budgetCategories,
+          docNciSelection: row.docNciSelection,
+          annualOrMyf: row.annualOrMyf,
+          docPriority: row.docPriority,
+          recused: row.recused
+        }));
+      }
+
+      it('warns a DOC-only user and skips every DOC-added row on proceed', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(allDocRows());
+        const before = rowSnapshot();
+        const modal = stubWarningModal();
+        const loadDocPayDefaults = spyOn(component, 'loadDocPayDefaults').and.callThrough();
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared DOC note' };
+
+        component.onApplyChanges();
+
+        expect(modal.open).toHaveBeenCalled();
+        expect(rowSnapshot()).toEqual(before);
+
+        component.onProceedDoNotPayWarning();
+
+        expect(modal.close).toHaveBeenCalled();
+        expect(rowSnapshot()).toEqual(before);
+        expect(component.rows.some(row => row.docDecision === 'Do Not Pay')).toBeFalse();
+        expect(loadDocPayDefaults).toHaveBeenCalled();
+        expect(component.canSave).toBeFalse();
+      });
+
+      it('leaves every row unchanged when the warning is cancelled', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants(allDocRows());
+        const before = rowSnapshot();
+        const modal = stubWarningModal();
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared DOC note' };
+
+        component.onApplyChanges();
+        component.onCancelDoNotPayWarning();
+
+        expect(modal.open).toHaveBeenCalled();
+        expect(modal.dismiss).toHaveBeenCalled();
+        expect(rowSnapshot()).toEqual(before);
+        expect(component.canSave).toBeFalse();
+      });
+
+      ['', '   '].forEach(notes => {
+        it(`produces no Do Not Pay rows or note errors on proceed with notes ${JSON.stringify(notes)}`, () => {
+          setRoles(true, false);
+          initializeFixtureWithGrants(allDocRows());
+          const before = rowSnapshot();
+          stubWarningModal();
+          component.bulkFields = { docDecision: 'Do Not Pay', docNotes: notes };
+
+          component.onApplyChanges();
+          component.onProceedDoNotPayWarning();
+          fixture.detectChanges();
+
+          expect(rowSnapshot()).toEqual(before);
+          expect(component.hasDoNotPayDocNotesErrors).toBeFalse();
+          expect(component.showBulkDoNotPayDocNotesError).toBeFalse();
+          expect(component.canSave).toBeFalse();
+          expect(getSaveButton().disabled).toBeTrue();
+        });
+      });
+
+      it('keeps dependent fields on a skipped DOC-added row already at Do Not Pay', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants([
+          grant({ applId: 100, addedByGroup: 'DOC', docDecision: 'Do Not Pay', docNotes: 'DOC-owned note' }),
+          grant({ applId: 200, addedByGroup: 'OEFIA' })
+        ]);
+        const docRowBefore = rowSnapshot()[0];
+        expect(docRowBefore.budgetCategories).not.toBeNull();
+        expect(docRowBefore.docNciSelection).not.toBeNull();
+        expect(docRowBefore.annualOrMyf).not.toBeNull();
+        expect(docRowBefore.docPriority).not.toBeNull();
+        const modal = stubWarningModal();
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared note' };
+
+        component.onApplyChanges();
+        component.onProceedDoNotPayWarning();
+
+        expect(modal.open).toHaveBeenCalled();
+        expect(rowSnapshot()[0]).toEqual(docRowBefore);
+        expect(component.rows[1].docDecision).toBe('Do Not Pay');
+        expect(component.rows[1].docNotes).toBe('shared note');
+        expect(component.rows[1].budgetCategories).toBeNull();
+        expect(component.rows[1].docNciSelection).toBeNull();
+        expect(component.rows[1].docPriority).toBeNull();
+      });
+
+      it('warns for DOC-added plus blank-origin rows and applies Do Not Pay only to the blank-origin row', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants([
+          grant({ applId: 100, addedByGroup: 'DOC', docNotes: 'DOC note' }),
+          grant({ applId: 200, addedByGroup: '' })
+        ]);
+        const modal = stubWarningModal();
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared note' };
+
+        component.onApplyChanges();
+        expect(modal.open).toHaveBeenCalled();
+        component.onProceedDoNotPayWarning();
+
+        expect(component.rows[0].docDecision).toBe('Pay');
+        expect(component.rows[0].docNotes).toBe('DOC note');
+        expect(component.rows[1].docDecision).toBe('Do Not Pay');
+        expect(component.rows[1].docNotes).toBe('shared note');
+      });
+
+      it('applies Do Not Pay without a warning for a blank-origin-only selection', () => {
+        setRoles(true, false);
+        initializeFixtureWithGrants([grant({ applId: 200, addedByGroup: null })]);
+        const modal = stubWarningModal();
+        component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'shared note' };
+
+        component.onApplyChanges();
+
+        expect(modal.open).not.toHaveBeenCalled();
+        expect(component.rows[0].docDecision).toBe('Do Not Pay');
+        expect(component.rows[0].docNotes).toBe('shared note');
+      });
+
+      [
+        { label: 'OEFIA-only', doc: false, oefia: true },
+        { label: 'dual-role', doc: true, oefia: true }
+      ].forEach(({ label, doc, oefia }) => {
+        it(`applies Do Not Pay to an all-DOC-added selection without a warning for ${label} users`, () => {
+          setRoles(doc, oefia);
+          initializeFixtureWithGrants(allDocRows());
+          const modal = stubWarningModal();
+          component.bulkFields = { docDecision: 'Do Not Pay', docNotes: 'authorized note' };
+
+          component.onApplyChanges();
+
+          expect(modal.open).not.toHaveBeenCalled();
+          expect(component.rows.map(row => row.docDecision)).toEqual(['Do Not Pay', 'Do Not Pay']);
+          expect(component.rows.map(row => row.docNotes)).toEqual(['authorized note', 'authorized note']);
+        });
+      });
     });
 
     it('exposes the exact tooltip by hover and keyboard focus while shared values are unapplied', fakeAsync(() => {

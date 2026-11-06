@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { FundingSubmBulkEditFieldsDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
+import { FundingSubmBulkEditFieldsDto, FundingSubmissionDocPayDefaultsDto, FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from '../../../service/app-user-session.service';
 import { NGXLogger } from 'ngx-logger';
@@ -8,10 +8,25 @@ import { Select2OptionData } from 'ng-select2';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
 import { saveAs } from 'file-saver';
-import { catchError, concatMap, from, map, Observable, of, Subscription, tap } from 'rxjs';
+import { catchError, concatMap, from, map, Observable, of, Subscription, take, tap } from 'rxjs';
 
 import { DocumentsDto } from '@cbiit/i2efsws-lib/model/documentsDto';
 import { DocumentService } from '../../../service/document.service';
+import { applyDocPayDefaults, DOC_PAY_SELECTION_FIELDS, DocPaySelectionField, DocPaySelections, isPayDecision, requireDocPayDefaults } from '../../doc-pay-defaults';
+
+type GrantEditFormModel = FundingSubmBulkEditFieldsDto & { justificationText?: string };
+
+interface FundingSaveReadback {
+  data: FundingSubmissionListGrantDto;
+  listId: number;
+  editVersion: number;
+  submittedForm: GrantEditFormModel;
+  submittedSnapshot: string;
+  hasJustificationChanges: boolean;
+  justificationText?: string;
+  files: File[];
+  deleteDocumentIds: number[];
+}
 
 @Component({
   selector: 'app-grant-detail',
@@ -26,8 +41,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   // Emitted when edit mode ends without any row teardown (Cancel, either path) — distinct from
   // `close`, which remains reserved for actual row-collapse/teardown (chevron toggle).
   @Output() editModeExited = new EventEmitter<void>();
-  // Emitted after every successful save (funding-fields and/or justification-only), once
-  // `this.data` has been fully mutated with the saved values — lets the parent
+  // Emitted after successful saved-value readback (funding-fields and/or justification-only) —
+  // lets the parent
   // (search-lists.component.ts) redraw its DataTables row so the list reflects the change
   // immediately without a full page reload. Distinct from `close` (row teardown) and
   // `editModeExited` (Cancel-flow no-op in the parent).
@@ -41,20 +56,28 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   // otherwise the justification textarea could silently start blank/stale. Set true on both
   // the success and error branches so a failed fetch never permanently locks out Edit mode.
   justificationLoaded = false;
-  // Guards onEdit() against pre-populating (and, downstream, onSave() against writing back) the
-  // Budget Categories field before the initial getBudgetCategories() fetch (triggered by
-  // fetchDropdownOptions(), from ngOnInit()) has resolved — otherwise applyFormModelToData()'s
-  // CODE->NAME .find() against budgetCategoryOptions can silently resolve to null (fallback
-  // already in place for a genuinely-unmatched code) purely due to load timing. Set true on both
-  // the success and error branches so a failed fetch never permanently locks out Edit mode — same
-  // rationale as justificationLoaded. Unlike justificationLoaded, this is NOT reset in
-  // ngOnChanges(): budgetCategoryOptions is a grant-independent lookup table fetched once per
-  // session (shareReplay(1) in FundingSubmDropdownLookupService), never re-fetched on a row
-  // switch, so resetting this flag would permanently re-disable Edit after the first row. See
-  // Prompt - Grant Detail Edit Button Budget Categories Race Condition.md.
+  // Preserve the initial budget-lookup Edit gate. This grant-independent lookup is not reset
+  // on row switches; both success and error release the gate.
   budgetCategoriesLoaded = false;
 
-  formModel: FundingSubmBulkEditFieldsDto & { justificationText?: string } = {};
+  formModel: GrantEditFormModel = {};
+  docPayDefaultsLoading = false;
+  docPayDefaultsError: string | null = null;
+  fundingRefreshError: string | null = null;
+  private docPayDefaults: FundingSubmissionDocPayDefaultsDto;
+  private docPayDefaultsResolved = false;
+  private docPayDefaultsSubscription: Subscription;
+  private fundingReadbackSubscription: Subscription;
+  private fundingSaveSubscription: Subscription;
+  private pendingFundingReadback: FundingSaveReadback;
+  private editVersion = 0;
+  private defaultsRequestVersion = 0;
+  private selectionVersions = new Map<DocPaySelectionField, number>();
+  private observedSelections: DocPaySelections = {};
+  private static readonly FUNDING_FIELDS = [
+    'docDecision', 'docPriority', 'docRecAmt', 'docRecReductionPct', 'docNciSelection',
+    'annualFundingR01', 'budgetCategories', 'docNotes', 'oefiaNotes', 'annualOrMyf'
+  ] as const;
   justificationFiles: File[] = [];
   justificationDocuments: DocumentsDto[] = [];
   stagedDeleteDocumentIds: number[] = [];
@@ -114,6 +137,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['listId'] || changes['data']) && this.listId && this.data?.applId) {
+      this.invalidateFundingRequests();
+      this.isEditMode = false;
       this.justificationLoaded = false;
       this.refreshJustificationData();
     }
@@ -172,29 +197,18 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     // Guard against building formModel from stale/absent data while the initial
     // justification fetch is still in flight — the template also disables the Edit button
     // while !justificationLoaded, but this guard protects against any other trigger path.
-    if (!this.justificationLoaded || !this.budgetCategoriesLoaded) {
+    if (!this.justificationLoaded || !this.budgetCategoriesLoaded || this.savingInProgress || this.pendingFundingReadback) {
       return;
     }
     // DOC users can only edit while list status is DOC Review.
     if (!this.canEnterEditMode) {
       return;
     }
+    this.invalidateFundingRequests();
+    this.selectionVersions.clear();
     this.fetchDocPriorityOptions();
-    this.formModel = {
-      docDecision:        this.data?.docDecision ?? null,
-      docPriority:        this.data?.docPriority != null ? String(this.data.docPriority) : null,
-      docRecAmt:          this.data?.docRecommendedAmount ?? null,
-      docRecReductionPct: this.data?.docRecommendedReductionPct ?? null,
-      docNciSelection:    this.data?.docNciSelection ?? null,
-      annualFundingR01:   this.data?.annualFundingR01 === undefined
-        ? (this.data?.twoYearAnnualFundingR01Flag ? 'Yes' : null)
-        : this.data.annualFundingR01,
-      budgetCategories:   this.data?.budgetCategoryCode ?? null,
-      docNotes:           this.data?.docNotes ?? '',
-      oefiaNotes:         this.data?.oefiaNotes ?? '',
-      annualOrMyf:        this.data?.annualOrMyf ?? null,
-      justificationText:  this.data?.justificationText ?? '',
-    };
+    this.formModel = this.formModelFromGrant(this.data);
+    this.observedSelections = { ...this.formModel };
     this.justificationFiles = [];
     this.justificationFileError = null;
     this.justificationSaveError = null;
@@ -231,15 +245,117 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.invalidateFundingRequests();
+    if (this.fundingSaveSubscription && !this.fundingSaveSubscription.closed) {
+      this.fundingSaveSubscription.unsubscribe();
+    }
     if (this.docPriorityOptionsSubscription && !this.docPriorityOptionsSubscription.closed) {
       this.docPriorityOptionsSubscription.unsubscribe();
     }
   }
 
   onDocDecisionChange(): void {
+    this.loadDocPayDefaults();
     this.recomputeDoNotPayOefiaLock();
     this.updateValidationErrorsLive();
     this.cdr.detectChanges();
+  }
+
+  onDocPaySelectionChange(field: DocPaySelectionField): void {
+    if (this.formModel[field] !== this.observedSelections[field]) {
+      this.selectionVersions.set(field, (this.selectionVersions.get(field) ?? 0) + 1);
+      this.observedSelections[field] = this.formModel[field];
+    }
+  }
+
+  private cancelDocPayDefaults(): void {
+    this.defaultsRequestVersion++;
+    if (this.docPayDefaultsSubscription && !this.docPayDefaultsSubscription.closed) {
+      this.docPayDefaultsSubscription.unsubscribe();
+    }
+    this.docPayDefaultsLoading = false;
+    this.docPayDefaultsError = null;
+    this.docPayDefaults = undefined;
+    this.docPayDefaultsResolved = false;
+  }
+
+  private invalidateFundingRequests(): void {
+    this.editVersion++;
+    this.cancelDocPayDefaults();
+    if (this.fundingReadbackSubscription && !this.fundingReadbackSubscription.closed) {
+      this.fundingReadbackSubscription.unsubscribe();
+    }
+    this.pendingFundingReadback = undefined;
+    this.fundingRefreshError = null;
+    this.savingInProgress = false;
+  }
+
+  loadDocPayDefaults(): void {
+    this.cancelDocPayDefaults();
+    if (this.savingInProgress || this.pendingFundingReadback || !this.needsDocPayDefaults()) {
+      return;
+    }
+
+    const data = this.data;
+    const listId = this.listId;
+    const form = this.formModel;
+    const requestedFields = { ...form };
+    this.observedSelections = { ...form };
+    const versions = new Map(this.selectionVersions);
+    const requestVersion = this.defaultsRequestVersion;
+    const editVersion = this.editVersion;
+    const isCurrent = () => this.isEditMode && this.data === data && this.listId === listId
+      && this.formModel === form && this.editVersion === editVersion
+      && this.defaultsRequestVersion === requestVersion
+      && isPayDecision(form.docDecision, this.decisionOptions);
+
+    this.docPayDefaultsLoading = true;
+    this.docPayDefaultsSubscription = this.fundingSubmissionsService.getDocPayDefaults(listId, [data.applId]).pipe(
+      map(defaults => requireDocPayDefaults(defaults, data.applId)),
+      take(1)
+    ).subscribe({
+      next: defaults => {
+        if (!isCurrent()) return;
+        applyDocPayDefaults(form, defaults, field =>
+          form[field] === requestedFields[field]
+          && (this.selectionVersions.get(field) ?? 0) === (versions.get(field) ?? 0));
+        for (const field of DOC_PAY_SELECTION_FIELDS) this.observedSelections[field] = form[field];
+        this.docPayDefaults = defaults;
+        this.docPayDefaultsResolved = true;
+        this.docPayDefaultsLoading = false;
+        this.updateValidationErrorsLive();
+        this.cdr.detectChanges();
+      },
+      error: error => {
+        if (!isCurrent()) return;
+        this.docPayDefaultsLoading = false;
+        this.docPayDefaultsError = this.getSaveErrorMessage(error, 'Unable to load DOC Pay defaults. Please try again.');
+        this.logger.error('Failed to load DOC Pay defaults', error);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private needsDocPayDefaults(): boolean {
+    return this.isEditMode && this.docFundingListCor
+      && this.isDoNotPayDecisionValue(this.data?.docDecision)
+      && isPayDecision(this.formModel.docDecision, this.decisionOptions);
+  }
+
+  get budgetCategoriesDisplay(): string {
+    if (this.isEditMode && this.docPayDefaults
+      && this.formModel.budgetCategories === this.docPayDefaults.budgetCategories) {
+      return this.docPayDefaults.budgetCategoriesName ?? this.docPayDefaults.budgetCategories;
+    }
+    return this.data?.budgetCategories;
+  }
+
+  get annualOrMyfDisplay(): string {
+    if (this.isEditMode && this.docPayDefaults
+      && this.formModel.annualOrMyf === this.docPayDefaults.annualOrMyf) {
+      return this.docPayDefaults.annualOrMyfName ?? this.docPayDefaults.annualOrMyf;
+    }
+    return this.data?.annualOrMyfName;
   }
 
   private get isDoNotPayRestricted(): boolean {
@@ -273,7 +389,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get hasSaveValidationErrors(): boolean {
-    return Object.keys(this.validateChangedValues()).length > 0 || !!this.justificationFileError;
+    return Object.keys(this.validateChangedValues()).length > 0 || !!this.justificationFileError
+      || this.docPayDefaultsLoading || !!this.docPayDefaultsError || !!this.pendingFundingReadback;
   }
 
   onDocRecReductionPctChange(): void {
@@ -319,7 +436,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onCancel(): void {
-    if (!this.isEditMode) {
+    if (!this.isEditMode || this.savingInProgress || this.pendingFundingReadback) {
       return;
     }
 
@@ -384,8 +501,13 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onSave(): void {
-    if (this.savingInProgress || this.justificationFileError) {
+    if (this.savingInProgress || this.justificationFileError || this.docPayDefaultsLoading
+      || this.docPayDefaultsError || this.pendingFundingReadback) {
       return;
+    }
+    if (this.needsDocPayDefaults() && !this.docPayDefaultsResolved) {
+      this.loadDocPayDefaults();
+      if (this.docPayDefaultsLoading || this.docPayDefaultsError) return;
     }
     this.suppressNextLeavePrompt = true;
     this.justificationSaveError = null;
@@ -435,28 +557,31 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    this.fundingSubmissionsService.bulkUpdateListGrants(
+    const readback: FundingSaveReadback = {
+      data: this.data,
+      listId: this.listId,
+      editVersion: this.editVersion,
+      submittedForm: { ...this.formModel },
+      submittedSnapshot: this.currentSnapshot(),
+      hasJustificationChanges,
+      justificationText: hasJustificationTextChange ? justificationText : undefined,
+      files: [...this.justificationFiles],
+      deleteDocumentIds: [...this.stagedDeleteDocumentIds]
+    };
+    this.fundingSaveSubscription = this.fundingSubmissionsService.bulkUpdateListGrants(
       { applIds: [this.data.applId], fields: saveFields },
       this.listId
     ).subscribe({
       next: () => {
+        if (!this.isCurrentFundingSave(readback)) return;
         this.logger.debug('Grant detail saved');
-        this.applyFormModelToData();
-        this.initialFundingSnapshot = this.currentFundingSnapshot();
-        this.initialFormSnapshot = this.currentSnapshot();
-        if (hasJustificationChanges) {
-          this.saveJustification(hasJustificationTextChange ? justificationText : undefined);
-        } else {
-          this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
-          this.isEditMode = false;
-          this.initialFormSnapshot = '';
-          this.initialJustificationText = '';
-          this.savingInProgress = false;
-          this.saved.emit();
-          this.cdr.detectChanges();
-        }
+        this.initialFundingSnapshot = this.currentFundingSnapshot(readback.submittedForm);
+        this.initialFormSnapshot = readback.submittedSnapshot;
+        this.pendingFundingReadback = readback;
+        this.refreshSavedFunding();
       },
       error: (err) => {
+        if (!this.isCurrentFundingSave(readback)) return;
         this.savingInProgress = false;
         this.fundingSaveError = this.getSaveErrorMessage(err, 'Unable to save the grant changes. Please try again.');
         this.logger.error('Grant detail save error', err);
@@ -466,7 +591,10 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private isDoNotPayDecisionSelected(): boolean {
-    const selectedDecision = this.formModel.docDecision;
+    return this.isDoNotPayDecisionValue(this.formModel.docDecision);
+  }
+
+  private isDoNotPayDecisionValue(selectedDecision: string): boolean {
     if (!selectedDecision) {
       return false;
     }
@@ -982,6 +1110,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private discardEditsAndClose(): void {
+    this.invalidateFundingRequests();
     this.isEditMode = false;
     this.formModel = {};
     this.justificationFiles = [];
@@ -1004,93 +1133,120 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  private currentSnapshot(): string {
+  private currentSnapshot(form: GrantEditFormModel = this.formModel): string {
     return JSON.stringify({
-      docDecision: this.formModel.docDecision ?? null,
-      docPriority: this.formModel.docPriority ?? null,
-      docRecAmt: this.formModel.docRecAmt ?? null,
-      docRecReductionPct: this.formModel.docRecReductionPct ?? null,
-      docNciSelection: this.formModel.docNciSelection ?? null,
-      annualFundingR01: this.formModel.annualFundingR01 ?? null,
-      budgetCategories: this.formModel.budgetCategories ?? null,
-      docNotes: this.formModel.docNotes ?? '',
-      oefiaNotes: this.formModel.oefiaNotes ?? '',
-      annualOrMyf: this.formModel.annualOrMyf ?? null,
-      justificationText: this.formModel.justificationText ?? ''
+      docDecision: form.docDecision ?? null,
+      docPriority: form.docPriority ?? null,
+      docRecAmt: form.docRecAmt ?? null,
+      docRecReductionPct: form.docRecReductionPct ?? null,
+      docNciSelection: form.docNciSelection ?? null,
+      annualFundingR01: form.annualFundingR01 ?? null,
+      budgetCategories: form.budgetCategories ?? null,
+      docNotes: form.docNotes ?? '',
+      oefiaNotes: form.oefiaNotes ?? '',
+      annualOrMyf: form.annualOrMyf ?? null,
+      justificationText: form.justificationText ?? ''
     });
   }
 
-  private currentFundingSnapshot(): string {
+  private currentFundingSnapshot(form: GrantEditFormModel = this.formModel): string {
     return JSON.stringify({
-      docDecision: this.formModel.docDecision ?? null,
-      docPriority: this.formModel.docPriority ?? null,
-      docRecAmt: this.formModel.docRecAmt ?? null,
-      docRecReductionPct: this.formModel.docRecReductionPct ?? null,
-      docNciSelection: this.formModel.docNciSelection ?? null,
-      annualFundingR01: this.formModel.annualFundingR01 ?? null,
-      budgetCategories: this.formModel.budgetCategories ?? null,
-      docNotes: this.formModel.docNotes ?? '',
-      oefiaNotes: this.formModel.oefiaNotes ?? '',
-      annualOrMyf: this.formModel.annualOrMyf ?? null
+      docDecision: form.docDecision ?? null,
+      docPriority: form.docPriority ?? null,
+      docRecAmt: form.docRecAmt ?? null,
+      docRecReductionPct: form.docRecReductionPct ?? null,
+      docNciSelection: form.docNciSelection ?? null,
+      annualFundingR01: form.annualFundingR01 ?? null,
+      budgetCategories: form.budgetCategories ?? null,
+      docNotes: form.docNotes ?? '',
+      oefiaNotes: form.oefiaNotes ?? '',
+      annualOrMyf: form.annualOrMyf ?? null
     });
   }
 
-  private applyFormModelToData(): void {
-    const doNotPaySelected = this.isDoNotPayDecisionSelected();
-    this.data.docDecision                 = this.formModel.docDecision;
-    this.data.docPriority                 = this.formModel.docPriority;
-    this.data.docRecommendedAmount        = this.formModel.docRecAmt;
-    this.data.docRecommendedReductionPct  = this.formModel.docRecReductionPct;
-    this.data.docNciSelection             = this.formModel.docNciSelection;
-    // R01 refresh fix (2026-08-25): twoYearAnnualFundingR01Flag started life as a boolean;
-    // formModel.annualFundingR01 is the Yes/No string the dropdown renders. Writing the raw
-    // string back left a truthy value for 'No' (the main grid renders `data ? 'Y' : ''`),
-    // showing 'Y' regardless of the selected value. Coerce to a real boolean here.
-    this.data.annualFundingR01 = this.formModel.annualFundingR01;
-    this.data.twoYearAnnualFundingR01Flag = this.formModel.annualFundingR01 === 'Yes';
-    // budgetCategoryCode fix (2026-08-25): formModel.budgetCategories now holds the grant's
-    // budget category CODE (seeded in onEdit() from this.data.budgetCategoryCode, matching the
-    // CODE-keyed budgetCategoryOptions Select2), not the NAME the main grid displays. Sync
-    // budgetCategoryCode (not the NAME-valued budgetCategories) so a subsequent re-onEdit() on
-    // this same in-memory row still seeds the dropdown correctly without a full page reload.
-    this.data.budgetCategoryCode          = this.formModel.budgetCategories;
-    // Refresh fix (2026-08-25): budgetCategories (NAME) is what Grant Detail's own read-only
-    // view AND the parent grid's column actually render — this was never written back, so both
-    // stayed stale after a Budget Categories edit. Resolve the NAME from the CODE by looking up
-    // the selected CODE against budgetCategoryOptions ({id, text} = {CODE, NAME}). If the
-    // selection is empty/cleared or no match is found (e.g. options not yet loaded — see
-    // Assumptions to Verify in the fix prompt), fall back to null rather than throwing.
-    const selectedBudgetCategoryOption = this.budgetCategoryOptions.find(
-      option => option.id === this.formModel.budgetCategories
-    );
-    this.data.budgetCategories             = selectedBudgetCategoryOption?.text ?? null;
-    this.data.docNotes                    = this.formModel.docNotes;
-    this.data.oefiaNotes                  = this.formModel.oefiaNotes;
-    this.data.annualOrMyf                 = this.formModel.annualOrMyf;
-    // DOC/NCI Selection & Annual/MYF CODE-vs-NAME fix (2026-08-25): docNciSelectionName and
-    // annualOrMyfName are what Grant Detail's own read-only view AND the parent grid's columns
-    // actually render — mirrors the budgetCategories NAME write-back above. Resolve each NAME
-    // from the selected CODE by looking up selectionOptions/annualMyfOptions ({id, text} =
-    // {CODE, NAME}), falling back to null when unmatched/cleared (e.g. options not yet loaded).
-    const selectedDocNciSelectionOption = this.selectionOptions.find(
-      option => option.id === this.formModel.docNciSelection
-    );
-    this.data.docNciSelectionName          = selectedDocNciSelectionOption?.text ?? null;
-    const selectedAnnualOrMyfOption = this.annualMyfOptions.find(
-      option => option.id === this.formModel.annualOrMyf
-    );
-    this.data.annualOrMyfName              = selectedAnnualOrMyfOption?.text ?? null;
+  private formModelFromGrant(grant: FundingSubmissionListGrantDto): GrantEditFormModel {
+    return {
+      docDecision: grant.docDecision ?? null,
+      docPriority: grant.docPriority != null ? String(grant.docPriority) : null,
+      docRecAmt: grant.docRecommendedAmount ?? null,
+      docRecReductionPct: grant.docRecommendedReductionPct ?? null,
+      docNciSelection: grant.docNciSelection ?? null,
+      annualFundingR01: grant.annualFundingR01 === undefined
+        ? (grant.twoYearAnnualFundingR01Flag ? 'Yes' : null)
+        : grant.annualFundingR01,
+      budgetCategories: grant.budgetCategoryCode ?? null,
+      docNotes: grant.docNotes ?? '',
+      oefiaNotes: grant.oefiaNotes ?? '',
+      annualOrMyf: grant.annualOrMyf ?? null,
+      justificationText: grant.justificationText ?? ''
+    };
+  }
 
-    if (doNotPaySelected) {
-      this.data.justificationText = '';
-      this.justificationDocuments = [];
-      if (this.data) {
-        this.data.justificationFileName = null;
-        this.data.justificationFilename = null;
-        this.data.docFilename = null;
-      }
-      this.syncJustificationAvailableFlag();
+  private isCurrentFundingSave(readback: FundingSaveReadback): boolean {
+    return this.isEditMode && this.editVersion === readback.editVersion
+      && this.data === readback.data && this.listId === readback.listId;
+  }
+
+  refreshSavedFunding(): void {
+    const readback = this.pendingFundingReadback;
+    if (!readback || !this.isCurrentFundingSave(readback)
+      || (this.fundingReadbackSubscription && !this.fundingReadbackSubscription.closed)) {
+      return;
     }
+    this.savingInProgress = true;
+    this.fundingRefreshError = null;
+    this.fundingReadbackSubscription = this.fundingSubmissionsService.getListDetail(readback.listId).pipe(
+      map(detail => {
+        const grant = detail.grants?.find(row => row.applId === readback.data.applId);
+        if (!grant) throw new Error('The saved grant is not present in the refreshed list.');
+        return grant;
+      }),
+      take(1)
+    ).subscribe({
+      next: grant => {
+        if (!this.isCurrentFundingSave(readback) || this.pendingFundingReadback !== readback) return;
+        const unchanged = this.currentSnapshot() === readback.submittedSnapshot
+          && this.justificationFiles.length === readback.files.length
+          && this.justificationFiles.every((file, index) => file === readback.files[index])
+          && JSON.stringify(this.stagedDeleteDocumentIds) === JSON.stringify(readback.deleteDocumentIds);
+        const persistedForm = this.formModelFromGrant(grant);
+        Object.assign(this.data, grant);
+        // Reconcile only fields the user has not changed since the write began.
+        for (const field of GrantDetailComponent.FUNDING_FIELDS) {
+          if (this.formModel[field] === readback.submittedForm[field]) {
+            Object.assign(this.formModel, { [field]: persistedForm[field] });
+          }
+        }
+        this.docPayDefaults = undefined;
+        this.initialFundingSnapshot = this.currentFundingSnapshot(persistedForm);
+        this.initialFormSnapshot = this.currentSnapshot(persistedForm);
+        this.initialJustificationText = persistedForm.justificationText;
+        this.pendingFundingReadback = undefined;
+        if (unchanged && readback.hasJustificationChanges) {
+          this.saveJustification(readback.justificationText);
+          return;
+        }
+        this.saveSuccessMessage = `Success! You have successfully updated Grant Selection for ${this.data.grantNumber}`;
+        if (unchanged) {
+          this.isEditMode = false;
+          this.initialFormSnapshot = '';
+          this.initialJustificationText = '';
+        } else {
+          this.saveSuccessMessage += ' Your newer edits have not been saved.';
+          this.updateValidationErrorsLive();
+        }
+        this.savingInProgress = false;
+        this.saved.emit();
+        this.cdr.detectChanges();
+      },
+      error: error => {
+        if (!this.isCurrentFundingSave(readback) || this.pendingFundingReadback !== readback) return;
+        this.savingInProgress = false;
+        this.fundingRefreshError = 'Grant changes were saved, but the saved values could not be refreshed. Retry refresh before saving again.';
+        this.logger.error('Failed to refresh saved grant changes', error);
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   private syncJustificationAvailableFlag(): void {

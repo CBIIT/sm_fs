@@ -111,6 +111,7 @@
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.annualFundingR01 === undefined ? (data.twoYearAnnualFundingR01Flag ? 'Yes' : '') : data.annualFundingR01}}</span>
               <ng-select2 *ngIf="isEditMode" name="annualFundingR01" [(ngModel)]="formModel.annualFundingR01"
+                (ngModelChange)="onDocPaySelectionChange('annualFundingR01')"
                 [data]="yesNoOptions" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
@@ -125,16 +126,18 @@
             <td class="grid-item">{{data.priorityScore}}</td>
             <td class="grid-label sep">Annual or MYF:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode || docFundingListCor">{{data.annualOrMyfName}}</span>
+              <span *ngIf="!isEditMode || docFundingListCor">{{annualOrMyfDisplay}}</span>
               <ng-select2 *ngIf="isEditMode && !docFundingListCor" name="annualOrMyf" [(ngModel)]="formModel.annualOrMyf"
+                (ngModelChange)="onDocPaySelectionChange('annualOrMyf')"
                 [data]="annualMyfOptions" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
             </td>
             <td class="grid-label">Budget Categories:</td>
             <td class="grid-item">
-              <span *ngIf="!isEditMode || docFundingListCor">{{data.budgetCategories}}</span>
+              <span *ngIf="!isEditMode || docFundingListCor">{{budgetCategoriesDisplay}}</span>
               <ng-select2 *ngIf="isEditMode && !docFundingListCor" name="budgetCategories" [(ngModel)]="formModel.budgetCategories"
+                (ngModelChange)="onDocPaySelectionChange('budgetCategories')"
                 [data]="budgetCategoryOptions" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
@@ -151,6 +154,7 @@
             <td class="grid-item">
               <span *ngIf="!isEditMode">{{data.docNciSelectionName}}</span>
               <ng-select2 *ngIf="isEditMode" name="docNciSelection" [(ngModel)]="formModel.docNciSelection"
+                (ngModelChange)="onDocPaySelectionChange('docNciSelection')"
                 [data]="selectionOptions" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
@@ -268,6 +272,17 @@
       </table>
 
       <!-- Buttons sit inside grid-container so they align with the table and stay visible -->
+      <div *ngIf="isEditMode && docPayDefaultsLoading" class="text-muted small py-2" role="status">
+        Loading DOC Pay defaults...
+      </div>
+      <div *ngIf="isEditMode && docPayDefaultsError" class="text-danger small py-2" role="alert">
+        {{docPayDefaultsError}}
+        <button type="button" class="btn btn-link btn-sm" (click)="loadDocPayDefaults()">Retry defaults</button>
+      </div>
+      <div *ngIf="fundingRefreshError" class="text-danger small py-2" role="alert">
+        {{fundingRefreshError}}
+        <button type="button" class="btn btn-link btn-sm" (click)="refreshSavedFunding()">Retry refresh</button>
+      </div>
       <div class="row g-0 save-error-row" *ngIf="isEditMode && fundingSaveError">
         <div class="col-12">
           <ngb-alert type="danger" [dismissible]="true" (closed)="fundingSaveError = null" role="alert">
@@ -281,7 +296,8 @@
           [disabled]="!justificationLoaded || !budgetCategoriesLoaded"
           [title]="(!justificationLoaded || !budgetCategoriesLoaded) ? 'Loading…' : ''"
           (click)="onEdit()">Edit</button>
-        <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode" (click)="onCancel()">Cancel</button>
+        <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode"
+          [disabled]="isSaveInProgress() || !!fundingRefreshError" (click)="onCancel()">Cancel</button>
         <span *ngIf="isEditMode" class="d-inline-block ms-3"
           [ngbTooltip]="hasSaveValidationErrors ? 'Complete all required fields before saving.' : null" container="body">
           <button type="button" class="btn btn-primary" (click)="onSave()"

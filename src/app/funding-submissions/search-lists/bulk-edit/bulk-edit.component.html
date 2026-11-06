@@ -48,7 +48,14 @@
       <div class="col-12">
         <ngb-alert type="danger" [dismissible]="true" (closed)="saveErrorMessage = ''">
           {{saveErrorMessage}}
+          <button *ngIf="savedChangesNeedRefresh" type="button" class="btn btn-link btn-sm"
+            (click)="refreshSavedFunding()" [disabled]="isSaving">Retry refresh</button>
         </ngb-alert>
+      </div>
+      <div *ngIf="docPayDefaultsLoading" class="text-muted small mb-2" role="status">Loading DOC Pay defaults...</div>
+      <div *ngIf="docPayDefaultsError" class="text-danger small mb-2" role="alert">
+        {{docPayDefaultsError}}
+        <button type="button" class="btn btn-link btn-sm" (click)="loadDocPayDefaults()">Retry defaults</button>
       </div>
     </div>
 
@@ -135,11 +142,12 @@
       </div>
 
       <div class="d-flex justify-content-end gap-2 mb-4">
-        <button type="button" class="btn btn-outline-secondary" (click)="onReset()">Reset</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="onReset()"
+          [disabled]="isSaving || savedChangesNeedRefresh">Reset</button>
         <span ngbTooltip="Enter or select at least one value to apply." [disableTooltip]="hasAnyBulkFieldValue"
           container="body">
           <button type="button" class="btn btn-primary ms-3" (click)="onApplyChanges()"
-            [disabled]="!hasAnyBulkFieldValue">Apply Changes</button>
+            [disabled]="!hasAnyBulkFieldValue || isSaving || savedChangesNeedRefresh">Apply Changes</button>
         </span>
       </div>
     </form>
@@ -160,7 +168,7 @@
         <ng-template #budgetCatRenderer let-data="adtData">
           <div class="field-with-inline-error">
             <ng-select2 [id]="'bcat-' + data.applId" [(ngModel)]="data.budgetCategories"
-              (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" width="100%">
+              (ngModelChange)="onRowFieldChange(data, 'budgetCategories')" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'budgetCategories')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('Budget Categories') }}
@@ -182,7 +190,7 @@
         <ng-template #docNciSelRenderer let-data="adtData">
           <div class="field-with-inline-error">
             <ng-select2 [id]="'dnci-' + data.applId" [(ngModel)]="data.docNciSelection"
-              (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" width="100%">
+              (ngModelChange)="onRowFieldChange(data, 'docNciSelection')" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'docNciSelection')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('DOC/NCI Selection') }}
@@ -193,7 +201,7 @@
         <ng-template #annualR01Renderer let-data="adtData">
           <div class="field-with-inline-error">
             <ng-select2 [id]="'ar01-' + data.applId" [(ngModel)]="data.annualFundingR01"
-              (ngModelChange)="onRowFieldChange()" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" width="100%">
+              (ngModelChange)="onRowFieldChange(data, 'annualFundingR01')" [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'annualFundingR01')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('Two-Year Annual Funding R01 (HRHR)') }}
@@ -204,7 +212,7 @@
         <ng-template #annualMyfRenderer let-data="adtData">
           <div class="field-with-inline-error">
             <ng-select2 [id]="'amyf-' + data.applId" [(ngModel)]="data.annualOrMyf"
-              (ngModelChange)="onRowFieldChange()"
+              (ngModelChange)="onRowFieldChange(data, 'annualOrMyf')"
               [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'annualOrMyf')" class="text-danger small validation-inline-error">
@@ -248,7 +256,8 @@
         [disableTooltip]="!showApplyBeforeSaveTooltip"
         [attr.tabindex]="showApplyBeforeSaveTooltip ? 0 : null" container="body">
         <button type="button" class="btn btn-primary" (click)="onSave()"
-          [disabled]="!rows.length || !canSave || hasDoNotPayDocNotesErrors || isSaving">
+          [disabled]="!rows.length || !canSave || hasDoNotPayDocNotesErrors || isSaving
+            || docPayDefaultsLoading || !!docPayDefaultsError || savedChangesNeedRefresh">
           <span *ngIf="!isSaving">Save</span>
           <span *ngIf="isSaving">Saving...</span>
         </button>
