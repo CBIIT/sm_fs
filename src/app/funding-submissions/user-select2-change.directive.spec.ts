@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NgSelect2Module, Select2OptionData } from 'ng-select2';
 
 import { UserSelect2ChangeDirective } from './user-select2-change.directive';
+import { installSelect2 } from './testing/install-select2';
 
 declare const jQuery: JQueryStatic;
 
@@ -64,12 +65,12 @@ describe('UserSelect2ChangeDirective', () => {
   });
 
   it('keeps automatic binding distinct from real Select2 selection after options change', async () => {
-    const previousPlugin = jQuery.fn.select2;
-    require('select2/dist/js/select2.full.js');
-    const liveFixture = TestBed.createComponent(Select2HostComponent);
-    const liveHost = liveFixture.componentInstance;
+    const restorePlugin = installSelect2(jQuery);
+    let liveFixture: ComponentFixture<Select2HostComponent>;
     let liveSelect: HTMLSelectElement;
     try {
+      liveFixture = TestBed.createComponent(Select2HostComponent);
+      const liveHost = liveFixture.componentInstance;
       liveHost.value = 'DOC';
       liveHost.options = [{ id: 'DOC', text: 'DOC' }, { id: 'NCI', text: 'NCI' }];
       liveFixture.detectChanges();
@@ -94,21 +95,27 @@ describe('UserSelect2ChangeDirective', () => {
       expect(liveHost.value).toBe('NCI');
       expect(liveHost.changes).toEqual(['NCI']);
     } finally {
-      if (liveSelect && jQuery(liveSelect).hasClass('select2-hidden-accessible')) {
-        jQuery(liveSelect).select2('destroy');
+      try {
+        if (liveSelect && jQuery(liveSelect).hasClass('select2-hidden-accessible')) {
+          jQuery(liveSelect).select2('destroy');
+        }
+      } finally {
+        try {
+          liveFixture?.destroy();
+        } finally {
+          restorePlugin();
+        }
       }
-      liveFixture.destroy();
-      jQuery.fn.select2 = previousPlugin;
     }
   });
 
   it('resolves an already-selected ACTCD label in the real plugin without a user edit', async () => {
-    const previousPlugin = jQuery.fn.select2;
-    require('select2/dist/js/select2.full.js');
-    const liveFixture = TestBed.createComponent(Select2HostComponent);
-    const liveHost = liveFixture.componentInstance;
+    const restorePlugin = installSelect2(jQuery);
+    let liveFixture: ComponentFixture<Select2HostComponent>;
     let liveSelect: HTMLSelectElement;
     try {
+      liveFixture = TestBed.createComponent(Select2HostComponent);
+      const liveHost = liveFixture.componentInstance;
       liveHost.value = 'ACTCD';
       liveHost.options = [{ id: 'ACTCD', text: 'ACTCD (unresolved)' }];
       liveFixture.detectChanges();
@@ -128,11 +135,17 @@ describe('UserSelect2ChangeDirective', () => {
       expect(liveHost.value).toBe('ACTCD');
       expect(liveHost.changes).toEqual([]);
     } finally {
-      if (liveSelect && jQuery(liveSelect).hasClass('select2-hidden-accessible')) {
-        jQuery(liveSelect).select2('destroy');
+      try {
+        if (liveSelect && jQuery(liveSelect).hasClass('select2-hidden-accessible')) {
+          jQuery(liveSelect).select2('destroy');
+        }
+      } finally {
+        try {
+          liveFixture?.destroy();
+        } finally {
+          restorePlugin();
+        }
       }
-      liveFixture.destroy();
-      jQuery.fn.select2 = previousPlugin;
     }
   });
 });

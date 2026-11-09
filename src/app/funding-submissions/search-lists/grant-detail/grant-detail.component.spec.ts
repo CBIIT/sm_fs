@@ -1,10 +1,10 @@
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { Component, ComponentRef, createComponent, EnvironmentInjector, NO_ERRORS_SCHEMA } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NgSelect2Module } from 'ng-select2';
-import { EMPTY, Observable, of, Subject, throwError } from 'rxjs';
+import { BehaviorSubject, EMPTY, NEVER, Observable, of, Subject, throwError } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmissionBulkEditRequestDto, FundingSubmissionDocPayDefaultsDto, FundingSubmissionListDetailDto, FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
@@ -18,6 +18,7 @@ import { DocumentService } from '../../../service/document.service';
 import { UserSelect2ChangeDirective } from '../../user-select2-change.directive';
 import { FUNDING_WRITE_RECOVERY_STORAGE, FundingWriteRecoveryService } from '../../funding-write-recovery.service';
 import { MemoryStorage } from '../../testing/memory-storage';
+import { installSelect2 } from '../../testing/install-select2';
 
 @Component({
   template: '<app-grant-detail [data]="grant" [listId]="listId"></app-grant-detail>'
@@ -26,6 +27,537 @@ class BoundGrantDetailHost {
   grant: any;
   listId = 1;
 }
+
+interface RealWidgetFundingService {
+  getJustification(listId: number, applId: number): Observable<any>;
+  getDocPriorityOptions(listId: number, applId: number): Observable<number[]>;
+  getBudgetCategoryOptions(applId: number): Observable<Array<{ code: string; name: string }>>;
+  getDocPayDefaults(listId: number, applIds: number[]): Observable<FundingSubmissionDocPayDefaultsDto[]>;
+  bulkUpdateListGrants(body: FundingSubmissionBulkEditRequestDto, listId: number): Observable<number>;
+  saveJustificationForm(...args: any[]): Observable<any>;
+  getListDetail(listId: number): Observable<FundingSubmissionListDetailDto>;
+}
+
+describe('FS-2251 standalone real Select2 rendering', () => {
+  const resolvedDefaults: FundingSubmissionDocPayDefaultsDto = {
+    applId: 100, transitionEligible: true, budgetCategories: 'R01R37', budgetCategoriesName: 'R01/R37',
+    docNciSelection: 'DOC', annualFundingR01: null, annualOrMyf: 'MYF', annualOrMyfName: 'MYF',
+    docPriority: '1', docRecAmt: 90000, docRecReductionPct: 10
+  };
+  let detailRef: ComponentRef<GrantDetailComponent>;
+  let detail: GrantDetailComponent;
+  let host: HTMLElement;
+  let jquery: any;
+  let restorePlugin: () => void;
+  let previousJquery: any;
+  let previousDollar: any;
+  let hadJquery: boolean;
+  let hadDollar: boolean;
+  let widgets: Set<HTMLSelectElement>;
+  let funding: jasmine.SpyObj<RealWidgetFundingService>;
+  let dropdowns: jasmine.SpyObj<FundingSubmDropdownLookupService>;
+  let user: jasmine.SpyObj<AppUserSessionService>;
+
+  function rememberWidgets(): void {
+    host.querySelectorAll('select.select2-hidden-accessible')
+      .forEach(element => widgets.add(element as HTMLSelectElement));
+  }
+
+  function destroyWidgets(): void {
+    rememberWidgets();
+    widgets.forEach(select => {
+      if (jquery(select).data('select2')) jquery(select).select2('destroy');
+    });
+  }
+
+  function selectElement(name: string): HTMLSelectElement {
+    const select = host.querySelector(`ng-select2[name="${name}"] select`) as HTMLSelectElement;
+    if (!select || !jquery(select).data('select2')) {
+      throw new Error(`Real Select2 is not initialized for ${name}.`);
+    }
+    widgets.add(select);
+    return select;
+  }
+
+  function choose(name: string, text: string): void {
+    const select = selectElement(name);
+    const widget = jquery(select).data('select2');
+    jquery(select).select2('open');
+    const result = Array.from(widget.$dropdown[0].querySelectorAll('.select2-results__option[aria-selected]'))
+      .map(option => option as HTMLElement)
+      .find(option => option.textContent.trim() === text) as HTMLElement;
+    if (!result) throw new Error(`No rendered Select2 result "${text}" for ${name}.`);
+    result.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, button: 0 }));
+  }
+
+  function clear(name: string): void {
+    selectElement(name);
+    const control = host.querySelector(`ng-select2[name="${name}"] .select2-selection__clear`) as HTMLElement;
+    if (!control) throw new Error(`No rendered Select2 clear control for ${name}.`);
+    control.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: 0 }));
+  }
+
+  function saveButton(): HTMLButtonElement {
+    return host.querySelector('button.btn-primary') as HTMLButtonElement;
+  }
+
+  function startEdit(): void {
+    detailRef.changeDetectorRef.detectChanges();
+    flushMicrotasks();
+    detail.onEdit();
+    flushMicrotasks();
+    rememberWidgets();
+  }
+
+  function startPay(): void {
+    startEdit();
+    choose('docDecision', 'Pay');
+    flushMicrotasks();
+    rememberWidgets();
+  }
+
+  beforeEach(async () => {
+    host = undefined;
+    detailRef = undefined;
+    restorePlugin = undefined;
+    widgets = new Set<HTMLSelectElement>();
+    jquery = require('jquery');
+    previousJquery = (window as any).jQuery;
+    previousDollar = (window as any).$;
+    hadJquery = Object.prototype.hasOwnProperty.call(window, 'jQuery');
+    hadDollar = Object.prototype.hasOwnProperty.call(window, '$');
+    (window as any).jQuery = jquery;
+    (window as any).$ = jquery;
+    restorePlugin = installSelect2(jquery);
+
+    funding = jasmine.createSpyObj('FundingSubmissionsService', [
+      'getJustification', 'saveJustificationForm', 'bulkUpdateListGrants', 'getDocPriorityOptions',
+      'getDocPayDefaults', 'getListDetail', 'getBudgetCategoryOptions'
+    ]);
+    funding.getJustification.and.returnValue(of({ justificationText: '' }));
+    funding.getDocPriorityOptions.and.returnValue(of([1, 2]));
+    funding.getBudgetCategoryOptions.and.returnValue(of([
+      { code: 'R01R37', name: 'R01/R37' }, { code: 'ACTCD', name: 'P01' }
+    ]));
+    funding.getDocPayDefaults.and.returnValue(of([resolvedDefaults]));
+    funding.bulkUpdateListGrants.and.returnValue(NEVER);
+    dropdowns = jasmine.createSpyObj('FundingSubmDropdownLookupService', [
+      'getDocDecisions', 'getAnnualFundingR01Options', 'getAnnualOrMyfOptions', 'getDocNciSelections'
+    ]);
+    dropdowns.getDocDecisions.and.returnValue(of([
+      { id: 'Pay', text: 'Pay' }, { id: 'Do Not Pay', text: 'Do Not Pay' }
+    ]));
+    dropdowns.getAnnualFundingR01Options.and.returnValue(of([{ id: 'Yes', text: 'Yes' }, { id: 'No', text: 'No' }]));
+    dropdowns.getAnnualOrMyfOptions.and.returnValue(of([{ id: 'MYF', text: 'MYF' }, { id: 'AF', text: 'Annual' }]));
+    dropdowns.getDocNciSelections.and.returnValue(of([{ id: 'DOC', text: 'DOC' }, { id: 'NCI', text: 'NCI' }]));
+    user = jasmine.createSpyObj('AppUserSessionService', ['hasRole']);
+    user.hasRole.and.callFake(role => role === roleNames.OEFIA_CERTIFIER);
+    const properties = jasmine.createSpyObj('AppPropertiesService', ['getProperty']);
+    properties.getProperty.and.returnValue('http://grant-viewer/');
+
+    await TestBed.configureTestingModule({
+      imports: [FormsModule, RouterTestingModule, NgSelect2Module, NgbTooltipModule],
+      declarations: [GrantDetailComponent, UserSelect2ChangeDirective],
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [
+        { provide: FundingSubmissionsService, useValue: funding },
+        { provide: FundingSubmDropdownLookupService, useValue: dropdowns },
+        { provide: AppUserSessionService, useValue: user },
+        { provide: AppPropertiesService, useValue: properties },
+        { provide: DocumentService, useValue: jasmine.createSpyObj('DocumentService', ['downloadById']) },
+        { provide: FUNDING_WRITE_RECOVERY_STORAGE, useValue: new MemoryStorage() },
+        { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
+        { provide: NgbModal, useValue: jasmine.createSpyObj('NgbModal', ['open']) }
+      ]
+    }).compileComponents();
+
+    host = document.createElement('app-grant-detail');
+    document.body.appendChild(host);
+    detailRef = createComponent(GrantDetailComponent, {
+      environmentInjector: TestBed.inject(EnvironmentInjector), hostElement: host
+    });
+    detail = detailRef.instance;
+    detail.listId = 1;
+    detail.data = {
+      applId: 100, grantNumber: '1R01CA123456-01', docDecision: 'Do Not Pay',
+      addedByGroup: 'OEFIA', originalRequestedTotal: 100000, annualFundingR01: null,
+      budgetCategoryCode: null, docNciSelection: null, annualOrMyf: null,
+      docNotes: 'Not recommended', oefiaNotes: '', justificationText: ''
+    };
+  });
+
+  afterEach(() => {
+    try {
+      if (host) destroyWidgets();
+    } finally {
+      try {
+        if (detailRef && !detailRef.hostView.destroyed) detailRef.destroy();
+      } finally {
+        host?.remove();
+        restorePlugin?.();
+        if (hadJquery) (window as any).jQuery = previousJquery;
+        else delete (window as any).jQuery;
+        if (hadDollar) (window as any).$ = previousDollar;
+        else delete (window as any).$;
+      }
+    }
+  });
+
+  it('updates rendered Save after a real 2Y selection with resolved Pay defaults and blank justification', fakeAsync(() => {
+    startPay();
+
+    const save = saveButton();
+    expect(detail.docPayDefaultsLoading).toBeFalse();
+    expect(detail.formModel.annualFundingR01).toBeNull();
+    expect(detail.formModel.justificationText).toBe('');
+    expect(detail.hasSaveValidationErrors).toBeTrue();
+    expect(detail.saveValidationErrors.annualFundingR01).toBeUndefined();
+    expect(host.textContent).not.toContain('Two-Year Annual Funding R01 (HRHR) is required');
+    expect(save.disabled).toBeTrue();
+
+    choose('annualFundingR01', 'Yes');
+    flushMicrotasks();
+
+    expect(detail.formModel.annualFundingR01).toBe('Yes');
+    expect(detail.hasSaveValidationErrors).toBeFalse();
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    expect(save.disabled)
+      .withContext(`2Y=${detail.formModel.annualFundingR01}, model invalid=${detail.hasSaveValidationErrors}`)
+      .toBeFalse();
+
+    clear('annualFundingR01');
+    flushMicrotasks();
+    expect(detail.formModel.annualFundingR01).toBeNull();
+    expect(detail.saveValidationErrors.annualFundingR01).toBe('Two-Year Annual Funding R01 (HRHR) is required');
+    expect(host.textContent).toContain('Two-Year Annual Funding R01 (HRHR) is required');
+    expect(save.disabled).toBeTrue();
+
+    choose('annualFundingR01', 'Yes');
+    flushMicrotasks();
+    expect(detail.formModel.annualFundingR01).toBe('Yes');
+    expect(detail.saveValidationErrors.annualFundingR01).toBeUndefined();
+    expect(host.textContent).not.toContain('Two-Year Annual Funding R01 (HRHR) is required');
+    expect(save.disabled).toBeFalse();
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    expect(funding.saveJustificationForm).not.toHaveBeenCalled();
+
+    save.click();
+    expect(funding.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+    expect(funding.bulkUpdateListGrants.calls.mostRecent().args[0].fields.annualFundingR01).toBe('Yes');
+    expect(funding.saveJustificationForm).not.toHaveBeenCalled();
+    flush();
+  }));
+
+  for (const { name, label, choice, value } of [
+    { name: 'annualOrMyf', label: 'Annual or MYF', choice: 'Annual', value: 'AF' },
+    { name: 'budgetCategories', label: 'Budget Categories', choice: 'P01', value: 'ACTCD' },
+    { name: 'docNciSelection', label: 'DOC/NCI Selection', choice: 'NCI', value: 'NCI' }
+  ]) {
+    it(`refreshes rendered validation and Save when ${name} is cleared and reselected`, fakeAsync(() => {
+      startPay();
+      choose('annualFundingR01', 'Yes');
+      flushMicrotasks();
+      expect(saveButton().disabled).toBeFalse();
+
+      clear(name);
+      flushMicrotasks();
+      expect(detail.formModel[name]).toBeNull();
+      expect(detail.saveValidationErrors[name]).toBe(`${label} is required`);
+      expect(host.textContent).toContain(`${label} is required`);
+      expect(saveButton().disabled).toBeTrue();
+
+      choose(name, choice);
+      flushMicrotasks();
+      expect(detail.formModel[name]).toBe(value);
+      expect(detail.saveValidationErrors[name]).toBeUndefined();
+      expect(host.textContent).not.toContain(`${label} is required`);
+      expect(saveButton().disabled).toBeFalse();
+      expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+      expect(funding.saveJustificationForm).not.toHaveBeenCalled();
+      flush();
+    }));
+  }
+
+  it('clears and reselects an unresolved category without re-entering or duplicating the real widget event', fakeAsync(() => {
+    detail.data.budgetCategoryCode = 'LEGACY';
+    startPay();
+    choose('annualFundingR01', 'Yes');
+    flushMicrotasks();
+    const select = selectElement('budgetCategories');
+    const originalWidget = jquery(select).data('select2');
+    expect(detail.budgetCategorySelectionUnresolved).toBeTrue();
+    expect(host.querySelector('ng-select2[name="budgetCategories"]').textContent).toContain('LEGACY (unresolved)');
+    expect(saveButton().disabled).toBeFalse();
+    const userEvents = spyOn(detail, 'onUserSelectChange').and.callThrough();
+
+    expect(() => clear('budgetCategories')).not.toThrow();
+    expect(userEvents.calls.allArgs()).toEqual([['budgetCategories', null]]);
+    expect(() => flushMicrotasks()).not.toThrow();
+    expect(detail.formModel.budgetCategories).toBeNull();
+    expect(detail.budgetCategorySelectionUnresolved).toBeFalse();
+    expect(jquery(select).data('select2')).toBeTruthy();
+    expect(jquery(select).data('select2')).not.toBe(originalWidget);
+    expect(host.querySelectorAll('ng-select2[name="budgetCategories"] .select2-container').length).toBe(1);
+    expect(detail.saveValidationErrors.budgetCategories).toBe('Budget Categories is required');
+    expect(saveButton().disabled).toBeTrue();
+
+    expect(() => choose('budgetCategories', 'P01')).not.toThrow();
+    expect(() => flushMicrotasks()).not.toThrow();
+    expect(userEvents.calls.allArgs()).toEqual([['budgetCategories', null], ['budgetCategories', 'ACTCD']]);
+    expect(detail.formModel.budgetCategories).toBe('ACTCD');
+    expect(detail.saveValidationErrors.budgetCategories).toBeUndefined();
+    expect(host.querySelector('ng-select2[name="budgetCategories"] .select2-selection__rendered').textContent)
+      .toContain('P01');
+    expect(host.querySelectorAll('ng-select2[name="budgetCategories"] .select2-container').length).toBe(1);
+    expect(saveButton().disabled).toBeFalse();
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    flush();
+  }));
+
+  it('coalesces multiple real widget events after their event stacks', fakeAsync(() => {
+    startPay();
+    const detection = spyOn((detail as any).cdr, 'detectChanges').and.callThrough();
+
+    choose('annualFundingR01', 'Yes');
+    choose('docNciSelection', 'NCI');
+    expect(detection).not.toHaveBeenCalled();
+    flushMicrotasks();
+    expect(detection).toHaveBeenCalledTimes(1);
+    expect(detail.formModel.annualFundingR01).toBe('Yes');
+    expect(detail.formModel.docNciSelection).toBe('NCI');
+    expect(saveButton().disabled).toBeFalse();
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    flush();
+  }));
+
+  it('does not detect changes when destroyed before a pending selection refresh', fakeAsync(() => {
+    startPay();
+    const detection = spyOn((detail as any).cdr, 'detectChanges').and.callThrough();
+    choose('annualFundingR01', 'Yes');
+    expect(detection).not.toHaveBeenCalled();
+
+    destroyWidgets();
+    detailRef.destroy();
+    expect(() => flushMicrotasks()).not.toThrow();
+    expect(detection).not.toHaveBeenCalled();
+    flush();
+  }));
+
+  it('keeps Save disabled when another selection remains missing after selecting 2Y', fakeAsync(() => {
+    startPay();
+    clear('budgetCategories');
+    flushMicrotasks();
+    choose('annualFundingR01', 'Yes');
+    flushMicrotasks();
+
+    expect(detail.formModel.annualFundingR01).toBe('Yes');
+    expect(detail.formModel.budgetCategories).toBeNull();
+    expect(detail.hasSaveValidationErrors).toBeTrue();
+    expect(detail.saveValidationErrors.budgetCategories).toBe('Budget Categories is required');
+    expect(saveButton().disabled).toBeTrue();
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    flush();
+  }));
+
+  it('does not let optional justification bypass a blank 2Y selection', fakeAsync(() => {
+    startPay();
+    const justification = host.querySelector('textarea[name="justificationText"]') as HTMLTextAreaElement;
+    expect(justification.disabled).toBeFalse();
+    justification.value = 'Optional text';
+    justification.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(detail.formModel.justificationText).toBe('Optional text');
+    expect(detail.formModel.annualFundingR01).toBeNull();
+    expect(saveButton().disabled).toBeTrue();
+    justification.value = '';
+    justification.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(saveButton().disabled).toBeTrue();
+    expect(detail.saveValidationErrors.annualFundingR01).toBeUndefined();
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    flush();
+  }));
+
+  for (const guard of [
+    { name: 'DOC Pay defaults loading', validation: true, activate: () => { detail.docPayDefaultsLoading = true; } },
+    { name: 'DOC Pay defaults error', validation: true, activate: () => { detail.docPayDefaultsError = 'Defaults failed'; } },
+    { name: 'justification file error', validation: true, activate: () => { detail.justificationFileError = 'Invalid file'; } },
+    {
+      name: 'funding readback', validation: true, activate: () => {
+        (detail as any).pendingFundingReadback = { listId: 1, data: detail.data };
+        detail.fundingRefreshError = 'Refresh required';
+      }
+    },
+    { name: 'funding recovery state', validation: true, activate: () => { detail.fundingRecoveryState = 'unknown'; } },
+    { name: 'funding recovery error', validation: true, activate: () => { detail.fundingRecoveryError = 'Recovery failed'; } },
+    { name: 'priority lookup loading on transition', validation: true, activate: () => { detail.docPriorityOptionsLoading = true; } },
+    { name: 'priority lookup error on transition', validation: true, activate: () => { detail.docPriorityOptionsError = 'Priority failed'; } },
+    { name: 'save in progress', validation: false, activate: () => { (detail as any).savingInProgress = true; } },
+    {
+      name: 'priority coordination', validation: false, activate: () => {
+        detail.priorityCoordinator = { isBlocked: () => true } as any;
+      }
+    }
+  ]) {
+    it(`keeps Save disabled for ${guard.name} after a real valid selection`, fakeAsync(() => {
+      startPay();
+      guard.activate();
+      choose('annualFundingR01', 'Yes');
+      flushMicrotasks();
+
+      expect(detail.formModel.annualFundingR01).toBe('Yes');
+      expect(detail.hasSaveValidationErrors).toBe(guard.validation);
+      expect(saveButton().disabled).toBeTrue();
+      expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+      flush();
+    }));
+  }
+
+  it('does not make budget loading or non-transition priority loading and errors general Save guards', fakeAsync(() => {
+    const priorities = new Subject<number[]>();
+    funding.getDocPriorityOptions.and.returnValue(priorities);
+    funding.getBudgetCategoryOptions.and.returnValue(NEVER);
+    detail.data = {
+      ...detail.data, docDecision: 'Pay', docPriority: 1, docRecommendedAmount: 90000,
+      docRecommendedReductionPct: 10, budgetCategoryCode: 'R01R37', docNciSelection: 'DOC', annualOrMyf: 'MYF'
+    };
+    startEdit();
+    expect(detail.budgetCategoryStatus).toBe('loading');
+    expect(detail.docPriorityOptionsLoading).toBeTrue();
+    choose('annualFundingR01', 'Yes');
+    flushMicrotasks();
+    expect(detail.hasSaveValidationErrors).toBeFalse();
+    expect(saveButton().disabled).toBeFalse();
+
+    priorities.error(new Error('Priority lookup unavailable'));
+    flushMicrotasks();
+    expect(detail.docPriorityOptionsError).toBeTruthy();
+    expect(detail.hasSaveValidationErrors).toBeFalse();
+    expect(saveButton().disabled).toBeFalse();
+    expect(funding.getDocPayDefaults).not.toHaveBeenCalled();
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    flush();
+  }));
+
+  for (const dualRole of [false, true]) {
+    it(`preserves DOC view-only annual and budget fields${dualRole ? ' for a dual-role user' : ''}`, fakeAsync(() => {
+      user.hasRole.and.callFake(role => role === roleNames.DOC_FUNDING_LIST_COR
+        || (dualRole && role === roleNames.OEFIA_CERTIFIER));
+      startPay();
+      expect(detail.docFundingListCor).toBeTrue();
+      expect(detail.OEFIACertifier).toBe(dualRole);
+      expect(host.querySelector('ng-select2[name="annualOrMyf"]')).toBeNull();
+      expect(host.querySelector('ng-select2[name="budgetCategories"]')).toBeNull();
+      expect(host.textContent).toContain('MYF');
+      expect(host.textContent).toContain('R01/R37');
+      choose('annualFundingR01', 'Yes');
+      flushMicrotasks();
+      expect(saveButton().disabled).toBeFalse();
+      expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+      flush();
+    }));
+  }
+
+  it('does not add a deferred refresh to the existing decision and priority handlers', fakeAsync(() => {
+    startEdit();
+    const detection = spyOn((detail as any).cdr, 'detectChanges').and.callThrough();
+    choose('docDecision', 'Pay');
+    const decisionDetections = detection.calls.count();
+    expect(decisionDetections).toBeGreaterThan(0);
+    flushMicrotasks();
+    expect(detection).toHaveBeenCalledTimes(decisionDetections);
+
+    detection.calls.reset();
+    choose('docPriority', '2');
+    expect(detection).toHaveBeenCalledTimes(1);
+    flushMicrotasks();
+    expect(detection).toHaveBeenCalledTimes(1);
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    flush();
+  }));
+
+  it('preserves a real newer selection through delayed defaults and submits only its user provenance', fakeAsync(() => {
+    const defaults = new Subject<FundingSubmissionDocPayDefaultsDto[]>();
+    const yesNo = new BehaviorSubject([{ id: 'Yes', text: 'Yes' }, { id: 'No', text: 'No' }]);
+    funding.getDocPayDefaults.and.returnValue(defaults);
+    dropdowns.getAnnualFundingR01Options.and.returnValue(yesNo);
+    startPay();
+    expect(detail.docPayDefaultsLoading).toBeTrue();
+    expect(saveButton().disabled).toBeTrue();
+    const userEvents = spyOn(detail, 'onUserSelectChange').and.callThrough();
+
+    choose('budgetCategories', 'P01');
+    flushMicrotasks();
+    expect(detail.formModel.budgetCategories).toBe('ACTCD');
+    yesNo.next([{ id: 'Yes', text: 'Yes (updated)' }, { id: 'No', text: 'No' }]);
+    defaults.next([{ ...resolvedDefaults, annualFundingR01: 'No' }]);
+    flushMicrotasks();
+
+    expect(detail.docPayDefaultsLoading).toBeFalse();
+    expect(detail.formModel.budgetCategories).toBe('ACTCD');
+    expect(detail.formModel.annualFundingR01).toBe('No');
+    expect(userEvents.calls.allArgs()).toEqual([['budgetCategories', 'ACTCD']]);
+    expect(saveButton().disabled).toBeFalse();
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    expect(funding.saveJustificationForm).not.toHaveBeenCalled();
+
+    saveButton().click();
+    expect(funding.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+    const [request, listId] = funding.bulkUpdateListGrants.calls.mostRecent().args;
+    expect(listId).toBe(1);
+    expect(request.fields.budgetCategories).toBe('ACTCD');
+    expect(request.fields.annualFundingR01).toBe('No');
+    expect(request.transitionIntents).toEqual([{ applId: 100, priorityMode: 'AUTO', editedFields: ['budgetCategories'] }]);
+    yesNo.complete();
+    flush();
+  }));
+
+  it('preserves an explicit clear through delayed defaults and submits the later real reselection', fakeAsync(() => {
+    const defaults = new Subject<FundingSubmissionDocPayDefaultsDto[]>();
+    const yesNo = new BehaviorSubject([{ id: 'Yes', text: 'Yes' }, { id: 'No', text: 'No' }]);
+    funding.getDocPayDefaults.and.returnValue(defaults);
+    dropdowns.getAnnualFundingR01Options.and.returnValue(yesNo);
+    startPay();
+    expect(detail.docPayDefaultsLoading).toBeTrue();
+    const userEvents = spyOn(detail, 'onUserSelectChange').and.callThrough();
+
+    choose('annualFundingR01', 'Yes');
+    flushMicrotasks();
+    clear('annualFundingR01');
+    flushMicrotasks();
+    expect(detail.formModel.annualFundingR01).toBeNull();
+    expect(saveButton().disabled).toBeTrue();
+    yesNo.next([{ id: 'Yes', text: 'Yes (updated)' }, { id: 'No', text: 'No' }]);
+    defaults.next([{ ...resolvedDefaults, annualFundingR01: 'No' }]);
+    flushMicrotasks();
+
+    expect(detail.docPayDefaultsLoading).toBeFalse();
+    expect(detail.formModel.annualFundingR01).toBeNull();
+    expect(detail.saveValidationErrors.annualFundingR01).toBe('Two-Year Annual Funding R01 (HRHR) is required');
+    expect(saveButton().disabled).toBeTrue();
+    expect(userEvents.calls.allArgs()).toEqual([
+      ['annualFundingR01', 'Yes'], ['annualFundingR01', null]
+    ]);
+
+    choose('annualFundingR01', 'Yes (updated)');
+    flushMicrotasks();
+    expect(detail.formModel.annualFundingR01).toBe('Yes');
+    expect(detail.saveValidationErrors.annualFundingR01).toBeUndefined();
+    expect(saveButton().disabled).toBeFalse();
+    expect(userEvents.calls.allArgs()).toEqual([
+      ['annualFundingR01', 'Yes'], ['annualFundingR01', null], ['annualFundingR01', 'Yes']
+    ]);
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    expect(funding.saveJustificationForm).not.toHaveBeenCalled();
+
+    saveButton().click();
+    expect(funding.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+    const [request, listId] = funding.bulkUpdateListGrants.calls.mostRecent().args;
+    expect(listId).toBe(1);
+    expect(request.fields.annualFundingR01).toBe('Yes');
+    expect(request.transitionIntents).toEqual([{ applId: 100, priorityMode: 'AUTO', editedFields: ['annualFundingR01'] }]);
+    yesNo.complete();
+    flush();
+  }));
+});
 
 describe('GrantDetailComponent', () => {
   const paySelections = {

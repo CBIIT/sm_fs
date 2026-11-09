@@ -51,7 +51,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   private grantData: any = null;
   private initialized = false;
   private destroyed = false;
-  private budgetRenderPending = false;
+  private viewRefreshPending = false;
   private handledDataChange: any = null;
   private grantChangeSequence = 0;
   private readonly grantBudgetOptions: GrantBudgetCategoryOptions;
@@ -64,7 +64,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       this.handledDataChange = value;
       this.prepareForGrantChange();
       this.loadGrantBudgetOptions();
-      this.scheduleBudgetRender();
+      this.scheduleViewRefresh();
       const sequence = ++this.grantChangeSequence;
       Promise.resolve().then(() => {
         if (!this.destroyed && this.grantChangeSequence === sequence) {
@@ -181,7 +181,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
         if (this.data?.applId === applId) {
           this.budgetCategoryOptions = state.options;
           this.budgetCategoriesLoaded = true;
-          this.scheduleBudgetRender();
+          this.scheduleViewRefresh();
         }
       }
     );
@@ -270,14 +270,14 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   retryBudgetCategories(): void {
     this.budgetCategoriesLoaded = false;
     this.grantBudgetOptions.retry(this.data?.applId);
-    this.scheduleBudgetRender();
+    this.scheduleViewRefresh();
   }
 
-  private scheduleBudgetRender(): void {
-    if (this.budgetRenderPending || this.destroyed) return;
-    this.budgetRenderPending = true;
+  private scheduleViewRefresh(): void {
+    if (this.viewRefreshPending || this.destroyed) return;
+    this.viewRefreshPending = true;
     Promise.resolve().then(() => {
-      this.budgetRenderPending = false;
+      this.viewRefreshPending = false;
       if (!this.destroyed) this.cdr.detectChanges();
     });
   }
@@ -430,6 +430,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.observedSelections[field] = value;
       this.updateValidationErrorsLive();
+      // Let Select2 finish its event before changed options can recreate the widget.
+      this.scheduleViewRefresh();
     }
   }
 
