@@ -10,6 +10,7 @@ import { MsalBroadcastService } from '@azure/msal-angular';
 import { InteractionStatus } from '@azure/msal-browser';
 import { v4 as uuidv4 } from 'uuid';
 import { NGXLogger } from "ngx-logger";
+import { HANDLE_FUNDING_REQUEST_ERROR_LOCALLY } from '../funding-submissions/funding-request-error-scope.service';
 
 export const DEBUG_ERROR_INTERCEPTOR = new InjectionToken<boolean>('debugMode', {
   providedIn: 'root',
@@ -61,6 +62,9 @@ export class ErrorInterceptor implements HttpInterceptor {
     }
     return next.handle(req).pipe(
       catchError((error) => {
+        if (req.context.get(HANDLE_FUNDING_REQUEST_ERROR_LOCALLY)) {
+          return throwError(() => error);
+        }
         if(this.handlingError) {
           this.logger.info(`Already handling an error. Let this one pass: -----\n${jsonStringifyRecursive(error)}\n-----`);
           return of(EMPTY);

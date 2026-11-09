@@ -2,12 +2,12 @@ import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EnvironmentInj
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
-import { Observable, Subject, Subscription, forkJoin } from 'rxjs';
+import { Observable, Subject, Subscription, defaultIfEmpty, forkJoin, map, take } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { Select2OptionData } from 'ng-select2';
-import { FundingSubmissionsService, FundingSubmissionListGrantDto, FundingSubmissionListGrantExportRequestDto, FundingSubmissionSendToNciDirectorRequestDto } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionsService, FundingSubmissionListDetailDto, FundingSubmissionListGrantDto, FundingSubmissionListGrantExportRequestDto, FundingSubmissionSendToNciDirectorRequestDto } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DatatableThrottle } from '../../utils/datatable-throttle';
 import { roleNames } from '../../service/role-names';
@@ -18,10 +18,21 @@ import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-looku
 import { AppUserSessionService } from 'src/app/service/app-user-session.service';
 import { NciDecisionCellRendererComponent } from '../../table-cell-renderers/nci-decision-cell-renderer/nci-decision-cell-renderer.component';
 import { formatFundingSubmissionDate, formatNciDecision } from '../../utils/funding-submission-format';
+import { FundingRequestErrorScopeService } from '../funding-request-error-scope.service';
+import { FundingWriteRecoveryService, isDefiniteFundingWriteRejection } from '../funding-write-recovery.service';
+import { DetailPriorityCoordinator } from './detail-priority-coordinator';
 
 declare var $: any;
 
 type NciTabId = 'all' | 'pending' | 'approved' | 'hold' | 'rejected' | 'recusals';
+
+interface RemovalReadback {
+  listId: number;
+  requestedApplIds: Set<number>;
+  blockedApplIds: Set<number>;
+  previousApplIds: Set<number>;
+  grantsRemoved: number | null;
+}
 
 @Component({
   selector: 'app-search-lists',
@@ -96,6 +107,10 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   sendGrantsToOefiaSuccess = false;
   sendGrantsToOefiaErrorMessage = '';
   removeGrantsErrorMessage = '';
+  removalRefreshError = '';
+  removalOutcomeUnknown = false;
+  unknownRemovalConfirmed = false;
+  fundingRecoveryError = '';
   justificationWarningMessage = '';
   isSendGrantsInDraftInProgress = false;
   isSendGrantsToOefiaInProgress = false;
@@ -120,7 +135,18 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedNciTab: NciTabId = 'all';
   blockedGrantNumbers: string[] = [];
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
-  private priorityRefreshSubscription: Subscription;
+  private listMetaSubscription: Subscription;
+  private removalWriteSubscription: Subscription;
+  private listMetaVersion = 0;
+  private priorityRenderVersion = 0;
+  private destroyed = false;
+  private pendingPriorityOrder: Array<Array<string | number>> | null = null;
+  private deferredListMetaRefresh = false;
+  private removalReadback: RemovalReadback | null = null;
+  private readonly priorityCoordinator = new DetailPriorityCoordinator(
+    (listId, applId, detail, moved) => this.reconcileDetailPriorities(listId, applId, detail, moved),
+    listId => this.onPriorityCoordinatorChange(listId)
+  );
   viewDocOptions: Select2OptionData[] = [
     { id: 'AB', text: 'Abstract(s)' },
     { id: 'SS', text: 'Summary Statement(s)' },
@@ -189,7 +215,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     private fundingSubmissionsService: FundingSubmissionsService,
     private http: HttpClient,
     private modalService: NgbModal,
-    private dropdownLookupService: FundingSubmDropdownLookupService
+    private dropdownLookupService: FundingSubmDropdownLookupService,
+    private fundingErrorScope: FundingRequestErrorScopeService,
+    private fundingWriteRecovery: FundingWriteRecoveryService
   ) { }
 
   ngOnInit(): void {
@@ -216,12 +244,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.route.queryParams.subscribe(params => {
       if (params['listId']) {
+        const previousListId = this.listId;
         this.listId = Number(params['listId']);
         this.pendingSelectedApplIds = navigationState?.selectionListId === this.listId
           ? navigationState.selectedApplIds || []
           : [];
         navigationState = null;
-        this.loadListMeta();
+        this.loadPendingFundingRecoveries();
+        this.loadListMeta(false, previousListId !== this.listId);
       }
       if (params['selectionDate']) {
         this.selectionDate = params['selectionDate'];
@@ -330,15 +360,47 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 0);
   }
 
-  private loadListMeta(): void {
-    if (this.priorityRefreshSubscription && !this.priorityRefreshSubscription.closed) {
-      this.priorityRefreshSubscription.unsubscribe();
+  private loadListMeta(forRemoval = false, initialListLoad = false): void {
+    if (!forRemoval && !initialListLoad && this.priorityCoordinator.hasPending(this.listId)) {
+      this.deferredListMetaRefresh = true;
+      return;
     }
-    forkJoin({
-      detail: this.fundingSubmissionsService.getListDetail(this.listId),
-      history: this.fundingSubmissionsService.getListStatusHistory(this.listId)
-    }).subscribe({
+    this.cancelListMeta();
+    const listId = this.listId;
+    const version = this.listMetaVersion;
+    const detailRequest = this.fundingSubmissionsService.getListDetail(listId);
+    const historyRequest = this.fundingSubmissionsService.getListStatusHistory(listId);
+    this.listMetaSubscription = forkJoin({
+      detail: forRemoval ? this.fundingErrorScope.handleLocally(detailRequest) : detailRequest,
+      history: forRemoval ? this.fundingErrorScope.handleLocally(historyRequest) : historyRequest
+    }).pipe(
+      defaultIfEmpty(null),
+      map(result => {
+        if (!result || (forRemoval && !Array.isArray(result.detail?.grants))) {
+          throw new Error('The refreshed list was not returned.');
+        }
+        const removal = forRemoval ? this.removalReadback : null;
+        if (removal && this.listId === listId && this.listMetaVersion === version) {
+          const currentApplIds = new Set(result.detail.grants.map(grant => grant.applId));
+          const missingRequested = [...removal.requestedApplIds]
+            .filter(id => removal.previousApplIds.has(id) && !currentApplIds.has(id));
+          if (missingRequested.some(id => removal.blockedApplIds.has(id))
+            || (removal.grantsRemoved !== null && missingRequested.length !== removal.grantsRemoved)) {
+            throw new Error('The removal readback does not match the removal result.');
+          }
+          const removed = removal.grantsRemoved === null
+            ? missingRequested.length > 0
+            : removal.grantsRemoved > 0;
+          const removedApplIds = new Set(missingRequested);
+          this.reconcileDetailPriorities(listId, null, result.detail, removed, removedApplIds);
+        }
+        return result;
+      }),
+      take(1)
+    ).subscribe({
       next: ({ detail, history }) => {
+        if (this.listId !== listId || this.listMetaVersion !== version) return;
+        const removal = forRemoval ? this.removalReadback : null;
         this.selectionDate = detail.listCode || this.selectionDate;
         this.totalGrants = detail.totalGrants ?? 0;
         this.docRecommendedTotal = detail.totalDocRecAmt ?? 0;
@@ -354,12 +416,27 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
             this.selectedRows.set(selectedGrant.applId, selectedGrant);
           }
         });
-        // Rebind expanded rows to the refreshed grant DTO so their per-grant stage gates
-        // cannot keep using the pre-refresh review status.
+        // Keep each expanded component's data reference while updating its stage and other fields.
         this.detailComponentsByApplId.forEach((componentRef, applId) => {
-          const refreshedGrant = this.cachedGrants.find(grant => grant.applId === applId);
+          const index = this.cachedGrants.findIndex(grant => grant.applId === applId);
+          const refreshedGrant = this.cachedGrants[index];
           if (refreshedGrant) {
-            componentRef.instance.data = refreshedGrant;
+            if (componentRef.instance.data?.applId === applId) {
+              Object.assign(componentRef.instance.data, refreshedGrant);
+              this.cachedGrants[index] = componentRef.instance.data;
+              if (this.selectedRows.has(applId)) {
+                this.selectedRows.set(applId, componentRef.instance.data);
+              }
+            } else {
+              componentRef.instance.data = refreshedGrant;
+            }
+            if (removal && componentRef.instance.isEditMode) {
+              componentRef.instance.fetchDocPriorityOptions();
+            }
+          } else if (removal?.requestedApplIds.has(applId) && !removal.blockedApplIds.has(applId)) {
+            componentRef.destroy();
+            this.detailComponentsByApplId.delete(applId);
+            return;
           }
           componentRef.instance.listStatus = this.listStatus;
           componentRef.changeDetectorRef.detectChanges();
@@ -367,10 +444,80 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
         this.listHistory = history;
         this.logger.debug('List detail:', detail);
-        this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+        this.renderPriorityChanges(listId, detail.grants || [], true);
+        if (removal) {
+          this.removalReadback = null;
+          this.removalRefreshError = '';
+          this.deferredListMetaRefresh = false;
+          this.priorityCoordinator.finishRemoval(listId);
+        }
       },
-      error: (err) => this.logger.error('Failed to load list detail', err)
+      error: err => {
+        if (this.listId !== listId || this.listMetaVersion !== version) return;
+        this.logger.error('Failed to load list detail', err);
+        if (forRemoval) {
+          this.removalRefreshError = 'The removal could not be reconciled with the list. Retry refresh before saving another grant.';
+          this.cdr.markForCheck();
+        }
+      }
     });
+  }
+
+  retryRemovalRefresh(): void {
+    if (!this.removalOutcomeUnknown && this.removalReadback && this.removalReadback.listId === this.listId) {
+      this.loadListMeta(true);
+    }
+  }
+
+  recoverUnknownRemoval(): void {
+    if (!this.removalOutcomeUnknown || !this.unknownRemovalConfirmed || !this.removalReadback) return;
+    this.removalOutcomeUnknown = false;
+    this.loadListMeta(true);
+  }
+
+  loadPendingFundingRecoveries(): void {
+    let applIds: number[];
+    try {
+      applIds = this.fundingWriteRecovery.pendingApplIds(this.listId);
+    } catch (error) {
+      this.logger.error('Unable to inspect funding save recovery for the list', error, { listId: this.listId });
+      this.fundingRecoveryError = 'Funding save recovery is unavailable or invalid. Contact support before saving.';
+      this.priorityCoordinator.setRecoveryUnavailable(this.listId, true);
+      return;
+    }
+    applIds.forEach(applId => this.priorityCoordinator.trackRecovery(this.listId, applId));
+    this.fundingRecoveryError = '';
+    this.priorityCoordinator.setRecoveryUnavailable(this.listId, false);
+  }
+
+  get pendingFundingGrantLabels(): string[] {
+    return this.priorityCoordinator.pendingWrites(this.listId)
+      .map(applId => this.cachedGrants.find(grant => grant.applId === applId)?.grantNumber || String(applId));
+  }
+
+  private cancelListMeta(): void {
+    this.listMetaVersion++;
+    if (this.listMetaSubscription && !this.listMetaSubscription.closed) {
+      this.listMetaSubscription.unsubscribe();
+    }
+  }
+
+  private onPriorityCoordinatorChange(listId: number): void {
+    if (listId !== this.listId) return;
+    if (this.priorityCoordinator.isRecoveryUnavailable(listId) && !this.fundingRecoveryError) {
+      this.fundingRecoveryError = 'Funding save recovery is unavailable or invalid. Contact support before saving.';
+    }
+    if (this.priorityCoordinator.hasPending(listId) && !this.removalReadback
+      && this.listMetaSubscription && !this.listMetaSubscription.closed) {
+      this.cancelListMeta();
+      this.deferredListMetaRefresh = true;
+    }
+    this.detailComponentsByApplId.forEach(componentRef => componentRef.changeDetectorRef?.detectChanges());
+    this.cdr.markForCheck();
+    if (!this.priorityCoordinator.hasPending(listId) && this.deferredListMetaRefresh) {
+      this.deferredListMetaRefresh = false;
+      this.loadListMeta();
+    }
   }
 
   private get assignedDocAbbrevs(): string[] {
@@ -932,8 +1079,13 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
                       componentRef.instance.data = rowData;
                       componentRef.instance.listId = this.listId;
                       componentRef.instance.listStatus = this.listStatus;
+                      componentRef.instance.priorityCoordinator = this.priorityCoordinator;
                       componentRef.instance.close.subscribe(() => {
-                        this.handleDetailRowClose(componentRef, applId, row, tr, $(event.currentTarget).find('i'));
+                        const currentRow = dt.row((_index: number, data: FundingSubmissionListGrantDto) =>
+                          data?.applId === applId);
+                        const currentTr = $(currentRow.node());
+                        this.handleDetailRowClose(componentRef, applId, currentRow, currentTr,
+                          currentTr.find('.toggle-details i'));
                       });
                       // Cancel (either path) reverts GrantDetailComponent to read-only and
                       // stays open — no row teardown here. Deliberately a no-op with respect to
@@ -946,7 +1098,11 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
                       // shared `rowData` object — redraw this row so the grid's own cells pick
                       // up the change immediately, without a page reload. No teardown here: the
                       // row must stay expanded, unlike the `close` (collapse) path above.
-                      componentRef.instance.saved.subscribe(() => this.handleDetailSaved(row));
+                      componentRef.instance.saved.subscribe(() => {
+                        const currentRow = dt.row((_index: number, data: FundingSubmissionListGrantDto) =>
+                          data?.applId === applId);
+                        this.handleDetailSaved(currentRow);
+                      });
 
                       // Run Angular change detection
                       componentRef.changeDetectorRef.detectChanges();
@@ -1094,40 +1250,91 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   // left untouched.
   private handleDetailSaved(row: any): void {
     row.invalidate().draw(false);
-    if (this.priorityRefreshSubscription && !this.priorityRefreshSubscription.closed) {
-      this.priorityRefreshSubscription.unsubscribe();
+  }
+
+  private reconcileDetailPriorities(
+    listId: number, savedApplId: number | null, detail: FundingSubmissionListDetailDto,
+    resetOrder: boolean, removedApplIds: Set<number> = new Set()
+  ): void {
+    if (listId !== this.listId) {
+      throw new Error('The list changed before DOC priorities could be refreshed.');
     }
-    const listId = this.listId;
-    this.priorityRefreshSubscription = this.fundingSubmissionsService.getListDetail(listId).subscribe({
-      next: detail => {
-        if (this.listId !== listId) {
-          return;
-        }
-        const priorities = new Map((detail.grants || []).map(grant => [grant.applId, grant.docPriority]));
-        const updatePriority = (grant: FundingSubmissionListGrantDto): void => {
-          if (grant && priorities.has(grant.applId)) {
-            grant.docPriority = priorities.get(grant.applId);
-          }
-        };
-        this.cachedGrants.forEach(updatePriority);
-        this.selectedRows.forEach(updatePriority);
-        this.detailComponentsByApplId.forEach(componentRef => {
-          if (componentRef.instance?.data) {
-            updatePriority(componentRef.instance.data);
-            componentRef.changeDetectorRef.detectChanges();
-          }
+    if (!Array.isArray(detail.grants)) {
+      throw new Error('The refreshed DOC priorities were not returned.');
+    }
+    const priorities = new Map(detail.grants.map(grant => [grant.applId, grant.docPriority]));
+    if (this.cachedGrants.some(grant => !priorities.has(grant.applId) && !removedApplIds.has(grant.applId))) {
+      throw new Error('A displayed grant is not present in the refreshed list.');
+    }
+    const prioritiesChanged = this.cachedGrants.length !== detail.grants.length
+      || this.cachedGrants.some(grant => !priorities.has(grant.applId)
+        || String(grant.docPriority ?? '') !== String(priorities.get(grant.applId) ?? ''));
+    for (const [applId, componentRef] of this.detailComponentsByApplId) {
+      if (componentRef.instance?.data && !priorities.has(applId) && !removedApplIds.has(applId)) {
+        throw new Error('An open grant is not present in the refreshed list.');
+      }
+    }
+    const order = resetOrder ? this.docPriorityOrder() : null;
+    const updatePriority = (grant: FundingSubmissionListGrantDto): void => {
+      if (grant && priorities.has(grant.applId)) {
+        grant.docPriority = priorities.get(grant.applId);
+      }
+    };
+    this.cachedGrants.forEach(updatePriority);
+    this.selectedRows.forEach(updatePriority);
+    this.detailComponentsByApplId.forEach((componentRef, applId) => {
+      if (applId !== savedApplId && priorities.has(applId) && !componentRef.instance.fundingRecoveryState) {
+        componentRef.instance.rebaseDocPriority(priorities.get(applId), prioritiesChanged);
+        componentRef.changeDetectorRef.detectChanges();
+      }
+    });
+    if (order) this.pendingPriorityOrder = order;
+    this.renderPriorityChanges(listId, detail.grants, false);
+  }
+
+  private docPriorityOrder(): Array<Array<string | number>> {
+    const columns = this.dtOptions.columns as Array<{ data?: string }> | undefined;
+    const doc = columns?.findIndex(column => column.data === 'doc') ?? -1;
+    const priority = columns?.findIndex(column => column.data === 'docPriority') ?? -1;
+    if (doc < 0 || priority < 0) {
+      throw new Error('The DOC priority table columns could not be found.');
+    }
+    return [[doc, 'asc'], [priority, 'asc']];
+  }
+
+  private renderPriorityChanges(listId: number, grants: FundingSubmissionListGrantDto[], reload: boolean): void {
+    const version = ++this.priorityRenderVersion;
+    const priorities = new Map(grants.map(grant => [grant.applId, grant.docPriority]));
+    this.dtElement?.dtInstance?.then(dt => {
+      if (this.destroyed || this.listId !== listId || this.priorityRenderVersion !== version) return;
+      if (this.pendingPriorityOrder) {
+        dt.order(this.pendingPriorityOrder);
+        this.pendingPriorityOrder = null;
+      }
+      if (reload) {
+        dt.ajax.reload(() => this.restoreExpandedDetails(dt, listId), false);
+      } else {
+        dt.rows().every(function() {
+          const grant = this.data() as FundingSubmissionListGrantDto;
+          if (grant && priorities.has(grant.applId)) grant.docPriority = priorities.get(grant.applId);
         });
-        this.dtElement?.dtInstance?.then(dt => {
-          if (this.listId !== listId) {
-            return;
-          }
-          dt.rows().every(function() {
-            updatePriority(this.data() as FundingSubmissionListGrantDto);
-          });
-          dt.rows().invalidate().draw(false);
-        });
-      },
-      error: error => this.logger.error('Failed to refresh DOC priorities after saving grant', error, { listId })
+        dt.rows().invalidate().draw(false);
+      }
+    });
+  }
+
+  private restoreExpandedDetails(dt: DataTables.Api, listId: number): void {
+    if (this.destroyed || this.listId !== listId) return;
+    const components = this.detailComponentsByApplId;
+    dt.rows().every(function() {
+      const grant = this.data() as FundingSubmissionListGrantDto;
+      const componentRef = components.get(grant?.applId);
+      const host = componentRef?.location?.nativeElement;
+      if (host) {
+        this.child(host).show();
+        $(this.node()).addClass('shown').find('.toggle-details i')
+          .removeClass('fa-plus-circle').addClass('fa-minus-circle');
+      }
     });
   }
 
@@ -1516,6 +1723,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get canRemoveSelectedGrants(): boolean {
     return this.selectedRows.size > 0
+      && !this.priorityCoordinator.hasPending(this.listId)
       && (!this.isDocOnlyUser() || !Array.from(this.selectedRows.values()).some(grant => this.isDocStageReadOnly(grant)));
   }
 
@@ -1786,24 +1994,65 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onConfirmRemove(): void {
     const applIds = Array.from(this.selectedRows.keys());
-    this.fundingSubmissionsService.removeGrantsFromList(this.listId, applIds).subscribe({
+    const listId = this.listId;
+    if (!this.priorityCoordinator.beginRemoval(listId)) return;
+    const previousApplIds = new Set(this.cachedGrants.map(grant => grant.applId));
+    const unknownRemoval: RemovalReadback = {
+      listId, requestedApplIds: new Set(applIds), blockedApplIds: new Set(), previousApplIds, grantsRemoved: null
+    };
+    const handleUnknownRemoval = (error: unknown): void => {
+      this.logger.error('Remove grants outcome is unknown', error, { listId });
+      this.removalReadback = unknownRemoval;
+      this.removalOutcomeUnknown = true;
+      this.unknownRemovalConfirmed = false;
+      this.removeGrantsErrorMessage = '';
+      this.removeModalRef?.close();
+      this.cdr.markForCheck();
+    };
+    this.removalWriteSubscription = this.fundingErrorScope.handleLocally(
+      this.fundingSubmissionsService.removeGrantsFromList(listId, applIds)
+    ).pipe(defaultIfEmpty(null), take(1)).subscribe({
       next: (result) => {
+        if (this.listId !== listId) {
+          this.priorityCoordinator.finishRemoval(listId);
+          return;
+        }
+        if (!result || !Number.isInteger(result.grantsRemoved)
+          || result.grantsRemoved < 0 || result.grantsRemoved > applIds.length) {
+          handleUnknownRemoval(new Error('The removal did not return a valid result.'));
+          return;
+        }
+        const grantsRemoved = result.grantsRemoved;
+        const blockedNumbers = new Set(result?.blockedGrantNumbers ?? []);
+        const blockedApplIds = new Set([...this.selectedRows.entries()]
+          .filter(([, grant]) => blockedNumbers.has(grant.grantNumber))
+          .map(([applId]) => applId));
         this.removeGrantsErrorMessage = '';
-        this.saveSuccessMessage = 'Success! The selected grant(s) have been removed from this list.';
+        this.saveSuccessMessage = grantsRemoved > 0
+          ? 'Success! The selected grant(s) have been removed from this list.' : '';
         this.originalAmendmentConflictMessages = [];
         this.setBlockedGrantNumbers(result?.blockedGrantNumbers ?? []);
         this.selectedRows.clear();
         this.removeModalRef?.close();
-        this.loadListMeta();
+        if (grantsRemoved === 0) {
+          this.deferredListMetaRefresh = false;
+          this.priorityCoordinator.finishRemoval(listId);
+          this.loadListMeta();
+          return;
+        }
+        this.removalReadback = {
+          listId, requestedApplIds: new Set(applIds), blockedApplIds, previousApplIds, grantsRemoved
+        };
+        this.loadListMeta(true);
       },
       error: (err) => {
         this.logger.error('Remove grants from list failed', err);
-        if (err?.status === 400 || err?.status === 409) {
+        if (isDefiniteFundingWriteRejection(err)) {
+          this.priorityCoordinator.finishRemoval(listId);
           this.removeGrantsErrorMessage = this.getRemoveGrantsError(err);
           return;
         }
-        this.removeGrantsErrorMessage = '';
-        this.removeModalRef?.close();
+        handleUnknownRemoval(err);
       }
     });
   }
@@ -1922,8 +2171,11 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.priorityRefreshSubscription && !this.priorityRefreshSubscription.closed) {
-      this.priorityRefreshSubscription.unsubscribe();
+    this.destroyed = true;
+    this.priorityRenderVersion++;
+    this.cancelListMeta();
+    if (this.removalWriteSubscription && !this.removalWriteSubscription.closed) {
+      this.removalWriteSubscription.unsubscribe();
     }
     if (this.pendingRealignFrame !== null) {
       window.cancelAnimationFrame(this.pendingRealignFrame);

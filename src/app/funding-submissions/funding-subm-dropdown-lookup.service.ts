@@ -11,6 +11,10 @@ interface LookupCodeDto {
   description?: string;
 }
 
+export function mapLookupOptions(rows: Array<{ code?: string; name?: string }>): Select2OptionData[] {
+  return rows.map(row => ({ id: row.code, text: row.name } as Select2OptionData));
+}
+
 
 /**
  * Response row shape for the dropdown lookup endpoints added for Individual/Bulk Edit dropdown
@@ -82,7 +86,7 @@ export class FundingSubmDropdownLookupService {
 
   private fetchAsSelect2Options(url: string): Observable<Select2OptionData[]> {
     return this.http.get<LookupCodeDto[]>(url).pipe(
-      map(rows => rows.map(row => ({ id: row.code, text: row.name } as Select2OptionData))),
+      map(mapLookupOptions),
       // Cache per lookup for the app's lifetime — shared across Individual Edit and Bulk Edit
       // so both screens issue only one HTTP call per lookup, not one each.
       shareReplay(1)
