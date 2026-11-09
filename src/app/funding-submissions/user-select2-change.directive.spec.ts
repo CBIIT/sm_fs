@@ -101,4 +101,38 @@ describe('UserSelect2ChangeDirective', () => {
       jQuery.fn.select2 = previousPlugin;
     }
   });
+
+  it('resolves an already-selected ACTCD label in the real plugin without a user edit', async () => {
+    const previousPlugin = jQuery.fn.select2;
+    require('select2/dist/js/select2.full.js');
+    const liveFixture = TestBed.createComponent(Select2HostComponent);
+    const liveHost = liveFixture.componentInstance;
+    let liveSelect: HTMLSelectElement;
+    try {
+      liveHost.value = 'ACTCD';
+      liveHost.options = [{ id: 'ACTCD', text: 'ACTCD (unresolved)' }];
+      liveFixture.detectChanges();
+      await liveFixture.whenStable();
+      liveFixture.detectChanges();
+      liveSelect = liveFixture.nativeElement.querySelector('select');
+      expect(jQuery(liveSelect).val()).toBe('ACTCD');
+      expect(liveFixture.nativeElement.querySelector('.select2-selection__rendered').textContent)
+        .toContain('ACTCD (unresolved)');
+
+      liveHost.options = [{ id: 'R01R37', text: 'R01/R37' }, { id: 'ACTCD', text: 'P01' }];
+      liveFixture.detectChanges();
+      await liveFixture.whenStable();
+      expect(jQuery(liveSelect).val()).toBe('ACTCD');
+      expect(liveSelect.selectedOptions[0].text).toBe('P01');
+      expect(liveFixture.nativeElement.querySelector('.select2-selection__rendered').textContent).toContain('P01');
+      expect(liveHost.value).toBe('ACTCD');
+      expect(liveHost.changes).toEqual([]);
+    } finally {
+      if (liveSelect && jQuery(liveSelect).hasClass('select2-hidden-accessible')) {
+        jQuery(liveSelect).select2('destroy');
+      }
+      liveFixture.destroy();
+      jQuery.fn.select2 = previousPlugin;
+    }
+  });
 });

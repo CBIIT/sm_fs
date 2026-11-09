@@ -1,5 +1,5 @@
-import { ComponentFixture, discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { Component, forwardRef, Input, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, discardPeriodicTasks, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { Component, DebugElement, forwardRef, getDebugNode, Input, NO_ERRORS_SCHEMA, ViewContainerRef } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EMPTY, Observable, of, Subject, throwError } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -50,8 +50,9 @@ describe('BulkEditComponent', () => {
   let component: BulkEditComponent;
   let fixture: ComponentFixture<BulkEditComponent>;
   let fundingSubmissionsServiceSpy: jasmine.SpyObj<Omit<FundingSubmissionsService,
-    'getDocPayDefaults' | 'getListDetail' | 'bulkUpdateListGrants'> & {
+    'getDocPayDefaults' | 'getListDetail' | 'bulkUpdateListGrants' | 'getBudgetCategoryOptions'> & {
       getDocPayDefaults(listId: number, applIds: number[]): Observable<FundingSubmissionDocPayDefaultsDto[]>;
+      getBudgetCategoryOptions(applId: number): Observable<Array<{ code?: string; name?: string }>>;
       getListDetail(listId: number): Observable<FundingSubmissionListDetailDto>;
       bulkUpdateListGrants(body: FundingSubmissionBulkEditRequestDto, listId: number): Observable<number>;
     }>;
@@ -84,8 +85,11 @@ describe('BulkEditComponent', () => {
     (window as any).$ = (window as any).$ || { fn: { DataTable: { ext: { pager: {} } } } };
 
     fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
-      'bulkUpdateListGrants', 'getDocPayDefaults', 'getListDetail'
+      'bulkUpdateListGrants', 'getDocPayDefaults', 'getListDetail', 'getBudgetCategoryOptions'
     ]);
+    fundingSubmissionsServiceSpy.getBudgetCategoryOptions.and.returnValue(of([
+      { code: 'ESIR37T4', name: 'ESI R37 T4 Board Competing Transition' }
+    ]));
     fundingSubmissionsServiceSpy.getListDetail.and.callFake(() => of({
       grants: component.rows.map(row => {
         const call = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.allArgs()
@@ -183,6 +187,170 @@ describe('BulkEditComponent', () => {
     view.destroy();
     return text;
   }
+
+  describe('FS-2533 per-grant Budget Categories', () => {
+    let first: Subject<any>;
+    let second: Subject<any>;
+
+    function renderBudgetCell(row: any): { view: any; select: FakeNgSelect2Component } {
+      const container = fixture.debugElement.query(By.css('table')).injector.get(ViewContainerRef);
+      const view = container.createEmbeddedView(component.budgetCatRenderer, { adtData: row });
+      view.detectChanges();
+      const element = view.rootNodes[0].querySelector('ng-select2');
+      return { view, select: (getDebugNode(element) as DebugElement).componentInstance };
+    }
+
+    beforeEach(() => {
+      first = new Subject<any>();
+      second = new Subject<any>();
+      fundingSubmissionsServiceSpy.getBudgetCategoryOptions.and.callFake(applId =>
+        applId === 100 ? first : second);
+    });
+
+    it('updates DataTable row bindings by grant, preserves the page through reset and readback, and saves ACTCD', fakeAsync(() => {
+      const initial = [
+        grant({ applId: 100, budgetCategoryCode: 'ACTCD', budgetCategories: 'P01' }),
+        grant({ applId: 200, budgetCategoryCode: 'RFA', budgetCategories: 'RFA' })
+      ];
+      initializeFixtureWithGrants(initial);
+      const reload = jasmine.createSpy('reload');
+      component.dtElement = { dtInstance: Promise.resolve({ ajax: { reload } }) } as any;
+      const a = renderBudgetCell(component.rows[0]);
+      const b = renderBudgetCell(component.rows[1]);
+      expect(a.select.data).toEqual([{ id: 'ACTCD', text: 'ACTCD (unresolved)' }]);
+      expect(b.select.data).toEqual([{ id: 'RFA', text: 'RFA (unresolved)' }]);
+
+      second.next([{ code: 'RFA', name: 'RFA' }, { code: 'ACTCD', name: 'R01' }]);
+      flushMicrotasks();
+      expect(b.select.data[1]).toEqual({ id: 'ACTCD', text: 'R01' });
+      expect(a.select.data[0].text).toBe('ACTCD (unresolved)');
+      first.next([{ code: 'RFA', name: 'RFA' }, { code: 'ACTCD', name: 'P01' }]);
+      flushMicrotasks();
+      expect(a.select.data[1]).toEqual({ id: 'ACTCD', text: 'P01' });
+      expect(component.canSave).toBeFalse();
+      expect(reload).not.toHaveBeenCalled();
+
+      component.bulkFields.budgetCategories = 'ACTCD';
+      component.onApplyChanges();
+      flushMicrotasks();
+      expect(component.rows.map(row => row.budgetCategories)).toEqual(['ACTCD', 'ACTCD']);
+      expect(component.getBudgetCategoryOptionsForRow(component.rows[0])[1].text).toBe('P01');
+      expect(component.getBudgetCategoryOptionsForRow(component.rows[1])[1].text).toBe('R01');
+
+      const beforeReset = component.rows[1];
+      component.onReset();
+      flushMicrotasks();
+      expect(component.rows[1]).not.toBe(beforeReset);
+      expect(component.rows.map(row => row.budgetCategories)).toEqual(['ACTCD', 'RFA']);
+      const redrawn = renderBudgetCell(component.rows[1]);
+      expect(redrawn.select.data[0]).toEqual({ id: 'RFA', text: 'RFA' });
+      expect(redrawn.select.data[1]).toEqual({ id: 'ACTCD', text: 'R01' });
+      expect(fundingSubmissionsServiceSpy.getBudgetCategoryOptions.calls.allArgs()).toEqual([[100], [200]]);
+
+      component.bulkFields.budgetCategories = 'ACTCD';
+      component.onApplyChanges();
+      component.rows[0].docNotes = 'Edited A';
+      component.onRowFieldChange();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [
+        { ...initial[0], budgetCategoryCode: 'ACTCD', budgetCategories: 'P01', docNotes: 'Edited A' },
+        { ...initial[1], budgetCategoryCode: 'ACTCD', budgetCategories: 'R01' }
+      ] }));
+      component.onSave();
+      flushMicrotasks();
+
+      const submitted = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.allArgs()
+        .map(([body]) => ({ id: body.applIds[0], code: body.fields.budgetCategories }));
+      expect(submitted).toEqual([{ id: 100, code: 'ACTCD' }, { id: 200, code: 'ACTCD' }]);
+      expect(component.rows.map(row => row.budgetCategories)).toEqual(['ACTCD', 'ACTCD']);
+      expect(component.getBudgetCategoryOptionsForRow(component.rows[0])[1].text).toBe('P01');
+      expect(component.getBudgetCategoryOptionsForRow(component.rows[1])[1].text).toBe('R01');
+      expect(reload.calls.allArgs().every(args => args[0] === null && args[1] === false)).toBeTrue();
+      expect(fundingSubmissionsServiceSpy.getBudgetCategoryOptions.calls.count()).toBe(2);
+      a.view.destroy();
+      b.view.destroy();
+      redrawn.view.destroy();
+      tick();
+    }));
+
+    it('keeps explicit ACTCD while one row is pending and another fails, including a full-row save and retry', fakeAsync(() => {
+      const retry = new Subject<any>();
+      fundingSubmissionsServiceSpy.getBudgetCategoryOptions.and.callFake(applId =>
+        applId === 100 ? first : fundingSubmissionsServiceSpy.getBudgetCategoryOptions.calls.count() <= 2 ? second : retry);
+      const initial = [
+        grant({ applId: 100, budgetCategoryCode: 'RFA', budgetCategories: 'RFA' }),
+        grant({ applId: 200, budgetCategoryCode: 'PARU', budgetCategories: "PAR U's" })
+      ];
+      initializeFixtureWithGrants(initial);
+      second.error({ status: 500 });
+      component.rows[1].docNotes = 'Keep this edit';
+      component.onRowFieldChange();
+      component.bulkFields.budgetCategories = 'ACTCD';
+      component.onApplyChanges();
+      flushMicrotasks();
+
+      expect(component.rows.map(row => row.budgetCategories)).toEqual(['ACTCD', 'ACTCD']);
+      expect(component.getBudgetCategoryStatus(component.rows[0])).toBe('loading');
+      expect(component.getBudgetCategoryStatus(component.rows[1])).toBe('error');
+      expect(component.getBudgetCategoryOptionsForRow(component.rows[1]))
+        .toEqual([{ id: 'ACTCD', text: 'ACTCD (unresolved)' }]);
+
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [
+        { ...initial[0], budgetCategoryCode: 'ACTCD', budgetCategories: 'P01' },
+        { ...initial[1], budgetCategoryCode: 'ACTCD', budgetCategories: 'R01', docNotes: 'Keep this edit' }
+      ] }));
+      component.onSave();
+      flushMicrotasks();
+      const submitted = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.allArgs();
+      expect(submitted.map(([body]) => body.fields.budgetCategories)).toEqual(['ACTCD', 'ACTCD']);
+      expect(submitted[1][0].fields.docNotes).toBe('Keep this edit');
+
+      component.retryBudgetCategories(component.rows[1]);
+      retry.next([{ code: 'ACTCD', name: 'R01' }]);
+      first.next([{ code: 'ACTCD', name: 'P01' }]);
+      flushMicrotasks();
+      expect(component.getBudgetCategoryOptionsForRow(component.rows[0])[0].text).toBe('P01');
+      expect(component.getBudgetCategoryOptionsForRow(component.rows[1])[0].text).toBe('R01');
+      expect(component.rows[1].docNotes).toBe('Keep this edit');
+      tick();
+    }));
+
+    it('preserves an untouched unresolved code in an unrelated save', fakeAsync(() => {
+      const original = grant({ budgetCategoryCode: 'LEGACY', budgetCategories: 'Legacy server label' });
+      initializeFixtureWithGrants([original]);
+      first.next([{ code: 'RFA', name: 'RFA' }]);
+      flushMicrotasks();
+      expect(component.getBudgetCategoryOptionsForRow(component.rows[0]))
+        .toEqual([{ id: 'RFA', text: 'RFA' }, { id: 'LEGACY', text: 'LEGACY (unresolved)' }]);
+      component.rows[0].docNotes = 'Changed unrelated notes';
+      component.onRowFieldChange();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [
+        { ...original, docNotes: 'Changed unrelated notes' }
+      ] }));
+      component.onSave();
+      flushMicrotasks();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0].fields.budgetCategories)
+        .toBe('LEGACY');
+      expect(component.rows[0].budgetCategories).toBe('LEGACY');
+      tick();
+    }));
+
+    it('does not request hidden row options for DOC-only users and preserves their category in unrelated saves', () => {
+      setRoles(true, false);
+      const original = grant({ budgetCategoryCode: 'ACTCD', budgetCategories: 'P01' });
+      seedHistoryStateAndInit([original]);
+      expect(fundingSubmissionsServiceSpy.getBudgetCategoryOptions).not.toHaveBeenCalled();
+      component.rows[0].docNotes = 'DOC note';
+      component.onRowFieldChange();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [{ ...original, docNotes: 'DOC note' }] }));
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0].fields.budgetCategories)
+        .toBe('ACTCD');
+    });
+  });
 
   describe('FS-2679 per-grant DOC Pay defaults and saved readback', () => {
     let defaultsResponse: Subject<FundingSubmissionDocPayDefaultsDto[]>;

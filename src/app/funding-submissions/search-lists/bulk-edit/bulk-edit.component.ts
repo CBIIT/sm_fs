@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -18,6 +18,7 @@ import {
   DocPaySelections, hasIncompleteDocRecommendation, isBlankSelection, isPayDecision, requireDocPayDefaults
 } from '../../doc-pay-defaults';
 import { FundingRequestErrorScopeService } from '../../funding-request-error-scope.service';
+import { GrantBudgetCategoryOptions } from '../../grant-budget-category-options';
 import {
   FundingWriteRecoveryService, FundingWriteRecoveryState, isDefiniteFundingWriteRejection
 } from '../../funding-write-recovery.service';
@@ -112,6 +113,9 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   private docPayDefaultsResolvedRows = new Set<number>();
   private provenanceByRow = new Map<number, DocPayProvenance>();
   private observedSelections = new Map<number, DocPaySelections>();
+  private readonly grantBudgetOptions: GrantBudgetCategoryOptions;
+  private budgetRenderPending = false;
+  private destroyed = false;
 
   get savedChangesNeedRefresh(): boolean {
     return this.pendingFundingReadbacks.size > 0;
@@ -143,9 +147,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       && this.hasDoNotPayDocNotesErrors;
   }
 
-  // Populated from the shared FundingSubmDropdownLookupService (2026-08-24 Individual/Bulk Edit
-  // dropdown consistency fix) so this screen and Individual Edit always use the same value
-  // lists. Initialized empty and populated in ngOnInit(); see fetchDropdownOptions().
+  // The shared Bulk selector remains generic; row options are keyed by applId.
   decisionOptions: Select2OptionData[] = [];
   docNciOptions: Select2OptionData[] = [];
   yesNoOptions: Select2OptionData[] = [];
@@ -162,8 +164,18 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     private dropdownLookupService: FundingSubmDropdownLookupService,
     private userSessionService: AppUserSessionService,
     private fundingWriteRecovery: FundingWriteRecoveryService,
-    private fundingErrorScope: FundingRequestErrorScopeService
-  ) {}
+    private fundingErrorScope: FundingRequestErrorScopeService,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.grantBudgetOptions = new GrantBudgetCategoryOptions(
+      this.fundingSubmissionsService, this.fundingErrorScope, (_applId, state) => {
+        if (state.status === 'error') {
+          this.logger.error('Failed to load grant Budget Categories options', state.error);
+        }
+        this.scheduleBudgetRender();
+      }
+    );
+  }
 
   ngOnInit(): void {
     this.invalidateFundingRequests();
@@ -195,6 +207,35 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
     this.loadFundingRecoveryStates();
     this.logger.debug(JSON.stringify(this.rows));
+    if (!this.docFundingListCor) {
+      this.rows.forEach(row => this.grantBudgetOptions.request(row.applId));
+    }
+  }
+
+  getBudgetCategoryOptionsForRow(row: EditableBulkRow): Select2OptionData[] {
+    return this.grantBudgetOptions.optionsFor(row.applId, row.budgetCategories);
+  }
+
+  getBudgetCategoryStatus(row: EditableBulkRow): 'loading' | 'ready' | 'error' {
+    return this.grantBudgetOptions.state(row.applId)?.status ?? 'error';
+  }
+
+  isBudgetCategoryUnresolved(row: EditableBulkRow): boolean {
+    return this.grantBudgetOptions.hasUnresolvedSelection(row.applId, row.budgetCategories);
+  }
+
+  retryBudgetCategories(row: EditableBulkRow): void {
+    this.grantBudgetOptions.retry(row.applId);
+    this.scheduleBudgetRender();
+  }
+
+  private scheduleBudgetRender(): void {
+    if (this.budgetRenderPending || this.destroyed) return;
+    this.budgetRenderPending = true;
+    Promise.resolve().then(() => {
+      this.budgetRenderPending = false;
+      if (!this.destroyed) this.cdr.detectChanges();
+    });
   }
 
   private fetchDropdownOptions(): void {
@@ -334,6 +375,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
+    this.grantBudgetOptions.destroy();
     this.invalidateFundingRequests();
     if (this.fundingSaveSubscription && !this.fundingSaveSubscription.closed) {
       this.fundingSaveSubscription.unsubscribe();
@@ -530,7 +573,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     // Apply Changes only enables Save when it actually changed at least one row's persisted
     // value; it must not leave a stale canSave=true when the shared values matched every row.
     this.recomputeCanSave();
-    this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+    this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
   }
 
   isDoNotPayDecisionSelected(decision: string | null | undefined): boolean {
@@ -769,7 +812,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.rowRequiredValidationEnabled = false;
     this.recomputeCanSave();
     this.clearSaveMessages();
-    this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+    this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
   }
 
   onSave(): void {
@@ -797,7 +840,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
           + `${incompletePairs.map(row => row.grantNumber ?? row.applId).join(', ')}. Correct them in Individual Edit.`;
       }
       this.recomputeCanSave();
-      this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+      this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
       return;
     }
 
@@ -1015,7 +1058,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         this.docPayDefaultsLoading = false;
         this.onRowFieldChange();
-        this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+        this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
       },
       error: error => {
         if (!isCurrent()) return;
@@ -1161,7 +1204,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
           this.saveErrorMessage = `${prefix} ${errors.join(' ')} Retry refresh.`;
         }
         if (needsReview && this.rows.some(row => this.needsDocPayDefaults(row))) this.loadDocPayDefaults();
-        this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
+        this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
       },
       error: error => {
         if (!readbacks.some(readback => this.isCurrentFundingSave(readback)

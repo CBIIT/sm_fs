@@ -187,8 +187,18 @@
           <div class="field-with-inline-error">
             <ng-select2 appUserSelect2Change [id]="'bcat-' + data.applId" [ngModel]="data.budgetCategories"
               (appUserSelect2Change)="onUserRowSelectChange(data, 'budgetCategories', $event)"
-              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="budgetCategoryOptions" [allowClear]="true" width="100%">
+              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="getBudgetCategoryOptionsForRow(data)"
+              [allowClear]="true" width="100%">
             </ng-select2>
+            <div *ngIf="getBudgetCategoryStatus(data) === 'loading'" class="small">Loading Budget Categories…</div>
+            <div *ngIf="getBudgetCategoryStatus(data) === 'error'" class="text-danger small">
+              Budget Categories could not be loaded. The current selection is preserved.
+              <button type="button" class="btn btn-link btn-sm" (click)="retryBudgetCategories(data)">Retry</button>
+            </div>
+            <div *ngIf="getBudgetCategoryStatus(data) === 'ready' && isBudgetCategoryUnresolved(data)" class="text-danger small">
+              The current Budget Categories code is not in the available options.
+              <button type="button" class="btn btn-link btn-sm" (click)="retryBudgetCategories(data)">Retry</button>
+            </div>
             <div *ngIf="hasMandatoryFieldError(data, 'budgetCategories')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('Budget Categories') }}
             </div>

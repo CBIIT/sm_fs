@@ -144,9 +144,21 @@
               <span *ngIf="!isEditMode || docFundingListCor">{{budgetCategoriesDisplay}}</span>
               <ng-select2 *ngIf="isEditMode && !docFundingListCor" appUserSelect2Change name="budgetCategories" [ngModel]="formModel.budgetCategories"
                 (appUserSelect2Change)="onUserSelectChange('budgetCategories', $event)"
-                [data]="budgetCategoryOptions" [placeholder]="'Select'" [allowClear]="true" width="100%"
+                [data]="budgetCategoryOptionsForForm" [placeholder]="'Select'" [allowClear]="true" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
+              <div *ngIf="isEditMode && !docFundingListCor && budgetCategoryStatus === 'loading'" class="small">
+                Loading Budget Categories…
+              </div>
+              <div *ngIf="isEditMode && !docFundingListCor && budgetCategoryStatus === 'error'" class="text-danger small">
+                Budget Categories could not be loaded. The current selection is preserved.
+                <button type="button" class="btn btn-link btn-sm" (click)="retryBudgetCategories()">Retry</button>
+              </div>
+              <div *ngIf="isEditMode && !docFundingListCor && budgetCategoryStatus === 'ready' && budgetCategorySelectionUnresolved"
+                class="text-danger small">
+                The current Budget Categories code is not in the available options.
+                <button type="button" class="btn btn-link btn-sm" (click)="retryBudgetCategories()">Retry</button>
+              </div>
             </td>
           </tr>
 
@@ -317,8 +329,8 @@
       <div class="d-flex justify-content-end gap-2 py-2 border-top">
        
         <button type="button" class="btn btn-outline-primary" *ngIf="!isEditMode && canEnterEditMode"
-          [disabled]="!justificationLoaded || !budgetCategoriesLoaded"
-          [title]="(!justificationLoaded || !budgetCategoriesLoaded) ? 'Loading…' : ''"
+          [disabled]="!justificationLoaded"
+          [title]="!justificationLoaded ? 'Loading…' : ''"
           (click)="onEdit()">Edit</button>
         <button type="button" class="btn btn-outline-secondary" *ngIf="isEditMode"
           [disabled]="isSaveInProgress() || !!fundingRefreshError" (click)="onCancel()">Cancel</button>

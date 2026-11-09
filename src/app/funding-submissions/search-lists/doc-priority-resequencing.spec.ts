@@ -20,6 +20,7 @@ import { DocumentService } from '../../service/document.service';
 import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-lookup.service';
 import { FUNDING_WRITE_RECOVERY_STORAGE, FundingWriteRecoveryService } from '../funding-write-recovery.service';
 import { MemoryStorage } from '../testing/memory-storage';
+import { installDataTables } from '../testing/install-datatables';
 import { UserSelect2ChangeDirective } from '../user-select2-change.directive';
 import { GrantDetailComponent } from './grant-detail/grant-detail.component';
 import { SearchListsComponent } from './search-lists.component';
@@ -28,6 +29,7 @@ interface FundingServiceStub {
   getJustification(listId: number, applId: number): Observable<FundingSubmJustificationDto>;
   getDocPriorityOptions(listId: number, applId: number): Observable<number[]>;
   getDocPayDefaults(listId: number, applIds: number[]): Observable<FundingSubmissionDocPayDefaultsDto[]>;
+  getBudgetCategoryOptions(applId: number): Observable<Array<{ code: string; name: string }>>;
   getListDetail(listId: number): Observable<FundingSubmissionListDetailDto>;
   getListStatusHistory(listId: number): Observable<FundingSubmListStatusHistoryDto[]>;
   bulkUpdateListGrants(body: FundingSubmissionBulkEditRequestDto, listId: number): Observable<number>;
@@ -90,8 +92,9 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     storage = new MemoryStorage();
     funding = jasmine.createSpyObj('FundingSubmissionsService', [
       'getJustification', 'getDocPriorityOptions', 'getDocPayDefaults', 'getListDetail',
-      'getListStatusHistory', 'bulkUpdateListGrants', 'removeGrantsFromList'
+      'getListStatusHistory', 'bulkUpdateListGrants', 'removeGrantsFromList', 'getBudgetCategoryOptions'
     ]);
+    funding.getBudgetCategoryOptions.and.returnValue(of([{ code: 'R01R37', name: 'R01/R37' }]));
     funding.getJustification.and.returnValue(of({ justificationText: '' }));
     funding.getDocPriorityOptions.and.returnValue(of([1, 2, 3, 4, 5]));
     funding.getListDetail.and.callFake(() => of(listDetail()));
@@ -629,7 +632,7 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     document.body.appendChild(table);
     let dt: DataTables.Api;
     try {
-      require('datatables.net');
+      installDataTables(jquery);
       (window as any).$ = jquery;
       const rows = [grant(100, 1), grant(200, 2), grant(300, 3)];
       seedRows(rows);

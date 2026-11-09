@@ -17,6 +17,7 @@ import {
   DocPaySelectionField, DocPaySelections, isBlankSelection, isPayDecision, requireDocPayDefaults
 } from '../../doc-pay-defaults';
 import { FundingRequestErrorScopeService } from '../../funding-request-error-scope.service';
+import { GrantBudgetCategoryOptions } from '../../grant-budget-category-options';
 import {
   FundingWriteRecoveryService, FundingWriteRecoveryState, isDefiniteFundingWriteRejection
 } from '../../funding-write-recovery.service';
@@ -45,7 +46,35 @@ interface FundingSaveReadback {
   styleUrls: ['./grant-detail.component.css']
 })
 export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() data: any = null;
+  private grantData: any = null;
+  private initialized = false;
+  private destroyed = false;
+  private budgetRenderPending = false;
+  private handledDataChange: any = null;
+  private grantChangeSequence = 0;
+  private readonly grantBudgetOptions: GrantBudgetCategoryOptions;
+
+  @Input()
+  set data(value: any) {
+    const previousApplId = this.grantData?.applId;
+    this.grantData = value;
+    if (this.initialized && previousApplId !== value?.applId) {
+      this.handledDataChange = value;
+      this.prepareForGrantChange();
+      this.loadGrantBudgetOptions();
+      this.scheduleBudgetRender();
+      const sequence = ++this.grantChangeSequence;
+      Promise.resolve().then(() => {
+        if (!this.destroyed && this.grantChangeSequence === sequence) {
+          if (this.handledDataChange === value) this.handledDataChange = null;
+          this.refreshJustificationData();
+        }
+      });
+    }
+  }
+  get data(): any {
+    return this.grantData;
+  }
   @Input() listId: number;
   @Input() listStatus = 'DOC Review';
   @Input() priorityCoordinator: DetailPriorityCoordinator | null = null;
@@ -68,8 +97,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   // otherwise the justification textarea could silently start blank/stale. Set true on both
   // the success and error branches so a failed fetch never permanently locks out Edit mode.
   justificationLoaded = false;
-  // Preserve the initial budget-lookup Edit gate. This grant-independent lookup is not reset
-  // on row switches; both success and error release the gate.
+  // This state describes the current grant's lookup; it does not gate unrelated editing.
   budgetCategoriesLoaded = false;
 
   formModel: GrantEditFormModel = {};
@@ -122,9 +150,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   private readonly ALLOWED_JUSTIFICATION_FILE_EXTENSIONS = ['doc', 'docx', 'rtf', 'xls', 'xlsx', 'pdf']; // mirrors FsubJustificationConstants.ALLOWED_FILE_EXTENSIONS
   private readonly JUSTIFICATION_UPLOAD_GUIDANCE = 'You may upload Microsoft Word, Rich Text Format, Microsoft Excel, or Adobe Acrobat document(s) only. Max file size is 10MB';
 
-  // Populated from the shared FundingSubmDropdownLookupService (2026-08-24 Individual/Bulk Edit
-  // dropdown consistency fix) so this screen and Bulk Edit always use the same value lists.
-  // Initialized empty and populated in ngOnInit(); see fetchDropdownOptions().
+  // Common dropdowns use the shared lookup; budget categories are grant-specific.
   decisionOptions: Select2OptionData[] = [];
   yesNoOptions: Select2OptionData[] = [];
   annualMyfOptions: Select2OptionData[] = [];
@@ -144,7 +170,20 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     private documentService: DocumentService,
     private fundingWriteRecovery: FundingWriteRecoveryService,
     private fundingErrorScope: FundingRequestErrorScopeService
-  ) {}
+  ) {
+    this.grantBudgetOptions = new GrantBudgetCategoryOptions(
+      this.fundingSubmissionsService, this.fundingErrorScope, (applId, state) => {
+        if (state.status === 'error') {
+          this.logger.error('Failed to load grant Budget Categories options', state.error);
+        }
+        if (this.data?.applId === applId) {
+          this.budgetCategoryOptions = state.options;
+          this.budgetCategoriesLoaded = true;
+          this.scheduleBudgetRender();
+        }
+      }
+    );
+  }
 
   ngOnInit(): void {
     this.grantViewerUrl = this.propertiesService.getProperty('GRANT_VIEWER_URL');
@@ -153,16 +192,33 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.financialAnalyst = this.userSessionService.hasRole(roleNames.FINANCIAL_ANALYST);
     this.fetchDropdownOptions();
     this.refreshJustificationData();
+    this.initialized = true;
+    this.loadGrantBudgetOptions();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['listId'] || changes['data']) && this.listId && this.data?.applId) {
-      this.invalidateFundingRequests();
-      this.isEditMode = false;
-      this.justificationLoaded = false;
-      this.refreshJustificationData();
+      this.grantChangeSequence++;
+      if (changes['data'] && !changes['listId'] && this.handledDataChange === this.data) {
+        this.refreshJustificationData();
+      } else {
+        this.resetForGrantChange();
+      }
     }
+    this.handledDataChange = null;
 
+    this.recomputeDoNotPayOefiaLock();
+  }
+
+  private resetForGrantChange(): void {
+    this.prepareForGrantChange();
+    this.refreshJustificationData();
+  }
+
+  private prepareForGrantChange(): void {
+    this.invalidateFundingRequests();
+    this.isEditMode = false;
+    this.justificationLoaded = false;
     this.recomputeDoNotPayOefiaLock();
   }
 
@@ -179,22 +235,48 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       next: options => { this.annualMyfOptions = options; this.cdr.detectChanges(); },
       error: err => this.logger.error('Failed to load Annual or MYF options', err)
     });
-    this.dropdownLookupService.getBudgetCategories().subscribe({
-      next: options => {
-        this.budgetCategoryOptions = options;
-        this.budgetCategoriesLoaded = true;
-        this.cdr.detectChanges();
-      },
-      error: err => {
-        this.logger.error('Failed to load Budget Categories options', err);
-        // Still flip the flag on error so a failed fetch never permanently disables Edit.
-        this.budgetCategoriesLoaded = true;
-        this.cdr.detectChanges();
-      }
-    });
     this.dropdownLookupService.getDocNciSelections().subscribe({
       next: options => { this.selectionOptions = options; this.cdr.detectChanges(); },
       error: err => this.logger.error('Failed to load DOC/NCI Selection options', err)
+    });
+  }
+
+  private loadGrantBudgetOptions(): void {
+    this.budgetCategoryOptions = [];
+    this.budgetCategoriesLoaded = false;
+    const applId = this.data?.applId;
+    this.grantBudgetOptions.request(applId);
+    const state = this.grantBudgetOptions.state(applId);
+    if (state) {
+      this.budgetCategoryOptions = state.options;
+      this.budgetCategoriesLoaded = state.status !== 'loading';
+    }
+  }
+
+  get budgetCategoryStatus(): 'loading' | 'ready' | 'error' {
+    return this.grantBudgetOptions.state(this.data?.applId)?.status ?? 'error';
+  }
+
+  get budgetCategoryOptionsForForm(): Select2OptionData[] {
+    return this.grantBudgetOptions.optionsFor(this.data?.applId, this.formModel.budgetCategories);
+  }
+
+  get budgetCategorySelectionUnresolved(): boolean {
+    return this.grantBudgetOptions.hasUnresolvedSelection(this.data?.applId, this.formModel.budgetCategories);
+  }
+
+  retryBudgetCategories(): void {
+    this.budgetCategoriesLoaded = false;
+    this.grantBudgetOptions.retry(this.data?.applId);
+    this.scheduleBudgetRender();
+  }
+
+  private scheduleBudgetRender(): void {
+    if (this.budgetRenderPending || this.destroyed) return;
+    this.budgetRenderPending = true;
+    Promise.resolve().then(() => {
+      this.budgetRenderPending = false;
+      if (!this.destroyed) this.cdr.detectChanges();
     });
   }
 
@@ -217,7 +299,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     // Guard against building formModel from stale/absent data while the initial
     // justification fetch is still in flight — the template also disables the Edit button
     // while !justificationLoaded, but this guard protects against any other trigger path.
-    if (!this.justificationLoaded || !this.budgetCategoriesLoaded || this.savingInProgress || this.pendingFundingReadback) {
+    if (!this.justificationLoaded || this.savingInProgress || this.pendingFundingReadback) {
       return;
     }
     // DOC users can only edit while list status is DOC Review.
@@ -310,6 +392,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
+    this.grantBudgetOptions.destroy();
     this.invalidateFundingRequests();
     if (this.fundingSaveSubscription && !this.fundingSaveSubscription.closed) {
       this.fundingSaveSubscription.unsubscribe();
@@ -816,7 +900,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       docDecision: this.normalizeOptionValueToId(fields.docDecision, this.decisionOptions),
       docNciSelection: this.normalizeOptionValueToId(fields.docNciSelection, this.selectionOptions),
       annualOrMyf: this.normalizeOptionValueToId(fields.annualOrMyf, this.annualMyfOptions),
-      budgetCategories: this.normalizeOptionValueToId(fields.budgetCategories, this.budgetCategoryOptions)
+      // The form already stores a category code. A grant's ACTCD name can itself
+      // resemble another code, so reverse-matching names could change an untouched value.
+      budgetCategories: String(fields.budgetCategories ?? '').trim() || null
     };
   }
 
@@ -1568,8 +1654,14 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       return of(true);
     }
 
-    return this.fundingSubmissionsService.getJustification(this.listId, this.data.applId).pipe(
+    const listId = this.listId;
+    const applId = this.data.applId;
+    const requestVersion = this.editVersion;
+    const isCurrent = () => !this.destroyed && this.editVersion === requestVersion
+      && this.listId === listId && this.data?.applId === applId;
+    return this.fundingSubmissionsService.getJustification(listId, applId).pipe(
       map(justification => {
+        if (!isCurrent()) return false;
         const rawDocuments = (justification as any)?.documents
           ?? (justification as any)?.document
           ?? (justification as any)?.docs
@@ -1586,6 +1678,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
         return true;
       }),
       catchError(err => {
+        if (!isCurrent()) return of(false);
         this.logger.debug('Unable to load justification documents', err);
         // Still flip the flag on error so a failed fetch never permanently disables Edit.
         this.justificationLoaded = true;

@@ -43,6 +43,8 @@ export class FundingRequestErrorScopeInterceptor implements HttpInterceptor {
         && /\/funding-submissions\/lists\/\d+\/grants$/.test(path))
       || (req.method === 'GET'
         && /\/funding-submissions\/lists\/\d+(?:\/status-history|\/grants\/(?:doc-pay-defaults|\d+\/doc-priority-options))?$/
-          .test(path));
+          .test(path))
+      || (req.method === 'GET'
+        && /\/funding-submissions\/grants\/\d+\/budget-category-options$/.test(path));
   }
 }
