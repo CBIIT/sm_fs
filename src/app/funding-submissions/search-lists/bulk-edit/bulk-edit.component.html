@@ -44,6 +44,11 @@
         </ngb-alert>
       </div>
     </div>
+    <div class="row" *ngIf="recommendationErrorMessage" role="alert">
+      <div class="col-12">
+        <ngb-alert type="danger" [dismissible]="false">{{recommendationErrorMessage}}</ngb-alert>
+      </div>
+    </div>
     <div class="row" *ngIf="saveErrorMessage" role="alert">
       <div class="col-12">
         <ngb-alert type="danger" [dismissible]="true" (closed)="saveErrorMessage = ''">
@@ -288,7 +293,7 @@
         [disableTooltip]="!showApplyBeforeSaveTooltip"
         [attr.tabindex]="showApplyBeforeSaveTooltip ? 0 : null" container="body">
         <button type="button" class="btn btn-primary" (click)="onSave()"
-          [disabled]="!rows.length || !canSave || hasDoNotPayDocNotesErrors || isSaving
+          [disabled]="!rows.length || !canSave || hasDoNotPayDocNotesErrors || hasMandatoryFieldErrors || hasRecommendationErrors || isSaving
             || docPayDefaultsLoading || !!docPayDefaultsError || !!fundingRecoveryError">
           <span *ngIf="!isSaving">Save</span>
           <span *ngIf="isSaving">Saving...</span>

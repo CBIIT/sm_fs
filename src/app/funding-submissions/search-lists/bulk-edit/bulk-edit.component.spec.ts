@@ -72,8 +72,8 @@ describe('BulkEditComponent', () => {
       docNotes: '',
       oefiaNotes: '',
       docPriority: 1,
-      docRecommendedAmount: null,
-      docRecommendedReductionPct: null,
+      docRecommendedAmount: 90000,
+      docRecommendedReductionPct: 10,
       twoYearAnnualFundingR01Flag: true,
       recusedFlag: false,
       ...overrides
@@ -635,12 +635,15 @@ describe('BulkEditComponent', () => {
       component.rows[1].annualFundingR01 = 'No';
       component.onRowFieldChange(component.rows[1], 'annualFundingR01');
       component.onSave();
-      expect(component.saveErrorMessage).toContain('recommended amount and reduction must both be supplied');
+      expect(component.recommendationErrorMessage).toContain('recommended amount, reduction, and priority must be supplied and valid');
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
     });
 
     it('keeps acknowledged, rejected and unknown row outcomes independent without replaying held rows', () => {
-      const third = { ...grant({ applId: 300 }), budgetCategories: 'ESIR37T4', annualFundingR01: 'Yes' };
+      const third = {
+        ...grant({ applId: 300 }), budgetCategories: 'ESIR37T4', annualFundingR01: 'Yes',
+        docRecAmt: 90000, docRecReductionPct: 10
+      };
       component.rows.push(third);
       (component as any).lastSavedRows.push({ ...third });
       const firstWrite = new Subject<number>();
@@ -1171,9 +1174,147 @@ describe('BulkEditComponent', () => {
     });
   });
 
+  describe('FS-2251 recommendation parity', () => {
+    it('does not show any validation errors for initially incomplete rows', () => {
+      seedHistoryStateAndInit([
+        grant({ docDecision: 'Do Not Pay', docNotes: '' }),
+        grant({ applId: 200, docRecommendedAmount: null, budgetCategoryCode: null })
+      ]);
+      expect(component.hasMandatoryFieldErrors).toBeFalse();
+      expect(component.hasDoNotPayDocNotesErrors).toBeFalse();
+      expect(component.hasRecommendationErrors).toBeFalse();
+      expect(component.recommendationErrorMessage).toBe('');
+    });
+
+    for (const fields of [
+      { docRecAmt: null }, { docRecReductionPct: null }, { docPriority: null },
+      { docRecAmt: -1 }, { docRecAmt: 1.5 }, { docRecReductionPct: 100 },
+      { docRecReductionPct: 1.234 }, { docPriority: '-1' }, { docPriority: '1.5' }
+    ]) {
+      it(`blocks a Pay row with ${JSON.stringify(fields)} on Apply and direct Save`, () => {
+        initializeFixtureWithGrants([grant()]);
+        Object.assign(component.rows[0], fields);
+        component.bulkFields = { docNotes: 'changed' };
+        component.onApplyChanges();
+        fixture.detectChanges();
+
+        expect(component.canSave).toBeTrue();
+        expect(component.hasRecommendationErrors).toBeTrue();
+        expect(getSaveButton().disabled).toBeTrue();
+        expect(component.recommendationErrorMessage).toContain('1R01CA123456-01');
+        expect(component.recommendationErrorMessage).toMatch(/Correct them in Individual Edit\.$/);
+        component.onSave();
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+        expect(fixture.nativeElement.textContent).toContain(component.recommendationErrorMessage);
+      });
+    }
+
+    it('validates missing saved recommendations even on unchanged submitted rows', () => {
+      seedHistoryStateAndInit([
+        grant({ docRecommendedAmount: null, docRecommendedReductionPct: null }),
+        grant({ applId: 200, grantNumber: 'OTHER' })
+      ]);
+      component.rows[1].docNotes = 'changed';
+      component.onRowFieldChange();
+      expect(component.hasRecommendationErrors).toBeFalse();
+      component.onSave();
+      expect(component.hasRecommendationErrors).toBeTrue();
+      expect(component.recommendationErrorMessage).toContain('1R01CA123456-01');
+      expect(component.recommendationErrorMessage).not.toContain('OTHER');
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
+
+    it('keeps derived errors across save-message clearing and refresh and clears fixed or reset rows', () => {
+      seedHistoryStateAndInit([grant({ docRecommendedAmount: null })]);
+      component.bulkFields = { docNotes: 'changed' };
+      component.onApplyChanges();
+      const message = component.recommendationErrorMessage;
+      (component as any).clearSaveMessages();
+      component.refreshSavedFunding();
+      expect(component.recommendationErrorMessage).toBe(message);
+      component.rows[0].docRecAmt = 100;
+      component.onRowFieldChange();
+      expect(component.hasRecommendationErrors).toBeFalse();
+      expect(component.recommendationErrorMessage).toBe('');
+      component.rows[0].docRecAmt = null;
+      component.onRowFieldChange();
+      expect(component.hasRecommendationErrors).toBeTrue();
+      component.onReset();
+      expect(component.hasRecommendationErrors).toBeFalse();
+      expect(component.recommendationErrorMessage).toBe('');
+    });
+
+    it('does not validate pending defaults and reevaluates when they arrive', () => {
+      const response = new Subject<FundingSubmissionDocPayDefaultsDto[]>();
+      fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(response);
+      seedHistoryStateAndInit([grant({
+        docDecision: 'Do Not Pay', docPriority: null,
+        docRecommendedAmount: null, docRecommendedReductionPct: null
+      })]);
+      component.bulkFields = { docDecision: 'Pay' };
+      component.onApplyChanges();
+      expect(component.docPayDefaultsLoading).toBeTrue();
+      expect(component.hasRecommendationErrors).toBeFalse();
+      response.next([{
+        applId: 100, transitionEligible: true, budgetCategories: 'ESIR37T4', docNciSelection: 'DOC',
+        annualFundingR01: 'No', annualOrMyf: 'MYF', docPriority: '1', docRecAmt: 100, docRecReductionPct: 0
+      }]);
+      expect(component.docPayDefaultsLoading).toBeFalse();
+      expect(component.hasRecommendationErrors).toBeFalse();
+      expect(component.hasMandatoryFieldErrors).toBeFalse();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalled();
+    });
+
+    it('ignores recommendations on Do Not Pay rows', () => {
+      seedHistoryStateAndInit([grant({ docDecision: 'Do Not Pay' })]);
+      component.bulkFields = { docNotes: 'Not recommended' };
+      component.onApplyChanges();
+      expect(component.rows[0].docRecAmt).toBeNull();
+      expect(component.hasRecommendationErrors).toBeFalse();
+      expect(component.hasMandatoryFieldErrors).toBeFalse();
+    });
+
+    it('retains the derived recommendation alert through real readback errors and successes', () => {
+      seedHistoryStateAndInit([grant(), grant({ applId: 200, grantNumber: 'GRANT-200' })]);
+      // The second row was already acknowledged and has no pending changes.
+      (component as any).acknowledgedRows.add(200);
+      component.rows[0].docNotes = 'changed';
+      component.onRowFieldChange();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+      const readback = new Subject<FundingSubmissionListDetailDto>();
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(readback);
+      component.onSave();
+      expect(component.savedChangesNeedRefresh).toBeTrue();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+
+      component.rows[1].docRecAmt = null;
+      component.onRowFieldChange();
+      const message = component.recommendationErrorMessage;
+      expect(message).toContain('GRANT-200');
+      (component as any).clearSaveMessages();
+      readback.error({ status: 500 });
+      expect(component.recommendationErrorMessage).toBe(message);
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [
+        grant({ docNotes: 'changed' }), grant({ applId: 200, grantNumber: 'GRANT-200' })
+      ] }));
+      component.refreshSavedFunding();
+      expect(component.savedChangesNeedRefresh).toBeFalse();
+      expect(component.recommendationErrorMessage).toBe(message);
+
+      (component as any).fundingRecoveryStates.set(200, 'unknown');
+      component.onRowFieldChange();
+      expect(component.hasRecommendationErrors).toBeFalse();
+      expect(component.recommendationErrorMessage).toBe('');
+    });
+  });
+
   describe('Req. 35 AC6 (FS-2356) and AC7 (FS-2357) — Save validation', () => {
-    it('applies a partial shared-field edit and validates the resulting row only when Save is selected', () => {
-      seedHistoryStateAndInit([grant({ twoYearAnnualFundingR01Flag: false })]);
+    it('validates on Apply and disables Save until the mandatory row selection is fixed', () => {
+      initializeFixtureWithGrants([grant({ annualFundingR01: null, twoYearAnnualFundingR01Flag: false })]);
+      expect(component.hasMandatoryFieldErrors).toBeFalse();
+      expect(component.hasRecommendationErrors).toBeFalse();
       component.bulkFields = { docNotes: 'partial shared edit' };
       component.onBulkFieldChange();
 
@@ -1181,7 +1322,9 @@ describe('BulkEditComponent', () => {
 
       expect(component.rows[0].docNotes).toBe('partial shared edit');
       expect(component.canSave).toBeTrue();
-      expect(component.hasMandatoryFieldError(component.rows[0], 'annualFundingR01')).toBeFalse();
+      fixture.detectChanges();
+      expect(component.hasMandatoryFieldError(component.rows[0], 'annualFundingR01')).toBeTrue();
+      expect(getSaveButton().disabled).toBeTrue();
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
 
       component.onSave();
@@ -1191,6 +1334,11 @@ describe('BulkEditComponent', () => {
         .toBe('Two-Year Annual Funding R01 (HRHR) is required');
       expect(component.canSave).toBeTrue();
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+
+      component.onUserRowSelectChange(component.rows[0], 'annualFundingR01', 'No');
+      fixture.detectChanges();
+      expect(component.hasMandatoryFieldErrors).toBeFalse();
+      expect(getSaveButton().disabled).toBeFalse();
     });
 
     [
@@ -1325,7 +1473,7 @@ describe('BulkEditComponent', () => {
       expect(row.annualFundingR01).toBeNull();
       expect(row.annualOrMyf).toBeNull();
       expect(component.getDoNotPayDocNotesErrorMessage())
-        .toBe('DOC Notes is required when DOC decision is Do Not Pay.');
+        .toBe('DOC Notes is required when DOC Decision is Do Not Pay.');
       expect(component.hasMandatoryFieldError(row, 'budgetCategories')).toBeFalse();
       expect(component.hasMandatoryFieldError(row, 'docNciSelection')).toBeFalse();
       expect(component.hasMandatoryFieldError(row, 'annualFundingR01')).toBeFalse();
@@ -1360,7 +1508,7 @@ describe('BulkEditComponent', () => {
       component.onApplyChanges();
       fixture.detectChanges();
 
-      const message = 'DOC Notes is required when DOC decision is Do Not Pay.';
+      const message = 'DOC Notes is required when DOC Decision is Do Not Pay.';
       expect(component.rows.every(row => component.hasDoNotPayDocNotesError(row))).toBeTrue();
       expect(component.showBulkDoNotPayDocNotesError).toBeTrue();
       expect(fixture.nativeElement.textContent).toContain(message);

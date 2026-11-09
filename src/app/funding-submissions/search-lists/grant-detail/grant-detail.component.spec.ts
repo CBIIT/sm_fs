@@ -28,6 +28,10 @@ class BoundGrantDetailHost {
 }
 
 describe('GrantDetailComponent', () => {
+  const paySelections = {
+    docDecision: 'Pay', budgetCategories: 'ESIR37T4', docNciSelection: 'DOC',
+    annualFundingR01: 'No', annualOrMyf: 'MYF'
+  };
   let component: GrantDetailComponent;
   let fixture: ComponentFixture<GrantDetailComponent>;
   let fundingSubmissionsServiceSpy: jasmine.SpyObj<Omit<FundingSubmissionsService,
@@ -121,7 +125,11 @@ describe('GrantDetailComponent', () => {
     fixture = TestBed.createComponent(GrantDetailComponent);
     component = fixture.componentInstance;
     component.listId = 1;
-    component.data = { applId: 100, grantNumber: '1R01CA123456-01', justificationText: '' };
+    component.data = {
+      applId: 100, grantNumber: '1R01CA123456-01', justificationText: '',
+      docDecision: 'Pay', budgetCategoryCode: 'ESIR37T4', docNciSelection: 'DOC',
+      annualFundingR01: 'No', annualOrMyf: 'MYF'
+    };
   });
 
   it('should create', () => {
@@ -249,7 +257,7 @@ describe('GrantDetailComponent', () => {
     });
 
     for (const activity of ['R03', 'R15', 'U01', 'missing activity']) {
-      it(`leaves 2Y blank for ${activity} and retains the service's required-field rejection`, () => {
+      it(`leaves 2Y blank for ${activity} and blocks the required field before submission`, () => {
         choosePay();
         defaultsResponse.next([{
           ...resolvedDefaults, annualFundingR01: null,
@@ -260,7 +268,8 @@ describe('GrantDetailComponent', () => {
           status: 400, error: { errorMessage: 'Two-Year Annual Funding R01 (HRHR) is required.' }
         })));
         component.onSave();
-        expect(component.fundingSaveError).toBe('Two-Year Annual Funding R01 (HRHR) is required.');
+        expect(component.saveValidationErrors.annualFundingR01).toBe('Two-Year Annual Funding R01 (HRHR) is required');
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
         expect(component.isEditMode).toBeTrue();
         expect(component.saveSuccessMessage).toBe('');
       });
@@ -397,13 +406,14 @@ describe('GrantDetailComponent', () => {
       expect(component.hasSaveValidationErrors).toBeTrue();
       component.formModel.docRecAmt = 80000;
       component.onDocRecAmtChange();
+      component.onUserSelectChange('annualFundingR01', 'No');
       component.onSave();
       const request = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0];
       expect(request.transitionIntents).toEqual([{
         applId: 100, priorityMode: 'SUBMITTED', editedFields: ['docRecAmt', 'annualFundingR01']
       }]);
       expect(request.fields.docRecReductionPct).toBe(20);
-      expect(request.fields.annualFundingR01).toBeNull();
+      expect(request.fields.annualFundingR01).toBe('No');
     });
 
     it('does not restore a user-cleared priority or combine an existing recommendation half with a preview', () => {
@@ -480,6 +490,9 @@ describe('GrantDetailComponent', () => {
     it('does not block a non-transition edit solely because priority options failed to load', () => {
       component.forceDiscardAndClose();
       component.data.docDecision = 'Pay';
+      Object.assign(component.data, {
+        budgetCategoryCode: 'ESIR37T4', docNciSelection: 'DOC', annualFundingR01: 'No', annualOrMyf: 'MYF'
+      });
       fundingSubmissionsServiceSpy.getDocPriorityOptions.and.returnValue(
         throwError(() => new Error('Options unavailable'))
       );
@@ -2135,7 +2148,7 @@ describe('GrantDetailComponent', () => {
       expect(component.formModel.annualFundingR01).toBe('No');
     });
 
-    it('preserves legacy null without claiming a successful save when the service rejects the required field', () => {
+    it('preserves legacy null and blocks Save locally for the required field', () => {
       fixture.detectChanges();
       getJustificationSubject.next({ justificationText: '' });
       getJustificationSubject.complete();
@@ -2166,13 +2179,12 @@ describe('GrantDetailComponent', () => {
       component.formModel.docNotes = 'Updated notes';
       component.onSave();
 
-      const [payload] = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args;
-      expect(payload.fields.annualFundingR01).toBeNull();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
       expect(component.data.annualFundingR01).toBeNull();
       expect(component.data.twoYearAnnualFundingR01Flag).toBeFalse();
       expect(component.isEditMode).toBeTrue();
       expect(component.formModel.annualFundingR01).toBeNull();
-      expect(component.fundingSaveError).toBe(message);
+      expect(component.saveValidationErrors.annualFundingR01).toBe('Two-Year Annual Funding R01 (HRHR) is required');
       expect(component.saveSuccessMessage).toBe('');
       expect(component.saved.emit).not.toHaveBeenCalled();
     });
@@ -2634,15 +2646,19 @@ describe('GrantDetailComponent', () => {
       expect(component.canEditOefiaNotes()).toBeFalse();
     });
 
-    it('does not activate the Do Not Pay lock for OEFIA users on OEFIA-added rows', () => {
+    it('requires editable DOC Notes and optional OEFIA Notes under the OEFIA Do Not Pay lock', () => {
       component.OEFIACertifier = true;
       component.onEdit();
       component.formModel.docDecision = 'DNP';
 
       component.onDocDecisionChange();
 
-      expect(component.doNotPayOefiaLockActive).toBeFalse();
+      expect(component.doNotPayOefiaLockActive).toBeTrue();
       expect(component.canEditOefiaNotes()).toBeTrue();
+      expect(component.saveValidationErrors.docNotes).toBe('DOC Notes is required when DOC Decision is Do Not Pay.');
+      expect(component.saveValidationErrors.oefiaNotes).toBeUndefined();
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('textarea[name="docNotes"]').disabled).toBeFalse();
     });
 
     it('preserves edited OEFIA Notes for OEFIA users when Do Not Pay is selected', () => {
@@ -2685,7 +2701,7 @@ describe('GrantDetailComponent', () => {
       { name: 'docPriority', label: 'DOC Priority' }
     ]) {
       it(`shows ${label} required immediately when cleared without blur`, async () => {
-        component.formModel = { docRecReductionPct: 10, docRecAmt: 100, docPriority: '1' };
+        component.formModel = { ...paySelections, docRecReductionPct: 10, docRecAmt: 100, docPriority: '1' };
         fixture.detectChanges();
         await fixture.whenStable();
 
@@ -2744,7 +2760,7 @@ describe('GrantDetailComponent', () => {
         it(`blocks ${role} Save when only ${field} is blank`, () => {
           component.docFundingListCor = role === 'DOC';
           component.OEFIACertifier = role === 'OEFIA';
-          component.formModel = { docRecReductionPct: 0, docRecAmt: 100, docPriority: '0' };
+          component.formModel = { ...paySelections, docRecReductionPct: 0, docRecAmt: 100, docPriority: '0' };
           component.formModel[field] = null;
           fixture.detectChanges();
 
@@ -2791,7 +2807,7 @@ describe('GrantDetailComponent', () => {
         { docPriority: '-1' },
         { docPriority: '1.5' }
       ]) {
-        component.formModel = { docRecReductionPct: 0, docRecAmt: 100, docPriority: '0', ...invalidFields };
+        component.formModel = { ...paySelections, docRecReductionPct: 0, docRecAmt: 100, docPriority: '0', ...invalidFields };
         expect(component.hasSaveValidationErrors).toBeTrue();
       }
     });
@@ -2811,11 +2827,76 @@ describe('GrantDetailComponent', () => {
       component.OEFIACertifier = true;
       expect(component.hasSaveValidationErrors).toBeTrue();
 
-      component.formModel = { docRecReductionPct: 0, docRecAmt: 100, docPriority: '0' };
+      component.formModel = { ...paySelections, docRecReductionPct: 0, docRecAmt: 100, docPriority: '0' };
       expect(component.hasSaveValidationErrors).toBeFalse();
       component.justificationFileError = 'Unsupported file type.';
       expect(component.hasSaveValidationErrors).toBeTrue();
     });
+  });
+
+  describe('FS-2251 Individual and Bulk Edit parity', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      component.onEdit();
+    });
+
+    for (const role of ['DOC', 'OEFIA', 'FA', 'OTHER', 'DOC non-OEFIA']) {
+      it(`requires editable DOC Notes, never OEFIA Notes, for Do Not Pay as ${role}`, () => {
+        component.docFundingListCor = role.startsWith('DOC');
+        component.OEFIACertifier = role === 'OEFIA';
+        component.financialAnalyst = role === 'FA';
+        component.data.addedByGroup = role === 'DOC non-OEFIA' ? 'OTHER' : 'OEFIA';
+        component.formModel = { docDecision: 'Do Not Pay', docNotes: ' \t ', oefiaNotes: '' };
+        component.onDocDecisionChange();
+        component.onSave();
+        fixture.detectChanges();
+
+        expect(component.saveValidationErrors).toEqual({
+          docNotes: 'DOC Notes is required when DOC Decision is Do Not Pay.'
+        });
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+        const docNotes: HTMLTextAreaElement = fixture.nativeElement.querySelector('textarea[name="docNotes"]');
+        expect(docNotes.disabled).toBeFalse();
+        const labels = Array.from(fixture.nativeElement.querySelectorAll('td.grid-label')) as HTMLElement[];
+        expect(labels.find(label => label.textContent.startsWith('DOC Notes')).textContent).toContain('(Required)');
+        expect(labels.find(label => label.textContent.startsWith('OEFIA Notes')).textContent).toContain('(Optional)');
+
+        component.formModel.docNotes = 'Not recommended';
+        component.onNotesModelChange('docNotes');
+        expect(component.hasSaveValidationErrors).toBeFalse();
+        expect(component.saveValidationErrors).toEqual({});
+        fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+        component.onSave();
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalled();
+      });
+    }
+
+    for (const role of ['DOC', 'OEFIA']) {
+      for (const [field, label] of [
+        ['docDecision', 'DOC Decision'], ['budgetCategories', 'Budget Categories'],
+        ['docNciSelection', 'DOC/NCI Selection'], ['annualFundingR01', 'Two-Year Annual Funding R01 (HRHR)'],
+        ['annualOrMyf', 'Annual or MYF']
+      ] as const) {
+        it(`blocks ${role} Pay save and renders ${label} required when cleared`, () => {
+          component.docFundingListCor = role === 'DOC';
+          component.OEFIACertifier = role === 'OEFIA';
+          component.formModel = { ...paySelections, docRecAmt: 100, docRecReductionPct: 0, docPriority: '1' };
+          component.onUserSelectChange(field, ' \t ');
+          fixture.detectChanges();
+
+          expect(component.saveValidationErrors[field]).toBe(`${label} is required`);
+          expect(component.hasSaveValidationErrors).toBeTrue();
+          expect(fixture.nativeElement.querySelector('button.btn-primary').disabled).toBeTrue();
+          expect(fixture.nativeElement.textContent).toContain(`${label} is required`);
+          component.onSave();
+          expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+          component.onUserSelectChange(field, paySelections[field]);
+          expect(component.saveValidationErrors[field]).toBeUndefined();
+          expect(component.hasSaveValidationErrors).toBeFalse();
+        });
+      }
+    }
   });
 
   describe('FS-2248 DOC reduction calculations', () => {
