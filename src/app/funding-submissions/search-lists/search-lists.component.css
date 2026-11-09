@@ -41,8 +41,7 @@
 
 .doc-count {
   width: 50px;
-  text-align: right;
-  padding-right: 16px;
+  text-align: left;
   flex-shrink: 0;
 }
 
@@ -100,10 +99,13 @@ tr.shown {
 }
 
 .doc-row {
-  height: 48px;
+  min-height: 48px;
+  padding: 8px 0;
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 70px 50px minmax(0, 1fr);
   align-items: center;
+  text-align: left;
   border-color: #d9d9d9 !important;
   font-family: Arial, sans-serif;
   font-size: 14px;
@@ -120,7 +122,6 @@ tr.shown {
   font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
-  width: fit-content;
 }
 
 .doc-status {
@@ -128,13 +129,14 @@ tr.shown {
   align-items: center;
   gap: 9px;
   color: #333;
-  white-space: nowrap;
+  min-width: 0;
 }
 
 .doc-status i {
   font-size: 16px;
   width: 16px;
-  text-align: center;
+  flex: 0 0 16px;
+  text-align: left;
 }
 
 .doc-status i.status-draft { color: #5a95da; }
