@@ -9,6 +9,7 @@ import { NGXLogger } from 'ngx-logger';
 import { of, Subject, throwError } from 'rxjs';
 import { FundingListsComponent } from './funding-lists.component';
 import { DirectorBulkEditComponent } from './bulk-edit/director-bulk-edit.component';
+import { NciDecisionCellRendererComponent } from '../../table-cell-renderers/nci-decision-cell-renderer/nci-decision-cell-renderer.component';
 import { FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DataTableDirective } from 'angular-datatables';
@@ -392,6 +393,90 @@ describe('FundingListsComponent', () => {
     expect(scrollArg.top).toBe(0);
     expect(scrollArg.behavior).toBe('smooth');
     expect(component.decisionSuccessMessage).toContain('Success! Grant R01CA123456 has been approved.');
+  });
+
+  ['Approve', 'Hold', 'Rejected'].forEach(decision => {
+    it(`refreshes saved decision metadata before rendering formatted ${decision}`, () => {
+      spyOn(window, 'scrollTo');
+      const reload = spyOn<any>(component, 'reloadTable').and.stub();
+      const saveResponse = new Subject<any>();
+      const detailResponse = new Subject<any>();
+      fundingSubmissionsServiceSpy.saveNciDecisions.and.returnValue(saveResponse);
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(detailResponse);
+      const grant = buildGrant({
+        applId: 42, nciDecision: 'Hold', nciDecisionByName: 'Previous Reviewer', nciDecisionDate: '2026-10-01'
+      });
+      component.listId = 39;
+      component.grants = [grant];
+      component.selectedTab = 'all';
+      component.selectedDoc = 'DCB';
+      component.selectedRows.set(42, grant);
+      (component as any).pendingDecision = decision;
+      (component as any).pendingDecisionGrant = grant;
+      component.pendingDecisionNote = 'Approved note';
+
+      component.onConfirmGrantDecision();
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+      saveResponse.next({ listId: 39, updatedCount: 1 });
+      saveResponse.complete();
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledWith(39);
+      expect(grant.nciDecisionByName).toBeUndefined();
+      expect(grant.nciDecisionDate).toBeUndefined();
+
+      detailResponse.next({ ...emptyListDetail(), grants: [{
+        ...grant, nciDecision: decision, nciDecisionByName: 'Current Reviewer',
+        nciDecisionDate: '2026-11-10', nciDirectorNotes: 'Approved note'
+      }] });
+      detailResponse.complete();
+
+      const expected = `${decision === 'Approve' ? 'Approved' : decision} by Current Reviewer on 11/10/2026`;
+      const renderer = new NciDecisionCellRendererComponent();
+      renderer.data = grant;
+      expect(renderer.decisionDisplay).toBe(expected);
+      const column = component.dtOptions.columns.find((candidate: any) => candidate.title === 'NCI Decision');
+      expect(column.render(grant.nciDecision, 'filter', grant)).toBe(expected);
+      expect(column.render(grant.nciDecision, 'export', grant)).toBe(expected);
+      expect(component.selectedRows.get(42)).toBe(grant);
+      expect(component.selectedTab).toBe('all');
+      expect(component.selectedDoc).toBe('DCB');
+      expect(reload).toHaveBeenCalled();
+    });
+  });
+
+  it('keeps the saved decision and warns when its metadata refresh fails', () => {
+    spyOn(window, 'scrollTo');
+    spyOn<any>(component, 'reloadTable').and.stub();
+    const grant = buildGrant({ applId: 42, nciDecision: 'Hold', nciDecisionByName: 'Old Reviewer', nciDecisionDate: '2026-10-01' });
+    component.grants = [grant];
+    component.selectedRows.set(42, grant);
+    (component as any).pendingDecision = 'Approve';
+    (component as any).pendingDecisionGrant = grant;
+    fundingSubmissionsServiceSpy.getListDetail.and.returnValue(throwError(() => new Error('Refresh failed')));
+
+    component.onConfirmGrantDecision();
+
+    expect(grant.nciDecision).toBe('Approve');
+    expect(grant.nciDecisionByName).toBeUndefined();
+    expect(grant.nciDecisionDate).toBeUndefined();
+    expect(component.grants).toEqual([grant]);
+    expect(component.selectedRows.get(42)).toBe(grant);
+    expect(component.decisionSuccessMessage).toContain('has been approved');
+    expect(component.loadErrorMessage).toContain('The decision was saved, but its details could not be refreshed');
+    expect(component.pendingDecisionValidationMessage).toBe('');
+  });
+
+  it('does not refresh metadata when saving the decision fails', () => {
+    const grant = buildGrant({ nciDecision: 'Hold', nciDecisionByName: 'Previous Reviewer' });
+    (component as any).pendingDecision = 'Approve';
+    (component as any).pendingDecisionGrant = grant;
+    fundingSubmissionsServiceSpy.saveNciDecisions.and.returnValue(throwError(() => ({ status: 409 })));
+
+    component.onConfirmGrantDecision();
+
+    expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+    expect(grant.nciDecision).toBe('Hold');
+    expect(grant.nciDecisionByName).toBe('Previous Reviewer');
+    expect(component.pendingDecisionValidationMessage).toContain('locked');
   });
 
   it('does not call save or scroll when Hold is submitted without required note', () => {

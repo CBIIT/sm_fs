@@ -1,7 +1,7 @@
 import { FundingSubmissionListGrantDto } from '@cbiit/i2efsws-lib';
 
 export function formatNciDecision(grant: FundingSubmissionListGrantDto): string {
-  const decision = String(grant?.nciDecision || '').trim();
+  const decision = String(grant?.nciDecision || '').trim() == "Approve" ? "Approved" : String(grant?.nciDecision || '').trim();
   if (!decision) return '';
 
   const locked = !!grant.lockedDate;
