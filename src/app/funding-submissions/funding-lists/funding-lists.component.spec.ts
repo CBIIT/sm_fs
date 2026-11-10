@@ -1115,6 +1115,14 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     fixture.nativeElement.querySelector('.grant-number-filter .btn-outline-secondary') as HTMLButtonElement;
   const feedback = (): HTMLElement | null =>
     fixture.nativeElement.querySelector('#directorGrantNumbersFeedback') as HTMLElement | null;
+  const counter = (): HTMLElement =>
+    fixture.nativeElement.querySelector('#directorGrantNumbersCounter') as HTMLElement;
+  // Karma omits the app's global Bootstrap styles, so apply its border-box sizing for production geometry.
+  const useBootstrapFieldBoxSizing = (): void => {
+    field().style.boxSizing = 'border-box';
+  };
+  const makeDirectorGrantNumbers = (count: number): string[] =>
+    Array.from({ length: count }, (_, index) => `1R01CA${String(100000 + index)}-01`);
   const enterGrantNumbers = (value: string): void => {
     field().value = value;
     field().dispatchEvent(new Event('input', { bubbles: true }));
@@ -1132,7 +1140,7 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     expect(searchButton().disabled).toBeTrue();
     expect(feedback()).toBeNull();
     expect(field().getAttribute('aria-invalid')).toBeNull();
-    expect(field().getAttribute('aria-describedby')).toBe('directorGrantNumbersHelp');
+    expect(field().getAttribute('aria-describedby')).toBe('directorGrantNumbersHelp directorGrantNumbersCounter');
 
     field().dispatchEvent(new Event('blur'));
     fixture.detectChanges();
@@ -1140,7 +1148,9 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     expect(feedback().classList.contains('invalid-feedback')).toBeTrue();
     expect(feedback().classList.contains('d-block')).toBeTrue();
     expect(field().getAttribute('aria-invalid')).toBe('true');
-    expect(field().getAttribute('aria-describedby')).toBe('directorGrantNumbersHelp directorGrantNumbersFeedback');
+    expect(field().getAttribute('aria-describedby')).toBe(
+      'directorGrantNumbersHelp directorGrantNumbersCounter directorGrantNumbersFeedback'
+    );
 
     enterGrantNumbers('R01CA000001');
     expect(searchButton().disabled).toBeFalse();
@@ -1168,7 +1178,126 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     expect(searchButton().disabled).toBeTrue();
     expect(feedback()).toBeNull();
     expect(field().getAttribute('aria-invalid')).toBeNull();
-    expect(field().getAttribute('aria-describedby')).toBe('directorGrantNumbersHelp');
+    expect(field().getAttribute('aria-describedby')).toBe('directorGrantNumbersHelp directorGrantNumbersCounter');
+  });
+
+  it('renders an associated 0/1000 counter without a character maxlength', () => {
+    expect(counter().textContent.trim()).toBe('0/1000');
+    expect(counter().classList.contains('grant-number-counter')).toBeTrue();
+    expect(field().hasAttribute('maxlength')).toBeFalse();
+    expect(field().maxLength).toBe(-1);
+    expect(field().getAttribute('aria-describedby').split(' ')).toContain('directorGrantNumbersCounter');
+    expect(feedback()).toBeNull();
+  });
+
+  it('counts parsed entries live across mixed separators, including duplicates, without changing validation', () => {
+    const reloadTable = spyOn<any>(component, 'reloadTable').and.stub();
+
+    enterGrantNumbers(' ,\r\n \t , ');
+    expect(counter().textContent.trim()).toBe('0/1000');
+    expect(feedback().textContent.trim()).toBe('At least one Grant Number is required.');
+    expect(searchButton().disabled).toBeTrue();
+
+    enterGrantNumbers('1R01CA000001-01');
+    expect(counter().textContent.trim()).toBe('1/1000');
+    expect(feedback()).toBeNull();
+    expect(searchButton().disabled).toBeFalse();
+
+    enterGrantNumbers('1R01CA000001-01, 1r01ca000001-01\n2U01CA000002-02 \t3P01CA000003-03,,');
+    expect(counter().textContent.trim()).toBe('4/1000');
+    expect(searchButton().disabled).toBeFalse();
+
+    searchButton().click();
+    fixture.detectChanges();
+    expect(reloadTable).toHaveBeenCalled();
+    expect((component as any).appliedGrantNumbers.size).toBe(3);
+    expect(counter().textContent.trim()).toBe('4/1000');
+
+    enterGrantNumbers('1R01CA000001-01, 1r01ca000001-01');
+    expect(counter().textContent.trim()).toBe('2/1000');
+  });
+
+  it('shows unclamped 1,000 and 1,001 boundaries for long input, updates on correction, and resets to 0/1000', async () => {
+    spyOn<any>(component, 'reloadTable').and.stub();
+    const grants = makeDirectorGrantNumbers(1001);
+    const validInput = grants.slice(0, 1000).join('\n');
+    expect(validInput.length).toBeGreaterThan(1000);
+    expect(field().hasAttribute('maxlength')).toBeFalse();
+
+    enterGrantNumbers(validInput);
+    expect(field().value).toBe(validInput);
+    expect(counter().textContent.trim()).toBe('1000/1000');
+    expect(feedback()).toBeNull();
+    expect(searchButton().disabled).toBeFalse();
+
+    const invalidInput = grants.join(', ');
+    enterGrantNumbers(invalidInput);
+    expect(field().value).toBe(invalidInput);
+    expect(counter().textContent.trim()).toBe('1001/1000');
+    expect(feedback().textContent.trim()).toBe('Do not exceed 1,000 Grant Numbers.');
+    expect(field().getAttribute('aria-invalid')).toBe('true');
+    expect(searchButton().disabled).toBeTrue();
+
+    enterGrantNumbers(grants.slice(1).join(' '));
+    expect(counter().textContent.trim()).toBe('1000/1000');
+    expect(feedback()).toBeNull();
+    expect(searchButton().disabled).toBeFalse();
+
+    resetButton().click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(field().value).toBe('');
+    expect(counter().textContent.trim()).toBe('0/1000');
+    expect(feedback()).toBeNull();
+    expect(searchButton().disabled).toBeTrue();
+  });
+
+  it('right-aligns the counter below the field with and without validation feedback', () => {
+    useBootstrapFieldBoxSizing();
+    const metaRow = fixture.nativeElement.querySelector('.grant-number-filter .grant-number-text-meta') as HTMLElement;
+    expect(counter().parentElement).toBe(metaRow);
+
+    let fieldRect = field().getBoundingClientRect();
+    let counterRect = counter().getBoundingClientRect();
+    expect(counterRect.width).toBeGreaterThan(0);
+    expect(counterRect.top).toBeGreaterThanOrEqual(fieldRect.bottom);
+    expect(counterRect.top - fieldRect.bottom).toBeLessThanOrEqual(8);
+    expect(Math.abs(counterRect.right - fieldRect.right)).toBeLessThanOrEqual(1);
+    expect(counterRect.left).toBeGreaterThan(fieldRect.left + fieldRect.width / 2);
+
+    field().dispatchEvent(new Event('blur'));
+    fixture.detectChanges();
+    fieldRect = field().getBoundingClientRect();
+    counterRect = counter().getBoundingClientRect();
+    const feedbackRect = feedback().getBoundingClientRect();
+    expect(feedback().parentElement).toBe(metaRow);
+    expect(feedbackRect.top).toBeGreaterThanOrEqual(fieldRect.bottom);
+    expect(feedbackRect.top - fieldRect.bottom).toBeLessThanOrEqual(8);
+    expect(Math.abs(feedbackRect.left - fieldRect.left)).toBeLessThanOrEqual(1);
+    expect(Math.abs(feedbackRect.top - counterRect.top)).toBeLessThanOrEqual(4);
+    expect(feedbackRect.right).toBeLessThanOrEqual(counterRect.left);
+    expect(Math.abs(counterRect.right - fieldRect.right)).toBeLessThanOrEqual(1);
+  });
+
+  it('keeps validation feedback and the counter readable when the row wraps at a narrow width', () => {
+    const filter = fixture.nativeElement.querySelector('.grant-number-filter') as HTMLElement;
+    useBootstrapFieldBoxSizing();
+    filter.style.width = '180px';
+    enterGrantNumbers(makeDirectorGrantNumbers(1001).join(','));
+
+    const fieldRect = field().getBoundingClientRect();
+    const counterRect = counter().getBoundingClientRect();
+    const feedbackRect = feedback().getBoundingClientRect();
+    expect(counter().textContent.trim()).toBe('1001/1000');
+    expect(feedback().textContent.trim()).toBe('Do not exceed 1,000 Grant Numbers.');
+    expect(feedbackRect.width).toBeGreaterThan(0);
+    expect(counterRect.width).toBeGreaterThan(0);
+    expect(feedbackRect.left).toBeGreaterThanOrEqual(fieldRect.left - 1);
+    expect(feedbackRect.right).toBeLessThanOrEqual(fieldRect.right + 1);
+    expect(counterRect.top).toBeGreaterThanOrEqual(feedbackRect.bottom - 1);
+    expect(Math.abs(counterRect.right - fieldRect.right)).toBeLessThanOrEqual(1);
+    expect(counter().scrollWidth).toBeLessThanOrEqual(Math.ceil(counterRect.width));
   });
 
   it('applies the marked DOC only when the rendered Search button is clicked', () => {

@@ -91,6 +91,30 @@
   margin-top: 0.25rem;
 }
 
+.grant-number-textarea {
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.grant-number-text-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.grant-number-validation-feedback {
+  width: auto;
+  margin-top: 0;
+}
+
+.grant-number-counter {
+  margin-left: auto;
+  text-align: right;
+  color: #6c757d;
+}
+
 .card {
   border: 1px solid #ccc !important;
 }

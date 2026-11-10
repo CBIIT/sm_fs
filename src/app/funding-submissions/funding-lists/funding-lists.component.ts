@@ -615,8 +615,12 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedDoc = doc;
   }
 
+  get grantNumberCount(): number {
+    return parseGrantNumbers(this.grantNumbers || '').length;
+  }
+
   get grantNumberValidationMessage(): string | null {
-    const count = parseGrantNumbers(this.grantNumbers || '').length;
+    const count = this.grantNumberCount;
     if (count === 0) {
       return 'At least one Grant Number is required.';
     }
