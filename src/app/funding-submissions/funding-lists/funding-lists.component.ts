@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { Select2OptionData } from 'ng-select2';
@@ -106,6 +106,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private pendingDecision: ProcessOption['value'] | null = null;
   private pendingDecisionGrant: FundingSubmissionListGrantDto | null = null;
   private pendingDecisionGrantNumber = '';
+  private decisionRefreshSubscription: Subscription;
   private appliedGrantNumbers: Set<string> | null = null;
   private appliedDoc = '';
   pendingDecisionNote = '';
@@ -577,6 +578,9 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.decisionRefreshSubscription && !this.decisionRefreshSubscription.closed) {
+      this.decisionRefreshSubscription.unsubscribe();
+    }
     this.unbindHorizontalDragScroll();
     $(document).off(this.processMenuOutsideClickNamespace);
     this.confirmDecisionsModalRef?.close();
@@ -1292,6 +1296,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.fundingSubmissionsService.saveNciDecisions(request, this.listId).subscribe({
       next: () => {
         this.pendingDecisionGrant!.nciDecision = this.pendingDecision!;
+        this.pendingDecisionGrant!.nciDecisionByName = undefined;
+        this.pendingDecisionGrant!.nciDecisionDate = undefined;
         (this.pendingDecisionGrant as any).nciDirectorNotes = item.nciDirectorNotes;
 
         const decisionText = this.pendingDecision === 'Approve'
@@ -1304,6 +1310,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.grantDecisionModalRef?.close();
         this.reloadTable();
+        this.refreshNciDecisionMetadata();
       },
       error: (err) => {
         this.logger.error('Failed to save NCI Director process decision', err);
@@ -1314,6 +1321,38 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private scrollToTopForDecisionFeedback(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  private refreshNciDecisionMetadata(): void {
+    if (this.decisionRefreshSubscription && !this.decisionRefreshSubscription.closed) {
+      this.decisionRefreshSubscription.unsubscribe();
+    }
+    const listId = this.listId;
+    this.decisionRefreshSubscription = this.fundingSubmissionsService.getListDetail(listId).subscribe({
+      next: detail => {
+        if (this.listId !== listId) return;
+        const refreshedGrants = new Map(this.extractGrantsFromDetail(detail)
+          .map(grant => [Number(grant.applId), grant]));
+        const currentGrants = new Set([...this.grants, ...this.selectedRows.values()]);
+        currentGrants.forEach(grant => {
+          const refreshed = refreshedGrants.get(Number(grant.applId));
+          if (!refreshed) return;
+          grant.nciDecision = refreshed.nciDecision;
+          grant.nciDecisionByName = refreshed.nciDecisionByName;
+          grant.nciDecisionDate = refreshed.nciDecisionDate;
+          grant.nciDirectorNotes = refreshed.nciDirectorNotes;
+          grant.lockedBy = refreshed.lockedBy;
+          grant.lockedDate = refreshed.lockedDate;
+        });
+        this.loadErrorMessage = '';
+        this.reloadTable();
+      },
+      error: err => {
+        if (this.listId !== listId) return;
+        this.logger.error('Failed to refresh saved NCI Director decisions', err);
+        this.loadErrorMessage = 'The decision was saved, but its details could not be refreshed. Please refresh the page to see the latest decision details.';
+      }
+    });
   }
 
   private toNciDecisionEnum(value: ProcessOption['value'] | null): NciDecisionItem.NciDecisionEnum | null {
