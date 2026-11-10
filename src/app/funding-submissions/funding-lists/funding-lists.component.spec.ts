@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { Directive, forwardRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { By } from '@angular/platform-browser';
@@ -33,6 +34,20 @@ function buildGrant(overrides: { [field: string]: any } = {}): FundingSubmission
 
 function emptyListDetail(): any {
   return { listCode: '', currentStatusDescrip: '', totalGrants: 0, totalDocRecAmt: 0, grants: [] };
+}
+
+@Directive({
+  selector: 'ng-select2',
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => Select2TestValueAccessor),
+    multi: true
+  }]
+})
+class Select2TestValueAccessor implements ControlValueAccessor {
+  writeValue(): void {}
+  registerOnChange(): void {}
+  registerOnTouched(): void {}
 }
 
 describe('FundingListsComponent', () => {
@@ -170,7 +185,7 @@ describe('FundingListsComponent', () => {
     expect(component.selectedRows.size).toBe(0);
   });
 
-  it('uses the default tab and DOC for a different list instead of restoring stale selections', () => {
+  it('uses the default tab without a DOC for a different list instead of restoring stale selections', () => {
     spyOnProperty(history, 'state', 'get').and.returnValue({
       fundingListViewState: { listId: 38, selectedTab: 'hold', selectedDoc: 'DCTD', selectedApplIds: [42] }
     });
@@ -183,7 +198,7 @@ describe('FundingListsComponent', () => {
     (component as any).loadListMeta();
 
     expect(component.selectedTab).toBe('pending');
-    expect(component.selectedDoc).toBe('DCB');
+    expect(component.selectedDoc).toBe('');
     expect(component.selectedRows.size).toBe(0);
   });
 
@@ -206,7 +221,7 @@ describe('FundingListsComponent', () => {
     expect(component.selectedRows.size).toBe(0);
   });
 
-  it('falls back to an available DOC without selecting grants hidden by that filter', () => {
+  it('retains an unavailable restored DOC without selecting grants hidden by that filter', () => {
     spyOnProperty(history, 'state', 'get').and.returnValue({
       fundingListViewState: { listId: 39, selectedTab: 'hold', selectedDoc: 'DCTD', selectedApplIds: [42] }
     });
@@ -220,8 +235,222 @@ describe('FundingListsComponent', () => {
     (component as any).loadListMeta();
 
     expect(component.selectedTab).toBe('hold');
-    expect(component.selectedDoc).toBe('DCB');
+    expect(component.selectedDoc).toBe('DCTD');
+    expect(component.filteredGrants).toEqual([]);
     expect(component.selectedRows.size).toBe(0);
+  });
+
+  describe('FS-2408 grant-number filter', () => {
+    let reloadTable: jasmine.Spy;
+
+    beforeEach(() => {
+      component.selectedTab = 'all';
+      component.grants = [
+        buildGrant({ applId: 1, grantNumber: ' R01CA000001 ', doc: 'DCB', nciDecision: null, docRecommendedAmount: 100 }),
+        buildGrant({ applId: 2, grantNumber: 'U01CA000002', doc: 'DCTD', nciDecision: '', docRecommendedAmount: 200 }),
+        buildGrant({ applId: 3, grantNumber: 'R01CA000003', doc: 'DCB', nciDecision: 'Approve', docRecommendedAmount: 300 }),
+        buildGrant({ applId: 4, grantNumber: 'R01CA000004', doc: 'DCTD', nciDecision: 'Hold', docRecommendedAmount: 400 }),
+        buildGrant({ applId: 5, grantNumber: 'R01CA000005', doc: 'DCB', reviewStatusCode: 'DRAFT' })
+      ];
+      reloadTable = spyOn<any>(component, 'reloadTable').and.stub();
+    });
+
+    it('starts on the default tab with all DOCs and does not default a DOC after tab changes', () => {
+      spyOnProperty(history, 'state', 'get').and.returnValue({});
+      component.listId = 39;
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+        ...emptyListDetail(),
+        grants: component.grants
+      }));
+
+      (component as any).loadListMeta();
+
+      expect(component.selectedTab).toBe('pending');
+      expect(component.selectedDoc).toBe('');
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2]);
+      component.selectTab('all');
+      expect(component.selectedDoc).toBe('');
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2, 3, 4]);
+    });
+
+    it('does not carry an applied search or selections to a different list on the same route', () => {
+      const queryParams = new Subject<{ listId: number }>();
+      (TestBed.inject(ActivatedRoute) as any).queryParams = queryParams.asObservable();
+      spyOnProperty(history, 'state', 'get').and.returnValue({});
+      component.ngOnInit();
+      component.listId = 39;
+      component.selectDoc('DCB');
+      component.grantNumbers = 'R01CA000001';
+      component.grantNumbersInteracted = true;
+      component.searchGrantNumbers();
+      component.selectedRows.set(1, component.grants[0]);
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+        ...emptyListDetail(),
+        grants: [
+          buildGrant({ applId: 6, doc: 'DCB', nciDecision: null }),
+          buildGrant({ applId: 7, doc: 'DCTD', nciDecision: null })
+        ]
+      }));
+
+      queryParams.next({ listId: 40 });
+
+      expect(component.listId).toBe(40);
+      expect(component.selectedTab).toBe('pending');
+      expect(component.selectedDoc).toBe('');
+      expect(component.grantNumbers).toBe('');
+      expect(component.grantNumbersInteracted).toBeFalse();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([6, 7]);
+      expect(component.selectedRows.size).toBe(0);
+    });
+
+    it('marks a DOC and shows its total without filtering, clearing selections, or reloading', () => {
+      component.selectedRows.set(2, component.grants[1]);
+
+      component.selectDoc('DCB');
+      component.selectDoc('DCB');
+
+      expect(component.selectedDoc).toBe('DCB');
+      expect(component.showSelectedDocSummary).toBeTrue();
+      expect(component.selectedDocSummary).toEqual({ doc: 'DCB', recommendedTotal: 400 });
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2, 3, 4]);
+      expect(component.selectedRows.has(2)).toBeTrue();
+      expect(reloadTable).not.toHaveBeenCalled();
+    });
+
+    it('validates zero, 1,000, and 1,001 entries before applying a search', () => {
+      component.selectedRows.set(1, component.grants[0]);
+      component.selectDoc('DCB');
+      component.grantNumbers = ' , \n ';
+      expect(component.grantNumberValidationMessage).toBe('At least one Grant Number is required.');
+      component.searchGrantNumbers();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2, 3, 4]);
+      expect(component.selectedRows.has(1)).toBeTrue();
+      expect(reloadTable).not.toHaveBeenCalled();
+
+      component.grantNumbers = Array(1000).fill('R01CA000001').join(' ');
+      expect(component.grantNumberValidationMessage).toBeNull();
+      component.searchGrantNumbers();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1]);
+      expect(component.selectedRows.size).toBe(0);
+      expect(reloadTable).toHaveBeenCalledTimes(1);
+
+      component.selectedRows.set(1, component.grants[0]);
+      component.grantNumbers += ', R01CA000001';
+      expect(component.grantNumberValidationMessage).toBe('Do not exceed 1,000 Grant Numbers.');
+      component.searchGrantNumbers();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1]);
+      expect(component.selectedRows.has(1)).toBeTrue();
+      expect(reloadTable).toHaveBeenCalledTimes(1);
+    });
+
+    it('matches exact grant numbers case-insensitively after trimming within the selected tab', () => {
+      component.selectedTab = 'pending';
+      component.grantNumbers = 'r01ca000001, u01Ca000002\nR01CA000003 R01CA00000';
+      component.selectedRows.set(4, component.grants[3]);
+
+      component.searchGrantNumbers();
+
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2]);
+      expect(component.selectedRows.size).toBe(0);
+      expect(reloadTable).toHaveBeenCalledTimes(1);
+
+      component.grantNumbers = 'R01CA00000';
+      component.searchGrantNumbers();
+      expect(component.filteredGrants).toEqual([]);
+    });
+
+    it('applies the selected DOC only on Search and leaves counts and totals unchanged', () => {
+      component.grantNumbers = 'R01CA000001,U01CA000002,R01CA000003';
+      component.selectDoc('DCB');
+      component.searchGrantNumbers();
+
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 3]);
+      expect(component.getTabCount('all')).toBe(4);
+      expect(component.getDocCount('DCTD')).toBe(2);
+      component.selectedRows.set(1, component.grants[0]);
+      component.selectDoc('DCTD');
+      expect(component.selectedDocSummary).toEqual({ doc: 'DCTD', recommendedTotal: 600 });
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 3]);
+      expect(component.selectedRows.has(1)).toBeTrue();
+      expect(reloadTable).toHaveBeenCalledTimes(1);
+
+      component.searchGrantNumbers();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([2]);
+      expect(component.selectedRows.size).toBe(0);
+      expect(reloadTable).toHaveBeenCalledTimes(2);
+    });
+
+    it('keeps the applied search across tabs, including when its DOC is unavailable', () => {
+      component.grantNumbers = 'R01CA000001 R01CA000003 R01CA000004';
+      component.selectDoc('DCB');
+      component.searchGrantNumbers();
+      component.selectedRows.set(1, component.grants[0]);
+
+      component.selectTab('approved');
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([3]);
+      expect(component.selectedRows.size).toBe(0);
+      component.selectTab('hold');
+      expect(component.availableDocs).toEqual(['DCTD']);
+      expect(component.selectedDoc).toBe('DCB');
+      expect(component.filteredGrants).toEqual([]);
+      component.selectTab('all');
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 3]);
+    });
+
+    it('retains a grant-only search across tabs without applying a later unsearched DOC', () => {
+      component.grantNumbers = 'R01CA000001 U01CA000002 R01CA000003';
+      component.searchGrantNumbers();
+      component.selectDoc('DCTD');
+
+      component.selectTab('pending');
+
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2]);
+      expect(component.selectedDoc).toBe('');
+      component.selectTab('approved');
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([3]);
+    });
+
+    it('keeps the existing Bulk Decision state shape without persisting an applied grant search', () => {
+      const navigate = spyOn(TestBed.inject(Router), 'navigate').and.returnValue(Promise.resolve(true));
+      const historyState = spyOnProperty(history, 'state', 'get').and.returnValue({ navigationId: 7 });
+      spyOn(history, 'replaceState').and.callFake(state => historyState.and.returnValue(state));
+      component.listId = 39;
+      component.selectDoc('DCB');
+      component.grantNumbers = 'R01CA000001';
+      component.searchGrantNumbers();
+      component.selectedRows.set(1, component.grants[0]);
+
+      component.goToDirectorBulkEdit();
+
+      expect(navigate.calls.mostRecent().args[1].state.fundingListViewState).toEqual({
+        listId: 39, selectedTab: 'all', selectedDoc: 'DCB', selectedApplIds: [1]
+      });
+      expect((component as any).restoreFundingListViewState()).toBeTrue();
+      expect(component.grantNumbers).toBe('');
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 3]);
+      expect(Array.from(component.selectedRows.keys())).toEqual([1]);
+    });
+
+    it('resets the input, interaction, DOC, search and selections without changing the tab', () => {
+      component.selectTab('pending');
+      component.selectDoc('DCB');
+      component.grantNumbers = 'R01CA000001';
+      component.grantNumbersInteracted = true;
+      component.searchGrantNumbers();
+      component.selectedRows.set(1, component.grants[0]);
+      reloadTable.calls.reset();
+
+      component.resetGrantNumberSearch();
+
+      expect(component.selectedTab).toBe('pending');
+      expect(component.grantNumbers).toBe('');
+      expect(component.grantNumbersInteracted).toBeFalse();
+      expect(component.showGrantNumberValidation).toBeFalse();
+      expect(component.selectedDoc).toBe('');
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2]);
+      expect(component.selectedRows.size).toBe(0);
+      expect(reloadTable).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('keeps restored selections on redraw but clears them when table ordering changes', () => {
@@ -756,5 +985,139 @@ describe('FundingListsComponent FS-2343 decision lock (rendered template)', () =
     component.selectedRows.set(32, buildGrant({ applId: 32 }));
     fixture.detectChanges();
     expect(bulkDecisionButton().disabled).toBeTrue();
+  });
+});
+
+describe('FundingListsComponent FS-2408 grant-number filter (rendered template)', () => {
+  let component: FundingListsComponent;
+  let fixture: ComponentFixture<FundingListsComponent>;
+
+  beforeEach(async () => {
+    const fundingSubmissionsServiceSpy = jasmine.createSpyObj<FundingSubmissionsService>('FundingSubmissionsService', [
+      'getListDetail',
+      'saveNciDecisions',
+      'confirmApprovalsAndRejections'
+    ]);
+    fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of(emptyListDetail()));
+
+    await TestBed.configureTestingModule({
+      declarations: [FundingListsComponent, Select2TestValueAccessor],
+      imports: [FormsModule, RouterTestingModule, NgbTooltipModule, NgbAlertModule],
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [
+        { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
+        { provide: HttpClient, useValue: {} },
+        { provide: AppPropertiesService, useValue: { getProperty: () => '' } },
+        { provide: LoaderService, useValue: { show: jasmine.createSpy('show'), hide: jasmine.createSpy('hide') } },
+        { provide: NgbModal, useValue: { open: jasmine.createSpy('open') } },
+        { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
+        { provide: NGXLogger, useValue: { error: jasmine.createSpy('error') } }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(FundingListsComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  });
+
+  const field = (): HTMLTextAreaElement =>
+    fixture.nativeElement.querySelector('#directorGrantNumbers') as HTMLTextAreaElement;
+  const searchButton = (): HTMLButtonElement =>
+    fixture.nativeElement.querySelector('.grant-number-filter .btn-primary') as HTMLButtonElement;
+  const resetButton = (): HTMLButtonElement =>
+    fixture.nativeElement.querySelector('.grant-number-filter .btn-outline-secondary') as HTMLButtonElement;
+  const feedback = (): HTMLElement | null =>
+    fixture.nativeElement.querySelector('#directorGrantNumbersFeedback') as HTMLElement | null;
+  const enterGrantNumbers = (value: string): void => {
+    field().value = value;
+    field().dispatchEvent(new Event('input', { bubbles: true }));
+    fixture.detectChanges();
+  };
+
+  it('renders the label, help and accessible validation only after interaction', () => {
+    const label = fixture.nativeElement.querySelector('label[for="directorGrantNumbers"]') as HTMLLabelElement;
+    const help = fixture.nativeElement.querySelector('#directorGrantNumbersHelp') as HTMLElement;
+
+    expect(label.textContent.trim()).toBe('Filter by Grant Number(s)');
+    expect(help.textContent.replace(/\s+/g, ' ').trim()).toBe(
+      'Enter at least one Grant Number in the field below. Multiple grant numbers should be separated by a space or comma.'
+    );
+    expect(searchButton().disabled).toBeTrue();
+    expect(feedback()).toBeNull();
+    expect(field().getAttribute('aria-invalid')).toBeNull();
+    expect(field().getAttribute('aria-describedby')).toBe('directorGrantNumbersHelp');
+
+    field().dispatchEvent(new Event('blur'));
+    fixture.detectChanges();
+    expect(feedback().textContent.trim()).toBe('At least one Grant Number is required.');
+    expect(feedback().classList.contains('invalid-feedback')).toBeTrue();
+    expect(feedback().classList.contains('d-block')).toBeTrue();
+    expect(field().getAttribute('aria-invalid')).toBe('true');
+    expect(field().getAttribute('aria-describedby')).toBe('directorGrantNumbersHelp directorGrantNumbersFeedback');
+
+    enterGrantNumbers('R01CA000001');
+    expect(searchButton().disabled).toBeFalse();
+    expect(feedback()).toBeNull();
+    enterGrantNumbers('');
+    expect(searchButton().disabled).toBeTrue();
+    expect(feedback().textContent.trim()).toBe('At least one Grant Number is required.');
+  });
+
+  it('enables Search for 1,000 entries, disables it for 1,001, and clears validation on Reset', async () => {
+    enterGrantNumbers(Array(1000).fill('R01CA000001').join(', '));
+    expect(searchButton().disabled).toBeFalse();
+    expect(feedback()).toBeNull();
+
+    enterGrantNumbers(Array(1001).fill('R01CA000001').join(' '));
+    expect(searchButton().disabled).toBeTrue();
+    expect(feedback().textContent.trim()).toBe('Do not exceed 1,000 Grant Numbers.');
+    expect(field().getAttribute('aria-invalid')).toBe('true');
+
+    resetButton().click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(field().value).toBe('');
+    expect(searchButton().disabled).toBeTrue();
+    expect(feedback()).toBeNull();
+    expect(field().getAttribute('aria-invalid')).toBeNull();
+    expect(field().getAttribute('aria-describedby')).toBe('directorGrantNumbersHelp');
+  });
+
+  it('applies the marked DOC only when the rendered Search button is clicked', () => {
+    const reloadTable = spyOn<any>(component, 'reloadTable').and.stub();
+    component.selectedTab = 'pending';
+    component.grants = [
+      buildGrant({ applId: 1, doc: 'DCB', grantNumber: 'R01CA000001', nciDecision: null }),
+      buildGrant({ applId: 2, doc: 'DCTD', grantNumber: 'U01CA000002', nciDecision: null })
+    ];
+    fixture.detectChanges();
+    const docTiles = fixture.nativeElement.querySelectorAll('.doc-tile') as NodeListOf<HTMLButtonElement>;
+    docTiles[0].click();
+    fixture.detectChanges();
+    expect(docTiles[0].classList.contains('active')).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.doc-summary').textContent).toContain('DCB Recommended Total');
+    expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2]);
+    expect(reloadTable).not.toHaveBeenCalled();
+
+    enterGrantNumbers('r01ca000001, u01ca000002');
+    searchButton().click();
+    fixture.detectChanges();
+    expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1]);
+    expect(reloadTable).toHaveBeenCalledTimes(1);
+
+    let response: { data: FundingSubmissionListGrantDto[] };
+    component.dtOptions.ajax({}, (result: { data: FundingSubmissionListGrantDto[] }) => response = result);
+    expect(response.data.map(grant => grant.applId)).toEqual([1]);
+
+    docTiles[1].click();
+    fixture.detectChanges();
+    expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1]);
+    expect(reloadTable).toHaveBeenCalledTimes(1);
+    searchButton().click();
+    expect(component.filteredGrants.map(grant => grant.applId)).toEqual([2]);
+    expect(reloadTable).toHaveBeenCalledTimes(2);
   });
 });

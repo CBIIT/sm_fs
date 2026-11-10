@@ -19,6 +19,7 @@ import { GrantDetailComponent } from '../search-lists/grant-detail/grant-detail.
 import { FoaCellRendererComponent } from '../../table-cell-renderers/foa-cell-renderer/foa-cell-renderer.component';
 import { FullGrantNumberCellRendererComponent } from '../../table-cell-renderers/full-grant-number-renderer/full-grant-number-cell-renderer.component';
 import { NciDecisionCellRendererComponent } from '../../table-cell-renderers/nci-decision-cell-renderer/nci-decision-cell-renderer.component';
+import { MAX_GRANT_NUMBER_COUNT, parseGrantNumbers } from '../../shared/grant-number-search-mode/grant-number-parser';
 import { formatNciDecision } from '../../utils/funding-submission-format';
 
 declare var $: any;
@@ -69,6 +70,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectedTab: NciTabId = 'all';
   selectedDoc = '';
+  grantNumbers = '';
+  grantNumbersInteracted = false;
   selectedViewDoc: string = null;
   selectedRows = new Map<number, FundingSubmissionListGrantDto>();
 
@@ -103,6 +106,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private pendingDecision: ProcessOption['value'] | null = null;
   private pendingDecisionGrant: FundingSubmissionListGrantDto | null = null;
   private pendingDecisionGrantNumber = '';
+  private appliedGrantNumbers: Set<string> | null = null;
+  private appliedDoc = '';
   pendingDecisionNote = '';
   pendingDecisionValidationMessage = '';
 
@@ -173,6 +178,10 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.route.queryParams.subscribe(params => {
       const routeListId = Number(params['listId']);
       if (!Number.isNaN(routeListId) && routeListId > 0) {
+        if (this.listId !== routeListId) {
+          this.clearGrantNumberFilterState();
+          this.clearSelections();
+        }
         this.listId = routeListId;
       }
 
@@ -590,17 +599,57 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectTab(tabId: NciTabId): void {
     this.selectedTab = tabId;
-    // Requirement: on tab change, default to the first doc from the sorted list for that tab.
-    this.selectedDoc = '';
-    this.ensureSelectedDocIsAvailableForTab();
+    if (!this.appliedGrantNumbers) {
+      this.appliedDoc = '';
+    }
+    this.selectedDoc = this.appliedDoc;
     this.clearSelections();
     this.reloadTable();
   }
 
   selectDoc(doc: string): void {
     this.selectedDoc = doc;
+  }
+
+  get grantNumberValidationMessage(): string | null {
+    const count = parseGrantNumbers(this.grantNumbers || '').length;
+    if (count === 0) {
+      return 'At least one Grant Number is required.';
+    }
+    if (count > MAX_GRANT_NUMBER_COUNT) {
+      return 'Do not exceed 1,000 Grant Numbers.';
+    }
+    return null;
+  }
+
+  get showGrantNumberValidation(): boolean {
+    return this.grantNumbersInteracted && !!this.grantNumberValidationMessage;
+  }
+
+  searchGrantNumbers(): void {
+    const grantNumbers = parseGrantNumbers(this.grantNumbers || '');
+    if (!grantNumbers.length || grantNumbers.length > MAX_GRANT_NUMBER_COUNT) {
+      return;
+    }
+
+    this.appliedGrantNumbers = new Set(grantNumbers.map(grantNumber => this.normalizeValue(grantNumber)));
+    this.appliedDoc = this.selectedDoc;
     this.clearSelections();
     this.reloadTable();
+  }
+
+  resetGrantNumberSearch(): void {
+    this.clearGrantNumberFilterState();
+    this.clearSelections();
+    this.reloadTable();
+  }
+
+  private clearGrantNumberFilterState(): void {
+    this.grantNumbers = '';
+    this.grantNumbersInteracted = false;
+    this.selectedDoc = '';
+    this.appliedGrantNumbers = null;
+    this.appliedDoc = '';
   }
 
   get canViewPdf(): boolean {
@@ -641,8 +690,10 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   get filteredGrants(): FundingSubmissionListGrantDto[] {
     return this.grants.filter(grant => {
       const tabMatch = this.matchesTab(grant);
-      const docMatch = !this.selectedDoc || this.normalizeValue(grant.doc) === this.normalizeValue(this.selectedDoc);
-      return tabMatch && docMatch;
+      const docMatch = !this.appliedDoc || this.normalizeValue(grant.doc) === this.normalizeValue(this.appliedDoc);
+      const grantNumberMatch = !this.appliedGrantNumbers ||
+        this.appliedGrantNumbers.has(this.normalizeValue(grant.grantNumber));
+      return tabMatch && docMatch && grantNumberMatch;
     });
   }
 
@@ -741,7 +792,6 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (!this.restoreFundingListViewState()) {
           this.selectDefaultDirectorTab();
-          this.ensureSelectedDocIsAvailableForTab();
         }
         this.reloadTable();
       },
@@ -782,8 +832,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.docRecommendedTotal = 0;
     this.grants = [];
     this.docRecommendedTotals = {};
+    this.clearGrantNumberFilterState();
     this.clearSelections();
-    this.ensureSelectedDocIsAvailableForTab();
     this.reloadTable();
   }
 
@@ -803,13 +853,6 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }, {});
   }
 
-  private ensureSelectedDocIsAvailableForTab(): void {
-    const availableSet = new Set(this.availableDocs.map(doc => this.normalizeValue(doc)));
-    if (!this.selectedDoc || !availableSet.has(this.normalizeValue(this.selectedDoc))) {
-      this.selectedDoc = this.availableDocs.length ? this.availableDocs[0] : '';
-    }
-  }
-
   private selectDefaultDirectorTab(): void {
     this.selectedTab = this.getTabCount('pending') > 0 ? 'pending' : 'all';
   }
@@ -826,7 +869,11 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.selectedTab = viewState.selectedTab;
     this.selectedDoc = viewState.selectedDoc;
-    this.ensureSelectedDocIsAvailableForTab();
+    this.grantNumbers = '';
+    this.grantNumbersInteracted = false;
+    this.appliedGrantNumbers = null;
+    // Keep the existing DOC-only filter when returning from Bulk Decision.
+    this.appliedDoc = viewState.selectedDoc;
     const selectedApplIds = new Set(viewState.selectedApplIds);
     this.selectedRows.clear();
     this.filteredGrants.forEach(grant => {
