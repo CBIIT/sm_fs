@@ -1220,6 +1220,94 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     fixture.detectChanges();
   };
 
+  it('preserves active tab and DOC tile colors over their base styles', () => {
+    component.grants = [buildGrant({ doc: 'DCB' })];
+    fixture.detectChanges();
+    const tile = fixture.nativeElement.querySelector('.doc-tile') as HTMLButtonElement;
+    tile.click();
+    fixture.detectChanges();
+
+    const activeTab = fixture.nativeElement.querySelector('.tab-btn.active') as HTMLElement;
+    [activeTab, tile].forEach(element => {
+      expect(element.classList.contains('active')).toBeTrue();
+      const style = getComputedStyle(element);
+      expect(style.backgroundColor).toBe('rgb(15, 130, 192)');
+      expect(style.color).toBe('rgb(255, 255, 255)');
+      expect(style.borderTopColor).toBe('rgb(15, 130, 192)');
+    });
+  });
+
+  it('styles unscoped DataTables fixed cells through odd, shown and open-menu states', () => {
+    const table = document.createElement('table');
+    table.className = 'dataTable';
+    table.innerHTML = `
+      <thead><tr><th class="dtfc-fixed-left">Select</th><th class="dtfc-fixed-right">Process</th></tr></thead>
+      <tbody><tr>
+        <td class="dtfc-fixed-left">Grant</td>
+        <td class="dtfc-fixed-right"><div class="process-dropdown-wrap">
+          <button class="process-toggle locked"><i class="fa-lock"></i>Process</button>
+          <div class="process-menu">Actions</div>
+        </div></td>
+      </tr></tbody>`;
+    fixture.nativeElement.querySelector('.funding-lists-page').appendChild(table);
+    try {
+      const row = table.tBodies[0].rows[0];
+      const left = row.cells[0];
+      const right = row.cells[1];
+      const headers = table.tHead.rows[0].cells;
+      expect(left.getAttributeNames().some(name => name.startsWith('_ngcontent'))).toBeFalse();
+      [headers[0], headers[1], left, right].forEach(cell => {
+        expect(getComputedStyle(cell).backgroundColor).toBe('rgb(255, 255, 255)');
+      });
+      expect(getComputedStyle(headers[0]).zIndex).toBe('2');
+      expect(getComputedStyle(headers[1]).zIndex).toBe('5');
+      expect(getComputedStyle(left).zIndex).toBe('2');
+      expect(getComputedStyle(right).zIndex).toBe('5');
+      row.className = 'odd';
+      [left, right].forEach(cell => expect(getComputedStyle(cell).backgroundColor).toBe('rgb(249, 249, 249)'));
+      row.classList.add('shown');
+      [left, right].forEach(cell => expect(getComputedStyle(cell).backgroundColor).toBe('rgb(238, 243, 255)'));
+      expect(getComputedStyle(right).overflow).toBe('visible');
+      right.classList.add('menu-open');
+      expect(getComputedStyle(right).zIndex).toBe('50');
+      const menu = table.querySelector('.process-menu') as HTMLElement;
+      expect(getComputedStyle(menu).position).toBe('absolute');
+      expect(getComputedStyle(menu).zIndex).toBe('2000');
+      const toggle = table.querySelector('button') as HTMLButtonElement;
+      [false, true].forEach(disabled => {
+        toggle.disabled = disabled;
+        const style = getComputedStyle(toggle);
+        expect(style.backgroundColor).toBe('rgb(230, 247, 233)');
+        expect(style.borderTopColor).toBe('rgb(8, 143, 39)');
+        expect(style.color).toBe('rgb(0, 0, 0)');
+        expect(style.opacity).toBe('1');
+      });
+    } finally {
+      table.remove();
+    }
+  });
+
+  it('keeps fixed-cell rules page-scoped and detail content sticky', () => {
+    const outside = document.createElement('table');
+    outside.className = 'dataTable';
+    outside.innerHTML = '<tbody><tr class="odd shown"><td class="dtfc-fixed-left">Outside</td></tr></tbody>';
+    document.body.appendChild(outside);
+    const detail = document.createElement('div');
+    detail.className = 'detail-row-sticky';
+    fixture.nativeElement.querySelector('.funding-lists-page').appendChild(detail);
+    try {
+      expect(getComputedStyle(outside.querySelector('td')).backgroundColor).not.toBe('rgb(238, 243, 255)');
+      fixture.nativeElement.querySelector('.funding-lists-page').appendChild(outside);
+      expect(getComputedStyle(outside.querySelector('td')).backgroundColor).toBe('rgb(238, 243, 255)');
+      expect(getComputedStyle(detail).position).toBe('sticky');
+      expect(getComputedStyle(detail).left).toBe('0px');
+      expect(getComputedStyle(detail).zIndex).toBe('3');
+    } finally {
+      outside.remove();
+      detail.remove();
+    }
+  });
+
   it('renders the optional help, enabled Search and accessible validation only when over the limit', () => {
     const label = fixture.nativeElement.querySelector('label[for="directorGrantNumbers"]') as HTMLLabelElement;
     const help = fixture.nativeElement.querySelector('#directorGrantNumbersHelp') as HTMLElement;
