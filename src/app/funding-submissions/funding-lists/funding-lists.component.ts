@@ -603,9 +603,6 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectTab(tabId: NciTabId): void {
     this.selectedTab = tabId;
-    if (!this.appliedGrantNumbers) {
-      this.appliedDoc = '';
-    }
     this.selectedDoc = this.appliedDoc;
     this.clearSelections();
     this.reloadTable();
@@ -620,11 +617,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get grantNumberValidationMessage(): string | null {
-    const count = this.grantNumberCount;
-    if (count === 0) {
-      return 'At least one Grant Number is required.';
-    }
-    if (count > MAX_GRANT_NUMBER_COUNT) {
+    if (this.grantNumberCount > MAX_GRANT_NUMBER_COUNT) {
       return 'Do not exceed 1,000 Grant Numbers.';
     }
     return null;
@@ -636,11 +629,14 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   searchGrantNumbers(): void {
     const grantNumbers = parseGrantNumbers(this.grantNumbers || '');
-    if (!grantNumbers.length || grantNumbers.length > MAX_GRANT_NUMBER_COUNT) {
+    if (grantNumbers.length > MAX_GRANT_NUMBER_COUNT) {
+      this.grantNumbersInteracted = true;
       return;
     }
 
-    this.appliedGrantNumbers = new Set(grantNumbers.map(grantNumber => this.normalizeValue(grantNumber)));
+    this.appliedGrantNumbers = grantNumbers.length
+      ? new Set(grantNumbers.map(grantNumber => this.normalizeValue(grantNumber)))
+      : null;
     this.appliedDoc = this.selectedDoc;
     this.clearSelections();
     this.reloadTable();

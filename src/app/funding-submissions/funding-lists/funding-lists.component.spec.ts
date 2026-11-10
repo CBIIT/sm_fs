@@ -318,29 +318,120 @@ describe('FundingListsComponent', () => {
       expect(reloadTable).not.toHaveBeenCalled();
     });
 
-    it('validates zero, 1,000, and 1,001 entries before applying a search', () => {
+    it('treats zero entries as valid and rejects only more than 1,000 entries', () => {
       component.selectedRows.set(1, component.grants[0]);
       component.selectDoc('DCB');
       component.grantNumbers = ' , \n ';
-      expect(component.grantNumberValidationMessage).toBe('At least one Grant Number is required.');
+      expect(component.grantNumberValidationMessage).toBeNull();
       component.searchGrantNumbers();
-      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2, 3, 4]);
-      expect(component.selectedRows.has(1)).toBeTrue();
-      expect(reloadTable).not.toHaveBeenCalled();
+      expect((component as any).appliedGrantNumbers).toBeNull();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 3]);
+      expect(component.selectedRows.size).toBe(0);
+      expect(reloadTable).toHaveBeenCalledTimes(1);
 
       component.grantNumbers = Array(1000).fill('R01CA000001').join(' ');
       expect(component.grantNumberValidationMessage).toBeNull();
       component.searchGrantNumbers();
       expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1]);
       expect(component.selectedRows.size).toBe(0);
-      expect(reloadTable).toHaveBeenCalledTimes(1);
+      expect(reloadTable).toHaveBeenCalledTimes(2);
 
       component.selectedRows.set(1, component.grants[0]);
+      component.selectDoc('DCTD');
       component.grantNumbers += ', R01CA000001';
       expect(component.grantNumberValidationMessage).toBe('Do not exceed 1,000 Grant Numbers.');
       component.searchGrantNumbers();
       expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1]);
       expect(component.selectedRows.has(1)).toBeTrue();
+      expect(reloadTable).toHaveBeenCalledTimes(2);
+    });
+
+    it('shows over-limit feedback on Search without prior interaction and leaves the applied search unchanged', () => {
+      component.grantNumbers = 'R01CA000001';
+      component.searchGrantNumbers();
+      component.selectedRows.set(1, component.grants[0]);
+      component.grantNumbersInteracted = false;
+      component.grantNumbers = Array(1001).fill('R01CA000001').join(',');
+      expect(component.showGrantNumberValidation).toBeFalse();
+
+      component.searchGrantNumbers();
+
+      expect(component.grantNumbersInteracted).toBeTrue();
+      expect(component.showGrantNumberValidation).toBeTrue();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1]);
+      expect(component.selectedRows.has(1)).toBeTrue();
+      expect(reloadTable).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows all DOCs in the current tab when Search has no DOC and no grant numbers', () => {
+      component.selectedTab = 'pending';
+      component.selectedRows.set(1, component.grants[0]);
+
+      component.searchGrantNumbers();
+
+      expect((component as any).appliedGrantNumbers).toBeNull();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2]);
+      expect(component.selectedRows.size).toBe(0);
+      expect(reloadTable).toHaveBeenCalledTimes(1);
+    });
+
+    it('applies a DOC-only Search within the current tab', () => {
+      component.selectDoc('DCTD');
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2, 3, 4]);
+
+      component.searchGrantNumbers();
+
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([2, 4]);
+      expect(reloadTable).toHaveBeenCalledTimes(1);
+    });
+
+    it('removes the grant-number restriction when the text is cleared and Search is clicked again', () => {
+      component.selectDoc('DCB');
+      component.grantNumbers = 'R01CA000001';
+      component.searchGrantNumbers();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1]);
+
+      component.grantNumbers = '';
+      component.searchGrantNumbers();
+      expect((component as any).appliedGrantNumbers).toBeNull();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 3]);
+
+      component.selectDoc('');
+      component.searchGrantNumbers();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2, 3, 4]);
+      expect(reloadTable).toHaveBeenCalledTimes(3);
+    });
+
+    it('keeps a DOC-only search across tabs, including when the DOC is unavailable', () => {
+      component.selectDoc('DCB');
+      component.searchGrantNumbers();
+      component.selectDoc('DCTD');
+      component.selectedRows.set(1, component.grants[0]);
+
+      component.selectTab('pending');
+      expect(component.selectedDoc).toBe('DCB');
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1]);
+      expect(component.selectedRows.size).toBe(0);
+      component.selectTab('hold');
+      expect(component.availableDocs).toEqual(['DCTD']);
+      expect(component.selectedDoc).toBe('DCB');
+      expect(component.filteredGrants).toEqual([]);
+      component.selectTab('approved');
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([3]);
+    });
+
+    it('resets a DOC-only search to all DOCs on the same tab', () => {
+      component.selectTab('pending');
+      component.selectDoc('DCTD');
+      component.searchGrantNumbers();
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([2]);
+      reloadTable.calls.reset();
+
+      component.resetGrantNumberSearch();
+
+      expect(component.selectedTab).toBe('pending');
+      expect(component.selectedDoc).toBe('');
+      expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2]);
       expect(reloadTable).toHaveBeenCalledTimes(1);
     });
 
@@ -1129,44 +1220,62 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     fixture.detectChanges();
   };
 
-  it('renders the label, help and accessible validation only after interaction', () => {
+  it('renders the optional help, enabled Search and accessible validation only when over the limit', () => {
     const label = fixture.nativeElement.querySelector('label[for="directorGrantNumbers"]') as HTMLLabelElement;
     const help = fixture.nativeElement.querySelector('#directorGrantNumbersHelp') as HTMLElement;
 
     expect(label.textContent.trim()).toBe('Filter by Grant Number(s)');
     expect(help.textContent.replace(/\s+/g, ' ').trim()).toBe(
-      'Enter at least one Grant Number in the field below. Multiple grant numbers should be separated by a space or comma.'
+      'Grant Numbers are optional. Multiple grant numbers should be separated by a space or comma.'
     );
-    expect(searchButton().disabled).toBeTrue();
+    expect(searchButton().disabled).toBeFalse();
+    expect(searchButton().hasAttribute('disabled')).toBeFalse();
     expect(feedback()).toBeNull();
     expect(field().getAttribute('aria-invalid')).toBeNull();
     expect(field().getAttribute('aria-describedby')).toBe('directorGrantNumbersHelp directorGrantNumbersCounter');
 
     field().dispatchEvent(new Event('blur'));
     fixture.detectChanges();
-    expect(feedback().textContent.trim()).toBe('At least one Grant Number is required.');
+    expect(feedback()).toBeNull();
+    expect(field().getAttribute('aria-invalid')).toBeNull();
+    expect(searchButton().disabled).toBeFalse();
+
+    enterGrantNumbers(makeDirectorGrantNumbers(1001).join(' '));
+    expect(feedback().textContent.trim()).toBe('Do not exceed 1,000 Grant Numbers.');
     expect(feedback().classList.contains('invalid-feedback')).toBeTrue();
     expect(feedback().classList.contains('d-block')).toBeTrue();
     expect(field().getAttribute('aria-invalid')).toBe('true');
     expect(field().getAttribute('aria-describedby')).toBe(
       'directorGrantNumbersHelp directorGrantNumbersCounter directorGrantNumbersFeedback'
     );
+    expect(searchButton().disabled).toBeFalse();
 
-    enterGrantNumbers('R01CA000001');
+    enterGrantNumbers('');
     expect(searchButton().disabled).toBeFalse();
     expect(feedback()).toBeNull();
-    enterGrantNumbers('');
-    expect(searchButton().disabled).toBeTrue();
-    expect(feedback().textContent.trim()).toBe('At least one Grant Number is required.');
   });
 
-  it('enables Search for 1,000 entries, disables it for 1,001, and clears validation on Reset', async () => {
+  it('shows over-limit feedback when Search is clicked before field interaction', () => {
+    const reloadTable = spyOn<any>(component, 'reloadTable').and.stub();
+    component.grantNumbers = makeDirectorGrantNumbers(1001).join(',');
+    fixture.detectChanges();
+    expect(feedback()).toBeNull();
+
+    searchButton().click();
+    fixture.detectChanges();
+
+    expect(feedback().textContent.trim()).toBe('Do not exceed 1,000 Grant Numbers.');
+    expect(field().getAttribute('aria-invalid')).toBe('true');
+    expect(reloadTable).not.toHaveBeenCalled();
+  });
+
+  it('keeps Search enabled for 1,000 and 1,001 entries and clears validation on Reset', async () => {
     enterGrantNumbers(Array(1000).fill('R01CA000001').join(', '));
     expect(searchButton().disabled).toBeFalse();
     expect(feedback()).toBeNull();
 
     enterGrantNumbers(Array(1001).fill('R01CA000001').join(' '));
-    expect(searchButton().disabled).toBeTrue();
+    expect(searchButton().disabled).toBeFalse();
     expect(feedback().textContent.trim()).toBe('Do not exceed 1,000 Grant Numbers.');
     expect(field().getAttribute('aria-invalid')).toBe('true');
 
@@ -1175,7 +1284,7 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     await fixture.whenStable();
     fixture.detectChanges();
     expect(field().value).toBe('');
-    expect(searchButton().disabled).toBeTrue();
+    expect(searchButton().disabled).toBeFalse();
     expect(feedback()).toBeNull();
     expect(field().getAttribute('aria-invalid')).toBeNull();
     expect(field().getAttribute('aria-describedby')).toBe('directorGrantNumbersHelp directorGrantNumbersCounter');
@@ -1195,8 +1304,8 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
 
     enterGrantNumbers(' ,\r\n \t , ');
     expect(counter().textContent.trim()).toBe('0/1000');
-    expect(feedback().textContent.trim()).toBe('At least one Grant Number is required.');
-    expect(searchButton().disabled).toBeTrue();
+    expect(feedback()).toBeNull();
+    expect(searchButton().disabled).toBeFalse();
 
     enterGrantNumbers('1R01CA000001-01');
     expect(counter().textContent.trim()).toBe('1/1000');
@@ -1236,7 +1345,7 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     expect(counter().textContent.trim()).toBe('1001/1000');
     expect(feedback().textContent.trim()).toBe('Do not exceed 1,000 Grant Numbers.');
     expect(field().getAttribute('aria-invalid')).toBe('true');
-    expect(searchButton().disabled).toBeTrue();
+    expect(searchButton().disabled).toBeFalse();
 
     enterGrantNumbers(grants.slice(1).join(' '));
     expect(counter().textContent.trim()).toBe('1000/1000');
@@ -1250,7 +1359,7 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     expect(field().value).toBe('');
     expect(counter().textContent.trim()).toBe('0/1000');
     expect(feedback()).toBeNull();
-    expect(searchButton().disabled).toBeTrue();
+    expect(searchButton().disabled).toBeFalse();
   });
 
   it('right-aligns the counter below the field with and without validation feedback', () => {
@@ -1266,8 +1375,7 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     expect(Math.abs(counterRect.right - fieldRect.right)).toBeLessThanOrEqual(1);
     expect(counterRect.left).toBeGreaterThan(fieldRect.left + fieldRect.width / 2);
 
-    field().dispatchEvent(new Event('blur'));
-    fixture.detectChanges();
+    enterGrantNumbers(makeDirectorGrantNumbers(1001).join(' '));
     fieldRect = field().getBoundingClientRect();
     counterRect = counter().getBoundingClientRect();
     const feedbackRect = feedback().getBoundingClientRect();
@@ -1333,5 +1441,44 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     searchButton().click();
     expect(component.filteredGrants.map(grant => grant.applId)).toEqual([2]);
     expect(reloadTable).toHaveBeenCalledTimes(2);
+  });
+
+  it('applies a rendered DOC-only Search and returns to all DOCs after Reset', async () => {
+    const reloadTable = spyOn<any>(component, 'reloadTable').and.stub();
+    component.selectedTab = 'pending';
+    component.grants = [
+      buildGrant({ applId: 1, doc: 'DCB', grantNumber: 'R01CA000001', nciDecision: null }),
+      buildGrant({ applId: 2, doc: 'DCTD', grantNumber: 'U01CA000002', nciDecision: null })
+    ];
+    fixture.detectChanges();
+    const docTiles = fixture.nativeElement.querySelectorAll('.doc-tile') as NodeListOf<HTMLButtonElement>;
+
+    searchButton().click();
+    fixture.detectChanges();
+    expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2]);
+
+    docTiles[1].click();
+    fixture.detectChanges();
+    expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2]);
+    expect(searchButton().disabled).toBeFalse();
+    searchButton().click();
+    fixture.detectChanges();
+    expect(component.filteredGrants.map(grant => grant.applId)).toEqual([2]);
+    expect(counter().textContent.trim()).toBe('0/1000');
+    expect(feedback()).toBeNull();
+
+    let response: { data: FundingSubmissionListGrantDto[] };
+    component.dtOptions.ajax({}, (result: { data: FundingSubmissionListGrantDto[] }) => response = result);
+    expect(response.data.map(grant => grant.applId)).toEqual([2]);
+
+    resetButton().click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(component.selectedTab).toBe('pending');
+    expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2]);
+    expect(counter().textContent.trim()).toBe('0/1000');
+    expect(searchButton().disabled).toBeFalse();
+    expect(reloadTable).toHaveBeenCalledTimes(3);
   });
 });

@@ -119,7 +119,7 @@
   <div class="grant-number-filter mb-4">
     <label for="directorGrantNumbers" class="form-label fw-semibold">Filter by Grant Number(s)</label>
     <p id="directorGrantNumbersHelp">
-      Enter at least one Grant Number in the field below. Multiple grant numbers should be separated by a space or comma.
+      Grant Numbers are optional. Multiple grant numbers should be separated by a space or comma.
     </p>
     <textarea
       id="directorGrantNumbers"
@@ -146,7 +146,7 @@
     </div>
     <div class="d-flex justify-content-end mt-3">
       <button type="button" class="btn btn-outline-secondary me-2" (click)="resetGrantNumberSearch()">Reset</button>
-      <button type="button" class="btn btn-primary" [disabled]="!!grantNumberValidationMessage" (click)="searchGrantNumbers()">
+      <button type="button" class="btn btn-primary" (click)="searchGrantNumbers()">
         Search
       </button>
     </div>
