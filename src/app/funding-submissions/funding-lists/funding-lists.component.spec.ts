@@ -1220,6 +1220,59 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
     fixture.detectChanges();
   };
 
+  it('renders the Filter and Search heading with a decorative rule after the tabs', () => {
+    const root = fixture.nativeElement as HTMLElement;
+    const headings = Array.from(root.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+    const heading = headings.find(element => element.textContent.trim() === 'Filter and Search');
+
+    expect(heading).withContext('Filter and Search heading').toBeDefined();
+    if (!heading) {
+      return;
+    }
+
+    const rule = heading.nextElementSibling as HTMLElement;
+    expect(heading.tagName).toBe('H2');
+    expect(heading.classList.contains('flex-shrink-0')).toBeTrue();
+    expect(heading.parentElement.classList.contains('d-flex')).toBeTrue();
+    expect(rule.tagName).toBe('HR');
+    expect(rule.classList.contains('flex-grow-1')).toBeTrue();
+    expect(rule.getAttribute('aria-hidden')).toBe('true');
+    expect(root.querySelector('.tabs').compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING)
+      .toBeTruthy();
+    expect(heading.compareDocumentPosition(root.querySelector('#directorDocFilterLabel')) & Node.DOCUMENT_POSITION_FOLLOWING)
+      .toBeTruthy();
+  });
+
+  it('introduces and accessibly labels the DOC button group before the grant filter', () => {
+    component.selectedTab = 'pending';
+    component.grants = [
+      buildGrant({ applId: 1, doc: 'DCB', nciDecision: null }),
+      buildGrant({ applId: 2, doc: 'DCTD', nciDecision: null })
+    ];
+    fixture.detectChanges();
+
+    const root = fixture.nativeElement as HTMLElement;
+    const label = root.querySelector('#directorDocFilterLabel') as HTMLElement;
+    const help = root.querySelector('#directorDocFilterHelp') as HTMLElement;
+    const group = root.querySelector('.doc-filters') as HTMLElement;
+    const grantFilter = root.querySelector('.grant-number-filter') as HTMLElement;
+    const labelText = label.querySelector('strong');
+
+    expect(label.tagName).toBe('DIV');
+    expect(labelText.textContent.trim()).toBe('Filter by DOC(s):');
+    expect(help.tagName).toBe('P');
+    expect(help.textContent.trim()).toBe('Select a DOC and click Search to filter the table below.');
+    expect(group.getAttribute('role')).toBe('group');
+    expect(group.getAttribute('aria-labelledby')).toBe(label.id);
+    expect(group.getAttribute('aria-describedby')).toBe(help.id);
+    expect(group.contains(label)).toBeFalse();
+    expect(group.contains(help)).toBeFalse();
+    expect(group.querySelectorAll('button.doc-tile').length).toBe(2);
+    expect(label.compareDocumentPosition(help) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(help.compareDocumentPosition(group) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(group.compareDocumentPosition(grantFilter) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('preserves active tab and DOC tile colors over their base styles', () => {
     component.grants = [buildGrant({ doc: 'DCB' })];
     fixture.detectChanges();

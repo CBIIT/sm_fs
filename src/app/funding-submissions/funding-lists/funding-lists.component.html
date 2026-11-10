@@ -97,7 +97,15 @@
     </button>
   </section>
 
-  <section class="doc-filters mb-4">
+  <div class="d-flex align-items-center mb-3">
+    <h2 class="h3 mb-0 me-3 flex-shrink-0">Filter and Search</h2>
+    <hr class="flex-grow-1" aria-hidden="true">
+  </div>
+
+  <div id="directorDocFilterLabel"><strong>Filter by DOC(s):</strong></div>
+  <p id="directorDocFilterHelp" class="mb-2">Select a DOC and click Search to filter the table below.</p>
+  <section class="doc-filters mb-4" role="group" aria-labelledby="directorDocFilterLabel"
+    aria-describedby="directorDocFilterHelp">
     <button
       type="button"
       class="doc-tile"
