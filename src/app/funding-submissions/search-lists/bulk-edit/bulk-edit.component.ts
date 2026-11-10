@@ -15,7 +15,7 @@ import { AppUserSessionService } from '../../../service/app-user-session.service
 import { roleNames } from '../../../service/role-names';
 import {
   applyDocPayDefaults, DOC_PAY_SELECTION_FIELDS, DocPayDefaultField, DocPayProvenance, DocPaySelectionField,
-  DocPaySelections, hasIncompleteDocRecommendation, isBlankSelection, isPayDecision, requireDocPayDefaults
+  DocPaySelections, isBlankSelection, isPayDecision, requireDocPayDefaults, validateDocRecommendation
 } from '../../doc-pay-defaults';
 import { FundingRequestErrorScopeService } from '../../funding-request-error-scope.service';
 import { GrantBudgetCategoryOptions } from '../../grant-budget-category-options';
@@ -91,10 +91,12 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   OEFIACertifier = false;
   private lastSavedRows: any[] = [];
   private pendingRealignFrame: number | null = null;
-  private readonly doNotPayDocNotesErrorMessage = 'DOC Notes is required when DOC decision is Do Not Pay.';
+  private readonly doNotPayDocNotesErrorMessage = 'DOC Notes is required when DOC Decision is Do Not Pay.';
   private doNotPayDocNotesErrorRowIds = new Set<number>();
   private mandatoryFieldErrorRowMap = new Map<number, Set<string>>();
   private rowRequiredValidationEnabled = false;
+  private recommendationErrorRowIds = new Set<number>();
+  recommendationErrorMessage = '';
   private bulkFieldsApplied = false;
   private bulkDoNotPayWithBlankDocNotesApplied = false;
   docPayDefaultsLoading = false;
@@ -139,6 +141,14 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get hasDoNotPayDocNotesErrors(): boolean {
     return this.doNotPayDocNotesErrorRowIds.size > 0;
+  }
+
+  get hasMandatoryFieldErrors(): boolean {
+    return this.mandatoryFieldErrorRowMap.size > 0;
+  }
+
+  get hasRecommendationErrors(): boolean {
+    return this.recommendationErrorRowIds.size > 0;
   }
 
   get showBulkDoNotPayDocNotesError(): boolean {
@@ -564,12 +574,12 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.restoreReadOnlyOefiaNotes();
+    this.rowRequiredValidationEnabled = true;
     this.loadDocPayDefaults();
     this.bulkFieldsApplied = true;
     this.updateDoNotPayDocNotesValidationErrors();
-    if (this.rowRequiredValidationEnabled) {
-      this.updateMandatoryFieldValidationErrors();
-    }
+    this.updateMandatoryFieldValidationErrors();
+    this.updateRecommendationValidationErrors();
     // Apply Changes only enables Save when it actually changed at least one row's persisted
     // value; it must not leave a stale canSave=true when the shared values matched every row.
     this.recomputeCanSave();
@@ -658,6 +668,19 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     return !!rowErrors && rowErrors.has(field);
   }
 
+  private updateRecommendationValidationErrors(): boolean {
+    const failingRows = this.rows.filter(row => this.shouldSubmitRow(row)
+      && isPayDecision(row.docDecision, this.decisionOptions)
+      && !(this.needsDocPayDefaults(row) && !this.docPayDefaultsResolvedRows.has(row.applId))
+      && Object.keys(validateDocRecommendation(row, { isRequired: () => true })).length > 0);
+    this.recommendationErrorRowIds = new Set(failingRows.map(row => row.applId));
+    this.recommendationErrorMessage = failingRows.length
+      ? 'DOC recommended amount, reduction, and priority must be supplied and valid for '
+        + `${failingRows.map(row => row.grantNumber ?? row.applId).join(', ')}. Correct them in Individual Edit.`
+      : '';
+    return failingRows.length === 0;
+  }
+
   getMandatoryFieldErrorMessage(fieldLabel: string): string {
     return `${fieldLabel} is required`;
   }
@@ -714,6 +737,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateDoNotPayDocNotesValidationErrors();
     if (this.rowRequiredValidationEnabled) {
       this.updateMandatoryFieldValidationErrors();
+      this.updateRecommendationValidationErrors();
     }
     this.recomputeCanSave();
   }
@@ -810,6 +834,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.doNotPayDocNotesErrorRowIds.clear();
     this.mandatoryFieldErrorRowMap.clear();
     this.rowRequiredValidationEnabled = false;
+    this.recommendationErrorRowIds.clear();
+    this.recommendationErrorMessage = '';
     this.recomputeCanSave();
     this.clearSaveMessages();
     this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
@@ -831,14 +857,9 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.enforceDoNotPayRulesForRows(rowsToSave);
     const hasNoDoNotPayErrors = this.updateDoNotPayDocNotesValidationErrors();
     const hasNoMandatoryFieldErrors = this.updateMandatoryFieldValidationErrors();
-    const incompletePairs = rowsToSave.filter(row => this.needsDocPayDefaults(row)
-      && hasIncompleteDocRecommendation(row));
-    if (!hasNoDoNotPayErrors || !hasNoMandatoryFieldErrors || incompletePairs.length) {
+    const hasNoRecommendationErrors = this.updateRecommendationValidationErrors();
+    if (!hasNoDoNotPayErrors || !hasNoMandatoryFieldErrors || !hasNoRecommendationErrors) {
       this.isSaving = false;
-      if (incompletePairs.length) {
-        this.saveErrorMessage = 'DOC recommended amount and reduction must both be supplied for '
-          + `${incompletePairs.map(row => row.grantNumber ?? row.applId).join(', ')}. Correct them in Individual Edit.`;
-      }
       this.recomputeCanSave();
       this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
       return;
@@ -1102,7 +1123,11 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fundingRecoveryError = this.getSaveErrorMessage(error);
       this.logger.error('Unable to load bulk funding save recovery state', error);
     }
-    this.updateDoNotPayDocNotesValidationErrors();
+    if (this.rowRequiredValidationEnabled) {
+      this.updateDoNotPayDocNotesValidationErrors();
+      this.updateMandatoryFieldValidationErrors();
+      this.updateRecommendationValidationErrors();
+    }
   }
 
   private isCurrentFundingSave(readback: BulkRowReadback): boolean {
@@ -1184,7 +1209,10 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
           this.bulkDoNotPayWithBlankDocNotesApplied = false;
         }
         this.updateDoNotPayDocNotesValidationErrors();
-        if (this.rowRequiredValidationEnabled) this.updateMandatoryFieldValidationErrors();
+        if (this.rowRequiredValidationEnabled) {
+          this.updateMandatoryFieldValidationErrors();
+          this.updateRecommendationValidationErrors();
+        }
         this.recomputeCanSave();
         if (savedCount) {
           this.saveSuccessMessage = !errors.length && !this.savedChangesNeedRefresh && !this.bulkWriteOutcomeMessage

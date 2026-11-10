@@ -2,7 +2,7 @@ import { FundingSubmissionDocPayDefaultsDto } from '@cbiit/i2efsws-lib';
 
 import {
   applyDocPayDefaults, DOC_PAY_SELECTION_FIELDS, DocPayFields, DocPayProvenance, DocPaySelections,
-  hasIncompleteDocRecommendation, isBlankSelection, isPayDecision, requireDocPayDefaults
+  hasIncompleteDocRecommendation, isBlankSelection, isPayDecision, requireDocPayDefaults, validateDocRecommendation
 } from './doc-pay-defaults';
 
 describe('FS-2679 DOC Pay selection reconciliation', () => {
@@ -32,6 +32,51 @@ describe('FS-2679 DOC Pay selection reconciliation', () => {
       expect(fields[field]).toBeNull();
     });
   }
+
+  describe('FS-2251 shared DOC recommendation validation', () => {
+    const valid = { docRecAmt: 100, docRecReductionPct: 0, docPriority: '0' };
+    const required = { isRequired: () => true };
+
+    for (const pct of [0, 99.99]) {
+      it(`accepts the percentage boundary ${pct} and zero priority`, () => {
+        expect(validateDocRecommendation({ ...valid, docRecReductionPct: pct }, required)).toEqual({});
+      });
+    }
+
+    for (const { field, value, message } of [
+      { field: 'docRecReductionPct', value: 100, message: 'Enter a numeric value between 0 and 99.99, with at most 2 decimal places.' },
+      { field: 'docRecReductionPct', value: -1, message: 'Enter a numeric value between 0 and 99.99, with at most 2 decimal places.' },
+      { field: 'docRecReductionPct', value: 1.234, message: 'Enter a numeric value between 0 and 99.99, with at most 2 decimal places.' },
+      { field: 'docRecReductionPct', value: NaN, message: 'Enter a numeric value between 0 and 99.99, with at most 2 decimal places.' },
+      { field: 'docRecAmt', value: -1, message: 'DOC Rec $ cannot be negative.' },
+      { field: 'docRecAmt', value: 1.5, message: 'DOC Rec $ must be a whole dollar amount.' },
+      { field: 'docPriority', value: '-1', message: 'DOC Priority must be a non-negative whole number.' },
+      { field: 'docPriority', value: '1.5', message: 'DOC Priority must be a non-negative whole number.' }
+    ]) {
+      it(`rejects ${field} = ${value} with the existing message`, () => {
+        expect(validateDocRecommendation({ ...valid, [field]: value }, required)).toEqual({ [field]: message });
+      });
+    }
+
+    for (const [field, label] of [
+      ['docRecReductionPct', 'DOC Rec % Red'], ['docRecAmt', 'DOC Rec $'], ['docPriority', 'DOC Priority']
+    ]) {
+      for (const value of [null, '', ' \t ']) {
+        it(`requires blank ${field} = ${JSON.stringify(value)} only when touched or saving`, () => {
+          const values = { ...valid, [field]: value };
+          expect(validateDocRecommendation(values, required)).toEqual({ [field]: `${label} is required` });
+          expect(validateDocRecommendation(values, { isRequired: () => false })).toEqual({});
+        });
+      }
+    }
+
+    it('retains untouched zero and whitespace-only priority live behavior', () => {
+      expect(validateDocRecommendation(valid, { isRequired: () => false })).toEqual({});
+      expect(validateDocRecommendation({ ...valid, docPriority: ' ' }, { isRequired: () => false })).toEqual({});
+      expect(validateDocRecommendation({ ...valid, docPriority: ' ' }, required))
+        .toEqual({ docPriority: 'DOC Priority is required' });
+    });
+  });
 
   it('retains a blank 2Y response rather than inventing a non-R01 default', () => {
     const fields: DocPaySelections = { annualFundingR01: null };

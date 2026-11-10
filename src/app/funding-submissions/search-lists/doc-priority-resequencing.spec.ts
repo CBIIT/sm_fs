@@ -51,6 +51,7 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     return {
       applId, grantNumber: `GRANT-${applId}`, doc: 'DCB', docDecision: 'Pay', docPriority: priority,
       docRecommendedAmount: 90000, docRecommendedReductionPct: 10, originalRequestedTotal: 100000,
+      budgetCategoryCode: 'R01R37', docNciSelection: 'DOC', annualFundingR01: 'No', annualOrMyf: 'MYF',
       docNotes: 'Stored note', oefiaNotes: '', addedByGroup: 'OEFIA', ...overrides
     };
   }

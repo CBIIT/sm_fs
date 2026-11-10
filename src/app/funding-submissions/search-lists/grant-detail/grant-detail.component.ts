@@ -14,7 +14,9 @@ import { DocumentsDto } from '@cbiit/i2efsws-lib/model/documentsDto';
 import { DocumentService } from '../../../service/document.service';
 import {
   applyDocPayDefaults, DOC_PAY_SELECTION_FIELDS, DocPayDefaultField, DocPayProvenance,
-  DocPaySelectionField, DocPaySelections, isBlankSelection, isPayDecision, requireDocPayDefaults
+  DocPaySelectionField, DocPaySelections, isBlankSelection, isPayDecision, requireDocPayDefaults,
+  isWholeDollarAmount, isValidReductionPctForCalculation, parseExactDecimal, toFiniteNumberOrNull,
+  validateDocRecommendation
 } from '../../doc-pay-defaults';
 import { FundingRequestErrorScopeService } from '../../funding-request-error-scope.service';
 import { GrantBudgetCategoryOptions } from '../../grant-budget-category-options';
@@ -49,7 +51,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   private grantData: any = null;
   private initialized = false;
   private destroyed = false;
-  private budgetRenderPending = false;
+  private viewRefreshPending = false;
   private handledDataChange: any = null;
   private grantChangeSequence = 0;
   private readonly grantBudgetOptions: GrantBudgetCategoryOptions;
@@ -62,7 +64,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       this.handledDataChange = value;
       this.prepareForGrantChange();
       this.loadGrantBudgetOptions();
-      this.scheduleBudgetRender();
+      this.scheduleViewRefresh();
       const sequence = ++this.grantChangeSequence;
       Promise.resolve().then(() => {
         if (!this.destroyed && this.grantChangeSequence === sequence) {
@@ -179,7 +181,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
         if (this.data?.applId === applId) {
           this.budgetCategoryOptions = state.options;
           this.budgetCategoriesLoaded = true;
-          this.scheduleBudgetRender();
+          this.scheduleViewRefresh();
         }
       }
     );
@@ -268,14 +270,14 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   retryBudgetCategories(): void {
     this.budgetCategoriesLoaded = false;
     this.grantBudgetOptions.retry(this.data?.applId);
-    this.scheduleBudgetRender();
+    this.scheduleViewRefresh();
   }
 
-  private scheduleBudgetRender(): void {
-    if (this.budgetRenderPending || this.destroyed) return;
-    this.budgetRenderPending = true;
+  private scheduleViewRefresh(): void {
+    if (this.viewRefreshPending || this.destroyed) return;
+    this.viewRefreshPending = true;
     Promise.resolve().then(() => {
-      this.budgetRenderPending = false;
+      this.viewRefreshPending = false;
       if (!this.destroyed) this.cdr.detectChanges();
     });
   }
@@ -419,6 +421,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   onUserSelectChange(field: DocPaySelectionField | 'docPriority' | 'docDecision', value: string | null): void {
     this.formModel[field] = value;
+    this.touchedRequiredFields.add(field);
     this.provenance.recordUserEdit(field);
     if (field === 'docDecision') {
       this.onDocDecisionChange();
@@ -427,6 +430,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.observedSelections[field] = value;
       this.updateValidationErrorsLive();
+      // Let Select2 finish its event before changed options can recreate the widget.
+      this.scheduleViewRefresh();
     }
   }
 
@@ -571,14 +576,14 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   onDocRecReductionPctChange(): void {
     this.provenance.recordUserEdit('docRecReductionPct');
     this.touchedRequiredFields.add('docRecReductionPct');
-    const reductionPct = this.toFiniteNumberOrNull(this.formModel.docRecReductionPct);
-    const baseAmount = this.parseExactDecimal(this.data?.originalRequestedTotal);
-    const parsedReductionPct = this.parseExactDecimal(this.formModel.docRecReductionPct);
+    const reductionPct = toFiniteNumberOrNull(this.formModel.docRecReductionPct);
+    const baseAmount = parseExactDecimal(this.data?.originalRequestedTotal);
+    const parsedReductionPct = parseExactDecimal(this.formModel.docRecReductionPct);
     if (baseAmount != null
       && baseAmount.coefficient > 0n
       && reductionPct != null
       && parsedReductionPct != null
-      && this.isValidReductionPctForCalculation(reductionPct)) {
+      && isValidReductionPctForCalculation(reductionPct)) {
       const pctScale = 10n ** BigInt(parsedReductionPct.scale);
       const numerator = baseAmount.coefficient * (100n * pctScale - parsedReductionPct.coefficient);
       const denominator = 10n ** BigInt(baseAmount.scale) * pctScale;
@@ -594,14 +599,14 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   onDocRecAmtChange(): void {
     this.provenance.recordUserEdit('docRecAmt');
     this.touchedRequiredFields.add('docRecAmt');
-    const updatedAmount = this.toFiniteNumberOrNull(this.formModel.docRecAmt);
-    const baseAmount = this.parseExactDecimal(this.data?.originalRequestedTotal);
-    const parsedAmount = this.parseExactDecimal(this.formModel.docRecAmt);
+    const updatedAmount = toFiniteNumberOrNull(this.formModel.docRecAmt);
+    const baseAmount = parseExactDecimal(this.data?.originalRequestedTotal);
+    const parsedAmount = parseExactDecimal(this.formModel.docRecAmt);
     if (baseAmount != null
       && baseAmount.coefficient > 0n
       && updatedAmount != null
       && updatedAmount >= 0
-      && this.isWholeDollarAmount(this.formModel.docRecAmt)
+      && isWholeDollarAmount(this.formModel.docRecAmt)
       && parsedAmount != null) {
       const commonScale = Math.max(baseAmount.scale, parsedAmount.scale);
       const scaledBase = baseAmount.coefficient * (10n ** BigInt(commonScale - baseAmount.scale));
@@ -992,6 +997,10 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     return this.OEFIACertifier || this.financialAnalyst;
   }
 
+  get isDocNotesRequired(): boolean {
+    return this.isDoNotPayDecisionSelected() && !this.isDoNotPayRestricted;
+  }
+
   private recomputeDoNotPayOefiaLock(): void {
     const doNotPaySelected = this.isDoNotPayDecisionSelected();
     const docShouldLock = this.docFundingListCor
@@ -1011,14 +1020,13 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       errors.docDecision = 'Do Not Pay is not available for grants added by a DOC user.';
     }
 
-    if (this.doNotPayOefiaLockActive) {
-      if (this.canEditOefiaNotes()) {
-        if (!String(this.formModel.oefiaNotes || '').trim()) {
-          errors.oefiaNotes = 'OEFIA Notes is required when DOC Decision is Do Not Pay.';
-        }
-      } else if (!String(this.formModel.docNotes || '').trim()) {
-        errors.docNotes = 'DOC Notes is required when DOC Decision is Do Not Pay.';
-      }
+    if (isBlankSelection(this.formModel.docDecision)
+      && (includeUntouchedRequired || this.touchedRequiredFields.has('docDecision'))) {
+      errors.docDecision = 'DOC Decision is required';
+    }
+
+    if (this.isDocNotesRequired && !String(this.formModel.docNotes || '').trim()) {
+      errors.docNotes = 'DOC Notes is required when DOC Decision is Do Not Pay.';
     }
 
     if (this.isDoNotPayDecisionSelected()) {
@@ -1026,39 +1034,25 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     const requiredFields = {
-      docRecReductionPct: 'DOC Rec % Red',
-      docRecAmt: 'DOC Rec $',
-      docPriority: 'DOC Priority'
+      budgetCategories: 'Budget Categories',
+      docNciSelection: 'DOC/NCI Selection',
+      annualFundingR01: 'Two-Year Annual Funding R01 (HRHR)',
+      annualOrMyf: 'Annual or MYF'
     };
     for (const field of Object.keys(requiredFields)) {
       const value = this.formModel[field];
-      if ((value == null || String(value).trim() === '')
+      if (isBlankSelection(value)
         && (includeUntouchedRequired || this.touchedRequiredFields.has(field))) {
         errors[field] = `${requiredFields[field]} is required`;
       }
     }
 
-    const pct = this.formModel.docRecReductionPct;
-    const numericPct = this.toFiniteNumberOrNull(pct);
-    if (!errors.docRecReductionPct && pct != null && String(pct).trim() !== '' && !this.isValidReductionPctForCalculation(numericPct)) {
-      errors.docRecReductionPct = 'Enter a numeric value between 0 and 99.99, with at most 2 decimal places.';
-    }
-
-    const amt = this.formModel.docRecAmt;
-    if (amt != null && amt < 0) {
-      errors.docRecAmt = 'DOC Rec $ cannot be negative.';
-    }
-
-    if (!errors.docRecAmt && amt != null && String(amt).trim() !== '' && !this.isWholeDollarAmount(amt)) {
-      errors.docRecAmt = 'DOC Rec $ must be a whole dollar amount.';
-    }
-
-    const priority = this.formModel.docPriority as any;
-    if (priority != null && priority !== '' && (!Number.isInteger(Number(priority)) || Number(priority) < 0)) {
-      errors.docPriority = 'DOC Priority must be a non-negative whole number.';
-    }
-
-    return errors;
+    return {
+      ...errors,
+      ...validateDocRecommendation(this.formModel, {
+        isRequired: field => includeUntouchedRequired || this.touchedRequiredFields.has(field)
+      })
+    };
   }
 
   private getFirstValidationError(errors: Record<string, string>): string | null {
@@ -1072,56 +1066,6 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.saveValidationErrors = {};
   }
 
-  private isWholeDollarAmount(value: unknown): boolean {
-    const parsed = this.parseExactDecimal(value);
-    return parsed != null && parsed.coefficient % (10n ** BigInt(parsed.scale)) === 0n;
-  }
-
-  private hasAtMostTwoDecimals(value: unknown): boolean {
-    const parsed = this.parseExactDecimal(value);
-    return parsed != null && parsed.scale <= 2;
-  }
-
-  private toFiniteNumberOrNull(value: any): number | null {
-    if (value == null || value === '') {
-      return null;
-    }
-
-    // Accept formatted user/backend values like "$100,000.50" or "10%".
-    const normalizedValue = typeof value === 'string'
-      ? value.replace(/[$,%\s]/g, '').replace(/,/g, '')
-      : value;
-
-    const numericValue = Number(normalizedValue);
-    return Number.isFinite(numericValue) ? numericValue : null;
-  }
-
-  private parseExactDecimal(value: unknown): { coefficient: bigint; scale: number } | null {
-    if (value == null || value === '') {
-      return null;
-    }
-
-    const normalizedValue = String(value).replace(/[$,%\s,]/g, '');
-    const match = /^([+-]?)(\d*)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$/.exec(normalizedValue);
-    if (!match || (!match[2] && !match[3])) {
-      return null;
-    }
-
-    const exponent = Number(match[4] ?? 0);
-    if (!Number.isSafeInteger(exponent) || Math.abs(exponent) > 1000) {
-      return null;
-    }
-    const fraction = match[3] ?? '';
-    const digits = `${match[2] || '0'}${fraction}`;
-    let coefficient = BigInt(`${match[1] === '-' ? '-' : ''}${digits}`);
-    let scale = fraction.length - exponent;
-    if (scale < 0) {
-      coefficient *= 10n ** BigInt(-scale);
-      scale = 0;
-    }
-    return { coefficient, scale };
-  }
-
   private roundHalfUpDivision(numerator: bigint, denominator: bigint): bigint {
     const negative = numerator < 0n;
     const absoluteNumerator = negative ? -numerator : numerator;
@@ -1129,10 +1073,6 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     const remainder = absoluteNumerator % denominator;
     const rounded = quotient + (remainder * 2n >= denominator ? 1n : 0n);
     return negative ? -rounded : rounded;
-  }
-
-  private isValidReductionPctForCalculation(value: number | null): boolean {
-    return value != null && value >= 0 && value < 100 && this.hasAtMostTwoDecimals(value);
   }
 
   private saveJustification(justificationText?: string): void {

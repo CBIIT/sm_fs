@@ -157,3 +157,97 @@ export function applyDocPayDefaults(
 export function hasIncompleteDocRecommendation(fields: DocPayFields): boolean {
   return isBlankSelection(fields.docRecAmt) !== isBlankSelection(fields.docRecReductionPct);
 }
+
+export type DocRecommendationField = 'docRecAmt' | 'docRecReductionPct' | 'docPriority';
+
+export function validateDocRecommendation(
+  values: Pick<DocPayFields, DocRecommendationField>,
+  options: { isRequired: (field: DocRecommendationField) => boolean }
+): Partial<Record<DocRecommendationField, string>> {
+  const errors: Partial<Record<DocRecommendationField, string>> = {};
+  const requiredFields = {
+    docRecReductionPct: 'DOC Rec % Red',
+    docRecAmt: 'DOC Rec $',
+    docPriority: 'DOC Priority'
+  };
+  for (const field of Object.keys(requiredFields) as DocRecommendationField[]) {
+    const value = values[field];
+    if ((value == null || String(value).trim() === '') && options.isRequired(field)) {
+      errors[field] = `${requiredFields[field]} is required`;
+    }
+  }
+
+  const pct = values.docRecReductionPct;
+  const numericPct = toFiniteNumberOrNull(pct);
+  if (!errors.docRecReductionPct && pct != null && String(pct).trim() !== '' && !isValidReductionPctForCalculation(numericPct)) {
+    errors.docRecReductionPct = 'Enter a numeric value between 0 and 99.99, with at most 2 decimal places.';
+  }
+
+  const amt = values.docRecAmt;
+  if (amt != null && amt < 0) {
+    errors.docRecAmt = 'DOC Rec $ cannot be negative.';
+  }
+  if (!errors.docRecAmt && amt != null && String(amt).trim() !== '' && !isWholeDollarAmount(amt)) {
+    errors.docRecAmt = 'DOC Rec $ must be a whole dollar amount.';
+  }
+
+  const priority = values.docPriority;
+  if (priority != null && priority !== '' && (!Number.isInteger(Number(priority)) || Number(priority) < 0)) {
+    errors.docPriority = 'DOC Priority must be a non-negative whole number.';
+  }
+  return errors;
+}
+
+export function isWholeDollarAmount(value: unknown): boolean {
+  const parsed = parseExactDecimal(value);
+  return parsed != null && parsed.coefficient % (10n ** BigInt(parsed.scale)) === 0n;
+}
+
+export function hasAtMostTwoDecimals(value: unknown): boolean {
+  const parsed = parseExactDecimal(value);
+  return parsed != null && parsed.scale <= 2;
+}
+
+export function toFiniteNumberOrNull(value: any): number | null {
+  if (value == null || value === '') {
+    return null;
+  }
+
+  // Accept formatted user/backend values like "$100,000.50" or "10%".
+  const normalizedValue = typeof value === 'string'
+    ? value.replace(/[$,%\s]/g, '').replace(/,/g, '')
+    : value;
+
+  const numericValue = Number(normalizedValue);
+  return Number.isFinite(numericValue) ? numericValue : null;
+}
+
+export function parseExactDecimal(value: unknown): { coefficient: bigint; scale: number } | null {
+  if (value == null || value === '') {
+    return null;
+  }
+
+  const normalizedValue = String(value).replace(/[$,%\s,]/g, '');
+  const match = /^([+-]?)(\d*)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$/.exec(normalizedValue);
+  if (!match || (!match[2] && !match[3])) {
+    return null;
+  }
+
+  const exponent = Number(match[4] ?? 0);
+  if (!Number.isSafeInteger(exponent) || Math.abs(exponent) > 1000) {
+    return null;
+  }
+  const fraction = match[3] ?? '';
+  const digits = `${match[2] || '0'}${fraction}`;
+  let coefficient = BigInt(`${match[1] === '-' ? '-' : ''}${digits}`);
+  let scale = fraction.length - exponent;
+  if (scale < 0) {
+    coefficient *= 10n ** BigInt(-scale);
+    scale = 0;
+  }
+  return { coefficient, scale };
+}
+
+export function isValidReductionPctForCalculation(value: number | null): boolean {
+  return value != null && value >= 0 && value < 100 && hasAtMostTwoDecimals(value);
+}
