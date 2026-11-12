@@ -1,4 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -17,8 +18,9 @@ import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lo
 import { AppUserSessionService } from '../../../service/app-user-session.service';
 import { roleNames } from '../../../service/role-names';
 import {
-  applyDocPayDefaults, DOC_PAY_SELECTION_FIELDS, DocPayDefaultField, DocPayProvenance, DocPaySelectionField,
-  DocPaySelections, isBlankSelection, isPayDecision, requireDocPayDefaults, validateDocRecommendation
+  applyDocPayDefaults, DOC_PAY_DEFAULTS_LOOKUP_ERROR, DOC_PAY_SELECTION_FIELDS, DocPayDefaultField, DocPayProvenance,
+  docPayDefaultsLookupLogContext, DocPaySelectionField, DocPaySelections, isBlankSelection, isPayDecision,
+  requireDocPayDefaults, technicalSupportMailto, validateDocRecommendation
 } from '../../doc-pay-defaults';
 import { FundingRequestErrorScopeService } from '../../funding-request-error-scope.service';
 import { GrantBudgetCategoryOptions } from '../../grant-budget-category-options';
@@ -105,6 +107,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   private bulkDoNotPayWithBlankDocNotesApplied = false;
   docPayDefaultsLoading = false;
   docPayDefaultsError = '';
+  readonly docPayDefaultsLookupError = DOC_PAY_DEFAULTS_LOOKUP_ERROR;
   fundingRecoveryError = '';
   confirmedUnknownRows: Record<number, boolean> = {};
   private docPayDefaultsSubscription: Subscription;
@@ -1061,6 +1064,10 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isSaving = false;
   }
 
+  get technicalSupportMailto(): string {
+    return technicalSupportMailto(this.propertiesService.getProperty('TECH_SUPPORT_EMAIL'));
+  }
+
   private needsDocPayDefaults(row: EditableBulkRow): boolean {
     return this.isDoNotPayDecisionValue(this.getLastSavedRow(row)?.docDecision)
       && isPayDecision(row.docDecision, this.decisionOptions);
@@ -1119,8 +1126,14 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       error: error => {
         if (!isCurrent()) return;
         this.docPayDefaultsLoading = false;
-        this.docPayDefaultsError = this.getSaveErrorMessage(error);
-        this.logger.error('Failed to load DOC Pay defaults for bulk edit', error);
+        if (error instanceof HttpErrorResponse) {
+          this.docPayDefaultsError = DOC_PAY_DEFAULTS_LOOKUP_ERROR;
+          this.logger.error('Failed to load DOC Pay defaults for bulk edit',
+            docPayDefaultsLookupLogContext(error, listId, requestedRows.map(row => row.applId)));
+        } else {
+          this.docPayDefaultsError = this.getSaveErrorMessage(error);
+          this.logger.error('Failed to load DOC Pay defaults for bulk edit', error);
+        }
       }
     });
   }

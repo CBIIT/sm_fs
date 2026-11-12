@@ -297,7 +297,11 @@
         Loading DOC Pay defaults...
       </div>
       <div *ngIf="isEditMode && docPayDefaultsError" class="text-danger small py-2" role="alert">
-        {{docPayDefaultsError}}
+        <ng-container *ngIf="docPayDefaultsError === docPayDefaultsLookupError; else docPayDefaultsErrorText">
+          We've encountered an unexpected error retrieving grant data. Please contact
+          <a [href]="technicalSupportMailto">Technical Support</a> for support.
+        </ng-container>
+        <ng-template #docPayDefaultsErrorText>{{docPayDefaultsError}}</ng-template>
         <button type="button" class="btn btn-link btn-sm" (click)="loadDocPayDefaults()">Retry defaults</button>
       </div>
       <div *ngIf="fundingRefreshError" class="text-danger small py-2" role="alert">

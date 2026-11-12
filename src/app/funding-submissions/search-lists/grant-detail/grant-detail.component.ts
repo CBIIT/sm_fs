@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FundingSubmBulkEditFieldsDto, FundingSubmissionDocPayDefaultsDto, FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from '../../../service/app-user-session.service';
@@ -13,9 +14,9 @@ import { catchError, concatMap, defaultIfEmpty, from, map, Observable, of, Subsc
 import { DocumentsDto } from '@cbiit/i2efsws-lib/model/documentsDto';
 import { DocumentService } from '../../../service/document.service';
 import {
-  applyDocPayDefaults, DOC_PAY_SELECTION_FIELDS, DocPayDefaultField, DocPayProvenance,
-  DocPaySelectionField, DocPaySelections, isBlankSelection, isPayDecision, requireDocPayDefaults,
-  isWholeDollarAmount, isValidReductionPctForCalculation, parseExactDecimal, toFiniteNumberOrNull,
+  applyDocPayDefaults, DOC_PAY_DEFAULTS_LOOKUP_ERROR, DOC_PAY_SELECTION_FIELDS, DocPayDefaultField, DocPayProvenance,
+  docPayDefaultsLookupLogContext, DocPaySelectionField, DocPaySelections, isBlankSelection, isPayDecision,
+  requireDocPayDefaults, technicalSupportMailto, isWholeDollarAmount, isValidReductionPctForCalculation, parseExactDecimal, toFiniteNumberOrNull,
   validateDocRecommendation
 } from '../../doc-pay-defaults';
 import { FundingRequestErrorScopeService } from '../../funding-request-error-scope.service';
@@ -106,6 +107,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   formModel: GrantEditFormModel = {};
   docPayDefaultsLoading = false;
   docPayDefaultsError: string | null = null;
+  readonly docPayDefaultsLookupError = DOC_PAY_DEFAULTS_LOOKUP_ERROR;
   docPriorityOptionsLoading = false;
   docPriorityOptionsError: string | null = null;
   fundingRefreshError: string | null = null;
@@ -509,11 +511,21 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       error: error => {
         if (!isCurrent()) return;
         this.docPayDefaultsLoading = false;
-        this.docPayDefaultsError = this.getSaveErrorMessage(error, 'Unable to load DOC Pay defaults. Please try again.');
-        this.logger.error('Failed to load DOC Pay defaults', error);
+        if (error instanceof HttpErrorResponse) {
+          this.docPayDefaultsError = DOC_PAY_DEFAULTS_LOOKUP_ERROR;
+          this.logger.error('Failed to load DOC Pay defaults',
+            docPayDefaultsLookupLogContext(error, listId, [data.applId]));
+        } else {
+          this.docPayDefaultsError = this.getSaveErrorMessage(error, 'Unable to load DOC Pay defaults. Please try again.');
+          this.logger.error('Failed to load DOC Pay defaults', error);
+        }
         this.cdr.detectChanges();
       }
     });
+  }
+
+  get technicalSupportMailto(): string {
+    return technicalSupportMailto(this.propertiesService.getProperty('TECH_SUPPORT_EMAIL'));
   }
 
   private needsDocPayDefaults(): boolean {

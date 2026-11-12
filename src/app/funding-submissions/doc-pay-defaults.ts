@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   FundingSubmBulkEditFieldsDto,
   FundingSubmissionDocPayDefaultsDto,
@@ -126,6 +127,52 @@ export function requireDocPayDefaults(
     throw new Error('The DOC Pay defaults could not be resolved. Refresh the list and try again.');
   }
   return grantDefaults;
+}
+
+export const DOC_PAY_DEFAULTS_LOOKUP_ERROR =
+  'We\'ve encountered an unexpected error retrieving grant data. Please contact Technical Support for support.';
+
+export function technicalSupportMailto(techSupportEmail: string): string {
+  return 'mailto:' + techSupportEmail + '?subject=Funding Selections';
+}
+
+export interface DocPayDefaultsLookupLogContext {
+  operation: 'getDocPayDefaults';
+  listId: number;
+  applIds: number[];
+  status: number;
+  statusText: string;
+  correlationId?: string;
+  reasonCode?: string;
+}
+
+// Allowlisted diagnostics only: never log the raw response, its body, URL, or headers.
+export function docPayDefaultsLookupLogContext(
+  error: HttpErrorResponse, listId: number, applIds: number[]
+): DocPayDefaultsLookupLogContext {
+  const body = asRecord(error.error);
+  const additionalData = asRecord(body?.additionalData);
+  const correlationId = nonBlankString(body?.correlationId)
+    ?? nonBlankString(additionalData?.correlationId)
+    ?? nonBlankString(error.headers?.get('X-Correlation-ID'));
+  const reasonCode = nonBlankString(additionalData?.reasonCode) ?? nonBlankString(body?.reasonCode);
+  return {
+    operation: 'getDocPayDefaults',
+    listId,
+    applIds: [...applIds],
+    status: error.status,
+    statusText: error.statusText,
+    ...(correlationId ? { correlationId } : {}),
+    ...(reasonCode ? { reasonCode } : {})
+  };
+}
+
+function asRecord(value: unknown): Record<string, unknown> | undefined {
+  return typeof value === 'object' && value !== null ? value as Record<string, unknown> : undefined;
+}
+
+function nonBlankString(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
 export function applyDocPayDefaults(

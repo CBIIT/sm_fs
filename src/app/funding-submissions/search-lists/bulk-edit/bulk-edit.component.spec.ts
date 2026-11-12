@@ -1,5 +1,6 @@
 import { ComponentFixture, discardPeriodicTasks, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { Component, DebugElement, forwardRef, getDebugNode, Input, NO_ERRORS_SCHEMA, ViewContainerRef } from '@angular/core';
+import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EMPTY, Observable, of, Subject, throwError } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -564,6 +565,80 @@ describe('BulkEditComponent', () => {
       expect(component.docPayDefaultsError).toBe('');
       expect(component.rows[0].docNotes).toBe('New note');
       expect(component.rows[0].budgetCategories).toBe('R01R37');
+    });
+
+    describe('FS-2714 defaults lookup HTTP failures', () => {
+      const lookupMessage = 'We\'ve encountered an unexpected error retrieving grant data. '
+        + 'Please contact Technical Support for support.';
+
+      function defaultsAlert(): HTMLElement {
+        fixture.detectChanges();
+        return Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('[role="alert"]'))
+          .find(alert => alert.textContent.includes('Retry defaults'));
+      }
+
+      beforeEach(() => {
+        (TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy).and.callFake((key: string) =>
+          key === 'TECH_SUPPORT_EMAIL' ? 'support@example.gov' : 'http://example/');
+      });
+
+      for (const status of [0, 400, 409, 500]) {
+        it(`shows the support message, logs safe context, and blocks Save until retry for HTTP ${status}`, () => {
+          applyPay();
+          component.rows[0].docNotes = 'New note';
+          defaultsResponse.error(new HttpErrorResponse({
+            status, statusText: `Status ${status}`,
+            url: '/fsws/funding-submissions/lists/1/grants/doc-pay-defaults?applIds=100&applIds=200',
+            headers: new HttpHeaders({ Authorization: 'Bearer secret-token' }),
+            error: {
+              errorMessage: 'ORA-06502 raw server failure', correlationId: 'corr-456',
+              additionalData: { reasonCode: 'DEFAULTS_UNRESOLVED' }
+            }
+          }));
+          const alert = defaultsAlert();
+          const text = alert.textContent.replace(/\s+/g, ' ');
+          expect(text).toContain(lookupMessage);
+          expect(text).not.toContain('ORA-06502');
+          expect(text).not.toContain(`Status ${status}`);
+          expect(text).not.toContain('doc-pay-defaults');
+          const link: HTMLAnchorElement = alert.querySelector('a');
+          expect(link.textContent.trim()).toBe('Technical Support');
+          expect(link.getAttribute('href')).toBe('mailto:support@example.gov?subject=Funding Selections');
+
+          const logger = TestBed.inject(NGXLogger).error as jasmine.Spy;
+          expect(logger).toHaveBeenCalledWith('Failed to load DOC Pay defaults for bulk edit', {
+            operation: 'getDocPayDefaults', listId: 1, applIds: [100, 200],
+            status, statusText: `Status ${status}`, correlationId: 'corr-456', reasonCode: 'DEFAULTS_UNRESOLVED'
+          });
+          const logged = JSON.stringify(logger.calls.mostRecent().args);
+          for (const unsafe of ['secret-token', 'ORA-06502', 'doc-pay-defaults', 'New note', 'Pay"']) {
+            expect(logged).not.toContain(unsafe);
+          }
+
+          expect(component.canSave).toBeTrue();
+          component.onSave();
+          expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+          expect(alert.querySelector('button').textContent).toContain('Retry defaults');
+          fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(of(defaultRows));
+          component.loadDocPayDefaults();
+          expect(component.docPayDefaultsError).toBe('');
+          expect(component.rows[0].budgetCategories).toBe('R01R37');
+          component.rows[1].annualFundingR01 = 'No';
+          component.onRowFieldChange(component.rows[1], 'annualFundingR01');
+          component.onSave();
+          expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalled();
+        });
+      }
+
+      it('keeps specific guidance for client-side default validation failures', () => {
+        applyPay();
+        defaultsResponse.next([defaultRows[0], { ...defaultRows[1], annualOrMyf: null }]);
+        const alert = defaultsAlert();
+        expect(component.docPayDefaultsError)
+          .toBe('The DOC Pay defaults could not be resolved. Refresh the list and try again.');
+        expect(alert.textContent).not.toContain('Technical Support');
+        expect(alert.querySelector('a')).toBeNull();
+      });
     });
 
     it('loads defaults for both dual-role and OEFIA-only callers', () => {
