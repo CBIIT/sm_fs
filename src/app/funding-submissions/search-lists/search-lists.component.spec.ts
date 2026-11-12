@@ -2106,6 +2106,61 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(columns[0][0].status).toBe('DOC Review');
     });
 
+    describe('NCI Director Review sent count (FS-2712)', () => {
+      beforeEach(() => {
+        component.docFundingListCor = false;
+      });
+
+      it('counts only Pay grants as sent for a DOC with one Pay and six Do Not Pay grants', () => {
+        const grants = [
+          { doc: 'OCC', reviewStatus: 'NCI Director Review', docDecision: 'Pay' },
+          ...Array.from({ length: 6 }, () => ({ doc: 'OCC', reviewStatus: 'NCI Director Review', docDecision: 'DNP' }))
+        ];
+
+        const item = (component as any).buildDocStatusColumns(grants)[0][0];
+
+        expect(item.status).toBe('NCI Director Review');
+        expect(item.count).toBe(7);
+        expect(item.countDisplay).toBe('1/7');
+      });
+
+      it('still displays n/n when every Director Review grant is Pay', () => {
+        const grants = [1, 2, 3].map(() => ({ doc: 'DCB', reviewStatus: 'NCI Director Review', docDecision: 'Pay' }));
+
+        const item = (component as any).buildDocStatusColumns(grants)[0][0];
+
+        expect(item.countDisplay).toBe('3/3');
+      });
+
+      it('requires both Director Review status and a Pay decision', () => {
+        const grants = [
+          { doc: 'DTP', reviewStatus: 'NCI Director Review', docDecision: 'Pay' },
+          { doc: 'DTP', reviewStatus: 'OEFIA Review', docDecision: 'Pay' },
+          { doc: 'DTP', reviewStatus: 'NCI Director Review', docDecision: 'DNP' }
+        ];
+
+        const item = (component as any).buildDocStatusColumns(grants)[0][0];
+
+        expect(item.status).toBe('NCI Director Review');
+        expect(item.countDisplay).toBe('1/3');
+      });
+
+      it('counts every decision value isGrantDocDecisionPay() treats as Pay', () => {
+        (component as any).docDecisionDisplayMap.set('P', 'Pay');
+        const grants = [
+          { doc: 'DCP', reviewStatus: 'NCI Director Review', docDecision: 'pay' },
+          { doc: 'DCP', reviewStatus: 'NCI Director Review', docDecision: 'P' },
+          { doc: 'DCP', reviewStatus: 'NCI Director Review', docDecision: 'DNP' }
+        ];
+        spyOn(component as any, 'isGrantDocDecisionPay').and.callThrough();
+
+        const item = (component as any).buildDocStatusColumns(grants)[0][0];
+
+        expect(item.countDisplay).toBe('2/3');
+        expect((component as any).isGrantDocDecisionPay).toHaveBeenCalledTimes(3);
+      });
+    });
+
     it('OEFIA/FA case: a zero-grant-count DOC entry in docs[] is still rendered in Review Status', () => {
       fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
         listCode: '9-May 19th',

@@ -575,9 +575,13 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       return String(totalCount);
     }
 
+    // FS-2712: only Pay grants are sent to the NCI Director, so Do Not Pay grants are excluded
+    // from the sent count even though they carry the DOC-level NCI Director Review status.
     const directorReviewCount = (grants || []).filter(grant => {
       const sameDoc = String(grant?.doc || '').trim() === doc;
-      return sameDoc && this.normalizeGrantReviewStatus(grant?.reviewStatus) === 'NCI Director Review';
+      return sameDoc
+        && this.normalizeGrantReviewStatus(grant?.reviewStatus) === 'NCI Director Review'
+        && this.isGrantDocDecisionPay(grant);
     }).length;
 
     return `${directorReviewCount}/${totalCount}`;
