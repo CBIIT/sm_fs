@@ -597,7 +597,7 @@ describe('BulkEditComponent', () => {
         ]);
         expect(requests.map(request => [
           request.fields.docPriority, request.fields.docRecAmt, request.fields.docRecReductionPct
-        ])).toEqual([['1', 90000, 10], ['2', 0, 0]]);
+        ])).toEqual([[null, 90000, 10], [null, 0, 0]]);
         expect(component.rows.map(row => [row.docPriority, row.docRecAmt, row.docRecReductionPct]))
           .toEqual([[4, 73000, 27], [5, 0, 0]]);
       });
@@ -639,21 +639,20 @@ describe('BulkEditComponent', () => {
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
     });
 
-    it('keeps acknowledged, rejected and unknown row outcomes independent without replaying held rows', () => {
+    it('FS-2516 sequences acknowledgement, rejection readback and unknown outcomes without sending later rows', () => {
       const third = {
         ...grant({ applId: 300 }), budgetCategories: 'ESIR37T4', annualFundingR01: 'Yes',
         docRecAmt: 90000, docRecReductionPct: 10
       };
-      component.rows.push(third);
-      (component as any).lastSavedRows.push({ ...third });
+      const fourth = { ...third, applId: 400 };
+      component.rows.push(third, fourth);
+      (component as any).lastSavedRows.push({ ...third }, { ...fourth });
       const firstWrite = new Subject<number>();
-      let thirdAttempts = 0;
       fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.callFake(request => {
         const applId = request.applIds[0];
         if (applId === 100) return firstWrite;
-        if (applId === 200) return throwError(() => ({ status: 500 }));
-        return ++thirdAttempts === 1
-          ? throwError(() => ({ status: 400, error: { detail: 'Rejected row' } })) : of(1);
+        if (applId === 200) return throwError(() => ({ status: 400, error: { detail: 'Rejected row' } }));
+        return throwError(() => ({ status: 500 }));
       });
       const firstRead = new Subject<FundingSubmissionListDetailDto>();
       fundingSubmissionsServiceSpy.getListDetail.and.returnValue(firstRead);
@@ -661,46 +660,39 @@ describe('BulkEditComponent', () => {
       component.onApplyChanges();
       defaultsResponse.next(defaultRows);
       component.onSave();
-      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(3);
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
       firstWrite.next(1);
-      expect(component.bulkWriteOutcomeMessage).toContain('Save outcome is unknown');
-      expect(component.bulkWriteOutcomeMessage).toContain('Rejected row');
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
       const recovery = TestBed.inject(FundingWriteRecoveryService);
       expect(recovery.get(1, 100)?.state).toBe('saved');
-      expect(recovery.get(1, 200)?.state).toBe('unknown');
+      expect(recovery.get(1, 200)).toBeNull();
       expect(recovery.get(1, 300)).toBeNull();
-      firstRead.next({
-        grants: [
-          { ...savedGrants()[0], annualFundingR01: null, twoYearAnnualFundingR01Flag: false },
-          savedGrants()[1],
-          grant({ applId: 300, annualFundingR01: 'No' })
-        ]
-      });
+      const refreshed = {
+        grants: [...savedGrants(), grant({ applId: 300, annualFundingR01: 'No' }),
+          grant({ applId: 400, annualFundingR01: 'No' })]
+      };
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of(refreshed));
+      firstRead.next(refreshed);
+      expect(component.bulkWriteOutcomeMessage).toContain('Save outcome is unknown');
+      expect(component.bulkWriteOutcomeMessage).toContain('Rejected row');
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(2);
       expect(component.saveSuccessMessage).toContain('saved for 1 grant');
       expect(component.saveSuccessMessage).not.toContain('Bulk changes have been applied');
       expect(recovery.get(1, 100)).toBeNull();
-      expect(component.unknownRecoveryRows.map(row => row.applId)).toEqual([200]);
-
-      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
-        grants: [...savedGrants(), grant({ applId: 300, annualFundingR01: 'No' })]
-      }));
+      expect(component.unknownRecoveryRows.map(row => row.applId)).toEqual([300]);
       component.onSave();
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.allArgs().map(([request]) => request.applIds[0]))
-        .toEqual([100, 200, 300, 300]);
-      expect(recovery.get(1, 200)?.state).toBe('unknown');
-      expect(component.saveSuccessMessage).not.toContain('Bulk changes have been applied');
-
+        .toEqual([100, 200, 300]);
       const lateRead = new Subject<FundingSubmissionListDetailDto>();
       fundingSubmissionsServiceSpy.getListDetail.and.returnValue(lateRead);
-      component.recoverUnknownRow(component.rows[1]);
+      component.recoverUnknownRow(component.rows[2]);
       expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(2);
-      component.confirmedUnknownRows[200] = true;
-      component.recoverUnknownRow(component.rows[1]);
-      expect(recovery.get(1, 200)?.state).toBe('unknown');
-      lateRead.next({ grants: savedGrants() });
-      expect(recovery.get(1, 200)).toBeNull();
-      expect(component.rows[1].budgetCategories).toBe('SAVEDU');
-      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(4);
+      component.confirmedUnknownRows[300] = true;
+      component.recoverUnknownRow(component.rows[2]);
+      expect(recovery.get(1, 300)?.state).toBe('unknown');
+      lateRead.next(refreshed);
+      expect(recovery.get(1, 300)).toBeNull();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(3);
     });
 
     it('preserves a newer edit through stale-conflict readback without retrying that row', () => {
@@ -732,7 +724,7 @@ describe('BulkEditComponent', () => {
           ...savedGrants()[0], docDecision: 'Do Not Pay', docPriority: null,
           docRecommendedAmount: null, docRecommendedReductionPct: null, budgetCategoryCode: null,
           docNciSelection: null, annualFundingR01: null, annualOrMyf: null, docNotes: 'Reason'
-        }]
+        }, savedGrants()[1]]
       }));
       component.onUserRowSelectChange(component.rows[0], 'docDecision', 'Do Not Pay');
       component.rows[0].docNotes = 'Reason';
@@ -741,7 +733,7 @@ describe('BulkEditComponent', () => {
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(3);
 
       fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(of([defaultRows[0]]));
-      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [savedGrants()[0]] }));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: savedGrants() }));
       component.onUserRowSelectChange(component.rows[0], 'docDecision', 'Pay');
       expect(component.rows[0].annualFundingR01).toBe('No');
       component.onSave();
@@ -760,7 +752,7 @@ describe('BulkEditComponent', () => {
       expect(component.unknownRecoveryRows.map(row => row.applId)).toEqual([100]);
       expect(component.fundingRecoveryError).toBe('');
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.allArgs().map(([request]) => request.applIds[0]))
-        .toEqual([200]);
+        .toEqual([]);
     });
 
     it('persists acknowledged and unknown rows when a mixed in-flight batch is destroyed', () => {
@@ -774,9 +766,9 @@ describe('BulkEditComponent', () => {
       component.ngOnDestroy();
       pending.next(1);
       const recovery = TestBed.inject(FundingWriteRecoveryService);
-      expect(recovery.get(1, 100)?.state).toBe('saved');
+      expect(recovery.get(1, 100)).toBeNull();
       expect(recovery.get(1, 200)?.state).toBe('unknown');
-      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(1);
     });
 
     it('restores priority and recommendations on Pay without restoring a cleared recused value', () => {
@@ -791,12 +783,12 @@ describe('BulkEditComponent', () => {
 
     it('keeps one write per row and reads actual saved codes, names and flags into rows and Reset baseline', () => {
       const response = new Subject<{ grants: FundingSubmissionListGrantDto[] }>();
-      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(response);
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValues(response, of({ grants: savedGrants() }));
       component.bulkFields = { docDecision: 'Pay', annualFundingR01: 'No' };
       component.onApplyChanges();
       defaultsResponse.next(defaultRows);
       component.onSave();
-      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
       expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledWith(1);
       expect(component.rows[0].budgetCategories).toBe('R01R37');
       expect(component.isSaving).toBeTrue();
@@ -818,8 +810,8 @@ describe('BulkEditComponent', () => {
     it('preserves newer row edits during write and refresh without marking them saved', () => {
       const write = new Subject<number>();
       const response = new Subject<{ grants: FundingSubmissionListGrantDto[] }>();
-      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(write);
-      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(response);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValues(write, of(1));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValues(response, of({ grants: savedGrants() }));
       component.bulkFields = { docDecision: 'Pay', annualFundingR01: 'No' };
       component.onApplyChanges();
       defaultsResponse.next(defaultRows);
@@ -844,7 +836,7 @@ describe('BulkEditComponent', () => {
       it(`distinguishes a persisted bulk save from ${failure} and never retries the writes`, () => {
         fundingSubmissionsServiceSpy.getListDetail.and.returnValue(failure === 'read error'
           ? throwError(() => new Error('Read unavailable'))
-          : failure === 'empty read' ? EMPTY : of({ grants: [savedGrants()[0]] }));
+          : failure === 'empty read' ? EMPTY : of({ grants: [savedGrants()[1]] }));
         component.bulkFields = { docDecision: 'Pay', annualFundingR01: 'No' };
         component.onApplyChanges();
         defaultsResponse.next(defaultRows);
@@ -852,10 +844,10 @@ describe('BulkEditComponent', () => {
         expect(component.saveErrorMessage).toContain('Bulk changes were saved');
         expect(component.savedChangesNeedRefresh).toBeTrue();
         component.onSave();
-        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
         fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: savedGrants() }));
         component.refreshSavedFunding();
-        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
         expect(component.saveErrorMessage).toBe('');
         expect(component.savedChangesNeedRefresh).toBeFalse();
         expect(component.rows[0].budgetCategories).toBe('SAVEDR01');
@@ -890,6 +882,133 @@ describe('BulkEditComponent', () => {
       expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
       expect(component.rows[0].docDecision).toBe('Do Not Pay');
       expect(component.saveSuccessMessage).toBe('');
+    });
+  });
+
+  describe('FS-2516 sequential priority refresh', () => {
+    it('refreshes between multiple Do Not Pay saves and rebases the final ranked row', () => {
+      seedHistoryStateAndInit([100, 200, 300].map((applId, index) =>
+        grant({ applId, doc: 'DCB', docPriority: index + 1 })));
+      const afterFirst = [
+        grant({ applId: 100, doc: 'DCB', docDecision: 'Do Not Pay', docPriority: null, docNotes: 'Reason' }),
+        grant({ applId: 200, doc: 'DCB', docPriority: 1 }),
+        grant({ applId: 300, doc: 'DCB', docPriority: 2 })
+      ];
+      const afterSecond = [
+        afterFirst[0],
+        grant({ applId: 200, doc: 'DCB', docDecision: 'Do Not Pay', docPriority: null, docNotes: 'Reason' }),
+        grant({ applId: 300, doc: 'DCB', docPriority: 1 })
+      ];
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValues(
+        of({ grants: afterFirst }), of({ grants: afterSecond }), of({ grants: afterSecond })
+      );
+      for (const row of component.rows.slice(0, 2)) {
+        row.docDecision = 'Do Not Pay';
+        row.docNotes = 'Reason';
+      }
+      component.onRowFieldChange();
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.allArgs()
+        .map(([request]) => request.fields.docPriority)).toEqual([null, null, '1']);
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(3);
+      expect(component.rows.map(row => row.docPriority)).toEqual([null, null, 1]);
+      expect(component.canSave).toBeFalse();
+    });
+
+    it('previews the append slot instead of a stale stored Do Not Pay priority', () => {
+      seedHistoryStateAndInit([grant({
+        docDecision: 'Do Not Pay', docPriority: 99, addedByGroup: 'OEFIA'
+      })]);
+      fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(of([{
+        applId: 100, transitionEligible: true, budgetCategories: 'ESIR37T4', docNciSelection: 'DOC',
+        annualFundingR01: 'No', annualOrMyf: 'MYF', docPriority: '1', docRecAmt: 90000, docRecReductionPct: 10
+      }]));
+      expect(component.rows[0].docPriority).toBe(99);
+      component.onUserRowSelectChange(component.rows[0], 'docDecision', 'Pay');
+      expect(component.rows[0].docPriority).toBe('1');
+    });
+
+    it('rebases an untouched queued priority after compaction and retains newer unsaved notes', () => {
+      seedHistoryStateAndInit([
+        grant({ applId: 100, doc: 'DCB', docPriority: 1 }),
+        grant({ applId: 200, doc: 'DCB', docPriority: 2, docNotes: 'Original second note' })
+      ]);
+      const firstWrite = new Subject<number>();
+      const firstRead = new Subject<FundingSubmissionListDetailDto>();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValues(firstWrite, of(1));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValues(firstRead, of({
+        grants: [
+          grant({ applId: 100, doc: 'DCB', docDecision: 'Do Not Pay', docPriority: null, docNotes: 'Reason' }),
+          grant({ applId: 200, doc: 'DCB', docPriority: 1, docNotes: 'Original second note' })
+        ]
+      }));
+      component.rows[0].docDecision = 'Do Not Pay';
+      component.rows[0].docNotes = 'Reason';
+      component.onRowFieldChange();
+      component.onSave();
+      component.rows[1].docNotes = 'Newer note';
+      component.onUserRowNotesChange(component.rows[1], 'docNotes');
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+      firstWrite.next(1);
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      expect(component.isSaving).toBeTrue();
+      firstRead.next({
+        grants: [
+          grant({ applId: 100, doc: 'DCB', docDecision: 'Do Not Pay', docPriority: null, docNotes: 'Reason' }),
+          grant({ applId: 200, doc: 'DCB', docPriority: 1, docNotes: 'Original second note' })
+        ]
+      });
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0].fields)
+        .toEqual(jasmine.objectContaining({ docPriority: '1', docNotes: 'Original second note' }));
+      expect(component.rows[1].docPriority).toBe(1);
+      expect(component.rows[1].docNotes).toBe('Newer note');
+      expect(component.canSave).toBeTrue();
+      expect(component.saveSuccessMessage).toContain('Your newer edits have not been saved.');
+    });
+
+    for (const status of [400, 409]) {
+      it(`waits for ${status} readback before sending another row with its refreshed priority`, () => {
+        seedHistoryStateAndInit([
+          grant({ applId: 100, docPriority: 1 }), grant({ applId: 200, docPriority: 3 })
+        ]);
+        const read = new Subject<FundingSubmissionListDetailDto>();
+        fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValues(
+          throwError(() => ({ status })), of(1)
+        );
+        const refreshed = { grants: [grant({ applId: 100, docPriority: 1 }), grant({ applId: 200, docPriority: 2 })] };
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValues(read, of(refreshed));
+        component.rows[0].docNotes = 'Pending note';
+        component.onRowFieldChange();
+        component.onSave();
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+        read.next(refreshed);
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0].fields.docPriority).toBe('2');
+        expect(component.rows[0].docNotes).toBe('Pending note');
+      });
+    }
+
+    it('holds a definite rejection when priority refresh fails and retries GET only', () => {
+      seedHistoryStateAndInit([grant({ applId: 100 }), grant({ applId: 200 })]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(throwError(() => ({ status: 400 })));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(throwError(() => ({ status: 500 })));
+      component.rows[0].docNotes = 'Pending note';
+      component.onRowFieldChange();
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      expect(component.savedChangesNeedRefresh).toBeTrue();
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+        grants: [grant({ applId: 100 }), grant({ applId: 200 })]
+      }));
+      component.refreshSavedFunding();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      expect(component.savedChangesNeedRefresh).toBeFalse();
+      expect(component.rows[0].docNotes).toBe('Pending note');
     });
   });
 

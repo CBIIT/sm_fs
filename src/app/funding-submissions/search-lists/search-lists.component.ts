@@ -1274,7 +1274,11 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         throw new Error('An open grant is not present in the refreshed list.');
       }
     }
-    const order = resetOrder ? this.docPriorityOrder() : null;
+    const savedDoc = detail.grants.find(grant => grant.applId === savedApplId)?.doc;
+    const docPrioritiesChanged = savedApplId != null && this.cachedGrants.some(grant =>
+      grant.doc === savedDoc && priorities.has(grant.applId)
+      && String(grant.docPriority ?? '') !== String(priorities.get(grant.applId) ?? ''));
+    const order = resetOrder || docPrioritiesChanged ? this.docPriorityOrder() : null;
     const updatePriority = (grant: FundingSubmissionListGrantDto): void => {
       if (grant && priorities.has(grant.applId)) {
         grant.docPriority = priorities.get(grant.applId);

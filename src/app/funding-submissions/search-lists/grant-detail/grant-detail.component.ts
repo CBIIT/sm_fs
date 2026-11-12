@@ -28,6 +28,7 @@ import { DetailPriorityCoordinator } from '../detail-priority-coordinator';
 type GrantEditFormModel = FundingSubmBulkEditFieldsDto & { justificationText?: string };
 
 interface FundingSaveReadback {
+  rejectionReason?: string;
   data: FundingSubmissionListGrantDto;
   listId: number;
   editVersion: number;
@@ -850,16 +851,19 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.fundingRecoveryState = state;
     this.savingInProgress = false;
     this.logger.error('Grant detail save error', error);
+    readback.rejectionReason = this.getFundingRejectionReason(error);
     if (state === 'conflict') {
       readback.outcome = 'conflict';
       this.pendingFundingReadback = readback;
-      this.fundingSaveError = 'The grant changed on the server. Refresh and review your changes before saving.';
+      this.fundingSaveError = readback.rejectionReason
+        ?? 'The grant changed on the server. Refresh and review your changes before saving.';
       this.refreshSavedFunding();
     } else if (state === 'unknown') {
       this.unknownFundingReadback = readback;
       this.fundingSaveError = 'The funding save outcome is unknown. Do not retry until support confirms it is final.';
     } else {
-      this.fundingSaveError = this.getSaveErrorMessage(error, 'Unable to save the grant changes. Please try again.');
+      this.fundingSaveError = readback.rejectionReason
+        ?? this.getSaveErrorMessage(error, 'Unable to save the grant changes. Please try again.');
     }
     this.cdr.detectChanges();
   }
@@ -1151,6 +1155,16 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  private getFundingRejectionReason(error: unknown): string | undefined {
+    if (typeof error !== 'object' || error === null || !('error' in error)
+      || typeof error.error !== 'object' || error.error === null) return undefined;
+    const body = error.error as {
+      errorMessage?: unknown; detail?: unknown; message?: unknown;
+    };
+    return [body.errorMessage, body.detail, body.message]
+      .find((message): message is string => typeof message === 'string' && !!message.trim())?.trim();
+  }
+
   private getSaveErrorMessage(error: unknown, fallback: string): string {
     if (typeof error !== 'object' || error === null) {
       return fallback;
@@ -1408,7 +1422,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   private formModelFromGrant(grant: FundingSubmissionListGrantDto): GrantEditFormModel {
     return {
       docDecision: grant.docDecision ?? null,
-      docPriority: grant.docPriority != null ? String(grant.docPriority) : null,
+      docPriority: !this.isDoNotPayDecisionValue(grant.docDecision) && grant.docPriority != null
+        ? String(grant.docPriority) : null,
       docRecAmt: grant.docRecommendedAmount ?? null,
       docRecReductionPct: grant.docRecommendedReductionPct ?? null,
       docNciSelection: grant.docNciSelection ?? null,
@@ -1485,8 +1500,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
         if (!grant) throw new Error('The saved grant is not present in the refreshed list.');
         if (this.isCurrentFundingSave(readback) && this.pendingFundingReadback === readback) {
           const previousPriority = readback.baselineForm.docPriority;
-          const moved = !isBlankSelection(previousPriority) && !isBlankSelection(grant.docPriority)
-            && String(previousPriority) !== String(grant.docPriority);
+          const moved = String(previousPriority ?? '') !== String(grant.docPriority ?? '');
           this.priorityCoordinator?.applyReadback(readback.listId, readback.data.applId, detail, moved);
         }
         return grant;
@@ -1542,7 +1556,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
           return;
         }
         if (readback.outcome !== 'saved') {
-          this.fundingSaveError = 'Server values were refreshed. Review your unsaved changes before saving.';
+          this.fundingSaveError = readback.rejectionReason
+            ?? 'Server values were refreshed. Review your unsaved changes before saving.';
           this.savingInProgress = false;
           this.cancelDocPayDefaults();
           this.fetchDocPriorityOptions();

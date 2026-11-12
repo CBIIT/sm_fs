@@ -534,7 +534,7 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     expect(currentOrder).toEqual([[2, 'desc']]);
   }));
 
-  it('keeps the selected sort after the required Do Not Pay priority clear', fakeAsync(() => {
+  it('re-sorts after the required Do Not Pay priority clear', fakeAsync(() => {
     const rows = [grant(100, 1), grant(200, 2)];
     seedRows(rows);
     const detail = openEditor(rows[1]);
@@ -545,11 +545,11 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     flushMicrotasks();
 
     expect(funding.bulkUpdateListGrants.calls.mostRecent().args[0].fields.docPriority).toBeNull();
-    expect(order).not.toHaveBeenCalled();
-    expect(currentOrder).toEqual([[2, 'desc']]);
+    expect(order).toHaveBeenCalledTimes(1);
+    expect(currentOrder).toEqual([[1, 'asc'], [3, 'asc']]);
   }));
 
-  it('keeps the selected sort for a blank-to-ranked AUTO transition', fakeAsync(() => {
+  it('re-sorts for a blank-to-ranked AUTO transition', fakeAsync(() => {
     const rows = [grant(100, 1), grant(200, null, { docDecision: 'Do Not Pay' })];
     seedRows(rows);
     const defaults: FundingSubmissionDocPayDefaultsDto = {
@@ -565,6 +565,109 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     flushMicrotasks();
 
     expect(funding.bulkUpdateListGrants.calls.mostRecent().args[0].transitionIntents[0].priorityMode).toBe('AUTO');
+    expect(order).toHaveBeenCalledTimes(1);
+    expect(currentOrder).toEqual([[1, 'asc'], [3, 'asc']]);
+  }));
+
+  it('re-sorts when only a peer in the saved DOC changed priority and preserves another DOC', fakeAsync(() => {
+    const rows = [grant(100, 1), grant(200, 3), grant(300, 7, { doc: 'DCP' })];
+    seedRows(rows);
+    const detail = openEditor(rows[0]);
+    const peer = openEditor(rows[1]);
+    serverGrants[0].docNotes = 'Updated notes';
+    serverGrants[1].docPriority = 2;
+    detail.formModel.docNotes = 'Updated notes';
+    detail.onSave();
+    flushMicrotasks();
+    expect(peer.formModel.docPriority).toBe('2');
+    expect(rows[2].docPriority).toBe(7);
+    expect(currentOrder).toEqual([[1, 'asc'], [3, 'asc']]);
+  }));
+
+  for (const emptyDoc of [false, true]) {
+    it(`uses API-provided restoration options and append preview with empty DOC=${emptyDoc}`, () => {
+      const rows = emptyDoc
+        ? [grant(200, 99, { docDecision: 'Do Not Pay' })]
+        : [grant(100, 3), grant(200, 99, { docDecision: 'Do Not Pay' }),
+          grant(300, 99, { docDecision: 'Do Not Pay' })];
+      seedRows(rows);
+      const append = emptyDoc ? 1 : 2;
+      funding.getDocPriorityOptions.and.returnValue(of(emptyDoc ? [1] : [1, 2]));
+      funding.getDocPayDefaults.and.returnValue(of([{
+        applId: 200, transitionEligible: true, budgetCategories: 'R01', docNciSelection: 'DOC',
+        annualOrMyf: 'MYF', docPriority: String(append), docRecAmt: 90000, docRecReductionPct: 10
+      }]));
+      const detail = openEditor(rows.find(row => row.applId === 200));
+      expect(detail.formModel.docPriority).toBeNull();
+      detail.onUserSelectChange('docDecision', 'Pay');
+      expect(detail.docPriorityOptions.map(option => option.id)).toEqual(emptyDoc ? ['1'] : ['1', '2']);
+      expect(detail.formModel.docPriority).toBe(String(append));
+      expect(detail.docPriorityOptionsError).toBeNull();
+    });
+  }
+
+  for (const reason of [
+    { status: 409, code: 'DOC_PRIORITY_SEQUENCE_AMBIGUOUS', message: 'The DOC priorities are ambiguous.' },
+    { status: 400, code: 'DOC_PRIORITY_INVALID', message: 'The DOC priority is invalid.' },
+    { status: 400, code: 'DOC_PRIORITY_OUT_OF_RANGE', message: 'The DOC priority is out of range.' }
+  ]) {
+    it(`retains the safe ${reason.code} reason, including through conflict readback retry`, () => {
+      const rows = [grant(100, 1), grant(200, 2)];
+      seedRows(rows);
+      const detail = openEditor(rows[0]);
+      funding.bulkUpdateListGrants.and.returnValue(throwError(() => ({
+        status: reason.status, error: {
+          errorMessage: reason.message,
+          additionalData: { reasonCode: reason.code, correlationId: 'test-correlation' }
+        }
+      })));
+      funding.getListDetail.and.returnValue(throwError(() => ({ status: 500 })));
+      detail.onUserSelectChange('docPriority', '2');
+      detail.onSave();
+      expect(detail.fundingSaveError).toBe(reason.message);
+      if (reason.status === 409) {
+        expect(detail.fundingRefreshError).toContain('could not be refreshed');
+        funding.getListDetail.and.returnValue(of(listDetail()));
+        detail.refreshSavedFunding();
+        expect(detail.fundingSaveError).toBe(reason.message);
+        expect(detail.fundingRefreshError).toBeNull();
+      }
+      expect(funding.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      expect(detail.formModel.docPriority).toBe('2');
+    });
+  }
+
+  it('uses the generic refresh banner when a conflict has no safe reason', () => {
+    const rows = [grant(100, 1), grant(200, 2)];
+    seedRows(rows);
+    const detail = openEditor(rows[0]);
+    funding.bulkUpdateListGrants.and.returnValue(throwError(() => ({ status: 409 })));
+    detail.onUserSelectChange('docPriority', '2');
+    detail.onSave();
+    expect(detail.fundingSaveError).toBe('Server values were refreshed. Review your unsaved changes before saving.');
+  });
+
+  it('retains a supplied rejection message even without a reason code', () => {
+    const rows = [grant(100, 1), grant(200, 2)];
+    seedRows(rows);
+    const detail = openEditor(rows[0]);
+    funding.bulkUpdateListGrants.and.returnValue(throwError(() => ({
+      status: 409, error: { message: 'The submitted DOC priority is no longer available.' }
+    })));
+    detail.onUserSelectChange('docPriority', '2');
+    detail.onSave();
+    expect(detail.fundingSaveError).toBe('The submitted DOC priority is no longer available.');
+  });
+
+  it('preserves the selected sort when only another DOC changed priority', fakeAsync(() => {
+    const rows = [grant(100, 1), grant(200, 3, { doc: 'DCP' })];
+    seedRows(rows);
+    const detail = openEditor(rows[0]);
+    detail.formModel.docNotes = 'Updated notes';
+    serverGrants[0].docNotes = 'Updated notes';
+    serverGrants[1].docPriority = 2;
+    detail.onSave();
+    flushMicrotasks();
     expect(order).not.toHaveBeenCalled();
     expect(currentOrder).toEqual([[2, 'desc']]);
   }));
