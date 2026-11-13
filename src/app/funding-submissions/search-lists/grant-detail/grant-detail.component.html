@@ -118,7 +118,7 @@
               <span *ngIf="!isEditMode">{{data.annualFundingR01 === undefined ? (data.twoYearAnnualFundingR01Flag ? 'Yes' : '') : data.annualFundingR01}}</span>
               <ng-select2 *ngIf="isEditMode" appUserSelect2Change name="annualFundingR01" [ngModel]="formModel.annualFundingR01"
                 (appUserSelect2Change)="onUserSelectChange('annualFundingR01', $event)"
-                [data]="yesNoOptions" [placeholder]="'Select'" [allowClear]="true" width="100%"
+                [data]="yesNoOptions" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
               <div *ngIf="isEditMode && saveValidationErrors.annualFundingR01" class="text-danger small mt-1">{{saveValidationErrors.annualFundingR01}}</div>
@@ -136,7 +136,7 @@
               <span *ngIf="!isEditMode || docFundingListCor">{{annualOrMyfDisplay}}</span>
               <ng-select2 *ngIf="isEditMode && !docFundingListCor" appUserSelect2Change name="annualOrMyf" [ngModel]="formModel.annualOrMyf"
                 (appUserSelect2Change)="onUserSelectChange('annualOrMyf', $event)"
-                [data]="annualMyfOptions" [placeholder]="'Select'" [allowClear]="true" width="100%"
+                [data]="annualMyfOptions" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
               <div *ngIf="isEditMode && saveValidationErrors.annualOrMyf" class="text-danger small mt-1">{{saveValidationErrors.annualOrMyf}}</div>
@@ -146,7 +146,7 @@
               <span *ngIf="!isEditMode || docFundingListCor">{{budgetCategoriesDisplay}}</span>
               <ng-select2 *ngIf="isEditMode && !docFundingListCor" appUserSelect2Change name="budgetCategories" [ngModel]="formModel.budgetCategories"
                 (appUserSelect2Change)="onUserSelectChange('budgetCategories', $event)"
-                [data]="budgetCategoryOptionsForForm" [placeholder]="'Select'" [allowClear]="true" width="100%"
+                [data]="budgetCategoryOptionsForForm" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
               <div *ngIf="isEditMode && !docFundingListCor && budgetCategoryStatus === 'loading'" class="small">
@@ -176,7 +176,7 @@
               <span *ngIf="!isEditMode">{{data.docNciSelectionName}}</span>
               <ng-select2 *ngIf="isEditMode" appUserSelect2Change name="docNciSelection" [ngModel]="formModel.docNciSelection"
                 (appUserSelect2Change)="onUserSelectChange('docNciSelection', $event)"
-                [data]="selectionOptions" [placeholder]="'Select'" [allowClear]="true" width="100%"
+                [data]="selectionOptions" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
               <div *ngIf="isEditMode && saveValidationErrors.docNciSelection" class="text-danger small mt-1">{{saveValidationErrors.docNciSelection}}</div>
