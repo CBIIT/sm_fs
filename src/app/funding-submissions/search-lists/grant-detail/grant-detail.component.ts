@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FundingSubmBulkEditFieldsDto, FundingSubmissionDocPayDefaultsDto, FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from '../../../service/app-user-session.service';
@@ -13,9 +14,9 @@ import { catchError, concatMap, defaultIfEmpty, from, map, Observable, of, Subsc
 import { DocumentsDto } from '@cbiit/i2efsws-lib/model/documentsDto';
 import { DocumentService } from '../../../service/document.service';
 import {
-  applyDocPayDefaults, DOC_PAY_SELECTION_FIELDS, DocPayDefaultField, DocPayProvenance,
-  DocPaySelectionField, DocPaySelections, isBlankSelection, isPayDecision, requireDocPayDefaults,
-  isWholeDollarAmount, isValidReductionPctForCalculation, parseExactDecimal, toFiniteNumberOrNull,
+  applyDocPayDefaults, DOC_PAY_DEFAULTS_LOOKUP_ERROR, DOC_PAY_SELECTION_FIELDS, DocPayDefaultField, DocPayProvenance,
+  docPayDefaultsLookupLogContext, DocPaySelectionField, DocPaySelections, isBlankSelection, isPayDecision,
+  requireDocPayDefaults, technicalSupportMailto, isWholeDollarAmount, isValidReductionPctForCalculation, parseExactDecimal, toFiniteNumberOrNull,
   validateDocRecommendation
 } from '../../doc-pay-defaults';
 import { FundingRequestErrorScopeService } from '../../funding-request-error-scope.service';
@@ -28,6 +29,7 @@ import { DetailPriorityCoordinator } from '../detail-priority-coordinator';
 type GrantEditFormModel = FundingSubmBulkEditFieldsDto & { justificationText?: string };
 
 interface FundingSaveReadback {
+  rejectionReason?: string;
   data: FundingSubmissionListGrantDto;
   listId: number;
   editVersion: number;
@@ -105,6 +107,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   formModel: GrantEditFormModel = {};
   docPayDefaultsLoading = false;
   docPayDefaultsError: string | null = null;
+  readonly docPayDefaultsLookupError = DOC_PAY_DEFAULTS_LOOKUP_ERROR;
   docPriorityOptionsLoading = false;
   docPriorityOptionsError: string | null = null;
   fundingRefreshError: string | null = null;
@@ -508,11 +511,21 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       error: error => {
         if (!isCurrent()) return;
         this.docPayDefaultsLoading = false;
-        this.docPayDefaultsError = this.getSaveErrorMessage(error, 'Unable to load DOC Pay defaults. Please try again.');
-        this.logger.error('Failed to load DOC Pay defaults', error);
+        if (error instanceof HttpErrorResponse) {
+          this.docPayDefaultsError = DOC_PAY_DEFAULTS_LOOKUP_ERROR;
+          this.logger.error('Failed to load DOC Pay defaults',
+            docPayDefaultsLookupLogContext(error, listId, [data.applId]));
+        } else {
+          this.docPayDefaultsError = this.getSaveErrorMessage(error, 'Unable to load DOC Pay defaults. Please try again.');
+          this.logger.error('Failed to load DOC Pay defaults', error);
+        }
         this.cdr.detectChanges();
       }
     });
+  }
+
+  get technicalSupportMailto(): string {
+    return technicalSupportMailto(this.propertiesService.getProperty('TECH_SUPPORT_EMAIL'));
   }
 
   private needsDocPayDefaults(): boolean {
@@ -850,16 +863,19 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.fundingRecoveryState = state;
     this.savingInProgress = false;
     this.logger.error('Grant detail save error', error);
+    readback.rejectionReason = this.getFundingRejectionReason(error);
     if (state === 'conflict') {
       readback.outcome = 'conflict';
       this.pendingFundingReadback = readback;
-      this.fundingSaveError = 'The grant changed on the server. Refresh and review your changes before saving.';
+      this.fundingSaveError = readback.rejectionReason
+        ?? 'The grant changed on the server. Refresh and review your changes before saving.';
       this.refreshSavedFunding();
     } else if (state === 'unknown') {
       this.unknownFundingReadback = readback;
       this.fundingSaveError = 'The funding save outcome is unknown. Do not retry until support confirms it is final.';
     } else {
-      this.fundingSaveError = this.getSaveErrorMessage(error, 'Unable to save the grant changes. Please try again.');
+      this.fundingSaveError = readback.rejectionReason
+        ?? this.getSaveErrorMessage(error, 'Unable to save the grant changes. Please try again.');
     }
     this.cdr.detectChanges();
   }
@@ -1151,6 +1167,16 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  private getFundingRejectionReason(error: unknown): string | undefined {
+    if (typeof error !== 'object' || error === null || !('error' in error)
+      || typeof error.error !== 'object' || error.error === null) return undefined;
+    const body = error.error as {
+      errorMessage?: unknown; detail?: unknown; message?: unknown;
+    };
+    return [body.errorMessage, body.detail, body.message]
+      .find((message): message is string => typeof message === 'string' && !!message.trim())?.trim();
+  }
+
   private getSaveErrorMessage(error: unknown, fallback: string): string {
     if (typeof error !== 'object' || error === null) {
       return fallback;
@@ -1408,7 +1434,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   private formModelFromGrant(grant: FundingSubmissionListGrantDto): GrantEditFormModel {
     return {
       docDecision: grant.docDecision ?? null,
-      docPriority: grant.docPriority != null ? String(grant.docPriority) : null,
+      docPriority: !this.isDoNotPayDecisionValue(grant.docDecision) && grant.docPriority != null
+        ? String(grant.docPriority) : null,
       docRecAmt: grant.docRecommendedAmount ?? null,
       docRecReductionPct: grant.docRecommendedReductionPct ?? null,
       docNciSelection: grant.docNciSelection ?? null,
@@ -1485,8 +1512,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
         if (!grant) throw new Error('The saved grant is not present in the refreshed list.');
         if (this.isCurrentFundingSave(readback) && this.pendingFundingReadback === readback) {
           const previousPriority = readback.baselineForm.docPriority;
-          const moved = !isBlankSelection(previousPriority) && !isBlankSelection(grant.docPriority)
-            && String(previousPriority) !== String(grant.docPriority);
+          const moved = String(previousPriority ?? '') !== String(grant.docPriority ?? '');
           this.priorityCoordinator?.applyReadback(readback.listId, readback.data.applId, detail, moved);
         }
         return grant;
@@ -1542,7 +1568,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
           return;
         }
         if (readback.outcome !== 'saved') {
-          this.fundingSaveError = 'Server values were refreshed. Review your unsaved changes before saving.';
+          this.fundingSaveError = readback.rejectionReason
+            ?? 'Server values were refreshed. Review your unsaved changes before saving.';
           this.savingInProgress = false;
           this.cancelDocPayDefaults();
           this.fetchDocPriorityOptions();

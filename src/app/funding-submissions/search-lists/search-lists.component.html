@@ -191,7 +191,7 @@
                             {{ d.countDisplay || d.count }}
                         </a>
 
-                        <span class="doc-status">
+                        <span class="doc-status" *ngIf="d.status">
                             <i class="fas" [ngClass]="[getDocStatusIcon(d.status), getDocStatusClass(d.status)]"></i>
                             <span>{{ d.status }}</span>
                         </span>

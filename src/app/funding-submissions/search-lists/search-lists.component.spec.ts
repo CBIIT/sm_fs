@@ -172,7 +172,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       providers: [
         { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
         { provide: Router, useValue: routerSpy },
-        { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
+        { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']) },
         { provide: LoaderService, useValue: loaderServiceSpy },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
@@ -2030,8 +2030,8 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       component.isNciDirector = false;
     });
 
-    function loadGrants(grants: any[]): void {
-      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants }));
+    function loadGrants(grants: any[], docs?: any[]): void {
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants, docs }));
       (component as any).loadListMeta();
       fixture.detectChanges();
     }
@@ -2062,10 +2062,14 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     it('renders all review stages with total counts and filters by the clicked DOC', () => {
       userSessionServiceSpy.getDocFundingSubmissionCoordinatorDocAbbrevs.and.returnValue(['DCB', 'DCP', 'DTP']);
       loadGrants([
-        { applId: 1, doc: 'DCB', reviewStatus: 'Under DOC Review' },
-        { applId: 2, doc: 'DCP', reviewStatus: 'OEFIA Review' },
-        { applId: 3, doc: 'DTP', reviewStatus: 'NCI Director Review' },
-        { applId: 4, doc: 'DTP', reviewStatus: 'OEFIA Review' }
+        { applId: 1, doc: 'DCB', docNonId: 1, reviewStatus: 'Under DOC Review' },
+        { applId: 2, doc: 'DCP', docNonId: 2, reviewStatus: 'OEFIA Review' },
+        { applId: 3, doc: 'DTP', docNonId: 3, reviewStatus: 'NCI Director Review' },
+        { applId: 4, doc: 'DTP', docNonId: 3, reviewStatus: 'OEFIA Review' }
+      ], [
+        { nonId: 1, currentStatusCode: 'DOCREVIEW' },
+        { nonId: 2, currentStatusCode: 'OEFIAREVIEW' },
+        { nonId: 3, currentStatusCode: 'DIRECTORREVIEW' }
       ]);
 
       const rows: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.doc-row'));
@@ -2091,12 +2095,18 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
   });
 
   describe('Review Status docs[] consumption (FS-2106 §12)', () => {
+    const withActualDocStatus = <T>(grants: T[], code: string): T[] => {
+      grants.forEach(grant => (grant as any).docNonId = 900);
+      (component as any).actualDocStatusCodes = new Map([[900, code]]);
+      return grants;
+    };
+
     it('orders Review Status alphabetically by DOC before splitting into columns', () => {
       component.docFundingListCor = false;
-      const grants = ['DTP', 'DCP', 'DCTD', 'DCB', 'DCCPS', 'DCB'].map(doc => ({
+      const grants = withActualDocStatus(['DTP', 'DCP', 'DCTD', 'DCB', 'DCCPS', 'DCB'].map(doc => ({
         doc,
         reviewStatus: 'DOC Review'
-      }));
+      })), 'DOCREVIEW');
 
       const columns = (component as any).buildDocStatusColumns(grants);
 
@@ -2104,6 +2114,181 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
         .toEqual([['DCB', 'DCCPS', 'DCP', 'DCTD'], ['DTP']]);
       expect(columns[0][0].count).toBe(2);
       expect(columns[0][0].status).toBe('DOC Review');
+    });
+
+    describe('NCI Director Review sent count (FS-2712)', () => {
+      beforeEach(() => {
+        component.docFundingListCor = false;
+      });
+
+      it('counts only Pay grants as sent for a DOC with one Pay and six Do Not Pay grants', () => {
+        const grants = withActualDocStatus([
+          { doc: 'OCC', reviewStatus: 'NCI Director Review', docDecision: 'Pay' },
+          ...Array.from({ length: 6 }, () => ({ doc: 'OCC', reviewStatus: 'NCI Director Review', docDecision: 'DNP' }))
+        ], 'DIRECTORREVIEW');
+
+        const item = (component as any).buildDocStatusColumns(grants)[0][0];
+
+        expect(item.status).toBe('NCI Director Review');
+        expect(item.count).toBe(7);
+        expect(item.countDisplay).toBe('1/7');
+      });
+
+      it('still displays n/n when every Director Review grant is Pay', () => {
+        const grants = withActualDocStatus(
+          [1, 2, 3].map(() => ({ doc: 'DCB', reviewStatus: 'NCI Director Review', docDecision: 'Pay' })),
+          'DIRECTORREVIEW'
+        );
+
+        const item = (component as any).buildDocStatusColumns(grants)[0][0];
+
+        expect(item.countDisplay).toBe('3/3');
+      });
+
+      it('requires both Director Review status and a Pay decision', () => {
+        const grants = withActualDocStatus([
+          { doc: 'DTP', reviewStatus: 'NCI Director Review', docDecision: 'Pay' },
+          { doc: 'DTP', reviewStatus: 'OEFIA Review', docDecision: 'Pay' },
+          { doc: 'DTP', reviewStatus: 'NCI Director Review', docDecision: 'DNP' }
+        ], 'DIRECTORREVIEW');
+
+        const item = (component as any).buildDocStatusColumns(grants)[0][0];
+
+        expect(item.status).toBe('NCI Director Review');
+        expect(item.countDisplay).toBe('1/3');
+      });
+
+      it('counts every decision value isGrantDocDecisionPay() treats as Pay', () => {
+        (component as any).docDecisionDisplayMap.set('P', 'Pay');
+        const grants = withActualDocStatus([
+          { doc: 'DCP', reviewStatus: 'NCI Director Review', docDecision: 'pay' },
+          { doc: 'DCP', reviewStatus: 'NCI Director Review', docDecision: 'P' },
+          { doc: 'DCP', reviewStatus: 'NCI Director Review', docDecision: 'DNP' }
+        ], 'DIRECTORREVIEW');
+        spyOn(component as any, 'isGrantDocDecisionPay').and.callThrough();
+
+        const item = (component as any).buildDocStatusColumns(grants)[0][0];
+
+        expect(item.countDisplay).toBe('2/3');
+        expect((component as any).isGrantDocDecisionPay).toHaveBeenCalledTimes(3);
+      });
+
+      it('keeps the actual Director DOC stage and 0/n when all remaining grants are projected OEFIA', () => {
+        const grants = [1, 2].map(applId => ({
+          applId, doc: 'DCB', docNonId: 111, reviewStatusCode: 'OEFIAREVIEW',
+          reviewStatus: 'Under OEFIA Review', docDecision: 'Do Not Pay'
+        }));
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+          grants,
+          docs: [
+            { nonId: 222, docAbbrev: 'DCB', currentStatusCode: 'DOCREVIEW' },
+            { nonId: 111, docAbbrev: 'Other label', currentStatusCode: 'DIRECTORREVIEW' }
+          ]
+        }));
+
+        (component as any).loadListMeta();
+
+        expect(component.docStatusColumns[0][0]).toEqual(jasmine.objectContaining({
+          doc: 'DCB', status: 'NCI Director Review', count: 2, countDisplay: '0/2'
+        }));
+        expect(component.currentReviewStatus).toBe('NCI Director Review');
+        expect(component.isDocStageReadOnly(grants[0])).toBeFalse();
+        component.docFundingListCor = true;
+        (TestBed.inject(AppUserSessionService).getDocFundingSubmissionCoordinatorDocAbbrevs as jasmine.Spy)
+          .and.returnValue(['DCB']);
+        expect(component.isDocStageReadOnly(grants[0])).toBeTrue();
+        expect((component as any).buildDocStatusColumns(grants)[0][0].countDisplay).toBe('2');
+      });
+
+      it('excludes a projected OEFIA Pay alias in an already-sent DOC from Send by DOC', () => {
+        (component as any).docDecisionDisplayMap.set('P', 'Pay');
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+          grants: [
+            { applId: 1, doc: 'DCB', docNonId: 111, reviewStatusCode: 'OEFIAREVIEW', docDecision: 'P' },
+            { applId: 2, doc: 'DCP', docNonId: 222, reviewStatusCode: 'OEFIAREVIEW', docDecision: 'P' }
+          ],
+          docs: [
+            { nonId: 111, currentStatusCode: 'DIRECTORREVIEW' },
+            { nonId: 222, currentStatusCode: 'OEFIAREVIEW', currentStatusDescrip: 'Under Review' }
+          ]
+        }));
+
+        (component as any).loadListMeta();
+        component.onSendGrantsByDocClick();
+
+        expect(component.hasSendByDocEligibleGrants).toBeTrue();
+        expect(component.sendByDocDocs).toEqual([
+          { doc: 'DCP', count: 1, selected: true, docNonIds: [222] }
+        ]);
+      });
+
+      for (const docs of [undefined, [], [{ nonId: 222, currentStatusCode: 'OEFIAREVIEW' }],
+        [{ nonId: 111, currentStatusCode: null }]]) {
+        it(`excludes and logs Pay aliases with incomplete actual DOC metadata: ${JSON.stringify(docs)}`, () => {
+          (component as any).docDecisionDisplayMap.set('P', 'Pay');
+          fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+            grants: [{ applId: 1, doc: 'DCB', docNonId: 111, reviewStatusCode: 'OEFIAREVIEW', docDecision: 'P' }],
+            docs
+          }));
+
+          (component as any).loadListMeta();
+          component.onSendGrantsByDocClick();
+
+          expect(component.hasSendByDocEligibleGrants).toBeFalse();
+          expect(component.sendByDocDocs).toEqual([]);
+          expect(TestBed.inject(NGXLogger).warn).toHaveBeenCalledWith(
+            'Review Status stage and Send by DOC withheld for grants without matching actual DOC status metadata',
+            { listId: component.listId, docNonIds: [111] }
+          );
+        });
+
+        it(`does not fabricate a DOC stage from projected grant status with incomplete metadata: ${JSON.stringify(docs)}`, () => {
+          fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+            grants: [
+              { applId: 1, doc: 'DCB', docNonId: 111, reviewStatusCode: 'DIRECTORREVIEW',
+                reviewStatus: 'Under NCI Director Review', docDecision: 'Pay' },
+              { applId: 2, doc: 'DCB', docNonId: 111, reviewStatusCode: 'DRAFT', reviewStatus: 'Draft', docDecision: 'Pay' }
+            ],
+            docs
+          }));
+
+          (component as any).loadListMeta();
+
+          expect(component.docStatusColumns[0][0]).toEqual(jasmine.objectContaining({
+            doc: 'DCB', status: '', count: 2, countDisplay: '2'
+          }));
+          expect(component.isCurrentStatusDraft).toBeFalse();
+          expect(TestBed.inject(NGXLogger).warn).toHaveBeenCalledWith(
+            'Review Status stage and Send by DOC withheld for grants without matching actual DOC status metadata',
+            { listId: component.listId, docNonIds: [111] }
+          );
+        });
+      }
+
+      it('rejects older same-list metadata after a funding readback and retains the deferred refresh', () => {
+        component.listId = 42;
+        const grants = [1, 2, 3, 4, 5, 6, 7].map(applId => ({
+          applId, doc: 'DCB', docNonId: 111, docPriority: applId,
+          docDecision: applId <= 2 ? 'Pay' : 'Do Not Pay',
+          reviewStatus: applId <= 2 ? 'Under NCI Director Review' : 'Under OEFIA Review'
+        }));
+        const detail = { grants, docs: [{ nonId: 111, currentStatusCode: 'DIRECTORREVIEW' }] };
+        (component as any).cachedGrants = grants.map(grant => ({ ...grant }));
+        const olderResponse = new Subject<any>();
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValues(olderResponse, of(detail));
+        (component as any).loadListMeta();
+
+        (component as any).priorityCoordinator.applyReadback(42, 2, detail, false);
+        olderResponse.next({ grants: [], docs: [] });
+        olderResponse.complete();
+
+        expect(olderResponse.observers.length).toBe(0);
+        expect(component.docStatusColumns[0][0].countDisplay).toBe('2/7');
+        expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(1);
+        (component as any).priorityCoordinator.finishWrite(42, 2);
+        expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(2);
+        expect(component.docStatusColumns[0][0].countDisplay).toBe('2/7');
+      });
     });
 
     it('OEFIA/FA case: a zero-grant-count DOC entry in docs[] is still rendered in Review Status', () => {
@@ -2168,7 +2353,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(items.find(item => item.doc === 'DCP')?.count).toBe(4);
     });
 
-    it('docs[] absent (undefined) falls back to the legacy per-grant aggregation', () => {
+    it('docs[] absent (undefined) aggregates per-grant counts without inferring a DOC stage (FS-2712)', () => {
       fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
         listCode: '9-May 19th',
         totalGrants: 2,
@@ -2187,7 +2372,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(items.length).toBe(1);
       expect(items[0].doc).toBe('DCB');
       expect(items[0].count).toBe(2);
-      expect(items[0].status).toBe('Draft');
+      expect(items[0].status).toBe('');
     });
 
     it('docs[] explicitly empty ([]) renders an empty Review Status section, never a fallback', () => {

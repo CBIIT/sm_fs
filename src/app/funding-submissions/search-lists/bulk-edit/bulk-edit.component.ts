@@ -1,10 +1,14 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
-import { catchError, defaultIfEmpty, defer, forkJoin, map, of, Subject, Subscription, take } from 'rxjs';
-import { FundingSubmissionsService, FundingSubmBulkEditFieldsDto, FundingSubmissionListGrantDto } from '@cbiit/i2efsws-lib';
+import { catchError, concatMap, defaultIfEmpty, defer, from, map, Observable, of, Subject, Subscription, take, takeWhile, toArray } from 'rxjs';
+import {
+  FundingSubmissionsService, FundingSubmBulkEditFieldsDto, FundingSubmissionListGrantDto,
+  FundingSubmissionTransitionIntentDto
+} from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { Select2OptionData } from 'ng-select2';
 import { DataTableDirective } from 'angular-datatables';
@@ -14,8 +18,9 @@ import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lo
 import { AppUserSessionService } from '../../../service/app-user-session.service';
 import { roleNames } from '../../../service/role-names';
 import {
-  applyDocPayDefaults, DOC_PAY_SELECTION_FIELDS, DocPayDefaultField, DocPayProvenance, DocPaySelectionField,
-  DocPaySelections, isBlankSelection, isPayDecision, requireDocPayDefaults, validateDocRecommendation
+  applyDocPayDefaults, DOC_PAY_DEFAULTS_LOOKUP_ERROR, DOC_PAY_SELECTION_FIELDS, DocPayDefaultField, DocPayProvenance,
+  docPayDefaultsLookupLogContext, DocPaySelectionField, DocPaySelections, isBlankSelection, isPayDecision,
+  requireDocPayDefaults, technicalSupportMailto, validateDocRecommendation
 } from '../../doc-pay-defaults';
 import { FundingRequestErrorScopeService } from '../../funding-request-error-scope.service';
 import { GrantBudgetCategoryOptions } from '../../grant-budget-category-options';
@@ -34,6 +39,7 @@ interface BulkRowReadback {
   baselineRow: EditableBulkRow;
   fieldVersions: Map<string, number>;
   outcome: FundingWriteRecoveryState;
+  transitionIntent?: FundingSubmissionTransitionIntentDto;
 }
 
 interface BulkWriteOutcome {
@@ -101,6 +107,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   private bulkDoNotPayWithBlankDocNotesApplied = false;
   docPayDefaultsLoading = false;
   docPayDefaultsError = '';
+  readonly docPayDefaultsLookupError = DOC_PAY_DEFAULTS_LOOKUP_ERROR;
   fundingRecoveryError = '';
   confirmedUnknownRows: Record<number, boolean> = {};
   private docPayDefaultsSubscription: Subscription;
@@ -110,6 +117,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly unknownFundingReadbacks = new Map<number, BulkRowReadback>();
   private readonly fundingRecoveryStates = new Map<number, FundingWriteRecoveryState>();
   private readonly acknowledgedRows = new Set<number>();
+  private priorityRefreshRequired = false;
   private editVersion = 0;
   private defaultsRequestVersion = 0;
   private docPayDefaultsResolvedRows = new Set<number>();
@@ -120,7 +128,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   private destroyed = false;
 
   get savedChangesNeedRefresh(): boolean {
-    return this.pendingFundingReadbacks.size > 0;
+    return this.pendingFundingReadbacks.size > 0 || this.priorityRefreshRequired;
   }
 
   get unknownRecoveryRows(): EditableBulkRow[] {
@@ -843,7 +851,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onSave(): void {
     if (!this.rows.length || !this.canSave || this.isSaving || this.docPayDefaultsLoading
-      || this.docPayDefaultsError || this.fundingRecoveryError) return;
+      || this.docPayDefaultsError || this.fundingRecoveryError || this.savedChangesNeedRefresh
+      || this.unknownRecoveryRows.length) return;
     const rowsToSave: EditableBulkRow[] = this.rows.filter(row => this.shouldSubmitRow(row));
     if (!rowsToSave.length) return;
     if (rowsToSave.some(row => this.needsDocPayDefaults(row) && !this.docPayDefaultsResolvedRows.has(row.applId))) {
@@ -865,8 +874,44 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const calls = rowsToSave.map(row => {
-      const readback = this.createRowReadback(row, 'unknown');
+    const readbacks = rowsToSave.map(row => this.createRowReadback(row, 'unknown'));
+    this.fundingSaveSubscription = from(readbacks).pipe(
+      concatMap((readback, index) => this.saveFundingRow(readback, readbacks.slice(index + 1))),
+      takeWhile(result => result.proceed, true),
+      toArray()
+    ).subscribe({
+      next: results => {
+        if (!this.isCurrentFundingSave(readbacks[0])) return;
+        this.isSaving = false;
+        const outcomes = results.map(result => result.outcome).filter((outcome): outcome is BulkWriteOutcome => !!outcome);
+        const failures = outcomes.filter(outcome => outcome.status !== 'saved');
+        if (failures.length) {
+          if (outcomes.length === 1 && failures[0].status === 'rejected' && !this.priorityRefreshRequired) {
+            this.saveErrorMessage = failures[0].message;
+          } else {
+            this.bulkWriteOutcomeMessage = failures.map(outcome => {
+              const row = this.rows.find(current => current.applId === outcome.applId);
+              return `${row?.grantNumber ?? outcome.applId}: ${outcome.message}`;
+            }).join(' ');
+          }
+        }
+        this.recomputeCanSave();
+        const savedCount = outcomes.filter(outcome => outcome.status === 'saved').length;
+        if (savedCount && !this.savedChangesNeedRefresh) {
+          this.saveSuccessMessage = !failures.length && !this.fundingRecoveryStates.size && !this.canSave
+            ? 'Success! Bulk changes have been applied'
+            : `Success! Changes were saved for ${savedCount} grant${savedCount === 1 ? '' : 's'}.`;
+          if (this.canSave) this.saveSuccessMessage += ' Your newer edits have not been saved.';
+        }
+      }
+    });
+  }
+
+  private saveFundingRow(
+    readback: BulkRowReadback, remaining: BulkRowReadback[]
+  ): Observable<{ proceed: boolean; outcome: BulkWriteOutcome | null }> {
+    return defer(() => {
+      if (!this.isCurrentFundingSave(readback)) return of({ proceed: false, outcome: null });
       const submitted = readback.submittedRow;
       const request = {
         applIds: [submitted.applId],
@@ -878,13 +923,13 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
           annualOrMyf: submitted.annualOrMyf,
           docNotes: submitted.docNotes,
           oefiaNotes: submitted.oefiaNotes,
-          docPriority: submitted.docPriority == null ? null : String(submitted.docPriority),
+          docPriority: readback.transitionIntent || submitted.docPriority == null
+            ? null : String(submitted.docPriority),
           docRecAmt: submitted.docRecAmt,
           docRecReductionPct: submitted.docRecReductionPct,
           recused: submitted.recused
         },
-        ...(this.needsDocPayDefaults(row)
-          ? { transitionIntents: [this.provenanceFor(row).intent(row.applId)] } : {})
+        ...(readback.transitionIntent ? { transitionIntents: [readback.transitionIntent] } : {})
       };
       let started = false;
       return defer(() => {
@@ -905,31 +950,20 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
             this.fundingRecoveryStates.set(submitted.applId, 'saved');
             this.pendingFundingReadbacks.set(submitted.applId, readback);
           }
-          return { applId: submitted.applId, status: 'saved' } as BulkWriteOutcome;
+          const outcome: BulkWriteOutcome = { applId: submitted.applId, status: 'saved' };
+          return outcome;
         }),
-        catchError(error => of(this.handleRowWriteFailure(readback, error, started)))
-      );
-    });
-    this.fundingSaveSubscription = forkJoin(calls).subscribe({
-      next: outcomes => {
-        if (rowsToSave.some(row => !this.rows.includes(row))) return;
-        this.isSaving = false;
-        const failures = outcomes.filter(outcome => outcome.status !== 'saved');
-        if (failures.length) {
-          if (outcomes.length === 1 && failures[0].status === 'rejected') {
-            this.saveErrorMessage = failures[0].message;
-          } else {
-            this.bulkWriteOutcomeMessage = failures.map(outcome => {
-              const row = this.rows.find(current => current.applId === outcome.applId);
-              return `${row?.grantNumber ?? outcome.applId}: ${outcome.message}`;
-            }).join(' ');
+        catchError(error => of(this.handleRowWriteFailure(readback, error, started))),
+        concatMap(outcome => {
+          if (!this.isCurrentFundingSave(readback)
+            || outcome.status === 'unknown' || outcome.status === 'not-sent') {
+            return of({ proceed: false, outcome });
           }
-        }
-        this.recomputeCanSave();
-        if (this.savedChangesNeedRefresh) {
-          this.refreshSavedFunding();
-        }
-      }
+          return this.refreshSavedFundingRequest(remaining).pipe(
+            map(refreshed => ({ proceed: refreshed, outcome }))
+          );
+        })
+      );
     });
   }
 
@@ -1026,7 +1060,12 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.pendingFundingReadbacks.clear();
     this.unknownFundingReadbacks.clear();
+    this.priorityRefreshRequired = false;
     this.isSaving = false;
+  }
+
+  get technicalSupportMailto(): string {
+    return technicalSupportMailto(this.propertiesService.getProperty('TECH_SUPPORT_EMAIL'));
   }
 
   private needsDocPayDefaults(row: EditableBulkRow): boolean {
@@ -1046,6 +1085,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     const requestVersion = this.defaultsRequestVersion;
     const requests = requestedRows.map(row => {
       const provenance = this.provenanceFor(row);
+      if (!provenance.hasUserEdit('docPriority')) row.docPriority = null;
       provenance.preparePreview(row);
       return { row, fields: { ...row }, versions: provenance.snapshot() };
     });
@@ -1071,7 +1111,9 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
           const provenance = this.provenanceFor(row);
           const appliedPriority = applyDocPayDefaults(row, defaults, field =>
             row[field] === fields[field]
-            && provenance.mayApplyDefault(field, versions));
+            && (field === 'docPriority'
+              ? !provenance.hasUserEdit(field) && provenance.unchangedSince(field, versions)
+              : provenance.mayApplyDefault(field, versions)));
           if (appliedPriority) provenance.markAutomaticPriorityApplied();
           const observed = this.observedSelections.get(row.applId);
           for (const field of DOC_PAY_SELECTION_FIELDS) observed[field] = row[field];
@@ -1084,8 +1126,14 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       error: error => {
         if (!isCurrent()) return;
         this.docPayDefaultsLoading = false;
-        this.docPayDefaultsError = this.getSaveErrorMessage(error);
-        this.logger.error('Failed to load DOC Pay defaults for bulk edit', error);
+        if (error instanceof HttpErrorResponse) {
+          this.docPayDefaultsError = DOC_PAY_DEFAULTS_LOOKUP_ERROR;
+          this.logger.error('Failed to load DOC Pay defaults for bulk edit',
+            docPayDefaultsLookupLogContext(error, listId, requestedRows.map(row => row.applId)));
+        } else {
+          this.docPayDefaultsError = this.getSaveErrorMessage(error);
+          this.logger.error('Failed to load DOC Pay defaults for bulk edit', error);
+        }
       }
     });
   }
@@ -1098,7 +1146,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
       submittedRow: { ...row },
       baselineRow: { ...(this.getLastSavedRow(row) ?? row) },
       fieldVersions: this.provenanceFor(row).snapshot(),
-      outcome
+      outcome,
+      ...(this.needsDocPayDefaults(row) ? { transitionIntent: this.provenanceFor(row).intent(row.applId) } : {})
     };
   }
 
@@ -1145,17 +1194,33 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   refreshSavedFunding(): void {
+    if (this.isSaving || (this.fundingReadbackSubscription && !this.fundingReadbackSubscription.closed)) return;
+    const editVersion = this.editVersion;
+    this.fundingReadbackSubscription = this.refreshSavedFundingRequest().subscribe(() => {
+      if (this.editVersion === editVersion) this.isSaving = false;
+    });
+  }
+
+  private refreshSavedFundingRequest(remaining: BulkRowReadback[] = []): Observable<boolean> {
+    const listId = this.listId;
+    const editVersion = this.editVersion;
+    const rows = this.rows;
+    const isCurrent = () => this.listId === listId && this.editVersion === editVersion && this.rows === rows;
     const readbacks = [...this.pendingFundingReadbacks.values()].filter(readback => this.isCurrentFundingSave(readback));
-    if (!readbacks.length || (this.fundingReadbackSubscription && !this.fundingReadbackSubscription.closed)) return;
+    this.priorityRefreshRequired = true;
     this.isSaving = true;
     this.saveErrorMessage = '';
-    this.fundingReadbackSubscription = this.fundingErrorScope.handleLocally(
+    return this.fundingErrorScope.handleLocally(
       this.fundingSubmissionsService.getListDetail(this.listId)
     ).pipe(
       defaultIfEmpty(null),
-      take(1)
-    ).subscribe({
-      next: detail => {
+      take(1),
+      map(detail => {
+        if (!isCurrent()) return false;
+        if (!Array.isArray(detail?.grants) || this.rows.some(row =>
+          !detail.grants.some(grant => grant.applId === row.applId))) {
+          throw new Error('A grant was not present in the refreshed list.');
+        }
         const errors: string[] = [];
         let savedCount = 0;
         let needsReview = false;
@@ -1204,7 +1269,25 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
           if (readback.outcome === 'saved') savedCount++;
           else needsReview = true;
         }
-        this.isSaving = false;
+        for (const row of this.rows as EditableBulkRow[]) {
+          if (readbacks.some(readback => readback.submittedRow.applId === row.applId)) continue;
+          const priority = detail.grants.find(grant => grant.applId === row.applId).docPriority ?? null;
+          const baseline = this.getLastSavedRow(row);
+          const provenance = this.provenanceFor(row);
+          const automaticPreview = this.needsDocPayDefaults(row)
+            && provenance.intent(row.applId).priorityMode === 'AUTO';
+          const untouched = !provenance.hasUserEdit('docPriority')
+            && (automaticPreview || String(row.docPriority ?? '') === String(baseline?.docPriority ?? ''));
+          if (untouched && !automaticPreview) row.docPriority = priority;
+          if (baseline) baseline.docPriority = priority;
+          for (const queued of remaining.filter(item => item.submittedRow.applId === row.applId)) {
+            if (String(queued.submittedRow.docPriority ?? '') === String(queued.baselineRow.docPriority ?? '')) {
+              queued.submittedRow.docPriority = priority;
+            }
+            queued.baselineRow.docPriority = priority;
+          }
+        }
+        this.priorityRefreshRequired = errors.length > 0;
         if (!errors.length && !this.savedChangesNeedRefresh) {
           this.bulkDoNotPayWithBlankDocNotesApplied = false;
         }
@@ -1226,25 +1309,24 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
           this.bulkWriteOutcomeMessage += ' Server values were refreshed; review unsaved changes before saving.';
         }
         if (errors.length) {
-          const prefix = readbacks.every(readback => readback.outcome === 'saved')
+          const prefix = readbacks.length && readbacks.every(readback => readback.outcome === 'saved')
             ? 'Bulk changes were saved, but some values could not be refreshed.'
             : 'Some grant values could not be refreshed.';
           this.saveErrorMessage = `${prefix} ${errors.join(' ')} Retry refresh.`;
         }
-        if (needsReview && this.rows.some(row => this.needsDocPayDefaults(row))) this.loadDocPayDefaults();
         this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
-      },
-      error: error => {
-        if (!readbacks.some(readback => this.isCurrentFundingSave(readback)
-          && this.pendingFundingReadbacks.get(readback.submittedRow.applId) === readback)) return;
-        this.isSaving = false;
-        this.saveErrorMessage = readbacks.every(readback => readback.outcome === 'saved')
+        return !errors.length;
+      }),
+      catchError(error => {
+        if (!isCurrent()) return of(false);
+        this.saveErrorMessage = readbacks.length && readbacks.every(readback => readback.outcome === 'saved')
           ? 'Bulk changes were saved, but the saved values could not be refreshed. Retry refresh before saving those grants again.'
           : 'Some grant changes could not be refreshed. Retry refresh before saving those grants again.';
         this.logger.error('Failed to refresh saved bulk changes', error);
         this.recomputeCanSave();
-      }
-    });
+        return of(false);
+      })
+    );
   }
 
   private scrollToSuccessMessage(): void {

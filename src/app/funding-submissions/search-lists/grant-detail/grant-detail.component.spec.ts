@@ -2,6 +2,7 @@ import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick } fr
 import { Component, ComponentRef, createComponent, EnvironmentInjector, NO_ERRORS_SCHEMA } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NgSelect2Module } from 'ng-select2';
 import { BehaviorSubject, EMPTY, NEVER, Observable, of, Subject, throwError } from 'rxjs';
@@ -19,6 +20,7 @@ import { UserSelect2ChangeDirective } from '../../user-select2-change.directive'
 import { FUNDING_WRITE_RECOVERY_STORAGE, FundingWriteRecoveryService } from '../../funding-write-recovery.service';
 import { MemoryStorage } from '../../testing/memory-storage';
 import { installSelect2 } from '../../testing/install-select2';
+import { DetailPriorityCoordinator } from '../detail-priority-coordinator';
 
 @Component({
   template: '<app-grant-detail [data]="grant" [listId]="listId"></app-grant-detail>'
@@ -1066,6 +1068,122 @@ describe('GrantDetailComponent', () => {
         expect(component.formModel.budgetCategories).toBe('R01R37');
       });
     }
+
+    describe('FS-2714 defaults lookup HTTP failures', () => {
+      const lookupMessage = 'We\'ve encountered an unexpected error retrieving grant data. '
+        + 'Please contact Technical Support for support.';
+
+      function httpFailure(status: number, error: unknown = {
+        errorMessage: 'ORA-06502 raw server failure', correlationId: 'corr-123',
+        additionalData: { reasonCode: 'DEFAULTS_UNRESOLVED' }
+      }, headers = new HttpHeaders({ Authorization: 'Bearer secret-token' })): HttpErrorResponse {
+        return new HttpErrorResponse({
+          status, statusText: `Status ${status}`, error, headers,
+          url: '/fsws/funding-submissions/lists/1/grants/doc-pay-defaults?applIds=100'
+        });
+      }
+
+      function defaultsAlert(): HTMLElement {
+        fixture.detectChanges();
+        return Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('[role="alert"]'))
+          .find(alert => alert.textContent.includes('Retry defaults'));
+      }
+
+      beforeEach(() => {
+        (TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy).and.callFake((key: string) =>
+          key === 'TECH_SUPPORT_EMAIL' ? 'support@example.gov' : 'http://grant-viewer/');
+      });
+
+      for (const status of [0, 400, 409, 500]) {
+        it(`shows the support message, logs safe context, and blocks Save until retry for HTTP ${status}`, () => {
+          choosePay();
+          defaultsResponse.error(httpFailure(status));
+          const alert = defaultsAlert();
+          const text = alert.textContent.replace(/\s+/g, ' ');
+          expect(text).toContain(lookupMessage);
+          expect(text).not.toContain('ORA-06502');
+          expect(text).not.toContain(`Status ${status}`);
+          expect(text).not.toContain('doc-pay-defaults');
+          const link: HTMLAnchorElement = alert.querySelector('a');
+          expect(link.textContent.trim()).toBe('Technical Support');
+          expect(link.getAttribute('href')).toBe('mailto:support@example.gov?subject=Funding Selections');
+
+          const logger = TestBed.inject(NGXLogger).error as jasmine.Spy;
+          expect(logger).toHaveBeenCalledWith('Failed to load DOC Pay defaults', {
+            operation: 'getDocPayDefaults', listId: 1, applIds: [100],
+            status, statusText: `Status ${status}`, correlationId: 'corr-123', reasonCode: 'DEFAULTS_UNRESOLVED'
+          });
+          const logged = JSON.stringify(logger.calls.mostRecent().args);
+          for (const unsafe of ['secret-token', 'ORA-06502', 'doc-pay-defaults', '90000', 'Pay"']) {
+            expect(logged).not.toContain(unsafe);
+          }
+
+          component.onSave();
+          expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+          expect(alert.querySelector('button').textContent).toContain('Retry defaults');
+          fundingSubmissionsServiceSpy.getDocPayDefaults.and.returnValue(of([resolvedDefaults]));
+          component.loadDocPayDefaults();
+          expect(component.docPayDefaultsError).toBeNull();
+          expect(component.formModel.budgetCategories).toBe('R01R37');
+          component.onSave();
+          expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+        });
+      }
+
+      it('logs the correlation ID header when the error body has none', () => {
+        choosePay();
+        defaultsResponse.error(httpFailure(500, 'Internal Server Error',
+          new HttpHeaders({ 'X-Correlation-ID': 'header-corr', Authorization: 'Bearer secret-token' })));
+        expect(TestBed.inject(NGXLogger).error).toHaveBeenCalledWith('Failed to load DOC Pay defaults', {
+          operation: 'getDocPayDefaults', listId: 1, applIds: [100],
+          status: 500, statusText: 'Status 500', correlationId: 'header-corr'
+        });
+        expect(defaultsAlert().textContent).not.toContain('Internal Server Error');
+      });
+
+      it('keeps specific guidance for client-side default validation failures', () => {
+        choosePay();
+        defaultsResponse.next([{ ...resolvedDefaults, transitionEligible: false }]);
+        const alert = defaultsAlert();
+        expect(component.docPayDefaultsError).toBe('The grant status has changed. Refresh the list before editing.');
+        expect(alert.textContent).toContain('Refresh the list before editing.');
+        expect(alert.textContent).not.toContain('Technical Support');
+        expect(alert.querySelector('a')).toBeNull();
+      });
+    });
+
+    it('reconciles the authoritative funding status before a later justification failure without emitting saved', () => {
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      const readback: FundingSubmissionListDetailDto = {
+        grants: [persistedGrant({
+          reviewStatusCode: 'DIRECTORREVIEW', reviewStatus: 'Under NCI Director Review'
+        })],
+        docs: [{ nonId: 111, currentStatusCode: 'DIRECTORREVIEW' }]
+      };
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of(readback));
+      const operations: string[] = [];
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.callFake(() => {
+        operations.push('justification');
+        return throwError(() => ({ status: 500 }));
+      });
+      const reconcile = jasmine.createSpy('reconcile').and.callFake(() => operations.push('funding'));
+      component.priorityCoordinator = new DetailPriorityCoordinator(reconcile, () => {});
+      component.formModel.justificationText = 'Pending justification';
+      const saved = jasmine.createSpy('saved');
+      component.saved.subscribe(saved);
+
+      component.onSave();
+
+      expect(reconcile).toHaveBeenCalledWith(1, 100, readback, true);
+      expect(operations).toEqual(['funding', 'justification']);
+      expect(component.data.reviewStatusCode).toBe('DIRECTORREVIEW');
+      expect(component.justificationSaveError).toBeTruthy();
+      expect(component.saveSuccessMessage).toBeFalsy();
+      expect(component.isEditMode).toBeTrue();
+      expect(saved).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(1);
+    });
 
     it('refreshes a stale transition conflict without retrying its rejected write', () => {
       choosePay();

@@ -97,7 +97,15 @@
     </button>
   </section>
 
-  <section class="doc-filters mb-4">
+  <div class="d-flex align-items-center mb-3">
+    <h2 class="h3 mb-0 me-3 flex-shrink-0">Filter and Search</h2>
+    <hr class="flex-grow-1" aria-hidden="true">
+  </div>
+
+  <div id="directorDocFilterLabel"><strong>Filter by DOC(s):</strong></div>
+  <p id="directorDocFilterHelp" class="mb-2">Select a DOC and click Search to filter the table below.</p>
+  <section class="doc-filters mb-4" role="group" aria-labelledby="directorDocFilterLabel"
+    aria-describedby="directorDocFilterHelp">
     <button
       type="button"
       class="doc-tile"
@@ -115,6 +123,42 @@
       <span class="ms-3">{{ selectedDocSummary.recommendedTotal | currency:'USD':'symbol':'1.0-0' }}</span>
     </div>
   </section>
+
+  <div class="grant-number-filter mb-4">
+    <label for="directorGrantNumbers" class="form-label fw-semibold">Filter by Grant Number(s)</label>
+    <p id="directorGrantNumbersHelp">
+      Grant Numbers are optional. Multiple grant numbers should be separated by a space or comma.
+    </p>
+    <textarea
+      id="directorGrantNumbers"
+      name="directorGrantNumbers"
+      class="form-control grant-number-textarea"
+      rows="3"
+      [(ngModel)]="grantNumbers"
+      [ngModelOptions]="{ standalone: true }"
+      (input)="grantNumbersInteracted = true"
+      (blur)="grantNumbersInteracted = true"
+      [attr.aria-invalid]="showGrantNumberValidation ? 'true' : null"
+      [attr.aria-describedby]="'directorGrantNumbersHelp directorGrantNumbersCounter' + (showGrantNumberValidation ? ' directorGrantNumbersFeedback' : '')">
+    </textarea>
+    <div class="grant-number-text-meta">
+      <div
+        *ngIf="showGrantNumberValidation"
+        id="directorGrantNumbersFeedback"
+        class="invalid-feedback d-block grant-number-validation-feedback">
+        {{ grantNumberValidationMessage }}
+      </div>
+      <div id="directorGrantNumbersCounter" class="grant-number-counter small">
+        {{ grantNumberCount }}/1000
+      </div>
+    </div>
+    <div class="d-flex justify-content-end mt-3">
+      <button type="button" class="btn btn-outline-secondary me-2" (click)="resetGrantNumberSearch()">Reset</button>
+      <button type="button" class="btn btn-primary" (click)="searchGrantNumbers()">
+        Search
+      </button>
+    </div>
+  </div>
 
   <section class="results card mb-5">
     <div class="card-body">

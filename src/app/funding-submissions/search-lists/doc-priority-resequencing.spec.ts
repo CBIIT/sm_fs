@@ -34,6 +34,7 @@ interface FundingServiceStub {
   getListStatusHistory(listId: number): Observable<FundingSubmListStatusHistoryDto[]>;
   bulkUpdateListGrants(body: FundingSubmissionBulkEditRequestDto, listId: number): Observable<number>;
   removeGrantsFromList(listId: number, applIds: number[]): Observable<FundingSubmissionRemoveGrantsFromListResultDto>;
+  saveJustificationForm(...args: unknown[]): Observable<unknown>;
 }
 
 describe('FS-2516 same-page DOC Priority resequencing', () => {
@@ -42,6 +43,7 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
   let funding: jasmine.SpyObj<FundingServiceStub>;
   let storage: MemoryStorage;
   let serverGrants: FundingSubmissionListGrantDto[];
+  let serverDocs: FundingSubmissionListDetailDto['docs'];
   let detailFixtures: ComponentFixture<GrantDetailComponent>[];
   let order: jasmine.Spy;
   let currentOrder: Array<Array<string | number>>;
@@ -57,7 +59,7 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
   }
 
   function listDetail(): FundingSubmissionListDetailDto {
-    return { grants: serverGrants.map(row => ({ ...row })), currentStatusDescrip: 'DOC Review' };
+    return { grants: serverGrants.map(row => ({ ...row })), docs: serverDocs, currentStatusDescrip: 'DOC Review' };
   }
 
   function openEditor(row: FundingSubmissionListGrantDto): GrantDetailComponent {
@@ -90,10 +92,12 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
 
   beforeEach(async () => {
     detailFixtures = [];
+    serverDocs = undefined;
     storage = new MemoryStorage();
     funding = jasmine.createSpyObj('FundingSubmissionsService', [
       'getJustification', 'getDocPriorityOptions', 'getDocPayDefaults', 'getListDetail',
-      'getListStatusHistory', 'bulkUpdateListGrants', 'removeGrantsFromList', 'getBudgetCategoryOptions'
+      'getListStatusHistory', 'bulkUpdateListGrants', 'removeGrantsFromList', 'getBudgetCategoryOptions',
+      'saveJustificationForm'
     ]);
     funding.getBudgetCategoryOptions.and.returnValue(of([{ code: 'R01R37', name: 'R01/R37' }]));
     funding.getJustification.and.returnValue(of({ justificationText: '' }));
@@ -133,7 +137,7 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
         { provide: DocumentService, useValue: jasmine.createSpyObj('DocumentService', ['downloadById']) },
         { provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['post']) },
         { provide: NgbModal, useValue: jasmine.createSpyObj('NgbModal', ['open']) },
-        { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
+        { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']) },
         { provide: FUNDING_WRITE_RECOVERY_STORAGE, useValue: storage }
       ]
     }).compileComponents();
@@ -163,6 +167,87 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     pageFixture.destroy();
     detailFixtures.forEach(fixture => fixture.destroy());
   });
+
+  for (const outcome of ['saved', 'justification failure', 'justification refresh failure', 'recovery']) {
+    it(`refreshes the FS-2712 card from 1/7 to 2/7 on ${outcome} without a card-only request`, fakeAsync(() => {
+      (TestBed.inject(AppUserSessionService).hasRole as jasmine.Spy)
+        .and.callFake(role => role === roleNames.OEFIA_CERTIFIER);
+      const rows = Array.from({ length: 7 }, (_, index) => grant(100 + index, index + 1, {
+        docNonId: 111, docDecision: index === 0 ? 'Pay' : 'Do Not Pay',
+        reviewStatusCode: index === 0 ? 'DIRECTORREVIEW' : 'OEFIAREVIEW',
+        reviewStatus: index === 0 ? 'Under NCI Director Review' : 'Under OEFIA Review'
+      }));
+      seedRows(rows);
+      serverDocs = [{ nonId: 111, currentStatusCode: 'DIRECTORREVIEW' }];
+      (page as any).updateDocStatusCard(listDetail());
+      const peer = openEditor(rows[2]);
+      const editor = openEditor(rows[1]);
+      const saved = jasmine.createSpy('saved');
+      editor.saved.subscribe(saved);
+      const destroy = spyOn(detailFixtures[1], 'destroy').and.callThrough();
+      peer.formModel.docNotes = 'Unsaved peer notes';
+      peer.onNotesModelChange('docNotes');
+      peer.formModel.docDecision = 'Pay';
+      funding.getDocPayDefaults.and.returnValue(of([{
+        applId: 101, transitionEligible: true, budgetCategories: 'R01R37', docNciSelection: 'DOC',
+        annualFundingR01: 'No', annualOrMyf: 'MYF', docPriority: '2', docRecAmt: 90000,
+        docRecReductionPct: 10
+      }]));
+      editor.onUserSelectChange('docDecision', 'Pay');
+      if (outcome.startsWith('justification')) {
+        editor.formModel.justificationText = 'Pending justification';
+        funding.saveJustificationForm.and.returnValue(outcome === 'justification failure'
+          ? throwError(() => ({ status: 500 })) : of({}));
+        if (outcome === 'justification refresh failure') {
+          funding.getJustification.and.returnValue(throwError(() => ({ status: 500 })));
+        }
+      }
+      if (outcome === 'recovery') {
+        funding.bulkUpdateListGrants.and.returnValue(throwError(() => ({ status: 500 })));
+      }
+      const response = new Subject<FundingSubmissionListDetailDto>();
+      funding.getListDetail.and.returnValue(response);
+
+      expect(page.docStatusColumns[0][0].countDisplay).toBe('1/7');
+      editor.onSave();
+      expect(page.docStatusColumns[0][0].countDisplay).toBe('1/7');
+      if (outcome === 'saved') {
+        editor.formModel.docNotes = 'Newer unsaved notes';
+        editor.onNotesModelChange('docNotes');
+      }
+      if (outcome === 'recovery') {
+        editor.unknownOutcomeConfirmed = true;
+        editor.recoverUnknownFunding();
+      }
+      serverGrants[1] = {
+        ...serverGrants[1], docDecision: 'Pay',
+        reviewStatusCode: 'DIRECTORREVIEW', reviewStatus: 'Under NCI Director Review'
+      };
+      response.next(listDetail());
+      flushMicrotasks();
+
+      expect(page.docStatusColumns[0][0].countDisplay).toBe('2/7');
+      expect(editor.data.reviewStatusCode).toBe('DIRECTORREVIEW');
+      expect(peer.formModel.docNotes).toBe('Unsaved peer notes');
+      expect(peer.formModel.docDecision).toBe('Pay');
+      expect(peer.isEditMode).toBeTrue();
+      expect(destroy).not.toHaveBeenCalled();
+      expect((page as any).detailComponentsByApplId.has(101)).toBeTrue();
+      expect(funding.getListDetail).toHaveBeenCalledTimes(1);
+      expect(funding.getListStatusHistory).not.toHaveBeenCalled();
+      expect(funding.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      if (outcome === 'saved') {
+        expect(editor.formModel.docNotes).toBe('Newer unsaved notes');
+        expect(editor.isEditMode).toBeTrue();
+      }
+      if (outcome.startsWith('justification')) {
+        expect(editor.justificationSaveError).toBeTruthy();
+        expect(editor.saveSuccessMessage).toBeFalsy();
+        expect(editor.isEditMode).toBeTrue();
+        expect(saved).not.toHaveBeenCalled();
+      }
+    }));
+  }
 
   it('rebases an untouched open priority and baseline while preserving notes and the later full-overwrite save', fakeAsync(() => {
     const rows = [grant(100, 1), grant(200, 2), grant(300, 3)];
@@ -534,7 +619,7 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     expect(currentOrder).toEqual([[2, 'desc']]);
   }));
 
-  it('keeps the selected sort after the required Do Not Pay priority clear', fakeAsync(() => {
+  it('re-sorts after the required Do Not Pay priority clear', fakeAsync(() => {
     const rows = [grant(100, 1), grant(200, 2)];
     seedRows(rows);
     const detail = openEditor(rows[1]);
@@ -545,11 +630,11 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     flushMicrotasks();
 
     expect(funding.bulkUpdateListGrants.calls.mostRecent().args[0].fields.docPriority).toBeNull();
-    expect(order).not.toHaveBeenCalled();
-    expect(currentOrder).toEqual([[2, 'desc']]);
+    expect(order).toHaveBeenCalledTimes(1);
+    expect(currentOrder).toEqual([[1, 'asc'], [3, 'asc']]);
   }));
 
-  it('keeps the selected sort for a blank-to-ranked AUTO transition', fakeAsync(() => {
+  it('re-sorts for a blank-to-ranked AUTO transition', fakeAsync(() => {
     const rows = [grant(100, 1), grant(200, null, { docDecision: 'Do Not Pay' })];
     seedRows(rows);
     const defaults: FundingSubmissionDocPayDefaultsDto = {
@@ -565,6 +650,109 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     flushMicrotasks();
 
     expect(funding.bulkUpdateListGrants.calls.mostRecent().args[0].transitionIntents[0].priorityMode).toBe('AUTO');
+    expect(order).toHaveBeenCalledTimes(1);
+    expect(currentOrder).toEqual([[1, 'asc'], [3, 'asc']]);
+  }));
+
+  it('re-sorts when only a peer in the saved DOC changed priority and preserves another DOC', fakeAsync(() => {
+    const rows = [grant(100, 1), grant(200, 3), grant(300, 7, { doc: 'DCP' })];
+    seedRows(rows);
+    const detail = openEditor(rows[0]);
+    const peer = openEditor(rows[1]);
+    serverGrants[0].docNotes = 'Updated notes';
+    serverGrants[1].docPriority = 2;
+    detail.formModel.docNotes = 'Updated notes';
+    detail.onSave();
+    flushMicrotasks();
+    expect(peer.formModel.docPriority).toBe('2');
+    expect(rows[2].docPriority).toBe(7);
+    expect(currentOrder).toEqual([[1, 'asc'], [3, 'asc']]);
+  }));
+
+  for (const emptyDoc of [false, true]) {
+    it(`uses API-provided restoration options and append preview with empty DOC=${emptyDoc}`, () => {
+      const rows = emptyDoc
+        ? [grant(200, 99, { docDecision: 'Do Not Pay' })]
+        : [grant(100, 3), grant(200, 99, { docDecision: 'Do Not Pay' }),
+          grant(300, 99, { docDecision: 'Do Not Pay' })];
+      seedRows(rows);
+      const append = emptyDoc ? 1 : 2;
+      funding.getDocPriorityOptions.and.returnValue(of(emptyDoc ? [1] : [1, 2]));
+      funding.getDocPayDefaults.and.returnValue(of([{
+        applId: 200, transitionEligible: true, budgetCategories: 'R01', docNciSelection: 'DOC',
+        annualOrMyf: 'MYF', docPriority: String(append), docRecAmt: 90000, docRecReductionPct: 10
+      }]));
+      const detail = openEditor(rows.find(row => row.applId === 200));
+      expect(detail.formModel.docPriority).toBeNull();
+      detail.onUserSelectChange('docDecision', 'Pay');
+      expect(detail.docPriorityOptions.map(option => option.id)).toEqual(emptyDoc ? ['1'] : ['1', '2']);
+      expect(detail.formModel.docPriority).toBe(String(append));
+      expect(detail.docPriorityOptionsError).toBeNull();
+    });
+  }
+
+  for (const reason of [
+    { status: 409, code: 'DOC_PRIORITY_SEQUENCE_AMBIGUOUS', message: 'The DOC priorities are ambiguous.' },
+    { status: 400, code: 'DOC_PRIORITY_INVALID', message: 'The DOC priority is invalid.' },
+    { status: 400, code: 'DOC_PRIORITY_OUT_OF_RANGE', message: 'The DOC priority is out of range.' }
+  ]) {
+    it(`retains the safe ${reason.code} reason, including through conflict readback retry`, () => {
+      const rows = [grant(100, 1), grant(200, 2)];
+      seedRows(rows);
+      const detail = openEditor(rows[0]);
+      funding.bulkUpdateListGrants.and.returnValue(throwError(() => ({
+        status: reason.status, error: {
+          errorMessage: reason.message,
+          additionalData: { reasonCode: reason.code, correlationId: 'test-correlation' }
+        }
+      })));
+      funding.getListDetail.and.returnValue(throwError(() => ({ status: 500 })));
+      detail.onUserSelectChange('docPriority', '2');
+      detail.onSave();
+      expect(detail.fundingSaveError).toBe(reason.message);
+      if (reason.status === 409) {
+        expect(detail.fundingRefreshError).toContain('could not be refreshed');
+        funding.getListDetail.and.returnValue(of(listDetail()));
+        detail.refreshSavedFunding();
+        expect(detail.fundingSaveError).toBe(reason.message);
+        expect(detail.fundingRefreshError).toBeNull();
+      }
+      expect(funding.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      expect(detail.formModel.docPriority).toBe('2');
+    });
+  }
+
+  it('uses the generic refresh banner when a conflict has no safe reason', () => {
+    const rows = [grant(100, 1), grant(200, 2)];
+    seedRows(rows);
+    const detail = openEditor(rows[0]);
+    funding.bulkUpdateListGrants.and.returnValue(throwError(() => ({ status: 409 })));
+    detail.onUserSelectChange('docPriority', '2');
+    detail.onSave();
+    expect(detail.fundingSaveError).toBe('Server values were refreshed. Review your unsaved changes before saving.');
+  });
+
+  it('retains a supplied rejection message even without a reason code', () => {
+    const rows = [grant(100, 1), grant(200, 2)];
+    seedRows(rows);
+    const detail = openEditor(rows[0]);
+    funding.bulkUpdateListGrants.and.returnValue(throwError(() => ({
+      status: 409, error: { message: 'The submitted DOC priority is no longer available.' }
+    })));
+    detail.onUserSelectChange('docPriority', '2');
+    detail.onSave();
+    expect(detail.fundingSaveError).toBe('The submitted DOC priority is no longer available.');
+  });
+
+  it('preserves the selected sort when only another DOC changed priority', fakeAsync(() => {
+    const rows = [grant(100, 1), grant(200, 3, { doc: 'DCP' })];
+    seedRows(rows);
+    const detail = openEditor(rows[0]);
+    detail.formModel.docNotes = 'Updated notes';
+    serverGrants[0].docNotes = 'Updated notes';
+    serverGrants[1].docPriority = 2;
+    detail.onSave();
+    flushMicrotasks();
     expect(order).not.toHaveBeenCalled();
     expect(currentOrder).toEqual([[2, 'desc']]);
   }));

@@ -37,12 +37,6 @@
   padding: 0.45rem 0.9rem;
 }
 
-.tab-btn.active {
-  background: #0f82c0;
-  color: #fff;
-  border-color: #0f82c0;
-}
-
 .doc-filters {
   display: flex;
   flex-wrap: wrap;
@@ -74,6 +68,7 @@
   text-align: center;
 }
 
+.tab-btn.active,
 .doc-tile.active {
   background: #0f82c0;
   color: #fff;
@@ -89,6 +84,30 @@
 .doc-tile .name {
   font-weight: 600;
   margin-top: 0.25rem;
+}
+
+.grant-number-textarea {
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.grant-number-text-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.grant-number-validation-feedback {
+  width: auto;
+  margin-top: 0;
+}
+
+.grant-number-counter {
+  margin-left: auto;
+  text-align: right;
+  color: #6c757d;
 }
 
 .card {
@@ -147,26 +166,34 @@ tr.shown {
   border-collapse: separate !important;
 }
 
-::ng-deep .funding-lists-page table.dataTable thead th.dtfc-fixed-left,
-::ng-deep .funding-lists-page table.dataTable thead th.dtfc-fixed-right {
-  background-color: #fff;
-  z-index: 2;
+::ng-deep .funding-lists-page table.dataTable thead th {
+  &.dtfc-fixed-left,
+  &.dtfc-fixed-right {
+    background-color: #fff;
+    z-index: 2;
+  }
 }
 
-::ng-deep .funding-lists-page table.dataTable tbody td.dtfc-fixed-left,
-::ng-deep .funding-lists-page table.dataTable tbody td.dtfc-fixed-right {
-  background-color: #fff !important;
-  z-index: 2;
+::ng-deep .funding-lists-page table.dataTable tbody td {
+  &.dtfc-fixed-left,
+  &.dtfc-fixed-right {
+    background-color: #fff !important;
+    z-index: 2;
+  }
 }
 
-::ng-deep .funding-lists-page table.dataTable tbody tr.odd td.dtfc-fixed-left,
-::ng-deep .funding-lists-page table.dataTable tbody tr.odd td.dtfc-fixed-right {
-  background-color: #f9f9f9 !important;
+::ng-deep .funding-lists-page table.dataTable tbody tr.odd td {
+  &.dtfc-fixed-left,
+  &.dtfc-fixed-right {
+    background-color: #f9f9f9 !important;
+  }
 }
 
-::ng-deep .funding-lists-page table.dataTable tbody tr.shown td.dtfc-fixed-left,
-::ng-deep .funding-lists-page table.dataTable tbody tr.shown td.dtfc-fixed-right {
-  background-color: #eef3ff !important;
+::ng-deep .funding-lists-page table.dataTable tbody tr.shown td {
+  &.dtfc-fixed-left,
+  &.dtfc-fixed-right {
+    background-color: #eef3ff !important;
+  }
 }
 
 ::ng-deep .funding-lists-page table.dataTable thead th.dtfc-fixed-right,
