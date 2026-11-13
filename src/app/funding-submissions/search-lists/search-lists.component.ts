@@ -135,6 +135,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedNciTab: NciTabId = 'all';
   blockedGrantNumbers: string[] = [];
   private cachedGrants: FundingSubmissionListGrantDto[] = [];
+  private actualDocStatusCodes = new Map<number, string>();
   private listMetaSubscription: Subscription;
   private removalWriteSubscription: Subscription;
   private listMetaVersion = 0;
@@ -441,7 +442,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           componentRef.instance.listStatus = this.listStatus;
           componentRef.changeDetectorRef.detectChanges();
         });
-        this.docStatusColumns = this.buildDocStatusColumns(this.cachedGrants);
+        this.updateDocStatusCard(detail);
         this.listHistory = history;
         this.logger.debug('List detail:', detail);
         this.renderPriorityChanges(listId, detail.grants || [], true);
@@ -532,6 +533,36 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return !this.isNciDirector && (!this.docFundingListCor || this.assignedDocAbbrevs.length > 1);
   }
 
+  private updateDocStatusCard(detail: FundingSubmissionListDetailDto): void {
+    this.actualDocStatusCodes.clear();
+    for (const doc of detail.docs || []) {
+      const code = String(doc.currentStatusCode || '').trim().toUpperCase();
+      if (doc.nonId != null && code) {
+        this.actualDocStatusCodes.set(doc.nonId, code);
+      }
+    }
+    const incompleteDocs = new Set<number>();
+    for (const grant of detail.grants || []) {
+      if (this.isGrantInOefiaReview(grant) && this.isGrantDocDecisionPay(grant)
+        && !this.actualDocStatusCodes.has(grant.docNonId)) {
+        incompleteDocs.add(grant.docNonId);
+      }
+    }
+    if (incompleteDocs.size) {
+      this.logger.warn('Send by DOC disabled for grants without matching actual DOC status metadata', {
+        listId: this.listId, docNonIds: Array.from(incompleteDocs)
+      });
+    }
+    this.docStatusColumns = this.buildDocStatusColumns(detail.grants || []);
+    this.cdr.markForCheck();
+  }
+
+  private getDocReviewStatus(grant: FundingSubmissionListGrantDto): string {
+    return this.normalizeGrantReviewStatus(
+      this.actualDocStatusCodes.get(grant.docNonId) || grant.reviewStatusCode || grant.reviewStatus
+    );
+  }
+
   private buildDocStatusColumns(grants: FundingSubmissionListGrantDto[]): any[][] {
     const assignedDocs = this.docFundingListCor ? new Set(this.assignedDocAbbrevs) : null;
     const docMap = new Map<string, { doc: string; count: number; statusRank: number }>();
@@ -540,7 +571,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (assignedDocs && !assignedDocs.has(doc.trim().toUpperCase())) {
         continue;
       }
-      const status = this.normalizeGrantReviewStatus((g as any).reviewStatus);
+      const status = this.getDocReviewStatus(g);
       const statusRank = this.getReviewStatusRank(status);
       if (!docMap.has(doc)) docMap.set(doc, { doc, count: 0, statusRank });
       const entry = docMap.get(doc);
@@ -575,8 +606,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       return String(totalCount);
     }
 
-    // FS-2712: only Pay grants are sent to the NCI Director, so Do Not Pay grants are excluded
-    // from the sent count even though they carry the DOC-level NCI Director Review status.
+    // FS-2712: the card uses the actual DOC stage, but only Pay grants projected in
+    // NCI Director Review count as sent; non-Pay grants remain in OEFIA Review.
     const directorReviewCount = (grants || []).filter(grant => {
       const sameDoc = String(grant?.doc || '').trim() === doc;
       return sameDoc
@@ -587,12 +618,12 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return `${directorReviewCount}/${totalCount}`;
   }
 
-  // Computes the overall current review status from all grants using precedence:
+  // Computes the overall actual DOC review status for the displayed grants using precedence:
   // NCI Director Review > OEFIA Review > DOC Review > Draft.
   private getCurrentReviewStatus(grants: FundingSubmissionListGrantDto[]): string {
     let highestStatusRank = 0;
     for (const grant of grants || []) {
-      const status = this.normalizeGrantReviewStatus((grant as any).reviewStatus);
+      const status = this.getDocReviewStatus(grant);
       highestStatusRank = Math.max(highestStatusRank, this.getReviewStatusRank(status));
     }
     return this.getReviewStatusByRank(highestStatusRank);
@@ -1296,6 +1327,14 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
         componentRef.changeDetectorRef.detectChanges();
       }
     });
+    if (savedApplId != null) {
+      if (this.listMetaSubscription && !this.listMetaSubscription.closed) {
+        this.deferredListMetaRefresh = true;
+      }
+      this.cancelListMeta();
+      // Reconcile before a later justification operation can fail without emitting `saved`.
+      this.updateDocStatusCard(detail);
+    }
     if (order) this.pendingPriorityOrder = order;
     this.renderPriorityChanges(listId, detail.grants, false);
   }
@@ -1823,7 +1862,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private isSendByDocEligibleGrant(grant: FundingSubmissionListGrantDto | any): boolean {
-    return this.isGrantInOefiaReview(grant) && this.isGrantDocDecisionPay(grant);
+    return this.actualDocStatusCodes.get(grant?.docNonId) === 'OEFIAREVIEW'
+      && this.isGrantInOefiaReview(grant) && this.isGrantDocDecisionPay(grant);
   }
 
   private isGrantInOefiaReview(grant: FundingSubmissionListGrantDto | any): boolean {

@@ -172,7 +172,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       providers: [
         { provide: ActivatedRoute, useValue: { queryParams: of({}) } },
         { provide: Router, useValue: routerSpy },
-        { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
+        { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']) },
         { provide: LoaderService, useValue: loaderServiceSpy },
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
@@ -2158,6 +2158,101 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
         expect(item.countDisplay).toBe('2/3');
         expect((component as any).isGrantDocDecisionPay).toHaveBeenCalledTimes(3);
+      });
+
+      it('keeps the actual Director DOC stage and 0/n when all remaining grants are projected OEFIA', () => {
+        const grants = [1, 2].map(applId => ({
+          applId, doc: 'DCB', docNonId: 111, reviewStatusCode: 'OEFIAREVIEW',
+          reviewStatus: 'Under OEFIA Review', docDecision: 'Do Not Pay'
+        }));
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+          grants,
+          docs: [
+            { nonId: 222, docAbbrev: 'DCB', currentStatusCode: 'DOCREVIEW' },
+            { nonId: 111, docAbbrev: 'Other label', currentStatusCode: 'DIRECTORREVIEW' }
+          ]
+        }));
+
+        (component as any).loadListMeta();
+
+        expect(component.docStatusColumns[0][0]).toEqual(jasmine.objectContaining({
+          doc: 'DCB', status: 'NCI Director Review', count: 2, countDisplay: '0/2'
+        }));
+        expect(component.currentReviewStatus).toBe('NCI Director Review');
+        expect(component.isDocStageReadOnly(grants[0])).toBeFalse();
+        component.docFundingListCor = true;
+        (TestBed.inject(AppUserSessionService).getDocFundingSubmissionCoordinatorDocAbbrevs as jasmine.Spy)
+          .and.returnValue(['DCB']);
+        expect(component.isDocStageReadOnly(grants[0])).toBeTrue();
+        expect((component as any).buildDocStatusColumns(grants)[0][0].countDisplay).toBe('2');
+      });
+
+      it('excludes a projected OEFIA Pay alias in an already-sent DOC from Send by DOC', () => {
+        (component as any).docDecisionDisplayMap.set('P', 'Pay');
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+          grants: [
+            { applId: 1, doc: 'DCB', docNonId: 111, reviewStatusCode: 'OEFIAREVIEW', docDecision: 'P' },
+            { applId: 2, doc: 'DCP', docNonId: 222, reviewStatusCode: 'OEFIAREVIEW', docDecision: 'P' }
+          ],
+          docs: [
+            { nonId: 111, currentStatusCode: 'DIRECTORREVIEW' },
+            { nonId: 222, currentStatusCode: 'OEFIAREVIEW', currentStatusDescrip: 'Under Review' }
+          ]
+        }));
+
+        (component as any).loadListMeta();
+        component.onSendGrantsByDocClick();
+
+        expect(component.hasSendByDocEligibleGrants).toBeTrue();
+        expect(component.sendByDocDocs).toEqual([
+          { doc: 'DCP', count: 1, selected: true, docNonIds: [222] }
+        ]);
+      });
+
+      for (const docs of [undefined, [], [{ nonId: 222, currentStatusCode: 'OEFIAREVIEW' }],
+        [{ nonId: 111, currentStatusCode: null }]]) {
+        it(`excludes and logs Pay aliases with incomplete actual DOC metadata: ${JSON.stringify(docs)}`, () => {
+          (component as any).docDecisionDisplayMap.set('P', 'Pay');
+          fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+            grants: [{ applId: 1, doc: 'DCB', docNonId: 111, reviewStatusCode: 'OEFIAREVIEW', docDecision: 'P' }],
+            docs
+          }));
+
+          (component as any).loadListMeta();
+          component.onSendGrantsByDocClick();
+
+          expect(component.hasSendByDocEligibleGrants).toBeFalse();
+          expect(component.sendByDocDocs).toEqual([]);
+          expect(TestBed.inject(NGXLogger).warn).toHaveBeenCalledWith(
+            'Send by DOC disabled for grants without matching actual DOC status metadata',
+            { listId: component.listId, docNonIds: [111] }
+          );
+        });
+      }
+
+      it('rejects older same-list metadata after a funding readback and retains the deferred refresh', () => {
+        component.listId = 42;
+        const grants = [1, 2, 3, 4, 5, 6, 7].map(applId => ({
+          applId, doc: 'DCB', docNonId: 111, docPriority: applId,
+          docDecision: applId <= 2 ? 'Pay' : 'Do Not Pay',
+          reviewStatus: applId <= 2 ? 'Under NCI Director Review' : 'Under OEFIA Review'
+        }));
+        const detail = { grants, docs: [{ nonId: 111, currentStatusCode: 'DIRECTORREVIEW' }] };
+        (component as any).cachedGrants = grants.map(grant => ({ ...grant }));
+        const olderResponse = new Subject<any>();
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValues(olderResponse, of(detail));
+        (component as any).loadListMeta();
+
+        (component as any).priorityCoordinator.applyReadback(42, 2, detail, false);
+        olderResponse.next({ grants: [], docs: [] });
+        olderResponse.complete();
+
+        expect(olderResponse.observers.length).toBe(0);
+        expect(component.docStatusColumns[0][0].countDisplay).toBe('2/7');
+        expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(1);
+        (component as any).priorityCoordinator.finishWrite(42, 2);
+        expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(2);
+        expect(component.docStatusColumns[0][0].countDisplay).toBe('2/7');
       });
     });
 

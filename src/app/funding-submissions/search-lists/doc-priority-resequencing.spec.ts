@@ -34,6 +34,7 @@ interface FundingServiceStub {
   getListStatusHistory(listId: number): Observable<FundingSubmListStatusHistoryDto[]>;
   bulkUpdateListGrants(body: FundingSubmissionBulkEditRequestDto, listId: number): Observable<number>;
   removeGrantsFromList(listId: number, applIds: number[]): Observable<FundingSubmissionRemoveGrantsFromListResultDto>;
+  saveJustificationForm(...args: unknown[]): Observable<unknown>;
 }
 
 describe('FS-2516 same-page DOC Priority resequencing', () => {
@@ -42,6 +43,7 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
   let funding: jasmine.SpyObj<FundingServiceStub>;
   let storage: MemoryStorage;
   let serverGrants: FundingSubmissionListGrantDto[];
+  let serverDocs: FundingSubmissionListDetailDto['docs'];
   let detailFixtures: ComponentFixture<GrantDetailComponent>[];
   let order: jasmine.Spy;
   let currentOrder: Array<Array<string | number>>;
@@ -57,7 +59,7 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
   }
 
   function listDetail(): FundingSubmissionListDetailDto {
-    return { grants: serverGrants.map(row => ({ ...row })), currentStatusDescrip: 'DOC Review' };
+    return { grants: serverGrants.map(row => ({ ...row })), docs: serverDocs, currentStatusDescrip: 'DOC Review' };
   }
 
   function openEditor(row: FundingSubmissionListGrantDto): GrantDetailComponent {
@@ -90,10 +92,12 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
 
   beforeEach(async () => {
     detailFixtures = [];
+    serverDocs = undefined;
     storage = new MemoryStorage();
     funding = jasmine.createSpyObj('FundingSubmissionsService', [
       'getJustification', 'getDocPriorityOptions', 'getDocPayDefaults', 'getListDetail',
-      'getListStatusHistory', 'bulkUpdateListGrants', 'removeGrantsFromList', 'getBudgetCategoryOptions'
+      'getListStatusHistory', 'bulkUpdateListGrants', 'removeGrantsFromList', 'getBudgetCategoryOptions',
+      'saveJustificationForm'
     ]);
     funding.getBudgetCategoryOptions.and.returnValue(of([{ code: 'R01R37', name: 'R01/R37' }]));
     funding.getJustification.and.returnValue(of({ justificationText: '' }));
@@ -133,7 +137,7 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
         { provide: DocumentService, useValue: jasmine.createSpyObj('DocumentService', ['downloadById']) },
         { provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['post']) },
         { provide: NgbModal, useValue: jasmine.createSpyObj('NgbModal', ['open']) },
-        { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error']) },
+        { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']) },
         { provide: FUNDING_WRITE_RECOVERY_STORAGE, useValue: storage }
       ]
     }).compileComponents();
@@ -163,6 +167,87 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     pageFixture.destroy();
     detailFixtures.forEach(fixture => fixture.destroy());
   });
+
+  for (const outcome of ['saved', 'justification failure', 'justification refresh failure', 'recovery']) {
+    it(`refreshes the FS-2712 card from 1/7 to 2/7 on ${outcome} without a card-only request`, fakeAsync(() => {
+      (TestBed.inject(AppUserSessionService).hasRole as jasmine.Spy)
+        .and.callFake(role => role === roleNames.OEFIA_CERTIFIER);
+      const rows = Array.from({ length: 7 }, (_, index) => grant(100 + index, index + 1, {
+        docNonId: 111, docDecision: index === 0 ? 'Pay' : 'Do Not Pay',
+        reviewStatusCode: index === 0 ? 'DIRECTORREVIEW' : 'OEFIAREVIEW',
+        reviewStatus: index === 0 ? 'Under NCI Director Review' : 'Under OEFIA Review'
+      }));
+      seedRows(rows);
+      serverDocs = [{ nonId: 111, currentStatusCode: 'DIRECTORREVIEW' }];
+      (page as any).updateDocStatusCard(listDetail());
+      const peer = openEditor(rows[2]);
+      const editor = openEditor(rows[1]);
+      const saved = jasmine.createSpy('saved');
+      editor.saved.subscribe(saved);
+      const destroy = spyOn(detailFixtures[1], 'destroy').and.callThrough();
+      peer.formModel.docNotes = 'Unsaved peer notes';
+      peer.onNotesModelChange('docNotes');
+      peer.formModel.docDecision = 'Pay';
+      funding.getDocPayDefaults.and.returnValue(of([{
+        applId: 101, transitionEligible: true, budgetCategories: 'R01R37', docNciSelection: 'DOC',
+        annualFundingR01: 'No', annualOrMyf: 'MYF', docPriority: '2', docRecAmt: 90000,
+        docRecReductionPct: 10
+      }]));
+      editor.onUserSelectChange('docDecision', 'Pay');
+      if (outcome.startsWith('justification')) {
+        editor.formModel.justificationText = 'Pending justification';
+        funding.saveJustificationForm.and.returnValue(outcome === 'justification failure'
+          ? throwError(() => ({ status: 500 })) : of({}));
+        if (outcome === 'justification refresh failure') {
+          funding.getJustification.and.returnValue(throwError(() => ({ status: 500 })));
+        }
+      }
+      if (outcome === 'recovery') {
+        funding.bulkUpdateListGrants.and.returnValue(throwError(() => ({ status: 500 })));
+      }
+      const response = new Subject<FundingSubmissionListDetailDto>();
+      funding.getListDetail.and.returnValue(response);
+
+      expect(page.docStatusColumns[0][0].countDisplay).toBe('1/7');
+      editor.onSave();
+      expect(page.docStatusColumns[0][0].countDisplay).toBe('1/7');
+      if (outcome === 'saved') {
+        editor.formModel.docNotes = 'Newer unsaved notes';
+        editor.onNotesModelChange('docNotes');
+      }
+      if (outcome === 'recovery') {
+        editor.unknownOutcomeConfirmed = true;
+        editor.recoverUnknownFunding();
+      }
+      serverGrants[1] = {
+        ...serverGrants[1], docDecision: 'Pay',
+        reviewStatusCode: 'DIRECTORREVIEW', reviewStatus: 'Under NCI Director Review'
+      };
+      response.next(listDetail());
+      flushMicrotasks();
+
+      expect(page.docStatusColumns[0][0].countDisplay).toBe('2/7');
+      expect(editor.data.reviewStatusCode).toBe('DIRECTORREVIEW');
+      expect(peer.formModel.docNotes).toBe('Unsaved peer notes');
+      expect(peer.formModel.docDecision).toBe('Pay');
+      expect(peer.isEditMode).toBeTrue();
+      expect(destroy).not.toHaveBeenCalled();
+      expect((page as any).detailComponentsByApplId.has(101)).toBeTrue();
+      expect(funding.getListDetail).toHaveBeenCalledTimes(1);
+      expect(funding.getListStatusHistory).not.toHaveBeenCalled();
+      expect(funding.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      if (outcome === 'saved') {
+        expect(editor.formModel.docNotes).toBe('Newer unsaved notes');
+        expect(editor.isEditMode).toBeTrue();
+      }
+      if (outcome.startsWith('justification')) {
+        expect(editor.justificationSaveError).toBeTruthy();
+        expect(editor.saveSuccessMessage).toBeFalsy();
+        expect(editor.isEditMode).toBeTrue();
+        expect(saved).not.toHaveBeenCalled();
+      }
+    }));
+  }
 
   it('rebases an untouched open priority and baseline while preserving notes and the later full-overwrite save', fakeAsync(() => {
     const rows = [grant(100, 1), grant(200, 2), grant(300, 3)];

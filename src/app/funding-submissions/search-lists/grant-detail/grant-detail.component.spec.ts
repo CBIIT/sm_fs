@@ -20,6 +20,7 @@ import { UserSelect2ChangeDirective } from '../../user-select2-change.directive'
 import { FUNDING_WRITE_RECOVERY_STORAGE, FundingWriteRecoveryService } from '../../funding-write-recovery.service';
 import { MemoryStorage } from '../../testing/memory-storage';
 import { installSelect2 } from '../../testing/install-select2';
+import { DetailPriorityCoordinator } from '../detail-priority-coordinator';
 
 @Component({
   template: '<app-grant-detail [data]="grant" [listId]="listId"></app-grant-detail>'
@@ -1149,6 +1150,39 @@ describe('GrantDetailComponent', () => {
         expect(alert.textContent).not.toContain('Technical Support');
         expect(alert.querySelector('a')).toBeNull();
       });
+    });
+
+    it('reconciles the authoritative funding status before a later justification failure without emitting saved', () => {
+      choosePay();
+      defaultsResponse.next([resolvedDefaults]);
+      const readback: FundingSubmissionListDetailDto = {
+        grants: [persistedGrant({
+          reviewStatusCode: 'DIRECTORREVIEW', reviewStatus: 'Under NCI Director Review'
+        })],
+        docs: [{ nonId: 111, currentStatusCode: 'DIRECTORREVIEW' }]
+      };
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of(readback));
+      const operations: string[] = [];
+      fundingSubmissionsServiceSpy.saveJustificationForm.and.callFake(() => {
+        operations.push('justification');
+        return throwError(() => ({ status: 500 }));
+      });
+      const reconcile = jasmine.createSpy('reconcile').and.callFake(() => operations.push('funding'));
+      component.priorityCoordinator = new DetailPriorityCoordinator(reconcile, () => {});
+      component.formModel.justificationText = 'Pending justification';
+      const saved = jasmine.createSpy('saved');
+      component.saved.subscribe(saved);
+
+      component.onSave();
+
+      expect(reconcile).toHaveBeenCalledWith(1, 100, readback, true);
+      expect(operations).toEqual(['funding', 'justification']);
+      expect(component.data.reviewStatusCode).toBe('DIRECTORREVIEW');
+      expect(component.justificationSaveError).toBeTruthy();
+      expect(component.saveSuccessMessage).toBeFalsy();
+      expect(component.isEditMode).toBeTrue();
+      expect(saved).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledTimes(1);
     });
 
     it('refreshes a stale transition conflict without retrying its rejected write', () => {
