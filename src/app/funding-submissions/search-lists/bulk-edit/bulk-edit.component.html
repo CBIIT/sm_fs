@@ -197,7 +197,7 @@
             <ng-select2 appUserSelect2Change [id]="'bcat-' + data.applId" [ngModel]="data.budgetCategories"
               (appUserSelect2Change)="onUserRowSelectChange(data, 'budgetCategories', $event)"
               [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="getBudgetCategoryOptionsForRow(data)"
-              [allowClear]="true" width="100%">
+              width="100%">
             </ng-select2>
             <div *ngIf="getBudgetCategoryStatus(data) === 'loading'" class="small">Loading Budget Categories…</div>
             <div *ngIf="getBudgetCategoryStatus(data) === 'error'" class="text-danger small">
@@ -230,7 +230,7 @@
           <div class="field-with-inline-error">
             <ng-select2 appUserSelect2Change [id]="'dnci-' + data.applId" [ngModel]="data.docNciSelection"
               (appUserSelect2Change)="onUserRowSelectChange(data, 'docNciSelection', $event)"
-              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" [allowClear]="true" width="100%">
+              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="docNciOptions" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'docNciSelection')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('DOC/NCI Selection') }}
@@ -242,7 +242,7 @@
           <div class="field-with-inline-error">
             <ng-select2 appUserSelect2Change [id]="'ar01-' + data.applId" [ngModel]="data.annualFundingR01"
               (appUserSelect2Change)="onUserRowSelectChange(data, 'annualFundingR01', $event)"
-              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" [allowClear]="true" width="100%">
+              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'annualFundingR01')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('Two-Year Annual Funding R01 (HRHR)') }}
@@ -254,7 +254,7 @@
           <div class="field-with-inline-error">
             <ng-select2 appUserSelect2Change [id]="'amyf-' + data.applId" [ngModel]="data.annualOrMyf"
               (appUserSelect2Change)="onUserRowSelectChange(data, 'annualOrMyf', $event)"
-              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" [allowClear]="true" width="100%">
+              [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="annualMyfOptions" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'annualOrMyf')" class="text-danger small validation-inline-error">
               {{ getMandatoryFieldErrorMessage('Annual or MYF') }}
