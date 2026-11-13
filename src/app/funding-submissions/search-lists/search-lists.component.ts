@@ -543,13 +543,12 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const incompleteDocs = new Set<number>();
     for (const grant of detail.grants || []) {
-      if (this.isGrantInOefiaReview(grant) && this.isGrantDocDecisionPay(grant)
-        && !this.actualDocStatusCodes.has(grant.docNonId)) {
+      if (!this.actualDocStatusCodes.has(grant.docNonId)) {
         incompleteDocs.add(grant.docNonId);
       }
     }
     if (incompleteDocs.size) {
-      this.logger.warn('Send by DOC disabled for grants without matching actual DOC status metadata', {
+      this.logger.warn('Review Status stage and Send by DOC withheld for grants without matching actual DOC status metadata', {
         listId: this.listId, docNonIds: Array.from(incompleteDocs)
       });
     }
@@ -557,38 +556,44 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  private getDocReviewStatus(grant: FundingSubmissionListGrantDto): string {
-    return this.normalizeGrantReviewStatus(
-      this.actualDocStatusCodes.get(grant.docNonId) || grant.reviewStatusCode || grant.reviewStatus
-    );
+  // FS-2712: the DOC stage comes only from actual docs[].currentStatusCode; projected grant
+  // statuses are never used to infer it. Returns null when the DOC's status metadata is unknown.
+  private getDocReviewStatus(grant: FundingSubmissionListGrantDto): string | null {
+    const code = this.actualDocStatusCodes.get(grant?.docNonId);
+    return code ? this.normalizeGrantReviewStatus(code) : null;
   }
 
   private buildDocStatusColumns(grants: FundingSubmissionListGrantDto[]): any[][] {
     const assignedDocs = this.docFundingListCor ? new Set(this.assignedDocAbbrevs) : null;
-    const docMap = new Map<string, { doc: string; count: number; statusRank: number }>();
+    const docMap = new Map<string, { doc: string; count: number; statusRank: number; statusKnown: boolean }>();
     for (const g of grants) {
       const doc = g.doc || '';
       if (assignedDocs && !assignedDocs.has(doc.trim().toUpperCase())) {
         continue;
       }
       const status = this.getDocReviewStatus(g);
-      const statusRank = this.getReviewStatusRank(status);
-      if (!docMap.has(doc)) docMap.set(doc, { doc, count: 0, statusRank });
+      const statusRank = status ? this.getReviewStatusRank(status) : 0;
+      if (!docMap.has(doc)) docMap.set(doc, { doc, count: 0, statusRank, statusKnown: true });
       const entry = docMap.get(doc);
       entry.count++;
       entry.statusRank = Math.max(entry.statusRank, statusRank);
+      entry.statusKnown = entry.statusKnown && status != null;
     }
-    const items = Array.from(docMap.values()).map(e => ({
-      doc: e.doc,
-      count: e.count,
-      status: this.getReviewStatusByRank(e.statusRank),
-      countDisplay: this.docFundingListCor
-        ? String(e.count)
-        : this.getDocStatusCountDisplay(e.doc, e.count, this.getReviewStatusByRank(e.statusRank), grants)
-    })).sort((left, right) => left.doc.localeCompare(right.doc));
+    const items = Array.from(docMap.values()).map(e => {
+      const status = e.statusKnown ? this.getReviewStatusByRank(e.statusRank) : '';
+      return {
+        doc: e.doc,
+        count: e.count,
+        status,
+        countDisplay: this.docFundingListCor
+          ? String(e.count)
+          : this.getDocStatusCountDisplay(e.doc, e.count, status, grants)
+      };
+    }).sort((left, right) => left.doc.localeCompare(right.doc));
     const currentReviewStatus = this.getCurrentReviewStatus(grants);
     this.currentReviewStatus = currentReviewStatus;
-    this.isCurrentStatusDraft = currentReviewStatus === 'Draft';
+    this.isCurrentStatusDraft = currentReviewStatus === 'Draft'
+      && (grants || []).every(grant => this.getDocReviewStatus(grant) != null);
     const columns: any[][] = [];
     for (let i = 0; i < items.length; i += 4) {
       columns.push(items.slice(i, i + 4));
@@ -624,7 +629,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     let highestStatusRank = 0;
     for (const grant of grants || []) {
       const status = this.getDocReviewStatus(grant);
-      highestStatusRank = Math.max(highestStatusRank, this.getReviewStatusRank(status));
+      if (status) {
+        highestStatusRank = Math.max(highestStatusRank, this.getReviewStatusRank(status));
+      }
     }
     return this.getReviewStatusByRank(highestStatusRank);
   }
