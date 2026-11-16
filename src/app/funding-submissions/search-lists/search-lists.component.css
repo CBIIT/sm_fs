@@ -40,7 +40,7 @@
 }
 
 .doc-count {
-  width: 50px;
+  width: 100px;
   text-align: left;
   flex-shrink: 0;
 }
@@ -103,12 +103,18 @@ tr.shown {
   padding: 8px 0;
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: 70px 50px minmax(0, 1fr);
+  grid-template-columns: 70px 60px minmax(0, 1fr);
   align-items: center;
   text-align: left;
   border-color: #d9d9d9 !important;
   font-family: Arial, sans-serif;
   font-size: 14px;
+}
+
+@media (min-width: 1600px) {
+  .doc-row {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 }
 
 .doc-name {
