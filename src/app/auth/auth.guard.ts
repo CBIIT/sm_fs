@@ -23,7 +23,7 @@ export class AuthGuard  {
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-      if (this.userSessionService.hasRole('I2E_USER')) {
+      if (this.userSessionService.hasAuthority('I2E_USER')) {
         this.logger.info(`Session active for user ${this.userSessionService.getLoggedOnUser()?.nihNetworkId}`);
         this.requestModel?.reset();
         this.requestModel?.programRecommendedCostsModel?.deepReset(false);

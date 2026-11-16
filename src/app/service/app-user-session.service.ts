@@ -152,4 +152,11 @@ export class AppUserSessionService {
     return this.roles.indexOf(role) > -1;
   }
 
+  hasAuthority(authority: string): boolean {
+    if ('Y'===this.loggedOnUser?.activeFlag) {
+      return this.hasRole(authority);
+    }
+    return false; 
+  }
+
 }
