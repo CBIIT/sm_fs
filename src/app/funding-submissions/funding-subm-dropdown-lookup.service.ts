@@ -30,7 +30,7 @@ export function mapLookupOptions(rows: Array<{ code?: string; name?: string }>):
  * `FundingSubmissionsServiceImpl`). {@code getDocDecisions()} and
  * {@code getAnnualFundingR01Options()} remain mock/placeholder data
  * ({@code FundingSubmDropdownLookupConstants} in `sm_i2e_fs_ws`) because no corresponding lookup
- * table exists in the schema for DOC Decision or Two-Year Annual Funding R01 — this is a schema
+ * table exists in the schema for DOC Decision or 2Yr R01 — this is a schema
  * gap, not an oversight. Once the generated client covers these endpoints, this service can be
  * removed in favor of `FundingSubmissionsService`.</p>
  */

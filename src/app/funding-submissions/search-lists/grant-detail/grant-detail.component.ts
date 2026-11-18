@@ -234,7 +234,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     });
     this.dropdownLookupService.getAnnualFundingR01Options().subscribe({
       next: options => { this.yesNoOptions = options; this.cdr.detectChanges(); },
-      error: err => this.logger.error('Failed to load Two-Year Annual Funding R01 options', err)
+      error: err => this.logger.error('Failed to load 2Yr R01 options', err)
     });
     this.dropdownLookupService.getAnnualOrMyfOptions().subscribe({
       next: options => { this.annualMyfOptions = options; this.cdr.detectChanges(); },
@@ -1052,7 +1052,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     const requiredFields = {
       budgetCategories: 'Budget Categories',
       docNciSelection: 'DOC/NCI Selection',
-      annualFundingR01: 'Two-Year Annual Funding R01 (HRHR)',
+      annualFundingR01: '2Yr R01',
       annualOrMyf: 'Annual or MYF'
     };
     for (const field of Object.keys(requiredFields)) {

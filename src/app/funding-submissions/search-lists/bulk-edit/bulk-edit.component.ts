@@ -267,7 +267,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.dropdownLookupService.getAnnualFundingR01Options().subscribe({
       next: options => this.yesNoOptions = options,
-      error: err => this.logger.error('Failed to load Two-Year Annual Funding R01 options', err)
+      error: err => this.logger.error('Failed to load 2Yr R01 options', err)
     });
     this.dropdownLookupService.getAnnualOrMyfOptions().subscribe({
       next: options => this.annualMyfOptions = options,
@@ -318,7 +318,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
         ngTemplateRef: { ref: this.docNciSelRenderer }
       }, // 4
       {
-        title: 'Two-Year Annual Funding R01 (HRHR)',
+        title: '2Yr R01',
         data: 'annualFundingR01',
         width: '100px',
         defaultContent: '',

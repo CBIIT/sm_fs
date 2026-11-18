@@ -1524,8 +1524,8 @@ describe('BulkEditComponent', () => {
       component.onSave();
 
       expect(component.hasMandatoryFieldError(component.rows[0], 'annualFundingR01')).toBeTrue();
-      expect(component.getMandatoryFieldErrorMessage('Two-Year Annual Funding R01 (HRHR)'))
-        .toBe('Two-Year Annual Funding R01 (HRHR) is required');
+      expect(component.getMandatoryFieldErrorMessage('2Yr R01'))
+        .toBe('2Yr R01 is required');
       expect(component.canSave).toBeTrue();
       expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
 
@@ -1541,7 +1541,7 @@ describe('BulkEditComponent', () => {
       { key: 'docNciSelection', label: 'DOC/NCI Selection', makeBlank: (row: any) => row.docNciSelection = ' ' },
       {
         key: 'annualFundingR01',
-        label: 'Two-Year Annual Funding R01 (HRHR)',
+        label: '2Yr R01',
         makeBlank: (row: any) => row.annualFundingR01 = null
       },
       { key: 'annualOrMyf', label: 'Annual or MYF', makeBlank: (row: any) => row.annualOrMyf = '  ' }
@@ -1596,7 +1596,7 @@ describe('BulkEditComponent', () => {
         ['budgetCategories', 'Budget Categories'],
         ['docDecision', 'DOC Decision'],
         ['docNciSelection', 'DOC/NCI Selection'],
-        ['annualFundingR01', 'Two-Year Annual Funding R01 (HRHR)'],
+        ['annualFundingR01', '2Yr R01'],
         ['annualOrMyf', 'Annual or MYF']
       ].forEach(([field, label]) => {
         expect(component.hasMandatoryFieldError(row, field)).toBeTrue();

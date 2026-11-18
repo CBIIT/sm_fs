@@ -457,7 +457,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     beforeEach(() => {
       component.ngAfterViewInit();
       const column = ((component as any).dtOptions.columns as any[])
-        .find(candidate => candidate.title === 'Two-Year Annual Funding R01 (HRHR)?');
+        .find(candidate => candidate.title === '2Yr R01');
       expect(column.data).toBe('twoYearAnnualFundingR01Flag');
       render = column.render;
     });

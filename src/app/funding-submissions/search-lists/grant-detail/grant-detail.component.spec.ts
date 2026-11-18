@@ -214,7 +214,7 @@ describe('FS-2251 standalone real Select2 rendering', () => {
     expect(detail.formModel.justificationText).toBe('');
     expect(detail.hasSaveValidationErrors).toBeTrue();
     expect(detail.saveValidationErrors.annualFundingR01).toBeUndefined();
-    expect(host.textContent).not.toContain('Two-Year Annual Funding R01 (HRHR) is required');
+    expect(host.textContent).not.toContain('2Yr R01 is required');
     expect(save.disabled).toBeTrue();
 
     choose('annualFundingR01', 'Yes');
@@ -230,15 +230,15 @@ describe('FS-2251 standalone real Select2 rendering', () => {
     clear('annualFundingR01');
     flushMicrotasks();
     expect(detail.formModel.annualFundingR01).toBeNull();
-    expect(detail.saveValidationErrors.annualFundingR01).toBe('Two-Year Annual Funding R01 (HRHR) is required');
-    expect(host.textContent).toContain('Two-Year Annual Funding R01 (HRHR) is required');
+    expect(detail.saveValidationErrors.annualFundingR01).toBe('2Yr R01 is required');
+    expect(host.textContent).toContain('2Yr R01 is required');
     expect(save.disabled).toBeTrue();
 
     choose('annualFundingR01', 'Yes');
     flushMicrotasks();
     expect(detail.formModel.annualFundingR01).toBe('Yes');
     expect(detail.saveValidationErrors.annualFundingR01).toBeUndefined();
-    expect(host.textContent).not.toContain('Two-Year Annual Funding R01 (HRHR) is required');
+    expect(host.textContent).not.toContain('2Yr R01 is required');
     expect(save.disabled).toBeFalse();
     expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
     expect(funding.saveJustificationForm).not.toHaveBeenCalled();
@@ -533,7 +533,7 @@ describe('FS-2251 standalone real Select2 rendering', () => {
 
     expect(detail.docPayDefaultsLoading).toBeFalse();
     expect(detail.formModel.annualFundingR01).toBeNull();
-    expect(detail.saveValidationErrors.annualFundingR01).toBe('Two-Year Annual Funding R01 (HRHR) is required');
+    expect(detail.saveValidationErrors.annualFundingR01).toBe('2Yr R01 is required');
     expect(saveButton().disabled).toBeTrue();
     expect(userEvents.calls.allArgs()).toEqual([
       ['annualFundingR01', 'Yes'], ['annualFundingR01', null]
@@ -799,10 +799,10 @@ describe('GrantDetailComponent', () => {
         }]);
         expect(component.formModel.annualFundingR01).toBeNull();
         fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(throwError(() => ({
-          status: 400, error: { errorMessage: 'Two-Year Annual Funding R01 (HRHR) is required.' }
+          status: 400, error: { errorMessage: '2Yr R01 is required.' }
         })));
         component.onSave();
-        expect(component.saveValidationErrors.annualFundingR01).toBe('Two-Year Annual Funding R01 (HRHR) is required');
+        expect(component.saveValidationErrors.annualFundingR01).toBe('2Yr R01 is required');
         expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
         expect(component.isEditMode).toBeTrue();
         expect(component.saveSuccessMessage).toBe('');
@@ -1653,7 +1653,7 @@ describe('GrantDetailComponent', () => {
 
         const element: HTMLElement = fixture.nativeElement;
         const label = Array.from(element.querySelectorAll('td.grid-label'))
-          .find(cell => cell.textContent.trim() === '2Y Annual Fnd R01:');
+          .find(cell => cell.textContent.trim() === '2Yr R01:');
         expect(label).toBeDefined();
         expect(label.nextElementSibling.textContent.trim()).toBe(expected);
       });
@@ -2791,7 +2791,7 @@ describe('GrantDetailComponent', () => {
       expect(component.isEditMode).toBeFalse();
       const element: HTMLElement = fixture.nativeElement;
       const label = Array.from(element.querySelectorAll('td.grid-label'))
-        .find(cell => cell.textContent.trim() === '2Y Annual Fnd R01:');
+        .find(cell => cell.textContent.trim() === '2Yr R01:');
       expect(label.nextElementSibling.textContent.trim()).toBe('No');
 
       component.onEdit();
@@ -2818,7 +2818,7 @@ describe('GrantDetailComponent', () => {
         annualOrMyf: 'MYF',
         docNotes: ''
       };
-      const message = 'Two-Year Annual Funding R01 (HRHR) is required.';
+      const message = '2Yr R01 is required.';
       fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(throwError(() => ({
         status: 400,
         error: { errorMessage: message }
@@ -2834,7 +2834,7 @@ describe('GrantDetailComponent', () => {
       expect(component.data.twoYearAnnualFundingR01Flag).toBeFalse();
       expect(component.isEditMode).toBeTrue();
       expect(component.formModel.annualFundingR01).toBeNull();
-      expect(component.saveValidationErrors.annualFundingR01).toBe('Two-Year Annual Funding R01 (HRHR) is required');
+      expect(component.saveValidationErrors.annualFundingR01).toBe('2Yr R01 is required');
       expect(component.saveSuccessMessage).toBe('');
       expect(component.saved.emit).not.toHaveBeenCalled();
     });
@@ -3525,7 +3525,7 @@ describe('GrantDetailComponent', () => {
     for (const role of ['DOC', 'OEFIA']) {
       for (const [field, label] of [
         ['docDecision', 'DOC Decision'], ['budgetCategories', 'Budget Categories'],
-        ['docNciSelection', 'DOC/NCI Selection'], ['annualFundingR01', 'Two-Year Annual Funding R01 (HRHR)'],
+        ['docNciSelection', 'DOC/NCI Selection'], ['annualFundingR01', '2Yr R01'],
         ['annualOrMyf', 'Annual or MYF']
       ] as const) {
         it(`blocks ${role} Pay save and renders ${label} required when cleared`, () => {

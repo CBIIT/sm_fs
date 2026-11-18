@@ -123,7 +123,7 @@
       <div class="row mb-3">
         <div class="col-4">
           <div class="field-with-inline-error">
-          <label class="form-label fw-semibold">Two-Year Annual Funding R01 (HRHR)</label>
+          <label class="form-label fw-semibold">2Yr R01</label>
           <ng-select2 appUserSelect2Change id="bulk-annual-r01" name="bulkAnnualFundingR01" [ngModel]="bulkFields.annualFundingR01"
             (appUserSelect2Change)="onUserBulkSelectChange('annualFundingR01', $event)"
             [disabled]="isDoNotPayDecisionSelected(bulkFields.docDecision)"
@@ -245,7 +245,7 @@
               [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="yesNoOptions" width="100%">
             </ng-select2>
             <div *ngIf="hasMandatoryFieldError(data, 'annualFundingR01')" class="text-danger small validation-inline-error">
-              {{ getMandatoryFieldErrorMessage('Two-Year Annual Funding R01 (HRHR)') }}
+              {{ getMandatoryFieldErrorMessage('2Yr R01') }}
             </div>
           </div>
         </ng-template>

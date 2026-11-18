@@ -910,7 +910,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
           defaultContent: ''
         }, // 22
         {
-          title: 'Two-Year Annual Funding R01 (HRHR)?',
+          title: '2Yr R01',
           data: 'twoYearAnnualFundingR01Flag',
           width: '160px',
           defaultContent: '',
