@@ -57,6 +57,28 @@ describe('FundingListsComponent', () => {
   let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsService>;
   let modalRefSpy: { close: jasmine.Spy; dismiss: jasmine.Spy };
 
+  it('FS-2684: shows only undecided, non-recused NCI Director Review grants in Pending Review', () => {
+    component.grants = [
+      buildGrant({ applId: 1, nciDecision: null, recusedFlag: false }),
+      buildGrant({ applId: 2, nciDecision: '', recusedFlag: false }),
+      buildGrant({ applId: 3, nciDecision: undefined, recusedFlag: false }),
+      buildGrant({ applId: 4, nciDecision: null, recusedFlag: true }),
+      buildGrant({ applId: 5, nciDecision: 'Approve' }),
+      buildGrant({ applId: 6, nciDecision: 'Hold' }),
+      buildGrant({ applId: 7, nciDecision: 'Rejected' }),
+      buildGrant({ applId: 8, nciDecision: null, reviewStatusCode: 'DRAFT' }),
+      buildGrant({ applId: 9, nciDecision: null, reviewStatusCode: undefined, reviewStatus: 'NCI Director Review' }),
+      buildGrant({ applId: 10, nciDecision: null, reviewStatusCode: undefined, reviewStatus: 'DOC Review' })
+    ];
+    component.selectedTab = 'pending';
+
+    expect(component.filteredGrants.map(grant => grant.applId)).toEqual([1, 2, 3, 9]);
+    expect(component.getTabCount('pending')).toBe(4);
+    expect(component.getDocCount('DCB')).toBe(4);
+    expect(component.getTabCount('recusals')).toBe(1);
+    expect(component.getTabCount('all')).toBe(8);
+  });
+
   beforeEach(async () => {
     modalRefSpy = { close: jasmine.createSpy('close'), dismiss: jasmine.createSpy('dismiss') };
     fundingSubmissionsServiceSpy = jasmine.createSpyObj<FundingSubmissionsService>('FundingSubmissionsService', [

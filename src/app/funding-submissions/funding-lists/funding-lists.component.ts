@@ -744,7 +744,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     const recused = grant.recusedFlag === true;
 
     if (tabId === 'all') return true;
-    if (tabId === 'pending') return !decision;
+    if (tabId === 'pending') return !decision && !recused;
     if (tabId === 'approved') return decision === 'APPROVE';
     if (tabId === 'hold') return decision === 'HOLD';
     if (tabId === 'rejected') return decision === 'REJECTED';
