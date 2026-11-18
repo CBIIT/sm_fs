@@ -1202,7 +1202,9 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   private matchesNciTab(grant: FundingSubmissionListGrantDto): boolean {
     switch (this.selectedNciTab) {
       case 'pending':
-        return grant.nciDecision === null || grant.nciDecision === undefined;
+        return this.normalizeGrantReviewStatus(grant.reviewStatusCode || grant.reviewStatus) === 'NCI Director Review'
+          && !grant.nciDecision?.trim()
+          && grant.recusedFlag !== true;
       case 'approved':
         return grant.nciDecision === 'Approve';
       case 'hold':

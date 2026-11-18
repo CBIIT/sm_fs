@@ -188,6 +188,119 @@ describe('FS-2251 standalone real Select2 rendering', () => {
     };
   });
 
+  it('immediately clears disabled fields when Do Not Pay is selected', fakeAsync(() => {
+    detail.data = {
+      ...detail.data, docDecision: 'Pay', docPriority: 1,
+      docRecommendedAmount: 90000, docRecommendedReductionPct: 10,
+      annualFundingR01: 'Yes', budgetCategoryCode: 'R01R37',
+      docNciSelection: 'DOC', annualOrMyf: 'MYF'
+    };
+    funding.getJustification.and.returnValue(of({ justificationText: 'Existing justification' }));
+    startEdit();
+
+    expect(selectElement('annualFundingR01').value).toBe('Yes');
+    choose('docDecision', 'Do Not Pay');
+    flushMicrotasks();
+
+    expect(detail.doNotPayOefiaLockActive).toBeTrue();
+    for (const field of ['docPriority', 'annualFundingR01', 'annualOrMyf', 'budgetCategories', 'docNciSelection']) {
+      expect(detail.formModel[field]).withContext(field).toBeNull();
+      const select = selectElement(field);
+      expect(select.disabled).withContext(field).toBeTrue();
+      expect(select.value).withContext(field).toBe('');
+    }
+    for (const field of ['docRecAmt', 'docRecReductionPct']) {
+      const input = host.querySelector(`input[name="${field}"]`) as HTMLInputElement;
+      expect(input.disabled).withContext(field).toBeTrue();
+      expect(input.value).withContext(field).toBe('');
+    }
+    expect(detail.formModel.justificationText).toBe('');
+    expect(detail.formModel.docNotes).toBe('Not recommended');
+    expect(detail.data.docRecommendedAmount).toBe(90000);
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    flush();
+  }));
+
+  it('restores unsaved dependent fields and justification when Pay is selected again', fakeAsync(() => {
+    detail.data = {
+      ...detail.data, docDecision: 'Pay', docPriority: 1,
+      docRecommendedAmount: 90000, docRecommendedReductionPct: 10,
+      annualFundingR01: 'Yes', budgetCategoryCode: 'R01R37',
+      docNciSelection: 'DOC', annualOrMyf: 'MYF'
+    };
+    startEdit();
+    choose('annualFundingR01', 'No');
+    choose('budgetCategories', 'P01');
+    detail.formModel.docRecAmt = 80000;
+    detail.formModel.docRecReductionPct = 20;
+    detail.formModel.justificationText = 'Unsaved justification';
+    const file = new File(['draft'], 'draft.txt', { type: 'text/plain' });
+    detail.justificationFiles = [file];
+    detail.justificationDocuments = [{ id: 11 }, { id: 12 }];
+    detail.stagedDeleteDocumentIds = [11];
+    const expectedForm = { ...detail.formModel };
+
+    for (const amount of [80000, 70000]) {
+      detail.formModel.docRecAmt = amount;
+      choose('docDecision', 'Do Not Pay');
+      flushMicrotasks();
+      detail.onDocDecisionChange();
+      detail.formModel.docNotes = 'Updated note';
+      choose('docDecision', 'Pay');
+      flushMicrotasks();
+
+      expect(detail.doNotPayOefiaLockActive).toBeFalse();
+      expect(detail.formModel).toEqual({ ...expectedForm, docRecAmt: amount, docNotes: 'Updated note' });
+      for (const field of ['docPriority', 'annualFundingR01', 'annualOrMyf', 'budgetCategories', 'docNciSelection']) {
+        expect(selectElement(field).disabled).withContext(field).toBeFalse();
+        expect(selectElement(field).value).withContext(field).toBe(String(expectedForm[field]));
+      }
+      expect(detail.justificationFiles).toEqual([file]);
+      expect(detail.stagedDeleteDocumentIds).toEqual([11]);
+    }
+    expect(detail.data.docRecommendedAmount).toBe(90000);
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    flush();
+  }));
+
+  it('restores user selections when an initially Do Not Pay grant is toggled back to Pay', fakeAsync(() => {
+    startPay();
+    choose('annualFundingR01', 'No');
+    choose('budgetCategories', 'P01');
+    choose('docPriority', '2');
+    flushMicrotasks();
+    const expectedForm = { ...detail.formModel };
+
+    choose('docDecision', 'Do Not Pay');
+    flushMicrotasks();
+    choose('docDecision', 'Pay');
+    flushMicrotasks();
+
+    expect(detail.formModel).toEqual(expectedForm);
+    expect(selectElement('budgetCategories').value).toBe('ACTCD');
+    expect(selectElement('annualFundingR01').value).toBe('No');
+    expect(selectElement('docPriority').value).toBe('2');
+    expect(detail.docPayDefaultsLoading).toBeFalse();
+    flush();
+  }));
+
+  it('discards the temporary Pay snapshot when the user cancels editing', fakeAsync(() => {
+    startPay();
+    choose('budgetCategories', 'P01');
+    choose('docDecision', 'Do Not Pay');
+    flushMicrotasks();
+    detail.forceDiscardAndClose();
+    detail.onEdit();
+    flushMicrotasks();
+    choose('docDecision', 'Pay');
+    flushMicrotasks();
+
+    expect(detail.formModel.budgetCategories).toBe('R01R37');
+    expect(selectElement('budgetCategories').value).toBe('R01R37');
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    flush();
+  }));
+
   afterEach(() => {
     try {
       if (host) destroyWidgets();

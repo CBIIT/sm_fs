@@ -105,6 +105,12 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   budgetCategoriesLoaded = false;
 
   formModel: GrantEditFormModel = {};
+  private doNotPaySnapshot: {
+    fields: GrantEditFormModel;
+    files: File[];
+    fileError: string | null;
+    deleteDocumentIds: number[];
+  } | null = null;
   docPayDefaultsLoading = false;
   docPayDefaultsError: string | null = null;
   readonly docPayDefaultsLookupError = DOC_PAY_DEFAULTS_LOOKUP_ERROR;
@@ -409,8 +415,33 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onDocDecisionChange(): void {
-    this.loadDocPayDefaults();
     this.recomputeDoNotPayOefiaLock();
+    if (this.doNotPayOefiaLockActive) {
+      if (!this.doNotPaySnapshot) {
+        const {
+          docPriority, docRecAmt, docRecReductionPct, annualFundingR01,
+          annualOrMyf, budgetCategories, docNciSelection, justificationText
+        } = this.formModel;
+        this.doNotPaySnapshot = {
+          fields: {
+            docPriority, docRecAmt, docRecReductionPct, annualFundingR01,
+            annualOrMyf, budgetCategories, docNciSelection, justificationText
+          },
+          files: [...this.justificationFiles],
+          fileError: this.justificationFileError,
+          deleteDocumentIds: [...this.stagedDeleteDocumentIds]
+        };
+      }
+      this.clearDoNotPayDependentFields();
+    } else if (isPayDecision(this.formModel.docDecision, this.decisionOptions) && this.doNotPaySnapshot) {
+      Object.assign(this.formModel, this.doNotPaySnapshot.fields);
+      this.justificationFiles = this.doNotPaySnapshot.files;
+      this.justificationFileError = this.doNotPaySnapshot.fileError;
+      this.stagedDeleteDocumentIds = this.doNotPaySnapshot.deleteDocumentIds;
+      this.observedSelections = { ...this.formModel };
+      this.doNotPaySnapshot = null;
+    }
+    this.loadDocPayDefaults();
     this.updateValidationErrorsLive();
     this.cdr.detectChanges();
   }
@@ -451,6 +482,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   private invalidateFundingRequests(): void {
     this.editVersion++;
+    this.doNotPaySnapshot = null;
     this.cancelDocPayDefaults();
     if (this.fundingReadbackSubscription && !this.fundingReadbackSubscription.closed) {
       this.fundingReadbackSubscription.unsubscribe();
@@ -1537,6 +1569,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
           && this.justificationFiles.every((file, index) => file === readback.files[index])
           && JSON.stringify(this.stagedDeleteDocumentIds) === JSON.stringify(readback.deleteDocumentIds);
         const persistedForm = this.formModelFromGrant(grant);
+        if (readback.outcome === 'saved') this.doNotPaySnapshot = null;
         Object.assign(this.data, grant);
         for (const field of GrantDetailComponent.FUNDING_FIELDS) {
           const changedSinceSubmit = !this.provenance.unchangedSince(field, readback.fieldVersions)

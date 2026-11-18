@@ -326,7 +326,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       (component as any).detailComponentsByApplId = new Map();
       (component as any).cachedGrants = [
         { applId: 1, nciDecision: null, recusedFlag: false, reviewStatusCode: 'DIRECTORREVIEW' },
-        { applId: 2, nciDecision: undefined, recusedFlag: false },
+        { applId: 2, nciDecision: undefined, recusedFlag: false, reviewStatusCode: 'DIRECTORREVIEW' },
         { applId: 3, nciDecision: 'Approve', recusedFlag: false },
         { applId: 4, nciDecision: 'Hold', recusedFlag: true },
         { applId: 5, nciDecision: 'Rejected', recusedFlag: false }
@@ -346,6 +346,24 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(filteredRows('approved').map(row => row.applId)).toEqual([3]);
       expect(filteredRows('hold').map(row => row.applId)).toEqual([4]);
       expect(filteredRows('rejected').map(row => row.applId)).toEqual([5]);
+    });
+
+    it('FS-2684: excludes recused, decided, and non-director-review grants from Pending Review', () => {
+      (component as any).cachedGrants = [
+        { applId: 1, nciDecision: null, recusedFlag: false, reviewStatusCode: 'DIRECTORREVIEW' },
+        { applId: 2, nciDecision: '', recusedFlag: false, reviewStatus: 'NCI Director Review' },
+        { applId: 3, nciDecision: null, recusedFlag: true, reviewStatusCode: 'DIRECTORREVIEW' },
+        { applId: 4, nciDecision: 'Approve', reviewStatusCode: 'DIRECTORREVIEW' },
+        { applId: 5, nciDecision: 'Hold', reviewStatusCode: 'DIRECTORREVIEW' },
+        { applId: 6, nciDecision: 'Rejected', reviewStatusCode: 'DIRECTORREVIEW' },
+        { applId: 7, nciDecision: null, reviewStatusCode: 'DRAFT', reviewStatus: 'NCI Director Review' },
+        { applId: 8, nciDecision: null, reviewStatus: 'DOC Review' },
+        { applId: 9, nciDecision: null }
+      ];
+
+      expect(filteredRows('pending').map(row => row.applId)).toEqual([1, 2]);
+      expect(filteredRows('recusals').map(row => row.applId)).toEqual([3]);
+      expect(filteredRows('all').length).toBe(9);
     });
 
     it('keeps recusals as an overlapping category', () => {
