@@ -26,7 +26,7 @@ import {
 } from '../../funding-write-recovery.service';
 import { DetailPriorityCoordinator } from '../detail-priority-coordinator';
 
-type GrantEditFormModel = FundingSubmBulkEditFieldsDto & { justificationText?: string };
+type GrantEditFormModel = FundingSubmBulkEditFieldsDto & { justificationText?: string, directorNotes?: string };
 
 interface FundingSaveReadback {
   rejectionReason?: string;
@@ -1251,7 +1251,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     return !!this.priorityCoordinator?.isBlocked(this.listId, this.data?.applId);
   }
 
-  onNotesModelChange(field?: 'docNotes' | 'oefiaNotes' | 'justificationText'): void {
+  onNotesModelChange(field?: 'docNotes' | 'oefiaNotes' | 'directorNotes' | 'justificationText'): void {
     if (field) this.provenance.recordUserEdit(field);
     this.justificationSaveError = null;
     this.updateValidationErrorsLive();
@@ -1418,6 +1418,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       budgetCategories: form.budgetCategories ?? null,
       docNotes: form.docNotes ?? '',
       oefiaNotes: form.oefiaNotes ?? '',
+      directorNotes: form.directorNotes ?? '',
       annualOrMyf: form.annualOrMyf ?? null,
       justificationText: form.justificationText ?? ''
     });

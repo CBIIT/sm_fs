@@ -231,9 +231,28 @@
               <!-- <a *ngIf="data.pfr && pfrRouterLink" [routerLink]="pfrRouterLink" target="_blank" rel="noopener noreferrer">{{data.pfr}}</a> -->
               <span>{{data.pfr || '-'}}</span>
             </td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td class="grid-label sep align-top pt-2">Justification<br><span class="fw-normal">(Optional)</span></td>
+            <td class="grid-label">Priority Score:</td>
+            <td class="grid-item">{{data.priorityScoreDisplay || '-'}}</td>
+
+           <td class="grid-label sep align-top pt-2">Dirctor Notes<br><span class="fw-normal">(Optional)</span></td>
+            <td class="grid-item" colspan="3">
+              <span *ngIf="!isEditMode">{{data.directorNotes || ''}}</span>
+              <div *ngIf="isEditMode">
+                <textarea class="form-control form-control-sm" rows="2"
+                  name="directorNotes" [(ngModel)]="formModel.directorNotes" (ngModelChange)="onNotesModelChange('directorNotes')" maxlength="1000"></textarea>
+                <div class="text-end small text-muted">{{(formModel.directorNotes || '').length}}/1000</div>
+                <div class="text-danger small me-auto align-self-center" *ngIf="saveValidationErrors.directorNotes">{{saveValidationErrors.directorNotes}}</div>
+              </div>
+            </td>
+
+           
+          </tr>
+           <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+             <td class="grid-label sep align-top pt-2">Justification<br><span class="fw-normal">(Optional)</span></td>
             <td class="grid-item" colspan="3">
               <div *ngIf="!isEditMode">
                 <div>{{data.justificationText || ''}}</div>
@@ -287,8 +306,7 @@
                 <div class="text-end small text-muted">{{(formModel.justificationText || '').length}}/1000</div>
               </div>
             </td>
-          </tr>
-
+           </tr>
         </tbody>
       </table>
 
