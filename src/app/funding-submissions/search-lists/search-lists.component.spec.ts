@@ -131,10 +131,14 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     return { host, viewRef };
   }
 
+  const testWindow = window as unknown as { $: unknown };
+  let originalJquery: unknown;
+
   beforeEach(async () => {
     // The component's ngOnInit() touches the global jQuery/DataTables plugin object
     // ($.fn.DataTable.ext.pager.numbers_length) which isn't loaded in the Karma test env.
-    (window as any).$ = { fn: { DataTable: { ext: { pager: {} } } } };
+    originalJquery = testWindow.$;
+    testWindow.$ = { fn: { DataTable: { ext: { pager: {} } } } };
 
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     modalRefSpy = jasmine.createSpyObj('NgbModalRef', ['close', 'dismiss']);
@@ -188,6 +192,10 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     // ngOnInit only (skip ngAfterViewInit — that wires up the live DataTables instance,
     // which isn't needed to exercise the guard logic under test here).
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    testWindow.$ = originalJquery;
   });
 
   describe('Bulk Edit selection restoration', () => {
@@ -312,6 +320,29 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(component.originalAmendmentConflictMessages).toEqual([]);
       expect(fixture.nativeElement.querySelector('.save-success-row').textContent).toContain('Success! 2 out of 2');
       expect(fixture.nativeElement.querySelector('.save-success-row li')).toBeNull();
+    });
+
+    it('renders advanced review rejections alongside pair conflicts and consumes the navigation state', () => {
+      const summary = 'Success! 1 out of 4 were successfully added to the list.';
+      const pairs = ['Original and amendment were not added.'];
+      const rejected = ['<img src=x> was not added because its DOC is in review (OEFIA).',
+        'Application ID 13 was not added because its DOC is in review (DIRECTOR).'];
+      const previousState = history.state;
+      try {
+        history.replaceState({
+          successMessage: summary, originalAmendmentConflictMessages: pairs,
+          advancedDocStageRejectionMessages: rejected
+        }, document.title);
+        component.ngOnInit();
+        fixture.detectChanges();
+        const alert: HTMLElement = fixture.nativeElement.querySelector('.save-success-row');
+        expect(alert.textContent).toContain(summary);
+        expect(Array.from(alert.querySelectorAll('li')).map(li => li.textContent)).toEqual([...pairs, ...rejected]);
+        expect(alert.querySelector('img')).toBeNull();
+        expect(history.state.advancedDocStageRejectionMessages).toBeUndefined();
+      } finally {
+        history.replaceState(previousState, document.title);
+      }
     });
   });
 

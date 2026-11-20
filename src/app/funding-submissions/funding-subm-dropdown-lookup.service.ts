@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { Select2OptionData } from 'ng-select2';
+import { SelectionDateCodeDto } from '@cbiit/i2efsws-lib';
 
 /** Raw JSON shape returned by the backend lookup endpoints (mirrors SelectionDateCodeDto). */
 interface LookupCodeDto {
@@ -48,6 +49,10 @@ export class FundingSubmDropdownLookupService {
   private annualOrMyfOptions$: Observable<Select2OptionData[]>;
 
   constructor(private http: HttpClient) {}
+
+  getAddGrantsSelectionDates(): Observable<SelectionDateCodeDto[]> {
+    return this.http.get<SelectionDateCodeDto[]>(`${this.basePath}/selection-dates/add-grants`);
+  }
 
   getBudgetCategories(): Observable<Select2OptionData[]> {
     if (!this.budgetCategories$) {
