@@ -43,9 +43,21 @@
             </td>
             <td class="grid-label">PI:</td>
             <td class="grid-item"><a *ngIf="data.piEmail" href="mailto:{{data.piEmail}}?subject={{data.grantNumber}} - {{data.piName}}">{{data.piName}}</a></td>
-            <td class="grid-label sep">NCI Decision:</td>
+            <td class="grid-label sep">NCI Decision:</td>  
             <td class="grid-item">
-              <span>{{data.nciDecision}}</span>
+              <span *ngIf="!isEditMode || !nciDirector">{{data.nciDecision || ''}}</span>
+              <ng-select2 *ngIf="isEditMode && nciDirector"
+                  name="nciDecision"
+                  [(ngModel)]="formModel.nciDecision"
+                  (ngModelChange)="onNciDecisionChange()"
+                  [data]="nciDecisionOptions"
+                  [allowClear]="true"
+                  width="100%"
+                  placeholder="Select">
+              </ng-select2>
+              <div *ngIf="isEditMode && nciDirector && saveValidationErrors.nciDecision" class="text-danger small mt-1">
+                {{saveValidationErrors.nciDecision}}
+              </div>
             </td>
             <td class="grid-label">DOC Decision:</td>
             <td class="grid-item">
@@ -234,10 +246,10 @@
             <td class="grid-label">Priority Score:</td>
             <td class="grid-item">{{data.priorityScoreDisplay || '-'}}</td>
 
-           <td class="grid-label sep align-top pt-2">Dirctor Notes<br><span class="fw-normal">(Optional)</span></td>
+            <td class="grid-label sep align-top pt-2">Director Notes<br><span class="fw-normal">{{ isDirectorNotesRequired ? '(Required)' : '(Optional)' }}</span></td>
             <td class="grid-item" colspan="3">
-              <span *ngIf="!isEditMode">{{data.directorNotes || ''}}</span>
-              <div *ngIf="isEditMode">
+              <span *ngIf="!isEditMode || !nciDirector">{{data.nciDirectorNotes || ''}}</span>
+              <div *ngIf="isEditMode && nciDirector">
                 <textarea class="form-control form-control-sm" rows="2"
                   name="directorNotes" [(ngModel)]="formModel.directorNotes" (ngModelChange)="onNotesModelChange('directorNotes')" maxlength="1000"></textarea>
                 <div class="text-end small text-muted">{{(formModel.directorNotes || '').length}}/1000</div>

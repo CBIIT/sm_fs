@@ -36,6 +36,7 @@ interface RealWidgetFundingService {
   getBudgetCategoryOptions(applId: number): Observable<Array<{ code: string; name: string }>>;
   getDocPayDefaults(listId: number, applIds: number[]): Observable<FundingSubmissionDocPayDefaultsDto[]>;
   bulkUpdateListGrants(body: FundingSubmissionBulkEditRequestDto, listId: number): Observable<number>;
+  saveNciDecisions: FundingSubmissionsService['saveNciDecisions'];
   saveJustificationForm(...args: any[]): Observable<any>;
   getListDetail(listId: number): Observable<FundingSubmissionListDetailDto>;
 }
@@ -134,7 +135,7 @@ describe('FS-2251 standalone real Select2 rendering', () => {
 
     funding = jasmine.createSpyObj('FundingSubmissionsService', [
       'getJustification', 'saveJustificationForm', 'bulkUpdateListGrants', 'getDocPriorityOptions',
-      'getDocPayDefaults', 'getListDetail', 'getBudgetCategoryOptions'
+      'getDocPayDefaults', 'getListDetail', 'getBudgetCategoryOptions', 'saveNciDecisions'
     ]);
     funding.getJustification.and.returnValue(of({ justificationText: '' }));
     funding.getDocPriorityOptions.and.returnValue(of([1, 2]));
@@ -187,6 +188,35 @@ describe('FS-2251 standalone real Select2 rendering', () => {
       docNotes: 'Not recommended', oefiaNotes: '', justificationText: ''
     };
   });
+
+  it('sends Hold selected in the real NCI Decision widget with newly entered Director Notes', fakeAsync(() => {
+    user.hasRole.and.callFake(role => role === roleNames.NCI_DIRECTOR);
+    detail.data = {
+      ...detail.data, docDecision: 'Pay', docPriority: 1,
+      docRecommendedAmount: 90000, docRecommendedReductionPct: 10,
+      annualFundingR01: 'Yes', budgetCategoryCode: 'R01R37',
+      docNciSelection: 'DOC', annualOrMyf: 'MYF', nciDecision: null, nciDirectorNotes: ''
+    };
+    funding.saveNciDecisions.and.returnValue(NEVER);
+    startEdit();
+    choose('nciDecision', 'On Hold');
+    flushMicrotasks();
+    const notes = host.querySelector('textarea[name="directorNotes"]') as HTMLTextAreaElement;
+    notes.value = 'TEST';
+    notes.dispatchEvent(new Event('input', { bubbles: true }));
+    flushMicrotasks();
+
+    expect(detail.formModel.nciDecision).toBe('Hold');
+    expect(detail.formModel.directorNotes).toBe('TEST');
+    expect(detail.hasSaveValidationErrors).toBeFalse();
+    detail.onSave();
+
+    expect(funding.saveNciDecisions).toHaveBeenCalledWith({
+      items: [{ applId: 100, nciDecision: 'Hold', nciDirectorNotes: 'TEST' }]
+    }, 1);
+    expect(funding.bulkUpdateListGrants).not.toHaveBeenCalled();
+    flush();
+  }));
 
   it('immediately clears disabled fields when Do Not Pay is selected', fakeAsync(() => {
     detail.data = {
@@ -702,7 +732,7 @@ describe('GrantDetailComponent', () => {
 
     fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
       'getJustification', 'saveJustificationForm', 'bulkUpdateListGrants', 'getDocPriorityOptions',
-      'getDocPayDefaults', 'getListDetail', 'getBudgetCategoryOptions'
+      'getDocPayDefaults', 'getListDetail', 'getBudgetCategoryOptions', 'saveNciDecisions'
     ]);
     fundingSubmissionsServiceSpy.getJustification.and.returnValue(getJustificationSubject.asObservable());
     fundingSubmissionsServiceSpy.getBudgetCategoryOptions.and.returnValue(of([
@@ -783,6 +813,196 @@ describe('GrantDetailComponent', () => {
     fixture.detectChanges();
     getJustificationSubject.complete();
     expect(component).toBeTruthy();
+  });
+
+  describe('Director Notes persistence', () => {
+    beforeEach(() => {
+      userSessionServiceSpy.hasRole.and.callFake((role: string) => role === roleNames.NCI_DIRECTOR);
+      Object.assign(component.data, {
+        nciDecision: 'Approve', nciDirectorNotes: 'Saved director note',
+        docPriority: 1, docRecommendedAmount: 90000, docRecommendedReductionPct: 10
+      });
+      fundingSubmissionsServiceSpy.saveNciDecisions.and.returnValue(of(undefined));
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [{
+        ...component.data, nciDirectorNotes: 'Updated director note'
+      }] }));
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      component.onEdit();
+    });
+
+    it('shows both director controls for an NCI Director in edit mode', () => {
+      expect(component.nciDirector).toBeTrue();
+      expect(fixture.nativeElement.querySelector('ng-select2[name="nciDecision"]')).toBeTruthy();
+      expect(fixture.nativeElement.querySelector('textarea[name="directorNotes"]')).toBeTruthy();
+    });
+
+    for (const role of [roleNames.DOC_FUNDING_LIST_COR, roleNames.OEFIA_CERTIFIER, roleNames.FINANCIAL_ANALYST, null]) {
+      it(`keeps director fields read-only and ignores their edits for ${role ?? 'users without a role'}`, () => {
+        userSessionServiceSpy.hasRole.and.callFake((candidate: string) => candidate === role);
+        component.ngOnInit();
+        fixture.detectChanges();
+
+        expect(component.nciDirector).toBeFalse();
+        expect(fixture.nativeElement.querySelector('ng-select2[name="nciDecision"]')).toBeNull();
+        expect(fixture.nativeElement.querySelector('textarea[name="directorNotes"]')).toBeNull();
+        expect(fixture.nativeElement.textContent).toContain('Saved director note');
+        expect(fixture.nativeElement.textContent).toContain('Approve');
+
+        component.formModel.nciDecision = 'Rejected';
+        component.formModel.directorNotes = 'Unauthorized note';
+        component.formModel.docNotes = 'Updated DOC note';
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [{
+          ...component.data, docNotes: 'Updated DOC note'
+        }] }));
+        component.onSave();
+
+        expect(fundingSubmissionsServiceSpy.saveNciDecisions).not.toHaveBeenCalled();
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalled();
+        expect(component.formModel.nciDecision).toBe('Approve');
+        expect(component.formModel.directorNotes).toBe('Saved director note');
+      });
+    }
+
+    it('saves Director Notes together with the selected decision and refreshes both', () => {
+      expect(component.formModel.directorNotes).toBe('Saved director note');
+      component.formModel.directorNotes = 'Updated director note';
+      component.formModel.nciDecision = 'Rejected';
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [{
+        ...component.data, nciDecision: 'Rejected', nciDirectorNotes: 'Updated director note'
+      }] }));
+      component.onNotesModelChange('directorNotes');
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveNciDecisions).toHaveBeenCalledWith({
+        items: [{ applId: 100, nciDecision: 'Rejected', nciDirectorNotes: 'Updated director note' }]
+      }, 1);
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      expect(component.data.nciDirectorNotes).toBe('Updated director note');
+      expect(component.data.nciDecision).toBe('Rejected');
+      expect(component.formModel.nciDecision).toBe('Rejected');
+      expect(component.isEditMode).toBeFalse();
+      expect(fixture.nativeElement.textContent).toContain('Updated director note');
+    });
+
+    it('sends an empty string to clear a note for an approved grant', () => {
+      component.formModel.directorNotes = '';
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [{
+        ...component.data, nciDirectorNotes: ''
+      }] }));
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveNciDecisions).toHaveBeenCalledWith({
+        items: [{ applId: 100, nciDecision: 'Approve', nciDirectorNotes: '' }]
+      }, 1);
+      expect(component.data.nciDirectorNotes).toBe('');
+      expect(component.formModel.directorNotes).toBe('');
+    });
+
+    it('does not send an unchanged note when only DOC fields change', () => {
+      component.formModel.docNotes = 'Updated DOC note';
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveNciDecisions).not.toHaveBeenCalled();
+      const fields = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0].fields;
+      expect(fields.docNotes).toBe('Updated DOC note');
+      expect(Object.keys(fields)).not.toContain('directorNotes');
+      expect(Object.keys(fields)).not.toContain('nciDirectorNotes');
+      expect(Object.keys(fields)).not.toContain('nciDecision');
+    });
+
+    it('keeps unsaved notes after a definite notes-only rejection', () => {
+      component.formModel.directorNotes = 'Updated director note';
+      fundingSubmissionsServiceSpy.saveNciDecisions.and.returnValue(throwError(() => new HttpErrorResponse({ status: 403 })));
+      component.onSave();
+
+      expect(component.isEditMode).toBeTrue();
+      expect(component.formModel.directorNotes).toBe('Updated director note');
+      expect(component.data.nciDirectorNotes).toBe('Saved director note');
+      expect(component.fundingRecoveryState).toBeNull();
+      expect(component.fundingSaveError).toBeTruthy();
+      expect(component.saveSuccessMessage).toBe('');
+    });
+
+    it('refreshes completed DOC changes and retains notes when the second write is rejected', () => {
+      component.formModel.docNotes = 'Updated DOC note';
+      component.formModel.directorNotes = 'Updated director note';
+      fundingSubmissionsServiceSpy.saveNciDecisions.and.returnValue(throwError(() => new HttpErrorResponse({ status: 400 })));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [{
+        ...component.data, docNotes: 'Updated DOC note'
+      }] }));
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledWith(1);
+      expect(component.data.docNotes).toBe('Updated DOC note');
+      expect(component.data.nciDirectorNotes).toBe('Saved director note');
+      expect(component.formModel.directorNotes).toBe('Updated director note');
+      expect(component.isEditMode).toBeTrue();
+      expect(component.fundingRecoveryState).toBeNull();
+      expect(component.saveSuccessMessage).toBe('');
+    });
+
+    it('allows a new decision and notes without a previously saved decision', () => {
+      component.data.nciDecision = null;
+      component.formModel.directorNotes = 'Updated director note';
+      component.onSave();
+
+      expect(component.saveValidationErrors.directorNotes).toBeUndefined();
+      expect(fundingSubmissionsServiceSpy.saveNciDecisions).toHaveBeenCalledWith({
+        items: [{ applId: 100, nciDecision: 'Approve', nciDirectorNotes: 'Updated director note' }]
+      }, 1);
+    });
+
+    it('saves decision-only changes without overwriting unchanged notes', () => {
+      component.formModel.nciDecision = 'Hold';
+      component.onNciDecisionChange();
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveNciDecisions).toHaveBeenCalledWith({
+        items: [{ applId: 100, nciDecision: 'Hold' }]
+      }, 1);
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
+
+    for (const decision of [null, 'Approve', 'Hold', 'Rejected']) {
+      for (const notes of ['', '   ', 'Director explanation']) {
+        it(`validates notes ${JSON.stringify(notes)} for selected decision ${decision}`, () => {
+          component.formModel.nciDecision = decision;
+          component.formModel.directorNotes = notes;
+          component.onNciDecisionChange();
+          const required = decision === 'Hold' || decision === 'Rejected';
+
+          expect(component.isDirectorNotesRequired).toBe(required);
+          expect(!!component.saveValidationErrors.directorNotes).toBe(required && !notes.trim());
+          expect(component.hasSaveValidationErrors).toBe(required && !notes.trim());
+          const label = Array.from(fixture.nativeElement.querySelectorAll('td'))
+            .find((element: HTMLElement) => element.textContent.includes('Director Notes')) as HTMLElement;
+          expect(label.textContent).toContain(required ? '(Required)' : '(Optional)');
+          if (required && !notes.trim()) {
+            component.onSave();
+            expect(fundingSubmissionsServiceSpy.saveNciDecisions).not.toHaveBeenCalled();
+          }
+        });
+      }
+    }
+
+    it('reports the API limitation before any write when saving notes without a decision', () => {
+      component.data.nciDecision = null;
+      component.formModel.nciDecision = null;
+      component.formModel.directorNotes = 'Optional note';
+      component.formModel.docNotes = 'Updated DOC note';
+      component.onNotesModelChange('directorNotes');
+
+      expect(component.hasSaveValidationErrors).toBeFalse();
+      component.onSave();
+
+      expect(component.fundingSaveError).toContain('not supported by the current API');
+      expect(component.isEditMode).toBeTrue();
+      expect(component.isSaveInProgress()).toBeFalse();
+      expect(fundingSubmissionsServiceSpy.saveNciDecisions).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+    });
   });
 
   describe('FS-2679 DOC Pay defaults and saved readback', () => {

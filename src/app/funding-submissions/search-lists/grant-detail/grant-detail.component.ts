@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FundingSubmBulkEditFieldsDto, FundingSubmissionDocPayDefaultsDto, FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
+import { FundingSubmBulkEditFieldsDto, FundingSubmissionDocPayDefaultsDto, FundingSubmissionListGrantDto, FundingSubmissionsService, Item as NciDecisionItem } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { AppUserSessionService } from '../../../service/app-user-session.service';
 import { NGXLogger } from 'ngx-logger';
@@ -26,7 +26,7 @@ import {
 } from '../../funding-write-recovery.service';
 import { DetailPriorityCoordinator } from '../detail-priority-coordinator';
 
-type GrantEditFormModel = FundingSubmBulkEditFieldsDto & { justificationText?: string, directorNotes?: string };
+type GrantEditFormModel = FundingSubmBulkEditFieldsDto & { justificationText?: string, directorNotes?: string, nciDecision?: string };
 
 interface FundingSaveReadback {
   rejectionReason?: string;
@@ -57,7 +57,11 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   private handledDataChange: any = null;
   private grantChangeSequence = 0;
   private readonly grantBudgetOptions: GrantBudgetCategoryOptions;
-
+  nciDecisionOptions: Select2OptionData[] = [
+    { id: 'Approve', text: 'Approve' },
+    { id: 'Hold', text: 'On Hold' },
+    { id: 'Rejected', text: 'Reject' }
+  ];
   @Input()
   set data(value: any) {
     const previousApplId = this.grantData?.applId;
@@ -133,7 +137,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   private observedSelections: DocPaySelections = {};
   private static readonly FUNDING_FIELDS = [
     'docDecision', 'docPriority', 'docRecAmt', 'docRecReductionPct', 'docNciSelection',
-    'annualFundingR01', 'budgetCategories', 'docNotes', 'oefiaNotes', 'annualOrMyf'
+    'annualFundingR01', 'budgetCategories', 'docNotes', 'oefiaNotes', 'annualOrMyf', 'directorNotes', 'nciDecision'
   ] as const;
   justificationFiles: File[] = [];
   justificationDocuments: DocumentsDto[] = [];
@@ -145,6 +149,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   docFundingListCor = false;
   OEFIACertifier = false;
   financialAnalyst = false;
+  nciDirector = false;
   doNotPayOefiaLockActive = false;
   saveValidationError: string | null = null;
   saveValidationErrors: Record<string, string> = {};
@@ -201,6 +206,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.docFundingListCor = this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
     this.OEFIACertifier = this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER);
     this.financialAnalyst = this.userSessionService.hasRole(roleNames.FINANCIAL_ANALYST);
+    this.nciDirector = this.userSessionService.hasRole(roleNames.NCI_DIRECTOR);
     this.fetchDropdownOptions();
     this.refreshJustificationData();
     this.initialized = true;
@@ -752,6 +758,11 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       this.formModel.oefiaNotes = this.data?.oefiaNotes ?? '';
     }
 
+    if (!this.nciDirector) {
+      this.formModel.nciDecision = this.data?.nciDecision ?? null;
+      this.formModel.directorNotes = this.data?.nciDirectorNotes ?? '';
+    }
+
     // Business rule: when DOC Decision is Do Not Pay, dependent funding and
     // justification fields are discarded before validation/persistence.
     if (this.isDoNotPayDecisionSelected() && !this.isDoNotPayRestricted) {
@@ -767,13 +778,24 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
     this.savingInProgress = true;
     this.logger.debug('GrantDetailComponent onSave()', this.formModel, 'listId:', this.listId);
-    const { justificationText, ...fields } = this.formModel;
+    const { justificationText, directorNotes, nciDecision, ...fields } = this.formModel;
     const saveFields = this.normalizeFieldsForSave(fields as FundingSubmBulkEditFieldsDto);
     const hasFundingFieldChanges = this.currentFundingSnapshot() !== this.initialFundingSnapshot;
+    const hasDirectorNotesChanges = (directorNotes ?? '') !== (this.data?.nciDirectorNotes ?? '');
+    const hasNciDecisionChanges = (nciDecision || null) !== (this.data?.nciDecision || null);
+    const hasDirectorChanges = hasDirectorNotesChanges || hasNciDecisionChanges;
+    const selectedNciDecision = this.selectedNciDecision();
     const hasJustificationTextChange = (justificationText ?? '') !== this.initialJustificationText;
     const hasJustificationChanges = this.justificationFiles.length > 0 || hasJustificationTextChange || this.stagedDeleteDocumentIds.length > 0;
 
-    if (!hasFundingFieldChanges && !hasJustificationChanges) {
+    if (hasDirectorChanges && !selectedNciDecision) {
+      this.savingInProgress = false;
+      this.fundingSaveError = 'Saving Director Notes or clearing an NCI Decision without a selected decision is not supported by the current API.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (!hasFundingFieldChanges && !hasDirectorChanges && !hasJustificationChanges) {
       this.savingInProgress = false;
       this.isEditMode = false;
       this.initialFormSnapshot = '';
@@ -785,7 +807,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    if (!hasFundingFieldChanges && hasJustificationChanges) {
+    if (!hasFundingFieldChanges && !hasDirectorChanges && hasJustificationChanges) {
       this.saveJustification(hasJustificationTextChange ? justificationText : undefined);
       return;
     }
@@ -844,9 +866,28 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       fields: saveFields,
       ...(this.needsDocPayDefaults() ? { transitionIntents: [this.provenance.intent(this.data.applId)] } : {})
     };
-    this.fundingSaveSubscription = this.fundingErrorScope.handleLocally(
-      this.fundingSubmissionsService.bulkUpdateListGrants(request, this.listId)
-    ).pipe(defaultIfEmpty(null), take(1)).subscribe({
+    let fundingFieldsSaved = false;
+    const fundingSave = hasFundingFieldChanges
+      ? this.fundingSubmissionsService.bulkUpdateListGrants(request, this.listId).pipe(
+        defaultIfEmpty(null),
+        take(1),
+        tap(count => {
+          if (count !== 1) throw new Error('The funding save returned an unexpected response.');
+          fundingFieldsSaved = true;
+        })
+      )
+      : of(1);
+    this.fundingSaveSubscription = this.fundingErrorScope.handleLocally(fundingSave.pipe(
+      concatMap(count => hasDirectorChanges
+        ? this.fundingSubmissionsService.saveNciDecisions({
+          items: [{
+            applId: readback.data.applId,
+            nciDecision: selectedNciDecision,
+            ...(hasDirectorNotesChanges ? { nciDirectorNotes: directorNotes ?? '' } : {})
+          }]
+        }, readback.listId).pipe(map(() => count))
+        : of(count))
+    )).pipe(defaultIfEmpty(null), take(1)).subscribe({
       next: count => {
         if (count !== 1) {
           this.handleFundingWriteFailure(readback, new Error('The funding save returned an unexpected response.'));
@@ -867,19 +908,24 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
         this.pendingFundingReadback = readback;
         this.refreshSavedFunding();
       },
-      error: error => this.handleFundingWriteFailure(readback, error)
+      error: error => this.handleFundingWriteFailure(readback, error, fundingFieldsSaved)
     });
   }
 
-  private handleFundingWriteFailure(readback: FundingSaveReadback, error: unknown): void {
+  private handleFundingWriteFailure(readback: FundingSaveReadback, error: unknown, hasCompletedWrite = false): void {
     let state: FundingWriteRecoveryState | null = 'unknown';
     try {
       if (typeof error === 'object' && error !== null && 'status' in error && error.status === 409) {
         this.fundingWriteRecovery.mark(readback.listId, readback.data.applId, 'conflict');
         state = 'conflict';
       } else if (isDefiniteFundingWriteRejection(error)) {
-        this.fundingWriteRecovery.clear(readback.listId, readback.data.applId);
-        state = null;
+        if (hasCompletedWrite) {
+          this.fundingWriteRecovery.mark(readback.listId, readback.data.applId, 'conflict');
+          state = 'conflict';
+        } else {
+          this.fundingWriteRecovery.clear(readback.listId, readback.data.applId);
+          state = null;
+        }
       }
     } catch (storageError) {
       this.logger.error('Unable to update funding save recovery state', storageError);
@@ -1061,8 +1107,28 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       && (docShouldLock || oefiaShouldLock);
   }
 
+  private selectedNciDecision(): NciDecisionItem.NciDecisionEnum | null {
+    const decision = this.formModel.nciDecision;
+    return decision === 'Approve' || decision === 'Hold' || decision === 'Rejected' ? decision : null;
+  }
+
+  get isDirectorNotesRequired(): boolean {
+    const decision = this.isEditMode && this.nciDirector ? this.formModel.nciDecision : this.data?.nciDecision;
+    return decision === 'Hold' || decision === 'Rejected';
+  }
+
+  onNciDecisionChange(): void {
+    this.provenance.recordUserEdit('nciDecision');
+    this.updateValidationErrorsLive();
+    this.cdr.detectChanges();
+  }
+
   private validateChangedValues(includeUntouchedRequired = true): Record<string, string> {
     const errors: Record<string, string> = {};
+
+    if (this.nciDirector && this.isDirectorNotesRequired && !(this.formModel.directorNotes ?? '').trim()) {
+      errors.directorNotes = 'NCI Director Note is required.';
+    }
 
     if (this.isDoNotPayRestricted && this.isDoNotPayDecisionSelected()) {
       errors.docDecision = 'Do Not Pay is not available for grants added by a DOC user.';
@@ -1409,6 +1475,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   private currentSnapshot(form: GrantEditFormModel = this.formModel): string {
     return JSON.stringify({
+      nciDecision: form.nciDecision ?? null,
       docDecision: form.docDecision ?? null,
       docPriority: form.docPriority ?? null,
       docRecAmt: form.docRecAmt ?? null,
@@ -1466,6 +1533,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   private formModelFromGrant(grant: FundingSubmissionListGrantDto): GrantEditFormModel {
     return {
+      nciDecision: grant.nciDecision ?? null,
+      directorNotes: grant.nciDirectorNotes ?? '',
       docDecision: grant.docDecision ?? null,
       docPriority: !this.isDoNotPayDecisionValue(grant.docDecision) && grant.docPriority != null
         ? String(grant.docPriority) : null,
