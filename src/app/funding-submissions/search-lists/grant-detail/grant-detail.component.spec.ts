@@ -2059,12 +2059,12 @@ describe('GrantDetailComponent', () => {
 
   describe('FS-2391 raw annual R01 detail display', () => {
     [
-      { raw: 'Yes', flag: false, expected: 'Yes' },
-      { raw: 'No', flag: false, expected: 'No' },
-      { raw: 'No', flag: true, expected: 'No' },
+      { raw: 'Yes', flag: false, expected: 'Y' },
+      { raw: 'No', flag: false, expected: 'N' },
+      { raw: 'No', flag: true, expected: 'N' },
       { raw: null, flag: false, expected: '' },
       { raw: null, flag: true, expected: '' },
-      { raw: undefined, flag: true, expected: 'Yes' },
+      { raw: undefined, flag: true, expected: 'Y' },
       { raw: undefined, flag: false, expected: '' }
     ].forEach(({ raw, flag, expected }) => {
       it(`renders raw ${String(raw)} with legacy flag ${flag} as "${expected}"`, () => {
@@ -2080,6 +2080,7 @@ describe('GrantDetailComponent', () => {
           .find(cell => cell.textContent.trim() === '2Yr R01:');
         expect(label).toBeDefined();
         expect(label.nextElementSibling.textContent.trim()).toBe(expected);
+        expect(component.data.annualFundingR01).toBe(raw);
       });
     });
   });
