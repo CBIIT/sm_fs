@@ -107,6 +107,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   sendGrantsToOefiaSuccess = false;
   sendGrantsToOefiaErrorMessage = '';
   removeGrantsErrorMessage = '';
+  bulkEditErrorMessage = '';
   removalRefreshError = '';
   removalOutcomeUnknown = false;
   unknownRemovalConfirmed = false;
@@ -1997,7 +1998,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onBulkEditClick(): void {
-    if (!this.canBulkEditByStatus) {
+    if (!this.validateBulkEditSelection()) {
       return;
     }
     this.executeWithUnsavedGuard(() => this.onBulkEdit());
@@ -2159,7 +2160,7 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onBulkEdit(): void {
-    if (!this.canBulkEditByStatus) {
+    if (!this.validateBulkEditSelection()) {
       return;
     }
     const grants = Array.from(this.selectedRows.values());
@@ -2176,48 +2177,37 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get canBulkEditByStatus(): boolean {
-    if (!this.isDocOnlyUser()) {
-      return true;
-    }
-
-    const listReviewStatus = this.getListReviewStatusForBulkEdit();
-    return listReviewStatus !== 'OEFIA Review' && listReviewStatus !== 'NCI Director Review';
+    return this.getIneligibleBulkEditGrants().length === 0;
   }
 
   get canBulkEdit(): boolean {
-    return this.canBulkEditByStatus && this.selectedRows.size > 0;
+    return this.selectedRows.size > 0;
   }
 
   get bulkEditTooltipMessage(): string {
-    if (!this.canBulkEditByStatus) {
-      return 'Bulk Edit is unavailable because the list status is OEFIA Review or NCI Director Review.';
-    }
     return 'Select at least one grant to bulk edit.';
   }
 
-  private getListReviewStatusForBulkEdit(): string {
-    const fromListStatus = this.normalizeListReviewStatus(this.listStatus);
-    if (fromListStatus) {
-      return fromListStatus;
-    }
-    return this.currentReviewStatus;
+  private getIneligibleBulkEditGrants(): FundingSubmissionListGrantDto[] {
+    return Array.from(this.selectedRows.values())
+      .map(selected => this.cachedGrants.find(grant => Number(grant.applId) === Number(selected.applId)) || selected)
+      .filter(grant => {
+        if (this.isNciDirector) return !!grant.lockedDate;
+        if (this.isOEFIACerifier) return !!String(grant.nciDecision || '').trim();
+        if (!this.isDocOnlyUser()) return false;
+        const statusCode = String(grant.reviewStatusCode || '').trim().toUpperCase();
+        return statusCode
+          ? statusCode !== 'DOCREVIEW'
+          : this.normalizeGrantReviewStatus(grant.reviewStatus) !== 'DOC Review';
+      });
   }
 
-  private normalizeListReviewStatus(status: string | null | undefined): string {
-    const normalized = String(status || '').trim().toLowerCase();
-    if (!normalized) {
-      return '';
-    }
-    if (normalized.includes('doc')) {
-      return 'DOC Review';
-    }
-    if (normalized.includes('oefia')) {
-      return 'OEFIA Review';
-    }
-    if (normalized.includes('director')) {
-      return 'NCI Director Review';
-    }
-    return '';
+  private validateBulkEditSelection(): boolean {
+    const ineligibleGrants = this.getIneligibleBulkEditGrants();
+    this.bulkEditErrorMessage = ineligibleGrants.length
+      ? `The following grant application(s) ${ineligibleGrants.map(grant => grant.grantNumber).join(', ')} are not eligible for bulk edit. Please remove these grants from your selection and click the "Bulk Edit" button again.`
+      : '';
+    return this.selectedRows.size > 0 && ineligibleGrants.length === 0;
   }
 
   onAddGrantsToList(): void {

@@ -1014,9 +1014,13 @@ describe('FundingListsComponent', () => {
       expect(component.hasLockedGrantSelected).toBeTrue();
       component.goToDirectorBulkEdit();
       expect(navigateSpy).not.toHaveBeenCalled();
+      expect(component.bulkEditErrorMessage).toBe(`The following grant application(s) ${component.grants[1].grantNumber} are not eligible for bulk edit. Please remove these grants from your selection and click the "Bulk Edit" button again.`);
 
       component.selectedRows.delete(22);
       expect(component.hasLockedGrantSelected).toBeFalse();
+      component.goToDirectorBulkEdit();
+      expect(component.bulkEditErrorMessage).toBe('');
+      expect(navigateSpy).toHaveBeenCalled();
     });
   });
 
@@ -1174,13 +1178,24 @@ describe('FundingListsComponent FS-2343 decision lock (rendered template)', () =
     expect(alert.query(By.css('.btn-close'))).withContext('dismissible').not.toBeNull();
   });
 
-  it('disables Bulk Decision when a locked row is selected', () => {
+  it('allows a mixed selection to show the Bulk Decision eligibility error', () => {
     component.grants = [buildGrant({ applId: 31 }), buildGrant({ applId: 32, lockedDate: new Date() })];
     component.selectedRows.set(31, component.grants[0]);
     fixture.detectChanges();
     expect(bulkDecisionButton().disabled).toBeFalse();
 
     component.selectedRows.set(32, buildGrant({ applId: 32 }));
+    fixture.detectChanges();
+    expect(bulkDecisionButton().disabled).toBeFalse();
+    bulkDecisionButton().click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain(component.bulkEditErrorMessage);
+    expect(component.bulkEditErrorMessage).toContain('are not eligible for bulk edit');
+  });
+
+  it('disables Bulk Decision when all grants are locked', () => {
+    component.grants = [buildGrant({ applId: 31, lockedDate: new Date() })];
+    component.selectedRows.set(31, component.grants[0]);
     fixture.detectChanges();
     expect(bulkDecisionButton().disabled).toBeTrue();
   });

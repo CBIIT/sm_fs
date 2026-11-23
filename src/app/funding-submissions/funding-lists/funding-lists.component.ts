@@ -62,6 +62,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   docRecommendedTotal = 0;
   decisionSuccessMessage = '';
   lockErrorMessage = '';
+  bulkEditErrorMessage = '';
   isLockingDecisions = false;
 
   grantViewerUrl = '';
@@ -492,13 +493,24 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.grants.some(grant => this.isLockableDecision(grant));
   }
 
+  get allGrantsLocked(): boolean {
+    return this.grants.length > 0 && this.grants.every(grant => this.isGrantLocked(grant));
+  }
+
   get isLockActionDisabled(): boolean {
     return !this.hasLockableDecisions || this.isLockingDecisions;
   }
 
   goToDirectorBulkEdit(): void {
-    const selectedGrants = Array.from(this.selectedRows.values());
-    if (!selectedGrants.length || this.hasLockedGrantSelected) {
+    this.bulkEditErrorMessage = '';
+    const selectedGrants = Array.from(this.selectedRows.values()).map(selected =>
+      this.grants.find(grant => Number(grant.applId) === Number(selected.applId)) || selected);
+    const ineligibleGrants = selectedGrants.filter(grant => this.isGrantLocked(grant));
+    if (ineligibleGrants.length) {
+      this.bulkEditErrorMessage = `The following grant application(s) ${ineligibleGrants.map(grant => grant.grantNumber).join(', ')} are not eligible for bulk edit. Please remove these grants from your selection and click the "Bulk Decision" button again.`;
+      return;
+    }
+    if (!selectedGrants.length) {
       return;
     }
 

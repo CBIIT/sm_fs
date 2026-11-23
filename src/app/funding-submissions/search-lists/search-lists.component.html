@@ -219,6 +219,10 @@
       each additional column that you want to sort. Please note, sorting by column headers will unselect any selected
       rows.</p>
       
+            <ngb-alert *ngIf="bulkEditErrorMessage" type="danger" [dismissible]="true" (closed)="bulkEditErrorMessage = ''" role="alert">
+                {{ bulkEditErrorMessage }}
+            </ngb-alert>
+
             <!-- Action buttons -->
             <div class="d-flex gap-2 mb-3" *ngIf="!isNciDirector">
                 <!-- Bulk Edit -->

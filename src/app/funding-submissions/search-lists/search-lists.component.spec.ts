@@ -933,6 +933,7 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     });
 
     it('Bulk Edit: is guarded and does not navigate until confirmed', () => {
+      component.selectedRows.set(100, { applId: 100 });
       component.onBulkEditClick();
       expect(modalServiceSpy.open).toHaveBeenCalled();
       expect(routerSpy.navigate).not.toHaveBeenCalled();
@@ -1128,13 +1129,13 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       );
     });
 
-    it('DOC role: enables Bulk Edit for a selected grant in Draft', () => {
+    it('DOC role: allows clicking Bulk Edit but rejects a selected grant in Draft', () => {
       component.docFundingListCor = true;
       component.listStatus = 'Draft';
       component.currentReviewStatus = 'Draft';
       component.selectedRows.set(100, { applId: 100, reviewStatusCode: 'DRAFT' });
 
-      expect(component.canBulkEditByStatus).toBeTrue();
+      expect(component.canBulkEditByStatus).toBeFalse();
       expect(component.canBulkEdit).toBeTrue();
       expect(component.canRemoveSelectedGrants).toBeTrue();
     });
@@ -1150,28 +1151,28 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
       expect(component.canRemoveSelectedGrants).toBeTrue();
     });
 
-    it('DOC role: disables Bulk Edit and Remove for a selected grant in OEFIA Review', () => {
+    it('DOC role: allows clicking Bulk Edit but disables Remove for a selected grant in OEFIA Review', () => {
       component.docFundingListCor = true;
       component.listStatus = 'OEFIA Review';
       component.currentReviewStatus = 'OEFIA Review';
       component.selectedRows.set(100, { applId: 100, reviewStatusCode: 'OEFIAREVIEW' });
 
       expect(component.canBulkEditByStatus).toBeFalse();
-      expect(component.canBulkEdit).toBeFalse();
+      expect(component.canBulkEdit).toBeTrue();
       expect(component.canRemoveSelectedGrants).toBeFalse();
     });
 
-    it('DOC role: disables Bulk Edit and Remove for a selected grant in NCI Director Review', () => {
+    it('DOC role: allows clicking Bulk Edit but disables Remove for a selected grant in NCI Director Review', () => {
       component.docFundingListCor = true;
       component.listStatus = 'NCI Director Review';
       component.currentReviewStatus = 'NCI Director Review';
       component.selectedRows.set(100, { applId: 100, reviewStatusCode: 'DIRECTORREVIEW' });
 
       expect(component.canBulkEditByStatus).toBeFalse();
-      expect(component.canBulkEdit).toBeFalse();
+      expect(component.canBulkEdit).toBeTrue();
       expect(component.canRemoveSelectedGrants).toBeFalse();
       expect(component.bulkEditTooltipMessage)
-        .toBe('Bulk Edit is unavailable because the list status is OEFIA Review or NCI Director Review.');
+        .toBe('Select at least one grant to bulk edit.');
     });
 
     it('DOC role: disables Bulk Edit without selected rows in Draft', () => {
@@ -1208,6 +1209,79 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
 
       component.isOEFIACerifier = true;
       expect(component.canAddGrantsToList).toBeTrue();
+    });
+  });
+
+  describe('Bulk Edit grant eligibility', () => {
+    const errorMessage = (grantNumbers: string) => `The following grant application(s) ${grantNumbers} are not eligible for bulk edit. Please remove these grants from your selection and click the "Bulk Edit" button again.`;
+
+    for (const decision of ['Approve', 'Hold', 'Rejected']) {
+      it(`rejects an OEFIA selection with NCI decision ${decision} before prompting to discard edits`, () => {
+        component.isOEFIACerifier = true;
+        component.selectedRows.set(100, { applId: 100, grantNumber: '1R01CA100000-01', nciDecision: decision });
+        (component as any).detailComponentsByApplId.set(100, fakeDetailComponentRef(true));
+
+        component.onBulkEditClick();
+
+        expect(component.bulkEditErrorMessage).toBe(errorMessage('1R01CA100000-01'));
+        expect(routerSpy.navigate).not.toHaveBeenCalled();
+        expect(modalServiceSpy.open).not.toHaveBeenCalled();
+        fixture.detectChanges();
+        expect(fixture.nativeElement.textContent).toContain(component.bulkEditErrorMessage);
+      });
+    }
+
+    for (const statusCode of ['DRAFT', 'OEFIAREVIEW', 'DIRECTORREVIEW', 'UNKNOWN', '']) {
+      it(`rejects a DOC grant with status ${statusCode || 'missing'} even when the list is in DOC Review`, () => {
+        component.docFundingListCor = true;
+        component.listStatus = 'DOC Review';
+        component.selectedRows.set(100, { applId: 100, grantNumber: '1R01CA100000-01', reviewStatusCode: statusCode });
+        component.onBulkEdit();
+        expect(component.bulkEditErrorMessage).toBe(errorMessage('1R01CA100000-01'));
+        expect(routerSpy.navigate).not.toHaveBeenCalled();
+      });
+    }
+
+    it('uses refreshed grant data, names only ineligible grants, and clears the error after deselection', () => {
+      component.isOEFIACerifier = true;
+      component.selectedRows.set(100, { applId: 100, grantNumber: 'ELIGIBLE' });
+      component.selectedRows.set(101, { applId: 101, grantNumber: 'DECIDED-1' });
+      component.selectedRows.set(102, { applId: 102, grantNumber: 'DECIDED-2' });
+      (component as any).cachedGrants = [
+        { applId: 101, grantNumber: 'DECIDED-1', nciDecision: 'Hold' },
+        { applId: 102, grantNumber: 'DECIDED-2', nciDecision: 'Approve' }
+      ];
+      component.onBulkEdit();
+      expect(component.bulkEditErrorMessage).toBe(errorMessage('DECIDED-1, DECIDED-2'));
+      expect(routerSpy.navigate).not.toHaveBeenCalled();
+      expect(component.selectedRows.size).toBe(3);
+
+      component.selectedRows.delete(101);
+      component.selectedRows.delete(102);
+      component.onBulkEdit();
+      expect(component.bulkEditErrorMessage).toBe('');
+      expect(routerSpy.navigate).toHaveBeenCalled();
+    });
+
+    for (const reviewStatus of [{ reviewStatusCode: 'DOCREVIEW' }, { reviewStatus: 'Under DOC Review' }]) {
+      it(`permits DOC Review grants using ${Object.keys(reviewStatus)[0]} regardless of the list status`, () => {
+        component.docFundingListCor = true;
+        component.listStatus = 'NCI Director Review';
+        component.selectedRows.set(100, { applId: 100, ...reviewStatus });
+        component.onBulkEdit();
+        expect(component.bulkEditErrorMessage).toBe('');
+        expect(routerSpy.navigate).toHaveBeenCalled();
+      });
+    }
+
+    it('preserves the unsaved-change prompt for eligible selections', () => {
+      component.isOEFIACerifier = true;
+      component.selectedRows.set(100, { applId: 100 });
+      (component as any).detailComponentsByApplId.set(100, fakeDetailComponentRef(true));
+      component.onBulkEditClick();
+      expect(component.bulkEditErrorMessage).toBe('');
+      expect(modalServiceSpy.open).toHaveBeenCalled();
+      expect(routerSpy.navigate).not.toHaveBeenCalled();
     });
   });
 

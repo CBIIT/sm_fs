@@ -171,8 +171,12 @@
         To apply sorting order to multiple columns, hold down the <b>Shift</b> key and click the header of each additional column that you want to sort. Please note, sorting by column headers will unselect any selected rows.
       </p>
 
+      <ngb-alert *ngIf="bulkEditErrorMessage" type="danger" [dismissible]="true" (closed)="bulkEditErrorMessage = ''"
+        role="alert">
+        {{ bulkEditErrorMessage }}
+      </ngb-alert>
       <div class="mb-3">
-        <button type="button" class="btn btn-primary" (click)="goToDirectorBulkEdit()" [disabled]="selectedRows.size === 0 || hasLockedGrantSelected">
+        <button type="button" class="btn btn-primary" (click)="goToDirectorBulkEdit()" [disabled]="selectedRows.size === 0 || allGrantsLocked">
           <i class="far fa-gavel me-1"></i>Bulk Decision
         </button>
       </div>
