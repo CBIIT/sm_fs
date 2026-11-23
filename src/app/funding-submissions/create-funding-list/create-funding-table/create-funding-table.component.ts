@@ -6,6 +6,7 @@ import { FoaCellRendererComponent } from '../../../table-cell-renderers/foa-cell
 import {
   FundingSubmissionsService,
   FundingSubmissionAddGrantsToListRequestDto,
+  FundingSubmissionAddGrantsToListResultDto,
   FundingSubmissionAddGrantsPairConflictErrorDto,
   FundingSubmissionOriginalAmendmentConflictDto,
   FundingSubmissionGrantSearchCriteriaDto,
@@ -16,7 +17,7 @@ import {
 } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService , LoaderService, NameRenderComponent } from '@cbiit/i2ecui-lib';
 import { NGXLogger } from 'ngx-logger';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import {
   FullGrantNumberCellRendererComponent
@@ -24,6 +25,7 @@ import {
 import { DatatableThrottle } from '../../../utils/datatable-throttle';
 import { CancerActivityCellRendererComponent } from 'src/app/table-cell-renderers/cancer-activity-cell-renderer/cancer-activity-cell-renderer.component';
 import { HttpClient } from '@angular/common/http';
+import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
 
 declare var $: any;
 
@@ -58,6 +60,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   saveToListErrorMessage = '';
   saveRejectedSummaryMessage = '';
   originalAmendmentConflictMessages: string[] = [];
+  advancedDocStageRejectionMessages: string[] = [];
   grantList: FundingSubmissionSearchResultDto[] = [];
   throttle: DatatableThrottle = new DatatableThrottle();
   selectedRows: Map<number, FundingSubmissionSearchResultDto> = new Map();
@@ -79,6 +82,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   private modalRef: NgbModalRef;
   selectedDate = '';
   selectionDateOptions: Select2OptionData[] = [];
+  private selectionDatesSubscription?: Subscription;
 
   private readonly onHorizontalDragPointerDown = (event: PointerEvent): void => {
     if (!this.dragScrollBodyEl) return;
@@ -124,18 +128,12 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
     private logger: NGXLogger,
     private modalService: NgbModal,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private dropdownLookupService: FundingSubmDropdownLookupService
   ) {}
 
   ngOnInit(): void {
     $.fn.DataTable.ext.pager.numbers_length = 5;
-    this.FundingSubmissionsService.getSelectionDateCodes().subscribe({
-      next: (dates: SelectionDateCodeDto[]) => {
-        this.selectionDateOptions = dates.map(d => ({ id: d.code, text: d.name || d.description || d.code }));
-        this.logger.debug('selectionDateOptions:', this.selectionDateOptions);
-      },
-      error: (err) => this.logger.error('Failed to load selection date codes', err)
-    });
   }
 
   ngAfterViewInit(): void {
@@ -398,6 +396,7 @@ initComplete: () => {
   }
 
   ngOnDestroy(): void {
+    this.selectionDatesSubscription?.unsubscribe();
     if (this.pendingRealignFrame !== null) {
       window.cancelAnimationFrame(this.pendingRealignFrame);
       this.pendingRealignFrame = null;
@@ -587,12 +586,26 @@ allDataSelected(data: any[]): boolean {
 
   addSelectedToList(): void {
     this.selectedDate = '';
+    this.selectionDateOptions = [];
     this.saveToListErrorMessage = '';
     this.saveRejectedSummaryMessage = '';
+    this.originalAmendmentConflictMessages = [];
+    this.advancedDocStageRejectionMessages = [];
     this.modalRef = this.modalService.open(this.addToListModalRef, { size: 'lg', centered: true });
+    this.selectionDatesSubscription?.unsubscribe();
+    this.selectionDatesSubscription = this.dropdownLookupService.getAddGrantsSelectionDates().subscribe({
+      next: (dates: SelectionDateCodeDto[]) => {
+        this.selectionDateOptions = dates.map(d => ({ id: d.code, text: d.name || d.description || d.code }));
+      },
+      error: (err) => {
+        this.logger.error('Failed to load Add Grants list names', err);
+        this.saveToListErrorMessage = 'Unable to load available list names. Close and reopen this dialog to try again.';
+      }
+    });
   }
 
   cancelModal(): void {
+    this.selectionDatesSubscription?.unsubscribe();
     this.saveToListErrorMessage = '';
     this.saveRejectedSummaryMessage = '';
     this.modalRef?.dismiss();
@@ -602,6 +615,7 @@ allDataSelected(data: any[]): boolean {
     this.saveSuccessMessage = '';
     this.saveRejectedSummaryMessage = '';
     this.originalAmendmentConflictMessages = [];
+    this.advancedDocStageRejectionMessages = [];
     // Coerce to Number — DataTables can return applId as string at runtime
     const applIds = Array.from(this.selectedRows.keys()).map(id => Number(id));
     const body: FundingSubmissionAddGrantsToListRequestDto = {
@@ -617,8 +631,23 @@ allDataSelected(data: any[]): boolean {
         // Do not retain prior selection after a successful save; returning to this page
         // should start with zero "Grant(s) Added".
         this.saveToListErrorMessage = '';
+        this.originalAmendmentConflictMessages = this.getPairConflictMessages(result.originalAmendmentConflicts ?? []);
+        // The installed generated client predates this optional response field.
+        const extendedResult: FundingSubmissionAddGrantsToListResultDto & { advancedDocStageRejections?: unknown } = result;
+        this.advancedDocStageRejectionMessages = this.getAdvancedDocStageMessages(extendedResult.advancedDocStageRejections);
+        if (!(result.grantsAdded > 0)) {
+          this.saveRejectedSummaryMessage = result.grantsAdded === 0
+            ? `0 out of ${this.selectedRows.size} were added to the list.`
+            : 'No grants were reported as added to the list.';
+          if (result.grantsAlreadyInList > 0) {
+            this.saveRejectedSummaryMessage += ` ${result.grantsAlreadyInList} already in the list.`;
+          }
+          return;
+        }
         this.saveSuccessMessage = `Success! ${result.grantsAdded} out of ${this.selectedRows.size} were successfully added to the list.`;
-        this.originalAmendmentConflictMessages = this.getPairConflictMessages(result.originalAmendmentConflicts);
+        if (result.grantsAlreadyInList > 0) {
+          this.saveSuccessMessage += ` ${result.grantsAlreadyInList} already in the list.`;
+        }
         this.selectedRows.clear();
         this.grantList.forEach((row: any) => row.selected = false);
         this.modalRef?.close();
@@ -634,7 +663,8 @@ allDataSelected(data: any[]): boolean {
             queryParams: { listId: result.listId, from: 'create' },
             state: {
               successMessage: this.saveSuccessMessage,
-              originalAmendmentConflictMessages: this.originalAmendmentConflictMessages
+              originalAmendmentConflictMessages: this.originalAmendmentConflictMessages,
+              advancedDocStageRejectionMessages: this.advancedDocStageRejectionMessages
             }
           });
           return;
@@ -687,6 +717,21 @@ allDataSelected(data: any[]): boolean {
       + `${pair.originalGrantNumber} and ${pair.amendmentGrantNumber}.`);
   }
 
+  private getAdvancedDocStageMessages(rejections: unknown): string[] {
+    if (rejections == null) return [];
+    if (!Array.isArray(rejections)) return ['Some grants could not be added because their DOC is in advanced review.'];
+    return rejections.map((rejection: unknown) => {
+      if (typeof rejection !== 'object' || rejection === null
+        || !('applId' in rejection) || typeof rejection.applId !== 'number'
+        || !('fullGrantNum' in rejection) || !(typeof rejection.fullGrantNum === 'string' || rejection.fullGrantNum === null)
+        || !('reviewStatusCode' in rejection) || typeof rejection.reviewStatusCode !== 'string') {
+        return 'A grant could not be added because its DOC is in advanced review.';
+      }
+      const grant = rejection.fullGrantNum || `Application ID ${rejection.applId}`;
+      return `${grant} was not added because its DOC is in review (${rejection.reviewStatusCode}).`;
+    });
+  }
+
   private getSaveToListError(error: any): string {
     if (error?.error === 'A Funding List must contain at least one grant.') {
       return error.error;
@@ -715,7 +760,8 @@ allDataSelected(data: any[]): boolean {
   navigateToList(selectionDate: string, successMessage?: string, fallbackListId?: number): void {
     const state = successMessage ? {
       successMessage,
-      originalAmendmentConflictMessages: [...this.originalAmendmentConflictMessages]
+      originalAmendmentConflictMessages: [...this.originalAmendmentConflictMessages],
+      advancedDocStageRejectionMessages: [...this.advancedDocStageRejectionMessages]
     } : undefined;
     this.FundingSubmissionsService.searchLists({ selectionCode: [selectionDate], start: 0, length: 1 }).subscribe({
       next: (result) => {

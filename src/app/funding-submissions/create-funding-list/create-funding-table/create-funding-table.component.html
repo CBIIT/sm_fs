@@ -4,6 +4,9 @@
   <ul *ngIf="originalAmendmentConflictMessages.length">
     <li *ngFor="let message of originalAmendmentConflictMessages">{{ message }}</li>
   </ul>
+  <ul *ngIf="advancedDocStageRejectionMessages.length">
+    <li *ngFor="let message of advancedDocStageRejectionMessages">{{ message }}</li>
+  </ul>
 </div>
 
 <div *ngIf="showResults" class="row mb-2">
@@ -38,6 +41,9 @@
     </div>
     <ul *ngIf="saveRejectedSummaryMessage && originalAmendmentConflictMessages.length" class="alert alert-warning">
       <li *ngFor="let message of originalAmendmentConflictMessages">{{ message }}</li>
+    </ul>
+    <ul *ngIf="saveRejectedSummaryMessage && advancedDocStageRejectionMessages.length" class="alert alert-warning">
+      <li *ngFor="let message of advancedDocStageRejectionMessages">{{ message }}</li>
     </ul>
     <div *ngIf="saveToListErrorMessage" class="alert alert-danger" role="alert">
       {{ saveToListErrorMessage }}

@@ -1,14 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { of, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
+import { FundingSubmissionAddGrantsToListRequestDto, FundingSubmissionAddGrantsToListResultDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { HttpClient } from '@angular/common/http';
 
 import { CreateFundingTableComponent } from './create-funding-table.component';
+import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
 
 /**
  * Unit tests for the "Grant Search Results checkbox disable" feature (Compass item 10):
@@ -31,6 +32,8 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
   let component: CreateFundingTableComponent;
   let fixture: ComponentFixture<CreateFundingTableComponent>;
   let modalRefSpy: jasmine.SpyObj<any>;
+  const testWindow = window as unknown as { $: unknown };
+  let originalJquery: unknown;
 
   /** Minimal chainable jQuery stand-in that records calls and lets tests fire a captured handler. */
   function fakeJq() {
@@ -70,7 +73,8 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
     // loaded in the Karma test env — stub the pieces this component actually reaches for. Reset
     // unconditionally (not `||=`) since individual tests below reassign `window.$` to a jasmine
     // spy and must not leak that spy into the next test's beforeEach.
-    (window as any).$ = { fn: { DataTable: { ext: { pager: {} } } } };
+    originalJquery = testWindow.$;
+    testWindow.$ = { fn: { DataTable: { ext: { pager: {} } } } };
 
     const fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', [
       'getSelectionDateCodes', 'searchGrants', 'addGrantsToList', 'searchLists'
@@ -83,6 +87,8 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
     modalRefSpy = jasmine.createSpyObj('NgbModalRef', ['close', 'dismiss']);
     const modalServiceSpy = jasmine.createSpyObj('NgbModal', ['open']);
     modalServiceSpy.open.and.returnValue(modalRefSpy);
+    const dropdownLookupServiceSpy = jasmine.createSpyObj('FundingSubmDropdownLookupService', ['getAddGrantsSelectionDates']);
+    dropdownLookupServiceSpy.getAddGrantsSelectionDates.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
       declarations: [CreateFundingTableComponent],
@@ -93,6 +99,7 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
         { provide: AppPropertiesService, useValue: propertiesServiceSpy },
         { provide: NGXLogger, useValue: jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']) },
         { provide: NgbModal, useValue: modalServiceSpy },
+        { provide: FundingSubmDropdownLookupService, useValue: dropdownLookupServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['post']) }
       ]
@@ -104,8 +111,35 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
     component.ngAfterViewInit(); // builds dtOptions (rowCallback/initComplete/headerCallback)
   });
 
+  afterEach(() => {
+    testWindow.$ = originalJquery;
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('loads eligible list names afresh when opening Add Grants, without calling the shared lookup', () => {
+    const lookup = TestBed.inject(FundingSubmDropdownLookupService) as jasmine.SpyObj<FundingSubmDropdownLookupService>;
+    const generated = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;
+    lookup.getAddGrantsSelectionDates.and.returnValues(
+      of([{ code: 'NEW', name: 'New list' }, { code: 'EXISTING', description: 'Existing list' }]),
+      of([{ code: 'NEW' }])
+    );
+    component.addSelectedToList();
+    expect(component.selectionDateOptions).toEqual([{ id: 'NEW', text: 'New list' }, { id: 'EXISTING', text: 'Existing list' }]);
+    component.addSelectedToList();
+    expect(component.selectionDateOptions).toEqual([{ id: 'NEW', text: 'NEW' }]);
+    expect(generated.getSelectionDateCodes).not.toHaveBeenCalled();
+  });
+
+  it('clears stale options and reports lookup failure', () => {
+    const lookup = TestBed.inject(FundingSubmDropdownLookupService) as jasmine.SpyObj<FundingSubmDropdownLookupService>;
+    lookup.getAddGrantsSelectionDates.and.returnValue(throwError(() => new Error('unavailable')));
+    component.selectionDateOptions = [{ id: 'stale', text: 'Stale' }];
+    component.addSelectedToList();
+    expect(component.selectionDateOptions).toEqual([]);
+    expect(component.saveToListErrorMessage).toContain('Unable to load available list names');
   });
 
   it('renders the Save Grant List modal copy with the "List Name" label text', () => {
@@ -285,10 +319,12 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
       originalAmendmentConflicts: pairs
     };
     let service: jasmine.SpyObj<FundingSubmissionsService>;
+    let addGrants: jasmine.Spy<(body: FundingSubmissionAddGrantsToListRequestDto) => Observable<FundingSubmissionAddGrantsToListResultDto>>;
     let router: jasmine.SpyObj<Router>;
 
     beforeEach(() => {
       service = TestBed.inject(FundingSubmissionsService) as jasmine.SpyObj<FundingSubmissionsService>;
+      addGrants = service.addGrantsToList as unknown as typeof addGrants;
       router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
       component.selectedDate = '202608';
       for (let id = 1; id <= 5; id++) {
@@ -319,7 +355,7 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
       expect(component.originalAmendmentConflictMessages).toEqual(messages);
       expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
         queryParams: { listId: 55, from: 'create' },
-        state: { successMessage: component.saveSuccessMessage, originalAmendmentConflictMessages: messages }
+        state: { successMessage: component.saveSuccessMessage, originalAmendmentConflictMessages: messages, advancedDocStageRejectionMessages: [] }
       });
       expect(modalRefSpy.close).toHaveBeenCalled();
       expect(component.selectedRows.size).toBe(0);
@@ -343,7 +379,7 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
 
         expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
           queryParams: { listId: 55, from: 'create' },
-          state: { successMessage: component.saveSuccessMessage, originalAmendmentConflictMessages: messages }
+          state: { successMessage: component.saveSuccessMessage, originalAmendmentConflictMessages: messages, advancedDocStageRejectionMessages: [] }
         });
       });
     });
@@ -359,7 +395,7 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
       expect(service.searchLists).not.toHaveBeenCalled();
       expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
         queryParams: { listId: 55, from: 'create' },
-        state: { successMessage: component.saveSuccessMessage, originalAmendmentConflictMessages: messages }
+        state: { successMessage: component.saveSuccessMessage, originalAmendmentConflictMessages: messages, advancedDocStageRejectionMessages: [] }
       });
     });
 
@@ -447,16 +483,101 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
       });
     });
 
-    it('retains success feedback for an existing-list zero-add result without treating it as a 400', () => {
+    it('keeps the modal open with conflicts and no success for an existing-list zero-add result', () => {
       service.addGrantsToList.and.returnValue(of({
         grantsAdded: 0, listCode: '202608', listId: 55, originalAmendmentConflicts: pairs
       }) as any);
       service.searchLists.and.returnValue(of({ data: [{ listId: 55 }] }) as any);
       component.saveToList();
-      expect(component.saveSuccessMessage).toBe('Success! 0 out of 5 were successfully added to the list.');
+      expect(component.saveSuccessMessage).toBe('');
       expect(component.originalAmendmentConflictMessages).toEqual(messages);
-      expect(component.saveRejectedSummaryMessage).toBe('');
-      expect(modalRefSpy.close).toHaveBeenCalled();
+      expect(component.saveRejectedSummaryMessage).toBe('0 out of 5 were added to the list.');
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('transports partial success, existing grants, pair conflicts and advanced review rejections together', () => {
+      const result = {
+        grantsAdded: 1, grantsAlreadyInList: 1, listCode: '202608', listId: 55,
+        originalAmendmentConflicts: pairs,
+        advancedDocStageRejections: [
+          { applId: 12, fullGrantNum: '<img src=x>', reviewStatusCode: 'OEFIA_REVIEW' },
+          { applId: 13, fullGrantNum: null, reviewStatusCode: 'DIRECTOR_REVIEW' }
+        ]
+      };
+      addGrants.and.returnValue(of(result));
+      service.searchLists.and.returnValue(throwError(() => ({ status: 500 })));
+      component.saveToList();
+      expect(component.saveSuccessMessage).toBe('Success! 1 out of 5 were successfully added to the list. 1 already in the list.');
+      expect(component.advancedDocStageRejectionMessages).toEqual([
+        '<img src=x> was not added because its DOC is in review (OEFIA_REVIEW).',
+        'Application ID 13 was not added because its DOC is in review (DIRECTOR_REVIEW).'
+      ]);
+      expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
+        queryParams: { listId: 55, from: 'create' },
+        state: {
+          successMessage: component.saveSuccessMessage,
+          originalAmendmentConflictMessages: messages,
+          advancedDocStageRejectionMessages: component.advancedDocStageRejectionMessages
+        }
+      });
+    });
+
+    it('transports advanced review rejections when navigating directly by list ID', () => {
+      component.selectedDate = '';
+      const result = {
+        grantsAdded: 1, listId: 55,
+        advancedDocStageRejections: [{ applId: 4, fullGrantNum: 'Grant 4', reviewStatusCode: 'OEFIA' }]
+      };
+      addGrants.and.returnValue(of(result));
+      component.saveToList();
+      expect(service.searchLists).not.toHaveBeenCalled();
+      expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
+        queryParams: { listId: 55, from: 'create' },
+        state: {
+          successMessage: component.saveSuccessMessage,
+          originalAmendmentConflictMessages: [],
+          advancedDocStageRejectionMessages: ['Grant 4 was not added because its DOC is in review (OEFIA).']
+        }
+      });
+    });
+
+    it('shows all rejections on zero additions without closing the modal or clearing selection', () => {
+      addGrants.and.returnValue(of({
+        grantsAdded: 0, grantsAlreadyInList: 1, listId: 55, originalAmendmentConflicts: pairs,
+        advancedDocStageRejections: [{ applId: 3, fullGrantNum: '<b>Grant</b>', reviewStatusCode: 'OEFIA' }]
+      }));
+      component.saveToList();
+      const { host, view } = renderModal();
+      expect(component.saveRejectedSummaryMessage).toBe('0 out of 5 were added to the list. 1 already in the list.');
+      expect(host.textContent).toContain('<b>Grant</b> was not added');
+      expect(host.querySelector('b')).toBeNull();
+      expect(host.textContent).toContain(messages[0]);
+      expect(host.textContent).not.toContain('Success!');
+      expect(component.selectedRows.size).toBe(5);
+      expect(router.navigate).not.toHaveBeenCalled();
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
+      view.destroy();
+    });
+
+    it('does not claim success when the server omits the added count', () => {
+      addGrants.and.returnValue(of({ listId: 55 }));
+      component.saveToList();
+      expect(component.saveSuccessMessage).toBe('');
+      expect(component.saveRejectedSummaryMessage).toBe('No grants were reported as added to the list.');
+      expect(modalRefSpy.close).not.toHaveBeenCalled();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('clears stale advanced feedback and tolerates an absent or malformed new field', () => {
+      component.advancedDocStageRejectionMessages = ['stale'];
+      addGrants.and.returnValue(of({ grantsAdded: 0, listId: 55 }));
+      component.saveToList();
+      expect(component.advancedDocStageRejectionMessages).toEqual([]);
+      const malformed = { grantsAdded: 0, advancedDocStageRejections: [null] };
+      addGrants.and.returnValue(of(malformed));
+      component.saveToList();
+      expect(component.advancedDocStageRejectionMessages).toEqual(['A grant could not be added because its DOC is in advanced review.']);
     });
   });
 

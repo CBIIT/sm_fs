@@ -137,10 +137,13 @@
     </div>
     <div class="row g-0 save-success-row" *ngIf="saveSuccessMessage.length > 0 && blockedGrantNumbers.length === 0">
     <div class="col-12">
-      <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''; originalAmendmentConflictMessages = []">
+      <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''; originalAmendmentConflictMessages = []; advancedDocStageRejectionMessages = []">
         <span><b>{{saveSuccessMessage}}</b></span>
         <ul *ngIf="originalAmendmentConflictMessages.length">
           <li *ngFor="let message of originalAmendmentConflictMessages">{{ message }}</li>
+        </ul>
+        <ul *ngIf="advancedDocStageRejectionMessages.length">
+          <li *ngFor="let message of advancedDocStageRejectionMessages">{{ message }}</li>
         </ul>
       </ngb-alert>
     </div>

@@ -29,4 +29,14 @@ describe('FundingSubmDropdownLookupService FS-2679 2Y options', () => {
     service.getAnnualFundingR01Options().subscribe(options => expect(options).toBe(individualOptions));
     http.expectNone('/i2efsws/api/v1/funding-submissions/annual-funding-r01-options');
   });
+
+  it('fetches current Add Grants selection dates on each request without using the shared lookup', () => {
+    const url = '/i2efsws/api/v1/funding-submissions/selection-dates/add-grants';
+    const rows = [{ code: '202608', name: 'August', description: 'August list' }];
+    service.getAddGrantsSelectionDates().subscribe(dates => expect(dates).toEqual(rows));
+    http.expectOne(url).flush(rows);
+    service.getAddGrantsSelectionDates().subscribe(dates => expect(dates).toEqual([]));
+    http.expectOne(url).flush([]);
+    http.expectNone('/i2efsws/api/v1/funding-submissions/selection-dates');
+  });
 });
