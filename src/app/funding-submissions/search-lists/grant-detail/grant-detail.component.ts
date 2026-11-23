@@ -319,7 +319,6 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     if (!this.justificationLoaded || this.savingInProgress || this.pendingFundingReadback) {
       return;
     }
-    // DOC users can only edit while list status is DOC Review.
     if (!this.canEnterEditMode) {
       return;
     }
@@ -1037,50 +1036,26 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     return addedByGroup == null || String(addedByGroup).trim().toUpperCase() === 'OEFIA';
   }
 
-  private isDocReviewStatus(): boolean {
-    return String(this.listStatus || '').trim().toLowerCase().includes('doc review');
-  }
-
-  private isReadOnlyDocStatusForDocUser(): boolean {
-    if (this.canEditOefiaNotes()) {
-      return false;
-    }
-
+  private getGrantReviewStatusCode(): string {
     const reviewStatusCode = String(this.data?.reviewStatusCode || '').trim().toUpperCase();
-    if (reviewStatusCode) {
-      return reviewStatusCode === 'OEFIAREVIEW' || reviewStatusCode === 'DIRECTORREVIEW';
-    }
-
-    const reviewStatus = String(this.data?.reviewStatus || '').trim().toLowerCase();
-    if (reviewStatus) {
-      return reviewStatus.includes('oefia review') || reviewStatus.includes('nci director review');
-    }
-
-    const status = String(this.listStatus || '').trim().toLowerCase();
-    return status.includes('oefia review') || status.includes('nci director review');
-  }
-
-  private hasConfirmedAndLockedApproveRejectDecision(): boolean {
-    if (!this.data?.lockedDate) {
-      return false;
-    }
-
-    const nciDecision = String(this.data?.nciDecision || '').trim().toUpperCase();
-    return nciDecision === 'APPROVE' || nciDecision === 'REJECTED' || nciDecision === 'REJECT';
+    if (reviewStatusCode) return reviewStatusCode;
+    const status = String(this.data?.reviewStatus || this.listStatus || '').trim().toUpperCase()
+      .replace(/^UNDER\s+/, '').replace(/\s+/g, '');
+    return status === 'NCIDIRECTORREVIEW' ? 'DIRECTORREVIEW' : status;
   }
 
   get canEnterEditMode(): boolean {
-    // Confirmed/locked Approve/Reject director decisions are immutable.
-    if (this.hasConfirmedAndLockedApproveRejectDecision() && this.canEditOefiaNotes()) {
-      return false;
+    if (!this.data || this.data.lockedDate) return false;
+    if (this.nciDirector) {
+      return this.getGrantReviewStatusCode() === 'DIRECTORREVIEW';
     }
-
-    // Requirement: DOC users are read-only in OEFIA Review and NCI Director Review.
+    if (this.OEFIACertifier) {
+      return !String(this.data.nciDecision || '').trim();
+    }
     if (this.docFundingListCor) {
-      return !this.isReadOnlyDocStatusForDocUser();
+      return this.getGrantReviewStatusCode() === 'DOCREVIEW';
     }
-
-    return true;
+    return false;
   }
 
   get canEditFundingSubmissionsSection(): boolean {

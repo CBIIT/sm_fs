@@ -195,7 +195,8 @@ describe('FS-2251 standalone real Select2 rendering', () => {
       ...detail.data, docDecision: 'Pay', docPriority: 1,
       docRecommendedAmount: 90000, docRecommendedReductionPct: 10,
       annualFundingR01: 'Yes', budgetCategoryCode: 'R01R37',
-      docNciSelection: 'DOC', annualOrMyf: 'MYF', nciDecision: null, nciDirectorNotes: ''
+      docNciSelection: 'DOC', annualOrMyf: 'MYF', nciDecision: null, nciDirectorNotes: '',
+      reviewStatusCode: 'DIRECTORREVIEW'
     };
     funding.saveNciDecisions.and.returnValue(NEVER);
     startEdit();
@@ -819,6 +820,7 @@ describe('GrantDetailComponent', () => {
     beforeEach(() => {
       userSessionServiceSpy.hasRole.and.callFake((role: string) => role === roleNames.NCI_DIRECTOR);
       Object.assign(component.data, {
+        reviewStatusCode: 'DIRECTORREVIEW',
         nciDecision: 'Approve', nciDirectorNotes: 'Saved director note',
         docPriority: 1, docRecommendedAmount: 90000, docRecommendedReductionPct: 10
       });
@@ -1764,7 +1766,96 @@ describe('GrantDetailComponent', () => {
     expect(component.justificationDocuments).toEqual([{ id: 2, docFilename: 'changed-row.pdf' }]);
   });
 
-  it('allows Edit when user does not have DOC role once data is loaded', () => {
+  describe('role and workflow Edit eligibility', () => {
+    const roles = [
+      { name: 'DOC', role: roleNames.DOC_FUNDING_LIST_COR },
+      { name: 'OEFIA', role: roleNames.OEFIA_CERTIFIER },
+      { name: 'Director/Delegate', role: roleNames.NCI_DIRECTOR },
+      { name: 'Financial Analyst only', role: roleNames.FINANCIAL_ANALYST },
+      { name: 'unauthorized', role: null }
+    ];
+
+    function initialize(role: roleNames | null): void {
+      userSessionServiceSpy.hasRole.and.callFake(actual => actual === role);
+      fixture.detectChanges();
+      getJustificationSubject.next({ justificationText: '' });
+      getJustificationSubject.complete();
+      fixture.detectChanges();
+    }
+
+    function expectEditAllowed(allowed: boolean): void {
+      expect(component.canEnterEditMode).toBe(allowed);
+      const button = fixture.nativeElement.querySelector('button.btn-outline-primary') as HTMLButtonElement;
+      if (allowed) {
+        expect(button).not.toBeNull();
+        expect(button?.disabled).toBeFalse();
+      } else {
+        expect(button).toBeNull();
+      }
+      component.onEdit();
+      expect(component.isEditMode).toBe(allowed);
+    }
+
+    for (const user of roles) {
+      for (const status of ['DRAFT', 'DOCREVIEW', 'OEFIAREVIEW', 'DIRECTORREVIEW']) {
+        it(`${user.name}: gates Edit for ${status} using the grant rather than list status`, () => {
+          component.listStatus = status === 'DOCREVIEW' ? 'NCI Director Review' : 'DOC Review';
+          component.data = { ...component.data, reviewStatusCode: status };
+          initialize(user.role);
+          const allowed = user.role === roleNames.OEFIA_CERTIFIER
+            || (user.role === roleNames.DOC_FUNDING_LIST_COR && status === 'DOCREVIEW')
+            || (user.role === roleNames.NCI_DIRECTOR && status === 'DIRECTORREVIEW');
+          expectEditAllowed(allowed);
+        });
+      }
+
+      it(`${user.name}: hides Edit for a locked grant regardless of its decision value`, () => {
+        component.data = {
+          ...component.data, reviewStatusCode: user.role === roleNames.NCI_DIRECTOR ? 'DIRECTORREVIEW' : 'DOCREVIEW',
+          nciDecision: 'Hold', lockedDate: new Date()
+        };
+        initialize(user.role);
+        expectEditAllowed(false);
+      });
+    }
+
+    for (const decision of ['Approve', 'Hold', 'Rejected']) {
+      it(`hides OEFIA Edit once ${decision} is recorded, without requiring a lock`, () => {
+        component.data = { ...component.data, reviewStatusCode: 'DIRECTORREVIEW', nciDecision: decision };
+        initialize(roleNames.OEFIA_CERTIFIER);
+        expectEditAllowed(false);
+      });
+
+      it(`allows Director/Delegate editing of unlocked ${decision} in Director Review`, () => {
+        component.data = { ...component.data, reviewStatusCode: 'DIRECTORREVIEW', nciDecision: decision };
+        initialize(roleNames.NCI_DIRECTOR);
+        expectEditAllowed(true);
+      });
+    }
+
+    it('treats a whitespace-only NCI decision as blank for OEFIA', () => {
+      component.data = { ...component.data, reviewStatusCode: 'DIRECTORREVIEW', nciDecision: '   ' };
+      initialize(roleNames.OEFIA_CERTIFIER);
+      expectEditAllowed(true);
+    });
+
+    it('recognizes the grant review description before the list status', () => {
+      component.listStatus = 'DOC Review';
+      component.data = { ...component.data, reviewStatus: 'Under NCI Director Review' };
+      initialize(roleNames.NCI_DIRECTOR);
+      expectEditAllowed(true);
+    });
+
+    it('does not let the Financial Analyst role bypass DOC workflow restrictions', () => {
+      component.data = { ...component.data, reviewStatusCode: 'OEFIAREVIEW' };
+      initialize(roleNames.DOC_FUNDING_LIST_COR);
+      component.financialAnalyst = true;
+      fixture.detectChanges();
+      expectEditAllowed(false);
+    });
+  });
+
+  it('blocks Edit when user has no authorized editing role once data is loaded', () => {
     fixture.detectChanges();
     getJustificationSubject.next({ justificationText: '' });
     getJustificationSubject.complete();
@@ -1774,10 +1865,10 @@ describe('GrantDetailComponent', () => {
 
     component.onEdit();
 
-    expect(component.isEditMode).toBeTrue();
+    expect(component.isEditMode).toBeFalse();
   });
 
-  it('hides Edit for OEFIA users', () => {
+  it('shows Edit for OEFIA users when no NCI decision is recorded', () => {
     fixture.detectChanges();
     getJustificationSubject.next({ justificationText: '' });
     getJustificationSubject.complete();
@@ -1789,9 +1880,9 @@ describe('GrantDetailComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.canEnterEditMode).toBeFalse();
+    expect(component.canEnterEditMode).toBeTrue();
     const editButton: HTMLButtonElement | null = fixture.nativeElement.querySelector('button.btn-outline-primary');
-    expect(editButton).toBeNull();
+    expect(editButton).not.toBeNull();
   });
 
   it('hides Edit for Financial Analyst users', () => {
@@ -1811,7 +1902,7 @@ describe('GrantDetailComponent', () => {
     expect(editButton).toBeNull();
   });
 
-  it('allows Edit for DOC role when list status is not OEFIA/NCI Director Review once data is loaded', () => {
+  it('blocks Edit for DOC role when the grant is in Draft', () => {
     fixture.detectChanges();
     getJustificationSubject.next({ justificationText: '' });
     getJustificationSubject.complete();
@@ -1821,7 +1912,7 @@ describe('GrantDetailComponent', () => {
 
     component.onEdit();
 
-    expect(component.isEditMode).toBeTrue();
+    expect(component.isEditMode).toBeFalse();
   });
 
   it('shows enabled Edit button for DOC role when list status is DOC Review', () => {
