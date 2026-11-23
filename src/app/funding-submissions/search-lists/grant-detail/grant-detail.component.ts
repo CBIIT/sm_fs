@@ -9,7 +9,7 @@ import { Select2OptionData } from 'ng-select2';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
 import { saveAs } from 'file-saver';
-import { catchError, concatMap, defaultIfEmpty, from, map, Observable, of, Subscription, take, tap } from 'rxjs';
+import { catchError, concatMap, defaultIfEmpty, EMPTY, from, map, Observable, of, Subscription, take, tap } from 'rxjs';
 
 import { DocumentsDto } from '@cbiit/i2efsws-lib/model/documentsDto';
 import { DocumentService } from '../../../service/document.service';
@@ -507,6 +507,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.unknownFundingReadback = undefined;
     this.fundingRefreshError = null;
     this.justificationSaveVersion++;
+    // Stops queued files from targeting a newer grant; an in-flight write may still have committed.
+    this.justificationSaveSubscription?.unsubscribe();
     this.savingInProgress = false;
   }
 
@@ -1180,17 +1182,25 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       ? [...this.justificationFiles]
       : [undefined];
 
+    this.justificationSaveSubscription?.unsubscribe();
     const operation = ++this.justificationSaveVersion;
-    const isCurrent = () => !this.destroyed && this.justificationSaveVersion === operation;
+    const listId = this.listId;
+    const applId = this.data.applId;
+    const isCurrent = () => !this.destroyed && this.justificationSaveVersion === operation
+      && this.listId === listId && this.data?.applId === applId;
     this.justificationSaveSubscription = from(filesToSave).pipe(
-      concatMap((file, index) => this.fundingSubmissionsService.saveJustificationForm(
-        this.listId,
-        this.data.applId,
+      concatMap((file, index) => !isCurrent() ? EMPTY : this.fundingSubmissionsService.saveJustificationForm(
+        listId,
+        applId,
         file,
         index === 0 ? normalizedJustificationText : undefined,
         index === 0 ? deleteDocumentIds : undefined
       ).pipe(
-        tap(document => this.acknowledgeJustificationSave(file, document, index === 0, normalizedJustificationText))
+        tap(document => {
+          if (isCurrent()) {
+            this.acknowledgeJustificationSave(file, document, index === 0, normalizedJustificationText);
+          }
+        })
       ))
     ).subscribe({
       complete: () => {
@@ -1220,7 +1230,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
         this.savingInProgress = false;
         this.justificationSaveError = this.getJustificationSaveError(err);
         this.logger.error('Justification save error', err);
-        this.loadJustificationData().subscribe(() => this.cdr.detectChanges());
+        this.loadJustificationData().subscribe(() => {
+          if (isCurrent()) this.cdr.detectChanges();
+        });
       }
     });
   }

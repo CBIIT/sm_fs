@@ -17,7 +17,8 @@ import { roleNames } from '../../../service/role-names';
 import { UserSelect2ChangeDirective } from '../../user-select2-change.directive';
 import { FUNDING_WRITE_RECOVERY_STORAGE, FundingWriteRecoveryService } from '../../funding-write-recovery.service';
 import { MemoryStorage } from '../../testing/memory-storage';
-import { FundingSaveProgressService, SHOW_SAVE_PROGRESS_PROPERTY } from '../../funding-save-progress.service';
+import { FundingSaveProgressService } from '../../funding-save-progress.service';
+import { environment } from 'src/environments/environment';
 import { FundingSaveOverlayComponent } from '../../funding-save-overlay.component';
 import { fundingSaveNavigationGuard } from '../../funding-save-navigation.guard';
 
@@ -2385,8 +2386,7 @@ describe('BulkEditComponent', () => {
     }
 
     function enableProgressMessages(): void {
-      (TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy).and.callFake((key: string) =>
-        key === 'FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS' ? 'true' : 'http://example/');
+      spyOnProperty(saveProgress(), 'showProgressMessages').and.returnValue(true);
     }
 
     function editNotes(rows: any[]): void {
@@ -2455,17 +2455,55 @@ describe('BulkEditComponent', () => {
       fixture.destroy();
       expect(saveProgress().active).toBeFalse();
     });
+
+    it('releases the block and requires refresh when obtaining the readback throws synchronously', () => {
+      editNotes([grant({ applId: 100 }), grant({ applId: 200 })]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+      fundingSubmissionsServiceSpy.getListDetail.and.callFake(() => { throw new Error('client failure'); });
+
+      component.onSave();
+      fixture.detectChanges();
+
+      expect(component.isSaving).toBeFalse();
+      expect(saveProgress().active).toBeFalse();
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(1);
+      expect(component.savedChangesNeedRefresh).toBeTrue();
+      expect(component.saveErrorMessage).toContain('Retry refresh');
+      expect(TestBed.inject(FundingWriteRecoveryService).get(component.listId, 100)?.state).toBe('saved');
+      expect(fixture.nativeElement.textContent).toContain('Retry refresh');
+    });
+
+    it('releases the block with an explicit refresh-required error when the queue fails unexpectedly', () => {
+      editNotes([grant()]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(of(1));
+      spyOn(component as any, 'refreshSavedFundingRequest').and.throwError('unexpected');
+
+      component.onSave();
+      fixture.detectChanges();
+
+      expect(component.isSaving).toBeFalse();
+      expect(saveProgress().active).toBeFalse();
+      expect(component.saveErrorMessage)
+        .toBe('The save stopped unexpectedly. Some changes may have been saved. Retry refresh before saving again.');
+      expect(component.savedChangesNeedRefresh).toBeTrue();
+      expect(TestBed.inject(FundingWriteRecoveryService).get(component.listId, component.rows[0].applId)?.state)
+        .toBe('saved');
+    });
   });
 
   describe('FundingSaveProgressService, overlay, and navigation guard', () => {
-    it('reads the property as trimmed, case-insensitive "true" only', () => {
-      const getProperty = TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy;
-      for (const [value, expected] of [[undefined, false], ['', false], ['false', false], ['yes', false],
-        [' True ', true], ['TRUE', true]] as Array<[string, boolean]>) {
-        getProperty.and.returnValue(value);
-        expect(saveProgress().showProgressMessages).withContext(String(value)).toBe(expected);
+    it('shows progress text only for an explicit boolean true environment flag, ignoring administered properties', () => {
+      const original = environment.FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS;
+      (TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy).and.returnValue('true');
+      try {
+        expect(original).toBeFalse();
+        for (const [value, expected] of [[false, false], [undefined, false], ['true', false], [true, true]] as Array<[any, boolean]>) {
+          (environment as any).FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS = value;
+          expect(saveProgress().showProgressMessages).withContext(String(value)).toBe(expected);
+        }
+      } finally {
+        environment.FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS = original;
       }
-      expect(getProperty).toHaveBeenCalledWith(SHOW_SAVE_PROGRESS_PROPERTY);
     });
 
     it('keeps the block until every owner ends and ignores stale tokens', () => {

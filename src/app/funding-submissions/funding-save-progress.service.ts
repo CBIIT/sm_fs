@@ -1,11 +1,6 @@
 import { Injectable } from '@angular/core';
-import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { BehaviorSubject, Observable } from 'rxjs';
-
-// Transient funding-save/loading status text is hidden unless this app property is exactly "true"
-// (trimmed, case-insensitive). The default lives here, not in environment overrides, because
-// AppPropertiesService prefers any truthy environment value over the administered app property.
-export const SHOW_SAVE_PROGRESS_PROPERTY = 'FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS';
+import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class FundingSaveProgressService {
@@ -15,15 +10,14 @@ export class FundingSaveProgressService {
 
   readonly active$: Observable<boolean> = this.activeSubject.asObservable();
 
-  constructor(private propertiesService: AppPropertiesService) {}
-
   get active(): boolean {
     return this.owners.size > 0;
   }
 
+  // Transient funding-save/loading status text is shown only when the build's environment file sets
+  // FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS to boolean true; administered app properties do not override it.
   get showProgressMessages(): boolean {
-    const value = this.propertiesService.getProperty(SHOW_SAVE_PROGRESS_PROPERTY);
-    return String(value ?? '').trim().toLowerCase() === 'true';
+    return environment.FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS === true;
   }
 
   begin(): number {

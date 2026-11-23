@@ -545,7 +545,7 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     expect(warning()).toBeTrue();
     const token = progress.begin();
     expect(warning()).toBeFalse();
-    (TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy).and.returnValue('true');
+    spyOnProperty(progress, 'showProgressMessages').and.returnValue(true);
     expect(warning()).toBeTrue();
     progress.end(token);
   });

@@ -11,6 +11,7 @@ export const environment = {
   TECH_SUPPORT_EMAIL: 'ncii2egrantsdevelopmentteam@mail.nih.gov',
   // I2EWEB_URL: 'https://i2e-test.nci.nih.gov/',
   apiBaseUrl: '',
+  FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS: false,
   msalConfig: {
     auth: {
       clientId: '4450b02b-ea0d-4a8c-bf01-cbad66fb841c',

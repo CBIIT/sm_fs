@@ -926,6 +926,15 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
         if (this.saveSuccessMessage) this.scrollToSuccessMessage();
+      },
+      error: error => {
+        if (!this.isCurrentFundingSave(readbacks[0])) return;
+        // Writes may already have committed, so keep recovery markers and require a server refresh.
+        this.logger.error('Bulk funding save stopped unexpectedly', error);
+        this.priorityRefreshRequired = true;
+        this.isSaving = false;
+        this.saveErrorMessage = 'The save stopped unexpectedly. Some changes may have been saved. Retry refresh before saving again.';
+        this.recomputeCanSave();
       }
     });
   }
@@ -1234,9 +1243,9 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.priorityRefreshRequired = true;
     this.isSaving = true;
     this.saveErrorMessage = '';
-    return this.fundingErrorScope.handleLocally(
+    return defer(() => this.fundingErrorScope.handleLocally(
       this.fundingSubmissionsService.getListDetail(this.listId)
-    ).pipe(
+    )).pipe(
       defaultIfEmpty(null),
       take(1),
       map(detail => {

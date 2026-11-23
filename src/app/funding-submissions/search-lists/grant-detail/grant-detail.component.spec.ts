@@ -1659,12 +1659,80 @@ describe('GrantDetailComponent', () => {
         expect(component.saveSuccessMessage).toBeFalsy();
       });
 
+      it('cancels queued Justification files for a replaced grant and ignores the late acknowledgement', () => {
+        const first = new File(['first'], 'first.pdf', { type: 'application/pdf' });
+        const second = new File(['second'], 'second.pdf', { type: 'application/pdf' });
+        const newer = new File(['newer'], 'newer.pdf', { type: 'application/pdf' });
+        const newerGrant = { ...component.data, ...persistedGrant({ applId: 200, grantNumber: 'NEWER' }) };
+        const responses: Array<Subject<any>> = [];
+        fundingSubmissionsServiceSpy.saveJustificationForm.and.callFake(() => {
+          const response = new Subject<any>();
+          responses.push(response);
+          return response;
+        });
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [persistedGrant()] }));
+        const savedSpy = jasmine.createSpy('saved');
+        component.saved.subscribe(savedSpy);
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        component.justificationFiles = [first, second];
+        component.onSave();
+        expect(fundingSubmissionsServiceSpy.saveJustificationForm.calls.allArgs())
+          .toEqual([[1, 100, first, undefined, undefined]]);
+        savedSpy.calls.reset();
+
+        component.data = newerGrant;
+        expect(saveProgress().active).toBeFalse();
+        component.justificationLoaded = true;
+        component.onEdit();
+        component.justificationFiles = [newer];
+        component.onSave();
+        expect(saveProgress().active).toBeTrue();
+
+        responses[0].next({ id: 10, docFilename: 'first.pdf' });
+        responses[0].complete();
+
+        expect(fundingSubmissionsServiceSpy.saveJustificationForm.calls.allArgs()).toEqual([
+          [1, 100, first, undefined, undefined],
+          [1, 200, newer, undefined, undefined]
+        ]);
+        expect(component.justificationDocuments.map(document => document.id)).not.toContain(10);
+        expect(component.justificationFiles).toEqual([newer]);
+        expect(saveProgress().active).toBeTrue();
+        expect(savedSpy).not.toHaveBeenCalled();
+
+        responses[1].next({ id: 20, docFilename: 'newer.pdf' });
+        responses[1].complete();
+        getJustificationSubject.next({ justificationText: '', documents: [{ id: 20, docFilename: 'newer.pdf' }] });
+        expect(saveProgress().active).toBeFalse();
+        expect(savedSpy).toHaveBeenCalledTimes(1);
+      });
+
+      it('does not redraw a destroyed view when the Justification error-path refresh resolves late', () => {
+        const refresh = new Subject<any>();
+        fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(throwError(() => ({ status: 500 })));
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [persistedGrant()] }));
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        fundingSubmissionsServiceSpy.getJustification.and.returnValue(refresh);
+        component.justificationFiles = [new File(['first'], 'first.pdf', { type: 'application/pdf' })];
+        component.onSave();
+        expect(component.justificationSaveError).toBeTruthy();
+        expect(saveProgress().active).toBeFalse();
+        const detectChanges = spyOn((component as any).cdr, 'detectChanges');
+
+        component.ngOnDestroy();
+        refresh.next({ justificationText: '', documents: [] });
+        refresh.complete();
+
+        expect(detectChanges).not.toHaveBeenCalled();
+      });
+
       it('hides the transient defaults loading text by default and shows it when the property is on', () => {
         choosePay();
         fixture.detectChanges();
         expect(fixture.nativeElement.textContent).not.toContain('Loading DOC Pay defaults');
-        (TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy).and.callFake((key: string) =>
-          key === 'FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS' ? ' TRUE ' : 'http://grant-viewer/');
+        spyOnProperty(TestBed.inject(FundingSaveProgressService), 'showProgressMessages').and.returnValue(true);
         fixture.detectChanges();
         expect(fixture.nativeElement.textContent).toContain('Loading DOC Pay defaults');
       });
@@ -2338,8 +2406,7 @@ describe('GrantDetailComponent', () => {
     });
 
     it('allows unrelated editing while pending and renders the detached view when options arrive', fakeAsync(() => {
-      (TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy).and.callFake((key: string) =>
-        key === 'FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS' ? 'true' : 'http://grant-viewer/');
+      spyOnProperty(TestBed.inject(FundingSaveProgressService), 'showProgressMessages').and.returnValue(true);
       fixture.detectChanges();
       fixture.changeDetectorRef.detach();
       getJustificationSubject.next({ justificationText: '' });
