@@ -8,7 +8,7 @@ import { NGXLogger } from 'ngx-logger';
 import { NgbModal, NgbTooltip, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { By } from '@angular/platform-browser';
 import { FundingSubmissionBulkEditRequestDto, FundingSubmissionDocPayDefaultsDto, FundingSubmissionListDetailDto, FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
-import { AppPropertiesService } from '@cbiit/i2ecui-lib';
+import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 
 import { BulkEditComponent } from './bulk-edit.component';
 import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lookup.service';
@@ -17,6 +17,9 @@ import { roleNames } from '../../../service/role-names';
 import { UserSelect2ChangeDirective } from '../../user-select2-change.directive';
 import { FUNDING_WRITE_RECOVERY_STORAGE, FundingWriteRecoveryService } from '../../funding-write-recovery.service';
 import { MemoryStorage } from '../../testing/memory-storage';
+import { FundingSaveProgressService, SHOW_SAVE_PROGRESS_PROPERTY } from '../../funding-save-progress.service';
+import { FundingSaveOverlayComponent } from '../../funding-save-overlay.component';
+import { fundingSaveNavigationGuard } from '../../funding-save-navigation.guard';
 
 @Component({
   selector: 'ng-select2',
@@ -135,7 +138,7 @@ describe('BulkEditComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [FormsModule, NgbTooltipModule],
-      declarations: [BulkEditComponent, FakeNgSelect2Component, UserSelect2ChangeDirective],
+      declarations: [BulkEditComponent, FakeNgSelect2Component, UserSelect2ChangeDirective, FundingSaveOverlayComponent],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
@@ -2374,6 +2377,150 @@ describe('BulkEditComponent', () => {
       component.onApplyChanges();
       expect(component.showApplyBeforeSaveTooltip).toBeFalse();
     });
+  });
+
+  describe('page-blocking save progress', () => {
+    function saveProgress(): FundingSaveProgressService {
+      return TestBed.inject(FundingSaveProgressService);
+    }
+
+    function enableProgressMessages(): void {
+      (TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy).and.callFake((key: string) =>
+        key === 'FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS' ? 'true' : 'http://example/');
+    }
+
+    function editNotes(rows: any[]): void {
+      initializeFixtureWithGrants(rows);
+      component.rows.forEach(row => row.docNotes = `changed ${row.applId}`);
+      component.onRowFieldChange();
+    }
+
+    it('holds one block across queued rows and hides transient save text by default', () => {
+      editNotes([grant({ applId: 100 }), grant({ applId: 200 })]);
+      const firstWrite = new Subject<number>();
+      const firstRead = new Subject<FundingSubmissionListDetailDto>();
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValues(firstWrite, of(1));
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValues(firstRead, of({
+        grants: component.rows.map(row => ({ ...row }))
+      }));
+
+      component.onSave();
+      fixture.detectChanges();
+      expect(saveProgress().active).toBeTrue();
+      expect(fixture.nativeElement.textContent).not.toContain('Saving');
+      expect(getSaveButton()).toBeTruthy();
+
+      firstWrite.next(1);
+      firstWrite.complete();
+      expect(saveProgress().active).toBeTrue();
+      firstRead.next({ grants: component.rows.map(row => ({ ...row })) });
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).toHaveBeenCalledTimes(2);
+      expect(saveProgress().active).toBeFalse();
+      expect(component.saveSuccessMessage).toBe('Success! Bulk changes have been applied');
+    });
+
+    it('shows the transient save text when the property is on', () => {
+      enableProgressMessages();
+      editNotes([grant()]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(new Subject<number>());
+
+      component.onSave();
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.textContent).toContain('Saving changes...');
+      expect(fixture.nativeElement.textContent).toContain('Saving...');
+    });
+
+    it('releases the block and keeps terminal messages visible on definite failure and unknown outcome', () => {
+      editNotes([grant()]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(
+        throwError(() => ({ status: 400, error: { detail: 'DOC reduction pair is inconsistent.' } })));
+      component.onSave();
+      fixture.detectChanges();
+      expect(saveProgress().active).toBeFalse();
+      expect(fixture.nativeElement.textContent).toContain('DOC reduction pair is inconsistent.');
+
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(throwError(() => ({ status: 500 })));
+      component.onSave();
+      fixture.detectChanges();
+      expect(saveProgress().active).toBeFalse();
+      expect(fixture.nativeElement.textContent).toContain('may still be running');
+    });
+
+    it('releases its block when destroyed mid-save', () => {
+      editNotes([grant()]);
+      fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(new Subject<number>());
+      component.onSave();
+      expect(saveProgress().active).toBeTrue();
+      fixture.destroy();
+      expect(saveProgress().active).toBeFalse();
+    });
+  });
+
+  describe('FundingSaveProgressService, overlay, and navigation guard', () => {
+    it('reads the property as trimmed, case-insensitive "true" only', () => {
+      const getProperty = TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy;
+      for (const [value, expected] of [[undefined, false], ['', false], ['false', false], ['yes', false],
+        [' True ', true], ['TRUE', true]] as Array<[string, boolean]>) {
+        getProperty.and.returnValue(value);
+        expect(saveProgress().showProgressMessages).withContext(String(value)).toBe(expected);
+      }
+      expect(getProperty).toHaveBeenCalledWith(SHOW_SAVE_PROGRESS_PROPERTY);
+    });
+
+    it('keeps the block until every owner ends and ignores stale tokens', () => {
+      const first = saveProgress().begin();
+      const second = saveProgress().begin();
+      saveProgress().end(first);
+      saveProgress().end(first);
+      expect(saveProgress().active).toBeTrue();
+      saveProgress().end(second);
+      expect(saveProgress().active).toBeFalse();
+    });
+
+    it('is independent of the shared LoaderService', () => {
+      const loader = new LoaderService(jasmine.createSpyObj('NGXLogger', ['trace', 'debug', 'info', 'log', 'warn', 'error']));
+      const token = saveProgress().begin();
+      loader.show();
+      loader.hide();
+      expect(saveProgress().active).toBeTrue();
+      saveProgress().end(token);
+    });
+
+    it('blocks navigation only while a save is active', () => {
+      const guard = () => TestBed.runInInjectionContext(() =>
+        fundingSaveNavigationGuard(null, null, null, null));
+      expect(guard()).toBeTrue();
+      const token = saveProgress().begin();
+      expect(guard()).toBeFalse();
+      saveProgress().end(token);
+      expect(guard()).toBeTrue();
+    });
+
+    it('renders a page dimmer and swallows keyboard input while active', () => {
+      const overlay = TestBed.createComponent(FundingSaveOverlayComponent);
+      overlay.detectChanges();
+      expect(overlay.nativeElement.querySelector('.dimmer')).toBeNull();
+
+      const token = saveProgress().begin();
+      overlay.detectChanges();
+      expect(overlay.nativeElement.querySelector('.dimmer .spinner')).not.toBeNull();
+      const blocked = new KeyboardEvent('keydown', { key: 'Enter', cancelable: true, bubbles: true });
+      document.body.dispatchEvent(blocked);
+      expect(blocked.defaultPrevented).toBeTrue();
+
+      saveProgress().end(token);
+      overlay.detectChanges();
+      expect(overlay.nativeElement.querySelector('.dimmer')).toBeNull();
+      const allowed = new KeyboardEvent('keydown', { key: 'Enter', cancelable: true, bubbles: true });
+      document.body.dispatchEvent(allowed);
+      expect(allowed.defaultPrevented).toBeFalse();
+      overlay.destroy();
+    });
+
+    function saveProgress(): FundingSaveProgressService {
+      return TestBed.inject(FundingSaveProgressService);
+    }
   });
 
   describe('FS-2108 — DOC Bulk Edit OEFIA Notes read-only behavior', () => {

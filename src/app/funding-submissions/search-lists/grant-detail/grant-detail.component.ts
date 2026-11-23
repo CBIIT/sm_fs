@@ -20,6 +20,7 @@ import {
   validateDocRecommendation
 } from '../../doc-pay-defaults';
 import { FundingRequestErrorScopeService } from '../../funding-request-error-scope.service';
+import { FundingSaveProgressService } from '../../funding-save-progress.service';
 import { GrantBudgetCategoryOptions } from '../../grant-budget-category-options';
 import {
   FundingWriteRecoveryService, FundingWriteRecoveryState, isDefiniteFundingWriteRejection
@@ -158,7 +159,10 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   private initialFundingSnapshot = '';
   private initialJustificationText = '';
   private cancelModalRef: NgbModalRef;
-  private savingInProgress = false;
+  private saving = false;
+  private saveProgressToken: number | null = null;
+  private justificationSaveSubscription: Subscription;
+  private justificationSaveVersion = 0;
   private suppressNextLeavePrompt = false;
 
   // Client-side validation constants — mirror FsubJustificationConstants (sm_i2e_fs_ws)
@@ -185,7 +189,8 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     private dropdownLookupService: FundingSubmDropdownLookupService,
     private documentService: DocumentService,
     private fundingWriteRecovery: FundingWriteRecoveryService,
-    private fundingErrorScope: FundingRequestErrorScopeService
+    private fundingErrorScope: FundingRequestErrorScopeService,
+    private saveProgress: FundingSaveProgressService
   ) {
     this.grantBudgetOptions = new GrantBudgetCategoryOptions(
       this.fundingSubmissionsService, this.fundingErrorScope, (applId, state) => {
@@ -414,6 +419,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     if (this.fundingSaveSubscription && !this.fundingSaveSubscription.closed) {
       this.fundingSaveSubscription.unsubscribe();
     }
+    this.justificationSaveSubscription?.unsubscribe();
     if (this.docPriorityOptionsSubscription && !this.docPriorityOptionsSubscription.closed) {
       this.docPriorityOptionsSubscription.unsubscribe();
     }
@@ -500,6 +506,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.pendingFundingReadback = undefined;
     this.unknownFundingReadback = undefined;
     this.fundingRefreshError = null;
+    this.justificationSaveVersion++;
     this.savingInProgress = false;
   }
 
@@ -1173,7 +1180,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       ? [...this.justificationFiles]
       : [undefined];
 
-    from(filesToSave).pipe(
+    const operation = ++this.justificationSaveVersion;
+    const isCurrent = () => !this.destroyed && this.justificationSaveVersion === operation;
+    this.justificationSaveSubscription = from(filesToSave).pipe(
       concatMap((file, index) => this.fundingSubmissionsService.saveJustificationForm(
         this.listId,
         this.data.applId,
@@ -1185,8 +1194,10 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
       ))
     ).subscribe({
       complete: () => {
+        if (!isCurrent()) return;
         this.justificationFileError = null;
         this.loadJustificationData().subscribe(refreshed => {
+          if (!isCurrent()) return;
           if (!refreshed) {
             this.savingInProgress = false;
             this.justificationSaveError = 'Justification changes were saved, but the justification data could not be refreshed.';
@@ -1205,6 +1216,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
         });
       },
       error: err => {
+        if (!isCurrent()) return;
         this.savingInProgress = false;
         this.justificationSaveError = this.getJustificationSaveError(err);
         this.logger.error('Justification save error', err);
@@ -1286,6 +1298,29 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   isSaveInProgress(): boolean {
     return this.savingInProgress;
+  }
+
+  // The whole save lifecycle (write, readback, Justification) owns one page-blocking token.
+  private get savingInProgress(): boolean {
+    return this.saving;
+  }
+
+  private set savingInProgress(value: boolean) {
+    this.saving = value;
+    if (value && !this.destroyed && this.saveProgressToken === null) {
+      this.saveProgressToken = this.saveProgress.begin();
+    } else if (!value && this.saveProgressToken !== null) {
+      this.saveProgress.end(this.saveProgressToken);
+      this.saveProgressToken = null;
+    }
+  }
+
+  get showSaveProgressMessages(): boolean {
+    return this.saveProgress.showProgressMessages;
+  }
+
+  get saveProgressActive(): boolean {
+    return this.saveProgress.active;
   }
 
   get prioritySaveBlocked(): boolean {

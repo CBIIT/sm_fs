@@ -19,6 +19,7 @@ import { AppUserSessionService } from 'src/app/service/app-user-session.service'
 import { NciDecisionCellRendererComponent } from '../../table-cell-renderers/nci-decision-cell-renderer/nci-decision-cell-renderer.component';
 import { formatFundingSubmissionDate, formatNciDecision } from '../../utils/funding-submission-format';
 import { FundingRequestErrorScopeService } from '../funding-request-error-scope.service';
+import { FundingSaveProgressService } from '../funding-save-progress.service';
 import { FundingWriteRecoveryService, isDefiniteFundingWriteRejection } from '../funding-write-recovery.service';
 import { DetailPriorityCoordinator } from './detail-priority-coordinator';
 
@@ -220,7 +221,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     private modalService: NgbModal,
     private dropdownLookupService: FundingSubmDropdownLookupService,
     private fundingErrorScope: FundingRequestErrorScopeService,
-    private fundingWriteRecovery: FundingWriteRecoveryService
+    private fundingWriteRecovery: FundingWriteRecoveryService,
+    readonly saveProgress: FundingSaveProgressService
   ) { }
 
   ngOnInit(): void {

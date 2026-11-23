@@ -118,7 +118,7 @@
                 (appUserSelect2Change)="onUserSelectChange('docPriority', $event)"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
-              <div *ngIf="isEditMode && docPriorityOptionsLoading" class="text-muted small" role="status">Loading priorities...</div>
+              <div *ngIf="isEditMode && docPriorityOptionsLoading && showSaveProgressMessages" class="text-muted small" role="status">Loading priorities...</div>
               <div *ngIf="isEditMode && docPriorityOptionsError" class="text-danger small" role="alert">
                 {{docPriorityOptionsError}}
                 <button type="button" class="btn btn-link btn-sm" (click)="fetchDocPriorityOptions()">Retry options</button>
@@ -161,7 +161,7 @@
                 [data]="budgetCategoryOptionsForForm" [placeholder]="'Select'" width="100%"
                 [disabled]="doNotPayOefiaLockActive">
               </ng-select2>
-              <div *ngIf="isEditMode && !docFundingListCor && budgetCategoryStatus === 'loading'" class="small">
+              <div *ngIf="isEditMode && !docFundingListCor && budgetCategoryStatus === 'loading' && showSaveProgressMessages" class="small">
                 Loading Budget Categories…
               </div>
               <div *ngIf="isEditMode && !docFundingListCor && budgetCategoryStatus === 'error'" class="text-danger small">
@@ -323,7 +323,7 @@
       </table>
 
       <!-- Buttons sit inside grid-container so they align with the table and stay visible -->
-      <div *ngIf="isEditMode && docPayDefaultsLoading" class="text-muted small py-2" role="status">
+      <div *ngIf="isEditMode && docPayDefaultsLoading && showSaveProgressMessages" class="text-muted small py-2" role="status">
         Loading DOC Pay defaults...
       </div>
       <div *ngIf="isEditMode && docPayDefaultsError" class="text-danger small py-2" role="alert">
@@ -341,7 +341,7 @@
       <div *ngIf="isEditMode && fundingRecoveryError" class="text-danger small py-2" role="alert">
         {{fundingRecoveryError}}
       </div>
-      <div *ngIf="isEditMode && prioritySaveBlocked" class="text-muted small py-2" role="status">
+      <div *ngIf="isEditMode && prioritySaveBlocked && (!saveProgressActive || showSaveProgressMessages)" class="text-muted small py-2" role="status">
         Another list update or its refresh must finish before this grant can be saved.
       </div>
       <div *ngIf="isEditMode && fundingRecoveryState === 'unknown'" class="alert alert-warning" role="alert">

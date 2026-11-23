@@ -18,6 +18,7 @@ import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lo
 import { DocumentService } from '../../../service/document.service';
 import { UserSelect2ChangeDirective } from '../../user-select2-change.directive';
 import { FUNDING_WRITE_RECOVERY_STORAGE, FundingWriteRecoveryService } from '../../funding-write-recovery.service';
+import { FundingSaveProgressService } from '../../funding-save-progress.service';
 import { MemoryStorage } from '../../testing/memory-storage';
 import { installSelect2 } from '../../testing/install-select2';
 import { DetailPriorityCoordinator } from '../detail-priority-coordinator';
@@ -1585,6 +1586,90 @@ describe('GrantDetailComponent', () => {
       expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
     });
 
+    describe('page-blocking save progress', () => {
+      function saveProgress(): FundingSaveProgressService {
+        return TestBed.inject(FundingSaveProgressService);
+      }
+
+      it('blocks through write and readback, then releases on success', () => {
+        const write = new Subject<number>();
+        const readback = new Subject<FundingSubmissionListDetailDto>();
+        fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(write);
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(readback);
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        component.onSave();
+        expect(saveProgress().active).toBeTrue();
+        write.next(1);
+        write.complete();
+        expect(saveProgress().active).toBeTrue();
+        readback.next({ grants: [persistedGrant()] });
+        expect(saveProgress().active).toBeFalse();
+        expect(component.saveSuccessMessage).toBeTruthy();
+      });
+
+      it('releases on a definite failure and on an unknown outcome, keeping their messages visible', () => {
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        fundingSubmissionsServiceSpy.bulkUpdateListGrants.and.returnValue(throwError(() => ({ status: 500 })));
+        component.onSave();
+        expect(saveProgress().active).toBeFalse();
+        expect(component.fundingRecoveryState).toBe('unknown');
+      });
+
+      it('does not block for a recovery marker found before any write', () => {
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        TestBed.inject(FundingWriteRecoveryService).begin(1, 100);
+        component.onSave();
+        expect(saveProgress().active).toBeFalse();
+      });
+
+      it('stays blocked through a chained Justification save and its refresh', () => {
+        const justification = new Subject<any>();
+        fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(justification);
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [persistedGrant()] }));
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        component.formModel.justificationText = 'Pending justification';
+        component.onSave();
+        expect(fundingSubmissionsServiceSpy.saveJustificationForm).toHaveBeenCalled();
+        expect(saveProgress().active).toBeTrue();
+        justification.next({});
+        justification.complete();
+        expect(saveProgress().active).toBeTrue();
+        getJustificationSubject.next({ justificationText: 'Pending justification' });
+        expect(saveProgress().active).toBeFalse();
+      });
+
+      it('ignores late Justification callbacks after destruction', () => {
+        const justification = new Subject<any>();
+        fundingSubmissionsServiceSpy.saveJustificationForm.and.returnValue(justification);
+        fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({ grants: [persistedGrant()] }));
+        choosePay();
+        defaultsResponse.next([resolvedDefaults]);
+        component.formModel.justificationText = 'Pending justification';
+        component.onSave();
+        expect(saveProgress().active).toBeTrue();
+        component.ngOnDestroy();
+        expect(saveProgress().active).toBeFalse();
+        justification.next({});
+        justification.complete();
+        expect(saveProgress().active).toBeFalse();
+        expect(component.saveSuccessMessage).toBeFalsy();
+      });
+
+      it('hides the transient defaults loading text by default and shows it when the property is on', () => {
+        choosePay();
+        fixture.detectChanges();
+        expect(fixture.nativeElement.textContent).not.toContain('Loading DOC Pay defaults');
+        (TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy).and.callFake((key: string) =>
+          key === 'FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS' ? ' TRUE ' : 'http://grant-viewer/');
+        fixture.detectChanges();
+        expect(fixture.nativeElement.textContent).toContain('Loading DOC Pay defaults');
+      });
+    });
+
     it('redraws the shared grid row only after actual saved readback and seeds subsequent edits from those values', () => {
       const row = component.data;
       const readbackResponse = new Subject<{ grants: FundingSubmissionListGrantDto[] }>();
@@ -2253,6 +2338,8 @@ describe('GrantDetailComponent', () => {
     });
 
     it('allows unrelated editing while pending and renders the detached view when options arrive', fakeAsync(() => {
+      (TestBed.inject(AppPropertiesService).getProperty as jasmine.Spy).and.callFake((key: string) =>
+        key === 'FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS' ? 'true' : 'http://grant-viewer/');
       fixture.detectChanges();
       fixture.changeDetectorRef.detach();
       getJustificationSubject.next({ justificationText: '' });
