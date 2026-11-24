@@ -584,6 +584,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get budgetCategoriesDisplay(): string {
+    if (this.isFundingFieldsEditMode && this.docFundingListCor && this.isDoNotPayDecisionSelected()) return '';
     if (this.isFundingFieldsEditMode && this.docPayDefaults
       && this.formModel.budgetCategories === this.docPayDefaults.budgetCategories) {
       return this.docPayDefaults.budgetCategoriesName ?? this.docPayDefaults.budgetCategories;
@@ -592,6 +593,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get annualOrMyfDisplay(): string {
+    if (this.isFundingFieldsEditMode && this.docFundingListCor && this.isDoNotPayDecisionSelected()) return '';
     if (this.isFundingFieldsEditMode && this.docPayDefaults
       && this.formModel.annualOrMyf === this.docPayDefaults.annualOrMyf) {
       return this.docPayDefaults.annualOrMyfName ?? this.docPayDefaults.annualOrMyf;

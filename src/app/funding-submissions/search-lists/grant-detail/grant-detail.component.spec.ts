@@ -3882,6 +3882,42 @@ describe('GrantDetailComponent', () => {
       ];
     });
 
+    for (const decision of ['DNP', 'Do Not Pay']) {
+      it(`blanks DOC read-only funding selections for ${decision} and restores them on Pay before save`, () => {
+        Object.assign(component.data, {
+          budgetCategoryCode: 'ESIR37T4', budgetCategories: 'ESI R37 T4 Board Competing Transition',
+          annualOrMyf: 'MYF', annualOrMyfName: 'Multi-Year Funding'
+        });
+        const displayedValue = (label: string): string => {
+          const labelCell = Array.from(fixture.nativeElement.querySelectorAll('td.grid-label'))
+            .find((cell: HTMLElement) => cell.textContent.trim() === label) as HTMLElement;
+          return labelCell.nextElementSibling.textContent.trim();
+        };
+        component.onEdit();
+        expect(fixture.nativeElement.querySelector('ng-select2[name="budgetCategories"]')).toBeNull();
+        expect(fixture.nativeElement.querySelector('ng-select2[name="annualOrMyf"]')).toBeNull();
+        expect(displayedValue('Budget Categories:')).toBe('ESI R37 T4 Board Competing Transition');
+        expect(displayedValue('Annual or MYF:')).toBe('Multi-Year Funding');
+
+        for (let toggle = 0; toggle < 2; toggle++) {
+          component.onUserSelectChange('docDecision', decision);
+          expect(displayedValue('Budget Categories:')).toBe('');
+          expect(displayedValue('Annual or MYF:')).toBe('');
+          expect(component.formModel.budgetCategories).toBeNull();
+          expect(component.formModel.annualOrMyf).toBeNull();
+          expect(component.data.budgetCategoryCode).toBe('ESIR37T4');
+          expect(component.data.annualOrMyf).toBe('MYF');
+
+          component.onUserSelectChange('docDecision', 'Pay');
+          expect(displayedValue('Budget Categories:')).toBe('ESI R37 T4 Board Competing Transition');
+          expect(displayedValue('Annual or MYF:')).toBe('Multi-Year Funding');
+          expect(component.formModel.budgetCategories).toBe('ESIR37T4');
+          expect(component.formModel.annualOrMyf).toBe('MYF');
+        }
+        expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      });
+    }
+
     it('requires DOC Notes when Do Not Pay is selected on an OEFIA-added row', () => {
       component.onEdit();
       component.formModel.docDecision = 'DNP';
