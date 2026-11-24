@@ -9,6 +9,111 @@ import { roleNames } from '../../service/role-names';
 
 declare var $: any;
 
+function initializeWithDataTables(component: FundingListsSearchComponent): void {
+  const original = Object.getOwnPropertyDescriptor($.fn, 'DataTable');
+  Object.defineProperty($.fn, 'DataTable', {
+    configurable: true,
+    value: { ext: { pager: { numbers_length: 7 } } }
+  });
+  try {
+    component.ngOnInit();
+  } finally {
+    if (original) {
+      Object.defineProperty($.fn, 'DataTable', original);
+    } else {
+      delete $.fn.DataTable;
+    }
+  }
+}
+
+describe('FundingListsSearchComponent List ID lookup (FS-2789)', () => {
+  let component: FundingListsSearchComponent;
+  let http: jasmine.SpyObj<HttpClient>;
+  let service: any;
+  let logger: jasmine.SpyObj<NGXLogger>;
+
+  beforeEach(() => {
+    http = jasmine.createSpyObj('HttpClient', ['get', 'post']);
+    http.get.and.returnValue(of([]));
+    logger = jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']);
+    service = jasmine.createSpyObj('FundingSubmissionsService', [
+      'getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount'
+    ]);
+    service.getSelectionDateCodes.and.returnValue(of([]));
+    service.getListStatusCodes.and.returnValue(of([]));
+    service.getPendingReviewListCount.and.returnValue(of(0));
+    service.searchLists.and.returnValue(of({ recordsTotal: 0, recordsFiltered: 0, data: [] }));
+    const userSession = jasmine.createSpyObj('AppUserSessionService', [
+      'hasRole', 'getDocFundingSubmissionCoordinatorDocAbbrevs'
+    ]);
+    userSession.hasRole.and.callFake((role: string) => role === roleNames.DOC_FUNDING_LIST_COR);
+    userSession.getDocFundingSubmissionCoordinatorDocAbbrevs.and.returnValue(['DCB']);
+    component = new FundingListsSearchComponent(
+      jasmine.createSpyObj('Router', ['navigate']), logger, http, service,
+      { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
+      jasmine.createSpyObj('LoaderService', ['show', 'hide']),
+      jasmine.createSpyObj('FundingSubmissionsStateService', [
+        'consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState'
+      ]),
+      userSession
+    );
+  });
+
+  it('GETs and maps all IDs, including 34 and more than 100 options, without searching lists', () => {
+    const ids = Array.from({ length: 125 }, (_, i) => i + 1);
+    http.get.and.returnValue(of(ids));
+
+    initializeWithDataTables(component);
+
+    expect(http.get).toHaveBeenCalledOnceWith('/i2efsws/api/v1/funding-submissions/lists/ids');
+    expect(service.searchLists).not.toHaveBeenCalled();
+    expect(component.listIdOptions).toEqual(ids.map(id => ({ id: String(id), text: String(id) })));
+    expect(component.listIdOptions[33]).toEqual({ id: '34', text: '34' });
+    expect(component.listIdOptions[124]).toEqual({ id: '125', text: '125' });
+    expect(component.selectedDocs).toEqual(['DCB']);
+  });
+
+  it('leaves options empty when the lookup returns an empty array', () => {
+    initializeWithDataTables(component);
+
+    expect(component.listIdOptions).toEqual([]);
+    expect(service.searchLists).not.toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('logs lookup failure and uses an empty array without a fallback search', () => {
+    const error = new Error('lookup failed');
+    http.get.and.returnValue(throwError(() => error));
+
+    initializeWithDataTables(component);
+
+    expect(logger.error).toHaveBeenCalledWith('Failed to load dropdown options', error);
+    expect(component.listIdOptions).toEqual([]);
+    expect(service.searchLists).not.toHaveBeenCalled();
+  });
+
+  it('keeps the selected List ID and DOC criteria on actual search after lookup initialization', () => {
+    http.get.and.returnValue(of([34]));
+    initializeWithDataTables(component);
+    component.listIdFilter = '34';
+    component.selectedListStatus = 'Completed';
+    component.filterForm = {
+      invalid: false, form: { value: { grantNumber: {}, fyRange: {} } }
+    } as any;
+
+    component.search();
+    component.ajaxCall(component, {
+      draw: 1, columns: [], order: [], start: 0, length: 10, search: { value: '', regex: false }
+    }, () => {});
+
+    expect(service.searchLists).toHaveBeenCalledTimes(1);
+    expect(service.searchLists.calls.mostRecent().args[0]).toEqual(jasmine.objectContaining({
+      listId: 34, divisionOfficeCenter: ['DCB'], listStatus: ['Completed'], start: 0, length: 10
+    }));
+    expect(http.get).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('FundingListsSearchComponent.formatLastActionDate (FS-2163)', () => {
   function instantiateComponent(): FundingListsSearchComponent {
     return new FundingListsSearchComponent(
@@ -51,7 +156,8 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
   let loggerSpy: jasmine.SpyObj<NGXLogger>;
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['post']);
+    httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'post']);
+    httpSpy.get.and.returnValue(of([]));
     loaderServiceSpy = jasmine.createSpyObj('LoaderService', ['show', 'hide']);
     loggerSpy = jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']);
     component = new FundingListsSearchComponent(
@@ -311,7 +417,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     userSession.hasRole.and.callFake((role: string) => role === roleNames.OEFIA_CERTIFIER);
     userSession.getDocFundingSubmissionCoordinatorDocAbbrevs = jasmine.createSpy('getDocFundingSubmissionCoordinatorDocAbbrevs').and.returnValue([]);
 
-    component.ngOnInit();
+    initializeWithDataTables(component);
 
     expect(fundingSubmissionsService.getOefiaPendingReviewListCount).toHaveBeenCalled();
     expect(fundingSubmissionsService.getPendingReviewListCount).not.toHaveBeenCalled();
@@ -332,7 +438,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     userSession.hasRole.and.callFake((role: string) => role === roleNames.NCI_DIRECTOR);
     userSession.getDocFundingSubmissionCoordinatorDocAbbrevs = jasmine.createSpy('getDocFundingSubmissionCoordinatorDocAbbrevs').and.returnValue([]);
 
-    component.ngOnInit();
+    initializeWithDataTables(component);
 
     expect(fundingSubmissionsService.getNciDirectorPendingReviewListCount).toHaveBeenCalled();
     expect(fundingSubmissionsService.getPendingReviewListCount).not.toHaveBeenCalled();
@@ -550,7 +656,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     const localComponent = new FundingListsSearchComponent(
       jasmine.createSpyObj('Router', ['navigate']),
       jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
-      jasmine.createSpyObj('HttpClient', ['post']),
+      jasmine.createSpyObj('HttpClient', ['get', 'post']),
       fundingSubmissionsService,
       { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
       jasmine.createSpyObj('LoaderService', ['show', 'hide']),
@@ -559,7 +665,8 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     );
     (localComponent as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.OEFIA_CERTIFIER);
 
-    localComponent.ngOnInit();
+    (localComponent as any).http.get.and.returnValue(of([]));
+    initializeWithDataTables(localComponent);
 
     expect(fundingSubmissionsService.getOefiaPendingReviewListCount).toHaveBeenCalled();
     expect(fundingSubmissionsService.getPendingReviewListCount).not.toHaveBeenCalled();
@@ -585,7 +692,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     const localComponent = new FundingListsSearchComponent(
       jasmine.createSpyObj('Router', ['navigate']),
       jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
-      jasmine.createSpyObj('HttpClient', ['post']),
+      jasmine.createSpyObj('HttpClient', ['get', 'post']),
       fundingSubmissionsService,
       { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
       jasmine.createSpyObj('LoaderService', ['show', 'hide']),
@@ -594,7 +701,8 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     );
     (localComponent as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.FINANCIAL_ANALYST);
 
-    localComponent.ngOnInit();
+    (localComponent as any).http.get.and.returnValue(of([]));
+    initializeWithDataTables(localComponent);
 
     expect(fundingSubmissionsService.getOefiaPendingReviewListCount).toHaveBeenCalled();
     expect(fundingSubmissionsService.getPendingReviewListCount).not.toHaveBeenCalled();
@@ -620,7 +728,7 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     const localComponent = new FundingListsSearchComponent(
       jasmine.createSpyObj('Router', ['navigate']),
       jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
-      jasmine.createSpyObj('HttpClient', ['post']),
+      jasmine.createSpyObj('HttpClient', ['get', 'post']),
       fundingSubmissionsService,
       { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
       jasmine.createSpyObj('LoaderService', ['show', 'hide']),
@@ -629,7 +737,8 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     );
     (localComponent as any).userSessionService.hasRole.and.callFake((role: string) => role === roleNames.NCI_DIRECTOR);
 
-    localComponent.ngOnInit();
+    (localComponent as any).http.get.and.returnValue(of([]));
+    initializeWithDataTables(localComponent);
 
     expect(fundingSubmissionsService.getNciDirectorPendingReviewListCount).toHaveBeenCalled();
     expect(fundingSubmissionsService.getPendingReviewListCount).not.toHaveBeenCalled();

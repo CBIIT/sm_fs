@@ -51,7 +51,6 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   private hasSavedSearchListsState = false;
   private defaultPendingReviewApplied = false;
   private readonly INIT_API_TIMEOUT_MS = 15000;
-  private readonly LIST_ID_PRELOAD_LIMIT = 100;
 
   selectionDateOptions: Select2OptionData[] = [];
   listIdOptions: Select2OptionData[] = [];
@@ -194,24 +193,17 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       },
     });
 
-    const initialListSearchCriteria: FundingSubmissionListSearchCriteriaDto = {
-      start: 0,
-      length: this.LIST_ID_PRELOAD_LIMIT,
-    };
-
-    this.fundingSubmissionsService.searchLists(initialListSearchCriteria).pipe(
+    this.http.get<number[]>('/i2efsws/api/v1/funding-submissions/lists/ids').pipe(
       timeout(this.INIT_API_TIMEOUT_MS),
       catchError((err) => {
         this.logger.error('Failed to load dropdown options', err);
-        return of({ data: [] } as any);
+        return of([] as number[]);
       })
     ).subscribe({
-      
-      next: (result) => {
-        const data = result.data || [];
-        this.listIdOptions = data.map(item => ({
-          id: String(item.listId),
-          text: String(item.listId)
+      next: (ids: number[]) => {
+        this.listIdOptions = ids.map(id => ({
+          id: String(id),
+          text: String(id)
         }));
       },
     });
