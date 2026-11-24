@@ -86,6 +86,9 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   }
 
   private getPendingReviewCountRequest(): Observable<number> {
+    if (this.isOgaLeadershipView) {
+      return of(0);
+    }
     const pendingReviewType = this.getPendingReviewTypeForCurrentUser();
     if (pendingReviewType === 'NCI_DIRECTOR') {
       return this.fundingSubmissionsService.getNciDirectorPendingReviewListCount();
@@ -102,6 +105,35 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     return pendingReviewType
       ? { ...baseCriteria, pendingReviewType }
       : baseCriteria;
+  }
+
+  get isOgaLeadershipView(): boolean {
+    return this.userSessionService.hasRole(roleNames.GM_LEADERSHIP)
+      && !this.userSessionService.hasRole(roleNames.NCI_DIRECTOR)
+      && !this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER)
+      && !this.userSessionService.hasRole(roleNames.FINANCIAL_ANALYST)
+      && !this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+  }
+
+  private normalizeSearchCriteriaForAudience(
+    criteria: FundingSubmissionListSearchCriteriaDto
+  ): FundingSubmissionListSearchCriteriaDto {
+    const normalized = { ...(criteria || {}) };
+    if (!this.isOgaLeadershipView) {
+      return normalized;
+    }
+
+    delete normalized.pendingReviewOnly;
+    delete normalized.pendingReviewType;
+    if (normalized.listStatus?.length) {
+      const listStatus = normalized.listStatus.filter(status => status !== 'Pending Review');
+      if (listStatus.length) {
+        normalized.listStatus = listStatus;
+      } else {
+        delete normalized.listStatus;
+      }
+    }
+    return normalized;
   }
 
   private triggerTableInit(): void {
@@ -231,19 +263,26 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
         const savedCriteria = saved.searchCriteria || {};
         const stalePendingStatus = saved.selectedListStatus === 'Pending Review'
           || savedCriteria.listStatus?.includes('Pending Review');
-        this.selectedListStatus = stalePendingStatus ? null : saved.selectedListStatus;
+        this.selectedListStatus = (stalePendingStatus || this.isOgaLeadershipView)
+          && saved.selectedListStatus === 'Pending Review'
+          ? null
+          : saved.selectedListStatus;
         this.selectedSelectionDate = saved.selectedSelectionDate;
         this.listIdFilter = saved.listIdFilter;
         this.filterForm?.form.patchValue(saved.formValue);
         if (saved.showResults) {
           const { nihNetworkId: _nihNetworkId, ...criteria } = savedCriteria;
-          this.pendingReviewOnly = stalePendingStatus || criteria.pendingReviewOnly === true;
+          const normalizedCriteria = this.normalizeSearchCriteriaForAudience(criteria);
+          this.pendingReviewOnly = this.isOgaLeadershipView
+            ? false
+            : stalePendingStatus || criteria.pendingReviewOnly === true;
           if (stalePendingStatus && criteria.listStatus?.includes('Pending Review')) {
-            criteria.listStatus = criteria.listStatus.filter(status => status !== 'Pending Review');
+            normalizedCriteria.listStatus = normalizedCriteria.listStatus
+              ?.filter(status => status !== 'Pending Review');
           }
           this.searchCriteria = this.pendingReviewOnly
-            ? this.buildPendingReviewCriteria(criteria)
-            : criteria;
+            ? this.buildPendingReviewCriteria(normalizedCriteria)
+            : normalizedCriteria;
           this.showResults = true;
           this.triggerTableInit();
         }
@@ -360,7 +399,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   }
 
   onViewList(row: any): void {
-    const targetRoute = this.isNciDirector
+    const targetRoute = this.isNciDirector || this.isOgaLeadershipView
       ? '/funding-submissions/funding-lists'
       : '/funding-submissions/search';
     this.router.navigate([targetRoute], {
@@ -375,6 +414,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       || !this.pendingReviewCountLoaded
       || this.defaultPendingReviewApplied
       || this.hasSavedSearchListsState
+      || this.isOgaLeadershipView
       || !pendingReviewType
       || this.pendingReviewCount <= 0
     ) {
@@ -396,7 +436,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     $this.latestColumns = columns;
     $this.latestOrder = order;
     const body: FundingSubmissionListSearchCriteriaDto = {
-      ...$this.searchCriteria,
+      ...$this.normalizeSearchCriteriaForAudience($this.searchCriteria),
       draw: dataTablesParameters.draw,
       columns,
       order,
@@ -421,7 +461,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
     // FS-2033: send the current business filters together with the retained normalized columns[] and
     // order[] so the backend can resolve each order's columnName and reproduce the live grid's sort.
     const body: FundingSubmissionListSearchCriteriaDto = {
-      ...this.searchCriteria,
+      ...this.normalizeSearchCriteriaForAudience(this.searchCriteria),
       columns: this.latestColumns,
       order: this.latestOrder,
       start: 0,
@@ -508,7 +548,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   }
 
   onPendingReviewClick(): void {
-    if (this.pendingReviewCount <= 0) {
+    if (this.isOgaLeadershipView || this.pendingReviewCount <= 0) {
       return;
     }
 

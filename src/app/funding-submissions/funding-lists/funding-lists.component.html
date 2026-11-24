@@ -50,7 +50,7 @@
 
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-4">
     <h1 class="mb-0">{{ pageTitle }}</h1>
-    <span ngbTooltip="There are no Approve or Reject decisions available to lock." [disableTooltip]="hasLockableDecisions" container="body">
+    <span *ngIf="!isOgaLeadershipView" ngbTooltip="There are no Approve or Reject decisions available to lock." [disableTooltip]="hasLockableDecisions" container="body">
       <button type="button" class="btn btn-success confirm-btn" [disabled]="isLockActionDisabled" (click)="onConfirmDecisionsClick()">
         <i class="far fa-lock me-1"></i>Confirm Approvals and Rejections
       </button>
@@ -175,7 +175,7 @@
         role="alert">
         {{ bulkEditErrorMessage }}
       </ngb-alert>
-      <div class="mb-3">
+      <div class="mb-3" *ngIf="!isOgaLeadershipView">
         <button type="button" class="btn btn-primary" (click)="goToDirectorBulkEdit()" [disabled]="selectedRows.size === 0 || allGrantsLocked">
           <i class="far fa-gavel me-1"></i>Bulk Decision
         </button>
