@@ -835,10 +835,76 @@ describe('GrantDetailComponent', () => {
       component.onEdit();
     });
 
-    it('shows both director controls for an NCI Director in edit mode', () => {
+    it('shows only the two Director controls with saved values and Save and Cancel', () => {
       expect(component.nciDirector).toBeTrue();
       expect(fixture.nativeElement.querySelector('ng-select2[name="nciDecision"]')).toBeTruthy();
       expect(fixture.nativeElement.querySelector('textarea[name="directorNotes"]')).toBeTruthy();
+      expect(component.formModel.nciDecision).toBe('Approve');
+      expect(component.formModel.directorNotes).toBe('Saved director note');
+      expect(component.nciDecisionOptions).toEqual([
+        { id: 'Approve', text: 'Approve' }, { id: 'Hold', text: 'On Hold' }, { id: 'Rejected', text: 'Reject' }
+      ]);
+      expect(fixture.nativeElement.querySelectorAll('ng-select2').length).toBe(1);
+      expect(fixture.nativeElement.querySelectorAll('textarea').length).toBe(1);
+      expect(fixture.nativeElement.querySelectorAll('input').length).toBe(0);
+      const buttons = Array.from(fixture.nativeElement.querySelectorAll('button'))
+        .map((button: HTMLButtonElement) => button.textContent.trim());
+      expect(buttons).toContain('Save');
+      expect(buttons).toContain('Cancel');
+      expect(fundingSubmissionsServiceSpy.getDocPriorityOptions).not.toHaveBeenCalled();
+    });
+
+    it('keeps all other fields view-only for Directors with additional OEFIA and DOC roles', () => {
+      component.OEFIACertifier = true;
+      component.docFundingListCor = true;
+      Object.assign(component.data, {
+        docNotes: 'Saved DOC note', oefiaNotes: 'Saved OEFIA note', justificationText: 'Saved justification',
+        annualOrMyfName: 'Annual', budgetCategories: 'Saved budget category', docNciSelectionName: 'DOC'
+      });
+      component.justificationDocuments = [{ id: 123, docFilename: 'saved.pdf' }];
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelectorAll('ng-select2').length).toBe(1);
+      expect(fixture.nativeElement.querySelectorAll('textarea').length).toBe(1);
+      expect(fixture.nativeElement.querySelectorAll('input').length).toBe(0);
+      for (const text of ['Saved DOC note', 'Saved OEFIA note', 'Saved justification', 'saved.pdf', 'Saved budget category', 'Annual', '$90,000', '10%']) {
+        expect(fixture.nativeElement.textContent).toContain(text);
+      }
+    });
+
+    it('validates only editable Director fields and saves only the NCI decision and notes', () => {
+      component.formModel.docDecision = null;
+      component.formModel.docRecAmt = null;
+      component.formModel.docPriority = null;
+      component.formModel.docRecReductionPct = null;
+      component.formModel.budgetCategories = null;
+      component.formModel.annualFundingR01 = null;
+      component.formModel.annualOrMyf = null;
+      component.formModel.docNciSelection = null;
+      component.docPayDefaultsError = 'DOC defaults unavailable';
+      component.docPriorityOptionsError = 'DOC priorities unavailable';
+      component.justificationFileError = 'Invalid justification file';
+      component.formModel.docNotes = 'Do not save this';
+      component.formModel.justificationText = 'Do not save this';
+      component.justificationFiles = [new File(['draft'], 'draft.pdf')];
+      component.stagedDeleteDocumentIds = [123];
+      component.formModel.nciDecision = 'Hold';
+      component.formModel.directorNotes = '   ';
+      component.onNciDecisionChange();
+      expect(component.saveValidationErrors).toEqual({ directorNotes: 'NCI Director Note is required' });
+      expect(component.hasSaveValidationErrors).toBeTrue();
+
+      component.formModel.directorNotes = 'Updated director note';
+      component.onNotesModelChange('directorNotes');
+      expect(component.saveValidationErrors).toEqual({});
+      expect(component.hasSaveValidationErrors).toBeFalse();
+      component.onSave();
+      expect(fundingSubmissionsServiceSpy.saveNciDecisions).toHaveBeenCalledWith({
+        items: [{ applId: 100, nciDecision: 'Hold', nciDirectorNotes: 'Updated director note' }]
+      }, 1);
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm).not.toHaveBeenCalled();
+      expect(component.isEditMode).toBeFalse();
+      expect(component.saveSuccessMessage).toBe('Success! You have successfully updated Grant Selection for 1R01CA123456-01');
     });
 
     for (const role of [roleNames.DOC_FUNDING_LIST_COR, roleNames.OEFIA_CERTIFIER, roleNames.FINANCIAL_ANALYST, null]) {
@@ -903,16 +969,15 @@ describe('GrantDetailComponent', () => {
       expect(component.formModel.directorNotes).toBe('');
     });
 
-    it('does not send an unchanged note when only DOC fields change', () => {
+    it('does not write when only view-only fields change', () => {
       component.formModel.docNotes = 'Updated DOC note';
+      component.formModel.oefiaNotes = 'Updated OEFIA note';
+      component.formModel.justificationText = 'Updated justification';
       component.onSave();
 
       expect(fundingSubmissionsServiceSpy.saveNciDecisions).not.toHaveBeenCalled();
-      const fields = fundingSubmissionsServiceSpy.bulkUpdateListGrants.calls.mostRecent().args[0].fields;
-      expect(fields.docNotes).toBe('Updated DOC note');
-      expect(Object.keys(fields)).not.toContain('directorNotes');
-      expect(Object.keys(fields)).not.toContain('nciDirectorNotes');
-      expect(Object.keys(fields)).not.toContain('nciDecision');
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.saveJustificationForm).not.toHaveBeenCalled();
     });
 
     it('keeps unsaved notes after a definite notes-only rejection', () => {
@@ -928,7 +993,8 @@ describe('GrantDetailComponent', () => {
       expect(component.saveSuccessMessage).toBe('');
     });
 
-    it('refreshes completed DOC changes and retains notes when the second write is rejected', () => {
+    it('does not write DOC changes and retains Director notes when the NCI write is rejected', () => {
+      const savedDocNotes = component.data.docNotes;
       component.formModel.docNotes = 'Updated DOC note';
       component.formModel.directorNotes = 'Updated director note';
       fundingSubmissionsServiceSpy.saveNciDecisions.and.returnValue(throwError(() => new HttpErrorResponse({ status: 400 })));
@@ -937,8 +1003,9 @@ describe('GrantDetailComponent', () => {
       }] }));
       component.onSave();
 
-      expect(fundingSubmissionsServiceSpy.getListDetail).toHaveBeenCalledWith(1);
-      expect(component.data.docNotes).toBe('Updated DOC note');
+      expect(fundingSubmissionsServiceSpy.bulkUpdateListGrants).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.getListDetail).not.toHaveBeenCalled();
+      expect(component.data.docNotes).toBe(savedDocNotes);
       expect(component.data.nciDirectorNotes).toBe('Saved director note');
       expect(component.formModel.directorNotes).toBe('Updated director note');
       expect(component.isEditMode).toBeTrue();
@@ -979,12 +1046,23 @@ describe('GrantDetailComponent', () => {
           expect(component.isDirectorNotesRequired).toBe(required);
           expect(!!component.saveValidationErrors.directorNotes).toBe(required && !notes.trim());
           expect(component.hasSaveValidationErrors).toBe(required && !notes.trim());
+          const saveButton = Array.from(fixture.nativeElement.querySelectorAll('button'))
+            .find((button: HTMLButtonElement) => button.textContent.trim() === 'Save') as HTMLButtonElement;
+          expect(saveButton.disabled).toBe(required && !notes.trim());
           const label = Array.from(fixture.nativeElement.querySelectorAll('td'))
             .find((element: HTMLElement) => element.textContent.includes('Director Notes')) as HTMLElement;
           expect(label.textContent).toContain(required ? '(Required)' : '(Optional)');
           if (required && !notes.trim()) {
+            expect(component.saveValidationErrors.directorNotes).toBe('NCI Director Note is required');
+            expect(fixture.nativeElement.textContent).toContain('NCI Director Note is required');
             component.onSave();
             expect(fundingSubmissionsServiceSpy.saveNciDecisions).not.toHaveBeenCalled();
+            component.formModel.directorNotes = 'Director explanation';
+            component.onNotesModelChange('directorNotes');
+            fixture.detectChanges();
+            expect(component.saveValidationErrors.directorNotes).toBeUndefined();
+            expect(fixture.nativeElement.textContent).not.toContain('NCI Director Note is required');
+            expect(saveButton.disabled).toBeFalse();
           }
         });
       }

@@ -353,7 +353,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     } else if (this.fundingRecoveryState === 'unknown') {
       this.unknownFundingReadback = this.createRecoveryReadback('unknown');
     }
-    this.fetchDocPriorityOptions();
+    if (!this.nciDirector) this.fetchDocPriorityOptions();
     this.recomputeDoNotPayOefiaLock();
     this.cdr.detectChanges();
   }
@@ -575,12 +575,16 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private needsDocPayDefaults(): boolean {
-    return this.isEditMode && this.isDoNotPayDecisionValue(this.data?.docDecision)
+    return this.isFundingFieldsEditMode && this.isDoNotPayDecisionValue(this.data?.docDecision)
       && isPayDecision(this.formModel.docDecision, this.decisionOptions);
   }
 
+  get isFundingFieldsEditMode(): boolean {
+    return this.isEditMode && !this.nciDirector;
+  }
+
   get budgetCategoriesDisplay(): string {
-    if (this.isEditMode && this.docPayDefaults
+    if (this.isFundingFieldsEditMode && this.docPayDefaults
       && this.formModel.budgetCategories === this.docPayDefaults.budgetCategories) {
       return this.docPayDefaults.budgetCategoriesName ?? this.docPayDefaults.budgetCategories;
     }
@@ -588,7 +592,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get annualOrMyfDisplay(): string {
-    if (this.isEditMode && this.docPayDefaults
+    if (this.isFundingFieldsEditMode && this.docPayDefaults
       && this.formModel.annualOrMyf === this.docPayDefaults.annualOrMyf) {
       return this.docPayDefaults.annualOrMyfName ?? this.docPayDefaults.annualOrMyf;
     }
@@ -626,8 +630,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get hasSaveValidationErrors(): boolean {
-    return Object.keys(this.validateChangedValues()).length > 0 || !!this.justificationFileError
-      || this.docPayDefaultsLoading || !!this.docPayDefaultsError || !!this.pendingFundingReadback
+    return Object.keys(this.validateChangedValues()).length > 0
+      || (!this.nciDirector && (!!this.justificationFileError || this.docPayDefaultsLoading || !!this.docPayDefaultsError))
+      || !!this.pendingFundingReadback
       || !!this.fundingRecoveryState || !!this.fundingRecoveryError
       || (this.needsDocPayDefaults() && (this.docPriorityOptionsLoading || !!this.docPriorityOptionsError));
   }
@@ -746,8 +751,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onSave(): void {
-    if (this.savingInProgress || this.justificationFileError || this.docPayDefaultsLoading
-      || this.docPayDefaultsError || this.pendingFundingReadback || this.fundingRecoveryState
+    if (this.savingInProgress
+      || (!this.nciDirector && (this.justificationFileError || this.docPayDefaultsLoading || this.docPayDefaultsError))
+      || this.pendingFundingReadback || this.fundingRecoveryState
       || this.fundingRecoveryError || this.prioritySaveBlocked
       || (this.needsDocPayDefaults() && (this.docPriorityOptionsLoading || this.docPriorityOptionsError))) {
       return;
@@ -773,7 +779,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
     // Business rule: when DOC Decision is Do Not Pay, dependent funding and
     // justification fields are discarded before validation/persistence.
-    if (this.isDoNotPayDecisionSelected() && !this.isDoNotPayRestricted) {
+    if (!this.nciDirector && this.isDoNotPayDecisionSelected() && !this.isDoNotPayRestricted) {
       this.clearDoNotPayDependentFields();
     }
 
@@ -788,13 +794,14 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     this.logger.debug('GrantDetailComponent onSave()', this.formModel, 'listId:', this.listId);
     const { justificationText, directorNotes, nciDecision, ...fields } = this.formModel;
     const saveFields = this.normalizeFieldsForSave(fields as FundingSubmBulkEditFieldsDto);
-    const hasFundingFieldChanges = this.currentFundingSnapshot() !== this.initialFundingSnapshot;
+    const hasFundingFieldChanges = !this.nciDirector && this.currentFundingSnapshot() !== this.initialFundingSnapshot;
     const hasDirectorNotesChanges = (directorNotes ?? '') !== (this.data?.nciDirectorNotes ?? '');
     const hasNciDecisionChanges = (nciDecision || null) !== (this.data?.nciDecision || null);
     const hasDirectorChanges = hasDirectorNotesChanges || hasNciDecisionChanges;
     const selectedNciDecision = this.selectedNciDecision();
     const hasJustificationTextChange = (justificationText ?? '') !== this.initialJustificationText;
-    const hasJustificationChanges = this.justificationFiles.length > 0 || hasJustificationTextChange || this.stagedDeleteDocumentIds.length > 0;
+    const hasJustificationChanges = !this.nciDirector
+      && (this.justificationFiles.length > 0 || hasJustificationTextChange || this.stagedDeleteDocumentIds.length > 0);
 
     if (hasDirectorChanges && !selectedNciDecision) {
       this.savingInProgress = false;
@@ -1111,8 +1118,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     const errors: Record<string, string> = {};
 
     if (this.nciDirector && this.isDirectorNotesRequired && !(this.formModel.directorNotes ?? '').trim()) {
-      errors.directorNotes = 'NCI Director Note is required.';
+      errors.directorNotes = 'NCI Director Note is required';
     }
+    if (this.nciDirector) return errors;
 
     if (this.isDoNotPayRestricted && this.isDoNotPayDecisionSelected()) {
       errors.docDecision = 'Do Not Pay is not available for grants added by a DOC user.';
