@@ -75,12 +75,14 @@ export class FullGrantNumberCellRendererComponent implements OnInit {
     const orgName = (this.data?.orgName ?? this.data?.institution)?.trim();
     const city = this.data?.institutionCity?.trim();
     const state = this.data?.institutionState?.trim();
+    const recusedSuffix = this.data?.recusedFlag === true ? ' (Recused)' : '';
 
     if (!orgName && !city && !state) {
-      return 'View Grantee Institution.';
+      return `View Grantee Institution.${recusedSuffix}`;
     }
 
     const location = [city, state].filter((part: string | undefined) => !!part).join(', ');
-    return location ? `${orgName ?? ''}\n${location}`.trim() : orgName ?? 'View Grantee Institution.';
+    const tooltip = location ? `${orgName ?? ''}\n${location}`.trim() : orgName ?? 'View Grantee Institution.';
+    return `${tooltip}${recusedSuffix}`;
   }
 }

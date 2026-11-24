@@ -1,6 +1,6 @@
 <div *ngIf="skip"><img src="images/grant-skip.png" alt="SKIP" width="40" height="16"  class="tdlabel"></div>
 <div *ngIf="exception"><img src="images/grant-exception.png" alt="EXCEPTION" width="64" height="20" class="tdlabel"></div>
-<a href="{{grantViewerUrl+data.applId}}" target="yourgrant" ngbTooltip="Click to View Grant Details">{{data.fullGrantNum ? data.fullGrantNum : data.grantNumber}}</a>
+<div><a href="{{grantViewerUrl+data.applId}}" target="yourgrant" ngbTooltip="Click to View Grant Details">{{data.fullGrantNum ? data.fullGrantNum : data.grantNumber}}</a></div>
 <div class="grant-icons">
   <a href="{{eGrantsUrl+data.applId}}" target="yourgrant" ngbTooltip="Click to go to this grant folder in the eGrants module." container="body">
     <span class="egrants-icon"></span>
@@ -12,7 +12,8 @@
   </div>
   <div *ngIf="data.grantNumber">
       <a href="" (click)="$event.preventDefault()" [ngbTooltip]="instituteTooltip" container="body">
-    <i class='fa fa-university' aria-hidden='true'></i>
+    <img *ngIf="data.recusedFlag === true" src="images/institution-recused.svg" width="18" height="16" alt="Recused institution">
+    <i *ngIf="data.recusedFlag !== true" class='fa fa-university' aria-hidden='true'></i>
   </a>
   </div>
 
