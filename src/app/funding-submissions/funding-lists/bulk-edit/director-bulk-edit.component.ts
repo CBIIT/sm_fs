@@ -149,14 +149,6 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
             return `<a href="mailto:${row.piEmail}?subject=${encodeURIComponent(subject)}">${data}</a>`;
           }
         },
-        {
-          title: 'Pctl',
-          data: 'percentile',
-          width: '70px',
-          defaultContent: '',
-          render: (value: number | null) => value == null ? '' : `${value}%`
-        },
-        { title: 'Priority Score', data: 'priorityScore', width: '95px', defaultContent: '' },
         { title: 'ESI', data: 'esi', width: '70px', defaultContent: '' },
         { title: 'DOC Priority', data: 'docPriority', width: '95px', defaultContent: '' },
         {
