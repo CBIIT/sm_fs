@@ -1118,7 +1118,7 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     const errors: Record<string, string> = {};
 
     if (this.nciDirector && this.isDirectorNotesRequired && !(this.formModel.directorNotes ?? '').trim()) {
-      errors.directorNotes = 'NCI Director Note is required';
+      errors.directorNotes = 'NCI Director Note is required.';
     }
     if (this.nciDirector) return errors;
 
