@@ -268,6 +268,7 @@ import { SearchListsComponent } from './funding-submissions/search-lists/search-
 import { GrantDetailComponent } from './funding-submissions/search-lists/grant-detail/grant-detail.component';
 import { BulkEditComponent } from './funding-submissions/search-lists/bulk-edit/bulk-edit.component';
 import { UserSelect2ChangeDirective } from './funding-submissions/user-select2-change.directive';
+import { FundingSaveOverlayComponent } from './funding-submissions/funding-save-overlay.component';
 import { FundingRequestErrorScopeInterceptor } from './funding-submissions/funding-request-error-scope.service';
 import { FundingListsSearchComponent } from './funding-submissions/funding-lists-search/funding-lists-search.component';
 import { FundingListsComponent } from './funding-submissions/funding-lists/funding-lists.component';
@@ -533,6 +534,7 @@ export function combinedInitializerFactory(
         GrantDetailComponent,
         BulkEditComponent,
         UserSelect2ChangeDirective,
+        FundingSaveOverlayComponent,
         FundingListsSearchComponent,
         FundingListsComponent,
         DirectorBulkEditComponent,

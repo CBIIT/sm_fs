@@ -37,7 +37,7 @@
   <h2 class="mt-3 mb-4">Bulk Edit</h2>
   </div>
   <div>
-    <div class="row" *ngIf="saveSuccessMessage.length > 0" #saveSuccessAlert tabindex="-1">
+    <div class="row" *ngIf="saveSuccessMessage.length > 0 && (!isSaving || showSaveProgressMessages)" #saveSuccessAlert tabindex="-1">
       <div class="col-12">
         <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
           <span><b>{{saveSuccessMessage}}</b></span>
@@ -58,25 +58,27 @@
     </div>
     <div *ngIf="bulkWriteOutcomeMessage" class="alert alert-warning" role="alert">{{bulkWriteOutcomeMessage}}</div>
     <div *ngIf="fundingRecoveryError" class="alert alert-danger" role="alert">{{fundingRecoveryError}}</div>
-    <div *ngIf="savedChangesNeedRefresh" class="alert alert-warning" role="alert">
+    <div *ngIf="savedChangesNeedRefresh && (!isSaving || showSaveProgressMessages)" class="alert alert-warning" role="alert">
       Some grants require a saved-value refresh before they can be saved again.
       <button type="button" class="btn btn-link btn-sm" (click)="refreshSavedFunding()" [disabled]="isSaving">
         Retry refresh
       </button>
     </div>
-    <div *ngFor="let row of unknownRecoveryRows" class="alert alert-warning" role="alert">
-      The previous save for {{row.grantNumber || row.applId}} may still be running. Do not retry until support
-      confirms that it has completed or rolled back and cannot commit later.
-      <div>
-        <label>
-          <input type="checkbox" [(ngModel)]="confirmedUnknownRows[row.applId]" [ngModelOptions]="{standalone: true}">
-          Support has confirmed the previous save is final.
-        </label>
-        <button type="button" class="btn btn-link btn-sm" (click)="recoverUnknownRow(row)"
-          [disabled]="!confirmedUnknownRows[row.applId] || isSaving">Refresh confirmed outcome</button>
+    <ng-container *ngIf="!isSaving || showSaveProgressMessages">
+      <div *ngFor="let row of unknownRecoveryRows" class="alert alert-warning" role="alert">
+        The previous save for {{row.grantNumber || row.applId}} may still be running. Do not retry until support
+        confirms that it has completed or rolled back and cannot commit later.
+        <div>
+          <label>
+            <input type="checkbox" [(ngModel)]="confirmedUnknownRows[row.applId]" [ngModelOptions]="{standalone: true}">
+            Support has confirmed the previous save is final.
+          </label>
+          <button type="button" class="btn btn-link btn-sm" (click)="recoverUnknownRow(row)"
+            [disabled]="!confirmedUnknownRows[row.applId] || isSaving">Refresh confirmed outcome</button>
+        </div>
       </div>
-    </div>
-    <div *ngIf="docPayDefaultsLoading" class="text-muted small mb-2" role="status">Loading DOC Pay defaults...</div>
+    </ng-container>
+    <div *ngIf="docPayDefaultsLoading && showSaveProgressMessages" class="text-muted small mb-2" role="status">Loading DOC Pay defaults...</div>
     <div *ngIf="docPayDefaultsError" class="text-danger small mb-2" role="alert">
       <ng-container *ngIf="docPayDefaultsError === docPayDefaultsLookupError; else docPayDefaultsErrorText">
         We've encountered an unexpected error retrieving grant data. Please contact
@@ -199,7 +201,7 @@
               [disabled]="isDoNotPayDecisionSelected(data.docDecision)" [data]="getBudgetCategoryOptionsForRow(data)"
               width="100%">
             </ng-select2>
-            <div *ngIf="getBudgetCategoryStatus(data) === 'loading'" class="small">Loading Budget Categories…</div>
+            <div *ngIf="getBudgetCategoryStatus(data) === 'loading' && showSaveProgressMessages" class="small">Loading Budget Categories…</div>
             <div *ngIf="getBudgetCategoryStatus(data) === 'error'" class="text-danger small">
               Budget Categories could not be loaded. The current selection is preserved.
               <button type="button" class="btn btn-link btn-sm" (click)="retryBudgetCategories(data)">Retry</button>
@@ -289,7 +291,7 @@
     </div>
 
     <div class="d-flex justify-content-end mb-4 mt-3">
-      <span class="me-3 align-self-center text-muted small" *ngIf="isSaving">
+      <span class="me-3 align-self-center text-muted small" *ngIf="isSaving && showSaveProgressMessages">
         <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
         Saving changes...
       </span>
@@ -300,8 +302,8 @@
           [disabled]="!rows.length || !canSave || hasDoNotPayDocNotesErrors || hasMandatoryFieldErrors || hasRecommendationErrors || isSaving
             || docPayDefaultsLoading || !!docPayDefaultsError || !!fundingRecoveryError
             || savedChangesNeedRefresh || unknownRecoveryRows.length > 0">
-          <span *ngIf="!isSaving">Save</span>
-          <span *ngIf="isSaving">Saving...</span>
+          <span *ngIf="!isSaving || !showSaveProgressMessages">Save</span>
+          <span *ngIf="isSaving && showSaveProgressMessages">Saving...</span>
         </button>
       </span>
     </div>

@@ -181,6 +181,41 @@ describe('FundingListsComponent', () => {
     });
   });
 
+  it('displays the detail list name (not the code) and carries it through Director Bulk Edit and back', () => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.returnValue(Promise.resolve(true));
+    spyOnProperty(history, 'state', 'get').and.returnValue({ navigationId: 3 });
+    spyOn(history, 'replaceState');
+    fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+      ...emptyListDetail(),
+      listCode: 'NOV-06',
+      selectionDateName: 'November 6 Selection',
+      grants: [buildGrant({ applId: 42, nciDecision: 'Hold' })]
+    }));
+    component.listId = 39;
+    component.pageTitle = 'NOV-06';
+
+    (component as any).loadListMeta();
+
+    expect(component.pageTitle).toBe('November 6 Selection');
+    component.selectedRows.set(42, component.grants[0]);
+    component.goToDirectorBulkEdit();
+    const outbound = navigate.calls.mostRecent().args[1];
+    expect(outbound.queryParams.selectionDate).toBe('November 6 Selection');
+    expect(outbound.state.selectionDate).toBe('November 6 Selection');
+
+    const bulkComponent = new DirectorBulkEditComponent(
+      TestBed.inject(ActivatedRoute), TestBed.inject(Router), TestBed.inject(AppPropertiesService),
+      fundingSubmissionsServiceSpy, TestBed.inject(NGXLogger)
+    );
+    bulkComponent.listId = 39;
+    bulkComponent.selectionDate = outbound.queryParams.selectionDate;
+    expect(bulkComponent.backLabel).toBe('Back to November 6 Selection');
+
+    bulkComponent.onBackClick();
+
+    expect(navigate.calls.mostRecent().args[1].queryParams).toEqual({ listId: 39, selectionDate: 'November 6 Selection' });
+  });
+
   it('restores the returned tab, DOC, and selections using fresh API rows', () => {
     const historyState = spyOnProperty(history, 'state', 'get').and.returnValue({
       navigationId: 7,

@@ -23,6 +23,7 @@ import {
   requireDocPayDefaults, technicalSupportMailto, validateDocRecommendation
 } from '../../doc-pay-defaults';
 import { FundingRequestErrorScopeService } from '../../funding-request-error-scope.service';
+import { FundingSaveProgressService } from '../../funding-save-progress.service';
 import { GrantBudgetCategoryOptions } from '../../grant-budget-category-options';
 import {
   FundingWriteRecoveryService, FundingWriteRecoveryState, isDefiniteFundingWriteRejection
@@ -89,7 +90,6 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   bulkFields: Partial<FundingSubmBulkEditFieldsDto> = {};
 
   canSave = false;
-  isSaving = false;
   saveSuccessMessage = '';
   saveErrorMessage = '';
   bulkWriteOutcomeMessage = '';
@@ -126,6 +126,26 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly grantBudgetOptions: GrantBudgetCategoryOptions;
   private budgetRenderPending = false;
   private destroyed = false;
+  private saving = false;
+  private saveProgressToken: number | null = null;
+
+  get isSaving(): boolean {
+    return this.saving;
+  }
+
+  set isSaving(value: boolean) {
+    this.saving = value;
+    if (value && !this.destroyed && this.saveProgressToken === null) {
+      this.saveProgressToken = this.saveProgress.begin();
+    } else if (!value && this.saveProgressToken !== null) {
+      this.saveProgress.end(this.saveProgressToken);
+      this.saveProgressToken = null;
+    }
+  }
+
+  get showSaveProgressMessages(): boolean {
+    return this.saveProgress.showProgressMessages;
+  }
 
   get savedChangesNeedRefresh(): boolean {
     return this.pendingFundingReadbacks.size > 0 || this.priorityRefreshRequired;
@@ -183,7 +203,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     private userSessionService: AppUserSessionService,
     private fundingWriteRecovery: FundingWriteRecoveryService,
     private fundingErrorScope: FundingRequestErrorScopeService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private saveProgress: FundingSaveProgressService
   ) {
     this.grantBudgetOptions = new GrantBudgetCategoryOptions(
       this.fundingSubmissionsService, this.fundingErrorScope, (_applId, state) => {
@@ -903,6 +924,17 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
             : `Success! Changes were saved for ${savedCount} grant${savedCount === 1 ? '' : 's'}.`;
           if (this.canSave) this.saveSuccessMessage += ' Your newer edits have not been saved.';
         }
+        this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
+        if (this.saveSuccessMessage) this.scrollToSuccessMessage();
+      },
+      error: error => {
+        if (!this.isCurrentFundingSave(readbacks[0])) return;
+        // Writes may already have committed, so keep recovery markers and require a server refresh.
+        this.logger.error('Bulk funding save stopped unexpectedly', error);
+        this.priorityRefreshRequired = true;
+        this.isSaving = false;
+        this.saveErrorMessage = 'The save stopped unexpectedly. Some changes may have been saved. Retry refresh before saving again.';
+        this.recomputeCanSave();
       }
     });
   }
@@ -959,7 +991,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
             || outcome.status === 'unknown' || outcome.status === 'not-sent') {
             return of({ proceed: false, outcome });
           }
-          return this.refreshSavedFundingRequest(remaining).pipe(
+          return this.refreshSavedFundingRequest(remaining, true).pipe(
             map(refreshed => ({ proceed: refreshed, outcome }))
           );
         })
@@ -1201,7 +1233,8 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private refreshSavedFundingRequest(remaining: BulkRowReadback[] = []): Observable<boolean> {
+  // In-queue readbacks defer table redraw and success focus to the queue's completion handler.
+  private refreshSavedFundingRequest(remaining: BulkRowReadback[] = [], inQueue = false): Observable<boolean> {
     const listId = this.listId;
     const editVersion = this.editVersion;
     const rows = this.rows;
@@ -1210,9 +1243,9 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
     this.priorityRefreshRequired = true;
     this.isSaving = true;
     this.saveErrorMessage = '';
-    return this.fundingErrorScope.handleLocally(
+    return defer(() => this.fundingErrorScope.handleLocally(
       this.fundingSubmissionsService.getListDetail(this.listId)
-    ).pipe(
+    )).pipe(
       defaultIfEmpty(null),
       take(1),
       map(detail => {
@@ -1303,7 +1336,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
             ? 'Success! Bulk changes have been applied'
             : `Success! Changes were saved for ${savedCount} grant${savedCount === 1 ? '' : 's'}.`;
           if (this.canSave) this.saveSuccessMessage += ' Your newer edits have not been saved.';
-          this.scrollToSuccessMessage();
+          if (!inQueue) this.scrollToSuccessMessage();
         }
         if (needsReview) {
           this.bulkWriteOutcomeMessage += ' Server values were refreshed; review unsaved changes before saving.';
@@ -1314,7 +1347,7 @@ export class BulkEditComponent implements OnInit, AfterViewInit, OnDestroy {
             : 'Some grant values could not be refreshed.';
           this.saveErrorMessage = `${prefix} ${errors.join(' ')} Retry refresh.`;
         }
-        this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
+        if (!inQueue) this.dtElement?.dtInstance?.then(dt => dt.ajax.reload(null, false));
         return !errors.length;
       }),
       catchError(error => {

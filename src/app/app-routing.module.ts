@@ -28,6 +28,7 @@ import { FundingListsSearchComponent } from './funding-submissions/funding-lists
 import { FundingListsComponent } from './funding-submissions/funding-lists/funding-lists.component';
 import { DirectorBulkEditComponent } from './funding-submissions/funding-lists/bulk-edit/director-bulk-edit.component';
 import { CanDeactivateSearchLists } from './funding-submissions/search-lists/can-deactivate-search-lists';
+import { withFundingSaveNavigationGuard } from './funding-submissions/funding-save-navigation.guard';
 import { CanDeactivatePlanStep6 } from './funding-plan/plan-step6/can-deactivate-plan-step6';
 import { CanDeactivateRequestStep2 } from './funding-request/step2/can-deactivate-request-step2';
 import { CanDeactivatePlanStep3 } from './funding-plan/plan-step3/can-deactivate-plan-step3';
@@ -69,8 +70,8 @@ const routes: Routes = [
       {path: 'fundingSourceDetails', component: FundingSourcesNamesComponent},
       {path: 'manage', component: ManageDesignationsComponent},
       {path: 'funding-submissions/create', component: CreateFundingListComponent, canActivate: [AuthGuard]},
-      {path: 'funding-submissions/search', component: SearchListsComponent, canActivate: [AuthGuard], canDeactivate: [CanDeactivateSearchLists]},
-      {path: 'funding-submissions/bulk-edit', component: BulkEditComponent, canActivate: [AuthGuard]},
+      withFundingSaveNavigationGuard({path: 'funding-submissions/search', component: SearchListsComponent, canActivate: [AuthGuard], canDeactivate: [CanDeactivateSearchLists]}),
+      withFundingSaveNavigationGuard({path: 'funding-submissions/bulk-edit', component: BulkEditComponent, canActivate: [AuthGuard]}),
       {path: 'funding-submissions/director-bulk-edit', component: DirectorBulkEditComponent, canActivate: [AuthGuard]},
       {path: 'funding-submissions/lists', component: FundingListsSearchComponent, canActivate: [AuthGuard]},
       {path: 'funding-submissions/funding-lists', component: FundingListsComponent, canActivate: [AuthGuard]},

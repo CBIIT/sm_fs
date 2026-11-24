@@ -6,6 +6,7 @@ export const environment = {
   KILLSWITCH_INTERVAL: 300000,
   TECH_SUPPORT_EMAIL: 'NCII2ESupport@mail.nih.gov',
   apiBaseUrl: '',
+  FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS: false,
   msalConfig: {
     auth: {
       clientId: '0ad31f45-5ea4-4030-a510-255cc14ff6ec',

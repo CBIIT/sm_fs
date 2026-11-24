@@ -19,6 +19,7 @@ import { roleNames } from '../../service/role-names';
 import { DocumentService } from '../../service/document.service';
 import { FundingSubmDropdownLookupService } from '../funding-subm-dropdown-lookup.service';
 import { FUNDING_WRITE_RECOVERY_STORAGE, FundingWriteRecoveryService } from '../funding-write-recovery.service';
+import { FundingSaveProgressService } from '../funding-save-progress.service';
 import { MemoryStorage } from '../testing/memory-storage';
 import { installDataTables } from '../testing/install-datatables';
 import { UserSelect2ChangeDirective } from '../user-select2-change.directive';
@@ -521,6 +522,32 @@ describe('FS-2516 same-page DOC Priority resequencing', () => {
     mover.recoverUnknownFunding();
     expect(peer.prioritySaveBlocked).toBeFalse();
     expect(page.pendingFundingGrantLabels).toEqual([]);
+  });
+
+  it('keeps a pending-save warning loaded on entry visible and hides it only while a save blocks the page', () => {
+    const testWindow = window as any;
+    const originalJquery = testWindow.$;
+    testWindow.$ = { fn: { DataTable: { ext: { pager: {} } } } };
+    try {
+      pageFixture.detectChanges();
+    } finally {
+      testWindow.$ = originalJquery;
+    }
+    seedRows([grant(100, 1), grant(300, 2)]);
+    TestBed.inject(FundingWriteRecoveryService).begin(42, 300);
+    page.loadPendingFundingRecoveries();
+    const progress = TestBed.inject(FundingSaveProgressService);
+    const warning = () => {
+      pageFixture.detectChanges();
+      return pageFixture.nativeElement.textContent.includes('Funding save pending for GRANT-300');
+    };
+    expect(progress.active).toBeFalse();
+    expect(warning()).toBeTrue();
+    const token = progress.begin();
+    expect(warning()).toBeFalse();
+    spyOnProperty(progress, 'showProgressMessages').and.returnValue(true);
+    expect(warning()).toBeTrue();
+    progress.end(token);
   });
 
   it('does not rebase another unresolved recovery until that write is confirmed and read back', () => {

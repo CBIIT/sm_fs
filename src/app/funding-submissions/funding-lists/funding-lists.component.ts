@@ -797,7 +797,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.fundingSubmissionsService.getListDetail(this.listId).subscribe({
       next: (detail: any) => {
         this.loadErrorMessage = '';
-        this.pageTitle = detail.listCode || this.pageTitle;
+        this.pageTitle = detail.selectionDateName;
         this.status = detail.currentStatusDescrip || '';
         this.listStatus = detail.currentStatusDescrip || '';
         const grants = this.extractGrantsFromDetail(detail);

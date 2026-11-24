@@ -67,6 +67,10 @@ export class FsMenuComponent implements OnInit {
   }
 
   hasUserFSAccess(): boolean {
-    return this.oefiaCertifier || this.docFunListCor || this.financialAnalyst || this.nciDirector;
+    return this.oefiaCertifier || this.docFunListCor || this.financialAnalyst || this.nciDirector || this.gmLeadership;
+  }
+
+  hasUserFSCreateAccess(): boolean {
+    return !this.nciDirector && (this.oefiaCertifier || this.docFunListCor || this.financialAnalyst);
   }
 }

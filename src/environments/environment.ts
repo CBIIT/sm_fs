@@ -10,6 +10,7 @@ export const environment = {
   KILLSWITCH_INTERVAL: 300000,
   TECH_SUPPORT_EMAIL: 'ncii2egrantsdevelopmentteam@mail.nih.gov',
   apiBaseUrl: '',
+  FUNDING_SUBMISSIONS_SHOW_SAVE_PROGRESS: false,
   msalConfig: {
     auth: {
       clientId: '4450b02b-ea0d-4a8c-bf01-cbad66fb841c',

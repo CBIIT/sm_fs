@@ -1,3 +1,4 @@
+import { fakeAsync, tick } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import { LoaderService } from '@cbiit/i2ecui-lib';
@@ -5,6 +6,8 @@ import { HttpClient } from '@angular/common/http';
 
 import { FundingListsSearchComponent } from './funding-lists-search.component';
 import { roleNames } from '../../service/role-names';
+
+declare var $: any;
 
 describe('FundingListsSearchComponent.formatLastActionDate (FS-2163)', () => {
   function instantiateComponent(): FundingListsSearchComponent {
@@ -506,10 +509,10 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
   });
 });
 
-describe('FundingListsSearchComponent list-name labels (FS-2273)', () => {
-  it('labels the search results code column as "List Name"', () => {
-    const component = new FundingListsSearchComponent(
-      jasmine.createSpyObj('Router', ['navigate']),
+describe('FundingListsSearchComponent list-name display', () => {
+  function instantiate(router = jasmine.createSpyObj('Router', ['navigate'])): FundingListsSearchComponent {
+    return new FundingListsSearchComponent(
+      router,
       jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
       jasmine.createSpyObj('HttpClient', ['post']),
       jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount', 'getOefiaPendingReviewListCount', 'getNciDirectorPendingReviewListCount']),
@@ -518,10 +521,51 @@ describe('FundingListsSearchComponent list-name labels (FS-2273)', () => {
       jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
       jasmine.createSpyObj('AppUserSessionService', ['hasRole'])
     );
+  }
+
+  it('binds the "List Name" column to the list name rather than the code', () => {
+    const component = instantiate();
 
     component.ngAfterViewInit();
 
     expect(component.dtOptions.columns[2].title).toBe('List Name');
-    expect(component.dtOptions.columns[2].data).toBe('code');
+    expect(component.dtOptions.columns[2].data).toBe('selectionDateName');
   });
+
+  it('View List carries the name as presentation text while preserving listId, destination, and from', () => {
+    const router = jasmine.createSpyObj('Router', ['navigate']);
+    const component = instantiate(router);
+
+    component.onViewList({ listId: 77, code: '9-MAY', selectionDateName: 'May 19th Selection' });
+
+    expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
+      queryParams: { listId: 77, selectionDate: 'May 19th Selection', from: 'lists' }
+    });
+  });
+
+  it('fallback View List link recovers the row by DataTables row, keeping a name with quotes and & intact', fakeAsync(() => {
+    const router = jasmine.createSpyObj('Router', ['navigate']);
+    const component = instantiate(router);
+    spyOn<any>(component, 'realignDataTableColumns').and.stub();
+    component.ngAfterViewInit();
+    const row = { listId: 88, code: 'Q-AMP', selectionDateName: 'Dr. "Q" & Partners\' List' };
+    const html = component.dtOptions.columns[5].render(null, 'display', row);
+    expect(html).not.toContain(row.selectionDateName);
+    const tbody = $(`<tbody><tr><td>${html}</td></tr></tbody>`);
+    const dt = {
+      rows: () => ({ count: () => 1 }),
+      button: () => ({ enable: () => undefined, disable: () => undefined, node: () => document.createElement('button') }),
+      table: () => ({ body: () => tbody[0] }),
+      row: (tr: any) => ({ data: () => ($(tr).is(tbody.find('tr')) ? row : undefined) })
+    };
+    component.dtElement = { dtInstance: Promise.resolve(dt) } as any;
+
+    component.dtOptions.drawCallback();
+    tick();
+    tbody.find('.view-list-link-fallback').trigger('click');
+
+    expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], {
+      queryParams: { listId: 88, selectionDate: 'Dr. "Q" & Partners\' List', from: 'lists' }
+    });
+  }));
 });
