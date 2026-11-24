@@ -283,7 +283,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
         }, // 1
         {
           title: 'List Name',
-          data: 'code',
+          data: 'selectionDateName',
           width: '130px',
           defaultContent: ''
         }, // 2
@@ -310,7 +310,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
             ? { ngTemplateRef: { ref: this.fundingListActionRenderer } }
             : {
                 render: (_data: number, _type: any, row: any) =>
-                  `<a href="javascript:void(0)" class="view-list-link-fallback" data-listid="${row.listId}" data-code="${row.code || ''}">View List</a>`
+                  `<a href="javascript:void(0)" class="view-list-link-fallback" data-listid="${row.listId}">View List</a>`
               })
         }, // 5
       ],
@@ -345,8 +345,8 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
             $(dt.table(0).body())
               .off('click', '.view-list-link-fallback')
               .on('click', '.view-list-link-fallback', (e: any) => {
-                const $el = $(e.currentTarget);
-                this.onViewList({ listId: $el.data('listid'), code: $el.data('code') });
+                // Recover the row from DataTables so the list name is never round-tripped through HTML.
+                this.onViewList(dt.row($(e.currentTarget).closest('tr')).data());
               });
           });
         }, 0);
@@ -364,7 +364,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
       ? '/funding-submissions/funding-lists'
       : '/funding-submissions/search';
     this.router.navigate([targetRoute], {
-      queryParams: { listId: row?.listId, selectionDate: row?.code || '', from: 'lists' }
+      queryParams: { listId: row?.listId, selectionDate: row?.selectionDateName || '', from: 'lists' }
     });
   }
 

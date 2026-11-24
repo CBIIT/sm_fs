@@ -554,6 +554,61 @@ describe('SearchListsComponent — unsaved-changes warning trigger coverage (FS-
     );
   });
 
+  describe('list-name display', () => {
+    it('replaces a code-valued route hint with the synchronously loaded detail name in the heading, confirmation, and Bulk Edit state', () => {
+      TestBed.inject(ActivatedRoute).queryParams = of({ listId: '42', selectionDate: '9-MAY', from: 'lists' });
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(of({
+        listId: 42, listCode: '9-MAY', selectionDateName: 'May 19th Selection', grants: []
+      } as any));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.selectionDate).toBe('May 19th Selection');
+      expect(fixture.nativeElement.querySelector('h2')?.textContent?.trim()).toBe('May 19th Selection');
+      component.selectedRows.set(100, { applId: 100 });
+      const { host, viewRef } = renderRemoveGrantsWarningModal();
+      expect(host.querySelector('.modal-body p')?.textContent?.trim())
+        .toBe('Are you sure you want to remove 1 grant(s) from May 19th Selection?');
+      viewRef.destroy();
+      host.remove();
+
+      component.onBulkEdit();
+
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/funding-submissions/bulk-edit'], jasmine.objectContaining({
+        state: jasmine.objectContaining({ listId: 42, selectionDate: 'May 19th Selection' })
+      }));
+    });
+
+    it('shows the route hint until a delayed detail arrives, then keeps the accepted name against later hints', () => {
+      const params$ = new Subject<any>();
+      TestBed.inject(ActivatedRoute).queryParams = params$;
+      const firstDetail$ = new Subject<any>();
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(firstDetail$);
+
+      component.ngOnInit();
+      params$.next({ listId: '42', selectionDate: 'May 19th Selection' });
+
+      expect(component.selectionDate).toBe('May 19th Selection');
+
+      firstDetail$.next({ listId: 42, listCode: '9-MAY', selectionDateName: 'May 19th Selection (Renamed)', grants: [] });
+      firstDetail$.complete();
+      expect(component.selectionDate).toBe('May 19th Selection (Renamed)');
+
+      const secondDetail$ = new Subject<any>();
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(secondDetail$);
+      params$.next({ listId: '42', selectionDate: '9-MAY' });
+
+      expect(component.selectionDate).toBe('May 19th Selection (Renamed)');
+
+      const otherDetail$ = new Subject<any>();
+      fundingSubmissionsServiceSpy.getListDetail.and.returnValue(otherDetail$);
+      params$.next({ listId: '43', selectionDate: 'June Selection' });
+
+      expect(component.selectionDate).toBe('June Selection');
+    });
+  });
+
   describe('remove-grants confirmation modal copy (FS-2219)', () => {
     it('renders the exact interpolated count-and-list-name message', () => {
       component.selectionDate = '9-May 19th';

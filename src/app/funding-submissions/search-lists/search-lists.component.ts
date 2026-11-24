@@ -82,6 +82,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
   documentURL = '';
 
   selectionDate = '';
+  // List whose detail-provided name has been accepted; later route hints must not replace it.
+  private acceptedSelectionDateListId: number | null = null;
   listId = 0;
   fromRoute = '';
   backLabel = 'Back to Search Results';
@@ -251,15 +253,18 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (params['listId']) {
         const previousListId = this.listId;
         this.listId = Number(params['listId']);
+        if (previousListId !== this.listId) {
+          this.acceptedSelectionDateListId = null;
+        }
+        this.applySelectionDateHint(params['selectionDate']);
         this.pendingSelectedApplIds = navigationState?.selectionListId === this.listId
           ? navigationState.selectedApplIds || []
           : [];
         navigationState = null;
         this.loadPendingFundingRecoveries();
         this.loadListMeta(false, previousListId !== this.listId);
-      }
-      if (params['selectionDate']) {
-        this.selectionDate = params['selectionDate'];
+      } else {
+        this.applySelectionDateHint(params['selectionDate']);
       }
       this.fromRoute = params['from'] || '';
       if (params['from'] === 'lists') {
@@ -366,6 +371,12 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 0);
   }
 
+  private applySelectionDateHint(hint: string | undefined): void {
+    if (hint && this.acceptedSelectionDateListId !== this.listId) {
+      this.selectionDate = hint;
+    }
+  }
+
   private loadListMeta(forRemoval = false, initialListLoad = false): void {
     if (!forRemoval && !initialListLoad && this.priorityCoordinator.hasPending(this.listId)) {
       this.deferredListMetaRefresh = true;
@@ -407,7 +418,8 @@ export class SearchListsComponent implements OnInit, AfterViewInit, OnDestroy {
       next: ({ detail, history }) => {
         if (this.listId !== listId || this.listMetaVersion !== version) return;
         const removal = forRemoval ? this.removalReadback : null;
-        this.selectionDate = detail.listCode || this.selectionDate;
+        this.selectionDate = detail.selectionDateName;
+        this.acceptedSelectionDateListId = listId;
         this.totalGrants = detail.totalGrants ?? 0;
         this.docRecommendedTotal = detail.totalDocRecAmt ?? 0;
         this.listStatus = detail.currentStatusDescrip;

@@ -619,6 +619,29 @@ describe('CreateFundingTableComponent — Grant Search Results checkbox disable 
     expect(exportButton.exportOptions.columns).toEqual(Array.from({ length: 17 }, (_, index) => index + 1));
   });
 
+  it('displays the Exists in List name while keeping code-based navigation and selectability', () => {
+    const column = (component.dtOptions.columns as any[]).find((col: any) => col.title === 'Exists in List');
+    expect(column.data).toBe('existsInListName');
+    expect(column.defaultContent).toBe('');
+
+    const navigateToListSpy = spyOn(component, 'navigateToList');
+    const row = { applId: 7, existsInListSelectionDate: '9-MAY', existsInListName: 'May 19th Selection' };
+    const view = component.existsInListRenderer.createEmbeddedView({ adtData: row });
+    view.detectChanges();
+    const link = view.rootNodes.find((node: any) => node.tagName === 'A') as HTMLAnchorElement;
+
+    expect(link.textContent.trim()).toBe('May 19th Selection');
+    link.click();
+    expect(navigateToListSpy).toHaveBeenCalledWith('9-MAY');
+    expect((component as any).isRowSelectable(row)).toBeFalse();
+    view.destroy();
+
+    const emptyView = component.existsInListRenderer.createEmbeddedView({ adtData: { applId: 8 } });
+    emptyView.detectChanges();
+    expect(emptyView.rootNodes.some((node: any) => node.tagName === 'A')).toBeFalse();
+    emptyView.destroy();
+  });
+
   describe('row checkbox: disabled state + tooltip (isRowSelectable / rowCallback)', () => {
     it('a grant with checkboxDisabled=true is not selectable', () => {
       expect((component as any).isRowSelectable({ applId: 1, checkboxDisabled: true })).toBeFalse();

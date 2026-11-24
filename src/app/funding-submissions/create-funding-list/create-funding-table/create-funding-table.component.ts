@@ -29,6 +29,9 @@ import { FundingSubmDropdownLookupService } from '../../funding-subm-dropdown-lo
 
 declare var $: any;
 
+// The installed generated client predates this optional display field; existsInListSelectionDate stays the code.
+type GrantSearchResultRow = FundingSubmissionSearchResultDto & { existsInListName?: string };
+
 @Component({
   selector: 'app-create-funding-table',
   templateUrl: './create-funding-table.component.html',
@@ -61,7 +64,7 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
   saveRejectedSummaryMessage = '';
   originalAmendmentConflictMessages: string[] = [];
   advancedDocStageRejectionMessages: string[] = [];
-  grantList: FundingSubmissionSearchResultDto[] = [];
+  grantList: GrantSearchResultRow[] = [];
   throttle: DatatableThrottle = new DatatableThrottle();
   selectedRows: Map<number, FundingSubmissionSearchResultDto> = new Map();
   private currentPage = 0;
@@ -279,8 +282,9 @@ export class CreateFundingTableComponent implements OnInit, AfterViewInit, OnDes
         }, // 15
         {
           title: 'Exists in List',
-          data: 'existsInListSelectionDate',
+          data: 'existsInListName',
           width: '50px',
+          defaultContent: '',
           ngTemplateRef: { ref: this.existsInListRenderer },
         }, // 16
         {
