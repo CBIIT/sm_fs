@@ -403,6 +403,134 @@ describe('FundingListsSearchComponent.exportListSearchResults (FS-2033)', () => 
     expect(body.pendingReviewType).toBe('NCI_DIRECTOR');
   });
 
+  it('uses the Director-like list route for GM leadership without inheriting the pending-review filter', () => {
+    const router = jasmine.createSpyObj('Router', ['navigate']);
+    const localComponent = new FundingListsSearchComponent(
+      router,
+      jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
+      jasmine.createSpyObj('HttpClient', ['post']),
+      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount', 'getOefiaPendingReviewListCount', 'getNciDirectorPendingReviewListCount']),
+      { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
+      jasmine.createSpyObj('LoaderService', ['show', 'hide']),
+      jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
+      jasmine.createSpyObj('AppUserSessionService', ['hasRole'])
+    );
+    (localComponent as any).userSessionService.hasRole.and.callFake(
+      (role: string) => role === roleNames.GM_LEADERSHIP
+    );
+    localComponent.pendingReviewCount = 5;
+
+    localComponent.onPendingReviewClick();
+    localComponent.onViewList({ listId: 77, selectionDateName: 'May Selection' });
+
+    expect(localComponent.isOgaLeadershipView).toBeTrue();
+    expect((localComponent as any).pendingReviewOnly).toBeFalse();
+    expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/funding-lists'], {
+      queryParams: { listId: 77, selectionDate: 'May Selection', from: 'lists' }
+    });
+  });
+
+  it('preserves the existing OEFIA experience when GM leadership is also present', () => {
+    const router = jasmine.createSpyObj('Router', ['navigate']);
+    const localComponent = new FundingListsSearchComponent(
+      router,
+      jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
+      jasmine.createSpyObj('HttpClient', ['post']),
+      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount', 'getOefiaPendingReviewListCount', 'getNciDirectorPendingReviewListCount']),
+      { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
+      jasmine.createSpyObj('LoaderService', ['show', 'hide']),
+      jasmine.createSpyObj('FundingSubmissionsStateService', ['consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState']),
+      jasmine.createSpyObj('AppUserSessionService', ['hasRole'])
+    );
+    (localComponent as any).userSessionService.hasRole.and.callFake(
+      (role: string) => role === roleNames.GM_LEADERSHIP || role === roleNames.OEFIA_CERTIFIER
+    );
+
+    localComponent.onViewList({ listId: 77, selectionDateName: 'May Selection' });
+
+    expect(localComponent.isOgaLeadershipView).toBeFalse();
+    expect(router.navigate).toHaveBeenCalledWith(['/funding-submissions/search'], jasmine.any(Object));
+  });
+
+  it('strips both hidden pending-review fields from GM search and export payloads', () => {
+    const searchLists = jasmine.createSpy('searchLists').and.returnValue(
+      of({ recordsTotal: 0, recordsFiltered: 0, data: [] })
+    );
+    (component as any).fundingSubmissionsService = { searchLists };
+    (component as any).userSessionService.hasRole.and.callFake(
+      (role: string) => role === roleNames.GM_LEADERSHIP
+    );
+    (component as any).searchCriteria = {
+      grantType: 'R01',
+      listStatus: ['Pending Review', 'Active'],
+      pendingReviewOnly: true,
+      pendingReviewType: 'NCI_DIRECTOR'
+    };
+
+    component.ajaxCall(component, {
+      draw: 1, columns: [], order: [], start: 0, length: 10, search: { value: '', regex: false }
+    }, () => { /* noop */ });
+
+    const searchBody = searchLists.calls.mostRecent().args[0] as any;
+    expect(searchBody.grantType).toBe('R01');
+    expect(searchBody.listStatus).toEqual(['Active']);
+    expect(searchBody.pendingReviewOnly).toBeUndefined();
+    expect(searchBody.pendingReviewType).toBeUndefined();
+
+    httpSpy.post.and.returnValue(of(new ArrayBuffer(8)));
+    spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+    spyOn(document, 'createElement').and.returnValue({ click: () => {}, download: '', href: '' } as any);
+    component.exportListSearchResults();
+
+    const exportBody = httpSpy.post.calls.mostRecent().args[1] as any;
+    expect(exportBody.pendingReviewOnly).toBeUndefined();
+    expect(exportBody.pendingReviewType).toBeUndefined();
+    expect(exportBody.listStatus).toEqual(['Active']);
+  });
+
+  it('removes restored pending-review state for GM leadership while retaining other filters', fakeAsync(() => {
+    const savedState = {
+      searchCriteria: {
+        grantType: 'R01',
+        listStatus: ['Pending Review', 'Active'],
+        pendingReviewOnly: true,
+        pendingReviewType: 'NCI_DIRECTOR'
+      },
+      selectedListStatus: 'Pending Review',
+      selectedDocs: [],
+      showResults: true,
+      formValue: {}
+    };
+    const stateService = jasmine.createSpyObj('FundingSubmissionsStateService', [
+      'consumeFreshNavigationRequest', 'getSearchListsState', 'isFreshNavigationRequested', 'saveSearchListsState'
+    ]);
+    stateService.consumeFreshNavigationRequest.and.returnValue(false);
+    stateService.getSearchListsState.and.returnValue(savedState);
+    const localComponent = new FundingListsSearchComponent(
+      jasmine.createSpyObj('Router', ['navigate']),
+      jasmine.createSpyObj('NGXLogger', ['debug', 'error', 'warn']),
+      jasmine.createSpyObj('HttpClient', ['post']),
+      jasmine.createSpyObj('FundingSubmissionsService', ['getSelectionDateCodes', 'searchLists', 'getListStatusCodes', 'getPendingReviewListCount', 'getOefiaPendingReviewListCount', 'getNciDirectorPendingReviewListCount']),
+      { caForDocEmitter: { next: jasmine.createSpy('next') } } as any,
+      jasmine.createSpyObj('LoaderService', ['show', 'hide']),
+      stateService,
+      jasmine.createSpyObj('AppUserSessionService', ['hasRole'])
+    );
+    (localComponent as any).userSessionService.hasRole.and.callFake(
+      (role: string) => role === roleNames.GM_LEADERSHIP
+    );
+
+    localComponent.ngAfterViewInit();
+    tick(1000);
+
+    expect(localComponent.isOgaLeadershipView).toBeTrue();
+    expect(localComponent.selectedListStatus).toBeNull();
+    expect((localComponent as any).searchCriteria.grantType).toBe('R01');
+    expect((localComponent as any).searchCriteria.listStatus).toEqual(['Active']);
+    expect((localComponent as any).searchCriteria.pendingReviewOnly).toBeUndefined();
+    expect((localComponent as any).searchCriteria.pendingReviewType).toBeUndefined();
+  }));
+
   it('uses OEFIA pending count endpoint for OEFIA users in ngOnInit', () => {
     const fundingSubmissionsService = jasmine.createSpyObj('FundingSubmissionsService', [
       'getSelectionDateCodes',

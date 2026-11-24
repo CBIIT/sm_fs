@@ -14,6 +14,8 @@ import { NciDecisionCellRendererComponent } from '../../table-cell-renderers/nci
 import { FundingSubmissionListGrantDto, FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
 import { DataTableDirective } from 'angular-datatables';
+import { AppUserSessionService } from '../../service/app-user-session.service';
+import { roleNames } from '../../service/role-names';
 
 const NO_LOCKABLE_DECISIONS_TOOLTIP = 'There are no Approve or Reject decisions available to lock.';
 const LOCK_SUCCESS_MESSAGE =
@@ -55,6 +57,7 @@ describe('FundingListsComponent', () => {
   let component: FundingListsComponent;
   let fixture: ComponentFixture<FundingListsComponent>;
   let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsService>;
+  let userSessionServiceSpy: jasmine.SpyObj<AppUserSessionService>;
   let modalRefSpy: { close: jasmine.Spy; dismiss: jasmine.Spy };
 
   it('FS-2684: shows only undecided, non-recused NCI Director Review grants in Pending Review', () => {
@@ -81,6 +84,8 @@ describe('FundingListsComponent', () => {
 
   beforeEach(async () => {
     modalRefSpy = { close: jasmine.createSpy('close'), dismiss: jasmine.createSpy('dismiss') };
+    userSessionServiceSpy = jasmine.createSpyObj<AppUserSessionService>('AppUserSessionService', ['hasRole']);
+    userSessionServiceSpy.hasRole.and.returnValue(false);
     fundingSubmissionsServiceSpy = jasmine.createSpyObj<FundingSubmissionsService>('FundingSubmissionsService', [
       'getListDetail',
       'saveNciDecisions',
@@ -122,6 +127,10 @@ describe('FundingListsComponent', () => {
         {
           provide: FundingSubmissionsService,
           useValue: fundingSubmissionsServiceSpy
+        },
+        {
+          provide: AppUserSessionService,
+          useValue: userSessionServiceSpy
         },
         {
           provide: NGXLogger,
@@ -895,6 +904,33 @@ describe('FundingListsComponent', () => {
       expect(html).not.toContain('Locked');
     });
 
+    it('renders only Details and blocks all decision actions for GM leadership', () => {
+      userSessionServiceSpy.hasRole.and.callFake((role: string) => role === roleNames.GM_LEADERSHIP);
+      const grant = buildGrant({ applId: 13, nciDecision: '' });
+      component.grants = [grant];
+      component.selectedRows.set(13, grant);
+      const navigate = spyOn(TestBed.inject(Router), 'navigate').and.returnValue(Promise.resolve(true));
+
+      const html = renderAction(grant);
+      component.goToDirectorBulkEdit();
+      component.onConfirmDecisionsClick();
+      component.onProceedConfirmDecisions();
+      (component as any).onProcessDecisionSelect(13, 'Approve', undefined, undefined, grant);
+      (component as any).pendingDecision = 'Approve';
+      (component as any).pendingDecisionGrant = grant;
+      component.onConfirmGrantDecision();
+
+      expect(component.isOgaLeadershipView).toBeTrue();
+      expect(html).toContain('toggle-details');
+      expect(html).not.toContain('Process');
+      expect(html).not.toContain('process-option');
+      expect(component.getTabCount('all')).toBe(1);
+      expect(navigate).not.toHaveBeenCalled();
+      expect(TestBed.inject(NgbModal).open).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.saveNciDecisions).not.toHaveBeenCalled();
+      expect(fundingSubmissionsServiceSpy.confirmApprovalsAndRejections).not.toHaveBeenCalled();
+    });
+
     it('refuses a Process decision for a locked row, even when the table row object is stale', () => {
       const openModalSpy = spyOn<any>(component, 'openGrantDecisionModal').and.stub();
       component.grants = [buildGrant({ applId: 13, lockedDate: new Date() })];
@@ -1164,6 +1200,7 @@ describe('FundingListsComponent FS-2343 decision lock (rendered template)', () =
         { provide: LoaderService, useValue: { show: jasmine.createSpy('show'), hide: jasmine.createSpy('hide') } },
         { provide: NgbModal, useValue: { open: jasmine.createSpy('open') } },
         { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
+        { provide: AppUserSessionService, useValue: { hasRole: () => false } },
         { provide: NGXLogger, useValue: { error: jasmine.createSpy('error') } }
       ]
     }).compileComponents();
@@ -1171,6 +1208,22 @@ describe('FundingListsComponent FS-2343 decision lock (rendered template)', () =
     fixture = TestBed.createComponent(FundingListsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  it('hides decision controls but retains tabs and PDF selection for GM leadership', () => {
+    const userSession = TestBed.inject(AppUserSessionService);
+    spyOn(userSession, 'hasRole').and.callFake((role: string) => role === roleNames.GM_LEADERSHIP);
+    component.grants = [buildGrant({ applId: 91, nciDecision: '' })];
+    component.selectedRows.set(91, component.grants[0]);
+    component.selectedViewDoc = 'Abstract';
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.confirm-btn')).toBeNull();
+    expect(fixture.nativeElement.textContent).not.toContain('Bulk Decision');
+    expect(fixture.nativeElement.textContent).toContain('Pending Review');
+    expect(fixture.nativeElement.querySelector('#view-doc-type')).not.toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('View PDF');
+    expect(component.canViewPdf).toBeTrue();
   });
 
   const lockButton = (): HTMLButtonElement =>
@@ -1259,6 +1312,7 @@ describe('FundingListsComponent FS-2408 grant-number filter (rendered template)'
         { provide: LoaderService, useValue: { show: jasmine.createSpy('show'), hide: jasmine.createSpy('hide') } },
         { provide: NgbModal, useValue: { open: jasmine.createSpy('open') } },
         { provide: FundingSubmissionsService, useValue: fundingSubmissionsServiceSpy },
+        { provide: AppUserSessionService, useValue: { hasRole: () => false } },
         { provide: NGXLogger, useValue: { error: jasmine.createSpy('error') } }
       ]
     }).compileComponents();

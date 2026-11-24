@@ -9,6 +9,8 @@ import { finalize } from 'rxjs/operators';
 import { DataTableDirective } from 'angular-datatables';
 import { Select2OptionData } from 'ng-select2';
 import { AppPropertiesService, LoaderService } from '@cbiit/i2ecui-lib';
+import { AppUserSessionService } from '../../service/app-user-session.service';
+import { roleNames } from '../../service/role-names';
 import {
   FundingSubmissionListGrantDto,
   FundingSubmissionNciDecisionRequestDto,
@@ -97,6 +99,14 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     return selected?.label || 'Pending Review';
   }
 
+  get isOgaLeadershipView(): boolean {
+    return this.userSessionService.hasRole(roleNames.GM_LEADERSHIP)
+      && !this.userSessionService.hasRole(roleNames.NCI_DIRECTOR)
+      && !this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER)
+      && !this.userSessionService.hasRole(roleNames.FINANCIAL_ANALYST)
+      && !this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+  }
+
   grants: FundingSubmissionListGrantDto[] = [];
   docRecommendedTotals: { [doc: string]: number } = {};
 
@@ -169,7 +179,8 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     private propertiesService: AppPropertiesService,
     private loaderService: LoaderService,
     private fundingSubmissionsService: FundingSubmissionsService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private userSessionService: AppUserSessionService
   ) {}
 
   ngOnInit(): void {
@@ -386,6 +397,13 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
           render: (_data: any, _type: any, row: FundingSubmissionListGrantDto) => {
             const applId = Number(row?.applId);
             const expandedIcon = this.detailComponentsByApplId.has(applId) ? 'fa-minus-circle' : 'fa-plus-circle';
+            const detailsButtonHtml = `
+                <button class="btn btn-link p-0 toggle-details d-block mx-auto mb-1" title="Details" data-appl-id="${applId}">
+                  <i class="far ${expandedIcon} fa-lg"></i>
+                </button>`;
+            if (this.isOgaLeadershipView) {
+              return `<div class="d-flex flex-column align-items-center gap-1 action-cell-wrap">${detailsButtonHtml}</div>`;
+            }
             const isLocked = this.isGrantLocked(row);
             const options = isLocked
               ? ''
@@ -399,9 +417,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
 
             return `
               <div class="d-flex flex-column align-items-center gap-1 action-cell-wrap">
-                <button class="btn btn-link p-0 toggle-details d-block mx-auto mb-1" title="Details" data-appl-id="${applId}">
-                  <i class="far ${expandedIcon} fa-lg"></i>
-                </button>
+                ${detailsButtonHtml}
                 <div class="btn-group process-dropdown-wrap">
                   ${actionButtonHtml}
                   <div class="dropdown-menu process-menu">
@@ -502,6 +518,9 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   goToDirectorBulkEdit(): void {
+    if (this.isOgaLeadershipView) {
+      return;
+    }
     this.bulkEditErrorMessage = '';
     const selectedGrants = Array.from(this.selectedRows.values()).map(selected =>
       this.grants.find(grant => Number(grant.applId) === Number(selected.applId)) || selected);
@@ -543,7 +562,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onConfirmDecisionsClick(): void {
-    if (this.isLockActionDisabled) {
+    if (this.isOgaLeadershipView || this.isLockActionDisabled) {
       return;
     }
     this.confirmDecisionsModalRef = this.modalService.open(this.confirmDecisionsWarningModalRef, { centered: true });
@@ -554,7 +573,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onProceedConfirmDecisions(): void {
-    if (this.isLockingDecisions) {
+    if (this.isOgaLeadershipView || this.isLockingDecisions) {
       return;
     }
 
@@ -1221,7 +1240,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getProcessOptionsForGrant(grant: FundingSubmissionListGrantDto): ProcessOption[] {
-    if (this.isGrantLocked(grant)) {
+    if (this.isOgaLeadershipView || this.isGrantLocked(grant)) {
       return [];
     }
 
@@ -1251,7 +1270,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
     tr?: JQuery,
     rowData?: FundingSubmissionListGrantDto
   ): void {
-    if (!Number.isFinite(applId)) {
+    if (this.isOgaLeadershipView || !Number.isFinite(applId)) {
       return;
     }
 
@@ -1277,7 +1296,7 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onConfirmGrantDecision(): void {
-    if (!this.pendingDecision || !this.pendingDecisionGrant) {
+    if (this.isOgaLeadershipView || !this.pendingDecision || !this.pendingDecisionGrant) {
       return;
     }
 
@@ -1408,6 +1427,9 @@ export class FundingListsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private openGrantDecisionModal(grant: FundingSubmissionListGrantDto, decision: ProcessOption['value']): void {
+    if (this.isOgaLeadershipView) {
+      return;
+    }
     this.pendingDecision = decision;
     this.pendingDecisionGrant = grant;
     this.pendingDecisionGrantNumber = String(grant?.grantNumber || '').trim();

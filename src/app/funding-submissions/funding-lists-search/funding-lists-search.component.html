@@ -3,7 +3,7 @@
 </div>
 
 <!-- Pending Review quick-filter badge -->
-<div class="row my-4 ms-3">
+<div class="row my-4 ms-3" *ngIf="!isOgaLeadershipView">
     <button type="button" class="btn btn-lg pending-review-button" [class.pending-review-results]="showResults" [disabled]="pendingReviewCount === 0" (click)="onPendingReviewClick()">
       <span class="me-1">{{ pendingReviewCount }}</span> Pending Review 
     </button>

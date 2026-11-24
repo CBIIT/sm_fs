@@ -2003,6 +2003,7 @@ describe('GrantDetailComponent', () => {
       { name: 'OEFIA', role: roleNames.OEFIA_CERTIFIER },
       { name: 'Director/Delegate', role: roleNames.NCI_DIRECTOR },
       { name: 'Financial Analyst only', role: roleNames.FINANCIAL_ANALYST },
+      { name: 'GM Leadership only', role: roleNames.GM_LEADERSHIP },
       { name: 'unauthorized', role: null }
     ];
 
