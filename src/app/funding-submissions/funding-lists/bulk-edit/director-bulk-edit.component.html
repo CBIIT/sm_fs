@@ -27,7 +27,7 @@
         [data]="decisionOptions"
         [allowClear]="true"
         width="100%"
-        placeholder="NCI Decision Placeholder">
+        placeholder="Select NCI Decision">
       </ng-select2>
     </div>
 
@@ -38,7 +38,7 @@
         class="form-control"
         rows="5"
         maxlength="1000"
-        placeholder="Enter NCI Director Notes here..."
+        placeholder=""
         [(ngModel)]="bulkNotes"></textarea>
       <div class="text-end text-muted small">{{ (bulkNotes || '').length }}/1000</div>
     </div>
