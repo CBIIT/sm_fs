@@ -359,6 +359,7 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
         this.updateNciDirectorNoteValidationErrors();
         this.saveSuccessMessage = 'Success! Bulk changes have been saved';
         this.savingInProgress = false;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       },
       error: (err) => {
         this.logger.error('Failed to save Director Bulk Edit decisions', err);

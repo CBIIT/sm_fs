@@ -3,7 +3,8 @@ import { Directive, forwardRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
-import { of } from 'rxjs';
+import { NgbAlertConfig, NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
+import { of, Subject, throwError } from 'rxjs';
 import { FundingSubmissionsService } from '@cbiit/i2efsws-lib';
 import { AppPropertiesService } from '@cbiit/i2ecui-lib';
 import { DirectorBulkEditComponent } from './director-bulk-edit.component';
@@ -30,6 +31,7 @@ describe('DirectorBulkEditComponent', () => {
   let component: DirectorBulkEditComponent;
   let fixture: ComponentFixture<DirectorBulkEditComponent>;
   let fundingSubmissionsServiceSpy: jasmine.SpyObj<FundingSubmissionsService>;
+  let scrollToSpy: jasmine.Spy;
 
   function grant(overrides: { [field: string]: any } = {}): any {
     return {
@@ -67,12 +69,13 @@ describe('DirectorBulkEditComponent', () => {
   }
 
   beforeEach(async () => {
+    scrollToSpy = spyOn(window, 'scrollTo');
     fundingSubmissionsServiceSpy = jasmine.createSpyObj('FundingSubmissionsService', ['saveNciDecisions', 'getListDetail']);
     fundingSubmissionsServiceSpy.saveNciDecisions.and.returnValue(of({} as any));
 
     await TestBed.configureTestingModule({
       declarations: [DirectorBulkEditComponent, Select2TestValueAccessor],
-      imports: [FormsModule],
+      imports: [FormsModule, NgbAlertModule],
       providers: [
         {
           provide: ActivatedRoute,
@@ -86,6 +89,7 @@ describe('DirectorBulkEditComponent', () => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
+    TestBed.inject(NgbAlertConfig).animation = false;
     fixture = TestBed.createComponent(DirectorBulkEditComponent);
     component = fixture.componentInstance;
   });
@@ -123,6 +127,7 @@ describe('DirectorBulkEditComponent', () => {
 
       expect(component.hasNciDirectorNoteErrors).toBeFalse();
       expect(getSaveButton().disabled).toBeFalse();
+      expect(scrollToSpy).not.toHaveBeenCalled();
     });
   });
 
@@ -160,15 +165,23 @@ describe('DirectorBulkEditComponent', () => {
     component.onSave();
 
     expect(fundingSubmissionsServiceSpy.saveNciDecisions).not.toHaveBeenCalled();
+    expect(scrollToSpy).not.toHaveBeenCalled();
   });
 
-  it('shows the saved success message and disables Save after a successful save', () => {
+  it('scrolls to the saved success message and disables Save only after a successful response', () => {
+    const response = new Subject<any>();
+    fundingSubmissionsServiceSpy.saveNciDecisions.and.returnValue(response);
     initializeWithGrants([grant({ applId: 1 })]);
     component.bulkDecision = 'Hold';
     component.bulkNotes = 'Pending budget review';
     component.applyChanges();
 
     component.onSave();
+    expect(scrollToSpy).not.toHaveBeenCalled();
+    expect(component.saveSuccessMessage).toBe('');
+
+    response.next({});
+    response.complete();
     fixture.detectChanges();
 
     expect(fundingSubmissionsServiceSpy.saveNciDecisions).toHaveBeenCalledWith({
@@ -179,6 +192,73 @@ describe('DirectorBulkEditComponent', () => {
     expect(component.hasNciDirectorNoteErrors).toBeFalse();
     expect(getSaveButton().disabled).toBeTrue();
     expect(component.rows[0].nciDecision).toBe('Hold');
+    expect(component.rows[0].nciDirectorNotes).toBe('Pending budget review');
+    expect(scrollToSpy).toHaveBeenCalledOnceWith({ top: 0, behavior: 'smooth' });
+  });
+
+  it('renders the dismissible success alert directly alongside the heading and form', () => {
+    initializeWithGrants([grant()]);
+    component.saveSuccessMessage = 'Success! Bulk changes have been saved';
+    fixture.detectChanges();
+
+    const page: HTMLElement = fixture.nativeElement.querySelector('.director-bulk-edit-page');
+    const alert: HTMLElement = page.querySelector('ngb-alert[type="success"]');
+    expect(alert.parentElement).toBe(page);
+    expect(alert.previousElementSibling).toBe(page.querySelector('h1'));
+    expect(alert.nextElementSibling).toBe(page.querySelector('.bulk-form'));
+    expect(alert.classList.contains('alert-success')).toBeTrue();
+    expect(alert.textContent).toContain('Success! Bulk changes have been saved');
+
+    alert.querySelector<HTMLButtonElement>('button.btn-close').click();
+    fixture.detectChanges();
+
+    expect(component.saveSuccessMessage).toBe('');
+    expect(page.querySelector('ngb-alert[type="success"]')).toBeNull();
+    expect(scrollToSpy).not.toHaveBeenCalled();
+  });
+
+  it('does not scroll or show success when the API save fails', () => {
+    fundingSubmissionsServiceSpy.saveNciDecisions.and.returnValue(throwError(() => ({ status: 500 })));
+    initializeWithGrants([grant()]);
+    component.bulkDecision = 'Approve';
+    component.applyChanges();
+
+    component.onSave();
+    fixture.detectChanges();
+
+    expect(fundingSubmissionsServiceSpy.saveNciDecisions).toHaveBeenCalledTimes(1);
+    expect(component.loadErrorMessage).toBe('Unable to save Director Bulk Edit changes right now. Please try again.');
+    expect(component.saveSuccessMessage).toBe('');
+    expect(component.savingInProgress).toBeFalse();
+    expect(getSaveButton().disabled).toBeFalse();
+    expect(scrollToSpy).not.toHaveBeenCalled();
+  });
+
+  [[], [grant()]].forEach(grants => {
+    it(`does not save or scroll for ${grants.length ? 'unchanged rows' : 'an empty selection'}`, () => {
+      initializeWithGrants(grants);
+      component.canSave = true;
+
+      component.onSave();
+
+      expect(fundingSubmissionsServiceSpy.saveNciDecisions).not.toHaveBeenCalled();
+      expect(component.canSave).toBeFalse();
+      expect(component.saveSuccessMessage).toBe('');
+      expect(scrollToSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  it('does not save or scroll when a changed row has no decision', () => {
+    initializeWithGrants([grant()]);
+    component.bulkNotes = 'Review pending';
+    component.applyChanges();
+
+    component.onSave();
+
+    expect(fundingSubmissionsServiceSpy.saveNciDecisions).not.toHaveBeenCalled();
+    expect(component.loadErrorMessage).toContain('Please select an NCI Decision');
+    expect(component.saveSuccessMessage).toBe('');
+    expect(scrollToSpy).not.toHaveBeenCalled();
   });
 
   it('configures the Export button and exports the displayed NCI Decision label', () => {

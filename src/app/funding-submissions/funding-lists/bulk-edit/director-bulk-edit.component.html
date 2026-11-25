@@ -5,13 +5,9 @@
 
   <h1 class="mt-4 mb-4">Bulk Decision</h1>
 
-  <div class="row" *ngIf="saveSuccessMessage.length > 0">
-    <div class="col-12">
-      <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
-        <span><b>{{saveSuccessMessage}}</b></span>
-      </ngb-alert>
-    </div>
-  </div>
+  <ngb-alert *ngIf="saveSuccessMessage.length > 0" type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
+    <span><b>{{saveSuccessMessage}}</b></span>
+  </ngb-alert>
 
   <div class="row" *ngIf="loadErrorMessage.length > 0">
     <div class="col-12">
