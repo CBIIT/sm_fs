@@ -85,10 +85,13 @@
         [(ngModel)]="data.nciDirectorNotes"
         (ngModelChange)="onRowChange()"></textarea>
       <div class="text-end small text-muted">{{ (data.nciDirectorNotes || '').length }}/1000</div>
+      <div *ngIf="hasNciDirectorNoteError(data)" class="text-danger small mt-1">
+        {{ getNciDirectorNoteErrorMessage() }}
+      </div>
     </div>
   </ng-template>
 
   <div class="d-flex justify-content-end mt-3 mb-4">
-    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="!rows.length || !canSave || savingInProgress">Save</button>
+    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="!rows.length || !canSave || hasNciDirectorNoteErrors || savingInProgress">Save</button>
   </div>
 </div>

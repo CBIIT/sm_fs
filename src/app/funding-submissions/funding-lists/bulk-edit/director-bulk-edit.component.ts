@@ -60,12 +60,14 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
   private lastSavedRows: DirectorBulkGrantRow[] = [];
+  private readonly nciDirectorNoteErrorMessage = 'NCI Director Note is required';
+  private nciDirectorNoteErrorRowIds = new Set<number>();
   private pendingRealignFrame: number | null = null;
   private selectedApplIds = new Set<number>();
 
   decisionOptions: Select2OptionData[] = [
     { id: 'Approve', text: 'Approve' },
-    { id: 'Hold', text: 'On Hold' },
+    { id: 'Hold', text: 'Hold' },
     { id: 'Rejected', text: 'Reject' }
   ];
 
@@ -163,17 +165,36 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
           data: 'nciDecision',
           width: '150px',
           defaultContent: '',
-          ngTemplateRef: { ref: this.nciDecisionRenderer }
+          ngTemplateRef: { ref: this.nciDecisionRenderer },
+          render: (data: string | null, type: string) => {
+            if (type === 'export') {
+              return this.decisionOptions.find(option => option.id === data)?.text ?? (data || '');
+            }
+            return data;
+          }
         },
         {
-          title: 'NCI Notes',
+          title: 'NCI Director Notes',
           data: 'nciDirectorNotes',
           width: '270px',
           defaultContent: '',
           ngTemplateRef: { ref: this.nciNotesRenderer }
         }
       ],
-      dom: '<"dt-controls dt-top"l<"ms-3"i><"ms-auto"<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
+      dom: '<"dt-controls dt-top"l<"ms-3"i><"ms-auto"B<"d-inline-block"p>>>rt<"dt-controls"<"me-auto"i>p>',
+      buttons: [
+        {
+          extend: 'excel',
+          className: 'btn-excel btn-export-all',
+          titleAttr: 'Export',
+          text: 'Export',
+          title: null,
+          header: true,
+          exportOptions: {
+            orthogonal: 'export'
+          }
+        }
+      ],
       rowCallback: (row: Node) => {
         this.dtOptions.columns.forEach((column: any, index: number) => {
           if (column.ngTemplateRef) {
@@ -185,6 +206,14 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
         });
       },
       drawCallback: () => {
+        this.dtElement?.dtInstance?.then((dt: DataTables.Api) => {
+          const exportButton = (dt as any).button('.btn-export-all');
+          if (dt.rows({ search: 'applied' }).count() > 0) {
+            exportButton.enable();
+          } else {
+            exportButton.disable();
+          }
+        });
         setTimeout(() => {
           this.realignDataTableColumns();
         }, 0);
@@ -234,6 +263,18 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
     return this.selectionDate ? `Back to ${this.selectionDate}` : 'Back to Lists';
   }
 
+  get hasNciDirectorNoteErrors(): boolean {
+    return this.nciDirectorNoteErrorRowIds.size > 0;
+  }
+
+  hasNciDirectorNoteError(row: DirectorBulkGrantRow): boolean {
+    return this.nciDirectorNoteErrorRowIds.has(Number(row?.applId));
+  }
+
+  getNciDirectorNoteErrorMessage(): string {
+    return this.nciDirectorNoteErrorMessage;
+  }
+
   get hasAnyBulkFieldValue(): boolean {
     return !!(this.bulkDecision || String(this.bulkNotes || '').trim());
   }
@@ -256,6 +297,7 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
     this.saveSuccessMessage = '';
     this.rows = JSON.parse(JSON.stringify(this.lastSavedRows));
     this.canSave = false;
+    this.updateNciDirectorNoteValidationErrors();
     this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
   }
 
@@ -286,7 +328,7 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   onSave(): void {
-    if (!this.canSave || this.savingInProgress) {
+    if (!this.canSave || this.savingInProgress || !this.updateNciDirectorNoteValidationErrors()) {
       return;
     }
 
@@ -314,7 +356,8 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
       next: () => {
         this.lastSavedRows = JSON.parse(JSON.stringify(this.rows));
         this.canSave = false;
-        this.saveSuccessMessage = 'Success! Bulk changes have been applied';
+        this.updateNciDirectorNoteValidationErrors();
+        this.saveSuccessMessage = 'Success! Bulk changes have been saved';
         this.savingInProgress = false;
       },
       error: (err) => {
@@ -368,22 +411,37 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   private recomputeCanSave(): void {
-    this.canSave = this.rows.some(row => {
-      const savedRow = this.lastSavedRows.find(item => item.applId === row.applId);
-      if (!savedRow) {
-        return true;
+    this.canSave = this.rows.some(row => this.isRowChanged(row));
+    this.updateNciDirectorNoteValidationErrors();
+  }
+
+  private isRowChanged(row: DirectorBulkGrantRow): boolean {
+    const savedRow = this.lastSavedRows.find(item => item.applId === row.applId);
+    if (!savedRow) {
+      return true;
+    }
+    return row.nciDecision !== savedRow.nciDecision || row.nciDirectorNotes !== savedRow.nciDirectorNotes;
+  }
+
+  private updateNciDirectorNoteValidationErrors(): boolean {
+    this.nciDirectorNoteErrorRowIds.clear();
+    this.rows.forEach(row => {
+      if (!this.isRowChanged(row)) return;
+      const requiresNote = row.nciDecision === 'Hold' || row.nciDecision === 'Rejected';
+      if (requiresNote && !String(row.nciDirectorNotes || '').trim()) {
+        this.nciDirectorNoteErrorRowIds.add(Number(row.applId));
       }
-      return row.nciDecision !== savedRow.nciDecision || row.nciDirectorNotes !== savedRow.nciDirectorNotes;
     });
+    return this.nciDirectorNoteErrorRowIds.size === 0;
   }
 
   private extractLastName(piName: string): string {
     const trimmed = String(piName || '').trim();
-    if (!trimmed) {
-      return '';
+    if (trimmed.includes(',')) {
+      return trimmed.split(',')[0].trim();
     }
-    const parts = trimmed.split(/[\s,]+/).filter(Boolean);
-    return parts.length ? parts[0] : trimmed;
+    const parts = trimmed.split(/\s+/);
+    return parts.length ? parts[parts.length - 1] : trimmed;
   }
 
   private mapSelectedGrants(grants: any[]): DirectorBulkGrantRow[] {
@@ -482,6 +540,7 @@ export class DirectorBulkEditComponent implements OnInit, AfterViewInit, OnDestr
     this.rows = rows;
     this.lastSavedRows = JSON.parse(JSON.stringify(rows));
     this.canSave = false;
+    this.updateNciDirectorNoteValidationErrors();
     this.dtElement?.dtInstance?.then(dt => dt.ajax.reload());
   }
 }
