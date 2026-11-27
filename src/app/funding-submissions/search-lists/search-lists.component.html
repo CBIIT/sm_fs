@@ -206,9 +206,12 @@
     </div>
 
     <!-- Grants in the List -->
-    <div class="card mb-3">
-        <div class="card-body">
-            <h5 class="card-title fw-bold my-3">Grants in the List</h5>
+    <div class="mb-3">
+        <div class="">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="h3 mb-0 me-3 flex-shrink-0">Grants in the List</h5>
+            <hr class="flex-grow-1" aria-hidden="true">
+            </div>
             <div *ngIf="isNciDirector" class="btn-group mb-3" role="tablist" aria-label="NCI grant review categories">
                 <button *ngFor="let tab of nciTabs" type="button" class="btn"
                     [class.btn-primary]="selectedNciTab === tab.id"
