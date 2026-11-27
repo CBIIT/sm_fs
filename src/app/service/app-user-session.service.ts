@@ -174,4 +174,12 @@ export class AppUserSessionService {
     return false; 
   }
 
+  get isFundingSubmissionsOgaLeadershipView(): boolean {
+  return this.hasRole(roleNames.GM_LEADERSHIP)
+    && !this.hasRole(roleNames.NCI_DIRECTOR)
+    && !this.hasRole(roleNames.OEFIA_CERTIFIER)
+    && !this.hasRole(roleNames.FINANCIAL_ANALYST)
+    && !this.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+}
+
 }

@@ -275,6 +275,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  get isOgaLeadershipView(): boolean {
+    return this.userSessionService.isFundingSubmissionsOgaLeadershipView;
+  }
   get budgetCategoryStatus(): 'loading' | 'ready' | 'error' {
     return this.grantBudgetOptions.state(this.data?.applId)?.status ?? 'error';
   }
@@ -1064,6 +1067,9 @@ export class GrantDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   get canEnterEditMode(): boolean {
     if (!this.data || this.data.lockedDate) return false;
+    if (this.isOgaLeadershipView) {
+      return false;
+    }
     if (this.nciDirector) {
       return this.getGrantReviewStatusCode() === 'DIRECTORREVIEW';
     }

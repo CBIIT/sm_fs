@@ -108,11 +108,7 @@ export class FundingListsSearchComponent implements OnInit, AfterViewInit, OnDes
   }
 
   get isOgaLeadershipView(): boolean {
-    return this.userSessionService.hasRole(roleNames.GM_LEADERSHIP)
-      && !this.userSessionService.hasRole(roleNames.NCI_DIRECTOR)
-      && !this.userSessionService.hasRole(roleNames.OEFIA_CERTIFIER)
-      && !this.userSessionService.hasRole(roleNames.FINANCIAL_ANALYST)
-      && !this.userSessionService.hasRole(roleNames.DOC_FUNDING_LIST_COR);
+      return this.userSessionService.isFundingSubmissionsOgaLeadershipView;
   }
 
   private normalizeSearchCriteriaForAudience(
