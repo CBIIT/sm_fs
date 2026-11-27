@@ -5,13 +5,9 @@
 
   <h1 class="mt-4 mb-4">Bulk Decision</h1>
 
-  <div class="row" *ngIf="saveSuccessMessage.length > 0">
-    <div class="col-12">
-      <ngb-alert type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
-        <span><b>{{saveSuccessMessage}}</b></span>
-      </ngb-alert>
-    </div>
-  </div>
+  <ngb-alert *ngIf="saveSuccessMessage.length > 0" type="success" [dismissible]="true" (closed)="saveSuccessMessage = ''">
+    <span><b>{{saveSuccessMessage}}</b></span>
+  </ngb-alert>
 
   <div class="row" *ngIf="loadErrorMessage.length > 0">
     <div class="col-12">
@@ -31,7 +27,7 @@
         [data]="decisionOptions"
         [allowClear]="true"
         width="100%"
-        placeholder="NCI Decision Placeholder">
+        placeholder="Select NCI Decision">
       </ng-select2>
     </div>
 
@@ -42,7 +38,7 @@
         class="form-control"
         rows="5"
         maxlength="1000"
-        placeholder="Enter NCI Director Notes here..."
+        placeholder=""
         [(ngModel)]="bulkNotes"></textarea>
       <div class="text-end text-muted small">{{ (bulkNotes || '').length }}/1000</div>
     </div>
@@ -85,10 +81,13 @@
         [(ngModel)]="data.nciDirectorNotes"
         (ngModelChange)="onRowChange()"></textarea>
       <div class="text-end small text-muted">{{ (data.nciDirectorNotes || '').length }}/1000</div>
+      <div *ngIf="hasNciDirectorNoteError(data)" class="text-danger small mt-1">
+        {{ getNciDirectorNoteErrorMessage() }}
+      </div>
     </div>
   </ng-template>
 
   <div class="d-flex justify-content-end mt-3 mb-4">
-    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="!rows.length || !canSave || savingInProgress">Save</button>
+    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="!rows.length || !canSave || hasNciDirectorNoteErrors || savingInProgress">Save</button>
   </div>
 </div>
