@@ -121,7 +121,7 @@ export class ProgramRecommendedCostsComponent implements OnInit, OnDestroy, Afte
   get currentGrantYear(): number {
     if (!!this.requestModel?.programRecommendedCostsModel?.grantAwarded) {
       if (this.isPayType4) {
-        return this.requestModel.programRecommendedCostsModel.grantAwarded.find(g => {return g.year >= this.requestModel.grant.supportYear;})?.year;
+        return this.requestModel.programRecommendedCostsModel.grantAwarded.find(g => {return g.year >= this.requestModel?.grant?.supportYear;})?.year;
       }
       else {
         return this.requestModel.programRecommendedCostsModel.grantAwarded[0].year;
